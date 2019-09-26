@@ -5,6 +5,8 @@
 ' 作成者 JOT渡部
 ' 更新車 JOT渡部
 '
+' 修正履歴:
+'         :
 ''************************************************************
 Imports System.Data.SqlClient
 Imports OFFICE.GRIS0005LeftBox

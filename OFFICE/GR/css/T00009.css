@@ -1,0 +1,112 @@
+﻿
+
+#detailkeybox {
+    top:0em;
+    margin-left:0.7em;
+    margin-right:0.78em;
+    height:5%;
+    min-width:95%;
+}
+
+#detailkeybox p {
+    margin:0em 0em 0em 0em;
+    height:0em;
+    top:0.2em;
+    left:0em;
+}
+
+#divListArea {
+    height:90%;
+    min-width:95%;
+}
+
+#pnlListArea {
+    margin-left:0.7em;
+    margin-right:0.78em;
+    height:89%;
+}
+
+#pnlListTotalArea {
+    margin-left:0.7em;
+    margin-right:0.78em;
+    height:11%;
+}
+
+/* 調整画面 */
+#divAdjustArea {
+    height:93%;
+    margin-left:0.7em;
+    margin-right:0.78em;
+    background-color:rgb(220,230,240);
+}
+
+#tblAdjustArea {
+    position:relative;
+    top:2em;
+    left:2.5em;
+}
+
+#tblAdjustArea tr {
+    position:relative;
+}
+
+#tblAdjustArea td {
+    position:relative;
+    padding:0em 0em 0em 0.5em;
+    width:5em;
+}
+
+/* 左(固定データテーブル用)DIV */
+div[data-generated="1"] div[id$="_FL"] {
+    left:0px;
+    top:0px;
+    position:absolute;
+}
+
+/* 右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_FR"] {
+    right:0px;
+    top:0px;
+    bottom:0px;
+    overflow:hidden;
+    position:absolute;
+}
+
+div[data-generated="1"] div[id$="_FL"] table,
+div[data-generated="1"] div[id$="_FR"] table {
+    border:1px solid white;
+    border-image:none;
+    width:100%;
+    height:24px;
+    border-collapse:collapse;
+    table-layout:fixed;
+    word-wrap:break-word;
+    font-size:1.2rem;
+}
+
+/* データ行スタイル */
+div[data-generated="1"] div[id$="_FL"] table tr,
+div[data-generated="1"] div[id$="_FR"] table tr {
+    background-color:white;
+    color:black;
+}
+
+/* データ行(偶数) */
+div[data-generated="1"] div[id$="_FL"] table tr:nth-child(even),
+div[data-generated="1"] div[id$="_FR"] table tr:nth-child(even) {
+    background-color:#ADD8E6;
+}
+
+div [data-generated="1"][data-scrolltype="1"] div[id$="_FL"] {
+    bottom:0px;
+}
+
+div [data-generated="1"][data-scrolltype="1"] div[id$="_FR"] {
+    right:16px;
+}
+
+#pnlListTotalArea th,
+#pnlListTotalArea td {
+    white-space:nowrap;     /* 折り返させない */
+    text-overflow:ellipsis; /* 領域越を点々表示 */
+}

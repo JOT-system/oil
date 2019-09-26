@@ -1,0 +1,40 @@
+﻿.logonbox {
+    top:2.4em;
+    bottom:1.4em;
+    width:100%;
+    position:fixed;
+    left:0em;
+    background-color: rgb(220,230,240);
+}
+
+.Operation {
+    top: 2em;
+    left: 50em;
+    position:relative;
+    z-index:20;
+}
+.logonkeybox {
+    top: 0em;
+    left: 8em;
+    position:relative;
+}
+.logonkeybox p {
+    margin-bottom:1em;
+}
+.logonkeybox span{
+    min-width: 8em;
+    position:relative;
+}
+.guidancebox {
+    left:7em;
+    width:67em;
+    height: 28em;
+    background-color:white;
+    border:inset;
+    overflow-y:scroll;
+    border-color:black
+}
+.guidancebox span {
+    color:red;
+    background-color:white;
+}

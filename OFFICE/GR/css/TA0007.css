@@ -1,0 +1,30 @@
+﻿/* ------------------------------
+    個別スタイル定義
+ ------------------------------ */
+
+#headerbox::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.Operation a:first-child {
+    left: 3em;
+    min-width:15em;
+    margin-right: 7em;
+}
+.Operation a:nth-child(2) {
+    min-width:15em;
+    margin-right: 25em;
+}
+
+
+#divListArea {
+    top: 0.5em;
+    left: 0.5em;
+    min-width: 1100px;
+/* float: left;*/
+}
+#detailbox {
+    display:none;
+}

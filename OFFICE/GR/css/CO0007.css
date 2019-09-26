@@ -1,0 +1,31 @@
+﻿
+#detailbox {
+    background-color:rgb(210,192,188)
+}
+
+#detailbuttonbox a {
+    left:60em;
+}
+
+#KEY_LINE_2 a:nth-child(2) {
+    left:0.6em;
+}
+
+#KEY_LINE_3 a:nth-child(2) {
+    left:0.6em;
+}
+
+#KEY_LINE_4 a:nth-child(2) {
+    left:1em;
+}
+
+.WF_Repeater {
+    position: fixed;
+    top: 10.8em;
+    bottom: 2.0em;
+    left: 3em;
+    width: 76.3em;
+    overflow: auto;
+    background-color: white;
+    table-layout: fixed;
+}

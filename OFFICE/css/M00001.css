@@ -1,0 +1,108 @@
+﻿/* ------------------------------
+ 凡例
+------------------------------ */
+
+/*
+h1 { color: red; }			--> h1要素に対して指定 
+h1, h2 { color: red; }		-->  h1 と h2要素に対して指定 
+ul li { color: red; }		-->  <ul>～</ul> の中にある li要素に対して指定 
+.sample { color: red; }		-->  class="sample" を持つ要素に対して指定 
+#sample { color: red; }		-->  id="sample" を持つ要素に対して指定 
+h1.sample { color: red; }	-->  class="sample" を持つ div要素に対して指定 
+a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して指定 
+*/
+
+/* ------------------------------
+ 擬似フレーム　スタイル定義
+------------------------------ */
+
+    #Menuheaderbox {
+        width:auto; 
+        top:2.4em;
+        bottom:1.4em;
+        position:fixed;
+        left:0px; 
+        right:0px; 
+
+        overflow:hidden;
+       	background-color: rgb(220,230,240); 
+    }
+        
+    #Menu_L{
+        height:auto; 
+        width:33em;
+
+        position:fixed;
+        margin: 5px 0px 0px 0px;
+        left:7em;
+        overflow-y:auto;
+}
+
+    #Menu_R{
+        height:auto; 
+        width:33em;
+
+        position:fixed;
+        margin: 5px 0px 0px 0px;
+        left:41em;
+        overflow-y:auto;
+    }
+
+
+    .WF_MenuLabel_L{
+        height:2em;
+        width:30em;
+
+        position:relative;
+        left:0em;
+        overflow:hidden;
+
+        color:black;
+        font-weight:bold;
+        vertical-align:middle;
+        text-align:left;
+    }
+
+    .WF_MenuButton_L{
+        height:2em;
+        width:30em;
+         
+        position:relative;
+        left:2em;
+        overflow:hidden;
+
+        color:black;
+        border:none;
+        background-color:gray;
+        vertical-align:middle;
+        text-align:left;
+    }
+
+    .WF_MenuLabel_R{
+        height:2em;
+        width:30em;
+
+        position:relative;
+        left:0em;
+        overflow:hidden;
+
+        color:black;
+        font-weight:bold;
+        vertical-align:middle;
+        text-align:left;
+    }
+
+    .WF_MenuButton_R{
+        height:2em;
+        width:30em;
+
+        position:relative;
+        left:2em;
+        overflow:hidden;
+
+        color:black;
+        border:none;
+        background-color:gray;
+        vertical-align:middle;
+        text-align:left;
+    }

@@ -1,0 +1,28 @@
+﻿/* ------------------------------
+    個別スタイル定義
+ ------------------------------ */
+
+
+#headerbox::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.Operation a:nth-child(2){
+    margin-left:3em;
+    margin-right:20em;
+}
+
+.leftMenubox {
+    top: 0.5em;
+    left:1em;
+    float:left;
+}
+#divListArea {
+    top: 0.5em;
+    left: 12.69em;
+    width: 85.1%;
+    min-width: 85%;
+    /*float: left;*/
+}

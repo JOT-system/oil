@@ -1,0 +1,22 @@
+﻿
+.DATE_TREE {
+    position:fixed;
+    top:6.7em;
+    bottom:25px;
+    left:4em;
+    width:14em;
+    overflow-y:auto;
+}
+
+.WF_Repeater {
+    position:fixed;
+    bottom:4%;
+    left:20em;
+    width:46em;
+    height:80%;
+    border:solid;
+    border-width:1px;
+    overflow:auto;
+    background-color:white;
+    table-layout:fixed;
+}

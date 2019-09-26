@@ -1,0 +1,26 @@
+﻿/* ------------------------------
+    個別スタイル定義
+ ------------------------------ */
+#RF_ERR_MEMO {
+    display:none;
+}
+#headerbox::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.Operation {
+    left: 58em;
+    top:0.4em;
+}
+.leftMenubox {
+    left:1em;
+    float:left;
+}
+#divListArea {
+    left: 12.05em;
+    width: 85.6%;
+    min-width: 85%;
+    /*float: left;*/
+}
+

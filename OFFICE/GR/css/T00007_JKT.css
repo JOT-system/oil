@@ -1,0 +1,24 @@
+﻿#headerbox {
+    height:100%;
+}
+
+#detailbox {
+    top:17.0em;
+}
+
+#pnlListArea {
+    margin-left:0.7em;
+    margin-right:0.78em;
+
+}
+
+div[data-generated='1'] th,
+div[data-generated='1'] td {
+    height: 16.5px !important;
+    font-size: 11px !important;
+    word-wrap: break-word;
+}
+
+#detailbox {
+    background-color: rgb(220, 230, 240) !important;
+}

@@ -1,0 +1,45 @@
+﻿.Operation {
+    z-index:20;
+    left:50.0em;
+}
+#headerbox {
+    height: calc(-21.2em + 100%);
+}
+p[id^="LINE"] a {
+    min-width: 12em;
+    position:relative;
+}
+
+p[id^="LINE"]  a:nth-child(1){
+    margin-left:3em;
+}
+
+#divListArea {
+   top: 4.1em;
+   height:calc(-6.5em + 100%); 
+}
+#detailbox {
+    top: calc(-18.8em + 100%);
+}
+#detailkeybox {
+    top:-0.6em;
+}
+#detailkeybox a{
+    width:32em;
+}
+#detailbuttonbox {
+    left: 60.5em;
+}
+#detailbuttonbox a {
+    left: 0em;
+}
+div[data-generated="1"] td,		
+div[data-generated="1"] th {
+    height:2.0rem;
+    font-size:1.2rem;
+}
+
+span[class^="WF_DViewRep"][class$="_Area"] {
+    height:14.5em;
+}
+

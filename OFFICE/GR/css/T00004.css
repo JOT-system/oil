@@ -1,0 +1,140 @@
+﻿/* ------------------------------
+    個別スタイル定義
+ ------------------------------ */
+
+/* 一覧　*/
+.Operation {
+    margin-left: 1em;
+}
+#detailbox {
+    background-color: rgb(210, 192, 188);
+}
+
+#detailbuttonbox a {
+    left:58em;
+}
+#detailkeybox {
+}
+[class*=WF_TEXT]{
+    font-size:small;
+}
+
+
+div[data-generated="1"] td,		
+div[data-generated="1"] th {
+    height:1.6em;
+    border-top-style : none;
+    border-bottom-style : none;
+}
+
+span[class^="WF_DViewRep"][class$="_Area"] {
+    top: 19.0em;
+    bottom: 2.0em;
+    left: 1.5em;
+    right: 1.5em;
+    font-size: small;
+    table-layout: fixed;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-width: 184em;
+}
+/* 詳細一覧表内のテキストボックス */
+span[class^="WF_DViewRep"] table input[type=text] {
+    width: 12rem;
+    height: 1.0em ;
+    visibility:hidden;
+}
+/* 詳細一覧表内の項目名称 */
+span[class^="WF_DViewRep"] table td:nth-child(2) span,
+span[class^="WF_DViewRep"] table td:nth-child(9) span,
+span[class^="WF_DViewRep"] table td:nth-child(16) span,
+span[class^="WF_DViewRep"] table td:nth-child(23) span,
+span[class^="WF_DViewRep"] table td:nth-child(30) span,
+span[class^="WF_DViewRep"] table td:nth-child(37) span{
+    width:10rem;
+    display:inline-block;
+}
+/* 詳細一覧表内の必須記号 */
+span[class^="WF_DViewRep"] table td:nth-child(3) span,
+span[class^="WF_DViewRep"] table td:nth-child(10) span,
+span[class^="WF_DViewRep"] table td:nth-child(17) span,
+span[class^="WF_DViewRep"] table td:nth-child(24) span,
+span[class^="WF_DViewRep"] table td:nth-child(31) span,
+span[class^="WF_DViewRep"] table td:nth-child(38) span{
+    width:0.5rem;
+    display:inline-block;
+}
+/* 詳細一覧表内の項目（非表示） */
+span[class^="WF_DViewRep"] table td:nth-child(4),
+span[class^="WF_DViewRep"] table td:nth-child(11),
+span[class^="WF_DViewRep"] table td:nth-child(18),
+span[class^="WF_DViewRep"] table td:nth-child(25),
+span[class^="WF_DViewRep"] table td:nth-child(32),
+span[class^="WF_DViewRep"] table td:nth-child(39){
+    display: none;
+}
+/* 詳細一覧表内の項目（空白） */
+span[class^="WF_DViewRep"] table td:nth-child(6) span,
+span[class^="WF_DViewRep"] table td:nth-child(13) span,
+span[class^="WF_DViewRep"] table td:nth-child(20) span,
+span[class^="WF_DViewRep"] table td:nth-child(27) span,
+span[class^="WF_DViewRep"] table td:nth-child(34) span,
+span[class^="WF_DViewRep"] table td:nth-child(41) span{
+    width:1px;
+    display:inline-block;
+}
+/* 詳細一覧表内の項目（値名称） */
+span[class^="WF_DViewRep"] table td:nth-child(7) span,
+span[class^="WF_DViewRep"] table td:nth-child(14) span,
+span[class^="WF_DViewRep"] table td:nth-child(21) span,
+span[class^="WF_DViewRep"] table td:nth-child(28) span,
+span[class^="WF_DViewRep"] table td:nth-child(35) span,
+span[class^="WF_DViewRep"] table td:nth-child(42) span{
+    width: 15rem;
+    display: inline-block;
+    color:blue;
+}
+/* 詳細一覧表内の項目（空白） */
+span[class^="WF_DViewRep"] table td:nth-child(8) span,
+span[class^="WF_DViewRep"] table td:nth-child(15) span,
+span[class^="WF_DViewRep"] table td:nth-child(22) span,
+span[class^="WF_DViewRep"] table td:nth-child(29) span,
+span[class^="WF_DViewRep"] table td:nth-child(36) span,
+span[class^="WF_DViewRep"] table td:nth-child(43) span{
+    width:0.5rem;
+    display:inline-block;
+}
+
+span[class^="WF_DViewRep"] table {
+    margin:0.00em 0em 0em 1.3em;
+}
+span[class^="WF_DViewRep"] table td {
+    padding:0px;
+    padding-top:0px;
+    padding-bottom:0px;
+}
+/* 独自左ボックス */
+#leftbox {
+    position: fixed;
+    top: 2.5em;
+    bottom: 1.4em;
+    left: 0em;
+    width: 0em;
+    overflow: hidden;
+    background-color: gray;
+    z-index: 20;
+}
+
+/* Table領域 */
+.WF_TableArea{
+    position:fixed;
+    top:6em;
+    bottom:2em;
+    left:1.5em;
+    overflow-x:hidden;
+    overflow-y:auto;
+    color:black;
+    z-index:30;
+    border: 1px black;
+    background-color:white;
+}

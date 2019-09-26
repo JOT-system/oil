@@ -1,0 +1,32 @@
+﻿/* ------------------------------
+    個別スタイル定義
+ ------------------------------ */
+#searchbuttonbox {
+    height: 2em;
+    left: 62.5em;
+    top:0.8em;
+    position:absolute;
+}
+#searchkeybox{
+    left:4em;
+    top:1.7em;
+    position:absolute;
+}
+
+#searchkeybox p{
+    margin : 0.5em 0px 0.5em 0px; 
+    position:relative ;
+    left:4em;
+}
+
+#searchkeybox a{
+    position:relative ;
+    min-width:9em;
+    max-width : 16em;
+    display:inline-block;
+}
+
+p[class^='LINE'] a:nth-child(1)  {
+    font-weight:bold;
+    text-decoration:underline;
+}

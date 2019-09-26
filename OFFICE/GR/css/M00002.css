@@ -1,0 +1,49 @@
+﻿
+/* ------------------------------
+    擬似フレーム　スタイル定義
+------------------------------ */
+#KEY_LINE_2 a:nth-child(2) {
+    left:3.8em;
+}
+
+#KEY_LINE_3 a:nth-child(2) {
+    left:4.2em;
+}
+
+/* (固定ヘッダーテーブル用)DIV */
+div[data-generated="1"] div[id$="_HL"],
+div[data-generated="1"] div[id$="_HR"] {
+    height:72px;
+}
+
+/* (固定データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"],
+div[data-generated="1"] div[id$="_DR"] {
+    top:74px;
+}
+
+div[data-generated="1"] div[id$="_HL"] table,
+div[data-generated="1"] div[id$="_HR"] table {
+    height:72px;
+}
+
+/* セルの設定(共通) */
+div[data-generated="1"] div[id$="_DL"] td,
+div[data-generated="1"] div[id$="_DL"] th,
+div[data-generated="1"] div[id$="_DR"] td,
+div[data-generated="1"] div[id$="_DR"] th {
+    height:1.6em;
+}
+
+
+/* 実行画面 ヘッダー部 */
+.headerbox {
+    height: calc(-2.4em - 16.8em - 1.4em + 100%);
+}
+/* 実行画面 明細部 */
+.detailbox {
+    top: calc(-1.4em - 16.8em + 100%);
+}
+span[class^="WF_DViewRep"][class$="_Area"] {
+    height: 10.8em;
+}

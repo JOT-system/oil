@@ -1,0 +1,25 @@
+﻿/* ------------------------------
+         擬似フレーム　スタイル定義
+------------------------------ */
+#Menuheaderbox {
+    width:auto; 
+    position:fixed;
+    top:2.4em;
+    bottom: 1.4em;
+    left:0px; 
+    right:0px; 
+    overflow:hidden;
+    background-color: rgb(220,230,240); 
+}
+
+    .WF_Guidance{
+        position:fixed;
+        top:10.5em;
+        left:12em;
+        height:18em;
+        width:67em;
+        background-color:white;
+        overflow:hidden;
+        border:inset;
+
+    }

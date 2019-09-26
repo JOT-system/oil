@@ -1,0 +1,1741 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>
+    </SchemaVersion>
+    <ProjectGuid>{4773EF56-9D2B-4E80-A7CE-FDC792FBC058}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>OFFICE</RootNamespace>
+    <AssemblyName>OFFICE</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MyType>Custom</MyType>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>OFFICE.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>OFFICE.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BASEDLL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\COMLIB\BASEDLL\BASEDLL\obj\BASEDLL.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="BASEDLL" />
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="OFFICE" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Collections.Specialized" />
+    <Import Include="System.Configuration" />
+    <Import Include="System.Text" />
+    <Import Include="System.Text.RegularExpressions" />
+    <Import Include="System.Web" />
+    <Import Include="System.Web.Caching" />
+    <Import Include="System.Web.SessionState" />
+    <Import Include="System.Web.Security" />
+    <Import Include="System.Web.Profile" />
+    <Import Include="System.Web.UI" />
+    <Import Include="System.Web.UI.WebControls" />
+    <Import Include="System.Web.UI.WebControls.WebParts" />
+    <Import Include="System.Web.UI.HtmlControls" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\BASEDLL.dll" />
+    <Content Include="bin\BASEDLL.pdb" />
+    <Content Include="bin\BASEDLL.xml" />
+    <Content Include="bin\OFFICE.dll" />
+    <Content Include="bin\OFFICE.pdb" />
+    <Content Include="bin\OFFICE.xml" />
+    <Content Include="css\common.css" />
+    <Content Include="css\M00001.css" />
+    <Content Include="css\M00000.css" />
+    <Content Include="css\MB0006.css" />
+    <Content Include="GR\css\CO0004.css" />
+    <Content Include="GR\css\CO0004S.css" />
+    <Content Include="GR\css\CO0007.css" />
+    <Content Include="GR\css\CO0007S.css" />
+    <Content Include="GR\css\CO0008.css" />
+    <Content Include="GR\css\CO0008S.css" />
+    <Content Include="GR\css\CO0010.css" />
+    <Content Include="GR\css\CO0010S.css" />
+    <Content Include="GR\css\CO0011.css" />
+    <Content Include="GR\css\CO0011S.css" />
+    <Content Include="GR\css\CO0012.css" />
+    <Content Include="GR\css\CO0012S.css" />
+    <Content Include="GR\css\CO0014.css" />
+    <Content Include="GR\css\CO0102.css" />
+    <Content Include="GR\css\CO0102S.css" />
+    <Content Include="GR\css\CO0105.css" />
+    <Content Include="GR\css\CO0106.css" />
+    <Content Include="GR\css\CO0108.css" />
+    <Content Include="GR\css\M00002S.css" />
+    <Content Include="GR\css\M00006.css" />
+    <Content Include="GR\css\M00006S.css" />
+    <Content Include="GR\css\MA0006.css" />
+    <Content Include="GR\css\MA0006S.css" />
+    <Content Include="GR\css\MB0002.css" />
+    <Content Include="GR\css\MB0002S.css" />
+    <Content Include="GR\css\MB0003S.css" />
+    <Content Include="GR\css\MB0004S.css" />
+    <Content Include="GR\css\MB0005S.css" />
+    <Content Include="GR\css\MC0001S.css" />
+    <Content Include="GR\css\MC0002S.css" />
+    <Content Include="GR\css\MC0003.css" />
+    <Content Include="GR\css\MC0003S.css" />
+    <Content Include="GR\css\MC0006S.css" />
+    <Content Include="GR\css\MC0006_JC.css" />
+    <Content Include="GR\css\MC0007.css" />
+    <Content Include="GR\css\MC0012.css" />
+    <Content Include="GR\css\MC0012S.css" />
+    <Content Include="GR\css\MD0002.css" />
+    <Content Include="GR\css\MD0002S.css" />
+    <Content Include="GR\css\T00004.css" />
+    <Content Include="GR\css\T00004S.css" />
+    <Content Include="GR\css\T00006.css" />
+    <Content Include="GR\css\T00006S.css" />
+    <Content Include="GR\css\T00007.css" />
+    <Content Include="GR\css\T00007I.css" />
+    <Content Include="GR\css\T00007I_JKT.css" />
+    <Content Include="GR\css\T00007I_KNK.css" />
+    <Content Include="GR\css\T00007I_NJS.css" />
+    <Content Include="GR\css\T00007S.css" />
+    <Content Include="GR\css\T00007_JKT.css" />
+    <Content Include="GR\css\T00007_KNK.css" />
+    <Content Include="GR\css\T00007_NJS.css" />
+    <Content Include="GR\css\T00008.css" />
+    <Content Include="GR\css\T00008S.css" />
+    <Content Include="GR\css\T00009.css" />
+    <Content Include="GR\css\T00009S.css" />
+    <Content Include="GR\css\T00011.css" />
+    <Content Include="GR\css\T00011S.css" />
+    <Content Include="GR\css\TA0001.css" />
+    <Content Include="GR\css\TA0002.css" />
+    <Content Include="GR\css\TA0002S.css" />
+    <Content Include="GR\css\TA0003.css" />
+    <Content Include="GR\css\TA0003S.css" />
+    <Content Include="GR\css\TA0006.css" />
+    <Content Include="GR\css\TA0007.css" />
+    <Content Include="GR\css\TA0007S.css" />
+    <Content Include="GR\css\TA0009.css" />
+    <Content Include="GR\css\TA0005.css" />
+    <Content Include="GR\css\TA0004.css" />
+    <Content Include="GR\css\T00005I.css" />
+    <Content Include="GR\css\TA0001S.css" />
+    <Content Include="GR\css\TA0006S.css" />
+    <Content Include="GR\css\TA0009S.css" />
+    <Content Include="GR\css\TA0005S.css" />
+    <Content Include="GR\css\TA0004S.css" />
+    <Content Include="GR\css\T00005S.css" />
+    <Content Include="GR\css\T00005.css" />
+    <Content Include="GR\css\T00010.css" />
+    <Content Include="GR\css\T00010S.css" />
+    <Content Include="GR\GRCO0004SELECT.aspx" />
+    <Content Include="GR\GRCO0004USER.aspx" />
+    <Content Include="GR\GRCO0007PROFMVARI.aspx" />
+    <Content Include="GR\GRCO0007SELECT.aspx" />
+    <Content Include="GR\GRCO0008PROFMMAP.aspx" />
+    <Content Include="GR\GRCO0008SELECT.aspx" />
+    <Content Include="GR\css\CO0015.css" />
+    <Content Include="GR\GRCO0010PROFMVIEW.aspx" />
+    <Content Include="GR\GRCO0010SELECT.aspx" />
+    <Content Include="GR\GRCO0011PROFMXLS.aspx" />
+    <Content Include="GR\GRCO0011SELECT.aspx" />
+    <Content Include="GR\GRCO0012SELECT.aspx" />
+    <Content Include="GR\GRCO0012SRVAUTHOR.aspx" />
+    <Content Include="GR\GRCO0015ONLINESTAT.aspx" />
+    <Content Include="GR\css\M00002.css" />
+    <Content Include="GR\css\MA0004.css" />
+    <Content Include="GR\css\MA0003.css" />
+    <Content Include="GR\css\MA0004S.css" />
+    <Content Include="GR\css\MA0003S.css" />
+    <Content Include="GR\css\MB0001.css" />
+    <Content Include="GR\css\MB0001S.css" />
+    <Content Include="GR\css\MB0003.css" />
+    <Content Include="GR\css\MB0004.css" />
+    <Content Include="GR\css\MB0005.css" />
+    <Content Include="GR\css\MB0007.css" />
+    <Content Include="GR\css\MB0007S.css" />
+    <Content Include="GR\css\MC0001.css" />
+    <Content Include="GR\css\MC0002.css" />
+    <Content Include="GR\css\MD0001.css" />
+    <Content Include="GR\css\MA0002.css" />
+    <Content Include="GR\css\MC0006.css" />
+    <Content Include="GR\css\MC0010.css" />
+    <Content Include="GR\css\MD0001S.css" />
+    <Content Include="GR\css\MA0002S.css" />
+    <Content Include="GR\css\MC0010S.css" />
+    <Content Include="GR\GRCO0014USERPASS.aspx" />
+    <Content Include="GR\GRCO0102SELECT.aspx" />
+    <Content Include="GR\GRCO0102XLSFORM.aspx" />
+    <Content Include="GR\GRCO0104XLSUPMULTI.ashx" />
+    <Content Include="GR\GRCO0105HELP.aspx" />
+    <Content Include="GR\GRCO0106LIBSEND.aspx" />
+    <Content Include="GR\GRCO0108CONFIRM.aspx" />
+    <Content Include="GR\GRM00002ORG.aspx" />
+    <Content Include="GR\GRM00002SELECT.aspx" />
+    <Content Include="GR\GRM00006SELECT.aspx" />
+    <Content Include="GR\GRM00006STRUCT.aspx" />
+    <Content Include="GR\GRMA0006SELECT.aspx" />
+    <Content Include="GR\GRMA0006SHABANORG.aspx" />
+    <Content Include="GR\GRMB0001SELECT.aspx" />
+    <Content Include="GR\GRMB0001STAFF.aspx" />
+    <Content Include="GR\GRMB0002SELECT.aspx" />
+    <Content Include="GR\GRMB0002STAFFORG.aspx" />
+    <Content Include="GR\GRMB0003HSTAFF.aspx" />
+    <Content Include="GR\GRMB0003SELECT.aspx" />
+    <Content Include="GR\GRMB0004SELECT.aspx" />
+    <Content Include="GR\GRMB0004WORKINGH.aspx" />
+    <Content Include="GR\GRMB0005CALENDAR.aspx" />
+    <Content Include="GR\GRMB0005SELECT.aspx" />
+    <Content Include="GR\GRMB0007SELECT.aspx" />
+    <Content Include="GR\GRMB0007STAFF.aspx" />
+    <Content Include="GR\GRMC0001FIXVALUE.aspx" />
+    <Content Include="GR\GRMC0001SELECT.aspx" />
+    <Content Include="GR\GRMC0002SELECT.aspx" />
+    <Content Include="GR\GRMC0002TORIHIKISAKI.aspx" />
+    <Content Include="GR\GRMC0003SELECT.aspx" />
+    <Content Include="GR\GRMC0003TORIORG.aspx" />
+    <Content Include="GR\GRMC0006SELECT.aspx" />
+    <Content Include="GR\GRMC0006SELECT_JC.aspx" />
+    <Content Include="GR\GRMC0006SELECT_R.aspx" />
+    <Content Include="GR\GRMC0006TODOKESAKI.aspx" />
+    <Content Include="GR\GRMC0006TODOKESAKI_JC.aspx" />
+    <Content Include="GR\GRMC0006TODOKESAKI_R.aspx" />
+    <Content Include="GR\GRMC0007SELECT.aspx" />
+    <Content Include="GR\GRMC0007TODKORG.aspx" />
+    <Content Include="GR\GRMC0010SELECT.aspx" />
+    <Content Include="GR\GRMC0010T3CNTL.aspx" />
+    <Content Include="GR\GRMC0012MODEL.aspx" />
+    <Content Include="GR\GRMC0012SELECT.aspx" />
+    <Content Include="GR\GRMD0002PRODORG.aspx" />
+    <Content Include="GR\GRMD0002SELECT.aspx" />
+    <Content Include="GR\GRT00004HORDER.aspx" />
+    <Content Include="GR\GRT00004SELECT.aspx" />
+    <Content Include="GR\GRT00005IMPORT.aspx" />
+    <Content Include="GR\GRT00005NIPPO.aspx" />
+    <Content Include="GR\GRT00005SELECT.aspx" />
+    <Content Include="GR\GRT00006EXPORT.aspx" />
+    <Content Include="GR\GRT00006SELECT.aspx" />
+    <Content Include="GR\GRT00007ICHIRAN.aspx" />
+    <Content Include="GR\GRT00007ICHIRAN_JKT.aspx" />
+    <Content Include="GR\GRT00007ICHIRAN_KNK.aspx" />
+    <Content Include="GR\GRT00007ICHIRAN_NJS.aspx" />
+    <Content Include="GR\GRT00007KINTAI.aspx" />
+    <Content Include="GR\GRT00007KINTAI_JKT.aspx" />
+    <Content Include="GR\GRT00007KINTAI_KNK.aspx" />
+    <Content Include="GR\GRT00007KINTAI_NJS.aspx" />
+    <Content Include="GR\GRT00007SELECT.aspx" />
+    <Content Include="GR\GRT00008KINTAISTAT.aspx" />
+    <Content Include="GR\GRT00008SELECT.aspx" />
+    <Content Include="GR\GRT00009JIMKINTAI.aspx" />
+    <Content Include="GR\GRT00009SELECT.aspx" />
+    <Content Include="GR\GRT00010APPROVE.aspx" />
+    <Content Include="GR\GRT00010SELECT.aspx" />
+    <Content Include="GR\GRT00011ACTUALQTY.aspx" />
+    <Content Include="GR\GRT00011SELECT.aspx" />
+    <Content Include="GR\GRTA0002KINTAILIST.aspx" />
+    <Content Include="GR\GRTA0002SELECT.aspx" />
+    <Content Include="GR\GRTA0003KYUYOLIST.aspx" />
+    <Content Include="GR\GRTA0003SELECT.aspx" />
+    <Content Include="GR\GRTA0006JIMKINTAILIST.aspx" />
+    <Content Include="GR\GRTA0007JIMKYUYOLIST.aspx" />
+    <Content Include="GR\GRTA0007SELECT.aspx" />
+    <Content Include="GR\GRTA0009LMKINTAICREW.aspx" />
+    <Content Include="GR\GRTA0009SELECT.aspx" />
+    <Content Include="GR\inc\GRCO0004WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0007WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0010WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0011WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0012WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0014WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0015WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0102WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0106WRKINC.ascx" />
+    <Content Include="GR\inc\GRM00002WRKINC.ascx" />
+    <Content Include="GR\inc\GRM00006WRKINC.ascx" />
+    <Content Include="GR\inc\GRMA0004WRKINC.ascx" />
+    <Content Include="GR\inc\GRMA0003WRKINC.ascx" />
+    <Content Include="GR\inc\GRMA0006WRKINC.ascx" />
+    <Content Include="GR\inc\GRMB0001WRKINC.ascx" />
+    <Content Include="GR\inc\GRMB0002WRKINC.ascx" />
+    <Content Include="GR\inc\GRMB0003WRKINC.ascx" />
+    <Content Include="GR\inc\GRMB0004WRKINC.ascx" />
+    <Content Include="GR\inc\GRMB0005WRKINC.ascx" />
+    <Content Include="GR\inc\GRMB0007WRKINC.ascx" />
+    <Content Include="GR\inc\GRMC0001WRKINC.ascx" />
+    <Content Include="GR\inc\GRMC0002WRKINC.ascx" />
+    <Content Include="GR\inc\GRMA0002WRKINC.ascx" />
+    <Content Include="GR\inc\GRMC0003WRKINC.ascx" />
+    <Content Include="GR\inc\GRMC0007WRKINC.ascx" />
+    <Content Include="GR\inc\GRMC0012WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00004WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00006WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00007WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00008WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00009WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00011WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0001WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0002WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0003WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0006WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0007WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0009WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0005WRKINC.ascx" />
+    <Content Include="GR\inc\GRTA0004WRKINC.ascx" />
+    <Content Include="GR\inc\GRMD0001WRKINC.ascx" />
+    <Content Include="GR\inc\GRMC0006WRKINC.ascx" />
+    <Content Include="GR\inc\GRCO0008WRKINC.ascx" />
+    <Content Include="GR\inc\GRMC0010WRKINC.ascx" />
+    <Content Include="GR\GRMD0001PRODUCT.aspx" />
+    <Content Include="GR\GRMD0001SELECT.aspx" />
+    <Content Include="GR\GRMA0002SELECT.aspx" />
+    <Content Include="GR\GRMA0002SHARYOA.aspx" />
+    <Content Include="GR\GRMA0003SELECT.aspx" />
+    <Content Include="GR\GRMA0003SHARYOB.aspx" />
+    <Content Include="GR\GRMA0004SELECT.aspx" />
+    <Content Include="GR\GRMA0004SHARYOC.aspx" />
+    <Content Include="GR\inc\GRMD0002WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00005WRKINC.ascx" />
+    <Content Include="GR\inc\GRT00010WRKINC.ascx" />
+    <Content Include="GR\script\CO0004.js" />
+    <Content Include="GR\script\CO0004S.js" />
+    <Content Include="GR\script\CO0007.js" />
+    <Content Include="GR\script\CO0007S.js" />
+    <Content Include="GR\script\CO0008.js" />
+    <Content Include="GR\script\CO0008S.js" />
+    <Content Include="GR\script\CO0010.js" />
+    <Content Include="GR\script\CO0010S.js" />
+    <Content Include="GR\script\CO0011.js" />
+    <Content Include="GR\script\CO0011S.js" />
+    <Content Include="GR\script\CO0012.js" />
+    <Content Include="GR\script\CO0012S.js" />
+    <Content Include="GR\script\CO0015.js" />
+    <Content Include="GR\script\CO0102.js" />
+    <Content Include="GR\script\CO0102S.js" />
+    <Content Include="GR\script\CO0105.js" />
+    <Content Include="GR\script\CO0106.js" />
+    <Content Include="GR\script\CO0108.js" />
+    <Content Include="GR\script\M00002.js" />
+    <Content Include="GR\script\M00002S.js" />
+    <Content Include="GR\script\M00006.js" />
+    <Content Include="GR\script\M00006S.js" />
+    <Content Include="GR\script\MA0004.js" />
+    <Content Include="GR\script\MA0003.js" />
+    <Content Include="GR\script\MA0004S.js" />
+    <Content Include="GR\script\MA0003S.js" />
+    <Content Include="GR\script\MA0006.js" />
+    <Content Include="GR\script\MA0006S.js" />
+    <Content Include="GR\script\MB0001.js" />
+    <Content Include="GR\script\MB0001S.js" />
+    <Content Include="GR\script\MB0002.js" />
+    <Content Include="GR\script\MB0002S.js" />
+    <Content Include="GR\script\MB0003.js" />
+    <Content Include="GR\script\MB0003S.js" />
+    <Content Include="GR\script\MB0004.js" />
+    <Content Include="GR\script\MB0004S.js" />
+    <Content Include="GR\script\MB0005.js" />
+    <Content Include="GR\script\MB0005S.js" />
+    <Content Include="GR\script\MB0007.js" />
+    <Content Include="GR\script\MB0007S.js" />
+    <Content Include="GR\script\MC0001.js" />
+    <Content Include="GR\script\MC0001S.js" />
+    <Content Include="GR\script\MC0002.js" />
+    <Content Include="GR\script\MC0002S.js" />
+    <Content Include="GR\script\MA0002.js" />
+    <Content Include="GR\script\MC0003.js" />
+    <Content Include="GR\script\MC0003S.js" />
+    <Content Include="GR\script\MC0006_JC.js" />
+    <Content Include="GR\script\MC0007.js" />
+    <Content Include="GR\script\MC0007S.js" />
+    <Content Include="GR\script\MC0012.js" />
+    <Content Include="GR\script\MC0012S.js" />
+    <Content Include="GR\script\T00006.js" />
+    <Content Include="GR\script\T00006S.js" />
+    <Content Include="GR\script\T00007.js" />
+    <Content Include="GR\script\T00007I.js" />
+    <Content Include="GR\script\T00007I_JKT.js" />
+    <Content Include="GR\script\T00007I_KNK.js" />
+    <Content Include="GR\script\T00007I_NJS.js" />
+    <Content Include="GR\script\T00007S.js" />
+    <Content Include="GR\script\T00007_JKT.js" />
+    <Content Include="GR\script\T00007_KNK.js" />
+    <Content Include="GR\script\T00007_NJS.js" />
+    <Content Include="GR\script\T00008.js" />
+    <Content Include="GR\script\T00008S.js" />
+    <Content Include="GR\script\T00009.js" />
+    <Content Include="GR\script\T00009S.js" />
+    <Content Include="GR\script\T00011.js" />
+    <Content Include="GR\script\T00011S.js" />
+    <Content Include="GR\script\TA0001.js" />
+    <Content Include="GR\script\TA0002.js" />
+    <Content Include="GR\script\TA0002S.js" />
+    <Content Include="GR\script\TA0003.js" />
+    <Content Include="GR\script\TA0003S.js" />
+    <Content Include="GR\script\TA0006.js" />
+    <Content Include="GR\script\TA0007.js" />
+    <Content Include="GR\script\TA0007S.js" />
+    <Content Include="GR\script\TA0009.js" />
+    <Content Include="GR\script\TA0005.js" />
+    <Content Include="GR\script\TA0004.js" />
+    <Content Include="GR\script\MD0001.js" />
+    <Content Include="GR\script\MA0002S.js" />
+    <Content Include="GR\script\MC0006.js" />
+    <Content Include="GR\script\MC0006S.js" />
+    <Content Include="GR\script\TA0001S.js" />
+    <Content Include="GR\script\TA0006S.js" />
+    <Content Include="GR\script\TA0009S.js" />
+    <Content Include="GR\script\TA0005S.js" />
+    <Content Include="GR\script\TA0004S.js" />
+    <Content Include="GR\script\MD0002.js" />
+    <Content Include="GR\script\MD0002S.js" />
+    <Content Include="GR\script\T00004.js" />
+    <Content Include="GR\script\T00004S.js" />
+    <Content Include="GR\script\T00005I.js" />
+    <Content Include="GR\script\T00005S.js" />
+    <Content Include="GR\script\T00005.js" />
+    <Content Include="GR\script\MC0010.js" />
+    <Content Include="GR\script\MD0001S.js" />
+    <Content Include="GR\script\MC0010S.js" />
+    <Content Include="GR\script\T00010.js" />
+    <Content Include="GR\script\T00010S.js" />
+    <Content Include="GR\GRTA0004LMNIPPO.aspx" />
+    <Content Include="GR\GRTA0004SELECT.aspx" />
+    <Content Include="GR\GRTA0005LMKINTAI.aspx" />
+    <Content Include="GR\GRTA0005SELECT.aspx" />
+    <Content Include="GR\GRTA0001HAISHA.aspx" />
+    <Content Include="GR\GRTA0001SELECT.aspx" />
+    <Content Include="GR\GRTA0006SELECT.aspx" />
+    <Content Include="inc\GRM00001WRKINC.ascx" />
+    <Content Include="inc\GRIS0001Title.ascx" />
+    <Content Include="inc\GRIS0002Footer.ascx" />
+    <Content Include="inc\GRIS0003SRightBox.ascx" />
+    <Content Include="inc\GRIS0004RightBox.ascx" />
+    <Content Include="inc\GRIS0005LeftBox.ascx" />
+    <Content Include="M00000LOGON.aspx" />
+    <Content Include="M00001MENU.aspx" />
+    <Content Include="MB0006SCHEDULE.aspx" />
+    <Content Include="script\calendar.js" />
+    <Content Include="script\common.js" />
+    <Content Include="script\event.js" />
+    <Content Include="script\M00001.js" />
+    <Content Include="script\M00000.js" />
+    <Content Include="script\MB0006.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="ヘルプ.jpg" />
+    <Content Include="先頭頁.png" />
+    <Content Include="最終頁.png" />
+    <Content Include="矢印L.png" />
+    <Content Include="矢印R.png" />
+    <Content Include="透明R.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="COMMON.vb" />
+    <Compile Include="GR\classes\GRCOM001FTPCTRL.vb" />
+    <Compile Include="GR\GRCO0007PROFMVARI.aspx.designer.vb">
+      <DependentUpon>GRCO0007PROFMVARI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0007PROFMVARI.aspx.vb">
+      <DependentUpon>GRCO0007PROFMVARI.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0007SELECT.aspx.designer.vb">
+      <DependentUpon>GRCO0007SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0007SELECT.aspx.vb">
+      <DependentUpon>GRCO0007SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0010PROFMVIEW.aspx.designer.vb">
+      <DependentUpon>GRCO0010PROFMVIEW.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0010PROFMVIEW.aspx.vb">
+      <DependentUpon>GRCO0010PROFMVIEW.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0010SELECT.aspx.designer.vb">
+      <DependentUpon>GRCO0010SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0010SELECT.aspx.vb">
+      <DependentUpon>GRCO0010SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0004SELECT.aspx.designer.vb">
+      <DependentUpon>GRCO0004SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0004SELECT.aspx.vb">
+      <DependentUpon>GRCO0004SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0004USER.aspx.designer.vb">
+      <DependentUpon>GRCO0004USER.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0004USER.aspx.vb">
+      <DependentUpon>GRCO0004USER.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0008PROFMMAP.aspx.designer.vb">
+      <DependentUpon>GRCO0008PROFMMAP.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0008PROFMMAP.aspx.vb">
+      <DependentUpon>GRCO0008PROFMMAP.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0008SELECT.aspx.designer.vb">
+      <DependentUpon>GRCO0008SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0008SELECT.aspx.vb">
+      <DependentUpon>GRCO0008SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0011PROFMXLS.aspx.designer.vb">
+      <DependentUpon>GRCO0011PROFMXLS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0011PROFMXLS.aspx.vb">
+      <DependentUpon>GRCO0011PROFMXLS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0011SELECT.aspx.designer.vb">
+      <DependentUpon>GRCO0011SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0011SELECT.aspx.vb">
+      <DependentUpon>GRCO0011SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0012SELECT.aspx.designer.vb">
+      <DependentUpon>GRCO0012SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0012SELECT.aspx.vb">
+      <DependentUpon>GRCO0012SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0012SRVAUTHOR.aspx.designer.vb">
+      <DependentUpon>GRCO0012SRVAUTHOR.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0012SRVAUTHOR.aspx.vb">
+      <DependentUpon>GRCO0012SRVAUTHOR.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0101PDFUP.ashx.vb">
+      <DependentUpon>GRCO0101PDFUP.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0015ONLINESTAT.aspx.designer.vb">
+      <DependentUpon>GRCO0015ONLINESTAT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0015ONLINESTAT.aspx.vb">
+      <DependentUpon>GRCO0015ONLINESTAT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0014USERPASS.aspx.designer.vb">
+      <DependentUpon>GRCO0014USERPASS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0014USERPASS.aspx.vb">
+      <DependentUpon>GRCO0014USERPASS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0100XLSUP.ashx.vb">
+      <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0102SELECT.aspx.designer.vb">
+      <DependentUpon>GRCO0102SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0102SELECT.aspx.vb">
+      <DependentUpon>GRCO0102SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0102XLSFORM.aspx.designer.vb">
+      <DependentUpon>GRCO0102XLSFORM.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0102XLSFORM.aspx.vb">
+      <DependentUpon>GRCO0102XLSFORM.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0103AUTONUM.ashx.vb">
+      <DependentUpon>GRCO0103AUTONUM.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0104XLSUPMULTI.ashx.vb">
+      <DependentUpon>GRCO0104XLSUPMULTI.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0105HELP.aspx.designer.vb">
+      <DependentUpon>GRCO0105HELP.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0105HELP.aspx.vb">
+      <DependentUpon>GRCO0105HELP.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0106LIBSEND.aspx.designer.vb">
+      <DependentUpon>GRCO0106LIBSEND.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0106LIBSEND.aspx.vb">
+      <DependentUpon>GRCO0106LIBSEND.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRCO0107SERVICE.ashx.vb">
+      <DependentUpon>GRCO0107SERVICE.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0108CONFIRM.aspx.designer.vb">
+      <DependentUpon>GRCO0108CONFIRM.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRCO0108CONFIRM.aspx.vb">
+      <DependentUpon>GRCO0108CONFIRM.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRM00002ORG.aspx.designer.vb">
+      <DependentUpon>GRM00002ORG.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRM00002ORG.aspx.vb">
+      <DependentUpon>GRM00002ORG.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRM00002SELECT.aspx.designer.vb">
+      <DependentUpon>GRM00002SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRM00002SELECT.aspx.vb">
+      <DependentUpon>GRM00002SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRM00006SELECT.aspx.designer.vb">
+      <DependentUpon>GRM00006SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRM00006SELECT.aspx.vb">
+      <DependentUpon>GRM00006SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRM00006STRUCT.aspx.designer.vb">
+      <DependentUpon>GRM00006STRUCT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRM00006STRUCT.aspx.vb">
+      <DependentUpon>GRM00006STRUCT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0006AJAX.ashx.vb">
+      <DependentUpon>GRMA0006AJAX.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0006SELECT.aspx.designer.vb">
+      <DependentUpon>GRMA0006SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0006SELECT.aspx.vb">
+      <DependentUpon>GRMA0006SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0006SHABANORG.aspx.designer.vb">
+      <DependentUpon>GRMA0006SHABANORG.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0006SHABANORG.aspx.vb">
+      <DependentUpon>GRMA0006SHABANORG.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMasterPage.Master.designer.vb">
+      <DependentUpon>GRMasterPage.Master</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMasterPage.Master.vb">
+      <DependentUpon>GRMasterPage.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0001SELECT.aspx.designer.vb">
+      <DependentUpon>GRMB0001SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0001SELECT.aspx.vb">
+      <DependentUpon>GRMB0001SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0001STAFF.aspx.designer.vb">
+      <DependentUpon>GRMB0001STAFF.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0001STAFF.aspx.vb">
+      <DependentUpon>GRMB0001STAFF.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0002SELECT.aspx.designer.vb">
+      <DependentUpon>GRMB0002SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0002SELECT.aspx.vb">
+      <DependentUpon>GRMB0002SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0002STAFFORG.aspx.designer.vb">
+      <DependentUpon>GRMB0002STAFFORG.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0002STAFFORG.aspx.vb">
+      <DependentUpon>GRMB0002STAFFORG.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0003HSTAFF.aspx.designer.vb">
+      <DependentUpon>GRMB0003HSTAFF.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0003HSTAFF.aspx.vb">
+      <DependentUpon>GRMB0003HSTAFF.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0003SELECT.aspx.designer.vb">
+      <DependentUpon>GRMB0003SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0003SELECT.aspx.vb">
+      <DependentUpon>GRMB0003SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0004SELECT.aspx.designer.vb">
+      <DependentUpon>GRMB0004SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0004SELECT.aspx.vb">
+      <DependentUpon>GRMB0004SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0004WORKINGH.aspx.designer.vb">
+      <DependentUpon>GRMB0004WORKINGH.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0004WORKINGH.aspx.vb">
+      <DependentUpon>GRMB0004WORKINGH.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0005CALENDAR.aspx.designer.vb">
+      <DependentUpon>GRMB0005CALENDAR.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0005CALENDAR.aspx.vb">
+      <DependentUpon>GRMB0005CALENDAR.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0005SELECT.aspx.designer.vb">
+      <DependentUpon>GRMB0005SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0005SELECT.aspx.vb">
+      <DependentUpon>GRMB0005SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0007SELECT.aspx.designer.vb">
+      <DependentUpon>GRMB0007SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0007SELECT.aspx.vb">
+      <DependentUpon>GRMB0007SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMB0007STAFF.aspx.designer.vb">
+      <DependentUpon>GRMB0007STAFF.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMB0007STAFF.aspx.vb">
+      <DependentUpon>GRMB0007STAFF.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0001FIXVALUE.aspx.designer.vb">
+      <DependentUpon>GRMC0001FIXVALUE.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0001FIXVALUE.aspx.vb">
+      <DependentUpon>GRMC0001FIXVALUE.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0001SELECT.aspx.designer.vb">
+      <DependentUpon>GRMC0001SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0001SELECT.aspx.vb">
+      <DependentUpon>GRMC0001SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0002SELECT.aspx.designer.vb">
+      <DependentUpon>GRMC0002SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0002SELECT.aspx.vb">
+      <DependentUpon>GRMC0002SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0002TORIHIKISAKI.aspx.designer.vb">
+      <DependentUpon>GRMC0002TORIHIKISAKI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0002TORIHIKISAKI.aspx.vb">
+      <DependentUpon>GRMC0002TORIHIKISAKI.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0003AJAX.ashx.vb">
+      <DependentUpon>GRMC0003AJAX.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0003SELECT.aspx.designer.vb">
+      <DependentUpon>GRMC0003SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0003SELECT.aspx.vb">
+      <DependentUpon>GRMC0003SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0003TORIORG.aspx.designer.vb">
+      <DependentUpon>GRMC0003TORIORG.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0003TORIORG.aspx.vb">
+      <DependentUpon>GRMC0003TORIORG.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0006SELECT.aspx.designer.vb">
+      <DependentUpon>GRMC0006SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0006SELECT.aspx.vb">
+      <DependentUpon>GRMC0006SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0006SELECT_JC.aspx.designer.vb">
+      <DependentUpon>GRMC0006SELECT_JC.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0006SELECT_JC.aspx.vb">
+      <DependentUpon>GRMC0006SELECT_JC.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0006SELECT_R.aspx.designer.vb">
+      <DependentUpon>GRMC0006SELECT_R.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0006SELECT_R.aspx.vb">
+      <DependentUpon>GRMC0006SELECT_R.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0006TODOKESAKI.aspx.designer.vb">
+      <DependentUpon>GRMC0006TODOKESAKI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0006TODOKESAKI.aspx.vb">
+      <DependentUpon>GRMC0006TODOKESAKI.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0006TODOKESAKI_JC.aspx.designer.vb">
+      <DependentUpon>GRMC0006TODOKESAKI_JC.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0006TODOKESAKI_JC.aspx.vb">
+      <DependentUpon>GRMC0006TODOKESAKI_JC.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0006TODOKESAKI_R.aspx.designer.vb">
+      <DependentUpon>GRMC0006TODOKESAKI_R.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0006TODOKESAKI_R.aspx.vb">
+      <DependentUpon>GRMC0006TODOKESAKI_R.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0007SELECT.aspx.designer.vb">
+      <DependentUpon>GRMC0007SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0007SELECT.aspx.vb">
+      <DependentUpon>GRMC0007SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0007TODKORG.aspx.designer.vb">
+      <DependentUpon>GRMC0007TODKORG.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0007TODKORG.aspx.vb">
+      <DependentUpon>GRMC0007TODKORG.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0010SELECT.aspx.designer.vb">
+      <DependentUpon>GRMC0010SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0010SELECT.aspx.vb">
+      <DependentUpon>GRMC0010SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0010T3CNTL.aspx.designer.vb">
+      <DependentUpon>GRMC0010T3CNTL.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0010T3CNTL.aspx.vb">
+      <DependentUpon>GRMC0010T3CNTL.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0012MODEL.aspx.designer.vb">
+      <DependentUpon>GRMC0012MODEL.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0012MODEL.aspx.vb">
+      <DependentUpon>GRMC0012MODEL.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMC0012SELECT.aspx.designer.vb">
+      <DependentUpon>GRMC0012SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMC0012SELECT.aspx.vb">
+      <DependentUpon>GRMC0012SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMD0002AJAX.ashx.vb">
+      <DependentUpon>GRMD0002AJAX.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMD0002PRODORG.aspx.designer.vb">
+      <DependentUpon>GRMD0002PRODORG.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMD0002PRODORG.aspx.vb">
+      <DependentUpon>GRMD0002PRODORG.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMD0002SELECT.aspx.designer.vb">
+      <DependentUpon>GRMD0002SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMD0002SELECT.aspx.vb">
+      <DependentUpon>GRMD0002SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00004COM.vb" />
+    <Compile Include="GR\GRT00004HORDER.aspx.designer.vb">
+      <DependentUpon>GRT00004HORDER.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00004HORDER.aspx.vb">
+      <DependentUpon>GRT00004HORDER.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00004SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00004SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00004SELECT.aspx.vb">
+      <DependentUpon>GRT00004SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00005COM.vb" />
+    <Compile Include="GR\GRT00005IMPORT.aspx.designer.vb">
+      <DependentUpon>GRT00005IMPORT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00005IMPORT.aspx.vb">
+      <DependentUpon>GRT00005IMPORT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00005NIPPO.aspx.designer.vb">
+      <DependentUpon>GRT00005NIPPO.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00005NIPPO.aspx.vb">
+      <DependentUpon>GRT00005NIPPO.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00005SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00005SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00005SELECT.aspx.vb">
+      <DependentUpon>GRT00005SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00006EXPORT.aspx.designer.vb">
+      <DependentUpon>GRT00006EXPORT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00006EXPORT.aspx.vb">
+      <DependentUpon>GRT00006EXPORT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00006SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00006SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00006SELECT.aspx.vb">
+      <DependentUpon>GRT00006SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007COM.vb" />
+    <Compile Include="GR\GRT00007ICHIRAN.aspx.designer.vb">
+      <DependentUpon>GRT00007ICHIRAN.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007ICHIRAN.aspx.vb">
+      <DependentUpon>GRT00007ICHIRAN.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007ICHIRAN_JKT.aspx.designer.vb">
+      <DependentUpon>GRT00007ICHIRAN_JKT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007ICHIRAN_JKT.aspx.vb">
+      <DependentUpon>GRT00007ICHIRAN_JKT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007ICHIRAN_KNK.aspx.designer.vb">
+      <DependentUpon>GRT00007ICHIRAN_KNK.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007ICHIRAN_KNK.aspx.vb">
+      <DependentUpon>GRT00007ICHIRAN_KNK.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007ICHIRAN_NJS.aspx.designer.vb">
+      <DependentUpon>GRT00007ICHIRAN_NJS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007ICHIRAN_NJS.aspx.vb">
+      <DependentUpon>GRT00007ICHIRAN_NJS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI.aspx.designer.vb">
+      <DependentUpon>GRT00007KINTAI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI.aspx.vb">
+      <DependentUpon>GRT00007KINTAI.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI_JKT.aspx.designer.vb">
+      <DependentUpon>GRT00007KINTAI_JKT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI_JKT.aspx.vb">
+      <DependentUpon>GRT00007KINTAI_JKT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI_KNK.aspx.designer.vb">
+      <DependentUpon>GRT00007KINTAI_KNK.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI_KNK.aspx.vb">
+      <DependentUpon>GRT00007KINTAI_KNK.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI_NJS.aspx.designer.vb">
+      <DependentUpon>GRT00007KINTAI_NJS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007KINTAI_NJS.aspx.vb">
+      <DependentUpon>GRT00007KINTAI_NJS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00007SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00007SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00007SELECT.aspx.vb">
+      <DependentUpon>GRT00007SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00008COM.vb" />
+    <Compile Include="GR\GRT00008KINTAISTAT.aspx.designer.vb">
+      <DependentUpon>GRT00008KINTAISTAT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00008KINTAISTAT.aspx.vb">
+      <DependentUpon>GRT00008KINTAISTAT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00008SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00008SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00008SELECT.aspx.vb">
+      <DependentUpon>GRT00008SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00009COM.vb" />
+    <Compile Include="GR\GRT00009JIMKINTAI.aspx.designer.vb">
+      <DependentUpon>GRT00009JIMKINTAI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00009JIMKINTAI.aspx.vb">
+      <DependentUpon>GRT00009JIMKINTAI.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00009SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00009SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00009SELECT.aspx.vb">
+      <DependentUpon>GRT00009SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00010APPROVE.aspx.designer.vb">
+      <DependentUpon>GRT00010APPROVE.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00010APPROVE.aspx.vb">
+      <DependentUpon>GRT00010APPROVE.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00010SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00010SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00010SELECT.aspx.vb">
+      <DependentUpon>GRT00010SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00011ACTUALQTY.aspx.designer.vb">
+      <DependentUpon>GRT00011ACTUALQTY.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00011ACTUALQTY.aspx.vb">
+      <DependentUpon>GRT00011ACTUALQTY.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRT00011SELECT.aspx.designer.vb">
+      <DependentUpon>GRT00011SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRT00011SELECT.aspx.vb">
+      <DependentUpon>GRT00011SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0002KINTAILIST.aspx.designer.vb">
+      <DependentUpon>GRTA0002KINTAILIST.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0002KINTAILIST.aspx.vb">
+      <DependentUpon>GRTA0002KINTAILIST.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0002SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0002SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0002SELECT.aspx.vb">
+      <DependentUpon>GRTA0002SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0003KYUYOLIST.aspx.designer.vb">
+      <DependentUpon>GRTA0003KYUYOLIST.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0003KYUYOLIST.aspx.vb">
+      <DependentUpon>GRTA0003KYUYOLIST.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0003SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0003SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0003SELECT.aspx.vb">
+      <DependentUpon>GRTA0003SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0006JIMKINTAILIST.aspx.designer.vb">
+      <DependentUpon>GRTA0006JIMKINTAILIST.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0006JIMKINTAILIST.aspx.vb">
+      <DependentUpon>GRTA0006JIMKINTAILIST.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0007JIMKYUYOLIST.aspx.designer.vb">
+      <DependentUpon>GRTA0007JIMKYUYOLIST.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0007JIMKYUYOLIST.aspx.vb">
+      <DependentUpon>GRTA0007JIMKYUYOLIST.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0007SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0007SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0007SELECT.aspx.vb">
+      <DependentUpon>GRTA0007SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0009LMKINTAICREW.aspx.designer.vb">
+      <DependentUpon>GRTA0009LMKINTAICREW.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0009LMKINTAICREW.aspx.vb">
+      <DependentUpon>GRTA0009LMKINTAICREW.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0009SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0009SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0009SELECT.aspx.vb">
+      <DependentUpon>GRTA0009SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0004WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0004WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0004WRKINC.ascx.vb">
+      <DependentUpon>GRCO0004WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0007WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0007WRKINC.ascx.vb">
+      <DependentUpon>GRCO0007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0010WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0010WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0010WRKINC.ascx.vb">
+      <DependentUpon>GRCO0010WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0011WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0011WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0011WRKINC.ascx.vb">
+      <DependentUpon>GRCO0011WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0012WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0012WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0012WRKINC.ascx.vb">
+      <DependentUpon>GRCO0012WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0014WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0014WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0014WRKINC.ascx.vb">
+      <DependentUpon>GRCO0014WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0015WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0015WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0015WRKINC.ascx.vb">
+      <DependentUpon>GRCO0015WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0102WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0102WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0102WRKINC.ascx.vb">
+      <DependentUpon>GRCO0102WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0106WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0106WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0106WRKINC.ascx.vb">
+      <DependentUpon>GRCO0106WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRM00002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRM00002WRKINC.ascx.vb">
+      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRM00006WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRM00006WRKINC.ascx.vb">
+      <DependentUpon>GRM00006WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0004WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMA0004WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0004WRKINC.ascx.vb">
+      <DependentUpon>GRMA0004WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0003WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMA0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0003WRKINC.ascx.vb">
+      <DependentUpon>GRMA0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0006WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMA0006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0006WRKINC.ascx.vb">
+      <DependentUpon>GRMA0006WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMB0001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0001WRKINC.ascx.vb">
+      <DependentUpon>GRMB0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMB0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0002WRKINC.ascx.vb">
+      <DependentUpon>GRMB0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0003WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMB0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0003WRKINC.ascx.vb">
+      <DependentUpon>GRMB0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0004WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMB0004WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0004WRKINC.ascx.vb">
+      <DependentUpon>GRMB0004WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0005WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMB0005WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0005WRKINC.ascx.vb">
+      <DependentUpon>GRMB0005WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0007WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMB0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMB0007WRKINC.ascx.vb">
+      <DependentUpon>GRMB0007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMC0001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0001WRKINC.ascx.vb">
+      <DependentUpon>GRMC0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMC0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0002WRKINC.ascx.vb">
+      <DependentUpon>GRMC0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMA0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMA0002WRKINC.ascx.vb">
+      <DependentUpon>GRMA0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0003WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMC0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0003WRKINC.ascx.vb">
+      <DependentUpon>GRMC0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0007WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMC0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0007WRKINC.ascx.vb">
+      <DependentUpon>GRMC0007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0012WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMC0012WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0012WRKINC.ascx.vb">
+      <DependentUpon>GRMC0012WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00004WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00004WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00004WRKINC.ascx.vb">
+      <DependentUpon>GRT00004WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00006WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00006WRKINC.ascx.vb">
+      <DependentUpon>GRT00006WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00007WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00007WRKINC.ascx.vb">
+      <DependentUpon>GRT00007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00008WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00008WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00008WRKINC.ascx.vb">
+      <DependentUpon>GRT00008WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00009WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00009WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00009WRKINC.ascx.vb">
+      <DependentUpon>GRT00009WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00011WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00011WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00011WRKINC.ascx.vb">
+      <DependentUpon>GRT00011WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0001WRKINC.ascx.vb">
+      <DependentUpon>GRTA0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0002WRKINC.ascx.vb">
+      <DependentUpon>GRTA0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0003WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0003WRKINC.ascx.vb">
+      <DependentUpon>GRTA0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0006WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0006WRKINC.ascx.vb">
+      <DependentUpon>GRTA0006WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0007WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0007WRKINC.ascx.vb">
+      <DependentUpon>GRTA0007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0009WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0009WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0009WRKINC.ascx.vb">
+      <DependentUpon>GRTA0009WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0005WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0005WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0005WRKINC.ascx.vb">
+      <DependentUpon>GRTA0005WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0004WRKINC.ascx.designer.vb">
+      <DependentUpon>GRTA0004WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRTA0004WRKINC.ascx.vb">
+      <DependentUpon>GRTA0004WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMD0001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMD0001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMD0001WRKINC.ascx.vb">
+      <DependentUpon>GRMD0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0006WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMC0006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0006WRKINC.ascx.vb">
+      <DependentUpon>GRMC0006WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0008WRKINC.ascx.designer.vb">
+      <DependentUpon>GRCO0008WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRCO0008WRKINC.ascx.vb">
+      <DependentUpon>GRCO0008WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0010WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMC0010WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMC0010WRKINC.ascx.vb">
+      <DependentUpon>GRMC0010WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMD0001PRODUCT.aspx.designer.vb">
+      <DependentUpon>GRMD0001PRODUCT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMD0001PRODUCT.aspx.vb">
+      <DependentUpon>GRMD0001PRODUCT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMD0001SELECT.aspx.designer.vb">
+      <DependentUpon>GRMD0001SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMD0001SELECT.aspx.vb">
+      <DependentUpon>GRMD0001SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0002SELECT.aspx.designer.vb">
+      <DependentUpon>GRMA0002SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0002SELECT.aspx.vb">
+      <DependentUpon>GRMA0002SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0002SHARYOA.aspx.designer.vb">
+      <DependentUpon>GRMA0002SHARYOA.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0002SHARYOA.aspx.vb">
+      <DependentUpon>GRMA0002SHARYOA.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0003SELECT.aspx.designer.vb">
+      <DependentUpon>GRMA0003SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0003SELECT.aspx.vb">
+      <DependentUpon>GRMA0003SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0003SHARYOB.aspx.designer.vb">
+      <DependentUpon>GRMA0003SHARYOB.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0003SHARYOB.aspx.vb">
+      <DependentUpon>GRMA0003SHARYOB.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0004SELECT.aspx.designer.vb">
+      <DependentUpon>GRMA0004SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0004SELECT.aspx.vb">
+      <DependentUpon>GRMA0004SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRMA0004SHARYOC.aspx.designer.vb">
+      <DependentUpon>GRMA0004SHARYOC.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRMA0004SHARYOC.aspx.vb">
+      <DependentUpon>GRMA0004SHARYOC.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRMD0002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRMD0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRMD0002WRKINC.ascx.vb">
+      <DependentUpon>GRMD0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00005WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00005WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00005WRKINC.ascx.vb">
+      <DependentUpon>GRT00005WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\inc\GRT00010WRKINC.ascx.designer.vb">
+      <DependentUpon>GRT00010WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\inc\GRT00010WRKINC.ascx.vb">
+      <DependentUpon>GRT00010WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0004LMNIPPO.aspx.designer.vb">
+      <DependentUpon>GRTA0004LMNIPPO.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0004LMNIPPO.aspx.vb">
+      <DependentUpon>GRTA0004LMNIPPO.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0004SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0004SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0004SELECT.aspx.vb">
+      <DependentUpon>GRTA0004SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0005LMKINTAI.aspx.designer.vb">
+      <DependentUpon>GRTA0005LMKINTAI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0005LMKINTAI.aspx.vb">
+      <DependentUpon>GRTA0005LMKINTAI.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0005SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0005SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0005SELECT.aspx.vb">
+      <DependentUpon>GRTA0005SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0001HAISHA.aspx.designer.vb">
+      <DependentUpon>GRTA0001HAISHA.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0001HAISHA.aspx.vb">
+      <DependentUpon>GRTA0001HAISHA.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0001SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0001SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0001SELECT.aspx.vb">
+      <DependentUpon>GRTA0001SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\GRTA0006SELECT.aspx.designer.vb">
+      <DependentUpon>GRTA0006SELECT.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\GRTA0006SELECT.aspx.vb">
+      <DependentUpon>GRTA0006SELECT.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRM00001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRM00001WRKINC.ascx.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0001Title.ascx.designer.vb">
+      <DependentUpon>GRIS0001Title.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0001Title.ascx.vb">
+      <DependentUpon>GRIS0001Title.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0002Footer.ascx.designer.vb">
+      <DependentUpon>GRIS0002Footer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0002Footer.ascx.vb">
+      <DependentUpon>GRIS0002Footer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0003SRightBox.ascx.designer.vb">
+      <DependentUpon>GRIS0003SRightBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0003SRightBox.ascx.vb">
+      <DependentUpon>GRIS0003SRightBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0004RightBox.ascx.designer.vb">
+      <DependentUpon>GRIS0004RightBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0004RightBox.ascx.vb">
+      <DependentUpon>GRIS0004RightBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0005LeftBox.ascx.designer.vb">
+      <DependentUpon>GRIS0005LeftBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0005LeftBox.ascx.vb">
+      <DependentUpon>GRIS0005LeftBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="M00000LOGON.aspx.designer.vb">
+      <DependentUpon>M00000LOGON.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="M00000LOGON.aspx.vb">
+      <DependentUpon>M00000LOGON.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="M00001MENU.aspx.designer.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="M00001MENU.aspx.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MB0006SCHEDULE.aspx.designer.vb">
+      <DependentUpon>MB0006SCHEDULE.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MB0006SCHEDULE.aspx.vb">
+      <DependentUpon>MB0006SCHEDULE.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\MyExtensions\MyWebExtension.vb">
+      <VBMyExtensionTemplateID>Microsoft.VisualBasic.Web.MyExtension</VBMyExtensionTemplateID>
+      <VBMyExtensionTemplateVersion>1.0.0.0</VBMyExtensionTemplateVersion>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GR\GRMasterPage.Master" />
+    <Content Include="GR\GRCO0100XLSUP.ashx" />
+    <Content Include="bin\OFFICE.dll.config" />
+    <Content Include="GR\GRCO0103AUTONUM.ashx" />
+    <Content Include="GR\GRCO0101PDFUP.ashx" />
+    <Content Include="GR\GRCO0107SERVICE.ashx" />
+    <Content Include="GR\GRMA0006AJAX.ashx" />
+    <Content Include="GR\GRMC0003AJAX.ashx" />
+    <Content Include="GR\GRMD0002AJAX.ashx" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\PublishProfiles\OFFICE.pubxml" />
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

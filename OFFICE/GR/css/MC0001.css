@@ -1,0 +1,29 @@
+﻿
+        /* ------------------------------
+         擬似フレーム　スタイル定義
+        ------------------------------ */
+        div[data-generated="1"] td,
+        div[data-generated="1"] th {
+            height:2.0rem;
+        }
+
+        #KEY_LINE_3 a:nth-child(2) {
+            left:3.8em;
+        }
+
+        #KEY_LINE_4 a:nth-child(2) {
+            left:4.3em;
+        }
+
+        #KEY_LINE_6 a:nth-child(2) {
+            left:18.9em;
+        }
+
+        #KEY_LINE_7 {
+            display :none ;
+        }
+        
+        span[class^="WF_DViewRep"][class$="_Area"] {
+            height:0%;
+            visibility:hidden;
+        }

@@ -1,0 +1,15 @@
+﻿div[data-generated="1"] td,
+div[data-generated="1"] th {
+    height:2.0rem;
+}
+
+.WF_Repeater {
+    position:fixed;
+    bottom:2.0em;
+    left:3em;
+    height:11.0em;
+    width:70em;
+    overflow:auto;
+    background-color:white;
+    table-layout:fixed;
+}

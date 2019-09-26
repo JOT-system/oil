@@ -1,0 +1,17 @@
+﻿#headerbox {
+    height:2.6em;
+}
+
+#detailbox {
+    top:5.0em; 
+}
+
+#divListArea {
+    height:95%;
+    min-width:95%;
+}
+
+#pnlListArea {
+    margin-left:0.7em;
+    margin-right:0.78em;
+}

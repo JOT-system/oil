@@ -1,0 +1,16 @@
+﻿div[data-generated="1"] td,
+div[data-generated="1"] th {
+    height:2.0rem;
+}
+
+#KEY_LINE_3 a:nth-child(2) {
+    left:3.7em;
+}
+
+#KEY_LINE_4 a:nth-child(2) {
+    left:4.08em;
+}
+
+span[class^="WF_DViewRep"][class$="_Area"] {
+    height: 10.8em;
+}

@@ -1,0 +1,114 @@
+﻿/* ------------------------------
+    個別スタイル定義
+ ------------------------------ */
+
+#headerbox::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+.Operation {
+    top: 0.4em;
+    /*z-index: 50;*/
+}
+.Operation a:nth-child(2) {
+    margin-left: 3em;
+    margin-right: 10em;
+}
+.Operation a:nth-child(n+3) {
+    margin-left: 0em;
+    margin-right: 0em;
+}
+.Operation a:nth-child(7) {
+    margin-left: 5em;
+    margin-right: 1em;
+}
+.Operation a:nth-child(n+7) {
+    top: 0.2%;
+}
+.leftMenubox {
+    top: 0.5em;
+    left: 1em;
+    float: left;
+}
+#divListArea {
+    top: 0.5em;
+    left: 12.69em;
+    width: 85.1%;
+    min-width: 85%;
+    /*float: left;*/
+}
+
+#WF_SELECTOR_TEXT {
+    width : 11.8em !important;
+}
+
+#WF_SHACHUHAKKBN_NJS, #WF_MODIFY_NJS {
+    pointer-events: none;
+}
+
+#detailbox {
+    top: 44%;
+    height: 59%;
+    z-index: 0;
+}
+
+#pnlListArea2 {
+    margin-left: 0.7em;
+    margin-right: 0.78em;
+    height: 100%;
+}
+
+#divListArea2 {
+    top: 10px;
+    height: 86.2%;
+    min-width: 95%;
+}
+
+div[data-generated='1'] div[id$='2_DR'], div[data-generated='1'] div[id$='2_DL'] {
+    overflow-x: hidden !important;
+}
+
+div[data-generated='1'] th,
+div[data-generated='1'] td {
+    height: 16.5px !important;
+    font-size: 11px !important;
+    word-wrap: break-word;
+}
+
+.Detail.ENEX span.KNK {
+    display: none;
+}
+.Detail.ENEX span.NJS {
+    display: none;
+}
+.Detail.ENEX span.JKT {
+    display: none;
+}
+.Detail.KNK span.ENEX {
+    display: none;
+}
+.Detail.KNK span.NJS {
+    display: none;
+}
+.Detail.KNK span.JKT {
+    display: none;
+}
+.Detail.NJS span.ENEX {
+    display: none;
+}
+.Detail.NJS span.KNK {
+    display: none;
+}
+.Detail.NJS span.JKT {
+    display: none;
+}
+.Detail.JKT span.ENEX {
+    display: none;
+}
+.Detail.JKT span.KNK {
+    display: none;
+}
+.Detail.JKT span.NJS {
+    display: none;
+}

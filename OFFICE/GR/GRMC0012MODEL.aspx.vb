@@ -1,4 +1,8 @@
-﻿Imports System.Data.SqlClient
+''************************************************************
+' モデル距離マスタメンテ登録画面
+'
+''************************************************************
+Imports System.Data.SqlClient
 Imports OFFICE.GRIS0005LeftBox
 Imports BASEDLL
 

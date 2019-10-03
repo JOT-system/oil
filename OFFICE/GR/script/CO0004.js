@@ -1,4 +1,5 @@
-﻿// ○OnLoad用処理(左右Box非表示)
+﻿
+// ○OnLoad用処理(左右Box非表示)
 function InitDisplay() {
 
     // 全部消す

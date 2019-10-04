@@ -1,4 +1,4 @@
-﻿branch2 test
+﻿branch test2
 // 11111
 // ○OnLoad用処理(左右Box非表示)
 function InitDisplay() {

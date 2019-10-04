@@ -37,5 +37,5 @@ function InitDisplay() {
 
     // リストの共通イベント(ホイール、横スクロール)をバインド
     bindListCommonEvents(pnlListAreaId, IsPostBack);
-
+    //shita
 };

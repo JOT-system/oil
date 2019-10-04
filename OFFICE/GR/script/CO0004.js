@@ -1,5 +1,4 @@
-﻿branch test
-// 22222
+﻿// 22222
 // 11111
 // ○OnLoad用処理(左右Box非表示)
 function InitDisplay() {
@@ -32,6 +31,7 @@ function InitDisplay() {
     }
 
     // 左ボックス拡張機能追加
+    // aaaaaa
     addLeftBoxExtention(leftListExtentionTarget);
 
     // リストの共通イベント(ホイール、横スクロール)をバインド

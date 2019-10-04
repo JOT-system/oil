@@ -1,4 +1,4 @@
-﻿//branch test2222
+﻿//branch test
 // 11111
 // ○OnLoad用処理(左右Box非表示)
 function InitDisplay() {

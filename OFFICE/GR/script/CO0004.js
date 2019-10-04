@@ -1,4 +1,5 @@
-﻿// morimori22222
+﻿//eeeeee
+// morimori22222
 // morimori
 // 11111
 // ○OnLoad用処理(左右Box非表示)

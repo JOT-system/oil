@@ -1,8 +1,4 @@
-﻿//eeeeee
-// morimori22222
-// morimori
-// 11111
-// ○OnLoad用処理(左右Box非表示)
+﻿// ○OnLoad用処理(左右Box非表示)
 function InitDisplay() {
 
     // 全部消す
@@ -33,7 +29,6 @@ function InitDisplay() {
     }
 
     // 左ボックス拡張機能追加
-    // aaaaaa
     addLeftBoxExtention(leftListExtentionTarget);
 
     // リストの共通イベント(ホイール、横スクロール)をバインド

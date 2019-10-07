@@ -1,5 +1,6 @@
 ﻿//22222
 //11111
+//22222
 // ○OnLoad用処理(左右Box非表示)
 
 function InitDisplay() {

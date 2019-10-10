@@ -62,9 +62,9 @@ div {
 
 /* 条件画面 */
 .searchbox {
-    top: 2.4em;
-    bottom: 1.4em;
-    left:0em;
+    top: 3.4em;
+    bottom: 0.4em;
+    left:0.4em;
     width:100%;
     position:fixed;
     overflow:hidden;

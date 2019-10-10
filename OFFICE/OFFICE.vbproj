@@ -347,6 +347,7 @@
     <Content Include="GR\inc\GRMD0002WRKINC.ascx" />
     <Content Include="GR\inc\GRT00005WRKINC.ascx" />
     <Content Include="GR\inc\GRT00010WRKINC.ascx" />
+    <Content Include="GR\OIM0004StationSearch.aspx" />
     <Content Include="GR\script\CO0004.js" />
     <Content Include="GR\script\CO0004S.js" />
     <Content Include="GR\script\CO0007.js" />
@@ -455,6 +456,7 @@
     <Content Include="GR\GRTA0001HAISHA.aspx" />
     <Content Include="GR\GRTA0001SELECT.aspx" />
     <Content Include="GR\GRTA0006SELECT.aspx" />
+    <Content Include="GR\WebForm1.aspx" />
     <Content Include="inc\GRM00001WRKINC.ascx" />
     <Content Include="inc\GRIS0001Title.ascx" />
     <Content Include="inc\GRIS0002Footer.ascx" />
@@ -1582,6 +1584,19 @@
     <Compile Include="GR\GRTA0006SELECT.aspx.vb">
       <DependentUpon>GRTA0006SELECT.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\OIM0004StationSearch.aspx.designer.vb">
+      <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\OIM0004StationSearch.aspx.vb">
+      <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="GR\WebForm1.aspx.designer.vb">
+      <DependentUpon>WebForm1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\WebForm1.aspx.vb">
+      <DependentUpon>WebForm1.aspx</DependentUpon>
     </Compile>
     <Compile Include="inc\GRM00001WRKINC.ascx.designer.vb">
       <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>

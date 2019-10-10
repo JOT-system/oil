@@ -456,7 +456,6 @@
     <Content Include="GR\GRTA0001HAISHA.aspx" />
     <Content Include="GR\GRTA0001SELECT.aspx" />
     <Content Include="GR\GRTA0006SELECT.aspx" />
-    <Content Include="GR\WebForm1.aspx" />
     <Content Include="inc\GRM00001WRKINC.ascx" />
     <Content Include="inc\GRIS0001Title.ascx" />
     <Content Include="inc\GRIS0002Footer.ascx" />
@@ -1591,12 +1590,6 @@
     <Compile Include="GR\OIM0004StationSearch.aspx.vb">
       <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="GR\WebForm1.aspx.designer.vb">
-      <DependentUpon>WebForm1.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="GR\WebForm1.aspx.vb">
-      <DependentUpon>WebForm1.aspx</DependentUpon>
     </Compile>
     <Compile Include="inc\GRM00001WRKINC.ascx.designer.vb">
       <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>

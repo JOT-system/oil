@@ -29,24 +29,26 @@ div {
 ------------------------------ */
 
 /* タイトル部分 */
-.titlebox {
-    top:0px;
-    height: 2.4em;
-    left:0em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:rgb(0,100,0);
-    text-align:center;
+#titlebox {
+    width: 100%;
+    margin: 0 auto 0 auto;
+    top: 0px;
+    height: 10em;
+    left: 0em;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(217,222,228);
+    text-align: center;
 }
 .titlebox_TEST {
     top: 0px;
     left: 0px;
     height: 2.4em;
-    width: 100%;
+    width: 100px;
+    margin: 0 auto 0 auto;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(255, 128, 255);
+    background-color: rgb(217,222,228);
     text-align: center;
 }
 .titlebox_HONSHA {
@@ -56,15 +58,15 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(255,69,0);
+    background-color: rgb(217,222,228);
     text-align: center;
 }
 
 /* 条件画面 */
 .searchbox {
-    top: 3.4em;
-    bottom: 0.4em;
-    left:0.4em;
+    top: 2.4em;
+    bottom: 1.4em;
+    left:0em;
     width:100%;
     position:fixed;
     overflow:hidden;
@@ -79,7 +81,7 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(220,230,240);
+    background-color: rgb(217,222,228);
 }
 
 /* 実行画面 明細部 */
@@ -90,7 +92,7 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(148,138,84);
+    background-color: rgb(237,237,237);
 }
 
 /* 実行画面 ヘッダー部のみ */
@@ -106,24 +108,24 @@ div {
 
 /* 実行画面 明細部のみ */
 .detailboxOnly {
-    top:2.4em;
+    top: 2.4em;
     bottom: 1.4em;
-    left:0em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:rgb(148,138,84);
+    left: 0em;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(237,237,237);
 }
 
 /* フッター部 */
 .footerbox {
-    bottom:0em;
-    height:1.4em;
-    left:0em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:darksalmon;
+    bottom: 0em;
+    height: 1.4em;
+    left: 0em;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(217,222,228);
 }
 
 /* 左ボックス */
@@ -156,57 +158,57 @@ div {
 
 /* 画面ID */
 .WF_TITLEID {
-    height:1em;
-    width:18em;
-    overflow:hidden;
-    position:fixed;
-    left:1em;
-    color:white;
-    font-size:small;
-    vertical-align:middle;
-    text-align:left;
+    height: 1em;
+    width: 18em;
+    overflow: hidden;
+    position: fixed;
+    left: 1em;
+    color: #2A3F54;
+    font-size: small;
+    vertical-align: middle;
+    text-align: left;
 }
 
 /* 画面名称 */
 .WF_TITLETEXT {
-    height:30px;
-    width:45em;
-    position:fixed;
-    top:3px;
-    left:3em;
-    color:white;
-    overflow:hidden;
-    font-size:x-large;
-    vertical-align:middle;
-    text-align:center;
+    height: 30px;
+    width: 80%;
+    position: fixed;
+    top: 3px;
+    left: 3em;
+    color: #2A3F54;
+    overflow: hidden;
+    font-size: x-large;
+    vertical-align: middle;
+    text-align: center;
 }
 
 /* 会社名 */
 .WF_TITLECAMP {
-    height:30px;
-    width:18em;
-    overflow:hidden;
-    position:fixed;
-    top:2px;
-    left:83em;
-    color:white;
-    font-size:small;
-    vertical-align:middle;
-    text-align:left;
+    height: 30px;
+    width: 18em;
+    overflow: hidden;
+    position: fixed;
+    top: 2px;
+    left: 82%;
+    color: #2A3F54;
+    font-size: small;
+    vertical-align: middle;
+    text-align: left;
 }
 
 /* 現在日時 */
 .WF_TITLEDATE {
-    height:15px;
-    width:13em;
-    overflow:hidden;
-    position:fixed;
-    top:18px;
-    left:83em;
-    color:white;
-    font-size:small;
-    vertical-align:middle;
-    text-align:left;
+    height: 15px;
+    width: 13em;
+    overflow: hidden;
+    position: fixed;
+    top: 18px;
+    left: 82%;
+    color: #2A3F54;
+    font-size: small;
+    vertical-align: middle;
+    text-align: left;
 }
 
 /* 右ボックス表示 */

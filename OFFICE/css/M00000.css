@@ -8,130 +8,33 @@
 }
 
 .Operation {
- /*   width: 350px; */
-    margin: 0 auto 0 auto;
-    position: relative;
-    z-index: 20;
+    top: 2em;
+    left: 50em;
+    position:relative;
+    z-index:20;
 }
 .logonkeybox {
-    width: 35%;
-    margin: 0 auto 0 auto;
-    position: relative;
+    top: 0em;
+    left: 8em;
+    position:relative;
 }
 .logonkeybox p {
     margin-bottom:1em;
 }
-    .logonkeybox span {
-        min-width: 8em;
-        position: relative;
-        width: 80%;
-        margin: 40px 3%;
-    }
+.logonkeybox span{
+    min-width: 8em;
+    position:relative;
+}
 .guidancebox {
-    width: 100px;
-    margin: 0 auto 0 auto;
-    top: 15em;
-    height: 15em;
-    background-color: white;
-    border: inset;
-    overflow-y: scroll;
-    border-color: black
+    left:7em;
+    width:67em;
+    height: 28em;
+    background-color:white;
+    border:inset;
+    overflow-y:scroll;
+    border-color:black
 }
 .guidancebox span {
     color:red;
     background-color:white;
-}
-
-#UserID {
-    /* input要素全部に対して装飾 */
-    background-image: linear-gradient(0deg, #F0F8FF, F8F8FF); /* グラデーション */
-    border: 1px solid #3c7fb1; /* 枠線 */
-    border-radius: 0.5em; /* 角丸 */
-    height: 50px;
-    font-size: 22px;
-    font-family: Meiryo;
-}
-
-#UserID:hover {
-        /* マウスが上に載ったとき */
-        background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
-        border: 1px solid #2c628b;
-    }
-
-#UserID:active {
-        /* 押されたとき */
-        background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
-        border: 1px solid skyblue;
-    }
-
-
-
-
-#PassWord {
-    /* input要素全部に対して装飾 */
-    background-image: linear-gradient(0deg, #F0F8FF, F8F8FF); /* グラデーション */
-    border: 1px solid #3c7fb1; /* 枠線 */
-    border-radius: 0.5em; /* 角丸 */
-    height: 50px;
-    font-size: 22px;
-    font-family: Meiryo;
-}
-
-#PassWord:hover {
-        /* マウスが上に載ったとき */
-        background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
-        border: 1px solid #2c628b;
-    }
-
-#PassWord:active {
-        /* 押されたとき */
-        background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
-        border: 1px solid skyblue;
-    }
-
-
-#OK {
-    /* input要素全部に対して装飾 */
-    background-image: linear-gradient(0deg, #F0F8FF, F8F8FF); /* グラデーション */
-    border-radius: 0.5em; /* 角丸 */
-    height: 50px;
-    font-size: 22px;
-    font-family: Meiryo; 
-    font-weight: bold;
-    text-decoration: none;
-    text-align: center;
-    padding: 8px 0 10px;
-    color: #fff;
-    background-color: #49a9d4;
-    border-radius: 5px;
-    box-shadow: 2px 2px #1a6ea0;
-}
-
-    #OK:hover {
-        /* マウスが上に載ったとき */
-        background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
-        border: 1px solid #2c628b;
-    }
-
-    #OK:active {
-        /* 押されたとき */
-        background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
-        border: 1px solid skyblue;
-    }
-
-
-#LogInImage {
-    font-size: 36px;
-    font-weight: bold;
-    font-family: Meiryo;
-    color: #2A3F54;
-    background-size: 300% 300%;
-    opacity: 0.4;
-}
-
-
-
-#WF_LOGO {
-    transform: translateY(70%);
-    
 }

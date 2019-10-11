@@ -487,7 +487,7 @@ Public Class MB0006SCHEDULE
         Try
 
             RemoteIp = Request.UserHostAddress
-            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(RemoteIp)
+            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
             For Each ipAddr As IPAddress In ClientIphEntry.AddressList
                 'IPv4にする
                 If ipAddr.AddressFamily = Sockets.AddressFamily.InterNetwork Then
@@ -572,8 +572,7 @@ Public Class MB0006SCHEDULE
             Case "172.16.219"  '水島
                 WF_SELECTAREA.Value = "関西"
             Case Else
-                'WF_SELECTAREA.Value = "北海道"
-                WF_SELECTAREA.Value = "本社"
+                WF_SELECTAREA.Value = "北海道"
 
         End Select
 
@@ -1037,7 +1036,7 @@ Public Class MB0006SCHEDULE
         Try
 
             RemoteIp = Request.UserHostAddress
-            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(RemoteIp)
+            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
             For Each ipAddr As IPAddress In ClientIphEntry.AddressList
                 'IPv4にする
                 If ipAddr.AddressFamily = Sockets.AddressFamily.InterNetwork Then
@@ -1055,7 +1054,6 @@ Public Class MB0006SCHEDULE
         Else
             RemoteIp3 = Mid(RemoteIp, 1, RemoteIp.LastIndexOf("."))
         End If
-
         '○ ユーザ
         Try
             Dim SQLStr0 As String =

@@ -90,16 +90,20 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="404cat.JPG" />
     <Content Include="bin\BASEDLL.dll" />
     <Content Include="bin\BASEDLL.pdb" />
     <Content Include="bin\BASEDLL.xml" />
     <Content Include="bin\OFFICE.dll" />
     <Content Include="bin\OFFICE.pdb" />
     <Content Include="bin\OFFICE.xml" />
+    <Content Include="bootstrap.min.css" />
     <Content Include="css\common.css" />
     <Content Include="css\M00001.css" />
     <Content Include="css\M00000.css" />
     <Content Include="css\MB0006.css" />
+    <Content Include="custom.min.css" />
+    <Content Include="font-awesome.min.css" />
     <Content Include="GR\css\CO0004.css" />
     <Content Include="GR\css\CO0004S.css" />
     <Content Include="GR\css\CO0007.css" />
@@ -465,6 +469,8 @@
     <Content Include="M00000LOGON.aspx" />
     <Content Include="M00001MENU.aspx" />
     <Content Include="MB0006SCHEDULE.aspx" />
+    <Content Include="nprogress.css" />
+    <Content Include="page_404.html" />
     <Content Include="script\calendar.js" />
     <Content Include="script\common.js" />
     <Content Include="script\event.js" />

@@ -12,26 +12,32 @@
         <!-- LOGON　TOPbox -->
         <div id="logonbox" class="logonbox" >
             <div id="logonkeybox" class="logonkeybox">
-  
-       <div id="LogInImage" class="LogInImage">
-          <asp:Image ID="WF_LOGO" runat ="server" ImageUrl ="~/logo.png" alt=""/>
-       </div>
+                <div id="Waku" class="Waku">
 
-                <p class="LINE_1">
+                    <div id="LogInImage" class="LogInImage">
+                        <asp:Image ID="WF_LOGO" runat ="server" ImageUrl ="~/logo.png" alt=""/>
+                    </div>
+
+
+                    <p class="LINE_1">
+                        <span>
+                            <asp:TextBox ID="UserID" runat="server" Width="300px" placeholder="UserID"></asp:TextBox>
+                        </span>
+                    </p>
+                    <p class="LINE_2">
                     <span>
-                        <asp:TextBox ID="UserID" runat="server" Width="300px" placeholder="UserID"></asp:TextBox>
+                        <asp:TextBox ID="PassWord" runat="server" Width="300px" TextMode="Password" placeholder="Password"></asp:TextBox>
                     </span>
-                </p>
-                <p class="LINE_2">
-                <span>
-                    <asp:TextBox ID="PassWord" runat="server" Width="300px" TextMode="Password" placeholder="Password"></asp:TextBox>
-                </span>
-                </p>
-                <div class="Operation" >
-                 <span>
-                    <input type="button" id="OK" value="LOGIN"  style="Width:300px" onclick="ButtonClick('WF_ButtonOK');" />
-                 </span>
-                </div>      
+                    </p>
+                    <div class="Operation" >
+                     <span>
+                        <input type="button" id="OK" value="LOGIN"  style="Width:300px" onclick="ButtonClick('WF_ButtonOK');" />
+                     </span>
+                    </div>
+                    <p class="LINE_3">
+                        
+                    </p>
+                 </div>   
             </div>
             
             <!--

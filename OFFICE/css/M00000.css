@@ -12,11 +12,15 @@
     margin: 0 auto 0 auto;
     position: relative;
     z-index: 20;
+    height:3em;
 }
 
 .logonkeybox {
-    width: 35%;
-    margin: 0 auto 0 auto;
+    width: 350px;
+    margin-top: 8%;
+    margin-right: auto;
+    margin-bottom: 0px;
+    margin-left: auto;
     position: relative;
 }
 
@@ -126,16 +130,24 @@
 
 
 #LogInImage {
-    font-size: 36px;
-    font-weight: bold;
-    font-family: Meiryo;
-    color: #2A3F54;
-    background-size: 300% 300%;
     opacity: 0.4;
 }
 
 
 
 #WF_LOGO {
-    transform: translateY(70%);
+    transform: translateY(5%);
 }
+
+
+.Waku {
+    padding-top: 0.5em;
+    padding-right: 1em;
+    padding-bottom: 0.5em;
+    padding-left: 1em;
+    background: -moz-linear-gradient(#ffb03c, #ff708d);
+    background: -webkit-linear-gradient(#ffb03c, #ff708d);
+    background: linear-gradient(to right, #ffb03c, #ff708d);
+    color: #FFF;
+}
+

@@ -108,7 +108,7 @@ Public Class M00000LOGON
         End If
         CS001INIFILE.CS0001INIFILEget()
         If Not isNormal(CS001INIFILE.ERR) Then
-            Master.output(CS001INIFILE.ERR, C_MESSAGE_TYPE.ABORT)
+            Master.Output(CS001INIFILE.ERR, C_MESSAGE_TYPE.ABORT)
             Exit Sub
         End If
 
@@ -120,7 +120,7 @@ Public Class M00000LOGON
             CS0050Session.APSV_ORG = CS0006TERMchk.TERMORG
             CS0050Session.APSV_M_ORG = CS0006TERMchk.MORG
         Else
-            Master.output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
+            Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
             Exit Sub
         End If
 
@@ -130,7 +130,8 @@ Public Class M00000LOGON
         Try
 
             ClientIP = Request.UserHostAddress
-            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
+            'Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
+            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(ClientIP)
             For Each ipAddr As IPAddress In ClientIphEntry.AddressList
                 'IPv4の場合
                 If ipAddr.AddressFamily = Sockets.AddressFamily.InterNetwork Then
@@ -138,7 +139,7 @@ Public Class M00000LOGON
                 End If
             Next
         Catch ex As Exception
-            Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントI IP取得失敗")
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントI IP取得失敗")
             CS0011LOGWRITE.INFSUBCLASS = "Main"
             CS0011LOGWRITE.INFPOSI = "クライアントIP取得失敗"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
@@ -174,14 +175,14 @@ Public Class M00000LOGON
         CS0008ONLINEstat.CS0008ONLINEstat()
         If isNormal(CS0008ONLINEstat.ERR) Then
             If CS0008ONLINEstat.ONLINESW = 0 Then
-                Master.output(C_MESSAGE_NO.CLOSED_SERVICE, C_MESSAGE_TYPE.ERR)
+                Master.Output(C_MESSAGE_NO.CLOSED_SERVICE, C_MESSAGE_TYPE.ERR)
                 WF_Guidance.Text = String.Empty
                 Exit Sub
             Else
                 WF_Guidance.Text = WF_Guidance.Text & CS0008ONLINEstat.TEXT.Replace(vbCrLf, "<br />")
             End If
         Else
-            Master.output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
+            Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
             Exit Sub
         End If
 
@@ -216,18 +217,18 @@ Public Class M00000LOGON
             CS0050Session.TERM_ORG = CS0006TERMchk.TERMORG
             CS0050Session.TERM_M_ORG = CS0006TERMchk.MORG
         Else
-            Master.output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
+            Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
             Exit Sub
         End If
 
 
         '■■■　初期メッセージ表示　■■■
-        Master.output(C_MESSAGE_NO.INPUT_ID_PASSWD, C_MESSAGE_TYPE.INF)
+        Master.Output(C_MESSAGE_NO.INPUT_ID_PASSWD, C_MESSAGE_TYPE.INF)
 
         'C:\APPL\APPLFILES\XML_TMPディレクトリの不要データを掃除
         Dim WW_File As String
 
-        For Each tempFile As String In System.IO.Directory.GetFiles( _
+        For Each tempFile As String In System.IO.Directory.GetFiles(
             CS0050Session.UPLOAD_PATH & "\XML_TMP", "*", System.IO.SearchOption.AllDirectories)
             ' ファイルパスからファイル名を取得
             WW_File = tempFile
@@ -266,7 +267,7 @@ Public Class M00000LOGON
             If CS0008ONLINEstat.ONLINESW = 0 Then Exit Sub
 
         Else
-            Master.output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
+            Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
             Exit Sub
         End If
 
@@ -276,8 +277,8 @@ Public Class M00000LOGON
 
         '○ 入力文字内の禁止文字排除
         '   画面UserID内の使用禁止文字排除
-        Master.eraseCharToIgnore(UserID.Text)
-        Master.eraseCharToIgnore(PassWord.Text)
+        Master.EraseCharToIgnore(UserID.Text)
+        Master.EraseCharToIgnore(PassWord.Text)
 
         '○ 画面UserIDのDB(S0004_USER)存在チェック
         Dim WW_USERID As String = String.Empty
@@ -302,7 +303,7 @@ Public Class M00000LOGON
 
             Try
                 'S0004_USER検索SQL文
-                Dim SQL_Str As String = _
+                Dim SQL_Str As String =
                      "SELECT " _
                    & " rtrim(A.USERID)   as USERID    , " _
                    & " rtrim(A.ORG)      as ORG       , " _
@@ -359,7 +360,7 @@ Public Class M00000LOGON
                 End Using
 
             Catch ex As Exception
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0004_USER SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0004_USER SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
                 CS0011LOGWRITE.INFPOSI = "S0004_USER SELECT"                           '
@@ -371,10 +372,10 @@ Public Class M00000LOGON
             End Try
 
             'ユーザID誤り
-            If Not isNormal(WW_err) OrElse _
-                UserID.Text = C_DEFAULT_DATAKEY OrElse _
+            If Not isNormal(WW_err) OrElse
+                UserID.Text = C_DEFAULT_DATAKEY OrElse
                 UserID.Text = "INIT" Then
-                Master.output(C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR, C_MESSAGE_TYPE.ERR)
+                Master.Output(C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR, C_MESSAGE_TYPE.ERR)
                 CS0011LOGWRITE.INFSUBCLASS = "Main"
                 CS0011LOGWRITE.INFPOSI = "パスワードERR USERID ERR"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
@@ -388,7 +389,7 @@ Public Class M00000LOGON
             '○ パスワードチェック
             'ユーザあり　かつ　(パスワード誤り　または　パスワード6回以上誤り)
             If (PassWord.Text <> WW_PASSWORD OrElse WW_MISSCNT >= C_MAX_MISS_PASSWORD_COUNT) Then
-                Master.output(C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR, C_MESSAGE_TYPE.ERR)
+                Master.Output(C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR, C_MESSAGE_TYPE.ERR)
                 CS0011LOGWRITE.INFSUBCLASS = "Main"
                 CS0011LOGWRITE.INFPOSI = "パスワードERR、MAX回数"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
@@ -398,7 +399,7 @@ Public Class M00000LOGON
                 'パスワードエラー回数のカウントUP
                 Try
                     'S0014_USER更新SQL文
-                    Dim SQL_Str As String = _
+                    Dim SQL_Str As String =
                          "Update S0014_USERPASS " _
                        & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                        & "Where  USERID  = @P3 "
@@ -417,7 +418,7 @@ Public Class M00000LOGON
 
                     End Using
                 Catch ex As Exception
-                    Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0014_USERPASS UPDATE")
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0014_USERPASS UPDATE")
                     CS0011LOGWRITE.INFSUBCLASS = "Main"
                     CS0011LOGWRITE.INFPOSI = "S0014_USERPASS Update"
                     CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
@@ -437,7 +438,7 @@ Public Class M00000LOGON
             'ミスカウントクリア
             Try
                 'S0014_USER更新SQL文
-                Dim SQL_Str As String = _
+                Dim SQL_Str As String =
                      "Update S0014_USERPASS " _
                    & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                    & "Where  USERID  = @P3 "
@@ -452,7 +453,7 @@ Public Class M00000LOGON
 
                 End Using
             Catch ex As Exception
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0014_USERPASS UPDATE")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0014_USERPASS UPDATE")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"
                 CS0011LOGWRITE.INFPOSI = "S0014_USERPASS Update"
@@ -478,7 +479,7 @@ Public Class M00000LOGON
                 End If
 
             Catch ex As Exception
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0009_URL SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0009_URL SELECT")
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
                 CS0011LOGWRITE.INFPOSI = "S0009_URL SELECT"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
@@ -499,7 +500,7 @@ Public Class M00000LOGON
 
             Try
                 'S0020_LOGONYMD検索SQL文
-                Dim SQL_Str As String = _
+                Dim SQL_Str As String =
                      "SELECT isnull(LOGONYMD, '') as LOGONYMD " _
                    & " FROM  S0020_LOGONYMD " _
                    & " Where TERMID   = @P1 "
@@ -525,7 +526,7 @@ Public Class M00000LOGON
                 End Using
 
             Catch ex As Exception
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0020_LOGONYMD SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0020_LOGONYMD SELECT")
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
                 CS0011LOGWRITE.INFPOSI = "S0020_LOGONYMD SELECT"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
@@ -583,7 +584,7 @@ Public Class M00000LOGON
             iTbl.Columns.Add("SORTYMD", GetType(String))                       'ソート用年月日
             iTbl.Columns.Add("MSG", GetType(String))                           'メッセージ
 
-            Dim SQLStr0 As String = _
+            Dim SQLStr0 As String =
                      " SELECT                                                                                                " _
                    & "         Z.TERMID                                                                      as TERMID       " _
                    & "       , Z.TERMCAMP                                                                    as COMPCODE     " _
@@ -595,7 +596,7 @@ Public Class M00000LOGON
                    & "   and   Z.ENDYMD           >= @P02                                                                    " _
                    & "   and   Z.DELFLG           <> @P03                                                                    "
 
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                      " SELECT  isnull(rtrim(A.SHARYOTYPE),'')              as SHARYOTYPE                                     " _
                    & "      ,  isnull(rtrim(A.TSHABAN),'')                  as TSHABAN                                       " _
                    & "      ,  isnull(rtrim(C.LICNPLTNO1),'')               as LICNPLTNO1                                    " _
@@ -809,7 +810,7 @@ Public Class M00000LOGON
             oTbl.Dispose()
             oTbl = Nothing
         Catch ex As Exception
-            Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0012_SRVAUTHOR SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0012_SRVAUTHOR SELECT")
             CS0011LOGWRITE.INFSUBCLASS = "GetSHARYOC"                   'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "DB:S0012_SRVAUTHOR SELECT"          '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                  '
@@ -835,7 +836,7 @@ Public Class M00000LOGON
             SQLcon.Open() 'DataBase接続(Open)
 
             'S0009_URL検索SQL文
-            Dim SQL_Str As String = _
+            Dim SQL_Str As String =
                  "SELECT rtrim(URL) as URL " _
                & " FROM  S0009_URL " _
                & " Where MAPID    = @P1 " _

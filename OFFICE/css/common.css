@@ -4,24 +4,24 @@
 
 /* ブラウザのデフォルト初期化 */
 * {
-    margin:0;
-    padding:0;
+    margin: 0;
+    padding: 0;
 }
 
 html {
-    font-size:62.5%;
+    font-size: 62.5%;
 }
 
 /* ブラウザのデフォルト初期化 */
 body {
-    margin:0;
-    padding:0;
-    overflow:auto;
-    font-size:1.6em;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    font-size: 1.6em;
 }
 
 div {
-    position:relative;
+    position: relative;
 }
 
 /* ------------------------------
@@ -29,26 +29,30 @@ div {
 ------------------------------ */
 
 /* タイトル部分 */
-.titlebox {
-    top:0px;
-    height: 2.4em;
-    left:0em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:rgb(0,100,0);
-    text-align:center;
+#titlebox {
+    width: 100%;
+    margin: 0 auto 0 auto;
+    top: 0px;
+    height: 10em;
+    left: 0em;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(217,222,228);
+    text-align: center;
 }
+
 .titlebox_TEST {
     top: 0px;
     left: 0px;
     height: 2.4em;
-    width: 100%;
+    width: 100px;
+    margin: 0 auto 0 auto;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(255, 128, 255);
+    background-color: rgb(217,222,228);
     text-align: center;
 }
+
 .titlebox_HONSHA {
     top: 0px;
     left: 0px;
@@ -56,19 +60,19 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(255,69,0);
+    background-color: rgb(217,222,228);
     text-align: center;
 }
 
 /* 条件画面 */
 .searchbox {
-    top: 3.4em;
-    bottom: 0.4em;
-    left:0.4em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:rgb(220,230,240);
+    top: 2.4em;
+    bottom: 1.4em;
+    left: 0em;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(220,230,240);
 }
 
 /* 実行画面 ヘッダー部 */
@@ -79,7 +83,7 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(220,230,240);
+    background-color: rgb(217,222,228);
 }
 
 /* 実行画面 明細部 */
@@ -90,40 +94,40 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(148,138,84);
+    background-color: rgb(237,237,237);
 }
 
 /* 実行画面 ヘッダー部のみ */
 .headerboxOnly {
-    top:2.4em;
+    top: 2.4em;
     bottom: 1.4em;
-    left:0em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:rgb(220,230,240);
+    left: 0em;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(220,230,240);
 }
 
 /* 実行画面 明細部のみ */
 .detailboxOnly {
-    top:2.4em;
+    top: 2.4em;
     bottom: 1.4em;
-    left:0em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:rgb(148,138,84);
+    left: 0em;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(237,237,237);
 }
 
 /* フッター部 */
 .footerbox {
-    bottom:0em;
-    height:1.4em;
-    left:0em;
-    width:100%;
-    position:fixed;
-    overflow:hidden;
-    background-color:darksalmon;
+    bottom: 0em;
+    height: 1.4em;
+    left: 0em;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(217,222,228);
 }
 
 /* 左ボックス */
@@ -156,153 +160,154 @@ div {
 
 /* 画面ID */
 .WF_TITLEID {
-    height:1em;
-    width:18em;
-    overflow:hidden;
-    position:fixed;
-    left:1em;
-    color:white;
-    font-size:small;
-    vertical-align:middle;
-    text-align:left;
+    height: 1em;
+    width: 18em;
+    overflow: hidden;
+    position: fixed;
+    left: 1em;
+    color: #2A3F54;
+    font-size: small;
+    vertical-align: middle;
+    text-align: left;
 }
 
 /* 画面名称 */
 .WF_TITLETEXT {
-    height:30px;
-    width:45em;
-    position:fixed;
-    top:3px;
-    left:3em;
-    color:white;
-    overflow:hidden;
-    font-size:x-large;
-    vertical-align:middle;
-    text-align:center;
+    height: 30px;
+    width: 80%;
+    position: fixed;
+    top: 3px;
+    left: 3em;
+    color: #2A3F54;
+    overflow: hidden;
+    font-size: x-large;
+    vertical-align: middle;
+    text-align: center;
 }
 
 /* 会社名 */
 .WF_TITLECAMP {
-    height:30px;
-    width:18em;
-    overflow:hidden;
-    position:fixed;
-    top:2px;
-    left:83em;
-    color:white;
-    font-size:small;
-    vertical-align:middle;
-    text-align:left;
+    height: 30px;
+    width: 18em;
+    overflow: hidden;
+    position: fixed;
+    top: 2px;
+    left: 82%;
+    color: #2A3F54;
+    font-size: small;
+    vertical-align: middle;
+    text-align: left;
 }
 
 /* 現在日時 */
 .WF_TITLEDATE {
-    height:15px;
-    width:13em;
-    overflow:hidden;
-    position:fixed;
-    top:18px;
-    left:83em;
-    color:white;
-    font-size:small;
-    vertical-align:middle;
-    text-align:left;
+    height: 15px;
+    width: 13em;
+    overflow: hidden;
+    position: fixed;
+    top: 18px;
+    left: 82%;
+    color: #2A3F54;
+    font-size: small;
+    vertical-align: middle;
+    text-align: left;
 }
 
 /* 右ボックス表示 */
 .WF_rightboxSW {
-    height:6%;
-    width:8%;
-    overflow:hidden;
-    position:fixed;
-    top:0px;
-    right:0px;
-    color:white;
-    font-size:small;
-    vertical-align:middle;
+    height: 6%;
+    width: 8%;
+    overflow: hidden;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    color: white;
+    font-size: small;
+    vertical-align: middle;
 }
 
 /* 操作 */
 .Operation {
-    margin-left:2em;
-    margin-top:0.5em;
-    height:1.5em;
+    margin-left: 2em;
+    margin-top: 0.5em;
+    height: 1.5em;
 }
 
-.Operation a {
-    position:relative;
-    margin:0em 0.7em 0em 0em;
-    top:-0.4em;
-}
+    .Operation a {
+        position: relative;
+        margin: 0em 0.7em 0em 0em;
+        top: -0.4em;
+    }
 
 /* 明細部 ボタン */
 #detailbuttonbox {
-    z-index:10;
+    z-index: 10;
 }
 
-#detailbuttonbox a {
-    position:relative;
-    margin:0em 0em 0em 0.2em;
-    top:0.5em;
-    left:48.8em;
-}
+    #detailbuttonbox a {
+        position: relative;
+        margin: 0em 0em 0em 0.2em;
+        top: 0.5em;
+        left: 48.8em;
+    }
 
 /* 明細部 Key項目 */
 #detailkeybox {
-    top:-1em;
-    z-index:1;
+    top: -1em;
+    z-index: 1;
 }
 
-#detailkeybox p {
-    position:relative;
-    margin:0em 0em 0.2em 0em;
-    height:1.4em;
-    left:3em;
-}
+    #detailkeybox p {
+        position: relative;
+        margin: 0em 0em 0.2em 0em;
+        height: 1.4em;
+        left: 3em;
+    }
 
-#detailkeybox a {
-    position:relative;
-    margin:0em 1em 0em 0em;
-}
+    #detailkeybox a {
+        position: relative;
+        margin: 0em 1em 0em 0em;
+    }
 
 /* テキストボックス */
 .WF_TEXTBOX_CSS {
-    color:black;
-    font-size:1.4rem;
-    vertical-align:middle;
-    text-align:left;
-    overflow:hidden;
-    ime-mode:inactive;
-    border:1px solid black;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+    ime-mode: inactive;
+    border: 1px solid black;
 }
 
 /* 左詰め */
 .WF_TEXT_LEFT {
-    color:black;
-    font-size:1.4rem;
-    vertical-align:middle;
-    text-align:left;
-    overflow:hidden;
-    ime-mode:inactive;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+    ime-mode: inactive;
 }
 
 .WF_TEXT_LEFT_K {
-    color:black;
-    font-size:1.4rem;
-    vertical-align:middle;
-    text-align:left;
-    overflow:hidden;
-    ime-mode:active;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+    ime-mode: active;
 }
 
 /* 中央 */
 .WF_TEXT_CENTER {
-    color:black;
-    font-size:1.4rem;
-    vertical-align:middle;
-    text-align:center;
-    overflow:hidden;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: center;
+    overflow: hidden;
 }
+
 .WF_TEXTBOX_CENTER {
     color: black;
     font-size: 1.4rem;
@@ -315,12 +320,13 @@ div {
 
 /* 右詰め */
 .WF_TEXT_RIGHT {
-    color:black;
-    font-size:1.4rem;
-    vertical-align:middle;
-    text-align:right;
-    overflow:hidden;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
 }
+
 .WF_TEXTBOX_RIGHT {
     color: black;
     font-size: 1.4rem;
@@ -333,63 +339,63 @@ div {
 
 /* テキスト表示情報 */
 .WF_TEXT {
-    color:blue;
-    font-size:small;
-    height:1.3em;
-    vertical-align:middle;
-    text-align:left;
-    overflow:hidden;
+    color: blue;
+    font-size: small;
+    height: 1.3em;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
 }
 
 .WF_TEXT_LEFT_LABEL {
-    color:blue;
-    font-size:1.4rem;
-    vertical-align:middle;
-    text-align:left;
-    overflow:hidden;
-    ime-mode:active;
+    color: blue;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+    ime-mode: active;
 }
 
 .WF_LABEL_LEFT {
-    color:black;
-    font-size:1.4rem;
-    vertical-align:middle;
-    text-align:left;
-    overflow:hidden;
-    ime-mode:inactive;
-    background-color:rgb(148,138,84);
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+    ime-mode: inactive;
+    background-color: rgb(148,138,84);
 }
 
 /* フッターメッセージ情報 */
 .WF_MESSAGE {
-    height:16px;
-    overflow:hidden;
-    position:fixed;
-    left:1.5em;
-    right:1.5em;
-    color:blue;
-    font-size:small;
-    vertical-align:middle;
+    height: 16px;
+    overflow: hidden;
+    position: fixed;
+    left: 1.5em;
+    right: 1.5em;
+    color: blue;
+    font-size: small;
+    vertical-align: middle;
 }
 
 /* 右ボックスメモ欄 */
 .WF_MEMO {
-    font-size:small;
-    vertical-align:top;
-    text-align:left;
+    font-size: small;
+    vertical-align: top;
+    text-align: left;
 }
 
 .RF_DTLDISP {
-    display:none;
+    display: none;
 }
 
 /* 左ボックスボタン */
 .button {
-    position: relative ;
+    position: relative;
     top: 1em;
     left: 0.8em;
     width: 25em;
-    height:5em;
+    height: 5em;
 }
 
 .LF_ListArea {
@@ -413,73 +419,73 @@ div {
 
 /* 左テーブル */
 #pnlLeftList_H {
-    position:fixed;
-    top:5.5em;
-    left:2em;
+    position: fixed;
+    top: 5.5em;
+    left: 2em;
 }
 
 #pnlLeftList_D {
-    position:fixed;
-    top:8.5em;
-    left:2.3em;
-    height:500px;
-    overflow-y:scroll;
-    font-size:1.4rem;
+    position: fixed;
+    top: 8.5em;
+    left: 2.3em;
+    height: 500px;
+    overflow-y: scroll;
+    font-size: 1.4rem;
 }
 
 /* 左ボックス拡張機能 */
 #WF_LeftBoxSortType {
-    width:300px;
+    width: 300px;
 }
 
 #WF_LEFTBOXFILTER {
-    width:342px;
-    font-size:1.2rem;
+    width: 342px;
+    font-size: 1.2rem;
 }
 
 #WF_buttonFilter {
-    width:50px;
-    min-height:22px;
+    width: 50px;
+    min-height: 22px;
 }
 
 /* リストエリア */
 #divListArea {
-    height:calc(100% - 45px);
-    min-width:990px;
+    height: calc(100% - 45px);
+    min-width: 990px;
 }
 
 #divPnlListArea_HLShowHideDetailBox {
-    color:crimson;
+    color: crimson;
 }
 
-/* TODO 他の項目のホバーイベントが機能しなくなる? */
-/*#divPnlListArea_HLShowHideDetailBox:hover {
+    /* TODO 他の項目のホバーイベントが機能しなくなる? */
+    /*#divPnlListArea_HLShowHideDetailBox:hover {
     text-decoration:underline;
     cursor:pointer;
 }*/
 
-#divPnlListArea_HLShowHideDetailBox.showDetail:before {
-    content:"SHOW INPUT";
-}
+    #divPnlListArea_HLShowHideDetailBox.showDetail:before {
+        content: "SHOW INPUT";
+    }
 
-#divPnlListArea_HLShowHideDetailBox.hideDetail:before {
-    content:"HIDE INPUT";
-}
+    #divPnlListArea_HLShowHideDetailBox.hideDetail:before {
+        content: "HIDE INPUT";
+    }
 
 /* ************************ */
 /* 上一覧表                 */
 /* ************************ */
 #pnlListArea {
-    margin-left:10px;
-    margin-right:10px;
-    height:100%;
-    position:relative;
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 100%;
+    position: relative;
 }
 
-#pnlListArea td, #pnlListArea th {
-    white-space:nowrap;             /* 折り返させない */
-    text-overflow:ellipsis;         /* 領域越を点々表示 */
-}
+    #pnlListArea td, #pnlListArea th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+    }
 
 /* ------------------------------
    CS0013ProfViewでの生成Table
@@ -488,7 +494,7 @@ div {
    ------------------------------ */
 div[data-generated="1"] {
     /* color:red; */
-    letter-spacing:-.4em;
+    letter-spacing: -.4em;
     /*margin-left:10px;
     margin-right:10px;
     height:calc(100% - 120px);
@@ -497,169 +503,168 @@ div[data-generated="1"] {
     overflow:hidden;*/
 }
 
-div[data-generated="1"] span.listSort {
-    cursor:pointer;
-}
+    div[data-generated="1"] span.listSort {
+        cursor: pointer;
+    }
 
-/* TODO 他の項目のホバーイベントが機能しなくなる? */
-/*div[data-generated="1"] span.listSort:hover {
+        /* TODO 他の項目のホバーイベントが機能しなくなる? */
+        /*div[data-generated="1"] span.listSort:hover {
     color:darkorange;
 }*/
 
-div[data-generated="1"] span.listSort.ASC:after {
-    width:16px;
-    height:16px;
-    content:"";
-    display:table-cell;
-    background-image:url('../Images/ascending.png');
-    background-repeat:no-repeat;
-    background-size:contain;
-    float:right;
-}
+        div[data-generated="1"] span.listSort.ASC:after {
+            width: 16px;
+            height: 16px;
+            content: "";
+            display: table-cell;
+            background-image: url('../Images/ascending.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            float: right;
+        }
 
-div[data-generated="1"] span.listSort.DESC:after {
-    width:16px;
-    height:16px;
-    display:table-cell;
-    content:"";
-    background-image:url('../Images/descending.png');
-    background-repeat:no-repeat;
-    background-size:contain;
-    float:right;
-}
+        div[data-generated="1"] span.listSort.DESC:after {
+            width: 16px;
+            height: 16px;
+            display: table-cell;
+            content: "";
+            background-image: url('../Images/descending.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            float: right;
+        }
 
-div[data-generated="1"] div {
-    /* color:red; */
-    letter-spacing:-.4em;
-    border-color:white;
-    border-width:0px;
-}
+    div[data-generated="1"] div {
+        /* color:red; */
+        letter-spacing: -.4em;
+        border-color: white;
+        border-width: 0px;
+    }
 
-div[data-generated="1"] div table {
-    /* color: red; */
-    letter-spacing:normal;
-    border-color:white;
-    border-width:0px;
-}
+        div[data-generated="1"] div table {
+            /* color: red; */
+            letter-spacing: normal;
+            border-color: white;
+            border-width: 0px;
+        }
 
-/* 左(固定ヘッダーテーブル用)DIV */
-div[data-generated="1"] div[id$="_HL"] {
-    left:0px;
-    top:0px;
-    position:absolute;
-}
+        /* 左(固定ヘッダーテーブル用)DIV */
+        div[data-generated="1"] div[id$="_HL"] {
+            left: 0px;
+            top: 0px;
+            position: absolute;
+        }
 
-/* 右(可変ヘッダーテーブル用)DIV */
-div[data-generated="1"] div[id$="_HR"] {
-    right:0px;
-    top:0px;
-    bottom:0px;
-    overflow:hidden;
-    position:absolute;
-}
+        /* 右(可変ヘッダーテーブル用)DIV */
+        div[data-generated="1"] div[id$="_HR"] {
+            right: 0px;
+            top: 0px;
+            bottom: 0px;
+            overflow: hidden;
+            position: absolute;
+        }
 
-/* 左(固定データテーブル用)DIV */
-div[data-generated="1"] div[id$="_DL"] {
-    left:0px;
-    top:26px;
-    /* top:48px; */
-    bottom:0px;
-    /* width:auto;  固定列の幅に合わされる */
-    overflow-x:hidden;
-    overflow-y:hidden;
-    position:absolute;
-    z-index:3;
-}
+        /* 左(固定データテーブル用)DIV */
+        div[data-generated="1"] div[id$="_DL"] {
+            left: 0px;
+            top: 26px;
+            /* top:48px; */
+            bottom: 0px;
+            /* width:auto;  固定列の幅に合わされる */
+            overflow-x: hidden;
+            overflow-y: hidden;
+            position: absolute;
+            z-index: 3;
+        }
 
-/* 右(可変データテーブル用)DIV */
-div[data-generated="1"] div[id$="_DR"] {
-    /* left:538px; */ /* 固定列の幅に合わせ共通処理でインラインで設定 */
-    right:0px;
-    top:26px;
-    /* top:48px; */
-    bottom:0px;
-    width:auto;
-    overflow-x:hidden;
-    overflow-y:hidden;
-    position:absolute;
-    z-index:2;
-}
+        /* 右(可変データテーブル用)DIV */
+        div[data-generated="1"] div[id$="_DR"] {
+            /* left:538px; */ /* 固定列の幅に合わせ共通処理でインラインで設定 */
+            right: 0px;
+            top: 26px;
+            /* top:48px; */
+            bottom: 0px;
+            width: auto;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            position: absolute;
+            z-index: 2;
+        }
 
-/* 左右データ・ヘッダーを格納するテーブルスタイル */
-div[data-generated="1"] div[id$="_HL"] table,
-div[data-generated="1"] div[id$="_HR"] table,
-div[data-generated="1"] div[id$="_DR"] table,
-div[data-generated="1"] div[id$="_DL"] table {
-    border:1px solid white;
-    border-image:none;
-    width:100%;
-    height:24px;
-    border-collapse:collapse;
-    table-layout:fixed;
-    word-wrap:break-word;
-    font-size:1.2rem;
-}
+            /* 左右データ・ヘッダーを格納するテーブルスタイル */
+            div[data-generated="1"] div[id$="_HL"] table,
+            div[data-generated="1"] div[id$="_HR"] table,
+            div[data-generated="1"] div[id$="_DR"] table,
+            div[data-generated="1"] div[id$="_DL"] table {
+                border: 1px solid white;
+                border-image: none;
+                width: 100%;
+                height: 24px;
+                border-collapse: collapse;
+                table-layout: fixed;
+                word-wrap: break-word;
+                font-size: 1.2rem;
+            }
 
-div[data-generated="1"] div[id$="_HL"] table,
-/*div[data-generated="1"] div[id$="_HR"] table {
+                div[data-generated="1"] div[id$="_HL"] table,
+                /*div[data-generated="1"] div[id$="_HR"] table {
     height:48px;
 }
 */
+                /* 左ヘッダー行スタイル */
+                div[data-generated="1"] div[id$="_HL"] table tr {
+                    background-color: rgb(149,179,215);
+                    color: rgb(0, 32, 96);
+                }
 
-/* 左ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HL"] table tr {
-    background-color:rgb(149,179,215);
-    color:rgb(0, 32, 96);
-}
+                /* 右ヘッダー行スタイル */
+                div[data-generated="1"] div[id$="_HR"] table tr {
+                    background-color: rgb(22,54,92);
+                    color: white;
+                }
 
-/* 右ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HR"] table tr {
-    background-color:rgb(22,54,92);
-    color:white;
-}
+                /* 左データ行スタイル */
+                div[data-generated="1"] div[id$="_DL"] table tr {
+                    background-color: rgb(149,179,215);
+                    color: rgb(0, 32, 96);
+                }
 
-/* 左データ行スタイル */
-div[data-generated="1"] div[id$="_DL"] table tr {
-    background-color:rgb(149,179,215);
-    color:rgb(0, 32, 96);
-}
+                /* データ行スタイル */
+                div[data-generated="1"] div[id$="_DR"] table tr,
+                div[data-generated="1"] div[id$="_DL"] table tr {
+                    background-color: white;
+                    color: black;
+                }
 
-/* データ行スタイル */
-div[data-generated="1"] div[id$="_DR"] table tr,
-div[data-generated="1"] div[id$="_DL"] table tr {
-    background-color:white;
-    color:black;
-}
+                    /* データ行(奇数) */
+                    div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd),
+                    div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) {
+                        background-color: #C8C8E8;
+                    }
 
-/* データ行(奇数) */
-div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd),
-div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) {
-    background-color:#C8C8E8;
-}
+    /* セルの設定(共通) */
+    div[data-generated="1"] td,
+    div[data-generated="1"] th {
+        border: 1px solid White;
+        height: 24px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 
-/* セルの設定(共通) */
-div[data-generated="1"] td,
-div[data-generated="1"] th {
-    border:1px solid White;
-    height:24px;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-    overflow:hidden;
-}
+    /* セルの設定(共通) */
+    div[data-generated="1"] div[id$="_HL"] td,
+    div[data-generated="1"] div[id$="_HL"] th,
+    div[data-generated="1"] div[id$="_HR"] td,
+    div[data-generated="1"] div[id$="_HR"] th {
+        border: 1px solid White;
+        /* word-break:break-all; */
+        word-wrap: break-word !important;
+        white-space: normal !important;
+        text-overflow: ellipsis;
+    }
 
-/* セルの設定(共通) */
-div[data-generated="1"] div[id$="_HL"] td,
-div[data-generated="1"] div[id$="_HL"] th,
-div[data-generated="1"] div[id$="_HR"] td,
-div[data-generated="1"] div[id$="_HR"] th {
-    border:1px solid White;
-    /* word-break:break-all; */
-    word-wrap:break-word !important;
-    white-space:normal !important;
-    text-overflow:ellipsis;
-}
-
-/*div[data-generated="1"] td:before,
+    /*div[data-generated="1"] td:before,
 div[data-generated="1"] th:before{
     content:"\00A0";
     display:inline-block;
@@ -667,205 +672,207 @@ div[data-generated="1"] th:before{
     white-space:nowrap;
 }*/
 
-/* ------------------------------
+    /* ------------------------------
 CS0013ProfViewでの生成Tableの
 SCROLL TYPE個別設定
 ------------------------------ */
-/* SCROLLTYPE=1(縦のみ) */
-div [data-generated="1"][data-scrolltype="1"] div[id$="_HR"] {
-    right:16px;
-}
+    /* SCROLLTYPE=1(縦のみ) */
+    div [data-generated="1"][data-scrolltype="1"] div[id$="_HR"] {
+        right: 16px;
+    }
 
-div [data-generated="1"][data-scrolltype="1"] div[id$="_DL"] {
-    bottom:0px;
-}
+    div [data-generated="1"][data-scrolltype="1"] div[id$="_DL"] {
+        bottom: 0px;
+    }
 
-div [data-generated="1"][data-scrolltype="1"] div[id$="_DR"] {
-    overflow-y:scroll;
-}
+    div [data-generated="1"][data-scrolltype="1"] div[id$="_DR"] {
+        overflow-y: scroll;
+    }
 
-/* SCROLLTYPE=2(横のみ) */
-div[data-generated="1"][data-scrolltype="2"] div[id$="_HR"] {
-    /* 初期値と同値 */
-}
+    /* SCROLLTYPE=2(横のみ) */
+    div[data-generated="1"][data-scrolltype="2"] div[id$="_HR"] {
+        /* 初期値と同値 */
+    }
 
-div [data-generated="1"][data-scrolltype="2"] div[id$="_DL"] {
-    bottom:16px;
-}
+    div [data-generated="1"][data-scrolltype="2"] div[id$="_DL"] {
+        bottom: 16px;
+    }
 
-div [data-generated="1"][data-scrolltype="2"] div[id$="_DR"] {
-    overflow-x:scroll;
-}
+    div [data-generated="1"][data-scrolltype="2"] div[id$="_DR"] {
+        overflow-x: scroll;
+    }
 
-/* SCROLLTYPE=3(縦横固定) */
-div[data-generated="1"][data-scrolltype="3"] div[id$="_HR"] {
-    right:16px;
-}
+    /* SCROLLTYPE=3(縦横固定) */
+    div[data-generated="1"][data-scrolltype="3"] div[id$="_HR"] {
+        right: 16px;
+    }
 
-div [data-generated="1"][data-scrolltype="3"] div[id$="_DL"] {
-    bottom:16px;
-}
+    div [data-generated="1"][data-scrolltype="3"] div[id$="_DL"] {
+        bottom: 16px;
+    }
 
-div [data-generated="1"][data-scrolltype="3"] div[id$="_DR"] {
-    overflow-x:scroll;
-    overflow-y:scroll;
-}
+    div [data-generated="1"][data-scrolltype="3"] div[id$="_DR"] {
+        overflow-x: scroll;
+        overflow-y: scroll;
+    }
 
-/* ------------------------------
+    /* ------------------------------
     CS0013ProfViewでの生成Tableの
     COLORSET定義 green
 ------------------------------ */
-/* 左ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="green"] {
-    background-color:#3F9877;
-}
+    /* 左ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="green"] {
+        background-color: #3F9877;
+    }
 
-/* 右ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="green"] {
-    background-color:#3F9877;
-}
+    /* 右ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="green"] {
+        background-color: #3F9877;
+    }
 
-/* データ行(奇数) */
-div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="green"],
-div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="green"] {
-    background-color:#91BA58;
-}
+    /* データ行(奇数) */
+    div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="green"],
+    div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="green"] {
+        background-color: #91BA58;
+    }
 
-/* ------------------------------
+    /* ------------------------------
 CS0013ProfViewでの生成Tableの
 COLORSET定義 red
 ------------------------------ */
-/* 左ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="red"] {
-    background-color:#942138;
-}
+    /* 左ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="red"] {
+        background-color: #942138;
+    }
 
-/* 右ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="red"] {
-    background-color:#942138;
-}
+    /* 右ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="red"] {
+        background-color: #942138;
+    }
 
-/* データ行(奇数) */
-div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="red"],
-div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="red"] {
-    background-color:#B92946;
-}
+    /* データ行(奇数) */
+    div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="red"],
+    div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="red"] {
+        background-color: #B92946;
+    }
 
-/* ------------------------------
+    /* ------------------------------
 CS0013ProfViewでの生成Tableの
 COLORSET定義 orange
 ------------------------------ */
-/* 左ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="orange"] {
-    background-color:#FF4700;
-}
+    /* 左ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="orange"] {
+        background-color: #FF4700;
+    }
 
-/* 右ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="orange"] {
-    background-color:#FF4700;
-}
+    /* 右ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="orange"] {
+        background-color: #FF4700;
+    }
 
-/* データ行(奇数) */
-div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="orange"],
-div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="orange"] {
-    background-color:#FFA500;
-}
+    /* データ行(奇数) */
+    div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="orange"],
+    div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="orange"] {
+        background-color: #FFA500;
+    }
 
-/* ------------------------------
+    /* ------------------------------
 CS0013ProfViewでの生成Tableの
 COLORSET定義 purple
 ------------------------------ */
-/* 左ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="purple"] {
-    background-color:#420039;
-}
+    /* 左ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HL"] table tr th[data-colorset="purple"] {
+        background-color: #420039;
+    }
 
-/* 右ヘッダー行スタイル */
-div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="purple"] {
-    background-color:#420039;
-}
+    /* 右ヘッダー行スタイル */
+    div[data-generated="1"] div[id$="_HR"] table tr th[data-colorset="purple"] {
+        background-color: #420039;
+    }
 
-/* データ行(奇数) */
-div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="purple"],
-div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="purple"] {
-    background-color:#CDB2CD;
-}
+    /* データ行(奇数) */
+    div[data-generated="1"] div[id$="_DR"] table tr:nth-child(odd) td[data-colorset="purple"],
+    div[data-generated="1"] div[id$="_DL"] table tr:nth-child(odd) td[data-colorset="purple"] {
+        background-color: #CDB2CD;
+    }
 
-/* ------------------------------
+    /* ------------------------------
 共通表マウスホバー時の色調整
 ------------------------------ */
-div[data-generated="1"] tr.hover td,
-div[data-generated="1"] tr.hover th {
-    background-color:#FFDADA !important;
-}
+    div[data-generated="1"] tr.hover td,
+    div[data-generated="1"] tr.hover th {
+        background-color: #FFDADA !important;
+    }
 
 /* ************************ */
 /* タブ下部の入力エリア     */
 /* ************************ */
 /* 詳細の一覧表 */
 span[class^="WF_DViewRep"][class$="_Area"] {
-    display:block;
-    position:fixed;
-    bottom:1.5em;
-    left:5px;
-    right:5px;
-    overflow-x:hidden;
-    overflow-y:auto;
-    background-color:white;
+    display: block;
+    position: fixed;
+    bottom: 1.5em;
+    left: 5px;
+    right: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: white;
     border: 2px solid blue;
-    background-color:rgb(220,230,240);
-    z-index:2;
+    background-color: rgb(220,230,240);
+    z-index: 2;
 }
 /* 詳細一覧表内のテキストボックス */
 span[class^="WF_DViewRep"] table input[type=text] {
     width: 15rem;
     height: 1.6rem;
-    visibility:hidden;
+    visibility: hidden;
 }
 
 span[class^="WF_DViewRep"] table {
-    width:100%;
-    margin-left:15px;
-    margin-top:5px;
+    width: 100%;
+    margin-left: 15px;
+    margin-top: 5px;
 }
-span[class^="WF_DViewRep"] table td {
-    padding:1px;
-    padding-top:2px;
-    padding-bottom:2px;
-}
-span[class^="WF_DViewRep"] table td:nth-child(1){
-    display:none;
-}
-/* 詳細一覧表内の項目名称 */
-span[class^="WF_DViewRep"] table td:nth-child(7n+2) span{
-    width:10rem;
-    display:inline-block;
-}
-/* 詳細一覧表内の必須記号 */
-span[class^="WF_DViewRep"] table td:nth-child(7n+3) span{
-    width:0.5rem;
-    display:inline-block;
-}
-/* 詳細一覧表内の項目（非表示） */
-span[class^="WF_DViewRep"] table td:nth-child(7n+4){
-    display: none;
-}
-/* 詳細一覧表内の項目（空白） */
-span[class^="WF_DViewRep"] table td:nth-child(7n+6) span{
-    width:1px;
-    display:inline-block;
-}
-/* 詳細一覧表内の項目（値名称） */
-span[class^="WF_DViewRep"] table td:nth-child(7n+7) span{
-    width: 10rem;
-    display: inline-block;
-    color:blue;
-}
-/* 詳細一覧表内の項目（空白） */
-span[class^="WF_DViewRep"] table td:nth-child(7n+1) span{
-    width:0.5rem;
-    display:inline-block;
-}
+
+    span[class^="WF_DViewRep"] table td {
+        padding: 1px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
+
+        span[class^="WF_DViewRep"] table td:nth-child(1) {
+            display: none;
+        }
+        /* 詳細一覧表内の項目名称 */
+        span[class^="WF_DViewRep"] table td:nth-child(7n+2) span {
+            width: 10rem;
+            display: inline-block;
+        }
+        /* 詳細一覧表内の必須記号 */
+        span[class^="WF_DViewRep"] table td:nth-child(7n+3) span {
+            width: 0.5rem;
+            display: inline-block;
+        }
+        /* 詳細一覧表内の項目（非表示） */
+        span[class^="WF_DViewRep"] table td:nth-child(7n+4) {
+            display: none;
+        }
+        /* 詳細一覧表内の項目（空白） */
+        span[class^="WF_DViewRep"] table td:nth-child(7n+6) span {
+            width: 1px;
+            display: inline-block;
+        }
+        /* 詳細一覧表内の項目（値名称） */
+        span[class^="WF_DViewRep"] table td:nth-child(7n+7) span {
+            width: 10rem;
+            display: inline-block;
+            color: blue;
+        }
+        /* 詳細一覧表内の項目（空白） */
+        span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
+            width: 0.5rem;
+            display: inline-block;
+        }
 
 #pnlListArea td, #pnlListArea th {
     white-space: nowrap; /* 折り返させない */

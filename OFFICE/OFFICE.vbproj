@@ -466,6 +466,7 @@
     <Content Include="inc\GRIS0003SRightBox.ascx" />
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
+    <Content Include="logo.png" />
     <Content Include="M00000LOGON.aspx" />
     <Content Include="M00001MENU.aspx" />
     <Content Include="MB0006SCHEDULE.aspx" />

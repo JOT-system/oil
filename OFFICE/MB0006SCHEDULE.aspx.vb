@@ -60,7 +60,7 @@ Public Class MB0006SCHEDULE
             Initialize()
 
             '〇メッセージセット
-            Master.output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+            Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
         End If
 
         Master.LOGINCOMP = WF_TERMCAMP.Text
@@ -73,7 +73,7 @@ Public Class MB0006SCHEDULE
         'INIファイル取得
         CS0001INIFILEget.CS0001INIFILEget()
         If Not isNormal(CS0001INIFILEget.ERR) Then
-            Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "システム管理者へ連絡して下さい(INI_File Not Find)")
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "システム管理者へ連絡して下さい(INI_File Not Find)")
             Exit Sub
         End If
 
@@ -85,7 +85,7 @@ Public Class MB0006SCHEDULE
             CS0050Session.APSV_M_ORG = CS0006TERMchk.TERMORG
             CS0050Session.APSV_ORG = CS0006TERMchk.MORG
         Else
-            Master.output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
+            Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
             Exit Sub
         End If
 
@@ -96,7 +96,7 @@ Public Class MB0006SCHEDULE
         CS0008ONLINEstat.CS0008ONLINEstat()
         If isNormal(CS0008ONLINEstat.ERR) AndAlso CS0008ONLINEstat.ONLINESW <> 0 Then
         Else
-            Master.output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
+            Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
             Exit Sub
         End If
 
@@ -104,7 +104,7 @@ Public Class MB0006SCHEDULE
         '○メッセージクリア
         Master.MAPID = MAPID
         '○Grid情報保存先のファイル名
-        Master.createXMLSaveFile()
+        Master.CreateXMLSaveFile()
         '〇端末情報の取得
         getTermData(WW_RTN)
         '〇処理日付設定
@@ -140,7 +140,7 @@ Public Class MB0006SCHEDULE
             If isNormal(CS0016VARIget.ERR) Then
                 WF_SELECTAREA.Value = CS0016VARIget.VALUE
             Else
-                Master.output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0016VARIget")
+                Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0016VARIget")
                 Exit Sub
             End If
         End If
@@ -185,13 +185,13 @@ Public Class MB0006SCHEDULE
         '■ 範囲チェック(ユーザ空欄セル入力はエラー)
         If CInt(WF_REP_LineCnt.Value) < 0 OrElse CInt(WF_REP_LineCnt.Value) > (WF_HEADdate_YMD.Items.Count - 1) Then
             'メッセージセット
-            Master.output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ABORT)
+            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ABORT)
             Exit Sub
         End If
 
         If CInt(WF_REP_ColCnt.Value) < 1 OrElse CInt(WF_REP_ColCnt.Value) > WF_HEADuser.Items.Count Then
             'メッセージセット
-            Master.output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ABORT)
+            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ABORT)
             Exit Sub
         End If
         'DataBase接続文字
@@ -231,7 +231,7 @@ Public Class MB0006SCHEDULE
 
             Catch ex As Exception
                 'メッセージセット
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "MB006_SCHEDULE")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "MB006_SCHEDULE")
 
                 Exit Sub
             End Try
@@ -313,14 +313,14 @@ Public Class MB0006SCHEDULE
 
             Catch ex As Exception
                 'メッセージセット
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "MB006_SCHEDULE")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "MB006_SCHEDULE")
 
                 Exit Sub
             End Try
         End Using
         'メッセージ表示
         '〇メッセージセット
-        Master.output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
 
 
     End Sub
@@ -418,7 +418,7 @@ Public Class MB0006SCHEDULE
             End Using
 
         Catch ex As Exception
-            Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "MB006_SCHEDULE SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "MB006_SCHEDULE SELECT")
 
             CS0011LOGWRITE.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "DB:M0006_STRUCT Select"           '
@@ -487,7 +487,7 @@ Public Class MB0006SCHEDULE
         Try
 
             RemoteIp = Request.UserHostAddress
-            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
+            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(RemoteIp)
             For Each ipAddr As IPAddress In ClientIphEntry.AddressList
                 'IPv4にする
                 If ipAddr.AddressFamily = Sockets.AddressFamily.InterNetwork Then
@@ -495,12 +495,12 @@ Public Class MB0006SCHEDULE
                 End If
             Next
         Catch ex As Exception
-            Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
             Exit Sub
         End Try
 
         If RemoteIp.LastIndexOf(".") < 0 Then
-            Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
             Exit Sub
         Else
             RemoteIp3 = Mid(RemoteIp, 1, RemoteIp.LastIndexOf("."))
@@ -572,7 +572,8 @@ Public Class MB0006SCHEDULE
             Case "172.16.219"  '水島
                 WF_SELECTAREA.Value = "関西"
             Case Else
-                WF_SELECTAREA.Value = "北海道"
+                'WF_SELECTAREA.Value = "北海道"
+                WF_SELECTAREA.Value = "本社"
 
         End Select
 
@@ -682,7 +683,7 @@ Public Class MB0006SCHEDULE
 
         Catch ex As Exception
             'メッセージセット
-            Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT)
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT)
 
             Exit Sub
         End Try
@@ -744,7 +745,7 @@ Public Class MB0006SCHEDULE
 
         Catch ex As Exception
             'メッセージセット
-            Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT)
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT)
 
             Exit Sub
         End Try
@@ -849,7 +850,7 @@ Public Class MB0006SCHEDULE
 
         Catch ex As Exception
             'メッセージセット
-            Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT)
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT)
             Exit Sub
         End Try
 
@@ -1036,7 +1037,7 @@ Public Class MB0006SCHEDULE
         Try
 
             RemoteIp = Request.UserHostAddress
-            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
+            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(RemoteIp)
             For Each ipAddr As IPAddress In ClientIphEntry.AddressList
                 'IPv4にする
                 If ipAddr.AddressFamily = Sockets.AddressFamily.InterNetwork Then
@@ -1044,16 +1045,17 @@ Public Class MB0006SCHEDULE
                 End If
             Next
         Catch ex As Exception
-            Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
             Exit Sub
         End Try
 
         If RemoteIp.LastIndexOf(".") < 0 Then
-            Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "クライアントIP取得失敗")
             Exit Sub
         Else
             RemoteIp3 = Mid(RemoteIp, 1, RemoteIp.LastIndexOf("."))
         End If
+
         '○ ユーザ
         Try
             Dim SQLStr0 As String =
@@ -1098,7 +1100,7 @@ Public Class MB0006SCHEDULE
             End Using
 
         Catch ex As Exception
-            Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0001_TERM SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0001_TERM SELECT")
             CS0011LOGWRITE.INFSUBCLASS = "getTermData"                   'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM SELECT"          '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                  '

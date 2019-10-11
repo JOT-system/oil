@@ -14,13 +14,13 @@ Option Explicit On
 Partial Public Class M00000LOGON
 
     '''<summary>
-    '''UserName コントロール。
+    '''WF_LOGO コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents UserName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_LOGO As Global.System.Web.UI.WebControls.Image
 
     '''<summary>
     '''UserID コントロール。
@@ -30,15 +30,6 @@ Partial Public Class M00000LOGON
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents UserID As Global.System.Web.UI.WebControls.TextBox
-
-    '''<summary>
-    '''PassName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents PassName As Global.System.Web.UI.WebControls.Label
 
     '''<summary>
     '''PassWord コントロール。

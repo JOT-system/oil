@@ -256,6 +256,7 @@
     <Content Include="GR\GRMC0010SELECT.aspx" />
     <Content Include="GR\GRMC0010T3CNTL.aspx" />
     <Content Include="GR\GRMC0012MODEL.aspx" />
+    <Content Include="GR\OIM0005TankSearch.aspx" />
     <Content Include="GR\GRMC0012SELECT.aspx" />
     <Content Include="GR\GRMD0002PRODORG.aspx" />
     <Content Include="GR\GRMD0002SELECT.aspx" />
@@ -887,6 +888,13 @@
     </Compile>
     <Compile Include="GR\GRMC0012MODEL.aspx.vb">
       <DependentUpon>GRMC0012MODEL.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GR\OIM0005TankSearch.aspx.designer.vb">
+      <DependentUpon>OIM0005TankSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="GR\OIM0005TankSearch.aspx.vb">
+      <DependentUpon>OIM0005TankSearch.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="GR\GRMC0012SELECT.aspx.designer.vb">

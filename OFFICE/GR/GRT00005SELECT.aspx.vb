@@ -212,7 +212,7 @@ Public Class GRT00005SELECT
                     .activeCalendar()
                 ElseIf WF_LeftMViewChange.Value = LIST_BOX_CLASSIFICATION.LC_STAFFCODE Then
                     '従業員の場合テーブル表記する
-                    Dim prmData As Hashtable = work.createSTAFFParam(WF_CAMPCODE.Text, WF_UORG.Text)
+                    Dim prmData As Hashtable = work.CreateSTAFFParam(WF_CAMPCODE.Text, WF_UORG.Text, WF_STYMD.Text, WF_ENDYMD.Text)
                     .seTTableList(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .activeTable()
                     WF_LeftboxOpen.Value = "OpenTbl"
@@ -222,7 +222,7 @@ Public Class GRT00005SELECT
                     If WF_LeftMViewChange.Value = LIST_BOX_CLASSIFICATION.LC_ORG Then
                         prmData = work.createORGParam(WF_CAMPCODE.Text, C_PERMISSION.REFERLANCE)
                     ElseIf WF_LeftMViewChange.Value = LIST_BOX_CLASSIFICATION.LC_STAFFCODE Then
-                        prmData = work.createSTAFFParam(WF_CAMPCODE.Text, WF_UORG.Text)
+                        prmData = work.CreateSTAFFParam(WF_CAMPCODE.Text, WF_UORG.Text, WF_STYMD.Text, WF_ENDYMD.Text)
                     End If
                     .setListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .activeListBox()
@@ -598,7 +598,7 @@ Public Class GRT00005SELECT
                 Case "UORG" '部署
                     leftview.CodeToName(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, work.CreateORGParam(WF_CAMPCODE.Text, C_PERMISSION.REFERLANCE))                     '部署
                 Case "STAFFCODE" '乗務員
-                    leftview.CodeToName(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_STAFFCODE, I_VALUE, O_TEXT, O_RTN, work.CreateSTAFFParam(WF_CAMPCODE.Text, String.Empty))               '従業員
+                    leftview.CodeToName(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_STAFFCODE, I_VALUE, O_TEXT, O_RTN, work.CreateSTAFFParam(WF_CAMPCODE.Text, String.Empty, WF_STYMD.Text, WF_ENDYMD.Text))               '従業員
             End Select
         End If
 
@@ -732,7 +732,7 @@ Public Class GRT00005SELECT
         If isNormal(WW_CS0024FCHECKERR) Then
             '③存在チェック(LeftBoxチェック)
             If WF_STAFFCODE.Text <> "" Then
-                leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STAFFCODE, WF_STAFFCODE.Text, WF_STAFFCODE_Text.Text, O_RTN, work.CreateSTAFFParam(WF_CAMPCODE.Text, WF_UORG.Text))
+                leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STAFFCODE, WF_STAFFCODE.Text, WF_STAFFCODE_Text.Text, O_RTN, work.CreateSTAFFParam(WF_CAMPCODE.Text, WF_UORG.Text, WF_STYMD.Text, WF_ENDYMD.Text))
                 If Not isNormal(O_RTN) Then
                     Master.Output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR)
                     O_RTN = C_MESSAGE_NO.INVALID_SELECTION_DATA

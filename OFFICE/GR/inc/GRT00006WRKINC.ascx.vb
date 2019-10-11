@@ -6,6 +6,7 @@ Public Class GRT00006WRKINC
     Public Const MAPIDS As String = "T00006S"                       'MAPID(選択)
     Public Const MAPID As String = "T00006"                         'MAPID(実行)
 
+    Public Const C_KOUEI_CLASS_CODE As String = "T00006_KOUEIORG"   '光英連携可否判定用FIXVAL KEY
     ''' <summary>
     ''' ワークデータ初期化処理
     ''' </summary>

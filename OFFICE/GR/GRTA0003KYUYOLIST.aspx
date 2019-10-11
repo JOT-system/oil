@@ -160,7 +160,7 @@
 
                 <!-- ■■■　手当関連１　■■■ -->
                 <a style="position:fixed;top:13.3em;left:3em; width:32em;" >
-                    <asp:Label ID="Label11" runat="server" Text="年始出勤日数" Height="1.1em" Width="5em" CssClass="WF_TEXT_LEFT" Font-Bold="false" Font-Underline="false"></asp:Label>
+                    <asp:Label ID="Label11" runat="server" Text="年始出勤日数" Height="1.3em" Width="6em" CssClass="WF_TEXT_LEFT" Font-Bold="false" Font-Underline="false"></asp:Label>
                     <b>
                     <asp:TextBox ID="WF_NENSHINISSUTTL" runat="server" Height="1.1em" Width="6em" CssClass="WF_TEXTBOX_CSS" readonly="true" style="text-align: right;"></asp:TextBox>
                     </b>
@@ -306,7 +306,12 @@
                     <asp:TextBox ID="WF_KOATUTIMETTL" runat="server" Height="1.1em" Width="6em" CssClass="WF_TEXTBOX_CSS" readonly="true" style="text-align: center;"></asp:TextBox>
                     </b>
                 </a>
-
+                <a style="position:fixed;top:30.6em;left:25em; width:32em;" >
+                    <asp:Label ID="WF_HAYADETIMETTL_LABEL" runat="server" Text="早 出 補 填" Height="1.3em" Width="6em" CssClass="WF_TEXT_LEFT" Font-Bold="false" Font-Underline="false"></asp:Label>
+                    <b>
+                    <asp:TextBox ID="WF_HAYADETIMETTL" runat="server" Height="1.1em" Width="6em" CssClass="WF_TEXTBOX_CSS" Enabled="true" style="text-align: center; "></asp:TextBox>
+                    </b>
+                </a>
 
                 <!-- ■■■　油種別（卸回数、走行距離）　■■■ -->
                 <a style="position:fixed;top:6.7em;left:37em; width:32em;" >

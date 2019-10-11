@@ -51,7 +51,7 @@ Public Class GRTA0004LMNIPPO
     ''' <summary>
     ''' 一覧最大表示件数（一画面）
     ''' </summary>
-    Private Const CONST_DSPROWCOUNT As Integer = 45         '１画面表示対象
+    Private Const CONST_DSPROWCOUNT As Integer = 40         '１画面表示対象
     ''' <summary>
     ''' 一覧のマウススクロール時の増分（件数）
     ''' </summary>
@@ -249,6 +249,9 @@ Public Class GRTA0004LMNIPPO
             WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
         End If
 
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
+
     End Sub
     ''' <summary>
     ''' 照会ボタン押下時処理
@@ -405,17 +408,16 @@ Public Class GRTA0004LMNIPPO
         If Not Master.RecoverTable(TA0004VIEWtbl, work.WF_SEL_XMLsaveF2.Text) Then Exit Sub
 
         '○ソート
-        Dim WW_TBLview As DataView
-        WW_TBLview = New DataView(TA0004VIEWtbl)
-        WW_TBLview.RowFilter = "HIDDEN= '0'"
+        Using WW_TBLview As DataView = New DataView(TA0004VIEWtbl)
+            WW_TBLview.RowFilter = "HIDDEN= '0'"
 
-        '○最終頁に移動
-        If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
-        Else
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
-        End If
-
+            '○最終頁に移動
+            If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
+            Else
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
+            End If
+        End Using
     End Sub
 
 
@@ -516,7 +518,7 @@ Public Class GRTA0004LMNIPPO
         End If
 
         '■ セレクター作成
-        ItitalSelector()
+        InitialSelector()
 
         '■ ソート
         CS0026TblSort.TABLE = TA0004tbl
@@ -3766,7 +3768,7 @@ Public Class GRTA0004LMNIPPO
     ''' セレクターの設定初期化処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub ItitalSelector()
+    Protected Sub InitialSelector()
 
         Dim WW_POS As String = ""
         Dim WW_TBLview As DataView

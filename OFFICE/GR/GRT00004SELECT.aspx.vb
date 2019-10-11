@@ -163,21 +163,29 @@ Public Class GRT00004SELECT
                 Exit Sub
             End If
 
-            '〇 光英当日データチェック処理
-            '油種条件が01(石油)かつ、NJS以外
-            If WF_OILTYPE.Text = GRT00004WRKINC.C_PRODUCT_OIL AndAlso
-             WF_CAMPCODE.Text <> GRT00004WRKINC.C_CAMPCODE_NJS Then
-                Dim exists = CheckKoueiData(WW_ERR_SW)
-                If Not isNormal(WW_ERR_SW) Then
-                    Exit Sub
-                ElseIf exists Then
-                    '当日データあり
+            ''〇 光英当日データチェック処理
+            If (Not String.IsNullOrEmpty(WF_OILTYPE.Text) AndAlso WF_OILTYPE.Text <> GRT00004WRKINC.C_PRODUCT_OIL) Then
+            Else
+                '油種条件が01(石油)
+                'FIXVALUE(T00004_KOUEIORG)が定義されている場合のみチェック対象
 
-                    'ダイアログ確認
-                    'Master.ConfirmWindow(C_MESSAGE_NO.DATE_FORMAT_ERROR, "当日変更データが存在します")
-                    'WF_SHUKODATEF.Focus()
-                    'Exit Sub
+                Dim T5Com = New GRT0005COM
+                If T5Com.IsKoueiAvailableOrg(WF_CAMPCODE.Text, WF_SHIPORG.Text, GRT00004WRKINC.C_KOUEI_CLASS_CODE, WW_ERRCODE) Then
+                    Dim exists As Boolean = CheckKoueiData(WW_ERR_SW)
+                    If Not isNormal(WW_ERR_SW) Then
+                        T5Com = Nothing
+                        Exit Sub
+                    ElseIf exists Then
+                        '当日データあり
+
+                        'ダイアログ確認
+                        Master.ConfirmWindow(C_MESSAGE_NO.KOUEI_CHANGE_DATA_EXISTS)
+                        WF_SHUKODATEF.Focus()
+                        T5Com = Nothing
+                        Exit Sub
+                    End If
                 End If
+                T5Com = Nothing
             End If
         End If
 
@@ -804,7 +812,8 @@ Public Class GRT00004SELECT
 
         '***** 当日（出庫日FROM以前）データあり→配乗済データに変更が発生している為、条件選択の日付範囲の見直しを促す *****
         Dim sm = New CS0050SESSION
-        Dim dateF As String = sm.LOGONDATE.Replace("/", "")
+        'Dim dateF As String = sm.LOGONDATE.Replace("/", "")
+        Dim dateF As String = Today.ToString("yyyyMMdd")
         Dim dateT As String = Date.Parse(WF_SHUKODATEF.Text).AddDays(-1).ToString("yyyyMMdd")
         Dim fileList = dicFileList.Where(Function(x) x.Key >= dateF AndAlso x.Key <= dateT).SelectMany(Function(x) x.Value)
         If fileList.Count > 0 Then

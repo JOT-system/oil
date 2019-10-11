@@ -252,7 +252,16 @@ Public Class GRMasterPage
                         If Not IsNothing(meObj) Then
                             meObj.Text = preObj.Text
                         End If
+                    ElseIf TypeOf ctl Is ListBox Then
+                        Dim preObj As ListBox = DirectCast(ctl, ListBox)
+                        Dim meObj As ListBox = DirectCast(myWork.FindControl(preObj.ClientID), ListBox)
+                        If Not IsNothing(meObj) Then
+                            For Each item As ListItem In preObj.Items
+                                meObj.Items.Add(item)
+                            Next
+                        End If
                     End If
+
                 Next
             End If
         Else

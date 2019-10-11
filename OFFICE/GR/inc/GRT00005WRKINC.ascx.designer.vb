@@ -66,7 +66,7 @@ Partial Public Class GRT00005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STAFFNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_IMPYM コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class GRT00005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_IMPYM As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_VIEWID コントロール。
     '''</summary>
@@ -525,4 +525,13 @@ Partial Public Class GRT00005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_T7KIN_XMLsaveF As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_KoueiLoadFile コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_KoueiLoadFile As Global.System.Web.UI.WebControls.ListBox
 End Class

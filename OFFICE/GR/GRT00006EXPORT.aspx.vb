@@ -30,13 +30,12 @@ Public Class GRT00006EXPORT
     Private WW_RTN_SW As String                                     '
     Private WW_DUMMY As String                                      '
 
-    Private Const CONST_DSPROWCOUNT As Integer = 45                 '１画面表示対象
-    Private Const CONST_SCROLLROWCOUNT As Integer = 25              'マウススクロール時の増分
+    Private Const CONST_DSPROWCOUNT As Integer = 40                 '１画面表示対象
+    Private Const CONST_SCROLLROWCOUNT As Integer = 20              'マウススクロール時の増分
 
     Private Const CONST_KOUEI As String = "JOTtoKouei"
     Private Const C_FILE_KOUEI As String = "kouei.zip"
     Private Const C_FILE_YAZAKI As String = "yazaki.zip"
-    Private Const C_CAMPCODE_NJS As String = "04"                   '会社コード(NJS)
 
     ''' <summary>
     ''' ファイル構造（矢崎）
@@ -190,10 +189,12 @@ Public Class GRT00006EXPORT
         End If
 
         '光英送信ボタン非表示設定
-        If work.WF_SEL_CAMPCODE.Text = C_CAMPCODE_NJS Then
+        Dim T5Com = New GRT0005COM
+        If Not T5Com.IsKoueiAvailableOrg(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_SHIPORG.Text, GRT00006WRKINC.C_KOUEI_CLASS_CODE, WW_ERRCODE) Then
             WF_IsHideKoueiButton.Value = "1"
+            WF_ButtonPut.Visible = False
         End If
-
+        T5Com = Nothing
 
         '○画面表示データ取得
         GRID_INITset()
@@ -310,6 +311,9 @@ Public Class GRT00006EXPORT
         Else
             ViewState("DISPLAY_LINECNT_LIST") = Nothing
         End If
+
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
     End Sub
 
     ''' <summary>
@@ -931,7 +935,8 @@ Public Class GRT00006EXPORT
             '※同一トリップのドロップ毎で異なる乗務員が設定されていた場合はあと勝ちとなる
 
             '光英オーダーDictionary検索キー（ORDERID|TRIPSEQ）
-            Dim targetKey = T00006row("JXORDERID") & C_VALUE_SPLIT_DELIMITER & GRW0001KOUEIORDER.TRIPSEQ_TYPE.START
+            Dim tmpOrderId As String = T00006row("JXORDERID").Replace("W", "")
+            Dim targetKey = tmpOrderId & C_VALUE_SPLIT_DELIMITER & GRW0001KOUEIORDER.TRIPSEQ_TYPE.START
 
             If koueiOrder.ContainsKey(targetKey) Then
                 order = koueiOrder.Item(targetKey)
@@ -943,7 +948,7 @@ Public Class GRT00006EXPORT
             End If
 
             '光英タイプ取得
-            Dim tmpkoueiType As String = T00006row("JXORDERID").ToString.Chars(0)
+            Dim tmpkoueiType As String = tmpOrderId.Chars(0)
             Dim koueiType As String = String.Empty
             If tmpkoueiType = GRW0001KOUEIORDER.KOUEITYPE_PREFIX.JXTG.ToUpper.Chars(0) Then
                 koueiType = GRW0001KOUEIORDER.KOUEITYPE_PREFIX.JXTG
@@ -1394,6 +1399,7 @@ Public Class GRT00006EXPORT
                & " WHERE A.CAMPCODE     	               = @P01                           " _
                & "   and A.SHUKODATE                      <= @P04 		                    " _
                & "   and A.SHUKODATE                      >= @P05  		                    " _
+               & "   and A.SHIPORG                         = @P06  		                    " _
                & "   and (A.STATUS                         = '2' 		                    " _
                & "    or  A.JXORDERID                     <> '') 		                    " _
                & "   and A.DELFLG                         <> '1'		                    " _
@@ -1648,7 +1654,7 @@ Public Class GRT00006EXPORT
 
         '品名名称
         CODENAME_get("PRODUCTCODE", T00006row("PRODUCTCODE"), T00006row("PRODUCTNAME"), WW_DUMMY)
-
+        T00006row("PRODUCT2NAME") = T00006row("PRODUCTNAME")
     End Sub
 
     ''' <summary>

@@ -43,6 +43,7 @@ Public Class GRT00005WRKINC
     Public Const C_OILTYPE03 As String = "03"                              '油種（化成品）
     Public Const C_OILTYPE04 As String = "04"                              '油種（コンテナ）
 
+    Public Const C_KOUEI_CLASS_CODE As String = "T00005_KOUEIORG"   '光英連携可否判定用FIXVAL KEY
     Public Const C_DIR_KOUEI As String = "KOUEI"                    '光英連携ディレクトリ名(LOCAL)
     Public Const C_DIR_KOUEI_RESULT As String = "result"            '光英連携日報ディレクトリ名
     Public Const C_KOUEI_RESULT_FILE_SERCH As String = "*_jotsyasai_*.csv"   '光英連携日報ファイルSearchPattern
@@ -283,13 +284,15 @@ Public Class GRT00005WRKINC
     ''' <param name="ORGCODE" >部署コード</param>
     ''' <returns>検索条件一覧</returns>
     ''' <remarks></remarks>
-    Function CreateSTAFFParam(ByVal COMPCODE As String, ByVal ORGCODE As String) As Hashtable
+    Function CreateSTAFFParam(ByVal COMPCODE As String, ByVal ORGCODE As String, Optional ByVal STYMD As String = "", Optional ByVal ENDYMD As String = "") As Hashtable
         Dim prmData As New Hashtable
         prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_COMPANY) = COMPCODE
         If Not String.IsNullOrEmpty(ORGCODE) Then
             prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_ORG) = ORGCODE
         End If
         prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_TYPEMODE) = GL0005StaffList.LC_STAFF_TYPE.DRIVER
+        prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_STYMD) = STYMD
+        prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_ENDYMD) = ENDYMD
         Return prmData
     End Function
 
@@ -1466,6 +1469,7 @@ Public Class GRT00005WRKINC
             Dim localDir = New DirectoryInfo(koueiPath)
             '[koueiType]_[jotsyasai]_[受信日時].csv
             Dim localFiles = localDir.GetFiles(C_KOUEI_RESULT_FILE_SERCH)
+
             If localFiles.Count = 0 Then
                 Exit Sub
             End If

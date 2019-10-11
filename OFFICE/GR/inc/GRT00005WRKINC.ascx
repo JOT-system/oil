@@ -65,5 +65,6 @@
             <asp:TextBox ID="WF_T7KIN_WORKDATE" runat="server"></asp:TextBox>           <!-- 明細の日付　 -->
             <asp:TextBox ID="WF_T7KIN_STAFFCODE" runat="server"></asp:TextBox>          <!-- 明細の従業員　 -->
             <asp:TextBox ID="WF_T7KIN_RECODEKBN" runat="server"></asp:TextBox>          <!-- 明細のレコード区分　 -->
-            <asp:TextBox ID="WF_T7KIN_XMLsaveF" runat="server"></asp:TextBox>               <!-- 画面一覧保存パス　 -->
-        </div>
+            <asp:TextBox ID="WF_T7KIN_XMLsaveF" runat="server"></asp:TextBox>           <!-- 画面一覧保存パス　 -->
+            <asp:ListBox ID="WF_KoueiLoadFile" runat="server"></asp:ListBox>            <!-- List光栄読込中ファイル -->
+      </div>

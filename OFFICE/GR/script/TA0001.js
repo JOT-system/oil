@@ -12,15 +12,16 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     };
     addLeftBoxExtention(leftListExtentionTarget);
+
     // ○画面切替用処理（表示/非表示切替「ヘッダー、ディティール」）
     if (document.getElementById('WF_IsHideDetailBox').value == "0") {
-        document.getElementById("headerbox").style.display = "none";
-        document.getElementById("detailbox").style.display = "block";
+        document.getElementById("headerbox").style.visibility = "hidden";
+        document.getElementById("detailbox").style.visibility = "visible";
         // 明細画面のスクロールをTOP表示に切替
         f_ScrollTop(0, 0)
     } else {
-        document.getElementById("headerbox").style.display = "block";
-        document.getElementById("detailbox").style.display = "none";
+        document.getElementById("headerbox").style.visibility = "visible";
+        document.getElementById("detailbox").style.visibility = "hidden";
         /* 共通一覧のスクロールイベント紐づけ */
         bindListCommonEvents(pnlListAreaId, IsPostBack);
     };

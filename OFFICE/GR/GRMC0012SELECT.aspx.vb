@@ -1,6 +1,6 @@
 ﻿Imports OFFICE.GRIS0005LeftBox
 Imports BASEDLL
-'aaaaaaaa
+
 ''' <summary>
 ''' モデル距離マスタ登録（条件）
 ''' </summary>

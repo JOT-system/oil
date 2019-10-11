@@ -3,6 +3,10 @@ function InitDisplay() {
     //前回の表示位置に移動する
     document.all('RepDetail').scrollTop = Number(document.getElementById("WF_SaveY").value);
     document.all('RepDetail').scrollLeft = Number(document.getElementById("WF_SaveX").value);
+
+    //Repeaterスケジュール日付部　スクロールイベント取得
+    if (window.document.getElementById("RepHeaderL").addEventListener) window.document.getElementById("RepHeaderL").addEventListener('DOMMouseScroll', wheel, false);
+    window.document.getElementById("RepHeaderL").onmousewheel = document.getElementById("RepHeaderL").nmousewheel = wheel;
 };
 
 // ○Repeater行変更処理
@@ -56,3 +60,22 @@ function f_newXY(x, y) {
 function f_dragEventCancel(event) {
     event.preventDefault();  //イベントをキャンセル
 };
+
+// ○DOM Scrollイベント無効処理（画面描画前）
+function wheel(event) {
+    var delta = 0;
+    if (!event) /* For IE. */
+        event = window.event;
+    if (event.wheelDelta) { /* IE/Opera. */
+        delta = event.wheelDelta / 120;
+        if (window.opera)
+            delta = -delta;
+    } else if (event.detail) { /** Mozilla case. */
+        delta = -event.detail / 3;
+    }
+
+    if (event.preventDefault) {
+        event.preventDefault();
+    }
+    event.returnValue = false;
+}

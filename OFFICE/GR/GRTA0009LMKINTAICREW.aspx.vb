@@ -57,7 +57,7 @@ Public Class GRTA0009LMKINTAICREW
     ''' <summary>
     ''' 一覧最大表示件数（一画面）
     ''' </summary>
-    Private Const CONST_DSPROWCOUNT As Integer = 45                 '１画面表示対象
+    Private Const CONST_DSPROWCOUNT As Integer = 40                 '１画面表示対象
     ''' <summary>
     ''' 一覧のマウススクロール時の増分（件数）
     ''' </summary>
@@ -266,33 +266,33 @@ Public Class GRTA0009LMKINTAICREW
         End If
 
         '○画面（GridView）表示
-        Dim WW_TBLview As DataView = New DataView(TA0009VIEWtbl)
+        Using WW_TBLview As DataView = New DataView(TA0009VIEWtbl)
 
-        'ソート
-        WW_TBLview.Sort = "LINECNT"
-        WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
-        '一覧作成
+            'ソート
+            WW_TBLview.Sort = "LINECNT"
+            WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
+            '一覧作成
 
-        CS0013PROFview.CAMPCODE = work.WF_SEL_CAMPCODE.Text
-        CS0013PROFview.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = GRTA0009WRKINC.MAPID
-        CS0013PROFview.VARI = Master.VIEWID
-        CS0013PROFview.SRCDATA = WW_TBLview.ToTable
-        CS0013PROFview.TBLOBJ = pnlListArea
-        CS0013PROFview.SCROLLTYPE = CS0013PROFview.SCROLLTYPE_ENUM.Horizontal
-        CS0013ProfView.TITLEOPT = True
-        CS0013ProfView.HIDEOPERATIONOPT = True
-        CS0013ProfView.CS0013ProfView()
-        '〇カレンダーの書式設定処理
-        setCalendarColor(pnlListArea.FindControl("pnlListArea_HR").Controls(0), MB0005tbl)
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+            CS0013ProfView.PROFID = Master.PROF_VIEW
+            CS0013ProfView.MAPID = GRTA0009WRKINC.MAPID
+            CS0013ProfView.VARI = Master.VIEWID
+            CS0013ProfView.SRCDATA = WW_TBLview.ToTable
+            CS0013ProfView.TBLOBJ = pnlListArea
+            CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
+            CS0013ProfView.TITLEOPT = True
+            CS0013ProfView.HIDEOPERATIONOPT = True
+            CS0013ProfView.CS0013ProfView()
+            '〇カレンダーの書式設定処理
+            SetCalendarColor(pnlListArea.FindControl("pnlListArea_HR").Controls(0), MB0005tbl)
 
-        '○クリア
-        If WW_TBLview.Count = 0 Then
-            WF_GridPosition.Text = "1"
-        Else
-            WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
-        End If
-
+            '○クリア
+            If WW_TBLview.Count = 0 Then
+                WF_GridPosition.Text = "1"
+            Else
+                WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
+            End If
+        End Using
     End Sub
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(EMS向け出力)ボタン処理 
@@ -336,6 +336,8 @@ Public Class GRTA0009LMKINTAICREW
         TA0009tblView.RowFilter = "NACHAISTDATE > '1950/01/01' or PAYKBN <> '00'"
         TA0009tblView.Sort = "PAYSTAFFCODE ASC, KEIJOYMD ASC"
         Dim TA0009tbl4EMS As DataTable = TA0009tblView.ToTable
+        TA0009tblView.Dispose()
+        TA0009tblView = Nothing
 
         '列追加
         TA0009tbl4EMS.Columns.Add("SAGYOUC", Type.GetType("System.String")) '作業部署
@@ -432,6 +434,13 @@ Public Class GRTA0009LMKINTAICREW
         '別画面でExcelを表示
         WF_PrintURL.Value = CS0030REPORT.URL
         ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+        TA0009tbl4EMS.Dispose()
+        TA0009tbl4EMS = Nothing
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
+        WW_GRPtbl.Dispose()
+        WW_GRPtbl = Nothing
 
     End Sub
 
@@ -565,17 +574,17 @@ Public Class GRTA0009LMKINTAICREW
         '○ T00009ALLデータリカバリ
         If Not Master.RecoverTable(TA0009VIEWtbl, work.WF_SEL_XMLsaveF2.Text) Then Exit Sub
         '○ソート
-        Dim WW_TBLview As DataView
-        WW_TBLview = New DataView(TA0009VIEWtbl)
-        WW_TBLview.RowFilter = "HIDDEN= '0'"
+        Using WW_TBLview As DataView = New DataView(TA0009VIEWtbl)
+            WW_TBLview.RowFilter = "HIDDEN= '0'"
 
-        '■ GridView表示
-        '○ 最終頁に移動
-        If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
-        Else
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
-        End If
+            '■ GridView表示
+            '○ 最終頁に移動
+            If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
+            Else
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
+            End If
+        End Using
     End Sub
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -798,7 +807,7 @@ Public Class GRTA0009LMKINTAICREW
         End If
 
         '■ セレクター作成
-        InittialSelector()
+        InitialSelector()
 
         '■ ソート
         CS0026TblSort.TABLE = TA0009tbl
@@ -1700,6 +1709,9 @@ Public Class GRTA0009LMKINTAICREW
         WW_TBLview = New DataView(IO_TBL)
         WW_TBLview.RowFilter = "SUPPORTKBN = '1'"
         WW_KEYtbl = WW_TBLview.ToTable(True, WW_Cols)
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
+
         Using SQLcon As SqlConnection = CS0050Session.getConnection()
 
             SQLcon.Open() 'DataBase接続(Open)
@@ -2419,6 +2431,9 @@ Public Class GRTA0009LMKINTAICREW
                 Next
             End Using
         End Using
+
+        WW_KEYtbl.Dispose()
+        WW_KEYtbl = Nothing
 
     End Sub
 
@@ -3841,7 +3856,7 @@ Public Class GRTA0009LMKINTAICREW
     ''' セレクタの初期設定
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub InittialSelector()
+    Protected Sub InitialSelector()
 
         Dim WW_POS As String = ""
         Dim WW_TBLview As DataView
@@ -3936,6 +3951,11 @@ Public Class GRTA0009LMKINTAICREW
         End If
 
         Repeater_set("1", WF_STAFFselector, "WF_SELstaff_VALUE", "WF_SELstaff_TEXT", WW_POS)
+
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
+        WW_GRPtbl.Dispose()
+        WW_GRPtbl = Nothing
 
     End Sub
     ''' <summary>

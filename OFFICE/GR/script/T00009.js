@@ -196,7 +196,8 @@ function DispFormat() {
 
             // 残業時間の有無によって申請、取り下げの状態を変更する
             if (document.getElementsByName("R_ORVERTIME" + (i + 1)) != undefined) {
-                if (document.getElementsByName("R_ORVERTIME" + (i + 1))[0].textContent == "") {
+                if (document.getElementsByName("R_ORVERTIME" + (i + 1))[0].textContent == "" &&
+                    document.getElementsByName("R_WNIGHTTIME" + (i + 1))[0].textContent == "") {
                     if (document.getElementById("chkpnlListAreaENTRYFLG" + (i + 1)) != undefined) {
                         document.getElementById("hchkpnlListAreaENTRYFLG" + (i + 1)).innerText = ""
                         document.getElementById("chkpnlListAreaENTRYFLG" + (i + 1)).checked = false;

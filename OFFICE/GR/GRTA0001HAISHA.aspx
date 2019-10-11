@@ -30,7 +30,7 @@
                     <asp:Label ID="WF_SEL_ORG" runat="server"  Font-Bold="True"></asp:Label>
                 </a>
                 <!-- ■　ボタン　■ -->
-                <a style="position:fixed;top:2.8em;left:49.5em;">
+                <a style="position:fixed;top:2.8em;left:53.5em;">
                     <input type="button" id="WF_ButtonPDF" value="全印刷"  style="Width:5em" onclick="ButtonClick('WF_ButtonPDF');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:58.0em;">
@@ -88,15 +88,16 @@
 
         <!-- 全体レイアウト　detailbox -->
         <div  class="detailboxOnly" id="detailbox">
-            <div class="Operation_Detail" >
-                <a>
-                    <input type="button" id="WF_BACK" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_BACK');" />
-                </a>
+            <div id="detailbuttonbox" class="detailbuttonbox">
+
+            <a style="position:fixed;top:2.8em;left:67em;">
+                <input type="button" id="WF_BACK" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_BACK');" />
+            </a><br />
             </div> 
             <div class="detailkeybox" id ="detailkeybox">
                 <p id="KEY_LINE_1">
                     <!-- ■　選択No　■ -->
-                    <a>
+                    <a style="position:fixed;top:3.0em;left:3em; width:32em;">
                         <asp:Label ID="WF_Sel_LINECNT_L" runat="server" Text="選択No" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True"></asp:Label>
                         <asp:TextBox ID="WF_Sel_LINECNT" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
@@ -104,136 +105,136 @@
                 <p id="KEY_LINE_2">
             
                     <!-- ■　出庫日　■ -->
-                    <a>
+                    <a style="position:fixed;top:4.4em;left:3em; width:25.0em;" >
                         <asp:Label ID="WF_SHUKODATE_L" runat="server" Text="出庫日" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_SHUKODATE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　帰庫日　■ -->
-                    <a>
+                    <a style="position:fixed;top:4.4em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_KIKODATE_L" runat="server" Text="帰庫日" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_KIKODATE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                 </p>
                 <p id="KEY_LINE_3">
                     <!-- ■　出荷日　■ -->
-                    <a>
+                    <a style="position:fixed;top:5.8em;left:3em; width:25.0em;">
                         <asp:Label ID="WF_SHUKADATE_L" runat="server" Text="出荷日" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_SHUKADATE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　届日　■ -->
-                    <a>
+                    <a style="position:fixed;top:5.8em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_TODOKEDATE_L" runat="server" Text="届日" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_TODOKEDATE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　両目　■ -->
-                    <a>
+                    <a style="position:fixed;top:5.8em;left:46.2em; width:25.0em;">
                         <asp:Label ID="WF_RYOME_L" runat="server" Text="両目" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="WF_RYOME" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                 </p>
                 <p id="KEY_LINE_4">
                     <!-- ■　油種　■ -->
-                    <a>
+                    <a style="position:fixed;top:7.2em;left:3em; width:25.0em;">
                         <asp:Label ID="WF_OILTYPE_L" runat="server" Text="油種" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_OILTYPE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　受注部署　■ -->
-                    <a>
+                    <a style="position:fixed;top:7.2em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_ORDERORG_L" runat="server" Text="受注部署" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_ORDERORG" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
 
                     <!-- ■　出荷部署　■ -->
-                    <a>
+                    <a style="position:fixed;top:7.2em;left:46.2em; width:25.0em;">
                         <asp:Label ID="WF_SHIPORG_L" runat="server" Text="出荷部署" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_SHIPORG" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                 </p>
                 <p id="KEY_LINE_5">
                     <!-- ■　取引先　■ -->
-                    <a>
+                    <a style="position:fixed;top:8.6em;left:3em; width:25.0em;">
                         <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先CD" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_TORICODE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　販売店　■ -->
-                    <a>
+                    <a style="position:fixed;top:8.6em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_STORICODE_L" runat="server" Text="販売店" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_STORICODE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　売上計上基準　■ -->
-                    <a>
+                    <a style="position:fixed;top:8.6em;left:46.2em; width:25.0em;">
                         <asp:Label ID="WF_URIKBN_L" runat="server" Text="売上計上基準" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_URIKBN" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                 </p>
                 <p id="KEY_LINE_6">
                     <!-- ■　業務車番　■ -->
-                    <a>
+                    <a style="position:fixed;top:10.0em;left:3em; width:25.0em;">
                         <asp:Label ID="WF_GSHABAN_L" runat="server" Text="業務車番" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_GSHABAN" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　コンテナシャーシ　■ -->
-                    <a>
+                    <a style="position:fixed;top:10.0em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_CONTCHASSIS_L" runat="server" Text="ｺﾝﾃﾅｼｬｰｼ" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_CONTCHASSIS" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　車腹　■ -->
-                    <a>
+                    <a style="position:fixed;top:10.0em;left:46.2em; width:25.0em;">
                         <asp:Label ID="WF_SHAFUKU_L" runat="server" Text="車腹" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="False"></asp:Label>
                         <asp:TextBox ID="WF_SHAFUKU" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                 </p>
                 <p id="KEY_LINE_7">
                     <!-- ■　統一車番（前）　■ -->
-                    <a>
+                    <a style="position:fixed;top:11.4em;left:3em; width:25.0em;">
                         <asp:Label ID="WF_TSHABANF_L" runat="server" Text="統一車番（前）" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="WF_TSHABANF" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　統一車番（後）　■ -->
-                    <a>
+                    <a style="position:fixed;top:11.4em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_TSHABANB_L" runat="server" Text="統一車番（後）" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="WF_TSHABANB" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                     <!-- ■　統一車番（後）２　■ -->
-                    <a>
+                    <a style="position:fixed;top:11.4em;left:46.2em; width:25.0em;">
                         <asp:Label ID="WF_TSHABANB2_L" runat="server" Text="統一車番（後）２" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="WF_TSHABANB2" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                 </p>
                 <p id="KEY_LINE_8">
                     <!-- ■　積置区分　■ -->
-                    <a>
+                    <a style="position:fixed;top:12.8em;left:3em; width:25.0em;">
                         <asp:Label ID="WF_TUMIOKIKBN_L" runat="server" Text="積置区分" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_TUMIOKIKBN" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
 
                     <!-- ■　トリップ　■ -->
-                    <a>
+                    <a style="position:fixed;top:12.8em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_TRIPNO_L" runat="server" Text="トリップ" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="False"></asp:Label>
                         <asp:TextBox ID="WF_TRIPNO" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
 
                     <!-- ■　ドロップ　■ -->
-                    <a>
+                    <a style="position:fixed;top:12.8em;left:46.2em; width:25.0em;">
                         <asp:Label ID="WF_DROPNO_L" runat="server" Text="ドロップ" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="False"></asp:Label>
                         <asp:TextBox ID="WF_DROPNO" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
                 </p>
                 <p id="KEY_LINE_9">
                     <!-- ■　乗務員　■ -->
-                    <a>
+                    <a style="position:fixed;top:14.2em;left:3em; width:25.0em;">
                         <asp:Label ID="WF_STAFFCODE_L" runat="server" Text="乗務員" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_STAFFCODE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
 
                     <!-- ■　副乗務員　■ -->
-                    <a>
+                    <a style="position:fixed;top:14.2em;left:24.6em; width:25.0em;">
                         <asp:Label ID="WF_SUBSTAFFCODE_L" runat="server" Text="副乗務員" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
                         <asp:TextBox ID="WF_SUBSTAFFCODE" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
 
                     <!-- ■　出勤時間　■ -->
-                    <a>
+                    <a style="position:fixed;top:14.2em;left:46.2em; width:25.0em;">
                         <asp:Label ID="WF_STTIME_L" runat="server" Text="出勤時間" Height="1.3em" Width="8.1em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="False"></asp:Label>
                         <asp:TextBox ID="WF_STTIME" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXT_LEFT_BORDER" ReadOnly="true"></asp:TextBox>
                     </a>
@@ -242,8 +243,7 @@
             <!-- DETAIL画面 -->
             <asp:MultiView ID="WF_DetailMView" runat="server">
                 <asp:View ID="WF_DView1" runat="server"  >
-
-                    <span class="WF_DViewRep1_Area" id="WF_DViewRep1_Area"  style="top:16.0em;left:1.5em;overflow-x:auto;overflow-y:auto;border: 2px solid blue;">
+                <span class="WF_DViewRep1_Area" id="WF_DViewRep1_Area">
                         <asp:Repeater ID="WF_DViewRep1" runat="server">
                             <HeaderTemplate>
 

@@ -27,6 +27,15 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSAVE").disabled = "disabled";
         document.getElementById("WF_ButtonDownload").disabled = "disabled";
     };
+    //光英受信ボタン表示／非表示
+    if (document.getElementById('WF_IsHideKoueiButton').value == "0") {
+        //表示
+        document.getElementById("WF_ButtonDownload").style.visibility = "visible";
+    } else {
+        //非表示 
+        document.getElementById("WF_ButtonDownload").style.visibility = "hidden";
+    };
+
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack);
     addLeftBoxExtention(leftListExtentionTarget);

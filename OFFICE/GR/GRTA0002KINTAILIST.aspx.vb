@@ -63,7 +63,7 @@ Public Class GRTA0002KINTAILIST
     ''' <summary>
     ''' 一覧最大表示件数（一画面）
     ''' </summary>
-    Private Const CONST_DSPROWCOUNT As Integer = 45         '１画面表示対象
+    Private Const CONST_DSPROWCOUNT As Integer = 40         '１画面表示対象
     ''' <summary>
     ''' 一覧のマウススクロール時の増分（件数）
     ''' </summary>
@@ -157,6 +157,7 @@ Public Class GRTA0002KINTAILIST
         rightview.MAPVARI = Master.MAPvariant
         rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
         rightview.PROFID = Master.PROF_REPORT
+        rightview.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
         rightview.Initialize(WW_DUMMY)
 
         WF_SEL_DATE.Text = work.WF_SEL_TAISHOYM.Text
@@ -191,8 +192,9 @@ Public Class GRTA0002KINTAILIST
             CS0013PROFview.LEVENT = "ondblclick"
             CS0013PROFview.LFUNC = "ListDbClick"
             CS0013PROFview.TITLEOPT = True
-            CS0013PROFview.HIDEOPERATIONOPT = True
-            CS0013PROFview.CS0013ProfView()
+            CS0013ProfView.HIDEOPERATIONOPT = True
+            CS0013ProfView.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
+            CS0013ProfView.CS0013ProfView()
         End Using
         If Not isNormal(CS0013PROFview.ERR) Then
             Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
@@ -293,8 +295,9 @@ Public Class GRTA0002KINTAILIST
             CS0013PROFview.LEVENT = "ondblclick"
             CS0013PROFview.LFUNC = "ListDbClick"
             CS0013PROFview.TITLEOPT = True
-            CS0013PROFview.HIDEOPERATIONOPT = True
-            CS0013PROFview.CS0013ProfView()
+            CS0013ProfView.HIDEOPERATIONOPT = True
+            CS0013ProfView.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
+            CS0013ProfView.CS0013ProfView()
 
         ElseIf work.WF_IsHideDetailBox.Text = "0" AndAlso WF_ButtonClick.Value <> "WF_GridDBclick" Then
 
@@ -308,8 +311,9 @@ Public Class GRTA0002KINTAILIST
             CS0013PROFview.TBLOBJ = pnlListArea2
             CS0013PROFview.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.None
             CS0013PROFview.TITLEOPT = True
-            CS0013PROFview.HIDEOPERATIONOPT = True
-            CS0013PROFview.CS0013ProfView()
+            CS0013ProfView.HIDEOPERATIONOPT = True
+            CS0013ProfView.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
+            CS0013ProfView.CS0013ProfView()
 
         End If
 
@@ -320,6 +324,8 @@ Public Class GRTA0002KINTAILIST
             WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
         End If
 
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
     End Sub
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(PDF出力)・一覧印刷ボタン処理
@@ -420,16 +426,17 @@ Public Class GRTA0002KINTAILIST
             End If
 
             '○ 帳票出力
-            CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-            CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-            CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-            CS0030REPORT.REPORTID = rightview.getReportId()         '帳票ID
-            CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
-            CS0030REPORT.TBLDATA = TA0002VIEWtbl                        'データ参照DataTable
+            CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text               '会社コード
+            CS0030REPORT.PROFID = Master.PROF_REPORT                        'プロファイルID
+            CS0030REPORT.MAPID = Master.MAPID                               '画面ID
+            CS0030REPORT.REPORTID = rightview.GetReportId()                 '帳票ID
+            CS0030REPORT.FILEtyp = "XLSX"                                   '出力ファイル形式
+            CS0030REPORT.TBLDATA = TA0002VIEWtbl                            'データ参照DataTable
+            CS0030REPORT.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"     '対象日付
             CS0030REPORT.CS0030REPORT()
             If isNormal(CS0030REPORT.ERR) Then
                 'ダウンロードファイル送信準備
-                System.IO.File.Copy(CS0030REPORT.FILEpath, WW_Dir & "\" & CType(WF_SELECTOR.Items(i).FindControl("WF_SELECTOR_VALUE"), System.Web.UI.WebControls.Label).Text & ".xlsx", True)
+                System.IO.File.Copy(CS0030REPORT.FILEpath, WW_Dir & "\" & "NO" & i.ToString("0000") & "_" & CType(WF_SELECTOR.Items(i).FindControl("WF_SELECTOR_VALUE"), System.Web.UI.WebControls.Label).Text & ".xlsx", True)
             Else
                 Master.output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORTtbl")
                 Exit Sub
@@ -443,6 +450,7 @@ Public Class GRTA0002KINTAILIST
 
         '○ 帳票出力
         CS0047XLSMERGE.DIR = WW_Dir                                   'PARAM01:フォルダー
+        CS0047XLSMERGE.REMOVALLENGTH = 7                              '名称を除去する長さ
         CS0047XLSMERGE.CS0047XLSMERGE()
         If isNormal(CS0047XLSMERGE.ERR) Then
             WW_Dir2 = CS0047XLSMERGE.URL                              'PARAM02:出力EXCEL
@@ -519,12 +527,13 @@ Public Class GRTA0002KINTAILIST
         End If
 
         '○ 帳票出力
-        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-        CS0030REPORT.REPORTID = rightview.getReportId()         '帳票ID
-        CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
-        CS0030REPORT.TBLDATA = TA0002VIEWtbl                    'データ参照DataTable
+        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text               '会社コード
+        CS0030REPORT.PROFID = Master.PROF_REPORT                        'プロファイルID
+        CS0030REPORT.MAPID = Master.MAPID                               '画面ID
+        CS0030REPORT.REPORTID = rightview.GetReportId()                 '帳票ID
+        CS0030REPORT.FILEtyp = "XLSX"                                   '出力ファイル形式
+        CS0030REPORT.TBLDATA = TA0002VIEWtbl                            'データ参照DataTable
+        CS0030REPORT.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"     '対象日付
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             Master.output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
@@ -615,12 +624,13 @@ Public Class GRTA0002KINTAILIST
             End If
 
             '○ 帳票出力
-            CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-            CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-            CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-            CS0030REPORT.REPORTID = rightview.getReportId()         '帳票ID
-            CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
-            CS0030REPORT.TBLDATA = TA0002VIEWtbl                        'データ参照DataTable
+            CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text               '会社コード
+            CS0030REPORT.PROFID = Master.PROF_REPORT                        'プロファイルID
+            CS0030REPORT.MAPID = Master.MAPID                               '画面ID
+            CS0030REPORT.REPORTID = rightview.GetReportId()                 '帳票ID
+            CS0030REPORT.FILEtyp = "XLSX"                                   '出力ファイル形式
+            CS0030REPORT.TBLDATA = TA0002VIEWtbl                            'データ参照DataTable
+            CS0030REPORT.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"     '対象日付
             CS0030REPORT.CS0030REPORT()
             If isNormal(CS0030REPORT.ERR) Then
                 'ダウンロードファイル送信準備
@@ -720,18 +730,17 @@ Public Class GRTA0002KINTAILIST
         GetViewTA0002(WF_SELECTOR_Posi.Value)
 
         '○ソート
-        Dim WW_TBLview As DataView
-        WW_TBLview = New DataView(TA0002VIEWtbl)
-        WW_TBLview.RowFilter = "HIDDEN= '0'"
+        Using WW_TBLview As DataView = New DataView(TA0002VIEWtbl)
+            WW_TBLview.RowFilter = "HIDDEN= '0'"
 
-        '■ GridView表示
-        '○ 最終頁に移動
-        If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
-        Else
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
-        End If
-
+            '■ GridView表示
+            '○ 最終頁に移動
+            If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
+            Else
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
+            End If
+        End Using
     End Sub
 
     ''' <summary>
@@ -1111,27 +1120,19 @@ Public Class GRTA0002KINTAILIST
                & " LEFT JOIN MB001_STAFF MB2 " _
                & "   ON    MB2.CAMPCODE     = @CAMPCODE " _
                & "   and   MB2.STAFFCODE    = MB.STAFFCODE " _
-               & "   and   MB2.STYMD       <= A.WORKDATE " _
-               & "   and   MB2.ENDYMD      >= A.WORKDATE " _
-               & "   and   MB2.STYMD        = (SELECT MAX(STYMD) FROM MB001_STAFF WHERE CAMPCODE = @CAMPCODE and STAFFCODE = MB.STAFFCODE and STYMD <= A.WORKDATE and ENDYMD >= A.WORKDATE and DELFLG <> '1' ) " _
+               & "   and   MB2.STYMD       <= @SEL_ENDYMD " _
+               & "   and   MB2.ENDYMD      >= @SEL_STYMD " _
+               & "   and   MB2.STYMD        = (SELECT MAX(STYMD) FROM MB001_STAFF WHERE CAMPCODE = @CAMPCODE and STAFFCODE = MB.STAFFCODE and STYMD <= @SEL_ENDYMD and ENDYMD >= @SEL_STYMD and DELFLG <> '1' ) " _
                & "   and   MB2.DELFLG      <> '1' " _
                & " LEFT JOIN MB002_STAFFORG MB3 " _
                & "   ON    MB3.CAMPCODE     = @CAMPCODE " _
-               & "   and   MB3.STAFFCODE    = MB2.STAFFCODE " _
-               & "   and   MB3.SORG         = MB2.HORG " _
+               & "   and   MB3.STAFFCODE    = A.STAFFCODE " _
+               & "   and   MB3.SORG         = @HORG " _
                & "   and   MB3.DELFLG      <> '1' " _
                & " LEFT JOIN MB005_CALENDAR CAL " _
                & "   ON    CAL.CAMPCODE    = @CAMPCODE " _
                & "   and   CAL.WORKINGYMD  = A.WORKDATE " _
                & "   and   CAL.DELFLG     <> '1' " _
-               & " LEFT JOIN MB004_WORKINGH B4 " _
-               & "   ON    B4.CAMPCODE    = @CAMPCODE " _
-               & "   and   B4.HORG        = MB2.HORG " _
-               & "   and   B4.STAFFKBN    = MB2.STAFFKBN " _
-               & "   and   B4.STYMD      <= @STYMD " _
-               & "   and   B4.ENDYMD     >= @ENDYMD " _
-               & "   and   B4.STYMD      = (SELECT MAX(STYMD) FROM MB004_WORKINGH WHERE CAMPCODE = @CAMPCODE and HORG = MB2.HORG and STAFFKBN = MB2.STAFFKBN and STYMD <= @STYMD and ENDYMD >= @ENDYMD and DELFLG <> '1') " _
-               & "   and   B4.DELFLG     <> '1' " _
                & " LEFT JOIN MC001_FIXVALUE F1 " _
                & "   ON    F1.CAMPCODE    = @CAMPCODE " _
                & "   and   F1.CLASS       = 'WORKINGWEEK' " _
@@ -1235,6 +1236,7 @@ Public Class GRTA0002KINTAILIST
                     Dim P_TAISHOYM As SqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", System.Data.SqlDbType.NVarChar)
                     Dim P_STYMD As SqlParameter = SQLcmd.Parameters.Add("@STYMD", System.Data.SqlDbType.Date)
                     Dim P_ENDYMD As SqlParameter = SQLcmd.Parameters.Add("@ENDYMD", System.Data.SqlDbType.Date)
+                    Dim P_HORG As SqlParameter = SQLcmd.Parameters.Add("@HORG", System.Data.SqlDbType.NVarChar)
                     Dim P_SEL_STYMD As SqlParameter = SQLcmd.Parameters.Add("@SEL_STYMD", System.Data.SqlDbType.Date)
                     Dim P_SEL_ENDYMD As SqlParameter = SQLcmd.Parameters.Add("@SEL_ENDYMD", System.Data.SqlDbType.Date)
 
@@ -1256,8 +1258,10 @@ Public Class GRTA0002KINTAILIST
                     Dim retCode As String = ""
                     T0007COM.ConvORGCODE(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_HORG.Text, orgCode, retCode)
                     If retCode = C_MESSAGE_NO.NORMAL Then
+                        P_HORG.Value = orgCode
                         P2_HORG.Value = orgCode
                     Else
+                        P_HORG.Value = work.WF_SEL_HORG.Text
                         P2_HORG.Value = work.WF_SEL_HORG.Text
                     End If
                     P2_TERMID.Value = CS0050SESSION.APSV_ID
@@ -2259,6 +2263,10 @@ Public Class GRTA0002KINTAILIST
 
         WW_TA0002tbl.Dispose()
         WW_TA0002tbl = Nothing
+        WW_NIPPOtbl.Dispose()
+        WW_NIPPOtbl = Nothing
+        dtFilter.Dispose()
+        dtFilter = Nothing
 
     End Sub
 
@@ -2614,6 +2622,10 @@ Public Class GRTA0002KINTAILIST
 
         WW_TA0002tbl.Dispose()
         WW_TA0002tbl = Nothing
+        WW_NIPPOtbl.Dispose()
+        WW_NIPPOtbl = Nothing
+        dtFilter.Dispose()
+        dtFilter = Nothing
 
     End Sub
 
@@ -3322,6 +3334,10 @@ Public Class GRTA0002KINTAILIST
 
         WW_TA0002tbl.Dispose()
         WW_TA0002tbl = Nothing
+        WW_NIPPOtbl.Dispose()
+        WW_NIPPOtbl = Nothing
+        dtFilter.Dispose()
+        dtFilter = Nothing
 
     End Sub
 
@@ -3986,6 +4002,10 @@ Public Class GRTA0002KINTAILIST
 
         WW_TA0002tbl.Dispose()
         WW_TA0002tbl = Nothing
+        WW_NIPPOtbl.Dispose()
+        WW_NIPPOtbl = Nothing
+        dtFilter.Dispose()
+        dtFilter = Nothing
 
     End Sub
 
@@ -4409,6 +4429,7 @@ Public Class GRTA0002KINTAILIST
         CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.None
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
         CS0013ProfView.CS0013ProfView()
 
         '○ Close
@@ -4663,14 +4684,6 @@ Public Class GRTA0002KINTAILIST
                & "   and   M2S.ENDYMD     >= @ENDYMD " _
                & "   and   M2S.STYMD       = (SELECT MAX(STYMD) FROM M0002_ORG WHERE CAMPCODE = A.CAMPCODE and ORGCODE = A.SHIPORG and STYMD <= @STYMD and ENDYMD >= @ENDYMD and DELFLG <> '1' )" _
                & "   and   M2S.DELFLG     <> '1' " _
-               & " LEFT JOIN MB004_WORKINGH B4 " _
-               & "   ON    B4.CAMPCODE    = A.CAMPCODE " _
-               & "   and   B4.HORG        = MB.HORG " _
-               & "   and   B4.STAFFKBN    = MB.STAFFKBN " _
-               & "   and   B4.STYMD      <= @STYMD " _
-               & "   and   B4.ENDYMD     >= @ENDYMD " _
-               & "   and   B4.STYMD      = (SELECT MAX(STYMD) FROM MB004_WORKINGH WHERE CAMPCODE = A.CAMPCODE and HORG = MB.HORG and STAFFKBN = MB.STAFFKBN and STYMD <= @STYMD and ENDYMD >= @ENDYMD and DELFLG <> '1') " _
-               & "   and   B4.DELFLG     <> '1' " _
                & " LEFT JOIN MB005_CALENDAR CAL " _
                & "   ON    CAL.CAMPCODE    = A.CAMPCODE " _
                & "   and   CAL.WORKINGYMD  = A.YMD " _
@@ -6469,6 +6482,16 @@ Public Class GRTA0002KINTAILIST
             Case CONST_CAMP_JKT
                 detailbox.Attributes("class") = "Detail JKT detailboxOnly"
         End Select
+
+        '～2019年9月は、早出補填手当を表示しない
+        If work.WF_SEL_TAISHOYM.Text <= "2019/09" Then
+            WF_HAYADETIME_L.Visible = False
+            WF_HAYADETIME.Visible = False
+        Else
+            WF_HAYADETIME_L.Visible = True
+            WF_HAYADETIME.Visible = True
+        End If
+
     End Sub
 
 End Class

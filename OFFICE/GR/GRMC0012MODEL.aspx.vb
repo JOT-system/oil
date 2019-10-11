@@ -1,14 +1,4 @@
-''************************************************************
-' モデル距離マスタメンテ登録画面
-' 作成日 yyyy/mm/dd
-' 更新日 yyyy/mm/dd
-' 作成者 JOT渡部
-' 更新車 JOT渡部
-'
-' 修正履歴:届先のみ→出荷場所のみへ打ち換えして登録が出来ない不具合の対応
-'         :
-''************************************************************
-Imports System.Data.SqlClient
+﻿Imports System.Data.SqlClient
 Imports OFFICE.GRIS0005LeftBox
 Imports BASEDLL
 
@@ -2012,13 +2002,11 @@ Public Class GRMC0012MODEL
 
                 Case "SHUKABASHO"   '出荷場所名称
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODES.Text))
-
                 Case "TORICODET"     '取引先名称（届先）
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CUSTOMER, I_VALUE, O_TEXT, O_RTN, work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text))
 
                 Case "TODOKECODE"   '届先名称
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODET.Text))
-
                 Case "MODELPATTERN" 'モデル距離パターン
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_MODELPT, I_VALUE, O_TEXT, O_RTN, work.CreateMODELPTParam(work.WF_SEL_CAMPCODE.Text, WF_MODELPT.Text))
 

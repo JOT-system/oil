@@ -141,7 +141,7 @@ Public Class GRT00006SELECT
 
         '〇 チェック処理
         WW_Check(WW_ERR_SW)
-        If WW_ERR_SW = "ERR" Then
+        If Not isNormal(WW_ERR_SW) Then
             Exit Sub
         End If
 
@@ -373,7 +373,7 @@ Public Class GRT00006SELECT
     ''' <remarks></remarks>
     Protected Sub WW_Check(ByRef O_RTN As String)
 
-        O_RTN = ""
+        O_RTN = C_MESSAGE_NO.NORMAL
 
         '〇 入力項目チェック
         Dim WW_CS0024FCHECKERR As String = ""
@@ -389,14 +389,14 @@ Public Class GRT00006SELECT
                 If Not isNormal(WW_RTN_SW) Then
                     Master.output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR)
                     WF_CAMPCODE.Focus()
-                    O_RTN = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_SELECTION_DATA
                     Exit Sub
                 End If
             End If
         Else
             Master.output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
             WF_CAMPCODE.Focus()
-            O_RTN = "ERR"
+            O_RTN = WW_CS0024FCHECKERR
             Exit Sub
         End If
 
@@ -405,7 +405,7 @@ Public Class GRT00006SELECT
         If String.IsNullOrEmpty(WF_SHUKODATEF.Text) Then
             Master.output(C_MESSAGE_NO.PREREQUISITE_ERROR, BASEDLL.C_MESSAGE_TYPE.ERR, "出庫日(FROM)")
             WF_SHUKODATEF.Focus()
-            O_RTN = "ERR"
+            O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
             Exit Sub
         End If
 
@@ -419,7 +419,7 @@ Public Class GRT00006SELECT
         Else
             Master.output(WW_CS0024FCHECKERR, BASEDLL.C_MESSAGE_TYPE.ERR, "出庫日(FROM)")
             WF_SHUKODATEF.Focus()
-            O_RTN = "ERR"
+            O_RTN = WW_CS0024FCHECKERR
             Exit Sub
         End If
 
@@ -434,7 +434,7 @@ Public Class GRT00006SELECT
         Else
             Master.output(WW_CS0024FCHECKERR, BASEDLL.C_MESSAGE_TYPE.ERR, "出庫日(TO)")
             WF_SHUKODATET.Focus()
-            O_RTN = "ERR"
+            O_RTN = WW_CS0024FCHECKERR
             Exit Sub
         End If
 
@@ -443,7 +443,7 @@ Public Class GRT00006SELECT
             If WW_SHUKODATEF > WW_SHUKODATET Then
                 Master.output(BASEDLL.C_MESSAGE_NO.START_END_RELATION_ERROR, BASEDLL.C_MESSAGE_TYPE.ERR)
                 WF_SHUKODATET.Focus()
-                O_RTN = "ERR"
+                O_RTN = C_MESSAGE_NO.START_END_RELATION_ERROR
                 Exit Sub
             End If
         End If

@@ -12,16 +12,25 @@ Option Explicit On
 
 
 Partial Public Class M00000LOGON
-
+    
     '''<summary>
-    '''UserName コントロール。
+    '''WF_LOGO コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents UserName As Global.System.Web.UI.WebControls.Label
-
+    Protected WithEvents WF_LOGO As Global.System.Web.UI.WebControls.Image
+    
+    '''<summary>
+    '''LoginLabel コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LoginLabel As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
     '''UserID コントロール。
     '''</summary>
@@ -30,16 +39,7 @@ Partial Public Class M00000LOGON
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents UserID As Global.System.Web.UI.WebControls.TextBox
-
-    '''<summary>
-    '''PassName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents PassName As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''PassWord コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class M00000LOGON
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents PassWord As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_Guidance コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class M00000LOGON
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_Guidance As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -66,7 +66,7 @@ Partial Public Class M00000LOGON
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_TERMID コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class M00000LOGON
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_TERMID As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_TERMCAMP コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class M00000LOGON
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_TERMCAMP As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class M00000LOGON
     '''</remarks>
     Public Shadows ReadOnly Property Master() As OFFICE.GRMasterPage
         Get
-            Return CType(MyBase.Master, OFFICE.GRMasterPage)
+            Return CType(MyBase.Master,OFFICE.GRMasterPage)
         End Get
     End Property
 End Class

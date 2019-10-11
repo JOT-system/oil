@@ -52,8 +52,8 @@ Public Class GRT00004HORDER
     Private WW_ERRLIST As List(Of String)                           'インポート中の１セット分のエラー
 
     Private Const CONST_DSPROW_MAX As Integer = 65000
-    Private Const CONST_DSPROWCOUNT As Integer = 45                 '１画面表示対象
-    Private Const CONST_SCROLLROWCOUNT As Integer = 25              'マウススクロール時の増分
+    Private Const CONST_DSPROWCOUNT As Integer = 40                 '１画面表示対象
+    Private Const CONST_SCROLLROWCOUNT As Integer = 20              'マウススクロール時の増分
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '詳細部タブID
 
     Private Const C_UPLOAD_EXCEL_REPORTID_NJS As String = "NJS配車表"
@@ -70,6 +70,7 @@ Public Class GRT00004HORDER
         Public Const RESULT As String = "3"                         '実績
         Public Const CANCEL As String = "9"                         '受注キャンセル
     End Class
+    Private Const JXORDER_WARNING As String = "W"                   'JXオーダー警告あり
 
     ''' <summary>
     ''' 車輛タイプ
@@ -197,6 +198,12 @@ Public Class GRT00004HORDER
                 Initialize()
             End If
 
+        Catch ex As Threading.ThreadAbortException
+            'キャンセルやServerTransferにて後続の処理が打ち切られた場合のエラーは発生させない
+        Catch ex As Exception
+            '○一覧再表示処理
+            DisplayGrid()
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR)
         Finally
 
             '○Close
@@ -307,10 +314,16 @@ Public Class GRT00004HORDER
         End If
 
         '光英受信ボタン非表示設定
-        If work.WF_SEL_CAMPCODE.Text = GRT00004WRKINC.C_CAMPCODE_NJS OrElse
-            (Not String.IsNullOrEmpty(work.WF_SEL_OILTYPE.Text) AndAlso work.WF_SEL_OILTYPE.Text <> GRT00004WRKINC.C_PRODUCT_OIL) Then
-            'NJS又は、油種条件が01(石油)以外は、非表示
+        If (Not String.IsNullOrEmpty(work.WF_SEL_OILTYPE.Text) AndAlso work.WF_SEL_OILTYPE.Text <> GRT00004WRKINC.C_PRODUCT_OIL) Then
+            '油種条件が01(石油)以外は、非表示
             WF_IsHideKoueiButton.Value = "1"
+        Else
+            Dim T5Com = New GRT0005COM
+            If Not T5Com.IsKoueiAvailableOrg(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_SHIPORG.Text, GRT00004WRKINC.C_KOUEI_CLASS_CODE, WW_ERRCODE) Then
+                'FIXVALUE(T00004_KOUEIORG)が定義されていない場合は、非表示
+                WF_IsHideKoueiButton.Value = "1"
+            End If
+            T5Com = Nothing
         End If
 
         '○Grid情報保存先のファイル名
@@ -376,17 +389,7 @@ Public Class GRT00004HORDER
                 For j As Integer = i To T00004tbl.Rows.Count - 1
 
                     If T00004tbl.Rows(j)("LINECNT") = 0 Then
-                        '取引先、油種、基準日（出荷日or届日）、受注部署、出荷部署、出庫日、業務車番、両目、トリップ、ドロップが同一
-                        If T00004tbl.Rows(j)("TORICODE") = T00004row("TORICODE") AndAlso
-                           T00004tbl.Rows(j)("OILTYPE") = T00004row("OILTYPE") AndAlso
-                           T00004tbl.Rows(j)("KIJUNDATE") = T00004row("KIJUNDATE") AndAlso
-                           T00004tbl.Rows(j)("ORDERORG") = T00004row("ORDERORG") AndAlso
-                           T00004tbl.Rows(j)("SHIPORG") = T00004row("SHIPORG") AndAlso
-                           T00004tbl.Rows(j)("SHUKODATE") = T00004row("SHUKODATE") AndAlso
-                           T00004tbl.Rows(j)("GSHABAN") = T00004row("GSHABAN") AndAlso
-                           T00004tbl.Rows(j)("RYOME") = T00004row("RYOME") AndAlso
-                           T00004tbl.Rows(j)("TRIPNO") = T00004row("TRIPNO") AndAlso
-                           T00004tbl.Rows(j)("DROPNO") = T00004row("DROPNO") Then
+                        If CompareOrder(T00004row, T00004tbl.Rows(j)) Then
 
                             WW_SEQ = WW_SEQ + 1
                             T00004tbl.Rows(j)("LINECNT") = WW_LINECNT
@@ -429,6 +432,13 @@ Public Class GRT00004HORDER
         For Each T00004row In T00004tbl.Rows
             If T00004row("HIDDEN") = "0" Then
                 WW_DataCNT = WW_DataCNT + 1
+            End If
+
+            If Not String.IsNullOrEmpty(T00004row("JXORDERID")) AndAlso
+               T00004row("JXORDERSTATUS") = JXORDER_WARNING Then
+
+                'JXオーダーでWARNING（マスタ変換エラー）は警告
+                T00004row("OPERATION") = C_LIST_OPERATION_CODE.WARNING
             End If
         Next
 
@@ -505,42 +515,56 @@ Public Class GRT00004HORDER
 
         '受信ファイルリスト
         Dim dicFileList As New Dictionary(Of String, List(Of FileInfo))
-        '光英ファイルFTP受信
-        work.GetKoueiFile(work.WF_SEL_SHIPORG.Text, dicFileList, O_RTN)
-        If Not isNormal(O_RTN) Then
-            Master.output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, "光英ファイル受信")
-            Exit Sub
-        End If
 
-        Dim dateF As String = work.WF_SEL_SHUKODATEF.Text.Replace("/", "")
-        Dim dateT As String = work.WF_SEL_SHUKODATET.Text.Replace("/", "")
-        Dim fileList = dicFileList.Where(Function(x) x.Key >= dateF AndAlso x.Key <= dateT).SelectMany(Function(x) x.Value).ToList
-        If fileList.Count > 0 Then
+        Try
 
-            '光英ファイルが存在する場合は取込
-            UPLOAD_KOUEI(fileList, O_RTN)
-        Else
-            '○メッセージ表示
-            Master.output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.INF, )
-        End If
-
-        '過去ファイル削除
-        For Each dat In dicFileList
-            If dat.Key < CS0050SESSION.LOGONDATE.Replace("/", "") Then
-                For Each file In dat.Value
-                    If file.Exists Then
-                        '光英連携が安定稼働するまでは論理削除
-                        Dim bakFileName As New FileInfo(file.FullName & ".used")
-                        If bakFileName.Exists Then
-                            bakFileName.Delete()
-                        End If
-                        file.MoveTo(bakFileName.FullName)
-
-                        'file.Delete()
-                    End If
-                Next
+            '光英ファイルFTP受信
+            work.GetKoueiFile(work.WF_SEL_SHIPORG.Text, dicFileList, O_RTN)
+            If Not isNormal(O_RTN) Then
+                Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, "光英受信")
+                Exit Sub
             End If
-        Next
+
+            Dim dateF As String = work.WF_SEL_SHUKODATEF.Text.Replace("/", "")
+            Dim dateT As String = work.WF_SEL_SHUKODATET.Text.Replace("/", "")
+            'Dim fileList = dicFileList.Where(Function(x) x.Key >= dateF AndAlso x.Key <= dateT).SelectMany(Function(x) x.Value).ToList
+            Dim fileList = dicFileList.Where(Function(x) x.Key >= dateF AndAlso x.Key <= dateT).Select(Function(x) x.Value.Last).ToList
+            If fileList.Count > 0 Then
+
+                '光英ファイルが存在する場合は取込
+                UPLOAD_KOUEI(fileList, O_RTN)
+            Else
+                '○メッセージ表示
+                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.INF, )
+            End If
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, "光英受信")
+            Exit Sub
+
+        End Try
+
+        Try
+            '過去ファイル削除
+            For Each dat In dicFileList
+                If dat.Key < CS0050SESSION.LOGONDATE.Replace("/", "") Then
+                    For Each file In dat.Value
+                        If file.Exists Then
+                            '光英連携が安定稼働するまでは論理削除
+                            Dim bakFileName As New FileInfo(file.FullName & ".used")
+                            If bakFileName.Exists Then
+                                bakFileName.Delete()
+                            End If
+                            file.MoveTo(bakFileName.FullName)
+
+                            'file.Delete()
+                        End If
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, "光英受信ファイル削除")
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -703,7 +727,7 @@ Public Class GRT00004HORDER
         For i As Integer = 1 To 4
             T00004INProw = T00004INPtbl.NewRow()
             T00004INProw("LINECNT") = 0
-            T00004INProw("OPERATION") = ""
+            T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
             T00004INProw("TIMSTP") = 0
             T00004INProw("SELECT") = 1
             T00004INProw("HIDDEN") = 0
@@ -766,6 +790,7 @@ Public Class GRT00004HORDER
             T00004INProw("PRODUCT1") = ""
             T00004INProw("PRODUCT1NAME") = ""
             T00004INProw("PRODUCT2") = ""
+            T00004INProw("PRODUCT2NAME") = ""
             T00004INProw("PRODUCTCODE") = ""
             T00004INProw("PRODUCTNAME") = ""
             T00004INProw("PRATIO") = ""
@@ -820,6 +845,7 @@ Public Class GRT00004HORDER
 
             T00004INProw("WORK_NO") = ""
             T00004INProw("JXORDERID") = ""
+            T00004INProw("JXORDERSTATUS") = ""
 
             T00004INPtbl.Rows.Add(T00004INProw)
 
@@ -910,8 +936,10 @@ Public Class GRT00004HORDER
             WF_SUBSTAFFCODE_TEXT.Text = WW_TEXT
             '出勤時間
             WF_STTIME.Text = ""
-            'JXORDERID
+
+            'JXORDER
             WF_JXORDERID.Text = ""
+            WF_JXORDERSTATUS.Text = ""
             Exit For
         Next
 
@@ -1031,18 +1059,30 @@ Public Class GRT00004HORDER
         'サマリ処理
         SUMMRY_SET()
 
-        For Each file As ListItem In WF_KoueiLoadFile.Items
-            Dim f = New FileInfo(file.Value)
-            If f.Exists Then
-                '光英連携が安定稼働するまでは論理削除
-                Dim bakFileName As New FileInfo(f.FullName & ".used")
-                If bakFileName.Exists Then
-                    bakFileName.Delete()
-                End If
-                f.MoveTo(bakFileName.FullName)
+        Try
+            '行位置が一致するデータ取得
+            Dim errCnt = (From tbl In T00004tbl.AsEnumerable
+                          Select tbl
+                          Where tbl.Field(Of String)("DELFLG") <> C_DELETE_FLG.DELETE _
+                            And tbl.Field(Of String)("JXORDERSTATUS") = "")
+            If errCnt.Count = 0 Then
+
+                For Each file As ListItem In WF_KoueiLoadFile.Items
+                    Dim f = New FileInfo(file.Value)
+                    If f.Exists Then
+                        '光英連携が安定稼働するまでは論理削除
+                        Dim bakFileName As New FileInfo(f.FullName & ".used")
+                        If bakFileName.Exists Then
+                            bakFileName.Delete()
+                        End If
+                        f.MoveTo(bakFileName.FullName)
+                    End If
+                    f = Nothing
+                Next
+                WF_KoueiLoadFile.Items.Clear()
             End If
-        Next
-        WF_KoueiLoadFile.Items.Clear()
+        Catch ex As Exception
+        End Try
 
         '○画面表示データ保存
         Master.SaveTable(T00004tbl)
@@ -1232,6 +1272,7 @@ Public Class GRT00004HORDER
 
             '変更またはエラーの場合、"有"とする
             If T00004INProw("OPERATION").ToString.Contains(C_LIST_OPERATION_CODE.UPDATING) OrElse
+                T00004INProw("OPERATION").ToString.Contains(C_LIST_OPERATION_CODE.WARNING) OrElse
                 T00004INProw("OPERATION").ToString.Contains(C_LIST_OPERATION_CODE.ERRORED) Then
                 WW_Change = "有"
             Else
@@ -1254,7 +1295,7 @@ Public Class GRT00004HORDER
                 WW_Change = "有"
                 T00004INProw("WORK_NO") = ""
                 T00004INProw("LINECNT") = 0
-                T00004INProw("ORDERNO") = ""
+                T00004INProw("ORDERNO") = C_LIST_OPERATION_CODE.NODATA
             End If
 
             '①詳細画面で追記された場合は"新"とする
@@ -1623,6 +1664,11 @@ Public Class GRT00004HORDER
     ''' <remarks></remarks>
     Protected Sub CODENAME_set(ByRef T00004row As DataRow)
 
+        Dim koueiFlag As Boolean = False
+        If Not String.IsNullOrEmpty(T00004row("JXORDERID")) Then
+            koueiFlag = True
+        End If
+
         '○名称付与
 
         '会社名称
@@ -1661,13 +1707,23 @@ Public Class GRT00004HORDER
         T00004row("PRODUCT1NAME") = ""
         CODENAME_get("PRODUCT1", T00004row("PRODUCT1"), T00004row("PRODUCT1NAME"), WW_DUMMY)
 
-        '品名コード名称
-        T00004row("PRODUCTNAME") = ""
-        CODENAME_get("PRODUCTCODE", T00004row("PRODUCTCODE"), T00004row("PRODUCTNAME"), WW_DUMMY)
-        '品名追加情報
-        If T00004row("HTANI") = "" Then
-            'List配送単位
-            CODENAME_get("HTANI", T00004row("PRODUCTCODE"), T00004row("HTANI"), WW_DUMMY)
+        If koueiFlag AndAlso T00004row("PRODUCTCODE").ToString.Contains("!") Then
+            '光英オーダーかつコードに『!』が含まれる場合は名称取得しない
+            '※JOTコード変換前の光英コード・名称が設定されている為
+        Else
+
+            '品名コード名称
+            T00004row("PRODUCTNAME") = ""
+            CODENAME_get("PRODUCTCODE", T00004row("PRODUCTCODE"), T00004row("PRODUCTNAME"), WW_DUMMY)
+            T00004row("PRODUCT2NAME") = T00004row("PRODUCTNAME")
+            '品名追加情報
+            If T00004row("HTANI") = "" Then
+                'List配送単位
+                Dim product = GetProduct(T00004row("SHIPORG"), T00004row("PRODUCTCODE"))
+                If Not IsNothing(product) Then
+                    T00004row("HTANI") = product.HTANI
+                End If
+            End If
         End If
 
         '臭有無名称
@@ -1682,9 +1738,14 @@ Public Class GRT00004HORDER
         T00004row("SHIPORGNAME") = ""
         CODENAME_get("SHIPORG", T00004row("SHIPORG"), T00004row("SHIPORGNAME"), WW_DUMMY)
 
-        '業務車番ナンバー
-        T00004row("GSHABANLICNPLTNO") = ""
-        CODENAME_get("GSHABAN", T00004row("GSHABAN"), T00004row("GSHABANLICNPLTNO"), WW_DUMMY)
+        If koueiFlag AndAlso T00004row("GSHABAN").ToString.Contains("!") Then
+            '光英オーダーかつコードに『!』が含まれる場合は名称取得しない
+            '※JOTコード変換前の光英コード・名称が設定されている為
+        Else
+            '業務車番ナンバー
+            T00004row("GSHABANLICNPLTNO") = ""
+            CODENAME_get("GSHABAN", T00004row("GSHABAN"), T00004row("GSHABANLICNPLTNO"), WW_DUMMY)
+        End If
 
         'コンテナシャーシナンバー
         T00004row("CONTCHASSISLICNPLTNO") = ""
@@ -1698,9 +1759,14 @@ Public Class GRT00004HORDER
         T00004row("SUBSTAFFCODENAME") = ""
         CODENAME_get("SUBSTAFFCODE", T00004row("SUBSTAFFCODE"), T00004row("SUBSTAFFCODENAME"), WW_DUMMY)
 
-        '届先コード名称
-        T00004row("TODOKECODENAME") = ""
-        CODENAME_get("TODOKECODE", T00004row("TODOKECODE"), T00004row("TODOKECODENAME"), WW_DUMMY, work.createDistinationParam(work.WF_SEL_CAMPCODE.Text, T00004row("SHIPORG"), T00004row("TORICODE"), "1"))
+        If koueiFlag AndAlso T00004row("TODOKECODE").ToString.Contains("!") Then
+            '光英オーダーかつコードに『!』が含まれる場合は名称取得しない
+            '※JOTコード変換前の光英コード・名称が設定されている為
+        Else
+            '届先コード名称
+            T00004row("TODOKECODENAME") = ""
+            CODENAME_get("TODOKECODE", T00004row("TODOKECODE"), T00004row("TODOKECODENAME"), WW_DUMMY, work.createDistinationParam(work.WF_SEL_CAMPCODE.Text, T00004row("SHIPORG"), T00004row("TORICODE"), "1"))
+        End If
 
         '配送単位名称
         T00004row("HTANINAME") = ""
@@ -1728,37 +1794,43 @@ Public Class GRT00004HORDER
             T00004row("NOTES10") = datTodoke.NOTES10                    '特定要件３
         End If
 
-        ''車両追加情報
-        For i As Integer = 0 To WF_ListGSHABAN.Items.Count - 1
-            If WF_ListGSHABAN.Items(i).Value = T00004row("GSHABAN") Then
-                If Val(T00004row("SHAFUKU")) = 0 Then
-                    T00004row("SHAFUKU") = WF_ListSHAFUKU.Items(i).Value                  'List車腹
-                End If
-                T00004row("SHARYOTYPEF") = Mid(WF_ListTSHABANF.Items(i).Value, 1, 1)  'List統一車番（前）
-                T00004row("TSHABANF") = Mid(WF_ListTSHABANF.Items(i).Value, 2, 19)    'List統一車番（前）
-                T00004row("SHARYOTYPEB") = Mid(WF_ListTSHABANB.Items(i).Value, 1, 1)  'List統一車番（後）
-                T00004row("TSHABANB") = Mid(WF_ListTSHABANB.Items(i).Value, 2, 19)    'List統一車番（後）
-                T00004row("SHARYOTYPEB2") = Mid(WF_ListTSHABANB2.Items(i).Value, 1, 1) 'List統一車番（後）２
-                T00004row("TSHABANB2") = Mid(WF_ListTSHABANB2.Items(i).Value, 2, 19)   'List統一車番（後）２
-                T00004row("SHARYOINFO1") = WF_ListSHARYOINFO1.Items(i).Value          'List車両情報１
-                T00004row("SHARYOINFO2") = WF_ListSHARYOINFO2.Items(i).Value          'List車両情報２
-                T00004row("SHARYOINFO3") = WF_ListSHARYOINFO3.Items(i).Value          'List車両情報３
-                T00004row("SHARYOINFO4") = WF_ListSHARYOINFO4.Items(i).Value          'List車両情報４
-                T00004row("SHARYOINFO5") = WF_ListSHARYOINFO5.Items(i).Value          'List車両情報５
-                T00004row("SHARYOINFO6") = WF_ListSHARYOINFO6.Items(i).Value          'List車両情報６
-                Exit For
-            End If
-        Next
+        If koueiFlag AndAlso T00004row("GSHABAN").ToString.Contains("?") Then
+        Else
 
-        '従業員追加情報
-        Dim datStaff As STAFF = GetStaff(T00004row("SHIPORG"), T00004row("STAFFCODE"))
-        If Not IsNothing(datStaff) AndAlso Not IsNothing(datStaff.STAFFCODE) Then
-            T00004row("STAFFCODENAME") = datStaff.STAFFNAMES                    '
-            T00004row("STAFFNOTES1") = datStaff.NOTES1                      '備考１
-            T00004row("STAFFNOTES2") = datStaff.NOTES2                      '備考２
-            T00004row("STAFFNOTES3") = datStaff.NOTES3                      '備考３
-            T00004row("STAFFNOTES4") = datStaff.NOTES4                      '備考４
-            T00004row("STAFFNOTES5") = datStaff.NOTES5                      '備考５
+            ''車両追加情報
+            For i As Integer = 0 To WF_ListGSHABAN.Items.Count - 1
+                If WF_ListGSHABAN.Items(i).Value = T00004row("GSHABAN") Then
+                    If Val(T00004row("SHAFUKU")) = 0 Then
+                        T00004row("SHAFUKU") = WF_ListSHAFUKU.Items(i).Value                  'List車腹
+                    End If
+                    T00004row("SHARYOTYPEF") = Mid(WF_ListTSHABANF.Items(i).Value, 1, 1)  'List統一車番（前）
+                    T00004row("TSHABANF") = Mid(WF_ListTSHABANF.Items(i).Value, 2, 19)    'List統一車番（前）
+                    T00004row("SHARYOTYPEB") = Mid(WF_ListTSHABANB.Items(i).Value, 1, 1)  'List統一車番（後）
+                    T00004row("TSHABANB") = Mid(WF_ListTSHABANB.Items(i).Value, 2, 19)    'List統一車番（後）
+                    T00004row("SHARYOTYPEB2") = Mid(WF_ListTSHABANB2.Items(i).Value, 1, 1) 'List統一車番（後）２
+                    T00004row("TSHABANB2") = Mid(WF_ListTSHABANB2.Items(i).Value, 2, 19)   'List統一車番（後）２
+                    T00004row("SHARYOINFO1") = WF_ListSHARYOINFO1.Items(i).Value          'List車両情報１
+                    T00004row("SHARYOINFO2") = WF_ListSHARYOINFO2.Items(i).Value          'List車両情報２
+                    T00004row("SHARYOINFO3") = WF_ListSHARYOINFO3.Items(i).Value          'List車両情報３
+                    T00004row("SHARYOINFO4") = WF_ListSHARYOINFO4.Items(i).Value          'List車両情報４
+                    T00004row("SHARYOINFO5") = WF_ListSHARYOINFO5.Items(i).Value          'List車両情報５
+                    T00004row("SHARYOINFO6") = WF_ListSHARYOINFO6.Items(i).Value          'List車両情報６
+                    Exit For
+                End If
+            Next
+        End If
+
+        If Not koueiFlag Then
+            '従業員追加情報
+            Dim datStaff As STAFF = GetStaff(T00004row("SHIPORG"), T00004row("STAFFCODE"))
+            If Not IsNothing(datStaff) AndAlso Not IsNothing(datStaff.STAFFCODE) Then
+                T00004row("STAFFCODENAME") = datStaff.STAFFNAMES                '
+                T00004row("STAFFNOTES1") = datStaff.NOTES1                      '備考１
+                T00004row("STAFFNOTES2") = datStaff.NOTES2                      '備考２
+                T00004row("STAFFNOTES3") = datStaff.NOTES3                      '備考３
+                T00004row("STAFFNOTES4") = datStaff.NOTES4                      '備考４
+                T00004row("STAFFNOTES5") = datStaff.NOTES5                      '備考５
+            End If
         End If
 
         If T00004row("TUMIOKIKBN") = "1" Then
@@ -1795,12 +1867,12 @@ Public Class GRT00004HORDER
         Master.CreateEmptyTable(T00004INPtbl)
 
         '行位置が一致するデータ取得
-        'Dim T00004INP = (From tbl In T00004tbl.AsEnumerable Select tbl
-        '                 Where tbl.Field(Of Integer)("LINECNT") = WW_LINECNT _
-        '                   And tbl.Field(Of String)("SELECT") = "1")
-
         Dim T00004INP = (From tbl In T00004tbl.AsEnumerable Select tbl
-                         Where tbl.Field(Of Integer)("LINECNT") = WW_LINECNT)
+                         Where tbl.Field(Of Integer)("LINECNT") = WW_LINECNT _
+                           And tbl.Field(Of String)("SELECT") = "1")
+
+        'Dim T00004INP = (From tbl In T00004tbl.AsEnumerable Select tbl
+        '                 Where tbl.Field(Of Integer)("LINECNT") = WW_LINECNT)
 
         'DetailBoxKey画面編集
         If T00004INP.Count > 0 Then
@@ -1863,8 +1935,9 @@ Public Class GRT00004HORDER
             WF_SUBSTAFFCODE_TEXT.Text = T00004row("SUBSTAFFCODENAME")
             WF_STTIME.Text = T00004row("STTIME")
 
-            '非表示 JXORDERID
+            '非表示 JXORDER
             WF_JXORDERID.Text = T00004row("JXORDERID")
+            WF_JXORDERSTATUS.Text = T00004row("JXORDERSTATUS")
 
             For i As Integer = 0 To T00004INP.Count - 1
                 T00004INP(i).Item("WORK_NO") = i
@@ -1902,7 +1975,6 @@ Public Class GRT00004HORDER
                 WF_TUMIOKIKBN.Enabled = False
                 WF_TRIPNO.Enabled = False
                 WF_DROPNO.Enabled = False
-                WF_STTIME.Enabled = False
 
                 WF_IsKoueiData.Value = "1"
 
@@ -1931,7 +2003,6 @@ Public Class GRT00004HORDER
                 WF_TUMIOKIKBN.Enabled = True
                 WF_TRIPNO.Enabled = True
                 WF_DROPNO.Enabled = True
-                WF_STTIME.Enabled = True
 
                 WF_IsKoueiData.Value = "0"
             End If
@@ -1945,7 +2016,7 @@ Public Class GRT00004HORDER
                 Dim T00004INProw = T00004INPtbl.NewRow()
                 T00004INProw("SELECT") = 1
                 T00004INProw("HIDDEN") = 1
-                T00004INProw("OPERATION") = ""
+                T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 T00004INProw("TIMSTP") = 0
                 T00004INProw("LINECNT") = WW_LINECNT
 
@@ -2068,6 +2139,9 @@ Public Class GRT00004HORDER
 
                 T00004INProw("WORK_NO") = ""
 
+                T00004INProw("JXORDERID") = ""
+                T00004INProw("JXORDERSTATUS") = ""
+
                 T00004INPtbl.Rows.Add(T00004INProw)
             Next
         End If
@@ -2157,8 +2231,9 @@ Public Class GRT00004HORDER
         WF_SUBSTAFFCODE_TEXT.Text = ""
         '出勤時間
         WF_STTIME.Text = ""
-        'JXORDERID
+        'JXORDER
         WF_JXORDERID.Text = ""
+        WF_JXORDERSTATUS.Text = ""
 
         WF_Sel_LINECNT.Text = ""
 
@@ -2385,6 +2460,7 @@ Public Class GRT00004HORDER
         Else
             outRow("OPERATION") = I_ROW("OPERATION").ToString.Replace(C_LIST_OPERATION_CODE.SELECTED, "")
         End If
+
     End Sub
 
     ''' <summary>
@@ -2668,7 +2744,8 @@ Public Class GRT00004HORDER
 
         For Each T00004SUMrow In T00004SUMtbl.Rows
 
-            If T00004SUMrow("DELFLG") = "0" AndAlso T00004SUMrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            If T00004SUMrow("DELFLG") = "0" AndAlso
+                (T00004SUMrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse T00004SUMrow("OPERATION") = C_LIST_OPERATION_CODE.WARNING) Then
                 Try
 
                     PARA01.Value = T00004SUMrow("CAMPCODE")                           '会社コード(CAMPCODE)
@@ -2843,275 +2920,290 @@ Public Class GRT00004HORDER
         Try
 
             'DataBase接続文字
-            Dim SQLcon = CS0050SESSION.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
+            Using SQLcon = CS0050SESSION.getConnection
+                SQLcon.Open() 'DataBase接続(Open)
 
-            '検索SQL文
-            Dim SQLStr As String =
-                 "SELECT 0                                     as LINECNT ,        " _
-               & "       ''                                    as OPERATION ,      " _
-               & "       '0'                                   as 'SELECT' ,       " _
-               & "       '0'                                   as HIDDEN ,         " _
-               & "       ''                                    as 'INDEX' ,        " _
-               & "       isnull(rtrim(A.CAMPCODE),'')          as CAMPCODE ,       " _
-               & "       isnull(rtrim(A.TERMORG),'')           as TERMORG ,        " _
-               & "       isnull(rtrim(A.ORDERNO),'')           as ORDERNO ,        " _
-               & "       isnull(rtrim(A.DETAILNO),'')          as DETAILNO ,       " _
-               & "       isnull(rtrim(A.TRIPNO),'')            as TRIPNO ,         " _
-               & "       isnull(rtrim(A.DROPNO),'')            as DROPNO ,         " _
-               & "       isnull(rtrim(A.SEQ),'00')             as SEQ ,            " _
-               & "       isnull(rtrim(A.TORICODE),'')          as TORICODE ,       " _
-               & "       isnull(rtrim(A.OILTYPE),'')           as OILTYPE ,        " _
-               & "       isnull(rtrim(A.STORICODE),'')         as STORICODE ,      " _
-               & "       isnull(rtrim(A.ORDERORG),'')          as ORDERORG ,       " _
-               & "       isnull(rtrim(A.SHUKODATE),'')         as SHUKODATE ,      " _
-               & "       isnull(rtrim(A.KIKODATE),'')          as KIKODATE ,       " _
-               & "       isnull(rtrim(A.KIJUNDATE),'')         as KIJUNDATE ,      " _
-               & "       isnull(rtrim(A.SHUKADATE),'')         as SHUKADATE ,      " _
-               & "       isnull(rtrim(A.TUMIOKIKBN),'')        as TUMIOKIKBN ,     " _
-               & "       isnull(rtrim(A.URIKBN),'')            as URIKBN ,         " _
-               & "       isnull(rtrim(A.STATUS),'')            as STATUS ,         " _
-               & "       isnull(rtrim(A.SHIPORG),'')           as SHIPORG ,        " _
-               & "       isnull(rtrim(A.SHUKABASHO),'')        as SHUKABASHO ,     " _
-               & "       isnull(rtrim(A.INTIME),'')            as INTIME ,         " _
-               & "       isnull(rtrim(A.OUTTIME),'')           as OUTTIME ,        " _
-               & "       isnull(rtrim(A.SHUKADENNO),'')        as SHUKADENNO ,     " _
-               & "       isnull(rtrim(A.TUMISEQ),'')           as TUMISEQ ,        " _
-               & "       isnull(rtrim(A.TUMIBA),'')            as TUMIBA ,         " _
-               & "       isnull(rtrim(A.GATE),'')              as GATE ,           " _
-               & "       isnull(rtrim(A.GSHABAN),'')           as GSHABAN ,        " _
-               & "       isnull(rtrim(A.RYOME),'')             as RYOME ,          " _
-               & "       isnull(rtrim(A.CONTCHASSIS),'')       as CONTCHASSIS ,    " _
-               & "       isnull(rtrim(A.SHAFUKU),'')           as SHAFUKU ,        " _
-               & "       isnull(rtrim(A.STAFFCODE),'')         as STAFFCODE ,      " _
-               & "       isnull(rtrim(A.SUBSTAFFCODE),'')      as SUBSTAFFCODE ,   " _
-               & "       isnull(rtrim(A.STTIME),'')            as STTIME ,         " _
-               & "       isnull(rtrim(A.TORIORDERNO),'')       as TORIORDERNO ,    " _
-               & "       isnull(rtrim(A.TODOKEDATE),'')        as TODOKEDATE ,     " _
-               & "       isnull(rtrim(A.TODOKETIME),'')        as TODOKETIME ,     " _
-               & "       isnull(rtrim(A.TODOKECODE),'')        as TODOKECODE ,     " _
-               & "       isnull(rtrim(A.PRODUCT1),'')          as PRODUCT1 ,       " _
-               & "       isnull(rtrim(A.PRODUCT2),'')          as PRODUCT2 ,       " _
-               & "       isnull(rtrim(A.PRODUCTCODE),'')       as PRODUCTCODE ,    " _
-               & "       isnull(rtrim(A.PRATIO),'')            as PRATIO ,         " _
-               & "       isnull(rtrim(A.SMELLKBN),'')          as SMELLKBN ,       " _
-               & "       isnull(rtrim(A.CONTNO),'')            as CONTNO ,         " _
-               & "       isnull(rtrim(A.HTANI),'')             as HTANI ,          " _
-               & "       isnull(rtrim(A.SURYO),'')             as SURYO ,          " _
-               & "       isnull(rtrim(A.DAISU),'')             as DAISU ,          " _
-               & "       isnull(rtrim(A.JSURYO),'')            as JSURYO ,         " _
-               & "       isnull(rtrim(A.JDAISU),'')            as JDAISU ,         " _
-               & "       isnull(rtrim(A.REMARKS1),'')          as REMARKS1 ,       " _
-               & "       isnull(rtrim(A.REMARKS2),'')          as REMARKS2 ,       " _
-               & "       isnull(rtrim(A.REMARKS3),'')          as REMARKS3 ,       " _
-               & "       isnull(rtrim(A.REMARKS4),'')          as REMARKS4 ,       " _
-               & "       isnull(rtrim(A.REMARKS5),'')          as REMARKS5 ,       " _
-               & "       isnull(rtrim(A.REMARKS6),'')          as REMARKS6 ,       " _
-               & "       isnull(rtrim(A.TAXKBN),'')            as TAXKBN ,         " _
-               & "       isnull(rtrim(A.SHARYOTYPEF),'')       as SHARYOTYPEF ,    " _
-               & "       isnull(rtrim(A.TSHABANF),'')          as TSHABANF ,       " _
-               & "       isnull(rtrim(A.SHARYOTYPEB),'')       as SHARYOTYPEB ,    " _
-               & "       isnull(rtrim(A.TSHABANB),'')          as TSHABANB ,       " _
-               & "       isnull(rtrim(A.SHARYOTYPEB2),'')      as SHARYOTYPEB2 ,   " _
-               & "       isnull(rtrim(A.TSHABANB2),'')         as TSHABANB2 ,      " _
-               & "       isnull(rtrim(A.JXORDERID),'')         as JXORDERID ,         " _
-               & "       isnull(rtrim(A.DELFLG),'')            as DELFLG ,         " _
-               & "       TIMSTP = cast(A.UPDTIMSTP  as bigint) ,        " _
-               & "       isnull(rtrim(B.SHARYOINFO1),'')       as SHARYOINFO1 ,    " _
-               & "       isnull(rtrim(B.SHARYOINFO2),'')       as SHARYOINFO2 ,    " _
-               & "       isnull(rtrim(B.SHARYOINFO3),'')       as SHARYOINFO3 ,    " _
-               & "       isnull(rtrim(B.SHARYOINFO4),'')       as SHARYOINFO4 ,    " _
-               & "       isnull(rtrim(B.SHARYOINFO5),'')       as SHARYOINFO5 ,    " _
-               & "       isnull(rtrim(B.SHARYOINFO6),'')       as SHARYOINFO6 ,    " _
-               & "       isnull(rtrim(C.ARRIVTIME),'')         as ARRIVTIME ,      " _
-               & "       isnull(rtrim(C.DISTANCE),'')          as DISTANCE ,       " _
-               & "       isnull(rtrim(D.ADDR1),'') +              				   " _
-               & "       isnull(rtrim(D.ADDR2),'') +            				   " _
-               & "       isnull(rtrim(D.ADDR3),'') +             				   " _
-               & "       isnull(rtrim(D.ADDR4),'')          	as ADDR ,          " _
-               & "       isnull(rtrim(D.NOTES1),'')        	    as NOTES1 ,        " _
-               & "       isnull(rtrim(D.NOTES2),'')          	as NOTES2 ,        " _
-               & "       isnull(rtrim(D.NOTES3),'')          	as NOTES3 ,        " _
-               & "       isnull(rtrim(D.NOTES4),'')          	as NOTES4 ,        " _
-               & "       isnull(rtrim(D.NOTES5),'')          	as NOTES5 ,        " _
-               & "       isnull(rtrim(D.NOTES6),'')        	    as NOTES6 ,        " _
-               & "       isnull(rtrim(D.NOTES7),'')          	as NOTES7 ,        " _
-               & "       isnull(rtrim(D.NOTES8),'')          	as NOTES8 ,        " _
-               & "       isnull(rtrim(D.NOTES9),'')          	as NOTES9 ,        " _
-               & "       isnull(rtrim(D.NOTES10),'')          	as NOTES10 ,       " _
-               & "       isnull(rtrim(E.NOTES1),'')        	    as STAFFNOTES1 ,   " _
-               & "       isnull(rtrim(E.NOTES2),'')          	as STAFFNOTES2 ,   " _
-               & "       isnull(rtrim(E.NOTES3),'')          	as STAFFNOTES3 ,   " _
-               & "       isnull(rtrim(E.NOTES4),'')          	as STAFFNOTES4 ,   " _
-               & "       isnull(rtrim(E.NOTES5),'')          	as STAFFNOTES5 ,   " _
-               & "       ''                                    as TUMIOKI ,        " _
-               & "       ''                                    as CAMPCODENAME ,   " _
-               & "       ''                                    as TERMORGNAME ,    " _
-               & "       ''                                    as TORICODENAME ,   " _
-               & "       ''                                    as OILTYPENAME ,    " _
-               & "       ''                                    as STORICODENAME ,  " _
-               & "       ''                                    as ORDERORGNAME ,   " _
-               & "       ''                                    as TUMIOKIKBNNAME , " _
-               & "       ''                                    as URIKBNNAME ,     " _
-               & "       ''                                    as STATUSNAME ,     " _
-               & "       ''                                    as SHIPORGNAME ,    " _
-               & "       ''                                    as SHUKABASHONAME , " _
-               & "       ''                                    as GSHABANLICNPLTNO ,    " _
-               & "       ''                                    as CONTCHASSISLICNPLTNO ,    " _
-               & "       ''                                    as STAFFCODENAME ,    " _
-               & "       ''                                    as SUBSTAFFCODENAME ,    " _
-               & "       ''                                    as TODOKECODENAME ,    " _
-               & "       ''                                    as HTANINAME ,    " _
-               & "       ''                                    as TAXKBNNAME ,    " _
-               & "       ''                                    as PRODUCT1NAME ,   " _
-               & "       ''                                    as PRODUCTNAME ,   " _
-               & "       ''                                    as SMELLKBNNAME ,   " _
-               & "       ''                                    as SURYO_SUM ,      " _
-               & "       ''                                    as DAISU_SUM ,      " _
-               & "       ''                                    as JSURYO_SUM ,      " _
-               & "       ''                                    as JDAISU_SUM ,      " _
-               & "       '0'                                   as WORK_NO          " _
-               & "  FROM T0004_HORDER AS A								" _
-               & " INNER JOIN ( SELECT Y.CAMPCODE, Y.CODE               " _
-               & "                FROM S0006_ROLE Y     				" _
-               & "               WHERE Y.CAMPCODE 	 	   = @P01		" _
-               & "                 and Y.OBJECT       	   = 'ORG'		" _
-               & "                 and Y.ROLE              = @P02		" _
-               & "                 and Y.PERMITCODE       in ('1','2')  " _
-               & "                 and Y.STYMD            <= @P03		" _
-               & "                 and Y.ENDYMD           >= @P04		" _
-               & "                 and Y.DELFLG           <> '1'		" _
-               & "            ) AS Z									" _
-               & "    ON Z.CAMPCODE		= A.CAMPCODE    				" _
-               & "   and Z.CODE       	= A.SHIPORG 	    			" _
-               & "  LEFT JOIN MA006_SHABANORG B							" _
-               & "    ON B.CAMPCODE     	= A.CAMPCODE 				" _
-               & "   and B.GSHABAN      	= A.GSHABAN 				" _
-               & "   and B.MANGUORG     	= A.SHIPORG 				" _
-               & "   and B.DELFLG          <> '1' 						" _
-               & "  LEFT JOIN MC007_TODKORG C 							" _
-               & "    ON C.CAMPCODE     	= A.CAMPCODE 				" _
-               & "   and C.TORICODE     	= A.TORICODE 				" _
-               & "   and C.TODOKECODE   	= A.TODOKECODE 				" _
-               & "   and C.UORG         	= A.SHIPORG 				" _
-               & "   and C.DELFLG          <> '1' 						" _
-               & "  LEFT JOIN MC006_TODOKESAKI D 						" _
-               & "    ON D.CAMPCODE     	= C.CAMPCODE 				" _
-               & "   and D.TORICODE     	= C.TORICODE				" _
-               & "   and D.TODOKECODE   	= C.TODOKECODE 				" _
-               & "   and D.STYMD           <= A.SHUKODATE				" _
-               & "   and D.ENDYMD          >= A.SHUKODATE				" _
-               & "   and D.DELFLG          <> '1' 						" _
-               & "  LEFT JOIN MB001_STAFF E      						" _
-               & "    ON E.CAMPCODE     	= A.CAMPCODE 				" _
-               & "   and E.STAFFCODE     	= A.STAFFCODE				" _
-               & "   and E.STYMD           <= A.SHUKODATE				" _
-               & "   and E.ENDYMD          >= A.SHUKODATE				" _
-               & "   and E.DELFLG          <> '1' 						" _
-               & " WHERE A.CAMPCODE         = @P01                      " _
-               & "   and A.SHUKADATE       <= @P05                      " _
-               & "   and A.SHUKADATE       >= @P06                      " _
-               & "   and A.TODOKEDATE      <= @P07                      " _
-               & "   and A.TODOKEDATE      >= @P08                      " _
-               & "   and A.SHUKODATE       <= @P09                      " _
-               & "   and A.SHUKODATE       >= @P10                      " _
-               & "   and A.DELFLG          <> '1'                       "
+                '検索SQL文
+                Dim SQLStr As String =
+                     "SELECT 0                                     as LINECNT ,        " _
+                   & "       ''                                    as OPERATION ,      " _
+                   & "       '0'                                   as 'SELECT' ,       " _
+                   & "       '0'                                   as HIDDEN ,         " _
+                   & "       ''                                    as 'INDEX' ,        " _
+                   & "       isnull(rtrim(A.CAMPCODE),'')          as CAMPCODE ,       " _
+                   & "       isnull(rtrim(A.TERMORG),'')           as TERMORG ,        " _
+                   & "       isnull(rtrim(A.ORDERNO),'')           as ORDERNO ,        " _
+                   & "       isnull(rtrim(A.DETAILNO),'')          as DETAILNO ,       " _
+                   & "       isnull(rtrim(A.TRIPNO),'')            as TRIPNO ,         " _
+                   & "       isnull(rtrim(A.DROPNO),'')            as DROPNO ,         " _
+                   & "       isnull(rtrim(A.SEQ),'00')             as SEQ ,            " _
+                   & "       isnull(rtrim(A.TORICODE),'')          as TORICODE ,       " _
+                   & "       isnull(rtrim(A.OILTYPE),'')           as OILTYPE ,        " _
+                   & "       isnull(rtrim(A.STORICODE),'')         as STORICODE ,      " _
+                   & "       isnull(rtrim(A.ORDERORG),'')          as ORDERORG ,       " _
+                   & "       isnull(rtrim(A.SHUKODATE),'')         as SHUKODATE ,      " _
+                   & "       isnull(rtrim(A.KIKODATE),'')          as KIKODATE ,       " _
+                   & "       isnull(rtrim(A.KIJUNDATE),'')         as KIJUNDATE ,      " _
+                   & "       isnull(rtrim(A.SHUKADATE),'')         as SHUKADATE ,      " _
+                   & "       isnull(rtrim(A.TUMIOKIKBN),'')        as TUMIOKIKBN ,     " _
+                   & "       isnull(rtrim(A.URIKBN),'')            as URIKBN ,         " _
+                   & "       isnull(rtrim(A.STATUS),'')            as STATUS ,         " _
+                   & "       isnull(rtrim(A.SHIPORG),'')           as SHIPORG ,        " _
+                   & "       isnull(rtrim(A.SHUKABASHO),'')        as SHUKABASHO ,     " _
+                   & "       isnull(rtrim(A.INTIME),'')            as INTIME ,         " _
+                   & "       isnull(rtrim(A.OUTTIME),'')           as OUTTIME ,        " _
+                   & "       isnull(rtrim(A.SHUKADENNO),'')        as SHUKADENNO ,     " _
+                   & "       isnull(rtrim(A.TUMISEQ),'')           as TUMISEQ ,        " _
+                   & "       isnull(rtrim(A.TUMIBA),'')            as TUMIBA ,         " _
+                   & "       isnull(rtrim(A.GATE),'')              as GATE ,           " _
+                   & "       isnull(rtrim(A.GSHABAN),'')           as GSHABAN ,        " _
+                   & "       isnull(rtrim(A.RYOME),'')             as RYOME ,          " _
+                   & "       isnull(rtrim(A.CONTCHASSIS),'')       as CONTCHASSIS ,    " _
+                   & "       isnull(rtrim(A.SHAFUKU),'')           as SHAFUKU ,        " _
+                   & "       isnull(rtrim(A.STAFFCODE),'')         as STAFFCODE ,      " _
+                   & "       isnull(rtrim(A.SUBSTAFFCODE),'')      as SUBSTAFFCODE ,   " _
+                   & "       isnull(rtrim(A.STTIME),'')            as STTIME ,         " _
+                   & "       isnull(rtrim(A.TORIORDERNO),'')       as TORIORDERNO ,    " _
+                   & "       isnull(rtrim(A.TODOKEDATE),'')        as TODOKEDATE ,     " _
+                   & "       isnull(rtrim(A.TODOKETIME),'')        as TODOKETIME ,     " _
+                   & "       isnull(rtrim(A.TODOKECODE),'')        as TODOKECODE ,     " _
+                   & "       isnull(rtrim(A.PRODUCT1),'')          as PRODUCT1 ,       " _
+                   & "       isnull(rtrim(A.PRODUCT2),'')          as PRODUCT2 ,       " _
+                   & "       isnull(rtrim(A.PRODUCTCODE),'')       as PRODUCTCODE ,    " _
+                   & "       isnull(rtrim(A.PRATIO),'')            as PRATIO ,         " _
+                   & "       isnull(rtrim(A.SMELLKBN),'')          as SMELLKBN ,       " _
+                   & "       isnull(rtrim(A.CONTNO),'')            as CONTNO ,         " _
+                   & "       isnull(rtrim(A.HTANI),'')             as HTANI ,          " _
+                   & "       isnull(rtrim(A.SURYO),'')             as SURYO ,          " _
+                   & "       isnull(rtrim(A.DAISU),'')             as DAISU ,          " _
+                   & "       isnull(rtrim(A.JSURYO),'')            as JSURYO ,         " _
+                   & "       isnull(rtrim(A.JDAISU),'')            as JDAISU ,         " _
+                   & "       isnull(rtrim(A.REMARKS1),'')          as REMARKS1 ,       " _
+                   & "       isnull(rtrim(A.REMARKS2),'')          as REMARKS2 ,       " _
+                   & "       isnull(rtrim(A.REMARKS3),'')          as REMARKS3 ,       " _
+                   & "       isnull(rtrim(A.REMARKS4),'')          as REMARKS4 ,       " _
+                   & "       isnull(rtrim(A.REMARKS5),'')          as REMARKS5 ,       " _
+                   & "       isnull(rtrim(A.REMARKS6),'')          as REMARKS6 ,       " _
+                   & "       isnull(rtrim(A.TAXKBN),'')            as TAXKBN ,         " _
+                   & "       isnull(rtrim(A.SHARYOTYPEF),'')       as SHARYOTYPEF ,    " _
+                   & "       isnull(rtrim(A.TSHABANF),'')          as TSHABANF ,       " _
+                   & "       isnull(rtrim(A.SHARYOTYPEB),'')       as SHARYOTYPEB ,    " _
+                   & "       isnull(rtrim(A.TSHABANB),'')          as TSHABANB ,       " _
+                   & "       isnull(rtrim(A.SHARYOTYPEB2),'')      as SHARYOTYPEB2 ,   " _
+                   & "       isnull(rtrim(A.TSHABANB2),'')         as TSHABANB2 ,      " _
+                   & "       isnull(rtrim(A.JXORDERID),'')         as JXORDERID ,         " _
+                   & "       isnull(rtrim(A.DELFLG),'')            as DELFLG ,         " _
+                   & "       TIMSTP = cast(A.UPDTIMSTP  as bigint) ,        " _
+                   & "       isnull(rtrim(B.SHARYOINFO1),'')       as SHARYOINFO1 ,    " _
+                   & "       isnull(rtrim(B.SHARYOINFO2),'')       as SHARYOINFO2 ,    " _
+                   & "       isnull(rtrim(B.SHARYOINFO3),'')       as SHARYOINFO3 ,    " _
+                   & "       isnull(rtrim(B.SHARYOINFO4),'')       as SHARYOINFO4 ,    " _
+                   & "       isnull(rtrim(B.SHARYOINFO5),'')       as SHARYOINFO5 ,    " _
+                   & "       isnull(rtrim(B.SHARYOINFO6),'')       as SHARYOINFO6 ,    " _
+                   & "       isnull(rtrim(C.ARRIVTIME),'')         as ARRIVTIME ,      " _
+                   & "       isnull(rtrim(C.DISTANCE),'')          as DISTANCE ,       " _
+                   & "       isnull(rtrim(D.ADDR1),'') +              				   " _
+                   & "       isnull(rtrim(D.ADDR2),'') +            				   " _
+                   & "       isnull(rtrim(D.ADDR3),'') +             				   " _
+                   & "       isnull(rtrim(D.ADDR4),'')          	as ADDR ,          " _
+                   & "       isnull(rtrim(D.NOTES1),'')        	    as NOTES1 ,        " _
+                   & "       isnull(rtrim(D.NOTES2),'')          	as NOTES2 ,        " _
+                   & "       isnull(rtrim(D.NOTES3),'')          	as NOTES3 ,        " _
+                   & "       isnull(rtrim(D.NOTES4),'')          	as NOTES4 ,        " _
+                   & "       isnull(rtrim(D.NOTES5),'')          	as NOTES5 ,        " _
+                   & "       isnull(rtrim(D.NOTES6),'')        	    as NOTES6 ,        " _
+                   & "       isnull(rtrim(D.NOTES7),'')          	as NOTES7 ,        " _
+                   & "       isnull(rtrim(D.NOTES8),'')          	as NOTES8 ,        " _
+                   & "       isnull(rtrim(D.NOTES9),'')          	as NOTES9 ,        " _
+                   & "       isnull(rtrim(D.NOTES10),'')          	as NOTES10 ,       " _
+                   & "       isnull(rtrim(E.NOTES1),'')        	    as STAFFNOTES1 ,   " _
+                   & "       isnull(rtrim(E.NOTES2),'')          	as STAFFNOTES2 ,   " _
+                   & "       isnull(rtrim(E.NOTES3),'')          	as STAFFNOTES3 ,   " _
+                   & "       isnull(rtrim(E.NOTES4),'')          	as STAFFNOTES4 ,   " _
+                   & "       isnull(rtrim(E.NOTES5),'')          	as STAFFNOTES5 ,   " _
+                   & "       ''                                    as TUMIOKI ,        " _
+                   & "       ''                                    as CAMPCODENAME ,   " _
+                   & "       ''                                    as TERMORGNAME ,    " _
+                   & "       ''                                    as TORICODENAME ,   " _
+                   & "       ''                                    as OILTYPENAME ,    " _
+                   & "       ''                                    as STORICODENAME ,  " _
+                   & "       ''                                    as ORDERORGNAME ,   " _
+                   & "       ''                                    as TUMIOKIKBNNAME , " _
+                   & "       ''                                    as URIKBNNAME ,     " _
+                   & "       ''                                    as STATUSNAME ,     " _
+                   & "       ''                                    as SHIPORGNAME ,    " _
+                   & "       ''                                    as SHUKABASHONAME , " _
+                   & "       ''                                    as GSHABANLICNPLTNO ,    " _
+                   & "       ''                                    as CONTCHASSISLICNPLTNO ,    " _
+                   & "       ''                                    as STAFFCODENAME ,    " _
+                   & "       ''                                    as SUBSTAFFCODENAME ,    " _
+                   & "       ''                                    as TODOKECODENAME ,    " _
+                   & "       ''                                    as HTANINAME ,    " _
+                   & "       ''                                    as TAXKBNNAME ,    " _
+                   & "       ''                                    as PRODUCT1NAME ,   " _
+                   & "       ''                                    as PRODUCT2NAME ,   " _
+                   & "       ''                                    as PRODUCTNAME ,   " _
+                   & "       ''                                    as SMELLKBNNAME ,   " _
+                   & "       ''                                    as SURYO_SUM ,      " _
+                   & "       ''                                    as DAISU_SUM ,      " _
+                   & "       ''                                    as JSURYO_SUM ,      " _
+                   & "       ''                                    as JDAISU_SUM ,      " _
+                   & "       ''                                    as JXORDERSTATUS ,   " _
+                   & "       '0'                                   as WORK_NO          " _
+                   & "  FROM T0004_HORDER AS A								" _
+                   & " INNER JOIN ( SELECT Y.CAMPCODE, Y.CODE               " _
+                   & "                FROM S0006_ROLE Y     				" _
+                   & "               WHERE Y.CAMPCODE 	 	   = @P01		" _
+                   & "                 and Y.OBJECT       	   = 'ORG'		" _
+                   & "                 and Y.ROLE              = @P02		" _
+                   & "                 and Y.PERMITCODE       in ('1','2')  " _
+                   & "                 and Y.STYMD            <= @P03		" _
+                   & "                 and Y.ENDYMD           >= @P04		" _
+                   & "                 and Y.DELFLG           <> '1'		" _
+                   & "            ) AS Z									" _
+                   & "    ON Z.CAMPCODE		= A.CAMPCODE    				" _
+                   & "   and Z.CODE       	= A.SHIPORG 	    			" _
+                   & "  LEFT JOIN MA006_SHABANORG B							" _
+                   & "    ON B.CAMPCODE     	= A.CAMPCODE 				" _
+                   & "   and B.GSHABAN      	= A.GSHABAN 				" _
+                   & "   and B.MANGUORG     	= A.SHIPORG 				" _
+                   & "   and B.DELFLG          <> '1' 						" _
+                   & "  LEFT JOIN MC007_TODKORG C 							" _
+                   & "    ON C.CAMPCODE     	= A.CAMPCODE 				" _
+                   & "   and C.TORICODE     	= A.TORICODE 				" _
+                   & "   and C.TODOKECODE   	= A.TODOKECODE 				" _
+                   & "   and C.UORG         	= A.SHIPORG 				" _
+                   & "   and C.DELFLG          <> '1' 						" _
+                   & "  LEFT JOIN MC006_TODOKESAKI D 						" _
+                   & "    ON D.CAMPCODE     	= C.CAMPCODE 				" _
+                   & "   and D.TORICODE     	= C.TORICODE				" _
+                   & "   and D.TODOKECODE   	= C.TODOKECODE 				" _
+                   & "   and D.STYMD           <= A.SHUKODATE				" _
+                   & "   and D.ENDYMD          >= A.SHUKODATE				" _
+                   & "   and D.DELFLG          <> '1' 						" _
+                   & "  LEFT JOIN MB001_STAFF E      						" _
+                   & "    ON E.CAMPCODE     	= A.CAMPCODE 				" _
+                   & "   and E.STAFFCODE     	= A.STAFFCODE				" _
+                   & "   and E.STYMD           <= A.SHUKODATE				" _
+                   & "   and E.ENDYMD          >= A.SHUKODATE				" _
+                   & "   and E.DELFLG          <> '1' 						" _
+                   & " WHERE A.CAMPCODE         = @P01                      " _
+                   & "   and A.SHUKADATE       <= @P05                      " _
+                   & "   and A.SHUKADATE       >= @P06                      " _
+                   & "   and A.TODOKEDATE      <= @P07                      " _
+                   & "   and A.TODOKEDATE      >= @P08                      " _
+                   & "   and A.SHUKODATE       <= @P09                      " _
+                   & "   and A.SHUKODATE       >= @P10                      " _
+                   & "   and A.DELFLG          <> '1'                       "
 
-            '■テーブル検索条件追加
+                '■テーブル検索条件追加
 
-            '条件画面で指定された油種を抽出
-            If work.WF_SEL_OILTYPE.Text <> Nothing Then
-                SQLStr = SQLStr & "   and A.OILTYPE          = @P12           		"
-            End If
+                '条件画面で指定された油種を抽出
+                If work.WF_SEL_OILTYPE.Text <> Nothing Then
+                    SQLStr = SQLStr & "   and A.OILTYPE          = @P12           		"
+                End If
 
-            '条件画面で指定された受注部署を抽出
-            If work.WF_SEL_ORDERORG.Text <> Nothing Then
-                SQLStr = SQLStr & "   and A.ORDERORG         = @P13           		"
-            End If
+                '条件画面で指定された受注部署を抽出
+                If work.WF_SEL_ORDERORG.Text <> Nothing Then
+                    SQLStr = SQLStr & "   and A.ORDERORG         = @P13           		"
+                End If
 
-            '条件画面で指定された出荷部署を抽出
-            If work.WF_SEL_SHIPORG.Text <> Nothing Then
-                SQLStr = SQLStr & "   and A.SHIPORG          = @P14           		"
-            Else
-                '★★★未指定時はユーザ所属支店部署で縛る必要あり
-            End If
+                '条件画面で指定された出荷部署を抽出
+                If work.WF_SEL_SHIPORG.Text <> Nothing Then
+                    SQLStr = SQLStr & "   and A.SHIPORG          = @P14           		"
+                Else
+                    '★★★未指定時はユーザ所属支店部署で縛る必要あり
+                End If
 
-            SQLStr = SQLStr & " ORDER BY A.TORICODE  ,A.OILTYPE ,A.SHUKADATE ,      " _
-                            & " 		 A.ORDERORG  ,A.SHIPORG ,	                " _
-                            & " 		 A.SHUKODATE ,A.TODOKEDATE ,A.GSHABAN ,      " _
-                            & " 		 A.RYOME     ,A.TRIPNO  ,A.DROPNO	 ,A.SEQ "
+                SQLStr = SQLStr & " ORDER BY A.TORICODE  ,A.OILTYPE ,A.SHUKADATE ,      " _
+                                & " 		 A.ORDERORG  ,A.SHIPORG ,	                " _
+                                & " 		 A.SHUKODATE ,A.TODOKEDATE ,A.GSHABAN ,      " _
+                                & " 		 A.RYOME     ,A.TRIPNO  ,A.DROPNO	 ,A.SEQ "
 
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.Date)      '権限(to)
-            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Date)      '権限(from)
-            Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.Date)      '出荷日(To)
-            Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.Date)      '出荷日(From)
-            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '届日(To)
-            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.Date)      '届日(From)
-            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.Date)      '出庫日(To)
-            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.Date)      '出庫日(From)
-            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar, 20)  '油種
-            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar, 20)  '受注部署
-            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.NVarChar, 20)  '出荷部署
-            PARA01.Value = work.WF_SEL_CAMPCODE.Text
-            PARA02.Value = Master.ROLE_ORG
-            PARA03.Value = Date.Now
-            PARA04.Value = Date.Now
+                Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar, 20)
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar, 20)
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.Date)      '権限(to)
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Date)      '権限(from)
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.Date)      '出荷日(To)
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.Date)      '出荷日(From)
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '届日(To)
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.Date)      '届日(From)
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.Date)      '出庫日(To)
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.Date)      '出庫日(From)
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar, 20)  '油種
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar, 20)  '受注部署
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.NVarChar, 20)  '出荷部署
+                PARA01.Value = work.WF_SEL_CAMPCODE.Text
+                PARA02.Value = Master.ROLE_ORG
+                PARA03.Value = Date.Now
+                PARA04.Value = Date.Now
 
-            '出荷日(To)
-            If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKADATET.Text) Then
-                PARA05.Value = C_MAX_YMD
-            Else
-                PARA05.Value = work.WF_SEL_SHUKADATET.Text
-            End If
-            '出荷日(From)
-            If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKADATEF.Text) Then
-                PARA06.Value = C_DEFAULT_YMD
-            Else
-                PARA06.Value = work.WF_SEL_SHUKADATEF.Text
-            End If
-            '届日(To)
-            If String.IsNullOrWhiteSpace(work.WF_SEL_TODOKEDATET.Text) Then
-                PARA07.Value = C_MAX_YMD
-            Else
-                PARA07.Value = work.WF_SEL_TODOKEDATET.Text
-            End If
-            '届日(From)
-            If String.IsNullOrWhiteSpace(work.WF_SEL_TODOKEDATEF.Text) Then
-                PARA08.Value = C_DEFAULT_YMD
-            Else
-                PARA08.Value = work.WF_SEL_TODOKEDATEF.Text
-            End If
-            '出庫日(To)
-            If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKODATET.Text) Then
-                PARA09.Value = C_MAX_YMD
-            Else
-                PARA09.Value = work.WF_SEL_SHUKODATET.Text
-            End If
-            '出庫日(From)
-            If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKODATEF.Text) Then
-                PARA10.Value = C_DEFAULT_YMD
-            Else
-                PARA10.Value = work.WF_SEL_SHUKODATEF.Text
-            End If
+                '出荷日(To)
+                If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKADATET.Text) Then
+                    PARA05.Value = C_MAX_YMD
+                Else
+                    PARA05.Value = work.WF_SEL_SHUKADATET.Text
+                End If
+                '出荷日(From)
+                If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKADATEF.Text) Then
+                    PARA06.Value = C_DEFAULT_YMD
+                Else
+                    PARA06.Value = work.WF_SEL_SHUKADATEF.Text
+                End If
+                '届日(To)
+                If String.IsNullOrWhiteSpace(work.WF_SEL_TODOKEDATET.Text) Then
+                    PARA07.Value = C_MAX_YMD
+                Else
+                    PARA07.Value = work.WF_SEL_TODOKEDATET.Text
+                End If
+                '届日(From)
+                If String.IsNullOrWhiteSpace(work.WF_SEL_TODOKEDATEF.Text) Then
+                    PARA08.Value = C_DEFAULT_YMD
+                Else
+                    PARA08.Value = work.WF_SEL_TODOKEDATEF.Text
+                End If
+                '出庫日(To)
+                If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKODATET.Text) Then
+                    PARA09.Value = C_MAX_YMD
+                Else
+                    PARA09.Value = work.WF_SEL_SHUKODATET.Text
+                End If
+                '出庫日(From)
+                If String.IsNullOrWhiteSpace(work.WF_SEL_SHUKODATEF.Text) Then
+                    PARA10.Value = C_DEFAULT_YMD
+                Else
+                    PARA10.Value = work.WF_SEL_SHUKODATEF.Text
+                End If
 
-            PARA12.Value = work.WF_SEL_OILTYPE.Text
-            PARA13.Value = work.WF_SEL_ORDERORG.Text
-            PARA14.Value = work.WF_SEL_SHIPORG.Text
+                PARA12.Value = work.WF_SEL_OILTYPE.Text
+                PARA13.Value = work.WF_SEL_ORDERORG.Text
+                PARA14.Value = work.WF_SEL_SHIPORG.Text
 
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-            'フィールド名とフィールドの型を取得
-            For index As Integer = 0 To SQLdr.FieldCount - 1
-                T00004tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-            Next
-            '〇テーブル検索結果をテーブル格納
-            T00004tbl.Load(SQLdr)
+                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                'フィールド名とフィールドの型を取得
+                For index As Integer = 0 To SQLdr.FieldCount - 1
+                    T00004tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                Next
+                '〇テーブル検索結果をテーブル格納
+                T00004tbl.Load(SQLdr)
 
-            If T00004tbl.Rows.Count > CONST_DSPROW_MAX Then
-                'データ取得件数が65,000件を超えたため表示できません。選択条件を変更して下さい。
-                Master.Output(C_MESSAGE_NO.DISPLAY_RECORD_OVER, C_MESSAGE_TYPE.ABORT)
+                If T00004tbl.Rows.Count > CONST_DSPROW_MAX Then
+                    'データ取得件数が65,000件を超えたため表示できません。選択条件を変更して下さい。
+                    Master.Output(C_MESSAGE_NO.DISPLAY_RECORD_OVER, C_MESSAGE_TYPE.ABORT)
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                    SQLdr = Nothing
+
+                    SQLcmd.Dispose()
+                    SQLcmd = Nothing
+
+                    SQLcon.Close() 'DataBase接続(Close)
+
+                    T00004tbl.Clear()
+                    Exit Sub
+                End If
+
                 'Close
                 SQLdr.Close() 'Reader(Close)
                 SQLdr = Nothing
@@ -3120,23 +3212,7 @@ Public Class GRT00004HORDER
                 SQLcmd = Nothing
 
                 SQLcon.Close() 'DataBase接続(Close)
-                SQLcon.Dispose()
-                SQLcon = Nothing
-
-                T00004tbl.Clear()
-                Exit Sub
-            End If
-
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
+            End Using
 
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "T0004_HORDER SELECT")
@@ -3202,6 +3278,11 @@ Public Class GRT00004HORDER
                 T00004row("PRODUCTCODE") = T00004row("CAMPCODE") + T00004row("OILTYPE") + T00004row("PRODUCT1") + T00004row("PRODUCT2")
             End If
 
+            'JXオーダーの場合はオーダーステータス設定
+            If Not String.IsNullOrEmpty(T00004row("JXORDERID")) Then
+                SetOrderStatus(T00004row)
+            End If
+
             '○項目名称設定
             CODENAME_set(T00004row)
 
@@ -3234,7 +3315,8 @@ Public Class GRT00004HORDER
         '
         For Each T00004UPDrow In T00004UPDtbl.Rows
 
-            If T00004UPDrow("DELFLG") = "0" AndAlso T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            If T00004UPDrow("DELFLG") = "0" AndAlso
+                (T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.WARNING) Then
                 Try
                     '〇配送受注DB登録
                     Dim SQLStr As String =
@@ -3508,7 +3590,7 @@ Public Class GRT00004HORDER
                     PARA67.Value = ""                                                 '配送実績単位(STANI)
                     PARA68.Value = T00004UPDrow("TAXKBN")                             '税区分(TAXKBN)
                     PARA69.Value = T00004UPDrow("PRODUCTCODE")                        '品名コード(PRODUCTCODE)
-                    PARA70.Value = T00004UPDrow("JXORDERID")                          'JXオーダー識別ID(JXORDERID)
+                    PARA70.Value = T00004UPDrow("JXORDERID") & T00004UPDrow("JXORDERSTATUS") 'JXオーダー識別ID(JXORDERID)
 
                     SQLcmd.CommandTimeout = 300
                     SQLcmd.ExecuteNonQuery()
@@ -3614,7 +3696,7 @@ Public Class GRT00004HORDER
                                T00004row("DELFLG") <> C_DELETE_FLG.DELETE Then
 
                                 T00004row("TIMSTP") = SQLdr("TIMSTP")
-                                T00004row("OPERATION") = ""
+                                T00004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                                 T00004row("ORDERNO") = T00004UPDrow("ORDERNO")
                                 T00004row("DETAILNO") = T00004UPDrow("DETAILNO")
                                 Exit For
@@ -3684,7 +3766,8 @@ Public Class GRT00004HORDER
 
         For Each T00004row In T00004tbl.Rows
 
-            If T00004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            If T00004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse
+                T00004row("OPERATION") = C_LIST_OPERATION_CODE.WARNING Then
                 For j As Integer = 0 To T00004tbl.Rows.Count - 1
                     '取引先、油種、基準日（出荷日or届日）、受注部署、出荷部署が同一
                     If T00004tbl.Rows(j)("TORICODE") = T00004row("TORICODE") AndAlso
@@ -3724,7 +3807,8 @@ Public Class GRT00004HORDER
                T00004row("ORDERORG") = WW_ORDERORG AndAlso
                T00004row("SHIPORG") = WW_SHIPORG Then
             Else
-                If T00004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+                If T00004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse
+                    T00004row("OPERATION") = C_LIST_OPERATION_CODE.WARNING Then
                     T00004WKtbl.Clear()
 
                     'オブジェクト内容検索
@@ -4011,7 +4095,7 @@ Public Class GRT00004HORDER
         '○画面表示レコードをマージ
         CS0026TBLSORTget.TABLE = T00004tbl
         CS0026TBLSORTget.SORTING = "TORICODE ,OILTYPE ,KIJUNDATE ,ORDERORG ,SHIPORG"
-        CS0026TBLSORTget.FILTER = "OPERATION = '" & C_LIST_OPERATION_CODE.UPDATING & "'"
+        CS0026TBLSORTget.FILTER = "OPERATION = '" & C_LIST_OPERATION_CODE.UPDATING & "' or OPERATION = '" & C_LIST_OPERATION_CODE.WARNING & "'"
         CS0026TBLSORTget.sort(T00004WKtbl)
         T00004UPDtbl.Merge(T00004WKtbl, False)
 
@@ -4041,7 +4125,8 @@ Public Class GRT00004HORDER
                 Next
             End If
 
-            If T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            If T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse
+                T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.WARNING Then
                 For j As Integer = i To T00004UPDtbl.Rows.Count - 1
                     '荷主、油種、基準日（出荷日or届日）、受注部署、出荷部署が同一
                     If T00004UPDtbl.Rows(j)("TORICODE") = T00004UPDrow("TORICODE") AndAlso
@@ -4064,7 +4149,7 @@ Public Class GRT00004HORDER
         '○更新対象以外のレコードを削除
         CS0026TBLSORTget.TABLE = T00004UPDtbl
         CS0026TBLSORTget.SORTING = "TORICODE ,OILTYPE ,KIJUNDATE ,ORDERORG ,SHIPORG ,SHUKODATE ,GSHABAN ,TRIPNO ,DROPNO , SEQ"
-        CS0026TBLSORTget.FILTER = "OPERATION = '" & C_LIST_OPERATION_CODE.UPDATING & "'"
+        CS0026TBLSORTget.FILTER = "OPERATION = '" & C_LIST_OPERATION_CODE.UPDATING & "' or OPERATION = '" & C_LIST_OPERATION_CODE.WARNING & "'"
         CS0026TBLSORTget.sort(T00004UPDtbl)
 
         '■■■ T00004UPDtblのDetailNO、SEQを再付番 ■■■
@@ -4221,7 +4306,7 @@ Public Class GRT00004HORDER
         'Sort　…　念のため
         CS0026TBLSORTget.TABLE = T00004UPDtbl
         CS0026TBLSORTget.SORTING = "TORICODE ,OILTYPE ,KIJUNDATE ,ORDERORG ,SHIPORG"
-        CS0026TBLSORTget.FILTER = "OPERATION = '" & C_LIST_OPERATION_CODE.UPDATING & "'"
+        CS0026TBLSORTget.FILTER = "OPERATION = '" & C_LIST_OPERATION_CODE.UPDATING & "' or OPERATION = '" & C_LIST_OPERATION_CODE.WARNING & "'"
         CS0026TBLSORTget.sort(T00004UPDtbl)
 
         '○集計用DBへ構造＆データをコピー
@@ -4539,7 +4624,8 @@ Public Class GRT00004HORDER
 
             For Each T00004UPDrow In T00004UPDtbl.Rows
 
-                If T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+                If T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse
+                    T00004UPDrow("OPERATION") = C_LIST_OPERATION_CODE.WARNING Then
                     If T00004UPDrow("TORICODE") <> WW_TORICODE OrElse
                        T00004UPDrow("OILTYPE") <> WW_OILTYPE OrElse
                        T00004UPDrow("KIJUNDATE") <> WW_KIJUNDATE OrElse
@@ -4620,7 +4706,7 @@ Public Class GRT00004HORDER
             Dim T00004INProw = T00004INPtbl.NewRow
 
             T00004INProw("LINECNT") = 0
-            T00004INProw("OPERATION") = ""
+            T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
             T00004INProw("TIMSTP") = 0
             T00004INProw("SELECT") = 0
             T00004INProw("HIDDEN") = 0
@@ -4683,6 +4769,7 @@ Public Class GRT00004HORDER
             T00004INProw("PRODUCT1") = ""
             T00004INProw("PRODUCT1NAME") = ""
             T00004INProw("PRODUCT2") = ""
+            T00004INProw("PRODUCT2NAME") = ""
             T00004INProw("PRODUCTCODE") = ""
             T00004INProw("PRODUCTNAME") = ""
             T00004INProw("PRATIO") = ""
@@ -4847,6 +4934,7 @@ Public Class GRT00004HORDER
             T00004INProw("TERMORG") = WF_DEFORG.Text
             'JXオーダー
             T00004INProw("JXORDERID") = WF_JXORDERID.Text
+            T00004INProw("JXORDERSTATUS") = WF_JXORDERSTATUS.Text
 
             '○名称付与
             CODENAME_set(T00004INProw)
@@ -4908,10 +4996,12 @@ Public Class GRT00004HORDER
         Next
 
 
-        '■■■ 更新前処理（入力情報へ乗務員引継ぎ設定）　■■■
+        '■■■ 更新前処理（入力情報へ乗務員引継ぎ設定 ※JXオーダーのみ対象）　■■■
         For Each T00004INProw In T00004INPtbl.Rows
             '数量・台数未設定時は対象外
             If T00004INProw("WORK_NO") = "" AndAlso Val(T00004INProw("SURYO")) = 0 AndAlso Val(T00004INProw("DAISU")) = 0 Then Continue For
+            'JXオーダー以外は対象外
+            If String.IsNullOrEmpty(T00004INProw("JXORDERID")) Then Continue For
 
             '乗務員コードが空なら設定（基本は空）
             If T00004INProw("OPERATION") <> C_LIST_OPERATION_CODE.NODATA AndAlso
@@ -5127,7 +5217,8 @@ Public Class GRT00004HORDER
 
             Dim T00004INProw = T00004INPtbl.Rows(i)
 
-            If T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            If T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse
+                T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.WARNING Then
                 For j As Integer = 0 To T00004tbl.Rows.Count - 1
                     '取引先、油種、基準日（出荷日or届日）、受注部署、出荷部署、出庫日、業務車番、両目、トリップ、ドロップが同一
                     If T00004tbl.Rows(j)("TORICODE") = T00004INProw("TORICODE") AndAlso
@@ -5173,7 +5264,8 @@ Public Class GRT00004HORDER
                     Next
                 End If
 
-                If T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+                If T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING OrElse
+                    T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.WARNING Then
                     For j As Integer = 0 To T00004INPtbl.Rows.Count - 1
                         '取引先、油種、基準日（出荷日or届日）、受注部署、出荷部署、出庫日、業務車番、両目、トリップ、ドロップが同一
                         If CompareOrder(T00004INPtbl.Rows(j), T00004INProw) AndAlso
@@ -5779,7 +5871,7 @@ Public Class GRT00004HORDER
 
             If WW_CHKFLG = "ON" Then
                 T00004INProw("SHAFUKU") = ""
-                Dim item = WF_ListGSHABAN.Items.FindByValue(T00004INProw("SHAFUKU"))
+                Dim item = WF_ListSHAFUKU.Items.FindByText(T00004INProw("GSHABAN"))
                 If Not IsNothing(item) Then
                     T00004INProw("SHAFUKU") = item.Value
                 End If
@@ -5977,8 +6069,8 @@ Public Class GRT00004HORDER
                 '■明細項目(品名２：PRODUCT2)
                 If T00004INProw("PRODUCTCODE") <> "" AndAlso T00004INProw("PRODUCTCODE").ToString.Length = 11 Then
                     Dim productCode As String = T00004INProw("PRODUCTCODE").ToString
-                    T00004INProw("PRODUCT1") = productCode.Substring(3, 2)
-                    T00004INProw("PRODUCT2") = productCode.Substring(5)
+                    T00004INProw("PRODUCT1") = productCode.Substring(4, 2)
+                    T00004INProw("PRODUCT2") = productCode.Substring(6, 5)
                 End If
             End If
 
@@ -6621,6 +6713,8 @@ Public Class GRT00004HORDER
             '品名名称
             CODENAME_get("PRODUCTCODE", T00004INProw("PRODUCTCODE"), WW_TEXT, WW_DUMMY)
             T00004INProw("PRODUCTNAME") = WW_TEXT
+            '品名２名称
+            T00004INProw("PRODUCT2NAME") = WW_TEXT
 
             '臭有無名称
             CODENAME_get("SMELLKBN", T00004INProw("SMELLKBN"), WW_TEXT, WW_DUMMY)
@@ -6654,6 +6748,7 @@ Public Class GRT00004HORDER
                 Case C_MESSAGE_NO.NORMAL,
                      C_MESSAGE_NO.WORNING_RECORD_EXIST
                     T00004INProw("SELECT") = 1
+                    T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.WARNING
                 Case C_MESSAGE_NO.BOX_ERROR_EXIST
                     T00004INProw("SELECT") = 1
                     T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
@@ -7446,33 +7541,33 @@ Public Class GRT00004HORDER
                 Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                 '○出力設定
                 While SQLdr.Read
-                    WF_ListGSHABAN.Items.Add(New ListItem("", SQLdr("GSHABAN")))
+                    WF_ListGSHABAN.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("GSHABAN")))
                     WF_ListKSHABAN.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("KOEISHABAN")))
-                    WF_ListSHARYOINFO1.Items.Add(New ListItem("", SQLdr("SHARYOINFO1")))
-                    WF_ListSHARYOINFO2.Items.Add(New ListItem("", SQLdr("SHARYOINFO2")))
-                    WF_ListSHARYOINFO3.Items.Add(New ListItem("", SQLdr("SHARYOINFO3")))
-                    WF_ListSHARYOINFO4.Items.Add(New ListItem("", SQLdr("SHARYOINFO4")))
-                    WF_ListSHARYOINFO5.Items.Add(New ListItem("", SQLdr("SHARYOINFO5")))
-                    WF_ListSHARYOINFO6.Items.Add(New ListItem("", SQLdr("SHARYOINFO6")))
-                    WF_ListOILTYPE.Items.Add(New ListItem("", SQLdr("OILTYPE")))
-                    WF_ListOILTYPENAME.Items.Add(New ListItem("", SQLdr("OILTYPENAME")))
-                    WF_ListSHAFUKU.Items.Add(New ListItem("", SQLdr("SHAFUKU")))
-                    WF_ListOWNCODE.Items.Add(New ListItem("", SQLdr("OWNCODE")))
-                    WF_ListOWNCODENAME.Items.Add(New ListItem("", SQLdr("OWNCODENAME")))
-                    WF_ListSHARYOSTATUS.Items.Add(New ListItem("", SQLdr("SHARYOSTATUS")))
-                    WF_ListSHARYOSTATUSNAME.Items.Add(New ListItem("", SQLdr("SHARYOSTATUSNAME")))
-                    WF_ListLICNPLTNOF.Items.Add(New ListItem("", SQLdr("TSHABANFNAMES")))
-                    WF_ListLICNPLTNOB.Items.Add(New ListItem("", SQLdr("TSHABANBNAMES")))
-                    WF_ListLICNPLTNOB2.Items.Add(New ListItem("", SQLdr("TSHABANB2NAMES")))
-                    WF_ListTSHABANF.Items.Add(New ListItem("", SQLdr("TSHABANF")))
-                    WF_ListTSHABANB.Items.Add(New ListItem("", SQLdr("TSHABANB")))
-                    WF_ListTSHABANB2.Items.Add(New ListItem("", SQLdr("TSHABANB2")))
-                    WF_ListHPRSINSNYMDF.Items.Add(New ListItem("", SQLdr("HPRSINSNYMDF")))
-                    WF_ListHPRSINSNYMDB.Items.Add(New ListItem("", SQLdr("HPRSINSNYMDB")))
-                    WF_ListHPRSINSNYMDB2.Items.Add(New ListItem("", SQLdr("HPRSINSNYMDB2")))
-                    WF_ListLICNYMDF.Items.Add(New ListItem("", SQLdr("LICNYMDF")))
-                    WF_ListLICNYMDB.Items.Add(New ListItem("", SQLdr("LICNYMDB")))
-                    WF_ListLICNYMDB2.Items.Add(New ListItem("", SQLdr("LICNYMDB2")))
+                    WF_ListSHARYOINFO1.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOINFO1")))
+                    WF_ListSHARYOINFO2.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOINFO2")))
+                    WF_ListSHARYOINFO3.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOINFO3")))
+                    WF_ListSHARYOINFO4.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOINFO4")))
+                    WF_ListSHARYOINFO5.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOINFO5")))
+                    WF_ListSHARYOINFO6.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOINFO6")))
+                    WF_ListOILTYPE.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("OILTYPE")))
+                    WF_ListOILTYPENAME.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("OILTYPENAME")))
+                    WF_ListSHAFUKU.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHAFUKU")))
+                    WF_ListOWNCODE.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("OWNCODE")))
+                    WF_ListOWNCODENAME.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("OWNCODENAME")))
+                    WF_ListSHARYOSTATUS.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOSTATUS")))
+                    WF_ListSHARYOSTATUSNAME.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("SHARYOSTATUSNAME")))
+                    WF_ListLICNPLTNOF.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("TSHABANFNAMES")))
+                    WF_ListLICNPLTNOB.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("TSHABANBNAMES")))
+                    WF_ListLICNPLTNOB2.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("TSHABANB2NAMES")))
+                    WF_ListTSHABANF.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("TSHABANF")))
+                    WF_ListTSHABANB.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("TSHABANB")))
+                    WF_ListTSHABANB2.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("TSHABANB2")))
+                    WF_ListHPRSINSNYMDF.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("HPRSINSNYMDF")))
+                    WF_ListHPRSINSNYMDB.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("HPRSINSNYMDB")))
+                    WF_ListHPRSINSNYMDB2.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("HPRSINSNYMDB2")))
+                    WF_ListLICNYMDF.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("LICNYMDF")))
+                    WF_ListLICNYMDB.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("LICNYMDB")))
+                    WF_ListLICNYMDB2.Items.Add(New ListItem(SQLdr("GSHABAN"), SQLdr("LICNYMDB2")))
 
                 End While
 
@@ -7910,6 +8005,7 @@ Public Class GRT00004HORDER
             XLStoINPtbl(WW_ERRCODE)
         End If
         If Not isNormal(WW_ERRCODE) Then
+            Master.Output(WW_ERRCODE, C_MESSAGE_TYPE.ERR)
             Exit Sub
         End If
 
@@ -7976,7 +8072,7 @@ Public Class GRT00004HORDER
         '■■■ UPLOAD_XLSデータ取得 ■■■   ☆☆☆ 2015/4/30追加
         CS0023XLSUPLOAD.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0023XLSUPLOAD.MAPID = GRT00004WRKINC.MAPID
-        CS0023XLSUPLOAD.CS0023XLSUPLOAD()
+        CS0023XLSUPLOAD.CS0023XLSUPLOAD(String.Empty, Master.PROF_REPORT)
         If isNormal(CS0023XLSUPLOAD.ERR) Then
             If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
                 O_RTN = C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR
@@ -8027,6 +8123,7 @@ Public Class GRT00004HORDER
              CS0023XLSUPLOAD.TBLDATA.Columns.Contains("OILTYPE") AndAlso CS0023XLSUPLOAD.TBLDATA.Columns.Contains("PRODUCT2")) Then
         Else
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            Master.Output(O_RTN, C_MESSAGE_TYPE.ERR)
             rightview.AddErrorReport("・アップロードExcelに『出荷日、出庫日、荷主、(品名コード or 油種・品名２)、出荷場所、車番、乗務員、トリップ、ドロップ』が存在しません。")
             Exit Sub
         End If
@@ -8160,7 +8257,7 @@ Public Class GRT00004HORDER
             If WW_COLUMNS.IndexOf("SHIPORG") < 0 Then
                 T00004INProw("SHIPORG") = WF_DEFORG.Text
             Else
-                T00004INProw("SHIPORG") = uploadRow("SHIPORG")
+                T00004INProw("SHIPORG") = uploadRow("SHIPORG").ToString.PadLeft(WF_DEFORG.Text.Length, "0")
             End If
 
             If WW_COLUMNS.IndexOf("SHUKABASHO") < 0 Then
@@ -8442,7 +8539,10 @@ Public Class GRT00004HORDER
                 End If
 
             End If
-
+            'JXオーダーの場合はオーダーステータス設定
+            If Not String.IsNullOrEmpty(T00004INProw("JXORDERID")) Then
+                SetOrderStatus(T00004INProw)
+            End If
             '○名称付与
             CODENAME_set(T00004INProw)
 
@@ -8649,7 +8749,7 @@ Public Class GRT00004HORDER
                 Dim T00004INProw = T00004INPtbl.NewRow
                 '***** T4項目順に編集 *****
                 T00004INProw("LINECNT") = 0
-                T00004INProw("OPERATION") = ""
+                T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 T00004INProw("TIMSTP") = "0"
                 T00004INProw("SELECT") = 1
                 T00004INProw("HIDDEN") = 0
@@ -8910,7 +9010,7 @@ Public Class GRT00004HORDER
 
             'CSV読込
             If KOUEIMNG.ReadCSV(file) <> True Then
-                Master.Output(KOUEIMNG.ERR, C_MESSAGE_TYPE.ABORT, "CSV読込エラー")
+                Master.Output(KOUEIMNG.ERR, C_MESSAGE_TYPE.ABORT, "読込エラー")
                 O_RTN = KOUEIMNG.ERR
                 Exit Sub
             End If
@@ -9049,72 +9149,63 @@ Public Class GRT00004HORDER
         Dim WW_ROWNUM As Integer = 0
         Dim WW_INDEX As Integer = 0
 
-        Dim rowStart As GRW0001KOUEIORDER.KOUEI_ORDER = Nothing             '始業レコード
-        Dim rowShip As GRW0001KOUEIORDER.KOUEI_ORDER = Nothing              '基地発レコード
-        Dim rowTodoke As List(Of GRW0001KOUEIORDER.KOUEI_ORDER) = Nothing   '配送先レコード
-        Dim rowKiko As GRW0001KOUEIORDER.KOUEI_ORDER = Nothing              '基地戻レコード
-        Dim rowEnd As GRW0001KOUEIORDER.KOUEI_ORDER = Nothing               '終業レコード
-
+        '全オーダー取得
         Dim order = KOUEIMNG.GetOrder()
-        For Each csvRow In KOUEIMNG.GetOrder().Values
-            Select Case Int32.Parse(csvRow.TRIPSEQ)
-                Case 0 '始業
-                    rowStart = csvRow
-                    rowTodoke = New List(Of GRW0001KOUEIORDER.KOUEI_ORDER)
-                    Continue For
-                Case 1 '出荷
-                    rowShip = csvRow
-                    Continue For
-                Case 99 '終業
-                    rowEnd = csvRow
-                Case Else
-                    If csvRow.DEPOFLAG = "1" Then 'デポフラグ
-                        '帰庫
-                        rowKiko = csvRow
-                    Else
-                        '配送
-                        rowTodoke.Add(csvRow)
-                    End If
-                    Continue For
-            End Select
+        'トリップ別にまとめる
+        Dim tripAll = order.GroupBy((Function(x) x.Value.ORDERID))
+        For Each trip In tripAll
+            Dim orderId = trip.Key
+            Dim rowStart As GRW0001KOUEIORDER.KOUEI_ORDER = Nothing             '始業レコード
+            Dim rowShip = New List(Of GRW0001KOUEIORDER.KOUEI_ORDER)            '基地発レコード
+            Dim rowTodoke = New List(Of GRW0001KOUEIORDER.KOUEI_ORDER)          '配送先レコード
+            Dim rowKiko As GRW0001KOUEIORDER.KOUEI_ORDER = Nothing              '基地戻レコード
+            Dim rowEnd As GRW0001KOUEIORDER.KOUEI_ORDER = Nothing               '終業レコード
 
-            '--------------------------------------------
-            ' 終業レコード時トリップ作成
-            '--------------------------------------------
+            Dim tripStatus As Integer = 0
 
-            '回順不備時はエラー
-            If IsNothing(rowStart) OrElse IsNothing(rowShip) OrElse IsNothing(rowTodoke) OrElse IsNothing(rowKiko) OrElse IsNothing(rowEnd) Then
-                Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "光英データ不備")
-                CS0011LOGWRITE.INFSUBCLASS = "CSV_TO_INP"                   'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = ""                                 '
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWRITE.TEXT = "光英データ回順設定不備"
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.FILE_IO_ERROR
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-                O_RTN = C_MESSAGE_NO.FILE_IO_ERROR
-                Exit Sub
+            'トリップ内回順判定
+            For Each csv In trip
+                Dim csvRow = csv.Value
+                Select Case Int32.Parse(csvRow.TRIPSEQ)
+                    Case 0 '始業
+                        rowStart = csvRow
+                    Case 99 '終業
+                        rowEnd = csvRow
+                    Case Else
+                        If rowShip.Count = 0 AndAlso csvRow.OWNERINFO = "|基地" Then
+                            '出荷
+                            rowShip.Add(csvRow)
+                        ElseIf csvRow.DEPOFLAG = "1" Then 'デポフラグ
+                            '帰庫
+                            rowKiko = csvRow
+                        Else
+                            '配送
+                            rowTodoke.Add(csvRow)
+                        End If
+                End Select
+            Next
+
+            '回順シーケンス不備
+            If IsNothing(rowStart) OrElse rowShip.Count = 0 OrElse rowTodoke.Count = 0 OrElse IsNothing(rowKiko) OrElse IsNothing(rowEnd) Then
+                Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "光英及び及び石油輸送システム担当へ連絡")
+                ErrMsgEditForKOUEI(rowStart, "回順", "回順シーケンス不備", C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR)
+                tripStatus = -1
+                Exit For
             End If
 
             Dim WW_SHUKODATE As Date
-            Dim tmpCodeBaseKey As String = rowTodoke(0).COURSEBASEKEY
+            Dim tmpCodeBaseKey As String = rowTodoke.First.COURSEBASEKEY
             Dim tmpShukoDate As String = tmpCodeBaseKey.Split(GRW0001KOUEIORDER.C_KOUEI_CSV_COLUMS_DELIMITER)(0)
-
             If Not DateTime.TryParseExact(tmpShukoDate, "yyyyMMdd", Nothing, Nothing, WW_SHUKODATE) Then
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 ErrMsgEditForKOUEI(rowStart, "出庫日", "コードベースキー読込エラー", C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR)
-                'トリップ初期化
-                rowStart = Nothing
-                rowShip = Nothing
-                rowKiko = Nothing
-                rowEnd = Nothing
-                rowTodoke = Nothing
-                Continue For
+                tripStatus = -1
+                Exit For
             End If
-
             '届先マスタ取得（出荷場所）
             Dim datShukabasho As TODOKESAKI = Nothing
             '光英届先マスタ取得
-            Dim tmpShukabasho = KOUEIMASTER.GetTodoke(rowShip.KOUEITYPE, rowShip.DESTCODE)
+            Dim tmpShukabasho = KOUEIMASTER.GetTodoke(rowShip.First.KOUEITYPE, rowShip.First.DESTCODE)
             If Not IsNothing(tmpShukabasho) Then
                 '光英マスタ存在
 
@@ -9122,23 +9213,31 @@ Public Class GRT00004HORDER
                 datShukabasho = GetTodoke(work.WF_SEL_SHIPORG.Text, todokeCode)
                 If IsNothing(datShukabasho) Then
                     '届先マスタ未存在
+                    '事前に登録処理が動くためこのケースはないハズ
                     datShukabasho = New TODOKESAKI With {
-                        .TODOKECODE = todokeCode
+                        .TODOKECODE = "!" & todokeCode & "!",
+                        .NAMES = "★マスタエラー★"
                     }
+                    ErrMsgEditForKOUEI(rowStart, "出荷場所", "届先マスタ不備", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                    tripStatus = 1
                 End If
             Else
                 '光英マスタ未存在
-
+                '新規届先発生時はこのパターン
                 tmpShukabasho = New KOUEI_MASTER.KOUEI_TODOKE With {
-                    .KOUEITYPE = rowShip.KOUEITYPE,
-                    .TODOKESAKICODE = rowShip.DESTCODE
+                    .KOUEITYPE = rowShip.First.KOUEITYPE,
+                    .TODOKESAKICODE = rowShip.First.DESTCODE
                 }
                 datShukabasho = New TODOKESAKI With {
-                    .TODOKECODE = tmpShukabasho.GetDBEntryCode
+                    .TODOKECODE = tmpShukabasho.GetDBEntryCode,
+                    .NAMES = rowShip.First.DESTNAME
                 }
 
+                ErrMsgEditForKOUEI(rowStart, "出荷場所", "光英マスタ未存在", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                tripStatus = 1
             End If
 
+            '**************************************** 光英受信時は従業員は一切入ってこないので処理不要 2019/09
             ''従業員マスタ取得（乗務員）
             'Dim datStaff As STAFF = Nothing
             'Dim tmpStaff = KOUEIMASTER.GetStaff2Code(rowStart.KOUEITYPE, rowStart.STAFFCODE)
@@ -9167,7 +9266,7 @@ Public Class GRT00004HORDER
             '    }
             'End If
 
-            Dim GSHABAN As String = ""
+            Dim GSHABAN As String = String.Empty
             ''光英マスタ取得
             Dim tmpSharyo = KOUEIMASTER.GetSharyo(rowStart.KOUEITYPE, rowStart.SHABANB)
             If Not IsNothing(tmpSharyo) Then
@@ -9176,18 +9275,23 @@ Public Class GRT00004HORDER
                 If Not IsNothing(shaban) Then
                     GSHABAN = shaban.Text
                 Else
-                    '車両部署マスタ未存在
-                    GSHABAN = tmpSharyo.REGISTERSHABAN
+                    '車番部署マスタ未存在
+                    GSHABAN = "!" & tmpSharyo.REGISTERSHABAN & "!"
+                    ErrMsgEditForKOUEI(rowStart, "業務車番", "車番部署マスタ不備", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                    tripStatus = 1
                 End If
             Else
                 '光英マスタ未存在
-                GSHABAN = rowStart.SHABANB
+                GSHABAN = "!" & rowStart.SHABANB & "!"
+                ErrMsgEditForKOUEI(rowStart, "業務車番", "光英マスタ未存在", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                tripStatus = 1
             End If
 
             '配送先毎にドロップ編集
             For Each row In rowTodoke
                 Dim WW_TODOKEDATE As Date
                 Dim WW_SHUKADATE As Date
+                Dim dropStatus As Integer = 0
 
                 '積置コード
                 Dim tmpTumiokiCode As String = row.FIELD(85)
@@ -9195,27 +9299,24 @@ Public Class GRT00004HORDER
                     WW_TODOKEDATE = WW_SHUKODATE
                     WW_SHUKADATE = WW_SHUKODATE
                 Else
-
+                    '積置又は積配（荷卸）
                     Dim tmpTumiokiCode2 As String = tmpTumiokiCode.Split(GRW0001KOUEIORDER.C_KOUEI_CSV_COLUMS_DELIMITER)(0)
                     Dim tmpTumiFlg As String = Left(tmpTumiokiCode2, 1)
                     Dim tmpDate As String = Mid(tmpTumiokiCode2, 2)
                     Select Case tmpTumiFlg
                         Case "s"
                             If Not DateTime.TryParseExact(tmpDate, "yyyyMMdd", Nothing, Nothing, WW_SHUKADATE) Then
-                                O_RTN = C_MESSAGE_NO.DATE_FORMAT_ERROR
-                                rightview.AddErrorReport("・『出荷日』の日付書式が正しくありません。")
-                                Exit Sub
+                                ErrMsgEditForKOUEI(rowStart, "出荷日", "出荷日の日付設定が正しくありません。", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                                dropStatus = -1
                             End If
                             WW_TODOKEDATE = WW_SHUKODATE
                         Case "t"
                             If Not DateTime.TryParseExact(tmpDate, "yyyyMMdd", Nothing, Nothing, WW_TODOKEDATE) Then
-                                O_RTN = C_MESSAGE_NO.DATE_FORMAT_ERROR
-                                rightview.AddErrorReport("・『届日』の日付書式が正しくありません。")
-                                Exit Sub
+                                ErrMsgEditForKOUEI(rowStart, "届日", "届日の日付設定が正しくありません。", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                                dropStatus = -1
                             End If
                             WW_SHUKADATE = WW_SHUKODATE
                     End Select
-
 
                 End If
 
@@ -9230,20 +9331,27 @@ Public Class GRT00004HORDER
                     datTodoke = GetTodoke(work.WF_SEL_SHIPORG.Text, todokeCode)
                     If IsNothing(datTodoke) Then
                         '届先マスタ未存在
+                        '事前に登録処理が動くためこのケースはないハズ
                         datTodoke = New TODOKESAKI With {
-                            .TODOKECODE = todokeCode
+                            .TODOKECODE = "!" & todokeCode & "!",
+                            .NAMES = "★マスタエラー★"
                         }
+                        ErrMsgEditForKOUEI(rowStart, "届先", "届先マスタ不備", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                        dropStatus = 1
                     End If
                 Else
                     '光英マスタ未存在
-
+                    '新規届先発生時はこのパターン
                     tmpTodoke = New KOUEI_MASTER.KOUEI_TODOKE With {
                         .KOUEITYPE = row.KOUEITYPE,
                         .TODOKESAKICODE = row.DESTCODE
                     }
                     datTodoke = New TODOKESAKI With {
-                        .TODOKECODE = tmpTodoke.GetDBEntryCode
+                        .TODOKECODE = tmpTodoke.GetDBEntryCode,
+                        .NAMES = row.DESTNAME
                     }
+                    ErrMsgEditForKOUEI(rowStart, "届先", "光英マスタ未存在", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                    dropStatus = 1
                 End If
 
                 '１ドロップにおける複数品目がある場合は枝番としてレコード作成
@@ -9251,19 +9359,27 @@ Public Class GRT00004HORDER
                 Dim productArray() = row.PRODUCTCODE
                 ' 品名別数量
                 Dim numArray() = row.PRODUCTNUM
+                ' 品名別名称
+                Dim nameArray() = row.PRODUCTNAME
                 '品名リスト作成（品名コード、数量）
                 Dim productList = productArray.Zip(numArray, Function(PRODUCTCD, NUM) New With {PRODUCTCD, NUM})
 
                 Dim seq As Integer = 0
                 For Each kproduct In productList
+                    Dim seqStatus As Integer = 0
+
                     Dim datProduct As PRODUCT = GetKProduct(work.WF_SEL_SHIPORG.Text, kproduct.PRODUCTCD)
                     If IsNothing(datProduct) Then
+                        '品名マスタ未存在
                         datProduct = New PRODUCT With {
                             .OILTYPE = "01",
                             .PRODUCT1 = "11",
-                            .PRODUCT2 = kproduct.PRODUCTCD,
-                            .PRODUCTCODE = kproduct.PRODUCTCD
+                            .PRODUCT2 = "",
+                            .PRODUCTCODE = "!" & kproduct.PRODUCTCD & "!",
+                            .NAMES = "★" & nameArray(seq) & "★"
                         }
+                        ErrMsgEditForKOUEI(rowStart, "品名", "品名部署マスタ不備", C_MESSAGE_NO.BOX_ERROR_EXIST)
+                        seqStatus = 1
                     End If
 
                     Dim T00004INProw = T00004INPtbl.NewRow
@@ -9271,7 +9387,7 @@ Public Class GRT00004HORDER
 
                     '***** T4項目順に編集 *****
                     T00004INProw("LINECNT") = 0
-                    T00004INProw("OPERATION") = ""
+                    T00004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     T00004INProw("TIMSTP") = "0"
                     T00004INProw("SELECT") = 1
                     If seq = 1 Then
@@ -9371,12 +9487,23 @@ Public Class GRT00004HORDER
                     T00004INProw("DAISU") = "1"
                     T00004INProw("JSURYO") = "0"
                     T00004INProw("JDAISU") = ""
-                    T00004INProw("REMARKS1") = ""
-                    T00004INProw("REMARKS2") = ""
-                    T00004INProw("REMARKS3") = ""
-                    T00004INProw("REMARKS4") = ""
-                    T00004INProw("REMARKS5") = ""
-                    T00004INProw("REMARKS6") = ""
+
+                    If rowShip.Count = 1 Then
+                        T00004INProw("REMARKS1") = ""
+                        T00004INProw("REMARKS2") = ""
+                        T00004INProw("REMARKS3") = row.MEMO1
+                        T00004INProw("REMARKS4") = row.MEMO2
+                        T00004INProw("REMARKS5") = row.JOINT
+                        T00004INProw("REMARKS6") = ""
+                    Else
+                        '複数積場がある場合
+                        For i = 1 To rowShip.Count - 1
+                            '2件目以降の積場を備考に設定（最大2件）
+                            '1件目は通常の出荷場所に設定されるので実質3積場まで対応
+                            If i > 2 Then Exit For
+                            T00004INProw("REMARKS" & i) = String.Format("積合出荷{0}({1})", i, rowShip(i).DESTNAME)
+                        Next
+                    End If
                     T00004INProw("TORIORDERNO") = ""
                     T00004INProw("STORICODE") = ""
                     T00004INProw("TERMORG") = WF_DEFORG.Text
@@ -9393,6 +9520,21 @@ Public Class GRT00004HORDER
                     T00004INProw("JXORDERID") = row.ORDERID
                     T00004INProw("DELFLG") = "0"
 
+                    '光英オーダーから名称設定。後続でマスタから設定
+                    '※マスタ未設定時用
+                    T00004INProw("PRODUCTNAME") = datProduct.NAMES
+                    T00004INProw("PRODUCT2NAME") = datProduct.NAMES
+                    T00004INProw("TODOKECODENAME") = datTodoke.NAMES
+                    T00004INProw("SHUKABASHONAME") = datShukabasho.NAMES
+                    T00004INProw("GSHABANLICNPLTNO") = tmpSharyo.LICNPLTNO
+
+                    If tripStatus = 0 AndAlso dropStatus = 0 AndAlso seqStatus = 0 Then
+                        T00004INProw("JXORDERSTATUS") = ""
+                    Else
+                        T00004INProw("JXORDERSTATUS") = JXORDER_WARNING
+                        dropStatus = -1
+                    End If
+
                     'Grid追加明細（新規追加と同じ）とする
                     T00004INProw("WORK_NO") = ""
 
@@ -9403,6 +9545,13 @@ Public Class GRT00004HORDER
                     T00004INPtbl.Rows.Add(T00004INProw)
 
                 Next
+
+                If dropStatus <> 0 Then
+                    '明細で警告発生時は同一ドロップ全ての明細に反映
+                    For Each seqRow As DataRow In T00004INPtbl.Rows
+                        seqRow("JXORDERSTATUS") = JXORDER_WARNING
+                    Next
+                End If
             Next
 
             'トリップ初期化
@@ -9440,6 +9589,22 @@ Public Class GRT00004HORDER
         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 便番号 =" & order.TRIP & " , "
         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 回順   =" & order.TRIPSEQ & "  "
         rightview.AddErrorReport(WW_ERR_MES)
+
+    End Sub
+    ''' <summary>
+    ''' JXオーダーステータス設定
+    ''' </summary>
+    ''' <remarks></remarks>
+    Sub SetOrderStatus(ByRef T00004row As DataRow)
+        Dim tmpOrderId As String = T00004row("JXORDERID")
+        'JXオーダーかつ末尾に警告マーク付きの場合
+        If tmpOrderId.EndsWith(JXORDER_WARNING) Then
+            'JXオーダーステータスにマーク設定
+            T00004row("JXORDERID") = tmpOrderId.Substring(0, tmpOrderId.Length - 1)
+            T00004row("JXORDERSTATUS") = JXORDER_WARNING
+        Else
+            T00004row("JXORDERSTATUS") = ""
+        End If
 
     End Sub
 
@@ -9536,7 +9701,7 @@ Public Class GRT00004HORDER
                     sb.Append("Where ")
                     sb.Append("      A.CAMPCODE = @CAMPCODE ")
                     sb.Append("  And A.STYMD <= @STYMD ")
-                    sb.Append("  And A.ENDYMD >= @ENDYMD ")
+                    sb.Append(" And A.ENDYMD >= @ENDYMD ")
                     sb.Append("  And A.DELFLG <> @DELFLG ")
                     'sb.Append("  And A.TODOKECODE = @TODOKECODE ") -- 一括取得
 
@@ -9601,7 +9766,7 @@ Public Class GRT00004HORDER
             Catch ex As Exception
                 Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "TODOKESAKI Select")
                 CS0011LOGWRITE.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:TODOKESAKI Select"           '
+                CS0011LOGWRITE.INFPOSI = "DBTODOKESAKI Select"           '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                  '
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -9656,28 +9821,28 @@ Public Class GRT00004HORDER
                 SQLcon.Open() 'DataBase接続(Open)
 
                 Dim sb As StringBuilder = New StringBuilder()
-                sb.Append("SELECT ")
-                sb.Append("  rtrim(A.PRODUCTCODE) as PRODUCTCODE ")
-                sb.Append("  , rtrim(A.OILTYPE) as OILTYPE ")
-                sb.Append("  , rtrim(A.PRODUCT1) as PRODUCT1 ")
-                sb.Append("  , rtrim(A.PRODUCT2) as PRODUCT2 ")
-                sb.Append("  , rtrim(A.NAMES) as NAMES ")
-                sb.Append("  , rtrim(B.HTANI) as HTANI ")
-                sb.Append("  , rtrim(B.KPRODUCT) as KPRODUCT ")
+                sb.Append("Select ")
+                sb.Append("  rtrim(A.PRODUCTCODE) As PRODUCTCODE ")
+                sb.Append("  , rtrim(A.OILTYPE) As OILTYPE ")
+                sb.Append("  , rtrim(A.PRODUCT1) As PRODUCT1 ")
+                sb.Append("  , rtrim(A.PRODUCT2) As PRODUCT2 ")
+                sb.Append("  , rtrim(A.NAMES) As NAMES ")
+                sb.Append("  , rtrim(B.HTANI) As HTANI ")
+                sb.Append("  , rtrim(B.KPRODUCT) As KPRODUCT ")
                 sb.Append("FROM ")
                 sb.Append("  MD001_PRODUCT A ")
                 sb.Append("  INNER JOIN MD002_PRODORG B ")
-                sb.Append("    ON B.PRODUCTCODE = A.PRODUCTCODE ")
-                sb.Append("    and B.CAMPCODE = A.CAMPCODE ")
-                sb.Append("    and B.UORG = @ORG ")
-                sb.Append("    and B.STYMD <= @STYMD ")
-                sb.Append("    and B.ENDYMD >= @ENDYMD ")
-                sb.Append("    and B.DELFLG <> @DELFLG ")
+                sb.Append("    On B.PRODUCTCODE = A.PRODUCTCODE ")
+                sb.Append("    And B.CAMPCODE = A.CAMPCODE ")
+                sb.Append("    And B.UORG = @ORG ")
+                sb.Append("    And B.STYMD <= @STYMD ")
+                sb.Append(" And B.ENDYMD >= @ENDYMD ")
+                sb.Append("    And B.DELFLG <> @DELFLG ")
                 sb.Append("WHERE ")
                 sb.Append("  A.CAMPCODE = @CAMPCODE ")
-                sb.Append("  and A.STYMD <= @STYMD ")
-                sb.Append("  and A.ENDYMD >= @ENDYMD ")
-                sb.Append("  and A.DELFLG <> @DELFLG ")
+                sb.Append("  And A.STYMD <= @STYMD ")
+                sb.Append(" And A.ENDYMD >= @ENDYMD ")
+                sb.Append("  And A.DELFLG <> @DELFLG ")
 
                 Dim SQLcmd As New SqlCommand(sb.ToString, SQLcon)
                 Dim CAMPCODE As SqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", System.Data.SqlDbType.NVarChar)
@@ -9720,9 +9885,9 @@ Public Class GRT00004HORDER
             End Using
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "PRODUCT SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "PRODUCT Select")
             CS0011LOGWRITE.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:PRODUCT Select"           '
+            CS0011LOGWRITE.INFPOSI = "DBPRODUCT Select"           '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                  '
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -9816,47 +9981,47 @@ Public Class GRT00004HORDER
                     SQLcon.Open() 'DataBase接続(Open)
 
                     Dim sb As StringBuilder = New StringBuilder()
-                    sb.Append("SELECT ")
+                    sb.Append("Select ")
                     sb.Append("  isnull(rtrim(A.STAFFCODE), '') as STAFFCODE ")
                     sb.Append("  , isnull(rtrim(A.STAFFNAMES), '') as STAFFNAMES ")
-                    sb.Append("  , isnull(rtrim(A.NOTES1), '') as NOTES1 ")
-                    sb.Append("  , isnull(rtrim(A.NOTES2), '') as NOTES2 ")
-                    sb.Append("  , isnull(rtrim(A.NOTES3), '') as NOTES3 ")
-                    sb.Append("  , isnull(rtrim(A.NOTES4), '') as NOTES4 ")
-                    sb.Append("  , isnull(rtrim(A.NOTES5), '') as NOTES5 ")
-                    sb.Append("FROM ")
-                    sb.Append("  MB001_STAFF A ")
-                    sb.Append("  INNER JOIN MB002_STAFFORG B ")
-                    sb.Append("    ON B.CAMPCODE = A.CAMPCODE ")
-                    sb.Append("    and B.STAFFCODE = A.STAFFCODE ")
-                    sb.Append("    and B.SORG = @ORG ")
-                    sb.Append("    and B.DELFLG <> @DELFLG ")
-                    sb.Append("Where ")
-                    sb.Append("  A.CAMPCODE = @CAMPCODE ")
-                    sb.Append("  and A.STYMD <= @STYMD ")
-                    sb.Append("  and A.ENDYMD >= @ENDYMD ")
-                    sb.Append("  and A.DELFLG <> @DELFLG ")
-                    sb.Append("ORDER BY ")
-                    sb.Append("  B.SEQ ")
-                    sb.Append("  , A.STAFFCODE ")
+                sb.Append("  , isnull(rtrim(A.NOTES1), '') as NOTES1 ")
+                sb.Append("  , isnull(rtrim(A.NOTES2), '') as NOTES2 ")
+                sb.Append("  , isnull(rtrim(A.NOTES3), '') as NOTES3 ")
+                sb.Append("  , isnull(rtrim(A.NOTES4), '') as NOTES4 ")
+                sb.Append("  , isnull(rtrim(A.NOTES5), '') as NOTES5 ")
+                sb.Append("FROM ")
+                sb.Append("  MB001_STAFF A ")
+                sb.Append("  INNER JOIN MB002_STAFFORG B ")
+                sb.Append("    ON B.CAMPCODE = A.CAMPCODE ")
+                sb.Append("    and B.STAFFCODE = A.STAFFCODE ")
+                sb.Append("    and B.SORG = @ORG ")
+                sb.Append("    and B.DELFLG <> @DELFLG ")
+                sb.Append("Where ")
+                sb.Append("  A.CAMPCODE = @CAMPCODE ")
+                sb.Append("  and A.STYMD <= @STYMD ")
+                sb.Append(" and A.ENDYMD >= @ENDYMD ")
+                sb.Append("  and A.DELFLG <> @DELFLG ")
+                sb.Append("ORDER BY ")
+                sb.Append("  B.SEQ ")
+                sb.Append("  , A.STAFFCODE ")
 
-                    Dim SQLcmd As New SqlCommand(sb.ToString, SQLcon)
-                    Dim CAMPCODE As SqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", System.Data.SqlDbType.NVarChar)
-                    Dim STYMD As SqlParameter = SQLcmd.Parameters.Add("@STYMD", System.Data.SqlDbType.Date)
-                    Dim ENDYMD As SqlParameter = SQLcmd.Parameters.Add("@ENDYMD", System.Data.SqlDbType.Date)
-                    Dim DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
-                    Dim ORG As SqlParameter = SQLcmd.Parameters.Add("@ORG", System.Data.SqlDbType.NVarChar)
-                    CAMPCODE.Value = work.WF_SEL_CAMPCODE.Text
-                    STYMD.Value = Date.Now
-                    ENDYMD.Value = Date.Now
-                    DELFLG.Value = C_DELETE_FLG.DELETE
-                    ORG.Value = I_ORG
+                Dim SQLcmd As New SqlCommand(sb.ToString, SQLcon)
+                Dim CAMPCODE As SqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", System.Data.SqlDbType.NVarChar)
+                Dim STYMD As SqlParameter = SQLcmd.Parameters.Add("@STYMD", System.Data.SqlDbType.Date)
+                Dim ENDYMD As SqlParameter = SQLcmd.Parameters.Add("@ENDYMD", System.Data.SqlDbType.Date)
+                Dim DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+                Dim ORG As SqlParameter = SQLcmd.Parameters.Add("@ORG", System.Data.SqlDbType.NVarChar)
+                CAMPCODE.Value = work.WF_SEL_CAMPCODE.Text
+                STYMD.Value = Date.Now
+                ENDYMD.Value = Date.Now
+                DELFLG.Value = C_DELETE_FLG.DELETE
+                ORG.Value = I_ORG
 
-                    '○SQL実行
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    '○出力設定
-                    While SQLdr.Read
-                        wkValue = New STAFF With {
+                '○SQL実行
+                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                '○出力設定
+                While SQLdr.Read
+                    wkValue = New STAFF With {
                             .STAFFCODE = SQLdr("STAFFCODE"),
                             .STAFFNAMES = SQLdr("STAFFNAMES"),
                             .NOTES1 = SQLdr("NOTES1"),
@@ -9866,25 +10031,25 @@ Public Class GRT00004HORDER
                             .NOTES5 = SQLdr("NOTES5")
                         }
 
-                        Dim tmpKey As String = String.Format("{1}{0}{2}{0}{3}", C_VALUE_SPLIT_DELIMITER, work.WF_SEL_CAMPCODE.Text, I_ORG, wkValue.STAFFCODE)
+                    Dim tmpKey As String = String.Format("{1}{0}{2}{0}{3}", C_VALUE_SPLIT_DELIMITER, work.WF_SEL_CAMPCODE.Text, I_ORG, wkValue.STAFFCODE)
 
-                        STAFFtbl(tmpKey) = wkValue
-                    End While
+                    STAFFtbl(tmpKey) = wkValue
+                End While
 
-                    If STAFFtbl.TryGetValue(wkKey, wkValue) Then
-                    End If
+                If STAFFtbl.TryGetValue(wkKey, wkValue) Then
+                End If
 
-                    'Close()
-                    SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
+                'Close()
+                SQLdr.Close() 'Reader(Close)
+                SQLdr = Nothing
 
-                    SQLcmd.Dispose()
-                    SQLcmd = Nothing
+                SQLcmd.Dispose()
+                SQLcmd = Nothing
 
-                    SQLcon.Close() 'DataBase接続(Close)
+                SQLcon.Close() 'DataBase接続(Close)
                 End Using
 
-            Catch ex As Exception
+                Catch ex As Exception
                 Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "STAFF SELECT")
                 CS0011LOGWRITE.INFSUBCLASS = "MAIN"                         'SUBクラス名
                 CS0011LOGWRITE.INFPOSI = "DB:STAFF Select"           '
@@ -9893,11 +10058,11 @@ Public Class GRT00004HORDER
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
                 Return Nothing
-            End Try
+                End Try
 
-        End If
+            End If
 
-        Return wkValue
+            Return wkValue
 
     End Function
 
@@ -9905,8 +10070,8 @@ Public Class GRT00004HORDER
     ''' 請求先取得   
     ''' </summary>
     ''' <param name="I_TORICODE">取引先コード</param>
-    ''' <param name="O_STORICODE" >請求先コード</param>
-    ''' <param name="O_NAMES" >請求先名称</param>
+    ''' <param name="O_STORICODE">請求先コード</param>
+    ''' <param name="O_NAMES">請求先名称</param>
     ''' <remarks></remarks>
     Protected Sub GetSTori(ByVal I_TORICODE As String, ByRef O_STORICODE As String, ByRef O_NAMES As String)
 
@@ -9930,8 +10095,8 @@ Public Class GRT00004HORDER
                     & "   INNER JOIN MC002_TORIHIKISAKI as B 		        " _
                     & "           ON B.CAMPCODE   	= A.CAMPCODE 		    " _
                     & "          and B.TORICODE   	= A.STORICODE 		    " _
-                    & "          and B.STYMD       <= @P1 				    " _
-                    & "          and B.ENDYMD      >= @P1 				    " _
+                    & "          and B.STYMD       <= @P1                   " _
+                    & " and B.ENDYMD      >= @P1 				    " _
                     & "          and B.DELFLG      <> '1' 				    " _
                     & "        Where A.CAMPCODE     = @P2 				    " _
                     & "          and A.UORG     	= @P3 				    " _

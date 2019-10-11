@@ -163,6 +163,7 @@ Public Class GRT00009JIMKINTAI
         rightview.MAPVARI = Master.MAPvariant
         rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
         rightview.PROFID = Master.PROF_REPORT
+        rightview.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
         rightview.Initialize(WW_DUMMY)
 
         '○ GridView初期設定
@@ -317,7 +318,7 @@ Public Class GRT00009JIMKINTAI
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         If Not IsNothing(specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)) Then
             '新潟東港を選択している場合、強制的に画面を変更する
-            CS0013ProfView.PROFID = C_DEFAULT_DATAKEY & "_" & (specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)).ToString
+            CS0013ProfView.PROFID = (specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)).ToString
         Else
             CS0013ProfView.PROFID = Master.PROF_VIEW
         End If
@@ -331,6 +332,7 @@ Public Class GRT00009JIMKINTAI
         CS0013ProfView.NOCOLUMNWIDTHOPT = -1
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.WITHTAGNAMES = True
+        CS0013ProfView.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
         CS0013ProfView.CS0013ProfView()
         If Not isNormal(CS0013ProfView.ERR) Then
             Master.output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
@@ -547,7 +549,7 @@ Public Class GRT00009JIMKINTAI
                 & "    , ISNULL(RTRIM(T007.PAYKBN), '00')                     AS PAYKBN" _
                 & "    , ''                                                   AS PAYKBNNAMES" _
                 & "    , ISNULL(RTRIM(T007.SHUKCHOKKBN), '0')                 AS SHUKCHOKKBN" _
-                & "    , ''                                                   AS SHUKCHOKKBNNAMES" _
+                & "    , CASE WHEN T007.HORG = '021506' THEN MC012.VALUE2 ELSE MC012.VALUE1 END AS SHUKCHOKKBNNAMES" _
                 & "    , ISNULL(RTRIM(T007.WORKKBN), '')                      AS WORKKBN" _
                 & "    , ''                                                   AS WORKKBNNAMES" _
                 & "    , ISNULL(FORMAT(T007.STDATE, 'yyyy/MM/dd'), '')        AS STDATE" _
@@ -970,6 +972,13 @@ Public Class GRT00009JIMKINTAI
                 & "        AND MC01.STYMD       <= @P5" _
                 & "        AND MC01.ENDYMD      >= @P5" _
                 & "        AND MC01.DELFLG      <> @P6" _
+                & "    LEFT JOIN MC001_FIXVALUE MC012" _
+                & "        ON  MC012.CAMPCODE     = TEMP.CAMPCODE" _
+                & "        AND MC012.CLASS        = 'T0009_SHUKCHOKKBN'" _
+                & "        AND MC012.KEYCODE      = T007.SHUKCHOKKBN" _
+                & "        AND MC012.STYMD       <= @P5" _
+                & "        AND MC012.ENDYMD      >= @P5" _
+                & "        AND MC012.DELFLG      <> @P6" _
                 & " WHERE" _
                 & "    TEMP.CAMPCODE = @P1" _
                 & " ORDER BY" _
@@ -1427,7 +1436,7 @@ Public Class GRT00009JIMKINTAI
                 CODENAME_get("STAFFKBN3", T00009row("STAFFKBN"), T00009row("STAFFKBNTAISHOGAI"), WW_DUMMY)              '残業申請対象外
                 CODENAME_get("HOLIDAYKBN", T00009row("HOLIDAYKBN"), T00009row("HOLIDAYKBNNAMES"), WW_DUMMY)             '休日区分
                 CODENAME_get("PAYKBN", T00009row("PAYKBN"), T00009row("PAYKBNNAMES"), WW_DUMMY)                         '勤怠区分
-                CODENAME_get("SHUKCHOKKBN", T00009row("SHUKCHOKKBN"), T00009row("SHUKCHOKKBNNAMES"), WW_DUMMY)          '宿日直区分
+                'CODENAME_get("SHUKCHOKKBN", T00009row("SHUKCHOKKBN"), T00009row("SHUKCHOKKBNNAMES"), WW_DUMMY)          '宿日直区分
                 CODENAME_get("WORKKBN", T00009row("WORKKBN"), T00009row("WORKKBNNAMES"), WW_DUMMY)                      '作業区分
                 CODENAME_get("SHARYOKBN", T00009row("SHARYOKBN"), T00009row("SHARYOKBNNAMES"), WW_DUMMY)                '単車・トレーラ区分
                 CODENAME_get("OILPAYKBN", T00009row("OILPAYKBN"), T00009row("OILPAYKBNNAMES"), WW_DUMMY)                '油種給与区分
@@ -1758,7 +1767,7 @@ Public Class GRT00009JIMKINTAI
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         If Not IsNothing(specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)) Then
             '新潟東港を選択している場合、強制的に画面を変更する
-            CS0013ProfView.PROFID = C_DEFAULT_DATAKEY & "_" & (specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)).ToString
+            CS0013ProfView.PROFID = (specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)).ToString
         Else
             CS0013ProfView.PROFID = Master.PROF_VIEW
         End If
@@ -1772,6 +1781,7 @@ Public Class GRT00009JIMKINTAI
         CS0013ProfView.NOCOLUMNWIDTHOPT = -1
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.WITHTAGNAMES = True
+        CS0013ProfView.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"
         CS0013ProfView.CS0013ProfView()
         If Not isNormal(CS0013ProfView.ERR) Then
             Master.output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
@@ -1965,7 +1975,7 @@ Public Class GRT00009JIMKINTAI
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA3.Value = Master.MAPID
                 PARA4.Value = Master.VIEWID
-                PARA5.Value = Date.Now
+                PARA5.Value = work.WF_SEL_TAISHOYM.Text & "/01"
                 PARA6.Value = C_DELETE_FLG.DELETE
 
                 Dim WW_PROFID As String = ""
@@ -1973,7 +1983,7 @@ Public Class GRT00009JIMKINTAI
 
                 If Not IsNothing(specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)) Then
                     '新潟東港を選択している場合、強制的に画面を変更する
-                    WW_PROFID = C_DEFAULT_DATAKEY & "_" & (specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)).ToString
+                    WW_PROFID = (specialOrg.Items.FindByValue(work.WF_SEL_HORG.Text)).ToString
                 Else
                     WW_PROFID = Master.PROF_VIEW
                 End If
@@ -2311,7 +2321,13 @@ Public Class GRT00009JIMKINTAI
         '○ 各会社毎で残業計算を行う
         'エネックス
         If work.WF_SEL_CAMPCODE.Text = GRT00009WRKINC.CAMP_ENEX Then
-            T0007COM.T0007_KintaiCalc(WW_T00009SELtbl, T00009INPtbl)
+            If work.WF_SEL_TAISHOYM.Text <= "2019/09" Then
+                '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                T0007COM.T0007_KintaiCalc_OLD(WW_T00009SELtbl, T00009INPtbl)
+            Else
+                '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                T0007COM.T0007_KintaiCalc(WW_T00009SELtbl, T00009INPtbl)
+            End If
         End If
 
         '近石
@@ -5289,12 +5305,13 @@ Public Class GRT00009JIMKINTAI
         End If
 
         '○ 帳票出力
-        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-        CS0030REPORT.REPORTID = rightview.getReportId()         '帳票ID
-        CS0030REPORT.FILEtyp = I_FILETYPE                       '出力ファイル形式
-        CS0030REPORT.TBLDATA = WW_OUTtbl                        'データ参照Table
+        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text               '会社コード
+        CS0030REPORT.PROFID = Master.PROF_REPORT                        'プロファイルID
+        CS0030REPORT.MAPID = Master.MAPID                               '画面ID
+        CS0030REPORT.REPORTID = rightview.GetReportId()                 '帳票ID
+        CS0030REPORT.FILEtyp = I_FILETYPE                               '出力ファイル形式
+        CS0030REPORT.TBLDATA = WW_OUTtbl                                'データ参照Table
+        CS0030REPORT.TARGETDATE = work.WF_SEL_TAISHOYM.Text & "/01"     '対象日付
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
@@ -5878,7 +5895,13 @@ Public Class GRT00009JIMKINTAI
             '各会社毎に計算を行う
             'エネックス
             If work.WF_SEL_CAMPCODE.Text = GRT00009WRKINC.CAMP_ENEX Then
-                T0007COM.T0007_KintaiCalc(T00009INPtbl, WW_T00009NXTtbl)
+                If work.WF_SEL_TAISHOYM.Text <= "2019/09" Then
+                    '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                    T0007COM.T0007_KintaiCalc_OLD(T00009INPtbl, WW_T00009NXTtbl)
+                Else
+                    '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                    T0007COM.T0007_KintaiCalc(T00009INPtbl, WW_T00009NXTtbl)
+                End If
             End If
 
             '近石
@@ -7149,7 +7172,13 @@ Public Class GRT00009JIMKINTAI
                 '各会社毎に計算を行う
                 'エネックス
                 If work.WF_SEL_CAMPCODE.Text = GRT00009WRKINC.CAMP_ENEX Then
-                    T0007COM.T0007_KintaiCalc(WW_T00009tbl, T00009tbl)
+                    If work.WF_SEL_TAISHOYM.Text <= "2019/09" Then
+                        '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                        T0007COM.T0007_KintaiCalc_OLD(WW_T00009tbl, T00009tbl)
+                    Else
+                        '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                        T0007COM.T0007_KintaiCalc(WW_T00009tbl, T00009tbl)
+                    End If
                 End If
 
                 '近石

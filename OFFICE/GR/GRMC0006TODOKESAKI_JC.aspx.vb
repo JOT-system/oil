@@ -1356,9 +1356,9 @@ Public Class GRMC0006TODOKESAKI_JC
             Case "CITIES"
                 '市町村コード
                 O_ATTR = "REF_Field_DBclick('CITIES', 'WF_Rep_FIELD' , '" & LIST_BOX_CLASSIFICATION.LC_FIX_VALUE & "');"
-            Case "MORG"
-                '管理部署名
-                O_ATTR = "REF_Field_DBclick('MORG', 'WF_Rep_FIELD' , '" & LIST_BOX_CLASSIFICATION.LC_ORG & "');"
+            'Case "MORG"
+            '    '管理部署名
+            '    O_ATTR = "REF_Field_DBclick('MORG', 'WF_Rep_FIELD' , '" & LIST_BOX_CLASSIFICATION.LC_ORG & "');"
             Case "CLASS"
                 '分類名
                 O_ATTR = "REF_Field_DBclick('CLASS', 'WF_Rep_FIELD' , '" & LIST_BOX_CLASSIFICATION.LC_FIX_VALUE & "');"
@@ -3072,8 +3072,7 @@ Public Class GRMC0006TODOKESAKI_JC
         '○単項目チェック(明細情報)
         Dim dicCheck As Dictionary(Of String, String) = New Dictionary(Of String, String) _
                                                         From {
-                                                              {"MORG", "管理部署"} _
-                                                            , {"NAMES", "届先名称（短）"} _
+                                                              {"NAMES", "届先名称（短）"} _
                                                             , {"NAMEL", "届先名称（長）"} _
                                                             , {"NAMESK", "届先カナ名称（短）"} _
                                                             , {"NAMELK", "届先カナ名称（長）"} _
@@ -3106,7 +3105,6 @@ Public Class GRMC0006TODOKESAKI_JC
                                                         From {
                                                               {"CAMPCODE", "会社"} _
                                                             , {"TORICODE", "取引先"} _
-                                                            , {"MORG", "管理部署"} _
                                                             , {"CITIES", "市町村コード（JIS)"} _
                                                             , {"CLASS", "分類"}
                                                             }
@@ -3757,7 +3755,7 @@ Public Class GRMC0006TODOKESAKI_JC
         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 取引先　　=" & INProw("TORICODE") & " , "
         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 届先　　　=" & INProw("TODOKECODE") & " , "
         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 名称（短）=" & INProw("NAMES") & " , "
-        WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 管理組織　=" & INProw("MORG") & " , "
+        'WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 管理組織　=" & INProw("MORG") & " , "
         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 開始年月日=" & INProw("STYMD") & " , "
         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> 終了年月日=" & INProw("ENDYMD") & " "
         rightview.AddErrorReport(WW_ERR_MES)

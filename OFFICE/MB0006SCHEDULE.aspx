@@ -99,203 +99,203 @@
 
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_01" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_01" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_01" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_02" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_02" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_02" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_03" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_03" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_03" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_04" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_04" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_04" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_05" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_05" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_05" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_06" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_06" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_06" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_07" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_07" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_07" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_08" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_08" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_08" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_09" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_09" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_09" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_10" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_10" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_10" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_11" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_11" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_11" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_12" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_12" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_12" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_13" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_13" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_13" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_14" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_14" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_14" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_15" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_15" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_15" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_16" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_16" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_16" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_17" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_17" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_17" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_18" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_18" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_18" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_19" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_19" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_19" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_20" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_20" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_20" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_21" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_21" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_21" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_22" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_22" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_22" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_23" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_23" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_23" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_24" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_24" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_24" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_25" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_25" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_25" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_26" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_26" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_26" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_27" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_27" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_27" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_28" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_28" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_28" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_29" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_29" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_29" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_30" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_30" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_30" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_31" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_31" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_31" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_32" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_32" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_32" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_33" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_33" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_33" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_34" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_34" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_34" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_35" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_35" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_35" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_36" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_36" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_36" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_37" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_37" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_37" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_38" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_38" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_38" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_39" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_39" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_39" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_40" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_40" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_40" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_41" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_41" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_41" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_42" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_42" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_42" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_43" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_43" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_43" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_44" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_44" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_44" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_45" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_45" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_45" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_46" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_46" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_46" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_47" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_47" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_47" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_48" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_48" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_48" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_49" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_49" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_49" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
                         <td style="height:1.8em;width:240px;vertical-align:top;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox id="WF_Rep_USER_50" runat="server" hidden="hidden"></asp:TextBox>
-                            <asp:TextBox id="WF_Rep_USERNM_50" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.7em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
+                            <asp:TextBox id="WF_Rep_USERNM_50" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="9.2em" Font-Bold="True" CssClass="WF_TEXT_CENTER"></asp:TextBox>
                         </td>
 
                         </tr>
@@ -320,10 +320,10 @@
                         <tr style="">
 
                         <!-- ■　日付　■ -->
-                        <td style="height:1.8em;width:5.0em;vertical-align:middle;border:solid 1px white;overflow:hidden;">
+                        <td style="height:1.0em;width:5.0em;vertical-align:middle;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox ID="WF_Rep_GDATE" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="5em" Font-Bold="True" CssClass="WF_TEXT_CENTER" TextMode="MultiLine"></asp:TextBox>
                         </td>
-                        <td style="height:1.8em;width:6.5em;vertical-align:middle;border:solid 1px white;overflow:hidden;">
+                        <td style="height:1.0em;width:6.5em;vertical-align:middle;border:solid 1px white;overflow:hidden;">
                             <asp:TextBox ID="WF_Rep_GDATE_TEXT" runat="server" ReadOnly="true" BorderWidth="1px"  Borderstyle="Solid" BorderColor="white" Width="6em" CssClass="WF_TEXT_LEFT" TextMode="MultiLine"></asp:TextBox>
                         </td>
 

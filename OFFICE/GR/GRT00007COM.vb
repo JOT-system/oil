@@ -7700,7 +7700,7 @@ Public Class GRT0007COM
         ioRow("TIMSTP") = "0"
         ioRow("SELECT") = "1"
         ioRow("HIDDEN") = "0"
-        ioRow("EXTRACTCNT") = "0"
+        ioRow("EXTRACTCNT") = 0
 
         ioRow("STATUS") = ""
         ioRow("CAMPCODE") = iCamp
@@ -10042,7 +10042,7 @@ Public Class GRT0007COM
         iTbl.Columns.Add("TIMSTP", GetType(String))
         iTbl.Columns.Add("SELECT", GetType(Integer))
         iTbl.Columns.Add("HIDDEN", GetType(Integer))
-        iTbl.Columns.Add("EXTRACTCNT", GetType(String))
+        iTbl.Columns.Add("EXTRACTCNT", GetType(Integer))
 
         iTbl.Columns.Add("STATUS", GetType(String))
         iTbl.Columns.Add("CAMPCODE", GetType(String))
@@ -11636,15 +11636,15 @@ Public Class GRT0007COM
                 L0001row("PAYMODELDISTANCE") = T0007HEADrow("MODELDISTANCETTL")                       'モデル距離
                 L0001row("PAYJIKYUSHATIME") = HHMMtoMinutes(T0007HEADrow("JIKYUSHATIMETTL")) '時給者時間
                 L0001row("PAYJYOMUTIME") = HHMMtoMinutes(T0007HEADrow("JYOMUTIMETTL"))       '乗務時間
-                L0001row("PAYHWORKNISSU") = T0007HEADrow("HWORKNISSUTTL")                             '休日出勤日数
-                L0001row("PAYKAITENCNT") = T0007HEADrow("KAITENCNTTTL")                               '回転数
-                L0001row("PAYSENJYOCNT") = T0007HEADrow("SENJYOCNTTTL")                               '洗浄回数
-                L0001row("PAYUNLOADADDCNT1") = T0007HEADrow("UNLOADADDCNT1TTL")                       '危険物荷卸回数1
-                L0001row("PAYUNLOADADDCNT2") = T0007HEADrow("UNLOADADDCNT2TTL")                       '危険物荷卸回数2
-                L0001row("PAYUNLOADADDCNT3") = T0007HEADrow("UNLOADADDCNT3TTL")                       '危険物荷卸回数3
-                L0001row("PAYUNLOADADDCNT4") = T0007HEADrow("UNLOADADDCNT4TTL")                       '危険物荷卸回数4
-                L0001row("PAYSHORTDISTANCE1") = T0007HEADrow("SHORTDISTANCE1TTL")                     '短距離手当1
-                L0001row("PAYSHORTDISTANCE2") = T0007HEADrow("SHORTDISTANCE2TTL")                     '短距離手当2
+                L0001row("PAYHWORKNISSU") = Val(T0007HEADrow("HWORKNISSUTTL"))                             '休日出勤日数
+                L0001row("PAYKAITENCNT") = Val(T0007HEADrow("KAITENCNTTTL"))                               '回転数
+                L0001row("PAYSENJYOCNT") = Val(T0007HEADrow("SENJYOCNTTTL"))                         '洗浄回数
+                L0001row("PAYUNLOADADDCNT1") = Val(T0007HEADrow("UNLOADADDCNT1TTL"))                       '危険物荷卸回数1
+                L0001row("PAYUNLOADADDCNT2") = Val(T0007HEADrow("UNLOADADDCNT2TTL"))                       '危険物荷卸回数2
+                L0001row("PAYUNLOADADDCNT3") = Val(T0007HEADrow("UNLOADADDCNT3TTL"))                       '危険物荷卸回数3
+                L0001row("PAYUNLOADADDCNT4") = Val(T0007HEADrow("UNLOADADDCNT4TTL"))                       '危険物荷卸回数4
+                L0001row("PAYSHORTDISTANCE1") = Val(T0007HEADrow("SHORTDISTANCE1TTL"))                     '短距離手当1
+                L0001row("PAYSHORTDISTANCE2") = Val(T0007HEADrow("SHORTDISTANCE2TTL"))                     '短距離手当2
                 L0001row("APPKIJUN") = ""                                                  '配賦基準
                 L0001row("APPKEY") = ""                                                    '配賦統計キー
 
@@ -11817,8 +11817,8 @@ Public Class GRT0007COM
                 Dim WW_SEQ As String = "000000"
 
                 '伝票番号採番
-                CS0033AutoNumber.CAMPCODE = T0007row("CAMPCODE")
-                CS0033AutoNumber.MORG = T0007row("HORG")
+                CS0033AutoNumber.CAMPCODE = T0007HEADrow("CAMPCODE")
+                CS0033AutoNumber.MORG = T0007HEADrow("HORG")
                 CS0033AutoNumber.SEQTYPE = CS0033AutoNumber.C_SEQTYPE.DENNO
                 CS0033AutoNumber.USERID = I_USERID
                 CS0033AutoNumber.getAutoNumber()
@@ -12541,15 +12541,15 @@ Public Class GRT0007COM
                     L0001row("PAYMODELDISTANCE") = T0007HEADrow("MODELDISTANCETTL")                       'モデル距離
                     L0001row("PAYJIKYUSHATIME") = HHMMtoMinutes(T0007HEADrow("JIKYUSHATIMETTL")) '時給者時間
                     L0001row("PAYJYOMUTIME") = HHMMtoMinutes(T0007HEADrow("JYOMUTIMETTL"))       '乗務時間
-                    L0001row("PAYHWORKNISSU") = T0007HEADrow("HWORKNISSUTTL")                             '休日出勤日数
-                    L0001row("PAYKAITENCNT") = T0007HEADrow("KAITENCNTTTL")                               '回転数
-                    L0001row("PAYSENJYOCNT") = T0007HEADrow("SENJYOCNTTTL")                               '洗浄回数
-                    L0001row("PAYUNLOADADDCNT1") = T0007HEADrow("UNLOADADDCNT1TTL")                       '危険物荷卸回数1
-                    L0001row("PAYUNLOADADDCNT2") = T0007HEADrow("UNLOADADDCNT2TTL")                       '危険物荷卸回数2
-                    L0001row("PAYUNLOADADDCNT3") = T0007HEADrow("UNLOADADDCNT3TTL")                       '危険物荷卸回数3
-                    L0001row("PAYUNLOADADDCNT4") = T0007HEADrow("UNLOADADDCNT4TTL")                       '危険物荷卸回数4
-                    L0001row("PAYSHORTDISTANCE1") = T0007HEADrow("SHORTDISTANCE1TTL")                     '短距離手当1
-                    L0001row("PAYSHORTDISTANCE2") = T0007HEADrow("SHORTDISTANCE2TTL")                     '短距離手当2
+                    L0001row("PAYHWORKNISSU") = Val(T0007HEADrow("HWORKNISSUTTL"))                             '休日出勤日数
+                    L0001row("PAYKAITENCNT") = Val(T0007HEADrow("KAITENCNTTTL"))                               '回転数
+                    L0001row("PAYSENJYOCNT") = Val(T0007HEADrow("SENJYOCNTTTL"))                               '洗浄回数
+                    L0001row("PAYUNLOADADDCNT1") = Val(T0007HEADrow("UNLOADADDCNT1TTL"))                       '危険物荷卸回数1
+                    L0001row("PAYUNLOADADDCNT2") = Val(T0007HEADrow("UNLOADADDCNT2TTL"))                       '危険物荷卸回数2
+                    L0001row("PAYUNLOADADDCNT3") = Val(T0007HEADrow("UNLOADADDCNT3TTL"))                       '危険物荷卸回数3
+                    L0001row("PAYUNLOADADDCNT4") = Val(T0007HEADrow("UNLOADADDCNT4TTL"))                       '危険物荷卸回数4
+                    L0001row("PAYSHORTDISTANCE1") = Val(T0007HEADrow("SHORTDISTANCE1TTL"))                     '短距離手当1
+                    L0001row("PAYSHORTDISTANCE2") = Val(T0007HEADrow("SHORTDISTANCE2TTL"))                     '短距離手当2
                 Else
                     L0001row("PAYWORKNISSU") = 0                                               '所労
                     L0001row("PAYSHOUKETUNISSU") = 0                                           '傷欠

@@ -97,6 +97,7 @@
             <input id="WF_RightboxOpen" runat="server" value=""  type="text" />         <!-- Rightbox 開閉 -->
             
             <input id="WF_PrintURL" runat="server" value=""  type="text" />             <!-- Textbox Print URL -->
+            <input id="WF_IsHideKoueiButton"  runat="server" value="0" type="text" />   <!-- 光栄受信ボタン非表示フラグ -->
             <asp:ListBox ID="WF_KoueiLoadFile" runat="server"></asp:ListBox>            <!-- List光栄読込中ファイル -->
         </div>
         <%-- rightview --%>

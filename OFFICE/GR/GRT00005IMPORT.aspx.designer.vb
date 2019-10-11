@@ -185,6 +185,15 @@ Partial Public Class GRT00005IMPORT
     Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_IsHideKoueiButton コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_IsHideKoueiButton As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''WF_KoueiLoadFile コントロール。
     '''</summary>
     '''<remarks>

@@ -130,7 +130,8 @@ Public Class M00000LOGON
         Try
 
             ClientIP = Request.UserHostAddress
-            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
+            'Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(System.Net.Dns.GetHostName())
+            Dim ClientIphEntry As IPHostEntry = Dns.GetHostEntry(ClientIP)
             For Each ipAddr As IPAddress In ClientIphEntry.AddressList
                 'IPv4の場合
                 If ipAddr.AddressFamily = Sockets.AddressFamily.InterNetwork Then

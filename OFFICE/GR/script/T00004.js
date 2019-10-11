@@ -21,22 +21,17 @@ function InitDisplay() {
     if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
         //活性
         document.getElementById("WF_ButtonUPDATE").disabled = "";
+        document.getElementById("WF_ButtonGet").disabled = "";
     } else {
         //非活性 
         document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
+        document.getElementById("WF_ButtonGet").disabled = "disabled";
     };
 
-    //光英受信ボタン活性／非活性
+    //光英受信ボタン表示／非表示
     if (document.getElementById('WF_IsHideKoueiButton').value == "0") {
         //表示
         document.getElementById("WF_ButtonGet").style.visibility = "visible";
-        if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
-            //活性
-            document.getElementById("WF_ButtonGet").disabled = "";
-        } else {
-            //非活性 
-            document.getElementById("WF_ButtonGet").disabled = "disabled";
-        };
     } else {
         //非表示 
         document.getElementById("WF_ButtonGet").style.visibility = "hidden";

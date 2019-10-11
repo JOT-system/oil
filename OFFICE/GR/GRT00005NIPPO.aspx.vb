@@ -67,7 +67,7 @@ Public Class GRT00005NIPPO
     Private WW_ERRLIST As List(Of String)                           'インポート中の１セット分のエラー
 
     Private Const CONST_DSPROWCOUNT As Integer = 20                 '１画面表示対象
-    Private Const CONST_SCROLLROWCOUNT As Integer = 7               'マウススクロール時の増分
+    Private Const CONST_SCROLLROWCOUNT As Integer = 10               'マウススクロール時の増分
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '詳細部タブID
     Private Const CONST_DETAIL_REP_COLUMN As Integer = 3            '詳細部の列数
 
@@ -120,6 +120,8 @@ Public Class GRT00005NIPPO
                             WF_GRID_ScroleUp()
                         Case "WF_WORKKBNChange"                         '■ 入力領域　作業区分変更時処理
                             WF_WORKKBN_OnChange()
+                        Case "WF_EXCEL_UPLOAD"
+                            Master.Output(C_MESSAGE_NO.FILE_UPLOAD_ERROR, C_MESSAGE_TYPE.ERR)
                     End Select
                     '○一覧再表示処理
                     DisplayGrid()
@@ -215,14 +217,9 @@ Public Class GRT00005NIPPO
         Next
 
         '○表示Linecnt取得
-        If String.IsNullOrEmpty(WF_GridPosition.Text) Then
+        If String.IsNullOrEmpty(WF_GridPosition.Text) OrElse
+            Not Integer.TryParse(WF_GridPosition.Text, WW_GridPosition) Then
             WW_GridPosition = 1
-        Else
-            Try
-                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
-            Catch ex As Exception
-                WW_GridPosition = 1
-            End Try
         End If
 
         '○表示格納位置決定
@@ -242,31 +239,33 @@ Public Class GRT00005NIPPO
         End If
 
         '○画面（GridView）表示
-        Dim WW_TBLview As DataView = New DataView(T0005INPtbl)
+        Using WW_TBLview As DataView = New DataView(T0005INPtbl)
 
-        'ソート
-        WW_TBLview.Sort = "LINECNT"
-        WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
-        '一覧作成
+            'ソート
+            WW_TBLview.Sort = "LINECNT"
+            WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
 
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
-        CS0013ProfView.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = GRT00005WRKINC.MAPID
-        CS0013ProfView.VARI = Master.VIEWID
-        CS0013ProfView.SRCDATA = WW_TBLview.ToTable
-        CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
-        CS0013ProfView.LEVENT = "ondblclick"
-        CS0013ProfView.LFUNC = "ListDbClick"
-        CS0013ProfView.TITLEOPT = True
-        CS0013ProfView.CS0013ProfView()
+            '一覧作成
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+            CS0013ProfView.PROFID = Master.PROF_VIEW
+            CS0013ProfView.MAPID = GRT00005WRKINC.MAPID
+            CS0013ProfView.VARI = Master.VIEWID
+            CS0013ProfView.SRCDATA = WW_TBLview.ToTable
+            CS0013ProfView.TBLOBJ = pnlListArea
+            CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
+            CS0013ProfView.LEVENT = "ondblclick"
+            CS0013ProfView.LFUNC = "ListDbClick"
+            CS0013ProfView.TITLEOPT = True
+            CS0013ProfView.CS0013ProfView()
 
-        '○クリア
-        If WW_TBLview.Count = 0 Then
-            WF_GridPosition.Text = "1"
-        Else
-            WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
-        End If
+            '○クリア
+            If WW_TBLview.Count = 0 Then
+                WF_GridPosition.Text = "1"
+            Else
+                WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
+            End If
+        End Using
+
         WF_YMD.Focus()
         '新規の場合、ヘッダ項目属性（入力）変更
         If work.WF_T5_YMD.Text = "" Then
@@ -880,7 +879,7 @@ Public Class GRT00005NIPPO
             If Not isNormal(WW_RESULT) Then Exit Sub
             '★★★ 画面遷移先URL取得 ★★★
             '画面遷移実行
-            Master.MAPID = work.WF_T5_FROMMAPID.Text
+            Master.MAPvariant = work.WF_T5_FROMMAPVARIANT.Text
             Master.TransitionPrevPage()
         Else
             '★★★★★★★★★★★★★★★★★★★★★★★★
@@ -1209,7 +1208,6 @@ Public Class GRT00005NIPPO
 
         If work.WF_T5_FROMMAPID.Text.Contains(GRT00005WRKINC.MAPID7) Then
             '勤怠画面から遷移して来た場合
-            'Master.MAPID = work.WF_T5_FROMMAPID.Text
             Master.MAPvariant = work.WF_T5_FROMMAPVARIANT.Text
 
             '★★★ 画面遷移 ★★★
@@ -1242,17 +1240,16 @@ Public Class GRT00005NIPPO
         If IsNothing(T0005INPtbl) Then If Not Master.RecoverTable(T0005INPtbl, work.WF_SEL_XMLsaveF2.Text) Then Exit Sub
 
         '○ソート
-        Dim WW_TBLview As DataView
-        WW_TBLview = New DataView(T0005INPtbl)
-        WW_TBLview.RowFilter = "HIDDEN= '0'"
+        Using WW_TBLview As DataView = New DataView(T0005INPtbl)
+            WW_TBLview.RowFilter = "HIDDEN= '0'"
 
-        '最終頁に移動
-        If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
-        Else
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
-        End If
-
+            '最終頁に移動
+            If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
+            Else
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
+            End If
+        End Using
     End Sub
 
     ''' <summary>
@@ -1444,7 +1441,7 @@ Public Class GRT00005NIPPO
                     WF_LeftboxOpen.Value = "OpenCTbl"
                 ElseIf WF_LeftMViewChange.Value = LIST_BOX_CLASSIFICATION.LC_STAFFCODE Then
                     '従業員の場合テーブル表記する
-                    Dim prmData As Hashtable = work.CreateSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text)
+                    Dim prmData As Hashtable = work.CreateSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text, WF_YMD.Text, WF_YMD.Text)
                     .SetTableList(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .ActiveTable()
                     WF_LeftboxOpen.Value = "OpenSTbl"
@@ -3156,9 +3153,9 @@ Public Class GRT00005NIPPO
             '〇品名コード（会社コード＋油種＋品名１コード＋品名２コード）から油種・品名１コード・品名２コードを取得する
             If Not String.IsNullOrEmpty(IO_ROW("PRODUCTCODE" & WI_GOODS_CNT)) Then
                 IO_ROW("PRODUCT" & WI_GOODS_CNT & "NAMES") = String.Empty
-                IO_ROW("OILTYPE" & WI_GOODS_CNT) = IO_ROW("PRODUCTCODE" & WI_GOODS_CNT).ToString.Substring(2, 2)
-                IO_ROW("PRODUCT1" & WI_GOODS_CNT) = IO_ROW("PRODUCTCODE" & WI_GOODS_CNT).ToString.Substring(4, 2)
-                IO_ROW("PRODUCT2" & WI_GOODS_CNT) = IO_ROW("PRODUCTCODE" & WI_GOODS_CNT).ToString.Substring(6)
+                IO_ROW("OILTYPE" & WI_GOODS_CNT) = Mid(IO_ROW("PRODUCTCODE" & WI_GOODS_CNT).ToString, 3, 2)
+                IO_ROW("PRODUCT1" & WI_GOODS_CNT) = Mid(IO_ROW("PRODUCTCODE" & WI_GOODS_CNT).ToString, 5, 2)
+                IO_ROW("PRODUCT2" & WI_GOODS_CNT) = Mid(IO_ROW("PRODUCTCODE" & WI_GOODS_CNT).ToString, 7)
                 CodeToName("PRODUCT2" & WI_GOODS_CNT, IO_ROW("PRODUCTCODE" & WI_GOODS_CNT), IO_ROW("PRODUCT" & WI_GOODS_CNT & "NAMES"), WW_DUMMY)
             End If
         Next
@@ -3765,7 +3762,7 @@ Public Class GRT00005NIPPO
         '荷卸しの場合
         '----------------------
         If T0005INProw("WORKKBN") = "B3" Then
-            If T0005INProw("DELFLG") = C_DELETE_FLG.DELETE Then
+            If T0005INProw("DELFLG") = C_DELETE_FLG.ALIVE Then
                 '・キー項目(取引先：TORICODE)
                 '①必須・項目属性チェック
                 Master.CheckFieldForTable(work.WF_SEL_CAMPCODE.Text, "TORICODE", T0005INProw("TORICODE"), WW_RTN, WW_CHECKREPORT, S0013tbl)
@@ -4004,8 +4001,8 @@ Public Class GRT00005NIPPO
                 '①必須・項目属性チェック
                 Master.CheckFieldForTable(work.WF_SEL_CAMPCODE.Text, "SURYO", T0005INProw("SURYO2"), WW_RTN, WW_CHECKREPORT, S0013tbl)
                 If isNormal(WW_RTN) Then
-                    T0005INProw("SURYO1") = Format(Val(T0005INProw("SURYO2")), "#,0.000")
-                    If Val(T0005INProw("SURYO1")) < 0 Then
+                    T0005INProw("SURYO2") = Format(Val(T0005INProw("SURYO2")), "#,0.000")
+                    If Val(T0005INProw("SURYO2")) < 0 Then
                         'エラーレポート編集
                         WW_CheckMES1 = "・更新できないレコード(数量２エラー)です。"
                         WW_CheckMES2 = T0005INProw("SURYO2")
@@ -4741,7 +4738,7 @@ Public Class GRT00005NIPPO
         If WW_RTN_SW = "新" Then
 
             '新規の入力の場合、ヘッダーがなければレコードを作成する
-            If work.WF_SEL_BUTTON.Text = GRT00005WRKINC.LC_BTN_TYPE.BTN_NEW AndAlso T0005INPtbl.Rows.Count = 0 Then
+            If Val(work.WF_SEL_BUTTON.Text) = GRT00005WRKINC.LC_BTN_TYPE.BTN_NEW AndAlso T0005INPtbl.Rows.Count = 0 Then
                 Dim WW_T0005INProw As DataRow = T0005INPtbl.NewRow
                 T0005COM.InitialT5INPRow(WW_T0005INProw)
                 WW_T0005INProw("LINECNT") = 0
@@ -6038,6 +6035,10 @@ Public Class GRT00005NIPPO
             WW_TBLview = Nothing
             WW_T0005tbl.Dispose()
             WW_T0005tbl = Nothing
+            WW_T0005INPtbl.Dispose()
+            WW_T0005INPtbl = Nothing
+            WW_TWOMANtbl.Dispose()
+            WW_TWOMANtbl = Nothing
 
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, "例外発生")
@@ -6387,7 +6388,7 @@ Public Class GRT00005NIPPO
 
                 Case "STAFFCODE"
                     '乗務員名
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STAFFCODE, I_VALUE, O_TEXT, O_RTN, work.CreateSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text))
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STAFFCODE, I_VALUE, O_TEXT, O_RTN, work.CreateSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text, WF_YMD.Text, WF_YMD.Text))
 
                 Case "CAMPCODE"
                     '会社名
@@ -6482,7 +6483,10 @@ Public Class GRT00005NIPPO
             Case C_PREV_MAP_LIST.T00005I
                 '一覧画面からの画面遷移
 
-            Case C_PREV_MAP_LIST.T00007, C_PREV_MAP_LIST.T00007JKT, C_PREV_MAP_LIST.T00007KNK, C_PREV_MAP_LIST.T00007NJS
+            Case C_PREV_MAP_LIST.T00007,
+                 C_PREV_MAP_LIST.T00007JKT,
+                 C_PREV_MAP_LIST.T00007KNK,
+                 C_PREV_MAP_LIST.T00007NJS
                 '〇ユーザ権限情報取得
                 work.WF_SEL_PERMIT_ORG.Text = Master.USER_ORG
                 Master.MAPvariant = "Admin"

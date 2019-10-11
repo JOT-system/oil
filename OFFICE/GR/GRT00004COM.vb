@@ -192,6 +192,14 @@ Namespace GRT00004COM
                 End Get
             End Property
             ''' <summary>
+            ''' 光英オーダーCSV No.8:ルート番号([j]or[a] + 車番CD)  
+            ''' </summary>
+            Public ReadOnly Property ROUTENO As String
+                Get
+                    Return _csvData(7)
+                End Get
+            End Property
+            ''' <summary>
             ''' 光英オーダーCSV No.9:回順
             ''' </summary>
             Public ReadOnly Property TRIPSEQ As String
@@ -312,6 +320,39 @@ Namespace GRT00004COM
                     _csvData(58) = value
                 End Set
             End Property
+            ''' <summary>
+            ''' 光英オーダーCSV No.69:注釈１
+            ''' </summary>
+            Public ReadOnly Property MEMO1 As String
+                Get
+                    Return _csvData(68)
+                End Get
+            End Property
+            ''' <summary>
+            ''' 光英オーダーCSV No.88:注釈２
+            ''' </summary>
+            Public ReadOnly Property MEMO2 As String
+                Get
+                    Return _csvData(87)
+                End Get
+            End Property
+            ''' <summary>
+            ''' 光英オーダーCSV No.72:ジョイント情報
+            ''' </summary>
+            Public ReadOnly Property JOINT As String
+                Get
+                    Return _csvData(71)
+                End Get
+            End Property
+
+            ''' <summary>
+            ''' 光英オーダーCSV No.73:受注品名名称
+            ''' </summary>
+            Public ReadOnly Property PRODUCTNAME As String()
+                Get
+                    Return _csvData(72).Split(C_KOUEI_CSV_COLUMS_DELIMITER)
+                End Get
+            End Property
 
             ''' <summary>
             ''' 光英オーダーCSV No.74:受注品名コード
@@ -328,6 +369,15 @@ Namespace GRT00004COM
             Public ReadOnly Property PRODUCTNUM As String()
                 Get
                     Return _csvData(74).Split(C_KOUEI_CSV_COLUMS_DELIMITER)
+                End Get
+            End Property
+
+            ''' <summary>
+            ''' 光英オーダーCSV No.79:注文主情報
+            ''' </summary>
+            Public ReadOnly Property OWNERINFO As String
+                Get
+                    Return _csvData(78)
                 End Get
             End Property
 
@@ -2871,8 +2921,6 @@ Namespace GRT00004COM
                                 toriCode = If(x.KOUEITYPE = GRW0001KOUEIORDER.KOUEITYPE_PREFIX.JX, GRT00004WRKINC.C_TORICODE_JX, GRT00004WRKINC.C_TORICODE_COSMO),
                                 destCode = x.DESTCODE,
                                 destName = x.DESTNAME,
-                                posiX = x.POSI_X,
-                                posiY = x.POSI_Y,
                                 destClass = If(x.TRIPSEQ = GRW0001KOUEIORDER.TRIPSEQ_TYPE.DEPT, "2", "1")
                          ).Distinct
 
@@ -2884,8 +2932,8 @@ Namespace GRT00004COM
                         .KOUEITYPE = row.koueitype,
                         .TODOKESAKICODE = row.destCode,
                         .NAME = row.destName,
-                        .LATITUDE = row.posiY,
-                        .LONGTIDUDE = row.posiX
+                        .LATITUDE = String.Empty,
+                        .LONGTIDUDE = String.Empty
                     }
                 End If
 
@@ -2959,19 +3007,26 @@ Namespace GRT00004COM
 
                 MC006Row("TODOKENAMEL") = I_NAME
                 MC006Row("TODOKENAMES") = I_NAME
-                MC006Row("LATITUDE") = I_LATITUDE
-                MC006Row("LONGITUDE") = I_LONGITUDE
                 MC006Row("CLASS") = I_CLASS
 
-                Dim clsGeoCoder = New CS0055GeoCoder()
-                Dim address As CS0055GeoCoder.AddressInfo = clsGeoCoder.GetAddress(I_LATITUDE, I_LONGITUDE)
-                If IsNothing(address) Then
-                    '取得エラー時継続
-                Else
-                    MC006Row("ADDR1") = address.Address1
-                    MC006Row("ADDR2") = address.Address2
-                    MC006Row("ADDR3") = address.Address3
-                    MC006Row("ADDR4") = address.Address4
+                '緯度経度が設定されている場合は緯度経度及び住所・市町村コードを設定する
+                If Not String.IsNullOrEmpty(I_LATITUDE) AndAlso Not String.IsNullOrEmpty(I_LATITUDE) Then
+                    MC006Row("LATITUDE") = I_LATITUDE
+                    MC006Row("LONGITUDE") = I_LONGITUDE
+
+                    'YOPLGeoCoderから住所取得
+                    Dim clsGeoCoder = New CS0055GeoCoder()
+                    Dim address As CS0055GeoCoder.AddressInfo = clsGeoCoder.GetAddress(I_LATITUDE, I_LONGITUDE)
+                    If IsNothing(address) Then
+                        '取得エラー時継続
+                    Else
+                        MC006Row("ADDR1") = address.Address1
+                        MC006Row("ADDR2") = address.Address2
+                        MC006Row("ADDR3") = address.Address3
+                        MC006Row("ADDR4") = address.Address4
+                        MC006Row("CITIES") = address.CityCode
+                    End If
+                    clsGeoCoder = Nothing
                 End If
 
             Catch ex As Exception
@@ -3000,7 +3055,6 @@ Namespace GRT00004COM
                      & "   SELECT CAST(UPDTIMSTP as bigint) as hensuu                       " _
                      & "     FROM MC006_TODOKESAKI                                          " _
                      & "     WHERE    CAMPCODE      = @P01                                  " _
-                     & "       and    rtrim(TORICODE)      = @P02                           " _
                      & "       and    rtrim(TODOKECODE)    = @P03 ;                         " _
                      & "                                                                    " _
                      & " OPEN hensuu ;                                                      " _
@@ -3144,7 +3198,6 @@ Namespace GRT00004COM
                      & "   SELECT CAST(UPDTIMSTP as bigint) as hensuu                       " _
                      & "     FROM MC007_TODKORG                                             " _
                      & "     WHERE    CAMPCODE      = @P01                                  " _
-                     & "       and    TORICODE      = @P02                                  " _
                      & "       and    TODOKECODE    = @P03                                  " _
                      & "       and    UORG          = @P04 ;                                " _
                      & "                                                                    " _

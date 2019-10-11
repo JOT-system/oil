@@ -741,11 +741,10 @@ Public Class GRT00007ICHIRAN_NJS
         Next
 
         '日報を勤怠フォーマットに変換し、マージする
-        Dim iT0005view As DataView
-        iT0005view = New DataView(T0005tbl)
-        iT0005view.Sort = "YMD, STAFFCODE, WORKKBN"
-        NIPPOget_T7Format("NEW", WW_T0007tbl, iT0005view)
-
+        Using iT0005view As DataView = New DataView(T0005tbl)
+            iT0005view.Sort = "YMD, STAFFCODE, WORKKBN"
+            NIPPOget_T7Format("NEW", WW_T0007tbl, iT0005view)
+        End Using
         CS0026TblSort.TABLE = WW_T0007tbl
         CS0026TblSort.FILTER = ""
         CS0026TblSort.SORTING = "SELECT, STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME, RECODEKBN, NIPPOLINKCODE"
@@ -935,6 +934,12 @@ Public Class GRT00007ICHIRAN_NJS
 
         WW_T0007SELtbl.Dispose()
         WW_T0007SELtbl = Nothing
+        WW_T0007tbl.Dispose()
+        WW_T0007tbl = Nothing
+        WW_T0007tbl2.Dispose()
+        WW_T0007tbl2 = Nothing
+        T0005tbl.Dispose()
+        T0005tbl = Nothing
 
         If Not Master.SaveTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
             Exit Sub
@@ -950,7 +955,7 @@ Public Class GRT00007ICHIRAN_NJS
         If WW_ERRCODE <> C_MESSAGE_NO.NORMAL Then
             WW_ERR_REPORT = "内部処理エラー" & ControlChars.NewLine & WW_MSG
 
-            rightview.addErrorReport(WW_ERR_REPORT)
+            rightview.AddErrorReport(WW_ERR_REPORT)
 
             CS0011LOGWRITE.INFSUBCLASS = "T0007_DuplCheck"             'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "T0007_DuplCheck"                 '
@@ -959,7 +964,7 @@ Public Class GRT00007ICHIRAN_NJS
             CS0011LOGWRITE.MESSAGENO = WW_ERRCODE
             CS0011LOGWRITE.CS0011LOGWrite()                            'ログ出力
 
-            Master.output(WW_ERRCODE, C_MESSAGE_TYPE.ABORT)
+            Master.Output(WW_ERRCODE, C_MESSAGE_TYPE.ABORT)
         End If
 
     End Sub
@@ -1461,6 +1466,9 @@ Public Class GRT00007ICHIRAN_NJS
             CS0044L1INSERT.SQLCON = SQLcon
             CS0044L1INSERT.CS0044L1Insert(L0001tbl)
 
+            WW_T0007SELtbl.Dispose()
+            WW_T0007SELtbl = Nothing
+
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "WF_ButtonUPDATE_Click"        'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "DB:INSERT L0001_TOKEI"            '
@@ -1519,6 +1527,8 @@ Public Class GRT00007ICHIRAN_NJS
         SQLcon.Close()
         SQLcon.Dispose()
         SQLcon = Nothing
+        T0007NIPPOtbl.Dispose()
+        T0007NIPPOtbl = Nothing
 
     End Sub
 
@@ -1982,6 +1992,8 @@ Public Class GRT00007ICHIRAN_NJS
         WW_TBLview = Nothing
         WW_TBL.Dispose()
         WW_TBL = Nothing
+        cpT0007tbl.Dispose()
+        cpT0007tbl = Nothing
 
     End Sub
 
@@ -2449,6 +2461,8 @@ Public Class GRT00007ICHIRAN_NJS
             bc.DestinationTableName = "#MBtemp"
             bc.WriteToServer(WW_MBtbl)
 
+            WW_MBtbl.Dispose()
+            WW_MBtbl = Nothing
             SQLcmd2.Dispose()
             SQLcmd2 = Nothing
             bc.Close()
@@ -2786,17 +2800,17 @@ Public Class GRT00007ICHIRAN_NJS
                & "   and   MB2.STYMD       <= CAL.WORKINGYMD " _
                & "   and   MB2.ENDYMD      >= CAL.WORKINGYMD " _
                & "   and   MB2.DELFLG      <> '1' " _
-               & " LEFT JOIN MB002_STAFFORG MB3 " _
-               & "   ON    MB3.CAMPCODE     = @CAMPCODE " _
-               & "   and   MB3.STAFFCODE    = MB2.STAFFCODE " _
-               & "   and   MB3.SORG         = MB2.HORG " _
-               & "   and   MB3.DELFLG      <> '1' " _
                & " LEFT JOIN T0007_KINTAI A " _
                & "   ON    A.CAMPCODE     = @CAMPCODE " _
                & "   and   A.WORKDATE     = CAL.WORKINGYMD " _
                & "   and   A.STAFFCODE    = MB.STAFFCODE " _
                & "   and   A.RECODEKBN    = CAL.RECODEKBN " _
                & "   and   A.DELFLG      <> '1' " _
+               & " LEFT JOIN MB002_STAFFORG MB3 " _
+               & "   ON    MB3.CAMPCODE     = @CAMPCODE " _
+               & "   and   MB3.STAFFCODE    = A.STAFFCODE " _
+               & "   and   MB3.SORG         = @SEL_HORG " _
+               & "   and   MB3.DELFLG      <> '1' " _
                & " LEFT JOIN M0001_CAMP M1 " _
                & "   ON    M1.CAMPCODE    = @CAMPCODE " _
                & "   and   M1.STYMD      <= @NOW " _
@@ -2920,7 +2934,7 @@ Public Class GRT00007ICHIRAN_NJS
             End If
 
             If WW_SORT = "" Then
-                WW_SORT = "ORDER BY HORG, STAFFCODE, WORKDATE, STDATE, STTIME, ENDDATE, ENDTIME, HDKBN DESC"
+                WW_SORT = "ORDER BY ORGSEQ, HORG, STAFFCODE, WORKDATE, STDATE, STTIME, ENDDATE, ENDTIME, HDKBN DESC"
             End If
 
             SQLStr = SQLStr & SQLWhere & WW_SORT
@@ -2929,6 +2943,7 @@ Public Class GRT00007ICHIRAN_NJS
             Dim P_TAISHOYM As SqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", System.Data.SqlDbType.NVarChar)
             Dim P_NOW As SqlParameter = SQLcmd.Parameters.Add("@NOW", System.Data.SqlDbType.Date)
             Dim P_YMD01 As SqlParameter = SQLcmd.Parameters.Add("@YMD01", System.Data.SqlDbType.NVarChar)
+            Dim P_HORG As SqlParameter = SQLcmd.Parameters.Add("@SEL_HORG", System.Data.SqlDbType.NVarChar)
             Dim P_SEL_STYMD As SqlParameter = SQLcmd.Parameters.Add("@SEL_STYMD", System.Data.SqlDbType.Date)
             Dim P_SEL_ENDYMD As SqlParameter = SQLcmd.Parameters.Add("@SEL_ENDYMD", System.Data.SqlDbType.Date)
 
@@ -2945,6 +2960,7 @@ Public Class GRT00007ICHIRAN_NJS
                 wDATE = Date.Now
             End Try
             P_SEL_ENDYMD.Value = work.WF_T7SEL_TAISHOYM.Text & "/" & DateTime.DaysInMonth(wDATE.Year, wDATE.Month).ToString("00")
+            P_HORG.Value = work.WF_T7SEL_HORG.Text
 
             SQLcmd.CommandTimeout = 300
             Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -2960,6 +2976,7 @@ Public Class GRT00007ICHIRAN_NJS
             P_TAISHOYM = SQLcmd.Parameters.Add("@TAISHOYM", System.Data.SqlDbType.NVarChar)
             P_NOW = SQLcmd.Parameters.Add("@NOW", System.Data.SqlDbType.Date)
             P_YMD01 = SQLcmd.Parameters.Add("@YMD01", System.Data.SqlDbType.NVarChar)
+            P_HORG = SQLcmd.Parameters.Add("@SEL_HORG", System.Data.SqlDbType.NVarChar)
             P_SEL_STYMD = SQLcmd.Parameters.Add("@SEL_STYMD", System.Data.SqlDbType.Date)
             P_SEL_ENDYMD = SQLcmd.Parameters.Add("@SEL_ENDYMD", System.Data.SqlDbType.Date)
 
@@ -2977,6 +2994,7 @@ Public Class GRT00007ICHIRAN_NJS
                 wDATE = Date.Now
             End Try
             P_SEL_ENDYMD.Value = wDATE.ToString("yyyy/MM") & "/" & DateTime.DaysInMonth(wDATE.Year, wDATE.Month).ToString("00")
+            P_HORG.Value = work.WF_T7SEL_HORG.Text
 
             SQLcmd.CommandTimeout = 300
             SQLdr = SQLcmd.ExecuteReader()
@@ -2991,7 +3009,7 @@ Public Class GRT00007ICHIRAN_NJS
             Dim WW_SEL As String = "HDKBN = 'H' and RECODEKBN = '0'"
             CS0026TblSort.TABLE = T0007BEFtbl
             CS0026TblSort.FILTER = WW_SEL
-            CS0026TblSort.SORTING = "STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME"
+            CS0026TblSort.SORTING = "ORGSEQ, STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME"
             T0007BEFtbl = CS0026TblSort.sort()
 
             '**********************************************************
@@ -3002,6 +3020,7 @@ Public Class GRT00007ICHIRAN_NJS
             P_TAISHOYM = SQLcmd.Parameters.Add("@TAISHOYM", System.Data.SqlDbType.NVarChar)
             P_NOW = SQLcmd.Parameters.Add("@NOW", System.Data.SqlDbType.Date)
             P_YMD01 = SQLcmd.Parameters.Add("@YMD01", System.Data.SqlDbType.NVarChar)
+            P_HORG = SQLcmd.Parameters.Add("@SEL_HORG", System.Data.SqlDbType.NVarChar)
             P_SEL_STYMD = SQLcmd.Parameters.Add("@SEL_STYMD", System.Data.SqlDbType.Date)
             P_SEL_ENDYMD = SQLcmd.Parameters.Add("@SEL_ENDYMD", System.Data.SqlDbType.Date)
 
@@ -3019,6 +3038,7 @@ Public Class GRT00007ICHIRAN_NJS
                 wDATE = Date.Now
             End Try
             P_SEL_ENDYMD.Value = dtAft.AddMonths(1).ToString("yyyy/MM/dd")
+            P_HORG.Value = work.WF_T7SEL_HORG.Text
 
             SQLcmd.CommandTimeout = 300
             SQLdr = SQLcmd.ExecuteReader()
@@ -3295,8 +3315,16 @@ Public Class GRT00007ICHIRAN_NJS
 
         T0007tbl.Merge(WW_T0007tbl2)
 
+        WW_T0007tbl.Dispose()
+        WW_T0007tbl = Nothing
+        WW_T0007tbl2.Dispose()
+        WW_T0007tbl2 = Nothing
+        WW_T0007SELtbl.Dispose()
+        WW_T0007SELtbl = Nothing
         T0005WKtbl.Dispose()
         T0005WKtbl = Nothing
+        iT0005view.Dispose()
+        iT0005view = Nothing
         '--------------------------------------------
         '合計明細レコードの作成
         '--------------------------------------------
@@ -3731,6 +3759,8 @@ Public Class GRT00007ICHIRAN_NJS
             '更新元（削除）データの戻し
             ioTbl.Merge(WW_T0007DELtbl)
 
+            WW_T0007tbl.Dispose()
+            WW_T0007tbl = Nothing
             WW_T0007HEADtbl.Dispose()
             WW_T0007HEADtbl = Nothing
             WW_T0007DTLtbl.Dispose()
@@ -3743,6 +3773,10 @@ Public Class GRT00007ICHIRAN_NJS
             iT0007DTLview = Nothing
             iT0005view.Dispose()
             iT0005view = Nothing
+            WW_WKDTLtbl.Dispose()
+            WW_WKDTLtbl = Nothing
+            wT0007tbl.Dispose()
+            wT0007tbl = Nothing
 
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "T0007_TTLEdit"                'SUBクラス名
@@ -6875,6 +6909,12 @@ Public Class GRT00007ICHIRAN_NJS
         WW_T0007DTLtbl = Nothing
         WW_T0007tbl.Dispose()
         WW_T0007tbl = Nothing
+        wT0007tbl.Dispose()
+        wT0007tbl = Nothing
+        iT0005view.Dispose()
+        iT0005view = Nothing
+        T0005tbl.Dispose()
+        T0005tbl = Nothing
 
     End Sub
 
@@ -7369,6 +7409,10 @@ Public Class GRT00007ICHIRAN_NJS
 
         WW_T0007HEADtbl.Dispose()
         WW_T0007HEADtbl = Nothing
+        WW_T0007HEADtbl2.Dispose()
+        WW_T0007HEADtbl2 = Nothing
+        WW_T0007HEADtbl3.Dispose()
+        WW_T0007HEADtbl3 = Nothing
         WW_T0007DTLtbl.Dispose()
         WW_T0007DTLtbl = Nothing
         WW_T0007DELtbl.Dispose()
@@ -7431,6 +7475,8 @@ Public Class GRT00007ICHIRAN_NJS
             End If
         Next
 
+        WW_HEADtbl.Dispose()
+        WW_HEADtbl = Nothing
         WW_TTLDTLtbl.Dispose()
         WW_TTLDTLtbl = Nothing
         TTLDTLview.Dispose()
@@ -9868,6 +9914,8 @@ Public Class GRT00007ICHIRAN_NJS
             bc.DestinationTableName = "#MBtemp"
             bc.WriteToServer(WW_MBtbl)
 
+            WW_MBtbl.Dispose()
+            WW_MBtbl = Nothing
             SQLcmd2.Dispose()
             SQLcmd2 = Nothing
             bc.Close()

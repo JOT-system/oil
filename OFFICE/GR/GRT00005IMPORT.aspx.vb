@@ -90,7 +90,7 @@ Public Class GRT00005IMPORT
     '伝票番号
     Private DENNO As Integer = 0                                    '伝票番号
 
-    Private Const CONST_DSPROWCOUNT As Integer = 50                 '１画面表示対象
+    Private Const CONST_DSPROWCOUNT As Integer = 40                 '１画面表示対象
     Private Const CONST_SCROLLROWCOUNT As Integer = 20              'マウススクロール時の増分
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '詳細部タブID
 
@@ -292,6 +292,9 @@ Public Class GRT00005IMPORT
             '保存しておいた、GridViewの表示開始位置、絞込み条件の乗務員、日報番号を設定し直す
             WF_STAFFCODE.Text = work.WF_T5I_STAFFCODE.Text
             WF_YMD.Text = work.WF_T5I_YMD.Text
+            For Each w In work.WF_KoueiLoadFile.Items
+                WF_KoueiLoadFile.Items.Add(w)
+            Next
             '保存しておいたエラーメッセージを表示
             rightview.setErrorReport(Replace(work.WF_T5_ERRMSG.Text, "\n", vbCrLf))
             WF_ButtonClick.Value = "WF_ButtonExtract2"
@@ -300,6 +303,13 @@ Public Class GRT00005IMPORT
             '○一覧再表示処理
             DisplayGrid()
         End If
+
+        '光英受信ボタン非表示設定
+        Dim T5Com = New GRT0005COM
+        If Not T5Com.IsKoueiAvailableOrg(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text, GRT00005WRKINC.C_KOUEI_CLASS_CODE, WW_ERRCODE) Then
+            WF_IsHideKoueiButton.Value = "1"
+        End If
+        T5Com = Nothing
 
         '〇テンポラリの削除
         work.DeleteTmpFiles()
@@ -358,30 +368,30 @@ Public Class GRT00005IMPORT
         End If
 
         '○画面（GridView）表示
-        Dim WW_TBLview As DataView = New DataView(T0005tbl)
+        Using WW_TBLview As DataView = New DataView(T0005tbl)
+            'ソート
+            WW_TBLview.Sort = "LINECNT"
+            WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
+            '一覧作成
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+            CS0013PROFview.PROFID = Master.PROF_VIEW
+            CS0013ProfView.MAPID = GRT00005WRKINC.MAPIDI
+            CS0013PROFview.VARI = Master.VIEWID
+            CS0013PROFview.SRCDATA = WW_TBLview.ToTable
+            CS0013PROFview.TBLOBJ = pnlListArea
+            CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
+            CS0013PROFview.LEVENT = "ondblclick"
+            CS0013PROFview.LFUNC = "ListDbClick"
+            CS0013PROFview.TITLEOPT = True
+            CS0013PROFview.CS0013ProfView()
 
-        'ソート
-        WW_TBLview.Sort = "LINECNT"
-        WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
-        '一覧作成
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
-        CS0013PROFview.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = GRT00005WRKINC.MAPIDI
-        CS0013PROFview.VARI = Master.VIEWID
-        CS0013PROFview.SRCDATA = WW_TBLview.ToTable
-        CS0013PROFview.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
-        CS0013PROFview.LEVENT = "ondblclick"
-        CS0013PROFview.LFUNC = "ListDbClick"
-        CS0013PROFview.TITLEOPT = True
-        CS0013PROFview.CS0013ProfView()
-
-        '○クリア
-        If WW_TBLview.Count = 0 Then
-            work.WF_T5I_GridPosition.Text = "1"
-        Else
-            work.WF_T5I_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
-        End If
+            '○クリア
+            If WW_TBLview.Count = 0 Then
+                work.WF_T5I_GridPosition.Text = "1"
+            Else
+                work.WF_T5I_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
+            End If
+        End Using
         WF_STAFFCODE.Focus()
 
     End Sub
@@ -690,19 +700,25 @@ Public Class GRT00005IMPORT
 
             Dim WW_DATE As Date = Date.Now
             '〇T0005更新処理
+            'SQLtrn = SQLcon.BeginTransaction
             T0005UPDATE.SQLcon = SQLcon
             T0005UPDATE.SQLtrn = SQLtrn
             T0005UPDATE.T0005tbl = T0005tbl
             T0005UPDATE.ENTRYDATE = WW_DATE
             T0005UPDATE.UPDUSERID = Master.USERID
             T0005UPDATE.UPDTERMID = Master.USERTERMID
+            T0005UPDATE.KOUEIFILES = WF_KoueiLoadFile
             T0005UPDATE.Update()
             If isNormal(T0005UPDATE.ERR) Then
                 T0005tbl = T0005UPDATE.T0005tbl
+                'SQLtrn.Commit()
             Else
                 Master.output(T0005UPDATE.ERR, C_MESSAGE_TYPE.ABORT, "例外発生")
+                'SQLtrn.Rollback()
                 Exit Sub
             End If
+            'SQLtrn = Nothing
+
             '〇不要テーブルデータ除去
             If Not IsNothing(WW_T0005DELtbl) Then
                 WW_T0005DELtbl.Dispose()
@@ -894,19 +910,6 @@ Public Class GRT00005IMPORT
 
         End Using
 
-        For Each file As ListItem In WF_KoueiLoadFile.Items
-            Dim f = New FileInfo(file.Value)
-            If f.Exists Then
-                '光英連携が安定稼働するまでは論理削除
-                Dim bakFileName As New FileInfo(f.FullName & ".used")
-                If bakFileName.Exists Then
-                    bakFileName.Delete()
-                End If
-                f.MoveTo(bakFileName.FullName)
-            End If
-        Next
-        WF_KoueiLoadFile.Items.Clear()
-
         '○GridViewデータをテーブルに保存
         If Not Master.SaveTable(T0005tbl, work.WF_SEL_XMLsaveF.Text) Then Exit Sub
         '○GridViewデータをテーブルに保存
@@ -981,17 +984,16 @@ Public Class GRT00005IMPORT
         '○データリカバリ 
         If Not Master.RecoverTable(T0005tbl, work.WF_SEL_XMLsaveF.Text) Then Exit Sub
         '○対象データ件数取得
-        Dim WW_TBLview As DataView
-        WW_TBLview = New DataView(T0005tbl)
-        WW_TBLview.RowFilter = "HIDDEN= '0'"
+        Using WW_TBLview As DataView = New DataView(T0005tbl)
+            WW_TBLview.RowFilter = "HIDDEN= '0'"
 
-        '最終頁に移動
-        If WW_TBLview.Count Mod 10 = 0 Then
-            work.WF_T5I_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
-        Else
-            work.WF_T5I_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
-        End If
-
+            '最終頁に移動
+            If WW_TBLview.Count Mod 10 = 0 Then
+                work.WF_T5I_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
+            Else
+                work.WF_T5I_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
+            End If
+        End Using
     End Sub
     ''' <summary>
     ''' フィールドダブルクリック処理
@@ -1010,7 +1012,7 @@ Public Class GRT00005IMPORT
                     Dim prmData As Hashtable = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text)
                     Select Case WF_LeftMViewChange.Value
                         Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
-                            prmData = work.createSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text)
+                            prmData = work.CreateSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text, work.WF_SEL_STYMD.Text, work.WF_SEL_ENDYMD.Text)
 
                     End Select
                     .setListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -1185,6 +1187,12 @@ Public Class GRT00005IMPORT
 
         '呼出元MAPID　
         work.WF_T5_FROMMAPID.Text = Master.MAPID
+
+        '光英受信ファイル
+        work.WF_KoueiLoadFile.Items.Clear()
+        For Each w In WF_KoueiLoadFile.Items
+            work.WF_KoueiLoadFile.Items.Add(w)
+        Next
 
         '★★★ 画面遷移先URL取得 ★★★
         Master.transitionPage()
@@ -3307,6 +3315,10 @@ Public Class GRT00005IMPORT
             WW_TBLview = Nothing
             WW_T0005tbl.Dispose()
             WW_T0005tbl = Nothing
+            WW_T0005INPtbl.Dispose()
+            WW_T0005INPtbl = Nothing
+            WW_TWOMANtbl.Dispose()
+            WW_TWOMANtbl = Nothing
 
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ABORT, "例外発生")
@@ -3382,6 +3394,7 @@ Public Class GRT00005IMPORT
         Dim WW_FileName2 As String = String.Empty
         Dim WW_FILEDATE As String = String.Empty
         Dim WW_JX_OLD_MODE As Boolean = False
+        Dim WW_OLD_MODE As Boolean = False
         Dim WW_SYASAI_PREFIX As String() = Nothing
         '■■■ チェック処理 ■■■
         O_RTN = C_MESSAGE_NO.NORMAL
@@ -3400,206 +3413,220 @@ Public Class GRT00005IMPORT
             WW_SYASAI_PREFIX = New String() {"cosmo_jotsyasai"}
         End If
         For Each WW_PREFIX As String In WW_SYASAI_PREFIX
-            Try
-                WW_JX_OLD_MODE = False
-                '〇ディレクトリの確認
-                If String.IsNullOrEmpty(I_FILEDIR) Then
-                    Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT)
+            WW_JX_OLD_MODE = False
+            '〇ディレクトリの確認
+            If String.IsNullOrEmpty(I_FILEDIR) Then
+                Master.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT)
+                Exit Sub
+            End If
+            Dim WW_Files As String() = System.IO.Directory.GetFiles(I_FILEDIR, WW_PREFIX.ToString & "_*.csv")
+            If WW_Files.Count = 0 Then
+                WW_Files = System.IO.Directory.GetFiles(I_FILEDIR, "*syasai.*")
+                WW_OLD_MODE = True
+            End If
+            For Each tempFile As String In WW_Files
+                If WW_OLD_MODE = False Then
+                    WW_FileName1 = tempFile
+                End If
+
+                'Try
+                'Dim fp As New FileInfo(tempFile)
+                ''Dim tmpDate As String = If(fp.Name.Length > 21, fp.Name.Substring(fp.Name.LastIndexOf(".") - 14, 14), "-")
+                'Dim tmpDate As String = ""
+                'Dim tmp() As String = fp.Name.Split("_")
+                'If fp.Name.Length > 21 Then
+                '    tmpDate = tmp(2)
+                'End If
+                '' ファイルパスからファイル名を取得
+                'If fp.Name.ToLower.StartsWith(WW_PREFIX) AndAlso WW_FILEDATE < tmpDate Then
+                '    WW_FILEDATE = tmpDate
+                '    WW_FileName1 = tempFile
+                'End If
+                'Catch ex As Exception
+                '    O_RTN = C_MESSAGE_NO.SYSTEM_ADM_ERROR
+                '    Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
+                '    CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                    'SUBクラス名
+                '    CS0011LOGWRITE.INFPOSI = "光英 csv read"                       '
+                '    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
+                '    CS0011LOGWRITE.TEXT = ex.ToString
+                '    CS0011LOGWRITE.MESSAGENO = O_RTN
+                '    CS0011LOGWRITE.CS0011LOGWrite()                                 'ログ出力
+                '    Exit Sub
+                'End Try
+                '〇JX対象は旧仕様の読み込みも行う
+                If I_MODE = GRT00005WRKINC.TERM_TYPE.JX AndAlso String.IsNullOrEmpty(WW_FileName1) Then
+                    Try
+                        For Each tempFile2 As String In System.IO.Directory.GetFiles(I_FILEDIR, "*.*")
+                            ' ファイルパスからファイル名を取得
+                            If tempFile2.ToLower Like "*syasai.csv" Then
+                                WW_FileName1 = tempFile2
+                            End If
+                            If tempFile2.ToLower Like "*yotei.csv" Then
+                                WW_FileName2 = tempFile2
+                            End If
+                        Next
+                        WW_JX_OLD_MODE = True
+                    Catch ex As Exception
+                        O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+                        Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
+                        CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                    'SUBクラス名
+                        CS0011LOGWRITE.INFPOSI = "光英 csv read"                       '
+                        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
+                        CS0011LOGWRITE.TEXT = ex.ToString
+                        CS0011LOGWRITE.MESSAGENO = O_RTN
+                        CS0011LOGWRITE.CS0011LOGWrite()                                 'ログ出力
+                        Exit Sub
+                    End Try
+                ElseIf I_MODE = GRT00005WRKINC.TERM_TYPE.JOT AndAlso String.IsNullOrEmpty(WW_FileName1) Then
+                    Try
+                        For Each tempFile2 As String In System.IO.Directory.GetFiles(I_FILEDIR, "*.*")
+                            ' ファイルパスからファイル名を取得
+                            If tempFile2.ToLower Like "*exsyasai.csv" Then
+                                WW_FileName1 = tempFile2
+                            End If
+                        Next
+                        'WW_JX_OLD_MODE = True
+                    Catch ex As Exception
+                        O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+                        Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
+                        CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                    'SUBクラス名
+                        CS0011LOGWRITE.INFPOSI = "光英 csv read"                       '
+                        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
+                        CS0011LOGWRITE.TEXT = ex.ToString
+                        CS0011LOGWRITE.MESSAGENO = O_RTN
+                        CS0011LOGWRITE.CS0011LOGWrite()                                 'ログ出力
+                        Exit Sub
+                    End Try
+                End If
+
+                If String.IsNullOrEmpty(WW_FileName1) Then
+                    O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+                    Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
+                    CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                 'SUBクラス名
+                    CS0011LOGWRITE.INFPOSI = "光英(ENEX) csv read"                    '
+                    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
+                    CS0011LOGWRITE.TEXT = "ファイル名：「" & WW_SYASAI_PREFIX.ToString & "」が必要です"
+                    CS0011LOGWRITE.MESSAGENO = O_RTN
+                    CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
                     Exit Sub
                 End If
-                For Each tempFile As String In System.IO.Directory.GetFiles(I_FILEDIR, WW_PREFIX.ToString & "_*.*")
-                    Dim fp As New FileInfo(tempFile)
-                    Dim tmpDate As String = If(fp.Name.Length > 21, fp.Name.Substring(fp.Name.LastIndexOf(".") - 14, 14), "-")
-                    ' ファイルパスからファイル名を取得
-                    If fp.Name.ToLower.StartsWith(WW_PREFIX) AndAlso WW_FILEDATE < tmpDate Then
-                        WW_FILEDATE = tmpDate
-                        WW_FileName1 = tempFile
-                    End If
-                Next
-            Catch ex As Exception
-                O_RTN = C_MESSAGE_NO.SYSTEM_ADM_ERROR
-                Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
-                CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                    'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "光英 csv read"                       '
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
-                CS0011LOGWRITE.TEXT = ex.ToString
-                CS0011LOGWRITE.MESSAGENO = O_RTN
-                CS0011LOGWRITE.CS0011LOGWrite()                                 'ログ出力
-                Exit Sub
-            End Try
-            '〇JX対象は旧仕様の読み込みも行う
-            If I_MODE = GRT00005WRKINC.TERM_TYPE.JX AndAlso String.IsNullOrEmpty(WW_FileName1) Then
-                Try
-                    For Each tempFile As String In System.IO.Directory.GetFiles(I_FILEDIR, "*.*")
-                        ' ファイルパスからファイル名を取得
-                        If tempFile.ToLower Like "*syasai.csv" Then
-                            WW_FileName1 = tempFile
-                        End If
-                        If tempFile.ToLower Like "*yotei.csv" Then
-                            WW_FileName2 = tempFile
-                        End If
-                    Next
-                    WW_JX_OLD_MODE = True
-                Catch ex As Exception
-                    O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
-                    Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
-                    CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                    'SUBクラス名
-                    CS0011LOGWRITE.INFPOSI = "光英 csv read"                       '
-                    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
-                    CS0011LOGWRITE.TEXT = ex.ToString
-                    CS0011LOGWRITE.MESSAGENO = O_RTN
-                    CS0011LOGWRITE.CS0011LOGWrite()                                 'ログ出力
-                    Exit Sub
-                End Try
-            ElseIf I_MODE = GRT00005WRKINC.TERM_TYPE.JOT AndAlso String.IsNullOrEmpty(WW_FileName1) Then
-                Try
-                    For Each tempFile As String In System.IO.Directory.GetFiles(I_FILEDIR, "*.*")
-                        ' ファイルパスからファイル名を取得
-                        If tempFile.ToLower Like "*exsyasai.csv" Then
-                            WW_FileName1 = tempFile
-                        End If
-                    Next
-                    WW_JX_OLD_MODE = True
-                Catch ex As Exception
-                    O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
-                    Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
-                    CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                    'SUBクラス名
-                    CS0011LOGWRITE.INFPOSI = "光英 csv read"                       '
-                    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
-                    CS0011LOGWRITE.TEXT = ex.ToString
-                    CS0011LOGWRITE.MESSAGENO = O_RTN
-                    CS0011LOGWRITE.CS0011LOGWrite()                                 'ログ出力
-                    Exit Sub
-                End Try
-            End If
+                '-----------------------------------------------
+                '●CSV読み込み（データテーブルに格納）
+                '-----------------------------------------------
+                '車載CSV格納テーブル
+                AddCsvColumn(KSYASAItbl, 53)
 
-            If String.IsNullOrEmpty(WW_FileName1) Then
-                O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
-                Master.Output(O_RTN, C_MESSAGE_TYPE.ERR, "光英 csv read")
-                CS0011LOGWRITE.INFSUBCLASS = "UPLOAD_KOUEI"                 'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "光英(ENEX) csv read"                    '
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
-                CS0011LOGWRITE.TEXT = "ファイル名：「" & WW_SYASAI_PREFIX.ToString & "」が必要です"
-                CS0011LOGWRITE.MESSAGENO = O_RTN
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-                Exit Sub
-            End If
-            '-----------------------------------------------
-            '●CSV読み込み（データテーブルに格納）
-            '-----------------------------------------------
-            '車載CSV格納テーブル
-            AddCsvColumn(KSYASAItbl, 53)
+                '日報DB更新用テーブル
+                T0005COM.AddColumnT0005tbl(T0005INPtbl)
+                AddColumnForT0005WKTbl()
 
-            '日報DB更新用テーブル
-            T0005COM.AddColumnT0005tbl(T0005INPtbl)
-            AddColumnForT0005WKTbl()
-
-            '車載CSV
-            ReadCsvFile(WW_FileName1, KSYASAItbl, WW_ERRCODE)
-            If Not isNormal(WW_ERRCODE) Then
-                O_RTN = WW_ERRCODE
-                Exit Sub
-            End If
-
-            '-----------------------------------------------
-            '■ヘッダ（キー項目）レコード編集（車載CSVより作成）
-            '-----------------------------------------------
-            WW_ERRLIST = New List(Of String)
-            WW_ERRLIST_ALL = New List(Of String)
-            WW_ERRLISTCNT = 0
-
-            CreateT0005tblHeaderForKouei(I_MODE, WW_ERRCODE)
-            If Not isNormal(WW_ERRCODE) Then
-                O_RTN = WW_ERRCODE
-                Exit Sub
-            End If
-
-            '-----------------------------------------------
-            '■明細コード編集（車載CSVより作成）
-            '-----------------------------------------------
-            For Each T0005WKrow As DataRow In T0005WKtbl.Rows
-                CreateT0005tblDetailForKouei(I_MODE, WW_JX_OLD_MODE, T0005WKrow("STROW"), T0005WKrow("ENDROW"), WW_ERRCODE)
+                '車載CSV
+                ReadCsvFile(WW_FileName1, KSYASAItbl, WW_ERRCODE)
                 If Not isNormal(WW_ERRCODE) Then
                     O_RTN = WW_ERRCODE
                     Exit Sub
                 End If
-            Next
 
-            '-----------------------------------------------
-            '■T0005tbl再編集（）
-            '-----------------------------------------------
-            '不要なデータ（作業区分）を除いたため明細行番号の再符番する
-            EditT0005Tbl(WW_ERRCODE)
-            If Not isNormal(WW_ERRCODE) Then
-                O_RTN = WW_ERRCODE
-                Exit Sub
-            End If
+                '-----------------------------------------------
+                '■ヘッダ（キー項目）レコード編集（車載CSVより作成）
+                '-----------------------------------------------
+                WW_ERRLIST = New List(Of String)
+                WW_ERRLIST_ALL = New List(Of String)
+                WW_ERRLISTCNT = 0
 
-            '-----------------------------------------------
-            '■出荷場所、届先ＤＢ編集
-            '-----------------------------------------------
-            EditMC006tbl(I_MODE, WW_JX_OLD_MODE, WW_ERRCODE)
-            If Not isNormal(WW_ERRCODE) Then
-                O_RTN = WW_ERRCODE
-                Exit Sub
-            End If
-
-            '-----------------------------------------------
-            '■項目変換（T0005INPtblより）
-            '-----------------------------------------------
-            ConvT0005tblData(T0005INPtbl, WW_ERRCODE)
-            If Not isNormal(WW_ERRCODE) Then
-                O_RTN = WW_ERRCODE
-                Exit Sub
-            End If
-
-            '-----------------------------------------------
-            '■２マンの再編集（T0005INPtblより）
-            '-----------------------------------------------
-            EditTwoManForKouei(T0005WKtbl, WW_ERRCODE)
-            If Not isNormal(WW_ERRCODE) Then
-                O_RTN = WW_ERRCODE
-                Exit Sub
-            End If
-
-            '-----------------------------------------------
-            '■関連チェック（T0005INPtblより）
-            '-----------------------------------------------
-            For Each T0005INProw As DataRow In T0005INPtbl.Rows
-                If T0005INProw("HDKBN") = "H" Then
-                    Continue For
+                CreateT0005tblHeaderForKouei(I_MODE, WW_ERRCODE)
+                If Not isNormal(WW_ERRCODE) Then
+                    O_RTN = WW_ERRCODE
+                    Exit Sub
                 End If
 
-                CheckT0005INPRow(T0005INProw, WW_ERRCODE)
-            Next
+                '-----------------------------------------------
+                '■明細コード編集（車載CSVより作成）
+                '-----------------------------------------------
+                For Each T0005WKrow As DataRow In T0005WKtbl.Rows
+                    CreateT0005tblDetailForKouei(I_MODE, WW_JX_OLD_MODE, T0005WKrow("STROW"), T0005WKrow("ENDROW"), WW_ERRCODE)
+                    If Not isNormal(WW_ERRCODE) Then
+                        O_RTN = WW_ERRCODE
+                        Exit Sub
+                    End If
+                Next
 
-            '-----------------------------------------------
-            '■表更新
-            '-----------------------------------------------
-            UpdateGridData(WW_ERRCODE)
-            If Not isNormal(WW_ERRCODE) Then
-                O_RTN = WW_ERRCODE
-                Exit Sub
-            End If
-
-            WF_KoueiLoadFile.Items.Add(New ListItem(WW_FileName1))
-
-            '○メッセージ表示
-            If WW_ERRLIST_ALL.Count > 0 Then
-                If WW_ERRLIST_ALL.IndexOf(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR) >= 0 Then
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                ElseIf WW_ERRLIST_ALL.IndexOf(C_MESSAGE_NO.BOX_ERROR_EXIST) >= 0 Then
-                    O_RTN = C_MESSAGE_NO.BOX_ERROR_EXIST
-                Else
-                    O_RTN = C_MESSAGE_NO.WORNING_RECORD_EXIST
+                '-----------------------------------------------
+                '■T0005tbl再編集（）
+                '-----------------------------------------------
+                '不要なデータ（作業区分）を除いたため明細行番号の再符番する
+                EditT0005Tbl(WW_ERRCODE)
+                If Not isNormal(WW_ERRCODE) Then
+                    O_RTN = WW_ERRCODE
+                    Exit Sub
                 End If
-                Exit Sub
-            End If
-            If O_RTN = C_MESSAGE_NO.WORNING_RECORD_EXIST Then
-                Master.Output(O_RTN, C_MESSAGE_TYPE.WAR)
-                Exit Sub
-            End If
+
+                '-----------------------------------------------
+                '■出荷場所、届先ＤＢ編集
+                '-----------------------------------------------
+                EditMC006tbl(I_MODE, WW_JX_OLD_MODE, WW_ERRCODE)
+                If Not isNormal(WW_ERRCODE) Then
+                    O_RTN = WW_ERRCODE
+                    Exit Sub
+                End If
+
+                '-----------------------------------------------
+                '■項目変換（T0005INPtblより）
+                '-----------------------------------------------
+                ConvT0005tblData(T0005INPtbl, WW_ERRCODE)
+                If Not isNormal(WW_ERRCODE) Then
+                    O_RTN = WW_ERRCODE
+                    Exit Sub
+                End If
+
+                '-----------------------------------------------
+                '■２マンの再編集（T0005INPtblより）
+                '-----------------------------------------------
+                EditTwoManForKouei(T0005WKtbl, WW_ERRCODE)
+                If Not isNormal(WW_ERRCODE) Then
+                    O_RTN = WW_ERRCODE
+                    Exit Sub
+                End If
+
+                '-----------------------------------------------
+                '■関連チェック（T0005INPtblより）
+                '-----------------------------------------------
+                For Each T0005INProw As DataRow In T0005INPtbl.Rows
+                    If T0005INProw("HDKBN") = "H" Then
+                        Continue For
+                    End If
+
+                    CheckT0005INPRow(T0005INProw, WW_ERRCODE)
+                Next
+
+                '-----------------------------------------------
+                '■表更新
+                '-----------------------------------------------
+                UpdateGridData(WW_ERRCODE)
+                If Not isNormal(WW_ERRCODE) Then
+                    O_RTN = WW_ERRCODE
+                    Exit Sub
+                End If
+
+                WF_KoueiLoadFile.Items.Add(New ListItem(WW_FileName1))
+            Next
         Next
+
+        '○メッセージ表示
+        If WW_ERRLIST_ALL.Count > 0 Then
+            If WW_ERRLIST_ALL.IndexOf(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR) >= 0 Then
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            ElseIf WW_ERRLIST_ALL.IndexOf(C_MESSAGE_NO.BOX_ERROR_EXIST) >= 0 Then
+                O_RTN = C_MESSAGE_NO.BOX_ERROR_EXIST
+            Else
+                O_RTN = C_MESSAGE_NO.WORNING_RECORD_EXIST
+            End If
+            Exit Sub
+        End If
+        If O_RTN = C_MESSAGE_NO.WORNING_RECORD_EXIST Then
+            Master.Output(O_RTN, C_MESSAGE_TYPE.WAR)
+            Exit Sub
+        End If
 
         If Not isNormal(O_RTN) Then Master.Output(O_RTN, C_MESSAGE_TYPE.ERR)
     End Sub
@@ -3655,7 +3682,7 @@ Public Class GRT00005IMPORT
                     WW_OLD_NIPPONO = KSYASAIrow("FIELD10")
                     Select Case I_MODE
                         Case GRT00005WRKINC.TERM_TYPE.JX, GRT00005WRKINC.TERM_TYPE.TG
-                            I_VALUE = Mid(KSYASAIrow("FIELD6"), 1, KSYASAIrow("FIELD6").length)
+                            I_VALUE = Mid(KSYASAIrow("FIELD6"), 1, 5)
                         Case GRT00005WRKINC.TERM_TYPE.JOT
                             I_VALUE = KSYASAIrow("FIELD6")
                         Case GRT00005WRKINC.TERM_TYPE.COSMO
@@ -3701,7 +3728,7 @@ Public Class GRT00005IMPORT
                 '①必須・項目属性チェック
                 Select Case I_MODE
                     Case GRT00005WRKINC.TERM_TYPE.JX, GRT00005WRKINC.TERM_TYPE.TG
-                        I_VALUE = Mid(KSYASAIrow("FIELD6"), 1, KSYASAIrow("FIELD6").length)
+                        I_VALUE = Mid(KSYASAIrow("FIELD6"), 1, 5)
                     Case GRT00005WRKINC.TERM_TYPE.JOT
                         I_VALUE = KSYASAIrow("FIELD6")
                         'I_VALUE = Mid(KSYASAIrow("FIELD6"), 1, 5)
@@ -4034,7 +4061,7 @@ Public Class GRT00005IMPORT
                 '①必須・項目属性チェック
                 Select Case I_MODE
                     Case GRT00005WRKINC.TERM_TYPE.JX, GRT00005WRKINC.TERM_TYPE.TG
-                        I_VALUE = Mid(KSYASAIrow("FIELD6"), 1, KSYASAIrow("FIELD6").length)
+                        I_VALUE = Mid(KSYASAIrow("FIELD6"), 1, 5)
                     Case GRT00005WRKINC.TERM_TYPE.JOT
                         I_VALUE = KSYASAIrow("FIELD6")
                         'I_VALUE.VALUE = Mid(KSYASAIrow("FIELD6"), 1, 5)
@@ -4586,7 +4613,7 @@ Public Class GRT00005IMPORT
                                     If isNormal(O_MESSAGE_NO) Then
                                         T0005INProw("SHUKABASHO") = O_VALUE.PadLeft(4, "0")
                                     Else
-                                        T0005INProw("SHUKABASHO") = WW_SEL("FIELD35")
+                                        T0005INProw("SHUKABASHO") = WW_SEL.Rows(0)("FIELD35")
                                         OutputErrorMessageByKouei(WW_SEL.Rows(0), "出荷地コード", O_CHECKREPORT, C_MESSAGE_NO.BOX_ERROR_EXIST, I_MODE)
                                     End If
                                 End If
@@ -5127,10 +5154,20 @@ Public Class GRT00005IMPORT
                                     I_VALUE = Mid(KSYASAIrow("FIELD30"), 1, KSYASAIrow("FIELD30").length - 1)
                                 End If
                             Case GRT00005WRKINC.TERM_TYPE.JX, GRT00005WRKINC.TERM_TYPE.TG
-                                If InStr(KSYASAIrow("FIELD30"), ".") = 0 Then
-                                    I_VALUE = Mid(KSYASAIrow("FIELD30"), 1, KSYASAIrow("FIELD30").length)
+                                If I_LEGACY_MODE = True Then
+                                    '旧（１０で割らない）
+                                    If InStr(KSYASAIrow("FIELD30"), ".") = 0 Then
+                                        I_VALUE = Mid(KSYASAIrow("FIELD30"), 1, KSYASAIrow("FIELD30").length)
+                                    Else
+                                        I_VALUE = Mid(KSYASAIrow("FIELD30"), 1, KSYASAIrow("FIELD30").length - 1)
+                                    End If
                                 Else
-                                    I_VALUE = Mid(KSYASAIrow("FIELD30"), 1, KSYASAIrow("FIELD30").length - 1)
+                                    '新（１０で割る）
+                                    If InStr(KSYASAIrow("FIELD30"), ".") = 0 Then
+                                        I_VALUE = (Val(KSYASAIrow("FIELD30")) / 10).ToString("#.00")
+                                    Else
+                                        I_VALUE = Mid(KSYASAIrow("FIELD30"), 1, KSYASAIrow("FIELD30").length - 1)
+                                    End If
                                 End If
                             Case GRT00005WRKINC.TERM_TYPE.COSMO
                                 'TODO
@@ -5615,11 +5652,19 @@ Public Class GRT00005IMPORT
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub Download_Click()
+        Const C_DIR_KOUEI As String = "KOUEI"                    '光英連携ディレクトリ名(LOCAL)
+        Const C_DIR_KOUEI_RESULT As String = "result"            '光英連携日報ディレクトリ名
+        Const C_DIR_KOUEI_SPLIT As String = "sprit"              '光英連携日報分割後ディレクトリ名
+        Const C_KOUEI_RESULT_FILE_SERCH As String = "*_jotsyasai_*.csv"   '光英連携日報ファイルSearchPattern
+
         rightview.SetErrorReport("")
         Dim O_RTN As String = C_MESSAGE_NO.NORMAL
+        Dim sm As New CS0050SESSION
 
         '受信ファイルリスト
         Dim dicFileList As New Dictionary(Of String, List(Of FileInfo))
+        Dim dicFileSplitList As New Dictionary(Of String, List(Of FileInfo))
+        Dim recFileList As New List(Of String)
         '光英ファイルFTP受信
         work.GetKoueiFile(work.WF_SEL_UORG.Text, dicFileList, O_RTN)
         If Not isNormal(O_RTN) Then
@@ -5628,11 +5673,108 @@ Public Class GRT00005IMPORT
         End If
 
         If dicFileList.Count > 0 Then
-            '光英ファイルが存在する場合は取込
+            '光英ファイルを日付、日報番号で分割
             For Each type In dicFileList
-                Dim mode = GRT00005WRKINC.FILE_SUFFIX.Suffix2TermType(type.Key)
-                UPLOAD_KOUEI(mode, type.Value(0).DirectoryName, O_RTN)
+                For i As Integer = 0 To type.Value.Count - 1
+
+                    '①受信ファイル読み込み
+                    Dim dir = New DirectoryInfo(type.Value(0).DirectoryName & "\" & C_DIR_KOUEI_SPLIT)
+                    If dir.Exists Then
+                    Else
+                        '分割ファイル格納フォルダー作成
+                        dir.Create()
+                    End If
+
+                    Dim WW_Text As New FileIO.TextFieldParser(type.Value(i).FullName, System.Text.Encoding.GetEncoding(932))
+                    '②キーブレイク（日付、日報番号）
+                    Dim WW_First As String = "OFF"
+                    Dim OLD_YMD As String = ""
+                    Dim OLD_NIPPONO As String = ""
+                    Dim SAVEstr As New System.Text.StringBuilder()
+                    Dim fileName() As String = type.Value(i).Name.Split(".")
+                    Dim outFileName As String = ""
+
+                    While Not WW_Text.EndOfData
+                        'CSVファイルのフィールドを読み込みます。
+                        Dim recode As String = WW_Text.ReadLine
+                        Dim fields As String() = recode.Split(",")
+                        If WW_First = "OFF" Then
+                            OLD_YMD = fields(3)
+                            OLD_NIPPONO = fields(9)
+                            WW_First = "ON"
+                        End If
+                        If fields(3) <> OLD_YMD OrElse fields(9) <> OLD_NIPPONO Then
+                            '④ファイル名変更（日付、日報番号）
+                            outFileName = dir.FullName & "\" & fileName(0) & "_" & OLD_YMD & "_" & OLD_NIPPONO & "." & fileName(1)
+                            '⑤ファイル出力（日付、日報番号）
+                            Dim SaveF As New System.IO.StreamWriter(outFileName, False, System.Text.Encoding.GetEncoding("unicode"))
+                            SaveF.Write(SAVEstr)
+                            SaveF.Close()
+                            SaveF.Dispose()
+                            SAVEstr.Clear()
+                        End If
+                        '③出力（日付、日報番号）
+                        SAVEstr.Append(recode)
+                        SAVEstr.Append(vbCrLf)
+                        OLD_YMD = fields(3)
+                        OLD_NIPPONO = fields(9)
+                    End While
+
+                    If OLD_YMD <> "" Then
+                        '④ファイル名変更（日付、日報番号）
+                        outFileName = dir.FullName & "\" & fileName(0) & "_" & OLD_YMD & "_" & OLD_NIPPONO & "." & fileName(1)
+                        '⑤ファイル出力（日付、日報番号）
+                        Dim SaveF As New System.IO.StreamWriter(outFileName, False, System.Text.Encoding.GetEncoding("unicode"))
+                        SaveF.Write(SAVEstr)
+                        SaveF.Close()
+                        SaveF.Dispose()
+                    End If
+
+                    'ファイルを解放します。
+                    WW_Text.Close()
+
+                    Dim f = New FileInfo(type.Value(i).FullName)
+                    If f.Exists Then
+                        '光英連携が安定稼働するまでは論理削除
+                        Dim bakFileName As New FileInfo(f.FullName & ".used")
+                        If bakFileName.Exists Then
+                            bakFileName.Delete()
+                        End If
+                        f.MoveTo(bakFileName.FullName)
+                    End If
+                Next
             Next
+        End If
+
+        '分割済みローカル光英ファイル取得
+        Dim koueiPath As String = Path.Combine(sm.UPLOAD_PATH, C_DIR_KOUEI, work.WF_SEL_UORG.Text, C_DIR_KOUEI_RESULT, C_DIR_KOUEI_SPLIT)
+        Dim localDirSprit = New DirectoryInfo(koueiPath)
+        If localDirSprit.Exists Then
+            Dim localFilesSprit = localDirSprit.GetFiles(C_KOUEI_RESULT_FILE_SERCH)
+
+            If localFilesSprit.Count > 0 Then
+
+                For Each file In localFilesSprit
+                    'ファイル名の1項目目はタイプ（区切り文字:"_"）
+                    Dim wk = file.Name.Split("_")
+                    Dim filetype = wk(0)
+                    'タイプ別ファイル一覧作成
+                    If Not dicFileSplitList.ContainsKey(filetype) Then
+                        dicFileSplitList.Add(filetype, New List(Of FileInfo))
+                    End If
+                    dicFileSplitList(filetype).Add(file)
+                Next
+
+                '光英ファイルが存在する場合は取込
+                'For Each type In dicFileSplitList
+                For Each type In dicFileSplitList
+                    Dim mode = GRT00005WRKINC.FILE_SUFFIX.Suffix2TermType(type.Key)
+                    UPLOAD_KOUEI(mode, type.Value(0).DirectoryName, O_RTN)
+                Next
+            Else
+                '○メッセージ表示
+                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.INF, )
+            End If
         Else
             '○メッセージ表示
             Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.INF, )
@@ -5899,6 +6041,8 @@ Public Class GRT00005IMPORT
             WW_T0005DELtbl = Nothing
             WW_T0005SELtbl.Dispose()
             WW_T0005SELtbl = Nothing
+            WW_T0005tbl.Dispose()
+            WW_T0005tbl = Nothing
 
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "CreateT0005Header"                'SUBクラス名
@@ -6154,6 +6298,8 @@ Public Class GRT00005IMPORT
             WW_T0005DELtbl = Nothing
             WW_T0005SELtbl.Dispose()
             WW_T0005SELtbl = Nothing
+            WW_T0005tbl.Dispose()
+            WW_T0005tbl = Nothing
 
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "CreateT0005Header"                'SUBクラス名
@@ -6292,6 +6438,10 @@ Public Class GRT00005IMPORT
 
             WW_KEYtbl.Dispose()
             WW_KEYtbl = Nothing
+            WW_T0005SELtbl.Dispose()
+            WW_T0005SELtbl = Nothing
+            WW_T0005tbl.Dispose()
+            WW_T0005tbl = Nothing
 
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "CreateT0005HeaderDummy"                'SUBクラス名
@@ -6692,6 +6842,7 @@ Public Class GRT00005IMPORT
             WW_TBLview.RowFilter = "HDKBN = 'D'"
             WW_KEYtbl = WW_TBLview.ToTable(True, WW_Cols)
             WW_TBLview.Dispose()
+            WW_TBLview = Nothing
 
             'GridView（日報ＤＢから取得）したデータより更新対象データを抽出
             CS0026TBLSORT.TABLE = T0005tbl
@@ -7493,9 +7644,10 @@ Public Class GRT00005IMPORT
         T0005COM.AddColumnT0005tbl(T0005INPtbl)
 
         '■■■ UPLOAD_XLSデータ取得 ■■■   ☆☆☆ 2015/4/30追加
-        CS0023XLSTBL.MAPID = Master.MAPID
+        'CS0023XLSTBL.MAPID = Master.MAPID
+        CS0023XLSTBL.MAPID = GRT00005WRKINC.MAPID
         CS0023XLSTBL.CAMPCODE = work.WF_SEL_CAMPCODE.Text
-        CS0023XLSTBL.CS0023XLSUPLOAD()
+        CS0023XLSTBL.CS0023XLSUPLOAD(String.Empty, Master.PROF_REPORT)
         If isNormal(CS0023XLSTBL.ERR) Then
             If CS0023XLSTBL.TBLDATA.Rows.Count = 0 Then
                 Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR, "例外発生")
@@ -7863,6 +8015,17 @@ Public Class GRT00005IMPORT
                     Dim WW_PRODUCT As String = T0005INProw(WW_PRODUCTCODE)
                     CodeToName("PRODUCT2", WW_PRODUCT, WW_TEXT, WW_RTN)
                     T0005INProw(WW_PRODUCTNAMES) = WW_TEXT
+                Else
+                    If T0005INProw(WW_OILTYPE) <> "" AndAlso T0005INProw(WW_PRODUCT1) <> "" AndAlso T0005INProw(WW_PRODUCT2) Then
+                        T0005INProw(WW_PRODUCTCODE) = T0005INProw("CAMPCODE") &
+                                                      T0005INProw(WW_OILTYPE) &
+                                                      T0005INProw(WW_PRODUCT1) &
+                                                      T0005INProw(WW_PRODUCT2)
+                        '名称付与
+                        Dim WW_PRODUCT As String = T0005INProw(WW_PRODUCTCODE)
+                        CodeToName("PRODUCT2", WW_PRODUCT, WW_TEXT, WW_RTN)
+                        T0005INProw(WW_PRODUCTNAMES) = WW_TEXT
+                    End If
                 End If
 
                 If WW_COLUMNS.IndexOf(WW_SURYO) < 0 Then
@@ -7988,6 +8151,8 @@ Public Class GRT00005IMPORT
         'キーテーブル作成
         WW_TBLview = New DataView(T0005INPtbl)
         WW_KEYtbl = WW_TBLview.ToTable(True, WW_Cols)
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
 
         WW_T0005tbl = T0005INPtbl.Clone
         'ヘッダレコードが存在する場合、チェックを行う
@@ -8028,6 +8193,8 @@ Public Class GRT00005IMPORT
         'キーテーブル作成
         WW_TBLview = New DataView(T0005INPtbl)
         WW_KEYtbl = WW_TBLview.ToTable(True, WW_Cols)
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
 
         'ヘッダレコード作成
         CreateT0005Header(T0005INPtbl)
@@ -11227,7 +11394,7 @@ Public Class GRT00005IMPORT
 
                 Case "STAFFCODE"
                     '乗務員名
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STAFFCODE, I_VALUE, O_TEXT, O_RTN, work.CreateSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text))
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STAFFCODE, I_VALUE, O_TEXT, O_RTN, work.CreateSTAFFParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_UORG.Text, work.WF_SEL_STYMD.Text, work.WF_SEL_ENDYMD.Text))
 
                 Case "CAMPCODE"
                     '会社名

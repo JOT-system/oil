@@ -58,119 +58,119 @@ Public Class GRT00007ICHIRAN
         L0001tbl = New DataTable
         T0005tbl = New DataTable
 
-        Try
+        'Try
 
-            If IsPostBack Then
+        If IsPostBack Then
 
-                '○ 各ボタン押下処理
-                If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
+            '○ 各ボタン押下処理
+            If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
 
-                    '○ 画面表示データ復元
-                    T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
-                    If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-                        Exit Sub
-                    End If
-
-                    Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonNIPPO"           '日報一括取込ボタン押下
-                            WF_ButtonNIPPO_Click()
-                        Case "WF_ButtonCALC"            '一括残業計算ボタン押下
-                            WF_ButtonCALC_Click()
-                        Case "WF_ButtonSAVE"            '一時保存ボタン押下
-                            WF_ButtonSAVE_Click()
-                        Case "WF_ButtonExtract"         '絞り込みボタン押下
-                            WF_ButtonExtract_Click()
-                        Case "WF_ButtonUPDATE"          'DB更新ボタン押下
-                            WF_ButtonUPDATE_Click()
-                        Case "WF_ButtonCSV"             'ﾀﾞｳﾝﾛｰﾄﾞボタン押下
-                            WF_ButtonPrint_Click("XLSX")
-                        Case "WF_ButtonPrint"           '一覧印刷ボタン押下
-                            WF_ButtonPrint_Click("pdf")
-                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            WF_ButtonFIRST_Click()
-                        Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            WF_ButtonLAST_Click()
-                        Case "WF_ButtonEND"             '終了ボタン押下
-                            WF_ButtonEND_Click()
-                        Case "WF_GridDBclick"           'GridViewダブルクリック
-                            WF_Grid_DBclick()
-                        Case "WF_MouseWheelUp"          'マウスホイール(Up)
-                            WF_GRID_Scrole()
-                        Case "WF_MouseWheelDown"        'マウスホイール(Down)
-                            WF_GRID_Scrole()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
-                            WF_FIELD_DBClick()
-                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
-                            WF_FIELD_Change()
-                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
-                            WF_ButtonSel_Click()
-                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
-                            WF_ButtonCan_Click()
-                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
-                            WF_ButtonSel_Click()
-                        Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
-                            WF_RadioButton_Click()
-                        Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
-                            WF_RIGHTBOX_Change()
-                        Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
-                            WF_FILEUPLOAD()
-                    End Select
-
-                    'スクロール処理
-                    Scrole_SUB()
-
+                '○ 画面表示データ復元
+                T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+                If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+                    Exit Sub
                 End If
-            Else
-                '○ 初期化処理
-                Initialize()
+
+                Select Case WF_ButtonClick.Value
+                    Case "WF_ButtonNIPPO"           '日報一括取込ボタン押下
+                        WF_ButtonNIPPO_Click()
+                    Case "WF_ButtonCALC"            '一括残業計算ボタン押下
+                        WF_ButtonCALC_Click()
+                    Case "WF_ButtonSAVE"            '一時保存ボタン押下
+                        WF_ButtonSAVE_Click()
+                    Case "WF_ButtonExtract"         '絞り込みボタン押下
+                        WF_ButtonExtract_Click()
+                    Case "WF_ButtonUPDATE"          'DB更新ボタン押下
+                        WF_ButtonUPDATE_Click()
+                    Case "WF_ButtonCSV"             'ﾀﾞｳﾝﾛｰﾄﾞボタン押下
+                        WF_ButtonPrint_Click("XLSX")
+                    Case "WF_ButtonPrint"           '一覧印刷ボタン押下
+                        WF_ButtonPrint_Click("pdf")
+                    Case "WF_ButtonFIRST"           '先頭頁ボタン押下
+                        WF_ButtonFIRST_Click()
+                    Case "WF_ButtonLAST"            '最終頁ボタン押下
+                        WF_ButtonLAST_Click()
+                    Case "WF_ButtonEND"             '終了ボタン押下
+                        WF_ButtonEND_Click()
+                    Case "WF_GridDBclick"           'GridViewダブルクリック
+                        WF_Grid_DBclick()
+                    Case "WF_MouseWheelUp"          'マウスホイール(Up)
+                        'WF_GRID_Scrole()
+                    Case "WF_MouseWheelDown"        'マウスホイール(Down)
+                        'WF_GRID_Scrole()
+                    Case "WF_Field_DBClick"         'フィールドダブルクリック
+                        WF_FIELD_DBClick()
+                    Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                        WF_FIELD_Change()
+                    Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                        WF_ButtonSel_Click()
+                    Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                        WF_ButtonCan_Click()
+                    Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                        WF_ButtonSel_Click()
+                    Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
+                        WF_RadioButton_Click()
+                    Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
+                        WF_RIGHTBOX_Change()
+                    Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
+                        WF_FILEUPLOAD()
+                End Select
+
+                'スクロール処理
                 Scrole_SUB()
-            End If
 
-            '○ 画面モード(更新・参照)設定
-            If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
-                WF_MAPpermitcode.Value = "TRUE"
-            Else
-                WF_MAPpermitcode.Value = "FALSE"
             End If
+        Else
+            '○ 初期化処理
+            Initialize()
+            Scrole_SUB()
+        End If
 
-        Finally
-            '○ 格納Table Close
-            If Not IsNothing(T0007tbl) Then
-                T0007tbl.Clear()
-                T0007tbl.Dispose()
-                T0007tbl = Nothing
-            End If
+        '○ 画面モード(更新・参照)設定
+        If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
+            WF_MAPpermitcode.Value = "TRUE"
+        Else
+            WF_MAPpermitcode.Value = "FALSE"
+        End If
 
-            If Not IsNothing(T0007INPtbl) Then
-                T0007INPtbl.Clear()
-                T0007INPtbl.Dispose()
-                T0007INPtbl = Nothing
-            End If
+        'Finally
+        '○ 格納Table Close
+        If Not IsNothing(T0007tbl) Then
+            T0007tbl.Clear()
+            T0007tbl.Dispose()
+            T0007tbl = Nothing
+        End If
 
-            If Not IsNothing(T0007PARMtbl) Then
-                T0007PARMtbl.Clear()
-                T0007PARMtbl.Dispose()
-                T0007PARMtbl = Nothing
-            End If
+        If Not IsNothing(T0007INPtbl) Then
+            T0007INPtbl.Clear()
+            T0007INPtbl.Dispose()
+            T0007INPtbl = Nothing
+        End If
 
-            If Not IsNothing(T0007WKtbl) Then
-                T0007WKtbl.Clear()
-                T0007WKtbl.Dispose()
-                T0007WKtbl = Nothing
-            End If
+        If Not IsNothing(T0007PARMtbl) Then
+            T0007PARMtbl.Clear()
+            T0007PARMtbl.Dispose()
+            T0007PARMtbl = Nothing
+        End If
 
-            If Not IsNothing(S0013tbl) Then
-                S0013tbl.Clear()
-                S0013tbl.Dispose()
-                S0013tbl = Nothing
-            End If
+        If Not IsNothing(T0007WKtbl) Then
+            T0007WKtbl.Clear()
+            T0007WKtbl.Dispose()
+            T0007WKtbl = Nothing
+        End If
 
-            If Not IsNothing(L0001tbl) Then
-                L0001tbl.Clear()
-                L0001tbl.Dispose()
-                L0001tbl = Nothing
-            End If
-        End Try
+        If Not IsNothing(S0013tbl) Then
+            S0013tbl.Clear()
+            S0013tbl.Dispose()
+            S0013tbl = Nothing
+        End If
+
+        If Not IsNothing(L0001tbl) Then
+            L0001tbl.Clear()
+            L0001tbl.Dispose()
+            L0001tbl = Nothing
+        End If
+        'End Try
     End Sub
 
     ''' <summary>
@@ -198,6 +198,7 @@ Public Class GRT00007ICHIRAN
         rightview.MAPVARI = Master.MAPvariant
         rightview.COMPCODE = work.WF_T7SEL_CAMPCODE.Text
         rightview.PROFID = Master.PROF_REPORT
+        rightview.TARGETDATE = work.WF_T7SEL_TAISHOYM.Text & "/01"
         rightview.Initialize(WW_DUMMY)
 
         '○ GridView初期設定
@@ -250,21 +251,30 @@ Public Class GRT00007ICHIRAN
 
                 Dim WW_FILENAME As String = work.WF_T7I_XMLsaveF.Text
                 work.WF_T7I_XMLsaveF.Text = work.WF_T7SEL_XMLsaveTmp.Text
-                WF_GRID_Scrole()
-
+                'WF_GRID_Scrole()
+                '○データリカバリ
+                If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+                    Exit Sub
+                End If
                 work.WF_T7I_XMLsaveF.Text = WW_FILENAME
                 If Not Master.SaveTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
                     Exit Sub
                 End If
             Else
-                '○ 先頭行に合わせる
+                ''○ 先頭行に合わせる
                 WF_GridPosition.Text = "1"
                 GRID_INITset()
             End If
         Else
             '勤怠個別画面から遷移した場合
             WF_GridPosition.Text = work.WF_T7I_GridPosition.Text
-            WF_GRID_Scrole()
+            T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+
+            '○データリカバリ
+            If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+                Exit Sub
+            End If
+            'WF_GRID_Scrole()
         End If
 
         '○ 画面表示データ保存
@@ -276,8 +286,10 @@ Public Class GRT00007ICHIRAN
         '月末日からその月の日数の取得し、画面表示件数（月末調整、合計の２行分プラス）とする
         WW_GridCnt = Val(dt.AddMonths(1).AddDays(-1).ToString("dd")) + 2
         '○ 一覧表示データ編集(性能対策)
+        'Dim TBLview = From a In T0007tbl.AsEnumerable
+        '              Where a.Item("HIDDEN") = 0 And a.Item("LINECNT") >= 1 And a.Item("LINECNT") <= WW_GridCnt
+        '              Order By a.Item("LINECNT")
         Dim TBLview As DataView = New DataView(T0007tbl)
-
         TBLview.RowFilter = "HIDDEN = 0 and LINECNT >= 1 and LINECNT <= " & WW_GridCnt
 
         CS0013ProfView.CAMPCODE = work.WF_T7SEL_CAMPCODE.Text
@@ -285,12 +297,14 @@ Public Class GRT00007ICHIRAN
         CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
+        'CS0013ProfView.SRCDATA = TBLview.CopyToDataTable
         CS0013ProfView.TBLOBJ = pnlListArea
         CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.None
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = False
         'CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.TARGETDATE = work.WF_T7SEL_TAISHOYM.Text & "/01"
         CS0013ProfView.CS0013ProfView()
         If Not isNormal(CS0013ProfView.ERR) Then
             Master.output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
@@ -309,11 +323,11 @@ Public Class GRT00007ICHIRAN
     ''' </summary>
     Protected Sub WF_ButtonSAVE_Click()
 
-        '画面表示を取得
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+        ''画面表示を取得
+        'T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+        'If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+        '    Exit Sub
+        'End If
 
         '一時保存ファイルに出力
         If Not Master.SaveTable(T0007tbl, work.WF_T7SEL_XMLsaveTmp.Text) Then
@@ -484,11 +498,11 @@ Public Class GRT00007ICHIRAN
             Exit Sub
         End If
 
-        '画面表示を取得
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+        ''画面表示を取得
+        'T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+        'If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+        '    Exit Sub
+        'End If
 
         '画面指定の日付（From、To）
         Dim WW_STDATE As String = work.WF_T7SEL_TAISHOYM.Text & "/" & CInt(WF_NIPPO_FROM.Text).ToString("00")
@@ -519,7 +533,14 @@ Public Class GRT00007ICHIRAN
             End If
 
         Next
-        T0007COM.T0007_KintaiCalc(WW_T0007SELtbl, T0007tbl)
+
+        If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+            '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+            T0007COM.T0007_KintaiCalc_OLD(WW_T0007SELtbl, T0007tbl)
+        Else
+            '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+            T0007COM.T0007_KintaiCalc(WW_T0007SELtbl, T0007tbl)
+        End If
 
         For Each WW_T7row As DataRow In WW_T0007SELtbl.Rows
             WW_T7row("TIMSTP") = "0"
@@ -628,7 +649,7 @@ Public Class GRT00007ICHIRAN
         If WW_ERRCODE <> C_MESSAGE_NO.NORMAL Then
             WW_ERR_REPORT = "内部処理エラー" & ControlChars.NewLine & WW_MSG
 
-            rightview.addErrorReport(WW_ERR_REPORT)
+            rightview.AddErrorReport(WW_ERR_REPORT)
 
             CS0011LOGWRITE.INFSUBCLASS = "T0007_DuplCheck"             'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "T0007_DuplCheck"                 '
@@ -637,7 +658,7 @@ Public Class GRT00007ICHIRAN
             CS0011LOGWRITE.MESSAGENO = WW_ERRCODE
             CS0011LOGWRITE.CS0011LOGWrite()                            'ログ出力
 
-            Master.output(WW_ERRCODE, C_MESSAGE_TYPE.ABORT)
+            Master.Output(WW_ERRCODE, C_MESSAGE_TYPE.ABORT)
         End If
     End Sub
 
@@ -652,11 +673,11 @@ Public Class GRT00007ICHIRAN
             Exit Sub
         End If
 
-        '画面表示を取得
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+        ''画面表示を取得
+        'T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+        'If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+        '    Exit Sub
+        'End If
 
         '画面指定の日付（From、To）
         Dim WW_STDATE As String = work.WF_T7SEL_TAISHOYM.Text & "/" & CInt(WF_NIPPO_FROM.Text).ToString("00")
@@ -730,11 +751,10 @@ Public Class GRT00007ICHIRAN
         Next
 
         '日報を勤怠フォーマットに変換し、マージする
-        Dim iT0005view As DataView
-        iT0005view = New DataView(T0005tbl)
-        iT0005view.Sort = "YMD, STAFFCODE, WORKKBN"
-        NIPPOget_T7Format("NEW", WW_T0007tbl, iT0005view)
-
+        Using iT0005view As DataView = New DataView(T0005tbl)
+            iT0005view.Sort = "YMD, STAFFCODE, WORKKBN"
+            NIPPOget_T7Format("NEW", WW_T0007tbl, iT0005view)
+        End Using
         CS0026TblSort.TABLE = WW_T0007tbl
         CS0026TblSort.FILTER = ""
         CS0026TblSort.SORTING = "SELECT, STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME, RECODEKBN, NIPPOLINKCODE"
@@ -801,7 +821,13 @@ Public Class GRT00007ICHIRAN
         CS0026TblSort.SORTING = "SELECT, STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME, RECODEKBN"
         WW_T0007SELtbl = CS0026TblSort.sort()
 
-        T0007COM.T0007_KintaiCalc(WW_T0007SELtbl, T0007tbl)
+        If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+            '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+            T0007COM.T0007_KintaiCalc_OLD(WW_T0007SELtbl, T0007tbl)
+        Else
+            '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+            T0007COM.T0007_KintaiCalc(WW_T0007SELtbl, T0007tbl)
+        End If
 
         For Each WW_T7row As DataRow In WW_T0007SELtbl.Rows
             WW_T7row("TIMSTP") = "0"
@@ -924,6 +950,12 @@ Public Class GRT00007ICHIRAN
 
         WW_T0007SELtbl.Dispose()
         WW_T0007SELtbl = Nothing
+        WW_T0007tbl.Dispose()
+        WW_T0007tbl = Nothing
+        WW_T0007tbl2.Dispose()
+        WW_T0007tbl2 = Nothing
+        T0005tbl.Dispose()
+        T0005tbl = Nothing
 
         If Not Master.SaveTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
             Exit Sub
@@ -939,7 +971,7 @@ Public Class GRT00007ICHIRAN
         If WW_ERRCODE <> C_MESSAGE_NO.NORMAL Then
             WW_ERR_REPORT = "内部処理エラー" & ControlChars.NewLine & WW_MSG
 
-            rightview.addErrorReport(WW_ERR_REPORT)
+            rightview.AddErrorReport(WW_ERR_REPORT)
 
             CS0011LOGWRITE.INFSUBCLASS = "T0007_DuplCheck"             'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "T0007_DuplCheck"                 '
@@ -948,7 +980,7 @@ Public Class GRT00007ICHIRAN
             CS0011LOGWRITE.MESSAGENO = WW_ERRCODE
             CS0011LOGWRITE.CS0011LOGWrite()                            'ログ出力
 
-            Master.output(WW_ERRCODE, C_MESSAGE_TYPE.ABORT)
+            Master.Output(WW_ERRCODE, C_MESSAGE_TYPE.ABORT)
         End If
 
     End Sub
@@ -1422,6 +1454,9 @@ Public Class GRT00007ICHIRAN
             CS0044L1INSERT.SQLCON = SQLcon
             CS0044L1INSERT.CS0044L1Insert(L0001tbl)
 
+            WW_T0007SELtbl.Dispose()
+            WW_T0007SELtbl = Nothing
+
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "WF_ButtonUPDATE_Click"        'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "DB:INSERT L0001_TOKEI"            '
@@ -1480,6 +1515,8 @@ Public Class GRT00007ICHIRAN
         SQLcon.Close()
         SQLcon.Dispose()
         SQLcon = Nothing
+        T0007NIPPOtbl.Dispose()
+        T0007NIPPOtbl = Nothing
 
     End Sub
 
@@ -1493,12 +1530,12 @@ Public Class GRT00007ICHIRAN
             Return
         End If
 
-        'テーブルデータ 復元(TEXTファイルより復元)
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+        ''テーブルデータ 復元(TEXTファイルより復元)
+        'T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
 
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+        'If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+        '    Exit Sub
+        'End If
 
         '〇Excel用追加項目クリア
         For i As Integer = 0 To T0007tbl.Rows.Count - 1
@@ -1575,12 +1612,13 @@ Public Class GRT00007ICHIRAN
         End If
 
         '○ 帳票出力dll Interface
-        CS0030REPORT.CAMPCODE = work.WF_T7SEL_CAMPCODE.Text         '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                    'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                           '画面ID
-        CS0030REPORT.REPORTID = rightview.getReportId()             '帳票ID
-        CS0030REPORT.FILEtyp = iOutType                             '出力ファイル形式
-        CS0030REPORT.TBLDATA = WW_TBL                               'データ参照tabledata
+        CS0030REPORT.CAMPCODE = work.WF_T7SEL_CAMPCODE.Text             '会社コード
+        CS0030REPORT.PROFID = Master.PROF_REPORT                        'プロファイルID
+        CS0030REPORT.MAPID = Master.MAPID                               '画面ID
+        CS0030REPORT.REPORTID = rightview.GetReportId()                 '帳票ID
+        CS0030REPORT.FILEtyp = iOutType                                 '出力ファイル形式
+        CS0030REPORT.TBLDATA = WW_TBL                                   'データ参照tabledata
+        CS0030REPORT.TARGETDATE = work.WF_T7SEL_TAISHOYM.Text & "/01"   '対象日付
         CS0030REPORT.CS0030REPORT()
 
         If CS0030REPORT.ERR = C_MESSAGE_NO.NORMAL Then
@@ -1601,6 +1639,8 @@ Public Class GRT00007ICHIRAN
         WW_TBLview = Nothing
         WW_TBL.Dispose()
         WW_TBL = Nothing
+        cpT0007tbl.Dispose()
+        cpT0007tbl = Nothing
 
     End Sub
 
@@ -1630,45 +1670,45 @@ Public Class GRT00007ICHIRAN
     ' ***  先頭頁ボタン処理                                                      
     Protected Sub WF_ButtonFIRST_Click()
 
-        '○データリカバリ 
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+        ''○データリカバリ 
+        'T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+        'If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+        '    Exit Sub
+        'End If
 
         '先頭頁に移動
         WF_GridPosition.Text = "1"
-        WF_GRID_Scrole()
+        'WF_GRID_Scrole()
 
     End Sub
 
     ' ***  最終頁ボタン処理                                                      
     Protected Sub WF_ButtonLAST_Click()
 
-        '○データリカバリ 
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+        ''○データリカバリ 
+        'T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+        'If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+        '    Exit Sub
+        'End If
 
         '○対象データ件数取得
-        Dim WW_TBLview As DataView
-        WW_TBLview = New DataView(T0007tbl)
-        WW_TBLview.RowFilter = "HIDDEN= '0'"
+        Using WW_TBLview As DataView = New DataView(T0007tbl)
+            WW_TBLview.RowFilter = "HIDDEN= '0'"
 
-        '最終頁に移動
-        '月初日をセット
-        Dim dt As Date = CDate(work.WF_T7SEL_TAISHOYM.Text & "/01")
-        '月末日からその月の日数の取得し、画面表示件数（月末調整、合計の２行分プラス）とする
-        WW_GridCnt = Val(dt.AddMonths(1).AddDays(-1).ToString("dd")) + 2
+            '最終頁に移動
+            '月初日をセット
+            Dim dt As Date = CDate(work.WF_T7SEL_TAISHOYM.Text & "/01")
+            '月末日からその月の日数の取得し、画面表示件数（月末調整、合計の２行分プラス）とする
+            WW_GridCnt = Val(dt.AddMonths(1).AddDays(-1).ToString("dd")) + 2
 
-        If WW_TBLview.Count Mod WW_GridCnt = 0 Then
-            WF_GridPosition.Text = WW_TBLview.Count - WW_GridCnt + 1
-        Else
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod WW_GridCnt) + 1
-        End If
+            If WW_TBLview.Count Mod WW_GridCnt = 0 Then
+                WF_GridPosition.Text = WW_TBLview.Count - WW_GridCnt + 1
+            Else
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod WW_GridCnt) + 1
+            End If
+        End Using
 
-        WF_GRID_Scrole()
+        'WF_GRID_Scrole()
 
     End Sub
 
@@ -1769,12 +1809,12 @@ Public Class GRT00007ICHIRAN
 
         Dim WW_LINECNT As Integer
 
-        '○処理準備
-        'テーブルデータ 復元(TEXTファイルより復元)
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+        ''○処理準備
+        ''テーブルデータ 復元(TEXTファイルより復元)
+        'T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+        'If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+        '    Exit Sub
+        'End If
 
         'LINECNT
         Try
@@ -2077,6 +2117,8 @@ Public Class GRT00007ICHIRAN
             bc.DestinationTableName = "#MBtemp"
             bc.WriteToServer(WW_MBtbl)
 
+            WW_MBtbl.Dispose()
+            WW_MBtbl = Nothing
             SQLcmd2.Dispose()
             SQLcmd2 = Nothing
             bc.Close()
@@ -2414,17 +2456,17 @@ Public Class GRT00007ICHIRAN
                & "   and   MB2.STYMD       <= CAL.WORKINGYMD " _
                & "   and   MB2.ENDYMD      >= CAL.WORKINGYMD " _
                & "   and   MB2.DELFLG      <> '1' " _
-               & " LEFT JOIN MB002_STAFFORG MB3 " _
-               & "   ON    MB3.CAMPCODE     = @CAMPCODE " _
-               & "   and   MB3.STAFFCODE    = MB2.STAFFCODE " _
-               & "   and   MB3.SORG         = MB2.HORG " _
-               & "   and   MB3.DELFLG      <> '1' " _
                & " LEFT JOIN T0007_KINTAI A " _
                & "   ON    A.CAMPCODE     = @CAMPCODE " _
                & "   and   A.WORKDATE     = CAL.WORKINGYMD " _
                & "   and   A.STAFFCODE    = MB.STAFFCODE " _
                & "   and   A.RECODEKBN    = CAL.RECODEKBN " _
                & "   and   A.DELFLG      <> '1' " _
+               & " LEFT JOIN MB002_STAFFORG MB3 " _
+               & "   ON    MB3.CAMPCODE     = @CAMPCODE " _
+               & "   and   MB3.STAFFCODE    = A.STAFFCODE " _
+               & "   and   MB3.SORG         = @SEL_HORG " _
+               & "   and   MB3.DELFLG      <> '1' " _
                & " LEFT JOIN M0001_CAMP M1 " _
                & "   ON    M1.CAMPCODE    = @CAMPCODE " _
                & "   and   M1.STYMD      <= @NOW " _
@@ -2548,7 +2590,8 @@ Public Class GRT00007ICHIRAN
             End If
 
             If WW_SORT = "" Then
-                WW_SORT = "ORDER BY HORG, STAFFCODE, WORKDATE, STDATE, STTIME, ENDDATE, ENDTIME, HDKBN DESC"
+                'WW_SORT = "ORDER BY HORG, STAFFCODE, WORKDATE, STDATE, STTIME, ENDDATE, ENDTIME, HDKBN DESC"
+                WW_SORT = "ORDER BY ORGSEQ, STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME"
             End If
 
             SQLStr = SQLStr & SQLWhere & WW_SORT
@@ -2557,6 +2600,7 @@ Public Class GRT00007ICHIRAN
             Dim P_TAISHOYM As SqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", System.Data.SqlDbType.NVarChar)
             Dim P_NOW As SqlParameter = SQLcmd.Parameters.Add("@NOW", System.Data.SqlDbType.Date)
             Dim P_YMD01 As SqlParameter = SQLcmd.Parameters.Add("@YMD01", System.Data.SqlDbType.NVarChar)
+            Dim P_HORG As SqlParameter = SQLcmd.Parameters.Add("@SEL_HORG", System.Data.SqlDbType.NVarChar)
             Dim P_SEL_STYMD As SqlParameter = SQLcmd.Parameters.Add("@SEL_STYMD", System.Data.SqlDbType.Date)
             Dim P_SEL_ENDYMD As SqlParameter = SQLcmd.Parameters.Add("@SEL_ENDYMD", System.Data.SqlDbType.Date)
 
@@ -2573,6 +2617,7 @@ Public Class GRT00007ICHIRAN
                 wDATE = Date.Now
             End Try
             P_SEL_ENDYMD.Value = work.WF_T7SEL_TAISHOYM.Text & "/" & DateTime.DaysInMonth(wDATE.Year, wDATE.Month).ToString("00")
+            P_HORG.Value = work.WF_T7SEL_HORG.Text
 
             SQLcmd.CommandTimeout = 300
             Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -2588,6 +2633,7 @@ Public Class GRT00007ICHIRAN
             P_TAISHOYM = SQLcmd.Parameters.Add("@TAISHOYM", System.Data.SqlDbType.NVarChar)
             P_NOW = SQLcmd.Parameters.Add("@NOW", System.Data.SqlDbType.Date)
             P_YMD01 = SQLcmd.Parameters.Add("@YMD01", System.Data.SqlDbType.NVarChar)
+            P_HORG = SQLcmd.Parameters.Add("@SEL_HORG", System.Data.SqlDbType.NVarChar)
             P_SEL_STYMD = SQLcmd.Parameters.Add("@SEL_STYMD", System.Data.SqlDbType.Date)
             P_SEL_ENDYMD = SQLcmd.Parameters.Add("@SEL_ENDYMD", System.Data.SqlDbType.Date)
 
@@ -2605,6 +2651,7 @@ Public Class GRT00007ICHIRAN
                 wDATE = Date.Now
             End Try
             P_SEL_ENDYMD.Value = wDATE.ToString("yyyy/MM") & "/" & DateTime.DaysInMonth(wDATE.Year, wDATE.Month).ToString("00")
+            P_HORG.Value = work.WF_T7SEL_HORG.Text
 
             SQLcmd.CommandTimeout = 300
             SQLdr = SQLcmd.ExecuteReader()
@@ -2619,7 +2666,7 @@ Public Class GRT00007ICHIRAN
             Dim WW_SEL As String = "HDKBN = 'H' and RECODEKBN = '0'"
             CS0026TblSort.TABLE = T0007BEFtbl
             CS0026TblSort.FILTER = WW_SEL
-            CS0026TblSort.SORTING = "STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME"
+            CS0026TblSort.SORTING = "ORGSEQ, STAFFCODE, WORKDATE, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME"
             T0007BEFtbl = CS0026TblSort.sort()
 
             '**********************************************************
@@ -2630,6 +2677,7 @@ Public Class GRT00007ICHIRAN
             P_TAISHOYM = SQLcmd.Parameters.Add("@TAISHOYM", System.Data.SqlDbType.NVarChar)
             P_NOW = SQLcmd.Parameters.Add("@NOW", System.Data.SqlDbType.Date)
             P_YMD01 = SQLcmd.Parameters.Add("@YMD01", System.Data.SqlDbType.NVarChar)
+            P_HORG = SQLcmd.Parameters.Add("@SEL_HORG", System.Data.SqlDbType.NVarChar)
             P_SEL_STYMD = SQLcmd.Parameters.Add("@SEL_STYMD", System.Data.SqlDbType.Date)
             P_SEL_ENDYMD = SQLcmd.Parameters.Add("@SEL_ENDYMD", System.Data.SqlDbType.Date)
 
@@ -2647,6 +2695,7 @@ Public Class GRT00007ICHIRAN
                 wDATE = Date.Now
             End Try
             P_SEL_ENDYMD.Value = dtAft.AddMonths(1).ToString("yyyy/MM/dd")
+            P_HORG.Value = work.WF_T7SEL_HORG.Text
 
             SQLcmd.CommandTimeout = 300
             SQLdr = SQLcmd.ExecuteReader()
@@ -2917,8 +2966,16 @@ Public Class GRT00007ICHIRAN
 
         T0007tbl.Merge(WW_T0007tbl2)
 
+        WW_T0007tbl.Dispose()
+        WW_T0007tbl = Nothing
+        WW_T0007tbl2.Dispose()
+        WW_T0007tbl2 = Nothing
+        WW_T0007SELtbl.Dispose()
+        WW_T0007SELtbl = Nothing
         T0005WKtbl.Dispose()
         T0005WKtbl = Nothing
+        iT0005view.Dispose()
+        iT0005view = Nothing
         '--------------------------------------------
         '合計明細レコードの作成
         '--------------------------------------------
@@ -2993,7 +3050,7 @@ Public Class GRT00007ICHIRAN
         End If
 
         '絞込みボタン処理（GridViewの表示）を行う
-        Scrole_SUB()
+        'Scrole_SUB()
 
         '重複チェック
         Dim WW_MSG As String = ""
@@ -3081,16 +3138,16 @@ Public Class GRT00007ICHIRAN
     End Sub
 
     ' ***  GridView マウスホイール時処理 (GridViewスクロール)
-    Protected Sub WF_GRID_Scrole()
+    'Protected Sub WF_GRID_Scrole()
 
-        T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
+    '    T0007COM.T0007tbl_ColumnsAdd(T0007tbl)
 
-        '○データリカバリ
-        If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
-            Exit Sub
-        End If
+    '    '○データリカバリ
+    '    If Not Master.RecoverTable(T0007tbl, work.WF_T7I_XMLsaveF.Text) Then
+    '        Exit Sub
+    '    End If
 
-    End Sub
+    'End Sub
 
     ' ***  GridView スクロールSUB
     Protected Sub Scrole_SUB()
@@ -3116,24 +3173,22 @@ Public Class GRT00007ICHIRAN
         Next
 
         '○表示Linecnt取得
-        If WF_GridPosition.Text = "" Then
+        If WF_GridPosition.Text = String.Empty Then
             WW_GridPosition = 1
         Else
-            Try
-                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
-            Catch ex As Exception
+            If Not Integer.TryParse(WF_GridPosition.Text, WW_GridPosition) Then
                 WW_GridPosition = 1
-            End Try
+            End If
         End If
 
         '○表示格納位置決定
 
-        '表示開始_格納位置決定(次頁スクロール)
         '月初日をセット
         Dim dt As Date = CDate(work.WF_T7SEL_TAISHOYM.Text & "/01")
         '月末日からその月の日数の取得し、画面表示件数（月末調整、合計の２行分プラス）とする
         WW_GridCnt = Val(dt.AddMonths(1).AddDays(-1).ToString("dd")) + 2
 
+        '表示開始_格納位置決定(次頁スクロール)
         If WF_ButtonClick.Value = "WF_MouseWheelUp" Then
             If (WW_GridPosition + WW_GridCnt) <= WW_DataCNT Then
                 WW_GridPosition = WW_GridPosition + WW_GridCnt
@@ -3155,6 +3210,9 @@ Public Class GRT00007ICHIRAN
         'ソート
         WW_TBLview.Sort = "LINECNT"
         WW_TBLview.RowFilter = "HIDDEN = 0 and EXTRACTCNT >= " & WW_GridPosition.ToString & " and EXTRACTCNT <= " & (WW_GridPosition + WW_GridCnt - 1).ToString
+        'Dim TBLview = From a In T0007tbl.AsEnumerable
+        '              Where a.Item("HIDDEN") = 0 And a.Item("EXTRACTCNT") >= WW_GridPosition And a.Item("EXTRACTCNT") <= (WW_GridPosition + WW_GridCnt - 1)
+        '              Order By a.Item("LINECNT")
 
         '○ 一覧作成
         CS0013ProfView.CAMPCODE = work.WF_T7SEL_CAMPCODE.Text
@@ -3162,12 +3220,14 @@ Public Class GRT00007ICHIRAN
         CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = WW_TBLview.ToTable
+        'CS0013ProfView.SRCDATA = TBLview.CopyToDataTable
         CS0013ProfView.TBLOBJ = pnlListArea
         CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.None
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = False
         'CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.TARGETDATE = work.WF_T7SEL_TAISHOYM.Text & "/01"
         CS0013ProfView.CS0013ProfView()
 
         '○クリア
@@ -3182,6 +3242,7 @@ Public Class GRT00007ICHIRAN
 
         WW_TBLview.Dispose()
         WW_TBLview = Nothing
+        'TBLview = Nothing
 
     End Sub
 
@@ -3330,6 +3391,8 @@ Public Class GRT00007ICHIRAN
             '更新元（削除）データの戻し
             ioTbl.Merge(WW_T0007DELtbl)
 
+            WW_T0007tbl.Dispose()
+            WW_T0007tbl = Nothing
             WW_T0007HEADtbl.Dispose()
             WW_T0007HEADtbl = Nothing
             WW_T0007DTLtbl.Dispose()
@@ -3342,6 +3405,10 @@ Public Class GRT00007ICHIRAN
             iT0007DTLview = Nothing
             iT0005view.Dispose()
             iT0005view = Nothing
+            WW_WKDTLtbl.Dispose()
+            WW_WKDTLtbl = Nothing
+            wT0007tbl.Dispose()
+            wT0007tbl = Nothing
 
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "T0007_TTLEdit"                'SUBクラス名
@@ -4923,7 +4990,7 @@ Public Class GRT00007ICHIRAN
         '○UPLOAD_XLSデータ取得
         CS0023XLSUPLOAD.CAMPCODE = work.WF_T7SEL_CAMPCODE.Text      '会社コード
         CS0023XLSUPLOAD.MAPID = Master.MAPID                        '画面ID
-        CS0023XLSUPLOAD.CS0023XLSUPLOAD()
+        CS0023XLSUPLOAD.CS0023XLSUPLOAD(String.Empty, Master.PROF_REPORT)
         If CS0023XLSUPLOAD.ERR = C_MESSAGE_NO.NORMAL Then
             If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
                 Master.output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR)
@@ -5793,7 +5860,13 @@ Public Class GRT00007ICHIRAN
 
             WW_T0007AFTtbl.Merge(T0007INPtbl)
 
-            T0007COM.T0007_KintaiCalc(T0007INPtbl, WW_T0007AFTtbl)
+            If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+                '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                T0007COM.T0007_KintaiCalc_OLD(T0007INPtbl, WW_T0007AFTtbl)
+            Else
+                '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                T0007COM.T0007_KintaiCalc(T0007INPtbl, WW_T0007AFTtbl)
+            End If
 
             WW_T0007AFTtbl.Dispose()
             WW_T0007AFTtbl = Nothing
@@ -6562,7 +6635,12 @@ Public Class GRT00007ICHIRAN
         WW_T0007DTLtbl = Nothing
         WW_T0007tbl.Dispose()
         WW_T0007tbl = Nothing
-
+        wT0007tbl.Dispose()
+        wT0007tbl = Nothing
+        iT0005view.Dispose()
+        iT0005view = Nothing
+        T0005tbl.Dispose()
+        T0005tbl = Nothing
     End Sub
 
     ' ***  ヘッダレコード編集
@@ -6908,11 +6986,14 @@ Public Class GRT00007ICHIRAN
 
         WW_T0007HEADtbl.Dispose()
         WW_T0007HEADtbl = Nothing
+        WW_T0007HEADtbl2.Dispose()
+        WW_T0007HEADtbl2 = Nothing
+        WW_T0007HEADtbl3.Dispose()
+        WW_T0007HEADtbl3 = Nothing
         WW_T0007DTLtbl.Dispose()
         WW_T0007DTLtbl = Nothing
         WW_T0007DELtbl.Dispose()
         WW_T0007DELtbl = Nothing
-
         iT0007view.Dispose()
         iT0007view = Nothing
     End Sub
@@ -6970,6 +7051,8 @@ Public Class GRT00007ICHIRAN
             End If
         Next
 
+        WW_HEADtbl.Dispose()
+        WW_HEADtbl = Nothing
         WW_TTLDTLtbl.Dispose()
         WW_TTLDTLtbl = Nothing
         TTLDTLview.Dispose()
@@ -9421,6 +9504,8 @@ Public Class GRT00007ICHIRAN
             bc.DestinationTableName = "#MBtemp"
             bc.WriteToServer(WW_MBtbl)
 
+            WW_MBtbl.Dispose()
+            WW_MBtbl = Nothing
             SQLcmd2.Dispose()
             SQLcmd2 = Nothing
             bc.Close()
@@ -9900,7 +9985,7 @@ Public Class GRT00007ICHIRAN
             T0007row("TIMSTP") = "0"
             T0007row("SELECT") = "1"
             T0007row("HIDDEN") = "1"
-            T0007row("EXTRACTCNT") = ""
+            T0007row("EXTRACTCNT") = 0
             If iKBN = "OLD" Then
                 T0007row("STATUS") = ""
             Else
@@ -10329,7 +10414,7 @@ Public Class GRT00007ICHIRAN
             T0007INProw("SELECT") = 1
             T0007INProw("HIDDEN") = 0
 
-            T0007INProw("EXTRACTCNT") = "0"
+            T0007INProw("EXTRACTCNT") = 0
 
             T0007INProw("HDKBN") = "H"
             If iTTLFLG = "月合計" Then

@@ -45,5 +45,6 @@
                 <asp:HiddenField ID="RF_MAPID_MEMO" runat="server" />
                 <asp:HiddenField ID="RF_PROFID" runat="server" />
                 <asp:HiddenField ID="RF_MAPVARI" runat="server" />
+                <asp:HiddenField ID="RF_TARGETDATE" runat="server" />
             </div>
         </div>

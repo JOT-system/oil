@@ -180,7 +180,9 @@ Public Class GRIS0001Title
             CS0015TITLEcamp.List = complist
             CS0015TITLEcamp.CS0015TITLEcamp()
             If CS0015TITLEcamp.ERR = C_MESSAGE_NO.NORMAL Then
-                WF_TITLECAMP.Text = complist.SelectedItem.Text
+                If complist.SelectedIndex >= 0 Then
+                    WF_TITLECAMP.Text = complist.SelectedItem.Text
+                End If
             Else
                 O_RTN = GS0001CAMPget.ERR
                 Exit Sub

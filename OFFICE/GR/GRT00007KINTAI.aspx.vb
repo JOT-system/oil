@@ -57,9 +57,9 @@ Public Class GRT00007KINTAI
         T0007INPtbl = New DataTable
         S0013tbl = New DataTable
 
-        Try
+        'Try
 
-            If IsPostBack Then
+        If IsPostBack Then
 
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
@@ -99,6 +99,9 @@ Public Class GRT00007KINTAI
                             WF_FIELD_Change()
                         Case "WF_DTABChange"                'DetailTab切替処理
                             WF_Detail_TABChange()
+                        Case "WF_EXCEL_UPLOAD"
+                            Master.Output(C_MESSAGE_NO.FILE_UPLOAD_ERROR, C_MESSAGE_TYPE.ERR)
+
                     End Select
 
                     'スクロール処理
@@ -118,9 +121,9 @@ Public Class GRT00007KINTAI
                 WF_MAPpermitcode.Value = "FALSE"
             End If
 
-        Finally
-            '○ 格納Table Close
-            If Not IsNothing(T0007tbl) Then
+        'Finally
+        '○ 格納Table Close
+        If Not IsNothing(T0007tbl) Then
                 T0007tbl.Clear()
                 T0007tbl.Dispose()
                 T0007tbl = Nothing
@@ -150,7 +153,7 @@ Public Class GRT00007KINTAI
                 S0013tbl = Nothing
             End If
 
-        End Try
+        'End Try
     End Sub
 
     ''' <summary>
@@ -250,6 +253,7 @@ Public Class GRT00007KINTAI
         'CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = False
         CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.TARGETDATE = work.WF_T7SEL_TAISHOYM.Text & "/01"
         CS0013ProfView.CS0013ProfView()
         If Not isNormal(CS0013ProfView.ERR) Then
             Master.output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
@@ -341,12 +345,18 @@ Public Class GRT00007KINTAI
             '----------------------------------------------
             '残業計算
             '----------------------------------------------
-            T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+                '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                T0007COM.T0007_KintaiCalc_OLD(T0007INPtbl, T0007tbl, hydFlg)
+            Else
+                '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            End If
 
         End If
 
             'スクロール処理
-            CS0026TblSort.TABLE = T0007INPtbl
+        CS0026TblSort.TABLE = T0007INPtbl
         CS0026TblSort.FILTER = ""
         CS0026TblSort.SORTING = "STAFFCODE, WORKDATE, STDATE, STTIME, ENDDATE, ENDTIME, WORKKBN"
         T0007INPtbl = CS0026TblSort.sort()
@@ -1597,7 +1607,13 @@ Public Class GRT00007KINTAI
             '----------------------------------------------
             '残業計算
             '----------------------------------------------
-            T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+                '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                T0007COM.T0007_KintaiCalc_OLD(T0007INPtbl, T0007tbl, hydFlg)
+            Else
+                '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            End If
 
         End If
 
@@ -1675,7 +1691,13 @@ Public Class GRT00007KINTAI
             '----------------------------------------------
             '残業計算
             '----------------------------------------------
-            T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+                '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                T0007COM.T0007_KintaiCalc_OLD(T0007INPtbl, T0007tbl, hydFlg)
+            Else
+                '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            End If
 
         End If
 
@@ -1762,7 +1784,13 @@ Public Class GRT00007KINTAI
             '----------------------------------------------
             '残業計算
             '----------------------------------------------
-            T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+                '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+                T0007COM.T0007_KintaiCalc_OLD(T0007INPtbl, T0007tbl, hydFlg)
+            Else
+                '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+                T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl, hydFlg)
+            End If
 
         End If
 
@@ -1880,7 +1908,13 @@ Public Class GRT00007KINTAI
         '----------------------------------------------
         '残業計算
         '----------------------------------------------
-        T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl)
+        If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+            '～2019年9月は、早出補填手当を計算しない（拘束開始が5:00以前は5:00とする）
+            T0007COM.T0007_KintaiCalc_OLD(T0007INPtbl, T0007tbl)
+        Else
+            '2019年10月～は、早出補填手当を計算する（出社時間＝拘束開始とする）
+            T0007COM.T0007_KintaiCalc(T0007INPtbl, T0007tbl)
+        End If
 
         '名称設定
         For Each WW_T0007row As DataRow In T0007INPtbl.Rows
@@ -1920,7 +1954,10 @@ Public Class GRT00007KINTAI
             Exit Sub
         End If
 
-        Master.output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+
+        T0005tbl.Dispose()
+        T0005tbl = Nothing
 
     End Sub
 
@@ -2458,6 +2495,14 @@ Public Class GRT00007KINTAI
             '編集
             NIPPO_EDIT(ioT7tbl, T0005tbl)
         Next
+        iT0005view.Dispose()
+        iT0005view = Nothing
+        WW_T0007DELtbl.Dispose()
+        WW_T0007DELtbl = Nothing
+        WW_T0007HEADtbl.Dispose()
+        WW_T0007HEADtbl = Nothing
+        WW_T0007DTLtbl.Dispose()
+        WW_T0007DTLtbl = Nothing
 
     End Sub
 
@@ -2465,15 +2510,17 @@ Public Class GRT00007KINTAI
     Private Sub NIPPOget_T7Format2(ByRef ioT7tbl As DataTable, ByVal iT5tbl As DataTable, ByVal iT7row As DataRow)
 
         'T5準備
-        Dim iT0005view As DataView
-        iT0005view = New DataView(iT5tbl)
-        iT0005view.Sort = "YMD, STAFFCODE"
+        Using iT0005view As DataView = New DataView(iT5tbl)
+            iT0005view.Sort = "YMD, STAFFCODE"
 
-        iT0005view.RowFilter = "YMD = #" & iT7row("WORKDATE") & "# and STAFFCODE ='" & iT7row("STAFFCODE") & "'"
-        Dim T0005tbl As DataTable = iT0005view.ToTable()
+            iT0005view.RowFilter = "YMD = #" & iT7row("WORKDATE") & "# and STAFFCODE ='" & iT7row("STAFFCODE") & "'"
+            Dim T0005tbl As DataTable = iT0005view.ToTable()
 
-        '編集
-        NIPPO_EDIT(ioT7tbl, T0005tbl)
+            '編集
+            NIPPO_EDIT(ioT7tbl, T0005tbl)
+            T0005tbl.Dispose()
+            T0005tbl = Nothing
+        End Using
 
     End Sub
 
@@ -2492,7 +2539,7 @@ Public Class GRT00007KINTAI
             T0007row("TIMSTP") = "0"
             T0007row("SELECT") = "1"
             T0007row("HIDDEN") = "1"
-            T0007row("EXTRACTCNT") = ""
+            T0007row("EXTRACTCNT") = "0"
 
             T0007row("STATUS") = "日報取込"
             T0007row("CAMPCODE") = T5row("CAMPCODE")
@@ -3939,7 +3986,12 @@ Public Class GRT00007KINTAI
         WW_T0007DTLtbl = Nothing
         WW_T0007tbl.Dispose()
         WW_T0007tbl = Nothing
-
+        iT0005view.Dispose()
+        iT0005view = Nothing
+        iT0007view.Dispose()
+        iT0007view = Nothing
+        wT0007tbl.Dispose()
+        wT0007tbl = Nothing
     End Sub
 
     ' ***  ヘッダレコード編集
@@ -4017,6 +4069,11 @@ Public Class GRT00007KINTAI
                 End If
                 WW_MATCH = "ON"
             Next
+            iT0007view.Dispose()
+            iT0007view = Nothing
+            wT0007tbl.Dispose()
+            wT0007tbl = Nothing
+
             If WW_MATCH = "ON" Then
                 WW_HEADrow("BREAKTIME") = T0007COM.formatHHMM(WW_BREAKTIME)
                 WW_HEADrow("BREAKTIMETTL") = T0007COM.formatHHMM(WW_BREAKTIME)
@@ -4108,7 +4165,10 @@ Public Class GRT00007KINTAI
         WW_T0007DTLtbl = Nothing
         WW_T0007DELtbl.Dispose()
         WW_T0007DELtbl = Nothing
-
+        iT0005view.Dispose()
+        iT0005view = Nothing
+        T0005tbl.Dispose()
+        T0005tbl = Nothing
     End Sub
 
 
@@ -4625,11 +4685,14 @@ Public Class GRT00007KINTAI
         'CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = False
         CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.TARGETDATE = work.WF_T7SEL_TAISHOYM.Text & "/01"
         CS0013ProfView.CS0013ProfView()
 
         '○クリア
         WF_GridPosition.Text = "1"
 
+        T0007tblGrid.Dispose()
+        T0007tblGrid = Nothing
         WW_TBLview.Dispose()
         WW_TBLview = Nothing
 
@@ -4903,7 +4966,9 @@ Public Class GRT00007KINTAI
                         WW_ERR_MES = WW_ERR_MES & ControlChars.NewLine & "  --> " & " ５分単位で入力してください。(" & WF_STTIME.Text & ") ,"
                         ERRMSG_write(WW_ERR_MES, WW_LINEerr, C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR)
                     End If
-                    WF_BINDSTDATE.Text = WF_STTIME.Text
+                    If work.WF_T7SEL_TAISHOYM.Text > "2019/09" Then
+                        WF_BINDSTDATE.Text = WF_STTIME.Text
+                    End If
                 Else
                     'エラーレポート編集
                     Dim WW_ERR_MES As String = ""
@@ -6690,7 +6755,7 @@ Public Class GRT00007KINTAI
                & "       '0' as [SELECT] , " _
                & "       '1' as HIDDEN , " _
                & "       '' as ORDERUMU , " _
-               & "       '0' as EXTRACTCNT , " _
+               & "       0 as EXTRACTCNT , " _
                & "       '' as CTRL , " _
                & "       '' as TWOMANTRIP , " _
                & "       isnull(rtrim(A.CAMPCODE),'')  as CAMPCODE, " _
@@ -7529,6 +7594,12 @@ Public Class GRT00007KINTAI
             WW_KEYtbl = Nothing
             WW_TBLview.Dispose()
             WW_TBLview = Nothing
+            WW_T0005DELtbl.Dispose()
+            WW_T0005DELtbl = Nothing
+            WW_T0005SELtbl.Dispose()
+            WW_T0005SELtbl = Nothing
+            WW_T0005tbl.Dispose()
+            WW_T0005tbl = Nothing
 
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "T0005_CreHead"                'SUBクラス名
@@ -7613,6 +7684,19 @@ Public Class GRT00007KINTAI
             Else
                 WF_NIPPObtn.Value = "FALSE"
             End If
+        End If
+
+        '～2019年9月は、早出補填手当を表示しない
+        If work.WF_T7SEL_TAISHOYM.Text <= "2019/09" Then
+            WF_HAYADETIME_LABEL.Visible = False
+            WF_HAYADETIME.Visible = False
+            WF_HAYADETIMETTL_LABEL.Visible = False
+            WF_HAYADETIMETTL.Visible = False
+        Else
+            WF_HAYADETIME_LABEL.Visible = True
+            WF_HAYADETIME.Visible = True
+            WF_HAYADETIMETTL_LABEL.Visible = True
+            WF_HAYADETIMETTL.Visible = True
         End If
 
         '○Grid情報保存先のファイル名

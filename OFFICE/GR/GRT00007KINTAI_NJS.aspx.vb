@@ -109,6 +109,9 @@ Public Class GRT00007KINTAI_NJS
                             WF_FIELD_Change()
                         Case "WF_DTABChange"                'DetailTab切替処理
                             WF_Detail_TABChange()
+                        Case "WF_EXCEL_UPLOAD"
+                            Master.Output(C_MESSAGE_NO.FILE_UPLOAD_ERROR, C_MESSAGE_TYPE.ERR)
+
                     End Select
 
                     'スクロール処理
@@ -1870,6 +1873,9 @@ Public Class GRT00007KINTAI_NJS
 
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
+        T0005tbl.Dispose()
+        T0005tbl = Nothing
+
     End Sub
 
     ''' <summary>
@@ -2662,6 +2668,14 @@ Public Class GRT00007KINTAI_NJS
             '編集
             NIPPO_EDIT(ioT7tbl, T0005tbl)
         Next
+        iT0005view.Dispose()
+        iT0005view = Nothing
+        WW_T0007DELtbl.Dispose()
+        WW_T0007DELtbl = Nothing
+        WW_T0007HEADtbl.Dispose()
+        WW_T0007HEADtbl = Nothing
+        WW_T0007DTLtbl.Dispose()
+        WW_T0007DTLtbl = Nothing
 
     End Sub
 
@@ -2669,15 +2683,17 @@ Public Class GRT00007KINTAI_NJS
     Private Sub NIPPOget_T7Format2(ByRef ioT7tbl As DataTable, ByVal iT5tbl As DataTable, ByVal iT7row As DataRow)
 
         'T5準備
-        Dim iT0005view As DataView
-        iT0005view = New DataView(iT5tbl)
-        iT0005view.Sort = "YMD, STAFFCODE"
+        Using iT0005view As DataView = New DataView(iT5tbl)
+            iT0005view.Sort = "YMD, STAFFCODE"
 
-        iT0005view.RowFilter = "YMD = #" & iT7row("WORKDATE") & "# and STAFFCODE ='" & iT7row("STAFFCODE") & "'"
-        Dim T0005tbl As DataTable = iT0005view.ToTable()
+            iT0005view.RowFilter = "YMD = #" & iT7row("WORKDATE") & "# and STAFFCODE ='" & iT7row("STAFFCODE") & "'"
+            Dim T0005tbl As DataTable = iT0005view.ToTable()
 
-        '編集
-        NIPPO_EDIT(ioT7tbl, T0005tbl)
+            '編集
+            NIPPO_EDIT(ioT7tbl, T0005tbl)
+            T0005tbl.Dispose()
+            T0005tbl = Nothing
+        End Using
 
     End Sub
 
@@ -4047,6 +4063,12 @@ Public Class GRT00007KINTAI_NJS
         WW_T0007DTLtbl = Nothing
         WW_T0007tbl.Dispose()
         WW_T0007tbl = Nothing
+        iT0005view.Dispose()
+        iT0005view = Nothing
+        iT0007view.Dispose()
+        iT0007view = Nothing
+        wT0007tbl.Dispose()
+        wT0007tbl = Nothing
 
     End Sub
 
@@ -4162,6 +4184,9 @@ Public Class GRT00007KINTAI_NJS
                 End If
                 WW_MATCH = "ON"
             Next
+            iT0007view.Dispose()
+            iT0007view = Nothing
+
             If WW_MATCH = "ON" Then
                 WW_HEADrow("BREAKTIME") = T0007COM.formatHHMM(WW_BREAKTIME)
                 WW_HEADrow("BREAKTIMETTL") = T0007COM.formatHHMM(WW_BREAKTIME)
@@ -4870,6 +4895,8 @@ Public Class GRT00007KINTAI_NJS
         '○クリア
         WF_GridPosition.Text = "1"
 
+        T0007tblGrid.Dispose()
+        T0007tblGrid = Nothing
         WW_TBLview.Dispose()
         WW_TBLview = Nothing
 
@@ -6178,10 +6205,10 @@ Public Class GRT00007KINTAI_NJS
         End If
 
         If WW_ERRLIST.Count > 0 Then
-            If WW_ERRLIST.IndexOf("10023") >= 0 Then
-                RTN = "10023"
-            ElseIf WW_ERRLIST.IndexOf("10018") >= 0 Then
-                RTN = "10018"
+            If WW_ERRLIST.IndexOf(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR) >= 0 Then
+                RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            ElseIf WW_ERRLIST.IndexOf(C_MESSAGE_NO.BOX_ERROR_EXIST) >= 0 Then
+                RTN = C_MESSAGE_NO.BOX_ERROR_EXIST
             End If
         End If
 
@@ -6229,16 +6256,16 @@ Public Class GRT00007KINTAI_NJS
                     errMsg = errMsg & "車両区分、油種"
                 End If
 
-                If (CType(WF_DView3.FindControl(WW_SHARYOKBN), System.Web.UI.WebControls.TextBox).Text <> "" OrElse
-                    CType(WF_DView3.FindControl(WW_OILPAYKBN), System.Web.UI.WebControls.TextBox).Text <> "") AndAlso
-                    CType(WF_DView3.FindControl(WW_SHUKABASHO), System.Web.UI.WebControls.TextBox).Text = "" AndAlso
-                    CType(WF_DView3.FindControl(WW_TODOKECODE), System.Web.UI.WebControls.TextBox).Text = "" Then
-                    'エラーレポート編集
-                    If errMsg <> "" Then
-                        errMsg = errMsg & "、"
-                    End If
-                    errMsg = errMsg & "出荷場所、届先"
-                End If
+                'If (CType(WF_DView3.FindControl(WW_SHARYOKBN), System.Web.UI.WebControls.TextBox).Text <> "" OrElse
+                '    CType(WF_DView3.FindControl(WW_OILPAYKBN), System.Web.UI.WebControls.TextBox).Text <> "") AndAlso
+                '    CType(WF_DView3.FindControl(WW_SHUKABASHO), System.Web.UI.WebControls.TextBox).Text = "" AndAlso
+                '    CType(WF_DView3.FindControl(WW_TODOKECODE), System.Web.UI.WebControls.TextBox).Text = "" Then
+                '    'エラーレポート編集
+                '    If errMsg <> "" Then
+                '        errMsg = errMsg & "、"
+                '    End If
+                '    errMsg = errMsg & "出荷場所、届先"
+                'End If
 
                 'エラーレポート編集
                 If errMsg <> "" Then
@@ -6270,10 +6297,10 @@ Public Class GRT00007KINTAI_NJS
         End If
 
         If WW_ERRLIST.Count > 0 Then
-            If WW_ERRLIST.IndexOf("10023") >= 0 Then
-                RTN = "10023"
-            ElseIf WW_ERRLIST.IndexOf("10018") >= 0 Then
-                RTN = "10018"
+            If WW_ERRLIST.IndexOf(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR) >= 0 Then
+                RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            ElseIf WW_ERRLIST.IndexOf(C_MESSAGE_NO.BOX_ERROR_EXIST) >= 0 Then
+                RTN = C_MESSAGE_NO.BOX_ERROR_EXIST
             End If
         End If
 
@@ -7164,6 +7191,12 @@ Public Class GRT00007KINTAI_NJS
             WW_KEYtbl = Nothing
             WW_TBLview.Dispose()
             WW_TBLview = Nothing
+            WW_T0005DELtbl.Dispose()
+            WW_T0005DELtbl = Nothing
+            WW_T0005SELtbl.Dispose()
+            WW_T0005SELtbl = Nothing
+            WW_T0005tbl.Dispose()
+            WW_T0005tbl = Nothing
 
         Catch ex As Exception
             CS0011LOGWRITE.INFSUBCLASS = "T0005_CreHead"                'SUBクラス名

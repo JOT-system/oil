@@ -54,7 +54,7 @@ Public Class GRTA0005LMKINTAI
     ''' <summary>
     ''' 一覧最大表示件数（一画面）
     ''' </summary>
-    Private Const CONST_DSPROWCOUNT As Integer = 45         '１画面表示対象
+    Private Const CONST_DSPROWCOUNT As Integer = 40         '１画面表示対象
     ''' <summary>
     ''' 一覧のマウススクロール時の増分（件数）
     ''' </summary>
@@ -230,33 +230,33 @@ Public Class GRTA0005LMKINTAI
         End If
 
         '○画面（GridView）表示
-        Dim WW_TBLview As DataView = New DataView(TA0005VIEWtbl)
+        Using WW_TBLview As DataView = New DataView(TA0005VIEWtbl)
 
-        'ソート
-        WW_TBLview.Sort = "LINECNT"
-        WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
-        '一覧作成
+            'ソート
+            WW_TBLview.Sort = "LINECNT"
+            WW_TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString & " and SELECT < " & (WW_GridPosition + CONST_DSPROWCOUNT).ToString
+            '一覧作成
 
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
-        CS0013ProfView.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = GRTA0005WRKINC.MAPID
-        CS0013ProfView.VARI = Master.VIEWID
-        CS0013ProfView.SRCDATA = WW_TBLview.ToTable
-        CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
-        CS0013ProfView.LEVENT = "ondblclick"
-        CS0013ProfView.LFUNC = "ListDbClick"
-        CS0013ProfView.TITLEOPT = True
-        CS0013ProfView.HIDEOPERATIONOPT = True
-        CS0013ProfView.CS0013ProfView()
+            CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+            CS0013ProfView.PROFID = Master.PROF_VIEW
+            CS0013ProfView.MAPID = GRTA0005WRKINC.MAPID
+            CS0013ProfView.VARI = Master.VIEWID
+            CS0013ProfView.SRCDATA = WW_TBLview.ToTable
+            CS0013ProfView.TBLOBJ = pnlListArea
+            CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
+            CS0013ProfView.LEVENT = "ondblclick"
+            CS0013ProfView.LFUNC = "ListDbClick"
+            CS0013ProfView.TITLEOPT = True
+            CS0013ProfView.HIDEOPERATIONOPT = True
+            CS0013ProfView.CS0013ProfView()
 
-        '○クリア
-        If WW_TBLview.Count = 0 Then
-            WF_GridPosition.Text = "1"
-        Else
-            WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
-        End If
-
+            '○クリア
+            If WW_TBLview.Count = 0 Then
+                WF_GridPosition.Text = "1"
+            Else
+                WF_GridPosition.Text = WW_TBLview.Item(0)("SELECT")
+            End If
+        End Using
     End Sub
     ''' <summary>
     ''' 照会ボタン押下時処理
@@ -403,17 +403,16 @@ Public Class GRTA0005LMKINTAI
         If Not Master.RecoverTable(TA0005VIEWtbl, work.WF_SEL_XMLsaveF2.Text) Then Exit Sub
 
         '○ソート
-        Dim WW_TBLview As DataView
-        WW_TBLview = New DataView(TA0005VIEWtbl)
-        WW_TBLview.RowFilter = "HIDDEN= '0'"
+        Using WW_TBLview As DataView = New DataView(TA0005VIEWtbl)
+            WW_TBLview.RowFilter = "HIDDEN= '0'"
 
-        '○最終頁に移動
-        If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
-        Else
-            WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
-        End If
-
+            '○最終頁に移動
+            If WW_TBLview.Count Mod CONST_SCROLLROWCOUNT = 0 Then
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT)
+            Else
+                WF_GridPosition.Text = WW_TBLview.Count - (WW_TBLview.Count Mod CONST_SCROLLROWCOUNT) + 1
+            End If
+        End Using
     End Sub
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -440,14 +439,14 @@ Public Class GRTA0005LMKINTAI
 
         If Not String.IsNullOrEmpty(WF_SELECTOR_PosiSTAFF.Value) AndAlso WF_SELECTOR_PosiSTAFF.Value <> GRTA0004WRKINC.ALL_SELECTOR.CODE Then
 
-                WW_Sort = WW_Sort & ",PAYSTAFFCODE"
-                If WW_Filter <> "" Then
-                    WW_Filter = WW_Filter & " and "
-                End If
-                WW_Filter = WW_Filter & "PAYSTAFFCODE = '" & WF_SELECTOR_PosiSTAFF.Value & "'"
+            WW_Sort = WW_Sort & ",PAYSTAFFCODE"
+            If WW_Filter <> "" Then
+                WW_Filter = WW_Filter & " and "
             End If
+            WW_Filter = WW_Filter & "PAYSTAFFCODE = '" & WF_SELECTOR_PosiSTAFF.Value & "'"
+        End If
 
-            WW_View.Sort = WW_Sort
+        WW_View.Sort = WW_Sort
         WW_View.RowFilter = WW_Filter
 
         TA0005VIEWtbl = WW_View.ToTable
@@ -2348,7 +2347,6 @@ Public Class GRTA0005LMKINTAI
         Dim wDATE As Date
         Dim wDATETime As DateTime
         Dim WW_TA0005WKtbl As DataTable = New DataTable
-        Dim WW_TA0005WK2tbl As DataTable = New DataTable
 
         '抽出条件(サーバー部署)List作成
         Dim W_ORGlst As List(Of String) = GetORGList(I_TERM_CLASS)
@@ -3837,6 +3835,10 @@ Public Class GRTA0005LMKINTAI
 
         SetRepeater("1", WF_STAFFselector, "WF_SELstaff_VALUE", "WF_SELstaff_TEXT", WW_POS)
 
+        WW_TBLview.Dispose()
+        WW_TBLview = Nothing
+        WW_GRPtbl.Dispose()
+        WW_GRPtbl = Nothing
     End Sub
     ''' <summary>
     ''' リピータ設定処理

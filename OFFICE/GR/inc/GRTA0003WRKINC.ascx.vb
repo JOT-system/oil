@@ -70,7 +70,7 @@ Public Class GRTA0003WRKINC
         End Try
         prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_COMPANY) = CAMPCODE
         prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_TYPEMODE) = GL0005StaffList.LC_STAFF_TYPE.ATTENDANCE_FOR_ALL
-        prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_STYMD) = TAISHOYM & "01"
+        prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_STYMD) = TAISHOYM & "/01"
         prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_ENDYMD) = TAISHOYM & "/" & DateTime.DaysInMonth(wDATE.Year, wDATE.Month).ToString("00")
         Return prmData
     End Function

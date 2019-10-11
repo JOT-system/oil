@@ -56,11 +56,11 @@ Public Class GRTA0001HAISHA
     ''' <summary>
     ''' 一覧最大表示件数（一画面）
     ''' </summary>
-    Private Const CONST_DSPROWCOUNT As Integer = 45                 '１画面表示対象
+    Private Const CONST_DSPROWCOUNT As Integer = 40                 '１画面表示対象
     ''' <summary>
     ''' 一覧のマウススクロール時の増分（件数）
     ''' </summary>
-    Private Const CONST_SCROLLROWCOUNT As Integer = 10              'マウススクロール時の増分
+    Private Const CONST_SCROLLROWCOUNT As Integer = 20              'マウススクロール時の増分
     ''' <summary>
     ''' 詳細部タブID
     ''' </summary>
@@ -620,6 +620,12 @@ Public Class GRTA0001HAISHA
         WF_STTIME.Text = String.Empty
         '〇
         work.WF_IsHideDetailBox.Text = "1"
+
+        '○Close
+        WF_DViewRep1.Visible = False
+        WF_DViewRep1.Dispose()
+        WF_DViewRep1 = Nothing
+
     End Sub
     ''' <summary>
     ''' 右リストボックスMEMO欄更新
@@ -702,6 +708,7 @@ Public Class GRTA0001HAISHA
                    & "       isnull(rtrim(A.TODOKEDATE),'')        as TODOKEDATE ,                " _
                    & "       isnull(rtrim(A.TODOKETIME),'')        as TODOKETIME ,                " _
                    & "       isnull(rtrim(A.TODOKECODE),'')        as TODOKECODE ,                " _
+                   & "       isnull(rtrim(A.PRODUCTCODE),'')       as PRODUCTCODE ,               " _
                    & "       isnull(rtrim(A.PRODUCT1),'')          as PRODUCT1 ,                  " _
                    & "       isnull(rtrim(A.PRODUCT2),'')          as PRODUCT2 ,                  " _
                    & "       isnull(rtrim(A.PRATIO),'')            as PRATIO ,                    " _
@@ -740,6 +747,7 @@ Public Class GRTA0001HAISHA
                    & "       isnull(rtrim(M023.NAMES),'')          as TERMORGNAME ,               " _
                    & "       isnull(rtrim(MC21.NAMES),'')          as TORICODENAME ,              " _
                    & "       isnull(rtrim(MC22.NAMES),'')          as STORICODENAME ,             " _
+                   & "       isnull(rtrim(MD1.NAMES),'')           as PRODUCTNAME ,               " _
                    & "       isnull(rtrim(MD1.NAMES),'')           as PRODUCT2NAME ,              " _
                    & "       isnull(rtrim(MC61.NAMES),'')          as TODOKECODENAME ,            " _
                    & "       isnull(rtrim(MC61.POSTNUM1),'')       as POSTNUM1 ,                  " _
@@ -1028,7 +1036,7 @@ Public Class GRTA0001HAISHA
 
                         '○項目名称設定
                         '業務車番名称
-                        CodeToName("BSHABAN", TA0001ALLrow("GSHABAN"), TA0001ALLrow("GSHABANLICNPLTNO"), O_RTN)
+                        CodeToName("GSHABAN", TA0001ALLrow("GSHABAN"), TA0001ALLrow("GSHABANLICNPLTNO"), O_RTN)
                         'コンテナシャーシ名称
                         CodeToName("CONTENAR", TA0001ALLrow("CONTCHASSIS"), TA0001ALLrow("CONTCHASSISLICNPLTNO"), O_RTN)
                         '積置区分名称
@@ -1040,7 +1048,7 @@ Public Class GRTA0001HAISHA
                         '油種名称
                         CodeToName("OILTYPE", TA0001ALLrow("OILTYPE"), TA0001ALLrow("OILTYPENAME"), O_RTN)
                         '品名１名称
-                        CodeToName("PROD1", TA0001ALLrow("PRODUCT1"), TA0001ALLrow("PRODUCT1NAME"), O_RTN)
+                        CodeToName("PRODUCT1", TA0001ALLrow("PRODUCT1"), TA0001ALLrow("PRODUCT1NAME"), O_RTN)
                         '売上計上基準名称
                         CodeToName("URIKBN", TA0001ALLrow("URIKBN"), TA0001ALLrow("URIKBNNAME"), O_RTN)
                         '状態名称
@@ -1138,6 +1146,11 @@ Public Class GRTA0001HAISHA
                             TA0001ALLrow("PRODUCT2_TXT") = ""
                         Else
                             TA0001ALLrow("PRODUCT2_TXT") = TA0001ALLrow("PRODUCT2NAME") & " (" & TA0001ALLrow("PRODUCT2") & ")"                '品名２
+                        End If
+                        If TA0001ALLrow("PRODUCTNAME") = Nothing AndAlso TA0001ALLrow("PRODUCTCODE") = Nothing Then
+                            TA0001ALLrow("PRODUCTNAME_TXT") = ""
+                        Else
+                            TA0001ALLrow("PRODUCTNAME_TXT") = TA0001ALLrow("PRODUCTNAME_TXT") & " (" & TA0001ALLrow("PRODUCTCODE") & ")"                '品名２
                         End If
 
                         If TA0001ALLrow("SMELLKBNNAME") = Nothing AndAlso TA0001ALLrow("SMELLKBN") = Nothing Then
@@ -1833,6 +1846,8 @@ Public Class GRTA0001HAISHA
         IO_TBL.Columns.Add("PRODUCT1NAME", GetType(String))
         IO_TBL.Columns.Add("PRODUCT2", GetType(String))             'PRODUCT2           品名２
         IO_TBL.Columns.Add("PRODUCT2NAME", GetType(String))
+        IO_TBL.Columns.Add("PRODUCTCODE", GetType(String))          'PRODUCTCODE        品名コード
+        IO_TBL.Columns.Add("PRODUCTNAME", GetType(String))
         IO_TBL.Columns.Add("CONTNO", GetType(String))               'CONTNO             コンテナ番号
         IO_TBL.Columns.Add("PRATIO", GetType(String))               'PRATIO             Ｐ比率
         IO_TBL.Columns.Add("SMELLKBN", GetType(String))             'SMELLKBN           臭有無
@@ -1936,6 +1951,7 @@ Public Class GRTA0001HAISHA
         IO_TBL.Columns.Add("TODOKETIME_TXT", GetType(String))       'TODOKETIME         時間指定（配送）
         IO_TBL.Columns.Add("PRODUCT1_TXT", GetType(String))         'PRODUCT1           品名１
         IO_TBL.Columns.Add("PRODUCT2_TXT", GetType(String))         'PRODUCT2           品名２
+        IO_TBL.Columns.Add("PRODUCTNAME_TXT", GetType(String))      'PRODUCTNAME        品名
         IO_TBL.Columns.Add("CONTNO_TXT", GetType(String))           'CONTNO             コンテナ番号
         IO_TBL.Columns.Add("PRATIO_TXT", GetType(String))           'PRATIO             Ｐ比率
         IO_TBL.Columns.Add("SMELLKBN_TXT", GetType(String))         'SMELLKBN           臭有無
@@ -2029,9 +2045,9 @@ Public Class GRTA0001HAISHA
                 Case "TUMIOKIKBN"
                     '積置区分名称
                     leftview.CodeToName(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.createFIXParam(work.WF_SEL_CAMPCODE.Text, "TUMIOKIKBN"))                 '積置区分名称
-                Case "PROD1"
+                Case "PRODUCT1"
                     '品名１名称
-                    leftview.CodeToName(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.createFIXParam(work.WF_SEL_CAMPCODE.Text, "PROD1"))                      '品名１名称
+                    leftview.CodeToName(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "PRODUCT1"))                   '品名１名称
                 Case "SMELLKBN"
                     '臭有無名称
                     leftview.CodeToName(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.createFIXParam(work.WF_SEL_CAMPCODE.Text, "SMELLKBN"))                   '臭有無名称

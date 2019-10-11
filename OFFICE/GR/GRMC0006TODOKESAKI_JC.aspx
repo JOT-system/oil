@@ -101,9 +101,9 @@
 
                 <!-- ■　取引先　■ -->
                 <a name="KEY_2" >
-                    <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先CD" Width="7em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
-                    <b ondblclick="Field_DBclick('WF_TORICODE',  <%=LIST_BOX_CLASSIFICATION.LC_CUSTOMER%>)">
-                        <asp:TextBox ID="WF_TORICODE" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                    <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先CD" Width="7em" CssClass="WF_TEXT_LEFT" Font-Bold="True" ></asp:Label>
+                    <b>
+                        <asp:TextBox ID="WF_TORICODE" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS" ReadOnly="true"></asp:TextBox>
                     </b>
                     <asp:Label ID="WF_TORICODE_TEXT" runat="server" Width="14em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                 </a>
@@ -112,22 +112,22 @@
             <p id="KEY_LINE_3">
                 <!-- ■　届先　■ -->
                 <a name="KEY_3" >
-                    <asp:Label ID="WF_TODOKECODE_L" runat="server" Text="届先CD" Width="7em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
-                    <b ondblclick="Field_DBclick('WF_TODOKECODE',  <%=LIST_BOX_CLASSIFICATION.LC_DISTINATION%>)">
-                    <asp:TextBox ID="WF_TODOKECODE" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                    <asp:Label ID="WF_TODOKECODE_L" runat="server" Text="届先CD" Width="7em" CssClass="WF_TEXT_LEFT" Font-Bold="True" ></asp:Label>
+                    <b>
+                    <asp:TextBox ID="WF_TODOKECODE" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS" ReadOnly="true"></asp:TextBox>
                     </b>
                     <asp:Label ID="WF_TODOKECODE_TEXT" runat="server" Width="14em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                 </a>
 
                 <!-- ■　有効年月日　■ -->
                 <a name="KEY_3" >
-                    <asp:Label ID="WF_STYMD_L" runat="server" Text="有効年月日" Width="7em" CssClass="WF_TEXT_LEFT" Font-Bold="True" Font-Underline="True"></asp:Label>
-                    <b ondblclick="Field_DBclick('WF_STYMD',  <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
-                        <asp:TextBox ID="WF_STYMD" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                    <asp:Label ID="WF_STYMD_L" runat="server" Text="有効年月日" Width="7em" CssClass="WF_TEXT_LEFT" Font-Bold="True" ></asp:Label>
+                    <b>
+                        <asp:TextBox ID="WF_STYMD" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS" ReadOnly="true"></asp:TextBox>
                     </b>
                     <asp:Label ID="WF_ENDYMD_L" runat="server" Text=" ～ " CssClass="WF_TEXT_LEFT"></asp:Label>
-                    <b ondblclick="Field_DBclick( 'WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
-                        <asp:TextBox ID="WF_ENDYMD" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                    <b>
+                        <asp:TextBox ID="WF_ENDYMD" runat="server" Width="8em" CssClass="WF_TEXTBOX_CSS" ReadOnly="true"></asp:TextBox>
                     </b>
                 </a>
 

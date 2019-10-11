@@ -61,6 +61,11 @@ Public Class GRIS0004RightBox
         Dim GS0003MEMOget As New GS0003MEMOget              '画面RightBOXメモ情報取得
         Dim GS0005ReportList As New GS0005ReportList        '画面RightBOXレポートID取得
 
+        '■対象日付
+        If IsNothing(TARGETDATE) OrElse TARGETDATE = "" Then
+            TARGETDATE = Date.Now.ToString("yyyy/MM/dd")
+        End If
+
         '〇 RightBOX情報設定
         O_RTN = C_MESSAGE_NO.NORMAL
         RF_RIGHT_SW1.Checked = True
@@ -85,6 +90,7 @@ Public Class GRIS0004RightBox
         GS0005ReportList.COMPCODE = COMPCODE
         GS0005ReportList.PROFID = PROFID
         GS0005ReportList.MAPID = MAPID_REPORT
+        GS0005ReportList.TARGETDATE = TARGETDATE
         GS0005ReportList.getList()
         If isNormal(GS0005ReportList.ERR) Then
             Try
@@ -105,6 +111,7 @@ Public Class GRIS0004RightBox
         CS0016ProfMValue.CAMPCODE = COMPCODE
         CS0016ProfMValue.VARI = MAPVARI
         CS0016ProfMValue.FIELD = C_FIX_VALUE_KEY
+        CS0016ProfMValue.TARGETDATE = TARGETDATE
         CS0016ProfMValue.getInfo()
         If isNormal(CS0016ProfMValue.ERR) Then
         Else
@@ -336,6 +343,17 @@ Public Class GRIS0004RightBox
         End Get
         Set(value As String)
             RF_PROFID.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' 対象日付
+    ''' </summary>
+    Public Property TARGETDATE As String
+        Get
+            Return RF_TARGETDATE.Value
+        End Get
+        Set(value As String)
+            RF_TARGETDATE.Value = value
         End Set
     End Property
 #End Region

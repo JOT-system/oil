@@ -242,8 +242,11 @@ Public Class GRT00008KINTAISTAT
 
         T00008tbl.AcceptChanges()
 
+        Dim WW_ORG As String = ""
+        If ORG_conv(Master.USER_ORG, WW_ORG) <> True Then Exit Sub
+
         '■■■  DetailBoxをT00008tblへ退避 ■■■
-        DetailBoxToT00008tbl("LIMIT")
+        DetailBoxToT00008tbl("LIMIT", WW_ORG)
 
         '--------------------------------
         '残業承認済の場合、締処理が可能
@@ -254,7 +257,7 @@ Public Class GRT00008KINTAISTAT
             If T00008row.RowState = DataRowState.Modified Then
                 'データに変更が存在するレコードのみ、以下処理を行う
 
-                If T00008row("ORGCODE") <> Master.USER_ORG And T00008row("LIMITKBN") = "支店" Then
+                If T00008row("ORGCODE") <> WW_ORG And T00008row("LIMITKBN") = "支店" Then
                     '支店で営業所分を締める場合（仮締→締）、サマリーテーブルは仮締時に営業所で作成済のためスキップする
                     Continue For
                 End If
@@ -379,7 +382,9 @@ Public Class GRT00008KINTAISTAT
         T00008tbl.AcceptChanges()
 
         '■■■  DetailBoxをT00008tblへ退避 ■■■
-        DetailBoxToT00008tbl("RELEASE")
+        Dim WW_ORG As String = ""
+        If ORG_conv(Master.USER_ORG, WW_ORG) <> True Then Exit Sub
+        DetailBoxToT00008tbl("RELEASE", WW_ORG)
 
         '■■■  T0008_KINTAISTAT更新 ■■■
         T0008_UPDATE(WW_ERRCODE)
@@ -764,20 +769,22 @@ Public Class GRT00008KINTAISTAT
                & "            'FALSE'                                as CHECKBOX ,      " _
                & "            TIMSTP = cast(A.UPDTIMSTP  as bigint)                     " _
                & "       FROM T0008_KINTAISTAT A                                        " _
-               & " INNER JOIN S0012_SRVAUTHOR as B                                      " _
-               & "         ON  B.TERMID    = @TERMID                                    " _
-               & "        and  B.OBJECT    = 'SRVORG'                                   " _
-               & "        and  B.STYMD    <= @YMD                                       " _
-               & "        and  B.ENDYMD   >= @YMD                                       " _
-               & "        and  B.DELFLG   <> '1'                                        " _
-               & " INNER JOIN S0006_ROLE      as C                                      " _
-               & "         ON  C.CAMPCODE  = B.CAMPCODE                                 " _
-               & "        and  C.OBJECT    = B.OBJECT                                   " _
-               & "        and  C.ROLE      = B.ROLE                                     " _
-               & "        and  C.PERMITCODE > 1                                         " _
-               & "        and  C.STYMD    <= @YMD                                       " _
-               & "        and  C.ENDYMD   >= @YMD                                       " _
-               & "        and  C.DELFLG   <> '1'                                        " _
+               & " INNER JOIN M0006_STRUCT B ON                                         " _
+               & "             B.CAMPCODE = A.CAMPCODE                                  " _
+               & "        And  B.OBJECT   = 'ORG'                                       " _
+               & "        And  B.STYMD   <= @YMD2                                       " _
+               & "        And  B.ENDYMD  >= @YMD2                                       " _
+               & "        And  B.DELFLG  <> '1'                                         " _
+               & "        And  B.STRUCT  In (                                           " _
+               & "        Select '管轄組織_' + C2.GRCODE02                              " _
+               & "        FROM M0006_STRUCT C2                                          " _
+               & "	WHERE                                                               " _
+               & "           C2.OBJECT   = B.OBJECT                                     " _
+               & "     and   C2.STRUCT   = '管轄組織'                                   " _
+               & "     and   C2.CODE     = @ORG                                        " _
+               & "     and   C2.STYMD   <= @YMD2                                        " _
+               & "     and   C2.ENDYMD  >= @YMD2                                        " _
+               & "     and   C2.DELFLG  <> '1')                                         " _
                & " INNER JOIN (select GRCODE01,GRCODE02 from M0006_STRUCT ORG           " _
                & "             where ORG.CAMPCODE = CAMPCODE                            " _
                & "             and   ORG.OBJECT   = 'ORG'                               " _
@@ -787,7 +794,7 @@ Public Class GRT00008KINTAISTAT
                & "             and   ORG.DELFLG  <> '1'                                 " _
                & "             group by  GRCODE01,GRCODE02) X                           " _
                & "         ON  X.GRCODE01   = A.ORGCODE                                 " _
-               & "        and  X.GRCODE01   = C.CODE                                    " _
+               & "        and  X.GRCODE01   = B.CODE                                    " _
                & "  LEFT JOIN M0002_ORG D                                               " _
                & "         ON  D.CAMPCODE = A.CAMPCODE                                  " _
                & "        and  D.ORGCODE  = A.ORGCODE                                   " _
@@ -805,13 +812,13 @@ Public Class GRT00008KINTAISTAT
                & "         ON  F.CAMPCODE = A.CAMPCODE                                  " _
                & "        and  F.OBJECT   = 'ORG'                                       " _
                & "        and  F.STRUCT   = '勤怠管理組織'                              " _
-               & "        and  F.CODE     = A.ORGCODE                                   " _
+               & "        and  F.CODE     = @ORG                                        " _
                & "        and  F.STYMD   <= @YMD2                                       " _
                & "        and  F.ENDYMD  >= @YMD2                                       " _
                & "        and  F.DELFLG  <> '1'                                         " _
                & "  WHERE      A.CAMPCODE = @CAMPCODE                                   " _
                & "        and  A.LIMITYM  = @LIMITYM                                    " _
-               & "        and  A.ORGCODE  = C.CODE                                      " _
+               & "        and  A.ORGCODE  = B.CODE                                      " _
                & "        and  A.DELFLG  <> '1'                                         " _
                & "  ORDER BY A.CAMPCODE ASC, A.ORGCODE ASC                              "
 
@@ -821,11 +828,13 @@ Public Class GRT00008KINTAISTAT
             Dim P_TERMID As SqlParameter = SQLcmd.Parameters.Add("@TERMID", System.Data.SqlDbType.NVarChar)
             Dim P_YMD As SqlParameter = SQLcmd.Parameters.Add("@YMD", System.Data.SqlDbType.Date)
             Dim P_YMD2 As SqlParameter = SQLcmd.Parameters.Add("@YMD2", System.Data.SqlDbType.Date)
+            Dim P_ORG As SqlParameter = SQLcmd.Parameters.Add("@ORG", System.Data.SqlDbType.NVarChar)
             P_CAMPCODE.Value = work.WF_SEL_CAMPCODE.Text
             P_LIMITYM.Value = work.WF_SEL_LIMITYM.Text
             P_TERMID.Value = CS0050SESSION.APSV_ID
             P_YMD.Value = Date.Now
             P_YMD2.Value = work.WF_SEL_LIMITYM.Text & "/01"
+            P_ORG.Value = Master.USER_ORG
             Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
 
@@ -903,6 +912,73 @@ Public Class GRT00008KINTAISTAT
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' ORG_conv（勤怠管理組織）変換
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Function ORG_conv(ByVal I_ORG As String, ByRef O_ORG_CONV As String) As Boolean
+
+
+        '■■■ 内部テーブル格納用データ取得 ■■■
+
+        '取引先部署内容検索
+        Try
+            O_ORG_CONV = I_ORG
+
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '検索SQL文
+            Dim SQLStr As String =
+                 "     SELECT isnull(rtrim(A.GRCODE01),'')          as GRCODE01     " _
+               & "       FROM M0006_STRUCT A                                        " _
+               & "        Where A.CAMPCODE = @CAMPCODE                              " _
+               & "        And   A.OBJECT   = 'ORG'                                  " _
+               & "        And   A.STRUCT   = '勤怠管理組織'                         " _
+               & "        And   A.CODE     = @ORG                                   " _
+               & "        And   A.STYMD   <= @YMD2                                  " _
+               & "        And   A.ENDYMD  >= @YMD2                                  " _
+               & "        And   A.DELFLG  <> '1'                                    "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            Dim P_CAMPCODE As SqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", System.Data.SqlDbType.NVarChar)
+            Dim P_YMD2 As SqlParameter = SQLcmd.Parameters.Add("@YMD2", System.Data.SqlDbType.Date)
+            Dim P_ORG As SqlParameter = SQLcmd.Parameters.Add("@ORG", System.Data.SqlDbType.NVarChar)
+            P_CAMPCODE.Value = work.WF_SEL_CAMPCODE.Text
+            P_YMD2.Value = work.WF_SEL_LIMITYM.Text & "/01"
+            P_ORG.Value = I_ORG
+            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+
+            While SQLdr.Read
+
+                O_ORG_CONV = SQLdr("GRCODE01")
+
+            End While
+
+            SQLdr.Dispose()
+            SQLdr = Nothing
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+            SQLcon.Close()
+            SQLcon.Dispose()
+            SQLcon = Nothing
+
+            ORG_conv = True
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "M0006_STRUCT SELECT")
+            CS0011LOGWRITE.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "DB:M0006_STRUCT Select"           '
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                  '
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+            ORG_conv = False
+            Exit Function
+        End Try
+
+    End Function
 
     ''' <summary>
     ''' 承認履歴テーブル強制更新処理
@@ -3697,7 +3773,7 @@ Public Class GRT00008KINTAISTAT
     ''' DetailBoxをT00008tblへ退避
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub DetailBoxToT00008tbl(ByVal iButton As String)
+    Protected Sub DetailBoxToT00008tbl(ByVal iButton As String, ByVal iOrg As String)
 
         '■■■ DetailよりT00008tbl編集 ■■■
         WF_UNAPPLIED.Value = ""
@@ -3795,7 +3871,7 @@ Public Class GRT00008KINTAISTAT
 
                         Case "支店"
                             '支店が自支店分の本締めを行う（申請・承認済の場合のみ締られる）
-                            If T00008tbl.Rows(i)("ORGCODE") = Master.USER_ORG Then
+                            If T00008tbl.Rows(i)("ORGCODE") = iOrg Then
                                 If T00008tbl.Rows(i)("LIMITFLG") = "0" AndAlso
                                     T00008tbl.Rows(i)("UNAPPLIED") = "0" AndAlso
                                     T00008tbl.Rows(i)("UNAPPROVED2") = "0" AndAlso

@@ -31,7 +31,7 @@
 
             <!-- ■　ボタン　■ -->
             <a style="position:fixed;top:2.8em;left:53.5em;">
-                <input type="button" id="WF_ButtonPut" value="光英送信"  style="Width:5em" onclick="ButtonClick('WF_ButtonPut');" />
+                <input type="button" id="WF_ButtonPut" value="光英送信"  style="Width:5em" runat="server" onclick="ButtonClick('WF_ButtonPut');" />
             </a>
             <a style="position:fixed;top:2.8em;left:58em;">
                 <input type="button" id="WF_ButtonCSV" value="光英CSV"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />

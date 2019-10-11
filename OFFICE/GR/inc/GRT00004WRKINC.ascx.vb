@@ -14,6 +14,7 @@ Public Class GRT00004WRKINC
     Public Const C_PRODUCT_OIL As String = "01"                     '石油
     Public Const C_PRODUCT_WHITEOIL As String = "11"                '白油
 
+    Public Const C_KOUEI_CLASS_CODE As String = "T00004_KOUEIORG"   '光英連携可否判定用FIXVAL KEY
     Public Const C_DIR_KOUEI As String = "KOUEI"                    '光英連携ディレクトリ名(LOCAL)
     Public Const C_DIR_KOUEI_ORDER As String = "order"              '光英連携配車ディレクトリ名
     Public Const C_KOUEI_ORDER_FILE_SERCH As String = "*_*_*.csv"   '光英連携配車ファイルSearchPattern
@@ -291,8 +292,9 @@ Public Class GRT00004WRKINC
                 'FTPリクエスト実行
                 control.Request(target, orgCode)
                 If Not isNormal(control.ERR) Then
-                    O_RTN = control.ERR
-                    Exit Sub
+                    'O_RTN = control.ERR
+                    'Exit Sub
+                    'FTP受信エラーでもエラーとしない
                 End If
             Next
 

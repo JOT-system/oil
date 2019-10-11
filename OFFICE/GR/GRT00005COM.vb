@@ -1007,8 +1007,9 @@ Public Class GRMC006UPDATE
                     End Using
                 End Using
             End If
+
             Dim clsGeoCoder = New CS0055GeoCoder()
-            Dim address As CS0055GeoCoder.AddressInfo = clsGeoCoder.GetAddress(I_LATITUDE, I_LONGITUDE)
+            Dim address As CS0055GeoCoder.AddressInfo = clsGeoCoder.GetAddress(MC006Row("LATITUDE"), MC006Row("LONGITUDE"))
             If IsNothing(address) Then
                 '取得エラー時継続
             Else
@@ -1016,7 +1017,9 @@ Public Class GRMC006UPDATE
                 MC006Row("ADDR2") = address.Address2
                 MC006Row("ADDR3") = address.Address3
                 MC006Row("ADDR4") = address.Address4
+                MC006Row("CITIES") = address.CityCode
             End If
+            clsGeoCoder = Nothing
 
         Catch ex As Exception
 
@@ -1043,7 +1046,6 @@ Public Class GRMC006UPDATE
                      & "   SELECT CAST(UPDTIMSTP as bigint) as hensuu                       " _
                      & "     FROM MC006_TODOKESAKI                                          " _
                      & "     WHERE    CAMPCODE      = @P01                                  " _
-                     & "       and    rtrim(TORICODE)      = @P02                           " _
                      & "       and    rtrim(TODOKECODE)    = @P03 ;                         " _
                      & "                                                                    " _
                      & " OPEN hensuu ;                                                      " _
@@ -1056,13 +1058,13 @@ Public Class GRMC006UPDATE
                      & "      , ADDR2        = @P11                                         " _
                      & "      , ADDR3        = @P12                                         " _
                      & "      , ADDR4        = @P13                                         " _
+                     & "      , CITIES       = @P19                                         " _
                      & "      , DELFLG       = @P34                                         " _
                      & "      , UPDYMD       = @P36                                         " _
                      & "      , UPDUSER      = @P37                                         " _
                      & "      , UPDTERMID    = @P38                                         " _
                      & "      , RECEIVEYMD   = @P39                                         " _
                      & "     WHERE    CAMPCODE             = @P01                           " _
-                     & "       and    rtrim(TORICODE)      = @P02                           " _
                      & "       and    rtrim(TODOKECODE)    = @P03 ;                         " _
                      & "                                                                    " _
                      & " IF ( @@FETCH_STATUS <> 0 )                                         " _
@@ -1203,7 +1205,6 @@ Public Class GRMC006UPDATE
                      & "   SELECT CAST(UPDTIMSTP as bigint) as hensuu                       " _
                      & "     FROM MC007_TODKORG                                             " _
                      & "     WHERE    CAMPCODE      = @P01                                  " _
-                     & "       and    TORICODE      = @P02                                  " _
                      & "       and    TODOKECODE    = @P03                                  " _
                      & "       and    UORG          = @P04 ;                                " _
                      & "                                                                    " _
@@ -3826,6 +3827,11 @@ Public Class GRT0005UPDATE
     ''' <returns></returns>
     Public Property T0005tbl As DataTable                                     '日報テーブル
     ''' <summary>
+    ''' 光英ファイル一覧（分割後）
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property KOUEIFILES As ListBox                                     '光英ファイル（分割後）
+    ''' <summary>
     ''' 登録日付
     ''' </summary>
     ''' <returns></returns>
@@ -3882,6 +3888,8 @@ Public Class GRT0005UPDATE
     ''' <remarks></remarks>
     Public Sub Update()
 
+        Dim WW_T5tblEx As DataTable = New DataTable
+        Dim WW_T5rowEx As DataRow = Nothing
         Try
             ERR = C_MESSAGE_NO.NORMAL
 
@@ -3930,7 +3938,10 @@ Public Class GRT0005UPDATE
             CS0026TblSort.SORTING = "SELECT, YMD, STAFFCODE, HDKBN DESC, CREWKBN, STDATE, STTIME, ENDDATE, ENDTIME, WORKKBN"
             WW_T0005UPDtbl = CS0026TblSort.sort()
 
+            WW_T5tblEx = WW_T0005UPDtbl.Clone
+            WW_T5rowEx = WW_T5tblEx.NewRow
             For Each WW_T5row As DataRow In WW_T0005UPDtbl.Rows
+                WW_T5rowEx.ItemArray = WW_T5row.ItemArray
                 If WW_T5row("HDKBN") = "H" Then
                     '日報ＤＢ削除処理
                     DeleteT0005(WW_T5row, ENTRYDATE, WW_RTN)
@@ -3946,180 +3957,25 @@ Public Class GRT0005UPDATE
                     Dim WW_oRow As DataRow = Nothing
                     EditT0005(WW_T5row, ENTRYDATE, WW_T0005tbl, WW_oRow, WW_RTN)
                     InsertT0005(WW_oRow)
-                End If
-            Next
 
-            '-----------------------------------------
-            '日報転送（配属部署へ）
-            '   C:\APPL\APPLFILES\SEND\SENDWORK\SRVENEX\20170218_185111719\PCxxxx\TABLE\T0005_NIPPO.dat
-            '-----------------------------------------
-            Dim WW_CAMPCODE_OLD As String = String.Empty
-            Dim WW_STAFFCODE_OLD As String = String.Empty
-            Dim WW_YMD_OLD As String = String.Empty
-            Dim WW_MORG As String = String.Empty
-            Dim WW_HORG As String = String.Empty
-            Dim WW_TERMIDArray As New List(Of String)
-            Dim WW_TODATATERMID As New List(Of String)
-            Dim WW_SENDTERMID As New List(Of String)
-            Dim WW_RENAMEDIR As String = String.Empty
-
-            Dim MB001tbl = New DataTable                                   '社員マスタテーブル
-            Dim WW_T0005WKtbl = WW_T0005tbl.Clone                          '日報ワーク
-            Dim WW_T0005SELtbl = New DataTable
-            Dim WW_T0005DELtbl = New DataTable
-
-            '削除データの編集（追加データは、上記INSERTデータを利用する）
-            WW_T0005UPDtbl.Clear()
-
-            CS0026TblSort.TABLE = T0005tbl
-            CS0026TblSort.FILTER = "OPERATION = '更新' and HDKBN = 'D' and DELFLG ='1'"
-            CS0026TblSort.SORTING = "SELECT, YMD, STAFFCODE, CREWKBN, HDKBN DESC, STDATE, STTIME, ENDDATE, ENDTIME, WORKKBN"
-            WW_T0005UPDtbl = CS0026TblSort.sort()
-
-
-            '日報ＤＢ編集
-            AddColumnT0005UPDtbl(WW_T0005DELtbl)
-
-            For Each WW_DelRow As DataRow In WW_T0005UPDtbl.Rows
-                Dim WW_oRow As DataRow = Nothing
-                EditT0005(WW_DelRow, ENTRYDATE, WW_T0005DELtbl, WW_oRow, WW_RTN)
-            Next
-
-            WW_T0005tbl.Merge(WW_T0005DELtbl)
-
-            Dim WW_Dir As String = HttpContext.Current.Session("FILEdir") & "\SEND\SENDWORK\"
-
-            For Each WW_T5ROW As DataRow In WW_T0005tbl.Rows
-                '従業員情報取得設定
-                If WW_T5ROW("CAMPCODE") = WW_CAMPCODE_OLD And
-                        WW_T5ROW("STAFFCODE") = WW_STAFFCODE_OLD And
-                        WW_T5ROW("YMD") = WW_YMD_OLD Then
-                Else
-                    '社員マスターより
-                    CS0043STAFFORGget.TBL = MB001tbl
-                    CS0043STAFFORGget.CAMPCODE = WW_T5ROW("CAMPCODE")
-                    CS0043STAFFORGget.STAFFCODE = WW_T5ROW("STAFFCODE")
-                    CS0043STAFFORGget.SORG = WW_T5ROW("SHIPORG")
-                    CS0043STAFFORGget.STYMD = WW_T5ROW("YMD")
-                    CS0043STAFFORGget.ENDYMD = WW_T5ROW("YMD")
-                    CS0043STAFFORGget.CS0043STAFFORGget()
-                    WW_MORG = CS0043STAFFORGget.MORG                               '管理部署（正）
-                    WW_HORG = CS0043STAFFORGget.HORG                               '配属部署（正）
-                End If
-
-                If WW_HORG <> WW_T5ROW("SHIPORG") Then
-                    If WW_MORG <> CS0050Session.APSV_M_ORG Then
-                        Dim WW_TERMID As String = String.Empty
-                        GetTermID(WW_HORG, WW_TERMID)
-                        Dim WW_T5WKrow As DataRow = WW_T0005WKtbl.NewRow
-                        WW_T5WKrow.ItemArray = WW_T5ROW.ItemArray
-                        If WW_TERMID = String.Empty Then
-                            WW_T5WKrow("UPDTERMID") = WW_T5ROW("UPDTERMID")
-                        Else
-                            WW_T5WKrow("UPDTERMID") = WW_TERMID
-                            If WW_TERMIDArray.IndexOf(WW_TERMID) >= 0 Then
-                            Else
-                                WW_TERMIDArray.Add(WW_TERMID)
-                            End If
-                            WW_T5WKrow("RECEIVEYMD") = ENTRYDATE
-                            WW_T0005WKtbl.Rows.Add(WW_T5WKrow)
-                        End If
-                    End If
-                End If
-                WW_CAMPCODE_OLD = WW_T5ROW("CAMPCODE")
-                WW_STAFFCODE_OLD = WW_T5ROW("STAFFCODE")
-                WW_YMD_OLD = WW_T5ROW("YMD")
-            Next
-
-            For i As Integer = 0 To WW_TERMIDArray.Count - 1
-                Dim WW_Dir_date As String = Date.Now.ToString("yyyyMMdd") & "_" & Date.Now.ToString("HHmmssfff")
-
-                CS0026TblSort.TABLE = WW_T0005WKtbl
-                CS0026TblSort.FILTER = "UPDTERMID='" & WW_TERMIDArray(i) & "'"
-                CS0026TblSort.SORTING = "UPDTERMID"
-                WW_T0005SELtbl = CS0026TblSort.sort()
-
-                GetSendTermArry(WW_TERMIDArray(i), WW_TERMIDArray(i), "T0005_NIPPO", WW_TODATATERMID, WW_SENDTERMID)
-                '自分を追加（送信端末IDは先頭を採用）
-                If WW_TODATATERMID.Count = 0 Or WW_SENDTERMID.Count = 0 Then
-                    Continue For
-                End If
-                WW_TODATATERMID.Add(WW_TERMIDArray(i))
-                WW_SENDTERMID.Add(WW_SENDTERMID(0))
-
-                For j As Integer = 0 To WW_TODATATERMID.Count - 1
-                    'C:\APPL\APPLFILES\SEND\SENDWORK\SRVENEX
-                    Dim WW_SDir As String = WW_Dir & WW_SENDTERMID(j)
-                    If System.IO.Directory.Exists(WW_SDir) Then
-                    Else
-                        System.IO.Directory.CreateDirectory(WW_SDir)
-                    End If
-                    'C:\APPL\APPLFILES\SEND\SENDWORK\SRVENEX\20170218_185111719
-                    WW_RENAMEDIR = WW_SDir & "\" & WW_Dir_date
-                    WW_SDir = WW_SDir & "\" & WW_Dir_date & "_CRE"
-                    If System.IO.Directory.Exists(WW_SDir) Then
-                    Else
-                        System.IO.Directory.CreateDirectory(WW_SDir)
-                    End If
-                    'C:\APPL\APPLFILES\SEND\SENDWORK\SRVENEX\20170218_185111719\PCxxxx
-                    WW_SDir = WW_SDir & "\" & WW_TODATATERMID(j)
-                    If System.IO.Directory.Exists(WW_SDir) Then
-                    Else
-                        System.IO.Directory.CreateDirectory(WW_SDir)
-                    End If
-                    'C:\APPL\APPLFILES\SEND\SENDWORK\SRVENEX\20170218_185111719\PCxxxx\TABLE
-                    WW_SDir = WW_SDir & "\TABLE"
-                    If System.IO.Directory.Exists(WW_SDir) Then
-                    Else
-                        System.IO.Directory.CreateDirectory(WW_SDir)
-                    End If
-                    'TABLEフォルダーに抽出データファイルを出力（テーブル名.dat)
-                    Dim WW_FilePath As String = WW_SDir & "\" & "T0005_NIPPO.dat"
-
-                    'DAT出力準備
-                    Dim WW_str As String = String.Empty
-                    Dim WW_IOstream As New System.IO.StreamWriter(WW_FilePath, False, System.Text.Encoding.GetEncoding("unicode"))
-                    'DATヘッダーデータ出力　…　ヘッダは必ず出力
-                    For k As Integer = 0 To WW_T0005SELtbl.Columns.Count - 1
-                        WW_str = WW_str & WW_T0005SELtbl.Columns(k).ColumnName.ToString
-                        If (WW_T0005SELtbl.Columns.Count - 1) = k Then
-                            WW_str = WW_str & ControlChars.NewLine
-                        Else
-                            WW_str = WW_str & ControlChars.Tab
-                        End If
-                    Next
-                    WW_IOstream.Write(WW_str)
-
-                    'DATデータ出力
-                    'DAT編集(ROWデータをDAT変換)
-                    For Each WW_SELrow In WW_T0005SELtbl.Select("")     '順検索指定なし
-                        WW_str = String.Empty
-                        For k = 0 To WW_SELrow.ItemArray.Count - 1
-                            If WW_T0005SELtbl.Columns(k).ColumnName.ToString = "UPDTERMID" Then
-                                WW_str = WW_str & HttpContext.Current.Session("APSRVname")
-                            Else
-                                WW_str = WW_str & WW_SELrow.ItemArray(k).ToString.Replace(vbCrLf, "\n")
-                            End If
-                            'タブ区切りでデータを出力
-                            If (WW_SELrow.ItemArray.Count - 1) = k Then
-                                WW_str = WW_str & ControlChars.NewLine
-                            Else
-                                WW_str = WW_str & ControlChars.Tab
+                    '光英受信ファイル削除（更新OKの場合のみ）
+                    If Not IsNothing(KOUEIFILES) Then
+                        For Each file As ListItem In KOUEIFILES.Items
+                            Dim f = New System.IO.FileInfo(file.Value)
+                            Dim WW_KEYWORD As String = Replace(WW_T5row("YMD"), "/", "") & "_" & WW_T5row("NIPPONO")
+                            If f.FullName.IndexOf(WW_KEYWORD) > 0 AndAlso f.FullName.ToLower.EndsWith(".csv") Then
+                                If f.Exists Then
+                                    '光英連携が安定稼働するまでは論理削除
+                                    Dim bakFileName As New System.IO.FileInfo(f.FullName & ".used")
+                                    If bakFileName.Exists Then
+                                        bakFileName.Delete()
+                                    End If
+                                    f.MoveTo(bakFileName.FullName)
+                                End If
                             End If
                         Next
-
-                        'DAT Line出力
-                        WW_IOstream.Write(WW_str)
-                    Next
-
-                    '閉じる
-                    WW_IOstream.Close()
-                    WW_IOstream.Dispose()
-                Next
-                Try
-                    System.IO.Directory.Move(WW_RENAMEDIR & "_CRE", WW_RENAMEDIR)
-                Catch ex As Exception
-                End Try
+                    End If
+                End If
             Next
 
             WW_T0005UPDtbl.Dispose()
@@ -4133,7 +3989,14 @@ Public Class GRT0005UPDATE
             CS0011LOGWRITE.INFSUBCLASS = "CS0050T0005UPDATE"            'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "例外発生"                         '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
+            Dim WW As String = ""
+            Try
+                For i As Integer = 0 To WW_T5rowEx.ItemArray.Length - 1
+                    WW = WW & WW_T5rowEx.ItemArray(i).ToString
+                Next
+            Catch ex2 As Exception
+            End Try
+            CS0011LOGWRITE.TEXT = ex.ToString() & "Data='" & WW & "'"
             CS0011LOGWRITE.MESSAGENO = ERR
             CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
             Exit Sub
@@ -4613,7 +4476,7 @@ Public Class GRT0005UPDATE
                 & "        @UPDTERMID," _
                 & "        @RECEIVEYMD); "
 
-        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+        Using SQLcmd As New SqlCommand(SQLStr, SQLcon, SQLtrn)
             Dim P_CAMPCODE As SqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", System.Data.SqlDbType.NVarChar, 20)
             Dim P_SHIPORG As SqlParameter = SQLcmd.Parameters.Add("@SHIPORG", System.Data.SqlDbType.NVarChar, 15)
             Dim P_TERMKBN As SqlParameter = SQLcmd.Parameters.Add("@TERMKBN", System.Data.SqlDbType.NVarChar, 1)
@@ -12879,6 +12742,46 @@ Public Class GRT0005COM
                 Exit For
             End If
         Next
+
+    End Function
+
+    ''' <summary>
+    ''' 光英連携可能部署
+    ''' </summary>
+    ''' <param name="I_COMPCODE">会社コード</param>
+    ''' <param name="I_ORGCODE">部署コード</param>
+    ''' <param name="I_CLASS">区分</param>
+    ''' <param name="O_RTN">ERRCODE</param>
+    ''' <returns>可否判定</returns>
+    ''' <remarks></remarks>
+    Public Function IsKoueiAvailableOrg(ByVal I_COMPCODE As String, ByVal I_ORGCODE As String, ByVal I_CLASS As String, ByRef O_RTN As String) As Boolean
+
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Try
+            Using GS0032 As New GS0032FIXVALUElst
+                GS0032.CAMPCODE = I_COMPCODE
+                GS0032.CLAS = I_CLASS
+                GS0032.STDATE = Date.Now
+                GS0032.ENDDATE = Date.Now
+                GS0032.GS0032FIXVALUElst()
+                If Not isNormal(GS0032.ERR) Then
+                    O_RTN = GS0032.ERR
+                    Return False
+                End If
+                '存在する場合TRUE、しない場合FALSEを帰す
+                Return (Not IsNothing(GS0032.VALUE1.Items.FindByValue(I_ORGCODE)))
+            End Using
+
+        Catch ex As Exception
+            CS0011LOGWRITE.INFSUBCLASS = "GRT0005COM"                   'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "DB:KoueiAvailableOrg Select"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+            O_RTN = C_MESSAGE_NO.DB_ERROR
+            Return False
+        End Try
 
     End Function
 End Class

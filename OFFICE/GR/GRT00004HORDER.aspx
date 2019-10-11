@@ -548,6 +548,7 @@
 
         <asp:TextBox ID="WF_DEFORG" runat="server"></asp:TextBox>                       <!-- 所属部署　 -->
         <asp:TextBox ID="WF_JXORDERID" runat="server"></asp:TextBox>                    <!-- JXオーダー識別ID　 -->
+        <asp:TextBox ID="WF_JXORDERSTATUS" runat="server"></asp:TextBox>                <!-- JXオーダーSTATUS　 -->
 
         <input id="WF_FIELD"  runat="server" value=""  type="text" />                   <!-- Textbox DBクリックフィールド -->
         <input id="WF_FIELD_REP"  runat="server" value=""  type="text" />               <!-- Textbox(Repeater) DBクリックフィールド -->

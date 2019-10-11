@@ -707,6 +707,24 @@ Partial Public Class GRTA0003KYUYOLIST
     Protected WithEvents WF_KOATUTIMETTL As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_HAYADETIMETTL_LABEL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_HAYADETIMETTL_LABEL As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_HAYADETIMETTL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_HAYADETIMETTL As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''Label53 コントロール。
     '''</summary>
     '''<remarks>

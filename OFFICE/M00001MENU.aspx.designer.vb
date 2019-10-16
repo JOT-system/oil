@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class M00001MENU
-
+    
     '''<summary>
     '''Repeater_Menu_L コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents Repeater_Menu_L As Global.System.Web.UI.WebControls.Repeater
-
+    
     '''<summary>
     '''Repeater_Menu_R コントロール。
     '''</summary>
@@ -30,7 +30,16 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents Repeater_Menu_R As Global.System.Web.UI.WebControls.Repeater
-
+    
+    '''<summary>
+    '''Repeater_Menu_L2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents Repeater_Menu_L2 As Global.System.Web.UI.WebControls.Repeater
+    
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -39,7 +48,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -48,7 +57,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.OFFICE.GRM00001WRKINC
-
+    
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -57,7 +66,7 @@ Partial Public Class M00001MENU
     '''</remarks>
     Public Shadows ReadOnly Property Master() As OFFICE.GRMasterPage
         Get
-            Return CType(MyBase.Master, OFFICE.GRMasterPage)
+            Return CType(MyBase.Master,OFFICE.GRMasterPage)
         End Get
     End Property
 End Class

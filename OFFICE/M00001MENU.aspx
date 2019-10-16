@@ -63,6 +63,35 @@
             </asp:Repeater>
           </a>
 
+
+          <a  class="Menu_L2" id="Menu_L2"  >
+            <asp:Repeater ID="Repeater_Menu_L2" runat="server" >
+                <HeaderTemplate>
+                    <table>
+                </HeaderTemplate>
+                <ItemTemplate>
+
+                    <tr>
+                        <td >
+                            <asp:Label ID="WF_MenuLabe_L2" runat="server" CssClass="WF_MenuLabel_L2"></asp:Label>
+                            <asp:Label ID="WF_MenuURL_L2" runat="server" Visible="False"></asp:Label>
+                            <asp:Label ID="WF_MenuVARI_L2" runat="server" Visible="False"></asp:Label>
+                            <asp:Label ID="WF_MenuMAP_L2" runat="server" Visible="False"></asp:Label>
+                            <asp:Button ID="WF_MenuButton_L2" runat="server" CssClass="WF_MenuButton_L2" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'"/> 
+                        </td>
+                    </tr>
+
+                </ItemTemplate>
+                <FooterTemplate>
+                    </table>
+                </FooterTemplate>
+             
+            </asp:Repeater>
+          </a>
+
+
+
+
             <a hidden="hidden">
                 <input id="WF_ButtonClick" runat="server" value=""  type="text" />        <!-- ボタン押下 -->
             </a>

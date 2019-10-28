@@ -1,0 +1,70 @@
+﻿<%@ Master Language="VB" AutoEventWireup="false" CodeBehind="OILMasterPage.Master.vb" Inherits="JOTWEB.OILMasterPage" %>
+<%@ register src="~/inc/GRIS0001Title.ascx" tagname="title" tagprefix="MSINC" %>
+<%@ register src="~/inc/GRIS0002Footer.ascx" tagname="footer" tagprefix="MSINC" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <%--全画面共通のスタイルシート --%>
+    <link href="~/css/common.css" rel="stylesheet" type="text/css"/>
+    <%--個別のスタイルは以下に記載 OR 外部ファイルに逃す --%>
+    <%--共通利用するJavaScript --%>
+    <script src='<%= ResolveUrl("~/script/common.js")%>' type="text/javascript" charset="utf-8"></script>
+    <script src='<%= ResolveUrl("~/script/event.js")%>' type="text/javascript" charset="utf-8"></script>
+    <%-- 左ボックスカレンダー使用の場合のスクリプト --%>
+    <script src='<%= ResolveUrl("~/script/calendar.js")%>' type="text/javascript" charset="utf-8"></script>
+    <%-- コンテンツ領域 --%>
+    <asp:ContentPlaceHolder ID="head" runat="server" />
+</head>
+
+<body onload ="InitDisplay(); AutoCursor(); ConfirmWindow();">
+
+    <form id="OILMasterPage" runat="server"
+                ondragstart="f_dragEventCancel(event)"
+                ondrag="f_dragEventCancel(event)"
+                ondragend="f_dragEventCancel(event)" 
+                ondragenter="f_dragEventCancel(event)"
+                ondragleave="f_dragEventCancel(event)" 
+                ondragover="f_dragEventCancel(event)"  
+                ondrop="f_dragEventCancel(event)">    <%-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 %>
+
+        <%-- 全体レイアウト　titlebox --%>
+        <MSINC:title id="title" runat="server" />
+
+        <%-- コンテンツ領域 --%>
+        <asp:ContentPlaceHolder ID="contents1" runat="server" />
+
+        <%-- FOOTER --%>
+        <MSINC:footer id="footer" runat="server" />
+
+        <div hidden="hidden">
+            <asp:HiddenField ID="MF_USERID" runat="server" />                   <%-- ユーザID              --%>
+            <asp:HiddenField ID="MF_COMP_ROLE" runat="server" />                <%-- 会社権限ロール        --%>
+            <asp:HiddenField ID="MF_MAP_ROLE" runat="server" />                 <%-- 更新権限ロール        --%>
+            <asp:HiddenField ID="MF_ORG_ROLE" runat="server" />                 <%-- 組織権限ロール        --%>
+            <asp:HiddenField ID="MF_PROF_VIEW" runat="server" />                <%-- 画面プロフID          --%>
+            <asp:HiddenField ID="MF_PROF_REPORT" runat="server" />              <%-- 帳票プロフID          --%>
+            <asp:HiddenField ID="MF_USER_ORG" runat="server" />                 <%-- ユーザ所属部署        --%>
+            <asp:HiddenField ID="MF_USERTERMID" runat="server" />               <%-- ユーザ所属サーバ      --%>
+
+            <asp:HiddenField ID="MF_MAPID" runat="server" value="" />           <%-- MAPID           --%>
+            <asp:HiddenField ID="MF_MAPvariant" runat="server" />               <%-- MAP変数         --%>
+            <asp:HiddenField ID="MF_MAPpermitcode" runat="server" />            <%-- MAP権限         --%>
+
+            <asp:HiddenField ID="MF_VIEWID" runat="server"/>                    <%-- 画面　          --%>
+            <asp:HiddenField ID="MF_XMLsaveF" runat="server"/>                  <%-- 画面情報退避F　 --%>
+            <asp:HiddenField ID="MF_HELP" runat="server" />                     <%-- 画面HELP有無    --%>
+            <asp:HiddenField ID="MF_DROP" runat="server" Value="FALSE" />       <%-- 画面D&D有無     --%>
+
+            <asp:HiddenField ID="MF_SUBMIT" runat="server" value="FALSE" />     <%-- サーバー処理中（TRUE:実行中、FALSE:未実行） --%>
+
+            <asp:HiddenField ID="MF_AGAIN" runat="server" Value="FALSE" />      <%-- 確認ポップアップ再実行イベント --%>
+            <asp:HiddenField ID="MF_ALT_MSG" runat="server" Value="FALSE" />    <%-- 確認ポップアップ表示メッセージ --%>
+            <asp:HiddenField ID="MF_ALERT" runat="server" Value="FALSE" />      <%-- 確認ポップアップ処理可能 --%>
+        </div>
+    </form>
+</body>
+</html>

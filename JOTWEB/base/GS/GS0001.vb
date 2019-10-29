@@ -181,9 +181,9 @@ Public Class GS0001CAMPget
             SQLcon.Open() 'DataBase接続(Open)
 
             'M0001_CAMP検索SQL文
-            Dim SQL_Str As String = _
+            Dim SQL_Str As String =
                     "SELECT rtrim(NAMES) as NAMES , rtrim(NAMEL) as NAMEL , rtrim(NAMESK) as NAMESK , rtrim(NAMELK) as NAMELK , rtrim(POSTNUM1) as POSTNUM1 , rtrim(POSTNUM2) as POSTNUM2 , rtrim(ADDR1) as ADDR1 , rtrim(ADDR2) as ADDR2 , rtrim(ADDR3) as ADDR3 , rtrim(ADDR4) as ADDR4 , rtrim(TEL) as TEL , rtrim(FAX) as FAX , rtrim(MAIL) as MAIL " _
-                & " FROM  M0001_CAMP " _
+                & " FROM  OIL.M0001_CAMP " _
                 & " Where CAMPCODE = @P1 " _
                 & "   and STYMD   <= @P2 " _
                 & "   and ENDYMD  >= @P3 " _

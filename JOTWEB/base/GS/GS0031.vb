@@ -60,9 +60,9 @@ Public Class GS0031TODtoTORget
         '●届先より荷主取得（APSRVOrg）
         Try
             If TODOKECODE <> "" Then
-                Dim SQLStr As String = _
+                Dim SQLStr As String =
                             " SELECT rtrim(A.TORICODE)      as TORICODE " _
-                        & " FROM MC007_TODKORG            as A        " _
+                        & " FROM OIL.MC007_TODKORG            as A        " _
                         & " Where        A.CAMPCODE        = @P1      " _
                         & "          and A.UORG            = @P2      " _
                         & "          and A.TODOKECODE      = @P3      " _

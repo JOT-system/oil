@@ -154,6 +154,10 @@ Public Module BaseDllConst
         ''' </summary>
         Public Const SELECTED As String = "★"
         ''' <summary>
+        ''' 追加対象
+        ''' </summary>
+        Public Const INSERTING As String = "追加"
+        ''' <summary>
         ''' 更新対象
         ''' </summary>
         Public Const UPDATING As String = "更新"

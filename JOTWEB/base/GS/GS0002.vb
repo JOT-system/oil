@@ -557,9 +557,9 @@ Public Class GS0002GRCODEsum
                     'CAMPCODE検索SQL文
                     Dim SQL_Str As String
                     If GRCAMPLIST(i) = "" Then
-                        SQL_Str = _
+                        SQL_Str =
                                 "SELECT rtrim(NODENAMES) as NODENAMES " _
-                            & " FROM  M0007_GROUP " _
+                            & " FROM  OIL.M0007_GROUP " _
                             & " Where USERID   = @P1 " _
                             & "   and OBJECT   = @P3 " _
                             & "   and STRUCT   = @P4 " _
@@ -568,9 +568,9 @@ Public Class GS0002GRCODEsum
                             & "   and ENDYMD >= @P7 " _
                             & "   and DELFLG <> @P8 "
                     Else
-                        SQL_Str = _
+                        SQL_Str =
                                 "SELECT rtrim(NODENAMES) as NODENAMES " _
-                            & " FROM  M0007_GROUP " _
+                            & " FROM  OIL.M0007_GROUP " _
                             & " Where USERID   = @P1 " _
                             & "   and CAMPCODE = @P2 " _
                             & "   and OBJECT   = @P3 " _

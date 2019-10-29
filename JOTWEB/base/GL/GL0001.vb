@@ -103,7 +103,7 @@ Public Class GL0001CompList
                   " SELECT                        " _
                 & " rtrim(A.CAMPCODE) as CODE  ,  " _
                 & " rtrim(A.NAMES)    as NAMES    " _
-                & " FROM  M0001_CAMP A            " _
+                & " FROM  OIL.M0001_CAMP A        " _
                 & " WHERE                         " _
                 & "       A.STYMD   <= @P4        " _
                 & "   and A.ENDYMD  >= @P3        " _
@@ -165,8 +165,8 @@ Public Class GL0001CompList
                     "SELECT " _
                 & " rtrim(A.CAMPCODE) as CODE ," _
                 & " rtrim(A.NAMES) as NAMES " _
-                & " FROM  M0001_CAMP A " _
-                & " INNER JOIN S0006_ROLE B ON " _
+                & " FROM  OIL.M0001_CAMP A " _
+                & " INNER JOIN COM.S0006_ROLE B ON " _
                 & "       B.CODE     = A.CAMPCODE " _
                 & "   and B.ROLE     = @P1 " _
                 & "   and B.OBJECT   = @P2 " _

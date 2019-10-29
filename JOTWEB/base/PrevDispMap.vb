@@ -14,7 +14,7 @@ Public Module PrevDispMap
         ''' <summary>
         ''' メニュー画面
         ''' </summary>
-        Public Const MENU As String = "ASP.M00001MENU_ASPX"
+        Public Const MENU As String = "ASP.OIL_M00001MENU_ASPX"
         ''' <summary>
         ''' ユーザIDマスタ入力（条件）
         ''' </summary>
@@ -471,23 +471,23 @@ Public Module PrevDispMap
         ''' <summary>
         ''' 貨物駅マスタメンテナンス（検索）
         ''' </summary>
-        Public Const OIM0004S As String = "ASP.GR_OIM0004STATIONSEARCH_ASPX"
+        Public Const OIM0004S As String = "ASP.OIL_OIM0004STATIONSEARCH_ASPX"
         ''' <summary>
         ''' 貨物駅マスタメンテナンス（一覧）
         ''' </summary>
-        Public Const OIM0004L As String = "ASP.GR_OIM0004STATIONLIST_ASPX"
+        Public Const OIM0004L As String = "ASP.OIL_OIM0004STATIONLIST_ASPX"
         ''' <summary>
         ''' 貨物駅マスタメンテナンス（登録）
         ''' </summary>
-        Public Const OIM0004C As String = "ASP.GR_OIM0004STATIONCREATE_ASPX"
+        Public Const OIM0004C As String = "ASP.OIL_OIM0004STATIONCREATE_ASPX"
         ''' <summary>
         ''' タンク車マスタ（条件）
         ''' </summary>
-        Public Const OIM0005S As String = "ASP.GR_OIM0005TankSearch_ASPX"
+        Public Const OIM0005S As String = "ASP.OIL_OIM0005TankSearch_ASPX"
         ''' <summary>
         ''' タンク車マスタ（実行）
         ''' </summary>
-        Public Const OIM0005L As String = "ASP.GR_OIM0005TankList_ASPX"
+        Public Const OIM0005L As String = "ASP.OIL_OIM0005TankList_ASPX"
     End Class
 
 End Module 'End BaseDllConst

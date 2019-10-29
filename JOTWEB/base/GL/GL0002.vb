@@ -181,8 +181,8 @@ Public Class GL0002OrgList
                 & "   rtrim(B.NAMES)       as NAMES     ,  " _
                 & "   rtrim(A.GRCODE01)    as CATEGORY  ,  " _
                 & "   rtrim(A.SEQ)         as SEQ          " _
-                & " FROM       M0006_STRUCT A              " _
-                & " INNER JOIN M0002_ORG B ON              " _
+                & " FROM       OIL.M0006_STRUCT A          " _
+                & " INNER JOIN OIL.M0002_ORG B ON          " _
                 & "         A.CAMPCODE = B.CAMPCODE        " _
                 & "   and   A.CODE     = B.ORGCODE         " _
                 & "   and   B.STYMD   <= @P5               " _
@@ -260,14 +260,14 @@ Public Class GL0002OrgList
                 & "   rtrim(B.NAMES)       as NAMES       , " _
                 & "   rtrim(A.GRCODE01)    as CATEGORY    , " _
                 & "   rtrim(A.SEQ)         as SEQ           " _
-                & " FROM       M0006_STRUCT A               " _
-                & " INNER JOIN M0002_ORG B ON               " _
+                & " FROM       OIL.M0006_STRUCT A           " _
+                & " INNER JOIN OIL.M0002_ORG B ON           " _
                 & "         A.CAMPCODE = B.CAMPCODE         " _
                 & "   and   A.CODE     = B.ORGCODE          " _
                 & "   and   B.STYMD   <= @P5                " _
                 & "   and   B.ENDYMD  >= @P4                " _
                 & "   and   B.DELFLG  <> @P8                " _
-                & " INNER JOIN M0006_STRUCT C ON            " _
+                & " INNER JOIN OIL.M0006_STRUCT C ON        " _
                 & "         A.CODE     = C.CODE             " _
                 & "   and   A.CAMPCODE = C.CAMPCODE         " _
                 & "   and   A.OBJECT   = C.OBJECT           " _
@@ -276,7 +276,7 @@ Public Class GL0002OrgList
                 & "   and   C.DELFLG  <> @P8                " _
                 & "   and   C.STRUCT  IN (                  " _
                 & "    SELECT @P2 + '_' + C2.GRCODE02       " _
-                & "    FROM M0006_STRUCT C2                 " _
+                & "    FROM OIL.M0006_STRUCT C2             " _
                 & "    WHERE                                " _
                 & "           C2.OBJECT   = @P1             " _
                 & "     and   C2.STRUCT   = @P2             " _
@@ -362,14 +362,14 @@ Public Class GL0002OrgList
                 & " rtrim(B.NAMES)       as NAMES ," _
                 & " rtrim(A.GRCODE01)    as CATEGORY    , " _
                 & " rtrim(A.SEQ)         as SEQ " _
-                & " FROM  M0006_STRUCT A " _
-                & " INNER JOIN M0002_ORG B ON " _
+                & " FROM  OIL.M0006_STRUCT A " _
+                & " INNER JOIN OIL.M0002_ORG B ON " _
                 & "         A.CAMPCODE = B.CAMPCODE " _
                 & "   and   A.CODE     = B.ORGCODE " _
                 & "   and   B.STYMD   <= @P5 " _
                 & "   and   B.ENDYMD  >= @P4 " _
                 & "   and   B.DELFLG  <> @P8 " _
-                & " INNER JOIN S0006_ROLE C ON " _
+                & " INNER JOIN OIL.S0006_ROLE C ON " _
                 & "         C.CAMPCODE = A.CAMPCODE " _
                 & "   and   C.OBJECT   = A.OBJECT " _
                 & "   and   C.ROLE     = @P6 " _
@@ -454,14 +454,14 @@ Public Class GL0002OrgList
                 & " rtrim(B.NAMES) as NAMES ," _
                 & " rtrim(A.GRCODE01)    as CATEGORY    , " _
                 & " rtimr(A.SEQ)   as SEQ " _
-                & " FROM  M0006_STRUCT A " _
-                & " INNER JOIN M0002_ORG B ON " _
+                & " FROM  OIL.M0006_STRUCT A " _
+                & " INNER JOIN OIL.M0002_ORG B ON " _
                 & "         A.CAMPCODE = B.CAMPCODE " _
                 & "   and   A.CODE     = B.ORGCODE " _
                 & "   and   B.STYMD   <= @P5 " _
                 & "   and   B.ENDYMD  >= @P4 " _
                 & "   and   B.DELFLG  <> @P8 " _
-                & " INNER JOIN S0012_SRVAUTHOR C ON " _
+                & " INNER JOIN COM.S0012_SRVAUTHOR C ON " _
                 & "         C.CAMPCODE = A.CAMPCODE " _
                 & "   and   C.OBJECT   = @P10 " _
                 & "   and   C.TERMID   = @P9 " _
@@ -469,7 +469,7 @@ Public Class GL0002OrgList
                 & "   and   C.STYMD   <= @P5 " _
                 & "   and   C.ENDYMD  >= @P4 " _
                 & "   and   C.DELFLG  <> @P8 " _
-                & " INNER JOIN S0006_ROLE D ON " _
+                & " INNER JOIN OIL.S0006_ROLE D ON " _
                 & "         D.CAMPCODE = A.CAMPCODE " _
                 & "   and   D.OBJECT   = C.OBJECT " _
                 & "   and   D.ROLE     = C.ROLE " _
@@ -557,14 +557,14 @@ Public Class GL0002OrgList
                 & " rtrim(B.NAMES) as NAMES  , " _
                 & " rtrim(A.GRCODE01)    as CATEGORY    , " _
                 & " rtrim(A.SEQ)  as SEQ " _
-                & " FROM  M0006_STRUCT A " _
-                & " INNER JOIN M0002_ORG B ON " _
+                & " FROM  OIL.M0006_STRUCT A " _
+                & " INNER JOIN OIL.M0002_ORG B ON " _
                 & "         A.CAMPCODE = B.CAMPCODE " _
                 & "   and   A.CODE     = B.ORGCODE " _
                 & "   and   B.STYMD   <= @P5 " _
                 & "   and   B.ENDYMD  >= @P4 " _
                 & "   and   B.DELFLG  <> @P8 " _
-                & " INNER JOIN S0012_SRVAUTHOR C ON " _
+                & " INNER JOIN COM.S0012_SRVAUTHOR C ON " _
                 & "         C.CAMPCODE = A.CAMPCODE " _
                 & "   and   C.OBJECT   = @P10 " _
                 & "   and   C.TERMID   = @P9 " _
@@ -572,7 +572,7 @@ Public Class GL0002OrgList
                 & "   and   C.STYMD   <= @P5 " _
                 & "   and   C.ENDYMD  >= @P4 " _
                 & "   and   C.DELFLG  <> @P8 " _
-                & " INNER JOIN S0006_ROLE D ON " _
+                & " INNER JOIN COM.S0006_ROLE D ON " _
                 & "         D.CAMPCODE = A.CAMPCODE " _
                 & "   and   D.OBJECT   = C.OBJECT " _
                 & "   and   D.ROLE     = C.ROLE " _
@@ -580,7 +580,7 @@ Public Class GL0002OrgList
                 & "   and   D.STYMD   <= @P5 " _
                 & "   and   D.ENDYMD  >= @P4 " _
                 & "   and   D.DELFLG  <> @P8 " _
-                & " INNER JOIN S0006_ROLE E ON " _
+                & " INNER JOIN COM.S0006_ROLE E ON " _
                 & "         E.CAMPCODE = A.CAMPCODE " _
                 & "   and   E.OBJECT   = A.OBJECT " _
                 & "   and   E.ROLE     = @P6 " _

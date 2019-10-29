@@ -7,10 +7,10 @@
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIM0004WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:content id="OIM0004SH" contentplaceholderid="head" runat="server">
+<asp:Content id="OIM0004SH" contentplaceholderid="head" runat="server">
     <link href='<%=ResolveUrl("~/OIL/css/OIM0004S.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0004S.js")%>'></script>
-</asp:content>
+</asp:Content>
 
 <asp:Content ID="OIM0004S" ContentPlaceHolderID="contents1" runat="server">
     <!-- 全体レイアウト　searchbox -->

@@ -57,9 +57,9 @@ Public Class GS0003MEMOget
             SQLcon.Open() 'DataBase接続(Open)
 
             'T0002_MEMO検索SQL文
-            Dim SQL_Str As String = _
+            Dim SQL_Str As String =
                     "SELECT rtrim(MEMO) as MEMO " _
-                & " FROM  T0002_MEMO " _
+                & " FROM  COM.T0002_MEMO " _
                 & " Where USERID   = @P1 " _
                 & "   and MAPID    = @P2 " _
                 & "   and DELFLG  <> @P3 "
@@ -113,9 +113,9 @@ Public Class GS0003MEMOget
                 SQLcon.Open() 'DataBase接続(Open)
 
                 'T0002_MEMO追加SQL文
-                Dim SQL_Str As String = _
+                Dim SQL_Str As String =
                         "INSERT " _
-                    & " INTO  T0002_MEMO " _
+                    & " INTO  COM.T0002_MEMO " _
                     & "     ( USERID  , " _
                     & "       MAPID   , " _
                     & "       MEMO    , " _

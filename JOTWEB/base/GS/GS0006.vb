@@ -85,11 +85,11 @@ Public Class GS0006ViewList
             SQLcon.Open() 'DataBase接続(Open)
 
             'S0011_UPROFXLS検索SQL文
-            Dim SQL_Str As String = _
+            Dim SQL_Str As String =
                   " SELECT " _
                 & "    rtrim(VARIANT)        as VARIANT            , " _
                 & "    rtrim(FIELDNAMES)     as FIELDNAMES           " _
-                & " FROM      S0025_PROFMVIEW " _
+                & " FROM      COM.S0025_PROFMVIEW " _
                 & " WHERE                         " _
                 & "           CAMPCODE   = @P1 " _
                 & "      and  PROFID    IN (@P2 ,'" & C_DEFAULT_DATAKEY & "')" _

@@ -386,7 +386,8 @@ Public Class OILMasterPage
             Me.MAPvariant = CS0017ForwardURL.VARI_RETURN
             Me.MAPID = CS0017ForwardURL.MAP_RETURN
             '画面遷移実行
-            Server.Transfer("../" & CS0017ForwardURL.URL)
+            '            Server.Transfer("../" & CS0017ForwardURL.URL)
+            Server.Transfer(CS0017ForwardURL.URL)
         Else
             footer.Output(CS0017ForwardURL.ERR, C_MESSAGE_TYPE.ABORT, "getPreviusURL")
         End If
@@ -426,7 +427,8 @@ Public Class OILMasterPage
             CS0050SESSION.VIEW_MAPID = CS0017ForwardURL.MAP_RETURN
             Me.MAPvariant = CS0017ForwardURL.VARI_RETURN
             Me.MAPID = CS0017ForwardURL.MAP_RETURN
-            Server.Transfer("../" & CS0017ForwardURL.URL)
+            '            Server.Transfer("../" & CS0017ForwardURL.URL)
+            Server.Transfer(CS0017ForwardURL.URL)
         Else
             footer.Output(CS0017ForwardURL.ERR, C_MESSAGE_TYPE.ABORT, "getNextURL")
         End If

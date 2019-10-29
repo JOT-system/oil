@@ -103,12 +103,12 @@ Public Class GL0011TermList
         '○ User権限によりDB(S0005_AUTHOR)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT TERMID, TERMNAME " & _
-                    " FROM S0001_TERM " & _
-                    " WHERE TERMCLASS     =  '1' " & _
-                    " AND   STYMD        <= getdate() " & _
-                    " AND   ENDYMD       >= getdate() " & _
+            Dim SQLStr As String =
+                    " SELECT TERMID, TERMNAME " &
+                    " FROM COM.S0001_TERM " &
+                    " WHERE TERMCLASS     =  '1' " &
+                    " AND   STYMD        <= getdate() " &
+                    " AND   ENDYMD       >= getdate() " &
                     " AND   DELFLG       <> '1' "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
@@ -154,13 +154,13 @@ Public Class GL0011TermList
         '○ User権限によりDB(S0005_AUTHOR)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT TERMID, TERMNAME   " & _
-                    " FROM S0001_TERM           " & _
-                    " WHERE                     " & _
-                    "       STYMD        <= @P2 " & _
-                    " AND   ENDYMD       >= @P1 " & _
-                    " AND   TERMCLASS   　= @P3 " & _
+            Dim SQLStr As String =
+                    " SELECT TERMID, TERMNAME   " &
+                    " FROM COM.S0001_TERM           " &
+                    " WHERE                     " &
+                    "       STYMD        <= @P2 " &
+                    " AND   ENDYMD       >= @P1 " &
+                    " AND   TERMCLASS   　= @P3 " &
                     " AND   DELFLG       <> '1' "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
@@ -212,12 +212,12 @@ Public Class GL0011TermList
         '○ User権限によりDB(S0005_AUTHOR)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT TERMID, TERMNAME   " & _
-                    " FROM S0001_TERM           " & _
-                    " WHERE                     " & _
-                    "       STYMD        <= @P2 " & _
-                    " AND   ENDYMD       >= @P1 " & _
+            Dim SQLStr As String =
+                    " SELECT TERMID, TERMNAME   " &
+                    " FROM COM.S0001_TERM           " &
+                    " WHERE                     " &
+                    "       STYMD        <= @P2 " &
+                    " AND   ENDYMD       >= @P1 " &
                     " AND   DELFLG       <> '1' "
             '〇ソート条件追加
             Select Case DEFAULT_SORT

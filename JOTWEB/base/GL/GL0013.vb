@@ -76,12 +76,12 @@ Public Class GL0013URLList
         '○ User権限によりDB(S0009_URL)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT rtrim(URL)             as CODE  , " & _
-                    "        rtrim(NAMES)           as NAMES   " & _
-                    " FROM S0009_URL " & _
-                    " WHERE   STYMD        <= @P2 " & _
-                    "   AND   ENDYMD       >= @P3 " & _
+            Dim SQLStr As String =
+                    " SELECT rtrim(URL)             as CODE  , " &
+                    "        rtrim(NAMES)           as NAMES   " &
+                    " FROM COM.S0009_URL " &
+                    " WHERE   STYMD        <= @P2 " &
+                    "   AND   ENDYMD       >= @P3 " &
                     "   AND   DELFLG       <> '1' "
 
             '〇ソート条件追加
@@ -136,12 +136,12 @@ Public Class GL0013URLList
         '○ User権限によりDB(S0009_URL)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT rtrim(MAPID)           as CODE  , " & _
-                    "        rtrim(NAMES)           as NAMES   " & _
-                    " FROM S0009_URL " & _
-                    " WHERE   STYMD        <= @P2 " & _
-                    "   AND   ENDYMD       >= @P3 " & _
+            Dim SQLStr As String =
+                    " SELECT rtrim(MAPID)           as CODE  , " &
+                    "        rtrim(NAMES)           as NAMES   " &
+                    " FROM COM.S0009_URL " &
+                    " WHERE   STYMD        <= @P2 " &
+                    "   AND   ENDYMD       >= @P3 " &
                     "   AND   DELFLG       <> '1' "
             '〇ソート条件追加
             Select Case DEFAULT_SORT

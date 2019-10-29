@@ -31,7 +31,7 @@ Public Class GRIS0002Footer
         WF_MESSAGE.ForeColor = Color.Black
         WF_MESSAGE.Font.Bold = False
         WF_HELPIMG.Visible = True
-        WF_HELPIMG.ImageUrl = ResolveUrl("~/ヘルプ.jpg")
+        WF_HELPIMG.ImageUrl = ResolveUrl("~/img/ヘルプ.jpg")
         MEGID = String.Empty
         MSGTYPE = String.Empty
         PARAM01 = String.Empty

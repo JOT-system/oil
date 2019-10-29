@@ -83,13 +83,13 @@ Public Class GS0004MEMOset
                          & " set @hensuu = 0 ;                                                                       " _
                          & " DECLARE hensuu CURSOR FOR                                                               " _
                          & "   SELECT CAST(UPDTIMSTP as bigint) as hensuu                                            " _
-                         & "     FROM    T0002_MEMO                                                                  " _
+                         & "     FROM    COM.T0002_MEMO                                                                  " _
                          & "     WHERE USERID =@P2                                                                   " _
                          & "       and MAPID = @P3 ;                                                                 " _
                          & " OPEN hensuu ;                                                                                  " _
                          & " FETCH NEXT FROM hensuu INTO @hensuu ;                                                          " _
                          & " IF ( @@FETCH_STATUS = 0 )                                                                      " _
-                         & "    UPDATE   T0002_MEMO                                                                         " _
+                         & "    UPDATE   COM.T0002_MEMO                                                                         " _
                          & "       SET                                                                                      " _
                          & "         MEMO       = @P1 ,                                                                     " _
                          & "         UPDYMD     = @P4 ,                                                                     " _
@@ -100,7 +100,7 @@ Public Class GS0004MEMOset
                          & "            USERID     = @P2                                                                    " _
                          & "       And  MAPID      = @P3                                                                    " _
                          & " IF ( @@FETCH_STATUS <> 0 )                                                                     " _
-                         & "    INSERT INTO T0002_MEMO                                                                      " _
+                         & "    INSERT INTO COM.T0002_MEMO                                                                      " _
                          & "       (USERID , MAPID , MEMO, DELFLG  ,                                                        " _
                          & "        INITYMD , UPDYMD , UPDUSER , UPDTERMID , RECEIVEYMD)                                    " _
                          & "        VALUES (@P2,@P3,@P1,@P8,                                                                " _

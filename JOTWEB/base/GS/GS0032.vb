@@ -189,9 +189,9 @@ Public Class GS0032FIXVALUElst
             SQLcon.Open() 'DataBase接続(Open)
 
             'S0011_UPROFXLS検索SQL文
-            Dim SQL_Str As String = _
+            Dim SQL_Str As String =
                     "SELECT rtrim(KEYCODE) as KEYCODE , rtrim(VALUE1) as VALUE1 , rtrim(VALUE2) as VALUE2 , rtrim(VALUE3) as VALUE3 , rtrim(VALUE4) as VALUE4 , rtrim(VALUE5) as VALUE5 " _
-                & " FROM  MC001_FIXVALUE " _
+                & " FROM  OIL.MC001_FIXVALUE " _
                 & " Where CAMPCODE  = @P1 " _
                 & "   and CLASS     = @P2 " _
                 & "   and STYMD    <= @P3 " _
@@ -264,9 +264,9 @@ Public Class GS0032FIXVALUElst
                 SQLcon.Open() 'DataBase接続(Open)
 
                 'S0011_UPROFXLS検索SQL文
-                Dim SQL_Str As String = _
+                Dim SQL_Str As String =
                         "SELECT rtrim(KEYCODE) as KEYCODE , rtrim(VALUE1) as VALUE1 , rtrim(VALUE2) as VALUE2 , rtrim(VALUE3) as VALUE3 , rtrim(VALUE4) as VALUE4 , rtrim(VALUE5) as VALUE5 " _
-                    & " FROM  MC001_FIXVALUE " _
+                    & " FROM  OIL.MC001_FIXVALUE " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and CLASS     = @P2 " _
                     & "   and STYMD    <= @P3 " _

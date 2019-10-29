@@ -89,7 +89,7 @@ Public Class GS0005ReportList
             SQLcon.Open() 'DataBase接続(Open)
 
             'S0011_UPROFXLS検索SQL文
-            Dim SQL_Str As String = _
+            Dim SQL_Str As String =
                   " SELECT " _
                 & "   rtrim(REPORTID) as REPORTID ," _
                 & "   rtrim(FIELDNAMES) as FIELDNAME ," _
@@ -97,7 +97,7 @@ Public Class GS0005ReportList
                 & "        WHEN rtrim(EXCELFILE) ='' THEN 'なし' " _
                 & "        ELSE rtrim(EXCELFILE) " _
                 & "   END  as EXCELFILE " _
-                & " FROM  S0026_PROFMXLS " _
+                & " FROM  COM.S0026_PROFMXLS " _
                 & " WHERE " _
                 & "       CAMPCODE    = @P1 " _
                 & "   and PROFID     IN (@P2, '" & C_DEFAULT_DATAKEY & "') " _

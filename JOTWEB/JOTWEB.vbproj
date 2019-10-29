@@ -96,6 +96,9 @@
   <ItemGroup>
     <Content Include="bin\JOTWEB.dll" />
     <Content Include="bin\JOTWEB.pdb" />
+    <Content Include="OIL\css\OIM0004C.css" />
+    <Content Include="OIL\css\OIM0004L.css" />
+    <Content Include="OIL\css\OIM0004S.css" />
     <Content Include="OIL\img\404cat.png" />
     <Content Include="OIL\css\ex\bootstrap.min.css" />
     <Content Include="css\common.css" />
@@ -122,6 +125,9 @@
     <Content Include="OIL\css\ex\nprogress.css" />
     <Content Include="OIL\ex\page_404.html" />
     <Content Include="OIL\OIM0004StationSearch.aspx" />
+    <Content Include="OIL\script\OIM0004C.js" />
+    <Content Include="OIL\script\OIM0004L.js" />
+    <Content Include="OIL\script\OIM0004S.js" />
     <Content Include="script\calendar.js" />
     <Content Include="script\common.js" />
     <Content Include="script\event.js" />

@@ -124,6 +124,7 @@
     <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\css\ex\nprogress.css" />
     <Content Include="OIL\ex\page_404.html" />
+    <Content Include="OIL\OIM0004StationCreate.aspx" />
     <Content Include="OIL\OIM0004StationList.aspx" />
     <Content Include="OIL\OIM0004StationSearch.aspx" />
     <Content Include="OIL\script\OIM0004C.js" />
@@ -300,6 +301,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OIL\OIM0004StationCreate.aspx.designer.vb">
+      <DependentUpon>OIM0004StationCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\OIM0004StationCreate.aspx.vb">
+      <DependentUpon>OIM0004StationCreate.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\OIM0004StationList.aspx.designer.vb">
       <DependentUpon>OIM0004StationList.aspx</DependentUpon>

@@ -76,6 +76,7 @@ Public Class GRIS0005LeftBox
     ''' <item><description>LC_EXTRA_LIST    : 指定されたリストを使用する</description></item>
     ''' <item><description>LC_CALENDAR      : カレンダー表示を行う</description></item>
     ''' <item><description>LC_FIX_VALUE     : 固定値区分のリストを作成</description></item>
+    ''' <item><description>LC_STATIONCODE   : 貨物駅パターンのリストを作成</description></item>
     ''' </list>
     Public Enum LIST_BOX_CLASSIFICATION
         LC_COMPANY
@@ -97,6 +98,7 @@ Public Class GRIS0005LeftBox
         LC_EXTRA_LIST
         LC_CALENDAR
         LC_FIX_VALUE
+        LC_STATIONCODE
     End Enum
     ''' <summary>
     ''' パラメタ群
@@ -139,6 +141,7 @@ Public Class GRIS0005LeftBox
         LP_DISPLAY_FORMAT
         LP_ROLE
         LP_SELECTED_CODE
+        LP_STATIONCODE
     End Enum
 
     ''' <summary>
@@ -408,6 +411,10 @@ Public Class GRIS0005LeftBox
                 'モデル距離パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MODELPATTERN"
                 lbox = createFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_STATIONCODE
+                '貨物駅パターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STATIONPATTERN"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing

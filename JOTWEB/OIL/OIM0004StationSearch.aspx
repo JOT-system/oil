@@ -1,11 +1,11 @@
-﻿<%@ Page Title="OIM0004S" Language="vb" AutoEventWireup="false" CodeBehind="OIM0004StationSearch.aspx.vb" Inherits="OFFICE.OIM0004StationSearch" %>
-<%@ MasterType VirtualPath="OILMasterPage.Master" %>
+﻿<%@ Page Title="OIM0004S" Language="vb" AutoEventWireup="false" CodeBehind="OIM0004StationSearch.aspx.vb" Inherits="JOTWEB.OIM0004StationSearch" %>
+<%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
-<%@ Import Namespace="OFFICE.GRIS0005LeftBox" %>
+<%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/inc/OIM0004WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/OIM0004WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:content id="OIM0004SH" contentplaceholderid="head" runat="server">
     <link href='<%=ResolveUrl("~/GR/css/OIM0004S.css")%>' rel="stylesheet" type="text/css" />

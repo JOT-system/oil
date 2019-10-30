@@ -279,7 +279,7 @@ Public Class OIM0004StationList
               " SELECT" _
             & "   0                                          AS LINECNT" _
             & " , ''                                         AS OPERATION" _
-            & " , CAST(OIM0004.TIMESTAMP AS bigint)          AS TIMSTP" _
+            & " , CAST(OIM0004.UPDTIMSTP AS bigint)          AS TIMSTP" _
             & " , 1                                          AS 'SELECT'" _
             & " , 0                                          AS HIDDEN" _
             & " , ISNULL(RTRIM(OIM0004.STATIONCODE), '')     AS STATIONCODE" _
@@ -604,7 +604,7 @@ Public Class OIM0004StationList
             & "    SET @hensuu = 0 ;" _
             & " DECLARE hensuu CURSOR FOR" _
             & "    SELECT" _
-            & "        CAST(TIMESTAMP AS bigint) AS hensuu" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
             & "    FROM" _
             & "        OIL.OIM0004_STATION" _
             & "    WHERE" _
@@ -660,7 +660,7 @@ Public Class OIM0004StationList
             & "    , UPDUSER" _
             & "    , UPDTERMID" _
             & "    , RECEIVEYMD" _
-            & "    , CAST(TIMESTAMP AS bigint) AS TIMSTP" _
+            & "    , CAST(UPDTIMSTP AS bigint) AS TIMSTP" _
             & " FROM" _
             & "    OIL.OIM0004_STATION" _
             & " WHERE" _

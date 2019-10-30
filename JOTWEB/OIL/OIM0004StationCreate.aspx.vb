@@ -216,7 +216,7 @@ Public Class OIM0004StationCreate
             & "    STATIONCODE" _
             & "    , BRANCH" _
             & " FROM" _
-            & "    OIM0004_STATION" _
+            & "    OIL.OIM0004_STATION" _
             & " WHERE" _
             & "        STATIONCODE      = @P1"
 
@@ -1037,21 +1037,6 @@ Public Class OIM0004StationCreate
                 Case "UORG"             '運用部署
                     prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                'Case "TORICODES"     '取引先名称(出荷先)
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CUSTOMER, I_VALUE, O_TEXT, O_RTN, work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text))
-
-                'Case "SHUKABASHO"   '出荷場所名称
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODES.Text))
-
-                'Case "TORICODET"     '取引先名称（届先）
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CUSTOMER, I_VALUE, O_TEXT, O_RTN, work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text))
-
-                'Case "TODOKECODE"   '届先名称
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODET.Text))
-
-                'Case "MODELPATTERN" 'モデル距離パターン
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_MODELPT, I_VALUE, O_TEXT, O_RTN, work.CreateMODELPTParam(work.WF_SEL_CAMPCODE.Text, WF_MODELPT.Text))
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

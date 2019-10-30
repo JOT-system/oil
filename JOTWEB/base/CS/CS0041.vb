@@ -156,7 +156,7 @@ Public Structure CS0041TORIORGget
                 SQLcon.Open() 'DataBase接続(Open)
 
                 '検索SQL文
-                Dim SQLStr As String = _
+                Dim SQLStr As String =
                      "SELECT " _
                    & "       isnull(rtrim(CAMPCODE),'') as CAMPCODE " _
                    & "     , isnull(rtrim(TORICODE),'') as TORICODE " _
@@ -167,7 +167,7 @@ Public Structure CS0041TORIORGget
                    & "     , isnull(rtrim(TORITYPE04),'') as TORITYPE04 " _
                    & "     , isnull(rtrim(TORITYPE05),'') as TORITYPE05 " _
                    & "     , isnull(rtrim(STORICODE),'') as STORICODE " _
-                   & " FROM  MC003_TORIORG " _
+                   & " FROM  OIL.MC003_TORIORG " _
                    & " Where DELFLG     <> '1' "
 
                 Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)

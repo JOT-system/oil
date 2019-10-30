@@ -371,7 +371,7 @@ Public Structure CS0038ACCODEget
                 Dim SQLcon = sm.getConnection
                 SQLcon.Open() 'DataBase接続(Open)
 
-                Dim SQL_Str As String = _
+                Dim SQL_Str As String =
                       "SELECT rtrim(CAMPCODE)               as CAMPCODE    " _
                     & "      ,SEQ                           as SEQ         " _
                     & "      ,STYMD                         as STYMD       " _
@@ -399,7 +399,7 @@ Public Structure CS0038ACCODEget
                     & "      ,isnull(rtrim(ACCODE),'')      as ACCODE      " _
                     & "      ,isnull(rtrim(SUBACCODE),'')   as SUBACCODE   " _
                     & "      ,isnull(rtrim(INQKBN),'')      as INQKBN      " _
-                    & " FROM  ML002_ACHANTEI " _
+                    & " FROM  OIL.ML002_ACHANTEI " _
                     & " WHERE CAMPCODE = @P1 " _
                     & "   and DENTYPE  = @P2 " _
                     & "   and DELFLG  <> @P3 " _

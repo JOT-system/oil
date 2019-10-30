@@ -239,7 +239,7 @@ Public Structure CS0035HORDERget
             'T0004_HORDER検索SQL文
             Dim SQLStr As String = ""
             SQLStr = " SELECT ORDERNO, DETAILNO, TRIPNO, DROPNO, SEQ " _
-                         & "     FROM T0004_HORDER " _
+                         & "     FROM COM.T0004_HORDER " _
                          & "     WHERE    CAMPCODE        = @P01 " _
                          & "       and    SHIPORG         = @P02 " _
                          & "       and    KIJUNDATE       = @P03 " _

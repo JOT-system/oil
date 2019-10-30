@@ -176,7 +176,7 @@ Public Structure CS0043STAFFORGget
 
                 '検索SQL文
                 Dim SQLStr As String = ""
-                SQLStr = _
+                SQLStr =
                          "SELECT isnull(rtrim(A.STAFFKBN),'') as STAFFKBN " _
                        & "      ,isnull(rtrim(A.MORG),'') as MORG " _
                        & "      ,isnull(rtrim(A.HORG),'') as HORG " _
@@ -184,8 +184,8 @@ Public Structure CS0043STAFFORGget
                        & "      ,isnull(rtrim(A.STAFFCODE),'') as STAFFCODE " _
                        & "      ,isnull(rtrim(A.STYMD),'') as STYMD " _
                        & "      ,isnull(rtrim(A.ENDYMD),'') as ENDYMD " _
-                       & " FROM  MB002_STAFFORG O " _
-                       & " INNER JOIN MB001_STAFF A " _
+                       & " FROM  OIL.MB002_STAFFORG O " _
+                       & " INNER JOIN OIL.MB001_STAFF A " _
                        & "   ON    A.CAMPCODE   = O.CAMPCODE   " _
                        & "   and   A.STAFFCODE  = O.STAFFCODE  " _
                        & "   and   A.CAMPCODE   = @P1 " _

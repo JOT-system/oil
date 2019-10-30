@@ -188,7 +188,7 @@ Public Structure CS0012AUTHORorg
             Dim SQLStr As String =
                  "SELECT rtrim(B.PERMITCODE) as PERMITCODE  " _
                & " FROM  com.S0004_USER              A          " _
-               & " INNER JOIN S0006_ROLE         B       ON " _
+               & " INNER JOIN com.S0006_ROLE         B       ON " _
                & "       B.CAMPCODE = A.CAMPCODE            " _
                & "   and B.OBJECT   = @P3                   " _
                & "   and B.ROLE     = A.ORGROLE             " _

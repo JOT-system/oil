@@ -149,7 +149,7 @@ Public Class CS0054FtpFiles
                 sb.Append("  , isnull(f.FTP_MODE, '') as FTP_MODE ")
                 sb.Append("  , isnull(f.FILE_MODE, '') as FILE_MODE ")
                 sb.Append("FROM ")
-                sb.Append("  S0028_FTPFILES f ")
+                sb.Append("  COM.S0028_FTPFILES f ")
                 sb.Append("WHERE ")
                 sb.Append("  f.TARGETID = @targetId ")
                 sb.Append("  AND f.STYMD <= @stymd ")

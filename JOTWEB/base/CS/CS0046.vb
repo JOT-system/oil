@@ -143,7 +143,7 @@ Public Structure CS0046TREEget
             SQLcon.Open() 'DataBase接続(Open)
 
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                  "SELECT isnull(rtrim(M6.USERID),'')            as USERID ,     " _
                & "       isnull(rtrim(M6.CAMPCODE),'')          as CAMPCODE ,   " _
                & "       isnull(rtrim(M6.OBJECT),'')            as OBJECT ,     " _
@@ -162,7 +162,7 @@ Public Structure CS0046TREEget
                & "       isnull(rtrim(M6.GRCODE10),'')          as GRCODE10 ,   " _
                & "       M6.STYMD                               as STYMD,       " _
                & "       M6.ENDYMD                              as ENDYMD       " _
-               & " FROM    M0006_STRUCT M6                                      " _
+               & " FROM    OIL.M0006_STRUCT M6                                      " _
                & " Where   M6.USERID     = 'Default'                            " _
                & "   and   M6.CAMPCODE   = @P1                                  " _
                & "   and   M6.OBJECT     = @P2                                  " _

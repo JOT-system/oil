@@ -333,19 +333,6 @@ Public Class OIM0004StationList
                     ''貨物駅コード
                     'CODENAME_get("STATIONCODE", OIM0004row("STATIONCODE"), OIM0004row("STATONNAME"), WW_DUMMY)
 
-                    ''取引先名称(出荷先)
-                    'CODENAME_get("TORICODES", OIM0004row("TORICODES"), OIM0004row("TORINAMES"), WW_DUMMY)
-                    'work.WF_SEL_TORICODES.Text = OIM0004row("TORICODES")
-
-                    ''出荷場所名称
-                    'CODENAME_get("SHUKABASHO", OIM0004row("SHUKABASHO"), OIM0004row("SHUKABASHONAMES"), WW_DUMMY)
-
-                    ''取引先名称(届先)
-                    'CODENAME_get("TORICODET", OIM0004row("TORICODET"), OIM0004row("TORINAMET"), WW_DUMMY)
-                    'work.WF_SEL_TORICODET.Text = OIM0004row("TORICODET")
-
-                    ''届先名称
-                    'CODENAME_get("TODOKECODE", OIM0004row("TODOKECODE"), OIM0004row("TODOKENAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -1215,7 +1202,6 @@ Public Class OIM0004StationList
 
         End If
 
-
         '○画面切替設定
         WF_BOXChange.Value = "headerbox"
 
@@ -1408,21 +1394,6 @@ Public Class OIM0004StationList
 
                 'フィールドによってパラメーターを変える
                 Select Case WW_FIELD
-                    'Case "WF_TORICODES"                             '取引先(出荷場所)
-                    '    prmData = work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text)
-
-                    'Case "WF_SHUKABASHO"                            '出荷場所
-                    '    prmData = work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, WF_TORICODES.Text)
-
-                    'Case "WF_TORICODET"                             '取引先(届先)
-                    '    prmData = work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text)
-
-                    'Case "WF_TODOKECODE"                            '届先
-                    '    prmData = work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, WF_TORICODET.Text)
-
-                    'Case "WF_MODELPT"                               'モデル距離パターン
-                    '    prmData = work.CreateMODELPTParam(work.WF_SEL_CAMPCODE.Text, WF_MODELPT.Text)
-
                     Case "WF_DELFLG"
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
                         prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
@@ -2060,21 +2031,6 @@ Public Class OIM0004StationList
                 Case "UORG"             '運用部署
                     prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                'Case "TORICODES"     '取引先名称(出荷先)
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CUSTOMER, I_VALUE, O_TEXT, O_RTN, work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text))
-
-                'Case "SHUKABASHO"   '出荷場所名称
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODES.Text))
-
-                'Case "TORICODET"     '取引先名称（届先）
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CUSTOMER, I_VALUE, O_TEXT, O_RTN, work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text))
-
-                'Case "TODOKECODE"   '届先名称
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODET.Text))
-
-                'Case "MODELPATTERN" 'モデル距離パターン
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_MODELPT, I_VALUE, O_TEXT, O_RTN, work.CreateMODELPTParam(work.WF_SEL_CAMPCODE.Text, WF_MODELPT.Text))
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

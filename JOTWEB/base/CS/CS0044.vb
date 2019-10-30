@@ -1033,7 +1033,7 @@ Public Structure CS0044L1INSERT
             Dim SQLStr As String =
                      "SELECT " _
                    & "   rtrim(MORGCODE) as MORGCODE " _
-                   & " FROM  M0002_ORG " _
+                   & " FROM  OIL.M0002_ORG " _
                    & " Where ORGCODE    = @P1 " _
                    & "   and STYMD     <= @P3 " _
                    & "   and ENDYMD    >= @P2 " _

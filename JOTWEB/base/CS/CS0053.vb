@@ -431,7 +431,7 @@ Public Class CS0053FtpClient
                 sb.Append("  , isnull(s.FTP_PASSWORD, '') as FTP_PASSWORD ")
                 sb.Append("  , isnull(s.PASV_MODE, '') as PASV_MODE ")
                 sb.Append("FROM ")
-                sb.Append("  S0027_FTPSERVER s ")
+                sb.Append("  COM.S0027_FTPSERVER s ")
                 sb.Append("WHERE ")
                 sb.Append("  s.SERVERID = @serverId ")
                 sb.Append("  AND s.STYMD <= @stymd ")

@@ -1033,7 +1033,7 @@ Public Structure CS0044L1INSERT
             Dim SQLStr As String =
                      "SELECT " _
                    & "   rtrim(MORGCODE) as MORGCODE " _
-                   & " FROM  OIL.M0002_ORG " _
+                   & " FROM  OIL.OIM0002_ORG " _
                    & " Where ORGCODE    = @P1 " _
                    & "   and STYMD     <= @P3 " _
                    & "   and ENDYMD    >= @P2 " _
@@ -1067,7 +1067,7 @@ Public Structure CS0044L1INSERT
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = "CS0044L1INSERT"               'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:M0002_ORG Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIM0002_ORG Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

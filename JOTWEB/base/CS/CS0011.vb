@@ -115,12 +115,12 @@ Public Structure CS0011LOGWrite
 
             'DataBase接続
             '*共通関数
-            'S0002_LOGCNTL検索SQL文
+            'OIS0002_LOGCNTL検索SQL文
             Dim SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
             Dim SQLstr_LOGCNTL As String = "SELECT A , E , W , I , N " _
-                                          & " FROM  com.S0002_LOGCNTL " _
+                                          & " FROM  COM.OIS0002_LOGCNTL " _
                                           & " Where stymd  <= @P1 " _
                                           & "   and endymd >= @P2 " _
                                           & "   and DELFLG <> @P3 "

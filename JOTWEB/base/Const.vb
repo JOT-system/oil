@@ -171,7 +171,7 @@ Public Module BaseDllConst
         Public Const WARNING As String = "警告"
     End Class
     ''' <summary>
-    ''' 端末分類（S0001_TERM TERMCLASS）
+    ''' 端末分類（OIS0001_TERM TERMCLASS）
     ''' </summary>
     Public Class C_TERMCLASS
         ''' <summary>

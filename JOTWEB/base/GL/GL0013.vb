@@ -73,13 +73,13 @@ Public Class GL0013URLList
     ''' </summary>
     Protected Sub getURLList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用MAPID取得
-        '○ User権限によりDB(S0009_URL)検索
+        '○ User権限によりDB(OIS0007_URL)検索
         Try
 
             Dim SQLStr As String =
                     " SELECT rtrim(URL)             as CODE  , " &
                     "        rtrim(NAMES)           as NAMES   " &
-                    " FROM COM.S0009_URL " &
+                    " FROM COM.OIS0007_URL " &
                     " WHERE   STYMD        <= @P2 " &
                     "   AND   ENDYMD       >= @P3 " &
                     "   AND   DELFLG       <> '1' "
@@ -114,7 +114,7 @@ Public Class GL0013URLList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0012"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0009_URL Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0007_URL Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -133,13 +133,13 @@ Public Class GL0013URLList
     ''' </summary>
     Protected Sub getMapList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用MAPID取得
-        '○ User権限によりDB(S0009_URL)検索
+        '○ User権限によりDB(OIS0007_URL)検索
         Try
 
             Dim SQLStr As String =
                     " SELECT rtrim(MAPID)           as CODE  , " &
                     "        rtrim(NAMES)           as NAMES   " &
-                    " FROM COM.S0009_URL " &
+                    " FROM COM.OIS0007_URL " &
                     " WHERE   STYMD        <= @P2 " &
                     "   AND   ENDYMD       >= @P3 " &
                     "   AND   DELFLG       <> '1' "
@@ -173,7 +173,7 @@ Public Class GL0013URLList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0012"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0009_URL Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0007_URL Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

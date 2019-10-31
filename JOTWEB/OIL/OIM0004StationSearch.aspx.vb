@@ -1,4 +1,7 @@
-﻿Imports JOTWEB.GRIS0005LeftBox
+﻿'Option Strict On
+'Option Explicit On
+
+Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
 ''' 貨物車マスタ登録（条件）

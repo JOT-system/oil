@@ -73,7 +73,7 @@ Public Class CS0008ONLINEstat : Implements IDisposable
                    & "  isnull(ONLINESW,0) as ONLINESW  " _
                    & ", rtrim(TEXT)        as TEXT      " _
                    & " FROM                             " _
-                   & "  com.S0029_ONLINESTAT                " _
+                   & "  COM.OIS0020_ONLINESTAT                " _
                    & " Where TERMID  = @P1              " _
                    & "   and DELFLG <> @P2              "
 

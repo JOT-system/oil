@@ -300,7 +300,7 @@ Public Structure CS0021PROFXLS
             & "    , RTRIM(STRUCTCODE) AS STRUCT" _
             & "    , SORTORDER         AS SORTORDER" _
             & " FROM" _
-            & "    com.S0026_PROFMXLS" _
+            & "    COM.OIS0014_PROFMXLS" _
             & " WHERE" _
             & "    CAMPCODE     = @P1" _
             & "    AND PROFID   = @P2" _
@@ -481,7 +481,7 @@ Public Structure CS0021PROFXLS
 
             Dim CS0011LOGWrite As New CS0011LOGWrite
             CS0011LOGWrite.INFSUBCLASS = METHOD_NAME                    'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:S0026_PROFMXLS Select"         '問題発生個所
+            CS0011LOGWrite.INFPOSI = "DB:OIS0014_PROFMXLS Select"         '問題発生個所
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT                 '異常
             CS0011LOGWrite.TEXT = ex.ToString()                         '例外エラー
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR            'DBエラー

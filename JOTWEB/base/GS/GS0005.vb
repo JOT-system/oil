@@ -82,7 +82,7 @@ Public Class GS0005ReportList
         Dim WW_ListBOX As New ListBox
 
         '●RightBOX用帳票List取得
-        '○ DB(S0026_PROFMXLS)検索　…　入力パラメータによる検索
+        '○ DB(OIS0014_PROFMXLS)検索　…　入力パラメータによる検索
         Try
             'DataBase接続文字
             Dim SQLcon = sm.getConnection
@@ -97,7 +97,7 @@ Public Class GS0005ReportList
                 & "        WHEN rtrim(EXCELFILE) ='' THEN 'なし' " _
                 & "        ELSE rtrim(EXCELFILE) " _
                 & "   END  as EXCELFILE " _
-                & " FROM  COM.S0026_PROFMXLS " _
+                & " FROM  COM.OIS0014_PROFMXLS " _
                 & " WHERE " _
                 & "       CAMPCODE    = @P1 " _
                 & "   and PROFID     IN (@P2, '" & C_DEFAULT_DATAKEY & "') " _

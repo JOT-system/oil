@@ -129,7 +129,7 @@ Public Class CS0029ProfViewD
                 & " isnull(rtrim(ADDEVENT3),'') as ADDEVENT3 , isnull(rtrim(ADDFUNC3),'') as ADDFUNC3 , " _
                 & " isnull(rtrim(ADDEVENT4),'') as ADDEVENT4 , isnull(rtrim(ADDFUNC4),'') as ADDFUNC4 , " _
                 & " isnull(rtrim(ADDEVENT5),'') as ADDEVENT5 , isnull(rtrim(ADDFUNC5),'') as ADDFUNC5   " _
-                & " FROM  com.S0025_PROFMVIEW  " _
+                & " FROM  COM.OIS0012_PROFMVIEW  " _
                 & " Where CAMPCODE = @CAMPCODE " _
                 & "   and PROFID   = @PROFID " _
                 & "   and MAPID    = @MAPID " _

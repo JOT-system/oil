@@ -89,7 +89,7 @@ Public Class GS0006ViewList
                   " SELECT " _
                 & "    rtrim(VARIANT)        as VARIANT            , " _
                 & "    rtrim(FIELDNAMES)     as FIELDNAMES           " _
-                & " FROM      COM.S0025_PROFMVIEW " _
+                & " FROM      COM.OIS0012_PROFMVIEW " _
                 & " WHERE                         " _
                 & "           CAMPCODE   = @P1 " _
                 & "      and  PROFID    IN (@P2 ,'" & C_DEFAULT_DATAKEY & "')" _

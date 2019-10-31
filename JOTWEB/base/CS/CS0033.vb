@@ -329,7 +329,7 @@ Public Class CS0033AutoNumber
                 '検索SQL文
                 Dim SQLStr As String =
                           " SELECT rtrim(IPADDR)     as IPADDR      " _
-                        & "   FROM com.S0001_TERM                       " _
+                        & "   FROM com.OIS0001_TERM                       " _
                         & "  Where TERMCLASS    = @P1               " _
                         & "    and STYMD       <= @P2               " _
                         & "    and ENDYMD      >= @P2               " _
@@ -354,7 +354,7 @@ Public Class CS0033AutoNumber
                             'データが抽出出来ない場合
                             ERR = C_MESSAGE_NO.DB_ERROR
                             CS0011LOGWRITE.INFSUBCLASS = Me.GetType.Name                'SUBクラス名
-                            CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM Select"             '
+                            CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"             '
                             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                             CS0011LOGWRITE.TEXT = "データが存在しません。"
                             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -370,7 +370,7 @@ Public Class CS0033AutoNumber
         Catch ex As Exception
             ERR = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWRITE.INFSUBCLASS = Me.GetType.Name      'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM Select"                  '
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"                  '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                              '
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

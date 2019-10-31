@@ -50,16 +50,16 @@ Public Class GS0003MEMOget
         End If
 
         '●画面メモ情報取得
-        '○ DB(T0002_MEMO)検索
+        '○ DB(OIS0000_MEMO)検索
         Try
             'DataBase接続文字
             Dim SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
-            'T0002_MEMO検索SQL文
+            'OIS0000_MEMO検索SQL文
             Dim SQL_Str As String =
                     "SELECT rtrim(MEMO) as MEMO " _
-                & " FROM  COM.T0002_MEMO " _
+                & " FROM  COM.OIS0000_MEMO " _
                 & " Where USERID   = @P1 " _
                 & "   and MAPID    = @P2 " _
                 & "   and DELFLG  <> @P3 "
@@ -94,7 +94,7 @@ Public Class GS0003MEMOget
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = "GS0003MEMOget"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:T0002_MEMO Select"             '
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0000_MEMO Select"             '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -112,10 +112,10 @@ Public Class GS0003MEMOget
                 Dim SQLcon = sm.getConnection
                 SQLcon.Open() 'DataBase接続(Open)
 
-                'T0002_MEMO追加SQL文
+                'OIS0000_MEMO追加SQL文
                 Dim SQL_Str As String =
                         "INSERT " _
-                    & " INTO  COM.T0002_MEMO " _
+                    & " INTO  COM.OIS0000_MEMO " _
                     & "     ( USERID  , " _
                     & "       MAPID   , " _
                     & "       MEMO    , " _
@@ -160,7 +160,7 @@ Public Class GS0003MEMOget
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
                 CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:T0002_MEMO Insert"
+                CS0011LOGWRITE.INFPOSI = "DB:OIS0000_MEMO Insert"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

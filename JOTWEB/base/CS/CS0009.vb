@@ -232,7 +232,7 @@ Public Structure CS0009MESSAGEout
             'Message検索SQL文
             Dim SQLStr As String =
                  "SELECT rtrim(TEXT) as TEXT " _
-               & " FROM  com.S0003_MESSAGE " _
+               & " FROM  COM.OIS0003_MESSAGE " _
                & " Where ID= @P1 "
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 10)
@@ -289,13 +289,13 @@ Public Structure CS0009MESSAGEout
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME             'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0003_MESSAGE Select"          '
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0003_MESSAGE Select"          '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
-            MESSAGEBOX.TEXT = "システム管理者へ連絡して下さい(DB S0003_MESSAGE Select ERR)"
+            MESSAGEBOX.TEXT = "システム管理者へ連絡して下さい(DB OIS0003_MESSAGE Select ERR)"
             MESSAGEBOX.ForeColor = MESSAGEBOX.ForeColor.red 'red
             MESSAGEBOX.BackColor = MESSAGEBOX.BackColor.darksalmon 'darksalmon
             MESSAGEBOX.Font.Bold = "True"

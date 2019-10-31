@@ -604,7 +604,7 @@ Public Class OILMasterPage
         CS0036FCHECK.CAMPCODE = I_COMPCODE                          '会社コード
         CS0036FCHECK.MAPID = Me.MAPID                               '画面ID
         CS0036FCHECK.FIELD = I_FIELD                                '項目名
-        CS0036FCHECK.TBL = IO_TBL                                   'S0013_DATAFIELDテーブル
+        CS0036FCHECK.TBL = IO_TBL                                   'OIS0016_DATAFIELDテーブル
         Return CS0036FCHECK.existsCheckField()
 
     End Function
@@ -625,7 +625,7 @@ Public Class OILMasterPage
         CS0036FCHECK.MAPID = Me.MAPID                               '画面ID
         CS0036FCHECK.FIELD = I_FIELD                                '項目名
         CS0036FCHECK.VALUE = IO_VALUE                               '値
-        CS0036FCHECK.TBL = IO_TBL                                   'S0013_DATAFIELDテーブル
+        CS0036FCHECK.TBL = IO_TBL                                   'OIS0016_DATAFIELDテーブル
         CS0036FCHECK.CS0036FCHECK()
 
         O_MESSAGENO = CS0036FCHECK.ERR
@@ -658,7 +658,7 @@ Public Class OILMasterPage
         CS0036FCHECK.MAPID = Me.MAPID                               '画面ID
         CS0036FCHECK.FIELD = I_FIELD                                '項目名
         CS0036FCHECK.VALUE = I_VALUE                               '値
-        CS0036FCHECK.TBL = IO_TBL                                   'S0013_DATAFIELDテーブル
+        CS0036FCHECK.TBL = IO_TBL                                   'OIS0016_DATAFIELDテーブル
         CS0036FCHECK.CS0036FCHECK()
 
         O_MESSAGENO = CS0036FCHECK.ERR

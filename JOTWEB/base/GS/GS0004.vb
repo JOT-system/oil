@@ -71,25 +71,25 @@ Public Class GS0004MEMOset
 
 
         '●画面メモ情報更新
-        '○ DB(T0002_MEMO)更新
+        '○ DB(OIS0000_MEMO)更新
         Try
             'DataBase接続文字
             Dim SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
-            'T0002_MEMO更新SQL文
+            'OIS0000_MEMO更新SQL文
             Dim SQLStr As String =
                     " DECLARE @hensuu as bigint ;                                                                    " _
                          & " set @hensuu = 0 ;                                                                       " _
                          & " DECLARE hensuu CURSOR FOR                                                               " _
                          & "   SELECT CAST(UPDTIMSTP as bigint) as hensuu                                            " _
-                         & "     FROM    COM.T0002_MEMO                                                                  " _
+                         & "     FROM    COM.OIS0000_MEMO                                                                  " _
                          & "     WHERE USERID =@P2                                                                   " _
                          & "       and MAPID = @P3 ;                                                                 " _
                          & " OPEN hensuu ;                                                                                  " _
                          & " FETCH NEXT FROM hensuu INTO @hensuu ;                                                          " _
                          & " IF ( @@FETCH_STATUS = 0 )                                                                      " _
-                         & "    UPDATE   COM.T0002_MEMO                                                                         " _
+                         & "    UPDATE   COM.OIS0000_MEMO                                                                         " _
                          & "       SET                                                                                      " _
                          & "         MEMO       = @P1 ,                                                                     " _
                          & "         UPDYMD     = @P4 ,                                                                     " _
@@ -100,7 +100,7 @@ Public Class GS0004MEMOset
                          & "            USERID     = @P2                                                                    " _
                          & "       And  MAPID      = @P3                                                                    " _
                          & " IF ( @@FETCH_STATUS <> 0 )                                                                     " _
-                         & "    INSERT INTO COM.T0002_MEMO                                                                      " _
+                         & "    INSERT INTO COM.OIS0000_MEMO                                                                      " _
                          & "       (USERID , MAPID , MEMO, DELFLG  ,                                                        " _
                          & "        INITYMD , UPDYMD , UPDUSER , UPDTERMID , RECEIVEYMD)                                    " _
                          & "        VALUES (@P2,@P3,@P1,@P8,                                                                " _
@@ -133,7 +133,7 @@ Public Class GS0004MEMOset
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:T0002_MEMO Update"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0000_MEMO Update"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

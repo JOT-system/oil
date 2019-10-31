@@ -93,7 +93,7 @@ Public Structure CS0006TERMchk
                 'MessageåüçıSQLï∂
                 Dim SQLStr As String =
                      "SELECT rtrim(TERMID) as TERMID , rtrim(TERMCAMP) as TERMCAMP , rtrim(TERMORG) as TERMORG , rtrim(MORG) as MORG" _
-                   & " FROM  com.S0001_TERM " _
+                   & " FROM  com.OIS0001_TERM " _
                    & " Where TERMID = @P1 " _
                    & "   and STYMD <= @P2 " _
                    & "   and ENDYMD >= @P3 " _
@@ -130,7 +130,7 @@ Public Structure CS0006TERMchk
 
                 Dim CS0011LOGWrite As New CS0011LOGWrite                    'LogOutput DirString Get
                 CS0011LOGWrite.INFSUBCLASS = METHOD_NAME                    'SUBÉNÉâÉXñº
-                CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM Select"             '
+                CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"             '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

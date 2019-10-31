@@ -180,7 +180,7 @@ Public Class CS0016ProfMValue
                         & ", VALUEADDMM " _
                         & ", VALUEADDDD " _
                         & ", rtrim(DELFLG) as DELFLG " _
-                        & " FROM  com.S0023_PROFMVARI " _
+                        & " FROM  COM.OIS0013_PROFMVARI " _
                         & " Where PROFID   IN (@P1 ,'" & C_DEFAULT_DATAKEY & "') " _
                         & "   and MAPID    = @P2 " _
                         & "   and VARIANT  = @P4 " _
@@ -210,7 +210,7 @@ Public Class CS0016ProfMValue
                         & ", VALUEADDMM " _
                         & ", VALUEADDDD " _
                         & ", rtrim(DELFLG) as DELFLG " _
-                        & " FROM  com.S0023_PROFMVARI " _
+                        & " FROM  COM.OIS0013_PROFMVARI " _
                         & " Where PROFID   IN (@P1 ,'" & C_DEFAULT_DATAKEY & "') " _
                         & "   and MAPID    = @P2 " _
                         & "   and CAMPCODE IN (@P3 ,'" & C_DEFAULT_DATAKEY & "') " _

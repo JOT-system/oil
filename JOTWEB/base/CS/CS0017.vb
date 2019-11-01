@@ -127,7 +127,7 @@ Public Structure CS0017ForwardURL
                    & "   and B.DELFLG   <> @P5 " _
                    & " Where " _
                    & "       A.MAPID     = @P1 " _
-                   & "   and A.VARIANT   = @P2 " _
+                   & "   and A.VARIANTP  = @P2 " _
                    & "   and A.TITLEKBN  = 'I' " _
                    & "   and A.STYMD    <= @P4 " _
                    & "   and A.ENDYMD   >= @P3 " _

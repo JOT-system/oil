@@ -550,17 +550,6 @@ Public Class M00001MENU
 
     End Sub
 
-
-
-
-
-
-
-
-
-
-
-
     ' ******************************************************************************
     ' ***  Repeater_Menu_R ボタン押下処理                                        ***
     ' ******************************************************************************
@@ -580,6 +569,11 @@ Public Class M00001MENU
         '○画面遷移権限チェック（右）
         CS0007CheckAuthority.MAPID = WW_MAPID.Text
         CS0007CheckAuthority.ROLECODE_MAP = Master.ROLE_MAP
+        '20191101-追加-START
+        CS0007CheckAuthority.ROLECODE_MENU = Master.ROLE_MENU
+        CS0007CheckAuthority.ROLECODE_VIEWPROF = Master.ROLE_VIEWPROF
+        CS0007CheckAuthority.ROLECODE_RPRTPROF = Master.ROLE_RPRTPROF
+        '20191101-追加-END
         CS0007CheckAuthority.check()
         If isNormal(CS0007CheckAuthority.ERR) Then
             If CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.REFERLANCE OrElse
@@ -588,6 +582,12 @@ Public Class M00001MENU
                 CS0050Session.VIEW_MAPID = WW_MAPID.Text
                 CS0050Session.VIEW_MAP_VARIANT = WW_VARI.Text
                 CS0050Session.MAP_ETC = ""
+                '20191101-追加-START
+                CS0050Session.VIEW_MENU_MODE = CS0007CheckAuthority.ROLECODE_MENU
+                CS0050Session.VIEW_MAP_MODE = CS0007CheckAuthority.ROLECODE_MAP
+                CS0050Session.VIEW_VIEWPROF_MODE = CS0007CheckAuthority.ROLECODE_VIEWPROF
+                CS0050Session.VIEW_RPRTPROF_MODE = CS0007CheckAuthority.ROLECODE_RPRTPROF
+                '20191101-追加-END
 
                 Master.MAPvariant = WW_VARI.Text
                 Master.MAPID = WW_MAPID.Text

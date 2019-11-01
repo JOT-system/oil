@@ -134,9 +134,9 @@ Public Structure CS0025AUTHORget
                    & " INNER JOIN COM.OIS0009_ROLE        B              ON " _
                    & "       B.OBJECT   = @P2                         " _
                    & "   and B.ROLE     = CASE B.OBJECT               " _
-                   & "                    WHEN 'ORG'  THEN A.ORGROLE  " _
-                   & "                    WHEN 'CAMP' THEN A.CAMPROLE " _
                    & "                    WHEN 'MAP'  THEN A.MAPROLE  " _
+                   & "                    WHEN 'VIEW' THEN A.VIEWPROFID " _
+                   & "                    WHEN 'RPRT' THEN A.RPRTPROFID " _
                    & "                    END                         " _
                    & "   and B.CAMPCODE = A.CAMPCODE                  " _
                    & "   and B.CODE     = @P3                         " _
@@ -148,6 +148,25 @@ Public Structure CS0025AUTHORget
                    & "   and A.ENDYMD  >= @P5                         " _
                    & "   and A.DELFLG  <> '1'                         " _
                    & "ORDER BY B.SEQ                                  "
+                '  "SELECT rtrim(B.PERMITCODE) as PERMITCODE        " _
+                '& " FROM       COM.OIS0004_USER        A                 " _
+                '& " INNER JOIN COM.OIS0009_ROLE        B              ON " _
+                '& "       B.OBJECT   = @P2                         " _
+                '& "   and B.ROLE     = CASE B.OBJECT               " _
+                '& "                    WHEN 'ORG'  THEN A.ORGROLE  " _
+                '& "                    WHEN 'CAMP' THEN A.CAMPROLE " _
+                '& "                    WHEN 'MAP'  THEN A.MAPROLE  " _
+                '& "                    END                         " _
+                '& "   and B.CAMPCODE = A.CAMPCODE                  " _
+                '& "   and B.CODE     = @P3                         " _
+                '& "   and B.STYMD   <= @P4                         " _
+                '& "   and B.ENDYMD  >= @P5                         " _
+                '& "   and B.DELFLG  <> '1'                         " _
+                '& " Where A.USERID   = @P1                         " _
+                '& "   and A.STYMD   <= @P4                         " _
+                '& "   and A.ENDYMD  >= @P5                         " _
+                '& "   and A.DELFLG  <> '1'                         " _
+                '& "ORDER BY B.SEQ                                  "
 
                 Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                     Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)

@@ -174,7 +174,7 @@ Public MustInherit Class GL0000 : Implements IDisposable
     Protected Sub addListData(ByVal I_SQLDR As SqlDataReader, ByVal CODE_NAME As String, ByVal NAMES_NAME As String)
         While I_SQLDR.Read
 
-            If Not extracheck(I_SQLDR) Then Continue While
+            '            If Not extracheck(I_SQLDR) Then Continue While
             '○出力編集
             Select Case VIEW_FORMAT
                 Case C_VIEW_FORMAT_PATTERN.NAMES

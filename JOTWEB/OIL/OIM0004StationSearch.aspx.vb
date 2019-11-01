@@ -162,7 +162,9 @@ Public Class OIM0004StationSearch
         work.WF_SEL_BRANCH.Text = TxtBranch.Text
 
         '○ 画面レイアウト設定
-        Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
+        If Master.VIEWID = "" Then
+            Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
+        End If
 
         Master.CheckParmissionCode(WF_CAMPCODE.Text)
         If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then

@@ -491,7 +491,7 @@ Public Class GRIS0005LeftBox
                    .TYPEMODE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0001CompList.LC_COMPANY_TYPE.ROLE) _
                  , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
                  , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                 , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_COMP) _
+                 , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
                  , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
                  , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0001CompList.C_VIEW_FORMAT_PATTERN.NAMES)
             }
@@ -600,9 +600,9 @@ Public Class GRIS0005LeftBox
                 , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
                 , .AUTHWITH = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY) _
                 , .Categorys = Categorys _
-                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
                 , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), String.Empty)
+                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG)
              }
                 CL0002OrgList.getList()
                 O_RTN = CL0002OrgList.ERR

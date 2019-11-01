@@ -15,12 +15,36 @@ Public Class CS0007CheckAuthority
     Public Property MAPID() As String
 
     ''' <summary>
+    ''' 権限チェックを行うメニュー表示のロール
+    ''' </summary>
+    ''' <value>ROLECODE(MENU)</value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property ROLECODE_MENU As String
+
+    ''' <summary>
     ''' 権限チェックを行う画面のロール
     ''' </summary>
     ''' <value>ROLECODE(MAP)</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property ROLECODE_MAP As String
+
+    ''' <summary>
+    ''' 権限チェックを行う画面表示項目のロール
+    ''' </summary>
+    ''' <value>ROLECODE(VIEWPROF)</value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property ROLECODE_VIEWPROF As String
+
+    ''' <summary>
+    ''' 権限チェックを行うエクセル出力のロール
+    ''' </summary>
+    ''' <value>ROLECODE(RPRTPROF)</value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property ROLECODE_RPRTPROF As String
 
     ''' <summary>
     ''' 権限チェックを行う会社コード
@@ -122,14 +146,14 @@ Public Class CS0007CheckAuthority
                 SQLcon.Open() 'DataBase接続(Open)
                 '●権限チェック（画面）　…　ユーザ操作権限取得
                 WW_USER_MAP_PERMIT = checkUserPermission(SQLcon, ROLECODE_MAP, C_ROLE_VARIANT.USER_PERTMIT, MAPID)
-                '●権限チェック（画面）　…　サーバ操作権限取得
-                WW_SRV_PERMIT = checkTermPermission(SQLcon, C_ROLE_VARIANT.SERV_PERTMIT)
-                '●権限チェック（会社）　…　ユーザ操作権限取得
-                If String.IsNullOrEmpty(ROLECODE_COMP) Then
-                    WW_USER_COMP_PERMIT = CInt(C_PERMISSION.UPDATE)
-                Else
-                    WW_USER_COMP_PERMIT = checkUserPermission(SQLcon, ROLECODE_COMP, C_ROLE_VARIANT.USER_COMP, COMPCODE)
-                End If
+                ''●権限チェック（画面）　…　サーバ操作権限取得
+                'WW_SRV_PERMIT = checkTermPermission(SQLcon, C_ROLE_VARIANT.SERV_PERTMIT)
+                ''●権限チェック（会社）　…　ユーザ操作権限取得
+                'If String.IsNullOrEmpty(ROLECODE_COMP) Then
+                '    WW_USER_COMP_PERMIT = CInt(C_PERMISSION.UPDATE)
+                'Else
+                '    WW_USER_COMP_PERMIT = checkUserPermission(SQLcon, ROLECODE_COMP, C_ROLE_VARIANT.USER_COMP, COMPCODE)
+                'End If
             End Using
 
         Catch ex As Exception
@@ -148,8 +172,9 @@ Public Class CS0007CheckAuthority
 
         '権限コード判定
         If isNormal(ERR) Then
-            '一番小さい権限を採用する
-            MAPPERMITCODE = Math.Min(WW_SRV_PERMIT, Math.Min(WW_USER_MAP_PERMIT, WW_USER_COMP_PERMIT))
+            ''一番小さい権限を採用する
+            'MAPPERMITCODE = Math.Min(WW_SRV_PERMIT, Math.Min(WW_USER_MAP_PERMIT, WW_USER_COMP_PERMIT))
+            MAPPERMITCODE = WW_USER_MAP_PERMIT
         End If
 
     End Sub

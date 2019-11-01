@@ -43,8 +43,11 @@
         <div hidden="hidden">
             <asp:HiddenField ID="MF_USERID" runat="server" />                   <%-- ユーザID              --%>
             <asp:HiddenField ID="MF_COMP_ROLE" runat="server" />                <%-- 会社権限ロール        --%>
-            <asp:HiddenField ID="MF_MAP_ROLE" runat="server" />                 <%-- 更新権限ロール        --%>
             <asp:HiddenField ID="MF_ORG_ROLE" runat="server" />                 <%-- 組織権限ロール        --%>
+            <asp:HiddenField ID="MF_MENU_ROLE" runat="server" />                <%-- メニュー権限ロール    --%>
+            <asp:HiddenField ID="MF_MAP_ROLE" runat="server" />                 <%-- 更新権限ロール        --%>
+            <asp:HiddenField ID="MF_VIEWPROF_ROLE" runat="server" />            <%-- 画面表示権限ロール    --%>
+            <asp:HiddenField ID="MF_RPRTPROF_ROLE" runat="server" />            <%-- エクセル出力権限ロール--%>
             <asp:HiddenField ID="MF_PROF_VIEW" runat="server" />                <%-- 画面プロフID          --%>
             <asp:HiddenField ID="MF_PROF_REPORT" runat="server" />              <%-- 帳票プロフID          --%>
             <asp:HiddenField ID="MF_USER_ORG" runat="server" />                 <%-- ユーザ所属部署        --%>

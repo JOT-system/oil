@@ -289,6 +289,12 @@ Public Class M00000LOGON
         Dim WW_MISSCNT As Integer = 0
         Dim WW_UPDYMD As Date
         Dim WW_UPDTIMSTP As Byte()
+        '20191101-追加-START
+        Dim WW_MENUROLE As String = String.Empty
+        Dim WW_MAPROLE As String = String.Empty
+        Dim WW_VIEWPROFID As String = String.Empty
+        Dim WW_RPRTPROFID As String = String.Empty
+        '20191101-追加-END
         Dim WW_MAPID As String = String.Empty
         Dim WW_VARIANT As String = String.Empty
         Dim WW_PASSENDYMD As String = String.Empty
@@ -314,6 +320,10 @@ Public Class M00000LOGON
                    & " A.INITYMD                      , " _
                    & " A.UPDYMD                       , " _
                    & " A.UPDTIMSTP                    , " _
+                   & " rtrim(A.MENUROLE) as MENUROLE  , " _
+                   & " rtrim(A.MAPROLE) as MAPROLE    , " _
+                   & " rtrim(A.VIEWPROFID) as VIEWPROFID    , " _
+                   & " rtrim(A.RPRTPROFID) as RPRTPROFID    , " _
                    & " rtrim(A.MAPID)    as MAPID     , " _
                    & " rtrim(A.VARIANT)  as VARIANT   , " _
                    & " B.PASSENDYMD      as PASSENDYMD  " _
@@ -347,6 +357,12 @@ Public Class M00000LOGON
                         WW_MISSCNT = SQLdr("MISSCNT")
                         WW_UPDYMD = SQLdr("UPDYMD")
                         WW_UPDTIMSTP = SQLdr("UPDTIMSTP")
+                        '20191101-追加-START
+                        WW_MENUROLE = SQLdr("MENUROLE")
+                        WW_MAPROLE = SQLdr("MAPROLE")
+                        WW_VIEWPROFID = SQLdr("VIEWPROFID")
+                        WW_RPRTPROFID = SQLdr("RPRTPROFID")
+                        '20191101-追加-END
                         WW_MAPID = SQLdr("MAPID")
                         WW_VARIANT = SQLdr("VARIANT")
                         WW_PASSENDYMD = SQLdr("PASSENDYMD")
@@ -538,10 +554,23 @@ Public Class M00000LOGON
         End Using
 
         CS0050Session.VIEW_MAPID = WW_MAPID
+        '20191101-追加-START
+        CS0050Session.VIEW_MENU_MODE = WW_MENUROLE
+        CS0050Session.VIEW_MAP_MODE = WW_MAPID
+        CS0050Session.VIEW_VIEWPROF_MODE = WW_VIEWPROFID
+        CS0050Session.VIEW_RPRTPROF_MODE = WW_RPRTPROFID
+        '20191101-追加-END
         CS0050Session.VIEW_MAP_VARIANT = WW_VARIANT
         CS0050Session.MAP_ETC = ""
         CS0050Session.VIEW_PERMIT = ""
+
         Master.MAPID = WW_MAPID
+        '20191101-追加-START
+        Master.ROLE_MENU = WW_MENUROLE
+        Master.ROLE_MAP = WW_MAPID
+        Master.ROLE_VIEWPROF = WW_VIEWPROFID
+        Master.ROLE_RPRTPROF = WW_RPRTPROFID
+        '20191101-追加-END
         Master.MAPvariant = WW_VARIANT
         Master.MAPpermitcode = ""
         CS0050Session.LOGONDATE = WW_LOGONYMD

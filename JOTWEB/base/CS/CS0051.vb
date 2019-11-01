@@ -46,9 +46,9 @@ Public Class CS0051UserInfo : Implements IDisposable
     ''' </summary>
     Public Property MAPVARI As String
     ''' <summary>
-    ''' 会社権限
+    ''' メニュー権限
     ''' </summary>
-    Public Property CAMPROLE As String
+    Public Property MENUROLE As String
     ''' <summary>
     ''' 更新権限
     ''' </summary>
@@ -112,14 +112,15 @@ Public Class CS0051UserInfo : Implements IDisposable
         '●初期化処理
         CAMPCODE = ""
         ORG = ""
-        STAFFCODE = ""
+        '        STAFFCODE = ""
         STAFFNAMES = ""
         STAFFNAMEL = ""
         MAPID = ""
         MAPVARI = ""
-        CAMPROLE = ""
+        '        CAMPROLE = ""
+        MENUROLE = ""
         MAPROLE = ""
-        ORGROLE = ""
+        '        ORGROLE = ""
         VIEWPROFID = ""
         RPRTPROFID = ""
         'セッション管理
@@ -150,14 +151,12 @@ Public Class CS0051UserInfo : Implements IDisposable
                      "SELECT " _
                    & "   rtrim(CAMPCODE) as CAMPCODE " _
                    & " , rtrim(ORG) as ORG " _
-                   & " , rtrim(STAFFCODE) as STAFFCODE " _
                    & " , rtrim(STAFFNAMES) as STAFFNAMES " _
                    & " , rtrim(STAFFNAMEL) as STAFFNAMEL " _
                    & " , rtrim(MAPID) as MAPID " _
                    & " , rtrim(VARIANT) as VARIANT " _
-                   & " , rtrim(CAMPROLE) as CAMPROLE " _
+                   & " , rtrim(MENUROLE) as MENUROLE " _
                    & " , rtrim(MAPROLE) as MAPROLE " _
-                   & " , rtrim(ORGROLE) as ORGROLE " _
                    & " , rtrim(VIEWPROFID) as VIEWPROFID " _
                    & " , rtrim(RPRTPROFID) as RPRTPROFID " _
                    & " FROM  COM.OIS0004_USER " _
@@ -165,6 +164,25 @@ Public Class CS0051UserInfo : Implements IDisposable
                    & "   and STYMD <= @P3 " _
                    & "   and ENDYMD >= @P2 " _
                    & "   and DELFLG <> @P4 "
+
+                '  "SELECT " _
+                '& "   rtrim(CAMPCODE) as CAMPCODE " _
+                '& " , rtrim(ORG) as ORG " _
+                '& " , rtrim(STAFFCODE) as STAFFCODE " _
+                '& " , rtrim(STAFFNAMES) as STAFFNAMES " _
+                '& " , rtrim(STAFFNAMEL) as STAFFNAMEL " _
+                '& " , rtrim(MAPID) as MAPID " _
+                '& " , rtrim(VARIANT) as VARIANT " _
+                '& " , rtrim(CAMPROLE) as CAMPROLE " _
+                '& " , rtrim(MAPROLE) as MAPROLE " _
+                '& " , rtrim(ORGROLE) as ORGROLE " _
+                '& " , rtrim(VIEWPROFID) as VIEWPROFID " _
+                '& " , rtrim(RPRTPROFID) as RPRTPROFID " _
+                '& " FROM  COM.OIS0004_USER " _
+                '& " Where USERID = @P1 " _
+                '& "   and STYMD <= @P3 " _
+                '& "   and ENDYMD >= @P2 " _
+                '& "   and DELFLG <> @P4 "
                 Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                     Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
                     Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
@@ -179,14 +197,16 @@ Public Class CS0051UserInfo : Implements IDisposable
                     If SQLdr.Read Then
                         CAMPCODE = SQLdr("CAMPCODE")
                         ORG = SQLdr("ORG")
-                        STAFFCODE = SQLdr("STAFFCODE")
+                        '                        STAFFCODE = SQLdr("STAFFCODE")
+                        '                        ORGROLE = SQLdr("ORGROLE")
                         STAFFNAMES = SQLdr("STAFFNAMES")
                         STAFFNAMEL = SQLdr("STAFFNAMEL")
                         MAPID = SQLdr("MAPID")
                         MAPVARI = SQLdr("VARIANT")
-                        CAMPROLE = SQLdr("CAMPROLE")
+                        '20191101-追加-START
+                        MENUROLE = SQLdr("MENUROLE")
+                        '20191101-追加-END
                         MAPROLE = SQLdr("MAPROLE")
-                        ORGROLE = SQLdr("ORGROLE")
                         VIEWPROFID = SQLdr("VIEWPROFID")
                         RPRTPROFID = SQLdr("RPRTPROFID")
                         ERR = C_MESSAGE_NO.NORMAL

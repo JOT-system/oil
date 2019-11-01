@@ -86,6 +86,22 @@ Public Module SessionKey
         ''' </summary>
         Public Const MAPPING_DISPLAY_MAP_ID As String = "MAPmapid"
         ''' <summary>
+        ''' メニュー表示権限
+        ''' </summary>
+        Public Const MAPPING_USER_MENU_MODE As String = "MAPMenuMode"
+        ''' <summary>
+        ''' 画面参照更新権限
+        ''' </summary>
+        Public Const MAPPING_USER_MAP_MODE As String = "MAPMapMode"
+        ''' <summary>
+        ''' 画面表示項目権限
+        ''' </summary>
+        Public Const MAPPING_USER_VIEWPROF_MODE As String = "MAPViewProfmode"
+        ''' <summary>
+        ''' エクセル出力権限
+        ''' </summary>
+        Public Const MAPPING_USER_RPRTPROF_MODE As String = "MAPRprtProfmode"
+        ''' <summary>
         ''' 画面表示バリアント
         ''' </summary>
         Public Const MAPPING_USER_MAP_VARIANT As String = "MAPvariant"

@@ -91,7 +91,8 @@ Public Class M00001MENU
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.NVarChar, 1)
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA2.Value = Master.MAPID
-                PARA3.Value = Master.MAPvariant
+                '                PARA3.Value = Master.MAPvariant
+                PARA3.Value = Master.ROLE_MENU
                 PARA4.Value = "1"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now
@@ -116,7 +117,8 @@ Public Class M00001MENU
                 '　１回目（ユーザＩＤ）での貼り付け
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA2.Value = Master.MAPID
-                PARA3.Value = Master.MAPvariant
+                '                PARA3.Value = Master.MAPvariant
+                PARA3.Value = Master.ROLE_MENU
                 PARA4.Value = "2"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now
@@ -140,7 +142,8 @@ Public Class M00001MENU
 
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA2.Value = Master.MAPID
-                PARA3.Value = Master.MAPvariant
+                '                PARA3.Value = Master.MAPvariant
+                PARA3.Value = Master.ROLE_MENU
                 PARA4.Value = "1"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now

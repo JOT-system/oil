@@ -97,8 +97,11 @@
     <Content Include="bin\JOTWEB.dll" />
     <Content Include="bin\JOTWEB.pdb" />
     <Content Include="img\tank2.png" />
+    <Content Include="OIL\css\OIM0005C.css" />
     <Content Include="OIL\css\OIM0004C.css" />
+    <Content Include="OIL\css\OIM0005L.css" />
     <Content Include="OIL\css\OIM0004L.css" />
+    <Content Include="OIL\css\OIM0005S.css" />
     <Content Include="OIL\css\OIM0004S.css" />
     <Content Include="OIL\img\404cat.png" />
     <Content Include="OIL\css\ex\bootstrap.min.css" />
@@ -121,15 +124,22 @@
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
     <Content Include="M00000LOGON.aspx" />
+    <Content Include="OIL\inc\OIM0005WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0004WRKINC.ascx" />
     <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\css\ex\nprogress.css" />
     <Content Include="OIL\ex\page_404.html" />
     <Content Include="OIL\OIM0004StationCreate.aspx" />
+    <Content Include="OIL\OIM0005TankCreate.aspx" />
+    <Content Include="OIL\OIM0005TankList.aspx" />
     <Content Include="OIL\OIM0004StationList.aspx" />
+    <Content Include="OIL\OIM0005TankSearch.aspx" />
     <Content Include="OIL\OIM0004StationSearch.aspx" />
+    <Content Include="OIL\script\OIM0005C.js" />
     <Content Include="OIL\script\OIM0004C.js" />
+    <Content Include="OIL\script\OIM0005L.js" />
     <Content Include="OIL\script\OIM0004L.js" />
+    <Content Include="OIL\script\OIM0005S.js" />
     <Content Include="OIL\script\OIM0004S.js" />
     <Content Include="script\calendar.js" />
     <Content Include="script\common.js" />
@@ -214,6 +224,13 @@
     <Compile Include="base\PrevDispMap.vb" />
     <Compile Include="base\SessionKey.vb" />
     <Compile Include="base\YDF.vb" />
+    <Compile Include="OIL\inc\OIM0005WRKINC.ascx.designer.vb">
+      <DependentUpon>OIM0005WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0005WRKINC.ascx.vb">
+      <DependentUpon>OIM0005WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="OIL\inc\OIM0004WRKINC.ascx.designer.vb">
       <DependentUpon>OIM0004WRKINC.ascx</DependentUpon>
     </Compile>
@@ -308,6 +325,20 @@
     </Compile>
     <Compile Include="OIL\OIM0004StationCreate.aspx.vb">
       <DependentUpon>OIM0004StationCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\OIM0005TankCreate.aspx.designer.vb">
+      <DependentUpon>OIM0005TankCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\OIM0005TankCreate.aspx.vb">
+      <DependentUpon>OIM0005TankCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\OIM0005TankList.aspx.designer.vb">
+      <DependentUpon>OIM0005TankList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\OIM0005TankList.aspx.vb">
+      <DependentUpon>OIM0005TankList.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\OIM0004StationList.aspx.designer.vb">
@@ -315,6 +346,13 @@
     </Compile>
     <Compile Include="OIL\OIM0004StationList.aspx.vb">
       <DependentUpon>OIM0004StationList.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\OIM0005TankSearch.aspx.designer.vb">
+      <DependentUpon>OIM0005TankSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\OIM0005TankSearch.aspx.vb">
+      <DependentUpon>OIM0005TankSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\OIM0004StationSearch.aspx.designer.vb">

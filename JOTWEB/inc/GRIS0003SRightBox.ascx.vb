@@ -490,6 +490,50 @@ Public Class GRIS0003SRightBox
         End Set
     End Property
     ''' <summary>
+    ''' メニュー表示変数
+    ''' </summary>
+    Public Property MENUROLE As String
+        Get
+            Return RF_MENUROLE.Value
+        End Get
+        Set(value As String)
+            RF_MENUROLE.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' 画面参照更新変数
+    ''' </summary>
+    Public Property MAPROLE As String
+        Get
+            Return RF_MAPROLE.Value
+        End Get
+        Set(value As String)
+            RF_MAPROLE.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' 画面表示項目変数
+    ''' </summary>
+    Public Property VIEWROLE As String
+        Get
+            Return RF_VIEWROLE.Value
+        End Get
+        Set(value As String)
+            RF_VIEWROLE.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' エクセル出力変数
+    ''' </summary>
+    Public Property RPRTROLE As String
+        Get
+            Return RF_RPRTROLE.Value
+        End Get
+        Set(value As String)
+            RF_RPRTROLE.Value = value
+        End Set
+    End Property
+    ''' <summary>
     ''' 会社コード
     ''' </summary>
     Public Property COMPCODE As String

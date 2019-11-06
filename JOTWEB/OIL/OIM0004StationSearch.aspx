@@ -25,38 +25,38 @@
 
         <!-- ○ 変動項目 ○ -->
         <!-- 会社コード -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">会社コード</a>
+        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;display:none">会社コード</a>
 
-        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+        <a style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
             <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:7.7em; left:27em;">
+        <a style="position:fixed; top:7.7em; left:27em;display:none">
             <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 運用部署 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">運用部署</a>
+        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;display:none">運用部署</a>
 
-        <a style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
+        <a style="position:fixed; top:9.9em; left:18em;display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
             <asp:TextBox ID="WF_UORG" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:9.9em; left:27em;">
+        <a style="position:fixed; top:9.9em; left:27em;display:none">
             <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 貨物駅コード -->
-        <a style="position:fixed; top:12.1em; left:4em; font-weight:bold; text-decoration:underline;">貨物駅コード</a>
+        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">貨物駅コード</a>
 
-        <a style="position:fixed; top:12.1em; left:18em;" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
+        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
             <asp:TextBox ID="TxtStationCode" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:12.1em; left:27em;">
+        <a style="position:fixed; top:7.7em; left:27em;">
             <asp:Label ID="LblStationCode" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 貨物コード枝番 -->
-        <a style="position:fixed; top:14.3em; left:4em; font-weight:bold;">貨物コード枝番</a>
-        <a style="position:fixed; top:14.3em; left:18em;" onchange="TextBox_change('TxtStationCode');">
+        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">貨物コード枝番</a>
+        <a style="position:fixed; top:9.9em; left:18em;" onchange="TextBox_change('TxtStationCode');">
             <asp:TextBox ID="TxtBranch" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:14.3em; left:27em;">
+        <a style="position:fixed; top:9.9em; left:27em;">
             <asp:Label ID="LblBranch" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
     </div>

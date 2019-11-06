@@ -390,10 +390,10 @@ Public Class OILMasterPage
 
         '〇画面戻先URL取得
         CS0017ForwardURL.MAPID = MF_MAPID.Value
-        '201101-変更-START
+        '20191101-変更-START
         '        CS0017ForwardURL.VARI = MF_MAPvariant.Value
         CS0017ForwardURL.VARI = MF_MENU_ROLE.Value
-        '201101-変更-END
+        '20191101-変更-END
         If Not String.IsNullOrEmpty(COMPCODE) Then
             CS0017ForwardURL.CAMPCODE = COMPCODE
         Else
@@ -437,10 +437,10 @@ Public Class OILMasterPage
 
         '〇画面遷移先URL取得
         CS0017ForwardURL.MAPID = MF_MAPID.Value
-        '201101-変更-START
+        '20191101-変更-START
         '        CS0017ForwardURL.VARI = MF_MAPvariant.Value
         CS0017ForwardURL.VARI = MF_MENU_ROLE.Value
-        '201101-変更-END
+        '20191101-変更-END
         If Not String.IsNullOrEmpty(COMPCODE) Then
             CS0017ForwardURL.CAMPCODE = COMPCODE
         Else

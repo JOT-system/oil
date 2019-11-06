@@ -38,5 +38,9 @@
                 <asp:HiddenField ID="RF_MAPIDS" runat="server"  value="" />
                 <asp:HiddenField ID="RF_PROFID" runat="server"  value="" />
                 <asp:HiddenField ID="RF_MAPVARI" runat="server"  value="" />
+                <asp:HiddenField ID="RF_MENUROLE" runat="server"  value="" />
+                <asp:HiddenField ID="RF_MAPROLE" runat="server"  value="" />
+                <asp:HiddenField ID="RF_VIEWROLE" runat="server"  value="" />
+                <asp:HiddenField ID="RF_RPRTROLE" runat="server"  value="" />
             </div>
         </div>

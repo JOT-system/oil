@@ -276,7 +276,7 @@ Public Structure CS0045GSHABANORGget
                 SQLcon.Open() 'DataBase接続(Open)
 
                 '検索SQL文
-                Dim SQLStr As String = _
+                Dim SQLStr As String =
                         " SELECT isnull(rtrim(O.SHARYOTYPEF),'')  as SHARYOTYPEF     " _
                       & "      , isnull(rtrim(O.TSHABANF),'')     as TSHABANF        " _
                       & "      , isnull(rtrim(A1.MANGMORG),'')    as MANGMORGF       " _
@@ -297,22 +297,22 @@ Public Structure CS0045GSHABANORGget
                       & "      , isnull(rtrim(O.CAMPCODE),'')     as CAMPCODE        " _
                       & "      , isnull(rtrim(O.MANGUORG),'')     as MANGUORG        " _
                       & "      , isnull(rtrim(O.GSHABAN),'')      as GSHABAN         " _
-                      & "   FROM MA006_SHABANORG  O                             " _
-                      & "   LEFT JOIN MA002_SHARYOA A1 						    " _
+                      & "   FROM OIL.MA006_SHABANORG  O                             " _
+                      & "   LEFT JOIN OIL.MA002_SHARYOA A1 						    " _
                       & "     ON A1.CAMPCODE   	= O.CAMPCODE 				    " _
                       & "    and A1.SHARYOTYPE  = O.SHARYOTYPEF 		        " _
                       & "    and A1.TSHABAN     = O.TSHABANF 		            " _
                       & "    and A1.STYMD      <= @P3                           " _
                       & "    and A1.ENDYMD     >= @P4                           " _
                       & "    and A1.DELFLG     <> '1' 						    " _
-                      & "   LEFT JOIN MA002_SHARYOA A2 						    " _
+                      & "   LEFT JOIN OIL.MA002_SHARYOA A2 						    " _
                       & "     ON A2.CAMPCODE   	= O.CAMPCODE 				    " _
                       & "    and A2.SHARYOTYPE  = O.SHARYOTYPEB 		        " _
                       & "    and A2.TSHABAN     = O.TSHABANB 		            " _
                       & "    and A2.STYMD      <= @P3                           " _
                       & "    and A2.ENDYMD     >= @P4                           " _
                       & "    and A2.DELFLG     <> '1' 						    " _
-                      & "   LEFT JOIN MA002_SHARYOA A3 						    " _
+                      & "   LEFT JOIN OIL.MA002_SHARYOA A3 						    " _
                       & "     ON A3.CAMPCODE   	= O.CAMPCODE 				    " _
                       & "    and A3.SHARYOTYPE  = O.SHARYOTYPEB2 		        " _
                       & "    and A3.TSHABAN     = O.TSHABANB2 		            " _

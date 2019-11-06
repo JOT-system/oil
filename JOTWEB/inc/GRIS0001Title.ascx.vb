@@ -67,7 +67,7 @@ Public Class GRIS0001Title
                     '検索SQL文
                     Dim SQLStr As String =
                          "SELECT rtrim(A.MAPNAMES) as NAMES " _
-                       & " FROM  com.OIS0024_PROFMMAP A " _
+                       & " FROM  COM.OIS0008_PROFMMAP A " _
                        & " Where  " _
                        & "       A.MAPIDP   = @P1 " _
                        & "   and A.VARIANTP = @P2 " _
@@ -220,7 +220,7 @@ Public Class GRIS0001Title
 
                 Dim SQLStr As String =
                         " SELECT TERMCLASS                " &
-                        " FROM com.OIS0001_TERM                 " &
+                        " FROM S0001_TERM                 " &
                         " WHERE TERMID        = @TERMID   " &
                         " AND   STYMD        <= getdate() " &
                         " AND   ENDYMD       >= getdate() " &

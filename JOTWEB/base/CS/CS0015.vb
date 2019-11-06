@@ -4,7 +4,7 @@ Imports System.Web.UI.WebControls
 ''' <summary>
 ''' タイトル会社取得
 ''' </summary>
-''' <remarks>CAMP権限によりDB(S0006_ROLE)とDB(S0012_SRVAUTHOR)を検索して両方許可のある会社コードを取得する。</remarks>
+''' <remarks>CAMP権限によりDB(OIS0009_ROLE)とDB(OIS0011_SRVAUTHOR)を検索して両方許可のある会社コードを取得する。</remarks>
 Public Class CS0015TITLEcamp
 
     ''' <summary>
@@ -82,7 +82,7 @@ Public Class CS0015TITLEcamp
         Using SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
             '●タイトル会社取得
-            '○ User権限によりDB(S0006_ROLE)検索
+            '○ User権限によりDB(OIS0009_ROLE)検索
             Try
                 'DataBase接続文字
 
@@ -90,36 +90,55 @@ Public Class CS0015TITLEcamp
                 '検索SQL文
                 Dim SQLStr As String =
                      "SELECT rtrim(A.CAMPCODE) as CAMPCODE " _
-                   & "     , rtrim(A.NAMES) as NAMES  " _
+                   & "     , rtrim(A.NAME) as NAME  " _
                    & "     , rtrim(MAX( B.PERMITCODE )) as PERMITCODE " _
-                   & " FROM  oil.OIM0001_CAMP A " _
-                   & " INNER JOIN com.OIS0009_ROLE B ON " _
-                   & "       B.CODE     = A.CAMPCODE " _
-                   & "   and B.OBJECT   = @P2 " _
-                   & "   and B.PERMITCODE >= 1 " _
-                   & "   and B.STYMD   <= @P3 " _
-                   & "   and B.ENDYMD  >= @P4 " _
+                   & " FROM  OIL.OIM0001_CAMP A " _
+                   & " INNER JOIN COM.OIS0009_ROLE B ON " _
+                   & "       B.PERMITCODE >= 1 " _
                    & "   and B.DELFLG  <> @P5 " _
-                   & " INNER JOIN com.OIS0004_USER C  ON " _
+                   & " INNER JOIN COM.OIS0004_USER C  ON " _
                    & "       C.USERID   = @P1 " _
+                   & "   and C.CAMPCODE = A.CAMPCODE " _
                    & "   and C.MENUROLE = B.ROLE " _
+                   & "   and C.MAPID = B.CODE " _
                    & "   and C.STYMD   <= @P3 " _
                    & "   and C.ENDYMD  >= @P4 " _
                    & "   and C.DELFLG  <> @P5 " _
-                   & " WHERE A.STYMD   <= @P3 " _
-                   & "   and A.ENDYMD  >= @P4 " _
-                   & "   and A.DELFLG  <> @P5 " _
-                   & "GROUP BY A.CAMPCODE , A.NAMES " _
+                   & " WHERE A.DELFLG  <> @P5 " _
+                   & "GROUP BY A.CAMPCODE , A.NAME " _
                    & "ORDER BY A.CAMPCODE "
+
+                '  "SELECT rtrim(A.CAMPCODE) as CAMPCODE " _
+                '& "     , rtrim(A.NAMES) as NAMES  " _
+                '& "     , rtrim(MAX( B.PERMITCODE )) as PERMITCODE " _
+                '& " FROM  OIL.OIM0001_CAMP A " _
+                '& " INNER JOIN COM.OIS0009_ROLE B ON " _
+                '& "       B.CODE     = A.CAMPCODE " _
+                '& "   and B.OBJECT   = @P2 " _
+                '& "   and B.PERMITCODE >= 1 " _
+                '& "   and B.STYMD   <= @P3 " _
+                '& "   and B.ENDYMD  >= @P4 " _
+                '& "   and B.DELFLG  <> @P5 " _
+                '& " INNER JOIN COM.OIS0004_USER C  ON " _
+                '& "       C.USERID   = @P1 " _
+                '& "   and C.CAMPROLE = B.ROLE " _
+                '& "   and C.STYMD   <= @P3 " _
+                '& "   and C.ENDYMD  >= @P4 " _
+                '& "   and C.DELFLG  <> @P5 " _
+                '& " WHERE A.STYMD   <= @P3 " _
+                '& "   and A.ENDYMD  >= @P4 " _
+                '& "   and A.DELFLG  <> @P5 " _
+                '& "GROUP BY A.CAMPCODE , A.NAMES " _
+                '& "ORDER BY A.CAMPCODE "
 
                 Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
+                '                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
                 PARA1.Value = USERID
-                PARA2.Value = C_ROLE_VARIANT.USER_COMP
+                '                PARA2.Value = C_ROLE_VARIANT.USER_COMP
                 PARA3.Value = Date.Now
                 PARA4.Value = Date.Now
                 PARA5.Value = C_DELETE_FLG.DELETE
@@ -129,7 +148,7 @@ Public Class CS0015TITLEcamp
                 While SQLdr.Read
                     i = i + 1
                     W_OBJ_USER_CAMPCODE.Add(SQLdr("CAMPCODE"))
-                    W_OBJ_USER_NAMES.Add(SQLdr("NAMES"))
+                    W_OBJ_USER_NAMES.Add(SQLdr("NAME"))
                     W_OBJ_USER_PERMIT.Add(SQLdr("PERMITCODE"))
                 End While
 
@@ -143,7 +162,7 @@ Public Class CS0015TITLEcamp
             Catch ex As Exception
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
                 CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:S0005_AUTHOR Select"           '
+                CS0011LOGWRITE.INFPOSI = "DB:OIS0010_AUTHOR Select"           '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -151,13 +170,13 @@ Public Class CS0015TITLEcamp
                 Exit Sub
             End Try
 
-            '○ 端末権限によりDB(S0012_SRVAUTHOR)検索
+            '○ 端末権限によりDB(OIS0011_SRVAUTHOR)検索
             'Try
             '    '検索SQL文
             '    Dim SQLStr As String =
             '         "SELECT rtrim(C.CAMPCODE) as CAMPCODE , rtrim(C.NAMES) as NAMES , rtrim(MAX( B.PERMITCODE )) as PERMITCODE " _
-            '       & " FROM  com.OIS0012_SRVAUTHOR A " _
-            '       & " INNER JOIN com.OIS0009_ROLE B " _
+            '       & " FROM  COM.OIS0011_SRVAUTHOR A " _
+            '       & " INNER JOIN COM.OIS0009_ROLE B " _
             '       & "   ON  B.CAMPCODE = A.CAMPCODE " _
             '       & "   and B.OBJECT   = @P2 " _
             '       & "   and B.ROLE     = A.ROLE " _
@@ -210,7 +229,7 @@ Public Class CS0015TITLEcamp
             'Catch ex As Exception
             '    Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             '    CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名
-            '    CS0011LOGWRITE.INFPOSI = "DB:S0012_SRVAUTHOR Select"        '
+            '    CS0011LOGWRITE.INFPOSI = "DB:OIS0011_SRVAUTHOR Select"        '
             '    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
             '    CS0011LOGWRITE.TEXT = ex.ToString()
             '    CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -220,11 +239,11 @@ Public Class CS0015TITLEcamp
         End Using
         '○出力編集(I_List)
         For i As Integer = 0 To W_OBJ_USER_CAMPCODE.Count - 1
-            For j As Integer = 0 To W_OBJ_SRV_CAMPCODE.Count - 1
-                If W_OBJ_USER_CAMPCODE(i) = W_OBJ_SRV_CAMPCODE(j) Then
-                    W_OBJ.Items.Add(New ListItem(W_OBJ_USER_NAMES(i), W_OBJ_USER_CAMPCODE(i)))
-                End If
-            Next j
+            'For j As Integer = 0 To W_OBJ_SRV_CAMPCODE.Count - 1
+            '    If W_OBJ_USER_CAMPCODE(i) = W_OBJ_SRV_CAMPCODE(j) Then
+            W_OBJ.Items.Add(New ListItem(W_OBJ_USER_NAMES(i), W_OBJ_USER_CAMPCODE(i)))
+            '    End If
+            'Next j
         Next i
 
         'デフォルト選択位置設定

@@ -194,7 +194,7 @@ Public Structure CS0042SHARYOORGget
                 SQLcon.Open() 'DataBase接続(Open)
 
                 '検索SQL文
-                Dim SQLStr As String = _
+                Dim SQLStr As String =
                      "SELECT " _
                    & "       isnull(rtrim(B.CAMPCODE),'') as CAMPCODE " _
                    & "     , isnull(rtrim(B.SHARYOTYPE),'') as SHARYOTYPE " _
@@ -207,15 +207,15 @@ Public Structure CS0042SHARYOORGget
                    & "     , isnull(rtrim(A.BASELEASE),'') as BASELEASE " _
                    & "     , isnull(rtrim(A.MANGOILTYPE),'') as MANGOILTYPE " _
                    & "     , isnull(rtrim(A.MANGSUPPL),'') as MANGSUPPL " _
-                   & " FROM  MA003_SHARYOB B " _
-                   & " INNER JOIN MA002_SHARYOA A " _
+                   & " FROM  OIL.MA003_SHARYOB B " _
+                   & " INNER JOIN OIL.MA002_SHARYOA A " _
                    & "   ON    A.CAMPCODE        = B.CAMPCODE                                                                " _
                    & "   and   A.SHARYOTYPE      = B.SHARYOTYPE                                                              " _
                    & "   and   A.TSHABAN         = B.TSHABAN                                                                 " _
                    & "   and   A.STYMD          <= B.ENDYMD                                                                  " _
                    & "   and   A.ENDYMD         >= B.STYMD                                                                   " _
                    & "   and   A.DELFLG         <> '1'                                                                       " _
-                   & " LEFT  JOIN MA006_SHABANORG O                                                                          " _
+                   & " LEFT  JOIN OIL.MA006_SHABANORG O                                                                          " _
                    & "   ON    O.CAMPCODE        = B.CAMPCODE                                                                " _
                    & "   and ((O.SHARYOTYPEF     = B.SHARYOTYPE and O.TSHABANF        = B.TSHABAN) or                        " _
                    & "        (O.SHARYOTYPEB     = B.SHARYOTYPE and O.TSHABANB        = B.TSHABAN) or                        " _

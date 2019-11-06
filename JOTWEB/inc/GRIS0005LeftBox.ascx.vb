@@ -76,6 +76,7 @@ Public Class GRIS0005LeftBox
     ''' <item><description>LC_EXTRA_LIST    : 指定されたリストを使用する</description></item>
     ''' <item><description>LC_CALENDAR      : カレンダー表示を行う</description></item>
     ''' <item><description>LC_FIX_VALUE     : 固定値区分のリストを作成</description></item>
+    ''' <item><description>LC_STATIONCODE   : 貨物駅パターンのリストを作成</description></item>
     ''' </list>
     Public Enum LIST_BOX_CLASSIFICATION
         LC_COMPANY
@@ -97,6 +98,7 @@ Public Class GRIS0005LeftBox
         LC_EXTRA_LIST
         LC_CALENDAR
         LC_FIX_VALUE
+        LC_STATIONCODE
     End Enum
     ''' <summary>
     ''' パラメタ群
@@ -139,6 +141,7 @@ Public Class GRIS0005LeftBox
         LP_DISPLAY_FORMAT
         LP_ROLE
         LP_SELECTED_CODE
+        LP_STATIONCODE
     End Enum
 
     ''' <summary>
@@ -170,7 +173,7 @@ Public Class GRIS0005LeftBox
                     ViewState("LF_LIST_SELECT") = Nothing
                     ViewState("LF_PARAMS") = Nothing
                 Case Else
-                    restore(O_RTN)
+                    Restore(O_RTN)
                     '〇取得
                     LF_FILTER_CODE = If(ViewState("LF_FILTER_CODE"), "0")
                     LF_SORTING_CODE = If(ViewState("LF_SORTING_CODE"), "0")
@@ -207,8 +210,8 @@ Public Class GRIS0005LeftBox
     Public Sub SetListBox(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
         LF_SORTING_CODE = C_SORTING_CODE.BOTH
         LF_FILTER_CODE = C_FILTER_CODE.ENABLE
-        ListToView(createListData(ListCode, O_RTN, Params))
-        backup(ListCode, Params)
+        ListToView(CreateListData(ListCode, O_RTN, Params))
+        Backup(ListCode, Params)
     End Sub
     ''' <summary>
     ''' 左リストボックス設定処理
@@ -226,8 +229,8 @@ Public Class GRIS0005LeftBox
     Public Sub SetTableList(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
         LF_SORTING_CODE = C_SORTING_CODE.HIDE
         LF_FILTER_CODE = C_FILTER_CODE.DISABLE
-        createTableList(ListCode, O_RTN, Params)
-        backup(ListCode, Params)
+        CreateTableList(ListCode, O_RTN, Params)
+        Backup(ListCode, Params)
 
     End Sub
     ''' <summary>
@@ -255,7 +258,7 @@ Public Class GRIS0005LeftBox
     ''' <remarks></remarks>
     Public Sub CodeToName(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
 
-        O_TEXT = getListText(createListData(ListCode, O_RTN, Params), I_VALUE, O_RTN)
+        O_TEXT = GetListText(CreateListData(ListCode, O_RTN, Params), I_VALUE, O_RTN)
     End Sub
     ''' <summary>
     ''' 固定値マスタよりサブコードを取得する
@@ -268,7 +271,7 @@ Public Class GRIS0005LeftBox
     ''' <remarks></remarks>
     Public Sub CodeToName(ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String, ByVal Params As Hashtable, Optional ByVal I_SUBCODE As Integer = 2)
 
-        O_TEXT = getListText(createSubCodeList(Params, O_RTN, I_SUBCODE), I_VALUE, O_RTN)
+        O_TEXT = GetListText(CreateSubCodeList(Params, O_RTN, I_SUBCODE), I_VALUE, O_RTN)
     End Sub
     ''' <summary>
     ''' テーブル表示時
@@ -354,65 +357,69 @@ Public Class GRIS0005LeftBox
         Select Case ListCode
             Case LIST_BOX_CLASSIFICATION.LC_COMPANY
                 '会社一覧設定
-                lbox = createCompList(Params, O_RTN)
+                lbox = CreateCompList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CUSTOMER
                 '取引先
-                lbox = createCustomerList(Params, O_RTN)
+                lbox = CreateCustomerList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_DISTINATION
                 '届先
-                lbox = createDistinationList(Params, O_RTN)
+                lbox = CreateDistinationList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_ORG
                 '部署
-                lbox = createOrg(Params, O_RTN)
+                lbox = CreateOrg(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
                 '社員
-                lbox = createStaff(Params, O_RTN)
+                lbox = CreateStaff(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CARCODE
                 '車両
-                lbox = createCarCode(Params, O_RTN)
+                lbox = CreateCarCode(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_WORKLORRY
                 '業務車番
-                lbox = createWorkLorry(Params, O_RTN)
+                lbox = CreateWorkLorry(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_GOODS
                 '品名
-                lbox = createGoods(Params, O_RTN)
+                lbox = CreateGoods(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_STAFFKBN
                 '社員区分
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STAFFKBN"
-                lbox = createFixValueList(Params, O_RTN)
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_URIKBN
                 '売上計上区分
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "URIKBN"
-                lbox = createFixValueList(Params, O_RTN)
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_OILTYPE
                 '油種
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OILTYPE"
-                lbox = createFixValueList(Params, O_RTN)
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_DELFLG
                 '削除区分
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "DELFLG"
-                lbox = createFixValueList(Params, O_RTN)
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_TERM
                 '端末
-                lbox = createTermList(Params, O_RTN)
+                lbox = CreateTermList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_ROLE
                 '権限コード
-                lbox = createRoleList(Params, O_RTN)
+                lbox = CreateRoleList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_URL
                 'URL
-                lbox = createURLList(Params, O_RTN)
+                lbox = CreateURLList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_EXTRA_LIST
                 '拡張リスト
-                lbox = createExtra(Params, O_RTN)
+                lbox = CreateExtra(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_MODELPT
                 'モデル距離パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MODELPATTERN"
-                lbox = createFixValueList(Params, O_RTN)
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_STATIONCODE
+                '貨物駅パターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STATIONPATTERN"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing
             Case Else
-                lbox = createFixValueList(Params, O_RTN)
+                lbox = CreateFixValueList(Params, O_RTN)
         End Select
         Return lbox
     End Function
@@ -484,7 +491,7 @@ Public Class GRIS0005LeftBox
                    .TYPEMODE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0001CompList.LC_COMPANY_TYPE.ROLE) _
                  , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
                  , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                 , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_COMP) _
+                 , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
                  , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
                  , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0001CompList.C_VIEW_FORMAT_PATTERN.NAMES)
             }
@@ -593,9 +600,9 @@ Public Class GRIS0005LeftBox
                 , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
                 , .AUTHWITH = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY) _
                 , .Categorys = Categorys _
-                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
                 , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), String.Empty)
+                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG)
              }
                 CL0002OrgList.getList()
                 O_RTN = CL0002OrgList.ERR

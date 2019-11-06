@@ -105,7 +105,7 @@ Public Structure CS0017ForwardURL
         Dim sm As New CS0050SESSION
 
         '●画面戻先URL取得
-        '○ DB(S0024_PROFMMAP-S0009_URL)検索
+        '○ DB(OIS0008_PROFMMAP-OIS0007_URL)検索
 
         Try
             'DataBase接続文字
@@ -119,15 +119,15 @@ Public Structure CS0017ForwardURL
                    & "      rtrim(A.VARIANTP) as VARIANTP , " _
                    & "      rtrim(A.MAPNAMES) as NAMES    , " _
                    & "      rtrim(B.URL)      as URL        " _
-                   & " FROM  com.OIS0008_PROFMMAP A " _
-                   & " INNER JOIN com.OIS0009_URL B " _
+                   & " FROM  COM.OIS0008_PROFMMAP A " _
+                   & " INNER JOIN COM.OIS0007_URL B " _
                    & "   ON  B.MAPID     = A.MAPIDP " _
                    & "   and B.STYMD    <= @P4 " _
                    & "   and B.ENDYMD   >= @P3 " _
                    & "   and B.DELFLG   <> @P5 " _
                    & " Where " _
                    & "       A.MAPID     = @P1 " _
-                   & "   and A.VARIANT   = @P2 " _
+                   & "   and A.VARIANTP  = @P2 " _
                    & "   and A.TITLEKBN  = 'I' " _
                    & "   and A.STYMD    <= @P4 " _
                    & "   and A.ENDYMD   >= @P3 " _
@@ -174,7 +174,7 @@ Public Structure CS0017ForwardURL
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME
-            CS0011LOGWRITE.INFPOSI = "S0024_PROFMMAP SELECT (" & MAPID & " " & VARI & ")"
+            CS0011LOGWRITE.INFPOSI = "OIS0008_PROFMMAP SELECT (" & MAPID & " " & VARI & ")"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -210,7 +210,7 @@ Public Structure CS0017ForwardURL
 
         'PARAM02: VARIP …任意項目
         '●変数情報取得
-        '○ DB(S0024_PROFMMAP-S0009_URL)検索
+        '○ DB(OIS0008_PROFMMAP-OIS0007_URL)検索
 
         'PARAM03: CAMPCODE …任意項目（本来は任意ではない）
 
@@ -226,8 +226,8 @@ Public Structure CS0017ForwardURL
                & "     rtrim(A.MAPNAMES) as NAMES  , " _
                & "     rtrim(A.MAPID)    as MAPID  , " _
                & "     rtrim(A.VARIANT)  as VARIANT  " _
-               & " FROM  com.OIS0008_PROFMMAP A " _
-               & " LEFT JOIN com.OIS0009_URL B " _
+               & " FROM  COM.OIS0008_PROFMMAP A " _
+               & " LEFT JOIN COM.OIS0007_URL B " _
                & "   ON  B.MAPID    = A.MAPID " _
                & "   and B.STYMD   <= @P4 " _
                & "   and B.ENDYMD  >= @P3 " _
@@ -280,7 +280,7 @@ Public Structure CS0017ForwardURL
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME
-            CS0011LOGWRITE.INFPOSI = "S0024_PROFMMAP SELECT"
+            CS0011LOGWRITE.INFPOSI = "OIS0008_PROFMMAP SELECT"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

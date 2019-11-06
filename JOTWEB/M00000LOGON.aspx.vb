@@ -280,7 +280,7 @@ Public Class M00000LOGON
         Master.EraseCharToIgnore(UserID.Text)
         Master.EraseCharToIgnore(PassWord.Text)
 
-        '○ 画面UserIDのDB(S0004_USER)存在チェック
+        '○ 画面UserIDのDB(OIS0004_USER)存在チェック
         Dim WW_USERID As String = String.Empty
         Dim WW_PASSWORD As String = String.Empty
         Dim WW_ORG As String = String.Empty
@@ -289,6 +289,12 @@ Public Class M00000LOGON
         Dim WW_MISSCNT As Integer = 0
         Dim WW_UPDYMD As Date
         Dim WW_UPDTIMSTP As Byte()
+        '20191101-追加-START
+        Dim WW_MENUROLE As String = String.Empty
+        Dim WW_MAPROLE As String = String.Empty
+        Dim WW_VIEWPROFID As String = String.Empty
+        Dim WW_RPRTPROFID As String = String.Empty
+        '20191101-追加-END
         Dim WW_MAPID As String = String.Empty
         Dim WW_VARIANT As String = String.Empty
         Dim WW_PASSENDYMD As String = String.Empty
@@ -336,11 +342,15 @@ Public Class M00000LOGON
                    & " A.INITYMD                      , " _
                    & " A.UPDYMD                       , " _
                    & " A.UPDTIMSTP                    , " _
+                   & " rtrim(A.MENUROLE) as MENUROLE  , " _
+                   & " rtrim(A.MAPROLE) as MAPROLE    , " _
+                   & " rtrim(A.VIEWPROFID) as VIEWPROFID    , " _
+                   & " rtrim(A.RPRTPROFID) as RPRTPROFID    , " _
                    & " rtrim(A.MAPID)    as MAPID     , " _
                    & " rtrim(A.VARIANT)  as VARIANT   , " _
                    & " B.PASSENDYMD      as PASSENDYMD  " _
-                   & " FROM       com.OIS0004_USER       A    " _
-                   & " INNER JOIN com.OIS0005_USERPASS   B ON " _
+                   & " FROM       S0004_USER       A    " _
+                   & " INNER JOIN S0014_USERPASS   B ON " _
                    & "       B.USERID      = A.USERID   " _
                    & "   and B.DELFLG     <> @P4        " _
                    & " Where A.USERID      = @P1        " _
@@ -373,6 +383,12 @@ Public Class M00000LOGON
                             WW_UPDYMD = SQLdr("UPDYMD")
                         End If
                         WW_UPDTIMSTP = SQLdr("UPDTIMSTP")
+                        '20191101-追加-START
+                        WW_MENUROLE = SQLdr("MENUROLE")
+                        WW_MAPROLE = SQLdr("MAPROLE")
+                        WW_VIEWPROFID = SQLdr("VIEWPROFID")
+                        WW_RPRTPROFID = SQLdr("RPRTPROFID")
+                        '20191101-追加-END
                         WW_MAPID = SQLdr("MAPID")
                         WW_VARIANT = SQLdr("VARIANT")
                         WW_PASSENDYMD = SQLdr("PASSENDYMD")
@@ -386,10 +402,10 @@ Public Class M00000LOGON
                 End Using
 
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0004_USER SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0004_USER SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "S0004_USER SELECT"                           '
+                CS0011LOGWRITE.INFPOSI = "OIS0004_USER SELECT"                           '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -426,7 +442,7 @@ Public Class M00000LOGON
                 Try
                     'S0014_USER更新SQL文
                     Dim SQL_Str As String =
-                         "Update com.OIS0005_USERPASS " _
+                         "Update COM.OIS0005_USERPASS " _
                        & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                        & "Where  USERID  = @P3 "
                     Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
@@ -444,9 +460,9 @@ Public Class M00000LOGON
 
                     End Using
                 Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0014_USERPASS UPDATE")
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS UPDATE")
                     CS0011LOGWRITE.INFSUBCLASS = "Main"
-                    CS0011LOGWRITE.INFPOSI = "S0005_USERPASS Update"
+                    CS0011LOGWRITE.INFPOSI = "OIS0005_USERPASS Update"
                     CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                     CS0011LOGWRITE.TEXT = ex.ToString()
                     CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -465,7 +481,7 @@ Public Class M00000LOGON
             Try
                 'S0014_USER更新SQL文
                 Dim SQL_Str As String =
-                     "Update com.OIS0005_USERPASS " _
+                     "Update COM.OIS0005_USERPASS " _
                    & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                    & "Where  USERID  = @P3 "
                 Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
@@ -479,10 +495,10 @@ Public Class M00000LOGON
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0014_USERPASS UPDATE")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS UPDATE")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"
-                CS0011LOGWRITE.INFPOSI = "S0005_USERPASS Update"
+                CS0011LOGWRITE.INFPOSI = "OIS0005_USERPASS Update"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -505,9 +521,9 @@ Public Class M00000LOGON
                 End If
 
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0009_URL SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0007_URL SELECT")
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "S0009_URL SELECT"
+                CS0011LOGWRITE.INFPOSI = "OIS0007_URL SELECT"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -518,17 +534,17 @@ Public Class M00000LOGON
             '★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
             'デバッグ時は、
             ' ①ログオン日付更新処理をコメントアウトする（リコンパイル）
-            ' ②S0020_LOGONYMDテーブルの該当SRV（TERMID）のログオン日付をテスト対象日に手修正
+            ' ②OIS0006_LOGONYMDテーブルの該当SRV（TERMID）のログオン日付をテスト対象日に手修正
             '
             '本番は、
             ' ①下記コメントを外し、ログオン日付更新処理を有効にする（リコンパイル）
             '★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
             Try
-                'S0020_LOGONYMD検索SQL文
+                'OIS0006_LOGONYMD検索SQL文
                 Dim SQL_Str As String =
                      "SELECT isnull(LOGONYMD, '') as LOGONYMD " _
-                   & " FROM  com.OIS0006_LOGONYMD " _
+                   & " FROM  COM.OIS0006_LOGONYMD " _
                    & " Where TERMID   = @P1 "
                 Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
                     Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
@@ -552,9 +568,9 @@ Public Class M00000LOGON
                 End Using
 
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0020_LOGONYMD SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0006_LOGONYMD SELECT")
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "S0006_LOGONYMD SELECT"
+                CS0011LOGWRITE.INFPOSI = "OIS0006_LOGONYMD SELECT"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -564,10 +580,23 @@ Public Class M00000LOGON
         End Using
 
         CS0050Session.VIEW_MAPID = WW_MAPID
+        '20191101-追加-START
+        CS0050Session.VIEW_MENU_MODE = WW_MENUROLE
+        CS0050Session.VIEW_MAP_MODE = WW_MAPID
+        CS0050Session.VIEW_VIEWPROF_MODE = WW_VIEWPROFID
+        CS0050Session.VIEW_RPRTPROF_MODE = WW_RPRTPROFID
+        '20191101-追加-END
         CS0050Session.VIEW_MAP_VARIANT = WW_VARIANT
         CS0050Session.MAP_ETC = ""
         CS0050Session.VIEW_PERMIT = ""
+
         Master.MAPID = WW_MAPID
+        '20191101-追加-START
+        Master.ROLE_MENU = WW_MENUROLE
+        Master.ROLE_MAP = WW_MAPID
+        Master.ROLE_VIEWPROF = WW_VIEWPROFID
+        Master.ROLE_RPRTPROF = WW_RPRTPROFID
+        '20191101-追加-END
         Master.MAPvariant = WW_VARIANT
         Master.MAPpermitcode = ""
         CS0050Session.LOGONDATE = WW_LOGONYMD
@@ -585,7 +614,7 @@ Public Class M00000LOGON
     ''' <param name="O_RTN">可否判定</param>
     ''' <param name="I_ClientIP3">調査用IPアドレス</param>
     ''' <remarks>
-    ''' <para>S0001_TERMを検索　IPADDRを見る　TERMID取得</para>
+    ''' <para>OIS0001_TERMを検索　IPADDRを見る　TERMID取得</para>
     ''' <para>TERMIDを基にM00006_STRUCTを検索</para>
     ''' <para >部署を基に運用ガイダンス表示</para>
     ''' </remarks>
@@ -861,10 +890,10 @@ Public Class M00000LOGON
         Using SQLcon As SqlConnection = CS0050Session.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
-            'S0009_URL検索SQL文
+            'OIS0007_URL検索SQL文
             Dim SQL_Str As String =
                  "SELECT rtrim(URL) as URL " _
-               & " FROM  com.OIS0007_URL " _
+               & " FROM  COM.OIS0007_URL " _
                & " Where MAPID    = @P1 " _
                & "   and STYMD   <= @P2 " _
                & "   and ENDYMD  >= @P3 " _

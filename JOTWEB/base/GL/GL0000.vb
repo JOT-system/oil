@@ -174,7 +174,7 @@ Public MustInherit Class GL0000 : Implements IDisposable
     Protected Sub addListData(ByVal I_SQLDR As SqlDataReader, ByVal CODE_NAME As String, ByVal NAMES_NAME As String)
         While I_SQLDR.Read
 
-            If Not extracheck(I_SQLDR) Then Continue While
+            '            If Not extracheck(I_SQLDR) Then Continue While
             '○出力編集
             Select Case VIEW_FORMAT
                 Case C_VIEW_FORMAT_PATTERN.NAMES
@@ -279,7 +279,7 @@ Public MustInherit Class GL0000 : Implements IDisposable
             Dim prmData As String = String.Empty
             For index As Integer = 0 To profTbl.GetLength(0) - 1
                 Dim fieldName As String = Convert.ToString(profTbl(index, 0))
-                prmData = If(String.IsNullOrEmpty(prmData), "", prmData & C_VALUE_SPLIT_DELIMITER) & _
+                prmData = If(String.IsNullOrEmpty(prmData), "", prmData & C_VALUE_SPLIT_DELIMITER) &
                             fieldName & "=" & srcTbl(i)(fieldName)
             Next
 

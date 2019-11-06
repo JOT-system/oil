@@ -129,7 +129,7 @@ Public Class CS0029ProfViewD
                 & " isnull(rtrim(ADDEVENT3),'') as ADDEVENT3 , isnull(rtrim(ADDFUNC3),'') as ADDFUNC3 , " _
                 & " isnull(rtrim(ADDEVENT4),'') as ADDEVENT4 , isnull(rtrim(ADDFUNC4),'') as ADDFUNC4 , " _
                 & " isnull(rtrim(ADDEVENT5),'') as ADDEVENT5 , isnull(rtrim(ADDFUNC5),'') as ADDFUNC5   " _
-                & " FROM  com.OIS0025_PROFMVIEW  " _
+                & " FROM  COM.OIS0012_PROFMVIEW  " _
                 & " Where CAMPCODE = @CAMPCODE " _
                 & "   and PROFID   = @PROFID " _
                 & "   and MAPID    = @MAPID " _
@@ -177,7 +177,7 @@ Public Class CS0029ProfViewD
             End Using
 
 
-                '■データ格納準備（テーブル列追加）
+            '■データ格納準備（テーブル列追加）
             WW_ROWMAX = CInt(WW_DT.Compute("Max(POSIROW)", ""))
             WW_COLMAX = CInt(WW_DT.Compute("Max(POSICOL)", ""))
             Me.ROWMAX = WW_ROWMAX

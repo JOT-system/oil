@@ -242,7 +242,7 @@ Public Class CS0026TBLSORT
             Dim SQLStr As String =
                  " SELECT FIELD , EFFECT         " _
                & "       , SORTKBN    as SORTKBN " _
-               & " FROM  com.OIS0012_PROFMVIEW         " _
+               & " FROM  COM.OIS0012_PROFMVIEW         " _
                & " WHERE                         " _
                & "       CAMPCODE = @P1          " _
                & "   and PROFID   = @P2          " _
@@ -256,7 +256,7 @@ Public Class CS0026TBLSORT
                & "   and SORTORDER     > 0       " _
                & "   and DELFLG  <> '1'          " _
                & " ORDER BY SORTORDER ASC        "
-            '(説明 S0025_PROFMVIEW)　…　画面一覧データの特定方法
+            '(説明 OIS0012_PROFMVIEW)　…　画面一覧データの特定方法
             '   HD区分=H(ヘッダー)の場合、TABフィールドは有効(複数TAB対応)。※左右位置は無効フィールド。
             '   HD区分=D(ディテール)の場合、TABフィールド(複数TAB対応)および左右位置は有効。
 

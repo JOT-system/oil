@@ -292,7 +292,7 @@ Public Class GL0005StaffList
                         & "      , rtrim(A.STAFFNAMES) as NAMES    " _
                         & "      , rtrim(A.STAFFKBN)   as KBN      " _
                         & " FROM                                   " _
-                        & "            MB001_STAFF        A        " _
+                        & "        OIL.MB001_STAFF        A        " _
                         & " WHERE                                  " _
                         & "            A.STYMD      <= @P3         " _
                         & "        and A.ENDYMD     >= @P2         " _
@@ -359,14 +359,14 @@ Public Class GL0005StaffList
                         & "      , rtrim(A.STAFFNAMES) as NAMES    " _
                         & "      , rtrim(A.STAFFKBN)   as KBN      " _
                         & " FROM                                   " _
-                        & "            MB001_STAFF        A        " _
-                        & " INNER JOIN M0002_ORG          B     ON " _
+                        & "        OIL.MB001_STAFF        A        " _
+                        & " INNER JOIN OIL.OIM0002_ORG      B     ON " _
                         & "            B.CAMPCODE    = A.CAMPCODE  " _
                         & "        and B.ORGCODE     = A.MORG      " _
                         & "        and B.DELFLG     <> '1'         " _
                         & "        and B.STYMD      <= @P3         " _
                         & "        and B.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         C     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE     C     ON " _
                         & "            C.CAMPCODE    = B.CAMPCODE  " _
                         & "        and C.CODE        = B.ORGCODE   " _
                         & "        and C.OBJECT      = @P4         " _
@@ -375,13 +375,13 @@ Public Class GL0005StaffList
                         & "        and C.STYMD      <= @P3         " _
                         & "        and C.ENDYMD     >= @P2         " _
                         & "        and C.DELFLG     <> '1'         " _
-                        & " INNER JOIN M0002_ORG          S     ON " _
+                        & " INNER JOIN OIL.OIM0002_ORG      S     ON " _
                         & "            S.CAMPCODE    = A.CAMPCODE  " _
                         & "        and S.ORGCODE     = A.HORG      " _
                         & "        and S.DELFLG     <> '1'         " _
                         & "        and S.STYMD      <= @P3         " _
                         & "        and S.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         T     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE     T     ON " _
                         & "            T.CAMPCODE    = B.CAMPCODE  " _
                         & "        and T.CODE        = B.ORGCODE   " _
                         & "        and T.OBJECT      = @P4         " _
@@ -463,8 +463,8 @@ Public Class GL0005StaffList
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
                    & "      , isnull(C.SEQ, 0)               as SEQ   " _
-                   & " FROM       MB001_STAFF  A                      " _
-                   & " INNER JOIN M0006_STRUCT B                   ON " _
+                   & " FROM       OIL.MB001_STAFF  A                  " _
+                   & " INNER JOIN OIL.M0006_STRUCT B               ON " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -473,7 +473,7 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C             ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -486,8 +486,8 @@ Public Class GL0005StaffList
                      "SELECT  isnull(rtrim(A.STAFFCODE),'')  as CODE  " _
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                   " _
+                   & " INNER JOIN OIL.M0006_STRUCT B              ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -574,8 +574,8 @@ Public Class GL0005StaffList
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
                    & "      , isnull(C.SEQ,0)                as SEQ   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                   " _
+                   & " INNER JOIN OIL.M0006_STRUCT B              ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -584,7 +584,7 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C             ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -592,7 +592,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E           " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -609,8 +609,8 @@ Public Class GL0005StaffList
                  "SELECT  isnull(rtrim(A.STAFFCODE),'')  as CODE  " _
                & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
-               & " FROM       MB001_STAFF A                       " _
-               & " INNER JOIN M0006_STRUCT B                    ON  " _
+               & " FROM       OIL.MB001_STAFF A                   " _
+               & " INNER JOIN OIL.M0006_STRUCT B              ON  " _
                & "        B.CAMPCODE = A.CAMPCODE                 " _
                & "   and  B.OBJECT    = @P6                       " _
                & "   and  B.STRUCT    = @P7                       " _
@@ -623,7 +623,7 @@ Public Class GL0005StaffList
                & "         A.STAFFKBN IN (                        " _
                & "            SELECT                              " _
                & "                     KEYCODE                    " _
-               & "            FROM MC001_FIXVALUE E               " _
+               & "            FROM COM.OIS0015_FIXVALUE E           " _
                & "            WHERE                               " _
                & "                    E.CAMPCODE = A.CAMPCODE     " _
                & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -709,8 +709,8 @@ Public Class GL0005StaffList
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
                    & "      , isnull(C.SEQ,0)                as SEQ   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                   " _
+                   & " INNER JOIN OIL.M0006_STRUCT B              ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -719,7 +719,7 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C             ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -727,7 +727,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E           " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -744,8 +744,8 @@ Public Class GL0005StaffList
                  "SELECT  isnull(rtrim(A.STAFFCODE),'')  as CODE  " _
                & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
-               & " FROM       MB001_STAFF A                       " _
-               & " INNER JOIN M0006_STRUCT B                    ON  " _
+               & " FROM       OIL.MB001_STAFF A                   " _
+               & " INNER JOIN OIL.M0006_STRUCT B              ON  " _
                & "        B.CAMPCODE = A.CAMPCODE                 " _
                & "   and  B.OBJECT    = @P6                       " _
                & "   and  B.STRUCT    = @P7                       " _
@@ -758,7 +758,7 @@ Public Class GL0005StaffList
                & "         A.STAFFKBN IN (                        " _
                & "            SELECT                              " _
                & "                     KEYCODE                    " _
-               & "            FROM MC001_FIXVALUE E               " _
+               & "            FROM COM.OIS0015_FIXVALUE E           " _
                & "            WHERE                               " _
                & "                    E.CAMPCODE = A.CAMPCODE     " _
                & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -844,8 +844,8 @@ Public Class GL0005StaffList
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
                    & "      , isnull(C.SEQ, 0)               as SEQ   " _
-                   & " FROM       MB001_STAFF  A                      " _
-                   & " INNER JOIN M0006_STRUCT B                   ON " _
+                   & " FROM       OIL.MB001_STAFF  A                      " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                   ON " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -854,14 +854,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -869,7 +869,7 @@ Public Class GL0005StaffList
                    & "   and   Y.ENDYMD  >= @P9                       " _
                    & "   and   Y.CODE     = A.HORG                    " _
                    & "   and   Y.DELFLG  <> '1'                       " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -882,8 +882,8 @@ Public Class GL0005StaffList
                      "SELECT  isnull(rtrim(A.STAFFCODE),'')  as CODE  " _
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -892,14 +892,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -989,8 +989,8 @@ Public Class GL0005StaffList
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
                    & "      , isnull(C.SEQ,0)                as SEQ   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -999,18 +999,18 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -1022,7 +1022,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1039,8 +1039,8 @@ Public Class GL0005StaffList
                  "SELECT  isnull(rtrim(A.STAFFCODE),'')  as CODE  " _
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -1049,14 +1049,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -1068,7 +1068,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1159,8 +1159,8 @@ Public Class GL0005StaffList
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
                    & "      , isnull(C.SEQ,0)                as SEQ   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -1169,18 +1169,18 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -1192,7 +1192,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1209,8 +1209,8 @@ Public Class GL0005StaffList
                  "SELECT  isnull(rtrim(A.STAFFCODE),'')  as CODE  " _
                    & "      , isnull(rtrim(A.STAFFNAMES),'') as NAMES " _
                    & "      , isnull(rtrim(A.STAFFKBN),'')   as KBN   " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -1219,14 +1219,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -1238,7 +1238,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1329,8 +1329,8 @@ Public Class GL0005StaffList
                         & "      , rtrim(A.STAFFNAMES) as NAMES    " _
                         & "      , rtrim(A.STAFFKBN)   as KBN      " _
                         & " FROM                                   " _
-                        & "            MB001_STAFF        A        " _
-                        & " INNER JOIN M0002_ORG          B     ON " _
+                        & "            OIL.MB001_STAFF        A        " _
+                        & " INNER JOIN OIL.OIM0002_ORG          B     ON " _
                         & "            B.CAMPCODE    = A.CAMPCODE  " _
                         & "        and B.ORGCODE     = A.MORG      " _
                         & "        and B.ORGLEVEL   IN             " _
@@ -1338,7 +1338,7 @@ Public Class GL0005StaffList
                         & "        and B.DELFLG     <> '1'         " _
                         & "        and B.STYMD      <= @P3         " _
                         & "        and B.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         C     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C     ON " _
                         & "            C.CAMPCODE    = B.CAMPCODE  " _
                         & "        and C.CODE        = B.ORGCODE   " _
                         & "        and C.OBJECT      = @P4         " _
@@ -1347,14 +1347,14 @@ Public Class GL0005StaffList
                         & "        and C.STYMD      <= @P3         " _
                         & "        and C.ENDYMD     >= @P2         " _
                         & "        and C.DELFLG     <> '1'         " _
-                        & " INNER JOIN M0002_ORG          S     ON " _
+                        & " INNER JOIN OIL.OIM0002_ORG          S     ON " _
                         & "            S.CAMPCODE    = A.CAMPCODE  " _
                         & "        and S.ORGCODE     = A.HORG      " _
                         & "        and S.ORGLEVEL    = '00010'     " _
                         & "        and S.DELFLG     <> '1'         " _
                         & "        and S.STYMD      <= @P3         " _
                         & "        and S.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         T     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE         T     ON " _
                         & "            T.CAMPCODE    = B.CAMPCODE  " _
                         & "        and T.CODE        = B.ORGCODE   " _
                         & "        and T.OBJECT      = @P4         " _
@@ -1436,12 +1436,12 @@ Public Class GL0005StaffList
                         & "      ,rtrim(A.STAFFKBN)     as KBN             " _
                         & "      ,B.SEQ                 as SEQ             " _
                         & " FROM                                           " _
-                        & "            MB001_STAFF        A                " _
-                        & " INNER JOIN MB002_STAFFORG     B            ON  " _
+                        & "            OIL.MB001_STAFF        A                " _
+                        & " INNER JOIN OIL.MB002_STAFFORG     B            ON  " _
                         & "         B.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   B.STAFFCODE          = A.STAFFCODE     " _
                         & "   and   B.DELFLG            <> '1'             " _
-                        & " INNER JOIN S0006_ROLE         C            ON  " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C            ON  " _
                         & "         C.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   C.CODE               = B.SORG          " _
                         & "   and   C.OBJECT             = @P4             " _
@@ -1454,7 +1454,7 @@ Public Class GL0005StaffList
                         & "         A.STAFFKBN IN (                        " _
                         & "            SELECT                              " _
                         & "                     KEYCODE                    " _
-                        & "            FROM MC001_FIXVALUE E               " _
+                        & "            FROM COM.OIS0015_FIXVALUE E               " _
                         & "            WHERE                               " _
                         & "                    E.CAMPCODE = A.CAMPCODE     " _
                         & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1474,13 +1474,13 @@ Public Class GL0005StaffList
                         & "      ,rtrim(A.STAFFKBN)     as KBN             " _
                         & "      ,B.SEQ                 as SEQ             " _
                         & " FROM                                           " _
-                        & "            MB001_STAFF        A                " _
-                        & " INNER JOIN MB002_STAFFORG     B            ON  " _
+                        & "            OIL.MB001_STAFF        A                " _
+                        & " INNER JOIN OIL.MB002_STAFFORG     B            ON  " _
                         & "         B.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   B.STAFFCODE          = A.STAFFCODE     " _
                         & "   and   B.SORG               = @P6             " _
                         & "   and   B.DELFLG            <> '1'             " _
-                        & " INNER JOIN S0006_ROLE         C            ON  " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C            ON  " _
                         & "         C.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   C.CODE               = B.SORG          " _
                         & "   and   C.OBJECT             = @P4             " _
@@ -1493,7 +1493,7 @@ Public Class GL0005StaffList
                         & "         A.STAFFKBN IN (                        " _
                         & "            SELECT                              " _
                         & "                     KEYCODE                    " _
-                        & "            FROM MC001_FIXVALUE E               " _
+                        & "            FROM COM.OIS0015_FIXVALUE E               " _
                         & "            WHERE                               " _
                         & "                    E.CAMPCODE = A.CAMPCODE     " _
                         & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1574,12 +1574,12 @@ Public Class GL0005StaffList
                         & "      ,rtrim(A.STAFFKBN)     as KBN             " _
                         & "      ,B.SEQ                 as SEQ             " _
                         & " FROM                                           " _
-                        & "            MB001_STAFF        A                " _
-                        & " INNER JOIN MB002_STAFFORG     B            ON  " _
+                        & "            OIL.MB001_STAFF        A                " _
+                        & " INNER JOIN OIL.MB002_STAFFORG     B            ON  " _
                         & "         B.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   B.STAFFCODE          = A.STAFFCODE     " _
                         & "   and   B.DELFLG            <> '1'             " _
-                        & " INNER JOIN S0006_ROLE         C            ON  " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C            ON  " _
                         & "         C.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   C.CODE               = B.SORG          " _
                         & "   and   C.OBJECT             = @P4             " _
@@ -1592,7 +1592,7 @@ Public Class GL0005StaffList
                         & "         A.STAFFKBN IN (                        " _
                         & "            SELECT                              " _
                         & "                     KEYCODE                    " _
-                        & "            FROM MC001_FIXVALUE E               " _
+                        & "            FROM COM.OIS0015_FIXVALUE E               " _
                         & "            WHERE                               " _
                         & "                    E.CAMPCODE = A.CAMPCODE     " _
                         & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1612,13 +1612,13 @@ Public Class GL0005StaffList
                         & "      ,rtrim(A.STAFFKBN)     as KBN             " _
                         & "      ,B.SEQ                 as SEQ             " _
                         & " FROM                                           " _
-                        & "            MB001_STAFF        A                " _
-                        & " INNER JOIN MB002_STAFFORG     B            ON  " _
+                        & "            OIL.MB001_STAFF        A                " _
+                        & " INNER JOIN OIL.MB002_STAFFORG     B            ON  " _
                         & "         B.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   B.STAFFCODE          = A.STAFFCODE     " _
                         & "   and   B.SORG               = @P6             " _
                         & "   and   B.DELFLG            <> '1'             " _
-                        & " INNER JOIN S0006_ROLE         C            ON  " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C            ON  " _
                         & "         C.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   C.CODE               = B.SORG          " _
                         & "   and   C.OBJECT             = @P4             " _
@@ -1631,7 +1631,7 @@ Public Class GL0005StaffList
                         & "         A.STAFFKBN IN (                        " _
                         & "            SELECT                              " _
                         & "                     KEYCODE                    " _
-                        & "            FROM MC001_FIXVALUE E               " _
+                        & "            FROM COM.OIS0015_FIXVALUE E               " _
                         & "            WHERE                               " _
                         & "                    E.CAMPCODE = A.CAMPCODE     " _
                         & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -1718,8 +1718,8 @@ Public Class GL0005StaffList
                         & "      , rtrim(A.HORG)       as HORG     " _
                         & "      , rtrim(B.NAMES)      as HORGNAMES" _
                         & " FROM                                   " _
-                        & "            MB001_STAFF       A         " _
-                        & " INNER JOIN M0002_ORG         B     ON  " _
+                        & "            OIL.MB001_STAFF       A         " _
+                        & " INNER JOIN OIL.OIM0002_ORG         B     ON  " _
                         & "            A.HORG        = B.ORGCODE   " _
                         & "        and A.CAMPCODE    = B.CAMPCODE  " _
                         & "        and B.STYMD      <= @P3         " _
@@ -1798,14 +1798,14 @@ Public Class GL0005StaffList
                         & "      , rtrim(A.HORG)       as HORG     " _
                         & "      , rtrim(S.NAMES)      as HORGNAMES" _
                         & " FROM                                   " _
-                        & "            MB001_STAFF        A        " _
-                        & " INNER JOIN M0002_ORG          B     ON " _
+                        & "            OIL.MB001_STAFF        A        " _
+                        & " INNER JOIN OIL.OIM0002_ORG          B     ON " _
                         & "            B.CAMPCODE    = A.CAMPCODE  " _
                         & "        and B.ORGCODE     = A.MORG      " _
                         & "        and B.DELFLG     <> '1'         " _
                         & "        and B.STYMD      <= @P3         " _
                         & "        and B.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         C     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C     ON " _
                         & "            C.CAMPCODE    = B.CAMPCODE  " _
                         & "        and C.CODE        = B.ORGCODE   " _
                         & "        and C.OBJECT      = @P4         " _
@@ -1814,13 +1814,13 @@ Public Class GL0005StaffList
                         & "        and C.STYMD      <= @P3         " _
                         & "        and C.ENDYMD     >= @P2         " _
                         & "        and C.DELFLG     <> '1'         " _
-                        & " INNER JOIN M0002_ORG          S     ON " _
+                        & " INNER JOIN OIL.OIM0002_ORG          S     ON " _
                         & "            S.CAMPCODE    = A.CAMPCODE  " _
                         & "        and S.ORGCODE     = A.HORG      " _
                         & "        and S.DELFLG     <> '1'         " _
                         & "        and S.STYMD      <= @P3         " _
                         & "        and S.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         T     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE         T     ON " _
                         & "            T.CAMPCODE    = B.CAMPCODE  " _
                         & "        and T.CODE        = B.ORGCODE   " _
                         & "        and T.OBJECT      = @P4         " _
@@ -1919,8 +1919,8 @@ Public Class GL0005StaffList
                         & "      , rtrim(A.HORG)       as HORG     " _
                         & "      , rtrim(S.NAMES)      as HORGNAMES" _
                         & " FROM                                   " _
-                        & "            MB001_STAFF        A        " _
-                        & " INNER JOIN M0002_ORG          B     ON " _
+                        & "            OIL.MB001_STAFF        A        " _
+                        & " INNER JOIN OIL.OIM0002_ORG          B     ON " _
                         & "            B.CAMPCODE    = A.CAMPCODE  " _
                         & "        and B.ORGCODE     = A.MORG      " _
                         & "        and B.ORGLEVEL   IN             " _
@@ -1928,7 +1928,7 @@ Public Class GL0005StaffList
                         & "        and B.DELFLG     <> '1'         " _
                         & "        and B.STYMD      <= @P3         " _
                         & "        and B.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         C     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C     ON " _
                         & "            C.CAMPCODE    = B.CAMPCODE  " _
                         & "        and C.CODE        = B.ORGCODE   " _
                         & "        and C.OBJECT      = @P4         " _
@@ -1937,14 +1937,14 @@ Public Class GL0005StaffList
                         & "        and C.STYMD      <= @P3         " _
                         & "        and C.ENDYMD     >= @P2         " _
                         & "        and C.DELFLG     <> '1'         " _
-                        & " INNER JOIN M0002_ORG          S     ON " _
+                        & " INNER JOIN OIL.OIM0002_ORG          S     ON " _
                         & "            S.CAMPCODE    = A.CAMPCODE  " _
                         & "        and S.ORGCODE     = A.HORG      " _
                         & "        and S.ORGLEVEL    = '00010'     " _
                         & "        and S.DELFLG     <> '1'         " _
                         & "        and S.STYMD      <= @P3         " _
                         & "        and S.ENDYMD     >= @P2         " _
-                        & " INNER JOIN S0006_ROLE         T     ON " _
+                        & " INNER JOIN COM.OIS0009_ROLE         T     ON " _
                         & "            T.CAMPCODE    = B.CAMPCODE  " _
                         & "        and T.CODE        = B.ORGCODE   " _
                         & "        and T.OBJECT      = @P4         " _
@@ -2037,12 +2037,12 @@ Public Class GL0005StaffList
                         & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                         & "      , B.SEQ               as SEQ              " _
                         & " FROM                                           " _
-                        & "            MB001_STAFF        A                " _
-                        & " INNER JOIN MB002_STAFFORG     B            ON  " _
+                        & "            OIL.MB001_STAFF        A                " _
+                        & " INNER JOIN OIL.MB002_STAFFORG     B            ON  " _
                         & "         B.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   B.STAFFCODE          = A.STAFFCODE     " _
                         & "   and   B.DELFLG            <> '1'             " _
-                        & " INNER JOIN S0006_ROLE         C            ON  " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C            ON  " _
                         & "         C.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   C.CODE               = B.SORG          " _
                         & "   and   C.OBJECT             = @P4             " _
@@ -2051,7 +2051,7 @@ Public Class GL0005StaffList
                         & "   and   C.STYMD             <= @P3             " _
                         & "   and   C.ENDYMD            >= @P2             " _
                         & "   and   C.DELFLG            <> '1'             " _
-                        & " INNER JOIN M0002_ORG          S            ON  " _
+                        & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                         & "            S.CAMPCODE        = A.CAMPCODE      " _
                         & "        and S.ORGCODE         = A.HORG          " _
                         & "        and S.DELFLG         <> '1'             " _
@@ -2061,7 +2061,7 @@ Public Class GL0005StaffList
                         & "         A.STAFFKBN IN (                        " _
                         & "            SELECT                              " _
                         & "                     KEYCODE                    " _
-                        & "            FROM MC001_FIXVALUE E               " _
+                        & "            FROM COM.OIS0015_FIXVALUE E               " _
                         & "            WHERE                               " _
                         & "                    E.CAMPCODE = A.CAMPCODE     " _
                         & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -2082,13 +2082,13 @@ Public Class GL0005StaffList
                         & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                         & "      , B.SEQ               as SEQ              " _
                         & " FROM                                           " _
-                        & "            MB001_STAFF        A                " _
-                        & " INNER JOIN MB002_STAFFORG     B            ON  " _
+                        & "            OIL.MB001_STAFF        A                " _
+                        & " INNER JOIN OIL.MB002_STAFFORG     B            ON  " _
                         & "         B.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   B.STAFFCODE          = A.STAFFCODE     " _
                         & "   and   B.SORG               = @P6             " _
                         & "   and   B.DELFLG            <> '1'             " _
-                        & " INNER JOIN S0006_ROLE         C            ON  " _
+                        & " INNER JOIN COM.OIS0009_ROLE         C            ON  " _
                         & "         C.CAMPCODE           = A.CAMPCODE      " _
                         & "   and   C.CODE               = B.SORG          " _
                         & "   and   C.OBJECT             = @P4             " _
@@ -2097,7 +2097,7 @@ Public Class GL0005StaffList
                         & "   and   C.STYMD             <= @P3             " _
                         & "   and   C.ENDYMD            >= @P2             " _
                         & "   and   C.DELFLG            <> '1'             " _
-                        & " INNER JOIN M0002_ORG          S            ON  " _
+                        & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                         & "            S.CAMPCODE        = A.CAMPCODE      " _
                         & "        and S.ORGCODE         = A.HORG          " _
                         & "        and S.DELFLG         <> '1'             " _
@@ -2107,7 +2107,7 @@ Public Class GL0005StaffList
                         & "         A.STAFFKBN IN (                        " _
                         & "            SELECT                              " _
                         & "                     KEYCODE                    " _
-                        & "            FROM MC001_FIXVALUE E               " _
+                        & "            FROM COM.OIS0015_FIXVALUE E               " _
                         & "            WHERE                               " _
                         & "                    E.CAMPCODE = A.CAMPCODE     " _
                         & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -2206,8 +2206,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                    & "      , isnull(C.SEQ, 0)    as CSEQ             " _
                    & "      , isnull(B.SEQ, 0)    as BSEQ             " _
-                   & " FROM       MB001_STAFF  A                      " _
-                   & " INNER JOIN M0006_STRUCT B                   ON " _
+                   & " FROM       OIL.MB001_STAFF  A                      " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                   ON " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2216,13 +2216,13 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
                    & "        and S.STYMD          <= @P3             " _
                    & "        and S.ENDYMD         >= @P2             " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -2237,8 +2237,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(A.STAFFNAMES) as NAMES            " _
                    & "      , rtrim(A.HORG)       as HORG             " _
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2247,7 +2247,7 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "        S.CAMPCODE  = A.CAMPCODE                " _
                    & "   and S.ORGCODE    = A.HORG                    " _
                    & "   and S.DELFLG    <> '1'                       " _
@@ -2347,8 +2347,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                    & "      , isnull(C.SEQ, 0)    as CSEQ             " _
                    & "      , isnull(B.SEQ, 0)    as BSEQ             " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2357,13 +2357,13 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
                    & "        and S.STYMD          <= @P3             " _
                    & "        and S.ENDYMD         >= @P2             " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -2371,7 +2371,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -2390,8 +2390,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(A.STAFFNAMES) as NAMES            " _
                    & "      , rtrim(A.HORG)       as HORG             " _
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2400,7 +2400,7 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
@@ -2410,7 +2410,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -2512,8 +2512,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                    & "      , isnull(C.SEQ, 0)    as CSEQ             " _
                    & "      , isnull(B.SEQ, 0)    as BSEQ             " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2522,13 +2522,13 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
                    & "        and S.STYMD          <= @P3             " _
                    & "        and S.ENDYMD         >= @P2             " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -2536,7 +2536,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -2555,8 +2555,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(A.STAFFNAMES) as NAMES            " _
                    & "      , rtrim(A.HORG)       as HORG             " _
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2565,7 +2565,7 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
@@ -2575,7 +2575,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -2678,8 +2678,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                    & "      , isnull(C.SEQ, 0)    as CSEQ             " _
                    & "      , isnull(B.SEQ, 0)    as BSEQ             " _
-                   & " FROM       MB001_STAFF  A                      " _
-                   & " INNER JOIN M0006_STRUCT B                   ON " _
+                   & " FROM       OIL.MB001_STAFF  A                      " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                   ON " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2688,14 +2688,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -2703,13 +2703,13 @@ Public Class GL0005StaffList
                    & "   and   Y.ENDYMD  >= @P9                       " _
                    & "   and   Y.CODE     = A.HORG                    " _
                    & "   and   Y.DELFLG  <> '1'                       " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
                    & "        and S.STYMD          <= @P3             " _
                    & "        and S.ENDYMD         >= @P2             " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
@@ -2724,8 +2724,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(A.STAFFNAMES) as NAMES            " _
                    & "      , rtrim(A.HORG)       as HORG             " _
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2734,14 +2734,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -2749,7 +2749,7 @@ Public Class GL0005StaffList
                    & "   and   Y.ENDYMD  >= @P9                       " _
                    & "   and   Y.CODE     = A.HORG                    " _
                    & "   and   Y.DELFLG  <> '1'                       " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
@@ -2854,8 +2854,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                    & "      , isnull(C.SEQ, 0)    as CSEQ             " _
                    & "      , isnull(B.SEQ, 0)    as BSEQ             " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2864,18 +2864,18 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -2883,7 +2883,7 @@ Public Class GL0005StaffList
                    & "   and   Y.ENDYMD  >= @P9                       " _
                    & "   and   Y.CODE     = A.HORG                    " _
                    & "   and   Y.DELFLG  <> '1'                       " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
@@ -2893,7 +2893,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -2912,8 +2912,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(A.STAFFNAMES) as NAMES            " _
                    & "      , rtrim(A.HORG)       as HORG             " _
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -2922,14 +2922,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -2937,7 +2937,7 @@ Public Class GL0005StaffList
                    & "   and   Y.ENDYMD  >= @P9                       " _
                    & "   and   Y.CODE     = A.HORG                    " _
                    & "   and   Y.DELFLG  <> '1'                       " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
@@ -2947,7 +2947,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -3055,8 +3055,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
                    & "      , isnull(C.SEQ, 0)    as CSEQ             " _
                    & "      , isnull(B.SEQ, 0)    as BSEQ             " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                    ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                    ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -3065,18 +3065,18 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " LEFT  JOIN MB002_STAFFORG C                 ON " _
+                   & " LEFT  JOIN OIL.MB002_STAFFORG C                 ON " _
                    & "        C.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  C.STAFFCODE = A.STAFFCODE               " _
                    & "   and  C.SORG      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -3084,7 +3084,7 @@ Public Class GL0005StaffList
                    & "   and   Y.ENDYMD  >= @P9                       " _
                    & "   and   Y.CODE     = A.HORG                    " _
                    & "   and   Y.DELFLG  <> '1'                       " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
@@ -3094,7 +3094,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _
@@ -3113,8 +3113,8 @@ Public Class GL0005StaffList
                    & "      , rtrim(A.STAFFNAMES) as NAMES            " _
                    & "      , rtrim(A.HORG)       as HORG             " _
                    & "      , rtrim(S.NAMES)      as HORGNAMES        " _
-                   & " FROM       MB001_STAFF A                       " _
-                   & " INNER JOIN M0006_STRUCT B                  ON  " _
+                   & " FROM       OIL.MB001_STAFF A                       " _
+                   & " INNER JOIN OIL.M0006_STRUCT B                  ON  " _
                    & "        B.CAMPCODE = A.CAMPCODE                 " _
                    & "   and  B.OBJECT    = @P6                       " _
                    & "   and  B.STRUCT    = @P7                       " _
@@ -3123,14 +3123,14 @@ Public Class GL0005StaffList
                    & "   and  B.ENDYMD   >= @P9                       " _
                    & "   and  B.DELFLG   <> '1'                       " _
                    & "   and  B.CODE      = A.HORG                    " _
-                   & " INNER JOIN S0012_SRVAUTHOR X                ON " _
+                   & " INNER JOIN COM.OIS0011_SRVAUTHOR X                ON " _
                    & "        X.CAMPCODE  = A.CAMPCODE                " _
                    & "   and  X.OBJECT    = @P10                      " _
                    & "   and  X.TERMID    = @P11                      " _
                    & "   and  X.STYMD    <= @P9                       " _
                    & "   and  X.ENDYMD   >= @P9                       " _
                    & "   and  X.DELFLG   <> '1'                       " _
-                   & " INNER JOIN S0006_ROLE      Y                ON " _
+                   & " INNER JOIN COM.OIS0009_ROLE      Y                ON " _
                    & "         Y.CAMPCODE = X.CAMPCODE                " _
                    & "   and   Y.OBJECT   = X.OBJECT                  " _
                    & "   and   Y.ROLE     = X.ROLE                    " _
@@ -3138,7 +3138,7 @@ Public Class GL0005StaffList
                    & "   and   Y.ENDYMD  >= @P9                       " _
                    & "   and   Y.CODE     = A.HORG                    " _
                    & "   and   Y.DELFLG  <> '1'                       " _
-                   & " INNER JOIN M0002_ORG          S            ON  " _
+                   & " INNER JOIN OIL.OIM0002_ORG          S            ON  " _
                    & "            S.CAMPCODE        = A.CAMPCODE      " _
                    & "        and S.ORGCODE         = A.HORG          " _
                    & "        and S.DELFLG         <> '1'             " _
@@ -3148,7 +3148,7 @@ Public Class GL0005StaffList
                    & "         A.STAFFKBN IN (                        " _
                    & "            SELECT                              " _
                    & "                     KEYCODE                    " _
-                   & "            FROM MC001_FIXVALUE E               " _
+                   & "            FROM COM.OIS0015_FIXVALUE E               " _
                    & "            WHERE                               " _
                    & "                    E.CAMPCODE = A.CAMPCODE     " _
                    & "              and   E.CLASS    = 'STAFFKBN'     " _

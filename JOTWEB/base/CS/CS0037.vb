@@ -261,9 +261,9 @@ Public Structure CS0037HORDERchk
             Dim SQLStr As String = ""
 
             If CREWKBN = "1" Then
-                SQLStr = _
+                SQLStr =
                            " SELECT CAMPCODE " _
-                         & "     FROM T0004_HORDER " _
+                         & "     FROM COM.T0004_HORDER " _
                          & "     WHERE    CAMPCODE        = @P01 " _
                          & "       and    SHIPORG         = @P02 " _
                          & "       and    ORDERNO         = @P03 " _
@@ -275,9 +275,9 @@ Public Structure CS0037HORDERchk
                          & "       and    STAFFCODE       = @P09 " _
                          & "       and    DELFLG         <> '1' "
             Else
-                SQLStr = _
+                SQLStr =
                            " SELECT CAMPCODE " _
-                         & "     FROM T0004_HORDER " _
+                         & "     FROM COM.T0004_HORDER " _
                          & "     WHERE    CAMPCODE        = @P01 " _
                          & "       and    SHIPORG         = @P02 " _
                          & "       and    ORDERNO         = @P03 " _

@@ -87,19 +87,19 @@ Public Class GL0012RoleList
     ''' </summary>
     Protected Sub getRoleList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用会社取得
-        '○ User権限によりDB(S0006_ROLE)検索
+        '○ User権限によりDB(OIS0009_ROLE)検索
         Try
 
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                     " SELECT                 " &
                     "         CODE          as CODE   , " &
-                    "         CODENAMES     as NAMES    " & _
-                    " FROM S0006_ROLE                   " & _
-                    " WHERE CAMPCODE        = @P1       " & _
-                    "   AND   STYMD        <= @P3       " & _
-                    "   AND   ENDYMD       >= @P2       " & _
-                    "   AND   OBJECT        = @P4       " & _
-                    "   AND   ROLE          = @P5       " & _
+                    "         CODENAMES     as NAMES    " &
+                    " FROM COM.OIS0009_ROLE                   " &
+                    " WHERE CAMPCODE        = @P1       " &
+                    "   AND   STYMD        <= @P3       " &
+                    "   AND   ENDYMD       >= @P2       " &
+                    "   AND   OBJECT        = @P4       " &
+                    "   AND   ROLE          = @P5       " &
                     "   AND   DELFLG       <> '1'       "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
@@ -141,7 +141,7 @@ Public Class GL0012RoleList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0011"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

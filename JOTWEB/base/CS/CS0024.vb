@@ -123,7 +123,7 @@ Public Structure CS0024FCHECK
         Dim sm As New CS0050SESSION
 
         '●項目情報取得
-        '○ DB(S0013_DATAFIELD)検索
+        '○ DB(OIS0016_DATAFIELD)検索
         Try
             '○指定ﾊﾟﾗﾒｰﾀで検索
             'DataBase接続文字
@@ -158,8 +158,8 @@ Public Structure CS0024FCHECK
                & "                        ELSE 1 END                    " _
                & "                       ) AS RNK                       " _
                & "   FROM                                               " _
-               & "             com.OIS0016_DATAFIELD             A            " _
-               & "   LEFT JOIN oil.OIS0015_FIXVALUE              B       ON   " _
+               & "             COM.OIS0016_DATAFIELD             A            " _
+               & "   LEFT JOIN COM.OIS0015_FIXVALUE              B       ON   " _
                & "            B.CLASS      = A.FIELD                    " _
                & "        and B.KEYCODE    = @P4                        " _
                & "        and B.STYMD     <= @P5                        " _
@@ -252,7 +252,7 @@ Public Structure CS0024FCHECK
                         End Try
 
                         '　整数部チェック
-                        If SQLdr("INTLENG") = 0 Then            'データフィールドマスタ(S0013_DATAFIELD)　桁数未設定
+                        If SQLdr("INTLENG") = 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定
                         Else
                             Try
                                 If WW_int.Length > SQLdr("INTLENG") Then
@@ -270,7 +270,7 @@ Public Structure CS0024FCHECK
                         End If
 
                         '　小数部チェック
-                        If SQLdr("DECLENG") = 0 Then            'データフィールドマスタ(S0013_DATAFIELD)　桁数未設定　
+                        If SQLdr("DECLENG") = 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定　
                             If WW_dec.Length > 0 Then
                                 CHECKREPORT = C_MESSAGE_TEXT.DECIMAL_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
                                 ERR = C_MESSAGE_NO.DECIMAL_LENGTH_OVER_ERROR
@@ -376,9 +376,9 @@ Public Structure CS0024FCHECK
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
                 CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                 'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"             '
+                CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"             '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                 '
-                CS0011LOGWRITE.TEXT = "データフィールドマスタ（S0013_DATAFIELD）に存在しません。"
+                CS0011LOGWRITE.TEXT = "データフィールドマスタ（OIS0016_DATAFIELD）に存在しません。"
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
                 CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
@@ -399,7 +399,7 @@ Public Structure CS0024FCHECK
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                 'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"             '
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"             '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                  '
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

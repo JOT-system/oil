@@ -65,7 +65,7 @@ Public Class M00001MENU
                         & "      rtrim(isnull(A.MAPNAMEL,''))   as NAMEL   , " _
                         & "      rtrim(isnull(B.URL,''))        as URL       " _
                         & " FROM      ROWIDX                      R          " _
-                        & " LEFT JOIN com.OIS0008_PROFMMAP              A       ON " _
+                        & " LEFT JOIN COM.OIS0008_PROFMMAP              A       ON " _
                         & "       A.CAMPCODE = @P1                           " _
                         & "   and A.MAPIDP   = @P2                           " _
                         & "   and A.VARIANTP = @P3                           " _
@@ -75,7 +75,7 @@ Public Class M00001MENU
                         & "   and A.ENDYMD  >= @P6                           " _
                         & "   and A.DELFLG  <> @P7                           " _
                         & "   and A.POSIROW  = R.ROWLINE                     " _
-                        & " LEFT JOIN com.OIS0007_URL                   B       ON " _
+                        & " LEFT JOIN COM.OIS0007_URL                   B       ON " _
                         & "       B.MAPID    = A.MAPID                       " _
                         & "   and B.STYMD   <= @P5                           " _
                         & "   and B.ENDYMD  >= @P6                           " _
@@ -91,7 +91,8 @@ Public Class M00001MENU
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.NVarChar, 1)
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA2.Value = Master.MAPID
-                PARA3.Value = Master.MAPvariant
+                '                PARA3.Value = Master.MAPvariant
+                PARA3.Value = Master.ROLE_MENU
                 PARA4.Value = "1"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now
@@ -116,7 +117,8 @@ Public Class M00001MENU
                 '　１回目（ユーザＩＤ）での貼り付け
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA2.Value = Master.MAPID
-                PARA3.Value = Master.MAPvariant
+                '                PARA3.Value = Master.MAPvariant
+                PARA3.Value = Master.ROLE_MENU
                 PARA4.Value = "2"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now
@@ -140,7 +142,8 @@ Public Class M00001MENU
 
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA2.Value = Master.MAPID
-                PARA3.Value = Master.MAPvariant
+                '                PARA3.Value = Master.MAPvariant
+                PARA3.Value = Master.ROLE_MENU
                 PARA4.Value = "1"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now
@@ -183,7 +186,7 @@ Public Class M00001MENU
                 'S0014_USER検索SQL文
                 Dim SQL_Str As String =
                      "SELECT PASSENDYMD " _
-                   & " FROM  com.OIS0005_USERPASS " _
+                   & " FROM  COM.OIS0005_USERPASS " _
                    & " Where USERID = @P1 " _
                    & "   and DELFLG <> @P2 "
                 Dim USERcmd As New SqlCommand(SQL_Str, SQLcon)
@@ -206,10 +209,10 @@ Public Class M00001MENU
                 USERcmd = Nothing
 
             Catch ex As Exception
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0014_USERPASS SELECT")
+                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "S0014_USERPASS SELECT"                '
+                CS0011LOGWRITE.INFPOSI = "OIS0005_USERPASS SELECT"                '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -547,17 +550,6 @@ Public Class M00001MENU
 
     End Sub
 
-
-
-
-
-
-
-
-
-
-
-
     ' ******************************************************************************
     ' ***  Repeater_Menu_R ボタン押下処理                                        ***
     ' ******************************************************************************
@@ -577,6 +569,11 @@ Public Class M00001MENU
         '○画面遷移権限チェック（右）
         CS0007CheckAuthority.MAPID = WW_MAPID.Text
         CS0007CheckAuthority.ROLECODE_MAP = Master.ROLE_MAP
+        '20191101-追加-START
+        CS0007CheckAuthority.ROLECODE_MENU = Master.ROLE_MENU
+        CS0007CheckAuthority.ROLECODE_VIEWPROF = Master.ROLE_VIEWPROF
+        CS0007CheckAuthority.ROLECODE_RPRTPROF = Master.ROLE_RPRTPROF
+        '20191101-追加-END
         CS0007CheckAuthority.check()
         If isNormal(CS0007CheckAuthority.ERR) Then
             If CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.REFERLANCE OrElse
@@ -585,6 +582,12 @@ Public Class M00001MENU
                 CS0050Session.VIEW_MAPID = WW_MAPID.Text
                 CS0050Session.VIEW_MAP_VARIANT = WW_VARI.Text
                 CS0050Session.MAP_ETC = ""
+                '20191101-追加-START
+                CS0050Session.VIEW_MENU_MODE = CS0007CheckAuthority.ROLECODE_MENU
+                CS0050Session.VIEW_MAP_MODE = CS0007CheckAuthority.ROLECODE_MAP
+                CS0050Session.VIEW_VIEWPROF_MODE = CS0007CheckAuthority.ROLECODE_VIEWPROF
+                CS0050Session.VIEW_RPRTPROF_MODE = CS0007CheckAuthority.ROLECODE_RPRTPROF
+                '20191101-追加-END
 
                 Master.MAPvariant = WW_VARI.Text
                 Master.MAPID = WW_MAPID.Text

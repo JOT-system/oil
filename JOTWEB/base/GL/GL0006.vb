@@ -245,7 +245,7 @@ Public Class GL0006GoodsList
                     & "            rtrim(A.PRODUCTCODE)  as CODE       , " _
                     & "            rtrim(A.NAMES)        as NAMES        " _
                     & " FROM                                             " _
-                    & "          MD001_PRODUCT             A             " _
+                    & "          OIL.MD001_PRODUCT             A             " _
                     & " WHERE                                            " _
                     & "            A.STYMD         <= @P3                " _
                     & "       and  A.ENDYMD        >= @P2                " _
@@ -312,7 +312,7 @@ Public Class GL0006GoodsList
                         & "            rtrim(A.PRODUCTCODE)  as CODE       , " _
                         & "            rtrim(A.NAMES)        as NAMES        " _
                         & " FROM                                             " _
-                        & "          MD001_PRODUCT             A             " _
+                        & "          OIL.MD001_PRODUCT             A             " _
                         & " WHERE                                            " _
                         & "            A.CAMPCODE       = @P1                " _
                         & "       and  A.STYMD         <= @P3                " _
@@ -338,8 +338,8 @@ Public Class GL0006GoodsList
                         & "            rtrim(A.NAMES)        as NAMES      , " _
                         & "            B.SEQ                 as SEQ          " _
                         & " FROM                                             " _
-                        & "            MD001_PRODUCT           A             " _
-                        & " INNER JOIN MD002_PRODORG           B          ON " _
+                        & "            OIL.MD001_PRODUCT           A             " _
+                        & " INNER JOIN OIL.MD002_PRODORG           B          ON " _
                         & "            B.PRODUCTCODE    = A.PRODUCTCODE      " _
                         & "       and  B.CAMPCODE       = @P8                " _
                         & "       and  B.UORG           = @P5                " _
@@ -431,7 +431,7 @@ Public Class GL0006GoodsList
                         & "            rtrim(A.PRODUCTCODE)  as CODE       , " _
                         & "            rtrim(A.NAMES)        as NAMES        " _
                         & " FROM                                             " _
-                        & "          MD001_PRODUCT             A             " _
+                        & "          OIL.MD001_PRODUCT             A             " _
                         & " WHERE                                            " _
                         & "            A.CAMPCODE       = @P1                " _
                         & "       and  A.STYMD         <= @P3                " _
@@ -457,8 +457,8 @@ Public Class GL0006GoodsList
                         & "            rtrim(A.NAMES)        as NAMES      , " _
                         & "            B.SEQ                 as SEQ          " _
                         & " FROM                                             " _
-                        & "            MD001_PRODUCT           A             " _
-                        & " INNER JOIN MD002_PRODORG           B          ON " _
+                        & "            OIL.MD001_PRODUCT           A             " _
+                        & " INNER JOIN OIL.MD002_PRODORG           B          ON " _
                         & "            B.PRODUCTCODE    = A.PRODUCTCODE      " _
                         & "       and  B.CAMPCODE       = @P8                " _
                         & "       and  B.UORG           = @P5                " _
@@ -548,15 +548,15 @@ Public Class GL0006GoodsList
                     & "            rtrim(A.PRODUCTCODE)  as CODE       , " _
                     & "            rtrim(A.NAMES)        as NAMES      , " _
                     & "            B.SEQ                 as SEQ          " _
-                    & " FROM       MD001_PRODUCT         A               " _
-                    & " INNER JOIN MD002_PRODORG         B            ON " _
+                    & " FROM       OIL.MD001_PRODUCT         A               " _
+                    & " INNER JOIN OIL.MD002_PRODORG         B            ON " _
                     & "            B.PRODUCTCODE    = A.PRODUCTCODE      " _
                     & "       and  B.CAMPCODE       = @P8                " _
                     & "       and  B.UORG           = @P5                " _
                     & "       and  B.STYMD         <= @P3                " _
                     & "       and  B.ENDYMD        >= @P2                " _
                     & "       and  B.DELFLG        <> '1'                " _
-                    & " INNER JOIN S0006_ROLE　          C            ON " _
+                    & " INNER JOIN COM.OIS0009_ROLE　          C            ON " _
                     & "            C.CAMPCODE       = B.CAMPCODE         " _
                     & "       and  C.CODE           = B.UORG             " _
                     & "       and  C.OBJECT         = @P6                " _
@@ -623,7 +623,7 @@ Public Class GL0006GoodsList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME            'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:MC001_FIXVALUE Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0015_FIXVALUE Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -643,14 +643,14 @@ Public Class GL0006GoodsList
         '検索SQL文
         Dim SQLStr As String = ""
 
-        '○ User権限によりDB(MC001_FIXVALUE)検索
+        '○ User権限によりDB(OIS0015_FIXVALUE)検索
         Try
             '検索SQL文
             SQLStr =
                       " SELECT " _
                     & "       rtrim(A.KEYCODE)     as CODE    , " _
                     & "       rtrim(A.VALUE1)      as NAMES     " _
-                    & " FROM       MC001_FIXVALUE    A          " _
+                    & " FROM       COM.OIS0015_FIXVALUE    A          " _
                     & " WHERE                                   " _
                     & "            A.CAMPCODE    = @P1          " _
                     & "       and  A.CLASS       = @P8          " _
@@ -690,7 +690,7 @@ Public Class GL0006GoodsList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME            'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:MC001_FIXVALUE Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0015_FIXVALUE Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -710,14 +710,14 @@ Public Class GL0006GoodsList
         '検索SQL文
         Dim SQLStr As String = ""
 
-        '○ User権限によりDB(MC001_FIXVALUE)検索
+        '○ User権限によりDB(OIS0015_FIXVALUE)検索
         Try
             '検索SQL文
             SQLStr =
                       " SELECT " _
                     & "       rtrim(A.KEYCODE)     as CODE    , " _
                     & "       rtrim(A.VALUE1)      as NAMES     " _
-                    & " FROM       MC001_FIXVALUE    A          " _
+                    & " FROM       COM.OIS0015_FIXVALUE    A          " _
                     & " WHERE                                   " _
                     & "            A.CAMPCODE    = @P1          " _
                     & "       and  A.CLASS       = @P8          " _
@@ -757,7 +757,7 @@ Public Class GL0006GoodsList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME            'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:MC001_FIXVALUE Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0015_FIXVALUE Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -787,15 +787,15 @@ Public Class GL0006GoodsList
                     & "            rtrim(A.PRODUCT1)   as CODE         , " _
                     & "            rtrim(D.VALUE1)     as NAMES        , " _
                     & "            B.SEQ               as SEQ            " _
-                    & " FROM       MD001_PRODUCT         A               " _
-                    & " INNER JOIN MD002_PRODORG         B            ON " _
+                    & " FROM       OIL.MD001_PRODUCT         A               " _
+                    & " INNER JOIN OIL.MD002_PRODORG         B            ON " _
                     & "            B.PRODUCTCODE    = A.PRODUCTCODE      " _
                     & "       and  B.CAMPCODE       = @P8                " _
                     & "       and  B.UORG           = @P5                " _
                     & "       and  B.STYMD         <= @P3                " _
                     & "       and  B.ENDYMD        >= @P2                " _
                     & "       and  B.DELFLG        <> '1'                " _
-                    & " INNER JOIN MC001_FIXVALUE        D               " _
+                    & " INNER JOIN COM.OIS0015_FIXVALUE        D               " _
                     & "            D.CAMPCODE       = A.CAMPCODE         " _
                     & "       and  D.KEYCODE        = A.PRODUCT1         " _
                     & "       and  D.CLASS          = @P9                " _
@@ -869,14 +869,14 @@ Public Class GL0006GoodsList
         '検索SQL文
         Dim SQLStr As String = ""
 
-        '○ DB(MC001_FIXVALUE)検索
+        '○ DB(OIS0015_FIXVALUE)検索
         Try
             '検索SQL文
             SQLStr =
                       " SELECT " _
                     & "            rtrim(A.KEYCODE)    as CODE         , " _
                     & "            rtrim(A.VALUE1)     as NAMES          " _
-                    & " FROM       MC001_FIXVALUE        A               " _
+                    & " FROM       COM.OIS0015_FIXVALUE        A               " _
                     & " WHERE                                            " _
                     & "            A.CAMPCODE       = @P1                " _
                     & "       and  A.CLASS          = @P9                " _
@@ -921,7 +921,7 @@ Public Class GL0006GoodsList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME            'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:MC001_FIXVALUE Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0015_FIXVALUE Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -948,7 +948,7 @@ Public Class GL0006GoodsList
                       " SELECT                                           " _
                     & "            rtrim(A.PRODUCT2)   as CODE         , " _
                     & "            rtrim(A.NAMES)      as NAMES          " _
-                    & " FROM       MD001_PRODUCT         A               " _
+                    & " FROM       OIL.MD001_PRODUCT         A               " _
                     & " WHERE                                            " _
                     & "            A.CAMPCODE       = @P1                " _
                     & "       and  A.STYMD         <= @P3                " _
@@ -1020,15 +1020,15 @@ Public Class GL0006GoodsList
         '○ User権限によりDB(MD001_PRODUCT)検索
         Try
             '検索SQL文
-            SQLStr = _
+            SQLStr =
                       " SELECT                                           " _
                     & "            rtrim(A.OILTYPE)    as OILTYPECODE  , " _
                     & "            rtrim(A.PRODUCT1)   as PRODUCT1CODE , " _
                     & "            rtrim(A.PRODUCT2)   as CODE         , " _
                     & "            rtrim(A.NAMES)      as NAMES        , " _
                     & "            B.SEQ               as SEQ            " _
-                    & " FROM       MD001_PRODUCT         A               " _
-                    & " INNER JOIN MD002_PRODORG         B            ON " _
+                    & " FROM       OIL.MD001_PRODUCT         A               " _
+                    & " INNER JOIN OIL.MD002_PRODORG         B            ON " _
                     & "            B.PRODUCTCODE    = A.PRODUCTCODE      " _
                     & "       and  B.CAMPCODE       = A.CAMPCODE         " _
                     & "       and  B.UORG           = @P4                " _
@@ -1114,29 +1114,29 @@ Public Class GL0006GoodsList
         '検索SQL文
         Dim SQLStr As String = ""
 
-        '○ User権限によりDB(MC001_FIXVALUE)検索
+        '○ User権限によりDB(OIS0015_FIXVALUE)検索
         Try
             '検索SQL文
-            SQLStr = _
+            SQLStr =
                       " SELECT " _
                     & "       rtrim(A.KEYCODE)     as CODE    ,  " _
                     & "       rtrim(A.VALUE1)      as NAMES   ,  " _
                     & "       B.SEQ                as SEQ        " _
-                    & " FROM       MC001_FIXVALUE    N           " _
-                    & " INNER JOIN MD001_PRODUCT     A       ON  " _
+                    & " FROM       COM.OIS0015_FIXVALUE    N           " _
+                    & " INNER JOIN OIL.MD001_PRODUCT     A       ON  " _
                     & "            A.CAMPCODE    = N.CAMPCODE    " _
                     & "       and  A.OILTYPE     = A.KEYCODE     " _
                     & "       and  A.STYMD      <= @P3           " _
                     & "       and  A.ENDYMD     >= @P2           " _
                     & "       and  A.DELFLG     <> '1'           " _
-                    & " INNER JOIN MC005_PRODORG     B       ON  " _
+                    & " INNER JOIN OIL.MC005_PRODORG     B       ON  " _
                     & "            B.PRODUCTCODE = A.PRODUCTCODE " _
                     & "       and  B.CAMPCODE    = @P8           " _
                     & "       and  B.UORG        = @P5           " _
                     & "       and  B.STYMD      <= @P3           " _
                     & "       and  B.ENDYMD     >= @P2           " _
                     & "       and  B.DELFLG     <> '1'           " _
-                    & " INNER JOIN S0006_ROLE        C       ON  " _
+                    & " INNER JOIN COM.OIS0009_ROLE        C       ON  " _
                     & "            C.CAMPCODE    = B.CAMPCODE    " _
                     & "       and  C.CODE        = B.UORG        " _
                     & "       and  C.OBJECT      = @P6           " _
@@ -1195,7 +1195,7 @@ Public Class GL0006GoodsList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME            'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:MC001_FIXVALUE Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0015_FIXVALUE Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1218,21 +1218,21 @@ Public Class GL0006GoodsList
         '○ User権限によりDB(MD001_PRODUCT)検索
         Try
             '検索SQL文
-            SQLStr = _
+            SQLStr =
                       " SELECT " _
                     & "            rtrim(A.OILTYPE)    as OILTYPECODE  , " _
                     & "            rtrim(A.PRODUCT1)   as CODE         , " _
                     & "            rtrim(D.VALUE1)     as NAMES        , " _
                     & "            B.SEQ               as SEQ            " _
-                    & " FROM       MD001_PRODUCT         A               " _
-                    & " INNER JOIN MD002_PRODORG         B            ON " _
+                    & " FROM       OIL.MD001_PRODUCT         A               " _
+                    & " INNER JOIN OIL.MD002_PRODORG         B            ON " _
                     & "            B.PRODUCTCODE    = A.PRODUCTCODE      " _
                     & "       and  B.CAMPCODE       = @P8                " _
                     & "       and  B.UORG           = @P5                " _
                     & "       and  B.STYMD         <= @P3                " _
                     & "       and  B.ENDYMD        >= @P2                " _
                     & "       and  B.DELFLG        <> '1'                " _
-                    & " INNER JOIN S0006_ROLE　          C            ON " _
+                    & " INNER JOIN COM.OIS0009_ROLE　          C            ON " _
                     & "            C.CAMPCODE       = B.CAMPCODE         " _
                     & "       and  C.CODE           = B.UORG             " _
                     & "       and  C.OBJECT         = @P6                " _
@@ -1241,7 +1241,7 @@ Public Class GL0006GoodsList
                     & "       and  C.STYMD         <= @P3                " _
                     & "       and  C.ENDYMD        >= @P2                " _
                     & "       and  C.DELFLG        <> '1'                " _
-                    & " INNER JOIN MC001_FIXVALUE        D               " _
+                    & " INNER JOIN COM.OIS0015_FIXVALUE        D               " _
                     & "            D.KEYCODE        = A.PRODUCT1         " _
                     & "       and  D.CLASS          = @P9                " _
                     & "       and  D.CAMPCODE       = A.CAMPCODE         " _
@@ -1327,22 +1327,22 @@ Public Class GL0006GoodsList
         '○ User権限によりDB(MD001_PRODUCT)検索
         Try
             '検索SQL文
-            SQLStr = _
+            SQLStr =
                       " SELECT                                           " _
                     & "            rtrim(A.OILTYPE)    as OILTYPECODE  , " _
                     & "            rtrim(A.PRODUCT1)   as PRODUCT1CODE , " _
                     & "            rtrim(A.PRODUCT2)   as CODE         , " _
                     & "            rtrim(A.NAMES)      as NAMES        , " _
                     & "            B.SEQ               as SEQ            " _
-                    & " FROM       MD001_PRODUCT         A               " _
-                    & " INNER JOIN MC005_PRODORG         B            ON " _
+                    & " FROM       OIL.MD001_PRODUCT         A               " _
+                    & " INNER JOIN OIL.MC005_PRODORG         B            ON " _
                     & "            B.PRODUCTCODE    = A.PRODUCTCODE      " _
                     & "       and  B.CAMPCODE       = @P8                " _
                     & "       and  B.UORG           = @P5                " _
                     & "       and  B.STYMD         <= @P3                " _
                     & "       and  B.ENDYMD        >= @P2                " _
                     & "       and  B.DELFLG        <> '1'                " _
-                    & " INNER JOIN S0006_ROLE　          C            ON " _
+                    & " INNER JOIN COM.OIS0009_ROLE　          C            ON " _
                     & "            C.CAMPCODE       = B.CAMPCODE         " _
                     & "       and  C.CODE           = B.UORG             " _
                     & "       and  C.OBJECT         = @P6                " _

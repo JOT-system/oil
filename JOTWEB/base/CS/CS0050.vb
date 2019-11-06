@@ -343,6 +343,70 @@ Public Class CS0050SESSION : Implements IDisposable
         End Set
     End Property
     ''' <summary>
+    ''' MENU_MODE
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VIEW_MENU_MODE As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return SESSION(C_SESSION_KEY.MAPPING_USER_MENU_MODE)
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.MAPPING_USER_MENU_MODE) = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' MAP_MODE
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VIEW_MAP_MODE As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return SESSION(C_SESSION_KEY.MAPPING_USER_MAP_MODE)
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.MAPPING_USER_MAP_MODE) = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' VIEWPROF_MODE
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VIEW_VIEWPROF_MODE As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return SESSION(C_SESSION_KEY.MAPPING_USER_VIEWPROF_MODE)
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.MAPPING_USER_VIEWPROF_MODE) = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' RPRTPROF_MODE
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VIEW_RPRTPROF_MODE As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return SESSION(C_SESSION_KEY.MAPPING_USER_RPRTPROF_MODE)
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.MAPPING_USER_RPRTPROF_MODE) = value
+        End Set
+    End Property
+    ''' <summary>
     ''' MAPVARIANT
     ''' </summary>
     ''' <value></value>

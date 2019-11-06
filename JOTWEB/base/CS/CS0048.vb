@@ -148,8 +148,8 @@ Public Structure CS0048Apploval
     ''' <returns></returns>
     Public Property O_APPLYSTATE As Dictionary(Of String, String)
 
-    Const TBL_FIXVALUE As String = "MC001_FIXVALUE"
-    Const TBL_APPROVAL As String = "S0022_APPROVAL"
+    Const TBL_FIXVALUE As String = "COM.OIS0015_FIXVALUE"
+    Const TBL_APPROVAL As String = "COM.OIS0017_APPROVAL"
     Const TBL_APPROVALHIST As String = "T0009_APPROVALHIST"
 
 

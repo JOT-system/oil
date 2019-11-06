@@ -209,22 +209,22 @@ Public Class GL0007CarList
         Try
 
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                  " SELECT DISTINCT                                                  " _
                & " isnull(rtrim(B.SHARYOTYPE),'') +                  		        " _
                & "        isnull(rtrim(B.TSHABAN),'') 	    as CODE ,               " _
                & "        isnull(rtrim(A.MANGSORG),'') 	    as MANGSORG ,           " _
                & "        isnull(rtrim(C.LICNPLTNO1),'') +                          " _
                & "        isnull(rtrim(C.LICNPLTNO2),'')    as NAMES                " _
-               & " FROM       MA003_SHARYOB                   B                     " _
-               & " INNER JOIN MA002_SHARYOA                   A                  ON " _
+               & " FROM       OIL.MA003_SHARYOB                   B                     " _
+               & " INNER JOIN OIL.MA002_SHARYOA                   A                  ON " _
                & "            A.CAMPCODE   	= B.CAMPCODE 				            " _
                & "        and A.SHARYOTYPE  = B.SHARYOTYPE  		                " _
                & "        and A.TSHABAN     = B.TSHABAN 		                    " _
                & "        and A.STYMD      <= @P3                                   " _
                & "        and A.ENDYMD     >= @P2                                   " _
                & "        and A.DELFLG     <> '1' 						            " _
-               & " LEFT  JOIN MA004_SHARYOC                   C                  ON " _
+               & " LEFT  JOIN OIL.MA004_SHARYOC                   C                  ON " _
                & "            C.CAMPCODE    = A.CAMPCODE 				            " _
                & "        and C.SHARYOTYPE  = A.SHARYOTYPE 		                    " _
                & "        and C.TSHABAN     = A.TSHABAN 			                " _
@@ -284,36 +284,36 @@ Public Class GL0007CarList
         '○ User権限によりDB(MA003_SHARYOB)検索
         Try
 
-            Dim profTbl As String(,) = { _
+            Dim profTbl As String(,) = {
                       {"TSHABAN", "統一車番", "10"} _
                     , {"LICNPLTNO", "登録車番", "8"} _
                     , {"MANGSORG", "設置部署", "6"} _
                     , {"MANGSORGNAME", "設置部署名称", "8"}
             }
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                  " SELECT isnull(rtrim(A.SHARYOTYPE),'') +                  		" _
                & "        isnull(rtrim(A.TSHABAN),'') 	    as TSHABAN ,            " _
                & "        isnull(rtrim(B.MANGSORG),'') 	    as MANGSORG ,           " _
                & "        isnull(rtrim(E.NAMES),'') 	    as MANGSORGNAME ,       " _
                & "        isnull(rtrim(D.LICNPLTNO1),'') +                          " _
                & "        isnull(rtrim(D.LICNPLTNO2),'')    as LICNPLTNO            " _
-               & " FROM       MA003_SHARYOB                   A                     " _
-               & " INNER JOIN MA002_SHARYOA                   B                  ON " _
+               & " FROM       OIL.MA003_SHARYOB                   A                     " _
+               & " INNER JOIN OIL.MA002_SHARYOA                   B                  ON " _
                & "            B.CAMPCODE   	= A.CAMPCODE 				            " _
                & "        and B.SHARYOTYPE  = A.SHARYOTYPE  		                " _
                & "        and B.TSHABAN     = A.TSHABAN 		                    " _
                & "        and B.STYMD      <= @P3                                   " _
                & "        and B.ENDYMD     >= @P2                                   " _
                & "        and B.DELFLG     <> '1' 						            " _
-               & " LEFT  JOIN MA004_SHARYOC                   D                  ON " _
+               & " LEFT  JOIN OIL.MA004_SHARYOC                   D                  ON " _
                & "            D.CAMPCODE    = A.CAMPCODE 				            " _
                & "        and D.SHARYOTYPE  = A.SHARYOTYPE 		                    " _
                & "        and D.TSHABAN     = A.TSHABAN 			                " _
                & "        and D.STYMD      <= @P3                                   " _
                & "        and D.ENDYMD     >= @P2                                   " _
                & "        and D.DELFLG     <> '1' 						            " _
-               & " LEFT JOIN  M0002_ORG                       E                  ON " _
+               & " LEFT JOIN  OIL.OIM0002_ORG                       E                  ON " _
                & "            E.CAMPCODE    = A.CAMPCODE                            " _
                & "        and E.ORGCODE     = B.MANGSORG                            " _
                & "        and E.STYMD      <= @P3                                   " _
@@ -368,22 +368,22 @@ Public Class GL0007CarList
         Try
 
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                  " SELECT DISTINCT                                                  " _
                & "        isnull(rtrim(B.SHARYOTYPE),'') +                  		" _
                & "        isnull(rtrim(B.TSHABAN),'') 	    as CODE ,               " _
                & "        isnull(rtrim(A.MANGSORG),'') 	    as MANGSORG ,           " _
                & "        isnull(rtrim(C.LICNPLTNO1),'') +                          " _
                & "        isnull(rtrim(C.LICNPLTNO2),'')    as NAMES                " _
-               & " FROM       MA003_SHARYOB                   B                     " _
-               & " INNER JOIN MA002_SHARYOA                   A                  ON " _
+               & " FROM       OIL.MA003_SHARYOB                   B                     " _
+               & " INNER JOIN OIL.MA002_SHARYOA                   A                  ON " _
                & "            A.CAMPCODE   	= B.CAMPCODE 				            " _
                & "        and A.SHARYOTYPE  = B.SHARYOTYPE  		                " _
                & "        and A.TSHABAN     = B.TSHABAN 		                    " _
                & "        and A.STYMD      <= @P3                                   " _
                & "        and A.ENDYMD     >= @P2                                   " _
                & "        and A.DELFLG     <> '1' 						            " _
-               & " LEFT  JOIN MA004_SHARYOC                   C                  ON " _
+               & " LEFT  JOIN OIL.MA004_SHARYOC                   C                  ON " _
                & "            C.CAMPCODE    = A.CAMPCODE 				            " _
                & "        and C.SHARYOTYPE  = A.SHARYOTYPE 		                    " _
                & "        and C.TSHABAN     = A.TSHABAN 			                " _
@@ -393,7 +393,7 @@ Public Class GL0007CarList
                & " WHERE      B.CAMPCODE    = @P1                                   " _
                & "        and B.SHARYOTYPE IN (                                     " _
                & "           SELECT RTRIM(S.KEYCODE)                                " _
-               & "           FROM   MC001_FIXVALUE                S                 " _
+               & "           FROM   COM.OIS0015_FIXVALUE                S                 " _
                & "           WHERE  S.VALUE2         = @P4                          " _
                & "             and  S.CLASS          = 'SHARYOTYPE'                 " _
                & "             and  S.CAMPCODE       = A.CAMPCODE                   " _
@@ -456,36 +456,36 @@ Public Class GL0007CarList
         '○ User権限によりDB(MA003_SHARYOB)検索
         Try
 
-            Dim profTbl As String(,) = { _
+            Dim profTbl As String(,) = {
                       {"TSHABAN", "統一車番", "20"} _
                     , {"LICNPLTNO", "登録車番", "8"} _
                     , {"MANGSORG", "設置部署", "6"} _
-                    , {"MANGSORGNAME", "設置部署名称", "8"} _
+                    , {"MANGSORGNAME", "設置部署名称", "8"}
             }
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                  " SELECT isnull(rtrim(A.SHARYOTYPE),'') +                  		" _
                & "        isnull(rtrim(A.TSHABAN),'') 	    as TSHABAN ,            " _
                & "        isnull(rtrim(B.MANGSORG),'') 	    as MANGSORG ,           " _
                & "        isnull(rtrim(E.NAMES),'') 	    as MANGSORGNAME ,       " _
                & "        isnull(rtrim(D.LICNPLTNO1),'') +                          " _
                & "        isnull(rtrim(D.LICNPLTNO2),'')    as LICNPLTNO            " _
-               & " FROM       MA003_SHARYOB                   A                     " _
-               & " INNER JOIN MA002_SHARYOA                   B                  ON " _
+               & " FROM       OIL.MA003_SHARYOB                   A                     " _
+               & " INNER JOIN OIL.MA002_SHARYOA                   B                  ON " _
                & "            B.CAMPCODE   	= A.CAMPCODE 				            " _
                & "        and B.SHARYOTYPE  = A.SHARYOTYPE  		                " _
                & "        and B.TSHABAN     = A.TSHABAN 		                    " _
                & "        and B.STYMD      <= @P3                                   " _
                & "        and B.ENDYMD     >= @P2                                   " _
                & "        and B.DELFLG     <> '1' 						            " _
-               & " LEFT  JOIN MA004_SHARYOC                   D                  ON " _
+               & " LEFT  JOIN OIL.MA004_SHARYOC                   D                  ON " _
                & "            D.CAMPCODE    = A.CAMPCODE 				            " _
                & "        and D.SHARYOTYPE  = A.SHARYOTYPE 		                    " _
                & "        and D.TSHABAN     = A.TSHABAN 			                " _
                & "        and D.STYMD      <= @P3                                   " _
                & "        and D.ENDYMD     >= @P2                                   " _
                & "        and D.DELFLG     <> '1' 						            " _
-               & " LEFT JOIN  M0002_ORG                       E                  ON " _
+               & " LEFT JOIN  OIL.OIM0002_ORG                       E                  ON " _
                & "            E.CAMPCODE    = A.CAMPCODE                            " _
                & "        and E.ORGCODE     = B.MANGSORG                            " _
                & "        and E.STYMD      <= @P3                                   " _
@@ -494,7 +494,7 @@ Public Class GL0007CarList
                & " WHERE      A.CAMPCODE    = @P1                                   " _
                & "        and A.SHARYOTYPE IN (                                     " _
                & "           SELECT RTRIM(S.KEYCODE)                                " _
-               & "           FROM   MC001_FIXVALUE                S                 " _
+               & "           FROM   COM.OIS0015_FIXVALUE                S                 " _
                & "           WHERE  S.VALUE2         = @P4                          " _
                & "             and  S.CLASS          = 'SHARYOTYPE'                 " _
                & "             and  S.CAMPCODE       = A.CAMPCODE                   " _
@@ -552,22 +552,22 @@ Public Class GL0007CarList
         Try
 
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                  " SELECT DISTINCT                                                  " _
                & "        isnull(rtrim(B.SHARYOTYPE),'') +                  		" _
                & "        isnull(rtrim(B.TSHABAN),'') 	    as CODE ,               " _
                & "        isnull(rtrim(A.MANGSORG),'') 	    as MANGSORG ,           " _
                & "        isnull(rtrim(C.LICNPLTNO1),'') +                          " _
                & "        isnull(rtrim(C.LICNPLTNO2),'')    as NAMES                " _
-               & " FROM       MA003_SHARYOB                   B                     " _
-               & " INNER JOIN MA002_SHARYOA                   A                  ON " _
+               & " FROM       OIL.MA003_SHARYOB                   B                     " _
+               & " INNER JOIN OIL.MA002_SHARYOA                   A                  ON " _
                & "            A.CAMPCODE   	= B.CAMPCODE 				            " _
                & "        and A.SHARYOTYPE  = B.SHARYOTYPE  		                " _
                & "        and A.TSHABAN     = B.TSHABAN 		                    " _
                & "        and A.STYMD      <= @P3                                   " _
                & "        and A.ENDYMD     >= @P2                                   " _
                & "        and A.DELFLG     <> '1' 						            " _
-               & " LEFT  JOIN MA004_SHARYOC                   C                  ON " _
+               & " LEFT  JOIN OIL.MA004_SHARYOC                   C                  ON " _
                & "            C.CAMPCODE    = A.CAMPCODE 				            " _
                & "        and C.SHARYOTYPE  = A.SHARYOTYPE 		                    " _
                & "        and C.TSHABAN     = A.TSHABAN 			                " _
@@ -577,7 +577,7 @@ Public Class GL0007CarList
                & " WHERE      B.CAMPCODE    = @P1                                   " _
                & "        and B.SHARYOTYPE IN (                                     " _
                & "           SELECT RTRIM(S.KEYCODE)                                " _
-               & "           FROM   MC001_FIXVALUE                S                 " _
+               & "           FROM   COM.OIS0015_FIXVALUE                S                 " _
                & "           WHERE  S.VALUE2         = @P4                          " _
                & "             and  S.CLASS          = 'SHARYOTYPE'                 " _
                & "             and  S.CAMPCODE       = A.CAMPCODE                   " _
@@ -641,36 +641,36 @@ Public Class GL0007CarList
         '○ User権限によりDB(MA003_SHARYOB)検索
         Try
 
-            Dim profTbl As String(,) = { _
+            Dim profTbl As String(,) = {
                       {"TSHABAN", "統一車番", "20"} _
                     , {"LICNPLTNO", "登録車番", "8"} _
                     , {"MANGSORG", "設置部署", "6"} _
-                    , {"MANGSORGNAME", "設置部署名称", "8"} _
+                    , {"MANGSORGNAME", "設置部署名称", "8"}
             }
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                  " SELECT isnull(rtrim(A.SHARYOTYPE),'') +                  		" _
                & "        isnull(rtrim(A.TSHABAN),'') 	    as TSHABAN ,            " _
                & "        isnull(rtrim(B.MANGSORG),'') 	    as MANGSORG ,           " _
                & "        isnull(rtrim(E.NAMES),'') 	    as MANGSORGNAME ,       " _
                & "        isnull(rtrim(D.LICNPLTNO1),'') +                          " _
                & "        isnull(rtrim(D.LICNPLTNO2),'')    as LICNPLTNO            " _
-               & " FROM       MA003_SHARYOB                   A                     " _
-               & " INNER JOIN MA002_SHARYOA                   B                  ON " _
+               & " FROM       OIL.MA003_SHARYOB                   A                     " _
+               & " INNER JOIN OIL.MA002_SHARYOA                   B                  ON " _
                & "            B.CAMPCODE   	= A.CAMPCODE 				            " _
                & "        and B.SHARYOTYPE  = A.SHARYOTYPE  		                " _
                & "        and B.TSHABAN     = A.TSHABAN 		                    " _
                & "        and B.STYMD      <= @P3                                   " _
                & "        and B.ENDYMD     >= @P2                                   " _
                & "        and B.DELFLG     <> '1' 						            " _
-               & " LEFT  JOIN MA004_SHARYOC                   D                  ON " _
+               & " LEFT  JOIN OIL.MA004_SHARYOC                   D                  ON " _
                & "            D.CAMPCODE    = A.CAMPCODE 				            " _
                & "        and D.SHARYOTYPE  = A.SHARYOTYPE 		                    " _
                & "        and D.TSHABAN     = A.TSHABAN 			                " _
                & "        and D.STYMD      <= @P3                                   " _
                & "        and D.ENDYMD     >= @P2                                   " _
                & "        and D.DELFLG     <> '1' 						            " _
-               & " LEFT JOIN  M0002_ORG                       E                  ON " _
+               & " LEFT JOIN  OIL.OIM0002_ORG                       E                  ON " _
                & "            E.CAMPCODE    = A.CAMPCODE                            " _
                & "        and E.ORGCODE     = B.MANGSORG                            " _
                & "        and E.STYMD      <= @P3                                   " _
@@ -679,7 +679,7 @@ Public Class GL0007CarList
                & " WHERE      A.CAMPCODE    = @P1                                   " _
                & "        and A.SHARYOTYPE IN (                                     " _
                & "           SELECT RTRIM(S.KEYCODE)                                " _
-               & "           FROM   MC001_FIXVALUE                S                 " _
+               & "           FROM   COM.OIS0015_FIXVALUE                S                 " _
                & "           WHERE  S.VALUE2         = @P4                          " _
                & "             and  S.CLASS          = 'SHARYOTYPE'                 " _
                & "             and  S.CAMPCODE       = A.CAMPCODE                   " _

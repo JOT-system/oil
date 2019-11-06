@@ -100,15 +100,15 @@ Public Class GL0011TermList
     ''' </summary>
     Protected Sub getTermList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用会社取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT TERMID, TERMNAME " & _
-                    " FROM S0001_TERM " & _
-                    " WHERE TERMCLASS     =  '1' " & _
-                    " AND   STYMD        <= getdate() " & _
-                    " AND   ENDYMD       >= getdate() " & _
+            Dim SQLStr As String =
+                    " SELECT TERMID, TERMNAME " &
+                    " FROM COM.OIS0001_TERM " &
+                    " WHERE TERMCLASS     =  '1' " &
+                    " AND   STYMD        <= getdate() " &
+                    " AND   ENDYMD       >= getdate() " &
                     " AND   DELFLG       <> '1' "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
@@ -134,7 +134,7 @@ Public Class GL0011TermList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0011"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -151,16 +151,16 @@ Public Class GL0011TermList
     ''' </summary>
     Protected Sub getTermClassList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用端末一覧取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT TERMID, TERMNAME   " & _
-                    " FROM S0001_TERM           " & _
-                    " WHERE                     " & _
-                    "       STYMD        <= @P2 " & _
-                    " AND   ENDYMD       >= @P1 " & _
-                    " AND   TERMCLASS   　= @P3 " & _
+            Dim SQLStr As String =
+                    " SELECT TERMID, TERMNAME   " &
+                    " FROM COM.OIS0001_TERM           " &
+                    " WHERE                     " &
+                    "       STYMD        <= @P2 " &
+                    " AND   ENDYMD       >= @P1 " &
+                    " AND   TERMCLASS   　= @P3 " &
                     " AND   DELFLG       <> '1' "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
@@ -192,7 +192,7 @@ Public Class GL0011TermList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0011"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -209,15 +209,15 @@ Public Class GL0011TermList
     ''' </summary>
     Protected Sub getAllList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用端末一覧取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
         Try
 
-            Dim SQLStr As String = _
-                    " SELECT TERMID, TERMNAME   " & _
-                    " FROM S0001_TERM           " & _
-                    " WHERE                     " & _
-                    "       STYMD        <= @P2 " & _
-                    " AND   ENDYMD       >= @P1 " & _
+            Dim SQLStr As String =
+                    " SELECT TERMID, TERMNAME   " &
+                    " FROM COM.OIS0001_TERM           " &
+                    " WHERE                     " &
+                    "       STYMD        <= @P2 " &
+                    " AND   ENDYMD       >= @P1 " &
                     " AND   DELFLG       <> '1' "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
@@ -247,7 +247,7 @@ Public Class GL0011TermList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0011"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0001_TERM Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

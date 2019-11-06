@@ -163,17 +163,17 @@ Public Class GL0003CustomerList
     ''' </summary>
     Protected Sub getCustomerList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用荷主取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
         Try
             Dim SQLStr As String
             '部署コード未設定時
             If String.IsNullOrEmpty(ORGCODE) Then
                 '検索SQL文
-                SQLStr = _
+                SQLStr =
                       " SELECT                                          " _
                     & "            rtrim(A.TORICODE) as CODE ,          " _
                     & "            rtrim(A.NAMES)    as NAMES           " _
-                    & " FROM       MC002_TORIHIKISAKI     A             " _
+                    & " FROM       OIL.MC002_TORIHIKISAKI     A         " _
                     & " WHERE                                           " _
                     & "              A.CAMPCODE = @COMPCODE             " _
                     & "        and   A.STYMD   <= @ENDYMD               " _
@@ -195,8 +195,8 @@ Public Class GL0003CustomerList
                     & "            rtrim(A.TORICODE)      as CODE ,         " _
                     & "            rtrim(A.NAMES) 	      as NAMES ,		" _
                     & "            rtrim(B.SEQ) 	      as SEQ  		    " _
-                    & "         FROM MC002_TORIHIKISAKI as A 			    " _
-                    & "   INNER JOIN MC003_TORIORG      as B ON  	        " _
+                    & "         FROM OIL.MC002_TORIHIKISAKI as A 	        " _
+                    & "   INNER JOIN OIL.MC003_TORIORG      as B ON  	    " _
                     & "              B.CAMPCODE          = A.CAMPCODE 		" _
                     & "          and B.TORICODE          = A.TORICODE 		" _
                     & "          and B.UORG              = @ORGCODE         " _
@@ -258,17 +258,17 @@ Public Class GL0003CustomerList
     ''' </summary>
     Protected Sub getCustomerTermList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用荷主取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
         Try
             ORGCODE = sm.APSV_ORG
 
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
             "   SELECT " _
                 & "            rtrim(A.TORICODE)      as CODE        ,  " _
                 & "            rtrim(A.NAMES) 	      as NAMES       ,  " _
                 & "            rtrim(B.SEQ)           as SEQ            " _
-                & "         FROM MC002_TORIHIKISAKI as A 			    " _
-                & "   INNER JOIN MC003_TORIORG      as B ON  	        " _
+                & "         FROM OIL.MC002_TORIHIKISAKI as A 		    " _
+                & "   INNER JOIN OIL.MC003_TORIORG      as B ON  	    " _
                 & "              B.CAMPCODE          = A.CAMPCODE 		" _
                 & "          and B.TORICODE          = A.TORICODE 		" _
                 & "          and B.UORG              = @ORGCODE         " _
@@ -326,7 +326,7 @@ Public Class GL0003CustomerList
     ''' </summary>
     Protected Sub getOwnerList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用荷主取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
         Try
             Dim SQLStr As String = String.Empty
             '部署コード未設定時
@@ -337,13 +337,13 @@ Public Class GL0003CustomerList
                         & "            rtrim(A.TORICODE)      as CODE        ,  " _
                         & "            rtrim(A.NAMES) 	      as NAMES       ,  " _
                         & "            rtrim(B.SEQ)           as SEQ            " _
-                        & " FROM       MC002_TORIHIKISAKI    A                  " _
-                        & " INNER JOIN MC003_TORIORG         B         ON       " _
+                        & " FROM       OIL.MC002_TORIHIKISAKI    A              " _
+                        & " INNER JOIN OIL.MC003_TORIORG         B         ON   " _
                         & "            B.CAMPCODE = A.CAMPCODE                  " _
                         & "        and B.TORICODE = A.TORICODE                  " _
                         & "        and B.TORITYPE02 = @TORITYPE                 " _
                         & "        and B.DELFLG  <> '1'                         " _
-                        & " INNER JOIN S0006_ROLE C ON                          " _
+                        & " INNER JOIN COM.OIS0009_ROLE C ON                      " _
                         & "            C.CAMPCODE = B.CAMPCODE                  " _
                         & "        and C.OBJECT   = @OBJECT                     " _
                         & "        and C.CODE     = B.UORG                      " _
@@ -365,14 +365,14 @@ Public Class GL0003CustomerList
                       & "            rtrim(A.TORICODE)      as CODE        ,    " _
                       & "            rtrim(A.NAMES) 	    as NAMES       ,    " _
                       & "            rtrim(B.SEQ)           as SEQ              " _
-                      & " FROM  MC002_TORIHIKISAKI A                            " _
-                      & " INNER JOIN MC003_TORIORG B                   ON       " _
+                      & " FROM  OIL.MC002_TORIHIKISAKI A                        " _
+                      & " INNER JOIN OIL.MC003_TORIORG B               ON       " _
                       & "            B.CAMPCODE    = A.CAMPCODE                 " _
                       & "        and B.TORICODE    = A.TORICODE                 " _
                       & "        and B.TORITYPE02  = @TORITYPE                  " _
                       & "        and B.UORG　　    = @ORGCODE                   " _
                       & "        and B.DELFLG     <> '1'                        " _
-                      & " INNER JOIN S0006_ROLE C                      ON       " _
+                      & " INNER JOIN COM.OIS0009_ROLE C                  ON       " _
                       & "            C.CAMPCODE    = B.CAMPCODE                 " _
                       & "        and C.OBJECT      = @OBJECT                    " _
                       & "        and C.CODE        = B.UORG                     " _
@@ -446,19 +446,19 @@ Public Class GL0003CustomerList
     ''' </summary>
     Protected Sub getOwnerTermList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用荷主取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
 
 
         Try
             ORGCODE = sm.APSV_ORG
 
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                   "   SELECT                                                " _
                 & "            rtrim(A.TORICODE)      as CODE            ,  " _
                 & "            rtrim(A.NAMES) 	      as NAMES           ,  " _
                 & "            rtrim(B.SEQ)           as SEQ                " _
-                & "         FROM MC002_TORIHIKISAKI as A 			        " _
-                & "   INNER JOIN MC003_TORIORG      as B ON  	            " _
+                & "         FROM OIL.MC002_TORIHIKISAKI as A 			    " _
+                & "   INNER JOIN OIL.MC003_TORIORG      as B ON  	        " _
                 & "              B.CAMPCODE          = A.CAMPCODE 	    	" _
                 & "          and B.TORICODE          = A.TORICODE 	    	" _
                 & "          and B.TORITYPE02        = @TORITYPE 			" _
@@ -471,7 +471,7 @@ Public Class GL0003CustomerList
                 & "          and A.DELFLG           <> '1' 				    " _
                 & "   GROUP BY A.TORICODE , A.NAMES , B.SEQ                 "
             '〇ソート条件追加
-            Select DEFAULT_SORT
+            Select Case DEFAULT_SORT
                 Case C_DEFAULT_SORT.CODE
                     SQLStr = SQLStr & " ORDER BY A.TORICODE, A.NAMES , B.SEQ "
                 Case C_DEFAULT_SORT.NAMES
@@ -523,7 +523,7 @@ Public Class GL0003CustomerList
     ''' </summary>
     Protected Sub getRideCarList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用荷主取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
         Try
             Dim SQLStr As String = String.Empty
             '部署コード未設定時
@@ -534,13 +534,13 @@ Public Class GL0003CustomerList
                                 & "            rtrim(A.TORICODE)      as CODE       ,    " _
                                 & "            rtrim(A.NAMES)         as NAMES      ,    " _
                                 & "            rtrim(B.SEQ)           as SEQ             " _
-                                & " FROM       MC002_TORIHIKISAKI A                      " _
-                                & " INNER JOIN MC003_TORIORG B               ON          " _
+                                & " FROM       OIL.MC002_TORIHIKISAKI A                  " _
+                                & " INNER JOIN OIL.MC003_TORIORG B           ON          " _
                                 & "       B.CAMPCODE     = A.CAMPCODE                    " _
                                 & "   and B.TORICODE        = A.TORICODE                 " _
                                 & "   and B.TORITYPE03      = @TORITYPE                  " _
                                 & "   and B.DELFLG         <> '1'                        " _
-                                & " INNER JOIN S0006_ROLE C                  ON          " _
+                                & " INNER JOIN COM.OIS0009_ROLE C              ON          " _
                                 & "       C.CAMPCODE        = B.CAMPCODE                 " _
                                 & "   and C.OBJECT          = @OBJECT                    " _
                                 & "   and C.CODE            = B.UORG                     " _
@@ -562,14 +562,14 @@ Public Class GL0003CustomerList
                                 & "            rtrim(A.TORICODE)      as CODE       ,    " _
                                 & "            rtrim(A.NAMES)         as NAMES      ,    " _
                                 & "            rtrim(B.SEQ)           as SEQ             " _
-                                & " FROM       MC002_TORIHIKISAKI       A                " _
-                                & " INNER JOIN MC003_TORIORG            B             ON " _
+                                & " FROM       OIL.MC002_TORIHIKISAKI       A            " _
+                                & " INNER JOIN OIL.MC003_TORIORG            B         ON " _
                                 & "       B.CAMPCODE      = A.CAMPCODE                   " _
                                 & "   and B.TORICODE      = A.TORICODE                   " _
                                 & "   and B.TORITYPE03    = @TORITYPE                    " _
                                 & "   and B.UORG　　      = @ORGCODE                     " _
                                 & "   and B.DELFLG       <> '1'                          " _
-                                & " INNER JOIN S0006_ROLE C                           ON " _
+                                & " INNER JOIN COM.OIS0009_ROLE C                       ON " _
                                 & "       C.CAMPCODE      = B.CAMPCODE                   " _
                                 & "   and C.OBJECT        = @OBJECT                      " _
                                 & "   and C.CODE          = B.UORG                       " _
@@ -642,19 +642,19 @@ Public Class GL0003CustomerList
     ''' </summary>
     Protected Sub getRideCarTermList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用荷主取得
-        '○ User権限によりDB(S0005_AUTHOR)検索
+        '○ User権限によりDB(OIS0010_AUTHOR)検索
 
 
         Try
             ORGCODE = sm.APSV_ORG
 
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                   "   SELECT " _
                 & "            rtrim(A.TORICODE)      as CODE         , " _
                 & "            rtrim(A.NAMES)         as NAMES        , " _
                 & "            rtrim(B.SEQ)           as SEQ            " _
-                & "         FROM MC002_TORIHIKISAKI as A 			    " _
-                & "   INNER JOIN MC003_TORIORG      as B ON  	        " _
+                & "         FROM OIL.MC002_TORIHIKISAKI as A 		    " _
+                & "   INNER JOIN OIL.MC003_TORIORG      as B ON  	    " _
                 & "              B.CAMPCODE          = A.CAMPCODE       " _
                 & "              B.TORICODE          = A.TORICODE 		" _
                 & "          and B.TORITYPE03        = @TORITYPE 		" _

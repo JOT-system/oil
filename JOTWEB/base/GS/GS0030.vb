@@ -61,9 +61,9 @@ Public Class GS0030URIKBNget
             '●売上計上区分デフォルト取得取得（APSRVOrg）
             '○ セッション変数（APSRVOrg）に紐付く荷主データ取得
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                     "   SELECT rtrim(A.URIKBN) 	as URIKBN 		    " _
-                & "   FROM   MC003_TORIORG      as A 			    " _
+                & "   FROM   OIL.MC003_TORIORG      as A 			    " _
                 & "   Where        A.CAMPCODE    = @P1 				" _
                 & "            and A.UORG        = @P2          	" _
                 & "            and A.TORICODE    = @P3 				" _

@@ -182,16 +182,16 @@ Public Class GS0032FIXVALUElst
         Dim sm As New CS0050SESSION
 
         '●固定値リスト取得(指定値)
-        '○ DB(MC001_FIXVALUE)検索
+        '○ DB(OIS0015_FIXVALUE)検索
         Try
             'DataBase接続文字
             Dim SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
             'S0011_UPROFXLS検索SQL文
-            Dim SQL_Str As String = _
+            Dim SQL_Str As String =
                     "SELECT rtrim(KEYCODE) as KEYCODE , rtrim(VALUE1) as VALUE1 , rtrim(VALUE2) as VALUE2 , rtrim(VALUE3) as VALUE3 , rtrim(VALUE4) as VALUE4 , rtrim(VALUE5) as VALUE5 " _
-                & " FROM  MC001_FIXVALUE " _
+                & " FROM  COM.OIS0015_FIXVALUE " _
                 & " Where CAMPCODE  = @P1 " _
                 & "   and CLASS     = @P2 " _
                 & "   and STYMD    <= @P3 " _
@@ -245,7 +245,7 @@ Public Class GS0032FIXVALUElst
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME            'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:MC001_FIXVALUE Select"         '
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0015_FIXVALUE Select"         '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -256,7 +256,7 @@ Public Class GS0032FIXVALUElst
         End Try
 
         '●固定値リスト取得(デフォルト値)
-        '○ DB(MC001_FIXVALUE)検索
+        '○ DB(OIS0015_FIXVALUE)検索
         If VALUE1.Items.Count = 0 Then
             Try
                 'DataBase接続文字
@@ -264,9 +264,9 @@ Public Class GS0032FIXVALUElst
                 SQLcon.Open() 'DataBase接続(Open)
 
                 'S0011_UPROFXLS検索SQL文
-                Dim SQL_Str As String = _
+                Dim SQL_Str As String =
                         "SELECT rtrim(KEYCODE) as KEYCODE , rtrim(VALUE1) as VALUE1 , rtrim(VALUE2) as VALUE2 , rtrim(VALUE3) as VALUE3 , rtrim(VALUE4) as VALUE4 , rtrim(VALUE5) as VALUE5 " _
-                    & " FROM  MC001_FIXVALUE " _
+                    & " FROM  COM.OIS0015_FIXVALUE " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and CLASS     = @P2 " _
                     & "   and STYMD    <= @P3 " _
@@ -319,7 +319,7 @@ Public Class GS0032FIXVALUElst
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
                 CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME            'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:MC001_FIXVALUE Select"         '
+                CS0011LOGWRITE.INFPOSI = "DB:OIS0015_FIXVALUE Select"         '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

@@ -77,6 +77,24 @@ Partial Public Class OILMasterPage
     Protected WithEvents MF_COMP_ROLE As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''MF_ORG_ROLE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_ORG_ROLE As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''MF_MENU_ROLE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_MENU_ROLE As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''MF_MAP_ROLE コントロール。
     '''</summary>
     '''<remarks>
@@ -86,13 +104,22 @@ Partial Public Class OILMasterPage
     Protected WithEvents MF_MAP_ROLE As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
-    '''MF_ORG_ROLE コントロール。
+    '''MF_VIEWPROF_ROLE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents MF_ORG_ROLE As Global.System.Web.UI.WebControls.HiddenField
+    Protected WithEvents MF_VIEWPROF_ROLE As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''MF_RPRTPROF_ROLE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_RPRTPROF_ROLE As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''MF_PROF_VIEW コントロール。

@@ -125,11 +125,11 @@ Public Class GS0017CODEget
 
                     '●Leftボックス用画面取得
                     OBJTYPE = "1"
-                    SQLStr = _
+                    SQLStr =
                             "  SELECT                                 " _
                         & "         rtrim(A.MAPID)      as CODE ,   " _
                         & "         rtrim(A.NAMES)      as NAME     " _
-                        & "    FROM S0009_URL A                     " _
+                        & "    FROM COM.OIS0007_URL A                     " _
                         & "   Where A.STYMD     <= @P1              " _
                         & "     and A.ENDYMD    >= @P1              " _
                         & "     and A.DELFLG    <> '1'              "
@@ -138,11 +138,11 @@ Public Class GS0017CODEget
 
                     '●Leftボックス用組織取得
                     OBJTYPE = "1"
-                    SQLStr = _
+                    SQLStr =
                             "  SELECT                                 " _
                         & "         rtrim(A.ORGCODE)    as CODE ,   " _
                         & "         rtrim(A.NAMES)      as NAME     " _
-                        & "    FROM M0002_ORG A                     " _
+                        & "    FROM OIL.OIM0002_ORG A                     " _
                         & "   Where A.CAMPCODE   = @P2              " _
                         & "     and A.STYMD     <= @P1              " _
                         & "     and A.ENDYMD    >= @P1              " _
@@ -152,11 +152,11 @@ Public Class GS0017CODEget
 
                     '●Leftボックス用ユーザ取得
                     OBJTYPE = "1"
-                    SQLStr = _
+                    SQLStr =
                             "  SELECT                                 " _
                         & "         rtrim(A.USERID)     as CODE ,   " _
                         & "         rtrim(A.STAFFNAMES) as NAME     " _
-                        & "    FROM S0004_USER A                    " _
+                        & "    FROM COM.OIS0004_USER A                    " _
                         & "   Where A.CAMPCODE   = @P2              " _
                         & "     and A.STYMD     <= @P1              " _
                         & "     and A.ENDYMD    >= @P1              " _
@@ -166,11 +166,11 @@ Public Class GS0017CODEget
 
                     '●Leftボックス用会社取得
                     OBJTYPE = "1"
-                    SQLStr = _
+                    SQLStr =
                             "  SELECT                                 " _
                         & "         rtrim(A.CAMPCODE)   as CODE ,   " _
                         & "         rtrim(A.NAMES)      as NAME     " _
-                        & "    FROM M0001_CAMP A                    " _
+                        & "    FROM OIL.OIM0001_CAMP A                    " _
                         & "   Where A.STYMD     <= @P1              " _
                         & "     and A.ENDYMD    >= @P1              " _
                         & "     and A.DELFLG    <> '1'              "
@@ -187,16 +187,16 @@ Public Class GS0017CODEget
                     '●Leftボックス用車両取得
                     OBJTYPE = "2"
                     If String.IsNullOrEmpty(UORG) Then
-                        SQLStr = _
+                        SQLStr =
                             " SELECT rtrim(A.GSHABAN)     as GSHABAN 	" _
-                        & "   FROM MA006_SHABANORG A 	          		" _
+                        & "   FROM OIL.MA006_SHABANORG A 	          		" _
                         & "  Where A.CAMPCODE   = @P2         	    " _
                         & "    and A.DELFLG    <> '1'          	    " _
                         & "  GROUP BY A.GSHABAN                 	"
                     Else
-                        SQLStr = _
+                        SQLStr =
                             " SELECT rtrim(A.GSHABAN)     as GSHABAN 	" _
-                        & "   FROM MA006_SHABANORG A 	          		" _
+                        & "   FROM OIL.MA006_SHABANORG A 	          		" _
                         & "  Where A.CAMPCODE   = @P2         	    " _
                         & "    and A.MANGUORG   = @P3     		    " _
                         & "    and A.DELFLG    <> '1'          	    " _
@@ -207,10 +207,10 @@ Public Class GS0017CODEget
 
                     '●Leftボックス用統一車番取得
                     OBJTYPE = "3"
-                    SQLStr = _
+                    SQLStr =
                             " SELECT rtrim(A.SHARYOTYPE) 	as SHARYOTYPE ,	" _
                         & "        rtrim(B.TSHABAN) 	as TSHABAN  	" _
-                        & "   FROM MA003_SHARYOB A 	          			" _
+                        & "   FROM OIL.MA003_SHARYOB A 	          			" _
                         & "  Where A.CAMPCODE   = @P1         			" _
                         & "    and A.STYMD     <= @P2 					" _
                         & "    and A.ENDYMD    >= @P2 					" _
@@ -221,10 +221,10 @@ Public Class GS0017CODEget
 
                     '●Leftボックス用荷主取得
                     OBJTYPE = "1"
-                    SQLStr = _
+                    SQLStr =
                             " SELECT rtrim(A.TORICODE)    as CODE ,   " _
                         & "        rtrim(A.NAMES)       as NAME     " _
-                        & "   FROM MC002_TORIHIKISAKI A             " _
+                        & "   FROM OIL.MC002_TORIHIKISAKI A             " _
                         & "  INNER JOIN MC003_TORIORG B             " _
                         & "     ON B.TORICODE   = A.TORICODE        " _
                         & "    and B.CAMPCODE   = @P2               " _

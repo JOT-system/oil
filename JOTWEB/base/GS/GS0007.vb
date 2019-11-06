@@ -150,7 +150,7 @@ Public Class GS0007FIXVALUElst
         ERR = C_MESSAGE_NO.DLL_IF_ERROR
 
         '●固定値リスト取得(指定値)
-        '○ DB(MC001_FIXVALUE)検索
+        '○ DB(OIS0015_FIXVALUE)検索
 
         Dim SQLStr As String = String.Empty
         Try
@@ -158,9 +158,9 @@ Public Class GS0007FIXVALUElst
             Dim SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
-            'MC001_FIXVALUE検索SQL文
+            'OIS0015_FIXVALUE検索SQL文
             If String.IsNullOrEmpty(CLAS) Then
-                SQLStr = _
+                SQLStr =
                       " SELECT DISTINCT                  " _
                     & "      rtrim(CLASS)  as KEYCODE , " _
                     & "      rtrim(NAMES)  as VALUE1  , " _
@@ -168,14 +168,14 @@ Public Class GS0007FIXVALUElst
                     & "      rtrim(NAMES)  as VALUE3  , " _
                     & "      rtrim(NAMES)  as VALUE4  , " _
                     & "      rtrim(NAMES)  as VALUE5    " _
-                    & " FROM  MC001_FIXVALUE             " _
+                    & " FROM  COM.OIS0015_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and STYMD    <= @P3 " _
                     & "   and ENDYMD   >= @P4 " _
                     & "   and DELFLG   <> @P5 " _
                     & " ORDER BY KEYCODE "
             Else
-                SQLStr = _
+                SQLStr =
                       " SELECT                           " _
                     & "      rtrim(KEYCODE) as KEYCODE , " _
                     & "      rtrim(VALUE1)  as VALUE1  , " _
@@ -183,7 +183,7 @@ Public Class GS0007FIXVALUElst
                     & "      rtrim(VALUE3)  as VALUE3  , " _
                     & "      rtrim(VALUE4)  as VALUE4  , " _
                     & "      rtrim(VALUE5)  as VALUE5    " _
-                    & " FROM  MC001_FIXVALUE             " _
+                    & " FROM  COM.OIS0015_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and CLASS     = @P2 " _
                     & "   and STYMD    <= @P3 " _
@@ -249,7 +249,7 @@ Public Class GS0007FIXVALUElst
         End Try
 
         '●固定値リスト取得(デフォルト値)
-        '○ DB(MC001_FIXVALUE)検索
+        '○ DB(OIS0015_FIXVALUE)検索
         If VALUE1.Items.Count = 0 Then
             Try
                 'DataBase接続文字

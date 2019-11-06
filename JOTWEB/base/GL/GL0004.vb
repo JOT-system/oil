@@ -168,7 +168,7 @@ Public Class GL0004DestinationList
                           "  SELECT                                       " _
                         & "         rtrim(A.TODOKECODE) as CODE ,         " _
                         & "         rtrim(A.NAMES)      as NAMES          " _
-                        & "    FROM MC006_TODOKESAKI    A                 " _
+                        & "    FROM OIL.MC006_TODOKESAKI    A             " _
                         & "   Where A.CAMPCODE     = @P1                  " _
                         & "     and substring(A.TODOKECODE,1,2)  <> 'JX'  " _
                         & "     and substring(A.TODOKECODE,1,5)  <> 'COSMO'  " _
@@ -180,7 +180,7 @@ Public Class GL0004DestinationList
                           "  SELECT                                       " _
                         & "         rtrim(A.TODOKECODE) as CODE  ,        " _
                         & "         rtrim(A.NAMES)      as NAMES          " _
-                        & "    FROM MC006_TODOKESAKI    A                 " _
+                        & "    FROM OIL.MC006_TODOKESAKI    A             " _
                         & "   Where A.CAMPCODE     = @P1                  " _
                         & "     and A.TORICODE     = @P4                  " _
                         & "     and substring(A.TODOKECODE,1,2)  <> 'JX'  " _
@@ -216,13 +216,13 @@ Public Class GL0004DestinationList
                             & "         rtrim(A.NOTES5)     as NOTES5 ,     " _
                             & "         rtrim(B.ARRIVTIME)  as ARRIVTIME ,  " _
                             & "         rtrim(B.DISTANCE)   as DISTANCE     " _
-                            & "    FROM MC006_TODOKESAKI A                  " _
-                            & "   INNER JOIN MC007_TODKORG B ON             " _
+                            & "    FROM OIL.MC006_TODOKESAKI A              " _
+                            & "   INNER JOIN OIL.MC007_TODKORG B ON         " _
                             & "         B.CAMPCODE      = A.CAMPCODE        " _
                             & "     and B.TORICODE 　　 = A.TORICODE        " _
                             & "     and B.TODOKECODE 　 = A.TODOKECODE      " _
                             & "     and B.DELFLG       <> '1'               " _
-                            & "   INNER JOIN S0006_ROLE C                   " _
+                            & "   INNER JOIN COM.OIS0009_ROLE C               " _
                             & "      ON C.CAMPCODE      = B.CAMPCODE        " _
                             & "     and C.CODE          = B.UORG            " _
                             & "     and C.OBJECT        = @P6               " _
@@ -257,7 +257,7 @@ Public Class GL0004DestinationList
                             & "     and B.TORICODE 　　 = A.TORICODE        " _
                             & "     and B.TODOKECODE 　 = A.TODOKECODE      " _
                             & "     and B.DELFLG       <> '1'               " _
-                            & "   INNER JOIN S0006_ROLE C                   " _
+                            & "   INNER JOIN OIS0009_ROLE C                   " _
                             & "      ON C.CAMPCODE      = B.CAMPCODE        " _
                             & "     and C.CODE          = B.UORG            " _
                             & "     and C.OBJECT        = @P6               " _
@@ -290,14 +290,14 @@ Public Class GL0004DestinationList
                             & "         rtrim(A.NOTES5)     as NOTES5 ,     " _
                             & "         rtrim(B.ARRIVTIME)  as ARRIVTIME ,  " _
                             & "         rtrim(B.DISTANCE)   as DISTANCE     " _
-                            & "    FROM MC006_TODOKESAKI A                  " _
-                            & "   INNER JOIN MC007_TODKORG B ON             " _
+                            & "    FROM OIL.MC006_TODOKESAKI A              " _
+                            & "   INNER JOIN OIL.MC007_TODKORG B ON         " _
                             & "         B.CAMPCODE      = A.CAMPCODE        " _
                             & "     and B.TORICODE 　　 = A.TORICODE        " _
                             & "     and B.TODOKECODE 　 = A.TODOKECODE      " _
                             & "     and B.UORG          = @P9               " _
                             & "     and B.DELFLG       <> '1'               " _
-                            & "   INNER JOIN S0006_ROLE C                   " _
+                            & "   INNER JOIN COM.OIS0009_ROLE C               " _
                             & "      ON C.CAMPCODE      = B.CAMPCODE        " _
                             & "     and C.CODE          = B.UORG            " _
                             & "     and C.OBJECT        = @P6               " _
@@ -327,14 +327,14 @@ Public Class GL0004DestinationList
                             & "         rtrim(A.NOTES5)     as NOTES5 ,     " _
                             & "         rtrim(B.ARRIVTIME)  as ARRIVTIME ,  " _
                             & "         rtrim(B.DISTANCE)   as DISTANCE     " _
-                            & "    FROM MC006_TODOKESAKI A                  " _
-                            & "   INNER JOIN MC007_TODKORG B ON             " _
+                            & "    FROM OIL.MC006_TODOKESAKI A              " _
+                            & "   INNER JOIN OIL.MC007_TODKORG B ON         " _
                             & "         B.CAMPCODE      = A.CAMPCODE        " _
                             & "     and B.TORICODE      = A.TORICODE        " _
                             & "     and B.TODOKECODE    = A.TODOKECODE      " _
                             & "     and B.UORG          = @P9               " _
                             & "     and B.DELFLG       <> '1'               " _
-                            & "   INNER JOIN S0006_ROLE C                   " _
+                            & "   INNER JOIN COM.OIS0009_ROLE C               " _
                             & "      ON C.CAMPCODE      = B.CAMPCODE        " _
                             & "     and C.CODE          = B.UORG            " _
                             & "     and C.OBJECT        = @P6               " _
@@ -440,8 +440,8 @@ Public Class GL0004DestinationList
                             & "              isnull(rtrim(A.NOTES10),'')       as NOTES10 ,    " _
                             & "              rtrim(B.ARRIVTIME)                as ARRIVTIME ,  " _
                             & "              isnull(rtrim(B.DISTANCE),'')      as DISTANCE     " _
-                            & "         FROM MC006_TODOKESAKI as A                             " _
-                            & "   INNER JOIN MC007_TODKORG    as B ON                          " _
+                            & "         FROM OIL.MC006_TODOKESAKI as A                         " _
+                            & "   INNER JOIN OIL.MC007_TODKORG    as B ON                      " _
                             & "              B.CAMPCODE     = A.CAMPCODE                       " _
                             & "          and B.TORICODE     = A.TORICODE                       " _
                             & "          and B.TODOKECODE   = A.TODOKECODE                     " _
@@ -493,8 +493,8 @@ Public Class GL0004DestinationList
                             & "              isnull(rtrim(A.NOTES10),'')       as NOTES10 ,    " _
                             & "              rtrim(B.ARRIVTIME)                as ARRIVTIME ,  " _
                             & "              isnull(rtrim(B.DISTANCE),'')      as DISTANCE     " _
-                            & "         FROM MC006_TODOKESAKI as A                             " _
-                            & "   INNER JOIN MC007_TODKORG    as B ON                          " _
+                            & "         FROM OIL.MC006_TODOKESAKI as A                         " _
+                            & "   INNER JOIN OIL.MC007_TODKORG    as B ON                      " _
                             & "              B.CAMPCODE     = A.CAMPCODE                       " _
                             & "          and B.TORICODE     = A.TORICODE                       " _
                             & "          and B.TODOKECODE   = A.TODOKECODE                     " _
@@ -550,8 +550,8 @@ Public Class GL0004DestinationList
                             & "              isnull(rtrim(A.NOTES10),'')       as NOTES10 ,    " _
                             & "              rtrim(B.ARRIVTIME)                as ARRIVTIME ,  " _
                             & "              isnull(rtrim(B.DISTANCE),'')      as DISTANCE     " _
-                            & "         FROM MC006_TODOKESAKI as A                             " _
-                            & "   INNER JOIN MC007_TODKORG    as B ON                          " _
+                            & "         FROM OIL.MC006_TODOKESAKI as A                         " _
+                            & "   INNER JOIN OIL.MC007_TODKORG    as B ON                      " _
                             & "              B.CAMPCODE     = A.CAMPCODE                       " _
                             & "          and B.TORICODE     = A.TORICODE                       " _
                             & "          and B.TODOKECODE   = A.TODOKECODE                     " _
@@ -604,8 +604,8 @@ Public Class GL0004DestinationList
                             & "              isnull(rtrim(B.NOTES10),'')       as NOTES10 ,    " _
                             & "              rtrim(A.ARRIVTIME)                as ARRIVTIME ,  " _
                             & "              isnull(rtrim(A.DISTANCE),'')      as DISTANCE     " _
-                            & "         FROM MC006_TODOKESAKI as A                             " _
-                            & "   INNER JOIN MC007_TODKORG    as B ON                          " _
+                            & "         FROM OIL.MC006_TODOKESAKI as A                         " _
+                            & "   INNER JOIN OIL.MC007_TODKORG    as B ON                      " _
                             & "              B.CAMPCODE     = A.CAMPCODE                       " _
                             & "          and B.TORICODE     = A.TORICODE                       " _
                             & "          and B.TODOKECODE   = A.TODOKECODE                     " _
@@ -711,7 +711,7 @@ Public Class GL0004DestinationList
                         "  SELECT                                           " _
                     & "         rtrim(A.TODOKECODE) as CODE ,               " _
                     & "         rtrim(A.NAMES)      as NAMES                " _
-                    & "    FROM MC006_TODOKESAKI    A                       " _
+                    & "    FROM OIL.MC006_TODOKESAKI    A                   " _
                     & "   Where A.CAMPCODE     = @P1                        " _
                     & "     and (substring(A.TODOKECODE,1,2)  = 'JX'        " _
                     & "      or  substring(A.TODOKECODE,1,5)  = 'COSMO')    " _
@@ -723,7 +723,7 @@ Public Class GL0004DestinationList
                         "  SELECT                                           " _
                     & "         rtrim(A.TODOKECODE) as CODE  ,              " _
                     & "         rtrim(A.NAMES)      as NAMES                " _
-                    & "    FROM MC006_TODOKESAKI    A                       " _
+                    & "    FROM OIL.MC006_TODOKESAKI    A                   " _
                     & "   Where A.CAMPCODE     = @P1                        " _
                     & "     and A.STYMD       <= @P3                        " _
                     & "     and A.ENDYMD      >= @P2                        " _

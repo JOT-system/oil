@@ -140,9 +140,9 @@ Public Class CS0036FCHECK
                     Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
                     CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-                    CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"             '
+                    CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"             '
                     CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                     '
-                    CS0011LOGWRITE.TEXT = "データフィールドマスタ（S0013_DATAFIELD）に存在しません。"
+                    CS0011LOGWRITE.TEXT = "データフィールドマスタ（OIS0016_DATAFIELD）に存在しません。"
                     CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
                     CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
@@ -159,7 +159,7 @@ Public Class CS0036FCHECK
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -246,9 +246,9 @@ Public Class CS0036FCHECK
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
                 CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"             '
+                CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"             '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                     '
-                CS0011LOGWRITE.TEXT = "データフィールドマスタ（S0013_DATAFIELD）に存在しません。"
+                CS0011LOGWRITE.TEXT = "データフィールドマスタ（OIS0016_DATAFIELD）に存在しません。"
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
                 CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
@@ -319,7 +319,7 @@ Public Class CS0036FCHECK
                         End Try
 
                         '　整数部チェック
-                        If WW_row(i)("INTLENG") <> 0 Then            'データフィールドマスタ(S0013_DATAFIELD)　桁数未設定
+                        If WW_row(i)("INTLENG") <> 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定
                             Try
                                 If WW_INT_SIDE.Length > WW_row(i)("INTLENG") Then
                                     CHECKREPORT = C_MESSAGE_TEXT.INTEGER_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
@@ -336,7 +336,7 @@ Public Class CS0036FCHECK
                         End If
 
                         '　小数部チェック
-                        If WW_row(i)("DECLENG") = 0 Then            'データフィールドマスタ(S0013_DATAFIELD)　桁数未設定　
+                        If WW_row(i)("DECLENG") = 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定　
                             If WW_DEC_SIDE.Length > 0 Then
                                 CHECKREPORT = C_MESSAGE_TEXT.DECIMAL_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
                                 ERR = C_MESSAGE_NO.DECIMAL_LENGTH_OVER_ERROR
@@ -401,7 +401,7 @@ Public Class CS0036FCHECK
                         If VALUE <> "" Then
                             VALUE = StrConv(VALUE, VbStrConv.Narrow)
                             Try
-                            If VALUE.Contains(":") Then
+                                If VALUE.Contains(":") Then
                                     WW_TIME = VALUE
                                 Else
                                     WW_TIME = VALUE.PadLeft(4, "0").Insert(2, ":")
@@ -415,7 +415,7 @@ Public Class CS0036FCHECK
                             End Try
 
                             '　整数部チェック
-                            If WW_row(i)("INTLENG") <> 0 Then            'データフィールドマスタ(S0013_DATAFIELD)　桁数未設定
+                            If WW_row(i)("INTLENG") <> 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定
                                 Dim WW_MINUTE As Integer = WW_TIME.Hour * 60 + WW_TIME.Minute
 
                                 Try
@@ -472,9 +472,9 @@ Public Class CS0036FCHECK
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
                 CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"
+                CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWRITE.TEXT = "S0013_DATAFIELDに" & FIELD & "が存在しません。"
+                CS0011LOGWRITE.TEXT = "OIS0016_DATAFIELDに" & FIELD & "が存在しません。"
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
                 CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
@@ -484,7 +484,7 @@ Public Class CS0036FCHECK
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -502,12 +502,12 @@ Public Class CS0036FCHECK
         End Try
     End Sub
     ''' <summary>
-    ''' S0013_DataField
+    ''' OIS0016_DATAFIELD
     ''' </summary>
     ''' <param name="I_SINGLE"></param>
     ''' <remarks></remarks>
     Protected Sub createFieldDataTbl(ByVal I_SINGLE As Boolean)
-        '○ DB(S0013_DATAFIELD)検索
+        '○ DB(OIS0016_DATAFIELD)検索
         ERR = C_MESSAGE_NO.NORMAL
         Try
 
@@ -561,8 +561,8 @@ Public Class CS0036FCHECK
                                & "                        ELSE 1 END                    " _
                                & "                       ) AS RNK                       " _
                                & "   FROM                                               " _
-                               & "             com.OIS0013_DATAFIELD             A            " _
-                               & "   LEFT JOIN oil.MC001_FIXVALUE              B       ON   " _
+                               & "             COM.OIS0016_DATAFIELD             A            " _
+                               & "   LEFT JOIN COM.OIS0015_FIXVALUE              B       ON   " _
                                & "            B.CLASS      = A.FIELD                    " _
                                & "        and B.STYMD     <= @P3                        " _
                                & "        and B.ENDYMD    >= @P4                        " _
@@ -614,7 +614,7 @@ Public Class CS0036FCHECK
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:S0013_DATAFIELD Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

@@ -95,7 +95,7 @@ Public Class GL0001CompList
     ''' </summary>
     Protected Sub getCompAllList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用会社取得
-        '○　DB(M0001_CAMP)検索
+        '○　DB(OIM0001_CAMP)検索
         Try
 
             '検索SQL文
@@ -103,7 +103,7 @@ Public Class GL0001CompList
                   " SELECT                        " _
                 & " rtrim(A.CAMPCODE) as CODE  ,  " _
                 & " rtrim(A.NAMES)    as NAMES    " _
-                & " FROM  M0001_CAMP A            " _
+                & " FROM  OIL.OIM0001_CAMP A        " _
                 & " WHERE                         " _
                 & "       A.STYMD   <= @P4        " _
                 & "   and A.ENDYMD  >= @P3        " _
@@ -139,7 +139,7 @@ Public Class GL0001CompList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0001"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:M0001_CAMP Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -157,19 +157,18 @@ Public Class GL0001CompList
     ''' </summary>
     Protected Sub getCompList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用会社取得
-        '○ User権限によりDB(M0001_CAMP)検索
+        '○ User権限によりDB(OIM0001_CAMP)検索
         Try
 
             '検索SQL文
             Dim SQLStr As String =
                     "SELECT " _
                 & " rtrim(A.CAMPCODE) as CODE ," _
-                & " rtrim(A.NAMES) as NAMES " _
-                & " FROM  M0001_CAMP A " _
-                & " INNER JOIN S0006_ROLE B ON " _
-                & "       B.CODE     = A.CAMPCODE " _
+                & " rtrim(A.NAME) as NAMES " _
+                & " FROM  OIL.OIM0001_CAMP A " _
+                & " INNER JOIN COM.OIS0009_ROLE B ON " _
+                & "       B.CAMPCODE     = A.CAMPCODE " _
                 & "   and B.ROLE     = @P1 " _
-                & "   and B.OBJECT   = @P2 " _
                 & "   and B.STYMD   <= @P4 " _
                 & "   and B.ENDYMD  >= @P3 " _
                 & "   and B.DELFLG  <> @P5 " _
@@ -177,24 +176,40 @@ Public Class GL0001CompList
                 & "       A.STYMD   <= @P4 " _
                 & "   and A.ENDYMD  >= @P3 " _
                 & "   and A.DELFLG  <> @P5 " _
-                & " GROUP BY A.CAMPCODE , A.NAMES "
+                & " GROUP BY A.CAMPCODE , A.NAME "
+            '    "SELECT " _
+            '& " rtrim(A.CAMPCODE) as CODE ," _
+            '& " rtrim(A.NAMES) as NAMES " _
+            '& " FROM  OIL.OIM0001_CAMP A " _
+            '& " INNER JOIN COM.OIS0009_ROLE B ON " _
+            '& "       B.CODE     = A.CAMPCODE " _
+            '& "   and B.ROLE     = @P1 " _
+            '& "   and B.OBJECT   = @P2 " _
+            '& "   and B.STYMD   <= @P4 " _
+            '& "   and B.ENDYMD  >= @P3 " _
+            '& "   and B.DELFLG  <> @P5 " _
+            '& " Where " _
+            '& "       A.STYMD   <= @P4 " _
+            '& "   and A.ENDYMD  >= @P3 " _
+            '& "   and A.DELFLG  <> @P5 " _
+            '& " GROUP BY A.CAMPCODE , A.NAMES "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
                 Case C_DEFAULT_SORT.CODE, String.Empty
-                    SQLStr = SQLStr & " ORDER BY A.CAMPCODE, A.NAMES "
+                    SQLStr = SQLStr & " ORDER BY A.CAMPCODE, A.NAME "
                 Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY A.NAMES, A.CAMPCODE "
+                    SQLStr = SQLStr & " ORDER BY A.NAME, A.CAMPCODE "
                 Case C_DEFAULT_SORT.SEQ
                 Case Else
             End Select
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
+                '                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
                 PARA1.Value = ROLECODE
-                PARA2.Value = C_ROLE_VARIANT.USER_COMP
+                '                PARA2.Value = C_ROLE_VARIANT.USER_COMP
                 PARA3.Value = STYMD
                 PARA4.Value = ENDYMD
                 PARA5.Value = C_DELETE_FLG.DELETE
@@ -210,7 +225,7 @@ Public Class GL0001CompList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0001"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:M0001_CAMP Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

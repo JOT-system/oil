@@ -191,7 +191,7 @@ Public Class GS0029T3CNTLget
         '検索SQL文
         Try
             '検索SQL文
-            Dim SQLStr As String = _
+            Dim SQLStr As String =
                     "SELECT isnull(rtrim(A.CAMPCODE),'')          as CAMPCODE ,        " _
                 & "       isnull(rtrim(A.TORICODE),'')          as TORICODE ,        " _
                 & "       isnull(rtrim(A.OILTYPE),'')           as OILTYPE ,         " _
@@ -212,7 +212,7 @@ Public Class GS0029T3CNTLget
                 & "       isnull(rtrim(A.CNTL15),'')            as CNTL15 ,          " _
                 & "       isnull(rtrim(A.CNTLVALUE),'')         as CNTLVALUE,        " _
                 & "       isnull(rtrim(A.URIKBN),'')            as URIKBN            " _
-                & " FROM MC010_T3CNTL AS A								" _
+                & " FROM OIL.MC010_T3CNTL AS A								" _
                 & " WHERE A.CAMPCODE         = @P01                      " _
                 & "   and A.TORICODE     	= @P02      				" _
                 & "   and A.OILTYPE          = @P03           		    " _

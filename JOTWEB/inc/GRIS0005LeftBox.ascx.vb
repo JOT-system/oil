@@ -99,6 +99,8 @@ Public Class GRIS0005LeftBox
         LC_CALENDAR
         LC_FIX_VALUE
         LC_STATIONCODE
+        LC_TANKNUMBER
+        LC_TANKMODEL
     End Enum
     ''' <summary>
     ''' パラメタ群
@@ -142,6 +144,8 @@ Public Class GRIS0005LeftBox
         LP_ROLE
         LP_SELECTED_CODE
         LP_STATIONCODE
+        LP_TANKNUMBER
+        LP_TANKMODEL
     End Enum
 
     ''' <summary>

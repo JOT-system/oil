@@ -279,7 +279,7 @@ Public MustInherit Class GL0000 : Implements IDisposable
             Dim prmData As String = String.Empty
             For index As Integer = 0 To profTbl.GetLength(0) - 1
                 Dim fieldName As String = Convert.ToString(profTbl(index, 0))
-                prmData = If(String.IsNullOrEmpty(prmData), "", prmData & C_VALUE_SPLIT_DELIMITER) &
+                prmData = If(String.IsNullOrEmpty(prmData), "", prmData & C_VALUE_SPLIT_DELIMITER) & _
                             fieldName & "=" & srcTbl(i)(fieldName)
             Next
 

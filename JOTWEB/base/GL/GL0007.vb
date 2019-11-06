@@ -284,7 +284,7 @@ Public Class GL0007CarList
         '○ User権限によりDB(MA003_SHARYOB)検索
         Try
 
-            Dim profTbl As String(,) = {
+            Dim profTbl As String(,) = { _
                       {"TSHABAN", "統一車番", "10"} _
                     , {"LICNPLTNO", "登録車番", "8"} _
                     , {"MANGSORG", "設置部署", "6"} _
@@ -456,11 +456,11 @@ Public Class GL0007CarList
         '○ User権限によりDB(MA003_SHARYOB)検索
         Try
 
-            Dim profTbl As String(,) = {
+            Dim profTbl As String(,) = { _
                       {"TSHABAN", "統一車番", "20"} _
                     , {"LICNPLTNO", "登録車番", "8"} _
                     , {"MANGSORG", "設置部署", "6"} _
-                    , {"MANGSORGNAME", "設置部署名称", "8"}
+                    , {"MANGSORGNAME", "設置部署名称", "8"} _
             }
             '検索SQL文
             Dim SQLStr As String =
@@ -641,11 +641,11 @@ Public Class GL0007CarList
         '○ User権限によりDB(MA003_SHARYOB)検索
         Try
 
-            Dim profTbl As String(,) = {
+            Dim profTbl As String(,) = { _
                       {"TSHABAN", "統一車番", "20"} _
                     , {"LICNPLTNO", "登録車番", "8"} _
                     , {"MANGSORG", "設置部署", "6"} _
-                    , {"MANGSORGNAME", "設置部署名称", "8"}
+                    , {"MANGSORGNAME", "設置部署名称", "8"} _
             }
             '検索SQL文
             Dim SQLStr As String =

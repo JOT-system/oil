@@ -177,7 +177,7 @@ Public Class CS0029ProfViewD
             End Using
 
 
-            '■データ格納準備（テーブル列追加）
+                '■データ格納準備（テーブル列追加）
             WW_ROWMAX = CInt(WW_DT.Compute("Max(POSIROW)", ""))
             WW_COLMAX = CInt(WW_DT.Compute("Max(POSICOL)", ""))
             Me.ROWMAX = WW_ROWMAX

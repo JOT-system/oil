@@ -220,7 +220,7 @@ Public Class GRIS0001Title
 
                 Dim SQLStr As String =
                         " SELECT TERMCLASS                " &
-                        " FROM S0001_TERM                 " &
+                        " FROM COM.OIS0001_TERM                 " &
                         " WHERE TERMID        = @TERMID   " &
                         " AND   STYMD        <= getdate() " &
                         " AND   ENDYMD       >= getdate() " &

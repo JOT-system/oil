@@ -8,7 +8,7 @@
 <asp:Content ID="M00000H" ContentPlaceHolderID="head" runat="server">
 
     <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/css/M00000.css")%>"/>  
- 
+
     <script type="text/javascript" src="<%=ResolveUrl("~/script/M00000.js")%>"></script>
 
 
@@ -65,7 +65,7 @@
 
                      <span>
 
-                        <input type="button" id="OK"  value="LOGIN"  style="Width:300px" onclick="ButtonClick('WF_ButtonOK');" />
+                        <input type="button" id="OK" value="LOGIN"  style="Width:300px" onclick="ButtonClick('WF_ButtonOK');" />
 
                      </span>
 

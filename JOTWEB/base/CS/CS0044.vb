@@ -1038,7 +1038,7 @@ Public Structure CS0044L1INSERT
                    & "   and STYMD     <= @P3 " _
                    & "   and ENDYMD    >= @P2 " _
                    & "   and DELFLG    <> @P4 "
-            Using SQLcmd As New SqlCommand(SQLStr, SQLCON)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 15)
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)

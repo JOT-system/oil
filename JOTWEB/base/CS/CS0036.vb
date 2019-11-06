@@ -401,7 +401,7 @@ Public Class CS0036FCHECK
                         If VALUE <> "" Then
                             VALUE = StrConv(VALUE, VbStrConv.Narrow)
                             Try
-                                If VALUE.Contains(":") Then
+                            If VALUE.Contains(":") Then
                                     WW_TIME = VALUE
                                 Else
                                     WW_TIME = VALUE.PadLeft(4, "0").Insert(2, ":")

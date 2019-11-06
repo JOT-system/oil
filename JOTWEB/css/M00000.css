@@ -4,7 +4,10 @@
     width: 100%;
     position: fixed;
     left: 0em;
-    background-color: rgb(220,230,240);
+    background: -moz-linear-gradient(65deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
+    background: -webkit-linear-gradient(65deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
+    background: linear-gradient(25deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
+    background-size: cover;
 }
 
 

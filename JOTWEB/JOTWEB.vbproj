@@ -96,6 +96,7 @@
   <ItemGroup>
     <Content Include="bin\JOTWEB.dll" />
     <Content Include="bin\JOTWEB.pdb" />
+    <Content Include="img\tank2.png" />
     <Content Include="OIL\css\OIM0005C.css" />
     <Content Include="OIL\css\OIM0004C.css" />
     <Content Include="OIL\css\OIM0005L.css" />

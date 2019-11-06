@@ -30,8 +30,8 @@ Public Structure CS0001INIFILEget
         SYS_DIR
     End Enum
 
-    Private Const IniFileC As String = "C:\APPL\APPLINI\JOTWEB.ini"
-    Private Const IniFileD As String = "D:\APPL\APPLINI\JOTWEB.ini"
+    Private Const IniFileC As String = "C:\APPL\APPLINI\OIL\JOTWEB.ini"
+    Private Const IniFileD As String = "D:\APPL\APPLINI\OIL\JOTWEB.ini"
 
     ''' <summary>
     ''' iniファイル情報取得

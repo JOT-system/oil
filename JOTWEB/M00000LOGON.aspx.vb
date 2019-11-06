@@ -373,7 +373,11 @@ Public Class M00000LOGON
                         WW_STYMD = SQLdr("STYMD")
                         WW_ENDYMD = SQLdr("ENDYMD")
                         WW_MISSCNT = SQLdr("MISSCNT")
-                        WW_UPDYMD = SQLdr("UPDYMD")
+                        If SQLdr("UPDYMD") Is DBNull.Value Then
+                            WW_UPDYMD = System.DateTime.UtcNow
+                        Else
+                            WW_UPDYMD = SQLdr("UPDYMD")
+                        End If
                         WW_UPDTIMSTP = SQLdr("UPDTIMSTP")
                         '20191101-追加-START
                         WW_MENUROLE = SQLdr("MENUROLE")

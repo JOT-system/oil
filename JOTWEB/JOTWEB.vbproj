@@ -1,0 +1,365 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>
+    </SchemaVersion>
+    <ProjectGuid>{4773EF56-9D2B-4E80-A7CE-FDC792FBC058}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>JOTWEB</RootNamespace>
+    <AssemblyName>JOTWEB</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <MyType>Custom</MyType>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>JOTWEB.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>JOTWEB.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <FilesToIncludeForPublish>AllFilesInProjectFolder</FilesToIncludeForPublish>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BASEDLL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\COMLIB\BASEDLL\BASEDLL\obj\BASEDLL.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="BASEDLL" />
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="JOTWEB" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Collections.Specialized" />
+    <Import Include="System.Configuration" />
+    <Import Include="System.Text" />
+    <Import Include="System.Text.RegularExpressions" />
+    <Import Include="System.Web" />
+    <Import Include="System.Web.Caching" />
+    <Import Include="System.Web.SessionState" />
+    <Import Include="System.Web.Security" />
+    <Import Include="System.Web.Profile" />
+    <Import Include="System.Web.UI" />
+    <Import Include="System.Web.UI.WebControls" />
+    <Import Include="System.Web.UI.WebControls.WebParts" />
+    <Import Include="System.Web.UI.HtmlControls" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\JOTWEB.dll" />
+    <Content Include="bin\JOTWEB.pdb" />
+    <Content Include="OIL\img\404cat.png" />
+    <Content Include="OIL\css\ex\bootstrap.min.css" />
+    <Content Include="css\common.css" />
+    <Content Include="OIL\css\M00001.css" />
+    <Content Include="css\M00000.css" />
+    <Content Include="OIL\css\ex\custom.min.css" />
+    <Content Include="OIL\css\ex\font-awesome.min.css" />
+    <Content Include="img\logo.png" />
+    <Content Include="img\ヘルプ.jpg" />
+    <Content Include="img\先頭頁.png" />
+    <Content Include="img\最終頁.png" />
+    <Content Include="img\矢印L.png" />
+    <Content Include="img\矢印R.png" />
+    <Content Include="img\透明R.png" />
+    <Content Include="OIL\inc\GRM00001WRKINC.ascx" />
+    <Content Include="inc\GRIS0001Title.ascx" />
+    <Content Include="inc\GRIS0002Footer.ascx" />
+    <Content Include="inc\GRIS0003SRightBox.ascx" />
+    <Content Include="inc\GRIS0004RightBox.ascx" />
+    <Content Include="inc\GRIS0005LeftBox.ascx" />
+    <Content Include="M00000LOGON.aspx" />
+    <Content Include="OIL\M00001MENU.aspx" />
+    <Content Include="OIL\css\ex\nprogress.css" />
+    <Content Include="OIL\ex\page_404.html" />
+    <Content Include="script\calendar.js" />
+    <Content Include="script\common.js" />
+    <Content Include="script\event.js" />
+    <Content Include="OIL\script\M00001.js" />
+    <Content Include="script\M00000.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="base\Const.vb" />
+    <Compile Include="base\CS\CS0001.vb" />
+    <Compile Include="base\CS\CS0006.vb" />
+    <Compile Include="base\CS\CS0007.vb" />
+    <Compile Include="base\CS\CS0008.vb" />
+    <Compile Include="base\CS\CS0009.vb" />
+    <Compile Include="base\CS\CS0010.vb" />
+    <Compile Include="base\CS\CS0011.vb" />
+    <Compile Include="base\CS\CS0012.vb" />
+    <Compile Include="base\CS\CS0013.vb" />
+    <Compile Include="base\CS\CS0015.vb" />
+    <Compile Include="base\CS\CS0016.vb" />
+    <Compile Include="base\CS\CS0017.vb" />
+    <Compile Include="base\CS\CS0020.vb" />
+    <Compile Include="base\CS\CS0021.vb" />
+    <Compile Include="base\CS\CS0023.vb" />
+    <Compile Include="base\CS\CS0024.vb" />
+    <Compile Include="base\CS\CS0025.vb" />
+    <Compile Include="base\CS\CS0026.vb" />
+    <Compile Include="base\CS\CS0027.vb" />
+    <Compile Include="base\CS\CS0028.vb" />
+    <Compile Include="base\CS\CS0029.vb" />
+    <Compile Include="base\CS\CS0030.vb" />
+    <Compile Include="base\CS\CS0031.vb" />
+    <Compile Include="base\CS\CS0032.vb" />
+    <Compile Include="base\CS\CS0033.vb" />
+    <Compile Include="base\CS\CS0035.vb" />
+    <Compile Include="base\CS\CS0036.vb" />
+    <Compile Include="base\CS\CS0037.vb" />
+    <Compile Include="base\CS\CS0038.vb" />
+    <Compile Include="base\CS\CS0041.vb" />
+    <Compile Include="base\CS\CS0042.vb" />
+    <Compile Include="base\CS\CS0043.vb" />
+    <Compile Include="base\CS\CS0044.vb" />
+    <Compile Include="base\CS\CS0045.vb" />
+    <Compile Include="base\CS\CS0046.vb" />
+    <Compile Include="base\CS\CS0047.vb" />
+    <Compile Include="base\CS\CS0048.vb" />
+    <Compile Include="base\CS\CS0050.vb" />
+    <Compile Include="base\CS\CS0051.vb" />
+    <Compile Include="base\CS\CS0052.vb" />
+    <Compile Include="base\CS\CS0053.vb" />
+    <Compile Include="base\CS\CS0054.vb" />
+    <Compile Include="base\CS\CS0055.vb" />
+    <Compile Include="base\GL\GL0000.vb" />
+    <Compile Include="base\GL\GL0001.vb" />
+    <Compile Include="base\GL\GL0002.vb" />
+    <Compile Include="base\GL\GL0003.vb" />
+    <Compile Include="base\GL\GL0004.vb" />
+    <Compile Include="base\GL\GL0005.vb" />
+    <Compile Include="base\GL\GL0006.vb" />
+    <Compile Include="base\GL\GL0007.vb" />
+    <Compile Include="base\GL\GL0008.vb" />
+    <Compile Include="base\GL\GL0011.vb" />
+    <Compile Include="base\GL\GL0012.vb" />
+    <Compile Include="base\GL\GL0013.vb" />
+    <Compile Include="base\GS\GS0000.vb" />
+    <Compile Include="base\GS\GS0001.vb" />
+    <Compile Include="base\GS\GS0002.vb" />
+    <Compile Include="base\GS\GS0003.vb" />
+    <Compile Include="base\GS\GS0004.vb" />
+    <Compile Include="base\GS\GS0005.vb" />
+    <Compile Include="base\GS\GS0006.vb" />
+    <Compile Include="base\GS\GS0007.vb" />
+    <Compile Include="base\GS\GS0017.vb" />
+    <Compile Include="base\GS\GS0029.vb" />
+    <Compile Include="base\GS\GS0030.vb" />
+    <Compile Include="base\GS\GS0031.vb" />
+    <Compile Include="base\GS\GS0032.vb" />
+    <Compile Include="base\Messages.vb" />
+    <Compile Include="base\PrevDispMap.vb" />
+    <Compile Include="base\SessionKey.vb" />
+    <Compile Include="base\YDF.vb" />
+    <Compile Include="OIL\OILMasterPage.Master.designer.vb">
+      <DependentUpon>OILMasterPage.Master</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\OILMasterPage.Master.vb">
+      <DependentUpon>OILMasterPage.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\GRM00001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\GRM00001WRKINC.ascx.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0001Title.ascx.designer.vb">
+      <DependentUpon>GRIS0001Title.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0001Title.ascx.vb">
+      <DependentUpon>GRIS0001Title.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0002Footer.ascx.designer.vb">
+      <DependentUpon>GRIS0002Footer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0002Footer.ascx.vb">
+      <DependentUpon>GRIS0002Footer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0003SRightBox.ascx.designer.vb">
+      <DependentUpon>GRIS0003SRightBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0003SRightBox.ascx.vb">
+      <DependentUpon>GRIS0003SRightBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0004RightBox.ascx.designer.vb">
+      <DependentUpon>GRIS0004RightBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0004RightBox.ascx.vb">
+      <DependentUpon>GRIS0004RightBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0005LeftBox.ascx.designer.vb">
+      <DependentUpon>GRIS0005LeftBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0005LeftBox.ascx.vb">
+      <DependentUpon>GRIS0005LeftBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="M00000LOGON.aspx.designer.vb">
+      <DependentUpon>M00000LOGON.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="M00000LOGON.aspx.vb">
+      <DependentUpon>M00000LOGON.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\M00001MENU.aspx.designer.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\M00001MENU.aspx.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\MyExtensions\MyWebExtension.vb">
+      <VBMyExtensionTemplateID>Microsoft.VisualBasic.Web.MyExtension</VBMyExtensionTemplateID>
+      <VBMyExtensionTemplateVersion>1.0.0.0</VBMyExtensionTemplateVersion>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="OIL\OILMasterPage.Master" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\PublishProfiles\JOTWEB.pubxml" />
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="OIL\dat\" />
+    <Folder Include="OIL\for\" />
+    <Folder Include="OIL\inv\" />
+    <Folder Include="OIL\loc\" />
+    <Folder Include="OIL\mas\" />
+    <Folder Include="OIL\ord\" />
+    <Folder Include="OIL\pay\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

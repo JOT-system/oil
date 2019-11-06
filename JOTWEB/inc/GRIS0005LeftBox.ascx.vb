@@ -142,6 +142,8 @@ Public Class GRIS0005LeftBox
         LP_ROLE
         LP_SELECTED_CODE
         LP_STATIONCODE
+        LP_TANKNUMBER
+        LP_TANKMODEL
     End Enum
 
     ''' <summary>

@@ -6,5 +6,5 @@
             <asp:Label ID="WF_TITLETEXT" class="WF_TITLETEXT" runat="server" Text=""></asp:Label>
             <asp:Label ID="WF_TITLECAMP" class="WF_TITLECAMP" runat="server" Text=""></asp:Label>
             <asp:Label ID="WF_TITLEDATE" class="WF_TITLEDATE" runat="server" Text=""></asp:Label>
-            <img class="WF_rightboxSW" src="<%=ResolveUrl("~/img/透明R.png")%>" style="z-index:30" ondblclick="r_boxDisplay();" alt=""/>
+                <img id="rightb" class="WF_rightboxSW" src="<%=ResolveUrl("~/img/right.png")%>" style="z-index:30" ondblclick="r_boxDisplay();" alt=""/>
         </div>

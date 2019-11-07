@@ -362,66 +362,66 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_COMPANY
                 '会社一覧設定
                 lbox = createCompList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_CUSTOMER
-                '取引先
-                lbox = createCustomerList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_DISTINATION
-                '届先
-                lbox = createDistinationList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_ORG
-                '部署
-                lbox = createOrg(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
-                '社員
-                lbox = createStaff(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_CARCODE
-                '車両
-                lbox = createCarCode(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_WORKLORRY
-                '業務車番
-                lbox = createWorkLorry(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_GOODS
-                '品名
-                lbox = createGoods(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_STAFFKBN
-                '社員区分
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STAFFKBN"
-                lbox = createFixValueList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_URIKBN
-                '売上計上区分
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "URIKBN"
-                lbox = createFixValueList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_OILTYPE
-                '油種
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OILTYPE"
-                lbox = createFixValueList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_CUSTOMER
+            '    '取引先
+            '    lbox = createCustomerList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_DISTINATION
+            '    '届先
+            '    lbox = createDistinationList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_ORG
+            '    '部署
+            '    lbox = createOrg(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
+            '    '社員
+            '    lbox = createStaff(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_CARCODE
+            '    '車両
+            '    lbox = createCarCode(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_WORKLORRY
+            '    '業務車番
+            '    lbox = createWorkLorry(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_GOODS
+            '    '品名
+            '    lbox = createGoods(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_STAFFKBN
+            '    '社員区分
+            '    Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STAFFKBN"
+            '    lbox = createFixValueList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_URIKBN
+            '    '売上計上区分
+            '    Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "URIKBN"
+            '    lbox = createFixValueList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_OILTYPE
+            '    '油種
+            '    Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OILTYPE"
+            '    lbox = createFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_DELFLG
                 '削除区分
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "DELFLG"
                 lbox = createFixValueList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_TERM
-                '端末
-                lbox = createTermList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_ROLE
-                '権限コード
-                lbox = createRoleList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_URL
-                'URL
-                lbox = createURLList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_EXTRA_LIST
-                '拡張リスト
-                lbox = createExtra(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_MODELPT
-                'モデル距離パターン
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MODELPATTERN"
-                lbox = createFixValueList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_TERM
+            '    '端末
+            '    lbox = createTermList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_ROLE
+            '    '権限コード
+            '    lbox = createRoleList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_URL
+            '    'URL
+            '    lbox = createURLList(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_EXTRA_LIST
+            '    '拡張リスト
+            '    lbox = createExtra(Params, O_RTN)
+            'Case LIST_BOX_CLASSIFICATION.LC_MODELPT
+            '    'モデル距離パターン
+            '    Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MODELPATTERN"
+            '    lbox = createFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_STATIONCODE
                 '貨物駅パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STATIONPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
-            Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
-                'カレンダー
-                lbox = Nothing
+                'Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                '    'カレンダー
+                '    lbox = Nothing
             Case Else
                 lbox = createFixValueList(Params, O_RTN)
         End Select
@@ -439,40 +439,40 @@ Public Class GRIS0005LeftBox
     ''' <remarks></remarks>
     Protected Sub CreateTableList(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
         Select Case ListCode
-            Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
-                '社員
-                Using GL0005StaffList As New GL0005StaffList With {
-                   .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0005StaffList.LC_STAFF_TYPE.ALL) _
-                 , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-                 , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-                 , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                 , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-                 , .STAFFKBN = If(Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST), Nothing) _
-                 , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
-                 , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-                 , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), GL0005StaffList.C_DEFAULT_SORT.SEQ) _
-                 , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0005StaffList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                 , .STAFFCODE = If(Params.Item(C_PARAMETERS.LP_SELECTED_CODE), String.Empty) _
-                 , .AREA = pnlLeftList
-                }
-                    GL0005StaffList.getTable()
-                    O_RTN = GL0005StaffList.ERR
-                End Using
-            Case LIST_BOX_CLASSIFICATION.LC_CARCODE
-                '車両
-                Using GL0007CarList As New GL0007CarList With {
-                   .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0007CarList.LC_LORRY_TYPE.ALL) _
-                 , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-                 , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-                 , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                 , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-                 , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-                 , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0007CarList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                 , .AREA = pnlLeftList
-                }
-                    GL0007CarList.getTable()
-                    O_RTN = GL0007CarList.ERR
-                End Using
+            'Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
+            '    '社員
+            '    Using GL0005StaffList As New GL0005StaffList With {
+            '       .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0005StaffList.LC_STAFF_TYPE.ALL) _
+            '     , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+            '     , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+            '     , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+            '     , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
+            '     , .STAFFKBN = If(Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST), Nothing) _
+            '     , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+            '     , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
+            '     , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), GL0005StaffList.C_DEFAULT_SORT.SEQ) _
+            '     , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0005StaffList.C_VIEW_FORMAT_PATTERN.NAMES) _
+            '     , .STAFFCODE = If(Params.Item(C_PARAMETERS.LP_SELECTED_CODE), String.Empty) _
+            '     , .AREA = pnlLeftList
+            '    }
+            '        GL0005StaffList.getTable()
+            '        O_RTN = GL0005StaffList.ERR
+            '    End Using
+            'Case LIST_BOX_CLASSIFICATION.LC_CARCODE
+            '    '車両
+            '    Using GL0007CarList As New GL0007CarList With {
+            '       .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0007CarList.LC_LORRY_TYPE.ALL) _
+            '     , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+            '     , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+            '     , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+            '     , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
+            '     , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+            '     , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0007CarList.C_VIEW_FORMAT_PATTERN.NAMES) _
+            '     , .AREA = pnlLeftList
+            '    }
+            '        GL0007CarList.getTable()
+            '        O_RTN = GL0007CarList.ERR
+            '    End Using
             Case Else
                 Exit Sub
         End Select
@@ -507,375 +507,384 @@ Public Class GRIS0005LeftBox
         End If
         Return LbMap.Item(key)
     End Function
-    ''' <summary>
-    ''' 取引先一覧の作成
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateCustomerList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        '○取引先ListBox設定
-        Dim KeyCode As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0003CustomerList.LC_CUSTOMER_TYPE.ALL) _
-                              & If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") _
-                              & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0003CustomerList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                              & If(Params.Item(C_PARAMETERS.LP_ORG), "-") _
-                              & LIST_BOX_CLASSIFICATION.LC_CUSTOMER
-        If Not LbMap.ContainsKey(KeyCode) Then
-            Using CL0003CustomerList As New GL0003CustomerList With {
-                  .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0003CustomerList.LC_CUSTOMER_TYPE.ALL) _
-                , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-                , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-                , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0003CustomerList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
-                , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-                , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "")
-            }
-                CL0003CustomerList.getList()
-                O_RTN = CL0003CustomerList.ERR
-                Dim lsbx = CL0003CustomerList.LIST
-                LbMap.Add(KeyCode, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(KeyCode)
-    End Function
-    ''' <summary>
-    ''' 届先一覧の作成
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateDistinationList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        '○取引先ListBox設定
-        Dim KeyCode As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0004DestinationList.LC_CUSTOMER_TYPE.ALL) _
-                              & If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") _
-                              & If(Params.Item(C_PARAMETERS.LP_CUSTOMER), "-") _
-                              & If(Params.Item(C_PARAMETERS.LP_CLASSCODE), "-") _
-                              & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0004DestinationList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                              & LIST_BOX_CLASSIFICATION.LC_DISTINATION
-        If Not LbMap.ContainsKey(KeyCode) Then
-            Using GL0004DestinationList As New GL0004DestinationList With {
-                  .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0004DestinationList.LC_CUSTOMER_TYPE.ALL) _
-                , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-                , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-                , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0004DestinationList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
-                , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-                , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-                , .TORICODE = If(Params.Item(C_PARAMETERS.LP_CUSTOMER), "") _
-                , .CLASSCODE = If(Params.Item(C_PARAMETERS.LP_CLASSCODE), "") _
-                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "")
-            }
-                GL0004DestinationList.getList()
-                O_RTN = GL0004DestinationList.ERR
-                Dim lsbx = GL0004DestinationList.LIST
-                LbMap.Add(KeyCode, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(KeyCode)
-    End Function
-    ''' <summary>
-    ''' 部署(管理・配属)
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateOrg(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        '○部署ListBox設定
-        Dim Categorys As String() = TryCast(Params.Item(C_PARAMETERS.LP_ORG_CATEGORYS), String())
-        Dim Key As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), "-")
-        For Each category As String In Categorys
-            Key = Key & category
-        Next
-        Key = Key & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                  & LIST_BOX_CLASSIFICATION.LC_ORG
 
-        If Not LbMap.ContainsKey(Key) Then
-            Using CL0002OrgList As New GL0002OrgList With {
-                  .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-                , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-                , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-                , .AUTHWITH = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY) _
-                , .Categorys = Categorys _
-                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
-                , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG)
-             }
-                CL0002OrgList.getList()
-                O_RTN = CL0002OrgList.ERR
-                Dim lsbx As ListBox = CL0002OrgList.LIST
-                LbMap.Add(Key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(Key)
-    End Function
+    '''' <summary>
+    '''' 取引先一覧の作成
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateCustomerList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    '○取引先ListBox設定
+    '    Dim KeyCode As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0003CustomerList.LC_CUSTOMER_TYPE.ALL) _
+    '                          & If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") _
+    '                          & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0003CustomerList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '                          & If(Params.Item(C_PARAMETERS.LP_ORG), "-") _
+    '                          & LIST_BOX_CLASSIFICATION.LC_CUSTOMER
+    '    If Not LbMap.ContainsKey(KeyCode) Then
+    '        Using CL0003CustomerList As New GL0003CustomerList With {
+    '              .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0003CustomerList.LC_CUSTOMER_TYPE.ALL) _
+    '            , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '            , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '            , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '            , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0003CustomerList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '            , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+    '            , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
+    '            , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+    '            , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "")
+    '        }
+    '            CL0003CustomerList.getList()
+    '            O_RTN = CL0003CustomerList.ERR
+    '            Dim lsbx = CL0003CustomerList.LIST
+    '            LbMap.Add(KeyCode, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(KeyCode)
+    'End Function
 
-    ''' <summary>
-    ''' 社員コード取得
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateStaff(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        '○社員ListBox設定   
+    '''' <summary>
+    '''' 届先一覧の作成
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateDistinationList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    '○取引先ListBox設定
+    '    Dim KeyCode As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0004DestinationList.LC_CUSTOMER_TYPE.ALL) _
+    '                          & If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") _
+    '                          & If(Params.Item(C_PARAMETERS.LP_CUSTOMER), "-") _
+    '                          & If(Params.Item(C_PARAMETERS.LP_CLASSCODE), "-") _
+    '                          & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0004DestinationList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '                          & LIST_BOX_CLASSIFICATION.LC_DISTINATION
+    '    If Not LbMap.ContainsKey(KeyCode) Then
+    '        Using GL0004DestinationList As New GL0004DestinationList With {
+    '              .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0004DestinationList.LC_CUSTOMER_TYPE.ALL) _
+    '            , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '            , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '            , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '            , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0004DestinationList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '            , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+    '            , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
+    '            , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+    '            , .TORICODE = If(Params.Item(C_PARAMETERS.LP_CUSTOMER), "") _
+    '            , .CLASSCODE = If(Params.Item(C_PARAMETERS.LP_CLASSCODE), "") _
+    '            , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "")
+    '        }
+    '            GL0004DestinationList.getList()
+    '            O_RTN = GL0004DestinationList.ERR
+    '            Dim lsbx = GL0004DestinationList.LIST
+    '            LbMap.Add(KeyCode, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(KeyCode)
+    'End Function
 
-        Dim Key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0005StaffList.LC_STAFF_TYPE.ALL) &
-                            If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
-                            If(Params.Item(C_PARAMETERS.LP_ORG), "-")
-        If Not IsNothing(Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST)) Then
-            For Each category In Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST)
-                Key = Key & category
-            Next
-        End If
-        Key = Key & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0005StaffList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                  & LIST_BOX_CLASSIFICATION.LC_STAFFCODE
+    '''' <summary>
+    '''' 部署(管理・配属)
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateOrg(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    '○部署ListBox設定
+    '    Dim Categorys As String() = TryCast(Params.Item(C_PARAMETERS.LP_ORG_CATEGORYS), String())
+    '    Dim Key As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), "-")
+    '    For Each category As String In Categorys
+    '        Key = Key & category
+    '    Next
+    '    Key = Key & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '              & LIST_BOX_CLASSIFICATION.LC_ORG
 
-        If Not LbMap.ContainsKey(Key) Then
-            Using GL0005StaffList As New GL0005StaffList With {
-               .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0005StaffList.LC_STAFF_TYPE.ALL) _
-             , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-             , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-             , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-             , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0005StaffList.C_VIEW_FORMAT_PATTERN.NAMES) _
-             , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-             , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-             , .STAFFKBN = If(Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST), Nothing) _
-             , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
-             , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-             , .STAFFCODE = If(Params.Item(C_PARAMETERS.LP_SELECTED_CODE), String.Empty)
-            }
-                GL0005StaffList.getList()
-                O_RTN = GL0005StaffList.ERR
-                Dim lsbx As ListBox = GL0005StaffList.LIST
-                LbMap.Add(Key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(Key)
-    End Function
-    ''' <summary>
-    ''' 統一車番コード取得
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateCarCode(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        '○統一車番ListBox設定   
+    '    If Not LbMap.ContainsKey(Key) Then
+    '        Using CL0002OrgList As New GL0002OrgList With {
+    '              .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '            , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '            , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '            , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '            , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+    '            , .AUTHWITH = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY) _
+    '            , .Categorys = Categorys _
+    '            , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
+    '            , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
+    '            , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG)
+    '         }
+    '            CL0002OrgList.getList()
+    '            O_RTN = CL0002OrgList.ERR
+    '            Dim lsbx As ListBox = CL0002OrgList.LIST
+    '            LbMap.Add(Key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(Key)
+    'End Function
 
-        Dim Key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0007CarList.LC_LORRY_TYPE.ALL) &
-                            If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
-                            If(Params.Item(C_PARAMETERS.LP_ORG), "-") &
-                            If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0007CarList.C_VIEW_FORMAT_PATTERN.NAMES) &
-                             LIST_BOX_CLASSIFICATION.LC_CARCODE
-        If Not LbMap.ContainsKey(Key) Then
-            Using GL007CarList As New GL0007CarList With {
-               .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0007CarList.LC_LORRY_TYPE.ALL) _
-             , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-             , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-             , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-             , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0007CarList.C_VIEW_FORMAT_PATTERN.NAMES) _
-             , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-             , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-             , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
-             , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE)
-            }
-                GL007CarList.getList()
-                O_RTN = GL007CarList.ERR
-                Dim lsbx As ListBox = GL007CarList.LIST
-                LbMap.Add(Key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(Key)
-    End Function
+    '''' <summary>
+    '''' 社員コード取得
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateStaff(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    '○社員ListBox設定   
 
-    ''' <summary>
-    ''' 業務車番コード取得
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateWorkLorry(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        '○業務車番ListBox設定   
+    '    Dim Key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0005StaffList.LC_STAFF_TYPE.ALL) &
+    '                        If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_ORG), "-")
+    '    If Not IsNothing(Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST)) Then
+    '        For Each category In Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST)
+    '            Key = Key & category
+    '        Next
+    '    End If
+    '    Key = Key & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0005StaffList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '              & LIST_BOX_CLASSIFICATION.LC_STAFFCODE
 
-        Dim Key As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
-                            If(Params.Item(C_PARAMETERS.LP_ORG), "-") &
-                            If(Params.Item(C_PARAMETERS.LP_OILTYPE), "-") &
-                            If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0008WorkLorryList.C_VIEW_FORMAT_PATTERN.NAMES) &
-                             LIST_BOX_CLASSIFICATION.LC_WORKLORRY
-        If Not LbMap.ContainsKey(Key) Then
-            Using GL008List As New GL0008WorkLorryList With {
-               .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-             , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-             , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-             , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0008WorkLorryList.C_VIEW_FORMAT_PATTERN.NAMES) _
-             , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-             , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-             , .OILTYPE = If(Params.Item(C_PARAMETERS.LP_OILTYPE), "")
-            }
-                GL008List.getList()
-                O_RTN = GL008List.ERR
-                Dim lsbx As ListBox = GL008List.LIST
-                LbMap.Add(Key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(Key)
-    End Function
+    '    If Not LbMap.ContainsKey(Key) Then
+    '        Using GL0005StaffList As New GL0005StaffList With {
+    '           .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0005StaffList.LC_STAFF_TYPE.ALL) _
+    '         , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '         , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '         , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '         , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0005StaffList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '         , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+    '         , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
+    '         , .STAFFKBN = If(Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST), Nothing) _
+    '         , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+    '         , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
+    '         , .STAFFCODE = If(Params.Item(C_PARAMETERS.LP_SELECTED_CODE), String.Empty)
+    '        }
+    '            GL0005StaffList.getList()
+    '            O_RTN = GL0005StaffList.ERR
+    '            Dim lsbx As ListBox = GL0005StaffList.LIST
+    '            LbMap.Add(Key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(Key)
+    'End Function
 
-    ''' <summary>
-    ''' 品名コード取得
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateGoods(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        '○品名ListBox設定   
-        Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0006GoodsList.LC_GOODS_TYPE.ALL) &
-                                 If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
-                                 If(Params.Item(C_PARAMETERS.LP_OILTYPE), "-") &
-                                 If(Params.Item(C_PARAMETERS.LP_PRODCODE1), "-") &
-                                 If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0006GoodsList.C_VIEW_FORMAT_PATTERN.NAMES) &
-                                  LIST_BOX_CLASSIFICATION.LC_GOODS
-        If Not LbMap.ContainsKey(key) Then
-            Using GL006GoodsList As New GL0006GoodsList With {
-               .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0006GoodsList.LC_GOODS_TYPE.ALL) _
-             , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-             , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-             , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-             , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0006GoodsList.C_VIEW_FORMAT_PATTERN.NAMES) _
-             , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-             , .ORGCAMPCODE = If(Params.Item(C_PARAMETERS.LP_ORG_COMP), "") _
-             , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-             , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
-             , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-             , .OILTYPE = If(Params.Item(C_PARAMETERS.LP_OILTYPE), "") _
-             , .PRODUCT1 = If(Params.Item(C_PARAMETERS.LP_PRODCODE1), "")
-            }
-                GL006GoodsList.getList()
-                O_RTN = GL006GoodsList.ERR
-                Dim lsbx As ListBox = GL006GoodsList.LIST
-                LbMap.Add(key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(key)
-    End Function
-    ''' <summary>
-    ''' 端末コード一覧を作成する
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateTermList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0011TermList.LC_TERM_TYPE.TERMINAL) &
-                         If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0011TermList.C_VIEW_FORMAT_PATTERN.NAMES) &
-                          LIST_BOX_CLASSIFICATION.LC_TERM
+    '''' <summary>
+    '''' 統一車番コード取得
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateCarCode(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    '○統一車番ListBox設定   
 
-        If Not LbMap.ContainsKey(key) Then
-            '○会社コードListBox設定
-            Using GL0011TermList As New GL0011TermList With {
-               .TYPEMODE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0011TermList.LC_TERM_TYPE.TERMINAL) _
-             , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-             , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-             , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-             , .CLASSCODE = If(Params.Item(C_PARAMETERS.LP_CLASSCODE), C_TERMCLASS.BASE) _
-             , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0011TermList.C_VIEW_FORMAT_PATTERN.NAMES)
-            }
-                GL0011TermList.getList()
-                Dim lsbx As ListBox = GL0011TermList.LIST
-                O_RTN = GL0011TermList.ERR
-                LbMap.Add(key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(key)
-    End Function
-    ''' <summary>
-    ''' 権限コード一覧を作成する
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateRoleList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), C_ROLE_VARIANT.USER_ORG) &
-                            If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
-                            If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0012RoleList.C_VIEW_FORMAT_PATTERN.NAMES) &
-                            LIST_BOX_CLASSIFICATION.LC_ROLE
+    '    Dim Key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0007CarList.LC_LORRY_TYPE.ALL) &
+    '                        If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_ORG), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0007CarList.C_VIEW_FORMAT_PATTERN.NAMES) &
+    '                         LIST_BOX_CLASSIFICATION.LC_CARCODE
+    '    If Not LbMap.ContainsKey(Key) Then
+    '        Using GL007CarList As New GL0007CarList With {
+    '           .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0007CarList.LC_LORRY_TYPE.ALL) _
+    '         , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '         , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '         , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '         , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0007CarList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '         , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+    '         , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
+    '         , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+    '         , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE)
+    '        }
+    '            GL007CarList.getList()
+    '            O_RTN = GL007CarList.ERR
+    '            Dim lsbx As ListBox = GL007CarList.LIST
+    '            LbMap.Add(Key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(Key)
+    'End Function
 
-        If Not LbMap.ContainsKey(key) Then
-            Using GL0012RoleList As New GL0012RoleList With {
-                .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-              , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-              , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-              , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0012RoleList.C_VIEW_FORMAT_PATTERN.NAMES) _
-              , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "")
-            }
-                Select Case If(Params.Item(C_PARAMETERS.LP_TYPEMODE), "")
-                    Case C_ROLE_VARIANT.USER_COMP
-                        GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_COMP
-                        GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_COMP)
-                    Case C_ROLE_VARIANT.USER_ORG
-                        GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_ORG
-                        GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG)
-                    Case C_ROLE_VARIANT.USER_PERTMIT
-                        GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
-                        GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP)
-                End Select
-                GL0012RoleList.getList()
-                Dim lsbx As ListBox = GL0012RoleList.LIST
-                O_RTN = GL0012RoleList.ERR
-                LbMap.Add(key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(key)
-    End Function
-    ''' <summary>
-    ''' URL/MAPID一覧を作成する
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateURLList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0013URLList.LC_URL_TYPE.MAPID) &
-                            If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0013URLList.C_VIEW_FORMAT_PATTERN.NAMES) &
-                            LIST_BOX_CLASSIFICATION.LC_URL
-        If Not LbMap.ContainsKey(key) Then
-            Using GL0013URLList As New GL0013URLList With {
-                .TYPECODE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0013URLList.LC_URL_TYPE.MAPID) _
-              , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-              , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-              , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-              , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0013URLList.C_VIEW_FORMAT_PATTERN.NAMES)
-                }
-                GL0013URLList.getList()
-                Dim lsbx As ListBox = GL0013URLList.LIST
-                O_RTN = GL0013URLList.ERR
-                LbMap.Add(key, lsbx)
-            End Using
-        End If
-        Return LbMap.Item(key)
-    End Function
-    ''' <summary>
-    ''' 拡張リスト一覧を作成する
-    ''' </summary>
-    ''' <param name="Params">取得用パラメータ</param>
-    ''' <param name="O_RTN">成功可否</param>
-    ''' <returns>作成した一覧情報</returns>
-    ''' <remarks></remarks>
-    Protected Function CreateExtra(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '''' <summary>
+    '''' 業務車番コード取得
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateWorkLorry(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    '○業務車番ListBox設定   
 
-        Return If(Params.Item(C_PARAMETERS.LP_LIST), New ListBox)
-    End Function
+    '    Dim Key As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_ORG), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_OILTYPE), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0008WorkLorryList.C_VIEW_FORMAT_PATTERN.NAMES) &
+    '                         LIST_BOX_CLASSIFICATION.LC_WORKLORRY
+    '    If Not LbMap.ContainsKey(Key) Then
+    '        Using GL008List As New GL0008WorkLorryList With {
+    '           .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '         , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '         , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '         , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0008WorkLorryList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '         , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+    '         , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
+    '         , .OILTYPE = If(Params.Item(C_PARAMETERS.LP_OILTYPE), "")
+    '        }
+    '            GL008List.getList()
+    '            O_RTN = GL008List.ERR
+    '            Dim lsbx As ListBox = GL008List.LIST
+    '            LbMap.Add(Key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(Key)
+    'End Function
+
+    '''' <summary>
+    '''' 品名コード取得
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateGoods(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    '○品名ListBox設定   
+    '    Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0006GoodsList.LC_GOODS_TYPE.ALL) &
+    '                             If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
+    '                             If(Params.Item(C_PARAMETERS.LP_OILTYPE), "-") &
+    '                             If(Params.Item(C_PARAMETERS.LP_PRODCODE1), "-") &
+    '                             If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0006GoodsList.C_VIEW_FORMAT_PATTERN.NAMES) &
+    '                              LIST_BOX_CLASSIFICATION.LC_GOODS
+    '    If Not LbMap.ContainsKey(key) Then
+    '        Using GL006GoodsList As New GL0006GoodsList With {
+    '           .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0006GoodsList.LC_GOODS_TYPE.ALL) _
+    '         , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '         , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '         , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '         , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0006GoodsList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '         , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+    '         , .ORGCAMPCODE = If(Params.Item(C_PARAMETERS.LP_ORG_COMP), "") _
+    '         , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
+    '         , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
+    '         , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
+    '         , .OILTYPE = If(Params.Item(C_PARAMETERS.LP_OILTYPE), "") _
+    '         , .PRODUCT1 = If(Params.Item(C_PARAMETERS.LP_PRODCODE1), "")
+    '        }
+    '            GL006GoodsList.getList()
+    '            O_RTN = GL006GoodsList.ERR
+    '            Dim lsbx As ListBox = GL006GoodsList.LIST
+    '            LbMap.Add(key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(key)
+    'End Function
+
+    '''' <summary>
+    '''' 端末コード一覧を作成する
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateTermList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0011TermList.LC_TERM_TYPE.TERMINAL) &
+    '                     If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0011TermList.C_VIEW_FORMAT_PATTERN.NAMES) &
+    '                      LIST_BOX_CLASSIFICATION.LC_TERM
+
+    '    If Not LbMap.ContainsKey(key) Then
+    '        '○会社コードListBox設定
+    '        Using GL0011TermList As New GL0011TermList With {
+    '           .TYPEMODE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0011TermList.LC_TERM_TYPE.TERMINAL) _
+    '         , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '         , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '         , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '         , .CLASSCODE = If(Params.Item(C_PARAMETERS.LP_CLASSCODE), C_TERMCLASS.BASE) _
+    '         , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0011TermList.C_VIEW_FORMAT_PATTERN.NAMES)
+    '        }
+    '            GL0011TermList.getList()
+    '            Dim lsbx As ListBox = GL0011TermList.LIST
+    '            O_RTN = GL0011TermList.ERR
+    '            LbMap.Add(key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(key)
+    'End Function
+
+    '''' <summary>
+    '''' 権限コード一覧を作成する
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateRoleList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), C_ROLE_VARIANT.USER_ORG) &
+    '                        If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0012RoleList.C_VIEW_FORMAT_PATTERN.NAMES) &
+    '                        LIST_BOX_CLASSIFICATION.LC_ROLE
+
+    '    If Not LbMap.ContainsKey(key) Then
+    '        Using GL0012RoleList As New GL0012RoleList With {
+    '            .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '          , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '          , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '          , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0012RoleList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '          , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "")
+    '        }
+    '            Select Case If(Params.Item(C_PARAMETERS.LP_TYPEMODE), "")
+    '                Case C_ROLE_VARIANT.USER_COMP
+    '                    GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_COMP
+    '                    GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_COMP)
+    '                Case C_ROLE_VARIANT.USER_ORG
+    '                    GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_ORG
+    '                    GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG)
+    '                Case C_ROLE_VARIANT.USER_PERTMIT
+    '                    GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
+    '                    GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP)
+    '            End Select
+    '            GL0012RoleList.getList()
+    '            Dim lsbx As ListBox = GL0012RoleList.LIST
+    '            O_RTN = GL0012RoleList.ERR
+    '            LbMap.Add(key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(key)
+    'End Function
+
+    '''' <summary>
+    '''' URL/MAPID一覧を作成する
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateURLList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0013URLList.LC_URL_TYPE.MAPID) &
+    '                        If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0013URLList.C_VIEW_FORMAT_PATTERN.NAMES) &
+    '                        LIST_BOX_CLASSIFICATION.LC_URL
+    '    If Not LbMap.ContainsKey(key) Then
+    '        Using GL0013URLList As New GL0013URLList With {
+    '            .TYPECODE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0013URLList.LC_URL_TYPE.MAPID) _
+    '          , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '          , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '          , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '          , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0013URLList.C_VIEW_FORMAT_PATTERN.NAMES)
+    '            }
+    '            GL0013URLList.getList()
+    '            Dim lsbx As ListBox = GL0013URLList.LIST
+    '            O_RTN = GL0013URLList.ERR
+    '            LbMap.Add(key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(key)
+    'End Function
+
+    '''' <summary>
+    '''' 拡張リスト一覧を作成する
+    '''' </summary>
+    '''' <param name="Params">取得用パラメータ</param>
+    '''' <param name="O_RTN">成功可否</param>
+    '''' <returns>作成した一覧情報</returns>
+    '''' <remarks></remarks>
+    'Protected Function CreateExtra(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+
+    '    Return If(Params.Item(C_PARAMETERS.LP_LIST), New ListBox)
+    'End Function
+
     ''' <summary>
     ''' ListBox設定共通サブ
     ''' </summary>

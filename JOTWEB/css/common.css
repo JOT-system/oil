@@ -1225,3 +1225,107 @@ span[class^="WF_DViewRep"] table {
     white-space: nowrap; /* 折り返させない */
     text-overflow: ellipsis; /* 領域越を点々表示 */
 }
+/*  ------------------------------  */
+/* ロード時のウェイトスタイル       */
+/*  ------------------------------  */
+/* 半透明の大枠 */
+#comloading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    overflow: hidden;
+    text-align: center;
+    cursor: wait;
+}
+/* 以下アニメーション設定 */
+@-webkit-keyframes scale {
+    0% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    45% {
+        -webkit-transform: scale(0.1);
+        transform: scale(0.1);
+        opacity: 0.7;
+    }
+
+    80% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scale {
+    0% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    45% {
+        -webkit-transform: scale(0.1);
+        transform: scale(0.1);
+        opacity: 0.7;
+    }
+
+    80% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.comloadingmsg {
+    margin-top: 15%;
+}
+
+    .comloadingmsg > div:nth-child(1) {
+        -webkit-animation: scale 0.75s -0.24s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+        animation: scale 0.75s -0.24s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+    }
+
+    .comloadingmsg > div:nth-child(2) {
+        -webkit-animation: scale 0.75s -0.12s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+        animation: scale 0.75s -0.12s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+    }
+
+    .comloadingmsg > div:nth-child(3) {
+        -webkit-animation: scale 0.75s 0s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+        animation: scale 0.75s 0s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+    }
+
+    .comloadingmsg > div {
+        background-color: #fff;
+        width: 15px;
+        height: 15px;
+        border-radius: 100%;
+        margin: 2px;
+        -webkit-animation-fill-mode: both;
+        animation-fill-mode: both;
+        display: inline-block;
+    }
+/* ダミーでフォーカスを合わせるテキスト */
+#comlodingtextbox {
+    position: absolute;
+    top: 0;
+    left: -10px;
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    line-height: 0;
+    color: transparent;
+    background-color: transparent;
+    border-color: transparent;
+    z-index: 0;
+}

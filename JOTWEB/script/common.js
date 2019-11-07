@@ -1075,3 +1075,149 @@ function ListDbClick(obj, lineCnt) {
         document.forms[0].submit();
     }
 }
+/**
+ * ポップアップの背面操作禁止を解除
+ * @param {string} modalWapperId ポップアップのID
+ * @return {undefined} なし
+ */
+function commonCloseModal(modalWapperId) {
+    var disableElemType = 'select,input:not([type="hidden"]),textarea,button';
+    var popUpInnerObjects = null;
+    var popUpInnerObjectsId = new Array();
+    if (modalWapperId !== '') {
+        var keepElemType = '{0} select,{0} input:not([type="hidden"]),{0} textarea,{0} button';
+        keepElemType = keepElemType.split('{0}').join("#" + modalWapperId);
+        popUpInnerObjects = document.forms[0].querySelectorAll(keepElemType);
+        if (popUpInnerObjects !== null) {
+            for (let i = 0, len = popUpInnerObjects.length; i < len; ++i) {
+                popUpInnerObjectsId.push(popUpInnerObjects[i].id);
+            }
+        }
+    }
+    document.forms[0].removeAttribute('data-showmodal');
+    var inputItems = document.forms[0].querySelectorAll(disableElemType);
+    for (let i = 0, len = inputItems.length; i < len; ++i) {
+        let inputItem = inputItems[i];
+        if (popUpInnerObjectsId.indexOf(inputItem.id) >= 0) {
+            continue;
+        }
+        inputItem.tabIndex = null;
+        inputItem.removeAttribute('tabIndex');
+        let indexVal = inputItem.getAttribute('data-orgtabindex');
+        if (indexVal !== null) {
+            inputItem.tabIndex = indexVal;
+            inputItem.removeAttribute('data-orgtabindex');
+        }
+    }
+}
+/**
+ * ポップアップの背面操作を禁止
+  * @param {string} modalWapperId ポップアップのID
+ * @return {undefined} なし
+ */
+function commonDisableModalBg(modalWapperId) {
+    var disableElemType = 'select,input:not([type="hidden"]),textarea,button,div.firstPage,div.lastPage';
+    var popUpInnerObjects = null;
+    var popUpInnerObjectsId = new Array();
+    if (modalWapperId !== '') {
+        var keepElemType = '{0} select,{0} input:not([type="hidden"]),{0} textarea,{0} button';
+        keepElemType = keepElemType.split('{0}').join("#" + modalWapperId);
+        popUpInnerObjects = document.forms[0].querySelectorAll(keepElemType);
+        if (popUpInnerObjects !== null) {
+            for (let i = 0, len = popUpInnerObjects.length; i < len; ++i) {
+                popUpInnerObjectsId.push(popUpInnerObjects[i].id);
+            }
+        }
+    }
+    var inputItems = document.forms[0].querySelectorAll(disableElemType);
+    for (let i = 0, len = inputItems.length; i < len; ++i) {
+        let inputItem = inputItems[i];
+        if (popUpInnerObjectsId.indexOf(inputItem.id) >= 0) {
+            continue;
+        }
+        let indexVal = inputItem.tabIndex;
+        if (inputItem.hasAttribute('tabIndex')) {
+            inputItem.dataset.orgtabindex = indexVal; //('data-orgtabindex', indexVal);
+        }
+        inputItem.tabIndex = '-1';
+    }
+    // keydownイベントの無効化
+    if (modalWapperId !== '') {
+        var modalWapperObj = document.getElementById(modalWapperId);
+        if (modalWapperObj !== null) {
+            modalWapperObj.tabIndex = '-1';
+            modalWapperObj.style.outline = 'none';
+            // 画面キーダウンイベントのバインド
+            modalWapperObj.addEventListener('keydown', (function (event) {
+                return function (event) {
+                    // ↑キー押下時
+                    if (window.event.keyCode === 38) {
+                        window.event.stopPropagation(); //フォームのキーダウンイベントに↑キー伝達抑止
+                    };
+                    // ↓キー押下時
+                    if (window.event.keyCode === 40) {
+                        window.event.stopPropagation(); //フォームのキーダウンイベントに↓キー伝達抑止
+                    };
+                };
+            })(event), false);
+        }
+    }
+}
+/**
+ *  ウェイト画面表示
+ * @return {undefined} なし
+ * @description 
+ */
+function commonDispWait() {
+    var hasElm = document.getElementById('comloading');
+    if (hasElm !== null) {
+        document.body.removeChild(hasElm);
+    }
+    // ウエイトスクリーン用半透明の大枠オブジェクト
+    var lodingObj;
+    lodingObj = document.createElement('div');
+    lodingObj.id = 'comloading';
+    lodingObj.classList.add('comloading');
+    // ウエイトスクリーン用のフォーカス移動抑止のオブジェクト
+    var forsubObj;
+    forsubObj = document.createElement('input');
+    forsubObj.id = 'comlodingtextbox';
+    forsubObj.type = 'text';
+    forsubObj.classList.add('comlodingtextbox');
+    forsubObj.tabindex = '1';
+    lodingObj.appendChild(forsubObj);
+    // ウェイトスクリーン用のアニメーション枠
+    var lodingMsgObj = document.createElement('div');
+    lodingMsgObj.classList.add('comloadingmsg');
+    // 子要素追加
+    var lodingMsgChild1Obj = document.createElement('div');
+    var lodingMsgChild2Obj = document.createElement('div');
+    var lodingMsgChild3Obj = document.createElement('div');
+    lodingMsgObj.appendChild(lodingMsgChild1Obj);
+    lodingMsgObj.appendChild(lodingMsgChild2Obj);
+    lodingMsgObj.appendChild(lodingMsgChild3Obj);
+    //lodingMsgObj.innerText = 'Loading.....';
+    lodingObj.appendChild(lodingMsgObj);
+    document.body.appendChild(lodingObj);
+    // テキストボックスにフォーカスを合わせておく
+    forsubObj = document.getElementById('comlodingtextbox');
+    forsubObj.select();
+    forsubObj.onblur = (function (forsubObj) {
+        return function () {
+            forsubObj.select();
+        }
+    }(forsubObj));
+    commonDisableModalBg('comloading');
+}
+/**
+ *  ウェイト画面非表示
+ * @return {undefined} なし
+ * @description 
+ */
+function commonHideWait() {
+    var hasElm = document.getElementById('comloading');
+    if (hasElm !== null) {
+        commonCloseModal('');
+        document.body.removeChild(hasElm);
+    }
+}

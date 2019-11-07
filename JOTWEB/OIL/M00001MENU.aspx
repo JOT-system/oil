@@ -27,7 +27,7 @@
                             <asp:Label ID="WF_MenuURL_L" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuVARI_L" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuMAP_L" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_L" runat="server" CssClass="WF_MenuButton_L" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'"/> 
+                            <asp:Button ID="WF_MenuButton_L" runat="server" CssClass="WF_MenuButton_L" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
 

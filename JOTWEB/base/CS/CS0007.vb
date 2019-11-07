@@ -248,78 +248,78 @@ Public Class CS0007CheckAuthority
         End Try
         checkUserPermission = WW_PERMIT
     End Function
-    ''' <summary>
-    ''' 端末権限の権限コードを取得する
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <param name="OBJCODE"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Protected Function checkTermPermission(ByVal SQLcon As SqlConnection, ByVal OBJCODE As String) As Integer
-        Dim WW_PERMIT As Integer = C_PERMISSION.INVALID
-        '検索SQL文
-        Try
-            '検索SQL文
-            Dim SQLStr As String =
-                 "SELECT rtrim(B.PERMITCODE) as PERMITCODE " _
-               & " FROM  COM.OIS0011_SRVAUTHOR A " _
-               & " INNER JOIN COM.OIS0009_ROLE B " _
-               & "   ON  B.OBJECT   = A.OBJECT " _
-               & "   and B.ROLE     = A.ROLE " _
-               & "   and B.STYMD   <= @P4 " _
-               & "   and B.ENDYMD  >= @P5 " _
-               & "   and B.DELFLG  <> @P6 " _
-               & " Where A.TERMID   = @P1 " _
-               & "   and A.OBJECT   = @P2 " _
-               & "   and B.CODE     = @P3 " _
-               & "   and A.STYMD   <= @P4 " _
-               & "   and A.ENDYMD  >= @P5 " _
-               & "   and A.DELFLG  <> @P6 " _
-               & "ORDER BY B.SEQ "
+    '''' <summary>
+    '''' 端末権限の権限コードを取得する
+    '''' </summary>
+    '''' <param name="SQLcon"></param>
+    '''' <param name="OBJCODE"></param>
+    '''' <returns></returns>
+    '''' <remarks></remarks>
+    'Protected Function checkTermPermission(ByVal SQLcon As SqlConnection, ByVal OBJCODE As String) As Integer
+    '    Dim WW_PERMIT As Integer = C_PERMISSION.INVALID
+    '    '検索SQL文
+    '    Try
+    '        '検索SQL文
+    '        Dim SQLStr As String =
+    '             "SELECT rtrim(B.PERMITCODE) as PERMITCODE " _
+    '           & " FROM  COM.OIS0011_SRVAUTHOR A " _
+    '           & " INNER JOIN COM.OIS0009_ROLE B " _
+    '           & "   ON  B.OBJECT   = A.OBJECT " _
+    '           & "   and B.ROLE     = A.ROLE " _
+    '           & "   and B.STYMD   <= @P4 " _
+    '           & "   and B.ENDYMD  >= @P5 " _
+    '           & "   and B.DELFLG  <> @P6 " _
+    '           & " Where A.TERMID   = @P1 " _
+    '           & "   and A.OBJECT   = @P2 " _
+    '           & "   and B.CODE     = @P3 " _
+    '           & "   and A.STYMD   <= @P4 " _
+    '           & "   and A.ENDYMD  >= @P5 " _
+    '           & "   and A.DELFLG  <> @P6 " _
+    '           & "ORDER BY B.SEQ "
 
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 1)
-                PARA1.Value = TERMID
-                PARA2.Value = OBJCODE
-                PARA3.Value = MAPID
-                PARA4.Value = Date.Now
-                PARA5.Value = Date.Now
-                PARA6.Value = C_DELETE_FLG.DELETE
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+    '        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+    '            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
+    '            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
+    '            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
+    '            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 1)
+    '            PARA1.Value = TERMID
+    '            PARA2.Value = OBJCODE
+    '            PARA3.Value = MAPID
+    '            PARA4.Value = Date.Now
+    '            PARA5.Value = Date.Now
+    '            PARA6.Value = C_DELETE_FLG.DELETE
+    '            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-                '権限コード初期値(権限なし)設定
+    '            '権限コード初期値(権限なし)設定
 
-                ERR = C_MESSAGE_NO.AUTHORIZATION_ERROR
+    '            ERR = C_MESSAGE_NO.AUTHORIZATION_ERROR
 
-                If SQLdr.Read Then
-                    WW_PERMIT = SQLdr("PERMITCODE")
-                    ERR = C_MESSAGE_NO.NORMAL
-                End If
+    '            If SQLdr.Read Then
+    '                WW_PERMIT = SQLdr("PERMITCODE")
+    '                ERR = C_MESSAGE_NO.NORMAL
+    '            End If
 
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-            End Using
+    '            'Close
+    '            SQLdr.Close() 'Reader(Close)
+    '            SQLdr = Nothing
+    '        End Using
 
-        Catch ex As Exception
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '    Catch ex As Exception
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
-            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIS0011_SRVAUTHOR Select"
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIS0011_SRVAUTHOR Select"
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWRITE.TEXT = ex.ToString()
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
-            ERR = C_MESSAGE_NO.DB_ERROR
-            checkTermPermission = WW_PERMIT
-            Exit Function
-        End Try
-        checkTermPermission = WW_PERMIT
-    End Function
+    '        ERR = C_MESSAGE_NO.DB_ERROR
+    '        checkTermPermission = WW_PERMIT
+    '        Exit Function
+    '    End Try
+    '    checkTermPermission = WW_PERMIT
+    'End Function
 End Class

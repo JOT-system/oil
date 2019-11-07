@@ -76,107 +76,107 @@ Public Class CS0036FCHECK
     'セッション制御宣言
     Private sm As New CS0050SESSION
 
-    ''' <summary>
-    ''' S00013に対応するチェック内容が存在するか確認する
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public Function existsCheckField() As Boolean
-        '●In PARAMチェック
-        Dim WW_SINGLECHECK As Boolean = False
-        'PARAM01: CAMPCODE
-        If IsNothing(CAMPCODE) Then
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '''' <summary>
+    '''' S00013に対応するチェック内容が存在するか確認する
+    '''' </summary>
+    '''' <returns></returns>
+    '''' <remarks></remarks>
+    'Public Function existsCheckField() As Boolean
+    '    '●In PARAMチェック
+    '    Dim WW_SINGLECHECK As Boolean = False
+    '    'PARAM01: CAMPCODE
+    '    If IsNothing(CAMPCODE) Then
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
-            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME               'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "CAMPCODE"                          '
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
-            CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DLL_IF_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            Return False
-        End If
+    '        CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME               'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "CAMPCODE"                          '
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
+    '        CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DLL_IF_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        Return False
+    '    End If
 
-        'PARAM02: MAPID
-        If IsNothing(MAPID) Then
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '    'PARAM02: MAPID
+    '    If IsNothing(MAPID) Then
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
-            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME               'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "MAPID"                          '
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
-            CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DLL_IF_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            Return False
-        End If
+    '        CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME               'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "MAPID"                          '
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
+    '        CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DLL_IF_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        Return False
+    '    End If
 
-        'PARAM03: FIELD
-        If IsNothing(FIELD) Then
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '    'PARAM03: FIELD
+    '    If IsNothing(FIELD) Then
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
-            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME               'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "FIELD"                          '
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
-            CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DLL_IF_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            Return False
-        End If
-        'EXTRAPARAM01: TBL
-        If IsNothing(TBL) Then
-            WW_SINGLECHECK = True
-            TBL = New DataTable
-        End If
-        'PARAM04: I_VALUE  空白を認める
+    '        CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME               'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "FIELD"                          '
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
+    '        CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DLL_IF_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        Return False
+    '    End If
+    '    'EXTRAPARAM01: TBL
+    '    If IsNothing(TBL) Then
+    '        WW_SINGLECHECK = True
+    '        TBL = New DataTable
+    '    End If
+    '    'PARAM04: I_VALUE  空白を認める
 
-        '●項目情報取得
-        Try
-            createFieldDataTbl(WW_SINGLECHECK)
-            If Not isNormal(ERR) Then Return False
+    '    '●項目情報取得
+    '    Try
+    '        createFieldDataTbl(WW_SINGLECHECK)
+    '        If Not isNormal(ERR) Then Return False
 
 
-            If TBL.Rows.Count = 0 Then
-                If Not WW_SINGLECHECK Then
-                    Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '        If TBL.Rows.Count = 0 Then
+    '            If Not WW_SINGLECHECK Then
+    '                Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
-                    CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-                    CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"             '
-                    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                     '
-                    CS0011LOGWRITE.TEXT = "データフィールドマスタ（OIS0016_DATAFIELD）に存在しません。"
-                    CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
-                    CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '                CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
+    '                CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"             '
+    '                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                     '
+    '                CS0011LOGWRITE.TEXT = "データフィールドマスタ（OIS0016_DATAFIELD）に存在しません。"
+    '                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
+    '                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
-                    ERR = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
-                End If
-                Return False
-            End If
-            Dim WW_row() As DataRow = TBL.Select("FIELD='" & FIELD & "'")
-            If WW_row.Count = 0 Then Return False
+    '                ERR = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
+    '            End If
+    '            Return False
+    '        End If
+    '        Dim WW_row() As DataRow = TBL.Select("FIELD='" & FIELD & "'")
+    '        If WW_row.Count = 0 Then Return False
 
-            Return True
+    '        Return True
 
-        Catch ex As Exception
-            Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
+    '    Catch ex As Exception
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
 
-            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIS0016_DATAFIELD Select"
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWRITE.TEXT = ex.ToString()
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
-            ERR = C_MESSAGE_NO.DB_ERROR
-            Return False
+    '        ERR = C_MESSAGE_NO.DB_ERROR
+    '        Return False
 
-        Finally
-            '〇単独処理の場合TBLを除去する
-            If WW_SINGLECHECK Then
-                TBL.Dispose()
-                TBL = Nothing
-            End If
-        End Try
+    '    Finally
+    '        '〇単独処理の場合TBLを除去する
+    '        If WW_SINGLECHECK Then
+    '            TBL.Dispose()
+    '            TBL = Nothing
+    '        End If
+    '    End Try
 
-    End Function
+    'End Function
 
     ''' <summary>
     ''' FIELDDATAによる項目のチェック処理

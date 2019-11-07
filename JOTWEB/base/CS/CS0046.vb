@@ -68,7 +68,7 @@ Public Structure CS0046TREEget
         Dim CS0009MESSAGEout As New CS0009MESSAGEout        'Message out
         Dim CS0011LOGWrite As New CS0011LOGWrite            'ログ格納ディレクトリ取得
         Dim CS0013UPROFview As New CS0013ProfView           'ユーザプロファイル（GridView）設定
-        Dim CS0026TBLSORTget As New CS0026TBLSORT           'GridView用テーブルソート文字列取得
+        '        Dim CS0026TBLSORTget As New CS0026TBLSORT           'GridView用テーブルソート文字列取得
 
         ERR = C_MESSAGE_NO.NORMAL
 

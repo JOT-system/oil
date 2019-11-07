@@ -52,7 +52,6 @@ div {
     width: 100%;
     margin: 0 auto 0 auto;
     top: 0px;
-    height: 10em;
     left: 0em;
     position: fixed;
     overflow: hidden;
@@ -282,7 +281,6 @@ div {
 
 .WF_rightboxSW {
     height: 6%;
-    width: 8%;
     overflow: hidden;
     position: fixed;
     top: 0px;
@@ -290,6 +288,7 @@ div {
     color: white;
     font-size: small;
     vertical-align: middle;
+    opacity: 0.5;
 }
 
 

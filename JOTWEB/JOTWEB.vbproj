@@ -154,7 +154,6 @@
     <Compile Include="base\CS\CS0009.vb" />
     <Compile Include="base\CS\CS0010.vb" />
     <Compile Include="base\CS\CS0011.vb" />
-    <Compile Include="base\CS\CS0012.vb" />
     <Compile Include="base\CS\CS0013.vb" />
     <Compile Include="base\CS\CS0015.vb" />
     <Compile Include="base\CS\CS0016.vb" />

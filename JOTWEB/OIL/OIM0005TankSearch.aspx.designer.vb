@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIM0005TankSearch
-    
+
     '''<summary>
     '''WF_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class OIM0005TankSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_CAMPCODE_TEXT コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class OIM0005TankSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CAMPCODE_TEXT As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_TANKNUMBER コントロール。
     '''</summary>

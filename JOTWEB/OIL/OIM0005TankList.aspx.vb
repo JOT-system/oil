@@ -269,11 +269,15 @@ Public Class OIM0005TankList
         '　検索説明
         '     条件指定に従い該当データをタンク車マスタから取得する
 
-        Dim SQLStr As String =
+        Dim SQLStr As String
+
+        If work.WF_SEL_TANKNUMBER.Text = "" And
+            work.WF_SEL_MODEL.Text = "" Then
+            SQLStr =
               " SELECT " _
             & "   0                                     AS LINECNT " _
             & " , ''                                    AS OPERATION " _
-            & " , CAST(OIM0005.TIMESTAMP AS bigint)       AS TIMESTAMP " _
+            & " , CAST(OIM0005.UPDTIMSTP AS bigint)       AS UPDTIMSTP " _
             & " , 1                                     AS 'SELECT' " _
             & " , 0                                     AS HIDDEN " _
             & " , ISNULL(RTRIM(OIM0005.DELFLG), '')         AS DELFLG " _
@@ -359,9 +363,102 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
             & " FROM OIL.OIM0005_TANK OIM0005 " _
-            & " WHERE OIM0005_TANK OIM0005 = @P1" _
-            & "   OR OIM0005_TANK OIM0005 = @P2" _
+            & " WHERE OIM0005.DELFLG      <> @P3"
+        Else
+            SQLStr =
+              " SELECT " _
+            & "   0                                     AS LINECNT " _
+            & " , ''                                    AS OPERATION " _
+            & " , CAST(OIM0005.UPDTIMSTP AS bigint)       AS UPDTIMSTP " _
+            & " , 1                                     AS 'SELECT' " _
+            & " , 0                                     AS HIDDEN " _
+            & " , ISNULL(RTRIM(OIM0005.DELFLG), '')         AS DELFLG " _
+            & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')         AS TANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.MODEL), '')         AS MODEL " _
+            & " , ISNULL(RTRIM(OIM0005.MODELKANA), '')         AS MODELKANA " _
+            & " , ISNULL(RTRIM(OIM0005.LOAD), '')         AS LOAD " _
+            & " , ISNULL(RTRIM(OIM0005.LOADUNIT), '')         AS LOADUNIT " _
+            & " , ISNULL(RTRIM(OIM0005.VOLUME), '')         AS VOLUME " _
+            & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')         AS VOLUMEUNIT " _
+            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')         AS ORIGINOWNERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')         AS ORIGINOWNERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')         AS OWNERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.OWNERNAME), '')         AS OWNERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECODE), '')         AS LEASECODE " _
+            & " , ISNULL(RTRIM(OIM0005.LEASENAME), '')         AS LEASENAME " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')         AS LEASECLASS " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')         AS LEASECLASSNEMAE " _
+            & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')         AS AUTOEXTENTION " _
+            & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN ''                   " _
+            & "   ELSE FORMAT(OIM0005.LEASESTYMD,'yyyy/MM/dd')              " _
+            & "   END                                     as LEASESTYMD   " _
+            & " , CASE WHEN OIM0005.LEASEENDYMD IS NULL THEN ''                   " _
+            & "   ELSE FORMAT(OIM0005.LEASEENDYMD,'yyyy/MM/dd')              " _
+            & "   END                                     as LEASEENDYMD   " _
+            & " , ISNULL(RTRIM(OIM0005.USERCODE), '')         AS USERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.USERNAME), '')         AS USERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONCODE), '')         AS CURRENTSTATIONCODE " _
+            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONNAME), '')         AS CURRENTSTATIONNAME " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONCODE), '')         AS EXTRADINARYSTATIONCODE " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONNAME), '')         AS EXTRADINARYSTATIONNAME " _
+            & " , CASE WHEN OIM0005.USERLIMIT IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.USERLIMIT,'yyyy/MM/dd')              " _
+            & "   END                                     as USERLIMIT   " _
+            & " , CASE WHEN OIM0005.LIMITTEXTRADIARYSTATION IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.LIMITTEXTRADIARYSTATION,'yyyy/MM/dd')              " _
+            & "   END                                     as LIMITTEXTRADIARYSTATION   " _
+            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPECODE), '')         AS DEDICATETYPECODE " _
+            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPENAME), '')         AS DEDICATETYPENAME " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPECODE), '')         AS EXTRADINARYTYPECODE " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPENAME), '')         AS EXTRADINARYTYPENAME " _
+            & " , CASE WHEN OIM0005.EXTRADINARYLIMIT IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.EXTRADINARYLIMIT,'yyyy/MM/dd')              " _
+            & "   END                                     as EXTRADINARYLIMIT   " _
+            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')         AS OPERATIONBASECODE " _
+            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')         AS OPERATIONBASENAME " _
+            & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')         AS COLORCODE " _
+            & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')         AS COLORNAME " _
+            & " , ISNULL(RTRIM(OIM0005.ENEOS), '')         AS ENEOS " _
+            & " , ISNULL(RTRIM(OIM0005.ECO), '')         AS ECO " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE1), '')         AS RESERVE1 " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE2), '')         AS RESERVE2 " _
+            & " , CASE WHEN OIM0005.JRINSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.JRINSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as JRINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.INSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.INSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as INSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.JRSPECIFIEDDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.JRSPECIFIEDDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as JRSPECIFIEDDATE   " _
+            & " , CASE WHEN OIM0005.SPECIFIEDDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.SPECIFIEDDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as SPECIFIEDDATE   " _
+            & " , CASE WHEN OIM0005.JRALLINSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.JRALLINSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as JRALLINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.ALLINSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.ALLINSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as ALLINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.TRANSFERDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.TRANSFERDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as TRANSFERDATE   " _
+            & " , ISNULL(RTRIM(OIM0005.OBTAINEDCODE), '')         AS OBTAINEDCODE " _
+            & " , CAST(ISNULL(RTRIM(OIM0005.PROGRESSYEAR), '') AS VarChar)         AS PROGRESSYEAR " _
+            & " , CAST(ISNULL(RTRIM(OIM0005.NEXTPROGRESSYEAR), '') AS VarChar)         AS NEXTPROGRESSYEAR " _
+            & " , ISNULL(RTRIM(OIM0005.JRTANKNUMBER), '')         AS JRTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.OLDTANKNUMBER), '')         AS OLDTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.OTTANKNUMBER), '')         AS OTTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER), '')         AS JXTGTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.COSMOTANKNUMBER), '')         AS COSMOTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
+            & " FROM OIL.OIM0005_TANK OIM0005 " _
+            & " WHERE OIM0005.TANKNUMBER = @P1" _
+            & "   OR OIM0005.MODEL = @P2" _
             & "   AND OIM0005.DELFLG      <> @P3"
+        End If
 
         ''○ 条件指定で指定されたものでSQLで可能なものを追加する
         ''JOT車番
@@ -886,7 +983,7 @@ Public Class OIM0005TankList
             & "    SET @hensuu = 0 ;" _
             & " DECLARE hensuu CURSOR FOR" _
             & "    SELECT" _
-            & "        CAST(TIMESTAMP AS bigint) AS hensuu" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
             & "    FROM" _
             & "        OIL.OIM0005_TANK" _
             & "    WHERE" _
@@ -1166,7 +1263,7 @@ Public Class OIM0005TankList
             & "    , UPDUSER" _
             & "    , UPDTERMID" _
             & "    , RECEIVEYMD" _
-            & "    , CAST(TIMESTAMP As bigint) As TIMESTAMP" _
+            & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
             & " FROM" _
             & "    OIL.OIM0005_TANK" _
             & " WHERE" _
@@ -2042,7 +2139,7 @@ Public Class OIM0005TankList
                             OIM0005INProw.Item(OIM0005INPcol) = 0
                         Case "OPERATION"
                             OIM0005INProw.Item(OIM0005INPcol) = C_LIST_OPERATION_CODE.NODATA
-                        Case "TIMESTAMP"
+                        Case "UPDTIMSTP"
                             OIM0005INProw.Item(OIM0005INPcol) = 0
                         Case "SELECT"
                             OIM0005INProw.Item(OIM0005INPcol) = 1
@@ -2363,7 +2460,7 @@ Public Class OIM0005TankList
                         OIM0005INProw.Item(OIM0005INPcol) = 0
                     Case "OPERATION"
                         OIM0005INProw.Item(OIM0005INPcol) = C_LIST_OPERATION_CODE.NODATA
-                    Case "TIMESTAMP"
+                    Case "UPDTIMSTP"
                         OIM0005INProw.Item(OIM0005INPcol) = 0
                     Case "SELECT"
                         OIM0005INProw.Item(OIM0005INPcol) = 1
@@ -2387,17 +2484,15 @@ Public Class OIM0005TankList
         End If
 
         OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        OIM0005INProw("TIMESTAMP") = 0
+        OIM0005INProw("UPDTIMSTP") = 0
         OIM0005INProw("SELECT") = 1
         OIM0005INProw("HIDDEN") = 0
 
         'OIM0005INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text        '会社コード
-        OIM0005INProw("TANKNUMBER") = work.WF_SEL_TANKNUMBER.Text        'JOT車番
-        OIM0005INProw("MODEL") = work.WF_SEL_MODEL.Text        '型式
+        OIM0005INProw("TANKNUMBER") = WF_TANKNUMBER.Text        'JOT車番
+        OIM0005INProw("MODEL") = WF_MODEL.Text        '型式
 
         OIM0005INProw("DELFLG") = WF_DELFLG.Text                     '削除フラグ
-
-        'OIM0005INProw("TANKNUMBER") = WF_TANKNUMBER.Text              'JOT車番
 
         OIM0005INProw("ORIGINOWNERCODE") = WF_ORIGINOWNERCODE.Text              '原籍所有者C
 
@@ -2817,6 +2912,225 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            '原籍所有者C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE", OIM0005INProw("ORIGINOWNERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "原籍所有者C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '名義所有者C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OWNERCODE", OIM0005INProw("OWNERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "名義所有者C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'リース先C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECODE", OIM0005INProw("LEASECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "リース先C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'リース区分C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASS", OIM0005INProw("LEASECLASS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "リース区分C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '自動延長(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTION", OIM0005INProw("AUTOEXTENTION"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "自動延長入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'リース開始年月日(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASESTYMD", OIM0005INProw("LEASESTYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "リース開始年月日入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'リース満了年月日(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASEENDYMD", OIM0005INProw("LEASEENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "リース満了年月日入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '第三者使用者C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERCODE", OIM0005INProw("USERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "第三者使用者C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '原常備駅C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CURRENTSTATIONCODE", OIM0005INProw("CURRENTSTATIONCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "原常備駅C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '臨時常備駅C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYSTATIONCODE", OIM0005INProw("EXTRADINARYSTATIONCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "臨時常備駅C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '第三者使用期限(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERLIMIT", OIM0005INProw("USERLIMIT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "第三者使用期限入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '臨時常備駅期限(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LIMITTEXTRADIARYSTATION", OIM0005INProw("LIMITTEXTRADIARYSTATION"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "臨時常備駅期限入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '原専用種別C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEDICATETYPECODE", OIM0005INProw("DEDICATETYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "原専用種別C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '臨時専用種別C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYTYPECODE", OIM0005INProw("EXTRADINARYTYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "臨時専用種別C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '臨時専用期限(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYLIMIT", OIM0005INProw("EXTRADINARYLIMIT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "臨時専用期限入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '運用基地C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASECODE", OIM0005INProw("OPERATIONBASECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "運用基地C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '塗色C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COLORCODE", OIM0005INProw("COLORCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "塗色C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'エネオス(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENEOS", OIM0005INProw("ENEOS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "エネオス入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'エコレール(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ECO", OIM0005INProw("ECO"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "エコレール入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '取得年月日(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ALLINSPECTIONDATE", OIM0005INProw("ALLINSPECTIONDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "取得年月日入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '車籍編入年月日(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRANSFERDATE", OIM0005INProw("TRANSFERDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "車籍編入年月日入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '取得先C(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OBTAINEDCODE", OIM0005INProw("OBTAINEDCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "取得先C入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
             '削除フラグ　有効なら関連チェックする。　※削除なら関連チェックせず、削除フラグを立てる
             'If OIM0005INProw("DELFLG") = C_DELETE_FLG.ALIVE Then
@@ -3216,7 +3530,7 @@ Public Class OIM0005TankList
                 '画面入力テーブル項目設定
                 OIM0005INProw("LINECNT") = OIM0005row("LINECNT")
                 OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-                OIM0005INProw("TIMESTAMP") = OIM0005row("TIMESTAMP")
+                OIM0005INProw("UPDTIMSTP") = OIM0005row("UPDTIMSTP")
                 OIM0005INProw("SELECT") = 1
                 OIM0005INProw("HIDDEN") = 0
 
@@ -3246,7 +3560,7 @@ Public Class OIM0005TankList
             OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
         End If
 
-        OIM0005row("TIMESTAMP") = "0"
+        OIM0005row("UPDTIMSTP") = "0"
         OIM0005row("SELECT") = 1
         OIM0005row("HIDDEN") = 0
 
@@ -3269,7 +3583,7 @@ Public Class OIM0005TankList
                 '画面入力テーブル項目設定
                 OIM0005INProw("LINECNT") = OIM0005row("LINECNT")
                 OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-                OIM0005INProw("TIMESTAMP") = OIM0005row("TIMESTAMP")
+                OIM0005INProw("UPDTIMSTP") = OIM0005row("UPDTIMSTP")
                 OIM0005INProw("SELECT") = 1
                 OIM0005INProw("HIDDEN") = 0
 

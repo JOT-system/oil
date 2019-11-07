@@ -24,7 +24,7 @@ Public Class OIM0005TankSearch
             '○ 各ボタン押下処理
             If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                 Select Case WF_ButtonClick.Value
-                    Case "WF_ButtonDO"                  '実行ボタン押下
+                    Case "WF_ButtonDO"                  '検索ボタン押下
                         WF_ButtonDO_Click()
                     Case "WF_ButtonEND"                 '終了ボタン押下
                         WF_ButtonEND_Click()
@@ -185,41 +185,41 @@ Public Class OIM0005TankSearch
             Exit Sub
         End If
 
-        'JOT車番
-        Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
-                WF_TANKNUMBER.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            WF_TANKNUMBER.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
+        ''JOT車番
+        'Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        'If isNormal(WW_CS0024FCHECKERR) Then
+        '    '存在チェック
+        '    CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
+        '    If Not isNormal(WW_RTN_SW) Then
+        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
+        '        WF_TANKNUMBER.Focus()
+        '        O_RTN = "ERR"
+        '        Exit Sub
+        '    End If
+        'Else
+        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+        '    WF_TANKNUMBER.Focus()
+        '    O_RTN = "ERR"
+        '    Exit Sub
+        'End If
 
-        '型式
-        Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("MODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
-                WF_MODEL.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            WF_MODEL.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
+        ''型式
+        'Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        'If isNormal(WW_CS0024FCHECKERR) Then
+        '    '存在チェック
+        '    CODENAME_get("MODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
+        '    If Not isNormal(WW_RTN_SW) Then
+        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
+        '        WF_MODEL.Focus()
+        '        O_RTN = "ERR"
+        '        Exit Sub
+        '    End If
+        'Else
+        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+        '    WF_MODEL.Focus()
+        '    O_RTN = "ERR"
+        '    Exit Sub
+        'End If
 
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
@@ -433,7 +433,7 @@ Public Class OIM0005TankSearch
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TANKNUMBER"        'JOT車番
-                    prmData = work.CreateTANKNUMBERParam(WF_TANKNUMBER.Text, I_VALUE)
+                    prmData = work.CreateTANKNUMBERParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "MODEL"        '型式
                     prmData = work.CreateTANKMODELParam(WF_MODEL.Text, I_VALUE)

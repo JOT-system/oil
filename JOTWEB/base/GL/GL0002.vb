@@ -150,14 +150,14 @@ Public Class GL0002OrgList
         SQLcon.Open() 'DataBase接続(Open)
 
         Select Case AUTHWITH
-            Case LS_AUTHORITY_WITH.USER
-                getOrgListWithUserAuth(SQLcon)
-            Case LS_AUTHORITY_WITH.MACHINE
-                getOrgListWithTermAuth(SQLcon)
-            Case LS_AUTHORITY_WITH.BOTH
-                getOrgListWithBothAuth(SQLcon)
-            Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ORG
-                getOrgRelationList(SQLcon)
+            'Case LS_AUTHORITY_WITH.USER
+            '    getOrgListWithUserAuth(SQLcon)
+            'Case LS_AUTHORITY_WITH.MACHINE
+            '    getOrgListWithTermAuth(SQLcon)
+            'Case LS_AUTHORITY_WITH.BOTH
+            '    getOrgListWithBothAuth(SQLcon)
+            'Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ORG
+            '    getOrgRelationList(SQLcon)
             Case Else
                 getOrgList(SQLcon)
         End Select
@@ -283,414 +283,418 @@ Public Class GL0002OrgList
         ERR = C_MESSAGE_NO.NORMAL
 
     End Sub
-    ''' <summary>
-    ''' 指定部署の関連する部署一覧取得
-    ''' </summary>
-    Protected Sub getOrgRelationList(ByVal SQLcon As SqlConnection)
-        '●Leftボックス用部署取得
-        '○ User権限によりDB(OIM0002_ORG)検索
-        Try
-            '検索SQL文
-            Dim SQLStr As String =
-                  " SELECT                                  " _
-                & "   rtrim(A.CODE)        as CODE        , " _
-                & "   rtrim(B.NAMES)       as NAMES       , " _
-                & "   rtrim(A.GRCODE01)    as CATEGORY    , " _
-                & "   rtrim(A.SEQ)         as SEQ           " _
-                & " FROM       OIL.M0006_STRUCT A           " _
-                & " INNER JOIN OIL.OIM0002_ORG B ON           " _
-                & "         A.CAMPCODE = B.CAMPCODE         " _
-                & "   and   A.CODE     = B.ORGCODE          " _
-                & "   and   B.STYMD   <= @P5                " _
-                & "   and   B.ENDYMD  >= @P4                " _
-                & "   and   B.DELFLG  <> @P8                " _
-                & " INNER JOIN OIL.M0006_STRUCT C ON        " _
-                & "         A.CODE     = C.CODE             " _
-                & "   and   A.CAMPCODE = C.CAMPCODE         " _
-                & "   and   A.OBJECT   = C.OBJECT           " _
-                & "   and   C.STYMD   <= @P5                " _
-                & "   and   C.ENDYMD  >= @P4                " _
-                & "   and   C.DELFLG  <> @P8                " _
-                & "   and   C.STRUCT  IN (                  " _
-                & "    SELECT @P2 + '_' + C2.GRCODE02       " _
-                & "    FROM OIL.M0006_STRUCT C2             " _
-                & "    WHERE                                " _
-                & "           C2.OBJECT   = @P1             " _
-                & "     and   C2.STRUCT   = @P2             " _
-                & "     and   C2.CODE     = @P10            " _
-                & "     and   C2.STYMD   <= @P5             " _
-                & "     and   C2.ENDYMD  >= @P4 " _
-                & "     and   C2.DELFLG  <> @P8 " _
-                & "    ) " _
-                & " WHERE " _
-                & "         A.OBJECT   = @P1 " _
-                & "   and   A.STRUCT   = @P2 " _
-                & "   and   A.STYMD   <= @P5 " _
-                & "   and   A.ENDYMD  >= @P4 " _
-                & "   and   A.DELFLG  <> @P8 "
-            If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
-            SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
-            '〇ソート条件追加
-            Select Case DEFAULT_SORT
-                Case C_DEFAULT_SORT.CODE
-                    SQLStr = SQLStr & " ORDER BY A.CODE , B.NAMES , A.SEQ "
-                Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY B.NAMES, A.CODE , A.SEQ "
-                Case C_DEFAULT_SORT.SEQ, String.Empty
-                    SQLStr = SQLStr & " ORDER BY A.SEQ, A.CODE , B.NAMES "
 
-                Case Else
-            End Select
+    '''' <summary>
+    '''' 指定部署の関連する部署一覧取得
+    '''' </summary>
+    'Protected Sub getOrgRelationList(ByVal SQLcon As SqlConnection)
+    '    '●Leftボックス用部署取得
+    '    '○ User権限によりDB(OIM0002_ORG)検索
+    '    Try
+    '        '検索SQL文
+    '        Dim SQLStr As String =
+    '              " SELECT                                  " _
+    '            & "   rtrim(A.CODE)        as CODE        , " _
+    '            & "   rtrim(B.NAMES)       as NAMES       , " _
+    '            & "   rtrim(A.GRCODE01)    as CATEGORY    , " _
+    '            & "   rtrim(A.SEQ)         as SEQ           " _
+    '            & " FROM       OIL.M0006_STRUCT A           " _
+    '            & " INNER JOIN OIL.OIM0002_ORG B ON           " _
+    '            & "         A.CAMPCODE = B.CAMPCODE         " _
+    '            & "   and   A.CODE     = B.ORGCODE          " _
+    '            & "   and   B.STYMD   <= @P5                " _
+    '            & "   and   B.ENDYMD  >= @P4                " _
+    '            & "   and   B.DELFLG  <> @P8                " _
+    '            & " INNER JOIN OIL.M0006_STRUCT C ON        " _
+    '            & "         A.CODE     = C.CODE             " _
+    '            & "   and   A.CAMPCODE = C.CAMPCODE         " _
+    '            & "   and   A.OBJECT   = C.OBJECT           " _
+    '            & "   and   C.STYMD   <= @P5                " _
+    '            & "   and   C.ENDYMD  >= @P4                " _
+    '            & "   and   C.DELFLG  <> @P8                " _
+    '            & "   and   C.STRUCT  IN (                  " _
+    '            & "    SELECT @P2 + '_' + C2.GRCODE02       " _
+    '            & "    FROM OIL.M0006_STRUCT C2             " _
+    '            & "    WHERE                                " _
+    '            & "           C2.OBJECT   = @P1             " _
+    '            & "     and   C2.STRUCT   = @P2             " _
+    '            & "     and   C2.CODE     = @P10            " _
+    '            & "     and   C2.STYMD   <= @P5             " _
+    '            & "     and   C2.ENDYMD  >= @P4 " _
+    '            & "     and   C2.DELFLG  <> @P8 " _
+    '            & "    ) " _
+    '            & " WHERE " _
+    '            & "         A.OBJECT   = @P1 " _
+    '            & "   and   A.STRUCT   = @P2 " _
+    '            & "   and   A.STYMD   <= @P5 " _
+    '            & "   and   A.ENDYMD  >= @P4 " _
+    '            & "   and   A.DELFLG  <> @P8 "
+    '        If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
+    '        SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
+    '        '〇ソート条件追加
+    '        Select Case DEFAULT_SORT
+    '            Case C_DEFAULT_SORT.CODE
+    '                SQLStr = SQLStr & " ORDER BY A.CODE , B.NAMES , A.SEQ "
+    '            Case C_DEFAULT_SORT.NAMES
+    '                SQLStr = SQLStr & " ORDER BY B.NAMES, A.CODE , A.SEQ "
+    '            Case C_DEFAULT_SORT.SEQ, String.Empty
+    '                SQLStr = SQLStr & " ORDER BY A.SEQ, A.CODE , B.NAMES "
 
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar, 20)
+    '            Case Else
+    '        End Select
 
-                PARA0.Value = CAMPCODE
-                PARA1.Value = C_ROLE_VARIANT.USER_ORG
-                PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
-                PARA4.Value = STYMD
-                PARA5.Value = ENDYMD
-                PARA8.Value = C_DELETE_FLG.DELETE
-                PARA10.Value = ORGCODE
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+    '        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+    '            Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
+    '            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
+    '            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
+    '            Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
+    '            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar, 20)
 
-                '○出力編集
-                addListData(SQLdr)
+    '            PARA0.Value = CAMPCODE
+    '            PARA1.Value = C_ROLE_VARIANT.USER_ORG
+    '            PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
+    '            PARA4.Value = STYMD
+    '            PARA5.Value = ENDYMD
+    '            PARA8.Value = C_DELETE_FLG.DELETE
+    '            PARA10.Value = ORGCODE
+    '            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
+    '            '○出力編集
+    '            addListData(SQLdr)
 
-            End Using
+    '            'Close
+    '            SQLdr.Close() 'Reader(Close)
+    '            SQLdr = Nothing
 
-        Catch ex As Exception
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
-            CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            ERR = C_MESSAGE_NO.DB_ERROR
-            Exit Sub
-        End Try
+    '        End Using
 
-        ERR = C_MESSAGE_NO.NORMAL
+    '    Catch ex As Exception
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWRITE.TEXT = ex.ToString()
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        ERR = C_MESSAGE_NO.DB_ERROR
+    '        Exit Sub
+    '    End Try
 
-    End Sub
+    '    ERR = C_MESSAGE_NO.NORMAL
 
-    ''' <summary>
-    ''' 部署一覧取得
-    ''' </summary>
-    Protected Sub getOrgListWithUserAuth(ByVal SQLcon As SqlConnection)
-        '●Leftボックス用会社取得
-        '○ User権限によりDB(OIS0010_AUTHOR)検索
-        Try
-            '検索SQL文
-            Dim SQLStr As String =
-                    "SELECT " _
-                & " rtrim(A.CODE)        as CODE ," _
-                & " rtrim(B.NAMES)       as NAMES ," _
-                & " rtrim(A.GRCODE01)    as CATEGORY    , " _
-                & " rtrim(A.SEQ)         as SEQ " _
-                & " FROM  OIL.M0006_STRUCT A " _
-                & " INNER JOIN OIL.OIM0002_ORG B ON " _
-                & "         A.CAMPCODE = B.CAMPCODE " _
-                & "   and   A.CODE     = B.ORGCODE " _
-                & "   and   B.STYMD   <= @P5 " _
-                & "   and   B.ENDYMD  >= @P4 " _
-                & "   and   B.DELFLG  <> @P8 " _
-                & " INNER JOIN COM.OIS0009_ROLE C ON " _
-                & "         C.CAMPCODE = A.CAMPCODE " _
-                & "   and   C.OBJECT   = A.OBJECT " _
-                & "   and   C.ROLE     = @P6 " _
-                & "   and   C.PERMITCODE >= @P7 " _
-                & "   and   C.STYMD   <= @P5 " _
-                & "   and   C.ENDYMD  >= @P4 " _
-                & "   and   C.DELFLG  <> @P8 " _
-                & " Where " _
-                & "         A.OBJECT   = @P1 " _
-                & "   and   A.STRUCT   = @P2 " _
-                & "   and   A.STYMD   <= @P5 " _
-                & "   and   A.ENDYMD  >= @P4 " _
-                & "   and   A.DELFLG  <> @P8 "
-            If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
-            SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
-            '〇ソート条件追加
-            Select Case DEFAULT_SORT
-                Case C_DEFAULT_SORT.CODE
-                    SQLStr = SQLStr & " ORDER BY A.CODE , B.NAMES , A.SEQ  "
-                Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY B.NAMES, A.CODE , A.SEQ  "
-                Case C_DEFAULT_SORT.SEQ, String.Empty
-                    SQLStr = SQLStr & " ORDER BY A.SEQ, A.CODE , B.NAMES  "
-                Case Else
-            End Select
+    'End Sub
 
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.Int, 1)
-                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
+    '''' <summary>
+    '''' 部署一覧取得
+    '''' </summary>
+    'Protected Sub getOrgListWithUserAuth(ByVal SQLcon As SqlConnection)
+    '    '●Leftボックス用会社取得
+    '    '○ User権限によりDB(OIS0010_AUTHOR)検索
+    '    Try
+    '        '検索SQL文
+    '        Dim SQLStr As String =
+    '                "SELECT " _
+    '            & " rtrim(A.CODE)        as CODE ," _
+    '            & " rtrim(B.NAMES)       as NAMES ," _
+    '            & " rtrim(A.GRCODE01)    as CATEGORY    , " _
+    '            & " rtrim(A.SEQ)         as SEQ " _
+    '            & " FROM  OIL.M0006_STRUCT A " _
+    '            & " INNER JOIN OIL.OIM0002_ORG B ON " _
+    '            & "         A.CAMPCODE = B.CAMPCODE " _
+    '            & "   and   A.CODE     = B.ORGCODE " _
+    '            & "   and   B.STYMD   <= @P5 " _
+    '            & "   and   B.ENDYMD  >= @P4 " _
+    '            & "   and   B.DELFLG  <> @P8 " _
+    '            & " INNER JOIN COM.OIS0009_ROLE C ON " _
+    '            & "         C.CAMPCODE = A.CAMPCODE " _
+    '            & "   and   C.OBJECT   = A.OBJECT " _
+    '            & "   and   C.ROLE     = @P6 " _
+    '            & "   and   C.PERMITCODE >= @P7 " _
+    '            & "   and   C.STYMD   <= @P5 " _
+    '            & "   and   C.ENDYMD  >= @P4 " _
+    '            & "   and   C.DELFLG  <> @P8 " _
+    '            & " Where " _
+    '            & "         A.OBJECT   = @P1 " _
+    '            & "   and   A.STRUCT   = @P2 " _
+    '            & "   and   A.STYMD   <= @P5 " _
+    '            & "   and   A.ENDYMD  >= @P4 " _
+    '            & "   and   A.DELFLG  <> @P8 "
+    '        If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
+    '        SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
+    '        '〇ソート条件追加
+    '        Select Case DEFAULT_SORT
+    '            Case C_DEFAULT_SORT.CODE
+    '                SQLStr = SQLStr & " ORDER BY A.CODE , B.NAMES , A.SEQ  "
+    '            Case C_DEFAULT_SORT.NAMES
+    '                SQLStr = SQLStr & " ORDER BY B.NAMES, A.CODE , A.SEQ  "
+    '            Case C_DEFAULT_SORT.SEQ, String.Empty
+    '                SQLStr = SQLStr & " ORDER BY A.SEQ, A.CODE , B.NAMES  "
+    '            Case Else
+    '        End Select
 
-                PARA0.Value = CAMPCODE
-                PARA1.Value = C_ROLE_VARIANT.USER_ORG
-                PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
-                PARA4.Value = STYMD
-                PARA5.Value = ENDYMD
-                PARA6.Value = ROLECODE
-                PARA7.Value = PERMISSION
-                PARA8.Value = C_DELETE_FLG.DELETE
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+    '        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+    '            Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
+    '            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
+    '            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
+    '            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.Int, 1)
+    '            Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
 
-                '○出力編集
-                addListData(SQLdr)
+    '            PARA0.Value = CAMPCODE
+    '            PARA1.Value = C_ROLE_VARIANT.USER_ORG
+    '            PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
+    '            PARA4.Value = STYMD
+    '            PARA5.Value = ENDYMD
+    '            PARA6.Value = ROLECODE
+    '            PARA7.Value = PERMISSION
+    '            PARA8.Value = C_DELETE_FLG.DELETE
+    '            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
+    '            '○出力編集
+    '            addListData(SQLdr)
 
-            End Using
+    '            'Close
+    '            SQLdr.Close() 'Reader(Close)
+    '            SQLdr = Nothing
 
-        Catch ex As Exception
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
-            CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            ERR = C_MESSAGE_NO.DB_ERROR
-            Exit Sub
-        End Try
+    '        End Using
 
-        ERR = C_MESSAGE_NO.NORMAL
+    '    Catch ex As Exception
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWRITE.TEXT = ex.ToString()
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        ERR = C_MESSAGE_NO.DB_ERROR
+    '        Exit Sub
+    '    End Try
 
-    End Sub
-    ''' <summary>
-    ''' 部署一覧取得
-    ''' </summary>
-    Protected Sub getOrgListWithTermAuth(ByVal SQLcon As SqlConnection)
-        '●Leftボックス用会社取得
-        '○ User権限によりDB(OIS0010_AUTHOR)検索
-        Try
-            '検索SQL文
-            Dim SQLStr As String =
-                    "SELECT " _
-                & " rtrim(A.CODE) as CODE ," _
-                & " rtrim(B.NAMES) as NAMES ," _
-                & " rtrim(A.GRCODE01)    as CATEGORY    , " _
-                & " rtimr(A.SEQ)   as SEQ " _
-                & " FROM  OIL.M0006_STRUCT A " _
-                & " INNER JOIN OIL.OIM0002_ORG B ON " _
-                & "         A.CAMPCODE = B.CAMPCODE " _
-                & "   and   A.CODE     = B.ORGCODE " _
-                & "   and   B.STYMD   <= @P5 " _
-                & "   and   B.ENDYMD  >= @P4 " _
-                & "   and   B.DELFLG  <> @P8 " _
-                & " INNER JOIN COM.OIS0011_SRVAUTHOR C ON " _
-                & "         C.CAMPCODE = A.CAMPCODE " _
-                & "   and   C.OBJECT   = @P10 " _
-                & "   and   C.TERMID   = @P9 " _
-                & "   and   C.ROLE     = @P6 " _
-                & "   and   C.STYMD   <= @P5 " _
-                & "   and   C.ENDYMD  >= @P4 " _
-                & "   and   C.DELFLG  <> @P8 " _
-                & " INNER JOIN COM.OIS0009_ROLE D ON " _
-                & "         D.CAMPCODE = A.CAMPCODE " _
-                & "   and   D.OBJECT   = C.OBJECT " _
-                & "   and   D.ROLE     = C.ROLE " _
-                & "   and   D.PERMITCODE >= @P7 " _
-                & "   and   D.STYMD   <= @P5 " _
-                & "   and   D.ENDYMD  >= @P4 " _
-                & "   and   D.DELFLG  <> @P8 " _
-                & " Where " _
-                & "         A.OBJECT   = @P1 " _
-                & "   and   A.STRUCT   = @P2 " _
-                & "   and   A.STYMD   <= @P5 " _
-                & "   and   A.ENDYMD  >= @P4 " _
-                & "   and   A.DELFLG  <> @P8 "
-            If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
-            SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
-            '〇ソート条件追加
-            Select Case DEFAULT_SORT
-                Case C_DEFAULT_SORT.CODE
-                    SQLStr = SQLStr & " ORDER BY A.CODE , B.NAMES , A.SEQ "
-                Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY A.NAMES, A.CODE , A.SEQ "
-                Case C_DEFAULT_SORT.SEQ, String.Empty
-                    SQLStr = SQLStr & " ORDER BY A.SEQ , A.CODE , B.NAMES "
-                Case Else
-            End Select
+    '    ERR = C_MESSAGE_NO.NORMAL
 
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.Int, 1)
-                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
-                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", System.Data.SqlDbType.NVarChar, 30)
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar, 20)
-                PARA0.Value = CAMPCODE
-                PARA1.Value = C_ROLE_VARIANT.USER_ORG
-                PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
-                PARA4.Value = STYMD
-                PARA5.Value = ENDYMD
-                PARA6.Value = ROLECODE
-                PARA7.Value = PERMISSION
-                PARA8.Value = C_DELETE_FLG.DELETE
-                PARA9.Value = TERMID
-                PARA10.Value = C_ROLE_VARIANT.SERV_ORG
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+    'End Sub
 
-                '○出力編集
-                addListData(SQLdr)
+    '''' <summary>
+    '''' 部署一覧取得
+    '''' </summary>
+    'Protected Sub getOrgListWithTermAuth(ByVal SQLcon As SqlConnection)
+    '    '●Leftボックス用会社取得
+    '    '○ User権限によりDB(OIS0010_AUTHOR)検索
+    '    Try
+    '        '検索SQL文
+    '        Dim SQLStr As String =
+    '                "SELECT " _
+    '            & " rtrim(A.CODE) as CODE ," _
+    '            & " rtrim(B.NAMES) as NAMES ," _
+    '            & " rtrim(A.GRCODE01)    as CATEGORY    , " _
+    '            & " rtimr(A.SEQ)   as SEQ " _
+    '            & " FROM  OIL.M0006_STRUCT A " _
+    '            & " INNER JOIN OIL.OIM0002_ORG B ON " _
+    '            & "         A.CAMPCODE = B.CAMPCODE " _
+    '            & "   and   A.CODE     = B.ORGCODE " _
+    '            & "   and   B.STYMD   <= @P5 " _
+    '            & "   and   B.ENDYMD  >= @P4 " _
+    '            & "   and   B.DELFLG  <> @P8 " _
+    '            & " INNER JOIN COM.OIS0011_SRVAUTHOR C ON " _
+    '            & "         C.CAMPCODE = A.CAMPCODE " _
+    '            & "   and   C.OBJECT   = @P10 " _
+    '            & "   and   C.TERMID   = @P9 " _
+    '            & "   and   C.ROLE     = @P6 " _
+    '            & "   and   C.STYMD   <= @P5 " _
+    '            & "   and   C.ENDYMD  >= @P4 " _
+    '            & "   and   C.DELFLG  <> @P8 " _
+    '            & " INNER JOIN COM.OIS0009_ROLE D ON " _
+    '            & "         D.CAMPCODE = A.CAMPCODE " _
+    '            & "   and   D.OBJECT   = C.OBJECT " _
+    '            & "   and   D.ROLE     = C.ROLE " _
+    '            & "   and   D.PERMITCODE >= @P7 " _
+    '            & "   and   D.STYMD   <= @P5 " _
+    '            & "   and   D.ENDYMD  >= @P4 " _
+    '            & "   and   D.DELFLG  <> @P8 " _
+    '            & " Where " _
+    '            & "         A.OBJECT   = @P1 " _
+    '            & "   and   A.STRUCT   = @P2 " _
+    '            & "   and   A.STYMD   <= @P5 " _
+    '            & "   and   A.ENDYMD  >= @P4 " _
+    '            & "   and   A.DELFLG  <> @P8 "
+    '        If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
+    '        SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
+    '        '〇ソート条件追加
+    '        Select Case DEFAULT_SORT
+    '            Case C_DEFAULT_SORT.CODE
+    '                SQLStr = SQLStr & " ORDER BY A.CODE , B.NAMES , A.SEQ "
+    '            Case C_DEFAULT_SORT.NAMES
+    '                SQLStr = SQLStr & " ORDER BY A.NAMES, A.CODE , A.SEQ "
+    '            Case C_DEFAULT_SORT.SEQ, String.Empty
+    '                SQLStr = SQLStr & " ORDER BY A.SEQ , A.CODE , B.NAMES "
+    '            Case Else
+    '        End Select
 
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
+    '        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+    '            Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
+    '            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
+    '            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
+    '            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.Int, 1)
+    '            Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
+    '            Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", System.Data.SqlDbType.NVarChar, 30)
+    '            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar, 20)
+    '            PARA0.Value = CAMPCODE
+    '            PARA1.Value = C_ROLE_VARIANT.USER_ORG
+    '            PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
+    '            PARA4.Value = STYMD
+    '            PARA5.Value = ENDYMD
+    '            PARA6.Value = ROLECODE
+    '            PARA7.Value = PERMISSION
+    '            PARA8.Value = C_DELETE_FLG.DELETE
+    '            PARA9.Value = TERMID
+    '            PARA10.Value = C_ROLE_VARIANT.SERV_ORG
+    '            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-            End Using
+    '            '○出力編集
+    '            addListData(SQLdr)
 
-        Catch ex As Exception
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
-            CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            ERR = C_MESSAGE_NO.DB_ERROR
-            Exit Sub
-        End Try
+    '            'Close
+    '            SQLdr.Close() 'Reader(Close)
+    '            SQLdr = Nothing
 
-        ERR = C_MESSAGE_NO.NORMAL
+    '        End Using
 
-    End Sub
-    ''' <summary>
-    ''' 部署一覧取得
-    ''' </summary>
-    Protected Sub getOrgListWithBothAuth(ByVal SQLcon As SqlConnection)
-        '●Leftボックス用会社取得
-        '○ User権限によりDB(OIS0010_AUTHOR)検索
-        Try
-            '検索SQL文
-            Dim SQLStr As String =
-                    "SELECT " _
-                & " rtrim(A.CODE) as CODE ," _
-                & " rtrim(B.NAMES) as NAMES  , " _
-                & " rtrim(A.GRCODE01)    as CATEGORY    , " _
-                & " rtrim(A.SEQ)  as SEQ " _
-                & " FROM  OIL.M0006_STRUCT A " _
-                & " INNER JOIN OIL.OIM0002_ORG B ON " _
-                & "         A.CAMPCODE = B.CAMPCODE " _
-                & "   and   A.CODE     = B.ORGCODE " _
-                & "   and   B.STYMD   <= @P5 " _
-                & "   and   B.ENDYMD  >= @P4 " _
-                & "   and   B.DELFLG  <> @P8 " _
-                & " INNER JOIN COM.OIS0011_SRVAUTHOR C ON " _
-                & "         C.CAMPCODE = A.CAMPCODE " _
-                & "   and   C.OBJECT   = @P10 " _
-                & "   and   C.TERMID   = @P9 " _
-                & "   and   C.ROLE     = @P6 " _
-                & "   and   C.STYMD   <= @P5 " _
-                & "   and   C.ENDYMD  >= @P4 " _
-                & "   and   C.DELFLG  <> @P8 " _
-                & " INNER JOIN COM.OIS0009_ROLE D ON " _
-                & "         D.CAMPCODE = A.CAMPCODE " _
-                & "   and   D.OBJECT   = C.OBJECT " _
-                & "   and   D.ROLE     = C.ROLE " _
-                & "   and   D.PERMITCODE >= @P7 " _
-                & "   and   D.STYMD   <= @P5 " _
-                & "   and   D.ENDYMD  >= @P4 " _
-                & "   and   D.DELFLG  <> @P8 " _
-                & " INNER JOIN COM.OIS0009_ROLE E ON " _
-                & "         E.CAMPCODE = A.CAMPCODE " _
-                & "   and   E.OBJECT   = A.OBJECT " _
-                & "   and   E.ROLE     = @P6 " _
-                & "   and   E.PERMITCODE >= @P7 " _
-                & "   and   E.STYMD   <= @P5 " _
-                & "   and   E.ENDYMD  >= @P4 " _
-                & "   and   E.DELFLG  <> @P8 " _
-                & " Where " _
-                & "         A.OBJECT   = @P1 " _
-                & "   and   A.STRUCT   = @P2 " _
-                & "   and   A.STYMD   <= @P5 " _
-                & "   and   A.ENDYMD  >= @P4 " _
-                & "   and   A.DELFLG  <> @P8 "
-            If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
-            SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
-            '〇ソート条件追加
-            Select Case DEFAULT_SORT
-                Case C_DEFAULT_SORT.CODE
-                    SQLStr = SQLStr & " ORDER BY A.CODE, B.NAMES, A.SEQ "
-                Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY B.NAMES, A.CODE, A.SEQ "
-                Case C_DEFAULT_SORT.SEQ, String.Empty
-                    SQLStr = SQLStr & " ORDER BY A.SEQ, A.CODE, B.NAMES "
+    '    Catch ex As Exception
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWRITE.TEXT = ex.ToString()
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        ERR = C_MESSAGE_NO.DB_ERROR
+    '        Exit Sub
+    '    End Try
 
-                Case Else
-            End Select
+    '    ERR = C_MESSAGE_NO.NORMAL
 
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.Int, 1)
-                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
-                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", System.Data.SqlDbType.NVarChar, 30)
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar, 20)
-                PARA0.Value = CAMPCODE
-                PARA1.Value = C_ROLE_VARIANT.USER_ORG
-                PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
-                PARA4.Value = STYMD
-                PARA5.Value = ENDYMD
-                PARA6.Value = ROLECODE
-                PARA7.Value = PERMISSION
-                PARA8.Value = C_DELETE_FLG.DELETE
-                PARA9.Value = TERMID
-                PARA10.Value = C_ROLE_VARIANT.SERV_ORG
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+    'End Sub
 
-                '○出力編集
-                addListData(SQLdr)
+    '''' <summary>
+    '''' 部署一覧取得
+    '''' </summary>
+    'Protected Sub getOrgListWithBothAuth(ByVal SQLcon As SqlConnection)
+    '    '●Leftボックス用会社取得
+    '    '○ User権限によりDB(OIS0010_AUTHOR)検索
+    '    Try
+    '        '検索SQL文
+    '        Dim SQLStr As String =
+    '                "SELECT " _
+    '            & " rtrim(A.CODE) as CODE ," _
+    '            & " rtrim(B.NAMES) as NAMES  , " _
+    '            & " rtrim(A.GRCODE01)    as CATEGORY    , " _
+    '            & " rtrim(A.SEQ)  as SEQ " _
+    '            & " FROM  OIL.M0006_STRUCT A " _
+    '            & " INNER JOIN OIL.OIM0002_ORG B ON " _
+    '            & "         A.CAMPCODE = B.CAMPCODE " _
+    '            & "   and   A.CODE     = B.ORGCODE " _
+    '            & "   and   B.STYMD   <= @P5 " _
+    '            & "   and   B.ENDYMD  >= @P4 " _
+    '            & "   and   B.DELFLG  <> @P8 " _
+    '            & " INNER JOIN COM.OIS0011_SRVAUTHOR C ON " _
+    '            & "         C.CAMPCODE = A.CAMPCODE " _
+    '            & "   and   C.OBJECT   = @P10 " _
+    '            & "   and   C.TERMID   = @P9 " _
+    '            & "   and   C.ROLE     = @P6 " _
+    '            & "   and   C.STYMD   <= @P5 " _
+    '            & "   and   C.ENDYMD  >= @P4 " _
+    '            & "   and   C.DELFLG  <> @P8 " _
+    '            & " INNER JOIN COM.OIS0009_ROLE D ON " _
+    '            & "         D.CAMPCODE = A.CAMPCODE " _
+    '            & "   and   D.OBJECT   = C.OBJECT " _
+    '            & "   and   D.ROLE     = C.ROLE " _
+    '            & "   and   D.PERMITCODE >= @P7 " _
+    '            & "   and   D.STYMD   <= @P5 " _
+    '            & "   and   D.ENDYMD  >= @P4 " _
+    '            & "   and   D.DELFLG  <> @P8 " _
+    '            & " INNER JOIN COM.OIS0009_ROLE E ON " _
+    '            & "         E.CAMPCODE = A.CAMPCODE " _
+    '            & "   and   E.OBJECT   = A.OBJECT " _
+    '            & "   and   E.ROLE     = @P6 " _
+    '            & "   and   E.PERMITCODE >= @P7 " _
+    '            & "   and   E.STYMD   <= @P5 " _
+    '            & "   and   E.ENDYMD  >= @P4 " _
+    '            & "   and   E.DELFLG  <> @P8 " _
+    '            & " Where " _
+    '            & "         A.OBJECT   = @P1 " _
+    '            & "   and   A.STRUCT   = @P2 " _
+    '            & "   and   A.STYMD   <= @P5 " _
+    '            & "   and   A.ENDYMD  >= @P4 " _
+    '            & "   and   A.DELFLG  <> @P8 "
+    '        If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P0 "
+    '        SQLStr = SQLStr & " GROUP BY A.CODE , B.NAMES , A.GRCODE01 , A.SEQ "
+    '        '〇ソート条件追加
+    '        Select Case DEFAULT_SORT
+    '            Case C_DEFAULT_SORT.CODE
+    '                SQLStr = SQLStr & " ORDER BY A.CODE, B.NAMES, A.SEQ "
+    '            Case C_DEFAULT_SORT.NAMES
+    '                SQLStr = SQLStr & " ORDER BY B.NAMES, A.CODE, A.SEQ "
+    '            Case C_DEFAULT_SORT.SEQ, String.Empty
+    '                SQLStr = SQLStr & " ORDER BY A.SEQ, A.CODE, B.NAMES "
 
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-            End Using
+    '            Case Else
+    '        End Select
 
-        Catch ex As Exception
-            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
-            CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            ERR = C_MESSAGE_NO.DB_ERROR
-            Exit Sub
-        End Try
+    '        Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+    '            Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
+    '            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
+    '            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
+    '            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 20)
+    '            Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.Int, 1)
+    '            Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
+    '            Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", System.Data.SqlDbType.NVarChar, 30)
+    '            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar, 20)
+    '            PARA0.Value = CAMPCODE
+    '            PARA1.Value = C_ROLE_VARIANT.USER_ORG
+    '            PARA2.Value = C_STRUCT_CODE.ORG_LIST_CODE
+    '            PARA4.Value = STYMD
+    '            PARA5.Value = ENDYMD
+    '            PARA6.Value = ROLECODE
+    '            PARA7.Value = PERMISSION
+    '            PARA8.Value = C_DELETE_FLG.DELETE
+    '            PARA9.Value = TERMID
+    '            PARA10.Value = C_ROLE_VARIANT.SERV_ORG
+    '            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-        ERR = C_MESSAGE_NO.NORMAL
+    '            '○出力編集
+    '            addListData(SQLdr)
 
-    End Sub
+    '            'Close
+    '            SQLdr.Close() 'Reader(Close)
+    '            SQLdr = Nothing
+    '        End Using
+
+    '    Catch ex As Exception
+    '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+    '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWRITE.TEXT = ex.ToString()
+    '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+    '        ERR = C_MESSAGE_NO.DB_ERROR
+    '        Exit Sub
+    '    End Try
+
+    '    ERR = C_MESSAGE_NO.NORMAL
+
+    'End Sub
+
     ''' <summary>
     ''' 一覧登録時のチェック処理
     ''' </summary>

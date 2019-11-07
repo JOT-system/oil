@@ -5,7 +5,6 @@ Imports System.Collections
 Imports System.Web.UI
 Imports System.Web.UI.WebControls
 Imports System.Drawing
-Imports BASEDLL
 
 ''' <summary>
 ''' マスターページクラス

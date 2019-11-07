@@ -358,7 +358,7 @@ Public Class OIM0005TankList
             & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
-            & " FROM OIM0005_TANK OIM0005 " _
+            & " FROM OIL.OIM0005_TANK OIM0005 " _
             & " WHERE OIM0005_TANK OIM0005 = @P1" _
             & "   OR OIM0005_TANK OIM0005 = @P2" _
             & "   AND OIM0005.DELFLG      <> @P3"
@@ -888,13 +888,13 @@ Public Class OIM0005TankList
             & "    SELECT" _
             & "        CAST(TIMESTAMP AS bigint) AS hensuu" _
             & "    FROM" _
-            & "        OIM0005_TANK" _
+            & "        OIL.OIM0005_TANK" _
             & "    WHERE" _
             & "        TANKNUMBER       = @P01 ;" _
             & " OPEN hensuu ;" _
             & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
             & " IF (@@FETCH_STATUS = 0)" _
-            & "    UPDATE OIM0005_TANK" _
+            & "    UPDATE OIL.OIM0005_TANK" _
             & "    SET" _
             & "        DELFLG = @P00" _
             & "        , ORIGINOWNERCODE = @P02" _
@@ -963,7 +963,7 @@ Public Class OIM0005TankList
             & "    WHERE" _
             & "        TANKNUMBER       = @P01 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
-            & "    INSERT INTO OIM0005_TANK" _
+            & "    INSERT INTO OIL.OIM0005_TANK" _
             & "        (DELFLG" _
             & "        , TANKNUMBER" _
             & "        , ORIGINOWNERCODE" _
@@ -1168,7 +1168,7 @@ Public Class OIM0005TankList
             & "    , RECEIVEYMD" _
             & "    , CAST(TIMESTAMP As bigint) As TIMESTAMP" _
             & " FROM" _
-            & "    OIM0005_TANK" _
+            & "    OIL.OIM0005_TANK" _
             & " WHERE" _
             & "        TANKNUMBER = @P01"
 

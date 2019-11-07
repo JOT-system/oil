@@ -1,5 +1,5 @@
 ﻿.logonbox {
-    top: 2.4em;
+    top: 6%;
     bottom: 1.4em;
     width: 100%;
     position: fixed;
@@ -10,8 +10,6 @@
     background-size: cover;
 }
 
-
-
 .Operation {
     /*   width: 350px; */
     margin: 0 auto 0 auto;
@@ -19,8 +17,6 @@
     z-index: 20;
     height: 3em;
 }
-
-
 
 .logonkeybox {
     width: 350px;
@@ -31,13 +27,9 @@
     position: relative;
 }
 
-
-
     .logonkeybox p {
         margin-bottom: 1em;
     }
-
-
 
     .logonkeybox span {
         min-width: 8em;
@@ -45,8 +37,6 @@
         width: 80%;
         margin: 40px 3%;
     }
-
-
 
 .guidancebox {
     width: 100px;
@@ -59,14 +49,10 @@
     border-color: black
 }
 
-
-
     .guidancebox span {
         color: red;
         background-color: white;
     }
-
-
 
 #UserID {
     /* input要素全部に対して装飾 */
@@ -78,29 +64,17 @@
     font-family: Meiryo;
 }
 
-
-
     #UserID:hover {
         /* マウスが上に載ったとき */
         background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
         border: 1px solid #2c628b;
     }
 
-
-
     #UserID:active {
         /* 押されたとき */
         background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
         border: 1px solid skyblue;
     }
-
-
-
-
-
-
-
-
 
 #PassWord {
     /* input要素全部に対して装飾 */
@@ -112,25 +86,17 @@
     font-family: Meiryo;
 }
 
-
-
     #PassWord:hover {
         /* マウスが上に載ったとき */
         background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
         border: 1px solid #2c628b;
     }
 
-
-
     #PassWord:active {
         /* 押されたとき */
         background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
         border: 1px solid skyblue;
     }
-
-
-
-
 
 #OK {
     /* input要素全部に対して装飾 */
@@ -149,15 +115,11 @@
     box-shadow: 2px 2px #1a6ea0;
 }
 
-
-
     #OK:hover {
         /* マウスが上に載ったとき */
         background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
         border: 1px solid #2c628b;
     }
-
-
 
     #OK:active {
         /* 押されたとき */
@@ -165,27 +127,13 @@
         border: 1px solid skyblue;
     }
 
-
-
-
-
 #LogInImage {
     opacity: 0.4;
 }
 
-
-
-
-
-
-
 #WF_LOGO {
-    transform: translateY(5%);
+    transform: translateY(3%);
 }
-
-
-
-
 
 .Waku {
     padding-top: 0.5em;

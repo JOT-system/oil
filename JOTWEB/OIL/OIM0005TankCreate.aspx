@@ -1,4 +1,4 @@
-﻿<%@ Page Title="OIM0005C" Language="vb" AutoEventWireup="false" CodeBehind="OIM0005TankCreate.aspx.vb" Inherits="JOTWEB.OIM0005TankCreate" %>
+﻿<%@ Page Title="OIM0005C" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIM0005TankCreate.aspx.vb" Inherits="JOTWEB.OIM0005TankCreate" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>

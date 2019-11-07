@@ -100,6 +100,14 @@ Public Class OIM0005TankSearch
         rightview.COMPCODE = WF_CAMPCODE.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
+
+        '201104-追加-START
+        rightview.MENUROLE = Master.ROLE_MENU
+        rightview.MAPROLE = Master.ROLE_MAP
+        rightview.VIEWROLE = Master.ROLE_VIEWPROF
+        rightview.RPRTROLE = Master.ROLE_RPRTPROF
+        '201104-追加-END
+
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
@@ -134,7 +142,9 @@ Public Class OIM0005TankSearch
 
 
         '○ 画面レイアウト設定
-        Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
+        If Master.VIEWID = "" Then
+            Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
+        End If
 
         Master.CheckParmissionCode(WF_CAMPCODE.Text)
         If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then

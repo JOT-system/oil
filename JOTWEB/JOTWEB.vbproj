@@ -91,6 +91,7 @@
   <ItemGroup>
     <Content Include="bin\JOTWEB.dll" />
     <Content Include="bin\JOTWEB.pdb" />
+    <Content Include="img\right.png" />
     <Content Include="img\tank2.png" />
     <Content Include="OIL\css\OIM0005C.css" />
     <Content Include="OIL\css\OIM0004C.css" />
@@ -111,7 +112,6 @@
     <Content Include="img\最終頁.png" />
     <Content Include="img\矢印L.png" />
     <Content Include="img\矢印R.png" />
-    <Content Include="img\透明R.png" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />
     <Content Include="inc\GRIS0001Title.ascx" />
     <Content Include="inc\GRIS0002Footer.ascx" />

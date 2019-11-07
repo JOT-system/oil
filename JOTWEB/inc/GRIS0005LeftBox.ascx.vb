@@ -368,9 +368,9 @@ Public Class GRIS0005LeftBox
             'Case LIST_BOX_CLASSIFICATION.LC_DISTINATION
             '    '届先
             '    lbox = createDistinationList(Params, O_RTN)
-            'Case LIST_BOX_CLASSIFICATION.LC_ORG
-            '    '部署
-            '    lbox = createOrg(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_ORG
+                '部署
+                lbox = createOrg(Params, O_RTN)
             'Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
             '    '社員
             '    lbox = createStaff(Params, O_RTN)
@@ -581,44 +581,44 @@ Public Class GRIS0005LeftBox
     '    Return LbMap.Item(KeyCode)
     'End Function
 
-    '''' <summary>
-    '''' 部署(管理・配属)
-    '''' </summary>
-    '''' <param name="Params">取得用パラメータ</param>
-    '''' <param name="O_RTN">成功可否</param>
-    '''' <returns>作成した一覧情報</returns>
-    '''' <remarks></remarks>
-    'Protected Function CreateOrg(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-    '    '○部署ListBox設定
-    '    Dim Categorys As String() = TryCast(Params.Item(C_PARAMETERS.LP_ORG_CATEGORYS), String())
-    '    Dim Key As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), "-")
-    '    For Each category As String In Categorys
-    '        Key = Key & category
-    '    Next
-    '    Key = Key & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
-    '              & LIST_BOX_CLASSIFICATION.LC_ORG
+    ''' <summary>
+    ''' 部署(管理・配属)
+    ''' </summary>
+    ''' <param name="Params">取得用パラメータ</param>
+    ''' <param name="O_RTN">成功可否</param>
+    ''' <returns>作成した一覧情報</returns>
+    ''' <remarks></remarks>
+    Protected Function CreateOrg(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+        '○部署ListBox設定
+        Dim Categorys As String() = TryCast(Params.Item(C_PARAMETERS.LP_ORG_CATEGORYS), String())
+        Dim Key As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), "-")
+        For Each category As String In Categorys
+            Key = Key & category
+        Next
+        Key = Key & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
+                  & LIST_BOX_CLASSIFICATION.LC_ORG
 
-    '    If Not LbMap.ContainsKey(Key) Then
-    '        Using CL0002OrgList As New GL0002OrgList With {
-    '              .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-    '            , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-    '            , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-    '            , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
-    '            , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-    '            , .AUTHWITH = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY) _
-    '            , .Categorys = Categorys _
-    '            , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
-    '            , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-    '            , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG)
-    '         }
-    '            CL0002OrgList.getList()
-    '            O_RTN = CL0002OrgList.ERR
-    '            Dim lsbx As ListBox = CL0002OrgList.LIST
-    '            LbMap.Add(Key, lsbx)
-    '        End Using
-    '    End If
-    '    Return LbMap.Item(Key)
-    'End Function
+        If Not LbMap.ContainsKey(Key) Then
+            Using CL0002OrgList As New GL0002OrgList With {
+                  .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+                , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+                , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+                , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
+                , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
+                , .AUTHWITH = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY) _
+                , .Categorys = Categorys _
+                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
+                , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
+                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG)
+             }
+                CL0002OrgList.getList()
+                O_RTN = CL0002OrgList.ERR
+                Dim lsbx As ListBox = CL0002OrgList.LIST
+                LbMap.Add(Key, lsbx)
+            End Using
+        End If
+        Return LbMap.Item(Key)
+    End Function
 
     '''' <summary>
     '''' 社員コード取得

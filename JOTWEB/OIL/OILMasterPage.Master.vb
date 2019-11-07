@@ -6,7 +6,6 @@ Imports System.Web.UI
 Imports System.Web.UI.WebControls
 Imports System.Drawing
 
-
 ''' <summary>
 ''' マスターページクラス
 ''' </summary>

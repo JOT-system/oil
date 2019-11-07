@@ -203,46 +203,46 @@ Public Class GRIS0001Title
     ' ***  端末種別取得（全社サーバーか否か判定）                                ***     
     ' ***   2019/09/02利用中止                                                   ***     
     ' ******************************************************************************
-    ''' <summary>
-    ''' 端末種別取得
-    ''' </summary>
-    ''' <param name="O_RTN"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Private Function GetTermClass(ByRef O_RTN As String) As String
-        Dim WW_TermClass As String = ""
+    '''' <summary>
+    '''' 端末種別取得
+    '''' </summary>
+    '''' <param name="O_RTN"></param>
+    '''' <returns></returns>
+    '''' <remarks></remarks>
+    'Private Function GetTermClass(ByRef O_RTN As String) As String
+    '    Dim WW_TermClass As String = ""
 
-        '○ ユーザ
-        Try
-            'DataBase接続文字
-            Using SQLcon As SqlConnection = CS0050Session.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
+    '    '○ ユーザ
+    '    Try
+    '        'DataBase接続文字
+    '        Using SQLcon As SqlConnection = CS0050Session.getConnection
+    '            SQLcon.Open() 'DataBase接続(Open)
 
-                Dim SQLStr As String =
-                        " SELECT TERMCLASS                " &
-                        " FROM COM.OIS0001_TERM                 " &
-                        " WHERE TERMID        = @TERMID   " &
-                        " AND   STYMD        <= getdate() " &
-                        " AND   ENDYMD       >= getdate() " &
-                        " AND   DELFLG       <> '1'       "
-                Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+    '            Dim SQLStr As String =
+    '                    " SELECT TERMCLASS                " &
+    '                    " FROM COM.OIS0001_TERM                 " &
+    '                    " WHERE TERMID        = @TERMID   " &
+    '                    " AND   STYMD        <= getdate() " &
+    '                    " AND   ENDYMD       >= getdate() " &
+    '                    " AND   DELFLG       <> '1'       "
+    '            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
 
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@TERMID", System.Data.SqlDbType.VarChar, 30)
-                    PARA1.Value = CS0050Session.APSV_ID
-                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+    '                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@TERMID", System.Data.SqlDbType.VarChar, 30)
+    '                PARA1.Value = CS0050Session.APSV_ID
+    '                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-                        While SQLdr.Read
-                            WW_TermClass = SQLdr("TERMCLASS")
-                        End While
-                    End Using
-                End Using
-            End Using
+    '                    While SQLdr.Read
+    '                        WW_TermClass = SQLdr("TERMCLASS")
+    '                    End While
+    '                End Using
+    '            End Using
+    '        End Using
 
-        Catch ex As Exception
-            O_RTN = C_MESSAGE_NO.DB_ERROR
-            Return WW_TermClass
-        End Try
-        Return WW_TermClass
+    '    Catch ex As Exception
+    '        O_RTN = C_MESSAGE_NO.DB_ERROR
+    '        Return WW_TermClass
+    '    End Try
+    '    Return WW_TermClass
 
-    End Function
+    'End Function
 End Class

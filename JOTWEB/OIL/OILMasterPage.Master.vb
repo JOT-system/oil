@@ -626,24 +626,24 @@ Public Class OILMasterPage
         End If
 
     End Sub
-    ''' <summary>
-    ''' 単項目チェック処理チェック存在確認
-    ''' </summary>
-    ''' <param name="I_COMPCODE">会社コード</param>
-    ''' <param name="I_FIELD">フィールド名</param>
-    ''' <param name="IO_TBL" >チェック用DATAFIELDテーブル</param>
-    ''' <returns>存在：TRUE　未存在：FALSE</returns>
-    ''' <remarks></remarks>
-    Public Function ExistCheckTable(ByVal I_COMPCODE As String, ByVal I_FIELD As String,
-                                    ByRef IO_TBL As DataTable) As Boolean
+    '''' <summary>
+    '''' 単項目チェック処理チェック存在確認
+    '''' </summary>
+    '''' <param name="I_COMPCODE">会社コード</param>
+    '''' <param name="I_FIELD">フィールド名</param>
+    '''' <param name="IO_TBL" >チェック用DATAFIELDテーブル</param>
+    '''' <returns>存在：TRUE　未存在：FALSE</returns>
+    '''' <remarks></remarks>
+    'Public Function ExistCheckTable(ByVal I_COMPCODE As String, ByVal I_FIELD As String,
+    '                                ByRef IO_TBL As DataTable) As Boolean
 
-        CS0036FCHECK.CAMPCODE = I_COMPCODE                          '会社コード
-        CS0036FCHECK.MAPID = Me.MAPID                               '画面ID
-        CS0036FCHECK.FIELD = I_FIELD                                '項目名
-        CS0036FCHECK.TBL = IO_TBL                                   'OIS0016_DATAFIELDテーブル
-        Return CS0036FCHECK.existsCheckField()
+    '    CS0036FCHECK.CAMPCODE = I_COMPCODE                          '会社コード
+    '    CS0036FCHECK.MAPID = Me.MAPID                               '画面ID
+    '    CS0036FCHECK.FIELD = I_FIELD                                '項目名
+    '    CS0036FCHECK.TBL = IO_TBL                                   'OIS0016_DATAFIELDテーブル
+    '    Return CS0036FCHECK.existsCheckField()
 
-    End Function
+    'End Function
     ''' <summary>
     ''' 単項目チェック処理チェックテーブル保持版
     ''' </summary>

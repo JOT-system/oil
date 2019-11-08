@@ -18,7 +18,7 @@
 <asp:Content ID="OIM0005C" ContentPlaceHolderID="contents1" runat="server">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　detailbox -->
-        <div class="detailboxOnly" id="detailbox">
+        <div class="detailboxOnly" id="detailbox" style="overflow-y: auto;">
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
                     <input type="button" id="WF_UPDATE" value="更新／追加" style="Width:7em" onclick="ButtonClick('WF_UPDATE');" />

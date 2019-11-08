@@ -1,11 +1,11 @@
 ﻿''************************************************************
 ' タンク車マスタメンテ登録画面
-' 作成日 yyyy/mm/dd
-' 更新日 yyyy/mm/dd
-' 作成者 JOT渡部
-' 更新車 JOT渡部
+' 作成日 2019/11/08
+' 更新日 2019/11/08
+' 作成者 JOT遠藤
+' 更新車 JOT遠藤
 '
-' 修正履歴:届先のみ→出荷場所のみへ打ち換えして登録が出来ない不具合の対応
+' 修正履歴:
 '         :
 ''************************************************************
 Imports System.Data.SqlClient
@@ -105,12 +105,10 @@ Public Class OIM0005TankCreate
 
                     '○ 一覧再表示処理
                     DisplayGrid()
-                    CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
                 End If
             Else
                 '○ 初期化処理
                 Initialize()
-                CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
             End If
 
             '○ 画面モード(更新・参照)設定

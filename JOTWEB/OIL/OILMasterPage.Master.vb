@@ -176,6 +176,7 @@ Public Class OILMasterPage
                     MF_MAP_ROLE.Value = DirectCast(.FindControl("MF_MAP_ROLE"), HiddenField).Value                   '画面参照更新権限
                     MF_VIEWPROF_ROLE.Value = DirectCast(.FindControl("MF_VIEWPROF_ROLE"), HiddenField).Value         '画面表示項目権限
                     MF_RPRTPROF_ROLE.Value = DirectCast(.FindControl("MF_RPRTPROF_ROLE"), HiddenField).Value         'エクセル出力権限
+                    MF_APPROVALID_ROLE.Value = DirectCast(.FindControl("MF_APPROVALID_ROLE"), HiddenField).Value     '承認権限
                     '20191101-追加-END
                 End With
             Else
@@ -187,6 +188,7 @@ Public Class OILMasterPage
                 MF_MAP_ROLE.Value = CS0050SESSION.VIEW_MAP_MODE
                 MF_VIEWPROF_ROLE.Value = CS0050SESSION.VIEW_VIEWPROF_MODE
                 MF_RPRTPROF_ROLE.Value = CS0050SESSION.VIEW_RPRTPROF_MODE
+                MF_APPROVALID_ROLE.Value = CS0050SESSION.VIEW_APPROVALID
                 '20191101-追加-END
 
             End If
@@ -195,20 +197,27 @@ Public Class OILMasterPage
             '〇ユーザ権限情報取得
             CS0051UserInfo.USERID = CS0050SESSION.USERID
 
+            '●ユーザ情報取得処理
             CS0051UserInfo.getInfo()
             If isNormal(CS0051UserInfo.ERR) Then
                 USERID = CS0051UserInfo.USERID
                 '                ROLE_COMP = CS0051UserInfo.CAMPROLE
                 '                ROLE_ORG = CS0051UserInfo.ORGROLE
+                PROF_REPORT = CS0051UserInfo.RPRTPROFID
+                PROF_VIEW = CS0051UserInfo.VIEWPROFID
                 '20191101-追加-STRAT
                 ROLE_MENU = CS0051UserInfo.MENUROLE
                 ROLE_MAP = CS0051UserInfo.MAPROLE
-                PROF_REPORT = CS0051UserInfo.RPRTPROFID
-                PROF_VIEW = CS0051UserInfo.VIEWPROFID
+                ROLE_VIEWPROF = CS0051UserInfo.VIEWPROFROLE
+                ROLE_RPRTPROF = CS0051UserInfo.RPRTPROFROLE
+                ROLE_APPROVALID = CS0051UserInfo.APPROVALIDROLE
+                MAPvariant = CS0051UserInfo.MAPVARI
                 '20191101-追加-END
                 USRCOMPCODE = CS0051UserInfo.CAMPCODE
                 USER_ORG = CS0051UserInfo.ORG
             End If
+
+            '●所属サーバ情報取得処理
             CS0051UserInfo.BelongtoServer()
             If isNormal(CS0051UserInfo.ERR) Then
                 USERTERMID = CS0051UserInfo.SERVERID
@@ -242,15 +251,19 @@ Public Class OILMasterPage
                 MF_MAPpermitcode.Value = DirectCast(.FindControl("MF_MAPpermitcode"), HiddenField).Value         'MAP権限
                 MF_VIEWID.Value = DirectCast(.FindControl("MF_VIEWID"), HiddenField).Value                       '画面
                 MF_XMLsaveF.Value = DirectCast(.FindControl("MF_XMLsaveF"), HiddenField).Value                                                                                    '画面情報退避F
+
                 '〇ユーザ権限情報取得
                 MF_USERID.Value = DirectCast(.FindControl("MF_USERID"), HiddenField).Value
                 '                MF_COMP_ROLE.Value = DirectCast(.FindControl("MF_COMP_ROLE"), HiddenField).Value
                 '                MF_ORG_ROLE.Value = DirectCast(.FindControl("MF_ORG_ROLE"), HiddenField).Value
+                MF_PROF_REPORT.Value = DirectCast(.FindControl("MF_PROF_REPORT"), HiddenField).Value             '帳票プロフID
+                MF_PROF_VIEW.Value = DirectCast(.FindControl("MF_PROF_VIEW"), HiddenField).Value                 '画面プロフID
                 '20191101-追加-START
                 MF_MENU_ROLE.Value = DirectCast(.FindControl("MF_MENU_ROLE"), HiddenField).Value                 'メニュー表示権限
                 MF_MAP_ROLE.Value = DirectCast(.FindControl("MF_MAP_ROLE"), HiddenField).Value                   '画面参照更新権限
-                MF_PROF_REPORT.Value = DirectCast(.FindControl("MF_PROF_REPORT"), HiddenField).Value             '画面表示項目権限
-                MF_PROF_VIEW.Value = DirectCast(.FindControl("MF_PROF_VIEW"), HiddenField).Value                 'エクセル出力権限
+                MF_VIEWPROF_ROLE.Value = DirectCast(.FindControl("MF_VIEWPROF_ROLE"), HiddenField).Value         '画面表示項目権限
+                MF_RPRTPROF_ROLE.Value = DirectCast(.FindControl("MF_RPRTPROF_ROLE"), HiddenField).Value         'エクセル出力権限
+                MF_APPROVALID_ROLE.Value = DirectCast(.FindControl("MF_APPROVALID_ROLE"), HiddenField).Value     '承認権限
                 '20191101-追加-END
                 MF_USER_ORG.Value = DirectCast(.FindControl("MF_USER_ORG"), HiddenField).Value
                 MF_USERTERMID.Value = DirectCast(.FindControl("MF_USERTERMID"), HiddenField).Value
@@ -281,6 +294,7 @@ Public Class OILMasterPage
             MF_MAP_ROLE.Value = CS0050SESSION.VIEW_MAP_MODE
             MF_VIEWPROF_ROLE.Value = CS0050SESSION.VIEW_VIEWPROF_MODE
             MF_RPRTPROF_ROLE.Value = CS0050SESSION.VIEW_RPRTPROF_MODE
+            MF_APPROVALID_ROLE.Value = CS0050SESSION.VIEW_APPROVALID
             '20191101-追加-END
 
             '〇ユーザ権限情報取得
@@ -292,14 +306,16 @@ Public Class OILMasterPage
                 USERID = CS0051UserInfo.USERID
                 'ROLE_COMP = CS0051UserInfo.CAMPROLE
                 'ROLE_ORG = CS0051UserInfo.ORGROLE
+                PROF_VIEW = CS0051UserInfo.VIEWPROFID
+                PROF_REPORT = CS0051UserInfo.RPRTPROFID
                 '20191101-追加-START
                 ROLE_MENU = CS0051UserInfo.MENUROLE
                 ROLE_MAP = CS0051UserInfo.MAPROLE
-                '                ROLE_VIEWPROF = CS0051UserInfo.VIEWPROFID
-                '                ROLE_RPRTPROF = CS0051UserInfo.RPRTPROFID
+                ROLE_VIEWPROF = CS0051UserInfo.VIEWPROFROLE
+                ROLE_RPRTPROF = CS0051UserInfo.RPRTPROFROLE
+                ROLE_APPROVALID = CS0051UserInfo.APPROVALIDROLE
+                MAPvariant = CS0051UserInfo.MAPVARI
                 '20191101-追加-END
-                PROF_VIEW = CS0051UserInfo.VIEWPROFID
-                PROF_REPORT = CS0051UserInfo.RPRTPROFID
                 USRCOMPCODE = CS0051UserInfo.CAMPCODE
                 USER_ORG = CS0051UserInfo.ORG
             End If
@@ -361,6 +377,7 @@ Public Class OILMasterPage
     Public Sub CheckParmissionCode(Optional ByVal COMPCODE As String = "")
         CS0007AUTHORmap.MAPID = MAPID
         CS0007AUTHORmap.ROLECODE_MAP = ROLE_MAP
+
         If Not String.IsNullOrEmpty(COMPCODE) Then
             CS0007AUTHORmap.COMPCODE = COMPCODE
             CS0007AUTHORmap.ROLECODE_COMP = ROLE_COMP
@@ -391,7 +408,7 @@ Public Class OILMasterPage
         CS0017ForwardURL.MAPID = MF_MAPID.Value
         '20191101-変更-START
         '        CS0017ForwardURL.VARI = MF_MAPvariant.Value
-        CS0017ForwardURL.VARI = MF_MENU_ROLE.Value
+        CS0017ForwardURL.VARI = MF_MAP_ROLE.Value
         '20191101-変更-END
         If Not String.IsNullOrEmpty(COMPCODE) Then
             CS0017ForwardURL.CAMPCODE = COMPCODE
@@ -414,9 +431,9 @@ Public Class OILMasterPage
         CS0017ForwardURL.getPreviusURL()
         If isNormal(CS0017ForwardURL.ERR) Then
             '次画面の変数セット
-            CS0050SESSION.VIEW_MAP_VARIANT = CS0017ForwardURL.VARI_RETURN
+            'CS0050SESSION.VIEW_MAP_VARIANT = CS0017ForwardURL.VARI_RETURN
             CS0050SESSION.VIEW_MAPID = CS0017ForwardURL.MAP_RETURN
-            Me.MAPvariant = CS0017ForwardURL.VARI_RETURN
+            'Me.MAPvariant = CS0017ForwardURL.VARI_RETURN
             Me.MAPID = CS0017ForwardURL.MAP_RETURN
             '画面遷移実行
             '            Server.Transfer("../" & CS0017ForwardURL.URL)
@@ -438,7 +455,7 @@ Public Class OILMasterPage
         CS0017ForwardURL.MAPID = MF_MAPID.Value
         '20191101-変更-START
         '        CS0017ForwardURL.VARI = MF_MAPvariant.Value
-        CS0017ForwardURL.VARI = MF_MENU_ROLE.Value
+        CS0017ForwardURL.VARI = MF_MAP_ROLE.Value
         '20191101-変更-END
         If Not String.IsNullOrEmpty(COMPCODE) Then
             CS0017ForwardURL.CAMPCODE = COMPCODE
@@ -459,9 +476,9 @@ Public Class OILMasterPage
         End If
         CS0017ForwardURL.getNextURL()
         If isNormal(CS0017ForwardURL.ERR) Then
-            CS0050SESSION.VIEW_MAP_VARIANT = CS0017ForwardURL.VARI_RETURN
+            'CS0050SESSION.VIEW_MAP_VARIANT = CS0017ForwardURL.VARI_RETURN
             CS0050SESSION.VIEW_MAPID = CS0017ForwardURL.MAP_RETURN
-            Me.MAPvariant = CS0017ForwardURL.VARI_RETURN
+            'Me.MAPvariant = CS0017ForwardURL.VARI_RETURN
             Me.MAPID = CS0017ForwardURL.MAP_RETURN
             '            Server.Transfer("../" & CS0017ForwardURL.URL)
             Server.Transfer(CS0017ForwardURL.URL)
@@ -985,6 +1002,17 @@ Public Class OILMasterPage
         End Get
         Set(value As String)
             MF_RPRTPROF_ROLE.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' ROLE_APPROVALID
+    ''' </summary>
+    Property ROLE_APPROVALID As String
+        Get
+            Return MF_APPROVALID_ROLE.Value
+        End Get
+        Set(value As String)
+            MF_APPROVALID_ROLE.Value = value
         End Set
     End Property
     ''' <summary>

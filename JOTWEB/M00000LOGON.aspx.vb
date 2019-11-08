@@ -255,6 +255,7 @@ Public Class M00000LOGON
         Dim WW_MAPROLE As String = String.Empty
         Dim WW_VIEWPROFID As String = String.Empty
         Dim WW_RPRTPROFID As String = String.Empty
+        Dim WW_APPROVALID As String = String.Empty
         '20191101-追加-END
         Dim WW_MAPID As String = String.Empty
         Dim WW_VARIANT As String = String.Empty
@@ -305,6 +306,7 @@ Public Class M00000LOGON
                    & " rtrim(A.RPRTPROFID) as RPRTPROFID    , " _
                    & " rtrim(A.MAPID)    as MAPID     , " _
                    & " rtrim(A.VARIANT)  as VARIANT   , " _
+                   & " rtrim(A.APPROVALID) as APPROVALID    , " _
                    & " B.PASSENDYMD      as PASSENDYMD  " _
                    & " FROM       COM.OIS0004_USER       A    " _
                    & " INNER JOIN COM.OIS0005_USERPASS   B ON " _
@@ -345,6 +347,7 @@ Public Class M00000LOGON
                         WW_MAPROLE = SQLdr("MAPROLE")
                         WW_VIEWPROFID = SQLdr("VIEWPROFID")
                         WW_RPRTPROFID = SQLdr("RPRTPROFID")
+                        WW_APPROVALID = SQLdr("APPROVALID")
                         '20191101-追加-END
                         WW_MAPID = SQLdr("MAPID")
                         WW_VARIANT = SQLdr("VARIANT")
@@ -542,6 +545,7 @@ Public Class M00000LOGON
         CS0050Session.VIEW_MAP_MODE = WW_MAPID
         CS0050Session.VIEW_VIEWPROF_MODE = WW_VIEWPROFID
         CS0050Session.VIEW_RPRTPROF_MODE = WW_RPRTPROFID
+        CS0050Session.VIEW_APPROVALID = WW_APPROVALID
         '20191101-追加-END
         CS0050Session.VIEW_MAP_VARIANT = WW_VARIANT
         CS0050Session.MAP_ETC = ""
@@ -553,6 +557,7 @@ Public Class M00000LOGON
         Master.ROLE_MAP = WW_MAPID
         Master.ROLE_VIEWPROF = WW_VIEWPROFID
         Master.ROLE_RPRTPROF = WW_RPRTPROFID
+        Master.ROLE_APPROVALID = WW_APPROVALID
         '20191101-追加-END
         Master.MAPvariant = WW_VARIANT
         Master.MAPpermitcode = ""

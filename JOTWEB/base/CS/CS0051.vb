@@ -54,6 +54,18 @@ Public Class CS0051UserInfo : Implements IDisposable
     ''' </summary>
     Public Property MAPROLE As String
     ''' <summary>
+    ''' 画面表示権限
+    ''' </summary>
+    Public Property VIEWPROFROLE As String
+    ''' <summary>
+    ''' エクセル出力権限
+    ''' </summary>
+    Public Property RPRTPROFROLE As String
+    ''' <summary>
+    ''' 承認権限
+    ''' </summary>
+    Public Property APPROVALIDROLE As String
+    ''' <summary>
     ''' 部署権限
     ''' </summary>
     Public Property ORGROLE As String
@@ -159,6 +171,7 @@ Public Class CS0051UserInfo : Implements IDisposable
                    & " , rtrim(MAPROLE) as MAPROLE " _
                    & " , rtrim(VIEWPROFID) as VIEWPROFID " _
                    & " , rtrim(RPRTPROFID) as RPRTPROFID " _
+                   & " , rtrim(APPROVALID) as APPROVALID " _
                    & " FROM  COM.OIS0004_USER " _
                    & " Where USERID = @P1 " _
                    & "   and STYMD <= @P3 " _
@@ -205,6 +218,9 @@ Public Class CS0051UserInfo : Implements IDisposable
                         MAPVARI = SQLdr("VARIANT")
                         '20191101-追加-START
                         MENUROLE = SQLdr("MENUROLE")
+                        VIEWPROFROLE = SQLdr("VIEWPROFID")
+                        RPRTPROFROLE = SQLdr("RPRTPROFID")
+                        APPROVALIDROLE = SQLdr("APPROVALID")
                         '20191101-追加-END
                         MAPROLE = SQLdr("MAPROLE")
                         VIEWPROFID = SQLdr("VIEWPROFID")

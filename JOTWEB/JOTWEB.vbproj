@@ -171,7 +171,6 @@
     <Compile Include="base\CS\CS0047.vb" />
     <Compile Include="base\CS\CS0050.vb" />
     <Compile Include="base\CS\CS0051.vb" />
-    <Compile Include="base\CS\CS0055.vb" />
     <Compile Include="base\GL\GL0000.vb" />
     <Compile Include="base\GL\GL0001.vb" />
     <Compile Include="base\GL\GL0002.vb" />

@@ -407,6 +407,22 @@ Public Class CS0050SESSION : Implements IDisposable
         End Set
     End Property
     ''' <summary>
+    ''' APPROVALID
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VIEW_APPROVALID As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return SESSION(C_SESSION_KEY.MAPPING_USER_APPROVALID)
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.MAPPING_USER_APPROVALID) = value
+        End Set
+    End Property
+    ''' <summary>
     ''' MAPVARIANT
     ''' </summary>
     ''' <value></value>

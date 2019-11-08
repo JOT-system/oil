@@ -89,18 +89,18 @@ Public Class OIM0004StationList
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                             WF_FILEUPLOAD()
-                        Case "WF_UPDATE"                '表更新ボタン押下
-                            WF_UPDATE_Click()
-                        Case "WF_CLEAR"                 'クリアボタン押下
-                            WF_CLEAR_Click()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
-                            WF_FIELD_DBClick()
-                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
-                            WF_ButtonSel_Click()
-                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
-                            WF_ButtonCan_Click()
-                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
-                            WF_ButtonSel_Click()
+                        'Case "WF_UPDATE"                '表更新ボタン押下
+                        '    WF_UPDATE_Click()
+                        'Case "WF_CLEAR"                 'クリアボタン押下
+                        '    WF_CLEAR_Click()
+                        'Case "WF_Field_DBClick"         'フィールドダブルクリック
+                        '    WF_FIELD_DBClick()
+                        'Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                        '    WF_ButtonSel_Click()
+                        'Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                        '    WF_ButtonCan_Click()
+                        'Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                        '    WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新

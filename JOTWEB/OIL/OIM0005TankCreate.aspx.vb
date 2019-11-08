@@ -105,12 +105,10 @@ Public Class OIM0005TankCreate
 
                     '○ 一覧再表示処理
                     DisplayGrid()
-                    CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
                 End If
             Else
                 '○ 初期化処理
                 Initialize()
-                CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
             End If
 
             '○ 画面モード(更新・参照)設定

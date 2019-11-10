@@ -124,12 +124,12 @@
     <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\css\ex\nprogress.css" />
     <Content Include="OIL\ex\page_404.html" />
-    <Content Include="OIL\OIM0004StationCreate.aspx" />
-    <Content Include="OIL\OIM0005TankCreate.aspx" />
-    <Content Include="OIL\OIM0005TankList.aspx" />
-    <Content Include="OIL\OIM0004StationList.aspx" />
-    <Content Include="OIL\OIM0005TankSearch.aspx" />
-    <Content Include="OIL\OIM0004StationSearch.aspx" />
+    <Content Include="OIL\mas\OIM0004StationCreate.aspx" />
+    <Content Include="OIL\mas\OIM0005TankCreate.aspx" />
+    <Content Include="OIL\mas\OIM0005TankList.aspx" />
+    <Content Include="OIL\mas\OIM0004StationList.aspx" />
+    <Content Include="OIL\mas\OIM0005TankSearch.aspx" />
+    <Content Include="OIL\mas\OIM0004StationSearch.aspx" />
     <Content Include="OIL\script\OIM0005C.js" />
     <Content Include="OIL\script\OIM0004C.js" />
     <Content Include="OIL\script\OIM0005L.js" />
@@ -283,45 +283,45 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OIL\OIM0004StationCreate.aspx.designer.vb">
+    <Compile Include="OIL\mas\OIM0004StationCreate.aspx.designer.vb">
       <DependentUpon>OIM0004StationCreate.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\OIM0004StationCreate.aspx.vb">
+    <Compile Include="OIL\mas\OIM0004StationCreate.aspx.vb">
       <DependentUpon>OIM0004StationCreate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="OIL\OIM0005TankCreate.aspx.designer.vb">
+    <Compile Include="OIL\mas\OIM0005TankCreate.aspx.designer.vb">
       <DependentUpon>OIM0005TankCreate.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\OIM0005TankCreate.aspx.vb">
+    <Compile Include="OIL\mas\OIM0005TankCreate.aspx.vb">
       <DependentUpon>OIM0005TankCreate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="OIL\OIM0005TankList.aspx.designer.vb">
+    <Compile Include="OIL\mas\OIM0005TankList.aspx.designer.vb">
       <DependentUpon>OIM0005TankList.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\OIM0005TankList.aspx.vb">
+    <Compile Include="OIL\mas\OIM0005TankList.aspx.vb">
       <DependentUpon>OIM0005TankList.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
-    <Compile Include="OIL\OIM0004StationList.aspx.designer.vb">
+    <Compile Include="OIL\mas\OIM0004StationList.aspx.designer.vb">
       <DependentUpon>OIM0004StationList.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\OIM0004StationList.aspx.vb">
+    <Compile Include="OIL\mas\OIM0004StationList.aspx.vb">
       <DependentUpon>OIM0004StationList.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
-    <Compile Include="OIL\OIM0005TankSearch.aspx.designer.vb">
+    <Compile Include="OIL\mas\OIM0005TankSearch.aspx.designer.vb">
       <DependentUpon>OIM0005TankSearch.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\OIM0005TankSearch.aspx.vb">
+    <Compile Include="OIL\mas\OIM0005TankSearch.aspx.vb">
       <DependentUpon>OIM0005TankSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
-    <Compile Include="OIL\OIM0004StationSearch.aspx.designer.vb">
+    <Compile Include="OIL\mas\OIM0004StationSearch.aspx.designer.vb">
       <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\OIM0004StationSearch.aspx.vb">
+    <Compile Include="OIL\mas\OIM0004StationSearch.aspx.vb">
       <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
@@ -360,7 +360,6 @@
     <Folder Include="OIL\for\" />
     <Folder Include="OIL\inv\" />
     <Folder Include="OIL\loc\" />
-    <Folder Include="OIL\mas\" />
     <Folder Include="OIL\ord\" />
     <Folder Include="OIL\pay\" />
   </ItemGroup>

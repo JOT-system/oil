@@ -2208,19 +2208,20 @@ Public Class OIM0005TankList
             End If
 
             '○ 項目セット
-            '会社コード
-            OIM0005INProw.Item("CAMPCODE") = work.WF_SEL_CAMPCODE.Text
+            ''会社コード
+            'OIM0005INProw.Item("CAMPCODE") = work.WF_SEL_CAMPCODE.Text
 
             'JOT車番
-            OIM0005INProw.Item("TANKNUMBER") = work.WF_SEL_TANKNUMBER.Text
+            If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
+                OIM0005INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
+            End If
+            'OIM0005INProw.Item("TANKNUMBER") = work.WF_SEL_TANKNUMBER.Text
 
             '型式
-            OIM0005INProw.Item("MODEL") = work.WF_SEL_MODEL.Text
-
-            ''JOT車番
-            'If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
-            '    OIM0005INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
-            'End If
+            If WW_COLUMNS.IndexOf("MODEL") >= 0 Then
+                OIM0005INProw("MODEL") = XLSTBLrow("MODEL")
+            End If
+            'OIM0005INProw.Item("MODEL") = work.WF_SEL_MODEL.Text
 
             '原籍所有者C
             If WW_COLUMNS.IndexOf("ORIGINOWNERCODE") >= 0 Then
@@ -2335,6 +2336,8 @@ Public Class OIM0005TankList
             '削除フラグ
             If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
                 OIM0005INProw("DELFLG") = XLSTBLrow("DELFLG")
+            Else
+                OIM0005INProw("DELFLG") = "0"
             End If
 
             '○ 名称取得

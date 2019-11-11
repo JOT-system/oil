@@ -175,6 +175,11 @@ Public Class OIM0005TankSearch
         Dim WW_TEXT As String = ""
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_LINEERR_SW As String = ""
+        Dim WW_DUMMY As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_LINE_ERR As String = ""
 
         '○ 単項目チェック
         '会社コード
@@ -193,6 +198,42 @@ Public Class OIM0005TankSearch
             WF_CAMPCODE.Focus()
             O_RTN = "ERR"
             Exit Sub
+        End If
+
+        'JOT車番(バリデーションチェック)　★★★お試し★★★
+        If WF_TANKNUMBER.Text <> "" Then
+            If 0 <= Asc(WF_TANKNUMBER.Text) And Asc(WF_TANKNUMBER.Text) <= 255 Then
+                If Not isNormal(WW_CS0024FCHECKERR) Then
+                    Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
+                    WF_TANKNUMBER.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Else
+                Master.Output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
+                WF_TANKNUMBER.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '型式(バリデーションチェック)　★★★お試し★★★
+        If WF_MODEL.Text <> "" Then
+            If 0 <= Asc(WF_MODEL.Text) And Asc(WF_MODEL.Text) <= 255 Then
+                If Not isNormal(WW_CS0024FCHECKERR) Then
+                    Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
+                    WF_MODEL.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Else
+                Master.Output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
+                WF_MODEL.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
 
         ''JOT車番

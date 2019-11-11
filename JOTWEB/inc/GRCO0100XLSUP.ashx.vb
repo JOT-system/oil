@@ -1,6 +1,4 @@
-﻿Imports System.Web
-Imports System.Web.Services
-Imports System.IO
+﻿Imports System.IO
 
 ''' <summary>
 ''' EXCEL帳票アップロード時処理

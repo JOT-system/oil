@@ -122,6 +122,15 @@ Partial Public Class OILMasterPage
     Protected WithEvents MF_RPRTPROF_ROLE As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''MF_APPROVALID_ROLE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_APPROVALID_ROLE As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''MF_PROF_VIEW コントロール。
     '''</summary>
     '''<remarks>

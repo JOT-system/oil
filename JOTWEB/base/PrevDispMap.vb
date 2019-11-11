@@ -471,27 +471,27 @@ Public Module PrevDispMap
         ''' <summary>
         ''' 貨物駅マスタメンテナンス（検索）
         ''' </summary>
-        Public Const OIM0004S As String = "ASP.OIL_OIM0004STATIONSEARCH_ASPX"
+        Public Const OIM0004S As String = "ASP.OIL_MAS_OIM0004STATIONSEARCH_ASPX"
         ''' <summary>
         ''' 貨物駅マスタメンテナンス（一覧）
         ''' </summary>
-        Public Const OIM0004L As String = "ASP.OIL_OIM0004STATIONLIST_ASPX"
+        Public Const OIM0004L As String = "ASP.OIL_MAS_OIM0004STATIONLIST_ASPX"
         ''' <summary>
         ''' 貨物駅マスタメンテナンス（登録）
         ''' </summary>
-        Public Const OIM0004C As String = "ASP.OIL_OIM0004STATIONCREATE_ASPX"
+        Public Const OIM0004C As String = "ASP.OIL_MAS_OIM0004STATIONCREATE_ASPX"
         ''' <summary>
         ''' タンク車マスタメンテナンス（検索）
         ''' </summary>
-        Public Const OIM0005S As String = "ASP.OIL_OIM0005TANKSEARCH_ASPX"
+        Public Const OIM0005S As String = "ASP.OIL_MAS_OIM0005TANKSEARCH_ASPX"
         ''' <summary>
         ''' タンク車マスタメンテナンス（一覧）
         ''' </summary>
-        Public Const OIM0005L As String = "ASP.OIL_OIM0005TANKLIST_ASPX"
+        Public Const OIM0005L As String = "ASP.OIL_MAS_OIM0005TANKLIST_ASPX"
         ''' <summary>
         ''' タンク車マスタメンテナンス（登録）
         ''' </summary>
-        Public Const OIM0005C As String = "ASP.OIL_OIM0005TANKCREATE_ASPX"
+        Public Const OIM0005C As String = "ASP.OIL_MAS_OIM0005TANKCREATE_ASPX"
     End Class
 
 End Module 'End BaseDllConst

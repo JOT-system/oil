@@ -138,7 +138,7 @@ Public Class OIM0004StationSearch
 
 
     ''' <summary>
-    ''' 実行ボタン押下時処理
+    ''' 検索ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDO_Click()

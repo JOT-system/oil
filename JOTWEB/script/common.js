@@ -536,7 +536,7 @@ function f_dragEvent(e) {
     var xhr = new XMLHttpRequest();
 
     // 「POST メソッド」「接続先 URL」を指定
-    xhr.open("POST", "../inc/GRCO0100XLSUP.ashx", false)
+    xhr.open("POST", "../../inc/GRCO0100XLSUP.ashx", false)
 
     // イベント設定
     // ⇒XHR 送信正常で実行されるイベント

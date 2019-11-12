@@ -1,18 +1,18 @@
-﻿<%@ Page Title="OIM0004S" Language="vb" AutoEventWireup="false" CodeBehind="OIM0004StationSearch.aspx.vb" Inherits="JOTWEB.OIM0004StationSearch" %>
+﻿<%@ Page Title="" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIT0001EmptyTurnDairySearch.aspx.vb" Inherits="JOTWEB.OIT0001EmptyTurnDairySearch" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/OIL/inc/OIM0004WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/OIT0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:Content id="OIM0004SH" contentplaceholderid="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIM0004S.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0004S.js")%>'></script>
+<asp:Content id="OIT0001SH" contentplaceholderid="head" runat="server">
+    <link href='<%=ResolveUrl("~/OIL/css/OIT0001S.css")%>' rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0001S.js")%>'></script>
 </asp:Content>
 
-<asp:Content ID="OIM0004S" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="OIT0001S" ContentPlaceHolderID="contents1" runat="server">
     <!-- 全体レイアウト　searchbox -->
     <div class="searchbox" id="searchbox">
         <!-- ○ 固定項目 ○ -->
@@ -42,22 +42,35 @@
         <a style="position:fixed; top:9.9em; left:27em;display:none">
             <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
-        <!-- 貨物駅コード -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">貨物駅コード</a>
-
-        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
-            <asp:TextBox ID="TxtStationCode" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <!-- 営業所 -->
+        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">★営業所</a>
+        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtSalesOffice');">
+            <asp:TextBox ID="TxtSalesOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">
-            <asp:Label ID="LblStationCode" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+            <asp:Label ID="LblSalesOfficeName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
-        <!-- 貨物コード枝番 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">貨物コード枝番</a>
-        <a style="position:fixed; top:9.9em; left:18em;" onchange="TextBox_change('TxtStationCode');">
-            <asp:TextBox ID="TxtBranch" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+
+        <!-- 積込日 -->
+        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">★積込日</a>
+        <a style="position:fixed; top:9.9em; left:18em;">
+            <asp:TextBox ID="TxtLoadingDateStart" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:9.9em; left:27em;">
-            <asp:Label ID="LblBranch" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        <a style="position:fixed; top:9.9em; left:27em; font-weight:bold;">～</a>
+        <a style="position:fixed; top:9.9em; left:29em;">
+            <asp:TextBox ID="TxtLoadingDateEnd" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        </a>
+
+        <!-- 拠点 -->
+        <a style="position:fixed; top:12.1em; left:4em; font-weight:bold;">拠点</a>
+        <a style="position:fixed; top:12.1em; left:18em;">
+            <asp:TextBox ID="TxtBase" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        </a>
+
+        <!-- 列車番号 -->
+        <a style="position:fixed; top:14.3em; left:4em; font-weight:bold;">列車番号</a>
+        <a style="position:fixed; top:14.3em; left:18em;">
+            <asp:TextBox ID="TxtTrainNumber" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
     </div>
 

@@ -5,7 +5,7 @@ Public Class OIM0004WRKINC
 
     Public Const MAPIDS As String = "OIM0004S"       'MAPID(条件)
     Public Const MAPIDL As String = "OIM0004L"       'MAPID(実行)
-    Public Const MAPIDC As String = "OIM0004C"       'MAPID(実行)
+    Public Const MAPIDC As String = "OIM0004C"       'MAPID(登録)
 
     ''' <summary>
     ''' ワークデータ初期化処理

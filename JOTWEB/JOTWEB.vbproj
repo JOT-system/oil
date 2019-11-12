@@ -93,6 +93,9 @@
     <Content Include="bin\JOTWEB.pdb" />
     <Content Include="img\right.png" />
     <Content Include="img\tank2.png" />
+    <Content Include="OIL\css\OIT0001D.css" />
+    <Content Include="OIL\css\OIT0001L.css" />
+    <Content Include="OIL\css\OIT0001S.css" />
     <Content Include="OIL\css\OIM0005C.css" />
     <Content Include="OIL\css\OIM0004C.css" />
     <Content Include="OIL\css\OIM0005L.css" />

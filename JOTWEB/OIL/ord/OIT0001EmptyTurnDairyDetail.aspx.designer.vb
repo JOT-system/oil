@@ -11,5 +11,5 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0003EmptyTurnDairyDetail
+Partial Public Class OIT0001EmptyTurnDairyDetail
 End Class

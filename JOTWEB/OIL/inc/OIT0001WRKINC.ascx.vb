@@ -7,6 +7,10 @@ Public Class OIT0001WRKINC
     Public Const MAPIDL As String = "OIT0001L"       'MAPID(実行)
     Public Const MAPIDC As String = "OIT0001C"       'MAPID(登録)
 
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+
+    End Sub
+
     ''' <summary>
     ''' ワークデータ初期化処理
     ''' </summary>
@@ -34,8 +38,18 @@ Public Class OIT0001WRKINC
 
     End Function
 
-    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-
-    End Sub
+    ''' <summary>
+    ''' 固定値マスタから一覧の取得
+    ''' </summary>
+    ''' <param name="COMPCODE"></param>
+    ''' <param name="FIXCODE"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Function CreateFIXParam(ByVal COMPCODE As String, Optional ByVal FIXCODE As String = "") As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = COMPCODE
+        prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = FIXCODE
+        CreateFIXParam = prmData
+    End Function
 
 End Class

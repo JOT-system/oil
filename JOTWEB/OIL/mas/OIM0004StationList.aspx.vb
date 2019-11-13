@@ -273,7 +273,7 @@ Public Class OIM0004StationList
 
         '○ 検索SQL
         '　検索説明
-        '     条件指定に従い該当データを出荷地・届先別モデル距離マスタから取得する
+        '     条件指定に従い該当データを貨物車マスタから取得する
 
         Dim SQLStr As String =
               " SELECT" _

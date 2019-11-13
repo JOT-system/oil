@@ -134,9 +134,8 @@
     <Content Include="OIL\mas\OIM0004StationList.aspx" />
     <Content Include="OIL\mas\OIM0005TankSearch.aspx" />
     <Content Include="OIL\mas\OIM0004StationSearch.aspx" />
-    <Content Include="OIL\ord\OIT0001EmptyTurnDairySearch.aspx" />
     <Content Include="OIL\ord\OIT0001EmptyTurnDairyList.aspx" />
-    <Content Include="OIL\ord\OIT0001EmptyTurnDairyDetail.aspx" />
+    <Content Include="OIL\ord\OIT0001EmptyTurnDairySearch.aspx" />
     <Content Include="OIL\script\OIT0001D.js" />
     <Content Include="OIL\script\OIT0001L.js" />
     <Content Include="OIL\script\OIT0001S.js" />
@@ -345,13 +344,6 @@
       <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
-    <Compile Include="OIL\ord\OIT0001EmptyTurnDairySearch.aspx.designer.vb">
-      <DependentUpon>OIT0001EmptyTurnDairySearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="OIL\ord\OIT0001EmptyTurnDairySearch.aspx.vb">
-      <DependentUpon>OIT0001EmptyTurnDairySearch.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
     <Compile Include="OIL\ord\OIT0001EmptyTurnDairyList.aspx.designer.vb">
       <DependentUpon>OIT0001EmptyTurnDairyList.aspx</DependentUpon>
     </Compile>
@@ -359,11 +351,11 @@
       <DependentUpon>OIT0001EmptyTurnDairyList.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
-    <Compile Include="OIL\ord\OIT0001EmptyTurnDairyDetail.aspx.designer.vb">
-      <DependentUpon>OIT0001EmptyTurnDairyDetail.aspx</DependentUpon>
+    <Compile Include="OIL\ord\OIT0001EmptyTurnDairySearch.aspx.designer.vb">
+      <DependentUpon>OIT0001EmptyTurnDairySearch.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\ord\OIT0001EmptyTurnDairyDetail.aspx.vb">
-      <DependentUpon>OIT0001EmptyTurnDairyDetail.aspx</DependentUpon>
+    <Compile Include="OIL\ord\OIT0001EmptyTurnDairySearch.aspx.vb">
+      <DependentUpon>OIT0001EmptyTurnDairySearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
   </ItemGroup>

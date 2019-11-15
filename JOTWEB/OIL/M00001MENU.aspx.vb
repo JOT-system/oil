@@ -119,7 +119,7 @@ Public Class M00001MENU
                 PARA2.Value = Master.MAPID
                 '                PARA3.Value = Master.MAPvariant
                 PARA3.Value = Master.ROLE_MENU
-                PARA4.Value = "2"
+                PARA4.Value = "3"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now
                 PARA7.Value = C_DELETE_FLG.DELETE
@@ -144,7 +144,7 @@ Public Class M00001MENU
                 PARA2.Value = Master.MAPID
                 '                PARA3.Value = Master.MAPvariant
                 PARA3.Value = Master.ROLE_MENU
-                PARA4.Value = "1"
+                PARA4.Value = "2"
                 PARA5.Value = Date.Now
                 PARA6.Value = Date.Now
                 PARA7.Value = C_DELETE_FLG.DELETE
@@ -162,11 +162,39 @@ Public Class M00001MENU
                 SQLdrL2.Close() 'Reader(Close)
                 SQLdrL2 = Nothing
 
+
+
+                PARA1.Value = work.WF_SEL_CAMPCODE.Text
+                PARA2.Value = Master.MAPID
+                '                PARA3.Value = Master.MAPvariant
+                PARA3.Value = Master.ROLE_MENU
+                PARA4.Value = "4"
+                PARA5.Value = Date.Now
+                PARA6.Value = Date.Now
+                PARA7.Value = C_DELETE_FLG.DELETE
+                Dim SQLdrR2 As SqlDataReader = SQLcmd.ExecuteReader()
+
+                If SQLdrR2.HasRows = True Then
+                    Repeater_Menu_R2.DataSource = SQLdrR2
+                    Repeater_Menu_R2.DataBind()
+                    WW_Select_CNT = "OK"
+                Else
+                    WW_Select_CNT = "NG"
+                End If
+
+                'Close
+                SQLdrR2.Close() 'Reader(Close)
+                SQLdrR2 = Nothing
+
+
+
+
+
                 SQLcmd.Dispose()
                 SQLcmd = Nothing
 
             Catch ex As Exception
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0008_UPROFMAP SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0008_UPROFMAP SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"
                 CS0011LOGWRITE.INFPOSI = "S0008_UPROFMAP SELECT"
@@ -209,7 +237,7 @@ Public Class M00001MENU
                 USERcmd = Nothing
 
             Catch ex As Exception
-                Master.output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
                 CS0011LOGWRITE.INFPOSI = "OIS0005_USERPASS SELECT"                '
@@ -221,7 +249,7 @@ Public Class M00001MENU
             End Try
 
             If DateDiff("d", Date.Now, WW_ENDYMD) < C_PASSWORD_CHANGE_LIMIT_COUNT Then
-                Master.output(C_MESSAGE_NO.PASSWORD_INVALID_AT_SOON, C_MESSAGE_TYPE.INF)
+                Master.Output(C_MESSAGE_NO.PASSWORD_INVALID_AT_SOON, C_MESSAGE_TYPE.INF)
             End If
 
         End Using
@@ -389,6 +417,71 @@ Public Class M00001MENU
 
     End Sub
 
+
+    ' ******************************************************************************
+    ' ***  Repeater_Menu_R バインド時 編集（右）                                 ***
+    ' ******************************************************************************
+    Protected Sub rptInfo_ItemDataBound_R2(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.RepeaterItemEventArgs) Handles Repeater_Menu_R2.ItemDataBound
+
+        '★★★ Repeater_Menu_Rバインド時 編集（右） ★★★
+        '○ヘッダー編集　 処理なし
+        If (e.Item.ItemType = ListItemType.Header) Then
+        End If
+
+        '○アイテム編集
+        If ((e.Item.ItemType = ListItemType.Item) Or (e.Item.ItemType = ListItemType.AlternatingItem)) Then
+            CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Text = DataBinder.Eval(e.Item.DataItem, "TITLE")
+            CType(e.Item.FindControl("WF_MenuVARI_R2"), Label).Text = DataBinder.Eval(e.Item.DataItem, "VARIANT")
+            If IsDBNull(DataBinder.Eval(e.Item.DataItem, "URL")) Then
+                CType(e.Item.FindControl("WF_MenuURL_R2"), Label).Text = ""
+            Else
+                CType(e.Item.FindControl("WF_MenuURL_R2"), Label).Text = DataBinder.Eval(e.Item.DataItem, "URL")
+            End If
+            CType(e.Item.FindControl("WF_MenuMAP_R2"), Label).Text = DataBinder.Eval(e.Item.DataItem, "MAPID")
+            CType(e.Item.FindControl("WF_MenuButton_R2"), Button).Text = "  " & DataBinder.Eval(e.Item.DataItem, "NAMES")
+
+            If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
+                If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
+                    CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Text = "　　"
+                    CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuVARI_R2"), Label).Visible = False
+                    CType(e.Item.FindControl("WF_MenuButton_R2"), Button).Visible = False
+                    CType(e.Item.FindControl("WF_MenuURL_R2"), Label).Visible = False
+                    CType(e.Item.FindControl("WF_MenuMAP_R2"), Label).Visible = False
+                Else
+                    CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Visible = False
+                    CType(e.Item.FindControl("WF_MenuVARI_R2"), Label).Visible = False
+                    CType(e.Item.FindControl("WF_MenuButton_R2"), Button).Visible = True
+                    CType(e.Item.FindControl("WF_MenuURL_R2"), Label).Visible = False
+                    CType(e.Item.FindControl("WF_MenuMAP_R2"), Label).Visible = False
+                End If
+            Else
+                CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Visible = True
+                CType(e.Item.FindControl("WF_MenuVARI_R2"), Label).Visible = False
+                CType(e.Item.FindControl("WF_MenuButton_R2"), Button).Visible = False
+                CType(e.Item.FindControl("WF_MenuURL_R2"), Label).Visible = False
+                CType(e.Item.FindControl("WF_MenuMAP_R2"), Label).Visible = False
+            End If
+        End If
+
+        '○フッター編集　 処理なし
+        If e.Item.ItemType = ListItemType.Footer Then
+        End If
+
+    End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
     ' ******************************************************************************
     ' ***  Repeater_Menu_L ボタン押下処理                                        ***
     ' ******************************************************************************
@@ -422,18 +515,18 @@ Public Class M00001MENU
                 Master.MAPvariant = WW_VARI.Text
                 Master.MAPID = WW_MAPID.Text
                 Master.MAPpermitcode = CS0007CheckAuthority.MAPPERMITCODE
-                Master.output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
-                Master.showMessage()
+                Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+                Master.ShowMessage()
 
             Else
-                Master.output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-                Master.showMessage()
+                Master.Output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
+                Master.ShowMessage()
 
                 Exit Sub
             End If
         Else
-            Master.output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-            Master.showMessage()
+            Master.Output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
+            Master.ShowMessage()
 
             Exit Sub
         End If
@@ -592,17 +685,17 @@ Public Class M00001MENU
                 Master.MAPvariant = WW_VARI.Text
                 Master.MAPID = WW_MAPID.Text
                 Master.MAPpermitcode = CS0007CheckAuthority.MAPPERMITCODE
-                Master.output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
-                Master.showMessage()
+                Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+                Master.ShowMessage()
             Else
-                Master.output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-                Master.showMessage()
+                Master.Output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
+                Master.ShowMessage()
 
                 Exit Sub
             End If
         Else
-            Master.output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-            Master.showMessage()
+            Master.Output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
+            Master.ShowMessage()
 
             Exit Sub
         End If
@@ -638,5 +731,99 @@ Public Class M00001MENU
         Server.Transfer(WW_URL.Text)
 
     End Sub
+
+
+
+    ' ******************************************************************************
+    ' ***  Repeater_Menu_R ボタン押下処理                                        ***
+    ' ******************************************************************************
+    Protected Sub Repeater_Menu_ItemCommand_R2(source As Object, e As RepeaterCommandEventArgs) Handles Repeater_Menu_R.ItemCommand
+
+        '共通宣言
+        '*共通関数宣言(BASEDLL)
+        Dim CS0007CheckAuthority As New CS0007CheckAuthority          'AUTHORmap
+
+        '★★★ ボタン押下時、画面遷移（右） ★★★
+        'ボタン押下時、画面遷移
+        Dim WW_COUNT As Integer = e.Item.ItemIndex.ToString()
+        Dim WW_URL As Label = Repeater_Menu_R.Items(WW_COUNT).FindControl("WF_MenuURL_R2")
+        Dim WW_VARI As Label = Repeater_Menu_R.Items(WW_COUNT).FindControl("WF_MenuVARI_R2")
+        Dim WW_MAPID As Label = Repeater_Menu_R.Items(WW_COUNT).FindControl("WF_MenuMAP_R2")
+
+        '○画面遷移権限チェック（右）
+        CS0007CheckAuthority.MAPID = WW_MAPID.Text
+        CS0007CheckAuthority.ROLECODE_MAP = Master.ROLE_MAP
+        '20191101-追加-START
+        CS0007CheckAuthority.ROLECODE_MENU = Master.ROLE_MENU
+        CS0007CheckAuthority.ROLECODE_VIEWPROF = Master.ROLE_VIEWPROF
+        CS0007CheckAuthority.ROLECODE_RPRTPROF = Master.ROLE_RPRTPROF
+        '20191101-追加-END
+        CS0007CheckAuthority.check()
+        If isNormal(CS0007CheckAuthority.ERR) Then
+            If CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.REFERLANCE OrElse
+               CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.UPDATE Then
+                CS0050Session.VIEW_PERMIT = CS0007CheckAuthority.MAPPERMITCODE
+                CS0050Session.VIEW_MAPID = WW_MAPID.Text
+                CS0050Session.VIEW_MAP_VARIANT = WW_VARI.Text
+                CS0050Session.MAP_ETC = ""
+                '20191101-追加-START
+                CS0050Session.VIEW_MENU_MODE = CS0007CheckAuthority.ROLECODE_MENU
+                CS0050Session.VIEW_MAP_MODE = CS0007CheckAuthority.ROLECODE_MAP
+                CS0050Session.VIEW_VIEWPROF_MODE = CS0007CheckAuthority.ROLECODE_VIEWPROF
+                CS0050Session.VIEW_RPRTPROF_MODE = CS0007CheckAuthority.ROLECODE_RPRTPROF
+                '20191101-追加-END
+
+                Master.MAPvariant = WW_VARI.Text
+                Master.MAPID = WW_MAPID.Text
+                Master.MAPpermitcode = CS0007CheckAuthority.MAPPERMITCODE
+                Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+                Master.ShowMessage()
+            Else
+                Master.Output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
+                Master.ShowMessage()
+
+                Exit Sub
+            End If
+        Else
+            Master.Output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
+            Master.ShowMessage()
+
+            Exit Sub
+        End If
+
+        'セッション変数クリア
+        HttpContext.Current.Session("Selected_STYMD") = ""
+        HttpContext.Current.Session("Selected_ENDYMD") = ""
+
+        HttpContext.Current.Session("Selected_USERIDFrom") = ""
+        HttpContext.Current.Session("Selected_USERIDTo") = ""
+        HttpContext.Current.Session("Selected_USERIDG1") = ""
+        HttpContext.Current.Session("Selected_USERIDG2") = ""
+        HttpContext.Current.Session("Selected_USERIDG3") = ""
+        HttpContext.Current.Session("Selected_USERIDG4") = ""
+        HttpContext.Current.Session("Selected_USERIDG5") = ""
+
+        HttpContext.Current.Session("Selected_MAPIDPFrom") = ""
+        HttpContext.Current.Session("Selected_MAPIDPTo") = ""
+        HttpContext.Current.Session("Selected_MAPIDPG1") = ""
+        HttpContext.Current.Session("Selected_MAPIDPG2") = ""
+        HttpContext.Current.Session("Selected_MAPIDPG3") = ""
+        HttpContext.Current.Session("Selected_MAPIDPG4") = ""
+        HttpContext.Current.Session("Selected_MAPIDPG5") = ""
+
+        HttpContext.Current.Session("Selected_MAPIDFrom") = ""
+        HttpContext.Current.Session("Selected_MAPIDTo") = ""
+        HttpContext.Current.Session("Selected_MAPIDG1") = ""
+        HttpContext.Current.Session("Selected_MAPIDG2") = ""
+        HttpContext.Current.Session("Selected_MAPIDG3") = ""
+        HttpContext.Current.Session("Selected_MAPIDG4") = ""
+        HttpContext.Current.Session("Selected_MAPIDG5") = ""
+
+        Server.Transfer(WW_URL.Text)
+
+    End Sub
+
+
+
 
 End Class

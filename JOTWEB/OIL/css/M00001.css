@@ -28,64 +28,95 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
        	background-color: rgb(220,230,240); 
     }
         
+
+/*在庫管理メニュー表示*/
     #Menu_L{
         height:auto; 
         width:33em;
-
         position:fixed;
         margin: 5px 0px 0px 0px;
-        left:7em;
+        left:2em;
         overflow-y:auto;
-}
+    }
 
+    .WF_MenuLabel_L {
+        height: 2em;
+        width: 30em;
+        position: relative;
+        left: 0em;
+        overflow: hidden;
+        color: black;
+        font-weight: bold;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    .WF_MenuButton_L {
+        height: 2em;
+        width: 17em;
+        position: relative;
+        left: 2em;
+        overflow: hidden;
+        color: black;
+        border: none;
+        background-color: gray;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+/*受注管理メニュー表示*/
+    #Menu_L2 {
+        height: auto;
+        width: 33em;
+        position: fixed;
+        margin: 5px 0px 0px 0px;
+        left: 20em;
+        overflow-y: auto;
+    }
+
+    .WF_MenuLabel_L2 {
+        height: 2em;
+        width: 30em;
+        position: relative;
+        left: 0em;
+        overflow: hidden;
+        color: black;
+        font-weight: bold;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    .WF_MenuButton_L2 {
+        height: 2em;
+        width: 17em;
+        position: relative;
+        left: 2em;
+        overflow: hidden;
+        color: black;
+        border: none;
+        background-color: gray;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+
+
+/*回送管理メニュー表示*/
     #Menu_R{
         height:auto; 
         width:33em;
-
         position:fixed;
         margin: 5px 0px 0px 0px;
         left:41em;
         overflow-y:auto;
     }
 
-
-    .WF_MenuLabel_L{
-        height:2em;
-        width:30em;
-
-        position:relative;
-        left:0em;
-        overflow:hidden;
-
-        color:black;
-        font-weight:bold;
-        vertical-align:middle;
-        text-align:left;
-    }
-
-    .WF_MenuButton_L{
-        height:2em;
-        width:30em;
-         
-        position:relative;
-        left:2em;
-        overflow:hidden;
-
-        color:black;
-        border:none;
-        background-color:gray;
-        vertical-align:middle;
-        text-align:left;
-    }
-
     .WF_MenuLabel_R{
         height:2em;
-        width:30em;
-
+        width:17em;
         position:relative;
         left:0em;
         overflow:hidden;
-
         color:black;
         font-weight:bold;
         vertical-align:middle;
@@ -94,15 +125,49 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
     .WF_MenuButton_R{
         height:2em;
-        width:30em;
-
+        width:17em;
         position:relative;
         left:2em;
         overflow:hidden;
-
         color:black;
         border:none;
         background-color:gray;
         vertical-align:middle;
         text-align:left;
     }
+
+/*マスタ管理メニュー表示*/
+#Menu_R2 {
+    height: auto;
+    width: 33em;
+    position: fixed;
+    margin: 5px 0px 0px 0px;
+    left: 61em;
+    overflow-y: auto;
+}
+
+.WF_MenuLabel_R2 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: black;
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.WF_MenuButton_R2 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: black;
+    border: none;
+    background-color: gray;
+    vertical-align: middle;
+    text-align: left;
+}
+

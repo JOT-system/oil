@@ -1,7 +1,7 @@
 ﻿''************************************************************
-' タンク車マスタメンテ検索画面
-' 作成日 2019/11/08
-' 更新日 2019/11/08
+' ユーザIDマスタメンテ検索画面
+' 作成日 2019/11/14
+' 更新日 2019/11/14
 ' 作成者 JOT遠藤
 ' 更新車 JOT遠藤
 '
@@ -11,10 +11,10 @@
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' タンク車マスタ登録（条件）
+''' ユーザIDマスタ登録（条件）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIM0005TankSearch
+Public Class OIS0001UserSearch
     Inherits Page
 
     '○ 共通処理結果
@@ -70,7 +70,7 @@ Public Class OIM0005TankSearch
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = OIM0005WRKINC.MAPIDS
+        Master.MAPID = OIS0001WRKINC.MAPIDS
 
         WF_CAMPCODE.Focus()
         WF_FIELD.Value = ""
@@ -97,35 +97,33 @@ Public Class OIM0005TankSearch
 
             '初期変数設定処理
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
-            Master.GetFirstValue(work.WF_SEL_TANKNUMBER.Text, "TANKNUMBER", WF_TANKNUMBER.Text)       'JOT車番
-            Master.GetFirstValue(work.WF_SEL_MODEL.Text, "MODEL", WF_MODEL.Text)       '型式
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then   '実行画面からの遷移
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD.Text)             '有効年月日(From)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text)           '有効年月日(To)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORG", WF_ORG.Text)                 '組織コード
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIS0001L Then   '実行画面からの遷移
             '画面項目設定処理
-            WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
-            WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER.Text            'JOT車番
-            WF_MODEL.Text = work.WF_SEL_MODEL.Text            '型式
+            WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
+            WF_STYMD.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
+            WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
+            WF_ORG.Text = work.WF_SEL_ORG.Text                  '組織コード
         End If
 
         '○ RightBox情報設定
-        rightview.MAPIDS = OIM0005WRKINC.MAPIDS
-        rightview.MAPID = OIM0005WRKINC.MAPIDL
+        rightview.MAPIDS = OIS0001WRKINC.MAPIDS
+        rightview.MAPID = OIS0001WRKINC.MAPIDL
         rightview.COMPCODE = WF_CAMPCODE.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
-
-        '201104-追加-START
         rightview.MENUROLE = Master.ROLE_MENU
         rightview.MAPROLE = Master.ROLE_MAP
         rightview.VIEWROLE = Master.ROLE_VIEWPROF
         rightview.RPRTROLE = Master.ROLE_RPRTPROF
-        '201104-追加-END
 
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
         CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
-        CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_DUMMY)         'JOT車番
-        CODENAME_get("MODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_DUMMY)         '型式
+        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)                        '組織コード
 
     End Sub
 
@@ -138,8 +136,9 @@ Public Class OIM0005TankSearch
 
         '○ 入力文字置き換え(使用禁止文字排除)
         Master.EraseCharToIgnore(WF_CAMPCODE.Text)          '会社コード
-        Master.EraseCharToIgnore(WF_TANKNUMBER.Text)          'JOT車番
-        Master.EraseCharToIgnore(WF_MODEL.Text)          '型式
+        Master.EraseCharToIgnore(WF_STYMD.Text)             '有効年月日(From)
+        Master.EraseCharToIgnore(WF_ENDYMD.Text)            '有効年月日(To)
+        Master.EraseCharToIgnore(WF_ORG.Text)               '組織コード
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -149,9 +148,13 @@ Public Class OIM0005TankSearch
 
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
-        work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER.Text        'JOT車番
-        work.WF_SEL_MODEL.Text = WF_MODEL.Text        '型式
-
+        work.WF_SEL_STYMD.Text = WF_STYMD.Text              '有効年月日(From)
+        If WF_ENDYMD.Text = "" Then
+            work.WF_SEL_ENDYMD.Text = WF_STYMD.Text         '有効年月日(From) → 有効年月日(To)
+        Else
+            work.WF_SEL_ENDYMD.Text = WF_ENDYMD.Text        '有効年月日(To)
+        End If
+        work.WF_SEL_ORG.Text = WF_ORG.Text                  '組織コード
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -202,70 +205,68 @@ Public Class OIM0005TankSearch
             Exit Sub
         End If
 
-        'JOT車番(バリデーションチェック)　★★★お試し★★★
-        If WF_TANKNUMBER.Text <> "" Then
-            If 0 <= Asc(WF_TANKNUMBER.Text) And Asc(WF_TANKNUMBER.Text) <= 255 Then
-                If Not isNormal(WW_CS0024FCHECKERR) Then
-                    Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
-                    WF_TANKNUMBER.Focus()
+        '有効年月日(From)
+        Master.CheckField(WF_CAMPCODE.Text, "STYMD", WF_STYMD.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(From) : " & WF_STYMD.Text)
+            WF_STYMD.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '有効年月日(To)
+        Master.CheckField(WF_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(To) : " & WF_ENDYMD.Text)
+            WF_ENDYMD.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '日付大小チェック
+        If WF_STYMD.Text <> "" AndAlso WF_ENDYMD.Text <> "" Then
+            Dim WW_DATE_ST As Date
+            Dim WW_DATE_END As Date
+            Try
+                Date.TryParse(WF_STYMD.Text, WW_DATE_ST)
+                Date.TryParse(WF_ENDYMD.Text, WW_DATE_END)
+
+                If WW_DATE_ST > WW_DATE_END Then
+                    Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR)
+                    WF_STYMD.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD.Text & ":" & WF_ENDYMD.Text)
+                WF_STYMD.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End Try
+        End If
+
+        '組織コード
+        WW_TEXT = WF_ORG.Text
+        Master.CheckField(WF_CAMPCODE.Text, "ORG", WF_ORG.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            If WW_TEXT = "" Then
+                WF_ORG.Text = ""
             Else
-                Master.Output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
-                WF_TANKNUMBER.Focus()
-                O_RTN = "ERR"
-                Exit Sub
+                '存在チェック
+                CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & WF_ORG.Text)
+                    WF_ORG.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
             End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_ORG.Focus()
+            O_RTN = "ERR"
+            Exit Sub
         End If
-
-        '型式(バリデーションチェック)　★★★お試し★★★
-        If WF_TANKNUMBER.Text <> "" Then
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
-                WF_MODEL.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
-
-        ''JOT車番
-        'Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    '存在チェック
-        '    CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
-        '    If Not isNormal(WW_RTN_SW) Then
-        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
-        '        WF_TANKNUMBER.Focus()
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-        '    WF_TANKNUMBER.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-
-        ''型式
-        'Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    '存在チェック
-        '    CODENAME_get("MODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
-        '    If Not isNormal(WW_RTN_SW) Then
-        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
-        '        WF_MODEL.Focus()
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-        '    WF_MODEL.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
 
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
@@ -299,24 +300,32 @@ Public Class OIM0005TankSearch
             End Try
 
             With leftview
-                '会社コード
-                Dim prmData As New Hashtable
-                prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+                Select Case WF_LeftMViewChange.Value
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
+                            Case "WF_STYMD"         '有効年月日(From)
+                                .WF_Calendar.Text = WF_STYMD.Text
+                            Case "WF_ENDYMD"        '有効年月日(To)
+                                .WF_Calendar.Text = WF_ENDYMD.Text
+                        End Select
+                        .ActiveCalendar()
 
-                ''JOT車番
-                'If WF_FIELD.Value = "WF_TANKNUMBER" Then
-                '    prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
-                'End If
+                    Case Else
+                        '以外
+                        Dim prmData As New Hashtable
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
-                ''型式
-                'If WF_FIELD.Value = "WF_MODEL" Then
-                '    prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
-                'End If
+                        'フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            Case "WF_ORG"       '所属部署
+                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                        End Select
 
-                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                .ActiveListBox()
+                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                        .ActiveListBox()
+                End Select
             End With
-
         End If
 
     End Sub
@@ -332,10 +341,8 @@ Public Class OIM0005TankSearch
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"          '会社コード
                 CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
-            Case "WF_TANKNUMBER"        'JOT車番
-                CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
-            Case "WF_MODEL"             '型式
-                CODENAME_get("MODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
+            Case "WF_ORG"               '所属部署
+                CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -375,21 +382,34 @@ Public Class OIM0005TankSearch
                 WF_CAMPCODE_TEXT.Text = WW_SelectText
                 WF_CAMPCODE.Focus()
 
-            Case "WF_TANKNUMBER"          'JOT車番
-                WF_TANKNUMBER.Text = WW_SelectValue
-                WF_TANKNUMBER_TEXT.Text = WW_SelectText
-                WF_TANKNUMBER.Focus()
+            Case "WF_STYMD"             '有効年月日(From)
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(WW_SelectValue, WW_DATE)
+                    WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                Catch ex As Exception
+                End Try
+                WF_STYMD.Focus()
 
-            Case "WF_MODEL"          '型式
-                WF_MODEL.Text = WW_SelectValue
-                WF_MODEL_TEXT.Text = WW_SelectText
-                WF_MODEL.Focus()
+            Case "WF_ENDYMD"            '有効年月日(To)
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(WW_SelectValue, WW_DATE)
+                    WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                Catch ex As Exception
+                End Try
+                WF_ENDYMD.Focus()
 
+            Case "WF_ORG"               '所属部署
+                WF_ORG.Text = WW_SelectValue
+                WF_ORG_TEXT.Text = WW_SelectText
+                WF_ORG.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
+        WF_LeftMViewChange.Value = ""  '★
 
     End Sub
 
@@ -404,15 +424,18 @@ Public Class OIM0005TankSearch
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"          '会社コード
                 WF_CAMPCODE.Focus()
-            Case "WF_TANKNUMBER"          'JOT車番
-                WF_TANKNUMBER.Focus()
-            Case "WF_MODEL"          '型式
-                WF_MODEL.Focus()
+            Case "WF_STYMD"             '有効年月日(From)
+                WF_STYMD.Focus()
+            Case "WF_ENDYMD"            '有効年月日(To)
+                WF_ENDYMD.Focus()
+            Case "WF_ORG"               '所属部署
+                WF_ORG.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
+        WF_LeftMViewChange.Value = ""
 
     End Sub
 
@@ -478,12 +501,9 @@ Public Class OIM0005TankSearch
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TANKNUMBER"        'JOT車番
-                    prmData = work.CreateTANKNUMBERParam(WF_CAMPCODE.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "MODEL"        '型式
-                    prmData = work.CreateTANKMODELParam(WF_MODEL.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "ORG"              '所属部署
+                    prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

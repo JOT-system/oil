@@ -39,7 +39,7 @@
                     <input type="button" id="WF_ButtonPrint" value="一覧印刷"  style="Width:5em" onclick="ButtonClick('WF_ButtonPrint');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:67em;">
-                    <input type="button" id="WF_ButtonEND" value="終了"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                    <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
                 </a>
                 <a style="position:fixed;top:3.2em;left:75em;">
                     <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />
@@ -57,12 +57,13 @@
         <div class="detailboxOnly" id="detailbox">
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
-                    <input type="button" id="WF_UPDATE" value="更新／追加" style="Width:7em" onclick="ButtonClick('WF_UPDATE');" />
+                    <input type="button" id="WF_UPDATE" value="表更新" style="Width:5em" onclick="ButtonClick('WF_UPDATE');" />
                 </a>
                 <a>
-                    <input type="button" id="WF_CLEAR" value="クリア" style="Width:7em" onclick="ButtonClick('WF_CLEAR');" />
+                    <input type="button" id="WF_CLEAR" value="クリア" style="Width:5em" onclick="ButtonClick('WF_CLEAR');" />
                 </a>
             </div>
+
             <div class="detailkeybox">
                 <p id="KEY_LINE_1">
                     <!-- 選択No -->
@@ -536,7 +537,6 @@
                     </a>
                 </p>
 
-                </p>
             </div>
         </div>
 

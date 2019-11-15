@@ -28,6 +28,18 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0001D As String = "ASP.OIL_ORD_OIT0001EMPTYTURNDAIRYDETAIL_ASPX"
         ''' <summary>
+        ''' ユーザIDマスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"
+        ''' <summary>
+        ''' ユーザIDマスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIS0001L As String = "ASP.OIL_MAS_OIS0001USERLIST_ASPX"
+        ''' <summary>
+        ''' ユーザIDマスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIS0001C As String = "ASP.OIL_MAS_OIS0001USERCREATE_ASPX"
+        ''' <summary>
         ''' 貨物駅マスタメンテナンス（検索）
         ''' </summary>
         Public Const OIM0004S As String = "ASP.OIL_MAS_OIM0004STATIONSEARCH_ASPX"

@@ -20,7 +20,7 @@
             <input type="button" id="WF_ButtonDO" value="検索"  style="Width:5em" onclick="ButtonClick('WF_ButtonDO');" />
         </a>
         <a style="position:fixed;top:2.8em;left:67em;">
-            <input type="button" id="WF_ButtonEND" value="終了"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+            <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
         </a>
 
         <!-- ○ 変動項目 ○ -->
@@ -51,24 +51,6 @@
         <a style="position:fixed; top:9.9em; left:27em;">
             <asp:Label ID="WF_MODEL_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
-<%--        <!-- JOT車番 -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">JOT車番</a>
-
-        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_TANKNUMBER');">
-            <asp:TextBox ID="TextBox1" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
-        </a>
-        <a style="position:fixed; top:7.7em; left:27em;">
-            <asp:Label ID="Label1" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
-        </a>
-        <!-- 型式 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">型式</a>
-
-        <a style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('WF_MODEL ', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_MODEL');">
-            <asp:TextBox ID="TextBox2" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
-        </a>
-        <a style="position:fixed; top:9.9em; left:27em;">
-            <asp:Label ID="Label2" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
-        </a>--%>
     </div>
 
     <!-- rightbox レイアウト -->

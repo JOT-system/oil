@@ -71,7 +71,7 @@ Public Class OIM0005TankList
                             WF_ButtonDownload_Click()
                         Case "WF_ButtonPrint"           '一覧印刷ボタン押下
                             WF_ButtonPrint_Click()
-                        Case "WF_ButtonEND"             '終了ボタン押下
+                        Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
                             WF_ButtonFIRST_Click()
@@ -189,7 +189,6 @@ Public Class OIM0005TankList
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005S Then
             'Grid情報保存先のファイル名
             Master.CreateXMLSaveFile()
-            '######### おためし ##########################
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005C Then
             Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
         End If
@@ -205,7 +204,6 @@ Public Class OIM0005TankList
     ''' <remarks></remarks>
     Protected Sub GridViewInitialize()
 
-        '######### おためし ##########################
         '登録画面からの遷移の場合はテーブルから取得しない
         If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.OIM0005C Then
             '○ 画面表示データ取得
@@ -460,12 +458,6 @@ Public Class OIM0005TankList
             & "   AND OIM0005.DELFLG      <> @P3"
         End If
 
-        ''○ 条件指定で指定されたものでSQLで可能なものを追加する
-        ''JOT車番
-        'If Not String.IsNullOrEmpty(work.WF_SEL_TANKNUMBER.Text) Then
-        '    SQLStr &= String.CONVERT(DATE, "    AND OIM0005.TANKNUMBER = '{0}'", work.WF_SEL_TANKNUMBER.Text)
-        'End If
-
         SQLStr &=
               " ORDER BY" _
             & "    OIM0005.TANKNUMBER"
@@ -494,20 +486,6 @@ Public Class OIM0005TankList
                 For Each OIM0005row As DataRow In OIM0005tbl.Rows
                     i += 1
                     OIM0005row("LINECNT") = i        'LINECNT
-
-                    '取引先名称(出荷先)
-                    'CODENAME_get("TORICODES", OIM0005row("TORICODES"), OIM0005row("TORINAMES"), WW_DUMMY)
-                    'work.WF_SEL_TORICODES.Text = OIM0005row("TORICODES")
-
-                    ''出荷場所名称
-                    'CODENAME_get("SHUKABASHO", OIM0005row("SHUKABASHO"), OIM0005row("SHUKABASHONAMES"), WW_DUMMY)
-
-                    ''取引先名称(届先)
-                    'CODENAME_get("TORICODET", OIM0005row("TORICODET"), OIM0005row("TORINAMET"), WW_DUMMY)
-                    'work.WF_SEL_TORICODET.Text = OIM0005row("TORICODET")
-
-                    ''届先名称
-                    'CODENAME_get("TODOKECODE", OIM0005row("TODOKECODE"), OIM0005row("TODOKENAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -707,7 +685,7 @@ Public Class OIM0005TankList
 
         '形式
         WF_MODEL.Text = ""
-        work.WF_SEL_MODEL.Text = ""
+        work.WF_SEL_MODEL2.Text = ""
 
         '形式カナ
         WF_MODELKANA.Text = ""
@@ -853,7 +831,6 @@ Public Class OIM0005TankList
 
         WF_GridDBclick.Text = ""
 
-        '############# おためし #############
         work.WF_SEL_DELFLG.Text = "0"
 
         '○ 遷移先(登録画面)退避データ保存先の作成
@@ -931,41 +908,6 @@ Public Class OIM0005TankList
         Dim WW_DUMMY As String = ""
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
-
-        '○同一レコードチェック
-        '※開始終了期間を持っていないため現状意味無し
-        'For Each OIM0005row As DataRow In OIM0005tbl.Rows
-        '    '読み飛ばし
-        '    If OIM0005row("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING OrElse
-        '        OIM0005row("DELFLG") = C_DELETE_FLG.DELETE Then
-        '        Continue For
-        '    End If
-
-        '    WW_LINEERR_SW = ""
-
-        '    '期間重複チェック
-        '    For Each checkRow As DataRow In OIM0005tbl.Rows
-        '        '同一KEY以外は読み飛ばし
-        '        If checkRow("CAMPCODE") = OIM0005row("CAMPCODE") AndAlso
-        '            checkRow("UORG") = OIM0005row("UORG") AndAlso
-        '            checkRow("MODELPATTERN") = OIM0005row("MODELPATTERN") AndAlso
-        '            checkRow("TORICODES") = OIM0005row("TORICODES") AndAlso
-        '            checkRow("SHUKABASHO") = OIM0005row("SHUKABASHO") AndAlso
-        '            checkRow("TORICODET") = OIM0005row("TORICODET") AndAlso
-        '            checkRow("TODOKECODE") = OIM0005row("TODOKECODE") Then
-        '        Else
-        '            Continue For
-        '        End If
-        '    Next
-
-        '    If WW_LINEERR_SW = "" Then
-        '        If OIM0005row("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
-        '            OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        '        End If
-        '    Else
-        '        OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-        '    End If
-        'Next
 
     End Sub
 
@@ -1407,7 +1349,6 @@ Public Class OIM0005TankList
                     If Trim(OIM0005row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
                         Trim(OIM0005row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
                         Trim(OIM0005row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
-                        '                        Trim(OIM0005row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING Then
                         Dim WW_DATENOW As DateTime = Date.Now
 
                         'DB更新
@@ -1714,7 +1655,7 @@ Public Class OIM0005TankList
 
 
     ''' <summary>
-    ''' 終了ボタン押下時処理
+    ''' 戻るボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
@@ -1791,7 +1732,7 @@ Public Class OIM0005TankList
 
         '形式
         WF_MODEL.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
-        work.WF_SEL_MODEL.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
+        work.WF_SEL_MODEL2.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
 
         '原籍所有者C
         WF_ORIGINOWNERCODE.Text = OIM0005tbl.Rows(WW_LINECNT)("ORIGINOWNERCODE")
@@ -1883,7 +1824,7 @@ Public Class OIM0005TankList
 
         '形式
         WF_MODEL.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
-        work.WF_SEL_MODEL.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
+        work.WF_SEL_MODEL2.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
 
         '形式カナ
         WF_MODELKANA.Text = OIM0005tbl.Rows(WW_LINECNT)("MODELKANA")
@@ -2060,9 +2001,6 @@ Public Class OIM0005TankList
 
         WF_GridDBclick.Text = ""
 
-        '############# おためし #############
-        'work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
-        '    Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
         '遷移先(登録画面)退避データ保存先の作成
         WW_CreateXMLSaveFile()
 
@@ -2208,20 +2146,15 @@ Public Class OIM0005TankList
             End If
 
             '○ 項目セット
-            ''会社コード
-            'OIM0005INProw.Item("CAMPCODE") = work.WF_SEL_CAMPCODE.Text
-
             'JOT車番
             If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
                 OIM0005INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
             End If
-            'OIM0005INProw.Item("TANKNUMBER") = work.WF_SEL_TANKNUMBER.Text
 
             '型式
             If WW_COLUMNS.IndexOf("MODEL") >= 0 Then
                 OIM0005INProw("MODEL") = XLSTBLrow("MODEL")
             End If
-            'OIM0005INProw.Item("MODEL") = work.WF_SEL_MODEL.Text
 
             '原籍所有者C
             If WW_COLUMNS.IndexOf("ORIGINOWNERCODE") >= 0 Then
@@ -2339,13 +2272,6 @@ Public Class OIM0005TankList
             Else
                 OIM0005INProw("DELFLG") = "0"
             End If
-
-            '○ 名称取得
-            'CODENAME_get("TORICODES", OIM0005INProw("TORICODES"), OIM0005INProw("TORINAMES"), WW_DUMMY)           '取引先名称(出荷先)
-            'CODENAME_get("SHUKABASHO", OIM0005INProw("SHUKABASHO"), OIM0005INProw("SHUKABASHONAMES"), WW_DUMMY)   '出荷場所名称
-
-            'CODENAME_get("TORICODET", OIM0005INProw("TORICODET"), OIM0005INProw("TORINAMET"), WW_DUMMY)           '取引先名称(届先)
-            'CODENAME_get("TODOKECODE", OIM0005INProw("TODOKECODE"), OIM0005INProw("TODOKENAME"), WW_DUMMY)        '届先名称
 
             OIM0005INPtbl.Rows.Add(OIM0005INProw)
         Next
@@ -2491,7 +2417,6 @@ Public Class OIM0005TankList
         OIM0005INProw("SELECT") = 1
         OIM0005INProw("HIDDEN") = 0
 
-        'OIM0005INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text        '会社コード
         OIM0005INProw("TANKNUMBER") = WF_TANKNUMBER.Text        'JOT車番
         OIM0005INProw("MODEL") = WF_MODEL.Text        '型式
 
@@ -2540,13 +2465,6 @@ Public Class OIM0005TankList
         OIM0005INProw("TRANSFERDATE") = WF_TRANSFERDATE.Text              '車籍編入年月日
 
         OIM0005INProw("OBTAINEDCODE") = WF_OBTAINEDCODE.Text              '取得先C
-
-        '○ 名称取得
-        'CODENAME_get("TORICODES", OIM0005INProw("TORICODES"), OIM0005INProw("TORINAMES"), WW_DUMMY)           '取引先名称(出荷先)
-        'CODENAME_get("SHUKABASHO", OIM0005INProw("SHUKABASHO"), OIM0005INProw("SHUKABASHONAMES"), WW_DUMMY)   '出荷場所名称
-
-        'CODENAME_get("TORICODET", OIM0005INProw("TORICODET"), OIM0005INProw("TORINAMET"), WW_DUMMY)           '取引先名称(届先)
-        'CODENAME_get("TODOKECODE", OIM0005INProw("TODOKECODE"), OIM0005INProw("TODOKENAME"), WW_DUMMY)        '届先名称
 
         '○ チェック用テーブルに登録する
         OIM0005INPtbl.Rows.Add(OIM0005INProw)
@@ -2668,21 +2586,6 @@ Public Class OIM0005TankList
 
                 'フィールドによってパラメーターを変える
                 Select Case WW_FIELD
-                    'Case "WF_TORICODES"                             '取引先(出荷場所)
-                    '    prmData = work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text)
-
-                        '    Case "WF_SHUKABASHO"                            '出荷場所
-                        '        prmData = work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, WF_TORICODES.Text)
-
-                        '    Case "WF_TORICODET"                             '取引先(届先)
-                        '        prmData = work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text)
-
-                        '    Case "WF_TODOKECODE"                            '届先
-                        '        prmData = work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, WF_TORICODET.Text)
-
-                        '    Case "WF_MODELPT"                               'モデル距離パターン
-                        '        prmData = work.CreateMODELPTParam(work.WF_SEL_CAMPCODE.Text, WF_MODELPT.Text)
-
                     Case "WF_DELFLG"
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
                         prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
@@ -2724,36 +2627,6 @@ Public Class OIM0005TankList
                     WF_DELFLG.Text = WW_SelectValue
                     WF_DELFLG_TEXT.Text = WW_SelectText
                     WF_DELFLG.Focus()
-
-                    '    'モデル距離パターン
-                    'Case "WF_MODELPT"
-                    '    WF_MODELPT.Text = WW_SelectValue
-                    '    WF_MODELPT_TEXT.Text = WW_SelectText
-                    '    WF_MODELPT.Focus()
-
-                    '    '取引先（出荷場所）
-                    'Case "WF_TORICODES"
-                    '    WF_TORICODES.Text = WW_SelectValue
-                    '    WF_TORICODES_TEXT.Text = WW_SelectText
-                    '    WF_TORICODES.Focus()
-
-                    '    '出荷場所
-                    'Case "WF_SHUKABASHO"
-                    '    WF_SHUKABASHO.Text = WW_SelectValue
-                    '    WF_SHUKABASHO_TEXT.Text = WW_SelectText
-                    '    WF_SHUKABASHO.Focus()
-
-                    '    '取引先（届先）
-                    'Case "WF_TORICODET"
-                    '    WF_TORICODET.Text = WW_SelectValue
-                    '    WF_TORICODET_TEXT.Text = WW_SelectText
-                    '    WF_TORICODET.Focus()
-
-                    '    '届先
-                    'Case "WF_TODOKECODE"
-                    '    WF_TODOKECODE.Text = WW_SelectValue
-                    '    WF_TODOKECODE_TEXT.Text = WW_SelectText
-                    '    WF_TODOKECODE.Focus()
             End Select
         Else
         End If
@@ -2778,27 +2651,6 @@ Public Class OIM0005TankList
                 '削除フラグ
                 Case "WF_DELFLG"
                     WF_DELFLG.Focus()
-
-                    '    'モデル距離パターン
-                    'Case "WF_MODELPT"
-                    '    WF_MODELPT.Focus()
-
-                    '    '取引先（出荷場所）
-                    'Case "WF_TORICODES"
-                    '    WF_TORICODES.Focus()
-
-                    '    '出荷場所
-                    'Case "WF_SHUKABASHO"
-                    '    WF_SHUKABASHO.Focus()
-
-                    '    '取引先（届先）
-                    'Case "WF_TORICODET"
-                    '    WF_TORICODET.Focus()
-
-                    '    '届先
-                    'Case "WF_TODOKECODE"
-                    '    WF_TODOKECODE.Focus()
-
             End Select
         Else
         End If
@@ -3135,159 +2987,6 @@ Public Class OIM0005TankList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '削除フラグ　有効なら関連チェックする。　※削除なら関連チェックせず、削除フラグを立てる
-            'If OIM0005INProw("DELFLG") = C_DELETE_FLG.ALIVE Then
-
-            'モデル距離パターン(バリデーションチェック)
-            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MODELPATTERN", OIM0005INProw("MODELPATTERN"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            'If isNormal(WW_CS0024FCHECKERR) Then
-            '    'モデル距離パターン存在チェック
-            '    CODENAME_get("MODELPATTERN", OIM0005INProw("MODELPATTERN"), WW_DUMMY, WW_RTN_SW)
-            '    If Not isNormal(WW_RTN_SW) Then
-            '        WW_CheckMES1 = "モデル距離パターンエラー。'1'：届先のみ  '2':出荷場所、届先指定   '3':出荷場所のみ　のいずれかを入力してください。"
-            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '        WW_LINE_ERR = "ERR"
-            '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '    End If
-            'Else
-            '    WW_CheckMES1 = "モデル距離パターンエラー。'1'：届先のみ  '2':出荷場所、届先指定   '3':出荷場所のみ　のいずれかを入力してください。"
-            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '    WW_LINE_ERR = "ERR"
-            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            'End If
-
-            '関連チェック
-
-            '        Select Case OIM0005INProw("MODELPATTERN")
-            '            Case CONST_PATTERN1 '届先のみ
-            '                '取引先（届先）、届先、モデル距離が入力されている事
-            '                '取引先（届先）、届先がマスタに登録されていること
-
-            '                If OIM0005INProw("TORICODES") = "" AndAlso OIM0005INProw("SHUKABASHO") = "" AndAlso
-            '                    OIM0005INProw("TORICODET") <> "" AndAlso OIM0005INProw("TODOKECODE") <> "" Then
-
-            '                    '取引先(届先)コード存在チェック
-            '                    CODENAME_get("TORICODET", OIM0005INProw("TORICODET"), WW_DUMMY, WW_RTN_SW)
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・取引先(届先)コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-
-            '                    '届先コード存在チェック
-            '                    work.WF_SEL_TORICODET.Text = OIM0005INProw("TORICODET")
-            '                    CODENAME_get("TODOKECODE", OIM0005INProw("TODOKECODE"), WW_DUMMY, WW_RTN_SW)  '届先名称
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・届先コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-            '                Else
-            '                    WW_CheckMES1 = "・モデル距離パターン組合せエラー。取引先（届先）コードと届先コードのみ入力してください。"
-            '                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                    WW_LINE_ERR = "PATTEN ERR"
-            '                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                End If
-
-            '            Case CONST_PATTERN2 '出荷場所、届先
-            '                '取引先（出荷場所）、出荷場所、取引先（届先）、届先、モデル距離が入力されている事
-            '                '取引先（出荷場所）、出荷場所、取引先（届先）、届先がマスタに登録されていること
-
-            '                If OIM0005INProw("TORICODES") <> "" AndAlso OIM0005INProw("SHUKABASHO") <> "" AndAlso
-            '                    OIM0005INProw("TORICODET") <> "" AndAlso OIM0005INProw("TODOKECODE") <> "" Then
-
-            '                    '取引先(出荷先)コード存在チェック
-            '                    CODENAME_get("TORICODES", OIM0005INProw("TORICODES"), WW_DUMMY, WW_RTN_SW)
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・取引先(出荷先)コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-
-            '                    '出荷場所コード存在チェック
-            '                    work.WF_SEL_TORICODES.Text = OIM0005INProw("TORICODES")
-            '                    CODENAME_get("SHUKABASHO", OIM0005INProw("SHUKABASHO"), WW_DUMMY, WW_RTN_SW)  '出荷場所名
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・出荷場所コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-
-            '                    '取引先(届先)コード存在チェック
-            '                    CODENAME_get("TORICODET", OIM0005INProw("TORICODET"), WW_DUMMY, WW_RTN_SW)
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・取引先(届先)コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-
-            '                    '届先コード存在チェック
-            '                    work.WF_SEL_TORICODET.Text = OIM0005INProw("TORICODET")
-            '                    CODENAME_get("TODOKECODE", OIM0005INProw("TODOKECODE"), WW_DUMMY, WW_RTN_SW)  '届先名称
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・届先コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-            '                Else
-            '                    WW_CheckMES1 = "モデル距離パターン組合せエラー。取引先（出荷場所）コード、出荷場所コード、取引先（届先）コード、届先コードを入力してください。"
-            '                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                    WW_LINE_ERR = "PATTEN ERR"
-            '                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                End If
-
-            '            Case CONST_PATTERN3 '出荷場所のみ
-            '                '取引先（出荷場所）、出荷場所、モデル距離が入力されている事
-            '                '取引先（出荷場所）、出荷場所がマスタに登録されていること
-            '                If OIM0005INProw("TORICODES") <> "" AndAlso OIM0005INProw("SHUKABASHO") <> "" AndAlso
-            '                    OIM0005INProw("TORICODET") = "" AndAlso OIM0005INProw("TODOKECODE") = "" Then
-
-            '                    '取引先(出荷先)コード存在チェック
-            '                    CODENAME_get("TORICODES", OIM0005INProw("TORICODES"), WW_DUMMY, WW_RTN_SW)
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・取引先(出荷先)コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-
-            '                    '出荷場所コード存在チェック
-            '                    work.WF_SEL_TORICODES.Text = OIM0005INProw("TORICODES")
-            '                    CODENAME_get("SHUKABASHO", OIM0005INProw("SHUKABASHO"), WW_DUMMY, WW_RTN_SW)  '出荷場所名
-            '                    If Not isNormal(WW_RTN_SW) Then
-            '                        WW_CheckMES1 = "・出荷場所コードエラー。マスタに存在しないコードです。"
-            '                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                        WW_LINE_ERR = "PATTEN ERR"
-            '                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                    End If
-            '                Else
-            '                    WW_CheckMES1 = "・モデル距離パターン組合せエラー。取引先（出荷先）コードと出荷場所コードのみ入力してください。"
-            '                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-            '                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-            '                    WW_LINE_ERR = "PATTEN ERR"
-            '                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            '                End If
-            '        End Select
-            'End If
-
             If WW_LINE_ERR = "" Then
                 If OIM0005INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
                     OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -3571,7 +3270,6 @@ Public Class OIM0005TankList
 
     End Sub
 
-
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
@@ -3621,25 +3319,6 @@ Public Class OIM0005TankList
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                'Case "UORG"             '運用部署
-                '    prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
-                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                    'Case "TORICODES"     '取引先名称(出荷先)
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CUSTOMER, I_VALUE, O_TEXT, O_RTN, work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text))
-
-                    'Case "SHUKABASHO"   '出荷場所名称
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODES.Text))
-
-                    'Case "TORICODET"     '取引先名称（届先）
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CUSTOMER, I_VALUE, O_TEXT, O_RTN, work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text))
-
-                    'Case "TODOKECODE"   '届先名称
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DISTINATION, I_VALUE, O_TEXT, O_RTN, work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, work.WF_SEL_TORICODET.Text))
-
-                    'Case "MODELPATTERN" 'モデル距離パターン
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_MODELPT, I_VALUE, O_TEXT, O_RTN, work.CreateMODELPTParam(work.WF_SEL_CAMPCODE.Text, WF_MODELPT.Text))
 
                 Case "DELFLG"           '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

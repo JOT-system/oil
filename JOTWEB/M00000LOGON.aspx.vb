@@ -19,40 +19,10 @@ Public Class M00000LOGON
 
         '■■■　初期処理　■■■
         '共通セッション情報
-        '   Namespace     : 名称空間(プロジェクト名)
         '   Class         : クラス(プロジェクト直下のクラス)
         '   Userid        : ユーザID
         '   APSRVname     : APサーバー名称
-        '   APSRVCamp     : APサーバー設置会社(全社サーバー："＊"、個別設置サーバー：会社)
-        '   APSRVOrg      : APサーバー設置部署(全社サーバー："＊"、個別設置サーバー：部署)
-        '   MOrg          : 管理部署(営業部、支店レベル)
         '   Term          : 操作端末(端末操作情報として利用)
-        '   TermCamp      : 操作端末会社(端末操作情報として利用)
-        '   TermORG       : 操作端末部署(端末操作情報として利用)
-        '   Selected_CAMPCODE   : 画面選択会社コード
-        '   Selected_STYMD      : 画面選択
-        '   Selected_ENDYMD     : 画面選択
-        '   Selected_USERIDFrom : 画面選択
-        '   Selected_USERIDTo   : 画面選択
-        '   Selected_USERIDG1   : 画面選択
-        '   Selected_USERIDG2   : 画面選択
-        '   Selected_USERIDG3   : 画面選択
-        '   Selected_USERIDG4   : 画面選択
-        '   Selected_USERIDG5   : 画面選択
-        '   Selected_MAPIDPFrom : 画面選択
-        '   Selected_MAPIDPTo   : 画面選択
-        '   Selected_MAPIDPG1   : 画面選択
-        '   Selected_MAPIDPG2   : 画面選択
-        '   Selected_MAPIDPG3   : 画面選択
-        '   Selected_MAPIDPG4   : 画面選択
-        '   Selected_MAPIDPG5   : 画面選択
-        '   Selected_MAPIDFrom  : 画面選択
-        '   Selected_MAPIDTo    : 画面選択
-        '   Selected_MAPIDG1    : 画面選択
-        '   Selected_MAPIDG2    : 画面選択
-        '   Selected_MAPIDG3    : 画面選択
-        '   Selected_MAPIDG4    : 画面選択
-        '   Selected_MAPIDG5    : 画面選択
 
         '   DBcon         : DB接続文字列 
         '   LOGdir        : ログ出力ディレクトリ 
@@ -61,10 +31,6 @@ Public Class M00000LOGON
         '   JNLdir        : 更新ジャーナル格納ディレクトリ
 
         '   MAPmapid      : 画面間IF(MAPID)
-        '   MAPvariant    : 画面間IF(変数)
-        '   MAPpermitcode : 画面間IF(権限)
-        '   MAPetc        : 画面間IF(各PRGで利用)
-        '   DRIVERS       : 事務用URL：初期URL(=htt://xxxx/JOTWEB)、乗務員用URL：初期URL(=htt://xxxx/DRIVERS)
 
         If IsPostBack Then
             PassWord.Attributes.Add("value", PassWord.Text)

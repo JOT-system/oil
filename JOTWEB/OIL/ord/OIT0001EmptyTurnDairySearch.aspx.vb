@@ -84,6 +84,8 @@ Public Class OIT0001EmptyTurnDairySearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "UORG", WF_UORG.Text)
             '営業所
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text)
+            '積込日(開始)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "LODDATE", TxtLoadingDateStart.Text)
             '拠点
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE", TxtBase.Text)
             '列車番号
@@ -96,6 +98,8 @@ Public Class OIT0001EmptyTurnDairySearch
             WF_UORG.Text = work.WF_SEL_UORG.Text
             '営業所
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICE.Text
+            '積込日(開始)
+            TxtLoadingDateStart.Text = work.WF_SEL_LOADINGDATE.Text
             '拠点
             TxtBase.Text = work.WF_SEL_BASE.Text
             '列車番号
@@ -132,6 +136,45 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDO_Click()
+
+        '○ 入力文字置き換え(使用禁止文字排除)
+        '会社コード
+        Master.EraseCharToIgnore(WF_CAMPCODE.Text)
+        '運用部署
+        Master.EraseCharToIgnore(WF_UORG.Text)
+        '営業所
+        Master.EraseCharToIgnore(TxtSalesOffice.Text)
+        '積込日(開始)
+        Master.EraseCharToIgnore(TxtLoadingDateStart.Text)
+        '拠点
+        Master.EraseCharToIgnore(TxtBase.Text)
+        '列車番号
+        Master.EraseCharToIgnore(TxtTrainNumber.Text)
+
+        ''○ チェック処理
+        'WW_Check(WW_ERR_SW)
+        'If WW_ERR_SW = "ERR" Then
+        '    Exit Sub
+        'End If
+
+        '○ 条件選択画面の入力値退避
+        '会社コード
+        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text
+        '運用部署
+        work.WF_SEL_UORG.Text = WF_UORG.Text
+        '営業所
+        work.WF_SEL_SALESOFFICE.Text = TxtSalesOffice.Text
+        '積込日
+        work.WF_SEL_LOADINGDATE.Text = TxtLoadingDateStart.Text
+        '拠点
+        work.WF_SEL_BASE.Text = TxtBase.Text
+        '列車番号
+        work.WF_SEL_TRAINNUMBER.Text = TxtTrainNumber.Text
+
+        '○ 画面レイアウト設定
+        If Master.VIEWID = "" Then
+            Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
+        End If
 
         Master.CheckParmissionCode(WF_CAMPCODE.Text)
         If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then

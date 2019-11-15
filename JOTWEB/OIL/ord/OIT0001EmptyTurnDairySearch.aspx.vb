@@ -84,6 +84,8 @@ Public Class OIT0001EmptyTurnDairySearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "UORG", WF_UORG.Text)
             '営業所
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text)
+            '積込日(開始)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "LODDATE", TxtLoadingDateStart.Text)
             '拠点
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE", TxtBase.Text)
             '列車番号
@@ -96,6 +98,8 @@ Public Class OIT0001EmptyTurnDairySearch
             WF_UORG.Text = work.WF_SEL_UORG.Text
             '営業所
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICE.Text
+            '積込日(開始)
+            TxtLoadingDateStart.Text = work.WF_SEL_LOADINGDATE.Text
             '拠点
             TxtBase.Text = work.WF_SEL_BASE.Text
             '列車番号
@@ -140,6 +144,8 @@ Public Class OIT0001EmptyTurnDairySearch
         Master.EraseCharToIgnore(WF_UORG.Text)
         '営業所
         Master.EraseCharToIgnore(TxtSalesOffice.Text)
+        '積込日(開始)
+        Master.EraseCharToIgnore(TxtLoadingDateStart.Text)
         '拠点
         Master.EraseCharToIgnore(TxtBase.Text)
         '列車番号
@@ -158,6 +164,8 @@ Public Class OIT0001EmptyTurnDairySearch
         work.WF_SEL_UORG.Text = WF_UORG.Text
         '営業所
         work.WF_SEL_SALESOFFICE.Text = TxtSalesOffice.Text
+        '積込日
+        work.WF_SEL_LOADINGDATE.Text = TxtLoadingDateStart.Text
         '拠点
         work.WF_SEL_BASE.Text = TxtBase.Text
         '列車番号

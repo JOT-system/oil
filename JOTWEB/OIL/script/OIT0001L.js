@@ -9,37 +9,43 @@ function InitDisplay() {
         document.getElementById("LF_LEFTBOX").style.width = "26em";
     };
 
-    // ○画面切替用処理（表示/非表示切替「ヘッダー、ディティール」）
-    if (document.getElementById('WF_BOXChange').value == "detailbox") {
-        document.getElementById("headerbox").style.visibility = "hidden";
-        document.getElementById("detailbox").style.visibility = "visible";
-        document.getElementById('WF_BOXChange').value = "detailbox";
-    } else {
-        document.getElementById("headerbox").style.visibility = "visible";
-        document.getElementById("detailbox").style.visibility = "hidden";
-        document.getElementById('WF_BOXChange').value = "headerbox";
-    };
-
     addLeftBoxExtention(leftListExtentionTarget);
 
     if (document.getElementById('WF_RightboxOpen').value == "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     };
 
-
-
-
-    //更新ボタン活性／非活性
-    if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
-        //活性
-        document.getElementById("WF_ButtonUPDATE").disabled = "";
-    } else {
-        //非活性 
-        document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
-    };
+    ////更新ボタン活性／非活性
+    //if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
+    //    //活性
+    //    document.getElementById("WF_ButtonUPDATE").disabled = "";
+    //} else {
+    //    //非活性 
+    //    document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
+    //};
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack);
 
-
+    // チェックボックス
+    ChangeCheckBox();
 };
 
+// ○チェックボックス変更
+function ChangeCheckBox() {
+
+    var objTable = document.getElementById("pnlListArea_DL").children[0];
+
+    var chkObjs = objTable.querySelectorAll("input[id^='chkpnlListAreaOPERATION']");
+    var spnObjs = objTable.querySelectorAll("span[id^='hchkpnlListAreaOPERATION']");
+
+    for (let i = 0; i < chkObjs.length; i++) {
+
+        if (chkObjs[i] !== null) {
+            if (spnObjs[i].innerText == "on") {
+                chkObjs[i].checked = true;
+            } else {
+                chkObjs[i].checked = false;
+            }
+        }
+    }
+}

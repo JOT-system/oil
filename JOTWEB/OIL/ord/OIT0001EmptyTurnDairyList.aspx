@@ -34,10 +34,10 @@
                 <a style="position:fixed;top:2.8em;left:0.5em;">
                     <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
                 </a>
-                <a style="position:fixed;top:2.8em;left:5.5em;">
-                    <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECTLIFTED');" />
+                <a style="position:fixed;top:2.8em;left:5em;">
+                    <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
                 </a>
-                <a style="position:fixed;top:2.8em;left:10.5em;">
+                <a style="position:fixed;top:2.8em;left:9.5em;">
                     <input type="button" id="WF_ButtonLINE_LIFTED" value="行解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:58em;">
@@ -49,10 +49,10 @@
                 <a style="position:fixed;top:2.8em;left:67em;">
                     <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
                 </a>
-                <a style="position:fixed;top:3.2em;left:75em;">
+                <a style="position:fixed;top:3.2em;left:75em;display:none;">
                     <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />
                 </a>
-                <a style="position:fixed;top:3.2em;left:77em;">
+                <a style="position:fixed;top:3.2em;left:77em;display:none;">
                     <asp:Image ID="WF_ButtonLAST2" runat="server" ImageUrl="~/img/最終頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonLAST');" Height="1em" ImageAlign="AbsMiddle" />
                 </a>
             </div>

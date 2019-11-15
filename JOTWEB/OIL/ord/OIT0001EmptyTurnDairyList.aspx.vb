@@ -28,7 +28,8 @@ Public Class OIT0001EmptyTurnDairyList
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
-    Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
+    '    Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
+    Private CS0013ProfView As New CS0013ProfView_TEST                    'Tableオブジェクト展開
     Private CS0020JOURNAL As New CS0020JOURNAL                      '更新ジャーナル出力
     Private CS0023XLSUPLOAD As New CS0023XLSUPLOAD                  'XLSアップロード
     Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
@@ -63,10 +64,6 @@ Public Class OIT0001EmptyTurnDairyList
                             WF_ButtonDownload_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
-                            'Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            '    WF_ButtonFIRST_Click()
-                            'Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            '    WF_ButtonLAST_Click()
                             'Case "WF_GridDBclick"           'GridViewダブルクリック
                             '    WF_Grid_DBClick()
                             'Case "WF_MouseWheelUp"          'マウスホイール(Up)
@@ -208,7 +205,8 @@ Public Class OIT0001EmptyTurnDairyList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
+        '        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView_TEST.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -382,7 +380,8 @@ Public Class OIT0001EmptyTurnDairyList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Horizontal
+        '        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView_TEST.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True

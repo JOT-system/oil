@@ -178,7 +178,7 @@
             <p id="KEY_LINE_12">
                 <!-- 画面初期値ロール -->
                 <a>
-                    <asp:Label ID="WF_VARIANT_L" runat="server" Text="画面初期値ロール" Width="10.0em" CssClass=WF_TEXT_LABEL></asp:Label>
+                    <asp:Label ID="WF_VARIANT_L" runat="server" Text="画面初期値ロール" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                     <asp:TextBox ID="WF_VARIANT" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                     <asp:Label ID="WF_VARIANT_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                 </a>

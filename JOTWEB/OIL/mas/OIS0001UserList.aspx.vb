@@ -1385,56 +1385,28 @@ Public Class OIS0001UserList
             Next
 
             '○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MODEL") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ORIGINOWNERCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OWNERCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASECLASS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("AUTOEXTENTION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASESTYMD") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LEASEENDYMD") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("USERCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CURRENTSTATIONCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYSTATIONCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("USERLIMIT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LIMITTEXTRADIARYSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DEDICATETYPECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYTYPECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("EXTRADINARYLIMIT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OPERATIONBASECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("COLORCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ENEOS") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ECO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ALLINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TRANSFERDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OBTAINEDCODE") >= 0 Then
+            If WW_COLUMNS.IndexOf("USERID") >= 0 Then
+
                 For Each OIS0001row As DataRow In OIS0001tbl.Rows
-                    If XLSTBLrow("TANKNUMBER") = OIS0001row("TANKNUMBER") AndAlso
-                        XLSTBLrow("MODEL") = OIS0001row("MODEL") AndAlso
-                        XLSTBLrow("ORIGINOWNERCODE") = OIS0001row("ORIGINOWNERCODE") AndAlso
-                        XLSTBLrow("OWNERCODE") = OIS0001row("OWNERCODE") AndAlso
-                        XLSTBLrow("LEASECODE") = OIS0001row("LEASECODE") AndAlso
-                        XLSTBLrow("LEASECLASS") = OIS0001row("LEASECLASS") AndAlso
-                        XLSTBLrow("AUTOEXTENTION") = OIS0001row("AUTOEXTENTION") AndAlso
-                        XLSTBLrow("LEASESTYMD") = OIS0001row("LEASESTYMD") AndAlso
-                        XLSTBLrow("LEASEENDYMD") = OIS0001row("LEASEENDYMD") AndAlso
-                        XLSTBLrow("USERCODE") = OIS0001row("USERCODE") AndAlso
-                        XLSTBLrow("CURRENTSTATIONCODE") = OIS0001row("CURRENTSTATIONCODE") AndAlso
-                        XLSTBLrow("EXTRADINARYSTATIONCODE") = OIS0001row("EXTRADINARYSTATIONCODE") AndAlso
-                        XLSTBLrow("USERLIMIT") = OIS0001row("USERLIMIT") AndAlso
-                        XLSTBLrow("LIMITTEXTRADIARYSTATION") = OIS0001row("LIMITTEXTRADIARYSTATION") AndAlso
-                        XLSTBLrow("DEDICATETYPECODE") = OIS0001row("DEDICATETYPECODE") AndAlso
-                        XLSTBLrow("EXTRADINARYTYPECODE") = OIS0001row("EXTRADINARYTYPECODE") AndAlso
-                        XLSTBLrow("EXTRADINARYLIMIT") = OIS0001row("EXTRADINARYLIMIT") AndAlso
-                        XLSTBLrow("OPERATIONBASECODE") = OIS0001row("OPERATIONBASECODE") AndAlso
-                        XLSTBLrow("COLORCODE") = OIS0001row("COLORCODE") AndAlso
-                        XLSTBLrow("ENEOS") = OIS0001row("ENEOS") AndAlso
-                        XLSTBLrow("ECO") = OIS0001row("ECO") AndAlso
-                        XLSTBLrow("ALLINSPECTIONDATE") = OIS0001row("ALLINSPECTIONDATE") AndAlso
-                        XLSTBLrow("TRANSFERDATE") = OIS0001row("TRANSFERDATE") AndAlso
-                        XLSTBLrow("OBTAINEDCODE") = OIS0001row("OBTAINEDCODE") Then
-                        OIS0001INProw.ItemArray = OIS0001row.ItemArray
+                    If XLSTBLrow("USERID") = OIS0001row("USERID") AndAlso
+                        XLSTBLrow("STAFFNAMES") = OIS0001row("STAFFNAMES") AndAlso
+                        XLSTBLrow("STAFFNAMEL") = OIS0001row("STAFFNAMEL") AndAlso
+                        XLSTBLrow("MAPID") = OIS0001row("MAPID") AndAlso
+                        XLSTBLrow("PASSWORD") = OIS0001row("PASSWORD") AndAlso
+                        XLSTBLrow("MISSCNT") = OIS0001row("MISSCNT") AndAlso
+                        XLSTBLrow("PASSENDYMD") = OIS0001row("PASSENDYMD") AndAlso
+                        XLSTBLrow("STYMD") = OIS0001row("STYMD") AndAlso
+                        XLSTBLrow("ENDYMD") = OIS0001row("ENDYMD") AndAlso
+                        XLSTBLrow("CAMPCODE") = OIS0001row("CAMPCODE") AndAlso
+                        XLSTBLrow("ORG") = OIS0001row("ORG") AndAlso
+                        XLSTBLrow("EMAIL") = OIS0001row("EMAIL") AndAlso
+                        XLSTBLrow("MENUROLE") = OIS0001row("MENUROLE") AndAlso
+                        XLSTBLrow("MAPROLE") = OIS0001row("MAPROLE") AndAlso
+                        XLSTBLrow("VIEWPROFID") = OIS0001row("VIEWPROFID") AndAlso
+                        XLSTBLrow("RPRTPROFID") = OIS0001row("RPRTPROFID") AndAlso
+                        XLSTBLrow("INIMAPVALROLE") = OIS0001row("INIMAPVALROLE") AndAlso
+                        XLSTBLrow("APPROVALID") = OIS0001row("APPROVALID") Then
+                        OIS0001INProw.ItemArray = OIS0001row.ItemArray Then
                         Exit For
                     End If
                 Next

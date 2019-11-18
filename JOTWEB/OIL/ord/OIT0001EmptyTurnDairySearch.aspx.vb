@@ -86,8 +86,8 @@ Public Class OIT0001EmptyTurnDairySearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text)
             '積込日(開始)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "LODDATE", TxtLoadingDateStart.Text)
-            '拠点
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE", TxtBase.Text)
+            ''拠点
+            'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE", TxtBase.Text)
             '列車番号
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", TxtTrainNumber.Text)
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0001L Then   '一覧画面からの遷移
@@ -100,8 +100,8 @@ Public Class OIT0001EmptyTurnDairySearch
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICE.Text
             '積込日(開始)
             TxtLoadingDateStart.Text = work.WF_SEL_LOADINGDATE.Text
-            '拠点
-            TxtBase.Text = work.WF_SEL_BASE.Text
+            ''拠点
+            'TxtBase.Text = work.WF_SEL_BASE.Text
             '列車番号
             TxtTrainNumber.Text = work.WF_SEL_TRAINNUMBER.Text
 
@@ -146,8 +146,8 @@ Public Class OIT0001EmptyTurnDairySearch
         Master.EraseCharToIgnore(TxtSalesOffice.Text)
         '積込日(開始)
         Master.EraseCharToIgnore(TxtLoadingDateStart.Text)
-        '拠点
-        Master.EraseCharToIgnore(TxtBase.Text)
+        ''拠点
+        'Master.EraseCharToIgnore(TxtBase.Text)
         '列車番号
         Master.EraseCharToIgnore(TxtTrainNumber.Text)
 
@@ -166,8 +166,8 @@ Public Class OIT0001EmptyTurnDairySearch
         work.WF_SEL_SALESOFFICE.Text = TxtSalesOffice.Text
         '積込日
         work.WF_SEL_LOADINGDATE.Text = TxtLoadingDateStart.Text
-        '拠点
-        work.WF_SEL_BASE.Text = TxtBase.Text
+        ''拠点
+        'work.WF_SEL_BASE.Text = TxtBase.Text
         '列車番号
         work.WF_SEL_TRAINNUMBER.Text = TxtTrainNumber.Text
 
@@ -193,6 +193,7 @@ Public Class OIT0001EmptyTurnDairySearch
 
         O_RTN = ""
         Dim WW_TEXT As String = ""
+        Dim WW_STYMD As Date
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
 
@@ -257,6 +258,21 @@ Public Class OIT0001EmptyTurnDairySearch
             Exit Sub
         End If
 
+        '積込日(開始)
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STYMD", TxtLoadingDateStart.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            Try
+                Date.TryParse(TxtLoadingDateStart.Text, WW_STYMD)
+            Catch ex As Exception
+                WW_STYMD = C_DEFAULT_YMD
+            End Try
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            TxtLoadingDateStart.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -286,22 +302,35 @@ Public Class OIT0001EmptyTurnDairySearch
             End Try
 
             With leftview
-                '会社コード
-                Dim prmData As New Hashtable
-                prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+                If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
 
-                '運用部署
-                If WF_FIELD.Value = "WF_UORG" Then
-                    prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
+                    '会社コード
+                    Dim prmData As New Hashtable
+                    prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+
+                    '運用部署
+                    If WF_FIELD.Value = "WF_UORG" Then
+                        prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
+                    End If
+
+                    '営業所
+                    If WF_FIELD.Value = "TxtSalesOffice" Then
+                        prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                    End If
+
+                    .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                    .ActiveListBox()
+                Else
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        Case "TxtLoadingDateStart"
+                            .WF_Calendar.Text = TxtLoadingDateStart.Text
+                            'Case "TxtLoadingDateEnd"
+                            '    .WF_Calendar.Text = TxtLoadingDateEnd.Text
+                    End Select
+                    .ActiveCalendar()
+
                 End If
-
-                '営業所
-                If WF_FIELD.Value = "TxtSalesOffice" Then
-                    prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
-                End If
-
-                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                .ActiveListBox()
             End With
 
         End If
@@ -368,6 +397,18 @@ Public Class OIT0001EmptyTurnDairySearch
                 LblSalesOfficeName.Text = WW_SelectText
                 TxtSalesOffice.Focus()
 
+            Case "TxtLoadingDateStart"  '積込日(開始)
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        TxtLoadingDateStart.Text = ""
+                    Else
+                        TxtLoadingDateStart.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                TxtLoadingDateStart.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -388,6 +429,8 @@ Public Class OIT0001EmptyTurnDairySearch
                 WF_UORG.Focus()
             Case "TxtSalesOffice"       '営業所
                 TxtSalesOffice.Focus()
+            Case "TxtLoadingDateStart"  '積込日(開始)
+                TxtLoadingDateStart.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行

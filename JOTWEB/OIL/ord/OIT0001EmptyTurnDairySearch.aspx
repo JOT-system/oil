@@ -53,23 +53,25 @@
 
         <!-- 積込日 -->
         <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">★積込日</a>
-        <a style="position:fixed; top:9.9em; left:18em;">
+        <a style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox ID="TxtLoadingDateStart" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:9.9em; left:27em; font-weight:bold;">～</a>
+<!--
         <a style="position:fixed; top:9.9em; left:29em;">
             <asp:TextBox ID="TxtLoadingDateEnd" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-
+-->
         <!-- 拠点 -->
+<!--
         <a style="position:fixed; top:12.1em; left:4em; font-weight:bold;">拠点</a>
         <a style="position:fixed; top:12.1em; left:18em;">
             <asp:TextBox ID="TxtBase" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-
+-->
         <!-- 列車番号 -->
-        <a style="position:fixed; top:14.3em; left:4em; font-weight:bold;">列車番号</a>
-        <a style="position:fixed; top:14.3em; left:18em;">
+        <a style="position:fixed; top:12.1em; left:4em; font-weight:bold;">列車番号</a>
+        <a style="position:fixed; top:12.1em; left:18em;">
             <asp:TextBox ID="TxtTrainNumber" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
     </div>

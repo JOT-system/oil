@@ -44,7 +44,7 @@
         </a>
         <!-- 営業所 -->
         <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">★営業所</a>
-        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtSalesOffice');">
+        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
             <asp:TextBox ID="TxtSalesOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">

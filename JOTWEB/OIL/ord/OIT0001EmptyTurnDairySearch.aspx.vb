@@ -200,7 +200,33 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_DBClick()
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
 
+            With leftview
+                '会社コード
+                Dim prmData As New Hashtable
+                prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+
+                '運用部署
+                If WF_FIELD.Value = "WF_UORG" Then
+                    prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
+                End If
+
+                '営業所
+                If WF_FIELD.Value = "TxtSalesOffice" Then
+                    prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                End If
+
+                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                .ActiveListBox()
+            End With
+
+        End If
     End Sub
 
     ''' <summary>
@@ -219,7 +245,38 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonSel_Click()
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
 
+        '○ 選択内容を取得
+        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "WF_CAMPCODE"          '会社コード
+                WF_CAMPCODE.Text = WW_SelectValue
+                WF_CAMPCODE_TEXT.Text = WW_SelectText
+                WF_CAMPCODE.Focus()
+
+            Case "WF_UORG"              '運用部署
+                WF_UORG.Text = WW_SelectValue
+                WF_UORG_TEXT.Text = WW_SelectText
+                WF_UORG.Focus()
+
+            Case "TxtSalesOffice"       '営業所
+                TxtSalesOffice.Text = WW_SelectValue
+                LblSalesOfficeName.Text = WW_SelectText
+                TxtSalesOffice.Focus()
+
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
     End Sub
 
     ''' <summary>
@@ -227,7 +284,19 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonCan_Click()
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "WF_CAMPCODE"          '会社コード
+                WF_CAMPCODE.Focus()
+            Case "WF_UORG"              '運用部署
+                WF_UORG.Focus()
+            Case "TxtSalesOffice"       '貨物車コード
+                TxtSalesOffice.Focus()
+        End Select
 
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
     End Sub
 
     ''' <summary>
@@ -286,9 +355,9 @@ Public Class OIT0001EmptyTurnDairySearch
                 Case "UORG"             '運用部署
                     prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                    'Case "OFFICECODE"       '営業所
-                    '    prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, I_VALUE)
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "OFFICECODE"       '営業所
+                    prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

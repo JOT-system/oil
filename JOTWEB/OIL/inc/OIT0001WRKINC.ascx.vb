@@ -18,7 +18,6 @@ Public Class OIT0001WRKINC
     Public Sub Initialize()
     End Sub
 
-
     ''' <summary>
     ''' 運用部署パラメーター
     ''' </summary>
@@ -36,6 +35,20 @@ Public Class OIT0001WRKINC
 
         CreateUORGParam = prmData
 
+    End Function
+
+    ''' <summary>
+    ''' 営業所の取得
+    ''' </summary>
+    ''' <param name="I_SALESOFFICEPT"></param>
+    ''' <returns></returns>
+    ''' <remarks>全て</remarks>
+    Function CreateSALESOFFICEParam(ByVal I_COMPCODE As String, ByVal I_SALESOFFICEPT As String) As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_SALESOFFICE) = I_SALESOFFICEPT
+        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+        CreateSALESOFFICEParam = prmData
     End Function
 
     ''' <summary>

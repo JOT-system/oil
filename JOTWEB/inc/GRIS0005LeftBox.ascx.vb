@@ -101,6 +101,7 @@ Public Class GRIS0005LeftBox
         LC_STATIONCODE
         LC_TANKNUMBER
         LC_TANKMODEL
+        LC_SALESOFFICE
     End Enum
     ''' <summary>
     ''' パラメタ群
@@ -146,6 +147,7 @@ Public Class GRIS0005LeftBox
         LP_STATIONCODE
         LP_TANKNUMBER
         LP_TANKMODEL
+        LP_SALESOFFICE
     End Enum
 
     ''' <summary>
@@ -419,9 +421,13 @@ Public Class GRIS0005LeftBox
                 '貨物駅パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STATIONPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
-                'Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
-                '    'カレンダー
-                '    lbox = Nothing
+            Case LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
+                '営業所(組織コード)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SALESOFFICE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                'カレンダー
+                lbox = Nothing
             Case Else
                 lbox = createFixValueList(Params, O_RTN)
         End Select

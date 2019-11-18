@@ -14,7 +14,6 @@
         <!-- 全体レイアウト　Menuheaderbox -->
         <div  class="Menuheaderbox" id="Menuheaderbox">
 
-
           <!-- 在庫管理メニュー表示 --------------------------------------------------------->
           <a  class="Menu_L" id="Menu_L"  >
             <asp:Repeater ID="Repeater_Menu_L" runat="server" >
@@ -22,7 +21,6 @@
                     <table>
                 </HeaderTemplate>
                 <ItemTemplate>
-
                     <tr>
                         <td >
                             <asp:Label ID="WF_MenuLabe_L" runat="server" CssClass="WF_MenuLabel_L"></asp:Label>
@@ -32,12 +30,10 @@
                             <asp:Button ID="WF_MenuButton_L" runat="server" CssClass="WF_MenuButton_L" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
-
                 </ItemTemplate>
                 <FooterTemplate>
                     </table>
                 </FooterTemplate>
-             
             </asp:Repeater>
           </a>
 
@@ -48,7 +44,6 @@
                     <table>
                 </HeaderTemplate>
                 <ItemTemplate>
-
                     <tr>
                         <td >
                             <!-- 受注管理メニュー表示 -->
@@ -56,19 +51,15 @@
                             <asp:Label ID="WF_MenuURL_L2" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuVARI_L2" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuMAP_L2" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_L2" runat="server" CssClass="WF_MenuButton_L2" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'"/> 
+                            <asp:Button ID="WF_MenuButton_L2" runat="server" CssClass="WF_MenuButton_L2" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
-
                 </ItemTemplate>
                 <FooterTemplate>
                     </table>
                 </FooterTemplate>
-             
             </asp:Repeater>
           </a>
-
-
 
           <!-- 回送管理メニュー表示 --------------------------------------------------------->
           <a class="Menu_R" id="Menu_R" >
@@ -83,18 +74,15 @@
                             <asp:Label ID="WF_MenuURL_R" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuVARI_R" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuMAP_R" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_R" runat="server" CssClass="WF_MenuButton_R" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'"/> 
+                            <asp:Button ID="WF_MenuButton_R" runat="server" CssClass="WF_MenuButton_R" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
                 </ItemTemplate>
-
                 <FooterTemplate>
                     </table>
                 </FooterTemplate>
-             
             </asp:Repeater>
           </a>
-
 
           <!-- マスタ管理メニュー表示 --------------------------------------------------------->
           <a class="Menu_R2" id="Menu_R2" >
@@ -109,29 +97,114 @@
                             <asp:Label ID="WF_MenuURL_R2" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuVARI_R2" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuMAP_R2" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_R2" runat="server" CssClass="WF_MenuButton_R2" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'"/> 
+                            <asp:Button ID="WF_MenuButton_R2" runat="server" CssClass="WF_MenuButton_R2" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
                 </ItemTemplate>
-
                 <FooterTemplate>
                     </table>
                 </FooterTemplate>
-             
             </asp:Repeater>
           </a>
 
+          <!-- 請求支払管理メニュー表示 --------------------------------------------------------->
+          <a  class="Menu_L3" id="Menu_L3"  >
+            <asp:Repeater ID="Repeater_Menu_L3" runat="server" >
+                <HeaderTemplate>
+                    <table>
+                </HeaderTemplate>
+                <ItemTemplate>
+                    <tr>
+                        <td >
+                            <!-- 受注管理メニュー表示 -->
+                            <asp:Label ID="WF_MenuLabe_L3" runat="server" CssClass="WF_MenuLabel_L3"></asp:Label>
+                            <asp:Label ID="WF_MenuURL_L3" runat="server" Visible="False"></asp:Label>
+                            <asp:Label ID="WF_MenuVARI_L3" runat="server" Visible="False"></asp:Label>
+                            <asp:Label ID="WF_MenuMAP_L3" runat="server" Visible="False"></asp:Label>
+                            <asp:Button ID="WF_MenuButton_L3" runat="server" CssClass="WF_MenuButton_L3" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                        </td>
+                    </tr>
+                </ItemTemplate>
+                <FooterTemplate>
+                    </table>
+                </FooterTemplate>
+            </asp:Repeater>
+          </a>
 
+          <!-- タンク車所在管理メニュー表示 --------------------------------------------------------->
+          <a  class="Menu_L4" id="Menu_L4"  >
+            <asp:Repeater ID="Repeater_Menu_L4" runat="server" >
+                <HeaderTemplate>
+                    <table>
+                </HeaderTemplate>
+                <ItemTemplate>
+                    <tr>
+                        <td >
+                            <!-- 受注管理メニュー表示 -->
+                            <asp:Label ID="WF_MenuLabe_L4" runat="server" CssClass="WF_MenuLabel_L4"></asp:Label>
+                            <asp:Label ID="WF_MenuURL_L4" runat="server" Visible="False"></asp:Label>
+                            <asp:Label ID="WF_MenuVARI_L4" runat="server" Visible="False"></asp:Label>
+                            <asp:Label ID="WF_MenuMAP_L4" runat="server" Visible="False"></asp:Label>
+                            <asp:Button ID="WF_MenuButton_L4" runat="server" CssClass="WF_MenuButton_L4" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                        </td>
+                    </tr>
+                </ItemTemplate>
+                <FooterTemplate>
+                    </table>
+                </FooterTemplate>
+            </asp:Repeater>
+          </a>
 
+          <!-- 実績・統計メニュー表示 --------------------------------------------------------->
+          <a class="Menu_R3" id="Menu_R3" >
+            <asp:Repeater ID="Repeater_Menu_R3" runat="server" >
+                <HeaderTemplate>
+                    <table>
+                </HeaderTemplate>
+                <ItemTemplate>
+                    <tr>
+                        <td >
+                            <asp:Label ID="WF_MenuLabe_R3" runat="server" CssClass="WF_MenuLabel_R3"></asp:Label>
+                            <asp:Label ID="WF_MenuURL_R3" runat="server"  Visible="False" ></asp:Label>
+                            <asp:Label ID="WF_MenuVARI_R3" runat="server"  Visible="False" ></asp:Label>
+                            <asp:Label ID="WF_MenuMAP_R3" runat="server" Visible="False"></asp:Label>
+                            <asp:Button ID="WF_MenuButton_R3" runat="server" CssClass="WF_MenuButton_R3" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                        </td>
+                    </tr>
+                </ItemTemplate>
+                <FooterTemplate>
+                    </table>
+                </FooterTemplate>
+            </asp:Repeater>
+          </a>
 
+          <!-- データ連携メニュー表示 --------------------------------------------------------->
+          <a class="Menu_R4" id="Menu_R4" >
+            <asp:Repeater ID="Repeater_Menu_R4" runat="server" >
+                <HeaderTemplate>
+                    <table>
+                </HeaderTemplate>
+                <ItemTemplate>
+                    <tr>
+                        <td >
+                            <asp:Label ID="WF_MenuLabe_R4" runat="server" CssClass="WF_MenuLabel_R4"></asp:Label>
+                            <asp:Label ID="WF_MenuURL_R4" runat="server"  Visible="False" ></asp:Label>
+                            <asp:Label ID="WF_MenuVARI_R4" runat="server"  Visible="False" ></asp:Label>
+                            <asp:Label ID="WF_MenuMAP_R4" runat="server" Visible="False"></asp:Label>
+                            <asp:Button ID="WF_MenuButton_R4" runat="server" CssClass="WF_MenuButton_R4" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                        </td>
+                    </tr>
+                </ItemTemplate>
+                <FooterTemplate>
+                    </table>
+                </FooterTemplate>
+            </asp:Repeater>
+          </a>
 
-
-
-
-
-            <a hidden="hidden">
-                <input id="WF_ButtonClick" runat="server" value=""  type="text" />        <!-- ボタン押下 -->
-            </a>
+         <!------- ボタン押下 ------->
+         <a hidden="hidden">
+                <input id="WF_ButtonClick" runat="server" value=""  type="text" />        
+          </a>
         </div>
             <!-- Work レイアウト -->
         <LSINC:work id="work" runat="server" />

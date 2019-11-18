@@ -30,26 +30,30 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
         
 
 /*在庫管理メニュー表示*/
-    #Menu_L{
-        height:auto; 
-        width:33em;
-        position:fixed;
-        margin: 5px 0px 0px 0px;
-        left:2em;
-        overflow-y:auto;
-    }
+#Menu_L {
+    height: auto;
+    width: 18%;
+    position: fixed;
+    margin: 5px 0px 0px 0px;
+    left: 2em;
+    overflow-y: auto;
+    background-color: mediumseagreen;
+    transform: translateY(3%);
+}
 
-    .WF_MenuLabel_L {
-        height: 2em;
-        width: 30em;
-        position: relative;
-        left: 0em;
-        overflow: hidden;
-        color: black;
-        font-weight: bold;
-        vertical-align: middle;
-        text-align: left;
-    }
+.WF_MenuLabel_L {
+    height: 2em;
+    width: 30em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: rgba(216, 221, 227, 0.8);
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: large;
+}
 
     .WF_MenuButton_L {
         height: 2em;
@@ -65,14 +69,14 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     }
 
 /*受注管理メニュー表示*/
-    #Menu_L2 {
-        height: auto;
-        width: 33em;
-        position: fixed;
-        margin: 5px 0px 0px 0px;
-        left: 20em;
-        overflow-y: auto;
-    }
+#Menu_L2 {
+    height: auto;
+    width: 30%;
+    position: fixed;
+    margin: 5px 0px 0px 0px;
+    left: 20em;
+    overflow-y: auto;
+}
 
     .WF_MenuLabel_L2 {
         height: 2em;
@@ -99,17 +103,89 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
         text-align: left;
     }
 
+/*請求支払管理メニュー表示*/
+#Menu_L3 {
+    height: auto;
+    width: 30%;
+    position: fixed;
+    margin: 25% 0% 0% 0%;
+    left: 2em;
+    overflow-y: auto;
+}
+
+.WF_MenuLabel_L3 {
+    height: 2em;
+    width: 30em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: black;
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.WF_MenuButton_L3 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: black;
+    border: none;
+    background-color: gray;
+    vertical-align: middle;
+    text-align: left;
+}
+
+
+/*タンク車所在管理メニュー表示*/
+#Menu_L4 {
+    height: auto;
+    width: 30%;
+    position: fixed;
+    margin: 25% 0% 0% 0%;
+    left: 20em;
+    overflow-y: auto;
+}
+
+.WF_MenuLabel_L4 {
+    height: 2em;
+    width: 30em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: black;
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.WF_MenuButton_L4 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: black;
+    border: none;
+    background-color: gray;
+    vertical-align: middle;
+    text-align: left;
+}
+
+
 
 
 /*回送管理メニュー表示*/
-    #Menu_R{
-        height:auto; 
-        width:33em;
-        position:fixed;
-        margin: 5px 0px 0px 0px;
-        left:41em;
-        overflow-y:auto;
-    }
+#Menu_R {
+    height: auto;
+    width: 30%;
+    position: fixed;
+    margin: 5px 0px 0px 0px;
+    left: 41em;
+    overflow-y: auto;
+}
 
     .WF_MenuLabel_R{
         height:2em;
@@ -139,7 +215,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 /*マスタ管理メニュー表示*/
 #Menu_R2 {
     height: auto;
-    width: 33em;
+    width: 30%;
     position: fixed;
     margin: 5px 0px 0px 0px;
     left: 61em;
@@ -170,4 +246,78 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     vertical-align: middle;
     text-align: left;
 }
+
+
+
+/*実績・統計メニュー表示*/
+#Menu_R3 {
+    height: auto;
+    width: 30%;
+    position: fixed;
+    margin: 25% 0% 0% 0%;
+    left: 41em;
+    overflow-y: auto;
+}
+
+.WF_MenuLabel_R3 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: black;
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.WF_MenuButton_R3 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: black;
+    border: none;
+    background-color: gray;
+    vertical-align: middle;
+    text-align: left;
+}
+
+/*データ連携メニュー表示*/
+#Menu_R4 {
+    height: auto;
+    width: 30%;
+    position: fixed;
+    margin: 25% 0% 0% 0%;
+    left: 61em;
+    overflow-y: auto;
+}
+
+.WF_MenuLabel_R4 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: black;
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.WF_MenuButton_R4 {
+    height: 2em;
+    width: 17em;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: black;
+    border: none;
+    background-color: gray;
+    vertical-align: middle;
+    text-align: left;
+}
+
+
 

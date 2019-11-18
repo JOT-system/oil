@@ -516,21 +516,11 @@ Public Class OIM0004StationCreate
 
                 'フィールドによってパラメーターを変える
                 Select Case WW_FIELD
-                    'Case "WF_TORICODES"                             '取引先(出荷場所)
-                    '    prmData = work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text)
+                    ''貨物車コード 
+                    'Case "STATIONCODE"
+                    '    prmData = work.CreateSTATIONPTParam(work.WF_SEL_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
 
-                    'Case "WF_SHUKABASHO"                            '出荷場所
-                    '    prmData = work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, WF_TORICODES.Text)
-
-                    'Case "WF_TORICODET"                             '取引先(届先)
-                    '    prmData = work.CreateTORIParam(work.WF_SEL_CAMPCODE.Text)
-
-                    'Case "WF_TODOKECODE"                            '届先
-                    '    prmData = work.CreateTODOKEParam(work.WF_SEL_CAMPCODE.Text, WF_TORICODET.Text)
-
-                    'Case "WF_MODELPT"                               'モデル距離パターン
-                    '    prmData = work.CreateMODELPTParam(work.WF_SEL_CAMPCODE.Text, WF_MODELPT.Text)
-
+                    '削除フラグ   
                     Case "WF_DELFLG"
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
                         prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
@@ -575,8 +565,9 @@ Public Class OIM0004StationCreate
 
                     '貨物駅コード
                 Case "STATIONCODE"
-                    TxtStationCode.Text = WW_SelectValue
+                    TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
                     LblStationCodeText.Text = WW_SelectText
+                    TxtBranch.Text = WW_SelectValue.Substring(4)
                     TxtStationCode.Focus()
 
                     '貨物コード枝番

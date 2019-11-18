@@ -86,8 +86,8 @@ Public Class OIT0001EmptyTurnDairySearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text)
             '積込日(開始)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "LODDATE", TxtLoadingDateStart.Text)
-            '拠点
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE", TxtBase.Text)
+            ''拠点
+            'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE", TxtBase.Text)
             '列車番号
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", TxtTrainNumber.Text)
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0001L Then   '一覧画面からの遷移
@@ -100,8 +100,8 @@ Public Class OIT0001EmptyTurnDairySearch
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICE.Text
             '積込日(開始)
             TxtLoadingDateStart.Text = work.WF_SEL_LOADINGDATE.Text
-            '拠点
-            TxtBase.Text = work.WF_SEL_BASE.Text
+            ''拠点
+            'TxtBase.Text = work.WF_SEL_BASE.Text
             '列車番号
             TxtTrainNumber.Text = work.WF_SEL_TRAINNUMBER.Text
 
@@ -146,16 +146,16 @@ Public Class OIT0001EmptyTurnDairySearch
         Master.EraseCharToIgnore(TxtSalesOffice.Text)
         '積込日(開始)
         Master.EraseCharToIgnore(TxtLoadingDateStart.Text)
-        '拠点
-        Master.EraseCharToIgnore(TxtBase.Text)
+        ''拠点
+        'Master.EraseCharToIgnore(TxtBase.Text)
         '列車番号
         Master.EraseCharToIgnore(TxtTrainNumber.Text)
 
-        ''○ チェック処理
-        'WW_Check(WW_ERR_SW)
-        'If WW_ERR_SW = "ERR" Then
-        '    Exit Sub
-        'End If
+        '○ チェック処理
+        WW_Check(WW_ERR_SW)
+        If WW_ERR_SW = "ERR" Then
+            Exit Sub
+        End If
 
         '○ 条件選択画面の入力値退避
         '会社コード
@@ -166,8 +166,8 @@ Public Class OIT0001EmptyTurnDairySearch
         work.WF_SEL_SALESOFFICE.Text = TxtSalesOffice.Text
         '積込日
         work.WF_SEL_LOADINGDATE.Text = TxtLoadingDateStart.Text
-        '拠点
-        work.WF_SEL_BASE.Text = TxtBase.Text
+        ''拠点
+        'work.WF_SEL_BASE.Text = TxtBase.Text
         '列車番号
         work.WF_SEL_TRAINNUMBER.Text = TxtTrainNumber.Text
 
@@ -181,6 +181,100 @@ Public Class OIT0001EmptyTurnDairySearch
             '画面遷移
             Master.TransitionPage()
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' チェック処理
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_Check(ByRef O_RTN As String)
+
+        O_RTN = ""
+        Dim WW_TEXT As String = ""
+        Dim WW_STYMD As Date
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+
+        '○ 単項目チェック
+        '会社コード
+        Master.CheckField(WF_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE.Text)
+                WF_CAMPCODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_CAMPCODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '運用部署
+        WW_TEXT = WF_UORG.Text
+        Master.CheckField(WF_CAMPCODE.Text, "UORG", WF_UORG.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            If WW_TEXT = "" Then
+                WF_UORG.Text = ""
+            Else
+                '存在チェック
+                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "運用部署 : " & WF_UORG.Text)
+                    WF_UORG.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_UORG.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '営業所
+        Master.CheckField(WF_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+                              "営業所 : " & TxtSalesOffice.Text)
+                TxtSalesOffice.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            TxtSalesOffice.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '積込日(開始)
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STYMD", TxtLoadingDateStart.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            Try
+                Date.TryParse(TxtLoadingDateStart.Text, WW_STYMD)
+            Catch ex As Exception
+                WW_STYMD = C_DEFAULT_YMD
+            End Try
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            TxtLoadingDateStart.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '○ 正常メッセージ
+        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
     End Sub
 
@@ -200,7 +294,46 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_DBClick()
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
 
+            With leftview
+                If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+
+                    '会社コード
+                    Dim prmData As New Hashtable
+                    prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+
+                    '運用部署
+                    If WF_FIELD.Value = "WF_UORG" Then
+                        prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
+                    End If
+
+                    '営業所
+                    If WF_FIELD.Value = "TxtSalesOffice" Then
+                        prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                    End If
+
+                    .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                    .ActiveListBox()
+                Else
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        Case "TxtLoadingDateStart"
+                            .WF_Calendar.Text = TxtLoadingDateStart.Text
+                            'Case "TxtLoadingDateEnd"
+                            '    .WF_Calendar.Text = TxtLoadingDateEnd.Text
+                    End Select
+                    .ActiveCalendar()
+
+                End If
+            End With
+
+        End If
     End Sub
 
     ''' <summary>
@@ -208,7 +341,25 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            '会社コード
+            Case "WF_CAMPCODE"
+                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            '運用部署
+            Case "WF_UORG"
+                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+            '営業所
+            Case "TxtSalesOffice"
+                CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+        End Select
 
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+        End If
     End Sub
 
     ' ******************************************************************************
@@ -219,7 +370,50 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonSel_Click()
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
 
+        '○ 選択内容を取得
+        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "WF_CAMPCODE"          '会社コード
+                WF_CAMPCODE.Text = WW_SelectValue
+                WF_CAMPCODE_TEXT.Text = WW_SelectText
+                WF_CAMPCODE.Focus()
+
+            Case "WF_UORG"              '運用部署
+                WF_UORG.Text = WW_SelectValue
+                WF_UORG_TEXT.Text = WW_SelectText
+                WF_UORG.Focus()
+
+            Case "TxtSalesOffice"       '営業所
+                TxtSalesOffice.Text = WW_SelectValue
+                LblSalesOfficeName.Text = WW_SelectText
+                TxtSalesOffice.Focus()
+
+            Case "TxtLoadingDateStart"  '積込日(開始)
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        TxtLoadingDateStart.Text = ""
+                    Else
+                        TxtLoadingDateStart.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                TxtLoadingDateStart.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
     End Sub
 
     ''' <summary>
@@ -227,7 +421,21 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonCan_Click()
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "WF_CAMPCODE"          '会社コード
+                WF_CAMPCODE.Focus()
+            Case "WF_UORG"              '運用部署
+                WF_UORG.Focus()
+            Case "TxtSalesOffice"       '営業所
+                TxtSalesOffice.Focus()
+            Case "TxtLoadingDateStart"  '積込日(開始)
+                TxtLoadingDateStart.Focus()
+        End Select
 
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
     End Sub
 
     ''' <summary>
@@ -235,6 +443,8 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_RIGHTBOX_DBClick()
+
+        rightview.InitViewID(WF_CAMPCODE.Text, WW_DUMMY)
 
     End Sub
 
@@ -244,6 +454,8 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' <remarks></remarks>
     Protected Sub WF_RIGHTBOX_Change()
 
+        rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
+
     End Sub
 
     ''' <summary>
@@ -251,6 +463,8 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_HELP_Click()
+
+        Master.ShowHelp()
 
     End Sub
 
@@ -286,9 +500,9 @@ Public Class OIT0001EmptyTurnDairySearch
                 Case "UORG"             '運用部署
                     prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                    'Case "OFFICECODE"       '営業所
-                    '    prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, I_VALUE)
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "OFFICECODE"       '営業所
+                    prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

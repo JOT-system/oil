@@ -151,11 +151,11 @@ Public Class OIT0001EmptyTurnDairySearch
         '列車番号
         Master.EraseCharToIgnore(TxtTrainNumber.Text)
 
-        ''○ チェック処理
-        'WW_Check(WW_ERR_SW)
-        'If WW_ERR_SW = "ERR" Then
-        '    Exit Sub
-        'End If
+        '○ チェック処理
+        WW_Check(WW_ERR_SW)
+        If WW_ERR_SW = "ERR" Then
+            Exit Sub
+        End If
 
         '○ 条件選択画面の入力値退避
         '会社コード
@@ -181,6 +181,84 @@ Public Class OIT0001EmptyTurnDairySearch
             '画面遷移
             Master.TransitionPage()
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' チェック処理
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_Check(ByRef O_RTN As String)
+
+        O_RTN = ""
+        Dim WW_TEXT As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+
+        '○ 単項目チェック
+        '会社コード
+        Master.CheckField(WF_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE.Text)
+                WF_CAMPCODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_CAMPCODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '運用部署
+        WW_TEXT = WF_UORG.Text
+        Master.CheckField(WF_CAMPCODE.Text, "UORG", WF_UORG.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            If WW_TEXT = "" Then
+                WF_UORG.Text = ""
+            Else
+                '存在チェック
+                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "運用部署 : " & WF_UORG.Text)
+                    WF_UORG.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_UORG.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '営業所
+        Master.CheckField(WF_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+                              "営業所 : " & TxtSalesOffice.Text)
+                TxtSalesOffice.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            TxtSalesOffice.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '○ 正常メッセージ
+        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
     End Sub
 
@@ -234,7 +312,25 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            '会社コード
+            Case "WF_CAMPCODE"
+                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            '運用部署
+            Case "WF_UORG"
+                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+            '営業所
+            Case "TxtSalesOffice"
+                CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+        End Select
 
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+        End If
     End Sub
 
     ' ******************************************************************************
@@ -290,7 +386,7 @@ Public Class OIT0001EmptyTurnDairySearch
                 WF_CAMPCODE.Focus()
             Case "WF_UORG"              '運用部署
                 WF_UORG.Focus()
-            Case "TxtSalesOffice"       '貨物車コード
+            Case "TxtSalesOffice"       '営業所
                 TxtSalesOffice.Focus()
         End Select
 
@@ -305,6 +401,8 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' <remarks></remarks>
     Protected Sub WF_RIGHTBOX_DBClick()
 
+        rightview.InitViewID(WF_CAMPCODE.Text, WW_DUMMY)
+
     End Sub
 
     ''' <summary>
@@ -313,6 +411,8 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' <remarks></remarks>
     Protected Sub WF_RIGHTBOX_Change()
 
+        rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
+
     End Sub
 
     ''' <summary>
@@ -320,6 +420,8 @@ Public Class OIT0001EmptyTurnDairySearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_HELP_Click()
+
+        Master.ShowHelp()
 
     End Sub
 

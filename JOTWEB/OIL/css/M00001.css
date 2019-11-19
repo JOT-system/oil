@@ -23,22 +23,24 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
         position:fixed;
         left:0px; 
         right:0px; 
-
         overflow:hidden;
-       	background-color: rgb(220,230,240); 
+       	background-color: rgb(255, 255, 255); 
     }
         
 
 /*在庫管理メニュー表示*/
 #Menu_L {
-    height: auto;
+    height: 48%;
     width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
     left: 2em;
     overflow-y: auto;
-    background-color: mediumseagreen;
-    transform: translateY(3%);
+    background-color: #8DCF3F;
+    background-image: url(../img/oiltank.png);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 40%;
 }
 
 .WF_MenuLabel_L {
@@ -47,61 +49,76 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     position: relative;
     left: 0em;
     overflow: hidden;
-    color: rgba(216, 221, 227, 0.8);
-    font-weight: bold;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 800;
     vertical-align: middle;
     text-align: left;
     font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
-    font-size: large;
+    font-size: 6ex;
+    /*    background: linear-gradient(transparent 10%, #F5F5F5 95%);*/
 }
 
-    .WF_MenuButton_L {
-        height: 2em;
-        width: 17em;
-        position: relative;
-        left: 2em;
-        overflow: hidden;
-        color: black;
-        border: none;
-        background-color: gray;
-        vertical-align: middle;
-        text-align: left;
-    }
+
+.WF_MenuButton_L {
+    height: 28px;
+    width: 90%;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: white;
+    border: none;
+    background-color: transparent;
+    vertical-align: middle;
+    text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+}
 
 /*受注管理メニュー表示*/
 #Menu_L2 {
-    height: auto;
-    width: 30%;
+    height: 48%;
+    width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
     left: 20em;
     overflow-y: auto;
+    background-color: #44DEDE;
+    background-image: url(../img/order.png);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 40%;
 }
 
-    .WF_MenuLabel_L2 {
-        height: 2em;
-        width: 30em;
-        position: relative;
-        left: 0em;
-        overflow: hidden;
-        color: black;
-        font-weight: bold;
-        vertical-align: middle;
-        text-align: left;
-    }
+.WF_MenuLabel_L2 {
+    height: 2em;
+    width: 30em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 800;
+    vertical-align: middle;
+    text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 6ex;
+}
 
-    .WF_MenuButton_L2 {
-        height: 2em;
-        width: 17em;
-        position: relative;
-        left: 2em;
-        overflow: hidden;
-        color: black;
-        border: none;
-        background-color: gray;
-        vertical-align: middle;
-        text-align: left;
-    }
+.WF_MenuButton_L2 {
+    height: 28px;
+    width: 120%;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: white;
+    border: none;
+    background-color: transparent;
+    vertical-align: middle;
+    text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight:800;
+}
 
 /*請求支払管理メニュー表示*/
 #Menu_L3 {
@@ -179,38 +196,48 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 /*回送管理メニュー表示*/
 #Menu_R {
-    height: auto;
-    width: 30%;
+    height: 48%;
+    width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
     left: 41em;
     overflow-y: auto;
+    background-color: #F58E7E;
+    background-image: url(../img/foward.png);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 40%;
 }
 
-    .WF_MenuLabel_R{
-        height:2em;
-        width:17em;
-        position:relative;
-        left:0em;
-        overflow:hidden;
-        color:black;
-        font-weight:bold;
-        vertical-align:middle;
-        text-align:left;
-    }
+.WF_MenuLabel_R {
+    height: 2em;
+    width: 30em;
+    position: relative;
+    left: 0em;
+    overflow: hidden;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 800;
+    vertical-align: middle;
+    text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 6ex;
+}
 
-    .WF_MenuButton_R{
-        height:2em;
-        width:17em;
-        position:relative;
-        left:2em;
-        overflow:hidden;
-        color:black;
-        border:none;
-        background-color:gray;
-        vertical-align:middle;
-        text-align:left;
-    }
+.WF_MenuButton_R {
+    height: 28px;
+    width: 80%;
+    position: relative;
+    left: 2em;
+    overflow: hidden;
+    color: white;
+    border: none;
+    background-color: transparent;
+    vertical-align: middle;
+    text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+}
 
 /*マスタ管理メニュー表示*/
 #Menu_R2 {

@@ -54,7 +54,7 @@ Public Class M00001MENU
                         & " SELECT                             " _
                         & "      ROWLINE + 1     AS ROWLINE    " _
                         & " FROM  ROWIDX                       " _
-                        & " WHERE ROWLINE <= 11                " _
+                        & " WHERE ROWLINE <= 6                " _
                         & ")                                   " _
                         & " SELECT                             " _
                         & "      rtrim(R.ROWLINE)               as SEQ     , " _
@@ -385,7 +385,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_L"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_L"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_L"), Label).Visible = False
@@ -438,7 +438,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_L2"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_L2"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_L2"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_L2"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_L2"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_L2"), Label).Visible = False
@@ -491,7 +491,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_R"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_R"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_R"), Label).Visible = False
@@ -543,7 +543,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_R2"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_R2"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_R2"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_R2"), Label).Visible = False
@@ -595,7 +595,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_L3"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_L3"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_L3"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_L3"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_L3"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_L3"), Label).Visible = False
@@ -648,7 +648,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_L4"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_L4"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_L4"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_L4"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_L4"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_L4"), Label).Visible = False
@@ -701,7 +701,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_R3"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_R3"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_R3"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_R3"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_R3"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_R3"), Label).Visible = False
@@ -753,7 +753,7 @@ Public Class M00001MENU
             If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
                 If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
                     CType(e.Item.FindControl("WF_MenuLabe_R4"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_R4"), Label).Visible = True
+                    CType(e.Item.FindControl("WF_MenuLabe_R4"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuVARI_R4"), Label).Visible = False
                     CType(e.Item.FindControl("WF_MenuButton_R4"), Button).Visible = False
                     CType(e.Item.FindControl("WF_MenuURL_R4"), Label).Visible = False

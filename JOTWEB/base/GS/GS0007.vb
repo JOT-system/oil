@@ -168,7 +168,7 @@ Public Class GS0007FIXVALUElst
                     & "      rtrim(NAMES)  as VALUE3  , " _
                     & "      rtrim(NAMES)  as VALUE4  , " _
                     & "      rtrim(NAMES)  as VALUE5    " _
-                    & " FROM  COM.OIS0015_FIXVALUE             " _
+                    & " FROM  OIL.VIW0001_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and STYMD    <= @P3 " _
                     & "   and ENDYMD   >= @P4 " _
@@ -183,7 +183,7 @@ Public Class GS0007FIXVALUElst
                     & "      rtrim(VALUE3)  as VALUE3  , " _
                     & "      rtrim(VALUE4)  as VALUE4  , " _
                     & "      rtrim(VALUE5)  as VALUE5    " _
-                    & " FROM  COM.OIS0015_FIXVALUE             " _
+                    & " FROM  OIL.VIW0001_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and CLASS     = @P2 " _
                     & "   and STYMD    <= @P3 " _
@@ -191,6 +191,39 @@ Public Class GS0007FIXVALUElst
                     & "   and DELFLG   <> @P5 " _
                     & " ORDER BY KEYCODE "
             End If
+
+            'If String.IsNullOrEmpty(CLAS) Then
+            '    SQLStr =
+            '          " SELECT DISTINCT                  " _
+            '        & "      rtrim(CLASS)  as KEYCODE , " _
+            '        & "      rtrim(NAMES)  as VALUE1  , " _
+            '        & "      rtrim(NAMES)  as VALUE2  , " _
+            '        & "      rtrim(NAMES)  as VALUE3  , " _
+            '        & "      rtrim(NAMES)  as VALUE4  , " _
+            '        & "      rtrim(NAMES)  as VALUE5    " _
+            '        & " FROM  COM.OIS0015_FIXVALUE             " _
+            '        & " Where CAMPCODE  = @P1 " _
+            '        & "   and STYMD    <= @P3 " _
+            '        & "   and ENDYMD   >= @P4 " _
+            '        & "   and DELFLG   <> @P5 " _
+            '        & " ORDER BY KEYCODE "
+            'Else
+            '    SQLStr =
+            '          " SELECT                           " _
+            '        & "      rtrim(KEYCODE) as KEYCODE , " _
+            '        & "      rtrim(VALUE1)  as VALUE1  , " _
+            '        & "      rtrim(VALUE2)  as VALUE2  , " _
+            '        & "      rtrim(VALUE3)  as VALUE3  , " _
+            '        & "      rtrim(VALUE4)  as VALUE4  , " _
+            '        & "      rtrim(VALUE5)  as VALUE5    " _
+            '        & " FROM  COM.OIS0015_FIXVALUE             " _
+            '        & " Where CAMPCODE  = @P1 " _
+            '        & "   and CLASS     = @P2 " _
+            '        & "   and STYMD    <= @P3 " _
+            '        & "   and ENDYMD   >= @P4 " _
+            '        & "   and DELFLG   <> @P5 " _
+            '        & " ORDER BY KEYCODE "
+            'End If
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)

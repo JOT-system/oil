@@ -267,10 +267,23 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.RTANK), '')           AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.HTANK), '')           AS HTANK" _
             & " , ISNULL(RTRIM(OIT0002.TTANK), '')           AS TTANK" _
+            & " , ISNULL(RTRIM(OIT0002.MTTANK), '')          AS MTTANK" _
             & " , ISNULL(RTRIM(OIT0002.KTANK), '')           AS KTANK" _
+            & " , ISNULL(RTRIM(OIT0002.K3TANK), '')          AS K3TANK" _
+            & " , ISNULL(RTRIM(OIT0002.K5TANK), '')          AS K5TANK" _
+            & " , ISNULL(RTRIM(OIT0002.K10TANK), '')         AS K10TANK" _
             & " , ISNULL(RTRIM(OIT0002.LTANK), '')           AS LTANK" _
             & " , ISNULL(RTRIM(OIT0002.ATANK), '')           AS ATANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTANK), '')           AS OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER1OTANK), '')     AS OTHER1OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER2OTANK), '')     AS OTHER2OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER3OTANK), '')     AS OTHER3OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER4OTANK), '')     AS OTHER4OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER5OTANK), '')     AS OTHER5OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER6OTANK), '')     AS OTHER6OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER7OTANK), '')     AS OTHER7OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER8OTANK), '')     AS OTHER8OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER9OTANK), '')     AS OTHER9OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER10OTANK), '')    AS OTHER10OTANK" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')       AS TOTALTANK" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE = @P1" _

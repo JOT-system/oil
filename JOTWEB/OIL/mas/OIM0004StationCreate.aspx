@@ -45,6 +45,7 @@
                 </p>
                 <p id="KEY_LINE_3">
                     <!-- 貨物車コード -->
+<!--                    <a ondblclick="Field_DBclick('STATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>)"> -->
                     <a>
                         <asp:Label ID="LblStationCode" runat="server" Text="貨物車コード" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="TxtStationCode" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>

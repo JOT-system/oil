@@ -119,6 +119,7 @@
     <Content Include="img\最終頁.png" />
     <Content Include="img\矢印L.png" />
     <Content Include="img\矢印R.png" />
+    <Content Include="OIL\img\foward.png" />
     <Content Include="OIL\img\oiltank.png" />
     <Content Include="OIL\img\order.png" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />

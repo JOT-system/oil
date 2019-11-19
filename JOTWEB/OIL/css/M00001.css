@@ -241,37 +241,47 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 /*マスタ管理メニュー表示*/
 #Menu_R2 {
-    height: auto;
-    width: 30%;
+    height: 48%;
+    width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
     left: 61em;
     overflow-y: auto;
+    background-color: #93B8CA;
+    background-image: url(../img/order.png);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 40%;
 }
 
 .WF_MenuLabel_R2 {
     height: 2em;
-    width: 17em;
+    width: 30em;
     position: relative;
     left: 0em;
     overflow: hidden;
-    color: black;
-    font-weight: bold;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 800;
     vertical-align: middle;
     text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 6ex;
 }
 
 .WF_MenuButton_R2 {
-    height: 2em;
-    width: 17em;
+    height: 28px;
+    width: 120%;
     position: relative;
     left: 2em;
     overflow: hidden;
-    color: black;
+    color: white;
     border: none;
-    background-color: gray;
+    background-color: transparent;
     vertical-align: middle;
     text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
 }
 
 

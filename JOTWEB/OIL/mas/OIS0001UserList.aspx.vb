@@ -268,18 +268,19 @@ Public Class OIS0001UserList
         '　検索説明
         '     条件指定に従い該当データをユーザマスタ、ユーザIDマスタから取得する
         Dim SQLStr As String =
-            " SELECT " _
-            & "    0                                                   AS LINECNT " _
+            " OPEN SYMMETRIC KEY loginpasskey DECRYPTION BY CERTIFICATE certjotoil; " _
+            & " Select " _
+            & "    0                                                   As LINECNT " _
             & "    , ''                                                AS OPERATION " _
-            & "    , CAST(OIS0004.UPDTIMSTP AS BIGINT)                    AS TIMSTP " _
+            & "    , CAST(OIS0004.UPDTIMSTP AS BIGINT)                    AS UPDTIMSTP " _
             & "    , 1                                                 AS 'SELECT' " _
             & "    , 0                                                 AS HIDDEN " _
             & "    , ISNULL(RTRIM(OIS0004.DELFLG), '')                    AS DELFLG " _
             & "    , ISNULL(RTRIM(OIS0004.USERID), '')                    AS USERID " _
             & "    , ISNULL(RTRIM(OIS0004.STAFFNAMES), '')                AS STAFFNAMES " _
-            & "    , ISNULL(RTRIM(OIS0004.STAFFNAMEL), '')                AS STAFFNAMEL0 " _
+            & "    , ISNULL(RTRIM(OIS0004.STAFFNAMEL), '')                AS STAFFNAMEL " _
             & "    , ISNULL(RTRIM(OIS0004.MAPID), '')                     AS MAPID " _
-            & "    , ISNULL(RTRIM(OIS0005.PASSWORD), '')                  AS PASSWORD " _
+            & "    , CONVERT(nvarchar, DecryptByKey(ISNULL(RTRIM(OIS0005.PASSWORD), ''))) As PASSWORD " _
             & "    , ISNULL(RTRIM(OIS0005.MISSCNT), '')                   AS MISSCNT " _
             & "    , ISNULL(FORMAT(OIS0005.PASSENDYMD, 'yyyy/MM/dd'), '') AS PASSENDYMD " _
             & "    , ISNULL(FORMAT(OIS0004.STYMD, 'yyyy/MM/dd'), '')      AS STYMD " _
@@ -293,7 +294,7 @@ Public Class OIS0001UserList
             & "    , ISNULL(RTRIM(OIS0004.MAPROLE), '')                   AS MAPROLE " _
             & "    , ISNULL(RTRIM(OIS0004.VIEWPROFID), '')                AS VIEWPROFID " _
             & "    , ISNULL(RTRIM(OIS0004.RPRTPROFID), '')                AS RPRTPROFID " _
-            & "    , ISNULL(RTRIM(OIS0004.VARIANT), '')             AS INIMAPVALROLE " _
+            & "    , ISNULL(RTRIM(OIS0004.VARIANT), '')             AS VARIANT " _
             & "    , ISNULL(RTRIM(OIS0004.APPROVALID), '')                AS APPROVALID " _
             & " FROM " _
             & "    COM.OIS0004_USER OIS0004 " _
@@ -343,9 +344,9 @@ Public Class OIS0001UserList
                 For Each OIS0001row As DataRow In OIS0001tbl.Rows
                     i += 1
                     OIS0001row("LINECNT") = i        'LINECNT
-                    '名称取得
-                    CODENAME_get("CAMPCODE", OIS0001row("CAMPCODE"), OIS0001row("CAMPNAMES"), WW_DUMMY)                               '会社コード
-                    CODENAME_get("ORG", OIS0001row("ORG"), OIS0001row("ORGNAMES"), WW_DUMMY)                                          '組織コード
+                    ''名称取得
+                    'CODENAME_get("CAMPCODE", OIS0001row("CAMPCODE"), OIS0001row("CAMPNAMES"), WW_DUMMY)                               '会社コード
+                    'CODENAME_get("ORG", OIS0001row("ORG"), OIS0001row("ORGNAMES"), WW_DUMMY)                                          '組織コード
                 Next
             End Using
         Catch ex As Exception
@@ -712,34 +713,30 @@ Public Class OIS0001UserList
             & "        COM.OIS0004_USER" _
             & "    INNER JOIN COM.OIS0005_USERPASS OIS0005 " _
             & "        ON  OIS0005.USERID   = OIS0004.USERID" _
-            & "        AND OIS0005.DELFLG  <> @P6" _
             & "    WHERE" _
-            & "        USERID       = @P1" _
-            & "        AND STYMD    = @P2" _
-            & "        AND CAMPCODE = @P4 ;" _
+            & "        USERID       = @P01" _
+            & "        AND STYMD    = @P08" _
+            & "        AND CAMPCODE = @P10 ;" _
             & " OPEN hensuu ;" _
             & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE COM.OIS0004_USER" _
             & "    SET" _
             & "        DELFLG = @P00" _
-            & "        , USERID = @P01" _
             & "        , STAFFNAMES = @P02" _
             & "        , STAFFNAMEL = @P03" _
             & "        , MAPID = @P04" _
             & "        , PASSWORD = @P05" _
             & "        , MISSCNT = @P06" _
             & "        , PASSENDYMD = @P07" _
-            & "        , STYMD = @P08" _
             & "        , ENDYMD = @P09" _
-            & "        , CAMPCODE = @P10" _
             & "        , ORG = @P11" _
             & "        , EMAIL = @P12" _
             & "        , MENUROLE = @P13" _
             & "        , MAPROLE = @P14" _
             & "        , VIEWPROFID = @P15" _
             & "        , RPRTPROFID = @P16" _
-            & "        , INIMAPVALROLE = @P17" _
+            & "        , VARIANT = @P17" _
             & "        , APPROVALID = @P18" _
             & "        , INITYMD = @P19" _
             & "        , INITUSER = @P20" _
@@ -749,7 +746,9 @@ Public Class OIS0001UserList
             & "        , UPDTERMID = @P24" _
             & "        , RECEIVEYMD = @P25" _
             & "    WHERE" _
-            & "        USERID       = @P01 ;" _
+            & "        USERID       = @P01" _
+            & "        AND STYMD    = @P08" _
+            & "        AND CAMPCODE = @P10 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO COM.OIS0004_USER" _
             & "        (DELFLG" _
@@ -769,7 +768,7 @@ Public Class OIS0001UserList
             & "        , MAPROLE" _
             & "        , VIEWPROFID" _
             & "        , RPRTPROFID" _
-            & "        , INIMAPVALROLE" _
+            & "        , VARIANT" _
             & "        , APPROVALID" _
             & "        , INITYMD" _
             & "        , INITUSER" _
@@ -828,7 +827,7 @@ Public Class OIS0001UserList
             & "        , MAPROLE" _
             & "        , VIEWPROFID" _
             & "        , RPRTPROFID" _
-            & "        , INIMAPVALROLE" _
+            & "        , VARIANT" _
             & "        , APPROVALID" _
             & "        , INITYMD" _
             & "        , INITUSER" _
@@ -842,9 +841,10 @@ Public Class OIS0001UserList
             & "    COM.OIS0004_USER" _
             & "    INNER JOIN COM.OIS0005_USERPASS OIS0005 " _
             & "        ON  OIS0005.USERID   = OIS0004.USERID" _
-            & "        AND OIS0005.DELFLG  <> @P6" _
-            & " WHERE" _
-            & "        USERID = @P01"
+            & "    WHERE" _
+            & "        USERID       = @P01" _
+            & "        AND STYMD    = @P08" _
+            & "        AND CAMPCODE = @P10"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
@@ -867,13 +867,13 @@ Public Class OIS0001UserList
                 Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 20)            'エクセル出力制御ロール
                 Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 20)            '画面初期値ロール
                 Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 20)            '承認権限ロール
-                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P58", SqlDbType.DateTime)            '登録年月日
-                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P59", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
-                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P60", SqlDbType.NVarChar, 20)            '登録端末
-                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P61", SqlDbType.DateTime)            '更新年月日
-                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P62", SqlDbType.NVarChar, 20)            '更新ユーザーＩＤ
-                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P63", SqlDbType.NVarChar, 20)            '更新端末
-                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P64", SqlDbType.DateTime)            '集信日時
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.DateTime)            '登録年月日
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 20)            '登録端末
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.DateTime)            '更新年月日
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 20)            '更新ユーザーＩＤ
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 20)            '更新端末
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.DateTime)            '集信日時
 
                 Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)            '削除フラグ
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 20)            'ユーザID
@@ -894,13 +894,13 @@ Public Class OIS0001UserList
                 Dim JPARA16 As SqlParameter = SQLcmdJnl.Parameters.Add("@P16", SqlDbType.NVarChar, 20)            'エクセル出力制御ロール
                 Dim JPARA17 As SqlParameter = SQLcmdJnl.Parameters.Add("@P17", SqlDbType.NVarChar, 20)            '画面初期値ロール
                 Dim JPARA18 As SqlParameter = SQLcmdJnl.Parameters.Add("@P18", SqlDbType.NVarChar, 20)            '承認権限ロール
-                Dim JPARA19 As SqlParameter = SQLcmdJnl.Parameters.Add("@P58", SqlDbType.DateTime)            '登録年月日
-                Dim JPARA20 As SqlParameter = SQLcmdJnl.Parameters.Add("@P59", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
-                Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P60", SqlDbType.NVarChar, 20)            '登録端末
-                Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P61", SqlDbType.DateTime)            '更新年月日
-                Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P62", SqlDbType.NVarChar, 20)            '更新ユーザーＩＤ
-                Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P63", SqlDbType.NVarChar, 20)            '更新端末
-                Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P64", SqlDbType.DateTime)            '集信日時
+                Dim JPARA19 As SqlParameter = SQLcmdJnl.Parameters.Add("@P19", SqlDbType.DateTime)            '登録年月日
+                Dim JPARA20 As SqlParameter = SQLcmdJnl.Parameters.Add("@P20", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
+                Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P21", SqlDbType.NVarChar, 20)            '登録端末
+                Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P22", SqlDbType.DateTime)            '更新年月日
+                Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P23", SqlDbType.NVarChar, 20)            '更新ユーザーＩＤ
+                Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P24", SqlDbType.NVarChar, 20)            '更新端末
+                Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P25", SqlDbType.DateTime)            '集信日時
 
                 For Each OIS0001row As DataRow In OIS0001tbl.Rows
                     If Trim(OIS0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
@@ -942,7 +942,7 @@ Public Class OIS0001UserList
                         PARA14.Value = OIS0001row("MAPROLE")
                         PARA15.Value = OIS0001row("VIEWPROFID")
                         PARA16.Value = OIS0001row("RPRTPROFID")
-                        PARA17.Value = OIS0001row("INIMAPVALROLE")
+                        PARA17.Value = OIS0001row("VARIANT")
                         PARA18.Value = OIS0001row("APPROVALID")
                         PARA19.Value = WW_DATENOW
                         PARA20.Value = Master.USERID
@@ -990,7 +990,7 @@ Public Class OIS0001UserList
                         JPARA14.Value = OIS0001row("MAPROLE")
                         JPARA15.Value = OIS0001row("VIEWPROFID")
                         JPARA16.Value = OIS0001row("RPRTPROFID")
-                        JPARA17.Value = OIS0001row("INIMAPVALROLE")
+                        JPARA17.Value = OIS0001row("VARIANT")
                         JPARA18.Value = OIS0001row("APPROVALID")
                         JPARA19.Value = WW_DATENOW
                         JPARA20.Value = Master.USERID
@@ -1404,133 +1404,103 @@ Public Class OIS0001UserList
                         XLSTBLrow("MAPROLE") = OIS0001row("MAPROLE") AndAlso
                         XLSTBLrow("VIEWPROFID") = OIS0001row("VIEWPROFID") AndAlso
                         XLSTBLrow("RPRTPROFID") = OIS0001row("RPRTPROFID") AndAlso
-                        XLSTBLrow("INIMAPVALROLE") = OIS0001row("INIMAPVALROLE") AndAlso
+                        XLSTBLrow("VARIANT") = OIS0001row("VARIANT") AndAlso
                         XLSTBLrow("APPROVALID") = OIS0001row("APPROVALID") Then
-                        OIS0001INProw.ItemArray = OIS0001row.ItemArray Then
+                        OIS0001INProw.ItemArray = OIS0001row.ItemArray
                         Exit For
                     End If
                 Next
             End If
 
             '○ 項目セット
-            'JOT車番
-            If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
-                OIS0001INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
+            'ユーザID
+            If WW_COLUMNS.IndexOf("USERID") >= 0 Then
+                OIS0001INProw("USERID") = XLSTBLrow("USERID")
             End If
 
-            '型式
-            If WW_COLUMNS.IndexOf("MODEL") >= 0 Then
-                OIS0001INProw("MODEL") = XLSTBLrow("MODEL")
+            '社員名（短）
+            If WW_COLUMNS.IndexOf("STAFFNAMES") >= 0 Then
+                OIS0001INProw("STAFFNAMES") = XLSTBLrow("STAFFNAMES")
             End If
 
-            '原籍所有者C
-            If WW_COLUMNS.IndexOf("ORIGINOWNERCODE") >= 0 Then
-                OIS0001INProw("ORIGINOWNERCODE") = XLSTBLrow("ORIGINOWNERCODE")
+            '社員名（長）
+            If WW_COLUMNS.IndexOf("STAFFNAMEL") >= 0 Then
+                OIS0001INProw("STAFFNAMEL") = XLSTBLrow("STAFFNAMEL")
             End If
 
-            '名義所有者C
-            If WW_COLUMNS.IndexOf("OWNERCODE") >= 0 Then
-                OIS0001INProw("OWNERCODE") = XLSTBLrow("OWNERCODE")
+            '画面ＩＤ
+            If WW_COLUMNS.IndexOf("MAPID") >= 0 Then
+                OIS0001INProw("MAPID") = XLSTBLrow("MAPID")
             End If
 
-            'リース先C
-            If WW_COLUMNS.IndexOf("LEASECODE") >= 0 Then
-                OIS0001INProw("LEASECODE") = XLSTBLrow("LEASECODE")
+            'パスワード
+            If WW_COLUMNS.IndexOf("PASSWORD") >= 0 Then
+                OIS0001INProw("PASSWORD") = XLSTBLrow("PASSWORD")
             End If
 
-            'リース区分C
-            If WW_COLUMNS.IndexOf("LEASECLASS") >= 0 Then
-                OIS0001INProw("LEASECLASS") = XLSTBLrow("LEASECLASS")
+            '誤り回数
+            If WW_COLUMNS.IndexOf("MISSCNT") >= 0 Then
+                OIS0001INProw("MISSCNT") = XLSTBLrow("MISSCNT")
             End If
 
-            '自動延長
-            If WW_COLUMNS.IndexOf("AUTOEXTENTION") >= 0 Then
-                OIS0001INProw("AUTOEXTENTION") = XLSTBLrow("AUTOEXTENTION")
+            'パスワード有効期限
+            If WW_COLUMNS.IndexOf("PASSENDYMD") >= 0 Then
+                OIS0001INProw("PASSENDYMD") = XLSTBLrow("PASSENDYMD")
             End If
 
-            'リース開始年月日
-            If WW_COLUMNS.IndexOf("LEASESTYMD") >= 0 Then
-                OIS0001INProw("LEASESTYMD") = XLSTBLrow("LEASESTYMD")
+            '開始年月日
+            If WW_COLUMNS.IndexOf("STYMD") >= 0 Then
+                OIS0001INProw("STYMD") = XLSTBLrow("STYMD")
             End If
 
-            'リース満了年月日
-            If WW_COLUMNS.IndexOf("LEASEENDYMD") >= 0 Then
-                OIS0001INProw("LEASEENDYMD") = XLSTBLrow("LEASEENDYMD")
+            '終了年月日
+            If WW_COLUMNS.IndexOf("ENDYMD") >= 0 Then
+                OIS0001INProw("ENDYMD") = XLSTBLrow("ENDYMD")
             End If
 
-            '第三者使用者C
-            If WW_COLUMNS.IndexOf("USERCODE") >= 0 Then
-                OIS0001INProw("USERCODE") = XLSTBLrow("USERCODE")
+            '会社コード
+            If WW_COLUMNS.IndexOf("CAMPCODE") >= 0 Then
+                OIS0001INProw("CAMPCODE") = XLSTBLrow("CAMPCODE")
             End If
 
-            '原常備駅C
-            If WW_COLUMNS.IndexOf("CURRENTSTATIONCODE") >= 0 Then
-                OIS0001INProw("CURRENTSTATIONCODE") = XLSTBLrow("CURRENTSTATIONCODE")
+            '組織コード
+            If WW_COLUMNS.IndexOf("ORG") >= 0 Then
+                OIS0001INProw("ORG") = XLSTBLrow("ORG")
             End If
 
-            '臨時常備駅C
-            If WW_COLUMNS.IndexOf("EXTRADINARYSTATIONCODE") >= 0 Then
-                OIS0001INProw("EXTRADINARYSTATIONCODE") = XLSTBLrow("EXTRADINARYSTATIONCODE")
+            'メールアドレス
+            If WW_COLUMNS.IndexOf("EMAIL") >= 0 Then
+                OIS0001INProw("EMAIL") = XLSTBLrow("EMAIL")
             End If
 
-            '第三者使用期限
-            If WW_COLUMNS.IndexOf("USERLIMIT") >= 0 Then
-                OIS0001INProw("USERLIMIT") = XLSTBLrow("USERLIMIT")
+            'メニュー表示制御ロール
+            If WW_COLUMNS.IndexOf("MENUROLE") >= 0 Then
+                OIS0001INProw("MENUROLE") = XLSTBLrow("MENUROLE")
             End If
 
-            '臨時常備駅期限
-            If WW_COLUMNS.IndexOf("LIMITTEXTRADIARYSTATION") >= 0 Then
-                OIS0001INProw("LIMITTEXTRADIARYSTATION") = XLSTBLrow("LIMITTEXTRADIARYSTATION")
+            '画面参照更新制御ロール
+            If WW_COLUMNS.IndexOf("MAPROLE") >= 0 Then
+                OIS0001INProw("MAPROLE") = XLSTBLrow("MAPROLE")
             End If
 
-            '原専用種別C
-            If WW_COLUMNS.IndexOf("DEDICATETYPECODE") >= 0 Then
-                OIS0001INProw("DEDICATETYPECODE") = XLSTBLrow("DEDICATETYPECODE")
+            '画面表示項目制御ロール
+            If WW_COLUMNS.IndexOf("VIEWPROFID") >= 0 Then
+                OIS0001INProw("VIEWPROFID") = XLSTBLrow("VIEWPROFID")
             End If
 
-            '臨時専用種別C
-            If WW_COLUMNS.IndexOf("EXTRADINARYTYPECODE") >= 0 Then
-                OIS0001INProw("EXTRADINARYTYPECODE") = XLSTBLrow("EXTRADINARYTYPECODE")
+            'エクセル出力制御ロール
+            If WW_COLUMNS.IndexOf("RPRTPROFID") >= 0 Then
+                OIS0001INProw("RPRTPROFID") = XLSTBLrow("RPRTPROFID")
             End If
 
-            '臨時専用期限
-            If WW_COLUMNS.IndexOf("EXTRADINARYLIMIT") >= 0 Then
-                OIS0001INProw("EXTRADINARYLIMIT") = XLSTBLrow("EXTRADINARYLIMIT")
+            '画面初期値ロール
+            If WW_COLUMNS.IndexOf("VARIANT") >= 0 Then
+                OIS0001INProw("VARIANT") = XLSTBLrow("VARIANT")
             End If
 
-            '運用基地C
-            If WW_COLUMNS.IndexOf("OPERATIONBASECODE") >= 0 Then
-                OIS0001INProw("OPERATIONBASECODE") = XLSTBLrow("OPERATIONBASECODE")
-            End If
-
-            '塗色C
-            If WW_COLUMNS.IndexOf("COLORCODE") >= 0 Then
-                OIS0001INProw("COLORCODE") = XLSTBLrow("COLORCODE")
-            End If
-
-            'エネオス
-            If WW_COLUMNS.IndexOf("ENEOS") >= 0 Then
-                OIS0001INProw("ENEOS") = XLSTBLrow("ENEOS")
-            End If
-
-            'エコレール
-            If WW_COLUMNS.IndexOf("ECO") >= 0 Then
-                OIS0001INProw("ECO") = XLSTBLrow("ECO")
-            End If
-
-            '取得年月日
-            If WW_COLUMNS.IndexOf("ALLINSPECTIONDATE") >= 0 Then
-                OIS0001INProw("ALLINSPECTIONDATE") = XLSTBLrow("ALLINSPECTIONDATE")
-            End If
-
-            '車籍編入年月日
-            If WW_COLUMNS.IndexOf("TRANSFERDATE") >= 0 Then
-                OIS0001INProw("TRANSFERDATE") = XLSTBLrow("TRANSFERDATE")
-            End If
-
-            '取得先C
-            If WW_COLUMNS.IndexOf("OBTAINEDCODE") >= 0 Then
-                OIS0001INProw("OBTAINEDCODE") = XLSTBLrow("OBTAINEDCODE")
+            '承認権限ロール
+            If WW_COLUMNS.IndexOf("APPROVALID") >= 0 Then
+                OIS0001INProw("APPROVALID") = XLSTBLrow("APPROVALID")
             End If
 
             '削除フラグ
@@ -2005,230 +1975,10 @@ Public Class OIS0001UserList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            'JOT車番(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIS0001INProw("TANKNUMBER"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'ユーザID(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIS0001INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "JOT車番入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '原籍所有者C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE", OIS0001INProw("ORIGINOWNERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "原籍所有者C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '名義所有者C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OWNERCODE", OIS0001INProw("OWNERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "名義所有者C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            'リース先C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECODE", OIS0001INProw("LEASECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "リース先C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            'リース区分C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASS", OIS0001INProw("LEASECLASS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "リース区分C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '自動延長(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTION", OIS0001INProw("AUTOEXTENTION"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "自動延長入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            'リース開始年月日(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASESTYMD", OIS0001INProw("LEASESTYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "リース開始年月日入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            'リース満了年月日(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASEENDYMD", OIS0001INProw("LEASEENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "リース満了年月日入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '第三者使用者C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERCODE", OIS0001INProw("USERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "第三者使用者C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '原常備駅C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CURRENTSTATIONCODE", OIS0001INProw("CURRENTSTATIONCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "原常備駅C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '臨時常備駅C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYSTATIONCODE", OIS0001INProw("EXTRADINARYSTATIONCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "臨時常備駅C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '第三者使用期限(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERLIMIT", OIS0001INProw("USERLIMIT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "第三者使用期限入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '臨時常備駅期限(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LIMITTEXTRADIARYSTATION", OIS0001INProw("LIMITTEXTRADIARYSTATION"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "臨時常備駅期限入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '原専用種別C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEDICATETYPECODE", OIS0001INProw("DEDICATETYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "原専用種別C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '臨時専用種別C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYTYPECODE", OIS0001INProw("EXTRADINARYTYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "臨時専用種別C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '臨時専用期限(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYLIMIT", OIS0001INProw("EXTRADINARYLIMIT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "臨時専用期限入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '運用基地C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASECODE", OIS0001INProw("OPERATIONBASECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "運用基地C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '塗色C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COLORCODE", OIS0001INProw("COLORCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "塗色C入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            'エネオス(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENEOS", OIS0001INProw("ENEOS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "エネオス入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            'エコレール(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ECO", OIS0001INProw("ECO"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "エコレール入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '取得年月日(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ALLINSPECTIONDATE", OIS0001INProw("ALLINSPECTIONDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "取得年月日入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '車籍編入年月日(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRANSFERDATE", OIS0001INProw("TRANSFERDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "車籍編入年月日入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '取得先C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OBTAINEDCODE", OIS0001INProw("OBTAINEDCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "取得先C入力エラー。"
+                WW_CheckMES1 = "ユーザID入力エラー。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -2268,63 +2018,24 @@ Public Class OIS0001UserList
         End If
 
         If Not IsNothing(OIS0001row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> JOT車番 =" & OIS0001row("TANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者C =" & OIS0001row("ORIGINOWNERCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者C =" & OIS0001row("OWNERCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース先C =" & OIS0001row("LEASECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分C =" & OIS0001row("LEASECLASS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 自動延長 =" & OIS0001row("AUTOEXTENTION") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース開始年月日 =" & OIS0001row("LEASESTYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース満了年月日 =" & OIS0001row("LEASEENDYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用者C =" & OIS0001row("USERCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原常備駅C =" & OIS0001row("CURRENTSTATIONCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅C =" & OIS0001row("EXTRADINARYSTATIONCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用期限 =" & OIS0001row("USERLIMIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅期限 =" & OIS0001row("LIMITTEXTRADIARYSTATION") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別C =" & OIS0001row("DEDICATETYPECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別C =" & OIS0001row("EXTRADINARYTYPECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用期限 =" & OIS0001row("EXTRADINARYLIMIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C =" & OIS0001row("OPERATIONBASECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色C =" & OIS0001row("COLORCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エネオス =" & OIS0001row("ENEOS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エコレール =" & OIS0001row("ECO") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 取得年月日 =" & OIS0001row("ALLINSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 車籍編入年月日 =" & OIS0001row("TRANSFERDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 取得先C =" & OIS0001row("OBTAINEDCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 形式 =" & OIS0001row("MODEL") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 形式カナ =" & OIS0001row("MODELKANA") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷重 =" & OIS0001row("LOAD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷重単位 =" & OIS0001row("LOADUNIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 容積 =" & OIS0001row("VOLUME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 容積単位 =" & OIS0001row("VOLUMEUNIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者 =" & OIS0001row("ORIGINOWNERNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者 =" & OIS0001row("OWNERNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース先 =" & OIS0001row("LEASENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分 =" & OIS0001row("LEASECLASSNEMAE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用者 =" & OIS0001row("USERNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原常備駅 =" & OIS0001row("CURRENTSTATIONNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅 =" & OIS0001row("EXTRADINARYSTATIONNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別 =" & OIS0001row("DEDICATETYPENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別 =" & OIS0001row("EXTRADINARYTYPENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 運用場所 =" & OIS0001row("OPERATIONBASENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色 =" & OIS0001row("COLORNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 予備1 =" & OIS0001row("RESERVE1") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 予備2 =" & OIS0001row("RESERVE2") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回指定年月日 =" & OIS0001row("SPECIFIEDDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回全検年月日(JR)  =" & OIS0001row("JRALLINSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 現在経年 =" & OIS0001row("PROGRESSYEAR") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回全検時経年 =" & OIS0001row("NEXTPROGRESSYEAR") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回交検年月日(JR） =" & OIS0001row("JRINSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回交検年月日 =" & OIS0001row("INSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回指定年月日(JR) =" & OIS0001row("JRSPECIFIEDDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> JR車番 =" & OIS0001row("JRTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 旧JOT車番 =" & OIS0001row("OLDTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> OT車番 =" & OIS0001row("OTTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> JXTG車番 =" & OIS0001row("JXTGTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> コスモ車番 =" & OIS0001row("COSMOTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 富士石油車番 =" & OIS0001row("FUJITANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シ車番 =" & OIS0001row("SHELLTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 予備 =" & OIS0001row("RESERVE3") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> ユーザID =" & OIS0001row("USERID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（短） =" & OIS0001row("STAFFNAMES") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（長） =" & OIS0001row("STAFFNAMEL") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面ＩＤ =" & OIS0001row("MAPID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード =" & OIS0001row("PASSWORD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 誤り回数 =" & OIS0001row("MISSCNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード有効期限 =" & OIS0001row("PASSENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日 =" & OIS0001row("STYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日 =" & OIS0001row("ENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード =" & OIS0001row("CAMPCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード =" & OIS0001row("ORG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> メールアドレス =" & OIS0001row("EMAIL") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> メニュー表示制御ロール =" & OIS0001row("MENUROLE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面参照更新制御ロール =" & OIS0001row("MAPROLE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面表示項目制御ロール =" & OIS0001row("VIEWPROFID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> エクセル出力制御ロール =" & OIS0001row("RPRTPROFID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面初期値ロール =" & OIS0001row("VARIANT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 承認権限ロール =" & OIS0001row("APPROVALID") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIS0001row("DELFLG")
         End If
 
@@ -2376,66 +2087,26 @@ Public Class OIS0001UserList
 
             'KEY項目が等しい時
             For Each OIS0001row As DataRow In OIS0001tbl.Rows
-                If OIS0001row("TANKNUMBER") = OIS0001INProw("TANKNUMBER") AndAlso
-                    OIS0001row("MODEL") = OIS0001INProw("MODEL") Then
+                If OIS0001row("USERID") = OIS0001INProw("USERID") AndAlso
+                    OIS0001row("STYMD") = OIS0001INProw("STYMD") AndAlso
+                    OIS0001row("ENDYMD") = OIS0001INProw("ENDYMD") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
                     If OIS0001row("DELFLG") = OIS0001INProw("DELFLG") AndAlso
-                        OIS0001row("ORIGINOWNERCODE") = OIS0001INProw("ORIGINOWNERCODE") AndAlso
-                        OIS0001row("OWNERCODE") = OIS0001INProw("OWNERCODE") AndAlso
-                        OIS0001row("LEASECODE") = OIS0001INProw("LEASECODE") AndAlso
-                        OIS0001row("LEASECLASS") = OIS0001INProw("LEASECLASS") AndAlso
-                        OIS0001row("AUTOEXTENTION") = OIS0001INProw("AUTOEXTENTION") AndAlso
-                        OIS0001row("LEASESTYMD") = OIS0001INProw("LEASESTYMD") AndAlso
-                        OIS0001row("LEASEENDYMD") = OIS0001INProw("LEASEENDYMD") AndAlso
-                        OIS0001row("USERCODE") = OIS0001INProw("USERCODE") AndAlso
-                        OIS0001row("CURRENTSTATIONCODE") = OIS0001INProw("CURRENTSTATIONCODE") AndAlso
-                        OIS0001row("EXTRADINARYSTATIONCODE") = OIS0001INProw("EXTRADINARYSTATIONCODE") AndAlso
-                        OIS0001row("USERLIMIT") = OIS0001INProw("USERLIMIT") AndAlso
-                        OIS0001row("LIMITTEXTRADIARYSTATION") = OIS0001INProw("LIMITTEXTRADIARYSTATION") AndAlso
-                        OIS0001row("DEDICATETYPECODE") = OIS0001INProw("DEDICATETYPECODE") AndAlso
-                        OIS0001row("EXTRADINARYTYPECODE") = OIS0001INProw("EXTRADINARYTYPECODE") AndAlso
-                        OIS0001row("EXTRADINARYLIMIT") = OIS0001INProw("EXTRADINARYLIMIT") AndAlso
-                        OIS0001row("OPERATIONBASECODE") = OIS0001INProw("OPERATIONBASECODE") AndAlso
-                        OIS0001row("COLORCODE") = OIS0001INProw("COLORCODE") AndAlso
-                        OIS0001row("ENEOS") = OIS0001INProw("ENEOS") AndAlso
-                        OIS0001row("ECO") = OIS0001INProw("ECO") AndAlso
-                        OIS0001row("ALLINSPECTIONDATE") = OIS0001INProw("ALLINSPECTIONDATE") AndAlso
-                        OIS0001row("TRANSFERDATE") = OIS0001INProw("TRANSFERDATE") AndAlso
-                        OIS0001row("OBTAINEDCODE") = OIS0001INProw("OBTAINEDCODE") AndAlso
-                        OIS0001row("MODEL") = OIS0001INProw("MODEL") AndAlso
-                        OIS0001row("MODELKANA") = OIS0001INProw("MODELKANA") AndAlso
-                        OIS0001row("LOAD") = OIS0001INProw("LOAD") AndAlso
-                        OIS0001row("LOADUNIT") = OIS0001INProw("LOADUNIT") AndAlso
-                        OIS0001row("VOLUME") = OIS0001INProw("VOLUME") AndAlso
-                        OIS0001row("VOLUMEUNIT") = OIS0001INProw("VOLUMEUNIT") AndAlso
-                        OIS0001row("ORIGINOWNERNAME") = OIS0001INProw("ORIGINOWNERNAME") AndAlso
-                        OIS0001row("OWNERNAME") = OIS0001INProw("OWNERNAME") AndAlso
-                        OIS0001row("LEASENAME") = OIS0001INProw("LEASENAME") AndAlso
-                        OIS0001row("LEASECLASSNEMAE") = OIS0001INProw("LEASECLASSNEMAE") AndAlso
-                        OIS0001row("USERNAME") = OIS0001INProw("USERNAME") AndAlso
-                        OIS0001row("CURRENTSTATIONNAME") = OIS0001INProw("CURRENTSTATIONNAME") AndAlso
-                        OIS0001row("EXTRADINARYSTATIONNAME") = OIS0001INProw("EXTRADINARYSTATIONNAME") AndAlso
-                        OIS0001row("DEDICATETYPENAME") = OIS0001INProw("DEDICATETYPENAME") AndAlso
-                        OIS0001row("EXTRADINARYTYPENAME") = OIS0001INProw("EXTRADINARYTYPENAME") AndAlso
-                        OIS0001row("OPERATIONBASENAME") = OIS0001INProw("OPERATIONBASENAME") AndAlso
-                        OIS0001row("COLORNAME") = OIS0001INProw("COLORNAME") AndAlso
-                        OIS0001row("RESERVE1") = OIS0001INProw("RESERVE1") AndAlso
-                        OIS0001row("RESERVE2") = OIS0001INProw("RESERVE2") AndAlso
-                        OIS0001row("SPECIFIEDDATE") = OIS0001INProw("SPECIFIEDDATE") AndAlso
-                        OIS0001row("JRALLINSPECTIONDATE") = OIS0001INProw("JRALLINSPECTIONDATE") AndAlso
-                        OIS0001row("PROGRESSYEAR") = OIS0001INProw("PROGRESSYEAR") AndAlso
-                        OIS0001row("NEXTPROGRESSYEAR") = OIS0001INProw("NEXTPROGRESSYEAR") AndAlso
-                        OIS0001row("JRINSPECTIONDATE") = OIS0001INProw("JRINSPECTIONDATE") AndAlso
-                        OIS0001row("INSPECTIONDATE") = OIS0001INProw("INSPECTIONDATE") AndAlso
-                        OIS0001row("JRSPECIFIEDDATE") = OIS0001INProw("JRSPECIFIEDDATE") AndAlso
-                        OIS0001row("JRTANKNUMBER") = OIS0001INProw("JRTANKNUMBER") AndAlso
-                        OIS0001row("OLDTANKNUMBER") = OIS0001INProw("OLDTANKNUMBER") AndAlso
-                        OIS0001row("OTTANKNUMBER") = OIS0001INProw("OTTANKNUMBER") AndAlso
-                        OIS0001row("JXTGTANKNUMBER") = OIS0001INProw("JXTGTANKNUMBER") AndAlso
-                        OIS0001row("COSMOTANKNUMBER") = OIS0001INProw("COSMOTANKNUMBER") AndAlso
-                        OIS0001row("FUJITANKNUMBER") = OIS0001INProw("FUJITANKNUMBER") AndAlso
-                        OIS0001row("SHELLTANKNUMBER") = OIS0001INProw("SHELLTANKNUMBER") AndAlso
-                        OIS0001row("RESERVE3") = OIS0001INProw("RESERVE3") AndAlso
+                        OIS0001row("STAFFNAMES") = OIS0001INProw("STAFFNAMES") AndAlso
+                        OIS0001row("STAFFNAMEL") = OIS0001INProw("STAFFNAMEL") AndAlso
+                        OIS0001row("MAPID") = OIS0001INProw("MAPID") AndAlso
+                        OIS0001row("PASSWORD") = OIS0001INProw("PASSWORD") AndAlso
+                        OIS0001row("MISSCNT") = OIS0001INProw("MISSCNT") AndAlso
+                        OIS0001row("PASSENDYMD") = OIS0001INProw("PASSENDYMD") AndAlso
+                        OIS0001row("CAMPCODE") = OIS0001INProw("CAMPCODE") AndAlso
+                        OIS0001row("ORG") = OIS0001INProw("ORG") AndAlso
+                        OIS0001row("EMAIL") = OIS0001INProw("EMAIL") AndAlso
+                        OIS0001row("MENUROLE") = OIS0001INProw("MENUROLE") AndAlso
+                        OIS0001row("MAPROLE") = OIS0001INProw("MAPROLE") AndAlso
+                        OIS0001row("VIEWPROFID") = OIS0001INProw("VIEWPROFID") AndAlso
+                        OIS0001row("RPRTPROFID") = OIS0001INProw("RPRTPROFID") AndAlso
+                        OIS0001row("INIMAPVALROLE") = OIS0001INProw("INIMAPVALROLE") AndAlso
+                        OIS0001row("APPROVALID") = OIS0001INProw("APPROVALID") AndAlso
                         OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
@@ -2551,9 +2222,8 @@ Public Class OIS0001UserList
     ''' <param name="I_VALUE"></param>
     ''' <param name="O_TEXT"></param>
     ''' <param name="O_RTN"></param>
-    ''' <param name="I_SUBCODE"></param>
     ''' <remarks></remarks>
-    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String, Optional ByVal I_SUBCODE As String = "1")
+    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
 
         O_TEXT = ""
         O_RTN = ""
@@ -2569,8 +2239,11 @@ Public Class OIS0001UserList
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
+                Case "ORG"         '組織コード
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+
                 Case "DELFLG"           '削除フラグ
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFixValueParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
 
             End Select
         Catch ex As Exception

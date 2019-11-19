@@ -319,7 +319,7 @@ Public Class OIS0001UserSearch
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
                             Case "WF_ORG"       '所属部署
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                                prmData = work.CreateORGParam(WF_ORG.Text)
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)

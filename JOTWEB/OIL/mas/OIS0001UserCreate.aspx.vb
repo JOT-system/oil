@@ -9,6 +9,7 @@
 '         :
 ''************************************************************
 Imports System.Data.SqlClient
+Imports System.Windows.Forms
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
@@ -183,6 +184,7 @@ Public Class OIS0001UserCreate
 
         'パスワード
         WF_PASSWORD.Text = work.WF_SEL_PASSWORD.Text
+        WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
 
         '誤り回数
         WF_MISSCNT.Text = work.WF_SEL_MISSCNT.Text
@@ -191,16 +193,16 @@ Public Class OIS0001UserCreate
         WF_PASSENDYMD.Text = work.WF_SEL_PASSENDYMD.Text
 
         '開始年月日
-        WF_STYMD.Text = work.WF_SEL_STYMD.Text
+        WF_STYMD.Text = work.WF_SEL_STYMD2.Text
 
         '終了年月日
-        WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text
+        WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
 
         '会社コード
-        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
+        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
 
         '組織コード
-        WF_ORG.Text = work.WF_SEL_ORG.Text
+        WF_ORG.Text = work.WF_SEL_ORG2.Text
 
         'メールアドレス
         WF_EMAIL.Text = work.WF_SEL_EMAIL.Text
@@ -996,7 +998,7 @@ Public Class OIS0001UserCreate
                         OIS0001row("MAPROLE") = OIS0001INProw("MAPROLE") AndAlso
                         OIS0001row("VIEWPROFID") = OIS0001INProw("VIEWPROFID") AndAlso
                         OIS0001row("RPRTPROFID") = OIS0001INProw("RPRTPROFID") AndAlso
-                        OIS0001row("INIMAPVALROLE") = OIS0001INProw("INIMAPVALROLE") AndAlso
+                        OIS0001row("VARIANT") = OIS0001INProw("VARIANT") AndAlso
                         OIS0001row("APPROVALID") = OIS0001INProw("APPROVALID") AndAlso
                         OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
                     Else

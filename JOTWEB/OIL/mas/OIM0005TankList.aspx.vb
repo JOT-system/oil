@@ -1822,10 +1822,6 @@ Public Class OIM0005TankList
         WF_OBTAINEDCODE.Text = OIM0005tbl.Rows(WW_LINECNT)("OBTAINEDCODE")
         work.WF_SEL_OBTAINEDCODE.Text = OIM0005tbl.Rows(WW_LINECNT)("OBTAINEDCODE")
 
-        '形式
-        WF_MODEL.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
-        work.WF_SEL_MODEL2.Text = OIM0005tbl.Rows(WW_LINECNT)("MODEL")
-
         '形式カナ
         WF_MODELKANA.Text = OIM0005tbl.Rows(WW_LINECNT)("MODELKANA")
         work.WF_SEL_MODELKANA.Text = OIM0005tbl.Rows(WW_LINECNT)("MODELKANA")

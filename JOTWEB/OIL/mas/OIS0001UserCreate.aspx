@@ -81,9 +81,10 @@
                 <!-- パスワード -->
                 <a>
                     <asp:Label ID="WF_PASSWORD_L" runat="server" Text="パスワード" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                    <asp:TextBox ID="WF_PASSWORD" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                    <asp:TextBox ID="WF_PASSWORD" runat="server" Height="1.1em" Width="15em" CssClass="WF_TEXTBOX_CSS" TextMode="Password"></asp:TextBox>
                     <asp:Label ID="WF_PASSWORD_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                </a>
+                    
+               </a>
 
                 <!-- 誤り回数 -->
                 <a>

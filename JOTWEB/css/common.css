@@ -365,7 +365,9 @@ div {
     border: 1px solid black;
 }
 
-
+.WF_TEXTBOX_CSS[type="password"]::-ms-reveal {
+    display: none;
+}
 
 /* 左詰め */
 

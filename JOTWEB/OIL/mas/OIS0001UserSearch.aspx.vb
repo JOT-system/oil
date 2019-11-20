@@ -318,8 +318,8 @@ Public Class OIS0001UserSearch
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
-                            Case "WF_ORG"       '所属部署
-                                prmData = work.CreateORGParam(WF_ORG.Text)
+                            Case "WF_ORG"       '組織コード
+                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -341,7 +341,7 @@ Public Class OIS0001UserSearch
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"          '会社コード
                 CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
-            Case "WF_ORG"               '所属部署
+            Case "WF_ORG"               '組織コード
                 CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
         End Select
 
@@ -400,7 +400,7 @@ Public Class OIS0001UserSearch
                 End Try
                 WF_ENDYMD.Focus()
 
-            Case "WF_ORG"               '所属部署
+            Case "WF_ORG"               '組織コード
                 WF_ORG.Text = WW_SelectValue
                 WF_ORG_TEXT.Text = WW_SelectText
                 WF_ORG.Focus()
@@ -428,7 +428,7 @@ Public Class OIS0001UserSearch
                 WF_STYMD.Focus()
             Case "WF_ENDYMD"            '有効年月日(To)
                 WF_ENDYMD.Focus()
-            Case "WF_ORG"               '所属部署
+            Case "WF_ORG"               '組織コード
                 WF_ORG.Focus()
         End Select
 
@@ -501,7 +501,7 @@ Public Class OIS0001UserSearch
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"              '所属部署
+                Case "ORG"              '組織コード
                     prmData = work.CreateORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select

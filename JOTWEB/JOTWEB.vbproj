@@ -53,7 +53,6 @@
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -196,6 +195,7 @@
     <Compile Include="base\GL\GL0001.vb" />
     <Compile Include="base\GL\GL0002.vb" />
     <Compile Include="base\GL\GL0003.vb" />
+    <Compile Include="base\GL\GL0012.vb" />
     <Compile Include="base\GS\GS0000.vb" />
     <Compile Include="base\GS\GS0001.vb" />
     <Compile Include="base\GS\GS0003.vb" />

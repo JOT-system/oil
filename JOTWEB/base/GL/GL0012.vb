@@ -15,6 +15,13 @@ Public Class GL0012RoleList
     ''' <remarks></remarks>
     Public Property ROLECODE() As String
     ''' <summary>
+    ''' ROLENAME
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property ROLENAME() As String
+    ''' <summary>
     ''' OBJCODE
     ''' </summary>
     ''' <value></value>
@@ -28,6 +35,11 @@ Public Class GL0012RoleList
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property CAMPCODE() As String
+    ''' <summary>
+    ''' CLAS
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Property CLAS() As String
     ''' <summary>
     ''' メソッド名
     ''' </summary>
@@ -91,24 +103,24 @@ Public Class GL0012RoleList
         Try
 
             Dim SQLStr As String =
-                    " SELECT                 " &
-                    "         CODE          as CODE   , " &
-                    "         CODENAMES     as NAMES    " &
-                    " FROM COM.OIS0009_ROLE                   " &
+                    " SELECT　                 " &
+                    "         ROLE          as ROLE   , " &
+                    "         ROLENAME      as ROLENAME " &
+                    " FROM COM.OIS0009_ROLE             " &
                     " WHERE CAMPCODE        = @P1       " &
-                    "   AND   STYMD        <= @P3       " &
-                    "   AND   ENDYMD       >= @P2       " &
+                    "   AND   STYMD        <= @P2       " &
+                    "   AND   ENDYMD       >= @P3       " &
                     "   AND   OBJECT        = @P4       " &
-                    "   AND   ROLE          = @P5       " &
-                    "   AND   DELFLG       <> '1'       "
+                    "   AND   DELFLG       <> @P5       "
+
             '〇ソート条件追加
             Select Case DEFAULT_SORT
                 Case C_DEFAULT_SORT.CODE, String.Empty
-                    SQLStr = SQLStr & " ORDER BY CODE , CODENAMES , SEQ "
+                    SQLStr = SQLStr & " ORDER BY CODE , ROLENAME , SEQ "
                 Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY CODENAMES , CODE , SEQ "
+                    SQLStr = SQLStr & " ORDER BY CODENAMES , ROLE , SEQ "
                 Case C_DEFAULT_SORT.SEQ
-                    SQLStr = SQLStr & " ORDER BY SEQ , CODE , CODENAMES "
+                    SQLStr = SQLStr & " ORDER BY SEQ , ROLE , ROLENAME "
                 Case Else
             End Select
 
@@ -120,16 +132,19 @@ Public Class GL0012RoleList
             Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.VarChar, 20)
 
             PARA1.Value = CAMPCODE
-            PARA2.Value = STYMD
-            PARA3.Value = ENDYMD
+            PARA2.Value = Date.Now
+            PARA3.Value = Date.Now
             PARA4.Value = OBJCODE
-            PARA5.Value = ROLECODE
+            PARA5.Value = C_DELETE_FLG.DELETE
             Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
 
             While SQLdr.Read
                 '○出力編集
-                LIST.Items.Add(New ListItem(SQLdr("NAMES"), SQLdr("CODE")))
+                If LIST.Items.Contains(New ListItem(SQLdr("ROLENAME"), SQLdr("ROLE"))) Then
+                Else
+                    LIST.Items.Add(New ListItem(SQLdr("ROLENAME"), SQLdr("ROLE")))
+                End If
             End While
 
             'Close

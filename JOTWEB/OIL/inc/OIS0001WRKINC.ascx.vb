@@ -19,7 +19,7 @@ Public Class OIS0001WRKINC
     End Sub
 
     '' <summary>
-    '' 運用部署パラメーター
+    '' 組織コードパラメーター
     '' </summary>
     '' <param name="I_COMPCODE"></param>
     '' <returns></returns>
@@ -35,6 +35,21 @@ Public Class OIS0001WRKINC
 
         CreateORGParam = prmData
 
+    End Function
+
+    '' <summary>
+    '' ロールマスタから一覧の取得
+    '' </summary>
+    '' <param name="COMPCODE"></param>
+    '' <param name="FIXCODE"></param>
+    '' <returns></returns>
+    '' <remarks></remarks>
+    Function CreateRoleList(ByVal COMPCODE As String, ByVal OBJCODE As String, ByVal ROLECODE As String) As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = COMPCODE
+        prmData.Item(C_PARAMETERS.LP_CLASSCODE) = OBJCODE
+        prmData.Item(C_PARAMETERS.LP_PERMISSION) = ROLECODE
+        CreateRoleList = prmData
     End Function
 
     '' <summary>

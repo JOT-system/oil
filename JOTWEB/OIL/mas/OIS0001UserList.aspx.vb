@@ -194,8 +194,73 @@ Public Class OIS0001UserList
         End If
 
         '○ 名称設定処理
-        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
-        CODENAME_get("ORG", work.WF_SEL_ORG.Text, WF_SEL_ORGNAME.Text, WW_DUMMY)                     '運用部署
+        '選択行
+        WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
+
+        'ユーザID
+        WF_USERID.Text = work.WF_SEL_USERID.Text
+
+        '社員名（短）
+        WF_STAFFNAMES.Text = work.WF_SEL_STAFFNAMES.Text
+
+        '社員名（長）
+        WF_STAFFNAMEL.Text = work.WF_SEL_STAFFNAMEL.Text
+
+        '画面ＩＤ
+        WF_MAPID.Text = work.WF_SEL_MAPID.Text
+
+        'パスワード
+        WF_PASSWORD.Text = work.WF_SEL_PASSWORD.Text
+        WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
+
+        '誤り回数
+        WF_MISSCNT.Text = work.WF_SEL_MISSCNT.Text
+
+        'パスワード有効期限
+        WF_PASSENDYMD.Text = work.WF_SEL_PASSENDYMD.Text
+
+        '開始年月日
+        WF_STYMD.Text = work.WF_SEL_STYMD2.Text
+
+        '終了年月日
+        WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
+
+        '会社コード
+        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+
+        '組織コード
+        WF_ORG.Text = work.WF_SEL_ORG2.Text
+        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)
+
+        'メールアドレス
+        WF_EMAIL.Text = work.WF_SEL_EMAIL.Text
+
+        'メニュー表示制御ロール
+        WF_MENUROLE.Text = work.WF_SEL_MENUROLE.Text
+        CODENAME_get("MENU", WF_MENUROLE.Text, WF_MENUROLE_TEXT.Text, WW_DUMMY)
+
+        '画面参照更新制御ロール
+        WF_MAPROLE.Text = work.WF_SEL_MAPROLE.Text
+        CODENAME_get("MAP", WF_MAPROLE.Text, WF_MAPROLE_TEXT.Text, WW_DUMMY)
+
+        '画面表示項目制御ロール
+        WF_VIEWPROFID.Text = work.WF_SEL_VIEWPROFID.Text
+        CODENAME_get("VIEW", WF_VIEWPROFID.Text, WF_VIEWPROFID_TEXT.Text, WW_DUMMY)
+
+        'エクセル出力制御ロール
+        WF_RPRTPROFID.Text = work.WF_SEL_RPRTPROFID.Text
+        CODENAME_get("XML", WF_RPRTPROFID.Text, WF_RPRTPROFID_TEXT.Text, WW_DUMMY)
+
+        '画面初期値ロール
+        WF_VARIANT.Text = work.WF_SEL_VARIANT.Text
+
+        '承認権限ロール
+        WF_APPROVALID.Text = work.WF_SEL_APPROVALID.Text
+        CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
+
+        '削除
+        WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
+        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
     End Sub
 
@@ -2032,26 +2097,44 @@ Public Class OIS0001UserList
                 Exit Sub
             End Try
 
-            Dim WW_FIELD As String = ""
-            If WF_FIELD_REP.Value = "" Then
-                WW_FIELD = WF_FIELD.Value
-            Else
-                WW_FIELD = WF_FIELD_REP.Value
-            End If
-
             With leftview
-                '会社コード
-                Dim prmData As New Hashtable
+                Select Case WF_LeftMViewChange.Value
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
+                            Case "WF_PASSENDYMD"         'パスワード有効期限
+                                .WF_Calendar.Text = WF_PASSENDYMD.Text
+                            Case "WF_STYMD"         '有効年月日(From)
+                                .WF_Calendar.Text = WF_STYMD.Text
+                            Case "WF_ENDYMD"        '有効年月日(To)
+                                .WF_Calendar.Text = WF_ENDYMD.Text
+                        End Select
+                        .ActiveCalendar()
 
-                'フィールドによってパラメーターを変える
-                Select Case WW_FIELD
-                    Case "WF_DELFLG"
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
+                    Case Else
+                        '以外
+                        Dim prmData As New Hashtable
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+
+                        'フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            Case "WF_ORG"       '組織コード
+                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                            Case "WF_MENUROLE"       'メニュー表示制御ロール
+                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
+                            Case "WF_MAPROLE"       '画面参照更新制御ロール
+                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
+                            Case "WF_VIEWPROFID"       '画面表示項目制御ロール
+                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
+                            Case "WF_RPRTPROFID"       'エクセル出力制御ロール
+                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
+                            Case "WF_APPROVALID"       '承認権限ロール
+                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
+                        End Select
+
+                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                        .ActiveListBox()
                 End Select
-
-                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                .ActiveListBox()
             End With
         End If
 
@@ -2081,11 +2164,67 @@ Public Class OIS0001UserList
         '○ 選択内容を画面項目へセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除フラグ
-                Case "WF_DELFLG"
+                Case "WF_DELFLG"            '削除フラグ
                     WF_DELFLG.Text = WW_SelectValue
                     WF_DELFLG_TEXT.Text = WW_SelectText
                     WF_DELFLG.Focus()
+
+                Case "WF_PASSENDYMD"             'パスワード有効期限
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(WW_SelectValue, WW_DATE)
+                        WF_PASSENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Catch ex As Exception
+                    End Try
+                    WF_PASSENDYMD.Focus()
+
+                Case "WF_STYMD"             '有効年月日(From)
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(WW_SelectValue, WW_DATE)
+                        WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Catch ex As Exception
+                    End Try
+                    WF_STYMD.Focus()
+
+                Case "WF_ENDYMD"            '有効年月日(To)
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(WW_SelectValue, WW_DATE)
+                        WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Catch ex As Exception
+                    End Try
+                    WF_ENDYMD.Focus()
+
+                Case "WF_ORG"               '組織コード
+                    WF_ORG.Text = WW_SelectValue
+                    WF_ORG_TEXT.Text = WW_SelectText
+                    WF_ORG.Focus()
+
+                Case "WF_MENUROLE"               'メニュー表示制御ロール
+                    WF_MENUROLE.Text = WW_SelectValue
+                    WF_MENUROLE_TEXT.Text = WW_SelectText
+                    WF_MENUROLE.Focus()
+
+                Case "WF_MAPROLE"               '画面参照更新制御ロール
+                    WF_MAPROLE.Text = WW_SelectValue
+                    WF_MAPROLE_TEXT.Text = WW_SelectText
+                    WF_MAPROLE.Focus()
+
+                Case "WF_VIEWPROFID"               '画面表示項目制御ロール
+                    WF_VIEWPROFID.Text = WW_SelectValue
+                    WF_VIEWPROFID_TEXT.Text = WW_SelectText
+                    WF_VIEWPROFID.Focus()
+
+                Case "WF_RPRTPROFID"               'エクセル出力制御ロール
+                    WF_RPRTPROFID.Text = WW_SelectValue
+                    WF_RPRTPROFID_TEXT.Text = WW_SelectText
+                    WF_RPRTPROFID.Focus()
+
+                Case "WF_APPROVALID"               '承認権限ロール
+                    WF_APPROVALID.Text = WW_SelectValue
+                    WF_APPROVALID_TEXT.Text = WW_SelectText
+                    WF_APPROVALID.Focus()
             End Select
         Else
         End If
@@ -2481,11 +2620,31 @@ Public Class OIS0001UserList
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "ORG"         '組織コード
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "MENU"           'メニュー表示制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_MENUROLE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "MAP"         '画面参照更新制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_MAPROLE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "VIEW"         '画面表示項目制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_VIEWPROFID.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "XML"         'エクセル出力制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_RPRTPROFID.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "APPROVAL"         '承認権限ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_APPROVALID.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "DELFLG"           '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
-
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

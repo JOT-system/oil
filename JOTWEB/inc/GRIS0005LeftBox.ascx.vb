@@ -102,6 +102,11 @@ Public Class GRIS0005LeftBox
         LC_TANKNUMBER
         LC_TANKMODEL
         LC_SALESOFFICE
+        LC_MENU
+        LC_MAP
+        LC_VIEW
+        LC_XML
+        LC_APPROVAL
     End Enum
     ''' <summary>
     ''' パラメタ群
@@ -148,6 +153,11 @@ Public Class GRIS0005LeftBox
         LP_TANKNUMBER
         LP_TANKMODEL
         LP_SALESOFFICE
+        LP_MENU
+        LP_MAP
+        LP_VIEW
+        LP_XML
+        LP_APPROVAL
     End Enum
 
     ''' <summary>
@@ -404,9 +414,9 @@ Public Class GRIS0005LeftBox
             'Case LIST_BOX_CLASSIFICATION.LC_TERM
             '    '端末
             '    lbox = createTermList(Params, O_RTN)
-            'Case LIST_BOX_CLASSIFICATION.LC_ROLE
-            '    '権限コード
-            '    lbox = createRoleList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_ROLE
+                '権限コード
+                lbox = CreateRoleList(Params, O_RTN)
             'Case LIST_BOX_CLASSIFICATION.LC_URL
             '    'URL
             '    lbox = createURLList(Params, O_RTN)
@@ -424,6 +434,26 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
                 '営業所(組織コード)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SALESOFFICE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_MENU
+                'メニュー表示制御ロールパターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MENU"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_MAP
+                '画面参照更新制御ロールパターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MAP"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_VIEW
+                '画面表示項目制御ロールパターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "VIEW"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_XML
+                'エクセル出力制御ロールパターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "XML"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_APPROVAL
+                '承認権限ロールパターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "APPROVAL"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
@@ -817,6 +847,71 @@ Public Class GRIS0005LeftBox
     '''' <param name="O_RTN">成功可否</param>
     '''' <returns>作成した一覧情報</returns>
     '''' <remarks></remarks>
+    'Protected Function CreateRoleList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+    '    Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), C_ROLE_VARIANT.USER_ORG) &
+    '                        If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &
+    '                        If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0012RoleList.C_VIEW_FORMAT_PATTERN.NAMES) &
+    '                        LIST_BOX_CLASSIFICATION.LC_ROLE
+
+    '    If Not LbMap.ContainsKey(key) Then
+    '        Using GL0012RoleList As New GL0012RoleList With {
+    '            .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
+    '          , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
+    '          , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
+    '          , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0012RoleList.C_VIEW_FORMAT_PATTERN.NAMES) _
+    '          , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "")
+    '        }
+    '            Select Case If(Params.Item(C_PARAMETERS.LP_TYPEMODE), "")
+    '                Case C_ROLE_VARIANT.USER_COMP
+    '                    GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_COMP
+    '                    GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_COMP)
+    '                Case C_ROLE_VARIANT.USER_ORG
+    '                    GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_ORG
+    '                    GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG)
+    '                Case C_ROLE_VARIANT.USER_PERTMIT
+    '                    GL0012RoleList.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
+    '                    GL0012RoleList.ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP)
+    '            End Select
+    '            GL0012RoleList.getList()
+    '            Dim lsbx As ListBox = GL0012RoleList.LIST
+    '            O_RTN = GL0012RoleList.ERR
+    '            LbMap.Add(key, lsbx)
+    '        End Using
+    '    End If
+    '    Return LbMap.Item(key)
+    'End Function
+
+    ''' <summary>
+    ''' 権限コード一覧を作成する
+    ''' </summary>
+    ''' <param name="Params">取得用パラメータ</param>
+    ''' <param name="O_RTN">成功可否</param>
+    ''' <returns>作成した一覧情報</returns>
+    ''' <remarks></remarks>
+    Protected Function CreateRoleList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+        Dim I_COMP = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
+        Dim I_CLASS = Params.Item(C_PARAMETERS.LP_CLASSCODE)
+        Dim I_ROLE = Params.Item(C_PARAMETERS.LP_PERMISSION)
+        Dim key As String = I_COMP & If(I_CLASS = String.Empty, "ALLVALUE", I_CLASS) & If(I_ROLE = String.Empty, "ALLVALUE", I_ROLE)
+        If Not LbMap.ContainsKey(key) Then
+            Dim lsbx As New ListBox
+
+            Using GL0012RoleList As New GL0012RoleList With {
+                   .CAMPCODE = I_COMP _
+                 , .OBJCODE = I_CLASS _
+                 , .ROLECODE = I_ROLE _
+                 , .LIST = lsbx
+                }
+                GL0012RoleList.getList()
+                O_RTN = GL0012RoleList.ERR
+                lsbx = GL0012RoleList.LIST
+                Dim cnt As Long = lsbx.Rows
+                LbMap.Add(key, lsbx)
+            End Using
+        End If
+
+        Return LbMap.Item(key)
+    End Function
     'Protected Function CreateRoleList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
     '    Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), C_ROLE_VARIANT.USER_ORG) &
     '                        If(Params.Item(C_PARAMETERS.LP_COMPANY), "-") &

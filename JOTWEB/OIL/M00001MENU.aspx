@@ -121,7 +121,7 @@
                             <asp:Label ID="WF_MenuURL_L3" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuVARI_L3" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuMAP_L3" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_L3" runat="server" CssClass="WF_MenuButton_L3" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                            <asp:Button ID="WF_MenuButton_L3" runat="server" CssClass="WF_MenuButton_L3" onmouseover="this.style.background='#FBA848';this.style.color=rgba(172, 172, 172)" onmouseout="this.style.background='#FDC44F';this.style.color='white'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
                 </ItemTemplate>

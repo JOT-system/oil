@@ -30,7 +30,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 /*在庫管理メニュー表示*/
 #Menu_L {
-    height: 48%;
+    height: 45%;
     width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
@@ -53,8 +53,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     font-weight: 800;
     vertical-align: middle;
     text-align: left;
-    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
-    font-size: 6ex;
+    font-size: 5ex;
     /*    background: linear-gradient(transparent 10%, #F5F5F5 95%);*/
 }
 
@@ -77,7 +76,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 /*受注管理メニュー表示*/
 #Menu_L2 {
-    height: 48%;
+    height: 45%;
     width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
@@ -100,8 +99,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     font-weight: 800;
     vertical-align: middle;
     text-align: left;
-    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
-    font-size: 6ex;
+    font-size: 5ex;
 }
 
 .WF_MenuButton_L2 {
@@ -122,12 +120,17 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 /*請求支払管理メニュー表示*/
 #Menu_L3 {
-    height: auto;
-    width: 30%;
+    height: 45%;
+    width: 18%;
     position: fixed;
-    margin: 25% 0% 0% 0%;
+    margin: 22% 0% 0% 0%;
     left: 2em;
     overflow-y: auto;
+    background-color: #FDC44F;
+    background-image: url(../img/oiltank.png);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 40%;
 }
 
 .WF_MenuLabel_L3 {
@@ -136,23 +139,27 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     position: relative;
     left: 0em;
     overflow: hidden;
-    color: black;
-    font-weight: bold;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 800;
     vertical-align: middle;
     text-align: left;
+    font-size: 5ex;
 }
 
 .WF_MenuButton_L3 {
-    height: 2em;
-    width: 17em;
+    height: 28px;
+    width: 90%;
     position: relative;
     left: 2em;
     overflow: hidden;
-    color: black;
+    color: white;
     border: none;
-    background-color: gray;
+    background-color: transparent;
     vertical-align: middle;
     text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
 }
 
 
@@ -196,7 +203,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 /*回送管理メニュー表示*/
 #Menu_R {
-    height: 48%;
+    height: 45%;
     width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
@@ -219,8 +226,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     font-weight: 800;
     vertical-align: middle;
     text-align: left;
-    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
-    font-size: 6ex;
+    font-size: 5ex;
 }
 
 .WF_MenuButton_R {
@@ -241,14 +247,14 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 /*マスタ管理メニュー表示*/
 #Menu_R2 {
-    height: 48%;
+    height: 45%;
     width: 18%;
     position: fixed;
     margin: 5px 0px 0px 0px;
     left: 61em;
     overflow-y: auto;
     background-color: #93B8CA;
-    background-image: url(../img/order.png);
+    background-image: url(../img/master.png);
     background-repeat: no-repeat;
     background-position: left bottom;
     background-size: 40%;
@@ -264,13 +270,12 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     font-weight: 800;
     vertical-align: middle;
     text-align: left;
-    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
-    font-size: 6ex;
+    font-size: 5ex;
 }
 
 .WF_MenuButton_R2 {
     height: 28px;
-    width: 120%;
+    width: 100%;
     position: relative;
     left: 2em;
     overflow: hidden;

@@ -56,23 +56,19 @@ Public Class GL0012RoleList
         '<< エラー説明 >>
         'O_ERR = OK:00000,ERR:00002(環境エラー),ERR:00003(DBerr)
         '●初期処理
-        'PARAM 01: ROLECODE
-        If checkParam(METHOD_NAME, ROLECODE) Then
-            Exit Sub
-        End If
-        'PARAM 02: OBJCODE
+        'PARAM 01: OBJCODE
         If checkParam(METHOD_NAME, OBJCODE) Then
             Exit Sub
         End If
-        'PARAM 03: CAMPCODE
+        'PARAM 02: CAMPCODE
         If checkParam(METHOD_NAME, CAMPCODE) Then
             Exit Sub
         End If
-        'PARAM EXTRA02: STYMD
+        'PARAM EXTRA01: STYMD
         If STYMD < C_DEFAULT_YMD Then
             STYMD = Date.Now
         End If
-        'PARAM EXTRA03: ENDYMD
+        'PARAM EXTRA02: ENDYMD
         If ENDYMD < C_DEFAULT_YMD Then
             ENDYMD = Date.Now
         End If

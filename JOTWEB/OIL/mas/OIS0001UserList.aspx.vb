@@ -2624,23 +2624,23 @@ Public Class OIS0001UserList
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MENU"           'メニュー表示制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_MENUROLE.Text)
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MAP"         '画面参照更新制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_MAPROLE.Text)
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "VIEW"         '画面表示項目制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_VIEWPROFID.Text)
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "XML"         'エクセル出力制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_RPRTPROFID.Text)
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "APPROVAL"         '承認権限ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD, WF_APPROVALID.Text)
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "DELFLG"           '削除フラグ

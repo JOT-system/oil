@@ -1,0 +1,1253 @@
+﻿''************************************************************
+' ユーザIDマスタメンテ登録画面
+' 作成日 2019/11/14
+' 更新日 2019/11/14
+' 作成者 JOT遠藤
+' 更新車 JOT遠藤
+'
+' 修正履歴:
+'         :
+''************************************************************
+Imports System.Data.SqlClient
+Imports JOTWEB.GRIS0005LeftBox
+
+''' <summary>
+''' ユーザIDマスタ登録（実行）
+''' </summary>
+''' <remarks></remarks>
+Public Class OIT0004UserCreate
+    Inherits Page
+
+    '○ 検索結果格納Table
+    Private OIT0004tbl As DataTable                                  '一覧格納用テーブル
+    Private OIT0004INPtbl As DataTable                               'チェック用テーブル
+    Private OIT0004UPDtbl As DataTable                               '更新用テーブル
+
+    Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
+    Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
+    Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
+
+    '○ データOPERATION用
+    Private Const CONST_INSERT As String = "Insert"                 'データ追加
+    Private Const CONST_UPDATE As String = "Update"                 'データ更新
+    Private Const CONST_PATTERNERR As String = "PATTEN ERR"         '関連チェックエラー
+
+    '○ 共通関数宣言(BASEDLL)
+    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+    Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
+    Private CS0020JOURNAL As New CS0020JOURNAL                      '更新ジャーナル出力
+    Private CS0023XLSUPLOAD As New CS0023XLSUPLOAD                  'XLSアップロード
+    Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
+    Private CS0030REPORT As New CS0030REPORT                        '帳票出力
+    Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+
+    '○ 共通処理結果
+    Private WW_ERR_SW As String = ""
+    Private WW_RTN_SW As String = ""
+    Private WW_DUMMY As String = ""
+    Private WW_ERRCODE As String                                    'サブ用リターンコード
+
+    ''' <summary>
+    ''' サーバー処理の遷移先
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
+
+        Try
+            If IsPostBack Then
+                '○ 各ボタン押下処理
+                If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
+                    '○ 画面表示データ復元
+                    Master.RecoverTable(OIT0004tbl, work.WF_SEL_INPTBL.Text)
+
+                    Select Case WF_ButtonClick.Value
+                        Case "WF_UPDATE"                '表更新ボタン押下
+                            WF_UPDATE_Click()
+                        Case "WF_CLEAR"                 'クリアボタン押下
+                            WF_CLEAR_Click()
+                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                            WF_FIELD_DBClick()
+                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                            WF_ButtonSel_Click()
+                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
+                        Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
+                            WF_RadioButton_Click()
+                        Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
+                            WF_RIGHTBOX_Change()
+                    End Select
+                End If
+            Else
+                '○ 初期化処理
+                Initialize()
+            End If
+
+            '○ 画面モード(更新・参照)設定
+            If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
+                WF_MAPpermitcode.Value = "TRUE"
+            Else
+                WF_MAPpermitcode.Value = "FALSE"
+            End If
+
+            WF_BOXChange.Value = "detailbox"
+
+        Finally
+            '○ 格納Table Close
+            If Not IsNothing(OIT0004tbl) Then
+                OIT0004tbl.Clear()
+                OIT0004tbl.Dispose()
+                OIT0004tbl = Nothing
+            End If
+
+            If Not IsNothing(OIT0004INPtbl) Then
+                OIT0004INPtbl.Clear()
+                OIT0004INPtbl.Dispose()
+                OIT0004INPtbl = Nothing
+            End If
+
+            If Not IsNothing(OIT0004UPDtbl) Then
+                OIT0004UPDtbl.Clear()
+                OIT0004UPDtbl.Dispose()
+                OIT0004UPDtbl = Nothing
+            End If
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 初期化処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub Initialize()
+
+        '○画面ID設定
+        Master.MAPID = OIT0004WRKINC.MAPIDC
+        '○HELP表示有無設定
+        Master.dispHelp = False
+        '○D&D有無設定
+        Master.eventDrop = True
+        '○Grid情報保存先のファイル名
+        'Master.CreateXMLSaveFile()
+
+        '○初期値設定
+        WF_FIELD.Value = ""
+        WF_ButtonClick.Value = ""
+        WF_LeftboxOpen.Value = ""
+        WF_RightboxOpen.Value = ""
+        rightview.ResetIndex()
+        leftview.ActiveListBox()
+
+        '右Boxへの値設定
+        rightview.MAPID = Master.MAPID
+        rightview.MAPVARI = Master.MAPvariant
+        rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
+        rightview.PROFID = Master.PROF_REPORT
+        rightview.Initialize(WW_DUMMY)
+
+        '○ 画面の値設定
+        WW_MAPValueSet()
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面初期値設定処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_MAPValueSet()
+
+        '○ 検索画面からの遷移
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004L Then
+            'Grid情報保存先のファイル名
+            Master.CreateXMLSaveFile()
+        End If
+
+        '○ 名称設定処理
+        '選択行
+        WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
+
+        'ユーザID
+        WF_USERID.Text = work.WF_SEL_USERID.Text
+
+        '社員名（短）
+        WF_STAFFNAMES.Text = work.WF_SEL_STAFFNAMES.Text
+
+        '社員名（長）
+        WF_STAFFNAMEL.Text = work.WF_SEL_STAFFNAMEL.Text
+
+        '画面ＩＤ
+        WF_MAPID.Text = work.WF_SEL_MAPID.Text
+
+        'パスワード
+        WF_PASSWORD.Text = work.WF_SEL_PASSWORD.Text
+        WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
+
+        '誤り回数
+        WF_MISSCNT.Text = work.WF_SEL_MISSCNT.Text
+
+        'パスワード有効期限
+        WF_PASSENDYMD.Text = work.WF_SEL_PASSENDYMD.Text
+
+        '開始年月日
+        WF_STYMD.Text = work.WF_SEL_STYMD2.Text
+
+        '終了年月日
+        WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
+
+        '会社コード
+        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+
+        '組織コード
+        WF_ORG.Text = work.WF_SEL_ORG2.Text
+        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)
+
+        'メールアドレス
+        WF_EMAIL.Text = work.WF_SEL_EMAIL.Text
+
+        'メニュー表示制御ロール
+        WF_MENUROLE.Text = work.WF_SEL_MENUROLE.Text
+        CODENAME_get("MENU", WF_MENUROLE.Text, WF_MENUROLE_TEXT.Text, WW_DUMMY)
+
+        '画面参照更新制御ロール
+        WF_MAPROLE.Text = work.WF_SEL_MAPROLE.Text
+        CODENAME_get("MAP", WF_MAPROLE.Text, WF_MAPROLE_TEXT.Text, WW_DUMMY)
+
+        '画面表示項目制御ロール
+        WF_VIEWPROFID.Text = work.WF_SEL_VIEWPROFID.Text
+        CODENAME_get("VIEW", WF_VIEWPROFID.Text, WF_VIEWPROFID_TEXT.Text, WW_DUMMY)
+
+        'エクセル出力制御ロール
+        WF_RPRTPROFID.Text = work.WF_SEL_RPRTPROFID.Text
+        CODENAME_get("XML", WF_RPRTPROFID.Text, WF_RPRTPROFID_TEXT.Text, WW_DUMMY)
+
+        '画面初期値ロール
+        WF_VARIANT.Text = work.WF_SEL_VARIANT.Text
+
+        '承認権限ロール
+        WF_APPROVALID.Text = work.WF_SEL_APPROVALID.Text
+        CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
+
+        '削除
+        WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
+        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0004tbl) Then
+            OIT0004tbl = New DataTable
+        End If
+
+        If OIT0004tbl.Columns.Count <> 0 Then
+            OIT0004tbl.Columns.Clear()
+        End If
+
+        OIT0004tbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データをユーザマスタ、ユーザIDマスタから取得する
+        Dim SQLStr As String =
+            " OPEN SYMMETRIC KEY loginpasskey DECRYPTION BY CERTIFICATE certjotoil; " _
+            & " Select " _
+            & "    0                                                   As LINECNT " _
+            & "    , ''                                                AS OPERATION " _
+            & "    , CAST(OIS0004.UPDTIMSTP AS BIGINT)                    AS UPDTIMSTP " _
+            & "    , 1                                                 AS 'SELECT' " _
+            & "    , 0                                                 AS HIDDEN " _
+            & "    , ISNULL(RTRIM(OIS0004.DELFLG), '')                    AS DELFLG " _
+            & "    , ISNULL(RTRIM(OIS0004.USERID), '')                    AS USERID " _
+            & "    , ISNULL(RTRIM(OIS0004.STAFFNAMES), '')                AS STAFFNAMES " _
+            & "    , ISNULL(RTRIM(OIS0004.STAFFNAMEL), '')                AS STAFFNAMEL " _
+            & "    , ISNULL(RTRIM(OIS0004.MAPID), '')                     AS MAPID " _
+            & "    , CONVERT(nvarchar, DecryptByKey(ISNULL(RTRIM(OIS0005.PASSWORD), ''))) As PASSWORD " _
+            & "    , ISNULL(RTRIM(OIS0005.MISSCNT), '')                   AS MISSCNT " _
+            & "    , ISNULL(FORMAT(OIS0005.PASSENDYMD, 'yyyy/MM/dd'), '') AS PASSENDYMD " _
+            & "    , ISNULL(FORMAT(OIS0004.STYMD, 'yyyy/MM/dd'), '')      AS STYMD " _
+            & "    , ISNULL(FORMAT(OIS0004.ENDYMD, 'yyyy/MM/dd'), '')     AS ENDYMD " _
+            & "    , ISNULL(RTRIM(OIS0004.CAMPCODE), '')                  AS CAMPCODE " _
+            & "    , ''                                                AS CAMPNAMES " _
+            & "    , ISNULL(RTRIM(OIS0004.ORG), '')                       AS ORG " _
+            & "    , ''                                                AS ORGNAMES " _
+            & "    , ISNULL(RTRIM(OIS0004.EMAIL), '')                     AS EMAIL " _
+            & "    , ISNULL(RTRIM(OIS0004.MENUROLE), '')                  AS MENUROLE " _
+            & "    , ISNULL(RTRIM(OIS0004.MAPROLE), '')                   AS MAPROLE " _
+            & "    , ISNULL(RTRIM(OIS0004.VIEWPROFID), '')                AS VIEWPROFID " _
+            & "    , ISNULL(RTRIM(OIS0004.RPRTPROFID), '')                AS RPRTPROFID " _
+            & "    , ISNULL(RTRIM(OIS0004.VARIANT), '')             AS VARIANT " _
+            & "    , ISNULL(RTRIM(OIS0004.APPROVALID), '')                AS APPROVALID " _
+            & " FROM " _
+            & "    COM.OIS0004_USER OIS0004 " _
+            & "    INNER JOIN COM.OIS0005_USERPASS OIS0005 " _
+            & "        ON  OIS0005.USERID   = OIS0004.USERID" _
+            & "        AND OIS0005.DELFLG  <> @P6" _
+            & " WHERE" _
+            & "    OIS0004.CAMPCODE    = @P1" _
+            & "    AND OIS0004.STYMD  <= @P4" _
+            & "    AND OIS0004.ENDYMD >= @P5" _
+            & "    AND OIS0004.DELFLG <> @P6"
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '組織コード
+        If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
+            SQLStr &= String.Format("    AND OIS0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
+        End If
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    OIS0004.ORG" _
+            & "    , OIS0004.USERID"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.Date)                '有効年月日(To)
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)                '有効年月日(From)
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
+
+                PARA1.Value = work.WF_SEL_CAMPCODE.Text
+                PARA4.Value = work.WF_SEL_ENDYMD.Text
+                PARA5.Value = work.WF_SEL_STYMD.Text
+                PARA6.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0004tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0004tbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0004row As DataRow In OIT0004tbl.Rows
+                    i += 1
+                    OIT0004row("LINECNT") = i        'LINECNT
+                    ''名称取得
+                    'CODENAME_get("CAMPCODE", OIT0004row("CAMPCODE"), OIT0004row("CAMPNAMES"), WW_DUMMY)                               '会社コード
+                    'CODENAME_get("ORG", OIT0004row("ORG"), OIT0004row("ORGNAMES"), WW_DUMMY)                                          '組織コード
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004D SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004D Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 一意制約チェック
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub UniqueKeyCheck(ByVal SQLcon As SqlConnection, ByRef O_MESSAGENO As String)
+
+        '○ 対象データ取得
+        Dim SQLStr As String =
+              " SELECT " _
+            & "     USERID " _
+            & "    , STYMD" _
+            & "    , ENDYMD" _
+            & " FROM" _
+            & "    COM.OIS0004_USER" _
+            & " WHERE" _
+            & "     USERID      = @P01"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20)            'JOT車番
+                PARA1.Value = WF_USERID.Text
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+
+                    Dim OIT0004Dhk = New DataTable
+
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0004Dhk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0004Dhk.Load(SQLdr)
+
+                    If OIT0004Dhk.Rows.Count > 0 Then
+                        '重複データエラー
+                        O_MESSAGENO = Messages.C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                    Else
+                        '正常終了時
+                        O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004D UPDATE_INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004D UPDATE_INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧画面-マウスホイール時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_Grid_Scroll()
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  詳細表示関連操作                                                      ***
+    ' ******************************************************************************
+
+    ''' <summary>
+    ''' 詳細画面-表更新ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_UPDATE_Click()
+
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
+
+        '○ DetailBoxをINPtblへ退避
+        DetailBoxToOIT0004INPtbl(WW_ERR_SW)
+        If Not isNormal(WW_ERR_SW) Then
+            Exit Sub
+        End If
+
+        '○ 項目チェック
+        INPTableCheck(WW_ERR_SW)
+
+        '○ 入力値のテーブル反映
+        If isNormal(WW_ERR_SW) Then
+            OIT0004tbl_UPD()
+        End If
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0004tbl, work.WF_SEL_INPTBL.Text)
+
+        '○ メッセージ表示
+        If WW_ERR_SW = "" Then
+            Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        Else
+            If isNormal(WW_ERR_SW) Then
+                Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+            Else
+                Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            End If
+        End If
+
+        If isNormal(WW_ERR_SW) Then
+            '前ページ遷移
+            Master.TransitionPrevPage()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 詳細画面-テーブル退避
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub DetailBoxToOIT0004INPtbl(ByRef O_RTN As String)
+
+        O_RTN = C_MESSAGE_NO.NORMAL
+
+        '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
+        Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除フラグ
+
+        '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
+        If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
+            String.IsNullOrEmpty(WF_DELFLG.Text) Then
+            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail")
+
+            CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "non Detail"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
+            CS0011LOGWrite.TEXT = "non Detail"
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+
+            O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
+            Exit Sub
+        End If
+
+        Master.CreateEmptyTable(OIT0004INPtbl, work.WF_SEL_INPTBL.Text)
+        Dim OIT0004INProw As DataRow = OIT0004INPtbl.NewRow
+
+        '○ 初期クリア
+        For Each OIT0004INPcol As DataColumn In OIT0004INPtbl.Columns
+            If IsDBNull(OIT0004INProw.Item(OIT0004INPcol)) OrElse IsNothing(OIT0004INProw.Item(OIT0004INPcol)) Then
+                Select Case OIT0004INPcol.ColumnName
+                    Case "LINECNT"
+                        OIT0004INProw.Item(OIT0004INPcol) = 0
+                    Case "OPERATION"
+                        OIT0004INProw.Item(OIT0004INPcol) = C_LIST_OPERATION_CODE.NODATA
+                    Case "UPDTIMSTP"
+                        OIT0004INProw.Item(OIT0004INPcol) = 0
+                    Case "SELECT"
+                        OIT0004INProw.Item(OIT0004INPcol) = 1
+                    Case "HIDDEN"
+                        OIT0004INProw.Item(OIT0004INPcol) = 0
+                    Case Else
+                        OIT0004INProw.Item(OIT0004INPcol) = ""
+                End Select
+            End If
+        Next
+
+        'LINECNT
+        If WF_Sel_LINECNT.Text = "" Then
+            OIT0004INProw("LINECNT") = 0
+        Else
+            Try
+                Integer.TryParse(WF_Sel_LINECNT.Text, OIT0004INProw("LINECNT"))
+            Catch ex As Exception
+                OIT0004INProw("LINECNT") = 0
+            End Try
+        End If
+
+        OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+        OIT0004INProw("UPDTIMSTP") = 0
+        OIT0004INProw("SELECT") = 1
+        OIT0004INProw("HIDDEN") = 0
+
+        OIT0004INProw("DELFLG") = WF_DELFLG.Text                     '削除フラグ
+
+        OIT0004INProw("USERID") = WF_USERID.Text              'ユーザID
+
+        OIT0004INProw("STAFFNAMES") = WF_STAFFNAMES.Text              '社員名（短）
+
+        OIT0004INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text              '社員名（長）
+
+        OIT0004INProw("MAPID") = WF_MAPID.Text              '画面ＩＤ
+
+        OIT0004INProw("PASSWORD") = WF_PASSWORD.Text              'パスワード
+
+        OIT0004INProw("MISSCNT") = WF_MISSCNT.Text              '誤り回数
+
+        OIT0004INProw("PASSENDYMD") = WF_PASSENDYMD.Text              'パスワード有効期限
+
+        OIT0004INProw("STYMD") = WF_STYMD.Text              '開始年月日
+
+        OIT0004INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
+
+        OIT0004INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
+
+        OIT0004INProw("ORG") = WF_ORG.Text              '組織コード
+
+        OIT0004INProw("EMAIL") = WF_EMAIL.Text              'メールアドレス
+
+        OIT0004INProw("MENUROLE") = WF_MENUROLE.Text              'メニュー表示制御ロール
+
+        OIT0004INProw("MAPROLE") = WF_MAPROLE.Text              '画面参照更新制御ロール
+
+        OIT0004INProw("VIEWPROFID") = WF_VIEWPROFID.Text              '画面表示項目制御ロール
+
+        OIT0004INProw("RPRTPROFID") = WF_RPRTPROFID.Text              'エクセル出力制御ロール
+
+        OIT0004INProw("VARIANT") = WF_VARIANT.Text              '画面初期値ロール
+
+        OIT0004INProw("APPROVALID") = WF_APPROVALID.Text              '承認権限ロール
+
+        '○ チェック用テーブルに登録する
+        OIT0004INPtbl.Rows.Add(OIT0004INProw)
+
+    End Sub
+
+
+    ''' <summary>
+    ''' 詳細画面-クリアボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_CLEAR_Click()
+
+        '○ 詳細画面初期化
+        DetailBoxClear()
+
+        '○ メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_CLEAR_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_FIELD_REP.Value = ""
+        WF_LeftboxOpen.Value = ""
+
+        Master.TransitionPrevPage()
+
+    End Sub
+
+    ''' <summary>
+    ''' 詳細画面初期化
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DetailBoxClear()
+
+        '○ 状態をクリア
+        For Each OIT0004row As DataRow In OIT0004tbl.Rows
+            Select Case OIT0004row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    WW_ERR_SW = C_LIST_OPERATION_CODE.NODATA
+
+                Case C_LIST_OPERATION_CODE.NODISP
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    WW_ERR_SW = C_LIST_OPERATION_CODE.NODATA
+
+                Case C_LIST_OPERATION_CODE.SELECTED
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                    WW_ERR_SW = C_MESSAGE_NO.NORMAL
+
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    WW_ERR_SW = C_MESSAGE_NO.NORMAL
+
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    WW_ERR_SW = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End Select
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0004tbl, work.WF_SEL_INPTBL.Text)
+
+        WF_Sel_LINECNT.Text = ""            'LINECNT
+
+        WF_USERID.Text = ""            'ユーザID
+        WF_STAFFNAMES.Text = ""            '社員名（短）
+        WF_STAFFNAMEL.Text = ""            '社員名（長）
+        WF_MAPID.Text = ""            '画面ＩＤ
+        WF_PASSWORD.Text = ""            'パスワード
+        WF_MISSCNT.Text = ""            '誤り回数
+        WF_PASSENDYMD.Text = ""            'パスワード有効期限
+        WF_STYMD.Text = ""            '開始年月日
+        WF_ENDYMD.Text = ""            '終了年月日
+        WF_CAMPCODE.Text = ""            '会社コード
+        WF_ORG.Text = ""            '組織コード
+        WF_EMAIL.Text = ""            'メールアドレス
+        WF_MENUROLE.Text = ""            'メニュー表示制御ロール
+        WF_MAPROLE.Text = ""            '画面参照更新制御ロール
+        WF_VIEWPROFID.Text = ""            '画面表示項目制御ロール
+        WF_RPRTPROFID.Text = ""            'エクセル出力制御ロール
+        WF_VARIANT.Text = ""            '画面初期値ロール
+        WF_APPROVALID.Text = ""            '承認権限ロール
+        WF_DELFLG.Text = ""                 '削除フラグ
+        WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
+
+    End Sub
+
+
+    ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
+
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                Select Case WF_LeftMViewChange.Value
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
+                            Case "WF_PASSENDYMD"         'パスワード有効期限
+                                .WF_Calendar.Text = WF_PASSENDYMD.Text
+                            Case "WF_STYMD"         '有効年月日(From)
+                                .WF_Calendar.Text = WF_STYMD.Text
+                            Case "WF_ENDYMD"        '有効年月日(To)
+                                .WF_Calendar.Text = WF_ENDYMD.Text
+                        End Select
+                        .ActiveCalendar()
+
+                    Case Else
+                        '以外
+                        Dim prmData As New Hashtable
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+
+                        'フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            Case "WF_ORG"       '組織コード
+                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                            Case "WF_MENUROLE"       'メニュー表示制御ロール
+                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MENU")
+                            Case "WF_MAPROLE"       '画面参照更新制御ロール
+                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MAP")
+                            Case "WF_VIEWPROFID"       '画面表示項目制御ロール
+                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "VIEW")
+                            Case "WF_RPRTPROFID"       'エクセル出力制御ロール
+                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "XML")
+                            Case "WF_APPROVALID"       '承認権限ロール
+                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
+                        End Select
+
+                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                        .ActiveListBox()
+                End Select
+            End With
+        End If
+
+    End Sub
+
+
+    ' ******************************************************************************
+    ' ***  leftBOX関連操作                                                       ***
+    ' ******************************************************************************
+
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+
+        '○ 選択内容を取得
+        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        If WF_FIELD_REP.Value = "" Then
+            Select Case WF_FIELD.Value
+                Case "WF_DELFLG"            '削除フラグ
+                    WF_DELFLG.Text = WW_SelectValue
+                    WF_DELFLG_TEXT.Text = WW_SelectText
+                    WF_DELFLG.Focus()
+
+                Case "WF_PASSENDYMD"             'パスワード有効期限
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(WW_SelectValue, WW_DATE)
+                        WF_PASSENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Catch ex As Exception
+                    End Try
+                    WF_PASSENDYMD.Focus()
+
+                Case "WF_STYMD"             '有効年月日(From)
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(WW_SelectValue, WW_DATE)
+                        WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Catch ex As Exception
+                    End Try
+                    WF_STYMD.Focus()
+
+                Case "WF_ENDYMD"            '有効年月日(To)
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(WW_SelectValue, WW_DATE)
+                        WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Catch ex As Exception
+                    End Try
+                    WF_ENDYMD.Focus()
+
+                Case "WF_ORG"               '組織コード
+                    WF_ORG.Text = WW_SelectValue
+                    WF_ORG_TEXT.Text = WW_SelectText
+                    WF_ORG.Focus()
+
+                Case "WF_MENUROLE"               'メニュー表示制御ロール
+                    WF_MENUROLE.Text = WW_SelectValue
+                    WF_MENUROLE_TEXT.Text = WW_SelectText
+                    WF_MENUROLE.Focus()
+
+                Case "WF_MAPROLE"               '画面参照更新制御ロール
+                    WF_MAPROLE.Text = WW_SelectValue
+                    WF_MAPROLE_TEXT.Text = WW_SelectText
+                    WF_MAPROLE.Focus()
+
+                Case "WF_VIEWPROFID"               '画面表示項目制御ロール
+                    WF_VIEWPROFID.Text = WW_SelectValue
+                    WF_VIEWPROFID_TEXT.Text = WW_SelectText
+                    WF_VIEWPROFID.Focus()
+
+                Case "WF_RPRTPROFID"               'エクセル出力制御ロール
+                    WF_RPRTPROFID.Text = WW_SelectValue
+                    WF_RPRTPROFID_TEXT.Text = WW_SelectText
+                    WF_RPRTPROFID.Focus()
+
+                Case "WF_APPROVALID"               '承認権限ロール
+                    WF_APPROVALID.Text = WW_SelectValue
+                    WF_APPROVALID_TEXT.Text = WW_SelectText
+                    WF_APPROVALID.Focus()
+            End Select
+        Else
+        End If
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_FIELD_REP.Value = ""
+        WF_LeftboxOpen.Value = ""
+        WF_RightboxOpen.Value = ""
+
+    End Sub
+
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
+
+        '○ フォーカスセット
+        If WF_FIELD_REP.Value = "" Then
+            Select Case WF_FIELD.Value
+                '削除フラグ
+                Case "WF_DELFLG"
+                    WF_DELFLG.Focus()
+            End Select
+        Else
+        End If
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_FIELD_REP.Value = ""
+        WF_LeftboxOpen.Value = ""
+        WF_RightboxOpen.Value = ""
+
+    End Sub
+
+
+    ''' <summary>
+    ''' RightBoxラジオボタン選択処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_RadioButton_Click()
+
+        If Not String.IsNullOrEmpty(WF_RightViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_RightViewChange.Value, WF_RightViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            rightview.SelectIndex(WF_RightViewChange.Value)
+            WF_RightViewChange.Value = ""
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' RightBoxメモ欄更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_RIGHTBOX_Change()
+
+        rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
+
+    End Sub
+
+
+    ' ******************************************************************************
+    ' ***  共通処理                                                              ***
+    ' ******************************************************************************
+
+    ''' <summary>
+    ''' 入力値チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub INPTableCheck(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+
+        Dim WW_LINE_ERR As String = ""
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_UniqueKeyCHECK As String = ""
+
+        '○ 画面操作権限チェック
+        '権限チェック(操作者がデータ内USERの更新権限があるかチェック
+        '　※権限判定時点：現在
+        CS0025AUTHORget.USERID = CS0050SESSION.USERID
+        CS0025AUTHORget.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
+        CS0025AUTHORget.CODE = Master.MAPID
+        CS0025AUTHORget.STYMD = Date.Now
+        CS0025AUTHORget.ENDYMD = Date.Now
+        CS0025AUTHORget.CS0025AUTHORget()
+        If isNormal(CS0025AUTHORget.ERR) AndAlso CS0025AUTHORget.PERMITCODE = C_PERMISSION.UPDATE Then
+        Else
+            WW_CheckMES1 = "・更新できないレコード(ユーザ更新権限なし)です。"
+            WW_CheckMES2 = ""
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            WW_LINE_ERR = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            Exit Sub
+        End If
+
+        '○ 単項目チェック
+        For Each OIT0004INProw As DataRow In OIT0004INPtbl.Rows
+
+            WW_LINE_ERR = ""
+
+            '削除フラグ(バリデーションチェック）
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIT0004INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("DELFLG", OIT0004INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0004INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0004INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'ユーザID(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIT0004INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "ユーザID入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0004INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '一意制約チェック
+            '同一レコードの更新の場合、チェック対象外
+            If OIT0004INProw("USERID") = work.WF_SEL_USERID.Text Then
+
+            Else
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    'DataBase接続
+                    SQLcon.Open()
+
+                    '一意制約チェック
+                    UniqueKeyCheck(SQLcon, WW_UniqueKeyCHECK)
+                End Using
+
+                If Not isNormal(WW_UniqueKeyCHECK) Then
+                    WW_CheckMES1 = "一意制約違反。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
+                                       "([" & OIT0004INProw("USERID") & "]" &
+                                       " [" & OIT0004INProw("STYMD") & "])" &
+                                       " [" & OIT0004INProw("ENDYMD") & "])"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0004INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                End If
+            End If
+
+            If WW_LINE_ERR = "" Then
+                If OIT0004INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
+                    OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                End If
+            Else
+                If WW_LINE_ERR = CONST_PATTERNERR Then
+                    '関連チェックエラーをセット
+                    OIT0004INProw.Item("OPERATION") = CONST_PATTERNERR
+                Else
+                    '単項目チェックエラーをセット
+                    OIT0004INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                End If
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' エラーレポート編集
+    ''' </summary>
+    ''' <param name="MESSAGE1"></param>
+    ''' <param name="MESSAGE2"></param>
+    ''' <param name="OIT0004row"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIT0004row As DataRow = Nothing)
+
+        Dim WW_ERR_MES As String = ""
+        WW_ERR_MES = MESSAGE1
+        If MESSAGE2 <> "" Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+        End If
+
+        If Not IsNothing(OIT0004row) Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> ユーザID =" & OIT0004row("USERID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（短） =" & OIT0004row("STAFFNAMES") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（長） =" & OIT0004row("STAFFNAMEL") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面ＩＤ =" & OIT0004row("MAPID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード =" & OIT0004row("PASSWORD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 誤り回数 =" & OIT0004row("MISSCNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード有効期限 =" & OIT0004row("PASSENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日 =" & OIT0004row("STYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日 =" & OIT0004row("ENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード =" & OIT0004row("CAMPCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード =" & OIT0004row("ORG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> メールアドレス =" & OIT0004row("EMAIL") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> メニュー表示制御ロール =" & OIT0004row("MENUROLE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面参照更新制御ロール =" & OIT0004row("MAPROLE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面表示項目制御ロール =" & OIT0004row("VIEWPROFID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> エクセル出力制御ロール =" & OIT0004row("RPRTPROFID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面初期値ロール =" & OIT0004row("VARIANT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 承認権限ロール =" & OIT0004row("APPROVALID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIT0004row("DELFLG")
+        End If
+
+        rightview.AddErrorReport(WW_ERR_MES)
+
+    End Sub
+
+
+    ''' <summary>
+    ''' OIT0004tbl更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub OIT0004tbl_UPD()
+
+        '○ 画面状態設定
+        For Each OIT0004row As DataRow In OIT0004tbl.Rows
+            Select Case OIT0004row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.NODISP
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            End Select
+        Next
+
+        '○ 追加変更判定
+        For Each OIT0004INProw As DataRow In OIT0004INPtbl.Rows
+
+            'エラーレコード読み飛ばし
+            If OIT0004INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
+                Continue For
+            End If
+
+            OIT0004INProw.Item("OPERATION") = CONST_INSERT
+
+            'KEY項目が等しい時
+            For Each OIT0004row As DataRow In OIT0004tbl.Rows
+                If OIT0004row("USERID") = OIT0004INProw("USERID") AndAlso
+                    OIT0004row("STYMD") = OIT0004INProw("STYMD") AndAlso
+                    OIT0004row("ENDYMD") = OIT0004INProw("ENDYMD") Then
+                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    If OIT0004row("DELFLG") = OIT0004INProw("DELFLG") AndAlso
+                        OIT0004row("STAFFNAMES") = OIT0004INProw("STAFFNAMES") AndAlso
+                        OIT0004row("STAFFNAMEL") = OIT0004INProw("STAFFNAMEL") AndAlso
+                        OIT0004row("MAPID") = OIT0004INProw("MAPID") AndAlso
+                        OIT0004row("PASSWORD") = OIT0004INProw("PASSWORD") AndAlso
+                        OIT0004row("MISSCNT") = OIT0004INProw("MISSCNT") AndAlso
+                        OIT0004row("PASSENDYMD") = OIT0004INProw("PASSENDYMD") AndAlso
+                        OIT0004row("CAMPCODE") = OIT0004INProw("CAMPCODE") AndAlso
+                        OIT0004row("ORG") = OIT0004INProw("ORG") AndAlso
+                        OIT0004row("EMAIL") = OIT0004INProw("EMAIL") AndAlso
+                        OIT0004row("MENUROLE") = OIT0004INProw("MENUROLE") AndAlso
+                        OIT0004row("MAPROLE") = OIT0004INProw("MAPROLE") AndAlso
+                        OIT0004row("VIEWPROFID") = OIT0004INProw("VIEWPROFID") AndAlso
+                        OIT0004row("RPRTPROFID") = OIT0004INProw("RPRTPROFID") AndAlso
+                        OIT0004row("VARIANT") = OIT0004INProw("VARIANT") AndAlso
+                        OIT0004row("APPROVALID") = OIT0004INProw("APPROVALID") AndAlso
+                        OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    Else
+                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        OIT0004INProw("OPERATION") = CONST_UPDATE
+                        Exit For
+                    End If
+
+                    Exit For
+
+                End If
+            Next
+        Next
+
+        '○ 変更有無判定　&　入力値反映
+        For Each OIT0004INProw As DataRow In OIT0004INPtbl.Rows
+            Select Case OIT0004INProw("OPERATION")
+                Case CONST_UPDATE
+                    TBL_UPDATE_SUB(OIT0004INProw)
+                Case CONST_INSERT
+                    TBL_INSERT_SUB(OIT0004INProw)
+                Case CONST_PATTERNERR
+                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
+                    TBL_INSERT_SUB(OIT0004INProw)
+                Case C_LIST_OPERATION_CODE.ERRORED
+                    TBL_ERR_SUB(OIT0004INProw)
+            End Select
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 更新予定データの一覧更新時処理
+    ''' </summary>
+    ''' <param name="OIT0004INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_UPDATE_SUB(ByRef OIT0004INProw As DataRow)
+
+        For Each OIT0004row As DataRow In OIT0004tbl.Rows
+
+            '同一レコードか判定
+            If OIT0004INProw("USERID") = OIT0004row("USERID") AndAlso
+                OIT0004INProw("STYMD") = OIT0004row("STYMD") AndAlso
+                OIT0004INProw("ENDYMD") = OIT0004row("ENDYMD") Then
+                '画面入力テーブル項目設定
+                OIT0004INProw("LINECNT") = OIT0004row("LINECNT")
+                OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                OIT0004INProw("UPDTIMSTP") = OIT0004row("UPDTIMSTP")
+                OIT0004INProw("SELECT") = 1
+                OIT0004INProw("HIDDEN") = 0
+
+                '項目テーブル項目設定
+                OIT0004row.ItemArray = OIT0004INProw.ItemArray
+                Exit For
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 追加予定データの一覧登録時処理
+    ''' </summary>
+    ''' <param name="OIT0004INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_INSERT_SUB(ByRef OIT0004INProw As DataRow)
+
+        '○ 項目テーブル項目設定
+        Dim OIT0004row As DataRow = OIT0004tbl.NewRow
+        OIT0004row.ItemArray = OIT0004INProw.ItemArray
+
+        OIT0004row("LINECNT") = OIT0004tbl.Rows.Count + 1
+        If OIT0004INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+        Else
+            OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.INSERTING
+        End If
+
+        OIT0004row("UPDTIMSTP") = "0"
+        OIT0004row("SELECT") = 1
+        OIT0004row("HIDDEN") = 0
+
+        OIT0004tbl.Rows.Add(OIT0004row)
+
+    End Sub
+
+
+    ''' <summary>
+    ''' エラーデータの一覧登録時処理
+    ''' </summary>
+    ''' <param name="OIT0004INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_ERR_SUB(ByRef OIT0004INProw As DataRow)
+
+        For Each OIT0004row As DataRow In OIT0004tbl.Rows
+
+            '同一レコードか判定
+            If OIT0004INProw("USERID") = OIT0004row("USERID") AndAlso
+                OIT0004INProw("STYMD") = OIT0004row("STYMD") AndAlso
+                OIT0004INProw("ENDYMD") = OIT0004row("ENDYMD") Then
+                '画面入力テーブル項目設定
+                OIT0004INProw("LINECNT") = OIT0004row("LINECNT")
+                OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                OIT0004INProw("UPDTIMSTP") = OIT0004row("UPDTIMSTP")
+                OIT0004INProw("SELECT") = 1
+                OIT0004INProw("HIDDEN") = 0
+
+                '項目テーブル項目設定
+                OIT0004row.ItemArray = OIT0004INProw.ItemArray
+                Exit For
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 名称取得
+    ''' </summary>
+    ''' <param name="I_FIELD"></param>
+    ''' <param name="I_VALUE"></param>
+    ''' <param name="O_TEXT"></param>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
+
+        O_TEXT = ""
+        O_RTN = ""
+
+        If I_VALUE = "" Then
+            O_RTN = C_MESSAGE_NO.NORMAL
+            Exit Sub
+        End If
+        Dim prmData As New Hashtable
+
+        Try
+            Select Case I_FIELD
+                Case "CAMPCODE"         '会社コード
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "ORG"         '組織コード
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "MENU"           'メニュー表示制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "MAP"         '画面参照更新制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "VIEW"         '画面表示項目制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "XML"         'エクセル出力制御ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "APPROVAL"         '承認権限ロール
+                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "DELFLG"           '削除フラグ
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+            End Select
+        Catch ex As Exception
+            O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+            Exit Sub
+        End Try
+
+    End Sub
+
+End Class

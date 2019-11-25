@@ -1,4 +1,4 @@
-﻿<%@ Control Language="vb" AutoEventWireup="false" CodeBehind="OIT0004WRKINC.ascx.vb" Inherits="JOTWEB.OIT0004WRKINC" %>
+﻿<%@ Control Language="vb" AutoEventWireup="false" CodeBehind="OIT0002WRKINC.ascx.vb" Inherits="JOTWEB.OIT0002WRKINC" %>
 
 <!-- Work レイアウト -->
 <div hidden="hidden">

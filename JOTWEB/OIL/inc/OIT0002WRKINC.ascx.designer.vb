@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0004WRKINC
+Partial Public Class OIT0002WRKINC
 
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。

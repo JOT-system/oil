@@ -1,24 +1,68 @@
-﻿<%@ Page Title="OIT0004D" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIT0004LinkDetail.aspx.vb" Inherits="JOTWEB.OIT0004UserCreate" %>
+﻿<%@ Page Title="OIT0002L" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIT0002LinkList.aspx.vb" Inherits="JOTWEB.OIT0002UserList" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/OIL/inc/OIT0004WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/OIT0002WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:Content ID="OIT0004DH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIT0004D.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0004D.js")%>'></script>
+<asp:Content ID="OIT0002LH" ContentPlaceHolderID="head" runat="server">
+    <link href='<%=ResolveUrl("~/OIL/css/OIT0002L.css")%>' rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0002L.js")%>'></script>
     <script type="text/javascript">
+        var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
     </script>
 </asp:Content>
  
-<asp:Content ID="OIT0004D" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="OIT0002L" ContentPlaceHolderID="contents1" runat="server">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
+        <!-- 全体レイアウト　headerbox -->
+        <div class="headerboxOnly" id="headerbox">
+            <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+                <!-- 会社コード -->
+                <a style="display:none;">
+                    <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
+                    <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                </a>
+
+                <!-- 組織コード -->
+                <a style="display:none;">
+                    <asp:Label ID="WF_SEL_ORG" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
+                    <asp:Label ID="WF_SEL_ORGNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                </a>
+
+                <!-- ボタン -->
+                <a style="position:fixed;top:2.8em;left:49em;">
+                    <input type="button" id="WF_ButtonINSERT" value="追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                </a>
+                <a style="position:fixed;top:2.8em;left:53.5em;">
+                    <input type="button" id="WF_ButtonUPDATE" value="DB更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                </a>
+                <a style="position:fixed;top:2.8em;left:58em;">
+                    <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
+                </a>
+                <a style="position:fixed;top:2.8em;left:62.5em;">
+                    <input type="button" id="WF_ButtonPrint" value="一覧印刷"  style="Width:5em" onclick="ButtonClick('WF_ButtonPrint');" />
+                </a>
+                <a style="position:fixed;top:2.8em;left:67em;">
+                    <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                </a>
+                <a style="position:fixed;top:3.2em;left:75em;">
+                    <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />
+                </a>
+                <a style="position:fixed;top:3.2em;left:77em;">
+                    <asp:Image ID="WF_ButtonLAST2" runat="server" ImageUrl="~/img/最終頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonLAST');" Height="1em" ImageAlign="AbsMiddle" />
+                </a>
+            </div>
+                <div id="divListArea">
+                    <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
+                </div>
+        </div>
+
         <!-- 全体レイアウト　detailbox -->
-        <div class="detailboxOnly" id="detailbox" style="overflow-y: auto;">
+        <div class="detailboxOnly" id="detailbox">
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
                     <input type="button" id="WF_UPDATE" value="表更新" style="Width:5em" onclick="ButtonClick('WF_UPDATE');" />

@@ -273,6 +273,17 @@ Public Class OIT0001EmptyTurnDairySearch
             Exit Sub
         End If
 
+        '列車番号
+        If TxtTrainNumber.Text <> "" Then
+            Master.CheckField(WF_CAMPCODE.Text, "TRAINNUMBER", TxtTrainNumber.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                TxtTrainNumber.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 

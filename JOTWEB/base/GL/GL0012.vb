@@ -99,7 +99,7 @@ Public Class GL0012RoleList
         Try
 
             Dim SQLStr As String =
-                    " SELECT　                 " &
+                    " SELECT DISTINCT                 " &
                     "         ROLE          as ROLE   , " &
                     "         ROLENAME      as ROLENAME " &
                     " FROM COM.OIS0009_ROLE             " &
@@ -107,18 +107,19 @@ Public Class GL0012RoleList
                     "   AND   STYMD        <= @P2       " &
                     "   AND   ENDYMD       >= @P3       " &
                     "   AND   OBJECT        = @P4       " &
-                    "   AND   DELFLG       <> @P5       "
+                    "   AND   DELFLG       <> @P5       " &
+                    "   ORDER BY ROLE , ROLENAME  "
 
             '〇ソート条件追加
-            Select Case DEFAULT_SORT
-                Case C_DEFAULT_SORT.CODE, String.Empty
-                    SQLStr = SQLStr & " ORDER BY CODE , ROLENAME , SEQ "
-                Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY CODENAMES , ROLE , SEQ "
-                Case C_DEFAULT_SORT.SEQ
-                    SQLStr = SQLStr & " ORDER BY SEQ , ROLE , ROLENAME "
-                Case Else
-            End Select
+            'Select Case DEFAULT_SORT
+            '    Case C_DEFAULT_SORT.CODE, String.Empty
+            '        SQLStr = SQLStr & " ORDER BY CODE , ROLENAME , SEQ "
+            '    Case C_DEFAULT_SORT.NAMES
+            '        SQLStr = SQLStr & " ORDER BY CODENAMES , ROLE , SEQ "
+            '    Case C_DEFAULT_SORT.SEQ
+            '        SQLStr = SQLStr & " ORDER BY SEQ , ROLE , ROLENAME "
+            '    Case Else
+            'End Select
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.VarChar, 20)
@@ -134,13 +135,8 @@ Public Class GL0012RoleList
             PARA5.Value = C_DELETE_FLG.DELETE
             Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-
             While SQLdr.Read
-                '○出力編集
-                If LIST.Items.Contains(New ListItem(SQLdr("ROLENAME"), SQLdr("ROLE"))) Then
-                Else
-                    LIST.Items.Add(New ListItem(SQLdr("ROLENAME"), SQLdr("ROLE")))
-                End If
+                LIST.Items.Add(New ListItem(SQLdr("ROLENAME"), SQLdr("ROLE")))
             End While
 
             'Close
@@ -164,7 +160,6 @@ Public Class GL0012RoleList
         ERR = C_MESSAGE_NO.NORMAL
 
     End Sub
-
 
 End Class
 

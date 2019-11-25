@@ -15,13 +15,13 @@ Imports JOTWEB.GRIS0005LeftBox
 ''' ユーザIDマスタ登録（実行）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIT0004UserList
+Public Class OIT0002UserList
     Inherits Page
 
     '○ 検索結果格納Table
-    Private OIT0004tbl As DataTable                                  '一覧格納用テーブル
-    Private OIT0004INPtbl As DataTable                               'チェック用テーブル
-    Private OIT0004UPDtbl As DataTable                               '更新用テーブル
+    Private OIT0002tbl As DataTable                                  '一覧格納用テーブル
+    Private OIT0002INPtbl As DataTable                               'チェック用テーブル
+    Private OIT0002UPDtbl As DataTable                               '更新用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -60,7 +60,7 @@ Public Class OIT0004UserList
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(OIT0004tbl)
+                    Master.RecoverTable(OIT0002tbl)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"          '追加ボタン押下
@@ -120,22 +120,22 @@ Public Class OIT0004UserList
 
         Finally
             '○ 格納Table Close
-            If Not IsNothing(OIT0004tbl) Then
-                OIT0004tbl.Clear()
-                OIT0004tbl.Dispose()
-                OIT0004tbl = Nothing
+            If Not IsNothing(OIT0002tbl) Then
+                OIT0002tbl.Clear()
+                OIT0002tbl.Dispose()
+                OIT0002tbl = Nothing
             End If
 
-            If Not IsNothing(OIT0004INPtbl) Then
-                OIT0004INPtbl.Clear()
-                OIT0004INPtbl.Dispose()
-                OIT0004INPtbl = Nothing
+            If Not IsNothing(OIT0002INPtbl) Then
+                OIT0002INPtbl.Clear()
+                OIT0002INPtbl.Dispose()
+                OIT0002INPtbl = Nothing
             End If
 
-            If Not IsNothing(OIT0004UPDtbl) Then
-                OIT0004UPDtbl.Clear()
-                OIT0004UPDtbl.Dispose()
-                OIT0004UPDtbl = Nothing
+            If Not IsNothing(OIT0002UPDtbl) Then
+                OIT0002UPDtbl.Clear()
+                OIT0002UPDtbl.Dispose()
+                OIT0002UPDtbl = Nothing
             End If
         End Try
 
@@ -148,7 +148,7 @@ Public Class OIT0004UserList
     Protected Sub Initialize()
 
         '○画面ID設定
-        Master.MAPID = OIT0004WRKINC.MAPIDL
+        Master.MAPID = OIT0002WRKINC.MAPIDL
         '○HELP表示有無設定
         Master.dispHelp = False
         '○D&D有無設定
@@ -186,11 +186,11 @@ Public Class OIT0004UserList
     Protected Sub WW_MAPValueSet()
 
         '○ 検索画面からの遷移
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004S Then
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002S Then
             'Grid情報保存先のファイル名
             Master.CreateXMLSaveFile()
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004D Then
-            Master.RecoverTable(OIT0004tbl, work.WF_SEL_INPTBL.Text)
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002D Then
+            Master.RecoverTable(OIT0002tbl, work.WF_SEL_INPTBL.Text)
         End If
 
         '○ 名称設定処理
@@ -271,7 +271,7 @@ Public Class OIT0004UserList
     Protected Sub GridViewInitialize()
 
         '登録画面からの遷移の場合はテーブルから取得しない
-        If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.OIT0004D Then
+        If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.OIT0002D Then
             '○ 画面表示データ取得
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
@@ -281,10 +281,10 @@ Public Class OIT0004UserList
         End If
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         '○ 一覧表示データ編集(性能対策)
-        Dim TBLview As DataView = New DataView(OIT0004tbl)
+        Dim TBLview As DataView = New DataView(OIT0002tbl)
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
@@ -319,15 +319,15 @@ Public Class OIT0004UserList
     ''' <remarks></remarks>
     Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
 
-        If IsNothing(OIT0004tbl) Then
-            OIT0004tbl = New DataTable
+        If IsNothing(OIT0002tbl) Then
+            OIT0002tbl = New DataTable
         End If
 
-        If OIT0004tbl.Columns.Count <> 0 Then
-            OIT0004tbl.Columns.Clear()
+        If OIT0002tbl.Columns.Count <> 0 Then
+            OIT0002tbl.Columns.Clear()
         End If
 
-        OIT0004tbl.Clear()
+        OIT0002tbl.Clear()
 
         '○ 検索SQL
         '　検索説明
@@ -398,27 +398,27 @@ Public Class OIT0004UserList
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0004tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        OIT0002tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0004tbl.Load(SQLdr)
+                    OIT0002tbl.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
-                For Each OIT0004row As DataRow In OIT0004tbl.Rows
+                For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     i += 1
-                    OIT0004row("LINECNT") = i        'LINECNT
+                    OIT0002row("LINECNT") = i        'LINECNT
                     ''名称取得
-                    'CODENAME_get("CAMPCODE", OIT0004row("CAMPCODE"), OIT0004row("CAMPNAMES"), WW_DUMMY)                               '会社コード
-                    'CODENAME_get("ORG", OIT0004row("ORG"), OIT0004row("ORGNAMES"), WW_DUMMY)                                          '組織コード
+                    'CODENAME_get("CAMPCODE", OIT0002row("CAMPCODE"), OIT0002row("CAMPNAMES"), WW_DUMMY)                               '会社コード
+                    'CODENAME_get("ORG", OIT0002row("ORG"), OIT0002row("ORGNAMES"), WW_DUMMY)                                          '組織コード
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004L SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0004L Select"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -438,11 +438,11 @@ Public Class OIT0004UserList
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
         '○ 表示対象行カウント(絞り込み対象)
-        For Each OIT0004row As DataRow In OIT0004tbl.Rows
-            If OIT0004row("HIDDEN") = 0 Then
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            If OIT0002row("HIDDEN") = 0 Then
                 WW_DataCNT += 1
                 '行(LINECNT)を再設定する。既存項目(SELECT)を利用
-                OIT0004row("SELECT") = WW_DataCNT
+                OIT0002row("SELECT") = WW_DataCNT
             End If
         Next
 
@@ -476,7 +476,7 @@ Public Class OIT0004UserList
         End If
 
         '○ 画面(GridView)表示
-        Dim TBLview As DataView = New DataView(OIT0004tbl)
+        Dim TBLview As DataView = New DataView(OIT0002tbl)
 
         '○ ソート
         TBLview.Sort = "LINECNT"
@@ -597,7 +597,7 @@ Public Class OIT0004UserList
         WF_BOXChange.Value = "detailbox"
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         WF_GridDBclick.Text = ""
 
@@ -607,7 +607,7 @@ Public Class OIT0004UserList
         WW_CreateXMLSaveFile()
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl, work.WF_SEL_INPTBL.Text)
+        Master.SaveTable(OIT0002tbl, work.WF_SEL_INPTBL.Text)
 
         '○ 次ページ遷移
         Master.TransitionPage()
@@ -639,7 +639,7 @@ Public Class OIT0004UserList
         End If
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         '○ GridView初期設定
         '○ 画面表示データ再取得
@@ -650,7 +650,7 @@ Public Class OIT0004UserList
         End Using
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         '○ 詳細画面クリア
         If isNormal(WW_ERRCODE) Then
@@ -686,38 +686,38 @@ Public Class OIT0004UserList
         Dim WW_DATE_END2 As Date
 
         '○ 日付重複チェック
-        For Each OIT0004row As DataRow In OIT0004tbl.Rows
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
             '読み飛ばし
-            If (OIT0004row("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING AndAlso
-                OIT0004row("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED) OrElse
-                OIT0004row("DELFLG") = C_DELETE_FLG.DELETE OrElse
-                OIT0004row("STYMD") = "" Then
+            If (OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING AndAlso
+                OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED) OrElse
+                OIT0002row("DELFLG") = C_DELETE_FLG.DELETE OrElse
+                OIT0002row("STYMD") = "" Then
                 Continue For
             End If
 
             WW_LINE_ERR = ""
 
             'チェック
-            For Each OIT0004Dhk As DataRow In OIT0004tbl.Rows
+            For Each OIT0002Dhk As DataRow In OIT0002tbl.Rows
 
                 '同一KEY以外は読み飛ばし
-                If OIT0004row("CAMPCODE") <> OIT0004Dhk("CAMPCODE") OrElse
-                    OIT0004row("USERID") <> OIT0004Dhk("USERID") OrElse
-                    OIT0004Dhk("DELFLG") = C_DELETE_FLG.DELETE Then
+                If OIT0002row("CAMPCODE") <> OIT0002Dhk("CAMPCODE") OrElse
+                    OIT0002row("USERID") <> OIT0002Dhk("USERID") OrElse
+                    OIT0002Dhk("DELFLG") = C_DELETE_FLG.DELETE Then
                     Continue For
                 End If
 
                 '期間変更対象は読み飛ばし
-                If OIT0004row("STYMD") = OIT0004Dhk("STYMD") Then
+                If OIT0002row("STYMD") = OIT0002Dhk("STYMD") Then
                     Continue For
                 End If
 
                 Try
-                    Date.TryParse(OIT0004row("STYMD"), WW_DATE_ST)
-                    Date.TryParse(OIT0004row("ENDYMD"), WW_DATE_END)
-                    Date.TryParse(OIT0004Dhk("STYMD"), WW_DATE_ST2)
-                    Date.TryParse(OIT0004Dhk("ENDYMD"), WW_DATE_END2)
+                    Date.TryParse(OIT0002row("STYMD"), WW_DATE_ST)
+                    Date.TryParse(OIT0002row("ENDYMD"), WW_DATE_END)
+                    Date.TryParse(OIT0002Dhk("STYMD"), WW_DATE_ST2)
+                    Date.TryParse(OIT0002Dhk("ENDYMD"), WW_DATE_END2)
                 Catch ex As Exception
                     Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
                     Exit Sub
@@ -726,7 +726,7 @@ Public Class OIT0004UserList
                 '開始日チェック
                 If WW_DATE_ST >= WW_DATE_ST2 AndAlso WW_DATE_ST <= WW_DATE_END2 Then
                     WW_CheckMES = "・エラー(期間重複)が存在します。"
-                    WW_CheckERR(WW_CheckMES, "", OIT0004row)
+                    WW_CheckERR(WW_CheckMES, "", OIT0002row)
                     O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     WW_LINE_ERR = "ERR"
                     Exit For
@@ -735,7 +735,7 @@ Public Class OIT0004UserList
                 '終了日チェック
                 If WW_DATE_END >= WW_DATE_ST2 AndAlso WW_DATE_END <= WW_DATE_END2 Then
                     WW_CheckMES = "・エラー(期間重複)が存在します。"
-                    WW_CheckERR(WW_CheckMES, "", OIT0004row)
+                    WW_CheckERR(WW_CheckMES, "", OIT0002row)
                     O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     WW_LINE_ERR = "ERR"
                     Exit For
@@ -744,7 +744,7 @@ Public Class OIT0004UserList
                 '日付連続性チェック
                 If WW_DATE_END.AddDays(1) <> WW_DATE_ST2 Then
                     WW_CheckMES = "・エラー(開始、終了年月日が連続していません)。"
-                    WW_CheckERR(WW_CheckMES, "", OIT0004row)
+                    WW_CheckERR(WW_CheckMES, "", OIT0002row)
                     O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     WW_LINE_ERR = "ERR"
                     Exit For
@@ -752,9 +752,9 @@ Public Class OIT0004UserList
             Next
 
             If WW_LINE_ERR = "" Then
-                OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
             Else
-                OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
             End If
         Next
 
@@ -951,48 +951,48 @@ Public Class OIT0004UserList
                 Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P24", SqlDbType.NVarChar, 20)            '更新端末
                 Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P25", SqlDbType.DateTime)            '集信日時
 
-                For Each OIT0004row As DataRow In OIT0004tbl.Rows
-                    If Trim(OIT0004row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
-                        Trim(OIT0004row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
-                        Trim(OIT0004row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
+                For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    If Trim(OIT0002row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
+                        Trim(OIT0002row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
+                        Trim(OIT0002row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
                         Dim WW_DATENOW As DateTime = Date.Now
 
                         'DB更新
-                        PARA00.Value = OIT0004row("DELFLG")
-                        PARA01.Value = OIT0004row("USERID")
-                        PARA02.Value = OIT0004row("STAFFNAMES")
-                        PARA03.Value = OIT0004row("STAFFNAMEL")
-                        PARA04.Value = OIT0004row("MAPID")
-                        'PARA05.Value = OIT0004row("PASSWORD")
-                        'If OIT0004row("MISSCNT") <> "" Then
-                        '    PARA06.Value = OIT0004row("MISSCNT")
+                        PARA00.Value = OIT0002row("DELFLG")
+                        PARA01.Value = OIT0002row("USERID")
+                        PARA02.Value = OIT0002row("STAFFNAMES")
+                        PARA03.Value = OIT0002row("STAFFNAMEL")
+                        PARA04.Value = OIT0002row("MAPID")
+                        'PARA05.Value = OIT0002row("PASSWORD")
+                        'If OIT0002row("MISSCNT") <> "" Then
+                        '    PARA06.Value = OIT0002row("MISSCNT")
                         'Else
                         '    PARA06.Value = "0"
                         'End If
-                        'If RTrim(OIT0004row("PASSENDYMD")) <> "" Then
-                        '    PARA07.Value = RTrim(OIT0004row("PASSENDYMD"))
+                        'If RTrim(OIT0002row("PASSENDYMD")) <> "" Then
+                        '    PARA07.Value = RTrim(OIT0002row("PASSENDYMD"))
                         'Else
                         '    PARA07.Value = C_DEFAULT_YMD
                         'End If
-                        If RTrim(OIT0004row("STYMD")) <> "" Then
-                            PARA08.Value = RTrim(OIT0004row("STYMD"))
+                        If RTrim(OIT0002row("STYMD")) <> "" Then
+                            PARA08.Value = RTrim(OIT0002row("STYMD"))
                         Else
                             PARA08.Value = C_DEFAULT_YMD
                         End If
-                        If RTrim(OIT0004row("ENDYMD")) <> "" Then
-                            PARA09.Value = RTrim(OIT0004row("ENDYMD"))
+                        If RTrim(OIT0002row("ENDYMD")) <> "" Then
+                            PARA09.Value = RTrim(OIT0002row("ENDYMD"))
                         Else
                             PARA09.Value = C_DEFAULT_YMD
                         End If
-                        PARA10.Value = OIT0004row("CAMPCODE")
-                        PARA11.Value = OIT0004row("ORG")
-                        PARA12.Value = OIT0004row("EMAIL")
-                        PARA13.Value = OIT0004row("MENUROLE")
-                        PARA14.Value = OIT0004row("MAPROLE")
-                        PARA15.Value = OIT0004row("VIEWPROFID")
-                        PARA16.Value = OIT0004row("RPRTPROFID")
-                        PARA17.Value = OIT0004row("VARIANT")
-                        PARA18.Value = OIT0004row("APPROVALID")
+                        PARA10.Value = OIT0002row("CAMPCODE")
+                        PARA11.Value = OIT0002row("ORG")
+                        PARA12.Value = OIT0002row("EMAIL")
+                        PARA13.Value = OIT0002row("MENUROLE")
+                        PARA14.Value = OIT0002row("MAPROLE")
+                        PARA15.Value = OIT0002row("VIEWPROFID")
+                        PARA16.Value = OIT0002row("RPRTPROFID")
+                        PARA17.Value = OIT0002row("VARIANT")
+                        PARA18.Value = OIT0002row("APPROVALID")
                         PARA19.Value = WW_DATENOW
                         PARA20.Value = Master.USERID
                         PARA21.Value = Master.USERTERMID
@@ -1003,44 +1003,44 @@ Public Class OIT0004UserList
                         SQLcmd.CommandTimeout = 300
                         SQLcmd.ExecuteNonQuery()
 
-                        'OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                        'OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
 
                         '更新ジャーナル出力
-                        JPARA00.Value = OIT0004row("DELFLG")
-                        JPARA01.Value = OIT0004row("USERID")
-                        JPARA02.Value = OIT0004row("STAFFNAMES")
-                        JPARA03.Value = OIT0004row("STAFFNAMEL")
-                        JPARA04.Value = OIT0004row("MAPID")
-                        'JPARA05.Value = OIT0004row("PASSWORD")
-                        'If OIT0004row("MISSCNT") <> "" Then
-                        '    JPARA06.Value = OIT0004row("MISSCNT")
+                        JPARA00.Value = OIT0002row("DELFLG")
+                        JPARA01.Value = OIT0002row("USERID")
+                        JPARA02.Value = OIT0002row("STAFFNAMES")
+                        JPARA03.Value = OIT0002row("STAFFNAMEL")
+                        JPARA04.Value = OIT0002row("MAPID")
+                        'JPARA05.Value = OIT0002row("PASSWORD")
+                        'If OIT0002row("MISSCNT") <> "" Then
+                        '    JPARA06.Value = OIT0002row("MISSCNT")
                         'Else
                         '    JPARA06.Value = "0"
                         'End If
-                        'If RTrim(OIT0004row("PASSENDYMD")) <> "" Then
-                        '    JPARA07.Value = RTrim(OIT0004row("PASSENDYMD"))
+                        'If RTrim(OIT0002row("PASSENDYMD")) <> "" Then
+                        '    JPARA07.Value = RTrim(OIT0002row("PASSENDYMD"))
                         'Else
                         '    JPARA07.Value = C_DEFAULT_YMD
                         'End If
-                        If RTrim(OIT0004row("STYMD")) <> "" Then
-                            JPARA08.Value = RTrim(OIT0004row("STYMD"))
+                        If RTrim(OIT0002row("STYMD")) <> "" Then
+                            JPARA08.Value = RTrim(OIT0002row("STYMD"))
                         Else
                             JPARA08.Value = C_DEFAULT_YMD
                         End If
-                        If RTrim(OIT0004row("ENDYMD")) <> "" Then
-                            JPARA09.Value = RTrim(OIT0004row("ENDYMD"))
+                        If RTrim(OIT0002row("ENDYMD")) <> "" Then
+                            JPARA09.Value = RTrim(OIT0002row("ENDYMD"))
                         Else
                             JPARA09.Value = C_DEFAULT_YMD
                         End If
-                        JPARA10.Value = OIT0004row("CAMPCODE")
-                        JPARA11.Value = OIT0004row("ORG")
-                        JPARA12.Value = OIT0004row("EMAIL")
-                        JPARA13.Value = OIT0004row("MENUROLE")
-                        JPARA14.Value = OIT0004row("MAPROLE")
-                        JPARA15.Value = OIT0004row("VIEWPROFID")
-                        JPARA16.Value = OIT0004row("RPRTPROFID")
-                        JPARA17.Value = OIT0004row("VARIANT")
-                        JPARA18.Value = OIT0004row("APPROVALID")
+                        JPARA10.Value = OIT0002row("CAMPCODE")
+                        JPARA11.Value = OIT0002row("ORG")
+                        JPARA12.Value = OIT0002row("EMAIL")
+                        JPARA13.Value = OIT0002row("MENUROLE")
+                        JPARA14.Value = OIT0002row("MAPROLE")
+                        JPARA15.Value = OIT0002row("VIEWPROFID")
+                        JPARA16.Value = OIT0002row("RPRTPROFID")
+                        JPARA17.Value = OIT0002row("VARIANT")
+                        JPARA18.Value = OIT0002row("APPROVALID")
                         JPARA19.Value = WW_DATENOW
                         JPARA20.Value = Master.USERID
                         JPARA21.Value = Master.USERTERMID
@@ -1050,22 +1050,22 @@ Public Class OIT0004UserList
                         JPARA25.Value = C_DEFAULT_YMD
 
                         Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
-                            If IsNothing(OIT0004UPDtbl) Then
-                                OIT0004UPDtbl = New DataTable
+                            If IsNothing(OIT0002UPDtbl) Then
+                                OIT0002UPDtbl = New DataTable
 
                                 For index As Integer = 0 To SQLdr.FieldCount - 1
-                                    OIT0004UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                                    OIT0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                                 Next
                             End If
 
-                            OIT0004UPDtbl.Clear()
-                            OIT0004UPDtbl.Load(SQLdr)
+                            OIT0002UPDtbl.Clear()
+                            OIT0002UPDtbl.Load(SQLdr)
                         End Using
 
-                        For Each OIT0004UPDrow As DataRow In OIT0004UPDtbl.Rows
-                            CS0020JOURNAL.TABLENM = "OIT0004L"
+                        For Each OIT0002UPDrow As DataRow In OIT0002UPDtbl.Rows
+                            CS0020JOURNAL.TABLENM = "OIT0002L"
                             CS0020JOURNAL.ACTION = "UPDATE_INSERT"
-                            CS0020JOURNAL.ROW = OIT0004UPDrow
+                            CS0020JOURNAL.ROW = OIT0002UPDrow
                             CS0020JOURNAL.CS0020JOURNAL()
                             If Not isNormal(CS0020JOURNAL.ERR) Then
                                 Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
@@ -1083,10 +1083,10 @@ Public Class OIT0004UserList
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004L UPDATE_INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L UPDATE_INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0004L UPDATE_INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L UPDATE_INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1233,48 +1233,48 @@ Public Class OIT0004UserList
                 Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P24", SqlDbType.NVarChar, 20)            '更新端末
                 Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P25", SqlDbType.DateTime)            '集信日時
 
-                For Each OIT0004row As DataRow In OIT0004tbl.Rows
-                    If Trim(OIT0004row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
-                        Trim(OIT0004row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
-                        Trim(OIT0004row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
+                For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    If Trim(OIT0002row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
+                        Trim(OIT0002row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
+                        Trim(OIT0002row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
                         Dim WW_DATENOW As DateTime = Date.Now
 
                         'DB更新
-                        PARA00.Value = OIT0004row("DELFLG")
-                        PARA01.Value = OIT0004row("USERID")
-                        'PARA02.Value = OIT0004row("STAFFNAMES")
-                        'PARA03.Value = OIT0004row("STAFFNAMEL")
-                        'PARA04.Value = OIT0004row("MAPID")
-                        PARA05.Value = OIT0004row("PASSWORD")
-                        If OIT0004row("MISSCNT") <> "" Then
-                            PARA06.Value = OIT0004row("MISSCNT")
+                        PARA00.Value = OIT0002row("DELFLG")
+                        PARA01.Value = OIT0002row("USERID")
+                        'PARA02.Value = OIT0002row("STAFFNAMES")
+                        'PARA03.Value = OIT0002row("STAFFNAMEL")
+                        'PARA04.Value = OIT0002row("MAPID")
+                        PARA05.Value = OIT0002row("PASSWORD")
+                        If OIT0002row("MISSCNT") <> "" Then
+                            PARA06.Value = OIT0002row("MISSCNT")
                         Else
                             PARA06.Value = "0"
                         End If
-                        If RTrim(OIT0004row("PASSENDYMD")) <> "" Then
-                            PARA07.Value = RTrim(OIT0004row("PASSENDYMD"))
+                        If RTrim(OIT0002row("PASSENDYMD")) <> "" Then
+                            PARA07.Value = RTrim(OIT0002row("PASSENDYMD"))
                         Else
                             PARA07.Value = C_DEFAULT_YMD
                         End If
-                        'If RTrim(OIT0004row("STYMD")) <> "" Then
-                        '    PARA08.Value = RTrim(OIT0004row("STYMD"))
+                        'If RTrim(OIT0002row("STYMD")) <> "" Then
+                        '    PARA08.Value = RTrim(OIT0002row("STYMD"))
                         'Else
                         '    PARA08.Value = C_DEFAULT_YMD
                         'End If
-                        'If RTrim(OIT0004row("ENDYMD")) <> "" Then
-                        '    PARA09.Value = RTrim(OIT0004row("ENDYMD"))
+                        'If RTrim(OIT0002row("ENDYMD")) <> "" Then
+                        '    PARA09.Value = RTrim(OIT0002row("ENDYMD"))
                         'Else
                         '    PARA09.Value = C_DEFAULT_YMD
                         'End If
-                        'PARA10.Value = OIT0004row("CAMPCODE")
-                        'PARA11.Value = OIT0004row("ORG")
-                        'PARA12.Value = OIT0004row("EMAIL")
-                        'PARA13.Value = OIT0004row("MENUROLE")
-                        'PARA14.Value = OIT0004row("MAPROLE")
-                        'PARA15.Value = OIT0004row("VIEWPROFID")
-                        'PARA16.Value = OIT0004row("RPRTPROFID")
-                        'PARA17.Value = OIT0004row("VARIANT")
-                        'PARA18.Value = OIT0004row("APPROVALID")
+                        'PARA10.Value = OIT0002row("CAMPCODE")
+                        'PARA11.Value = OIT0002row("ORG")
+                        'PARA12.Value = OIT0002row("EMAIL")
+                        'PARA13.Value = OIT0002row("MENUROLE")
+                        'PARA14.Value = OIT0002row("MAPROLE")
+                        'PARA15.Value = OIT0002row("VIEWPROFID")
+                        'PARA16.Value = OIT0002row("RPRTPROFID")
+                        'PARA17.Value = OIT0002row("VARIANT")
+                        'PARA18.Value = OIT0002row("APPROVALID")
                         PARA19.Value = WW_DATENOW
                         PARA20.Value = Master.USERID
                         PARA21.Value = Master.USERTERMID
@@ -1285,44 +1285,44 @@ Public Class OIT0004UserList
                         SQLcmd.CommandTimeout = 300
                         SQLcmd.ExecuteNonQuery()
 
-                        OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                        OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
 
                         '更新ジャーナル出力
-                        JPARA00.Value = OIT0004row("DELFLG")
-                        JPARA01.Value = OIT0004row("USERID")
-                        'JPARA02.Value = OIT0004row("STAFFNAMES")
-                        'JPARA03.Value = OIT0004row("STAFFNAMEL")
-                        'JPARA04.Value = OIT0004row("MAPID")
-                        JPARA05.Value = OIT0004row("PASSWORD")
-                        If OIT0004row("MISSCNT") <> "" Then
-                            JPARA06.Value = OIT0004row("MISSCNT")
+                        JPARA00.Value = OIT0002row("DELFLG")
+                        JPARA01.Value = OIT0002row("USERID")
+                        'JPARA02.Value = OIT0002row("STAFFNAMES")
+                        'JPARA03.Value = OIT0002row("STAFFNAMEL")
+                        'JPARA04.Value = OIT0002row("MAPID")
+                        JPARA05.Value = OIT0002row("PASSWORD")
+                        If OIT0002row("MISSCNT") <> "" Then
+                            JPARA06.Value = OIT0002row("MISSCNT")
                         Else
                             JPARA06.Value = "0"
                         End If
-                        If RTrim(OIT0004row("PASSENDYMD")) <> "" Then
-                            JPARA07.Value = RTrim(OIT0004row("PASSENDYMD"))
+                        If RTrim(OIT0002row("PASSENDYMD")) <> "" Then
+                            JPARA07.Value = RTrim(OIT0002row("PASSENDYMD"))
                         Else
                             JPARA07.Value = C_DEFAULT_YMD
                         End If
-                        'If RTrim(OIT0004row("STYMD")) <> "" Then
-                        '    JPARA08.Value = RTrim(OIT0004row("STYMD"))
+                        'If RTrim(OIT0002row("STYMD")) <> "" Then
+                        '    JPARA08.Value = RTrim(OIT0002row("STYMD"))
                         'Else
                         '    JPARA08.Value = C_DEFAULT_YMD
                         'End If
-                        'If RTrim(OIT0004row("ENDYMD")) <> "" Then
-                        '    JPARA09.Value = RTrim(OIT0004row("ENDYMD"))
+                        'If RTrim(OIT0002row("ENDYMD")) <> "" Then
+                        '    JPARA09.Value = RTrim(OIT0002row("ENDYMD"))
                         'Else
                         '    JPARA09.Value = C_DEFAULT_YMD
                         'End If
-                        'JPARA10.Value = OIT0004row("CAMPCODE")
-                        'JPARA11.Value = OIT0004row("ORG")
-                        'JPARA12.Value = OIT0004row("EMAIL")
-                        'JPARA13.Value = OIT0004row("MENUROLE")
-                        'JPARA14.Value = OIT0004row("MAPROLE")
-                        'JPARA15.Value = OIT0004row("VIEWPROFID")
-                        'JPARA16.Value = OIT0004row("RPRTPROFID")
-                        'JPARA17.Value = OIT0004row("VARIANT")
-                        'JPARA18.Value = OIT0004row("APPROVALID")
+                        'JPARA10.Value = OIT0002row("CAMPCODE")
+                        'JPARA11.Value = OIT0002row("ORG")
+                        'JPARA12.Value = OIT0002row("EMAIL")
+                        'JPARA13.Value = OIT0002row("MENUROLE")
+                        'JPARA14.Value = OIT0002row("MAPROLE")
+                        'JPARA15.Value = OIT0002row("VIEWPROFID")
+                        'JPARA16.Value = OIT0002row("RPRTPROFID")
+                        'JPARA17.Value = OIT0002row("VARIANT")
+                        'JPARA18.Value = OIT0002row("APPROVALID")
                         JPARA19.Value = WW_DATENOW
                         JPARA20.Value = Master.USERID
                         JPARA21.Value = Master.USERTERMID
@@ -1332,22 +1332,22 @@ Public Class OIT0004UserList
                         JPARA25.Value = C_DEFAULT_YMD
 
                         Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
-                            If IsNothing(OIT0004UPDtbl) Then
-                                OIT0004UPDtbl = New DataTable
+                            If IsNothing(OIT0002UPDtbl) Then
+                                OIT0002UPDtbl = New DataTable
 
                                 For index As Integer = 0 To SQLdr.FieldCount - 1
-                                    OIT0004UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                                    OIT0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                                 Next
                             End If
 
-                            OIT0004UPDtbl.Clear()
-                            OIT0004UPDtbl.Load(SQLdr)
+                            OIT0002UPDtbl.Clear()
+                            OIT0002UPDtbl.Load(SQLdr)
                         End Using
 
-                        For Each OIT0004UPDrow As DataRow In OIT0004UPDtbl.Rows
-                            CS0020JOURNAL.TABLENM = "OIT0004L"
+                        For Each OIT0002UPDrow As DataRow In OIT0002UPDtbl.Rows
+                            CS0020JOURNAL.TABLENM = "OIT0002L"
                             CS0020JOURNAL.ACTION = "UPDATE_INSERT"
-                            CS0020JOURNAL.ROW = OIT0004UPDrow
+                            CS0020JOURNAL.ROW = OIT0002UPDrow
                             CS0020JOURNAL.CS0020JOURNAL()
                             If Not isNormal(CS0020JOURNAL.ERR) Then
                                 Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
@@ -1365,10 +1365,10 @@ Public Class OIT0004UserList
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004L UPDATE_INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L UPDATE_INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0004L UPDATE_INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L UPDATE_INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1392,7 +1392,7 @@ Public Class OIT0004UserList
         CS0030REPORT.MAPID = Master.MAPID                       '画面ID
         CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
         CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
-        CS0030REPORT.TBLDATA = OIT0004tbl                        'データ参照  Table
+        CS0030REPORT.TBLDATA = OIT0002tbl                        'データ参照  Table
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
@@ -1421,7 +1421,7 @@ Public Class OIT0004UserList
         CS0030REPORT.MAPID = Master.MAPID                       '画面ID
         CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
         CS0030REPORT.FILEtyp = "pdf"                            '出力ファイル形式
-        CS0030REPORT.TBLDATA = OIT0004tbl                        'データ参照Table
+        CS0030REPORT.TBLDATA = OIT0002tbl                        'データ参照Table
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
@@ -1468,7 +1468,7 @@ Public Class OIT0004UserList
     Protected Sub WF_ButtonLAST_Click()
 
         '○ ソート
-        Dim TBLview As New DataView(OIT0004tbl)
+        Dim TBLview As New DataView(OIT0002tbl)
         TBLview.RowFilter = "HIDDEN = 0"
 
         '○ 最終頁に移動
@@ -1508,121 +1508,121 @@ Public Class OIT0004UserList
         End Try
 
         '選択行
-        WF_Sel_LINECNT.Text = OIT0004tbl.Rows(WW_LINECNT)("LINECNT")
-        work.WF_SEL_LINECNT.Text = OIT0004tbl.Rows(WW_LINECNT)("LINECNT")
+        WF_Sel_LINECNT.Text = OIT0002tbl.Rows(WW_LINECNT)("LINECNT")
+        work.WF_SEL_LINECNT.Text = OIT0002tbl.Rows(WW_LINECNT)("LINECNT")
 
         'ユーザID
-        WF_USERID.Text = OIT0004tbl.Rows(WW_LINECNT)("USERID")
-        work.WF_SEL_USERID.Text = OIT0004tbl.Rows(WW_LINECNT)("USERID")
+        WF_USERID.Text = OIT0002tbl.Rows(WW_LINECNT)("USERID")
+        work.WF_SEL_USERID.Text = OIT0002tbl.Rows(WW_LINECNT)("USERID")
 
         '社員名（短）
-        WF_STAFFNAMES.Text = OIT0004tbl.Rows(WW_LINECNT)("STAFFNAMES")
-        work.WF_SEL_STAFFNAMES.Text = OIT0004tbl.Rows(WW_LINECNT)("STAFFNAMES")
+        WF_STAFFNAMES.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMES")
+        work.WF_SEL_STAFFNAMES.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMES")
 
         '社員名（長）
-        WF_STAFFNAMEL.Text = OIT0004tbl.Rows(WW_LINECNT)("STAFFNAMEL")
-        work.WF_SEL_STAFFNAMEL.Text = OIT0004tbl.Rows(WW_LINECNT)("STAFFNAMEL")
+        WF_STAFFNAMEL.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMEL")
+        work.WF_SEL_STAFFNAMEL.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMEL")
 
         '画面ＩＤ
-        WF_MAPID.Text = OIT0004tbl.Rows(WW_LINECNT)("MAPID")
-        work.WF_SEL_MAPID.Text = OIT0004tbl.Rows(WW_LINECNT)("MAPID")
+        WF_MAPID.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPID")
+        work.WF_SEL_MAPID.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPID")
 
         'パスワード
-        WF_PASSWORD.Text = OIT0004tbl.Rows(WW_LINECNT)("PASSWORD")
-        work.WF_SEL_PASSWORD.Text = OIT0004tbl.Rows(WW_LINECNT)("PASSWORD")
+        WF_PASSWORD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSWORD")
+        work.WF_SEL_PASSWORD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSWORD")
 
         '誤り回数
-        WF_MISSCNT.Text = OIT0004tbl.Rows(WW_LINECNT)("MISSCNT")
-        work.WF_SEL_MISSCNT.Text = OIT0004tbl.Rows(WW_LINECNT)("MISSCNT")
+        WF_MISSCNT.Text = OIT0002tbl.Rows(WW_LINECNT)("MISSCNT")
+        work.WF_SEL_MISSCNT.Text = OIT0002tbl.Rows(WW_LINECNT)("MISSCNT")
 
         'パスワード有効期限
-        WF_PASSENDYMD.Text = OIT0004tbl.Rows(WW_LINECNT)("PASSENDYMD")
-        work.WF_SEL_PASSENDYMD.Text = OIT0004tbl.Rows(WW_LINECNT)("PASSENDYMD")
+        WF_PASSENDYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSENDYMD")
+        work.WF_SEL_PASSENDYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSENDYMD")
 
         '開始年月日
-        WF_STYMD.Text = OIT0004tbl.Rows(WW_LINECNT)("STYMD")
-        work.WF_SEL_STYMD2.Text = OIT0004tbl.Rows(WW_LINECNT)("STYMD")
+        WF_STYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("STYMD")
+        work.WF_SEL_STYMD2.Text = OIT0002tbl.Rows(WW_LINECNT)("STYMD")
 
         '終了年月日
-        WF_ENDYMD.Text = OIT0004tbl.Rows(WW_LINECNT)("ENDYMD")
-        work.WF_SEL_ENDYMD2.Text = OIT0004tbl.Rows(WW_LINECNT)("ENDYMD")
+        WF_ENDYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("ENDYMD")
+        work.WF_SEL_ENDYMD2.Text = OIT0002tbl.Rows(WW_LINECNT)("ENDYMD")
 
         '会社コード
-        WF_CAMPCODE.Text = OIT0004tbl.Rows(WW_LINECNT)("CAMPCODE")
-        work.WF_SEL_CAMPCODE2.Text = OIT0004tbl.Rows(WW_LINECNT)("CAMPCODE")
+        WF_CAMPCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("CAMPCODE")
+        work.WF_SEL_CAMPCODE2.Text = OIT0002tbl.Rows(WW_LINECNT)("CAMPCODE")
 
         '組織コード
-        WF_ORG.Text = OIT0004tbl.Rows(WW_LINECNT)("ORG")
-        work.WF_SEL_ORG2.Text = OIT0004tbl.Rows(WW_LINECNT)("ORG")
+        WF_ORG.Text = OIT0002tbl.Rows(WW_LINECNT)("ORG")
+        work.WF_SEL_ORG2.Text = OIT0002tbl.Rows(WW_LINECNT)("ORG")
 
         'メールアドレス
-        WF_EMAIL.Text = OIT0004tbl.Rows(WW_LINECNT)("EMAIL")
-        work.WF_SEL_EMAIL.Text = OIT0004tbl.Rows(WW_LINECNT)("EMAIL")
+        WF_EMAIL.Text = OIT0002tbl.Rows(WW_LINECNT)("EMAIL")
+        work.WF_SEL_EMAIL.Text = OIT0002tbl.Rows(WW_LINECNT)("EMAIL")
 
         'メニュー表示制御ロール
-        WF_MENUROLE.Text = OIT0004tbl.Rows(WW_LINECNT)("MENUROLE")
-        work.WF_SEL_MENUROLE.Text = OIT0004tbl.Rows(WW_LINECNT)("MENUROLE")
+        WF_MENUROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MENUROLE")
+        work.WF_SEL_MENUROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MENUROLE")
 
         '画面参照更新制御ロール
-        WF_MAPROLE.Text = OIT0004tbl.Rows(WW_LINECNT)("MAPROLE")
-        work.WF_SEL_MAPROLE.Text = OIT0004tbl.Rows(WW_LINECNT)("MAPROLE")
+        WF_MAPROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPROLE")
+        work.WF_SEL_MAPROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPROLE")
 
         '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = OIT0004tbl.Rows(WW_LINECNT)("VIEWPROFID")
-        work.WF_SEL_VIEWPROFID.Text = OIT0004tbl.Rows(WW_LINECNT)("VIEWPROFID")
+        WF_VIEWPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("VIEWPROFID")
+        work.WF_SEL_VIEWPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("VIEWPROFID")
 
         'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = OIT0004tbl.Rows(WW_LINECNT)("RPRTPROFID")
-        work.WF_SEL_RPRTPROFID.Text = OIT0004tbl.Rows(WW_LINECNT)("RPRTPROFID")
+        WF_RPRTPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("RPRTPROFID")
+        work.WF_SEL_RPRTPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("RPRTPROFID")
 
         '画面初期値ロール
-        WF_VARIANT.Text = OIT0004tbl.Rows(WW_LINECNT)("VARIANT")
-        work.WF_SEL_VARIANT.Text = OIT0004tbl.Rows(WW_LINECNT)("VARIANT")
+        WF_VARIANT.Text = OIT0002tbl.Rows(WW_LINECNT)("VARIANT")
+        work.WF_SEL_VARIANT.Text = OIT0002tbl.Rows(WW_LINECNT)("VARIANT")
 
         '承認権限ロール
-        WF_APPROVALID.Text = OIT0004tbl.Rows(WW_LINECNT)("APPROVALID")
-        work.WF_SEL_APPROVALID.Text = OIT0004tbl.Rows(WW_LINECNT)("APPROVALID")
+        WF_APPROVALID.Text = OIT0002tbl.Rows(WW_LINECNT)("APPROVALID")
+        work.WF_SEL_APPROVALID.Text = OIT0002tbl.Rows(WW_LINECNT)("APPROVALID")
 
         '削除フラグ
-        WF_DELFLG.Text = OIT0004tbl.Rows(WW_LINECNT)("DELFLG")
+        WF_DELFLG.Text = OIT0002tbl.Rows(WW_LINECNT)("DELFLG")
         CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
-        work.WF_SEL_DELFLG.Text = OIT0004tbl.Rows(WW_LINECNT)("DELFLG")
+        work.WF_SEL_DELFLG.Text = OIT0002tbl.Rows(WW_LINECNT)("DELFLG")
 
         '○ 状態をクリア
-        For Each OIT0004row As DataRow In OIT0004tbl.Rows
-            Select Case OIT0004row("OPERATION")
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            Select Case OIT0002row("OPERATION")
                 Case C_LIST_OPERATION_CODE.NODATA
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.NODISP
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
             End Select
         Next
 
         '○ 選択明細の状態を設定
-        Select Case OIT0004tbl.Rows(WW_LINECNT)("OPERATION")
+        Select Case OIT0002tbl.Rows(WW_LINECNT)("OPERATION")
             Case C_LIST_OPERATION_CODE.NODATA
-                OIT0004tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                OIT0002tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
             Case C_LIST_OPERATION_CODE.NODISP
-                OIT0004tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                OIT0002tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
             Case C_LIST_OPERATION_CODE.SELECTED
-                OIT0004tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                OIT0002tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
             Case C_LIST_OPERATION_CODE.UPDATING
-                OIT0004tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                OIT0002tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
             Case C_LIST_OPERATION_CODE.ERRORED
-                OIT0004tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                OIT0002tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
         End Select
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         WF_GridDBclick.Text = ""
 
@@ -1630,7 +1630,7 @@ Public Class OIT0004UserList
         WW_CreateXMLSaveFile()
 
         '画面表示データ保存(遷移先(登録画面)向け)
-        Master.SaveTable(OIT0004tbl, work.WF_SEL_INPTBL.Text)
+        Master.SaveTable(OIT0002tbl, work.WF_SEL_INPTBL.Text)
 
         '登録画面ページへ遷移
         Master.TransitionPage()
@@ -1689,27 +1689,27 @@ Public Class OIT0004UserList
         Next
 
         '○ XLSUPLOAD明細⇒INPtbl
-        Master.CreateEmptyTable(OIT0004INPtbl)
+        Master.CreateEmptyTable(OIT0002INPtbl)
 
         For Each XLSTBLrow As DataRow In CS0023XLSUPLOAD.TBLDATA.Rows
-            Dim OIT0004INProw As DataRow = OIT0004INPtbl.NewRow
+            Dim OIT0002INProw As DataRow = OIT0002INPtbl.NewRow
 
             '○ 初期クリア
-            For Each OIT0004INPcol As DataColumn In OIT0004INPtbl.Columns
-                If IsDBNull(OIT0004INProw.Item(OIT0004INPcol)) OrElse IsNothing(OIT0004INProw.Item(OIT0004INPcol)) Then
-                    Select Case OIT0004INPcol.ColumnName
+            For Each OIT0002INPcol As DataColumn In OIT0002INPtbl.Columns
+                If IsDBNull(OIT0002INProw.Item(OIT0002INPcol)) OrElse IsNothing(OIT0002INProw.Item(OIT0002INPcol)) Then
+                    Select Case OIT0002INPcol.ColumnName
                         Case "LINECNT"
-                            OIT0004INProw.Item(OIT0004INPcol) = 0
+                            OIT0002INProw.Item(OIT0002INPcol) = 0
                         Case "OPERATION"
-                            OIT0004INProw.Item(OIT0004INPcol) = C_LIST_OPERATION_CODE.NODATA
+                            OIT0002INProw.Item(OIT0002INPcol) = C_LIST_OPERATION_CODE.NODATA
                         Case "UPDTIMSTP"
-                            OIT0004INProw.Item(OIT0004INPcol) = 0
+                            OIT0002INProw.Item(OIT0002INPcol) = 0
                         Case "SELECT"
-                            OIT0004INProw.Item(OIT0004INPcol) = 1
+                            OIT0002INProw.Item(OIT0002INPcol) = 1
                         Case "HIDDEN"
-                            OIT0004INProw.Item(OIT0004INPcol) = 0
+                            OIT0002INProw.Item(OIT0002INPcol) = 0
                         Case Else
-                            OIT0004INProw.Item(OIT0004INPcol) = ""
+                            OIT0002INProw.Item(OIT0002INPcol) = ""
                     End Select
                 End If
             Next
@@ -1717,22 +1717,22 @@ Public Class OIT0004UserList
             '○ 変更元情報をデフォルト設定
             If WW_COLUMNS.IndexOf("USERID") >= 0 Then
 
-                For Each OIT0004row As DataRow In OIT0004tbl.Rows
-                    If XLSTBLrow("USERID") = OIT0004row("USERID") AndAlso
-                        XLSTBLrow("STAFFNAMES") = OIT0004row("STAFFNAMES") AndAlso
-                        XLSTBLrow("STAFFNAMEL") = OIT0004row("STAFFNAMEL") AndAlso
-                        XLSTBLrow("STYMD") = OIT0004row("STYMD") AndAlso
-                        XLSTBLrow("ENDYMD") = OIT0004row("ENDYMD") AndAlso
-                        XLSTBLrow("CAMPCODE") = OIT0004row("CAMPCODE") AndAlso
-                        XLSTBLrow("ORG") = OIT0004row("ORG") AndAlso
-                        XLSTBLrow("EMAIL") = OIT0004row("EMAIL") AndAlso
-                        XLSTBLrow("MENUROLE") = OIT0004row("MENUROLE") AndAlso
-                        XLSTBLrow("MAPROLE") = OIT0004row("MAPROLE") AndAlso
-                        XLSTBLrow("VIEWPROFID") = OIT0004row("VIEWPROFID") AndAlso
-                        XLSTBLrow("RPRTPROFID") = OIT0004row("RPRTPROFID") AndAlso
-                        XLSTBLrow("VARIANT") = OIT0004row("VARIANT") AndAlso
-                        XLSTBLrow("APPROVALID") = OIT0004row("APPROVALID") Then
-                        OIT0004INProw.ItemArray = OIT0004row.ItemArray
+                For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    If XLSTBLrow("USERID") = OIT0002row("USERID") AndAlso
+                        XLSTBLrow("STAFFNAMES") = OIT0002row("STAFFNAMES") AndAlso
+                        XLSTBLrow("STAFFNAMEL") = OIT0002row("STAFFNAMEL") AndAlso
+                        XLSTBLrow("STYMD") = OIT0002row("STYMD") AndAlso
+                        XLSTBLrow("ENDYMD") = OIT0002row("ENDYMD") AndAlso
+                        XLSTBLrow("CAMPCODE") = OIT0002row("CAMPCODE") AndAlso
+                        XLSTBLrow("ORG") = OIT0002row("ORG") AndAlso
+                        XLSTBLrow("EMAIL") = OIT0002row("EMAIL") AndAlso
+                        XLSTBLrow("MENUROLE") = OIT0002row("MENUROLE") AndAlso
+                        XLSTBLrow("MAPROLE") = OIT0002row("MAPROLE") AndAlso
+                        XLSTBLrow("VIEWPROFID") = OIT0002row("VIEWPROFID") AndAlso
+                        XLSTBLrow("RPRTPROFID") = OIT0002row("RPRTPROFID") AndAlso
+                        XLSTBLrow("VARIANT") = OIT0002row("VARIANT") AndAlso
+                        XLSTBLrow("APPROVALID") = OIT0002row("APPROVALID") Then
+                        OIT0002INProw.ItemArray = OIT0002row.ItemArray
                         Exit For
                     End If
                 Next
@@ -1741,92 +1741,92 @@ Public Class OIT0004UserList
             '○ 項目セット
             'ユーザID
             If WW_COLUMNS.IndexOf("USERID") >= 0 Then
-                OIT0004INProw("USERID") = XLSTBLrow("USERID")
+                OIT0002INProw("USERID") = XLSTBLrow("USERID")
             End If
 
             '社員名（短）
             If WW_COLUMNS.IndexOf("STAFFNAMES") >= 0 Then
-                OIT0004INProw("STAFFNAMES") = XLSTBLrow("STAFFNAMES")
+                OIT0002INProw("STAFFNAMES") = XLSTBLrow("STAFFNAMES")
             End If
 
             '社員名（長）
             If WW_COLUMNS.IndexOf("STAFFNAMEL") >= 0 Then
-                OIT0004INProw("STAFFNAMEL") = XLSTBLrow("STAFFNAMEL")
+                OIT0002INProw("STAFFNAMEL") = XLSTBLrow("STAFFNAMEL")
             End If
 
             '開始年月日
             If WW_COLUMNS.IndexOf("STYMD") >= 0 Then
-                OIT0004INProw("STYMD") = XLSTBLrow("STYMD")
+                OIT0002INProw("STYMD") = XLSTBLrow("STYMD")
             End If
 
             '終了年月日
             If WW_COLUMNS.IndexOf("ENDYMD") >= 0 Then
-                OIT0004INProw("ENDYMD") = XLSTBLrow("ENDYMD")
+                OIT0002INProw("ENDYMD") = XLSTBLrow("ENDYMD")
             End If
 
             '会社コード
             If WW_COLUMNS.IndexOf("CAMPCODE") >= 0 Then
-                OIT0004INProw("CAMPCODE") = XLSTBLrow("CAMPCODE")
+                OIT0002INProw("CAMPCODE") = XLSTBLrow("CAMPCODE")
             End If
 
             '組織コード
             If WW_COLUMNS.IndexOf("ORG") >= 0 Then
-                OIT0004INProw("ORG") = XLSTBLrow("ORG")
+                OIT0002INProw("ORG") = XLSTBLrow("ORG")
             End If
 
             'メールアドレス
             If WW_COLUMNS.IndexOf("EMAIL") >= 0 Then
-                OIT0004INProw("EMAIL") = XLSTBLrow("EMAIL")
+                OIT0002INProw("EMAIL") = XLSTBLrow("EMAIL")
             End If
 
             'メニュー表示制御ロール
             If WW_COLUMNS.IndexOf("MENUROLE") >= 0 Then
-                OIT0004INProw("MENUROLE") = XLSTBLrow("MENUROLE")
+                OIT0002INProw("MENUROLE") = XLSTBLrow("MENUROLE")
             End If
 
             '画面参照更新制御ロール
             If WW_COLUMNS.IndexOf("MAPROLE") >= 0 Then
-                OIT0004INProw("MAPROLE") = XLSTBLrow("MAPROLE")
+                OIT0002INProw("MAPROLE") = XLSTBLrow("MAPROLE")
             End If
 
             '画面表示項目制御ロール
             If WW_COLUMNS.IndexOf("VIEWPROFID") >= 0 Then
-                OIT0004INProw("VIEWPROFID") = XLSTBLrow("VIEWPROFID")
+                OIT0002INProw("VIEWPROFID") = XLSTBLrow("VIEWPROFID")
             End If
 
             'エクセル出力制御ロール
             If WW_COLUMNS.IndexOf("RPRTPROFID") >= 0 Then
-                OIT0004INProw("RPRTPROFID") = XLSTBLrow("RPRTPROFID")
+                OIT0002INProw("RPRTPROFID") = XLSTBLrow("RPRTPROFID")
             End If
 
             '画面初期値ロール
             If WW_COLUMNS.IndexOf("VARIANT") >= 0 Then
-                OIT0004INProw("VARIANT") = XLSTBLrow("VARIANT")
+                OIT0002INProw("VARIANT") = XLSTBLrow("VARIANT")
             End If
 
             '承認権限ロール
             If WW_COLUMNS.IndexOf("APPROVALID") >= 0 Then
-                OIT0004INProw("APPROVALID") = XLSTBLrow("APPROVALID")
+                OIT0002INProw("APPROVALID") = XLSTBLrow("APPROVALID")
             End If
 
             '削除フラグ
             If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
-                OIT0004INProw("DELFLG") = XLSTBLrow("DELFLG")
+                OIT0002INProw("DELFLG") = XLSTBLrow("DELFLG")
             Else
-                OIT0004INProw("DELFLG") = "0"
+                OIT0002INProw("DELFLG") = "0"
             End If
 
-            OIT0004INPtbl.Rows.Add(OIT0004INProw)
+            OIT0002INPtbl.Rows.Add(OIT0002INProw)
         Next
 
         '○ 項目チェック
         INPTableCheck(WW_ERR_SW)
 
         '○ 入力値のテーブル反映
-        OIT0004tbl_UPD()
+        OIT0002tbl_UPD()
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         '○ メッセージ表示
         If isNormal(WW_ERR_SW) Then
@@ -1856,7 +1856,7 @@ Public Class OIT0004UserList
         rightview.SetErrorReport("")
 
         '○ DetailBoxをINPtblへ退避
-        DetailBoxToOIT0004INPtbl(WW_ERR_SW)
+        DetailBoxToOIT0002INPtbl(WW_ERR_SW)
         If Not isNormal(WW_ERR_SW) Then
             Exit Sub
         End If
@@ -1866,11 +1866,11 @@ Public Class OIT0004UserList
 
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
-            OIT0004tbl_UPD()
+            OIT0002tbl_UPD()
         End If
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         '○ 詳細画面初期化
         If isNormal(WW_ERR_SW) Then
@@ -1898,7 +1898,7 @@ Public Class OIT0004UserList
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub DetailBoxToOIT0004INPtbl(ByRef O_RTN As String)
+    Protected Sub DetailBoxToOIT0002INPtbl(ByRef O_RTN As String)
 
         O_RTN = C_MESSAGE_NO.NORMAL
 
@@ -1921,83 +1921,83 @@ Public Class OIT0004UserList
             Exit Sub
         End If
 
-        Master.CreateEmptyTable(OIT0004INPtbl)
-        Dim OIT0004INProw As DataRow = OIT0004INPtbl.NewRow
+        Master.CreateEmptyTable(OIT0002INPtbl)
+        Dim OIT0002INProw As DataRow = OIT0002INPtbl.NewRow
 
         '○ 初期クリア
-        For Each OIT0004INPcol As DataColumn In OIT0004INPtbl.Columns
-            If IsDBNull(OIT0004INProw.Item(OIT0004INPcol)) OrElse IsNothing(OIT0004INProw.Item(OIT0004INPcol)) Then
-                Select Case OIT0004INPcol.ColumnName
+        For Each OIT0002INPcol As DataColumn In OIT0002INPtbl.Columns
+            If IsDBNull(OIT0002INProw.Item(OIT0002INPcol)) OrElse IsNothing(OIT0002INProw.Item(OIT0002INPcol)) Then
+                Select Case OIT0002INPcol.ColumnName
                     Case "LINECNT"
-                        OIT0004INProw.Item(OIT0004INPcol) = 0
+                        OIT0002INProw.Item(OIT0002INPcol) = 0
                     Case "OPERATION"
-                        OIT0004INProw.Item(OIT0004INPcol) = C_LIST_OPERATION_CODE.NODATA
+                        OIT0002INProw.Item(OIT0002INPcol) = C_LIST_OPERATION_CODE.NODATA
                     Case "UPDTIMSTP"
-                        OIT0004INProw.Item(OIT0004INPcol) = 0
+                        OIT0002INProw.Item(OIT0002INPcol) = 0
                     Case "SELECT"
-                        OIT0004INProw.Item(OIT0004INPcol) = 1
+                        OIT0002INProw.Item(OIT0002INPcol) = 1
                     Case "HIDDEN"
-                        OIT0004INProw.Item(OIT0004INPcol) = 0
+                        OIT0002INProw.Item(OIT0002INPcol) = 0
                     Case Else
-                        OIT0004INProw.Item(OIT0004INPcol) = ""
+                        OIT0002INProw.Item(OIT0002INPcol) = ""
                 End Select
             End If
         Next
 
         'LINECNT
         If WF_Sel_LINECNT.Text = "" Then
-            OIT0004INProw("LINECNT") = 0
+            OIT0002INProw("LINECNT") = 0
         Else
             Try
-                Integer.TryParse(WF_Sel_LINECNT.Text, OIT0004INProw("LINECNT"))
+                Integer.TryParse(WF_Sel_LINECNT.Text, OIT0002INProw("LINECNT"))
             Catch ex As Exception
-                OIT0004INProw("LINECNT") = 0
+                OIT0002INProw("LINECNT") = 0
             End Try
         End If
 
-        OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        OIT0004INProw("UPDTIMSTP") = 0
-        OIT0004INProw("SELECT") = 1
-        OIT0004INProw("HIDDEN") = 0
+        OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+        OIT0002INProw("UPDTIMSTP") = 0
+        OIT0002INProw("SELECT") = 1
+        OIT0002INProw("HIDDEN") = 0
 
-        OIT0004INProw("USERID") = WF_USERID.Text              'ユーザID
+        OIT0002INProw("USERID") = WF_USERID.Text              'ユーザID
 
-        OIT0004INProw("STAFFNAMES") = WF_STAFFNAMES.Text              '社員名（短）
+        OIT0002INProw("STAFFNAMES") = WF_STAFFNAMES.Text              '社員名（短）
 
-        OIT0004INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text              '社員名（長）
+        OIT0002INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text              '社員名（長）
 
-        OIT0004INProw("MAPID") = WF_MAPID.Text              '画面ＩＤ
+        OIT0002INProw("MAPID") = WF_MAPID.Text              '画面ＩＤ
 
-        OIT0004INProw("PASSWORD") = WF_PASSWORD.Text              'パスワード
+        OIT0002INProw("PASSWORD") = WF_PASSWORD.Text              'パスワード
 
-        OIT0004INProw("MISSCNT") = WF_MISSCNT.Text              '誤り回数
+        OIT0002INProw("MISSCNT") = WF_MISSCNT.Text              '誤り回数
 
-        OIT0004INProw("PASSENDYMD") = WF_PASSENDYMD.Text              'パスワード有効期限
+        OIT0002INProw("PASSENDYMD") = WF_PASSENDYMD.Text              'パスワード有効期限
 
-        OIT0004INProw("STYMD") = WF_STYMD.Text              '開始年月日
+        OIT0002INProw("STYMD") = WF_STYMD.Text              '開始年月日
 
-        OIT0004INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
+        OIT0002INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
 
-        OIT0004INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
+        OIT0002INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
 
-        OIT0004INProw("ORG") = WF_ORG.Text              '組織コード
+        OIT0002INProw("ORG") = WF_ORG.Text              '組織コード
 
-        OIT0004INProw("EMAIL") = WF_EMAIL.Text              'メールアドレス
+        OIT0002INProw("EMAIL") = WF_EMAIL.Text              'メールアドレス
 
-        OIT0004INProw("MENUROLE") = WF_MENUROLE.Text              'メニュー表示制御ロール
+        OIT0002INProw("MENUROLE") = WF_MENUROLE.Text              'メニュー表示制御ロール
 
-        OIT0004INProw("MAPROLE") = WF_MAPROLE.Text              '画面参照更新制御ロール
+        OIT0002INProw("MAPROLE") = WF_MAPROLE.Text              '画面参照更新制御ロール
 
-        OIT0004INProw("VIEWPROFID") = WF_VIEWPROFID.Text              '画面表示項目制御ロール
+        OIT0002INProw("VIEWPROFID") = WF_VIEWPROFID.Text              '画面表示項目制御ロール
 
-        OIT0004INProw("RPRTPROFID") = WF_RPRTPROFID.Text              'エクセル出力制御ロール
+        OIT0002INProw("RPRTPROFID") = WF_RPRTPROFID.Text              'エクセル出力制御ロール
 
-        OIT0004INProw("VARIANT") = WF_VARIANT.Text              '画面初期値ロール
+        OIT0002INProw("VARIANT") = WF_VARIANT.Text              '画面初期値ロール
 
-        OIT0004INProw("APPROVALID") = WF_APPROVALID.Text              '承認権限ロール
+        OIT0002INProw("APPROVALID") = WF_APPROVALID.Text              '承認権限ロール
 
         '○ チェック用テーブルに登録する
-        OIT0004INPtbl.Rows.Add(OIT0004INProw)
+        OIT0002INPtbl.Rows.Add(OIT0002INProw)
 
     End Sub
 
@@ -2031,32 +2031,32 @@ Public Class OIT0004UserList
     Protected Sub DetailBoxClear()
 
         '○ 状態をクリア
-        For Each OIT0004row As DataRow In OIT0004tbl.Rows
-            Select Case OIT0004row("OPERATION")
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            Select Case OIT0002row("OPERATION")
                 Case C_LIST_OPERATION_CODE.NODATA
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     WW_ERR_SW = C_LIST_OPERATION_CODE.NODATA
 
                 Case C_LIST_OPERATION_CODE.NODISP
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     WW_ERR_SW = C_LIST_OPERATION_CODE.NODATA
 
                 Case C_LIST_OPERATION_CODE.SELECTED
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
                     WW_ERR_SW = C_MESSAGE_NO.NORMAL
 
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                     WW_ERR_SW = C_MESSAGE_NO.NORMAL
 
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                     WW_ERR_SW = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End Select
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0004tbl)
+        Master.SaveTable(OIT0002tbl)
 
         WF_Sel_LINECNT.Text = ""            'LINECNT
 
@@ -2331,51 +2331,51 @@ Public Class OIT0004UserList
         End If
 
         '○ 単項目チェック
-        For Each OIT0004INProw As DataRow In OIT0004INPtbl.Rows
+        For Each OIT0002INProw As DataRow In OIT0002INPtbl.Rows
 
             WW_LINE_ERR = ""
 
             '削除フラグ(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIT0004INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIT0002INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
-                CODENAME_get("DELFLG", OIT0004INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
+                CODENAME_get("DELFLG", OIT0002INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
                     WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0004INProw)
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0002INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0004INProw)
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0002INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             'ユーザID(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIT0004INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIT0002INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "ユーザID入力エラー。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0004INProw)
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0002INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             If WW_LINE_ERR = "" Then
-                If OIT0004INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
-                    OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                If OIT0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
+                    OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 End If
             Else
                 If WW_LINE_ERR = CONST_PATTERNERR Then
                     '関連チェックエラーをセット
-                    OIT0004INProw.Item("OPERATION") = CONST_PATTERNERR
+                    OIT0002INProw.Item("OPERATION") = CONST_PATTERNERR
                 Else
                     '単項目チェックエラーをセット
-                    OIT0004INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    OIT0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                 End If
             End If
         Next
@@ -2387,9 +2387,9 @@ Public Class OIT0004UserList
     ''' </summary>
     ''' <param name="MESSAGE1"></param>
     ''' <param name="MESSAGE2"></param>
-    ''' <param name="OIT0004row"></param>
+    ''' <param name="OIT0002row"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIT0004row As DataRow = Nothing)
+    Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIT0002row As DataRow = Nothing)
 
         Dim WW_ERR_MES As String = ""
         WW_ERR_MES = MESSAGE1
@@ -2397,26 +2397,26 @@ Public Class OIT0004UserList
             WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
         End If
 
-        If Not IsNothing(OIT0004row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> ユーザID =" & OIT0004row("USERID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（短） =" & OIT0004row("STAFFNAMES") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（長） =" & OIT0004row("STAFFNAMEL") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面ＩＤ =" & OIT0004row("MAPID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード =" & OIT0004row("PASSWORD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 誤り回数 =" & OIT0004row("MISSCNT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード有効期限 =" & OIT0004row("PASSENDYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日 =" & OIT0004row("STYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日 =" & OIT0004row("ENDYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード =" & OIT0004row("CAMPCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード =" & OIT0004row("ORG") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> メールアドレス =" & OIT0004row("EMAIL") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> メニュー表示制御ロール =" & OIT0004row("MENUROLE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面参照更新制御ロール =" & OIT0004row("MAPROLE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面表示項目制御ロール =" & OIT0004row("VIEWPROFID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エクセル出力制御ロール =" & OIT0004row("RPRTPROFID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面初期値ロール =" & OIT0004row("VARIANT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 承認権限ロール =" & OIT0004row("APPROVALID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIT0004row("DELFLG")
+        If Not IsNothing(OIT0002row) Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> ユーザID =" & OIT0002row("USERID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（短） =" & OIT0002row("STAFFNAMES") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（長） =" & OIT0002row("STAFFNAMEL") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面ＩＤ =" & OIT0002row("MAPID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード =" & OIT0002row("PASSWORD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 誤り回数 =" & OIT0002row("MISSCNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード有効期限 =" & OIT0002row("PASSENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日 =" & OIT0002row("STYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日 =" & OIT0002row("ENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード =" & OIT0002row("CAMPCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード =" & OIT0002row("ORG") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> メールアドレス =" & OIT0002row("EMAIL") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> メニュー表示制御ロール =" & OIT0002row("MENUROLE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面参照更新制御ロール =" & OIT0002row("MAPROLE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面表示項目制御ロール =" & OIT0002row("VIEWPROFID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> エクセル出力制御ロール =" & OIT0002row("RPRTPROFID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面初期値ロール =" & OIT0002row("VARIANT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 承認権限ロール =" & OIT0002row("APPROVALID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIT0002row("DELFLG")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
@@ -2434,63 +2434,63 @@ Public Class OIT0004UserList
     End Sub
 
     ''' <summary>
-    ''' OIT0004tbl更新
+    ''' OIT0002tbl更新
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub OIT0004tbl_UPD()
+    Protected Sub OIT0002tbl_UPD()
 
         '○ 画面状態設定
-        For Each OIT0004row As DataRow In OIT0004tbl.Rows
-            Select Case OIT0004row("OPERATION")
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            Select Case OIT0002row("OPERATION")
                 Case C_LIST_OPERATION_CODE.NODATA
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.NODISP
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-                    OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
             End Select
         Next
 
         '○ 追加変更判定
-        For Each OIT0004INProw As DataRow In OIT0004INPtbl.Rows
+        For Each OIT0002INProw As DataRow In OIT0002INPtbl.Rows
 
             'エラーレコード読み飛ばし
-            If OIT0004INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
+            If OIT0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
                 Continue For
             End If
 
-            OIT0004INProw.Item("OPERATION") = CONST_INSERT
+            OIT0002INProw.Item("OPERATION") = CONST_INSERT
 
             'KEY項目が等しい時
-            For Each OIT0004row As DataRow In OIT0004tbl.Rows
-                If OIT0004row("USERID") = OIT0004INProw("USERID") AndAlso
-                    OIT0004row("STYMD") = OIT0004INProw("STYMD") AndAlso
-                    OIT0004row("ENDYMD") = OIT0004INProw("ENDYMD") Then
+            For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                If OIT0002row("USERID") = OIT0002INProw("USERID") AndAlso
+                    OIT0002row("STYMD") = OIT0002INProw("STYMD") AndAlso
+                    OIT0002row("ENDYMD") = OIT0002INProw("ENDYMD") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIT0004row("DELFLG") = OIT0004INProw("DELFLG") AndAlso
-                        OIT0004row("STAFFNAMES") = OIT0004INProw("STAFFNAMES") AndAlso
-                        OIT0004row("STAFFNAMEL") = OIT0004INProw("STAFFNAMEL") AndAlso
-                        OIT0004row("MAPID") = OIT0004INProw("MAPID") AndAlso
-                        OIT0004row("PASSWORD") = OIT0004INProw("PASSWORD") AndAlso
-                        OIT0004row("MISSCNT") = OIT0004INProw("MISSCNT") AndAlso
-                        OIT0004row("PASSENDYMD") = OIT0004INProw("PASSENDYMD") AndAlso
-                        OIT0004row("CAMPCODE") = OIT0004INProw("CAMPCODE") AndAlso
-                        OIT0004row("ORG") = OIT0004INProw("ORG") AndAlso
-                        OIT0004row("EMAIL") = OIT0004INProw("EMAIL") AndAlso
-                        OIT0004row("MENUROLE") = OIT0004INProw("MENUROLE") AndAlso
-                        OIT0004row("MAPROLE") = OIT0004INProw("MAPROLE") AndAlso
-                        OIT0004row("VIEWPROFID") = OIT0004INProw("VIEWPROFID") AndAlso
-                        OIT0004row("RPRTPROFID") = OIT0004INProw("RPRTPROFID") AndAlso
-                        OIT0004row("VARIANT") = OIT0004INProw("VARIANT") AndAlso
-                        OIT0004row("APPROVALID") = OIT0004INProw("APPROVALID") AndAlso
-                        OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    If OIT0002row("DELFLG") = OIT0002INProw("DELFLG") AndAlso
+                        OIT0002row("STAFFNAMES") = OIT0002INProw("STAFFNAMES") AndAlso
+                        OIT0002row("STAFFNAMEL") = OIT0002INProw("STAFFNAMEL") AndAlso
+                        OIT0002row("MAPID") = OIT0002INProw("MAPID") AndAlso
+                        OIT0002row("PASSWORD") = OIT0002INProw("PASSWORD") AndAlso
+                        OIT0002row("MISSCNT") = OIT0002INProw("MISSCNT") AndAlso
+                        OIT0002row("PASSENDYMD") = OIT0002INProw("PASSENDYMD") AndAlso
+                        OIT0002row("CAMPCODE") = OIT0002INProw("CAMPCODE") AndAlso
+                        OIT0002row("ORG") = OIT0002INProw("ORG") AndAlso
+                        OIT0002row("EMAIL") = OIT0002INProw("EMAIL") AndAlso
+                        OIT0002row("MENUROLE") = OIT0002INProw("MENUROLE") AndAlso
+                        OIT0002row("MAPROLE") = OIT0002INProw("MAPROLE") AndAlso
+                        OIT0002row("VIEWPROFID") = OIT0002INProw("VIEWPROFID") AndAlso
+                        OIT0002row("RPRTPROFID") = OIT0002INProw("RPRTPROFID") AndAlso
+                        OIT0002row("VARIANT") = OIT0002INProw("VARIANT") AndAlso
+                        OIT0002row("APPROVALID") = OIT0002INProw("APPROVALID") AndAlso
+                        OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
-                        OIT0004INProw("OPERATION") = CONST_UPDATE
+                        OIT0002INProw("OPERATION") = CONST_UPDATE
                         Exit For
                     End If
 
@@ -2501,17 +2501,17 @@ Public Class OIT0004UserList
         Next
 
         '○ 変更有無判定　&　入力値反映
-        For Each OIT0004INProw As DataRow In OIT0004INPtbl.Rows
-            Select Case OIT0004INProw("OPERATION")
+        For Each OIT0002INProw As DataRow In OIT0002INPtbl.Rows
+            Select Case OIT0002INProw("OPERATION")
                 Case CONST_UPDATE
-                    TBL_UPDATE_SUB(OIT0004INProw)
+                    TBL_UPDATE_SUB(OIT0002INProw)
                 Case CONST_INSERT
-                    TBL_INSERT_SUB(OIT0004INProw)
+                    TBL_INSERT_SUB(OIT0002INProw)
                 Case CONST_PATTERNERR
                     '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-                    TBL_INSERT_SUB(OIT0004INProw)
+                    TBL_INSERT_SUB(OIT0002INProw)
                 Case C_LIST_OPERATION_CODE.ERRORED
-                    TBL_ERR_SUB(OIT0004INProw)
+                    TBL_ERR_SUB(OIT0002INProw)
             End Select
         Next
 
@@ -2520,23 +2520,23 @@ Public Class OIT0004UserList
     ''' <summary>
     ''' 更新予定データの一覧更新時処理
     ''' </summary>
-    ''' <param name="OIT0004INProw"></param>
+    ''' <param name="OIT0002INProw"></param>
     ''' <remarks></remarks>
-    Protected Sub TBL_UPDATE_SUB(ByRef OIT0004INProw As DataRow)
+    Protected Sub TBL_UPDATE_SUB(ByRef OIT0002INProw As DataRow)
 
-        For Each OIT0004row As DataRow In OIT0004tbl.Rows
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
             '同一レコードか判定
-            If OIT0004INProw("USERID") = OIT0004row("USERID") Then
+            If OIT0002INProw("USERID") = OIT0002row("USERID") Then
                 '画面入力テーブル項目設定
-                OIT0004INProw("LINECNT") = OIT0004row("LINECNT")
-                OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-                OIT0004INProw("UPDTIMSTP") = OIT0004row("UPDTIMSTP")
-                OIT0004INProw("SELECT") = 1
-                OIT0004INProw("HIDDEN") = 0
+                OIT0002INProw("LINECNT") = OIT0002row("LINECNT")
+                OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                OIT0002INProw("UPDTIMSTP") = OIT0002row("UPDTIMSTP")
+                OIT0002INProw("SELECT") = 1
+                OIT0002INProw("HIDDEN") = 0
 
                 '項目テーブル項目設定
-                OIT0004row.ItemArray = OIT0004INProw.ItemArray
+                OIT0002row.ItemArray = OIT0002INProw.ItemArray
                 Exit For
             End If
         Next
@@ -2546,49 +2546,49 @@ Public Class OIT0004UserList
     ''' <summary>
     ''' 追加予定データの一覧登録時処理
     ''' </summary>
-    ''' <param name="OIT0004INProw"></param>
+    ''' <param name="OIT0002INProw"></param>
     ''' <remarks></remarks>
-    Protected Sub TBL_INSERT_SUB(ByRef OIT0004INProw As DataRow)
+    Protected Sub TBL_INSERT_SUB(ByRef OIT0002INProw As DataRow)
 
         '○ 項目テーブル項目設定
-        Dim OIT0004row As DataRow = OIT0004tbl.NewRow
-        OIT0004row.ItemArray = OIT0004INProw.ItemArray
+        Dim OIT0002row As DataRow = OIT0002tbl.NewRow
+        OIT0002row.ItemArray = OIT0002INProw.ItemArray
 
-        OIT0004row("LINECNT") = OIT0004tbl.Rows.Count + 1
-        If OIT0004INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
-            OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+        OIT0002row("LINECNT") = OIT0002tbl.Rows.Count + 1
+        If OIT0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
         Else
-            OIT0004row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
         End If
 
-        OIT0004row("UPDTIMSTP") = "0"
-        OIT0004row("SELECT") = 1
-        OIT0004row("HIDDEN") = 0
+        OIT0002row("UPDTIMSTP") = "0"
+        OIT0002row("SELECT") = 1
+        OIT0002row("HIDDEN") = 0
 
-        OIT0004tbl.Rows.Add(OIT0004row)
+        OIT0002tbl.Rows.Add(OIT0002row)
 
     End Sub
 
     ''' <summary>
     ''' エラーデータの一覧登録時処理
     ''' </summary>
-    ''' <param name="OIT0004INProw"></param>
+    ''' <param name="OIT0002INProw"></param>
     ''' <remarks></remarks>
-    Protected Sub TBL_ERR_SUB(ByRef OIT0004INProw As DataRow)
+    Protected Sub TBL_ERR_SUB(ByRef OIT0002INProw As DataRow)
 
-        For Each OIT0004row As DataRow In OIT0004tbl.Rows
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
             '同一レコードか判定
-            If OIT0004INProw("USERID") = OIT0004row("USERID") Then
+            If OIT0002INProw("USERID") = OIT0002row("USERID") Then
                 '画面入力テーブル項目設定
-                OIT0004INProw("LINECNT") = OIT0004row("LINECNT")
-                OIT0004INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-                OIT0004INProw("UPDTIMSTP") = OIT0004row("UPDTIMSTP")
-                OIT0004INProw("SELECT") = 1
-                OIT0004INProw("HIDDEN") = 0
+                OIT0002INProw("LINECNT") = OIT0002row("LINECNT")
+                OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                OIT0002INProw("UPDTIMSTP") = OIT0002row("UPDTIMSTP")
+                OIT0002INProw("SELECT") = 1
+                OIT0002INProw("HIDDEN") = 0
 
                 '項目テーブル項目設定
-                OIT0004row.ItemArray = OIT0004INProw.ItemArray
+                OIT0002row.ItemArray = OIT0002INProw.ItemArray
                 Exit For
             End If
         Next

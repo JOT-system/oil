@@ -14,7 +14,7 @@ Imports JOTWEB.GRIS0005LeftBox
 ''' ユーザIDマスタ登録（条件）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIT0004LinkSearch
+Public Class OIT0002LinkSearch
     Inherits Page
 
     '○ 共通処理結果
@@ -70,7 +70,7 @@ Public Class OIT0004LinkSearch
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = OIT0004WRKINC.MAPIDS
+        Master.MAPID = OIT0002WRKINC.MAPIDS
 
         WF_CAMPCODE.Focus()
         WF_FIELD.Value = ""
@@ -99,7 +99,7 @@ Public Class OIT0004LinkSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD.Text)             '有効年月日(From)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text)           '有効年月日(To)
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004L Then   '実行画面からの遷移
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
             WF_STYMD.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
@@ -107,8 +107,8 @@ Public Class OIT0004LinkSearch
         End If
 
         '○ RightBox情報設定
-        rightview.MAPIDS = OIT0004WRKINC.MAPIDS
-        rightview.MAPID = OIT0004WRKINC.MAPIDL
+        rightview.MAPIDS = OIT0002WRKINC.MAPIDS
+        rightview.MAPID = OIT0002WRKINC.MAPIDL
         rightview.COMPCODE = WF_CAMPCODE.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW

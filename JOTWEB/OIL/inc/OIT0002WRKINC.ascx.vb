@@ -1,12 +1,12 @@
 ﻿'Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
-Public Class OIT0004WRKINC
+Public Class OIT0002WRKINC
     Inherits UserControl
 
-    Public Const MAPIDS As String = "OIT0004S"       'MAPID(検索)
-    Public Const MAPIDL As String = "OIT0004L"       'MAPID(一覧)
-    Public Const MAPIDD As String = "OIT0004D"       'MAPID(更新)
+    Public Const MAPIDS As String = "OIT0002S"       'MAPID(検索)
+    Public Const MAPIDL As String = "OIT0002L"       'MAPID(一覧)
+    Public Const MAPIDD As String = "OIT0002D"       'MAPID(更新)
 
     ''○ 共通関数宣言(BASEDLL)
     'Private CS0050SESSION As New CS0050SESSION          'セッション情報操作処理

@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0004LinkSearch
+Partial Public Class OIT0002LinkSearch
     
     '''<summary>
     '''WF_CAMPCODE コントロール。
@@ -120,7 +120,7 @@ Partial Public Class OIT0004LinkSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-    
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -128,8 +128,8 @@ Partial Public Class OIT0004LinkSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIT0004WRKINC
-    
+    Protected WithEvents work As Global.JOTWEB.OIT0002WRKINC
+
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>

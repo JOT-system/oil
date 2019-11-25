@@ -1,18 +1,18 @@
-﻿<%@ Page Title="OIT0004S" Language="vb" AutoEventWireup="false" CodeBehind="OIT0004LinkSearch.aspx.vb" Inherits="JOTWEB.OIT0004LinkSearch" %>
+﻿<%@ Page Title="OIT0002S" Language="vb" AutoEventWireup="false" CodeBehind="OIT0002LinkSearch.aspx.vb" Inherits="JOTWEB.OIT0002LinkSearch" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/OIL/inc/OIT0004WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/OIT0002WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:content id="OIT0004SH" contentplaceholderid="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIT0004S.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0004S.js")%>'></script>
+<asp:content id="OIT0002SH" contentplaceholderid="head" runat="server">
+    <link href='<%=ResolveUrl("~/OIL/css/OIT0002S.css")%>' rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0002S.js")%>'></script>
 </asp:content>
 
-<asp:Content ID="OIT0004S" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="OIT0002S" ContentPlaceHolderID="contents1" runat="server">
     <!-- 全体レイアウト　searchbox -->
     <div class="searchbox" id="searchbox">
         <!-- ○ 固定項目 ○ -->

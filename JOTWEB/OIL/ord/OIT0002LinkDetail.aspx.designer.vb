@@ -11,70 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0004UserList
-    
-    '''<summary>
-    '''WF_SEL_CAMPCODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_SEL_CAMPNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_SEL_ORG コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SEL_ORG As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_SEL_ORGNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SEL_ORGNAME As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_ButtonFIRST2 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonFIRST2 As Global.System.Web.UI.WebControls.Image
-    
-    '''<summary>
-    '''WF_ButtonLAST2 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonLAST2 As Global.System.Web.UI.WebControls.Image
-    
-    '''<summary>
-    '''pnlListArea コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
+Partial Public Class OIT0002UserCreate
     
     '''<summary>
     '''WF_Sel_LINECNT_L コントロール。
@@ -624,7 +561,7 @@ Partial Public Class OIT0004UserList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-    
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -632,8 +569,8 @@ Partial Public Class OIT0004UserList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.System.Web.UI.UserControl
-    
+    Protected WithEvents work As Global.JOTWEB.OIT0002WRKINC
+
     '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>

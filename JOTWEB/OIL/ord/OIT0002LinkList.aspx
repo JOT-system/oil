@@ -34,17 +34,20 @@
                 </a>
 
                 <!-- ボタン -->
+                <a style="position:fixed;top:2.8em;left:23em;">
+                    <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                </a>
+                <a style="position:fixed;top:2.8em;left:27.5em;">
+                    <input type="button" id="WF_ButtonALLCANCEL" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLCANCEL');" />
+                </a>
                 <a style="position:fixed;top:2.8em;left:49em;">
-                    <input type="button" id="WF_ButtonINSERT" value="追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                    <input type="button" id="WF_ButtonINSERT" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:53.5em;">
                     <input type="button" id="WF_ButtonUPDATE" value="DB更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:58em;">
                     <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:62.5em;">
-                    <input type="button" id="WF_ButtonPrint" value="一覧印刷"  style="Width:5em" onclick="ButtonClick('WF_ButtonPrint');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:67em;">
                     <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />

@@ -38,6 +38,8 @@ Public Class OIT0002LinkSearch
                         WF_ButtonDO_Click()
                     Case "WF_ButtonEND"                 '戻るボタン押下
                         WF_ButtonEND_Click()
+                    Case "WF_CheckBox"                  'チェックボックス押下
+                        WF_CheckBox_Click()
                     Case "WF_Field_DBClick"             'フィールドダブルクリック
                         WF_FIELD_DBClick()
                     Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
@@ -78,6 +80,7 @@ Public Class OIT0002LinkSearch
         WF_LeftboxOpen.Value = ""
         WF_LeftMViewChange.Value = ""
         WF_RightboxOpen.Value = ""
+        WF_INCLUDUSED.Checked = False
         leftview.ActiveListBox()
 
         '○ 画面の値設定
@@ -97,13 +100,17 @@ Public Class OIT0002LinkSearch
 
             '初期変数設定処理
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "DEPSTATION", WF_DEPSTATION.Text)   '空車発駅
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD.Text)             '有効年月日(From)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text)           '有効年月日(To)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO.Text)         '本線列車
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
+            WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION.Text    '空車発駅
             WF_STYMD.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
             WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
+            WF_TRAINNO.Text = work.WF_SEL_TRAINNO.Text          '本線列車
         End If
 
         '○ RightBox情報設定
@@ -245,7 +252,6 @@ Public Class OIT0002LinkSearch
 
     End Sub
 
-
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -257,6 +263,16 @@ Public Class OIT0002LinkSearch
 
     End Sub
 
+    ''' <summary>
+    ''' チェックボックス押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_CheckBox_Click()
+
+        '○ チェックボックスの値取得
+        Dim CheckBoxSelected As Boolean = WF_INCLUDUSED.Checked
+
+    End Sub
 
     ''' <summary>
     ''' フィールドダブルクリック時処理

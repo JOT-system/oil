@@ -67,18 +67,16 @@ Public Class OIT0001EmptyTurnDairyList
                             WF_ButtonDownload_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
-                            'Case "WF_GridDBclick"           'GridViewダブルクリック
-                            '    WF_Grid_DBClick()
-                            'Case "WF_MouseWheelUp"          'マウスホイール(Up)
-                            '    WF_Grid_Scroll()
-                            'Case "WF_MouseWheelDown"        'マウスホイール(Down)
-                            '    WF_Grid_Scroll()
-                            'Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
-                            '    WF_FILEUPLOAD()
-                            'Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
-                            '    WF_RadioButton_Click()
-                            'Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
-                            '    WF_RIGHTBOX_Change()
+                        Case "WF_GridDBclick"           'GridViewダブルクリック
+                            WF_Grid_DBClick()
+                        Case "WF_MouseWheelUp"          'マウスホイール(Up)
+                            WF_Grid_Scroll()
+                        Case "WF_MouseWheelDown"        'マウスホイール(Down)
+                            WF_Grid_Scroll()
+                        Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
+                            WF_RadioButton_Click()
+                        Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
+                            WF_RIGHTBOX_Change()
                     End Select
 
                     '○ 一覧再表示処理
@@ -262,7 +260,9 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')       AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')      AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')         AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')      AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')  AS DEPSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')      AS ARRSTATION" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')  AS ARRSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.LODDATE), '')         AS LODDATE" _
             & " , ISNULL(RTRIM(OIT0002.DEPDATE), '')         AS DEPDATE" _
@@ -674,6 +674,167 @@ Public Class OIT0001EmptyTurnDairyList
 
     End Sub
 
+    ''' <summary>
+    ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_Grid_DBClick()
+
+        Dim WW_LINECNT As Integer = 0
+        Dim WW_FIELD_OBJ As Object = Nothing
+        Dim WW_VALUE As String = ""
+        Dim WW_TEXT As String = ""
+
+        '○ LINECNT取得
+        Try
+            Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT)
+            WW_LINECNT -= 1
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        '選択行
+        work.WF_SEL_LINECNT.Text = OIT0001tbl.Rows(WW_LINECNT)("LINECNT")
+        '受注№
+        work.WF_SEL_ORDERNUMBER.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERNO")
+        '登録日
+        work.WF_SEL_REGISTRATIONDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERYMD")
+        '受注進行ステータス
+        work.WF_SEL_STATUS.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERSTATUS")
+        '受注情報
+        work.WF_SEL_INFORMATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFO")
+        '受注営業所名
+        work.WF_SEL_ORDERSALESOFFICE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICENAME")
+
+        '本線列車
+        work.WF_SEL_TRAIN.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNO")
+        '発駅
+        work.WF_SEL_DEPARTURESTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPSTATION")
+        '着駅
+        work.WF_SEL_ARRIVALSTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRSTATION")
+
+        '積込日
+        work.WF_SEL_LOADINGDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("LODDATE")
+        '発日
+        work.WF_SEL_LOADINGCAR_DEPARTUREDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPDATE")
+        '着日
+        work.WF_SEL_LOADINGCAR_ARRIVALDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRDATE")
+        '受入日
+        work.WF_SEL_RECEIPTDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACCDATE")
+
+        '車数（レギュラー）
+        work.WF_SEL_REGULAR_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("RTANK")
+        '車数（ハイオク）
+        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("HTANK")
+        '車数（灯油）
+        work.WF_SEL_KEROSENE_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("TTANK")
+        '車数（未添加灯油）
+        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("MTTANK")
+        '車数（軽油）
+        work.WF_SEL_DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("KTANK")
+        '車数（３号軽油）
+        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("K3TANK")
+        '車数（５号軽油）
+        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("K5TANK")
+        '車数（１０号軽油）
+        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("K10TANK")
+        '車数（LSA）
+        work.WF_SEL_LSA_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("LTANK")
+        '車数（A重油）
+        work.WF_SEL_AHEAVY_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("ATANK")
+        '合計車数
+        work.WF_SEL_TANKCARTOTAL.Text = OIT0001tbl.Rows(WW_LINECNT)("TOTALTANK")
+
+        '削除フラグ
+        work.WF_SEL_DELFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("DELFLG")
+
+        '○ 状態をクリア
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+            Select Case OIT0001row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.NODISP
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            End Select
+
+        Next
+
+        '○ 選択明細の状態を設定
+        Select Case OIT0001tbl.Rows(WW_LINECNT)("OPERATION")
+            Case C_LIST_OPERATION_CODE.NODATA
+                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            Case C_LIST_OPERATION_CODE.NODISP
+                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            Case C_LIST_OPERATION_CODE.SELECTED
+                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            Case C_LIST_OPERATION_CODE.UPDATING
+                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+            Case C_LIST_OPERATION_CODE.ERRORED
+                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+        End Select
+
+        '○画面切替設定
+        WF_BOXChange.Value = "detailbox"
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
+
+        WF_GridDBclick.Text = ""
+
+        '遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
+
+        '画面表示データ保存(遷移先(登録画面)向け)
+        Master.SaveTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
+
+        '登録画面ページへ遷移
+        Master.TransitionPage()
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧画面-マウスホイール時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_Grid_Scroll()
+
+    End Sub
+
+    ''' <summary>
+    ''' RightBoxラジオボタン選択処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_RadioButton_Click()
+
+        If Not String.IsNullOrEmpty(WF_RightViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_RightViewChange.Value, WF_RightViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            rightview.SelectIndex(WF_RightViewChange.Value)
+            WF_RightViewChange.Value = ""
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' RightBoxメモ欄更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_RIGHTBOX_Change()
+
+        rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
+
+    End Sub
+
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
     ' ******************************************************************************
@@ -716,4 +877,13 @@ Public Class OIT0001EmptyTurnDairyList
 
     End Sub
 
+    ''' <summary>
+    ''' 遷移先(登録画面)退避データ保存先の作成
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_CreateXMLSaveFile()
+        work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
+            Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
+
+    End Sub
 End Class

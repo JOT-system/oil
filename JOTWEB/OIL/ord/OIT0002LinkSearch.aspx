@@ -34,14 +34,14 @@
             <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
 
-        <!-- 油槽所コード -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">★油槽所</a>
+        <!-- 発駅コード -->
+        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">★発駅</a>
 
-        <a style="position:fixed; top:7.7em; left:10em;" ondblclick="Field_DBclick('WF_OILTANKCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_OILTANKCODE');">
-            <asp:TextBox ID="WF_OILTANKCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a style="position:fixed; top:7.7em; left:10em;" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_OILTANKCODE');">
+            <asp:TextBox ID="WF_DEPSTATION" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">
-            <asp:Label ID="WF_OILTANKCODE_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+            <asp:Label ID="WF_DEPSTATION_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
 
         <!-- 年月日 -->
@@ -63,11 +63,12 @@
         <a style="position:fixed; top:12.1em; left:27em;">
             <asp:Label ID="WF_TRAINNO_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
+        
         <!-- 利用済含む -->
-        <a style="position:fixed; top:14.3em; left:4em; font-weight:bold; text-decoration:underline;">利用済含む</a>
+        <a style="position:fixed; top:14.3em; left:4em;">利用済含む</a>
 
-        <a style="position:fixed; top:14.3em; left:10em;" ondblclick="Field_DBclick('WF_INCLUDUSED', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_INCLUDUSED');">
-            <asp:TextBox ID="WF_INCLUDUSED" runat="server" Height="1.4em" Width="1.5em" onblur="MsgClear();"></asp:TextBox>
+        <a style="position:fixed;top:14.3em;left:10em;">
+            <asp:CheckBox id="WF_INCLUDUSED" runat="server"  onclick="ButtonClick('WF_CheckBox');"/>
         </a>
         <a style="position:fixed; top:14.3em; left:27em;">
             <asp:Label ID="WF_INCLUDUSED_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>

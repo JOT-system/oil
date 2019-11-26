@@ -63,6 +63,10 @@ Public Class OIT0002UserList
                     Master.RecoverTable(OIT0002tbl)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonALLSELECT"　　　 '全選択ボタン押下
+                            WF_ButtonALLSELECT_Click()
+                        Case "WF_ButtonALLCANCEL"　　　 '選択解除ボタン押下
+                            WF_ButtonALLCANCEL_Click()
                         Case "WF_ButtonINSERT"          '追加ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonUPDATE"          'DB更新ボタン押下
@@ -504,6 +508,34 @@ Public Class OIT0002UserList
 
         TBLview.Dispose()
         TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' 全選択ボタン処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonALLSELECT_Click()
+
+        '全チェックボックスON
+        For Each repItem As RepeaterItem In WF_Repeater.Items
+            CType(repItem.FindControl("WF_Rep_CheckBox"), System.Web.UI.WebControls.CheckBox).Checked = True
+        Next
+
+        'WF_Repeater.Visible = True
+
+    End Sub
+
+    ''' <summary>
+    ''' 選択解除ボタン処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonALLCANCEL_Click()
+
+        '全チェックボックスOFF
+        For Each repItem As RepeaterItem In WF_Repeater.Items
+            CType(repItem.FindControl("WF_Rep_CheckBox"), System.Web.UI.WebControls.CheckBox).Checked = False
+        Next
 
     End Sub
 

@@ -32,22 +32,22 @@ Partial Public Class OIT0002LinkSearch
     Protected WithEvents WF_CAMPCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_OILTANKCODE コントロール。
+    '''WF_DEPSTATION コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_OILTANKCODE As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_DEPSTATION As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_OILTANKCODE_TEXT コントロール。
+    '''WF_DEPSTATION_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_OILTANKCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_DEPSTATION_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_STYMD コントロール。
@@ -92,7 +92,7 @@ Partial Public Class OIT0002LinkSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_INCLUDUSED As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_INCLUDUSED As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
     '''WF_INCLUDUSED_TEXT コントロール。
@@ -120,7 +120,7 @@ Partial Public Class OIT0002LinkSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -129,7 +129,7 @@ Partial Public Class OIT0002LinkSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.OIT0002WRKINC
-
+    
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>

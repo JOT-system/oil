@@ -14,7 +14,6 @@
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>         <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_USERID" runat="server"></asp:TextBox>         <!-- ユーザID -->
     <asp:TextBox ID="WF_SEL_STAFFNAMES" runat="server"></asp:TextBox>         <!-- 社員名（短） -->
-    <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>         <!-- 社員名（短） -->
     <asp:TextBox ID="WF_SEL_STAFFNAMEL" runat="server"></asp:TextBox>         <!-- 社員名（長） -->
     <asp:TextBox ID="WF_SEL_EMAIL" runat="server"></asp:TextBox>         <!-- メールアドレス -->
     <asp:TextBox ID="WF_SEL_MENUROLE" runat="server"></asp:TextBox>         <!-- メニュー表示制御ロール -->

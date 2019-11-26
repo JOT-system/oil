@@ -145,7 +145,7 @@
                             <asp:Label ID="WF_MenuURL_L4" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuVARI_L4" runat="server" Visible="False"></asp:Label>
                             <asp:Label ID="WF_MenuMAP_L4" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_L4" runat="server" CssClass="WF_MenuButton_L4" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                            <asp:Button ID="WF_MenuButton_L4" runat="server" CssClass="WF_MenuButton_L4" onmouseover="this.style.background='#990066';this.style.color=rgba(172, 172, 172)" onmouseout="this.style.background='#CC6699';this.style.color='white'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
                 </ItemTemplate>
@@ -168,7 +168,7 @@
                             <asp:Label ID="WF_MenuURL_R3" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuVARI_R3" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuMAP_R3" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_R3" runat="server" CssClass="WF_MenuButton_R3" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                            <asp:Button ID="WF_MenuButton_R3" runat="server" CssClass="WF_MenuButton_R3" onmouseover="this.style.background='#737373';this.style.color=rgba(172, 172, 172)" onmouseout="this.style.background='#CCCCCC';this.style.color='white'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
                 </ItemTemplate>
@@ -191,7 +191,7 @@
                             <asp:Label ID="WF_MenuURL_R4" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuVARI_R4" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuMAP_R4" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_R4" runat="server" CssClass="WF_MenuButton_R4" onmouseover="this.style.background='blue';this.style.color='white'" onmouseout="this.style.background='gray';this.style.color='black'" OnClientClick="commonDispWait();"/> 
+                            <asp:Button ID="WF_MenuButton_R4" runat="server" CssClass="WF_MenuButton_R4" onmouseover="this.style.background='#363947';this.style.color=rgba(172, 172, 172)" onmouseout="this.style.background='#383838';this.style.color='white'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
                 </ItemTemplate>

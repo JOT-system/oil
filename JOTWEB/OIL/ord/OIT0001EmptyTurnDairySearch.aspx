@@ -52,7 +52,7 @@
         </a>
 
         <!-- 積込日 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">★積込日</a>
+        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">★積込日</a>
         <a style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox ID="TxtLoadingDateStart" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>

@@ -38,7 +38,7 @@
                     <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:9.5em;">
-                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:58em;">
                     <input type="button" id="WF_ButtonINSERT" value="新規登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
@@ -72,37 +72,37 @@
 
         <!-- イベント用 -->
         <div hidden="hidden">
-            <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
             <!-- GridView DBクリック-->
-            <asp:TextBox ID="WF_GridPosition" Text="" runat="server"></asp:TextBox>
+            <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
             <!-- GridView表示位置フィールド -->
+            <asp:TextBox ID="WF_GridPosition" Text="" runat="server"></asp:TextBox>
 
+            <!-- Textbox DBクリックフィールド -->
             <input id="WF_FIELD" runat="server" value="" type="text" />
-            <!-- Textbox DBクリックフィールド -->
-            <input id="WF_FIELD_REP" runat="server" value="" type="text" />
             <!-- Textbox(Repeater) DBクリックフィールド -->
-            <input id="WF_SelectedIndex" runat="server" value="" type="text" />
+            <input id="WF_FIELD_REP" runat="server" value="" type="text" />
             <!-- Textbox DBクリックフィールド -->
+            <input id="WF_SelectedIndex" runat="server" value="" type="text" />
 
-            <input id="WF_LeftMViewChange" runat="server" value="" type="text" />
             <!-- LeftBox Mview切替 -->
-            <input id="WF_LeftboxOpen" runat="server" value="" type="text" />
+            <input id="WF_LeftMViewChange" runat="server" value="" type="text" />
             <!-- LeftBox 開閉 -->
-            <input id="WF_RightViewChange" runat="server" value="" type="text" />
+            <input id="WF_LeftboxOpen" runat="server" value="" type="text" />
             <!-- Rightbox Mview切替 -->
-            <input id="WF_RightboxOpen" runat="server" value="" type="text" />
+            <input id="WF_RightViewChange" runat="server" value="" type="text" />
             <!-- Rightbox 開閉 -->
+            <input id="WF_RightboxOpen" runat="server" value="" type="text" />
 
-            <input id="WF_PrintURL" runat="server" value="" type="text" />
             <!-- Textbox Print URL -->
+            <input id="WF_PrintURL" runat="server" value="" type="text" />
 
-            <input id="WF_BOXChange" runat="server" value="headerbox" type="text" />
             <!-- 一覧・詳細画面切替用フラグ -->
+            <input id="WF_BOXChange" runat="server" value="headerbox" type="text" />
 
-            <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- ボタン押下 -->
-            <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- 権限 -->
+            <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         </div>
  
 </asp:Content>

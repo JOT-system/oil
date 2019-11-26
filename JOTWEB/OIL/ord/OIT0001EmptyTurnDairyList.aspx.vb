@@ -16,6 +16,7 @@ Public Class OIT0001EmptyTurnDairyList
     Private OIT0001tbl As DataTable                                 '一覧格納用テーブル
     Private OIT0001INPtbl As DataTable                              'チェック用テーブル
     Private OIT0001UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0001WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -52,12 +53,14 @@ Public Class OIT0001EmptyTurnDairyList
                     Master.RecoverTable(OIT0001tbl)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click()
                         Case "WF_ButtonALLSELECT"       '全選択ボタン押下
                             WF_ButtonALLSELECT_Click()
                         Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
                             WF_ButtonSELECT_LIFTED_Click()
-                        'Case "WF_ButtonLINE_LIFTED"     '行削除ボタン押下
-                        '    WF_ButtonLINE_LIFTED_Click()
+                        Case "WF_ButtonLINE_LIFTED"     '行削除ボタン押下
+                            WF_ButtonLINE_LIFTED_Click()
                         Case "WF_ButtonINSERT"          '新規登録ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonCSV"             'ダウンロードボタン押下
@@ -253,6 +256,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " , CAST(OIT0002.UPDTIMSTP AS bigint)          AS TIMSTP" _
             & " , 1                                          AS 'SELECT'" _
             & " , 0                                          AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　    AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0002.ORDERYMD), '')        AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '   ')  AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')       AS ORDERINFO" _
@@ -285,9 +289,18 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.OTHER9OTANK), '')     AS OTHER9OTANK" _
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANK), '')    AS OTHER10OTANK" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')       AS TOTALTANK" _
+            & " , ISNULL(RTRIM(OIT0002.DELFLG), '')          AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE = @P1" _
-            & "   AND OIT0002.DELFLG      <> @P2"
+            & "   AND OIT0002.LODDATE    >= @P2" _
+            & "   AND OIT0002.DELFLG     <> @P3"
+        '& "   AND OIT0002.TRAINNO    = @P4"
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '列車番号
+        If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then
+            SQLStr &= String.Format("    AND OIT0002.TRAINNO = '{0}'", work.WF_SEL_TRAINNUMBER.Text)
+        End If
 
         SQLStr &=
               " ORDER BY" _
@@ -296,10 +309,14 @@ Public Class OIT0001EmptyTurnDairyList
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 10) '受注№
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.DateTime)     '積込日(開始)
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)  '削除フラグ
+                'Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)  '列車番号
 
                 PARA1.Value = work.WF_SEL_SALESOFFICE.Text
-                PARA2.Value = C_DELETE_FLG.DELETE
+                PARA2.Value = work.WF_SEL_LOADINGDATE.Text
+                PARA3.Value = C_DELETE_FLG.DELETE
+                'PARA4.Value = work.WF_SEL_TRAINNUMBER.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -413,6 +430,26 @@ Public Class OIT0001EmptyTurnDairyList
 
     End Sub
 
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理
+    ''' </summary>
+    Protected Sub WF_CheckBoxSELECT_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0001tbl)
+
+        'チェックボックス判定
+        For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
+            If OIT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                OIT0001tbl.Rows(i)("OPERATION") = WF_FIELD.Value
+            End If
+
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
+
+    End Sub
 
     ''' <summary>
     ''' 全選択ボタン押下時処理
@@ -451,6 +488,90 @@ Public Class OIT0001EmptyTurnDairyList
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0001tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 行削除ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonLINE_LIFTED_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0001tbl)
+
+        '■■■ OIT0001tbl関連の受注・受注明細を論理削除 ■■■
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注・受注明細を一括論理削除
+            Dim SQLStr As String =
+                      " UPDATE OIL.OIT0002_ORDER        " _
+                    & "    SET UPDYMD      = @P11,      " _
+                    & "        UPDUSER     = @P12,      " _
+                    & "        UPDTERMID   = @P13,      " _
+                    & "        RECEIVEYMD  = @P14,      " _
+                    & "        DELFLG      = '1'        " _
+                    & "  WHERE ORDERNO     = @P01       " _
+                    & "    AND DELFLG     <> '1'       ;" _
+                    & " UPDATE OIL.OIT0003_DETAIL       " _
+                    & "    SET UPDYMD      = @P11,      " _
+                    & "        UPDUSER     = @P12,      " _
+                    & "        UPDTERMID   = @P13,      " _
+                    & "        RECEIVEYMD  = @P14,      " _
+                    & "        DELFLG      = '1'        " _
+                    & "  WHERE ORDERNO     = @P01       " _
+                    & "    AND DELFLG     <> '1'       ;"
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            '選択されている行は削除対象
+            For Each OIT0001UPDrow In OIT0001tbl.Rows
+                If OIT0001UPDrow("OPERATION") = "on" Then
+                    OIT0001UPDrow("DELFLG") = C_DELETE_FLG.DELETE
+                    OIT0001UPDrow("HIDDEN") = 1
+
+                    PARA01.Value = OIT0001UPDrow("ORDERNO")
+                    PARA11.Value = Date.Now
+                    PARA12.Value = Master.USERID
+                    PARA13.Value = Master.USERTERMID
+                    PARA14.Value = C_DEFAULT_YMD
+
+                    SQLcmd.ExecuteNonQuery()
+                End If
+            Next
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001L DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001L DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

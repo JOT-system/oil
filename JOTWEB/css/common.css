@@ -101,6 +101,14 @@ div {
     background-color: rgb(220,230,240);
 }
 
+/* 条件画面 チェックボックス */
+.searchbox input[type=checkbox] {
+    top:0em;
+    left:0em;
+    width:1.4em;
+    height:1.4em;
+}
+
 
 
 /* 実行画面 ヘッダー部 */

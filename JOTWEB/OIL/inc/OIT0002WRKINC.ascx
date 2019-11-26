@@ -4,17 +4,21 @@
 <div hidden="hidden">
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>         <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_CAMPCODE2" runat="server"></asp:TextBox>         <!-- 会社コード2 -->
+    <asp:TextBox ID="WF_SEL_INCLUDUSED" runat="server"></asp:TextBox>         <!-- 利用済含む -->
     <asp:TextBox ID="WF_SEL_ORG" runat="server"></asp:TextBox>              <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_ORG2" runat="server"></asp:TextBox>              <!-- 組織コード2 -->
+    <asp:TextBox ID="WF_SEL_DEPSTATION" runat="server"></asp:TextBox>         <!-- 空車発駅 -->
+    <asp:TextBox ID="WF_SEL_DEPSTATION2" runat="server"></asp:TextBox>         <!-- 空車発駅2 -->
     <asp:TextBox ID="WF_SEL_STYMD" runat="server"></asp:TextBox>         <!-- 開始年月日 -->
     <asp:TextBox ID="WF_SEL_STYMD2" runat="server"></asp:TextBox>         <!-- 開始年月日2 -->
     <asp:TextBox ID="WF_SEL_ENDYMD" runat="server"></asp:TextBox>         <!-- 終了年月日 -->
     <asp:TextBox ID="WF_SEL_ENDYMD2" runat="server"></asp:TextBox>         <!-- 終了年月日2 -->
+    <asp:TextBox ID="WF_SEL_TRAINNO" runat="server"></asp:TextBox>         <!-- 本線列車 -->
+    <asp:TextBox ID="WF_SEL_TRAINNO2" runat="server"></asp:TextBox>         <!-- 本線列車2 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>        <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>         <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_USERID" runat="server"></asp:TextBox>         <!-- ユーザID -->
     <asp:TextBox ID="WF_SEL_STAFFNAMES" runat="server"></asp:TextBox>         <!-- 社員名（短） -->
-    <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>         <!-- 社員名（短） -->
     <asp:TextBox ID="WF_SEL_STAFFNAMEL" runat="server"></asp:TextBox>         <!-- 社員名（長） -->
     <asp:TextBox ID="WF_SEL_EMAIL" runat="server"></asp:TextBox>         <!-- メールアドレス -->
     <asp:TextBox ID="WF_SEL_MENUROLE" runat="server"></asp:TextBox>         <!-- メニュー表示制御ロール -->

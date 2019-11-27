@@ -32,7 +32,7 @@
             <!-- 会社コード -->
             <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;display:none">会社コード</a>
 
-            <a style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+            <a class="ef" style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
                 <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a style="position:fixed; top:7.7em; left:27em;display:none">
@@ -41,7 +41,7 @@
             <!-- 運用部署 -->
             <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;display:none">運用部署</a>
 
-            <a style="position:fixed; top:9.9em; left:18em;display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
+            <a class="ef" style="position:fixed; top:9.9em; left:18em;display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
                 <asp:TextBox ID="WF_UORG" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a style="position:fixed; top:9.9em; left:27em;display:none">
@@ -50,17 +50,17 @@
 
             <!-- ■　受注営業所　■ -->
             <a style="position:fixed; top:4.4em; left:4em; font-weight:bold;">受注営業所</a>
-            <a style="position:fixed; top:4.4em; left:11em;">
+            <a class="ef" style="position:fixed; top:4.4em; left:11em;">
                 <asp:TextBox ID="TxtOrderOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
             <!-- ■　本社列車　■ -->
             <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">本社列車</a>
-            <a style="position:fixed; top:7.7em; left:11em;" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
+            <a class="ef" style="position:fixed; top:7.7em; left:11em;" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
                 <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　発駅　■ -->
             <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">発駅</a>
-            <a style="position:fixed; top:9.9em; left:11em;" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
+            <a class="ef" style="position:fixed; top:9.9em; left:11em;" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
                 <asp:TextBox ID="TxtDepstation" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a style="position:fixed; top:9.9em; left:20em;">
@@ -68,7 +68,7 @@
             </a>
             <!-- ■　着駅　■ -->
             <a style="position:fixed; top:9.9em; left:38em; font-weight:bold; text-decoration:underline;">着駅</a>
-            <a style="position:fixed; top:9.9em; left:43em;" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
+            <a class="ef" style="position:fixed; top:9.9em; left:43em;" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
                 <asp:TextBox ID="TxtArrstation" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a style="position:fixed; top:9.9em; left:52em;">
@@ -77,22 +77,22 @@
 
             <!-- ■　(予定)積込日　■ -->
             <a style="position:fixed; top:12.1em; left:4em; font-weight:bold; text-decoration:underline;">(予定)積込日</a>
-            <a style="position:fixed; top:12.1em; left:11em;" ondblclick="Field_DBclick('TxtLoadingDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <a class="ef" style="position:fixed; top:12.1em; left:11em;" ondblclick="Field_DBclick('TxtLoadingDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="TxtLoadingDate" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(予定)発日　■ -->
             <a style="position:fixed; top:12.1em; left:24em; font-weight:bold; text-decoration:underline;">発日</a>
-            <a style="position:fixed; top:12.1em; left:27em;" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <a class="ef" style="position:fixed; top:12.1em; left:27em;" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="TxtDepDate" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(予定)積車着日　■ -->
             <a style="position:fixed; top:12.1em; left:38em; font-weight:bold; text-decoration:underline;">積車着日</a>
-            <a style="position:fixed; top:12.1em; left:43em;" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <a class="ef" style="position:fixed; top:12.1em; left:43em;" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="TxtArrDate" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(予定)受入日　■ -->
             <a style="position:fixed; top:12.1em; left:55em; font-weight:bold; text-decoration:underline;">受入日</a>
-            <a style="position:fixed; top:12.1em; left:59em;" ondblclick="Field_DBclick('TxtAccDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <a class="ef" style="position:fixed; top:12.1em; left:59em;" ondblclick="Field_DBclick('TxtAccDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="TxtAccDate" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
 
@@ -101,62 +101,62 @@
 
             <!-- ■　合計車数　■ -->
             <a style="position:fixed; top:15.0em; left:19em; font-weight:bold;">合計</a>
-            <a style="position:fixed; top:16.5em; left:19em;">
+            <a class="ef" style="position:fixed; top:16.5em; left:19em;">
                 <asp:TextBox ID="TxtTotalTank" runat="server" Height="5.6em" Width="5em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
 
             <!-- ■　車数（ハイオク）　■ -->
             <a style="position:fixed; top:15.0em; left:23.3em; font-weight:bold;">ハイオク</a>
-            <a style="position:fixed; top:16.5em; left:23.3em;">
+            <a class="ef" style="position:fixed; top:16.5em; left:23.3em;">
                 <asp:TextBox ID="TxtHTank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
             <!-- ■　車数（レギュラー）　■ -->
             <a style="position:fixed; top:18.5em; left:23.3em; font-weight:bold;">レギュラー</a>
-            <a style="position:fixed; top:20.0em; left:23.3em;">
+            <a class="ef" style="position:fixed; top:20.0em; left:23.3em;">
                 <asp:TextBox ID="TxtRTank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
 
             <!-- ■　車数（灯油）　■ -->
             <a style="position:fixed; top:15.0em; left:29.3em; font-weight:bold;">灯油</a>
-            <a style="position:fixed; top:16.5em; left:29.3em;">
+            <a class="ef" style="position:fixed; top:16.5em; left:29.3em;">
                 <asp:TextBox ID="TxtTTank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
             <!-- ■　車数（未添加灯油）　■ -->
             <a style="position:fixed; top:18.5em; left:29.3em; font-weight:bold;">未添加灯油</a>
-            <a style="position:fixed; top:20.0em; left:29.3em;">
+            <a class="ef" style="position:fixed; top:20.0em; left:29.3em;">
                 <asp:TextBox ID="TxtMTTank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
 
             <!-- ■　車数（軽油）　■ -->
             <a style="position:fixed; top:15.0em; left:35.0em; font-weight:bold;">軽油</a>
-            <a style="position:fixed; top:16.5em; left:35.0em;">
+            <a class="ef" style="position:fixed; top:16.5em; left:35.0em;">
                 <asp:TextBox ID="TxtKTank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
             <!-- ■　車数（３号軽油）　■ -->
             <a style="position:fixed; top:18.5em; left:35.0em; font-weight:bold;">３号軽油</a>
-            <a style="position:fixed; top:20.0em; left:35.0em;">
+            <a class="ef" style="position:fixed; top:20.0em; left:35.0em;">
                 <asp:TextBox ID="TxtK3Tank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
 
             <!-- ■　車数（５号軽油）　■ -->
             <a style="position:fixed; top:15.0em; left:40.7em; font-weight:bold;">５号軽油</a>
-            <a style="position:fixed; top:16.5em; left:40.7em;">
+            <a class="ef" style="position:fixed; top:16.5em; left:40.7em;">
                 <asp:TextBox ID="TxtK5Tank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
             <!-- ■　車数（１０号軽油）　■ -->
             <a style="position:fixed; top:18.5em; left:40.7em; font-weight:bold;">１０号軽油</a>
-            <a style="position:fixed; top:20.0em; left:40.7em;">
+            <a class="ef" style="position:fixed; top:20.0em; left:40.7em;">
                 <asp:TextBox ID="TxtK10Tank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
 
             <!-- ■　車数（LSA）　■ -->
             <a style="position:fixed; top:15.0em; left:46.4em; font-weight:bold;">ＬＳＡ</a>
-            <a style="position:fixed; top:16.5em; left:46.4em;">
+            <a class="ef" style="position:fixed; top:16.5em; left:46.4em;">
                 <asp:TextBox ID="TxtLTank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
             <!-- ■　車数（A重油）　■ -->
             <a style="position:fixed; top:18.5em; left:46.4em; font-weight:bold;">Ａ重油</a>
-            <a style="position:fixed; top:20.0em; left:46.4em;">
+            <a class="ef" style="position:fixed; top:20.0em; left:46.4em;">
                 <asp:TextBox ID="TxtATank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
         </div>

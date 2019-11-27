@@ -191,7 +191,7 @@
                             <asp:Label ID="WF_MenuURL_R4" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuVARI_R4" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuMAP_R4" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_R4" runat="server" CssClass="WF_MenuButton_R4" onmouseover="this.style.background='#363947';this.style.color=rgba(172, 172, 172)" onmouseout="this.style.background='#383838';this.style.color='white'" OnClientClick="commonDispWait();"/> 
+                            <asp:Button ID="WF_MenuButton_R4" runat="server" CssClass="WF_MenuButton_R4" onmouseover="this.style.background='#00b894';this.style.color=rgba(172, 172, 172)" onmouseout="this.style.background='#55efc4';this.style.color='white'" OnClientClick="commonDispWait();"/> 
                         </td>
                     </tr>
                 </ItemTemplate>

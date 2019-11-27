@@ -21,17 +21,31 @@
     <!-- 全体レイアウト　headerbox -->
     <div class="headerboxOnly" id="headerbox">
         <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
-            <!-- 会社 -->
-            <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-            <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
 
-            <!-- 運用部署 -->
-            <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-            <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
-
+            <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
             <a style="position:fixed;top:2.8em;left:67em;">
                 <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+            </a>
+
+            <!-- ○ 変動項目 ○ -->
+            <!-- 会社コード -->
+            <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;display:none">会社コード</a>
+
+            <a style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+                <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+            </a>
+            <a style="position:fixed; top:7.7em; left:27em;display:none">
+                <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+            </a>
+            <!-- 運用部署 -->
+            <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;display:none">運用部署</a>
+
+            <a style="position:fixed; top:9.9em; left:18em;display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
+                <asp:TextBox ID="WF_UORG" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+            </a>
+            <a style="position:fixed; top:9.9em; left:27em;display:none">
+                <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
             </a>
 
             <!-- ■　受注営業所　■ -->
@@ -40,25 +54,25 @@
                 <asp:TextBox ID="TxtOrderOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
             <!-- ■　本社列車　■ -->
-            <a style="position:fixed; top:7.7em; left:4em; font-weight:bold;">本社列車</a>
-            <a style="position:fixed; top:7.7em; left:11em;">
+            <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">本社列車</a>
+            <a style="position:fixed; top:7.7em; left:11em;" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
                 <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　発駅　■ -->
             <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">発駅</a>
-            <a style="position:fixed; top:9.9em; left:11em;" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtDepstation');">
+            <a style="position:fixed; top:9.9em; left:11em;" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
                 <asp:TextBox ID="TxtDepstation" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a style="position:fixed; top:9.9em; left:20em;">
-                <asp:Label ID="LblDepstationName" runat="server" Width="17em" CssClass="WF_TEXT">発発発発発発発発発発発発発発発発発発発発発発発発発</asp:Label>
+                <asp:Label ID="LblDepstationName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
             </a>
             <!-- ■　着駅　■ -->
             <a style="position:fixed; top:9.9em; left:38em; font-weight:bold; text-decoration:underline;">着駅</a>
-            <a style="position:fixed; top:9.9em; left:43em;" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtArrstation');">
+            <a style="position:fixed; top:9.9em; left:43em;" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
                 <asp:TextBox ID="TxtArrstation" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a style="position:fixed; top:9.9em; left:52em;">
-                <asp:Label ID="LblArrstationName" runat="server" Width="17em" CssClass="WF_TEXT">着着着着着着着着着着着着着着着着着着着着着着着着着</asp:Label>
+                <asp:Label ID="LblArrstationName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
             </a>
 
             <!-- ■　(予定)積込日　■ -->
@@ -146,13 +160,33 @@
                 <asp:TextBox ID="TxtATank" runat="server" Height="1.4em" Width="7em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
         </div>
-
-
     </div>
 
-        <!-- 全体レイアウト　detailbox -->
+    <!-- 全体レイアウト　detailbox -->
     <div class="detailbox" id="detailbox">
-        <div style="height:1em;"></div>
+        <div style="height:3em;">
+        <div id="detailbuttonbox" class="detailbuttonbox">
+            <!-- ボタン -->
+            <a style="left:0.5em;">
+                <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
+            </a>
+            <a style="left:0.5em;">
+                <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+            </a>
+            <a style="left:0.5em;">
+                <input type="button" id="WF_ButtonLINE_LIFTED" value="行解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+            </a>
+            <a style="left:0.5em;">
+                <input type="button" id="WF_ButtonLINE_ADD" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />
+            </a>
+            <a style="left:0.5em;">
+                <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
+            </a>
+            <a style="left:43.5em;">
+                <input type="button" id="WF_ButtonUPDATE" value="明細更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+            </a>
+        </div>
+        </div>
         <div id="divListArea">
             <asp:panel id="pnlListArea" runat="server"></asp:panel>
         </div>
@@ -181,6 +215,8 @@
             <!-- Textbox DBクリックフィールド -->
             <input id="WF_SelectedIndex" runat="server" value="" type="text" />
 
+            <!-- 画面表示切替 -->
+            <input id="WF_DISP" runat="server" value="" type="text" />
             <!-- LeftBox Mview切替 -->
             <input id="WF_LeftMViewChange" runat="server" value="" type="text" />
             <!-- LeftBox 開閉 -->

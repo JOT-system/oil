@@ -14,40 +14,40 @@ Option Explicit On
 Partial Public Class OIT0001EmptyTurnDairyDetail
     
     '''<summary>
-    '''WF_SEL_CAMPCODE コントロール。
+    '''WF_CAMPCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_CAMPNAME コントロール。
+    '''WF_CAMPCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CAMPCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_SELUORG_L コントロール。
+    '''WF_UORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SELUORG_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_UORG As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SELUORG_TEXT コントロール。
+    '''WF_UORG_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SELUORG_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_UORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''TxtOrderOffice コントロール。
@@ -318,6 +318,15 @@ Partial Public Class OIT0001EmptyTurnDairyDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_DISP コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DISP As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_LeftMViewChange コントロール。

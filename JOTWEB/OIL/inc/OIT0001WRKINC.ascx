@@ -63,6 +63,9 @@
     <asp:TextBox ID="WF_SEL_TANKCARTOTAL" runat="server"></asp:TextBox>
     <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>
+    <!-- 作成フラグ -->
+    <asp:TextBox ID="WF_SEL_CREATEFLG" runat="server"></asp:TextBox>
+
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
 

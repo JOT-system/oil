@@ -1,5 +1,5 @@
 ﻿''************************************************************
-' ユーザIDマスタメンテ検索画面
+' 貨車連結順序表テーブル検索画面
 ' 作成日 2019/11/14
 ' 更新日 2019/11/14
 ' 作成者 JOT遠藤
@@ -11,7 +11,7 @@
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' ユーザIDマスタ登録（条件）
+''' 貨車連結順序表テーブル登録（条件）
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIT0002LinkSearch
@@ -38,8 +38,6 @@ Public Class OIT0002LinkSearch
                         WF_ButtonDO_Click()
                     Case "WF_ButtonEND"                 '戻るボタン押下
                         WF_ButtonEND_Click()
-                    Case "WF_CheckBox"                  'チェックボックス押下
-                        WF_CheckBox_Click()
                     Case "WF_Field_DBClick"             'フィールドダブルクリック
                         WF_FIELD_DBClick()
                     Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
@@ -80,7 +78,6 @@ Public Class OIT0002LinkSearch
         WF_LeftboxOpen.Value = ""
         WF_LeftMViewChange.Value = ""
         WF_RightboxOpen.Value = ""
-        WF_INCLUDUSED.Checked = False
         leftview.ActiveListBox()
 
         '○ 画面の値設定
@@ -104,6 +101,10 @@ Public Class OIT0002LinkSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD.Text)             '有効年月日(From)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text)           '有効年月日(To)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO.Text)         '本線列車
+
+            'ステータス選択
+            WF_SW1.Checked = True
+            WF_SW2.Checked = False
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
@@ -111,6 +112,15 @@ Public Class OIT0002LinkSearch
             WF_STYMD.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
             WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
             WF_TRAINNO.Text = work.WF_SEL_TRAINNO.Text          '本線列車
+
+            'ステータス選択
+            If work.WF_SEL_SELECT.Text = "1" Then
+                WF_SW1.Checked = False
+                WF_SW2.Checked = True
+            Else
+                WF_SW1.Checked = True
+                WF_SW2.Checked = False
+            End If
         End If
 
         '○ RightBox情報設定
@@ -140,8 +150,10 @@ Public Class OIT0002LinkSearch
 
         '○ 入力文字置き換え(使用禁止文字排除)
         Master.EraseCharToIgnore(WF_CAMPCODE.Text)          '会社コード
+        Master.EraseCharToIgnore(WF_DEPSTATION.Text)        '空車発駅
         Master.EraseCharToIgnore(WF_STYMD.Text)             '有効年月日(From)
         Master.EraseCharToIgnore(WF_ENDYMD.Text)            '有効年月日(To)
+        Master.EraseCharToIgnore(WF_TRAINNO.Text)           '本線列車
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -151,12 +163,14 @@ Public Class OIT0002LinkSearch
 
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
+        work.WF_SEL_DEPSTATION.Text = WF_DEPSTATION.Text    '空車発駅
         work.WF_SEL_STYMD.Text = WF_STYMD.Text              '有効年月日(From)
         If WF_ENDYMD.Text = "" Then
             work.WF_SEL_ENDYMD.Text = WF_STYMD.Text         '有効年月日(From) → 有効年月日(To)
         Else
-            work.WF_SEL_ENDYMD.Text = WF_ENDYMD.Text        '有効年月日(To)
+            work.WF_SEL_TRAINNO.Text = WF_TRAINNO.Text      '有効年月日(To)
         End If
+        work.WF_SEL_DEPSTATION.Text = WF_DEPSTATION.Text    '空車発駅
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -207,24 +221,6 @@ Public Class OIT0002LinkSearch
             Exit Sub
         End If
 
-        '有効年月日(From)
-        Master.CheckField(WF_CAMPCODE.Text, "STYMD", WF_STYMD.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If Not isNormal(WW_CS0024FCHECKERR) Then
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(From) : " & WF_STYMD.Text)
-            WF_STYMD.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
-        '有効年月日(To)
-        Master.CheckField(WF_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If Not isNormal(WW_CS0024FCHECKERR) Then
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(To) : " & WF_ENDYMD.Text)
-            WF_ENDYMD.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
         '日付大小チェック
         If WF_STYMD.Text <> "" AndAlso WF_ENDYMD.Text <> "" Then
             Dim WW_DATE_ST As Date
@@ -264,17 +260,6 @@ Public Class OIT0002LinkSearch
     End Sub
 
     ''' <summary>
-    ''' チェックボックス押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_CheckBox_Click()
-
-        '○ チェックボックスの値取得
-        Dim CheckBoxSelected As Boolean = WF_INCLUDUSED.Checked
-
-    End Sub
-
-    ''' <summary>
     ''' フィールドダブルクリック時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -304,11 +289,11 @@ Public Class OIT0002LinkSearch
                         Dim prmData As New Hashtable
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
-                        'フィールドによってパラメータを変える
-                        Select Case WF_FIELD.Value
-                            Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-                        End Select
+                        ''フィールドによってパラメータを変える
+                        'Select Case WF_FIELD.Value
+                        '    Case "WF_ORG"       '組織コード
+                        '        prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                        'End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -480,9 +465,9 @@ Public Class OIT0002LinkSearch
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"              '組織コード
-                    prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                    'Case "ORG"              '組織コード
+                    '    prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

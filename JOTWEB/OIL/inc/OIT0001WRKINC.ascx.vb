@@ -3,9 +3,9 @@
 Public Class OIT0001WRKINC
     Inherits System.Web.UI.UserControl
 
-    Public Const MAPIDS As String = "OIT0001S"       'MAPID(条件)
-    Public Const MAPIDL As String = "OIT0001L"       'MAPID(実行)
-    Public Const MAPIDC As String = "OIT0001C"       'MAPID(登録)
+    Public Const MAPIDS As String = "OIT0001S"       'MAPID(検索)
+    Public Const MAPIDL As String = "OIT0001L"       'MAPID(一覧)
+    Public Const MAPIDD As String = "OIT0001D"       'MAPID(明細)
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 

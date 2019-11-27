@@ -52,14 +52,12 @@ function ChangeCheckBox() {
 
 
 // ○チェックボックス変更
-function ChangeCheckBox2(obj, lineCnt) {
+function SelectCheckBox(obj, lineCnt) {
 
     var objTable = document.getElementById("pnlListArea_DL").children[0];
 
     var chkObjs = objTable.querySelectorAll("input[id^='chkpnlListAreaOPERATION']");
     var spnObjs = objTable.querySelectorAll("span[id^='hchkpnlListAreaOPERATION']");
-    var aaa
-    var bbb
 
     if (document.getElementById("MF_SUBMIT").value == "FALSE") {
 

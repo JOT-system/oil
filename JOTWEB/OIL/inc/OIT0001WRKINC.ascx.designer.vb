@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIT0001WRKINC
-
+    
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_UORG コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_UORG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SALESOFFICE コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SALESOFFICE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BASE コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BASE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TRAINNUMBER コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TRAINNUMBER As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LINECNT コントロール。
     '''</summary>
@@ -66,7 +66,16 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-
+    
+    '''<summary>
+    '''WF_SEL_ORDERNUMBER コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_ORDERNUMBER As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
     '''WF_SEL_REGISTRATIONDATE コントロール。
     '''</summary>
@@ -75,7 +84,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_REGISTRATIONDATE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STATUS コントロール。
     '''</summary>
@@ -84,7 +93,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STATUS As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INFORMATION コントロール。
     '''</summary>
@@ -93,7 +102,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INFORMATION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ORDERSALESOFFICE コントロール。
     '''</summary>
@@ -102,7 +111,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORDERSALESOFFICE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TRAIN コントロール。
     '''</summary>
@@ -111,7 +120,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TRAIN As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DEPARTURESTATION コントロール。
     '''</summary>
@@ -120,7 +129,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DEPARTURESTATION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ARRIVALSTATION コントロール。
     '''</summary>
@@ -129,7 +138,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ARRIVALSTATION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LOADINGDATE コントロール。
     '''</summary>
@@ -138,7 +147,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LOADINGDATE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LOADINGCAR_DEPARTUREDATE コントロール。
     '''</summary>
@@ -147,7 +156,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LOADINGCAR_DEPARTUREDATE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LOADINGCAR_ARRIVALDATE コントロール。
     '''</summary>
@@ -156,7 +165,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LOADINGCAR_ARRIVALDATE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_RECEIPTDATE コントロール。
     '''</summary>
@@ -165,7 +174,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_RECEIPTDATE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_REGULAR_TANKCAR コントロール。
     '''</summary>
@@ -174,7 +183,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_REGULAR_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_HIGHOCTANE_TANKCAR コントロール。
     '''</summary>
@@ -183,7 +192,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_HIGHOCTANE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_KEROSENE_TANKCAR コントロール。
     '''</summary>
@@ -192,7 +201,16 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_KEROSENE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    
+    '''<summary>
+    '''WF_SEL_NOTADDED_KEROSENE_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_NOTADDED_KEROSENE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
     '''WF_SEL_DIESEL_TANKCAR コントロール。
     '''</summary>
@@ -201,7 +219,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_NUM3DIESEL_TANKCAR コントロール。
     '''</summary>
@@ -212,6 +230,24 @@ Partial Public Class OIT0001WRKINC
     Public WithEvents WF_SEL_NUM3DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
+    '''WF_SEL_NUM5DIESEL_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_NUM5DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_NUM10DIESEL_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_NUM10DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
     '''WF_SEL_LSA_TANKCAR コントロール。
     '''</summary>
     '''<remarks>
@@ -219,7 +255,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LSA_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_AHEAVY_TANKCAR コントロール。
     '''</summary>
@@ -228,7 +264,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_AHEAVY_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TANKCARTOTAL コントロール。
     '''</summary>
@@ -237,7 +273,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TANKCARTOTAL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DELFLG コントロール。
     '''</summary>
@@ -246,7 +282,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INPTBL コントロール。
     '''</summary>

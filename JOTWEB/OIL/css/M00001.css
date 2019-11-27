@@ -31,16 +31,17 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 /*在庫管理メニュー表示*/
 #Menu_L {
     height: 45%;
-    width: 18%;
+    width: 24%;
     position: fixed;
-    margin: 5px 0px 0px 0px;
-    left: 2em;
+    /*margin: 5px 0px 0px 0px;*/
+    left: 0.5%;
+    top: 6%;
     overflow-y: auto;
     background-color: #8DCF3F;
     background-image: url(../img/oiltank.png);
     background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: 40%;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_L {
@@ -50,7 +51,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     left: 0em;
     overflow: hidden;
     color: rgba(56, 56, 56, 0.6);
-    font-weight: 800;
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
     font-size: 5ex;
@@ -60,7 +61,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 .WF_MenuButton_L {
     height: 28px;
-    width: 90%;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
@@ -71,22 +72,23 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     text-align: left;
     font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 /*受注管理メニュー表示*/
 #Menu_L2 {
     height: 45%;
-    width: 18%;
+    width: 24%;
     position: fixed;
-    margin: 5px 0px 0px 0px;
-    left: 20em;
+/*    margin: 5px 0px 0px 0px;*/
+    left: 25.5%;
+    top: 6%;
     overflow-y: auto;
     background-color: #44DEDE;
     background-image: url(../img/order.png);
     background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: 40%;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_L2 {
@@ -96,7 +98,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     left: 0em;
     overflow: hidden;
     color: rgba(56, 56, 56, 0.6);
-    font-weight: 800;
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
     font-size: 5ex;
@@ -104,7 +106,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 .WF_MenuButton_L2 {
     height: 28px;
-    width: 120%;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
@@ -115,22 +117,23 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     text-align: left;
     font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
     font-size: 20px;
-    font-weight:800;
+    font-weight:600;
 }
 
 /*請求支払管理メニュー表示*/
 #Menu_L3 {
     height: 45%;
-    width: 18%;
+    width: 24%;
     position: fixed;
-    margin: 22% 0% 0% 0%;
-    left: 2em;
+/*    margin: 22% 0% 0% 0%;*/
+    left: 0.5%;
+    top:51.5%;
     overflow-y: auto;
     background-color: #FDC44F;
-    background-image: url(../img/oiltank.png);
+    background-image: url(../img/pay.png);
     background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: 40%;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_L3 {
@@ -140,7 +143,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     left: 0em;
     overflow: hidden;
     color: rgba(56, 56, 56, 0.6);
-    font-weight: 800;
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
     font-size: 5ex;
@@ -148,7 +151,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 .WF_MenuButton_L3 {
     height: 28px;
-    width: 90%;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
@@ -159,18 +162,23 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     text-align: left;
     font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 
 /*タンク車所在管理メニュー表示*/
 #Menu_L4 {
-    height: auto;
-    width: 30%;
+    height: 45%;
+    width: 24%;
     position: fixed;
-    margin: 25% 0% 0% 0%;
-    left: 20em;
-    overflow-y: auto;
+/*    margin: 22% 0% 0% 0%;*/
+    left: 25.5%;
+    top: 51.5%;
+    background-color: #CC6699;
+    background-image: url(../img/tank.png);
+    background-repeat: no-repeat;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_L4 {
@@ -179,41 +187,44 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     position: relative;
     left: 0em;
     overflow: hidden;
-    color: black;
-    font-weight: bold;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
+    font-size: 5ex;
 }
 
 .WF_MenuButton_L4 {
-    height: 2em;
-    width: 17em;
+    height: 28px;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
-    color: black;
+    color: white;
     border: none;
-    background-color: gray;
+    background-color: transparent;
     vertical-align: middle;
     text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
 }
-
-
 
 
 /*回送管理メニュー表示*/
 #Menu_R {
     height: 45%;
-    width: 18%;
+    width: 24%;
     position: fixed;
-    margin: 5px 0px 0px 0px;
-    left: 41em;
+/*    margin: 5px 0px 0px 0px;*/
+    left: 50.5%;
+    top: 6%;
     overflow-y: auto;
     background-color: #F58E7E;
     background-image: url(../img/foward.png);
     background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: 40%;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_R {
@@ -223,7 +234,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     left: 0em;
     overflow: hidden;
     color: rgba(56, 56, 56, 0.6);
-    font-weight: 800;
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
     font-size: 5ex;
@@ -231,7 +242,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 .WF_MenuButton_R {
     height: 28px;
-    width: 80%;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
@@ -242,22 +253,23 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     text-align: left;
     font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 /*マスタ管理メニュー表示*/
 #Menu_R2 {
     height: 45%;
-    width: 18%;
+    width: 24%;
     position: fixed;
-    margin: 5px 0px 0px 0px;
-    left: 61em;
+/*    margin: 5px 0px 0px 0px;*/
+    left: 75.5%;
+    top: 6%;
     overflow-y: auto;
     background-color: #93B8CA;
     background-image: url(../img/master.png);
     background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: 40%;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_R2 {
@@ -267,7 +279,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     left: 0em;
     overflow: hidden;
     color: rgba(56, 56, 56, 0.6);
-    font-weight: 800;
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
     font-size: 5ex;
@@ -275,7 +287,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
 
 .WF_MenuButton_R2 {
     height: 28px;
-    width: 100%;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
@@ -286,79 +298,99 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     text-align: left;
     font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 
 
 /*実績・統計メニュー表示*/
 #Menu_R3 {
-    height: auto;
-    width: 30%;
+    height: 45%;
+    width: 24%;
     position: fixed;
-    margin: 25% 0% 0% 0%;
-    left: 41em;
+/*    margin: 22% 0% 0% 0%;*/
+    left: 50.5%;
+    top: 51.5%;
     overflow-y: auto;
+    background-color: #CCCCCC;
+    background-image: url(../img/statistics.png);
+    background-repeat: no-repeat;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_R3 {
     height: 2em;
-    width: 17em;
+    width: 30em;
     position: relative;
     left: 0em;
     overflow: hidden;
-    color: black;
-    font-weight: bold;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
+    font-size: 5ex;
 }
 
 .WF_MenuButton_R3 {
-    height: 2em;
-    width: 17em;
+    height: 28px;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
-    color: black;
+    color: white;
     border: none;
-    background-color: gray;
+    background-color: transparent;
     vertical-align: middle;
     text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 /*データ連携メニュー表示*/
 #Menu_R4 {
-    height: auto;
-    width: 30%;
+    height: 45%;
+    width: 24%;
     position: fixed;
-    margin: 25% 0% 0% 0%;
-    left: 61em;
+/*    margin: 22% 0% 0% 0%;*/
+    left: 75.5%;
+    top: 51.5%;
     overflow-y: auto;
+    background-color: #55efc4;
+    background-image: url(../img/datalink.png);
+    background-repeat: no-repeat;
+    background-position: left 2pt bottom 2pt;
+    background-size: 25%;
 }
 
 .WF_MenuLabel_R4 {
     height: 2em;
-    width: 17em;
+    width: 30em;
     position: relative;
     left: 0em;
     overflow: hidden;
-    color: black;
-    font-weight: bold;
+    color: rgba(56, 56, 56, 0.6);
+    font-weight: 600;
     vertical-align: middle;
     text-align: left;
+    font-size: 5ex;
 }
 
 .WF_MenuButton_R4 {
-    height: 2em;
-    width: 17em;
+    height: 28px;
+    width: 110%;
     position: relative;
     left: 2em;
     overflow: hidden;
-    color: black;
+    color: white;
     border: none;
-    background-color: gray;
+    background-color: transparent;
     vertical-align: middle;
     text-align: left;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 

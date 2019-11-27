@@ -38,22 +38,6 @@ Public Class OIT0002WRKINC
     End Function
 
     '' <summary>
-    '' ロールマスタから一覧の取得
-    '' </summary>
-    '' <param name="COMPCODE"></param>
-    '' <param name="FIXCODE"></param>
-    '' <returns></returns>
-    '' <remarks></remarks>
-    Function CreateRoleList(ByVal COMPCODE As String, ByVal OBJCODE As String) As Hashtable
-        Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = COMPCODE
-        prmData.Item(C_PARAMETERS.LP_CLASSCODE) = OBJCODE
-        prmData.Item(C_PARAMETERS.LP_STYMD) = WF_SEL_STYMD.Text
-        prmData.Item(C_PARAMETERS.LP_ENDYMD) = WF_SEL_ENDYMD.Text
-        CreateRoleList = prmData
-    End Function
-
-    '' <summary>
     '' 固定値マスタから一覧の取得
     '' </summary>
     '' <param name="COMPCODE"></param>

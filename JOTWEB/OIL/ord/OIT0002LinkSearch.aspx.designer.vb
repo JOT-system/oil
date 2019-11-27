@@ -86,22 +86,22 @@ Partial Public Class OIT0002LinkSearch
     Protected WithEvents WF_TRAINNO_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_INCLUDUSED コントロール。
+    '''WF_SW1 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_INCLUDUSED As Global.System.Web.UI.WebControls.CheckBox
+    Protected WithEvents WF_SW1 As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
-    '''WF_INCLUDUSED_TEXT コントロール。
+    '''WF_SW2 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_INCLUDUSED_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SW2 As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''rightview コントロール。

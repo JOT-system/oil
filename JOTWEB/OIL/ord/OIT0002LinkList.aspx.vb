@@ -201,66 +201,14 @@ Public Class OIT0002UserList
         '選択行
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        'ユーザID
-        WF_USERID.Text = work.WF_SEL_USERID.Text
+        ''開始年月日
+        'WF_STYMD.Text = work.WF_SEL_STYMD2.Text
 
-        '社員名（短）
-        WF_STAFFNAMES.Text = work.WF_SEL_STAFFNAMES.Text
+        ''終了年月日
+        'WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
 
-        '社員名（長）
-        WF_STAFFNAMEL.Text = work.WF_SEL_STAFFNAMEL.Text
-
-        '画面ＩＤ
-        WF_MAPID.Text = work.WF_SEL_MAPID.Text
-
-        'パスワード
-        WF_PASSWORD.Text = work.WF_SEL_PASSWORD.Text
-        WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
-
-        '誤り回数
-        WF_MISSCNT.Text = work.WF_SEL_MISSCNT.Text
-
-        'パスワード有効期限
-        WF_PASSENDYMD.Text = work.WF_SEL_PASSENDYMD.Text
-
-        '開始年月日
-        WF_STYMD.Text = work.WF_SEL_STYMD2.Text
-
-        '終了年月日
-        WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
-
-        '会社コード
-        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
-
-        '組織コード
-        WF_ORG.Text = work.WF_SEL_ORG2.Text
-        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)
-
-        'メールアドレス
-        WF_EMAIL.Text = work.WF_SEL_EMAIL.Text
-
-        'メニュー表示制御ロール
-        WF_MENUROLE.Text = work.WF_SEL_MENUROLE.Text
-        CODENAME_get("MENU", WF_MENUROLE.Text, WF_MENUROLE_TEXT.Text, WW_DUMMY)
-
-        '画面参照更新制御ロール
-        WF_MAPROLE.Text = work.WF_SEL_MAPROLE.Text
-        CODENAME_get("MAP", WF_MAPROLE.Text, WF_MAPROLE_TEXT.Text, WW_DUMMY)
-
-        '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = work.WF_SEL_VIEWPROFID.Text
-        CODENAME_get("VIEW", WF_VIEWPROFID.Text, WF_VIEWPROFID_TEXT.Text, WW_DUMMY)
-
-        'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = work.WF_SEL_RPRTPROFID.Text
-        CODENAME_get("XML", WF_RPRTPROFID.Text, WF_RPRTPROFID_TEXT.Text, WW_DUMMY)
-
-        '画面初期値ロール
-        WF_VARIANT.Text = work.WF_SEL_VARIANT.Text
-
-        '承認権限ロール
-        WF_APPROVALID.Text = work.WF_SEL_APPROVALID.Text
-        CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
+        ''会社コード
+        'WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
 
         '削除
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
@@ -337,64 +285,58 @@ Public Class OIT0002UserList
         '　検索説明
         '     条件指定に従い該当データをユーザマスタ、ユーザIDマスタから取得する
         Dim SQLStr As String =
-            " OPEN SYMMETRIC KEY loginpasskey DECRYPTION BY CERTIFICATE certjotoil; " _
-            & " Select " _
+              " Select " _
             & "    0                                                   As LINECNT " _
             & "    , ''                                                AS OPERATION " _
-            & "    , CAST(OIS0004.UPDTIMSTP AS BIGINT)                    AS UPDTIMSTP " _
+            & "    , CAST(OIT0004.UPDTIMSTP AS BIGINT)                    AS UPDTIMSTP " _
             & "    , 1                                                 AS 'SELECT' " _
             & "    , 0                                                 AS HIDDEN " _
-            & "    , ISNULL(RTRIM(OIS0004.DELFLG), '')                    AS DELFLG " _
-            & "    , ISNULL(RTRIM(OIS0004.USERID), '')                    AS USERID " _
-            & "    , ISNULL(RTRIM(OIS0004.STAFFNAMES), '')                AS STAFFNAMES " _
-            & "    , ISNULL(RTRIM(OIS0004.STAFFNAMEL), '')                AS STAFFNAMEL " _
-            & "    , ISNULL(RTRIM(OIS0004.MAPID), '')                     AS MAPID " _
-            & "    , CONVERT(nvarchar, DecryptByKey(ISNULL(RTRIM(OIS0005.PASSWORD), ''))) As PASSWORD " _
-            & "    , ISNULL(RTRIM(OIS0005.MISSCNT), '')                   AS MISSCNT " _
-            & "    , ISNULL(FORMAT(OIS0005.PASSENDYMD, 'yyyy/MM/dd'), '') AS PASSENDYMD " _
-            & "    , ISNULL(FORMAT(OIS0004.STYMD, 'yyyy/MM/dd'), '')      AS STYMD " _
-            & "    , ISNULL(FORMAT(OIS0004.ENDYMD, 'yyyy/MM/dd'), '')     AS ENDYMD " _
-            & "    , ISNULL(RTRIM(OIS0004.CAMPCODE), '')                  AS CAMPCODE " _
-            & "    , ''                                                AS CAMPNAMES " _
-            & "    , ISNULL(RTRIM(OIS0004.ORG), '')                       AS ORG " _
-            & "    , ''                                                AS ORGNAMES " _
-            & "    , ISNULL(RTRIM(OIS0004.EMAIL), '')                     AS EMAIL " _
-            & "    , ISNULL(RTRIM(OIS0004.MENUROLE), '')                  AS MENUROLE " _
-            & "    , ISNULL(RTRIM(OIS0004.MAPROLE), '')                   AS MAPROLE " _
-            & "    , ISNULL(RTRIM(OIS0004.VIEWPROFID), '')                AS VIEWPROFID " _
-            & "    , ISNULL(RTRIM(OIS0004.RPRTPROFID), '')                AS RPRTPROFID " _
-            & "    , ISNULL(RTRIM(OIS0004.VARIANT), '')             AS VARIANT " _
-            & "    , ISNULL(RTRIM(OIS0004.APPROVALID), '')                AS APPROVALID " _
+            & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
+            & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')      AS INITYMD " _
+            & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
+            & "    , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                    AS LINKDETAILNO " _
+            & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                    AS STATUS " _
+            & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                    AS PREORDERNO " _
+            & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                    AS OFFICECODE " _
+            & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                    AS DEPSTATION " _
+            & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                    AS DEPSTATIONNAME " _
+            & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                    AS RETSTATION " _
+            & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                    AS RETSTATIONNAME " _
+            & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
+            & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
+            & "    , ISNULL(RTRIM(OIT0004.LINETRAINNO), '')                    AS LINETRAINNO " _
+            & "    , ISNULL(RTRIM(OIT0004.LINEORDER), '')                    AS LINEORDER " _
+            & "    , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')                    AS TANKNUMBER " _
+            & "    , ISNULL(RTRIM(OIT0004.PREOILCODE), '')                    AS PREOILCODE " _
             & " FROM " _
-            & "    COM.OIS0004_USER OIS0004 " _
-            & "    INNER JOIN COM.OIS0005_USERPASS OIS0005 " _
-            & "        ON  OIS0005.USERID   = OIS0004.USERID" _
-            & "        AND OIS0005.DELFLG  <> @P6" _
+            & "    OIL.OIT0004_LINK OIT0004 " _
             & " WHERE" _
-            & "    OIS0004.CAMPCODE    = @P1" _
-            & "    AND OIS0004.STYMD  <= @P4" _
-            & "    AND OIS0004.ENDYMD >= @P5" _
-            & "    AND OIS0004.DELFLG <> @P6"
+            & "    OIT0004.DEPSTATION　　  = @P1" _
+            & "    AND OIT0004.INITYMD　　 >= @P2" _
+            & "    AND OIT0004.INITYMD     <= @P3" _
+            & "    OIT0004.TRAINNO　　  = @P4" _
+            & "    OIT0004.STATUS　　  = @P5" _
+            & "    AND OIT0004.DELFLG <> @P6"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
-        '組織コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
-            SQLStr &= String.Format("    AND OIS0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
-        End If
+        ''組織コード
+        'If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
+        '    SQLStr &= String.Format("    AND OIT0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
+        'End If
 
-        SQLStr &=
-              " ORDER BY" _
-            & "    OIS0004.ORG" _
-            & "    , OIS0004.USERID"
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0004.ORG" _
+        '    & "    , OIT0004.USERID"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
+                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.Date)                '有効年月日(To)
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)                '有効年月日(From)
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
-                PARA1.Value = work.WF_SEL_CAMPCODE.Text
+                'PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA4.Value = work.WF_SEL_ENDYMD.Text
                 PARA5.Value = work.WF_SEL_STYMD.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
@@ -517,12 +459,18 @@ Public Class OIT0002UserList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonALLSELECT_Click()
 
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0002tbl)
+
         '全チェックボックスON
-        For Each repItem As RepeaterItem In WF_Repeater.Items
-            CType(repItem.FindControl("WF_Rep_CheckBox"), System.Web.UI.WebControls.CheckBox).Checked = True
+        For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
+            If OIT0002tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0002tbl.Rows(i)("OPERATION") = "on"
+            End If
         Next
 
-        'WF_Repeater.Visible = True
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0002tbl)
 
     End Sub
 
@@ -532,10 +480,18 @@ Public Class OIT0002UserList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonALLCANCEL_Click()
 
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0002tbl)
+
         '全チェックボックスOFF
-        For Each repItem As RepeaterItem In WF_Repeater.Items
-            CType(repItem.FindControl("WF_Rep_CheckBox"), System.Web.UI.WebControls.CheckBox).Checked = False
+        For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
+            If OIT0002tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0002tbl.Rows(i)("OPERATION") = ""
+            End If
         Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0002tbl)
 
     End Sub
 
@@ -549,77 +505,17 @@ Public Class OIT0002UserList
         WF_Sel_LINECNT.Text = ""
         work.WF_SEL_LINECNT.Text = ""
 
-        'ユーザID
-        WF_USERID.Text = ""
-        work.WF_SEL_USERID.Text = ""
+        ''開始年月日
+        'WF_STYMD.Text = ""
+        'work.WF_SEL_STYMD2.Text = ""
 
-        '社員名（短）
-        WF_STAFFNAMES.Text = ""
-        work.WF_SEL_STAFFNAMES.Text = ""
+        ''終了年月日
+        'WF_ENDYMD.Text = ""
+        'work.WF_SEL_ENDYMD2.Text = ""
 
-        '社員名（長）
-        WF_STAFFNAMEL.Text = ""
-        work.WF_SEL_STAFFNAMEL.Text = ""
-
-        '画面ＩＤ
-        WF_MAPID.Text = ""
-        work.WF_SEL_MAPID.Text = ""
-
-        'パスワード
-        WF_PASSWORD.Text = ""
-        work.WF_SEL_PASSWORD.Text = ""
-
-        '誤り回数
-        WF_MISSCNT.Text = ""
-        work.WF_SEL_MISSCNT.Text = ""
-
-        'パスワード有効期限
-        WF_PASSENDYMD.Text = ""
-        work.WF_SEL_PASSENDYMD.Text = ""
-
-        '開始年月日
-        WF_STYMD.Text = ""
-        work.WF_SEL_STYMD2.Text = ""
-
-        '終了年月日
-        WF_ENDYMD.Text = ""
-        work.WF_SEL_ENDYMD2.Text = ""
-
-        '会社コード
-        WF_CAMPCODE.Text = ""
-        work.WF_SEL_CAMPCODE2.Text = ""
-
-        '組織コード
-        WF_ORG.Text = ""
-        work.WF_SEL_ORG2.Text = ""
-
-        'メールアドレス
-        WF_EMAIL.Text = ""
-        work.WF_SEL_EMAIL.Text = ""
-
-        'メニュー表示制御ロール
-        WF_MENUROLE.Text = ""
-        work.WF_SEL_MENUROLE.Text = ""
-
-        '画面参照更新制御ロール
-        WF_MAPROLE.Text = ""
-        work.WF_SEL_MAPROLE.Text = ""
-
-        '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = ""
-        work.WF_SEL_VIEWPROFID.Text = ""
-
-        'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = ""
-        work.WF_SEL_RPRTPROFID.Text = ""
-
-        '画面初期値ロール
-        WF_VARIANT.Text = ""
-        work.WF_SEL_VARIANT.Text = ""
-
-        '承認権限ロール
-        WF_APPROVALID.Text = ""
-        work.WF_SEL_APPROVALID.Text = ""
+        ''会社コード
+        'WF_CAMPCODE.Text = ""
+        'work.WF_SEL_CAMPCODE2.Text = ""
 
         '削除
         WF_DELFLG.Text = "0"
@@ -723,8 +619,7 @@ Public Class OIT0002UserList
             '読み飛ばし
             If (OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING AndAlso
                 OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED) OrElse
-                OIT0002row("DELFLG") = C_DELETE_FLG.DELETE OrElse
-                OIT0002row("STYMD") = "" Then
+                OIT0002row("DELFLG") = C_DELETE_FLG.DELETE Then
                 Continue For
             End If
 
@@ -733,54 +628,54 @@ Public Class OIT0002UserList
             'チェック
             For Each OIT0002Dhk As DataRow In OIT0002tbl.Rows
 
-                '同一KEY以外は読み飛ばし
-                If OIT0002row("CAMPCODE") <> OIT0002Dhk("CAMPCODE") OrElse
-                    OIT0002row("USERID") <> OIT0002Dhk("USERID") OrElse
-                    OIT0002Dhk("DELFLG") = C_DELETE_FLG.DELETE Then
-                    Continue For
-                End If
+                ''同一KEY以外は読み飛ばし
+                'If OIT0002row("CAMPCODE") <> OIT0002Dhk("CAMPCODE") OrElse
+                '    OIT0002row("USERID") <> OIT0002Dhk("USERID") OrElse
+                '    OIT0002Dhk("DELFLG") = C_DELETE_FLG.DELETE Then
+                '    Continue For
+                'End If
 
-                '期間変更対象は読み飛ばし
-                If OIT0002row("STYMD") = OIT0002Dhk("STYMD") Then
-                    Continue For
-                End If
+                ''期間変更対象は読み飛ばし
+                'If OIT0002row("STYMD") = OIT0002Dhk("STYMD") Then
+                '    Continue For
+                'End If
 
-                Try
-                    Date.TryParse(OIT0002row("STYMD"), WW_DATE_ST)
-                    Date.TryParse(OIT0002row("ENDYMD"), WW_DATE_END)
-                    Date.TryParse(OIT0002Dhk("STYMD"), WW_DATE_ST2)
-                    Date.TryParse(OIT0002Dhk("ENDYMD"), WW_DATE_END2)
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
-                    Exit Sub
-                End Try
+                'Try
+                '    Date.TryParse(OIT0002row("STYMD"), WW_DATE_ST)
+                '    Date.TryParse(OIT0002row("ENDYMD"), WW_DATE_END)
+                '    Date.TryParse(OIT0002Dhk("STYMD"), WW_DATE_ST2)
+                '    Date.TryParse(OIT0002Dhk("ENDYMD"), WW_DATE_END2)
+                'Catch ex As Exception
+                '    Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+                '    Exit Sub
+                'End Try
 
-                '開始日チェック
-                If WW_DATE_ST >= WW_DATE_ST2 AndAlso WW_DATE_ST <= WW_DATE_END2 Then
-                    WW_CheckMES = "・エラー(期間重複)が存在します。"
-                    WW_CheckERR(WW_CheckMES, "", OIT0002row)
-                    O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    WW_LINE_ERR = "ERR"
-                    Exit For
-                End If
+                ''開始日チェック
+                'If WW_DATE_ST >= WW_DATE_ST2 AndAlso WW_DATE_ST <= WW_DATE_END2 Then
+                '    WW_CheckMES = "・エラー(期間重複)が存在します。"
+                '    WW_CheckERR(WW_CheckMES, "", OIT0002row)
+                '    O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                '    WW_LINE_ERR = "ERR"
+                '    Exit For
+                'End If
 
-                '終了日チェック
-                If WW_DATE_END >= WW_DATE_ST2 AndAlso WW_DATE_END <= WW_DATE_END2 Then
-                    WW_CheckMES = "・エラー(期間重複)が存在します。"
-                    WW_CheckERR(WW_CheckMES, "", OIT0002row)
-                    O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    WW_LINE_ERR = "ERR"
-                    Exit For
-                End If
+                ''終了日チェック
+                'If WW_DATE_END >= WW_DATE_ST2 AndAlso WW_DATE_END <= WW_DATE_END2 Then
+                '    WW_CheckMES = "・エラー(期間重複)が存在します。"
+                '    WW_CheckERR(WW_CheckMES, "", OIT0002row)
+                '    O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                '    WW_LINE_ERR = "ERR"
+                '    Exit For
+                'End If
 
-                '日付連続性チェック
-                If WW_DATE_END.AddDays(1) <> WW_DATE_ST2 Then
-                    WW_CheckMES = "・エラー(開始、終了年月日が連続していません)。"
-                    WW_CheckERR(WW_CheckMES, "", OIT0002row)
-                    O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    WW_LINE_ERR = "ERR"
-                    Exit For
-                End If
+                ''日付連続性チェック
+                'If WW_DATE_END.AddDays(1) <> WW_DATE_ST2 Then
+                '    WW_CheckMES = "・エラー(開始、終了年月日が連続していません)。"
+                '    WW_CheckERR(WW_CheckMES, "", OIT0002row)
+                '    O_RTNCODE = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                '    WW_LINE_ERR = "ERR"
+                '    Exit For
+                'End If
             Next
 
             If WW_LINE_ERR = "" Then
@@ -807,7 +702,7 @@ Public Class OIT0002UserList
             & "    SELECT" _
             & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
             & "    FROM" _
-            & "        COM.OIS0004_USER" _
+            & "        OIL.OIT0004_LINK" _
             & "    WHERE" _
             & "        USERID       = @P01" _
             & "        AND STYMD    = @P08" _
@@ -815,7 +710,7 @@ Public Class OIT0002UserList
             & " OPEN hensuu ;" _
             & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
             & " IF (@@FETCH_STATUS = 0)" _
-            & "    UPDATE COM.OIS0004_USER" _
+            & "    UPDATE OIL.OIT0004_LINK" _
             & "    SET" _
             & "        DELFLG = @P00" _
             & "        , STAFFNAMES = @P02" _
@@ -842,7 +737,7 @@ Public Class OIT0002UserList
             & "        AND STYMD    = @P08" _
             & "        AND CAMPCODE = @P10 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
-            & "    INSERT INTO COM.OIS0004_USER" _
+            & "    INSERT INTO OIL.OIT0004_LINK" _
             & "        (DELFLG" _
             & "        , USERID" _
             & "        , STAFFNAMES" _
@@ -921,7 +816,7 @@ Public Class OIT0002UserList
             & "        , RECEIVEYMD" _
             & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
             & " FROM" _
-            & "    COM.OIS0004_USER" _
+            & "    OIL.OIT0004_LINK" _
             & " WHERE" _
             & "        USERID       = @P01" _
             & "        AND STYMD    = @P08" _
@@ -1137,13 +1032,13 @@ Public Class OIT0002UserList
             & "    SELECT" _
             & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
             & "    FROM" _
-            & "        COM.OIS0005_USERPASS" _
+            & "        OIL.OIS0005_LINKPASS" _
             & "    WHERE" _
             & "        USERID       = @P01 ;" _
             & " OPEN hensuu ;" _
             & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
             & " IF (@@FETCH_STATUS = 0)" _
-            & "    UPDATE COM.OIS0005_USERPASS" _
+            & "    UPDATE OIL.OIS0005_LINKPASS" _
             & "    SET" _
             & "        DELFLG = @P00" _
             & "        , PASSWORD = EncryptByKey(Key_GUID('loginpasskey')  , @P05)" _
@@ -1159,7 +1054,7 @@ Public Class OIT0002UserList
             & "    WHERE" _
             & "        USERID       = @P01" _
             & " IF (@@FETCH_STATUS <> 0)" _
-            & "    INSERT INTO COM.OIS0005_USERPASS" _
+            & "    INSERT INTO OIL.OIS0005_LINKPASS" _
             & "        (DELFLG" _
             & "        , USERID" _
             & "        , PASSWORD" _
@@ -1205,7 +1100,7 @@ Public Class OIT0002UserList
             & "        , RECEIVEYMD" _
             & "    , CAST(UPDTIMSTP As bigint) As UPDTIMSTP" _
             & " FROM" _
-            & "    COM.OIS0005_USERPASS" _
+            & "    OIL.OIS0005_LINKPASS" _
             & " WHERE" _
             & "        USERID       = @P01"
 
@@ -1543,77 +1438,17 @@ Public Class OIT0002UserList
         WF_Sel_LINECNT.Text = OIT0002tbl.Rows(WW_LINECNT)("LINECNT")
         work.WF_SEL_LINECNT.Text = OIT0002tbl.Rows(WW_LINECNT)("LINECNT")
 
-        'ユーザID
-        WF_USERID.Text = OIT0002tbl.Rows(WW_LINECNT)("USERID")
-        work.WF_SEL_USERID.Text = OIT0002tbl.Rows(WW_LINECNT)("USERID")
+        ''開始年月日
+        'WF_STYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("STYMD")
+        'work.WF_SEL_STYMD2.Text = OIT0002tbl.Rows(WW_LINECNT)("STYMD")
 
-        '社員名（短）
-        WF_STAFFNAMES.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMES")
-        work.WF_SEL_STAFFNAMES.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMES")
+        ''終了年月日
+        'WF_ENDYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("ENDYMD")
+        'work.WF_SEL_ENDYMD2.Text = OIT0002tbl.Rows(WW_LINECNT)("ENDYMD")
 
-        '社員名（長）
-        WF_STAFFNAMEL.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMEL")
-        work.WF_SEL_STAFFNAMEL.Text = OIT0002tbl.Rows(WW_LINECNT)("STAFFNAMEL")
-
-        '画面ＩＤ
-        WF_MAPID.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPID")
-        work.WF_SEL_MAPID.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPID")
-
-        'パスワード
-        WF_PASSWORD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSWORD")
-        work.WF_SEL_PASSWORD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSWORD")
-
-        '誤り回数
-        WF_MISSCNT.Text = OIT0002tbl.Rows(WW_LINECNT)("MISSCNT")
-        work.WF_SEL_MISSCNT.Text = OIT0002tbl.Rows(WW_LINECNT)("MISSCNT")
-
-        'パスワード有効期限
-        WF_PASSENDYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSENDYMD")
-        work.WF_SEL_PASSENDYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("PASSENDYMD")
-
-        '開始年月日
-        WF_STYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("STYMD")
-        work.WF_SEL_STYMD2.Text = OIT0002tbl.Rows(WW_LINECNT)("STYMD")
-
-        '終了年月日
-        WF_ENDYMD.Text = OIT0002tbl.Rows(WW_LINECNT)("ENDYMD")
-        work.WF_SEL_ENDYMD2.Text = OIT0002tbl.Rows(WW_LINECNT)("ENDYMD")
-
-        '会社コード
-        WF_CAMPCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("CAMPCODE")
-        work.WF_SEL_CAMPCODE2.Text = OIT0002tbl.Rows(WW_LINECNT)("CAMPCODE")
-
-        '組織コード
-        WF_ORG.Text = OIT0002tbl.Rows(WW_LINECNT)("ORG")
-        work.WF_SEL_ORG2.Text = OIT0002tbl.Rows(WW_LINECNT)("ORG")
-
-        'メールアドレス
-        WF_EMAIL.Text = OIT0002tbl.Rows(WW_LINECNT)("EMAIL")
-        work.WF_SEL_EMAIL.Text = OIT0002tbl.Rows(WW_LINECNT)("EMAIL")
-
-        'メニュー表示制御ロール
-        WF_MENUROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MENUROLE")
-        work.WF_SEL_MENUROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MENUROLE")
-
-        '画面参照更新制御ロール
-        WF_MAPROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPROLE")
-        work.WF_SEL_MAPROLE.Text = OIT0002tbl.Rows(WW_LINECNT)("MAPROLE")
-
-        '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("VIEWPROFID")
-        work.WF_SEL_VIEWPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("VIEWPROFID")
-
-        'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("RPRTPROFID")
-        work.WF_SEL_RPRTPROFID.Text = OIT0002tbl.Rows(WW_LINECNT)("RPRTPROFID")
-
-        '画面初期値ロール
-        WF_VARIANT.Text = OIT0002tbl.Rows(WW_LINECNT)("VARIANT")
-        work.WF_SEL_VARIANT.Text = OIT0002tbl.Rows(WW_LINECNT)("VARIANT")
-
-        '承認権限ロール
-        WF_APPROVALID.Text = OIT0002tbl.Rows(WW_LINECNT)("APPROVALID")
-        work.WF_SEL_APPROVALID.Text = OIT0002tbl.Rows(WW_LINECNT)("APPROVALID")
+        ''会社コード
+        'WF_CAMPCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("CAMPCODE")
+        'work.WF_SEL_CAMPCODE2.Text = OIT0002tbl.Rows(WW_LINECNT)("CAMPCODE")
 
         '削除フラグ
         WF_DELFLG.Text = OIT0002tbl.Rows(WW_LINECNT)("DELFLG")
@@ -1746,44 +1581,34 @@ Public Class OIT0002UserList
                 End If
             Next
 
-            '○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("USERID") >= 0 Then
+            ''○ 変更元情報をデフォルト設定
+            'If WW_COLUMNS.IndexOf("USERID") >= 0 Then
 
-                For Each OIT0002row As DataRow In OIT0002tbl.Rows
-                    If XLSTBLrow("USERID") = OIT0002row("USERID") AndAlso
-                        XLSTBLrow("STAFFNAMES") = OIT0002row("STAFFNAMES") AndAlso
-                        XLSTBLrow("STAFFNAMEL") = OIT0002row("STAFFNAMEL") AndAlso
-                        XLSTBLrow("STYMD") = OIT0002row("STYMD") AndAlso
-                        XLSTBLrow("ENDYMD") = OIT0002row("ENDYMD") AndAlso
-                        XLSTBLrow("CAMPCODE") = OIT0002row("CAMPCODE") AndAlso
-                        XLSTBLrow("ORG") = OIT0002row("ORG") AndAlso
-                        XLSTBLrow("EMAIL") = OIT0002row("EMAIL") AndAlso
-                        XLSTBLrow("MENUROLE") = OIT0002row("MENUROLE") AndAlso
-                        XLSTBLrow("MAPROLE") = OIT0002row("MAPROLE") AndAlso
-                        XLSTBLrow("VIEWPROFID") = OIT0002row("VIEWPROFID") AndAlso
-                        XLSTBLrow("RPRTPROFID") = OIT0002row("RPRTPROFID") AndAlso
-                        XLSTBLrow("VARIANT") = OIT0002row("VARIANT") AndAlso
-                        XLSTBLrow("APPROVALID") = OIT0002row("APPROVALID") Then
-                        OIT0002INProw.ItemArray = OIT0002row.ItemArray
-                        Exit For
-                    End If
-                Next
-            End If
+            '    For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            '        If XLSTBLrow("USERID") = OIT0002row("USERID") AndAlso
+            '            XLSTBLrow("STAFFNAMES") = OIT0002row("STAFFNAMES") AndAlso
+            '            XLSTBLrow("STAFFNAMEL") = OIT0002row("STAFFNAMEL") AndAlso
+            '            XLSTBLrow("STYMD") = OIT0002row("STYMD") AndAlso
+            '            XLSTBLrow("ENDYMD") = OIT0002row("ENDYMD") AndAlso
+            '            XLSTBLrow("CAMPCODE") = OIT0002row("CAMPCODE") AndAlso
+            '            XLSTBLrow("ORG") = OIT0002row("ORG") AndAlso
+            '            XLSTBLrow("EMAIL") = OIT0002row("EMAIL") AndAlso
+            '            XLSTBLrow("MENUROLE") = OIT0002row("MENUROLE") AndAlso
+            '            XLSTBLrow("MAPROLE") = OIT0002row("MAPROLE") AndAlso
+            '            XLSTBLrow("VIEWPROFID") = OIT0002row("VIEWPROFID") AndAlso
+            '            XLSTBLrow("RPRTPROFID") = OIT0002row("RPRTPROFID") AndAlso
+            '            XLSTBLrow("VARIANT") = OIT0002row("VARIANT") AndAlso
+            '            XLSTBLrow("APPROVALID") = OIT0002row("APPROVALID") Then
+            '            OIT0002INProw.ItemArray = OIT0002row.ItemArray
+            '            Exit For
+            '        End If
+            '    Next
+            'End If
 
             '○ 項目セット
-            'ユーザID
-            If WW_COLUMNS.IndexOf("USERID") >= 0 Then
-                OIT0002INProw("USERID") = XLSTBLrow("USERID")
-            End If
-
-            '社員名（短）
-            If WW_COLUMNS.IndexOf("STAFFNAMES") >= 0 Then
-                OIT0002INProw("STAFFNAMES") = XLSTBLrow("STAFFNAMES")
-            End If
-
-            '社員名（長）
-            If WW_COLUMNS.IndexOf("STAFFNAMEL") >= 0 Then
-                OIT0002INProw("STAFFNAMEL") = XLSTBLrow("STAFFNAMEL")
+            '会社コード
+            If WW_COLUMNS.IndexOf("CAMPCODE") >= 0 Then
+                OIT0002INProw("CAMPCODE") = XLSTBLrow("CAMPCODE")
             End If
 
             '開始年月日
@@ -1794,51 +1619,6 @@ Public Class OIT0002UserList
             '終了年月日
             If WW_COLUMNS.IndexOf("ENDYMD") >= 0 Then
                 OIT0002INProw("ENDYMD") = XLSTBLrow("ENDYMD")
-            End If
-
-            '会社コード
-            If WW_COLUMNS.IndexOf("CAMPCODE") >= 0 Then
-                OIT0002INProw("CAMPCODE") = XLSTBLrow("CAMPCODE")
-            End If
-
-            '組織コード
-            If WW_COLUMNS.IndexOf("ORG") >= 0 Then
-                OIT0002INProw("ORG") = XLSTBLrow("ORG")
-            End If
-
-            'メールアドレス
-            If WW_COLUMNS.IndexOf("EMAIL") >= 0 Then
-                OIT0002INProw("EMAIL") = XLSTBLrow("EMAIL")
-            End If
-
-            'メニュー表示制御ロール
-            If WW_COLUMNS.IndexOf("MENUROLE") >= 0 Then
-                OIT0002INProw("MENUROLE") = XLSTBLrow("MENUROLE")
-            End If
-
-            '画面参照更新制御ロール
-            If WW_COLUMNS.IndexOf("MAPROLE") >= 0 Then
-                OIT0002INProw("MAPROLE") = XLSTBLrow("MAPROLE")
-            End If
-
-            '画面表示項目制御ロール
-            If WW_COLUMNS.IndexOf("VIEWPROFID") >= 0 Then
-                OIT0002INProw("VIEWPROFID") = XLSTBLrow("VIEWPROFID")
-            End If
-
-            'エクセル出力制御ロール
-            If WW_COLUMNS.IndexOf("RPRTPROFID") >= 0 Then
-                OIT0002INProw("RPRTPROFID") = XLSTBLrow("RPRTPROFID")
-            End If
-
-            '画面初期値ロール
-            If WW_COLUMNS.IndexOf("VARIANT") >= 0 Then
-                OIT0002INProw("VARIANT") = XLSTBLrow("VARIANT")
-            End If
-
-            '承認権限ロール
-            If WW_COLUMNS.IndexOf("APPROVALID") >= 0 Then
-                OIT0002INProw("APPROVALID") = XLSTBLrow("APPROVALID")
             End If
 
             '削除フラグ
@@ -1992,47 +1772,16 @@ Public Class OIT0002UserList
         OIT0002INProw("SELECT") = 1
         OIT0002INProw("HIDDEN") = 0
 
-        OIT0002INProw("USERID") = WF_USERID.Text              'ユーザID
+        'OIT0002INProw("STYMD") = WF_STYMD.Text              '開始年月日
 
-        OIT0002INProw("STAFFNAMES") = WF_STAFFNAMES.Text              '社員名（短）
+        'OIT0002INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
 
-        OIT0002INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text              '社員名（長）
-
-        OIT0002INProw("MAPID") = WF_MAPID.Text              '画面ＩＤ
-
-        OIT0002INProw("PASSWORD") = WF_PASSWORD.Text              'パスワード
-
-        OIT0002INProw("MISSCNT") = WF_MISSCNT.Text              '誤り回数
-
-        OIT0002INProw("PASSENDYMD") = WF_PASSENDYMD.Text              'パスワード有効期限
-
-        OIT0002INProw("STYMD") = WF_STYMD.Text              '開始年月日
-
-        OIT0002INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
-
-        OIT0002INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
-
-        OIT0002INProw("ORG") = WF_ORG.Text              '組織コード
-
-        OIT0002INProw("EMAIL") = WF_EMAIL.Text              'メールアドレス
-
-        OIT0002INProw("MENUROLE") = WF_MENUROLE.Text              'メニュー表示制御ロール
-
-        OIT0002INProw("MAPROLE") = WF_MAPROLE.Text              '画面参照更新制御ロール
-
-        OIT0002INProw("VIEWPROFID") = WF_VIEWPROFID.Text              '画面表示項目制御ロール
-
-        OIT0002INProw("RPRTPROFID") = WF_RPRTPROFID.Text              'エクセル出力制御ロール
-
-        OIT0002INProw("VARIANT") = WF_VARIANT.Text              '画面初期値ロール
-
-        OIT0002INProw("APPROVALID") = WF_APPROVALID.Text              '承認権限ロール
+        'OIT0002INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
 
         '○ チェック用テーブルに登録する
         OIT0002INPtbl.Rows.Add(OIT0002INProw)
 
     End Sub
-
 
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
@@ -2092,24 +1841,9 @@ Public Class OIT0002UserList
 
         WF_Sel_LINECNT.Text = ""            'LINECNT
 
-        WF_USERID.Text = ""            'ユーザID
-        WF_STAFFNAMES.Text = ""            '社員名（短）
-        WF_STAFFNAMEL.Text = ""            '社員名（長）
-        WF_MAPID.Text = ""            '画面ＩＤ
-        WF_PASSWORD.Text = ""            'パスワード
-        WF_MISSCNT.Text = ""            '誤り回数
-        WF_PASSENDYMD.Text = ""            'パスワード有効期限
-        WF_STYMD.Text = ""            '開始年月日
-        WF_ENDYMD.Text = ""            '終了年月日
-        WF_CAMPCODE.Text = ""            '会社コード
-        WF_ORG.Text = ""            '組織コード
-        WF_EMAIL.Text = ""            'メールアドレス
-        WF_MENUROLE.Text = ""            'メニュー表示制御ロール
-        WF_MAPROLE.Text = ""            '画面参照更新制御ロール
-        WF_VIEWPROFID.Text = ""            '画面表示項目制御ロール
-        WF_RPRTPROFID.Text = ""            'エクセル出力制御ロール
-        WF_VARIANT.Text = ""            '画面初期値ロール
-        WF_APPROVALID.Text = ""            '承認権限ロール
+        'WF_CAMPCODE.Text = ""            '会社コード
+        'WF_STYMD.Text = ""            '開始年月日
+        'WF_ENDYMD.Text = ""            '終了年月日
         WF_DELFLG.Text = ""                 '削除フラグ
         WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
 
@@ -2131,41 +1865,29 @@ Public Class OIT0002UserList
 
             With leftview
                 Select Case WF_LeftMViewChange.Value
-                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
-                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
-                        Select Case WF_FIELD.Value
-                            Case "WF_PASSENDYMD"         'パスワード有効期限
-                                .WF_Calendar.Text = WF_PASSENDYMD.Text
-                            Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_STYMD.Text
-                            Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_ENDYMD.Text
-                        End Select
-                        .ActiveCalendar()
+                    'Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                    '    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    '    Select Case WF_FIELD.Value
+                    '        Case "WF_STYMD"         '有効年月日(From)
+                    '            .WF_Calendar.Text = WF_STYMD.Text
+                    '        Case "WF_ENDYMD"        '有効年月日(To)
+                    '            .WF_Calendar.Text = WF_ENDYMD.Text
+                    '    End Select
+                    '    .ActiveCalendar()
 
-                    Case Else
-                        '以外
-                        Dim prmData As New Hashtable
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+                    'Case Else
+                    '    '以外
+                    '    Dim prmData As New Hashtable
+                    '    prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
-                        'フィールドによってパラメータを変える
-                        Select Case WF_FIELD.Value
-                            Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-                            Case "WF_MENUROLE"       'メニュー表示制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_MAPROLE"       '画面参照更新制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_VIEWPROFID"       '画面表示項目制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_RPRTPROFID"       'エクセル出力制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_APPROVALID"       '承認権限ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                        End Select
+                    'フィールドによってパラメータを変える
+                    'Select Case WF_FIELD.Value
+                    '    Case "WF_ORG"       '組織コード
+                    '        prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                    'End Select
 
-                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                        .ActiveListBox()
+                    '.SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                    '    .ActiveListBox()
                 End Select
             End With
         End If
@@ -2201,62 +1923,29 @@ Public Class OIT0002UserList
                     WF_DELFLG_TEXT.Text = WW_SelectText
                     WF_DELFLG.Focus()
 
-                Case "WF_PASSENDYMD"             'パスワード有効期限
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_PASSENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_PASSENDYMD.Focus()
+                    'Case "WF_STYMD"             '有効年月日(From)
+                    '    Dim WW_DATE As Date
+                    '    Try
+                    '        Date.TryParse(WW_SelectValue, WW_DATE)
+                    '        WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    '    Catch ex As Exception
+                    '    End Try
+                    '    WF_STYMD.Focus()
 
-                Case "WF_STYMD"             '有効年月日(From)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_STYMD.Focus()
+                    'Case "WF_ENDYMD"            '有効年月日(To)
+                    '    Dim WW_DATE As Date
+                    '    Try
+                    '        Date.TryParse(WW_SelectValue, WW_DATE)
+                    '        WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    '    Catch ex As Exception
+                    '    End Try
+                    '    WF_ENDYMD.Focus()
 
-                Case "WF_ENDYMD"            '有効年月日(To)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_ENDYMD.Focus()
+                    'Case "WF_ORG"               '組織コード
+                    '    WF_ORG.Text = WW_SelectValue
+                    '    WF_ORG_TEXT.Text = WW_SelectText
+                    '    WF_ORG.Focus()
 
-                Case "WF_ORG"               '組織コード
-                    WF_ORG.Text = WW_SelectValue
-                    WF_ORG_TEXT.Text = WW_SelectText
-                    WF_ORG.Focus()
-
-                Case "WF_MENUROLE"               'メニュー表示制御ロール
-                    WF_MENUROLE.Text = WW_SelectValue
-                    WF_MENUROLE_TEXT.Text = WW_SelectText
-                    WF_MENUROLE.Focus()
-
-                Case "WF_MAPROLE"               '画面参照更新制御ロール
-                    WF_MAPROLE.Text = WW_SelectValue
-                    WF_MAPROLE_TEXT.Text = WW_SelectText
-                    WF_MAPROLE.Focus()
-
-                Case "WF_VIEWPROFID"               '画面表示項目制御ロール
-                    WF_VIEWPROFID.Text = WW_SelectValue
-                    WF_VIEWPROFID_TEXT.Text = WW_SelectText
-                    WF_VIEWPROFID.Focus()
-
-                Case "WF_RPRTPROFID"               'エクセル出力制御ロール
-                    WF_RPRTPROFID.Text = WW_SelectValue
-                    WF_RPRTPROFID_TEXT.Text = WW_SelectText
-                    WF_RPRTPROFID.Focus()
-
-                Case "WF_APPROVALID"               '承認権限ロール
-                    WF_APPROVALID.Text = WW_SelectValue
-                    WF_APPROVALID_TEXT.Text = WW_SelectText
-                    WF_APPROVALID.Focus()
             End Select
         Else
         End If
@@ -2388,28 +2077,28 @@ Public Class OIT0002UserList
             End If
 
             'ユーザID(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIT0002INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "ユーザID入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0002INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIT0002INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "ユーザID入力エラー。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0002INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            If WW_LINE_ERR = "" Then
-                If OIT0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
-                    OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-                End If
-            Else
-                If WW_LINE_ERR = CONST_PATTERNERR Then
-                    '関連チェックエラーをセット
-                    OIT0002INProw.Item("OPERATION") = CONST_PATTERNERR
-                Else
-                    '単項目チェックエラーをセット
-                    OIT0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-                End If
-            End If
+            'If WW_LINE_ERR = "" Then
+            '    If OIT0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
+            '        OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+            '    End If
+            'Else
+            '    If WW_LINE_ERR = CONST_PATTERNERR Then
+            '        '関連チェックエラーをセット
+            '        OIT0002INProw.Item("OPERATION") = CONST_PATTERNERR
+            '    Else
+            '        '単項目チェックエラーをセット
+            '        OIT0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            '    End If
+            'End If
         Next
 
     End Sub
@@ -2430,24 +2119,9 @@ Public Class OIT0002UserList
         End If
 
         If Not IsNothing(OIT0002row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> ユーザID =" & OIT0002row("USERID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（短） =" & OIT0002row("STAFFNAMES") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 社員名（長） =" & OIT0002row("STAFFNAMEL") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面ＩＤ =" & OIT0002row("MAPID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード =" & OIT0002row("PASSWORD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 誤り回数 =" & OIT0002row("MISSCNT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> パスワード有効期限 =" & OIT0002row("PASSENDYMD") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日 =" & OIT0002row("STYMD") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日 =" & OIT0002row("ENDYMD") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード =" & OIT0002row("CAMPCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード =" & OIT0002row("ORG") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> メールアドレス =" & OIT0002row("EMAIL") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> メニュー表示制御ロール =" & OIT0002row("MENUROLE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面参照更新制御ロール =" & OIT0002row("MAPROLE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面表示項目制御ロール =" & OIT0002row("VIEWPROFID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エクセル出力制御ロール =" & OIT0002row("RPRTPROFID") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 画面初期値ロール =" & OIT0002row("VARIANT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 承認権限ロール =" & OIT0002row("APPROVALID") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIT0002row("DELFLG")
         End If
 
@@ -2499,26 +2173,10 @@ Public Class OIT0002UserList
 
             'KEY項目が等しい時
             For Each OIT0002row As DataRow In OIT0002tbl.Rows
-                If OIT0002row("USERID") = OIT0002INProw("USERID") AndAlso
-                    OIT0002row("STYMD") = OIT0002INProw("STYMD") AndAlso
+                If OIT0002row("STYMD") = OIT0002INProw("STYMD") AndAlso
                     OIT0002row("ENDYMD") = OIT0002INProw("ENDYMD") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
                     If OIT0002row("DELFLG") = OIT0002INProw("DELFLG") AndAlso
-                        OIT0002row("STAFFNAMES") = OIT0002INProw("STAFFNAMES") AndAlso
-                        OIT0002row("STAFFNAMEL") = OIT0002INProw("STAFFNAMEL") AndAlso
-                        OIT0002row("MAPID") = OIT0002INProw("MAPID") AndAlso
-                        OIT0002row("PASSWORD") = OIT0002INProw("PASSWORD") AndAlso
-                        OIT0002row("MISSCNT") = OIT0002INProw("MISSCNT") AndAlso
-                        OIT0002row("PASSENDYMD") = OIT0002INProw("PASSENDYMD") AndAlso
-                        OIT0002row("CAMPCODE") = OIT0002INProw("CAMPCODE") AndAlso
-                        OIT0002row("ORG") = OIT0002INProw("ORG") AndAlso
-                        OIT0002row("EMAIL") = OIT0002INProw("EMAIL") AndAlso
-                        OIT0002row("MENUROLE") = OIT0002INProw("MENUROLE") AndAlso
-                        OIT0002row("MAPROLE") = OIT0002INProw("MAPROLE") AndAlso
-                        OIT0002row("VIEWPROFID") = OIT0002INProw("VIEWPROFID") AndAlso
-                        OIT0002row("RPRTPROFID") = OIT0002INProw("RPRTPROFID") AndAlso
-                        OIT0002row("VARIANT") = OIT0002INProw("VARIANT") AndAlso
-                        OIT0002row("APPROVALID") = OIT0002INProw("APPROVALID") AndAlso
                         OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
@@ -2650,30 +2308,6 @@ Public Class OIT0002UserList
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "ORG"         '組織コード
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "MENU"           'メニュー表示制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "MAP"         '画面参照更新制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "VIEW"         '画面表示項目制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "XML"         'エクセル出力制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "APPROVAL"         '承認権限ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "DELFLG"           '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

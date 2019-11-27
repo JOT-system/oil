@@ -5,8 +5,6 @@
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>         <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_CAMPCODE2" runat="server"></asp:TextBox>         <!-- 会社コード2 -->
     <asp:TextBox ID="WF_SEL_INCLUDUSED" runat="server"></asp:TextBox>         <!-- 利用済含む -->
-    <asp:TextBox ID="WF_SEL_ORG" runat="server"></asp:TextBox>              <!-- 組織コード -->
-    <asp:TextBox ID="WF_SEL_ORG2" runat="server"></asp:TextBox>              <!-- 組織コード2 -->
     <asp:TextBox ID="WF_SEL_DEPSTATION" runat="server"></asp:TextBox>         <!-- 空車発駅 -->
     <asp:TextBox ID="WF_SEL_DEPSTATION2" runat="server"></asp:TextBox>         <!-- 空車発駅2 -->
     <asp:TextBox ID="WF_SEL_STYMD" runat="server"></asp:TextBox>         <!-- 開始年月日 -->
@@ -15,22 +13,23 @@
     <asp:TextBox ID="WF_SEL_ENDYMD2" runat="server"></asp:TextBox>         <!-- 終了年月日2 -->
     <asp:TextBox ID="WF_SEL_TRAINNO" runat="server"></asp:TextBox>         <!-- 本線列車 -->
     <asp:TextBox ID="WF_SEL_TRAINNO2" runat="server"></asp:TextBox>         <!-- 本線列車2 -->
+    <asp:TextBox ID="WF_SEL_SELECT" runat="server"></asp:TextBox>           <!-- ステータス選択 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>        <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>         <!-- 削除フラグ -->
-    <asp:TextBox ID="WF_SEL_USERID" runat="server"></asp:TextBox>         <!-- ユーザID -->
-    <asp:TextBox ID="WF_SEL_STAFFNAMES" runat="server"></asp:TextBox>         <!-- 社員名（短） -->
-    <asp:TextBox ID="WF_SEL_STAFFNAMEL" runat="server"></asp:TextBox>         <!-- 社員名（長） -->
-    <asp:TextBox ID="WF_SEL_EMAIL" runat="server"></asp:TextBox>         <!-- メールアドレス -->
-    <asp:TextBox ID="WF_SEL_MENUROLE" runat="server"></asp:TextBox>         <!-- メニュー表示制御ロール -->
-    <asp:TextBox ID="WF_SEL_MAPROLE" runat="server"></asp:TextBox>         <!-- 画面参照更新制御ロール -->
-    <asp:TextBox ID="WF_SEL_VIEWPROFID" runat="server"></asp:TextBox>         <!-- 画面表示項目制御ロール -->
-    <asp:TextBox ID="WF_SEL_RPRTPROFID" runat="server"></asp:TextBox>         <!-- エクセル出力制御ロール -->
-    <asp:TextBox ID="WF_SEL_MAPID" runat="server"></asp:TextBox>         <!-- 画面ＩＤ -->
-    <asp:TextBox ID="WF_SEL_VARIANT" runat="server"></asp:TextBox>         <!-- 画面初期値ロール -->
-    <asp:TextBox ID="WF_SEL_APPROVALID" runat="server"></asp:TextBox>         <!-- 承認権限ロール -->
-    <asp:TextBox ID="WF_SEL_PASSWORD" runat="server"></asp:TextBox>         <!-- パスワード -->
-    <asp:TextBox ID="WF_SEL_MISSCNT" runat="server"></asp:TextBox>         <!-- 誤り回数 -->
-    <asp:TextBox ID="WF_SEL_PASSENDYMD" runat="server"></asp:TextBox>         <!-- パスワード有効期限 -->
+    <asp:TextBox ID="WF_SEL_LINKNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表№ -->
+    <asp:TextBox ID="WF_SEL_LINKDETAILNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表明細№ -->
+    <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>         <!-- ステータス -->
+    <asp:TextBox ID="WF_SEL_PREORDERNO" runat="server"></asp:TextBox>         <!-- 前回オーダー№ -->
+    <asp:TextBox ID="WF_SEL_OFFICECODE" runat="server"></asp:TextBox>         <!-- 登録営業所コード -->
+    <asp:TextBox ID="WF_SEL_DEPSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車発駅名 -->
+    <asp:TextBox ID="WF_SEL_RETSTATION" runat="server"></asp:TextBox>         <!-- 空車着駅コード -->
+    <asp:TextBox ID="WF_SEL_RETSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車着駅名 -->
+    <asp:TextBox ID="WF_SEL_EMPARRDATE" runat="server"></asp:TextBox>         <!-- 空車着日（予定） -->
+    <asp:TextBox ID="WF_SEL_ACTUALEMPARRDATE" runat="server"></asp:TextBox>         <!-- 空車着日（実績） -->
+    <asp:TextBox ID="WF_SEL_LINETRAINNO" runat="server"></asp:TextBox>         <!-- 入線列車番号 -->
+    <asp:TextBox ID="WF_SEL_LINEORDER" runat="server"></asp:TextBox>         <!-- 入線順 -->
+    <asp:TextBox ID="WF_SEL_TANKNUMBER" runat="server"></asp:TextBox>         <!-- タンク車№ -->
+    <asp:TextBox ID="WF_SEL_PREOILCODE" runat="server"></asp:TextBox>         <!-- 前回油種 -->
     <asp:TextBox ID="WF_SEL_INITYMD" runat="server"></asp:TextBox>         <!-- 登録年月日 -->
     <asp:TextBox ID="WF_SEL_INITUSER" runat="server"></asp:TextBox>         <!-- 登録ユーザーＩＤ -->
     <asp:TextBox ID="WF_SEL_INITTERMID" runat="server"></asp:TextBox>         <!-- 登録端末 -->

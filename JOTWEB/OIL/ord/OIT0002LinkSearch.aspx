@@ -67,10 +67,15 @@
         <!-- ステータス選択 -->
         <a style="position:fixed; top:14.3em; left:1em;">ステータス選択</a>
        
-        <a class="inline-radio" style="position:fixed; top:14.3em; left:10em;">
-	        <div><input type="radio" name="title" checked="checked"/><label>利用可のみ表示</label></div>
-	        <div><input type="radio" name="title"/><label>全て表示</label></div>
+        <a class="inline-radio" id="checkbox" style="position:fixed; top:14.3em; left:10em;">
+            <div><asp:RadioButton ID="WF_SW1" runat="server" GroupName="WF_SW" Text="利用可のみ表示" /></div>
+            <div><asp:RadioButton ID="WF_SW2" runat="server" GroupName="WF_SW" Text="全て表示" /></div>
         </a>
+
+<%--        <a class="inline-radio" id="checkbox" style="position:fixed; top:14.3em; left:10em;">
+	        <div><input type="radio" name="title" checked="checked" onclick="ButtonClick('WF_CheckBox');"/><label>利用可のみ表示</label></div>
+	        <div><input type="radio" name="title" onclick="ButtonClick('WF_CheckBox');"/><label>全て表示</label></div>
+        </a>--%>
 
 <%--        <a style="position:fixed; top:14.3em; left:10em;">
             <asp:RadioButton ID="WF_SW1" runat="server" GroupName="WF_SW" Text=" 利用可のみ表示" Width="9em" />

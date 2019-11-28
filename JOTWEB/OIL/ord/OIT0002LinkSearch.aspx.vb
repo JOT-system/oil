@@ -103,8 +103,8 @@ Public Class OIT0002LinkSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO.Text)         '本線列車
 
             'ステータス選択
-            WF_SW1.Checked = True
-            WF_SW2.Checked = False
+            'WF_SW1.Checked = True
+            'WF_SW2.Checked = False
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
@@ -114,13 +114,13 @@ Public Class OIT0002LinkSearch
             WF_TRAINNO.Text = work.WF_SEL_TRAINNO.Text          '本線列車
 
             'ステータス選択
-            If work.WF_SEL_SELECT.Text = "1" Then
-                WF_SW1.Checked = False
-                WF_SW2.Checked = True
-            Else
-                WF_SW1.Checked = True
-                WF_SW2.Checked = False
-            End If
+            'If work.WF_SEL_SELECT.Text = "1" Then
+            '    WF_SW1.Checked = False
+            '    WF_SW2.Checked = True
+            'Else
+            '    WF_SW1.Checked = True
+            '    WF_SW2.Checked = False
+            'End If
         End If
 
         '○ RightBox情報設定

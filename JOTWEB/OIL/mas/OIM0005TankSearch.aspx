@@ -27,7 +27,7 @@
         <!-- 会社コード -->
         <a style="display:none; position:fixed; top:5.5em; left:4em; font-weight:bold; text-decoration:underline;">会社コード</a>
 
-        <a style="display:none; position:fixed; top:5.5em; left:18em;" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+        <a  class="ef" style="display:none; position:fixed; top:5.5em; left:18em;" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
             <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="display:none; position:fixed; top:5.5em; left:27em;">
@@ -36,7 +36,7 @@
         <!-- JOT車番 -->
         <a style="position:fixed; top:7.7em; left:4em; font-weight:bold;">JOT車番</a>
 
-        <a style="position:fixed; top:7.7em; left:18em;">
+        <a  class="ef" style="position:fixed; top:7.7em; left:18em;">
             <asp:TextBox ID="WF_TANKNUMBER" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">
@@ -45,7 +45,7 @@
         <!-- 型式 -->
         <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">型式</a>
 
-        <a style="position:fixed; top:9.9em; left:18em;">
+        <a  class="ef" style="position:fixed; top:9.9em; left:18em;">
             <asp:TextBox ID="WF_MODEL" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:9.9em; left:27em;">

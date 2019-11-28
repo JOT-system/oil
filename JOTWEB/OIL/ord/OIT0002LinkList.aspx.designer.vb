@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0002UserList
+Partial Public Class OIT0002LinkList
     
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。

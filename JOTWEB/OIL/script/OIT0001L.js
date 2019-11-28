@@ -51,7 +51,7 @@ function ChangeCheckBox() {
 }
 
 
-// ○チェックボックス変更
+// ○チェックボックス選択
 function SelectCheckBox(obj, lineCnt) {
 
     var objTable = document.getElementById("pnlListArea_DL").children[0];

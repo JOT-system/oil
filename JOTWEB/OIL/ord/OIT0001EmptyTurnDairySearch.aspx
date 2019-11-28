@@ -27,7 +27,7 @@
         <!-- 会社コード -->
         <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;display:none">会社コード</a>
 
-        <a style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+        <a class="ef" style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
             <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;display:none">
@@ -36,7 +36,7 @@
         <!-- 運用部署 -->
         <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;display:none">運用部署</a>
 
-        <a style="position:fixed; top:9.9em; left:18em;display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
+        <a class="ef" style="position:fixed; top:9.9em; left:18em;display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
             <asp:TextBox ID="WF_UORG" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:9.9em; left:27em;display:none">
@@ -44,7 +44,7 @@
         </a>
         <!-- 営業所 -->
         <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">★営業所</a>
-        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
+        <a class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
             <asp:TextBox ID="TxtSalesOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">
@@ -53,7 +53,7 @@
 
         <!-- 積込日 -->
         <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">★積込日</a>
-        <a style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+        <a class="ef" style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox ID="TxtLoadingDateStart" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:9.9em; left:27em; font-weight:bold;">～</a>
@@ -71,7 +71,7 @@
 -->
         <!-- 列車番号 -->
         <a style="position:fixed; top:12.1em; left:4em; font-weight:bold;">列車番号</a>
-        <a style="position:fixed; top:12.1em; left:18em;">
+        <a class="ef" style="position:fixed; top:12.1em; left:18em;">
             <asp:TextBox ID="TxtTrainNumber" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
     </div>

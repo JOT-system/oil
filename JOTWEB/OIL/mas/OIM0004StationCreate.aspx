@@ -37,7 +37,7 @@
                 </p>
                 <p id="KEY_LINE_2">
                     <!-- 削除フラグ -->
-                    <a ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)">
+                    <a class="ef" ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)">
                         <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
                         <asp:TextBox ID="WF_DELFLG" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
@@ -46,14 +46,14 @@
                 <p id="KEY_LINE_3">
                     <!-- 貨物車コード -->
 <!--                    <a ondblclick="Field_DBclick('STATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>)"> -->
-                    <a>
+                    <a class="ef">
                         <asp:Label ID="LblStationCode" runat="server" Text="貨物車コード" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="TxtStationCode" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblStationCodeText" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
 
                     <!-- 貨物コード枝番 -->
-                    <a>
+                    <a class="ef" >
                         <asp:Label ID="LblBranch" runat="server" Text="貨物コード枝番" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="TxtBranch" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblBranchText" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
@@ -61,14 +61,14 @@
                 </p>
                 <p id="KEY_LINE_4">
                     <!-- 貨物駅名称 -->
-                    <a>
+                    <a class="ef" >
                         <asp:Label ID="LblStationName" runat="server" Text="貨物駅名称" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="TxtStationName" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblStationNameText" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
 
                     <!-- 貨物駅名称カナ -->
-                    <a>
+                    <a class="ef" >
                         <asp:Label ID="LblStationNameKana" runat="server" Text="貨物駅名称カナ" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="TxtStationNameKana" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblStationNameKanaText" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
@@ -76,14 +76,14 @@
                 </p>
                 <p id="KEY_LINE_5">
                     <!-- 貨物駅種別名称 -->
-                    <a>
+                    <a class="ef" >
                         <asp:Label ID="LblTypeName" runat="server" Text="貨物駅種別名称" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="TxtTypeName" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblTypeNameText" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
 
                     <!-- 貨物駅種別名称カナ -->
-                    <a>
+                    <a class="ef" >
                         <asp:Label ID="LblTypeNameKana" runat="server" Text="貨物駅種別名称" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="false"></asp:Label>
                         <asp:TextBox ID="TxtTypeNameKana" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="LblTypeNameKanaText" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>

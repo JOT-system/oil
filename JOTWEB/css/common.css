@@ -95,10 +95,29 @@ div {
     top: 2.4em;
     bottom: 1.4em;
     left: 0em;
-    width: 100%;
-    position: fixed;
+    width: 80%;
+    position: relative;
     overflow: hidden;
-    background-color: rgb(220,230,240);
+    background-color: rgb(255,255,255);
+}
+
+    .searchbox input[type='text'] {
+        font: 14px/23px sans-serif;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.3em;
+        transition: 0.3s;
+        letter-spacing: 1px;
+        color: rgba(42, 63, 84, 1);
+        border: 1px solid #1b2538;
+        border-radius: 3px;
+    }
+
+
+.ef input[type='text']:focus {
+    border: 1px solid rgba(1,60,65, .5);
+    outline: none;
+    box-shadow: 0 0 5px 1px rgba(218,60,65, .5);
 }
 
 /* 条件画面 チェックボックス */
@@ -248,6 +267,7 @@ div {
     font-size: x-large;
     vertical-align: middle;
     text-align: center;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
 }
 
 

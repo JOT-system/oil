@@ -87,12 +87,12 @@ Public Class OIT0001EmptyTurnDairyList
                 Initialize()
             End If
 
-            ''○ 画面モード(更新・参照)設定
-            'If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
-            '    WF_MAPpermitcode.Value = "TRUE"
-            'Else
-            '    WF_MAPpermitcode.Value = "FALSE"
-            'End If
+            '○ 画面モード(更新・参照)設定
+            If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
+                WF_MAPpermitcode.Value = "TRUE"
+            Else
+                WF_MAPpermitcode.Value = "FALSE"
+            End If
 
         Finally
             '○ 格納Table Close
@@ -249,47 +249,47 @@ Public Class OIT0001EmptyTurnDairyList
 
         Dim SQLStr As String =
               " SELECT" _
-            & "   0                                          AS LINECNT" _
-            & " , ''                                         AS OPERATION" _
-            & " , CAST(OIT0002.UPDTIMSTP AS bigint)          AS TIMSTP" _
-            & " , 1                                          AS 'SELECT'" _
-            & " , 0                                          AS HIDDEN" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　    AS ORDERNO" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERYMD), '')        AS ORDERYMD" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '   ')  AS ORDERSTATUS" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')       AS ORDERINFO" _
-            & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')      AS OFFICENAME" _
-            & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')         AS TRAINNO" _
-            & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')      AS DEPSTATION" _
-            & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')  AS DEPSTATIONNAME" _
-            & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')      AS ARRSTATION" _
-            & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')  AS ARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(OIT0002.LODDATE), '')         AS LODDATE" _
-            & " , ISNULL(RTRIM(OIT0002.DEPDATE), '')         AS DEPDATE" _
-            & " , ISNULL(RTRIM(OIT0002.ARRDATE), '')         AS ARRDATE" _
-            & " , ISNULL(RTRIM(OIT0002.ACCDATE), '')         AS ACCDATE" _
-            & " , ISNULL(RTRIM(OIT0002.RTANK), '')           AS RTANK" _
-            & " , ISNULL(RTRIM(OIT0002.HTANK), '')           AS HTANK" _
-            & " , ISNULL(RTRIM(OIT0002.TTANK), '')           AS TTANK" _
-            & " , ISNULL(RTRIM(OIT0002.MTTANK), '')          AS MTTANK" _
-            & " , ISNULL(RTRIM(OIT0002.KTANK), '')           AS KTANK" _
-            & " , ISNULL(RTRIM(OIT0002.K3TANK), '')          AS K3TANK" _
-            & " , ISNULL(RTRIM(OIT0002.K5TANK), '')          AS K5TANK" _
-            & " , ISNULL(RTRIM(OIT0002.K10TANK), '')         AS K10TANK" _
-            & " , ISNULL(RTRIM(OIT0002.LTANK), '')           AS LTANK" _
-            & " , ISNULL(RTRIM(OIT0002.ATANK), '')           AS ATANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER1OTANK), '')     AS OTHER1OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER2OTANK), '')     AS OTHER2OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER3OTANK), '')     AS OTHER3OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER4OTANK), '')     AS OTHER4OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER5OTANK), '')     AS OTHER5OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER6OTANK), '')     AS OTHER6OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER7OTANK), '')     AS OTHER7OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER8OTANK), '')     AS OTHER8OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER9OTANK), '')     AS OTHER9OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.OTHER10OTANK), '')    AS OTHER10OTANK" _
-            & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')       AS TOTALTANK" _
-            & " , ISNULL(RTRIM(OIT0002.DELFLG), '')          AS DELFLG" _
+            & "   0                                                  AS LINECNT" _
+            & " , ''                                                 AS OPERATION" _
+            & " , CAST(OIT0002.UPDTIMSTP AS bigint)                  AS TIMSTP" _
+            & " , 1                                                  AS 'SELECT'" _
+            & " , 0                                                  AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
+            & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '   ')          AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
+            & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
+            & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')  AS LODDATE" _
+            & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')  AS DEPDATE" _
+            & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '')  AS ARRDATE" _
+            & " , ISNULL(FORMAT(OIT0002.ACCDATE, 'yyyy/MM/dd'), '')  AS ACCDATE" _
+            & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
+            & " , ISNULL(RTRIM(OIT0002.HTANK), '')                   AS HTANK" _
+            & " , ISNULL(RTRIM(OIT0002.TTANK), '')                   AS TTANK" _
+            & " , ISNULL(RTRIM(OIT0002.MTTANK), '')                  AS MTTANK" _
+            & " , ISNULL(RTRIM(OIT0002.KTANK), '')                   AS KTANK" _
+            & " , ISNULL(RTRIM(OIT0002.K3TANK), '')                  AS K3TANK" _
+            & " , ISNULL(RTRIM(OIT0002.K5TANK), '')                  AS K5TANK" _
+            & " , ISNULL(RTRIM(OIT0002.K10TANK), '')                 AS K10TANK" _
+            & " , ISNULL(RTRIM(OIT0002.LTANK), '')                   AS LTANK" _
+            & " , ISNULL(RTRIM(OIT0002.ATANK), '')                   AS ATANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER1OTANK), '')             AS OTHER1OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER2OTANK), '')             AS OTHER2OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER3OTANK), '')             AS OTHER3OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER4OTANK), '')             AS OTHER4OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER5OTANK), '')             AS OTHER5OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER6OTANK), '')             AS OTHER6OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER7OTANK), '')             AS OTHER7OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER8OTANK), '')             AS OTHER8OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER9OTANK), '')             AS OTHER9OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER10OTANK), '')            AS OTHER10OTANK" _
+            & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')               AS TOTALTANK" _
+            & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE = @P1" _
             & "   AND OIT0002.LODDATE    >= @P2" _
@@ -581,54 +581,73 @@ Public Class OIT0001EmptyTurnDairyList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
-        ''選択行
-        'WF_Sel_LINECNT.Text = ""
-        'work.WF_SEL_LINECNT.Text = ""
+        '選択行
+        work.WF_SEL_LINECNT.Text = ""
+        '受注№
+        work.WF_SEL_ORDERNUMBER.Text = ""
+        '登録日
+        work.WF_SEL_REGISTRATIONDATE.Text = ""
+        '受注進行ステータス
+        work.WF_SEL_STATUS.Text = ""
+        '受注情報
+        work.WF_SEL_INFORMATION.Text = ""
+        '受注営業所名
+        work.WF_SEL_ORDERSALESOFFICE.Text = ""
 
-        ''貨物車コード
-        'TxtStationCode.Text = ""
-        'work.WF_SEL_STATIONCODE2.Text = ""
+        '本線列車
+        work.WF_SEL_TRAIN.Text = ""
+        '発駅
+        work.WF_SEL_DEPARTURESTATION.Text = ""
+        '着駅
+        work.WF_SEL_ARRIVALSTATION.Text = ""
 
-        ''貨物コード枝番
-        'TxtBranch.Text = ""
-        'work.WF_SEL_BRANCH2.Text = ""
+        '積込日
+        work.WF_SEL_LOADINGDATE.Text = ""
+        '発日
+        work.WF_SEL_LOADINGCAR_DEPARTUREDATE.Text = ""
+        '着日
+        work.WF_SEL_LOADINGCAR_ARRIVALDATE.Text = ""
+        '受入日
+        work.WF_SEL_RECEIPTDATE.Text = ""
 
-        ''貨物駅名称
-        'TxtStationName.Text = ""
-        'work.WF_SEL_STATONNAME.Text = ""
+        '車数（レギュラー）
+        work.WF_SEL_REGULAR_TANKCAR.Text = "0"
+        '車数（ハイオク）
+        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = "0"
+        '車数（灯油）
+        work.WF_SEL_KEROSENE_TANKCAR.Text = "0"
+        '車数（未添加灯油）
+        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = "0"
+        '車数（軽油）
+        work.WF_SEL_DIESEL_TANKCAR.Text = "0"
+        '車数（３号軽油）
+        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = "0"
+        '車数（５号軽油）
+        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = "0"
+        '車数（１０号軽油）
+        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = "0"
+        '車数（LSA）
+        work.WF_SEL_LSA_TANKCAR.Text = "0"
+        '車数（A重油）
+        work.WF_SEL_AHEAVY_TANKCAR.Text = "0"
+        '合計車数
+        work.WF_SEL_TANKCARTOTAL.Text = "0"
 
-        ''貨物駅名称カナ
-        'TxtStationNameKana.Text = ""
-        'work.WF_SEL_STATIONNAMEKANA.Text = ""
+        '削除フラグ
+        work.WF_SEL_DELFLG.Text = "0"
+        '作成フラグ(新規登録：1, 更新：2)
+        work.WF_SEL_CREATEFLG.Text = "1"
 
-        ''貨物駅種別名称
-        'TxtTypeName.Text = ""
-        'work.WF_SEL_TYPENAME.Text = ""
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
 
-        ''貨物駅種別名称
-        'TxtTypeNameKana.Text = ""
-        'work.WF_SEL_TYPENAMEKANA.Text = ""
+        WF_GridDBclick.Text = ""
 
-        ''削除
-        'WF_DELFLG.Text = "0"
-        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        '○ 遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
 
-        ''○画面切替設定
-        'WF_BOXChange.Value = "detailbox"
-
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0001tbl)
-
-        'WF_GridDBclick.Text = ""
-
-        ''############# おためし #############
-        'work.WF_SEL_DELFLG.Text = "0"
-
-        ''○ 遷移先(登録画面)退避データ保存先の作成
-        'WW_CreateXMLSaveFile()
-
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
 
         '○ 次ページ遷移
         Master.TransitionPage()
@@ -747,6 +766,8 @@ Public Class OIT0001EmptyTurnDairyList
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("DELFLG")
+        '作成フラグ(新規登録：1, 更新：2)
+        work.WF_SEL_CREATEFLG.Text = "2"
 
         '○ 状態をクリア
         For Each OIT0001row As DataRow In OIT0001tbl.Rows

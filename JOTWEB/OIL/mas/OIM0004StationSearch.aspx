@@ -26,7 +26,6 @@
         <!-- ○ 変動項目 ○ -->
         <!-- 会社コード -->
         <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;display:none">会社コード</a>
-
         <a style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
             <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
@@ -45,7 +44,7 @@
         <!-- 貨物駅コード -->
         <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">貨物駅コード</a>
 
-        <a style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
+        <a class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
             <asp:TextBox ID="TxtStationCode" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">
@@ -53,7 +52,7 @@
         </a>
         <!-- 貨物コード枝番 -->
         <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">貨物コード枝番</a>
-        <a style="position:fixed; top:9.9em; left:18em;" onchange="TextBox_change('TxtStationCode');">
+        <a class="ef" style="position:fixed; top:9.9em; left:18em;" onchange="TextBox_change('TxtStationCode');">
             <asp:TextBox ID="TxtBranch" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:9.9em; left:27em;">

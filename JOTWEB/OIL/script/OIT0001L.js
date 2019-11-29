@@ -54,26 +54,8 @@ function ChangeCheckBox() {
 // ○チェックボックス選択
 function SelectCheckBox(obj, lineCnt) {
 
-    var objTable = document.getElementById("pnlListArea_DL").children[0];
-
-    var chkObjs = objTable.querySelectorAll("input[id^='chkpnlListAreaOPERATION']");
-    var spnObjs = objTable.querySelectorAll("span[id^='hchkpnlListAreaOPERATION']");
-
     if (document.getElementById("MF_SUBMIT").value == "FALSE") {
-
-        for (let i = 0; i < chkObjs.length; i++) {
-            if (i == lineCnt - 1) {
-                if (chkObjs[i].checked == true) {
-                    document.getElementById("WF_SelectedIndex").value = i + 1;
-                    document.getElementById("WF_FIELD").value = "on";
-                } else {
-                    spnObjs[i].innerText = "";
-                    document.getElementById("WF_SelectedIndex").value = i + 1;
-                    document.getElementById("WF_FIELD").value = "";
-                }
-            }
-        }
-
+        document.getElementById("WF_SelectedIndex").value = lineCnt
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
         document.body.style.cursor = "wait";
         document.forms[0].submit();

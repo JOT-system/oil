@@ -38,7 +38,7 @@
                     <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:9.5em;">
-                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:58em;">
                     <input type="button" id="WF_ButtonINSERT" value="新規登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />

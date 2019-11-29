@@ -99,7 +99,7 @@ Public Class OIT0001EmptyTurnDairySearch
             '営業所
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICE.Text
             '積込日(開始)
-            TxtLoadingDateStart.Text = work.WF_SEL_LOADINGDATE.Text
+            TxtLoadingDateStart.Text = work.WF_SEL_LOADING.Text
             ''拠点
             'TxtBase.Text = work.WF_SEL_BASE.Text
             '列車番号
@@ -166,6 +166,7 @@ Public Class OIT0001EmptyTurnDairySearch
         work.WF_SEL_SALESOFFICE.Text = TxtSalesOffice.Text
         '積込日
         work.WF_SEL_LOADINGDATE.Text = TxtLoadingDateStart.Text
+        work.WF_SEL_LOADING.Text = TxtLoadingDateStart.Text
         ''拠点
         'work.WF_SEL_BASE.Text = TxtBase.Text
         '列車番号

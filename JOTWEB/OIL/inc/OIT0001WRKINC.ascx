@@ -8,6 +8,8 @@
     <asp:TextBox ID="WF_SEL_UORG" runat="server"></asp:TextBox>
     <!-- 営業所 -->
     <asp:TextBox ID="WF_SEL_SALESOFFICE" runat="server"></asp:TextBox>
+    <!-- 積込日 -->
+    <asp:TextBox ID="WF_SEL_LOADING" runat="server"></asp:TextBox>
     <!-- 拠点 -->
     <asp:TextBox ID="WF_SEL_BASE" runat="server"></asp:TextBox>
     <!-- 列車番号 -->

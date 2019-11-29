@@ -174,7 +174,7 @@
                 <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonLINE_LIFTED" value="行解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
             </a>
             <a style="left:0.5em;">
                 <input type="button" id="WF_ButtonLINE_ADD" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />

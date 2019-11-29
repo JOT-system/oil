@@ -441,9 +441,12 @@ Public Class OIT0001EmptyTurnDairyList
         'チェックボックス判定
         For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
             If OIT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                OIT0001tbl.Rows(i)("OPERATION") = WF_FIELD.Value
+                If OIT0001tbl.Rows(i)("OPERATION") = "on" Then
+                    OIT0001tbl.Rows(i)("OPERATION") = ""
+                Else
+                    OIT0001tbl.Rows(i)("OPERATION") = "on"
+                End If
             End If
-
         Next
 
         '○ 画面表示データ保存
@@ -536,8 +539,12 @@ Public Class OIT0001EmptyTurnDairyList
             Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
 
             '選択されている行は削除対象
+            Dim i As Integer = 0
+            Dim j As Integer = 9000
             For Each OIT0001UPDrow In OIT0001tbl.Rows
                 If OIT0001UPDrow("OPERATION") = "on" Then
+                    j += 1
+                    OIT0001UPDrow("LINECNT") = j        'LINECNT
                     OIT0001UPDrow("DELFLG") = C_DELETE_FLG.DELETE
                     OIT0001UPDrow("HIDDEN") = 1
 
@@ -548,6 +555,9 @@ Public Class OIT0001EmptyTurnDairyList
                     PARA14.Value = C_DEFAULT_YMD
 
                     SQLcmd.ExecuteNonQuery()
+                Else
+                    i += 1
+                    OIT0001UPDrow("LINECNT") = i        'LINECNT
                 End If
             Next
 

@@ -303,15 +303,15 @@ Public Class OIM0005TankSearch
                 Dim prmData As New Hashtable
                 prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
-                ''JOT車番
-                'If WF_FIELD.Value = "WF_TANKNUMBER" Then
-                '    prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
-                'End If
+                'JOT車番
+                If WF_FIELD.Value = "WF_TANKNUMBER" Then
+                    prmData = work.CreateTankParam(WF_CAMPCODE.Text, "TANKNUMBER")
+                End If
 
-                ''型式
-                'If WF_FIELD.Value = "WF_MODEL" Then
-                '    prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
-                'End If
+                '型式
+                If WF_FIELD.Value = "WF_MODEL" Then
+                    prmData = work.CreateTankParam(WF_CAMPCODE.Text, "TANKMODEL")
+                End If
 
                 .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                 .ActiveListBox()
@@ -479,10 +479,10 @@ Public Class OIM0005TankSearch
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TANKNUMBER"        'JOT車番
-                    prmData = work.CreateTANKNUMBERParam(WF_CAMPCODE.Text, I_VALUE)
+                    prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "MODEL"        '型式
-                    prmData = work.CreateTANKMODELParam(WF_MODEL.Text, I_VALUE)
+                    prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

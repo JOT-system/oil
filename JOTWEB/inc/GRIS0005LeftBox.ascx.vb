@@ -423,13 +423,21 @@ Public Class GRIS0005LeftBox
                 '貨物駅パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STATIONPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER
+                'タンク車番号
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TANKMODEL
+                'タンク車番号
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKMODEL"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
                 '営業所(組織コード)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SALESOFFICE"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER
                 '本線列車番号
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TRAINNO"
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー

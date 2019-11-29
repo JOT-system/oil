@@ -36,7 +36,7 @@
         <!-- JOT車番 -->
         <a style="position:fixed; top:7.7em; left:4em; font-weight:bold;">JOT車番</a>
 
-        <a  class="ef" style="position:fixed; top:7.7em; left:18em;">
+        <a  class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
             <asp:TextBox ID="WF_TANKNUMBER" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">
@@ -45,7 +45,7 @@
         <!-- 型式 -->
         <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">型式</a>
 
-        <a  class="ef" style="position:fixed; top:9.9em; left:18em;">
+        <a  class="ef" style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_TANKMODEL%>);" onchange="TextBox_change('WF_MODEL');">
             <asp:TextBox ID="WF_MODEL" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:9.9em; left:27em;">

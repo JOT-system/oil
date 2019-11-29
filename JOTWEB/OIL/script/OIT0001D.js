@@ -55,29 +55,31 @@ function ChangeCheckBox() {
 // ○チェックボックス選択
 function SelectCheckBox(obj, lineCnt) {
 
-    var objTable = document.getElementById("pnlListArea_DL").children[0];
-
-    var chkObjs = objTable.querySelectorAll("input[id^='chkpnlListAreaOPERATION']");
-    var spnObjs = objTable.querySelectorAll("span[id^='hchkpnlListAreaOPERATION']");
-
     if (document.getElementById("MF_SUBMIT").value == "FALSE") {
-
-        for (let i = 0; i < chkObjs.length; i++) {
-            if (i == lineCnt - 1) {
-                if (chkObjs[i].checked == true) {
-                    document.getElementById("WF_SelectedIndex").value = i + 1;
-                    document.getElementById("WF_FIELD").value = "on";
-                } else {
-                    spnObjs[i].innerText = "";
-                    document.getElementById("WF_SelectedIndex").value = i + 1;
-                    document.getElementById("WF_FIELD").value = "";
-                }
-            }
-        }
-
+        document.getElementById("WF_SelectedIndex").value = lineCnt
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }
 
 }
+
+// ○左Box用処理（左Box表示/非表示切り替え）
+function ListField_DBclick(pnlList, Line, fieldNM) {
+    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        document.getElementById('WF_GridDBclick').value = Line;
+        document.getElementById('WF_FIELD').value = fieldNM;
+
+        if (fieldNM == "TANKNO") {
+            document.getElementById('WF_LeftMViewChange').value = 20;
+        }
+        else if (fieldNM == "OILNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 24;
+        }
+        document.getElementById('WF_LeftboxOpen').value = "Open";
+        document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
+        document.body.style.cursor = "wait";
+        document.forms[0].submit();
+    };
+};

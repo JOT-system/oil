@@ -290,6 +290,24 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         OIT0001tbl.Clear()
 
+        If IsNothing(OIT0001WKtbl) Then
+            OIT0001WKtbl = New DataTable
+        End If
+
+        If OIT0001WKtbl.Columns.Count <> 0 Then
+            OIT0001WKtbl.Columns.Clear()
+        End If
+
+        OIT0001WKtbl.Clear()
+
+        '○ 取得SQL
+        '　検索説明　：　受注№の連番を決める
+        Dim SQLStrNum As String =
+        " SELECT " _
+            & " ISNULL(FORMAT(MAX(SUBSTRING(OIT0002.ORDERNO, 10, 2)) + 1,'00'),'01') AS ORDERNO_NUM" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " WHERE SUBSTRING(OIT0002.ORDERNO, 2, 8) = FORMAT(GETDATE(),'yyyyMMdd')"
+
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データを受注、受注明細等のマスタから取得する
@@ -305,7 +323,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS TIMSTP" _
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
-            & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd')             AS ORDERNO" _
             & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS ORDERYMD" _
             & " , ''                                             AS SHIPPERSNAME" _
             & " , ''                                             AS OILCODE" _
@@ -319,7 +336,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINT" _
-            & " , '0'                                            AS DELFLG" _
+            & " , @P2                                            AS DELFLG" _
+            & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO" _
+            & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
+            & " , ''                                             AS KAMOKU" _
             & " FROM sys.all_objects "
 
             SQLStr &=
@@ -335,7 +355,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , CAST(OIT0002.UPDTIMSTP AS bigint)              AS TIMSTP" _
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')             AS ORDERNO" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '')            AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '   ')     AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0003.OILCODE), '')             AS OILCODE" _
@@ -360,6 +379,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(FORMAT(OIT0003.RETURNDATETRAIN, 'yyyy/MM/dd'), '')                AS RETURNDATETRAIN" _
             & " , ISNULL(RTRIM(OIT0003.JOINT), '')               AS JOINT" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')              AS DELFLG" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')             AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')            AS DETAILNO" _
             & " , ISNULL(RTRIM(OIT0003.KAMOKU), '')              AS KAMOKU" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
@@ -396,12 +416,30 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdNum As New SqlCommand(SQLStrNum, SQLcon)
+
+                Using SQLdrNum As SqlDataReader = SQLcmdNum.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdrNum.FieldCount - 1
+                        OIT0001WKtbl.Columns.Add(SQLdrNum.GetName(index), SQLdrNum.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001WKtbl.Load(SQLdrNum)
+                End Using
+
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
 
-                PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
-                PARA2.Value = C_DELETE_FLG.DELETE
+                If work.WF_SEL_CREATEFLG.Text = 1 Then
+                    For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
+                        PARA1.Value = OIT0001WKrow("ORDERNO_NUM")
+                        PARA2.Value = C_DELETE_FLG.ALIVE
+                    Next
+                ElseIf work.WF_SEL_CREATEFLG.Text = 2 Then
+                    PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
+                    PARA2.Value = C_DELETE_FLG.DELETE
+                End If
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -550,7 +588,20 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '本社列車
                     If WF_FIELD.Value = "TxtHeadOfficeTrain" Then
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, TxtHeadOfficeTrain.Text)
+                        '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, TxtHeadOfficeTrain.Text + work.WF_SEL_UORG.Text)
+                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_UORG.Text, TxtHeadOfficeTrain.Text)
+                    End If
+
+                    '油種
+                    If WF_FIELD.Value = "OILNAME" Then
+                        '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_UORG.Text, "")
+                    End If
+
+                    'タンク車№
+                    If WF_FIELD.Value = "TANKNO" Then
+                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_UORG.Text, "")
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -590,9 +641,12 @@ Public Class OIT0001EmptyTurnDairyDetail
         'チェックボックス判定
         For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
             If OIT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                OIT0001tbl.Rows(i)("OPERATION") = WF_FIELD.Value
+                If OIT0001tbl.Rows(i)("OPERATION") = "on" Then
+                    OIT0001tbl.Rows(i)("OPERATION") = ""
+                Else
+                    OIT0001tbl.Rows(i)("OPERATION") = "on"
+                End If
             End If
-
         Next
 
         '○ 画面表示データ保存
@@ -613,6 +667,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             '運用部署
             Case "WF_UORG"
                 CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+            '本線列車
+            Case "TxtHeadOfficeTrain"
+
             '発駅
             Case "TxtDepstation"
                 CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_RTN_SW)
@@ -639,6 +696,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Protected Sub WF_ButtonSel_Click()
         Dim WW_SelectValue As String = ""
         Dim WW_SelectText As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", ""}
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
@@ -660,7 +718,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WF_UORG.Focus()
 
             Case "TxtHeadOfficeTrain"   '本社列車
+                '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
                 TxtHeadOfficeTrain.Text = WW_SelectValue
+                FixvalueMasterSearch("TRAINNUMBER", "", WW_SelectValue, WW_GetValue)
+
+                '発駅
+                TxtDepstation.Text = WW_GetValue(1)
+                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+                '着駅
+                TxtArrstation.Text = WW_GetValue(2)
+                CODENAME_get("ARRSTATION", TxtArrstation.Text, LblArrstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
 
             Case "TxtDepstation"        '発駅
@@ -721,6 +788,37 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtAccDate.Focus()
+
+            Case "OILNAME"   '(一覧)油種
+            Case "TANKNO"    '(一覧)タンク車№
+
+                '○ LINECNT取得
+                Dim WW_LINECNT As Integer = 0
+                If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+                '○ 設定項目取得
+                Dim WW_SETVALUE As String
+                WW_SETVALUE = WW_SelectText
+
+                '○ 画面表示データ復元
+                If Not Master.RecoverTable(OIT0001tbl) Then Exit Sub
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = OIT0001tbl.AsEnumerable.
+                            FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+                If IsNothing(updHeader) Then Exit Sub
+
+                '〇 一覧項目へ設定
+                If WF_FIELD.Value = "OILNAME" Then
+                    updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+                ElseIf WF_FIELD.Value = "TANKNO" Then
+                    updHeader.Item(WF_FIELD.Value) = WW_SETVALUE.Substring(0, 8).Trim()
+                End If
+                'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+
+                '○ 画面表示データ保存
+                If Not Master.SaveTable(OIT0001tbl) Then Exit Sub
+
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -843,8 +941,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
 
             '選択されている行は削除対象
+            Dim i As Integer = 0
+            Dim j As Integer = 9000
             For Each OIT0001UPDrow In OIT0001tbl.Rows
                 If OIT0001UPDrow("OPERATION") = "on" Then
+                    j += 1
+                    OIT0001UPDrow("LINECNT") = j        'LINECNT
                     OIT0001UPDrow("DELFLG") = C_DELETE_FLG.DELETE
                     OIT0001UPDrow("HIDDEN") = 1
 
@@ -859,6 +961,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA14.Value = C_DEFAULT_YMD
 
                     SQLcmd.ExecuteNonQuery()
+                Else
+                    i += 1
+                    OIT0001UPDrow("LINECNT") = i        'LINECNT
                 End If
             Next
 
@@ -891,21 +996,47 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' </summary>
     Protected Sub WF_ButtonLINE_ADD_Click()
 
+        If IsNothing(OIT0001WKtbl) Then
+            OIT0001WKtbl = New DataTable
+        End If
+
+        If OIT0001WKtbl.Columns.Count <> 0 Then
+            OIT0001WKtbl.Columns.Clear()
+        End If
+
+        OIT0001WKtbl.Clear()
+
         'DataBase接続文字
         Dim SQLcon = CS0050SESSION.getConnection
         SQLcon.Open() 'DataBase接続(Open)
 
-        '○ 検索SQL
-        '　検索説明
-        '     条件指定に従い該当データを受注、受注明細等のマスタから取得する
+        Dim SQLStrNum As String =
+        " SELECT " _
+            & "  MAX(OIT0003_1.ORDERNO)                                      AS ORDERNO" _
+            & ", FORMAT(MAX(SUBSTRING(OIT0003_1.ORDERNO, 10, 2)) + 1, '00')  AS ORDERNO_NUM" _
+            & ", FORMAT(MAX(ISNULL(OIT0003_2.DETAILNO, '000')) + 1, '000')   AS DETAILNO_NUM" _
+            & " FROM (" _
+            & "  SELECT ISNULL(MAX(OIT0003.ORDERNO),'O' + FORMAT(GETDATE(),'yyyyMMdd') + '00') AS ORDERNO" _
+            & "  FROM   OIL.OIT0003_DETAIL OIT0003" _
+            & "  WHERE  SUBSTRING(OIT0003.ORDERNO, 2, 8) = FORMAT(GETDATE(),'yyyyMMdd')" _
+            & " ) OIT0003_1 " _
+            & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003_2 ON" _
+            & " OIT0003_1.ORDERNO = OIT0003_2.ORDERNO"
+
+        '" SELECT " _
+        '    & " ISNULL(FORMAT(MAX(SUBSTRING(OIT0002.ORDERNO, 10, 2)) + 1,'00'),'01') AS ORDERNO" _
+        '    & " FROM OIL.OIT0002_ORDER OIT0002 " _
+        '    & " WHERE SUBSTRING(OIT0002.ORDERNO, 2, 8) = FORMAT(GETDATE(),'yyyyMMdd')"
+
+        '○ 追加SQL
+        '　 説明　：　行追加用SQL
         Dim SQLStr As String =
         " SELECT TOP (1)" _
             & "   0                                              AS LINECNT" _
             & " , ''                                             AS OPERATION" _
-            & " , '0'                                             AS TIMSTP" _
+            & " , '0'                                            AS TIMSTP" _
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
-            & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd')             AS ORDERNO" _
             & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS ORDERYMD" _
             & " , ''                                             AS SHIPPERSNAME" _
             & " , ''                                             AS OILCODE" _
@@ -920,18 +1051,31 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINT" _
             & " , '0'                                            AS DELFLG" _
+            & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P01      AS ORDERNO" _
+            & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
+            & " , ''                                             AS KAMOKU" _
             & " FROM sys.all_objects "
         SQLStr &=
                   " ORDER BY" _
                 & "    LINECNT"
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 11) '受注№
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdNum As New SqlCommand(SQLStrNum, SQLcon)
 
-                PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
-                PARA2.Value = C_DELETE_FLG.DELETE
+                Using SQLdrNum As SqlDataReader = SQLcmdNum.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdrNum.FieldCount - 1
+                        OIT0001WKtbl.Columns.Add(SQLdrNum.GetName(index), SQLdrNum.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001WKtbl.Load(SQLdrNum)
+                End Using
+
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
+                    PARA1.Value = OIT0001WKrow("ORDERNO_NUM")
+                Next
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     ''○ フィールド名とフィールドの型を取得
@@ -944,14 +1088,31 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Using
 
                 Dim i As Integer = 0
+                Dim j As Integer = 9000
+                Dim intDetailNo As Integer
                 Dim strOrderNoBak As String = ""
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
-                    i += 1
+
+                    '行追加データに既存の受注№を設定する。
+                    '既存データがなく新規データの場合は、SQLでの項目[受注№]を利用
                     If OIT0001row("LINECNT") = 0 Then
-                        OIT0001row("ORDERNO") = strOrderNoBak
+                        If strOrderNoBak <> "" Then
+                            OIT0001row("ORDERNO") = strOrderNoBak
+                            intDetailNo += 1
+                            OIT0001row("DETAILNO") = intDetailNo.ToString("000")
+                        End If
                     End If
-                    OIT0001row("LINECNT") = i        'LINECNT
+
+                    '削除対象データと通常データとそれぞれでLINECNTを振り分ける
+                    If OIT0001row("HIDDEN") = 1 Then
+                        j += 1
+                        OIT0001row("LINECNT") = j        'LINECNT
+                    Else
+                        i += 1
+                        OIT0001row("LINECNT") = i        'LINECNT
+                    End If
                     strOrderNoBak = OIT0001row("ORDERNO")
+                    intDetailNo = OIT0001row("DETAILNO")
                 Next
             End Using
         Catch ex As Exception
@@ -1088,6 +1249,94 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
 
+    End Sub
+
+    ''' <summary>
+    ''' マスタ検索処理
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <param name="O_VALUE"></param>
+    Protected Sub FixvalueMasterSearch(ByVal I_CODE As String, ByVal I_CLASS As String, ByVal I_KEYCODE As String, ByRef O_VALUE() As String)
+
+        If IsNothing(OIT0001WKtbl) Then
+            OIT0001WKtbl = New DataTable
+        End If
+
+        If OIT0001WKtbl.Columns.Count <> 0 Then
+            OIT0001WKtbl.Columns.Clear()
+        End If
+
+        OIT0001WKtbl.Clear()
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '検索SQL文
+            Dim SQLStr As String =
+               " SELECT" _
+                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '   ') AS CAMPCODE" _
+                & " , ISNULL(RTRIM(VIW0001.CLASS), '   ')    AS CLASS" _
+                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '   ')  AS KEYCODE" _
+                & " , ISNULL(RTRIM(VIW0001.STYMD), '   ')    AS STYMD" _
+                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '   ')   AS ENDYMD" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE1), '   ')   AS VALUE1" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE2), '   ')   AS VALUE2" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE3), '   ')   AS VALUE3" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE4), '   ')   AS VALUE4" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE5), '   ')   AS VALUE5" _
+                & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
+                & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
+                & " WHERE VIW0001.CLASS = @P01" _
+                & " AND VIW0001.KEYCODE = @P02" _
+                & " AND VIW0001.DELFLG <> @P03"
+
+            SQLStr &=
+                  " ORDER BY" _
+                & "    VIW0001.KEYCODE"
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+                PARA01.Value = I_CLASS
+                PARA02.Value = I_KEYCODE
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001WKtbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
+                    O_VALUE(0) = OIT0001WKrow("VALUE1")
+                    O_VALUE(1) = OIT0001WKrow("VALUE2")
+                    O_VALUE(2) = OIT0001WKrow("VALUE3")
+                    O_VALUE(3) = OIT0001WKrow("VALUE4")
+                    O_VALUE(4) = OIT0001WKrow("VALUE5")
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D MASTER_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D MASTER_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>

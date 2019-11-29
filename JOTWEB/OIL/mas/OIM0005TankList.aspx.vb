@@ -266,194 +266,104 @@ Public Class OIM0005TankList
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データをタンク車マスタから取得する
-
-        Dim SQLStr As String
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   0                                     AS LINECNT " _
+            & " , ''                                    AS OPERATION " _
+            & " , CAST(OIM0005.UPDTIMSTP AS bigint)       AS UPDTIMSTP " _
+            & " , 1                                     AS 'SELECT' " _
+            & " , 0                                     AS HIDDEN " _
+            & " , ISNULL(RTRIM(OIM0005.DELFLG), '')         AS DELFLG " _
+            & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')         AS TANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.MODEL), '')         AS MODEL " _
+            & " , ISNULL(RTRIM(OIM0005.MODELKANA), '')         AS MODELKANA " _
+            & " , ISNULL(RTRIM(OIM0005.LOAD), '')         AS LOAD " _
+            & " , ISNULL(RTRIM(OIM0005.LOADUNIT), '')         AS LOADUNIT " _
+            & " , ISNULL(RTRIM(OIM0005.VOLUME), '')         AS VOLUME " _
+            & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')         AS VOLUMEUNIT " _
+            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')         AS ORIGINOWNERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')         AS ORIGINOWNERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')         AS OWNERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.OWNERNAME), '')         AS OWNERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECODE), '')         AS LEASECODE " _
+            & " , ISNULL(RTRIM(OIM0005.LEASENAME), '')         AS LEASENAME " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')         AS LEASECLASS " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')         AS LEASECLASSNEMAE " _
+            & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')         AS AUTOEXTENTION " _
+            & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN ''                   " _
+            & "   ELSE FORMAT(OIM0005.LEASESTYMD,'yyyy/MM/dd')              " _
+            & "   END                                     as LEASESTYMD   " _
+            & " , CASE WHEN OIM0005.LEASEENDYMD IS NULL THEN ''                   " _
+            & "   ELSE FORMAT(OIM0005.LEASEENDYMD,'yyyy/MM/dd')              " _
+            & "   END                                     as LEASEENDYMD   " _
+            & " , ISNULL(RTRIM(OIM0005.USERCODE), '')         AS USERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.USERNAME), '')         AS USERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONCODE), '')         AS CURRENTSTATIONCODE " _
+            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONNAME), '')         AS CURRENTSTATIONNAME " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONCODE), '')         AS EXTRADINARYSTATIONCODE " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONNAME), '')         AS EXTRADINARYSTATIONNAME " _
+            & " , CASE WHEN OIM0005.USERLIMIT IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.USERLIMIT,'yyyy/MM/dd')              " _
+            & "   END                                     as USERLIMIT   " _
+            & " , CASE WHEN OIM0005.LIMITTEXTRADIARYSTATION IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.LIMITTEXTRADIARYSTATION,'yyyy/MM/dd')              " _
+            & "   END                                     as LIMITTEXTRADIARYSTATION   " _
+            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPECODE), '')         AS DEDICATETYPECODE " _
+            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPENAME), '')         AS DEDICATETYPENAME " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPECODE), '')         AS EXTRADINARYTYPECODE " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPENAME), '')         AS EXTRADINARYTYPENAME " _
+            & " , CASE WHEN OIM0005.EXTRADINARYLIMIT IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.EXTRADINARYLIMIT,'yyyy/MM/dd')              " _
+            & "   END                                     as EXTRADINARYLIMIT   " _
+            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')         AS OPERATIONBASECODE " _
+            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')         AS OPERATIONBASENAME " _
+            & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')         AS COLORCODE " _
+            & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')         AS COLORNAME " _
+            & " , ISNULL(RTRIM(OIM0005.ENEOS), '')         AS ENEOS " _
+            & " , ISNULL(RTRIM(OIM0005.ECO), '')         AS ECO " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE1), '')         AS RESERVE1 " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE2), '')         AS RESERVE2 " _
+            & " , CASE WHEN OIM0005.JRINSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.JRINSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as JRINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.INSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.INSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as INSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.JRSPECIFIEDDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.JRSPECIFIEDDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as JRSPECIFIEDDATE   " _
+            & " , CASE WHEN OIM0005.SPECIFIEDDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.SPECIFIEDDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as SPECIFIEDDATE   " _
+            & " , CASE WHEN OIM0005.JRALLINSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.JRALLINSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as JRALLINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.ALLINSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.ALLINSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as ALLINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.TRANSFERDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.TRANSFERDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as TRANSFERDATE   " _
+            & " , ISNULL(RTRIM(OIM0005.OBTAINEDCODE), '')         AS OBTAINEDCODE " _
+            & " , CAST(ISNULL(RTRIM(OIM0005.PROGRESSYEAR), '') AS VarChar)         AS PROGRESSYEAR " _
+            & " , CAST(ISNULL(RTRIM(OIM0005.NEXTPROGRESSYEAR), '') AS VarChar)         AS NEXTPROGRESSYEAR " _
+            & " , ISNULL(RTRIM(OIM0005.JRTANKNUMBER), '')         AS JRTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.OLDTANKNUMBER), '')         AS OLDTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.OTTANKNUMBER), '')         AS OTTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER), '')         AS JXTGTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.COSMOTANKNUMBER), '')         AS COSMOTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
+            & " FROM OIL.OIM0005_TANK OIM0005 "
 
         If work.WF_SEL_TANKNUMBER.Text = "" And
             work.WF_SEL_MODEL.Text = "" Then
-            SQLStr =
-              " SELECT " _
-            & "   0                                     AS LINECNT " _
-            & " , ''                                    AS OPERATION " _
-            & " , CAST(OIM0005.UPDTIMSTP AS bigint)       AS UPDTIMSTP " _
-            & " , 1                                     AS 'SELECT' " _
-            & " , 0                                     AS HIDDEN " _
-            & " , ISNULL(RTRIM(OIM0005.DELFLG), '')         AS DELFLG " _
-            & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')         AS TANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.MODEL), '')         AS MODEL " _
-            & " , ISNULL(RTRIM(OIM0005.MODELKANA), '')         AS MODELKANA " _
-            & " , ISNULL(RTRIM(OIM0005.LOAD), '')         AS LOAD " _
-            & " , ISNULL(RTRIM(OIM0005.LOADUNIT), '')         AS LOADUNIT " _
-            & " , ISNULL(RTRIM(OIM0005.VOLUME), '')         AS VOLUME " _
-            & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')         AS VOLUMEUNIT " _
-            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')         AS ORIGINOWNERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')         AS ORIGINOWNERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')         AS OWNERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.OWNERNAME), '')         AS OWNERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECODE), '')         AS LEASECODE " _
-            & " , ISNULL(RTRIM(OIM0005.LEASENAME), '')         AS LEASENAME " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')         AS LEASECLASS " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')         AS LEASECLASSNEMAE " _
-            & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')         AS AUTOEXTENTION " _
-            & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN ''                   " _
-            & "   ELSE FORMAT(OIM0005.LEASESTYMD,'yyyy/MM/dd')              " _
-            & "   END                                     as LEASESTYMD   " _
-            & " , CASE WHEN OIM0005.LEASEENDYMD IS NULL THEN ''                   " _
-            & "   ELSE FORMAT(OIM0005.LEASEENDYMD,'yyyy/MM/dd')              " _
-            & "   END                                     as LEASEENDYMD   " _
-            & " , ISNULL(RTRIM(OIM0005.USERCODE), '')         AS USERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.USERNAME), '')         AS USERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONCODE), '')         AS CURRENTSTATIONCODE " _
-            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONNAME), '')         AS CURRENTSTATIONNAME " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONCODE), '')         AS EXTRADINARYSTATIONCODE " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONNAME), '')         AS EXTRADINARYSTATIONNAME " _
-            & " , CASE WHEN OIM0005.USERLIMIT IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.USERLIMIT,'yyyy/MM/dd')              " _
-            & "   END                                     as USERLIMIT   " _
-            & " , CASE WHEN OIM0005.LIMITTEXTRADIARYSTATION IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.LIMITTEXTRADIARYSTATION,'yyyy/MM/dd')              " _
-            & "   END                                     as LIMITTEXTRADIARYSTATION   " _
-            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPECODE), '')         AS DEDICATETYPECODE " _
-            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPENAME), '')         AS DEDICATETYPENAME " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPECODE), '')         AS EXTRADINARYTYPECODE " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPENAME), '')         AS EXTRADINARYTYPENAME " _
-            & " , CASE WHEN OIM0005.EXTRADINARYLIMIT IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.EXTRADINARYLIMIT,'yyyy/MM/dd')              " _
-            & "   END                                     as EXTRADINARYLIMIT   " _
-            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')         AS OPERATIONBASECODE " _
-            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')         AS OPERATIONBASENAME " _
-            & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')         AS COLORCODE " _
-            & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')         AS COLORNAME " _
-            & " , ISNULL(RTRIM(OIM0005.ENEOS), '')         AS ENEOS " _
-            & " , ISNULL(RTRIM(OIM0005.ECO), '')         AS ECO " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE1), '')         AS RESERVE1 " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE2), '')         AS RESERVE2 " _
-            & " , CASE WHEN OIM0005.JRINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.INSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.INSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as INSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.JRSPECIFIEDDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRSPECIFIEDDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRSPECIFIEDDATE   " _
-            & " , CASE WHEN OIM0005.SPECIFIEDDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.SPECIFIEDDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as SPECIFIEDDATE   " _
-            & " , CASE WHEN OIM0005.JRALLINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRALLINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRALLINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.ALLINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.ALLINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as ALLINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.TRANSFERDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.TRANSFERDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as TRANSFERDATE   " _
-            & " , ISNULL(RTRIM(OIM0005.OBTAINEDCODE), '')         AS OBTAINEDCODE " _
-            & " , CAST(ISNULL(RTRIM(OIM0005.PROGRESSYEAR), '') AS VarChar)         AS PROGRESSYEAR " _
-            & " , CAST(ISNULL(RTRIM(OIM0005.NEXTPROGRESSYEAR), '') AS VarChar)         AS NEXTPROGRESSYEAR " _
-            & " , ISNULL(RTRIM(OIM0005.JRTANKNUMBER), '')         AS JRTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.OLDTANKNUMBER), '')         AS OLDTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.OTTANKNUMBER), '')         AS OTTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER), '')         AS JXTGTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.COSMOTANKNUMBER), '')         AS COSMOTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
-            & " FROM OIL.OIM0005_TANK OIM0005 " _
-            & " WHERE OIM0005.DELFLG      <> @P3"
+            SQLStr &=
+              " WHERE OIM0005.DELFLG      <> @P3"
         Else
-            SQLStr =
-              " SELECT " _
-            & "   0                                     AS LINECNT " _
-            & " , ''                                    AS OPERATION " _
-            & " , CAST(OIM0005.UPDTIMSTP AS bigint)       AS UPDTIMSTP " _
-            & " , 1                                     AS 'SELECT' " _
-            & " , 0                                     AS HIDDEN " _
-            & " , ISNULL(RTRIM(OIM0005.DELFLG), '')         AS DELFLG " _
-            & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')         AS TANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.MODEL), '')         AS MODEL " _
-            & " , ISNULL(RTRIM(OIM0005.MODELKANA), '')         AS MODELKANA " _
-            & " , ISNULL(RTRIM(OIM0005.LOAD), '')         AS LOAD " _
-            & " , ISNULL(RTRIM(OIM0005.LOADUNIT), '')         AS LOADUNIT " _
-            & " , ISNULL(RTRIM(OIM0005.VOLUME), '')         AS VOLUME " _
-            & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')         AS VOLUMEUNIT " _
-            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')         AS ORIGINOWNERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')         AS ORIGINOWNERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')         AS OWNERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.OWNERNAME), '')         AS OWNERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECODE), '')         AS LEASECODE " _
-            & " , ISNULL(RTRIM(OIM0005.LEASENAME), '')         AS LEASENAME " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')         AS LEASECLASS " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')         AS LEASECLASSNEMAE " _
-            & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')         AS AUTOEXTENTION " _
-            & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN ''                   " _
-            & "   ELSE FORMAT(OIM0005.LEASESTYMD,'yyyy/MM/dd')              " _
-            & "   END                                     as LEASESTYMD   " _
-            & " , CASE WHEN OIM0005.LEASEENDYMD IS NULL THEN ''                   " _
-            & "   ELSE FORMAT(OIM0005.LEASEENDYMD,'yyyy/MM/dd')              " _
-            & "   END                                     as LEASEENDYMD   " _
-            & " , ISNULL(RTRIM(OIM0005.USERCODE), '')         AS USERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.USERNAME), '')         AS USERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONCODE), '')         AS CURRENTSTATIONCODE " _
-            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONNAME), '')         AS CURRENTSTATIONNAME " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONCODE), '')         AS EXTRADINARYSTATIONCODE " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONNAME), '')         AS EXTRADINARYSTATIONNAME " _
-            & " , CASE WHEN OIM0005.USERLIMIT IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.USERLIMIT,'yyyy/MM/dd')              " _
-            & "   END                                     as USERLIMIT   " _
-            & " , CASE WHEN OIM0005.LIMITTEXTRADIARYSTATION IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.LIMITTEXTRADIARYSTATION,'yyyy/MM/dd')              " _
-            & "   END                                     as LIMITTEXTRADIARYSTATION   " _
-            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPECODE), '')         AS DEDICATETYPECODE " _
-            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPENAME), '')         AS DEDICATETYPENAME " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPECODE), '')         AS EXTRADINARYTYPECODE " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPENAME), '')         AS EXTRADINARYTYPENAME " _
-            & " , CASE WHEN OIM0005.EXTRADINARYLIMIT IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.EXTRADINARYLIMIT,'yyyy/MM/dd')              " _
-            & "   END                                     as EXTRADINARYLIMIT   " _
-            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')         AS OPERATIONBASECODE " _
-            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')         AS OPERATIONBASENAME " _
-            & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')         AS COLORCODE " _
-            & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')         AS COLORNAME " _
-            & " , ISNULL(RTRIM(OIM0005.ENEOS), '')         AS ENEOS " _
-            & " , ISNULL(RTRIM(OIM0005.ECO), '')         AS ECO " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE1), '')         AS RESERVE1 " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE2), '')         AS RESERVE2 " _
-            & " , CASE WHEN OIM0005.JRINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.INSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.INSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as INSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.JRSPECIFIEDDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRSPECIFIEDDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRSPECIFIEDDATE   " _
-            & " , CASE WHEN OIM0005.SPECIFIEDDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.SPECIFIEDDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as SPECIFIEDDATE   " _
-            & " , CASE WHEN OIM0005.JRALLINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRALLINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRALLINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.ALLINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.ALLINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as ALLINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.TRANSFERDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.TRANSFERDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as TRANSFERDATE   " _
-            & " , ISNULL(RTRIM(OIM0005.OBTAINEDCODE), '')         AS OBTAINEDCODE " _
-            & " , CAST(ISNULL(RTRIM(OIM0005.PROGRESSYEAR), '') AS VarChar)         AS PROGRESSYEAR " _
-            & " , CAST(ISNULL(RTRIM(OIM0005.NEXTPROGRESSYEAR), '') AS VarChar)         AS NEXTPROGRESSYEAR " _
-            & " , ISNULL(RTRIM(OIM0005.JRTANKNUMBER), '')         AS JRTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.OLDTANKNUMBER), '')         AS OLDTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.OTTANKNUMBER), '')         AS OTTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER), '')         AS JXTGTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.COSMOTANKNUMBER), '')         AS COSMOTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
-            & " FROM OIL.OIM0005_TANK OIM0005 " _
-            & " WHERE OIM0005.TANKNUMBER = @P1" _
+            SQLStr &=
+              " WHERE OIM0005.TANKNUMBER = @P1" _
             & "   OR OIM0005.MODEL = @P2" _
             & "   AND OIM0005.DELFLG      <> @P3"
         End If

@@ -105,7 +105,7 @@ Public Class OIT0002LinkSearch
             'ステータス選択
             WF_SW1.Checked = True
             WF_SW2.Checked = False
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '実行画面からの遷移
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '一覧画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
             WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION.Text    '空車発駅
@@ -115,11 +115,11 @@ Public Class OIT0002LinkSearch
 
             'ステータス選択
             If work.WF_SEL_SELECT.Text = "1" Then
-                WF_SW1.Checked = False
-                WF_SW2.Checked = True
-            Else
                 WF_SW1.Checked = True
                 WF_SW2.Checked = False
+            Else
+                WF_SW1.Checked = False
+                WF_SW2.Checked = True
             End If
         End If
 
@@ -143,7 +143,7 @@ Public Class OIT0002LinkSearch
 
 
     ''' <summary>
-    ''' 実行ボタン押下時処理
+    ''' 検索ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDO_Click()
@@ -168,9 +168,15 @@ Public Class OIT0002LinkSearch
         If WF_ENDYMD.Text = "" Then
             work.WF_SEL_ENDYMD.Text = WF_STYMD.Text         '有効年月日(From) → 有効年月日(To)
         Else
-            work.WF_SEL_TRAINNO.Text = WF_TRAINNO.Text      '有効年月日(To)
+            work.WF_SEL_ENDYMD.Text = WF_ENDYMD.Text      '有効年月日(To)
         End If
-        work.WF_SEL_DEPSTATION.Text = WF_DEPSTATION.Text    '空車発駅
+        work.WF_SEL_TRAINNO.Text = WF_TRAINNO.Text    '本線列車
+        If WF_SW1.Checked = True Then
+            work.WF_SEL_SELECT.Text = "1"                   '利用可のみ表示
+        End If
+        If WF_SW2.Checked = True Then
+            work.WF_SEL_SELECT.Text = "0"                   '全て表示
+        End If
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then

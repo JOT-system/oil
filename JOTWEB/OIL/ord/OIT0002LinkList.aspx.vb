@@ -1,5 +1,5 @@
 ﻿''************************************************************
-' ユーザIDマスタメンテ一覧画面
+' 貨車連結順序表一覧画面
 ' 作成日 2019/11/14
 ' 更新日 2019/11/14
 ' 作成者 JOT遠藤
@@ -12,10 +12,10 @@ Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' ユーザIDマスタ登録（実行）
+''' 貨車連結順序表テーブル登録（実行）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIT0002UserList
+Public Class OIT0002LinkList
     Inherits Page
 
     '○ 検索結果格納Table
@@ -67,14 +67,14 @@ Public Class OIT0002UserList
                             WF_ButtonALLSELECT_Click()
                         Case "WF_ButtonALLCANCEL"　　　 '選択解除ボタン押下
                             WF_ButtonALLCANCEL_Click()
-                        Case "WF_ButtonINSERT"          '追加ボタン押下
+                        Case "WF_ButtonINSERT"          '行削除ボタン押下
                             WF_ButtonINSERT_Click()
-                        Case "WF_ButtonUPDATE"          'DB更新ボタン押下
+                        Case "WF_ButtonUPDATE"          '更新ボタン押下
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonCSV"             'ダウンロードボタン押下
                             WF_ButtonDownload_Click()
-                        Case "WF_ButtonPrint"           '一覧印刷ボタン押下
-                            WF_ButtonPrint_Click()
+                        'Case "WF_ButtonPrint"           '一覧印刷ボタン押下
+                        '    WF_ButtonPrint_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
@@ -87,10 +87,10 @@ Public Class OIT0002UserList
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
-                        Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
-                            WF_FILEUPLOAD()
-                        Case "WF_UPDATE"                '表更新ボタン押下
-                            WF_UPDATE_Click()
+                        'Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
+                        '    WF_FILEUPLOAD()
+                        'Case "WF_UPDATE"                '表更新ボタン押下
+                        '    WF_UPDATE_Click()
                         Case "WF_CLEAR"                 'クリアボタン押下
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
@@ -201,14 +201,11 @@ Public Class OIT0002UserList
         '選択行
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        ''開始年月日
-        'WF_STYMD.Text = work.WF_SEL_STYMD2.Text
+        '空車発駅
+        WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION2.Text
 
-        ''終了年月日
-        'WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
-
-        ''会社コード
-        'WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+        '本線列車
+        WF_TRAINNO.Text = work.WF_SEL_TRAINNO2.Text
 
         '削除
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
@@ -283,62 +280,92 @@ Public Class OIT0002UserList
 
         '○ 検索SQL
         '　検索説明
-        '     条件指定に従い該当データをユーザマスタ、ユーザIDマスタから取得する
+        '     条件指定に従い該当データをユーザマスタ、貨車連結順序表テーブルから取得する
         Dim SQLStr As String =
-              " Select " _
-            & "    0                                                   As LINECNT " _
-            & "    , ''                                                AS OPERATION " _
-            & "    , CAST(OIT0004.UPDTIMSTP AS BIGINT)                    AS UPDTIMSTP " _
-            & "    , 1                                                 AS 'SELECT' " _
-            & "    , 0                                                 AS HIDDEN " _
-            & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
-            & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')      AS INITYMD " _
-            & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
-            & "    , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                    AS LINKDETAILNO " _
-            & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                    AS STATUS " _
-            & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                    AS PREORDERNO " _
-            & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                    AS OFFICECODE " _
-            & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                    AS DEPSTATION " _
-            & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                    AS DEPSTATIONNAME " _
-            & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                    AS RETSTATION " _
-            & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                    AS RETSTATIONNAME " _
-            & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
-            & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
-            & "    , ISNULL(RTRIM(OIT0004.LINETRAINNO), '')                    AS LINETRAINNO " _
-            & "    , ISNULL(RTRIM(OIT0004.LINEORDER), '')                    AS LINEORDER " _
-            & "    , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')                    AS TANKNUMBER " _
-            & "    , ISNULL(RTRIM(OIT0004.PREOILCODE), '')                    AS PREOILCODE " _
-            & " FROM " _
-            & "    OIL.OIT0004_LINK OIT0004 " _
-            & " WHERE" _
-            & "    OIT0004.DEPSTATION　　  = @P1" _
-            & "    AND OIT0004.INITYMD　　 >= @P2" _
-            & "    AND OIT0004.INITYMD     <= @P3" _
-            & "    OIT0004.TRAINNO　　  = @P4" _
-            & "    OIT0004.STATUS　　  = @P5" _
-            & "    AND OIT0004.DELFLG <> @P6"
+                  " Select " _
+                & "    0                                                   As LINECNT " _
+                & "    , ''                                                AS OPERATION " _
+                & "    , CAST(OIT0004.UPDTIMSTP AS BIGINT)                    AS UPDTIMSTP " _
+                & "    , 1                                                 AS 'SELECT' " _
+                & "    , 0                                                 AS HIDDEN " _
+                & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
+                & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')      AS INITYMD " _
+                & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
+                & "    , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                    AS LINKDETAILNO " _
+                & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                    AS STATUS " _
+                & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                    AS PREORDERNO " _
+                & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                    AS OFFICECODE " _
+                & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                    AS TRAINNO " _
+                & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                    AS DEPSTATION " _
+                & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                    AS DEPSTATIONNAME " _
+                & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')                    AS RETSTATION " _
+                & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                    AS RETSTATIONNAME " _
+                & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
+                & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
+                & "    , ISNULL(RTRIM(OIT0004.LINETRAINNO), '')                    AS LINETRAINNO " _
+                & "    , ISNULL(RTRIM(OIT0004.LINEORDER), '')                    AS LINEORDER " _
+                & "    , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')                    AS TANKNUMBER " _
+                & "    , ISNULL(RTRIM(OIT0004.PREOILCODE), '')                    AS PREOILCODE " _
+                & " FROM " _
+                & "    OIL.OIT0004_LINK OIT0004 "
 
-        '○ 条件指定で指定されたものでSQLで可能なものを追加する
-        ''組織コード
-        'If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
-        '    SQLStr &= String.Format("    AND OIT0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
-        'End If
+        If work.WF_SEL_TRAINNO.Text <> "" Then
+            If work.WF_SEL_SELECT.Text = "1" Then
+                SQLStr &=
+                  " WHERE" _
+                & "    OIT0004.DEPSTATION        = @P1" _
+                & "    AND OIT0004.INITYMD      >= @P2" _
+                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    AND OIT0004.TRAINNO       = @P4" _
+                & "    And OIT0004.STATUS        = @P5" _
+                & "    AND OIT0004.DELFLG       <> @P6"
+            Else
+                SQLStr &=
+                  " WHERE" _
+                & "    OIT0004.DEPSTATION        = @P1" _
+                & "    AND OIT0004.INITYMD      >= @P2" _
+                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    AND OIT0004.TRAINNO       = @P4" _
+                & "    AND OIT0004.DELFLG       <> @P6"
+            End If
+        Else
+            If work.WF_SEL_SELECT.Text = "1" Then
+                SQLStr &=
+                  " WHERE" _
+                & "    OIT0004.DEPSTATION        = @P1" _
+                & "    AND OIT0004.INITYMD      >= @P2" _
+                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    And OIT0004.STATUS        = @P5" _
+                & "    AND OIT0004.DELFLG       <> @P6"
+            Else
+                SQLStr &=
+                  " WHERE" _
+                & "    OIT0004.DEPSTATION        = @P1" _
+                & "    AND OIT0004.INITYMD      >= @P2" _
+                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    AND OIT0004.DELFLG       <> @P6"
+            End If
+        End If
 
-        'SQLStr &=
-        '      " ORDER BY" _
-        '    & "    OIT0004.ORG" _
-        '    & "    , OIT0004.USERID"
+        SQLStr &=
+              " ORDER BY" _
+            & "    OIT0004.LINKNO" _
+            & "    , OIT0004.LINKDETAILNO"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.Date)                '有効年月日(To)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)                '有効年月日(From)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 7)         '空車発駅コード
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.Date)                '有効年月日(To)
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Date)                '有効年月日(From)
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)         '本線列車
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 1)         'ステータス
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
-                'PARA1.Value = work.WF_SEL_CAMPCODE.Text
-                PARA4.Value = work.WF_SEL_ENDYMD.Text
-                PARA5.Value = work.WF_SEL_STYMD.Text
+                PARA1.Value = work.WF_SEL_DEPSTATION.Text
+                PARA2.Value = work.WF_SEL_STYMD.Text
+                PARA3.Value = work.WF_SEL_ENDYMD.Text
+                PARA4.Value = work.WF_SEL_TRAINNO.Text
+                PARA5.Value = work.WF_SEL_SELECT.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -608,10 +635,6 @@ Public Class OIT0002UserList
         Dim WW_CheckMES2 As String = ""
         Dim WW_LINE_ERR As String = ""
         Dim WW_CheckMES As String = ""
-        Dim WW_DATE_ST As Date
-        Dim WW_DATE_END As Date
-        Dim WW_DATE_ST2 As Date
-        Dim WW_DATE_END2 As Date
 
         '○ 日付重複チェック
         For Each OIT0002row As DataRow In OIT0002tbl.Rows
@@ -688,7 +711,7 @@ Public Class OIT0002UserList
     End Sub
 
     ''' <summary>
-    ''' ユーザIDマスタ登録更新
+    ''' 貨車連結順序表テーブル登録更新
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
@@ -1336,34 +1359,34 @@ Public Class OIT0002UserList
 
     End Sub
 
-    ''' <summary>
-    ''' ﾀﾞｳﾝﾛｰﾄﾞ(PDF出力)・一覧印刷ボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonPrint_Click()
+    '''' <summary>
+    '''' ﾀﾞｳﾝﾛｰﾄﾞ(PDF出力)・一覧印刷ボタン押下時処理
+    '''' </summary>
+    '''' <remarks></remarks>
+    ''Protected Sub WF_ButtonPrint_Click()
 
-        '○ 帳票出力
-        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-        CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
-        CS0030REPORT.FILEtyp = "pdf"                            '出力ファイル形式
-        CS0030REPORT.TBLDATA = OIT0002tbl                        'データ参照Table
-        CS0030REPORT.CS0030REPORT()
-        If Not isNormal(CS0030REPORT.ERR) Then
-            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
-            Else
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
-            End If
-            Exit Sub
-        End If
+    '    '○ 帳票出力
+    '    CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
+    '    CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
+    '    CS0030REPORT.MAPID = Master.MAPID                       '画面ID
+    '    CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
+    '    CS0030REPORT.FILEtyp = "pdf"                            '出力ファイル形式
+    '    CS0030REPORT.TBLDATA = OIT0002tbl                        'データ参照Table
+    '    CS0030REPORT.CS0030REPORT()
+    '    If Not isNormal(CS0030REPORT.ERR) Then
+    '        If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
+    '            Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+    '        Else
+    '            Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
+    '        End If
+    '        Exit Sub
+    '    End If
 
-        '○ 別画面でPDFを表示
-        WF_PrintURL.Value = CS0030REPORT.URL
-        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_PDFPrint();", True)
+    '    '○ 別画面でPDFを表示
+    '    WF_PrintURL.Value = CS0030REPORT.URL
+    '    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_PDFPrint();", True)
 
-    End Sub
+    'End Sub
 
 
     ''' <summary>

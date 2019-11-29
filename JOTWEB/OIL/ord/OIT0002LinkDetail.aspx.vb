@@ -15,7 +15,7 @@ Imports JOTWEB.GRIS0005LeftBox
 ''' ユーザIDマスタ登録（実行）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIT0002UserCreate
+Public Class OIT0002LinlDetail
     Inherits Page
 
     '○ 検索結果格納Table
@@ -169,27 +169,6 @@ Public Class OIT0002UserCreate
         '選択行
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        'ユーザID
-        WF_USERID.Text = work.WF_SEL_USERID.Text
-
-        '社員名（短）
-        WF_STAFFNAMES.Text = work.WF_SEL_STAFFNAMES.Text
-
-        '社員名（長）
-        WF_STAFFNAMEL.Text = work.WF_SEL_STAFFNAMEL.Text
-
-        '画面ＩＤ
-        WF_MAPID.Text = work.WF_SEL_MAPID.Text
-
-        'パスワード
-        WF_PASSWORD.Text = work.WF_SEL_PASSWORD.Text
-        WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
-
-        '誤り回数
-        WF_MISSCNT.Text = work.WF_SEL_MISSCNT.Text
-
-        'パスワード有効期限
-        WF_PASSENDYMD.Text = work.WF_SEL_PASSENDYMD.Text
 
         '開始年月日
         WF_STYMD.Text = work.WF_SEL_STYMD2.Text
@@ -200,35 +179,6 @@ Public Class OIT0002UserCreate
         '会社コード
         WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
 
-        '組織コード
-        WF_ORG.Text = work.WF_SEL_ORG2.Text
-        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)
-
-        'メールアドレス
-        WF_EMAIL.Text = work.WF_SEL_EMAIL.Text
-
-        'メニュー表示制御ロール
-        WF_MENUROLE.Text = work.WF_SEL_MENUROLE.Text
-        CODENAME_get("MENU", WF_MENUROLE.Text, WF_MENUROLE_TEXT.Text, WW_DUMMY)
-
-        '画面参照更新制御ロール
-        WF_MAPROLE.Text = work.WF_SEL_MAPROLE.Text
-        CODENAME_get("MAP", WF_MAPROLE.Text, WF_MAPROLE_TEXT.Text, WW_DUMMY)
-
-        '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = work.WF_SEL_VIEWPROFID.Text
-        CODENAME_get("VIEW", WF_VIEWPROFID.Text, WF_VIEWPROFID_TEXT.Text, WW_DUMMY)
-
-        'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = work.WF_SEL_RPRTPROFID.Text
-        CODENAME_get("XML", WF_RPRTPROFID.Text, WF_RPRTPROFID_TEXT.Text, WW_DUMMY)
-
-        '画面初期値ロール
-        WF_VARIANT.Text = work.WF_SEL_VARIANT.Text
-
-        '承認権限ロール
-        WF_APPROVALID.Text = work.WF_SEL_APPROVALID.Text
-        CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
 
         '削除
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
@@ -298,14 +248,14 @@ Public Class OIT0002UserCreate
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '組織コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
-            SQLStr &= String.Format("    AND OIS0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
-        End If
+        'If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
+        '    SQLStr &= String.Format("    AND OIS0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
+        'End If
 
-        SQLStr &=
-              " ORDER BY" _
-            & "    OIS0004.ORG" _
-            & "    , OIS0004.USERID"
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIS0004.ORG" _
+        '    & "    , OIS0004.USERID"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -695,16 +645,16 @@ Public Class OIT0002UserCreate
                         Select Case WF_FIELD.Value
                             Case "WF_ORG"       '組織コード
                                 prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-                            Case "WF_MENUROLE"       'メニュー表示制御ロール
-                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MENU")
-                            Case "WF_MAPROLE"       '画面参照更新制御ロール
-                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MAP")
-                            Case "WF_VIEWPROFID"       '画面表示項目制御ロール
-                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "VIEW")
-                            Case "WF_RPRTPROFID"       'エクセル出力制御ロール
-                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "XML")
-                            Case "WF_APPROVALID"       '承認権限ロール
-                                prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
+                                'Case "WF_MENUROLE"       'メニュー表示制御ロール
+                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MENU")
+                                'Case "WF_MAPROLE"       '画面参照更新制御ロール
+                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MAP")
+                                'Case "WF_VIEWPROFID"       '画面表示項目制御ロール
+                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "VIEW")
+                                'Case "WF_RPRTPROFID"       'エクセル出力制御ロール
+                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "XML")
+                                'Case "WF_APPROVALID"       '承認権限ロール
+                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -943,28 +893,28 @@ Public Class OIT0002UserCreate
 
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
-            If OIT0002INProw("USERID") = work.WF_SEL_USERID.Text Then
+            'If OIT0002INProw("USERID") = work.WF_SEL_USERID.Text Then
 
-            Else
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    'DataBase接続
-                    SQLcon.Open()
+            'Else
+            '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            '        'DataBase接続
+            '        SQLcon.Open()
 
-                    '一意制約チェック
-                    UniqueKeyCheck(SQLcon, WW_UniqueKeyCHECK)
-                End Using
+            '        '一意制約チェック
+            '        UniqueKeyCheck(SQLcon, WW_UniqueKeyCHECK)
+            '    End Using
 
-                If Not isNormal(WW_UniqueKeyCHECK) Then
-                    WW_CheckMES1 = "一意制約違反。"
-                    WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
-                                       "([" & OIT0002INProw("USERID") & "]" &
-                                       " [" & OIT0002INProw("STYMD") & "])" &
-                                       " [" & OIT0002INProw("ENDYMD") & "])"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0002INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
-                End If
-            End If
+            '    If Not isNormal(WW_UniqueKeyCHECK) Then
+            '        WW_CheckMES1 = "一意制約違反。"
+            '        WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
+            '                           "([" & OIT0002INProw("USERID") & "]" &
+            '                           " [" & OIT0002INProw("STYMD") & "])" &
+            '                           " [" & OIT0002INProw("ENDYMD") & "])"
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIT0002INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
+            '    End If
+            'End If
 
             If WW_LINE_ERR = "" Then
                 If OIT0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
@@ -1220,25 +1170,25 @@ Public Class OIT0002UserCreate
                     prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
-                Case "MENU"           'メニュー表示制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "MENU"           'メニュー表示制御ロール
+                '    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
-                Case "MAP"         '画面参照更新制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "MAP"         '画面参照更新制御ロール
+                '    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
-                Case "VIEW"         '画面表示項目制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "VIEW"         '画面表示項目制御ロール
+                '    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
-                Case "XML"         'エクセル出力制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "XML"         'エクセル出力制御ロール
+                '    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
-                Case "APPROVAL"         '承認権限ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "APPROVAL"         '承認権限ロール
+                '    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "DELFLG"           '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

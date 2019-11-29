@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0002UserCreate
+Partial Public Class OIT0002LinlDetail
     
     '''<summary>
     '''WF_Sel_LINECNT_L コントロール。
@@ -561,7 +561,7 @@ Partial Public Class OIT0002UserCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -570,7 +570,7 @@ Partial Public Class OIT0002UserCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.OIT0002WRKINC
-
+    
     '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>

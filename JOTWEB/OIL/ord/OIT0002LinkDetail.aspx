@@ -1,4 +1,4 @@
-﻿<%@ Page Title="OIT0002D" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIT0002LinkDetail.aspx.vb" Inherits="JOTWEB.OIT0002UserCreate" %>
+﻿<%@ Page Title="OIT0002D" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIT0002LinkDetail.aspx.vb" Inherits="JOTWEB.OIT0002LinlDetail" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>

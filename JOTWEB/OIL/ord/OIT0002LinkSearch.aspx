@@ -37,7 +37,7 @@
         <!-- 発駅コード -->
         <a style="position:fixed; top:7.7em; left:5em; font-weight:bold; text-decoration:underline;">★発駅</a>
 
-        <a class="ef" style="position:fixed; top:7.7em; left:10em;" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_OILTANKCODE');">
+        <a class="ef" style="position:fixed; top:7.7em; left:10em;" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_OILTANKCODE');">
             <asp:TextBox ID="WF_DEPSTATION" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">

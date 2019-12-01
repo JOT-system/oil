@@ -370,7 +370,7 @@ Public Class OIM0005TankList
 
         SQLStr &=
               " ORDER BY" _
-            & "    OIM0005.TANKNUMBER"
+            & "    RIGHT('0000000000' + CAST(OIM0005.TANKNUMBER AS NVARCHAR), 10)"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -2487,18 +2487,53 @@ Public Class OIM0005TankList
             End If
 
             With leftview
-                '会社コード
-                Dim prmData As New Hashtable
+                Select Case WF_LeftMViewChange.Value
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
+                            Case "WF_LEASESTYMD"         'リース開始年月日
+                                .WF_Calendar.Text = WF_LEASESTYMD.Text
+                            Case "WF_LEASEENDYMD"         'リース満了年月日
+                                .WF_Calendar.Text = WF_LEASEENDYMD.Text
+                            Case "WF_USERLIMIT"         '第三者使用期限
+                                .WF_Calendar.Text = WF_USERLIMIT.Text
+                            Case "WF_LIMITTEXTRADIARYSTATION"         '臨時常備駅期限
+                                .WF_Calendar.Text = WF_LIMITTEXTRADIARYSTATION.Text
+                            Case "WF_EXTRADINARYLIMIT"         '臨時専用期限
+                                .WF_Calendar.Text = WF_EXTRADINARYLIMIT.Text
+                            Case "WF_ALLINSPECTIONDATE"         '取得年月日
+                                .WF_Calendar.Text = WF_ALLINSPECTIONDATE.Text
+                            Case "WF_TRANSFERDATE"         '車籍編入年月日
+                                .WF_Calendar.Text = WF_TRANSFERDATE.Text
+                            Case "WF_SPECIFIEDDATE"         '次回指定年月日
+                                .WF_Calendar.Text = WF_SPECIFIEDDATE.Text
+                            Case "WF_JRALLINSPECTIONDATE"         '次回全検年月日(JR)
+                                .WF_Calendar.Text = WF_JRALLINSPECTIONDATE.Text
+                            Case "WF_JRINSPECTIONDATE"         '次回交検年月日(JR）
+                                .WF_Calendar.Text = WF_JRINSPECTIONDATE.Text
+                            Case "WF_INSPECTIONDATE"         '次回交検年月日
+                                .WF_Calendar.Text = WF_INSPECTIONDATE.Text
+                            Case "WF_JRSPECIFIEDDATE"         '次回指定年月日(JR)
+                                .WF_Calendar.Text = WF_JRSPECIFIEDDATE.Text
+                        End Select
+                        .ActiveCalendar()
 
-                'フィールドによってパラメーターを変える
-                Select Case WW_FIELD
-                    Case "WF_DELFLG"
+                    Case Else
+                        '以外
+                        Dim prmData As New Hashtable
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
-                End Select
 
-                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                .ActiveListBox()
+                        'フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            Case "WF_TANKNUMBER"       'タンク車番号
+                                prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER")
+                            Case "WF_MENUROLE"       'タンク車型式
+                                prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKMODEL")
+                        End Select
+
+                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                        .ActiveListBox()
+                End Select
             End With
         End If
 

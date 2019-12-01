@@ -44,10 +44,10 @@ Public Class OIS0001WRKINC
     '' <param name="FIXCODE"></param>
     '' <returns></returns>
     '' <remarks></remarks>
-    Function CreateRoleList(ByVal COMPCODE As String, ByVal OBJCODE As String) As Hashtable
+    Function CreateRoleList(ByVal I_COMPCODE As String, ByVal I_OBJCODE As String) As Hashtable
         Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = COMPCODE
-        prmData.Item(C_PARAMETERS.LP_CLASSCODE) = OBJCODE
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_CLASSCODE) = I_OBJCODE
         prmData.Item(C_PARAMETERS.LP_STYMD) = WF_SEL_STYMD.Text
         prmData.Item(C_PARAMETERS.LP_ENDYMD) = WF_SEL_ENDYMD.Text
         CreateRoleList = prmData
@@ -60,10 +60,10 @@ Public Class OIS0001WRKINC
     '' <param name="FIXCODE"></param>
     '' <returns></returns>
     '' <remarks></remarks>
-    Function CreateFIXParam(ByVal COMPCODE As String, Optional ByVal FIXCODE As String = "") As Hashtable
+    Function CreateFIXParam(ByVal I_COMPCODE As String, Optional ByVal I_FIXCODE As String = "") As Hashtable
         Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = COMPCODE
-        prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = FIXCODE
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = I_FIXCODE
         CreateFIXParam = prmData
     End Function
 

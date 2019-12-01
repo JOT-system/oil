@@ -3,6 +3,7 @@
 <!-- Work レイアウト -->
 <div hidden="hidden">
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>         <!-- 会社コード -->
+    <asp:TextBox ID="WF_SEL_ORG" runat="server"></asp:TextBox>         <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>        <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>         <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_TANKNUMBER" runat="server"></asp:TextBox>         <!-- JOT車番 -->

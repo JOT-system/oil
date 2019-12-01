@@ -34,31 +34,17 @@ Public Class OIM0005WRKINC
     End Function
 
     '' <summary>
-    '' タンク車パターンの取得
+    '' タンク車関連パターンの取得
     '' </summary>
     '' <param name="I_TANKNUMBERPT"></param>
     '' <returns></returns>
     '' <remarks>全て</remarks>
-    Function CreateTANKNUMBERParam(ByVal I_COMPCODE As String, ByVal I_TANKNUMBERPT As String) As Hashtable
+    Function CreateTankParam(ByVal I_COMPCODE As String, ByVal I_TANK As String) As Hashtable
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
-        prmData.Item(C_PARAMETERS.LP_TANKNUMBER) = I_TANKNUMBERPT
+        prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = I_TANK
         prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
-        CreateTANKNUMBERParam = prmData
-    End Function
-
-    '' <summary>
-    '' 型式の取得
-    '' </summary>
-    '' <param name="I_TANKNUMBERPT"></param>
-    '' <returns></returns>
-    '' <remarks>全て</remarks>
-    Function CreateTANKMODELParam(ByVal I_COMPCODE As String, ByVal I_TANKMODELPT As String) As Hashtable
-        Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
-        prmData.Item(C_PARAMETERS.LP_TANKMODEL) = I_TANKMODELPT
-        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
-        CreateTANKMODELParam = prmData
+        CreateTankParam = prmData
     End Function
 
     '' <summary>
@@ -68,10 +54,10 @@ Public Class OIM0005WRKINC
     '' <param name="FIXCODE"></param>
     '' <returns></returns>
     '' <remarks></remarks>
-    Function CreateFIXParam(ByVal COMPCODE As String, Optional ByVal FIXCODE As String = "") As Hashtable
+    Function CreateFIXParam(ByVal I_COMPCODE As String, Optional ByVal I_FIXCODE As String = "") As Hashtable
         Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = COMPCODE
-        prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = FIXCODE
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = I_FIXCODE
         CreateFIXParam = prmData
     End Function
 

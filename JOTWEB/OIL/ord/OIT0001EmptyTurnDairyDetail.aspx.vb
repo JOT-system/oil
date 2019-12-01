@@ -174,7 +174,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         'End If
 
         '受注営業所
-        TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
+        'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
         '本社列車
         TxtHeadOfficeTrain.Text = work.WF_SEL_TRAIN.Text
         '発駅
@@ -219,7 +219,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         '運用部署
         CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_UORG_TEXT.Text, WW_DUMMY)
         '受注営業所
-        CODENAME_get("UORG", work.WF_SEL_UORG.Text, TxtOrderOffice.Text, WW_DUMMY)
+        CODENAME_get("SALESOFFICE", work.WF_SEL_SALESOFFICECODE.Text, TxtOrderOffice.Text, WW_DUMMY)
         '発駅
         CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
         '着駅
@@ -363,17 +363,17 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0005.LASTOILCODE), '')         AS LASTOILCODE" _
             & " , ISNULL(RTRIM(OIM0003_PAST.OILNAME), '')        AS LASTOILNAME" _
             & " , CASE" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '×'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '〇'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '◎'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
             & "   END                                                                      AS JRINSPECTIONALERT" _
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), '')               AS JRINSPECTIONDATE" _
             & " , CASE" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '×'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '〇'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '◎'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
             & "   END                                                                      AS JRALLINSPECTIONALERT" _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE" _
             & " , ISNULL(FORMAT(OIT0003.RETURNDATETRAIN, 'yyyy/MM/dd'), '')                AS RETURNDATETRAIN" _
@@ -589,19 +589,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '本社列車
                     If WF_FIELD.Value = "TxtHeadOfficeTrain" Then
                         '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, TxtHeadOfficeTrain.Text + work.WF_SEL_UORG.Text)
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_UORG.Text, TxtHeadOfficeTrain.Text)
+                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICE.Text, TxtHeadOfficeTrain.Text)
                     End If
 
                     '油種
                     If WF_FIELD.Value = "OILNAME" Then
                         '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_UORG.Text, "")
+                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICE.Text, "")
                     End If
 
                     'タンク車№
                     If WF_FIELD.Value = "TANKNO" Then
                         prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_UORG.Text, "")
+                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICE.Text, "")
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -720,7 +720,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             Case "TxtHeadOfficeTrain"   '本社列車
                 '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
                 TxtHeadOfficeTrain.Text = WW_SelectValue
-                FixvalueMasterSearch("TRAINNUMBER", "", WW_SelectValue, WW_GetValue)
+                FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 '発駅
                 TxtDepstation.Text = WW_GetValue(1)
@@ -789,16 +789,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Try
                 TxtAccDate.Focus()
 
-            Case "OILNAME"   '(一覧)油種
-            Case "TANKNO"    '(一覧)タンク車№
-
+            Case "OILNAME", "TANKNO"   '(一覧)油種, (一覧)タンク車№
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
 
                 '○ 設定項目取得
-                Dim WW_SETVALUE As String
-                WW_SETVALUE = WW_SelectText
+                Dim WW_SETTEXT As String = WW_SelectText
+                Dim WW_SETVALUE As String = WW_SelectValue
 
                 '○ 画面表示データ復元
                 If Not Master.RecoverTable(OIT0001tbl) Then Exit Sub
@@ -809,15 +807,65 @@ Public Class OIT0001EmptyTurnDairyDetail
                 If IsNothing(updHeader) Then Exit Sub
 
                 '〇 一覧項目へ設定
+                '油種名を一覧に設定
                 If WF_FIELD.Value = "OILNAME" Then
-                    updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
-                ElseIf WF_FIELD.Value = "TANKNO" Then
-                    updHeader.Item(WF_FIELD.Value) = WW_SETVALUE.Substring(0, 8).Trim()
-                End If
-                'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    updHeader.Item("OILCODE") = WW_SETVALUE
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                '○ 画面表示データ保存
-                If Not Master.SaveTable(OIT0001tbl) Then Exit Sub
+                    'タンク車№を一覧に設定
+                ElseIf WF_FIELD.Value = "TANKNO" Then
+                    Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
+                    updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
+
+                    FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+
+                    '前回油種
+                    Dim WW_LASTOILNAME As String = ""
+                    updHeader.Item("LASTOILCODE") = WW_GetValue(1)
+                    CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                    updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+
+                    '交検日
+                    Dim WW_JRINSPECTIONCNT As String
+                    updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
+                    If WW_GetValue(2) <> "" Then
+                        WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Now(), Date.Parse(WW_GetValue(2)))
+
+                        Select Case WW_JRINSPECTIONCNT
+                            Case 0 To 3
+                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            Case 4 To 6
+                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            Case Else
+                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                        End Select
+                    Else
+                        updHeader.Item("JRINSPECTIONALERT") = ""
+                    End If
+
+                    '全検日
+                    Dim WW_JRALLINSPECTIONCNT As String
+                    updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
+                    If WW_GetValue(3) <> "" Then
+                        WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Now(), Date.Parse(WW_GetValue(3)))
+
+                        Select Case WW_JRALLINSPECTIONCNT
+                            Case 0 To 3
+                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            Case 4 To 6
+                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            Case Else
+                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                        End Select
+                    Else
+                        updHeader.Item("JRALLINSPECTIONALERT") = ""
+                    End If
+
+                End If
+                    'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+
+                    '○ 画面表示データ保存
+                    If Not Master.SaveTable(OIT0001tbl) Then Exit Sub
 
         End Select
 
@@ -1645,11 +1693,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
 
+                Case "SALESOFFICE"       '営業所
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
+
                 Case "DEPSTATION"       '発駅
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPSTATION"))
 
                 Case "ARRSTATION"       '着駅
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ARRSTATION"))
+
+                Case "PRODUCTPATTERN"   '油種
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_UORG.Text, "PRODUCTPATTERN"))
 
             End Select
         Catch ex As Exception

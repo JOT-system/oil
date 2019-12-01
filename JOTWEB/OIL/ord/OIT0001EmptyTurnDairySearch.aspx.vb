@@ -163,6 +163,7 @@ Public Class OIT0001EmptyTurnDairySearch
         '運用部署
         work.WF_SEL_UORG.Text = WF_UORG.Text
         '営業所
+        work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
         work.WF_SEL_SALESOFFICE.Text = TxtSalesOffice.Text
         '積込日
         work.WF_SEL_LOADINGDATE.Text = TxtLoadingDateStart.Text

@@ -97,7 +97,7 @@ Public Class OIT0001EmptyTurnDairySearch
             '運用部署
             WF_UORG.Text = work.WF_SEL_UORG.Text
             '営業所
-            TxtSalesOffice.Text = work.WF_SEL_SALESOFFICE.Text
+            TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
             '積込日(開始)
             TxtLoadingDateStart.Text = work.WF_SEL_LOADING.Text
             ''拠点
@@ -163,7 +163,8 @@ Public Class OIT0001EmptyTurnDairySearch
         '運用部署
         work.WF_SEL_UORG.Text = WF_UORG.Text
         '営業所
-        work.WF_SEL_SALESOFFICE.Text = TxtSalesOffice.Text
+        work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
+        work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
         '積込日
         work.WF_SEL_LOADINGDATE.Text = TxtLoadingDateStart.Text
         work.WF_SEL_LOADING.Text = TxtLoadingDateStart.Text

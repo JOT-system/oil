@@ -6,7 +6,9 @@
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>
     <!-- 運用部署 -->
     <asp:TextBox ID="WF_SEL_UORG" runat="server"></asp:TextBox>
-    <!-- 営業所 -->
+    <!-- 営業所コード -->
+    <asp:TextBox ID="WF_SEL_SALESOFFICECODE" runat="server"></asp:TextBox>
+    <!-- 営業所名 -->
     <asp:TextBox ID="WF_SEL_SALESOFFICE" runat="server"></asp:TextBox>
     <!-- 積込日 -->
     <asp:TextBox ID="WF_SEL_LOADING" runat="server"></asp:TextBox>

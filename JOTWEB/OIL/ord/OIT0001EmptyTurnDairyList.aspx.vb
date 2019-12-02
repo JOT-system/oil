@@ -313,7 +313,7 @@ Public Class OIT0001EmptyTurnDairyList
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)  '削除フラグ
                 'Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)  '列車番号
 
-                PARA1.Value = work.WF_SEL_SALESOFFICE.Text
+                PARA1.Value = work.WF_SEL_SALESOFFICECODE.Text
                 PARA2.Value = work.WF_SEL_LOADINGDATE.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
                 'PARA4.Value = work.WF_SEL_TRAINNUMBER.Text

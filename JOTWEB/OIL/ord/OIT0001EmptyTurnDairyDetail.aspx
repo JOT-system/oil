@@ -50,8 +50,8 @@
 
             <!-- ■　受注営業所　■ -->
             <a style="position:fixed; top:4.4em; left:4em; font-weight:bold;">受注営業所</a>
-            <a class="ef" style="position:fixed; top:4.4em; left:11em;">
-                <asp:TextBox ID="TxtOrderOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            <a class="ef" style="position:fixed; top:4.4em; left:11em;" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
+                <asp:TextBox ID="TxtOrderOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　本社列車　■ -->
             <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">本社列車</a>

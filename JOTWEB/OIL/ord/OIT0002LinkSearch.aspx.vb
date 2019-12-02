@@ -97,6 +97,7 @@ Public Class OIT0002LinkSearch
 
             '初期変数設定処理
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORG", WF_ORG.Text)                '組織コード
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "DEPSTATION", WF_DEPSTATION.Text)   '空車発駅
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD.Text)             '有効年月日(From)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text)           '有効年月日(To)
@@ -108,6 +109,7 @@ Public Class OIT0002LinkSearch
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '一覧画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
+            WF_ORG.Text = work.WF_SEL_ORG.Text        　　　　　'組織コード
             WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION.Text    '空車発駅
             WF_STYMD.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
             WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
@@ -138,9 +140,11 @@ Public Class OIT0002LinkSearch
 
         '○ 名称設定処理
         CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
+        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         　　　　　　　 '組織コード
+        CODENAME_get("DEPSTATION", WF_DEPSTATION.Text, WF_DEPSTATION_TEXT.Text, WW_DUMMY)   '空車発駅
+        CODENAME_get("TRAINNO", WF_TRAINNO.Text, WF_TRAINNO_TEXT.Text, WW_DUMMY)         　 '本線列車
 
     End Sub
-
 
     ''' <summary>
     ''' 検索ボタン押下時処理
@@ -163,14 +167,15 @@ Public Class OIT0002LinkSearch
 
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
+        work.WF_SEL_ORG.Text = WF_ORG.Text        　　　　　'組織コード
         work.WF_SEL_DEPSTATION.Text = WF_DEPSTATION.Text    '空車発駅
         work.WF_SEL_STYMD.Text = WF_STYMD.Text              '有効年月日(From)
         If WF_ENDYMD.Text = "" Then
             work.WF_SEL_ENDYMD.Text = WF_STYMD.Text         '有効年月日(From) → 有効年月日(To)
         Else
-            work.WF_SEL_ENDYMD.Text = WF_ENDYMD.Text      '有効年月日(To)
+            work.WF_SEL_ENDYMD.Text = WF_ENDYMD.Text      　'有効年月日(To)
         End If
-        work.WF_SEL_TRAINNO.Text = WF_TRAINNO.Text    '本線列車
+        work.WF_SEL_TRAINNO.Text = WF_TRAINNO.Text    　　　'本線列車
         If WF_SW1.Checked = True Then
             work.WF_SEL_SELECT.Text = "1"                   '利用可のみ表示
         End If
@@ -289,17 +294,18 @@ Public Class OIT0002LinkSearch
                                 .WF_Calendar.Text = WF_ENDYMD.Text
                         End Select
                         .ActiveCalendar()
-
                     Case Else
                         '以外
                         Dim prmData As New Hashtable
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
-                        ''フィールドによってパラメータを変える
-                        'Select Case WF_FIELD.Value
-                        '    Case "WF_ORG"       '組織コード
-                        '        prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-                        'End Select
+                        'フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            Case "WF_DEPSTATION"       '空車発駅
+                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "STATIONPATTERN")
+                            Case "WF_TRAINNO"          '本線列車
+                                prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
+                        End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -309,7 +315,6 @@ Public Class OIT0002LinkSearch
 
     End Sub
 
-
     ''' <summary>
     ''' フィールドチェンジ時処理
     ''' </summary>
@@ -318,8 +323,10 @@ Public Class OIT0002LinkSearch
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "WF_CAMPCODE"          '会社コード
-                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            Case "WF_DEPSTATION"          '空車発駅
+                CODENAME_get("DEPSTATION", WF_DEPSTATION.Text, WF_DEPSTATION_TEXT.Text, WW_RTN_SW)
+            Case "WF_TRAINNO"          '本線列車
+                CODENAME_get("TRAINNO", WF_TRAINNO.Text, WF_TRAINNO_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -354,10 +361,10 @@ Public Class OIT0002LinkSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "WF_CAMPCODE"          '会社コード
-                WF_CAMPCODE.Text = WW_SelectValue
-                WF_CAMPCODE_TEXT.Text = WW_SelectText
-                WF_CAMPCODE.Focus()
+            Case "WF_DEPSTATION"        '空車発駅
+                WF_DEPSTATION.Text = WW_SelectValue
+                WF_DEPSTATION_TEXT.Text = WW_SelectText
+                WF_DEPSTATION.Focus()
 
             Case "WF_STYMD"             '有効年月日(From)
                 Dim WW_DATE As Date
@@ -376,6 +383,11 @@ Public Class OIT0002LinkSearch
                 Catch ex As Exception
                 End Try
                 WF_ENDYMD.Focus()
+
+            Case "WF_TRAINNO"           '本線列車
+                WF_TRAINNO.Text = WW_SelectValue
+                WF_TRAINNO_TEXT.Text = WW_SelectText
+                WF_TRAINNO.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -394,12 +406,14 @@ Public Class OIT0002LinkSearch
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "WF_CAMPCODE"          '会社コード
-                WF_CAMPCODE.Focus()
+            Case "WF_DEPSTATION"        '空車発駅
+                WF_DEPSTATION.Focus()
             Case "WF_STYMD"             '有効年月日(From)
                 WF_STYMD.Focus()
             Case "WF_ENDYMD"            '有効年月日(To)
                 WF_ENDYMD.Focus()
+            Case "WF_TRAINNO"           '本線列車
+                WF_TRAINNO.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -408,7 +422,6 @@ Public Class OIT0002LinkSearch
         WF_LeftMViewChange.Value = ""
 
     End Sub
-
 
     ''' <summary>
     ''' RightBoxダブルクリック時処理
@@ -430,7 +443,6 @@ Public Class OIT0002LinkSearch
 
     End Sub
 
-
     ''' <summary>
     ''' ヘルプ表示
     ''' </summary>
@@ -440,7 +452,6 @@ Public Class OIT0002LinkSearch
         Master.ShowHelp()
 
     End Sub
-
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -471,9 +482,15 @@ Public Class OIT0002LinkSearch
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                    'Case "ORG"              '組織コード
-                    '    prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "ORG"             '組織コード
+                    prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STATIONPATTERN"       '空車発駅
+                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "STATIONPATTERN")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "WF_TRAINNO"           '本線列車
+                    prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

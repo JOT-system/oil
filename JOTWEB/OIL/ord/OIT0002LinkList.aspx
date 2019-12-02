@@ -27,6 +27,12 @@
                     <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
                 </a>
 
+                <!-- 組織コード -->
+                <a style="display:none;">
+                    <asp:Label ID="WF_SEL_ORG" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
+                    <asp:Label ID="WF_SEL_ORGNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                </a>
+
                 <!-- ボタン -->
                 <a style="position:fixed;top:2.8em;left:23em;">
                     <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
@@ -212,8 +218,8 @@
                         <asp:Label ID="WF_PREOILCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
                 </p>
-                </div>
             </div>
+        </div>
 
         <!-- rightbox レイアウト -->
         <MSINC:rightview ID="rightview" runat="server" />

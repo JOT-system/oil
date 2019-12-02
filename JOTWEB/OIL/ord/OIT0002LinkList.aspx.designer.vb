@@ -32,6 +32,24 @@ Partial Public Class OIT0002LinkList
     Protected WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_SEL_ORG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEL_ORG As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SEL_ORGNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEL_ORGNAME As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_ButtonFIRST2 コントロール。
     '''</summary>
     '''<remarks>

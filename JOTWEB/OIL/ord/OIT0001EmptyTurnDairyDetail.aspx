@@ -19,7 +19,7 @@
 <asp:Content ID="OIT0001D" ContentPlaceHolderID="contents1" runat="server">
     <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
     <!-- 全体レイアウト　headerbox -->
-    <div class="headerboxOnly" id="headerbox">
+    <div class="headerbox" id="headerbox">
         <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
 
             <!-- ○ 固定項目 ○ -->

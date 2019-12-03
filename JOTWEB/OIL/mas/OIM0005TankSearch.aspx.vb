@@ -445,6 +445,11 @@ Public Class OIM0005TankSearch
 
         Try
             Select Case I_FIELD
+                Case "CAMPCODE"         '会社コード
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "ORG"             '運用部署
+                    prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TANKNUMBER"        'JOT車番
                     prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)

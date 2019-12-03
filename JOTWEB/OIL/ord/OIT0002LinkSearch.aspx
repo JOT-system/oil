@@ -25,17 +25,27 @@
 
         <!-- ○ 変動項目 ○ -->
         <!-- 会社コード -->
-        <a style="display:none; position:fixed; top:5.5em; left:4em; font-weight:bold; text-decoration:underline;">会社コード</a>
+        <a style="display:none; position:fixed; top:3.3em; left:4em; font-weight:bold; text-decoration:underline;">会社コード</a>
 
-        <a class="ef" style="display:none; position:fixed; top:5.5em; left:18em;" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+        <a  class="ef" style="display:none; position:fixed; top:5.5em; left:18em;" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
             <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="display:none; position:fixed; top:5.5em; left:27em;">
+        <a style="display:none; position:fixed; top:3.3em; left:27em;">
             <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
 
+        <!-- 組織コード -->
+        <a style="display:none; position:fixed; top:5.5em; left:4em; font-weight:bold; text-decoration:underline;">組織コード</a>
+
+        <a  class="ef" style="display:none; position:fixed; top:5.5em; left:18em;" ondblclick="Field_DBclick('WF_ORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORG');">
+            <asp:TextBox ID="WF_ORG" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        </a>
+        <a style="display:none; position:fixed; top:5.5em; left:27em;">
+            <asp:Label ID="WF_ORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        </a>
+
         <!-- 発駅コード -->
-        <a style="position:fixed; top:7.7em; left:5em; font-weight:bold; text-decoration:underline;">★発駅</a>
+        <a style="position:fixed; top:7.7em; left:5em; font-weight:bold; color:#737373; text-decoration:underline;">★発駅</a>
 
         <a class="ef" style="position:fixed; top:7.7em; left:10em;" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_OILTANKCODE');">
             <asp:TextBox ID="WF_DEPSTATION" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>

@@ -20,7 +20,7 @@ Public Class OIM0005WRKINC
     '' <param name="I_COMPCODE"></param>
     '' <returns></returns>
     '' <remarks></remarks>
-    Public Function CreateUORGParam(ByVal I_COMPCODE As String) As Hashtable
+    Public Function CreateORGParam(ByVal I_COMPCODE As String) As Hashtable
 
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
@@ -29,7 +29,7 @@ Public Class OIM0005WRKINC
         prmData.Item(C_PARAMETERS.LP_ORG_CATEGORYS) = New String() {
             GL0002OrgList.C_CATEGORY_LIST.CARAGE}
 
-        CreateUORGParam = prmData
+        CreateORGParam = prmData
 
     End Function
 

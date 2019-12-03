@@ -171,13 +171,13 @@ Public Class OIT0002LinlDetail
 
 
         '開始年月日
-        WF_STYMD.Text = work.WF_SEL_STYMD2.Text
+        WF_STYMD.Text = work.WF_SEL_STYMD.Text
 
         '終了年月日
-        WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
+        WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text
 
         '会社コード
-        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
 
 
         '削除

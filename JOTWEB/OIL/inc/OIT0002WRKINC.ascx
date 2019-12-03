@@ -3,7 +3,7 @@
 <!-- Work レイアウト -->
 <div hidden="hidden">
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>         <!-- 会社コード -->
-    <asp:TextBox ID="WF_SEL_CAMPCODE2" runat="server"></asp:TextBox>         <!-- 会社コード2 -->
+    <asp:TextBox ID="WF_SEL_ORG" runat="server"></asp:TextBox>         <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_INCLUDUSED" runat="server"></asp:TextBox>         <!-- 利用済含む -->
     <asp:TextBox ID="WF_SEL_DEPSTATION" runat="server"></asp:TextBox>         <!-- 空車発駅 -->
     <asp:TextBox ID="WF_SEL_DEPSTATION2" runat="server"></asp:TextBox>         <!-- 空車発駅2 -->

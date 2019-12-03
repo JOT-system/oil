@@ -102,15 +102,18 @@ div {
 }
 
     .searchbox input[type='text'] {
-        font: 14px/23px sans-serif;
+        font: 16px/23px sans-serif;
+        color: #737373;
         box-sizing: border-box;
         width: 100%;
         padding: 0.3em;
         transition: 0.3s;
         letter-spacing: 1px;
-        color: rgba(42, 63, 84, 1);
-        border: 1px solid #1b2538;
-        border-radius: 3px;
+        border-color: rgba(176, 176, 276, 0.6);
+        border-style: solid;
+        border-width: thin;
+        /*    border: 1px solid #1b2538; */
+
     }
 
 
@@ -127,7 +130,6 @@ div {
     width:1.4em;
     height:1.4em;
 }
-
 
 
 /* 実行画面 ヘッダー部 */
@@ -473,8 +475,8 @@ div {
 /* テキスト表示情報 */
 
 .WF_TEXT {
-    color: blue;
-    font-size: small;
+    color: #737373;
+    font-size: 16px;
     height: 1.3em;
     vertical-align: middle;
     text-align: left;

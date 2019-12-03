@@ -25,34 +25,37 @@
 
         <!-- ○ 変動項目 ○ -->
         <!-- 会社コード -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">会社コード</a>
+        <a id="WF_CAMPCODE_LABEL" >会社コード</a>
 
-        <a class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
-            <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a class="ef" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+            <asp:TextBox  CssClass="BoxIcon" ID="WF_CAMPCODE" runat="server"  onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:7.7em; left:27em;">
-            <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        <a >
+            <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
 
-        <!-- 有効年月日 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">有効年月日</a>
-        <a style="position:fixed; top:9.9em; left:11.5em;">範囲指定</a>
-        <a class="ef" style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-            <asp:TextBox ID="WF_STYMD" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <!-- 有効年月日(開始） -->
+        <a id="WF_STYMD_LABEL" >有効年月日（開始）</a>
+
+        <a class="ef" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <asp:TextBox CssClass="CalendarIcon" ID="WF_STYMD" runat="server"  onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:9.9em; left:42.5em;">～</a>
-        <a class="ef" style="position:fixed; top:9.9em; left:44em;" ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-            <asp:TextBox ID="WF_ENDYMD" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+
+        <!-- 有効年月日(終了） -->
+        <a id="WF_ENDYMD_LABEL" >有効年月日（終了）</a>
+
+        <a class="ef" ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <asp:TextBox CssClass="CalendarIcon" ID="WF_ENDYMD" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
 
         <!-- 組織コード -->
-        <a style="position:fixed; top:12.1em; left:4em; font-weight:bold; text-decoration:underline;">組織コード</a>
+        <a id="WF_ORG_LABEL" >組織コード</a>
 
-        <a class="ef" style="position:fixed; top:12.1em; left:18em;" ondblclick="Field_DBclick('WF_ORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORG');">
-            <asp:TextBox ID="WF_ORG" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a class="ef" ondblclick="Field_DBclick('WF_ORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORG');">
+            <asp:TextBox CssClass="BoxIcon" ID="WF_ORG" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:12.1em; left:27em;">
-            <asp:Label ID="WF_ORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        <a >
+            <asp:Label ID="WF_ORG_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
     </div>
 

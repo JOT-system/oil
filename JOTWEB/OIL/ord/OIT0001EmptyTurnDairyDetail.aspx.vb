@@ -213,6 +213,9 @@ Public Class OIT0001EmptyTurnDairyDetail
         '新規作成の場合(油種別タンク車数のテキストボックスの入力を可とする。)
         If work.WF_SEL_CREATEFLG.Text = 1 Then
 
+            '画面表示設定
+            WW_ScreenEnabledSet()
+
         End If
 
         '○ 名称設定処理
@@ -320,7 +323,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         If work.WF_SEL_CREATEFLG.Text = 1 Then
 
             SQLStr =
-              " SELECT TOP (18)" _
+              " SELECT TOP (0)" _
             & "   0                                              AS LINECNT" _
             & " , ''                                             AS OPERATION" _
             & " , ''                                             AS TIMSTP" _
@@ -679,7 +682,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             '本社列車
             Case "TxtHeadOfficeTrain"
                 Dim WW_GetValue() As String = {"", "", "", "", ""}
-                FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+                WW_FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
                 '発駅
                 TxtDepstation.Text = WW_GetValue(1)
@@ -749,13 +752,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                     LblDepstationName.Text = ""
                     TxtArrstation.Text = ""
                     LblArrstationName.Text = ""
+
+                End If
+
+                '新規作成の場合(油種別タンク車数のテキストボックスの入力を可とする。)
+                If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    WW_ScreenEnabledSet()
                 End If
                 TxtOrderOffice.Focus()
 
             Case "TxtHeadOfficeTrain"   '本社列車
                 '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
                 TxtHeadOfficeTrain.Text = WW_SelectValue
-                FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                WW_FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 '発駅
                 TxtDepstation.Text = WW_GetValue(1)
@@ -854,7 +863,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                     updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
 
-                    FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
 
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
@@ -1037,17 +1046,28 @@ Public Class OIT0001EmptyTurnDairyDetail
                     & "        DELFLG      = '1'        " _
                     & "  WHERE ORDERNO     = @P01       " _
                     & "    AND DETAILNO    = @P02       " _
-                    & "    AND TANKNO      = @P03       " _
-                    & "    AND KAMOKU      = @P04       " _
                     & "    AND DELFLG     <> '1'       ;"
+
+            'Dim SQLStr As String =
+            '        " UPDATE OIL.OIT0003_DETAIL       " _
+            '        & "    SET UPDYMD      = @P11,      " _
+            '        & "        UPDUSER     = @P12,      " _
+            '        & "        UPDTERMID   = @P13,      " _
+            '        & "        RECEIVEYMD  = @P14,      " _
+            '        & "        DELFLG      = '1'        " _
+            '        & "  WHERE ORDERNO     = @P01       " _
+            '        & "    AND DETAILNO    = @P02       " _
+            '        & "    AND TANKNO      = @P03       " _
+            '        & "    AND KAMOKU      = @P04       " _
+            '        & "    AND DELFLG     <> '1'       ;"
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
 
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
-            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
-            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)
+            'Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+            'Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)
 
             Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
             Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
@@ -1066,8 +1086,8 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     PARA01.Value = OIT0001UPDrow("ORDERNO")
                     PARA02.Value = OIT0001UPDrow("DETAILNO")
-                    PARA03.Value = OIT0001UPDrow("TANKNO")
-                    PARA04.Value = OIT0001UPDrow("KAMOKU")
+                    'PARA03.Value = OIT0001UPDrow("TANKNO")
+                    'PARA04.Value = OIT0001UPDrow("KAMOKU")
 
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
@@ -1492,7 +1512,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             '油種名
             If WW_COLUMNS.IndexOf("OILNAME") >= 0 Then
                 OIT0001INProw("OILNAME") = XLSTBLrow("OILNAME")
-                FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_N", OIT0001INProw("OILNAME"), WW_GetValue)
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_N", OIT0001INProw("OILNAME"), WW_GetValue)
                 OIT0001INProw("OILCODE") = WW_GetValue(0)
             End If
 
@@ -1500,44 +1520,69 @@ Public Class OIT0001EmptyTurnDairyDetail
             If WW_COLUMNS.IndexOf("TANKNO") >= 0 Then
                 OIT0001INProw("TANKNO") = XLSTBLrow("TANKNO")
 
-                'タンク車№から対象データを自動で設定
-                'FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
-                FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
+                '●タンク車№から対象データを自動で設定
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
+                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
                 OIT0001INProw("LASTOILCODE") = WW_GetValue(1)
+
+                '交検日
                 OIT0001INProw("JRINSPECTIONDATE") = WW_GetValue(2)
+
+                '交付アラート
+                If WW_GetValue(2) <> "" Then
+                    Dim WW_JRINSPECTIONCNT As String = DateDiff(DateInterval.Day, Date.Parse(Now.ToString("yyyy/MM/dd")), Date.Parse(WW_GetValue(2)))
+                    Dim WW_JRINSPECTIONFLG As String
+                    If WW_JRINSPECTIONCNT <= 3 Then
+                        WW_JRINSPECTIONFLG = "1"
+                    ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                        WW_JRINSPECTIONFLG = "2"
+                    Else
+                        WW_JRINSPECTIONFLG = "3"
+                    End If
+                    Select Case WW_JRINSPECTIONFLG
+                        Case "1"
+                            OIT0001INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                        Case "2"
+                            OIT0001INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                        Case "3"
+                            OIT0001INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                    End Select
+                Else
+                    OIT0001INProw("JRINSPECTIONALERT") = ""
+                End If
+
+                '全検日
                 OIT0001INProw("JRALLINSPECTIONDATE") = WW_GetValue(3)
 
-                '前回油種コードから油種名を取得し設定
+                '全検アラート
+                If WW_GetValue(3) <> "" Then
+                    Dim WW_JRALLINSPECTIONCNT As String = DateDiff(DateInterval.Day, Date.Parse(Now.ToString("yyyy/MM/dd")), Date.Parse(WW_GetValue(3)))
+                    Dim WW_JRALLINSPECTIONFLG As String
+                    If WW_JRALLINSPECTIONCNT <= 3 Then
+                        WW_JRALLINSPECTIONFLG = "1"
+                    ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                        WW_JRALLINSPECTIONFLG = "2"
+                    Else
+                        WW_JRALLINSPECTIONFLG = "3"
+                    End If
+                    Select Case WW_JRALLINSPECTIONFLG
+                        Case "1"
+                            OIT0001INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                        Case "2"
+                            OIT0001INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                        Case "3"
+                            OIT0001INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                    End Select
+                Else
+                    OIT0001INProw("JRALLINSPECTIONALERT") = ""
+                End If
+
+                '前回油種名(前回油種コードから油種名を取得し設定)
                 WW_GetValue = {"", "", "", "", ""}
-                FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "PRODUCTPATTERN", OIT0001INProw("LASTOILCODE"), WW_GetValue)
-                OIT0001INProw("LASTOILNAME") = WW_GetValue(1)
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", OIT0001INProw("LASTOILCODE"), WW_GetValue)
+                OIT0001INProw("LASTOILNAME") = WW_GetValue(0)
 
             End If
-
-            ''前回油種名
-            'If WW_COLUMNS.IndexOf("LASTOILNAME") >= 0 Then
-            '    OIT0001INProw("LASTOILNAME") = XLSTBLrow("LASTOILNAME")
-            'End If
-
-            ''交付アラート
-            'If WW_COLUMNS.IndexOf("JRINSPECTIONALERT") >= 0 Then
-            '    OIT0001INProw("JRINSPECTIONALERT") = XLSTBLrow("JRINSPECTIONALERT")
-            'End If
-
-            ''交検日
-            'If WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 Then
-            '    OIT0001INProw("JRINSPECTIONDATE") = XLSTBLrow("JRINSPECTIONDATE")
-            'End If
-
-            ''全検アラート
-            'If WW_COLUMNS.IndexOf("JRALLINSPECTIONALERT") >= 0 Then
-            '    OIT0001INProw("JRALLINSPECTIONALERT") = XLSTBLrow("JRALLINSPECTIONALERT")
-            'End If
-
-            ''全検日
-            'If WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 Then
-            '    OIT0001INProw("JRALLINSPECTIONDATE") = XLSTBLrow("JRALLINSPECTIONDATE")
-            'End If
 
             '返送日列車
             If WW_COLUMNS.IndexOf("RETURNDATETRAIN") >= 0 Then
@@ -1646,13 +1691,15 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim WW_GetValue() As String = {"", "", "", "", ""}
 
         Select Case WF_FIELD.Value
+            Case "TxtOrderOffice"    '受注営業所
+
             Case "OILNAME"           '(一覧)油種
-                FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_N", WW_ListValue, WW_GetValue)
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_N", WW_ListValue, WW_GetValue)
                 updHeader.Item("OILCODE") = WW_GetValue(0)
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
             Case "TANKNO"            '(一覧)タンク車№
-                FixvalueMasterSearch("", "TANKNUMBER", WW_ListValue, WW_GetValue)
+                WW_FixvalueMasterSearch("", "TANKNUMBER", WW_ListValue, WW_GetValue)
 
                 'タンク車№
                 updHeader.Item("TANKNO") = WW_ListValue
@@ -1661,6 +1708,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim WW_LASTOILNAME As String = ""
                 updHeader.Item("LASTOILCODE") = WW_GetValue(1)
                 CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue)
                 updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
 
                 '交検日
@@ -1923,7 +1971,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' <param name="I_CLASS"></param>
     ''' <param name="I_KEYCODE"></param>
     ''' <param name="O_VALUE"></param>
-    Protected Sub FixvalueMasterSearch(ByVal I_CODE As String, ByVal I_CLASS As String, ByVal I_KEYCODE As String, ByRef O_VALUE() As String)
+    Protected Sub WW_FixvalueMasterSearch(ByVal I_CODE As String, ByVal I_CLASS As String, ByVal I_KEYCODE As String, ByRef O_VALUE() As String)
 
         If IsNothing(OIT0001WKtbl) Then
             OIT0001WKtbl = New DataTable
@@ -1956,13 +2004,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
-                & " AND VIW0001.KEYCODE = @P02" _
                 & " AND VIW0001.DELFLG <> @P03"
 
             '○ 条件指定で指定されたものでSQLで可能なものを追加する
-            '貨物コード枝番
+            '会社コード
             If Not String.IsNullOrEmpty(I_CODE) Then
                 SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
+            End If
+            'マスターキー
+            If Not String.IsNullOrEmpty(I_KEYCODE) Then
+                SQLStr &= String.Format("    AND VIW0001.KEYCODE = '{0}'", I_KEYCODE)
             End If
 
             SQLStr &=
@@ -1972,11 +2023,11 @@ Public Class OIT0001EmptyTurnDairyDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
 
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
-                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+                'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
 
                 PARA01.Value = I_CLASS
-                PARA02.Value = I_KEYCODE
+                'PARA02.Value = I_KEYCODE
                 PARA03.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -1989,14 +2040,21 @@ Public Class OIT0001EmptyTurnDairyDetail
                     OIT0001WKtbl.Load(SQLdr)
                 End Using
 
-                Dim i As Integer = 0
-                For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
-                    O_VALUE(0) = OIT0001WKrow("VALUE1")
-                    O_VALUE(1) = OIT0001WKrow("VALUE2")
-                    O_VALUE(2) = OIT0001WKrow("VALUE3")
-                    O_VALUE(3) = OIT0001WKrow("VALUE4")
-                    O_VALUE(4) = OIT0001WKrow("VALUE5")
-                Next
+                If I_KEYCODE.Equals("") Then
+                    Dim i As Integer = 0
+                    For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
+                        O_VALUE(i) = OIT0001WKrow("KEYCODE")
+                        i += 1
+                    Next
+                Else
+                    For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
+                        O_VALUE(0) = OIT0001WKrow("VALUE1")
+                        O_VALUE(1) = OIT0001WKrow("VALUE2")
+                        O_VALUE(2) = OIT0001WKrow("VALUE3")
+                        O_VALUE(3) = OIT0001WKrow("VALUE4")
+                        O_VALUE(4) = OIT0001WKrow("VALUE5")
+                    Next
+                End If
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D MASTER_SELECT")
@@ -2009,6 +2067,72 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End Try
     End Sub
+
+    ''' <summary>
+    ''' 画面表示設定処理
+    ''' </summary>
+    Protected Sub WW_ScreenEnabledSet()
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", ""}
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue)
+
+        '〇初期化
+        'ハイオク
+        TxtHTank.Enabled = False
+        'レギュラー
+        TxtRTank.Enabled = False
+        '灯油
+        TxtTTank.Enabled = False
+        '未添加灯油
+        TxtMTTank.Enabled = False
+        '軽油
+        TxtKTank.Enabled = False
+        '３号軽油
+        TxtK3Tank.Enabled = False
+        '軽油５
+        TxtK5Tank.Enabled = False
+        '軽油１０
+        TxtK10Tank.Enabled = False
+        'ＬＳＡ
+        TxtLTank.Enabled = False
+        'Ａ重油
+        TxtATank.Enabled = False
+
+        For i As Integer = 0 To WW_GetValue.Length - 1
+            Select Case WW_GetValue(i)
+                    'ハイオク
+                Case "1001"
+                    TxtHTank.Enabled = True
+                    'レギュラー
+                Case "1101"
+                    TxtRTank.Enabled = True
+                    '灯油
+                Case "1301"
+                    TxtTTank.Enabled = True
+                    '未添加灯油
+                Case "1302"
+                    TxtMTTank.Enabled = True
+                    '軽油
+                Case "1401", "1406"
+                    TxtKTank.Enabled = True
+                    '３号軽油
+                Case "1404", "1405"
+                    TxtK3Tank.Enabled = True
+                    '軽油５
+                Case "1402"
+                    TxtK5Tank.Enabled = True
+                    '軽油１０
+                Case "1403"
+                    TxtK10Tank.Enabled = True
+                    'ＬＳＡ
+                Case "2201", "2202"
+                    TxtLTank.Enabled = True
+                    'Ａ重油
+                Case "2101"
+                    TxtATank.Enabled = True
+            End Select
+        Next
+    End Sub
+
 
     ''' <summary>
     ''' 受注TBL登録更新

@@ -1716,7 +1716,6 @@ Public Class OIS0001UserList
 
             '○ 変更元情報をデフォルト設定
             If WW_COLUMNS.IndexOf("USERID") >= 0 Then
-
                 For Each OIS0001row As DataRow In OIS0001tbl.Rows
                     If XLSTBLrow("USERID") = OIS0001row("USERID") AndAlso
                         XLSTBLrow("STAFFNAMES") = OIS0001row("STAFFNAMES") AndAlso

@@ -393,7 +393,7 @@ Public Class OIT0002LinkSearch
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
-        WF_LeftMViewChange.Value = ""  '★
+        'WF_LeftMViewChange.Value = ""  '★
 
     End Sub
 
@@ -419,7 +419,7 @@ Public Class OIT0002LinkSearch
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
-        WF_LeftMViewChange.Value = ""
+        'WF_LeftMViewChange.Value = ""
 
     End Sub
 

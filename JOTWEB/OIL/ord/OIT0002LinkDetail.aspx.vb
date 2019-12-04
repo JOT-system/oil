@@ -169,16 +169,56 @@ Public Class OIT0002LinlDetail
         '選択行
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
+        '空車発駅
+        WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION2.Text
 
-        '開始年月日
-        WF_STYMD.Text = work.WF_SEL_STYMD.Text
+        '本線列車
+        WF_TRAINNO.Text = work.WF_SEL_TRAINNO2.Text
 
-        '終了年月日
-        WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text
+        '貨車連結順序表№
+        WF_LINKNO.Text = work.WF_SEL_LINKNO.Text
 
-        '会社コード
-        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
+        '貨車連結順序表明細№
+        WF_LINKDETAILNO.Text = work.WF_SEL_LINKDETAILNO.Text
 
+        'ステータス
+        WF_STATUS.Text = work.WF_SEL_STATUS.Text
+
+        '情報
+        WF_INFO.Text = work.WF_SEL_INFO.Text
+
+        '前回オーダー№
+        WF_PREORDERNO.Text = work.WF_SEL_PREORDERNO.Text
+
+        '登録営業所コード
+        WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text
+
+        '空車発駅名
+        WF_DEPSTATIONNAME.Text = work.WF_SEL_DEPSTATIONNAME.Text
+
+        '空車着駅コード
+        WF_RETSTATION.Text = work.WF_SEL_RETSTATION.Text
+
+        '空車着駅名
+        WF_RETSTATIONNAME.Text = work.WF_SEL_RETSTATIONNAME.Text
+
+        '空車着日（予定）
+        WF_EMPARRDATE.Text = work.WF_SEL_EMPARRDATE.Text
+
+        '空車着日（実績）
+        WF_ACTUALEMPARRDATE.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
+
+        '入線列車番号
+        WF_LINETRAINNO.Text = work.WF_SEL_LINETRAINNO.Text
+
+        '入線順
+        WF_LINEORDER.Text = work.WF_SEL_LINEORDER.Text
+
+        'タンク車№
+        WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER.Text
+
+        '前回油種
+        WF_PREOILCODE.Text = work.WF_SEL_PREOILCODE.Text
 
         '削除
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
@@ -322,7 +362,7 @@ Public Class OIT0002LinlDetail
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20)            'JOT車番
-                PARA1.Value = WF_USERID.Text
+                PARA1.Value = WF_LINKNO.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
@@ -486,41 +526,39 @@ Public Class OIT0002LinlDetail
 
         OIT0002INProw("DELFLG") = WF_DELFLG.Text                     '削除フラグ
 
-        OIT0002INProw("USERID") = WF_USERID.Text              'ユーザID
+        OIT0002INProw("LINKNO") = WF_LINKNO.Text              '貨車連結順序表№
 
-        OIT0002INProw("STAFFNAMES") = WF_STAFFNAMES.Text              '社員名（短）
+        OIT0002INProw("LINKDETAILNO") = WF_LINKDETAILNO.Text              '貨車連結順序表明細№
 
-        OIT0002INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text              '社員名（長）
+        OIT0002INProw("STATUS") = WF_STATUS.Text              'ステータス
 
-        OIT0002INProw("MAPID") = WF_MAPID.Text              '画面ＩＤ
+        OIT0002INProw("INFO") = WF_INFO.Text              '情報
 
-        OIT0002INProw("PASSWORD") = WF_PASSWORD.Text              'パスワード
+        OIT0002INProw("PREORDERNO") = WF_PREORDERNO.Text              '前回オーダー№
 
-        OIT0002INProw("MISSCNT") = WF_MISSCNT.Text              '誤り回数
+        OIT0002INProw("TRAINNO") = WF_TRAINNO.Text              '本線列車
 
-        OIT0002INProw("PASSENDYMD") = WF_PASSENDYMD.Text              'パスワード有効期限
+        OIT0002INProw("OFFICECODE") = WF_OFFICECODE.Text              '登録営業所コード
 
-        OIT0002INProw("STYMD") = WF_STYMD.Text              '開始年月日
+        OIT0002INProw("DEPSTATION") = WF_DEPSTATION.Text              '空車発駅コード
 
-        OIT0002INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
+        OIT0002INProw("DEPSTATIONNAME") = WF_DEPSTATIONNAME.Text              '空車発駅名
 
-        OIT0002INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
+        OIT0002INProw("RETSTATION") = WF_RETSTATION.Text              '空車着駅コード
 
-        OIT0002INProw("ORG") = WF_ORG.Text              '組織コード
+        OIT0002INProw("RETSTATIONNAME") = WF_RETSTATIONNAME.Text              '空車着駅名
 
-        OIT0002INProw("EMAIL") = WF_EMAIL.Text              'メールアドレス
+        OIT0002INProw("EMPARRDATE") = WF_EMPARRDATE.Text              '空車着日（予定）
 
-        OIT0002INProw("MENUROLE") = WF_MENUROLE.Text              'メニュー表示制御ロール
+        OIT0002INProw("ACTUALEMPARRDATE") = WF_ACTUALEMPARRDATE.Text              '空車着日（実績）
 
-        OIT0002INProw("MAPROLE") = WF_MAPROLE.Text              '画面参照更新制御ロール
+        OIT0002INProw("LINETRAINNO") = WF_LINETRAINNO.Text              '入線列車番号
 
-        OIT0002INProw("VIEWPROFID") = WF_VIEWPROFID.Text              '画面表示項目制御ロール
+        OIT0002INProw("LINEORDER") = WF_LINEORDER.Text              '入線順
 
-        OIT0002INProw("RPRTPROFID") = WF_RPRTPROFID.Text              'エクセル出力制御ロール
+        OIT0002INProw("TANKNUMBER") = WF_TANKNUMBER.Text              'タンク車№
 
-        OIT0002INProw("VARIANT") = WF_VARIANT.Text              '画面初期値ロール
-
-        OIT0002INProw("APPROVALID") = WF_APPROVALID.Text              '承認権限ロール
+        OIT0002INProw("PREOILCODE") = WF_PREOILCODE.Text              '前回油種
 
         '○ チェック用テーブルに登録する
         OIT0002INPtbl.Rows.Add(OIT0002INProw)
@@ -585,24 +623,23 @@ Public Class OIT0002LinlDetail
 
         WF_Sel_LINECNT.Text = ""            'LINECNT
 
-        WF_USERID.Text = ""            'ユーザID
-        WF_STAFFNAMES.Text = ""            '社員名（短）
-        WF_STAFFNAMEL.Text = ""            '社員名（長）
-        WF_MAPID.Text = ""            '画面ＩＤ
-        WF_PASSWORD.Text = ""            'パスワード
-        WF_MISSCNT.Text = ""            '誤り回数
-        WF_PASSENDYMD.Text = ""            'パスワード有効期限
-        WF_STYMD.Text = ""            '開始年月日
-        WF_ENDYMD.Text = ""            '終了年月日
-        WF_CAMPCODE.Text = ""            '会社コード
-        WF_ORG.Text = ""            '組織コード
-        WF_EMAIL.Text = ""            'メールアドレス
-        WF_MENUROLE.Text = ""            'メニュー表示制御ロール
-        WF_MAPROLE.Text = ""            '画面参照更新制御ロール
-        WF_VIEWPROFID.Text = ""            '画面表示項目制御ロール
-        WF_RPRTPROFID.Text = ""            'エクセル出力制御ロール
-        WF_VARIANT.Text = ""            '画面初期値ロール
-        WF_APPROVALID.Text = ""            '承認権限ロール
+        WF_LINKNO.Text = ""            '貨車連結順序表№
+        WF_LINKDETAILNO.Text = ""            '貨車連結順序表明細№
+        WF_STATUS.Text = ""            'ステータス
+        WF_INFO.Text = ""            '情報
+        WF_PREORDERNO.Text = ""            '前回オーダー№
+        WF_TRAINNO.Text = ""            '本線列車
+        WF_OFFICECODE.Text = ""            '登録営業所コード
+        WF_DEPSTATION.Text = ""            '空車発駅コード
+        WF_DEPSTATIONNAME.Text = ""            '空車発駅名
+        WF_RETSTATION.Text = ""            '空車着駅コード
+        WF_RETSTATIONNAME.Text = ""            '空車着駅名
+        WF_EMPARRDATE.Text = ""            '空車着日（予定）
+        WF_ACTUALEMPARRDATE.Text = ""            '空車着日（実績）
+        WF_LINETRAINNO.Text = ""            '入線列車番号
+        WF_LINEORDER.Text = ""            '入線順
+        WF_TANKNUMBER.Text = ""            'タンク車№
+        WF_PREOILCODE.Text = ""            '前回油種
         WF_DELFLG.Text = ""                 '削除フラグ
         WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
 
@@ -627,35 +664,23 @@ Public Class OIT0002LinlDetail
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "WF_PASSENDYMD"         'パスワード有効期限
-                                .WF_Calendar.Text = WF_PASSENDYMD.Text
-                            Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_STYMD.Text
-                            Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_ENDYMD.Text
+                            'Case "WF_STYMD"         '有効年月日(From)
+                            '    .WF_Calendar.Text = WF_STYMD.Text
+                            'Case "WF_ENDYMD"        '有効年月日(To)
+                            '    .WF_Calendar.Text = WF_ENDYMD.Text
                         End Select
                         .ActiveCalendar()
 
                     Case Else
                         '以外
                         Dim prmData As New Hashtable
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
 
                         'フィールドによってパラメータを変える
-                        Select Case WF_FIELD.Value
-                            Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-                                'Case "WF_MENUROLE"       'メニュー表示制御ロール
-                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MENU")
-                                'Case "WF_MAPROLE"       '画面参照更新制御ロール
-                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MAP")
-                                'Case "WF_VIEWPROFID"       '画面表示項目制御ロール
-                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "VIEW")
-                                'Case "WF_RPRTPROFID"       'エクセル出力制御ロール
-                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "XML")
-                                'Case "WF_APPROVALID"       '承認権限ロール
-                                '    prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
-                        End Select
+                        'Select Case WF_FIELD.Value
+                        '    Case "WF_ORG"       '組織コード
+                        '        prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                        'End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -694,62 +719,29 @@ Public Class OIT0002LinlDetail
                     WF_DELFLG_TEXT.Text = WW_SelectText
                     WF_DELFLG.Focus()
 
-                Case "WF_PASSENDYMD"             'パスワード有効期限
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_PASSENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_PASSENDYMD.Focus()
+                    'Case "WF_STYMD"             '有効年月日(From)
+                    '    Dim WW_DATE As Date
+                    '    Try
+                    '        Date.TryParse(WW_SelectValue, WW_DATE)
+                    '        WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    '    Catch ex As Exception
+                    '    End Try
+                    '    WF_STYMD.Focus()
 
-                Case "WF_STYMD"             '有効年月日(From)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_STYMD.Focus()
+                    'Case "WF_ENDYMD"            '有効年月日(To)
+                    '    Dim WW_DATE As Date
+                    '    Try
+                    '        Date.TryParse(WW_SelectValue, WW_DATE)
+                    '        WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    '    Catch ex As Exception
+                    '    End Try
+                    '    WF_ENDYMD.Focus()
 
-                Case "WF_ENDYMD"            '有効年月日(To)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_ENDYMD.Focus()
+                    'Case "WF_ORG"               '組織コード
+                    '    WF_ORG.Text = WW_SelectValue
+                    '    WF_ORG_TEXT.Text = WW_SelectText
+                    '    WF_ORG.Focus()
 
-                Case "WF_ORG"               '組織コード
-                    WF_ORG.Text = WW_SelectValue
-                    WF_ORG_TEXT.Text = WW_SelectText
-                    WF_ORG.Focus()
-
-                Case "WF_MENUROLE"               'メニュー表示制御ロール
-                    WF_MENUROLE.Text = WW_SelectValue
-                    WF_MENUROLE_TEXT.Text = WW_SelectText
-                    WF_MENUROLE.Focus()
-
-                Case "WF_MAPROLE"               '画面参照更新制御ロール
-                    WF_MAPROLE.Text = WW_SelectValue
-                    WF_MAPROLE_TEXT.Text = WW_SelectText
-                    WF_MAPROLE.Focus()
-
-                Case "WF_VIEWPROFID"               '画面表示項目制御ロール
-                    WF_VIEWPROFID.Text = WW_SelectValue
-                    WF_VIEWPROFID_TEXT.Text = WW_SelectText
-                    WF_VIEWPROFID.Focus()
-
-                Case "WF_RPRTPROFID"               'エクセル出力制御ロール
-                    WF_RPRTPROFID.Text = WW_SelectValue
-                    WF_RPRTPROFID_TEXT.Text = WW_SelectText
-                    WF_RPRTPROFID.Focus()
-
-                Case "WF_APPROVALID"               '承認権限ロール
-                    WF_APPROVALID.Text = WW_SelectValue
-                    WF_APPROVALID_TEXT.Text = WW_SelectText
-                    WF_APPROVALID.Focus()
             End Select
         Else
         End If

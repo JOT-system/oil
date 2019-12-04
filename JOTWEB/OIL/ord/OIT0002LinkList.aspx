@@ -115,102 +115,111 @@
                         <asp:Label ID="WF_STATUS_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
 
+                    <!-- 情報 -->
+                    <a class="ef">
+                        <asp:Label ID="WF_INFO_L" runat="server" Text="情報" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_INFO" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_INFO_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                    </a>
+                </p>
+
+                <p id="KEY_LINE_4">
                     <!-- 前回オーダー№ -->
                     <a class="ef">
                         <asp:Label ID="WF_PREORDERNO_L" runat="server" Text="前回オーダー№" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_PREORDERNO" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_PREORDERNO_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
-                </p>
 
-                <p id="KEY_LINE_4">
                     <!-- 本線列車 -->
                     <a class="ef">
                         <asp:Label ID="WF_TRAINNO_L" runat="server" Text="本線列車" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_TRAINNO" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_TRAINNO_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
+                </p>
 
+                <p id="KEY_LINE_5">
                     <!-- 登録営業所コード -->
                     <a class="ef">
                         <asp:Label ID="WF_OFFICECODE_L" runat="server" Text="登録営業所コード" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_OFFICECODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_OFFICECODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
-                </p>
 
-                <p id="KEY_LINE_5">
                     <!-- 空車発駅コード -->
                     <a class="ef">
                         <asp:Label ID="WF_DEPSTATION_L" runat="server" Text="空車発駅コード" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_DEPSTATION" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_DEPSTATION_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
+                </p>
 
+                <p id="KEY_LINE_6">
                     <!-- 空車発駅名 -->
                     <a class="ef">
                         <asp:Label ID="WF_DEPSTATIONNAME_L" runat="server" Text="空車発駅名" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_DEPSTATIONNAME" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_DEPSTATIONNAME_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
-                </p>
 
-                <p id="KEY_LINE_6">
                     <!-- 空車着駅コード -->
                     <a class="ef">
                         <asp:Label ID="WF_RETSTATION_L" runat="server" Text="空車着駅コード" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_RETSTATION" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_RETSTATION_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
+                </p>
 
+                <p id="KEY_LINE_7">
                     <!-- 空車着駅名 -->
                     <a class="ef">
                         <asp:Label ID="WF_RETSTATIONNAME_L" runat="server" Text="空車着駅名" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_RETSTATIONNAME" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_RETSTATIONNAME_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
-                </p>
 
-                <p id="KEY_LINE_7">
                     <!-- 空車着日（予定） -->
                     <a class="ef">
                         <asp:Label ID="WF_EMPARRDATE_L" runat="server" Text="空車着日（予定）" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_EMPARRDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_EMPARRDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
+                </p>
 
+                <p id="KEY_LINE_8">
                     <!-- 空車着日（実績） -->
                     <a class="ef">
                         <asp:Label ID="WF_ACTUALEMPARRDATE_L" runat="server" Text="空車着日（実績）" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_ACTUALEMPARRDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_ACTUALEMPARRDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
-                </p>
 
-                <p id="KEY_LINE_8">
                     <!-- 入線列車番号 -->
                     <a class="ef">
                         <asp:Label ID="WF_LINETRAINNO_L" runat="server" Text="入線列車番号" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_LINETRAINNO" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_LINETRAINNO_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
+                </p>
 
+                <p id="KEY_LINE_9">
                     <!-- 入線順 -->
                     <a class="ef">
                         <asp:Label ID="WF_LINEORDER_L" runat="server" Text="入線順" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_LINEORDER" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_LINEORDER_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
-                </p>
 
-                <p id="KEY_LINE_9">
                     <!-- タンク車№ -->
                     <a class="ef">
                         <asp:Label ID="WF_TANKNUMBER_L" runat="server" Text="タンク車№" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_TANKNUMBER" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_TANKNUMBER_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
+                </p>
 
+                <p id="KEY_LINE_10">
                     <!-- 前回油種 -->
                     <a class="ef">
                         <asp:Label ID="WF_PREOILCODE_L" runat="server" Text="前回油種" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>

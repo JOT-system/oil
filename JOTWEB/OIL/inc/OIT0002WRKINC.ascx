@@ -19,6 +19,7 @@
     <asp:TextBox ID="WF_SEL_LINKNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表№ -->
     <asp:TextBox ID="WF_SEL_LINKDETAILNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表明細№ -->
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>         <!-- ステータス -->
+    <asp:TextBox ID="WF_SEL_INFO" runat="server"></asp:TextBox>         <!-- 情報 -->
     <asp:TextBox ID="WF_SEL_PREORDERNO" runat="server"></asp:TextBox>         <!-- 前回オーダー№ -->
     <asp:TextBox ID="WF_SEL_OFFICECODE" runat="server"></asp:TextBox>         <!-- 登録営業所コード -->
     <asp:TextBox ID="WF_SEL_DEPSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車発駅名 -->

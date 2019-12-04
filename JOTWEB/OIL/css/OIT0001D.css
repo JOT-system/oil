@@ -1,2 +1,35 @@
-﻿body {
+﻿/* 実行画面 ヘッダー部 */
+
+.headerbox {
+    top: 2.4em;
+    left: 0em;
+    height: calc(-2.4em - 21.8em - 1.4em + 100%);
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(220,230,240);
+}
+
+/* 実行画面 明細部 */
+
+.detailbox {
+    top: calc(-2.4em - 21.8em - 1.4em + 100%);
+    bottom: 1.4em;
+    left: 0em;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(237,237,237);
+}
+
+/* セルの設定(共通) */
+
+div[data-generated="1"] td,
+div[data-generated="1"] th {
+    border: 1px solid White;
+    height: 28px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }

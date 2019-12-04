@@ -33,15 +33,15 @@
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    border-right: 0.1em solid #b6b6b6;
+  /*  border-right: 0.1em solid #b6b6b6;*/
 }
 
 .inline-radio div:last-child label {
     border-right: 0;
 }
 
-.inline-radio input:checked + label {
-    background: #d81b60;
-    font-weight: 500;
-    color: #fff;
-}
+    .inline-radio input:checked + label {
+        background: rgba(176, 176, 276, 0.6);
+        font-weight: 500;
+        color: #737373;
+    }

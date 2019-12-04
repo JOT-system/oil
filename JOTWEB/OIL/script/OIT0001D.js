@@ -77,9 +77,23 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM == "OILNAME") {
             document.getElementById('WF_LeftMViewChange').value = 24;
         }
+        else if (fieldNM == "RETURNDATETRAIN") {
+            document.getElementById('WF_LeftMViewChange').value = 17;
+        }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";
+        document.forms[0].submit();
+    };
+};
+
+// ○一覧用処理（チェンジイベント）
+function ListField_Change(pnlList, Line, fieldNM) {
+    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        document.getElementById('WF_GridDBclick').value = Line;
+        document.getElementById('WF_FIELD').value = fieldNM;
+        document.getElementById('WF_ButtonClick').value = "WF_ListChange";
         document.forms[0].submit();
     };
 };

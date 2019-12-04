@@ -30,7 +30,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_UORG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SALESOFFICECODE コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SALESOFFICECODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SALESOFFICE コントロール。
     '''</summary>

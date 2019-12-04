@@ -203,6 +203,33 @@ Partial Public Class OIT0002LinkList
     Protected WithEvents WF_STATUS_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_INFO_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INFO_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INFO コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INFO As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_INFO_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INFO_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_PREORDERNO_L コントロール。
     '''</summary>
     '''<remarks>

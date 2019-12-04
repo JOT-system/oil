@@ -3,7 +3,7 @@
 #WF_CAMPCODE_LABEL {
     position:fixed; 
     top:5em; 
-    left:29em; 
+    left:40em; 
     color:#737373;
 /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -13,18 +13,18 @@
 #WF_CAMPCODE {
     position: fixed;
     top: 6.5em;
-    left: 29em;
+    left: 40em;
     border-radius: 3px;
     padding-left: 21px;
-    height: 2em; 
-    width :10em;
+    height: 2em;
+    width: 10em;
 }
 
 /*会社名称*/
 #WF_CAMPCODE_TEXT {
     position: fixed;
     top: 6.8em;
-    left: 40em;
+    left: 51em;
     height: 2em;
     width: 10em;
 }
@@ -33,7 +33,7 @@
 #WF_STYMD_LABEL {
     position: fixed;
     top: 9.5em;
-    left: 29em;
+    left: 40em;
     color: #737373;
 }
 
@@ -41,7 +41,7 @@
 #WF_STYMD {
     position: fixed;
     top: 11em;
-    left: 29em;
+    left: 40em;
     border-radius: 3px;
     padding-left: 21px;
     height: 2em;
@@ -53,7 +53,7 @@
 #WF_ENDYMD_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 29em;
+    left: 40em;
     color: #737373;
 }
 
@@ -61,7 +61,7 @@
 #WF_ENDYMD {
     position: fixed;
     top: 15em;
-    left: 29em;
+    left: 40em;
     border-radius: 3px;
     padding-left: 21px;
     height: 2em;
@@ -72,7 +72,7 @@
 #WF_ORG_LABEL {
     position: fixed;
     top: 18em;
-    left: 29em;
+    left: 40em;
     color: #737373;
 }
 
@@ -80,7 +80,7 @@
 #WF_ORG {
     position: fixed;
     top: 19.5em;
-    left: 29em;
+    left: 40em;
     border-radius: 3px;
     padding-left: 21px;
     height: 2em;
@@ -92,7 +92,7 @@
 #WF_ORG_TEXT {
     position: fixed;
     top: 19.8em;
-    left: 40em;
+    left: 51em;
     height: 2em;
     width: 10em;
 }

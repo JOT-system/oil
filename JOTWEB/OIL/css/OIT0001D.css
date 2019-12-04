@@ -3,7 +3,7 @@
 .headerbox {
     top: 2.4em;
     left: 0em;
-    height: calc(-2.4em - 21.8em - 1.4em + 100%);
+    height: calc(-2.4em - 22.2em - 1.4em + 100%);
     width: 100%;
     position: fixed;
     overflow: hidden;
@@ -13,7 +13,7 @@
 /* 実行画面 明細部 */
 
 .detailbox {
-    top: calc(-2.4em - 21.8em - 1.4em + 100%);
+    top: calc(-2.4em - 22.2em - 1.4em + 100%);
     bottom: 1.4em;
     left: 0em;
     height: 100%;

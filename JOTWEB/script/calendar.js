@@ -1,10 +1,10 @@
-﻿var kabe_sun = "pink";
-var kabe_mon = "lightgrey";
-var kabe_tue = "lightgrey";
-var kabe_wed = "lightgrey";
-var kabe_thu = "lightgrey";
-var kabe_fri = "lightgrey";
-var kabe_sat = "lightblue";
+﻿var kabe_sun = "rgba(255,255,255,0.38)";
+var kabe_mon = "rgba(255,255,255,0.38)";
+var kabe_tue = "rgba(255,255,255,0.38)";
+var kabe_wed = "rgba(255,255,255,0.38)";
+var kabe_thu = "rgba(255,255,255,0.38)";
+var kabe_fri = "rgba(255,255,255,0.38)";
+var kabe_sat = "rgba(255,255,255,0.38)";
 var firstAltMsg = "&nbsp";
 var firstAltYMD = "&nbsp";
 
@@ -101,13 +101,44 @@ function carenda(num,calId) {
         }
     }
 
+    // 月を英語表記にする
+    var usmonth;
+    if (month == 1) {
+        usmonth = "January"
+    } else if (month == 2) {
+        usmonth = "February"
+    } else if (month == 3) {
+        usmonth = "March"
+    } else if (month == 4) {
+        usmonth = "April"
+    } else if (month == 5) {
+        usmonth = "May"
+    } else if (month == 6) {
+        usmonth = "June"
+    } else if (month == 7) {
+        usmonth = "July"
+    } else if (month == 8) {
+        usmonth = "August"
+    } else if (month == 9) {
+        usmonth = "September"
+    } else if (month == 10) {
+        usmonth = "October"
+    } else if (month == 11) {
+        usmonth = "November"
+    } else if (month == 12) {
+        usmonth = "Decembar"
+    }
+
     editMsg = "";
-    editMsg += "<table border=0 cellspacing=3><tr><td style='cursor:pointer;background:white' align='center' onclick='carenda(1)'><b style='font-size:large;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:white'><b stylr='font-size:x-large'>" + year + "年" + month + "月</b></td><td style='cursor:pointer;background:white' align='center' onclick='carenda(2)'><b style='font-size:large'>&gt;&gt;</b></td></tr>\n";
-    editMsg += "<tr>" + defTD("日", "red", kabe_sun) + defTD("月", "black", kabe_mon) + defTD("火", "black", kabe_tue) + defTD("水", "black", kabe_wed) + defTD("木", "black", kabe_thu) + defTD("金", "black", kabe_fri) + defTD("土", "blue", kabe_sat) + "</tr>\n";
+ //   editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:white' align='center' onclick='carenda(1)'><b style='font-size:large;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:white'><b stylr='font-size:x-large'>" + year + "年" + month + "月</b></td><td style='cursor:pointer;background:white' align='center' onclick='carenda(2)'><b style='font-size:large'>&gt;&gt;</b></td></tr>\n";
+    editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38)' align='center' onclick='carenda(1)'><b style='font-size:large;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:rgba(255, 255, 255, 0.38)'><b stylr='font-size:x-large'>" + usmonth + "&nbsp" + year + "</b></td><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38)' align='center' onclick='carenda(2)'><b style='font-size:large'>&gt;&gt;</b></td></tr>\n";
+
+    editMsg += "<tr>" + defTD("Su", "#383838", kabe_sun) + defTD("Mo", "#383838", kabe_mon) + defTD("Tu", "#383838", kabe_tue) + defTD("We", "black", kabe_wed) + defTD("Th", "#383838", kabe_thu) + defTD("Fr", "#383838", kabe_fri) + defTD("Sa", "#383838", kabe_sat) + "</tr>\n";
     editMsg += "<tr>";
 
+
     for (dayIndex = 0; dayIndex < (new Date(year, month - 1, 1)).getDay() ; dayIndex++) {
-        editMsg += defTD("&nbsp;", "white", "white");
+        editMsg += defTD("&nbsp;", "rgba(255, 255, 255, 0.38)", "rgba(255, 255, 255, 0.38)");
     }
 
     //行事テーブル（祝日）の再設定
@@ -154,19 +185,19 @@ function carenda(num,calId) {
         var altMsg = "&nbsp";
         //曜日別基本設定
         switch (dayIndex) {
-            case 0: fontColor = "red";
+            case 0: fontColor = "#F27398";
                 kabeColor = kabe_sun; break;
-            case 1: fontColor = "black";
+            case 1: fontColor = "#383838";
                 kabeColor = kabe_mon; break;
-            case 2: fontColor = "black";
+            case 2: fontColor = "#383838";
                 kabeColor = kabe_tue; break;
-            case 3: fontColor = "black";
+            case 3: fontColor = "#383838";
                 kabeColor = kabe_wed; break;
-            case 4: fontColor = "black";
+            case 4: fontColor = "#383838";
                 kabeColor = kabe_thu; break;
-            case 5: fontColor = "black";
+            case 5: fontColor = "#383838";
                 kabeColor = kabe_fri; break;
-            case 6: fontColor = "blue";
+            case 6: fontColor = "#40AAEF";
                 kabeColor = kabe_sat; break;
         }
 

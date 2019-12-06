@@ -77,6 +77,17 @@ Public Class OIT0001EmptyTurnDairySearch
             '〇画面間の情報クリア
             work.Initialize()
 
+            'Dim a As String
+            'a = Master.USERID
+            'a = Master.USER_ORG
+            'a = Master.ROLE_MENU
+            'a = Master.ROLE_MAP
+            'a = Master.ROLE_VIEWPROF
+            'a = Master.ROLE_RPRTPROF
+            'a = Master.MAPvariant
+            'a = Master.ROLE_APPROVALID
+            'a = Master.MAPpermitcode
+
             '〇初期変数設定処理
             '会社コード
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)
@@ -326,10 +337,13 @@ Public Class OIT0001EmptyTurnDairySearch
                         prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
                     End If
 
+                    '########################################
                     '営業所
                     If WF_FIELD.Value = "TxtSalesOffice" Then
-                        prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                        'prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                        prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
                     End If
+                    '########################################
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .ActiveListBox()

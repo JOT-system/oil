@@ -117,6 +117,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WF_MAPpermitcode.Value = "FALSE"
             End If
 
+            '○ 作成モード(１：新規登録, ２：更新)設定
+            If work.WF_SEL_CREATEFLG.Text = "1" Then
+                WF_CREATEFLG.Value = "1"
+            Else
+                WF_CREATEFLG.Value = "2"
+            End If
         Finally
             '○ 格納Table Close
             If Not IsNothing(OIT0001tbl) Then
@@ -232,9 +238,20 @@ Public Class OIT0001EmptyTurnDairyDetail
             '画面表示設定
             WW_ScreenEnabledSet()
         Else
+
             '既存データの修正については、受注営業所は入力不可とする。
             TxtOrderOffice.Enabled = False
         End If
+
+        '〇営業所配下情報を取得・設定
+        Dim WW_GetValue() As String = {"", "", "", "", ""}
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", work.WF_SEL_SALESOFFICECODE.Text, WW_GetValue)
+        work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+        work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+        work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+        work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+        work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+        work.WF_SEL_CONSIGNEENAME.Text = ""
 
         '○ 名称設定処理
         '会社コード
@@ -706,6 +723,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             z += 1
         Next
 
+        ''〇 1件以上の登録があった場合
+        'If intTankCnt <> 0 Then
+        '    '作成フラグを"2"(更新)に切換え
+        '    work.WF_SEL_CREATEFLG.Text = "2"
+        'End If
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0001tbl)
 
@@ -744,6 +767,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     If WF_FIELD.Value = "WF_UORG" Then
                         prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
                     End If
+
+                    '########################################
+                    '受注営業所
+                    If WF_FIELD.Value = "TxtOrderOffice" Then
+                        prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
+                    End If
+                    '########################################
 
                     '本社列車
                     If WF_FIELD.Value = "TxtHeadOfficeTrain" Then
@@ -916,6 +946,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtLTank.Text = "0"
                     TxtATank.Text = "0"
 
+                    '〇営業所配下情報を取得・設定
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", work.WF_SEL_SALESOFFICECODE.Text, WW_GetValue)
+                    work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                    work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                    work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                    work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                    work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                    work.WF_SEL_CONSIGNEENAME.Text = ""
+
                     '○ 一覧の初期化画面表示データ取得
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                         SQLcon.Open()       'DataBase接続
@@ -925,6 +964,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '○ 画面表示データ保存
                     Master.SaveTable(OIT0001tbl)
+
                 End If
 
                 '新規作成の場合(油種別タンク車数のテキストボックスの入力を可とする。)
@@ -1609,6 +1649,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         If Not isNormal(WW_ERRCODE) Then
             Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
         End If
+
+
 
     End Sub
 
@@ -2879,9 +2921,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        OILCODE     = @P05, RETURNDATETRAIN = @P07, JOINT = @P08" _
-            & "        , UPDYMD    = @P19, UPDUSER         = @P20" _
-            & "        , UPDTERMID = @P21, RECEIVEYMD      = @P22" _
+            & "        TANKNO      = @P03, OILCODE    = @P05, RETURNDATETRAIN = @P07, JOINT = @P08" _
+            & "        , UPDYMD    = @P19, UPDUSER    = @P20" _
+            & "        , UPDTERMID = @P21, RECEIVEYMD = @P22" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & "        AND DETAILNO     = @P02" _

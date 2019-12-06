@@ -239,6 +239,8 @@
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- 権限 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <!-- 新規・更新切替用フラグ -->
+            <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         </div>
 </asp:Content>
 

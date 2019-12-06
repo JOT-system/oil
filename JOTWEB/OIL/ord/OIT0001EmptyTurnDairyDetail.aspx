@@ -24,6 +24,9 @@
 
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
+            <a style="position:fixed;top:2.8em;left:62.5em;">
+                <input type="button" id="WF_ButtonINSERT" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+            </a>
             <a style="position:fixed;top:2.8em;left:67em;">
                 <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
             </a>

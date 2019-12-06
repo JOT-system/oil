@@ -72,5 +72,17 @@
 
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
+    <!-- 荷主コード -->
+    <asp:TextBox ID="WF_SEL_SHIPPERSCODE" runat="server"></asp:TextBox>
+    <!-- 荷主名 -->
+    <asp:TextBox ID="WF_SEL_SHIPPERSNAME" runat="server"></asp:TextBox>
+    <!-- 基地コード -->
+    <asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>
+    <!-- 基地名 -->
+    <asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>
+    <!-- 荷受人コード -->
+    <asp:TextBox ID="WF_SEL_CONSIGNEECODE" runat="server"></asp:TextBox>
+    <!-- 荷受人名 -->
+    <asp:TextBox ID="WF_SEL_CONSIGNEENAME" runat="server"></asp:TextBox>
 
 </div>

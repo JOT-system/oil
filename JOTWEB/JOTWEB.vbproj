@@ -157,7 +157,6 @@
     <Content Include="OIL\mas\OIS0001UserCreate.aspx" />
     <Content Include="OIL\mas\OIS0001UserList.aspx" />
     <Content Include="OIL\mas\OIS0001UserSearch.aspx" />
-    <Content Include="OIL\ord\OIT0002LinkDetail.aspx" />
     <Content Include="OIL\ord\OIT0002LinkList.aspx" />
     <Content Include="OIL\ord\OIT0002LinkSearch.aspx" />
     <Content Include="OIL\ord\OIT0001EmptyTurnDairyDetail.aspx" />
@@ -422,13 +421,6 @@
     <Compile Include="OIL\mas\OIM0004StationSearch.aspx.vb">
       <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="OIL\ord\OIT0002LinkDetail.aspx.designer.vb">
-      <DependentUpon>OIT0002LinkDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="OIL\ord\OIT0002LinkDetail.aspx.vb">
-      <DependentUpon>OIT0002LinkDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\ord\OIT0002LinkList.aspx.designer.vb">
       <DependentUpon>OIT0002LinkList.aspx</DependentUpon>

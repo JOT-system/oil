@@ -5,8 +5,8 @@
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>         <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_ORG" runat="server"></asp:TextBox>         <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_INCLUDUSED" runat="server"></asp:TextBox>         <!-- 利用済含む -->
-    <asp:TextBox ID="WF_SEL_DEPSTATION" runat="server"></asp:TextBox>         <!-- 空車発駅 -->
-    <asp:TextBox ID="WF_SEL_DEPSTATION2" runat="server"></asp:TextBox>         <!-- 空車発駅2 -->
+    <asp:TextBox ID="WF_SEL_DEPSTATION" runat="server"></asp:TextBox>         <!-- 空車発駅コード -->
+    <asp:TextBox ID="WF_SEL_DEPSTATION2" runat="server"></asp:TextBox>         <!-- 空車発駅コード2 -->
     <asp:TextBox ID="WF_SEL_STYMD" runat="server"></asp:TextBox>         <!-- 開始年月日 -->
     <asp:TextBox ID="WF_SEL_STYMD2" runat="server"></asp:TextBox>         <!-- 開始年月日2 -->
     <asp:TextBox ID="WF_SEL_ENDYMD" runat="server"></asp:TextBox>         <!-- 終了年月日 -->
@@ -16,6 +16,7 @@
     <asp:TextBox ID="WF_SEL_SELECT" runat="server"></asp:TextBox>           <!-- ステータス選択 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>        <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>         <!-- 削除フラグ -->
+    <asp:TextBox ID="WF_SEL_CREATEFLG" runat="server"></asp:TextBox>         <!-- 作成フラグ -->
     <asp:TextBox ID="WF_SEL_LINKNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表№ -->
     <asp:TextBox ID="WF_SEL_LINKDETAILNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表明細№ -->
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>         <!-- ステータス -->

@@ -69,6 +69,8 @@ Public Class OIS0001UserCreate
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
+                        Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
+                            WF_FIELD_Change()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
@@ -711,6 +713,50 @@ Public Class OIS0001UserCreate
                         .ActiveListBox()
                 End Select
             End With
+        End If
+
+    End Sub
+
+
+    ''' <summary>
+    ''' フィールドチェンジ時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_Change()
+
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            'Case "WF_CAMPCODE"          '会社コード
+            '    CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ORG"               '組織コード
+                CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_MENUROLE"               'メニュー表示制御ロール
+                CODENAME_get("MENU", WF_MENUROLE.Text, WF_MENUROLE_TEXT.Text, WW_DUMMY)
+
+            Case "WF_MAPROLE"               '画面参照更新制御ロール
+                CODENAME_get("MAP", WF_MAPROLE.Text, WF_MAPROLE_TEXT.Text, WW_DUMMY)
+
+            Case "WF_VIEWPROFID"               '画面表示項目制御ロール
+                CODENAME_get("VIEW", WF_VIEWPROFID.Text, WF_VIEWPROFID_TEXT.Text, WW_DUMMY)
+
+            Case "WF_RPRTPROFID"               'エクセル出力制御ロール
+                CODENAME_get("XML", WF_RPRTPROFID.Text, WF_RPRTPROFID_TEXT.Text, WW_DUMMY)
+
+            Case "WF_APPROVALID"               '承認権限ロール
+                CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
+
+            Case "WF_DELFLG"               '削除フラグ
+                CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+
+        End Select
+
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
         End If
 
     End Sub

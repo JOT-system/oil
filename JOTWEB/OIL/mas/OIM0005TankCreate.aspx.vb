@@ -69,6 +69,8 @@ Public Class OIM0005TankCreate
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
+                        Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
+                            WF_FIELD_Change()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
@@ -970,6 +972,31 @@ Public Class OIM0005TankCreate
                         .ActiveListBox()
                 End Select
             End With
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' フィールドチェンジ時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_Change()
+
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            Case "WF_TANKNUMBER"        'JOT車番
+                CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
+            Case "WF_MODEL"             '型式
+                CODENAME_get("TANKMODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
+            Case "WF_DELFLG"             '削除フラグ
+                CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
+        End Select
+
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
         End If
 
     End Sub
@@ -1927,6 +1954,8 @@ Public Class OIM0005TankCreate
                 Case "MODEL"        '型式
                     prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "DELFLG"           '削除
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

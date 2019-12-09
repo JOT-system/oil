@@ -783,6 +783,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                         prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtHeadOfficeTrain.Text)
                     End If
 
+                    '発駅
+                    If WF_FIELD.Value = "TxtDepstation" Then
+                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtDepstation.Text)
+                    End If
+
+                    '着駅
+                    If WF_FIELD.Value = "TxtArrstation" Then
+                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtArrstation.Text)
+                    End If
+
                     '油種
                     If WF_FIELD.Value = "OILNAME" Then
                         '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
@@ -812,9 +822,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                         '(予定)受入日
                         Case "TxtAccDate"
                             .WF_Calendar.Text = TxtAccDate.Text
-                        '返送日列車
-                        Case "RETURNDATETRAIN"
-                            .WF_Calendar.Text = Date.Now.ToString("yyyy/MM/dd")
+                            ''返送日列車
+                            'Case "RETURNDATETRAIN"
+                            '    .WF_Calendar.Text = Date.Now.ToString("yyyy/MM/dd")
                     End Select
                     .ActiveCalendar()
 

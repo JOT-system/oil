@@ -96,6 +96,7 @@
     <Content Include="OIL\css\OIS0001C.css" />
     <Content Include="OIL\css\OIS0001L.css" />
     <Content Include="OIL\css\OIS0001S.css" />
+    <Content Include="OIL\css\OIT0003S.css" />
     <Content Include="OIL\css\OIT0002D.css" />
     <Content Include="OIL\css\OIT0001D.css" />
     <Content Include="OIL\css\OIT0002L.css" />
@@ -138,6 +139,7 @@
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
     <Content Include="M00000LOGON.aspx" />
+    <Content Include="OIL\inc\OIT0003WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0002WRKINC.ascx" />
     <Content Include="OIL\inc\OIS0001WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0005WRKINC.ascx" />
@@ -164,6 +166,8 @@
     <Content Include="OIL\script\OIS0001C.js" />
     <Content Include="OIL\script\OIS0001L.js" />
     <Content Include="OIL\script\OIS0001S.js" />
+    <Content Include="OIL\script\OIT0003L.js" />
+    <Content Include="OIL\script\OIT0003S.js" />
     <Content Include="OIL\script\OIT0002D.js" />
     <Content Include="OIL\script\OIT0001D.js" />
     <Content Include="OIL\script\OIT0002L.js" />
@@ -231,6 +235,13 @@
     <Compile Include="base\YDF.vb" />
     <Compile Include="inc\GRCO0100XLSUP.ashx.vb">
       <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0003WRKINC.ascx.designer.vb">
+      <DependentUpon>OIT0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0003WRKINC.ascx.vb">
+      <DependentUpon>OIT0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\OIT0002WRKINC.ascx.designer.vb">
       <DependentUpon>OIT0002WRKINC.ascx</DependentUpon>

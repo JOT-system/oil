@@ -14,7 +14,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 11                 'マウススクロール時稼働行数
+    Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
 
     Private Const CONST_TxtHTank As String = "1001"                 '油種(ハイオク)
@@ -237,6 +237,8 @@ Public Class OIT0001EmptyTurnDairyDetail
 
             '画面表示設定
             WW_ScreenEnabledSet()
+
+            TxtOrderOffice.ReadOnly = True
         Else
 
             '既存データの修正については、受注営業所は入力不可とする。

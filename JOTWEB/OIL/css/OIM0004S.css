@@ -49,14 +49,14 @@
 */
 }
     #WF_STATIONCODE input[type='text'] {
-        Height: 1.4em;
+        Height: 2.1em;
         Width: 10em;
     }
 
 /* 貨物駅コード名称*/
 #WF_STATIONCODE_TEXT {
     position: fixed;
-    top: calc(19% - 50px/2);
+    top: calc(20% - 50px/2);
     left: calc(55% - 50px/2);
     /*
     top: 6.8em;
@@ -75,7 +75,7 @@
     position: fixed;
     height: 50px;
     width: 120px;
-    top: calc(24% - 50px/2);
+    top: calc(25% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
     /*
@@ -93,7 +93,7 @@
     position: fixed;
     height: 50px;
     width: 140px;
-    top: calc(28% - 50px/2);
+    top: calc(29% - 50px/2);
     left: calc(46% - 140px/2);
     /*
     top: 6.5em;
@@ -106,7 +106,7 @@
 }
 
     #WF_BRANCH input[type='text'] {
-        Height: 1.4em;
+        Height: 2.1em;
         Width: 10em;
     }
 

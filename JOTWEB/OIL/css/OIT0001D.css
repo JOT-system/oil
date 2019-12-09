@@ -513,19 +513,6 @@
         Width: 7em;
     }
 
-/* 実行画面 ヘッダー部 */
-
-.headerbox {
-    top: 2.4em;
-    left: 0em;
-    height: calc(-2.4em - 18.4em - 1.4em + 100%);
-    width: 100%;
-    position: fixed;
-    overflow: hidden;
-    background-color: rgb(217,222,228);
-    min-width: 990px;
-}
-
 
 /* 実行画面 ヘッダー部(詳細) */
 .Operation input[type='text'] {
@@ -543,6 +530,20 @@
         margin: 0em 0.7em 0em 0em;
         top: -0.4em;
     }
+
+
+/* 実行画面 ヘッダー部 */
+
+.headerbox {
+    top: 2.4em;
+    left: 0em;
+    height: calc(- 18.4em - 1.4em + 100%);
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(217,222,228);
+    min-width: 990px;
+}
 
 /* 実行画面 明細部 */
 /*

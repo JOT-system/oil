@@ -580,13 +580,13 @@ div {
     border-radius:2px;
 }
 
-
 /* 左リストボックス  カレンダー*/
 #Calendar {
     background-color: rgba(153, 102, 0, 0.3);
+    font-size: 1em;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    border-radius:5px;
 }
-
-
 
 
 /* 左テーブル */
@@ -595,7 +595,6 @@ div {
     top: 5.5em;
     left: 2em;
 }
-
 
 
 #pnlLeftList_D {

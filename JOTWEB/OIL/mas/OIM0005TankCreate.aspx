@@ -38,17 +38,17 @@
 
                 <p id="KEY_LINE_2">
                     <!-- 削除フラグ -->
-                    <a class="ef" ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)">
+                    <a class="ef" ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
                         <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除フラグ" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
                         <asp:TextBox ID="WF_DELFLG" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
-                        <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                        <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- JOT車番 -->
                     <a  class="ef" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
                         <asp:Label ID="WF_TANKNUMBER_L" runat="server" Text="JOT車番" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
                         <asp:TextBox ID="WF_TANKNUMBER" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
-                        <asp:Label ID="WF_TANKNUMBER_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                        <asp:Label ID="WF_TANKNUMBER_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
 
@@ -233,7 +233,7 @@
                     <a  class="ef" ondblclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_TANKMODEL%>);" onchange="TextBox_change('WF_MODEL');">
                         <asp:Label ID="WF_MODEL_L" runat="server" Text="形式" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
                         <asp:TextBox ID="WF_MODEL" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
-                        <asp:Label ID="WF_MODEL_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                        <asp:Label ID="WF_MODEL_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- 形式カナ -->

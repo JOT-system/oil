@@ -20,7 +20,7 @@
             <input type="button" id="WF_ButtonDO" value="検索"  style="Width:5em" onclick="ButtonClick('WF_ButtonDO');" />
         </a>
         <a style="position:fixed;top:2.8em;left:67em;">
-            <input type="button" id="WF_ButtonEND" value="終了"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+            <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
         </a>
 
         <!-- ○ 変動項目 ○ -->
@@ -43,20 +43,20 @@
             <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 営業所 -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">★営業所</a>
-        <a class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
-            <asp:TextBox ID="TxtSalesOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a id="WF_OFFICECODE_LABEL">★営業所</a>
+        <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
+            <asp:TextBox CssClass="BoxIcon" ID="TxtSalesOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:7.7em; left:27em;">
-            <asp:Label ID="LblSalesOfficeName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        <a id="WF_OFFICECODE_TEXT" >
+            <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
 
         <!-- 積込日 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">★積込日</a>
-        <a class="ef" style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-            <asp:TextBox ID="TxtLoadingDateStart" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a id="WF_LOADINGDATE_LABEL">★積込日</a>
+        <a class="ef" id="WF_LOADINGDATE" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <asp:TextBox CssClass="CalendarIcon" ID="TxtLoadingDateStart" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:9.9em; left:27em; font-weight:bold;">～</a>
+        <a id="WF_LOADINGDATE_SYMBOL">～</a>
 <!--
         <a style="position:fixed; top:9.9em; left:29em;">
             <asp:TextBox ID="TxtLoadingDateEnd" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
@@ -70,9 +70,9 @@
         </a>
 -->
         <!-- 列車番号 -->
-        <a style="position:fixed; top:12.1em; left:4em; font-weight:bold;">列車番号</a>
-        <a class="ef" style="position:fixed; top:12.1em; left:18em;">
-            <asp:TextBox ID="TxtTrainNumber" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a id="WF_TRAINNO_LABEL">列車番号</a>
+        <a class="ef" id="WF_TRAINNO">
+            <asp:TextBox ID="TxtTrainNumber" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
     </div>
 

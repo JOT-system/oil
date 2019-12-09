@@ -1,2 +1,152 @@
-﻿body {
+﻿/*左Boxオープン用虫眼鏡アイコン*/
+.BoxIcon {
+    background-image: url(../img/leftbox.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/*カレンダーオープン用アイコン*/
+.CalendarIcon {
+    background-image: url(../img/calendar.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/* 空回日報(検索)画面 */
+/* #################１行目 ################# */
+/* 営業所(ラベル) */
+#WF_OFFICECODE_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(15% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*営業所コードinput tag*/
+#WF_OFFICECODE {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(19% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+    #WF_OFFICECODE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* 営業所名称*/
+#WF_OFFICECODE_TEXT {
+    position: fixed;
+    top: calc(20% - 50px/2);
+    left: calc(54% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+
+/* #################２行目 ################# */
+/* 積込日(ラベル) */
+#WF_LOADINGDATE_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(27% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position: fixed;
+    top: 9.5em;
+    left: 40em;
+    color: #737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 積込日 */
+#WF_LOADINGDATE {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(31% - 50px/2);
+    left: calc(46% - 140px/2);
+/*
+    position: fixed;
+    top: 11em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+*/
+}
+/* 積込日(記号) */
+#WF_LOADINGDATE_SYMBOL {
+    position: fixed;
+    top: calc(32% - 50px/2);
+    left: calc(54% - 50px/2);
+/*
+    position: fixed;
+    top: 11em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+
+/* #################３行目 ################# */
+/* 列車番号(ラベル) */
+#WF_TRAINNO_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(39% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+/*
+    position: fixed;
+    top: 14em;
+    left: 40em;
+    color: #737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 列車番号 */
+#WF_TRAINNO {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(43% - 50px/2);
+    left: calc(46% - 140px/2);
+/*
+    position: fixed;
+    top: 15.5em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+*/
 }

@@ -1,11 +1,11 @@
 ﻿Imports JOTWEB.GRIS0005LeftBox
 
-Public Class OIT0001WRKINC
+Public Class OIT0003WRKINC
     Inherits System.Web.UI.UserControl
 
-    Public Const MAPIDS As String = "OIT0001S"       'MAPID(検索)
-    Public Const MAPIDL As String = "OIT0001L"       'MAPID(一覧)
-    Public Const MAPIDD As String = "OIT0001D"       'MAPID(明細)
+    Public Const MAPIDS As String = "OIT0003S"       'MAPID(検索)
+    Public Const MAPIDL As String = "OIT0003L"       'MAPID(一覧)
+    Public Const MAPIDD As String = "OIT0003D"       'MAPID(明細)
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
@@ -49,20 +49,6 @@ Public Class OIT0001WRKINC
         prmData.Item(C_PARAMETERS.LP_SALESOFFICE) = I_SALESOFFICEPT
         prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
         CreateSALESOFFICEParam = prmData
-    End Function
-
-    ''' <summary>
-    ''' 貨物車パターンの取得
-    ''' </summary>
-    ''' <param name="I_STATIONPT"></param>
-    ''' <returns></returns>
-    ''' <remarks>全て</remarks>
-    Function CreateSTATIONPTParam(ByVal I_COMPCODE As String, ByVal I_STATIONPT As String) As Hashtable
-        Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
-        prmData.Item(C_PARAMETERS.LP_STATIONCODE) = I_STATIONPT
-        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
-        CreateSTATIONPTParam = prmData
     End Function
 
     ''' <summary>

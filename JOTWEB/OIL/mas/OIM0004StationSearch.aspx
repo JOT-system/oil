@@ -42,20 +42,20 @@
             <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 貨物駅コード -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">貨物駅コード</a>
+        <a id="WF_STATIONCODE_LABEL">貨物駅コード</a>
 
-        <a class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
-            <asp:TextBox ID="TxtStationCode" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a class="ef" id="WF_STATIONCODE" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
+            <asp:TextBox CssClass="BoxIcon" ID="TxtStationCode" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:7.7em; left:27em;">
+        <a  id="WF_STATIONCODE_TEXT">
             <asp:Label ID="LblStationCode" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 貨物コード枝番 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold;">貨物コード枝番</a>
-        <a class="ef" style="position:fixed; top:9.9em; left:18em;" onchange="TextBox_change('TxtStationCode');">
-            <asp:TextBox ID="TxtBranch" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a id="WF_BRANCH_LABEL">貨物コード枝番</a>
+        <a class="ef" id="WF_BRANCH" onchange="TextBox_change('TxtStationCode');">
+            <asp:TextBox ID="TxtBranch" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:9.9em; left:27em;">
+        <a id="WF_BRANCH_TEXT">
             <asp:Label ID="LblBranch" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
     </div>

@@ -1,2 +1,128 @@
-﻿body {
+﻿/*左Boxオープン用虫眼鏡アイコン*/
+.BoxIcon {
+    background-image: url(../img/leftbox.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
 }
+
+/*カレンダーオープン用アイコン*/
+.CalendarIcon {
+    background-image: url(../img/calendar.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/* 貨物車マスタ(検索)画面 */
+/* #################１行目 ################# */
+/* 貨物駅コード(ラベル) */
+#WF_STATIONCODE_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 100px;
+    top: calc(15% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*貨物駅コードinput tag*/
+#WF_STATIONCODE {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(19% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+    #WF_STATIONCODE input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* 貨物駅コード名称*/
+#WF_STATIONCODE_TEXT {
+    position: fixed;
+    top: calc(20% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+    #WF_STATIONCODE_TEXT input[type='text'] {
+        Width: 17em;
+    }
+
+/* #################２行目 ################# */
+/* 貨物コード枝番(ラベル) */
+#WF_BRANCH_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 120px;
+    top: calc(25% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*貨物コード枝番input tag*/
+#WF_BRANCH {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(29% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+
+    #WF_BRANCH input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* 貨物駅コード枝番名称*/
+#WF_BRANCH_TEXT {
+    position: fixed;
+    top: calc(28% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+    #WF_BRANCH_TEXT input[type='text'] {
+        Width: 17em;
+    }
+

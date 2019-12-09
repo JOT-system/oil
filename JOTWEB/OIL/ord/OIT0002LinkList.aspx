@@ -34,20 +34,23 @@
                 </a>
 
                 <!-- ボタン -->
-                <a style="position:fixed;top:2.8em;left:23em;">
+                <a style="position:fixed;top:2.8em;left:0.5em;">
                     <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
                 </a>
-                <a style="position:fixed;top:2.8em;left:27.5em;">
+                <a style="position:fixed;top:2.8em;left:5em;">
                     <input type="button" id="WF_ButtonALLCANCEL" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLCANCEL');" />
                 </a>
-                <a style="position:fixed;top:2.8em;left:49em;">
-                    <input type="button" id="WF_ButtonINSERT" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                <a style="position:fixed;top:2.8em;left:9.5em;">
+                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
                 </a>
-                <a style="position:fixed;top:2.8em;left:53.5em;">
-                    <input type="button" id="WF_ButtonUPDATE" value="DB更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                <a style="position:fixed;top:2.8em;left:14em;">
+                    <input type="button" id="WF_ButtonUPDATE" value="更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
                 </a>
-                <a style="position:fixed;top:2.8em;left:58em;">
+                <a style="position:fixed;top:2.8em;left:18.5em;">
                     <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
+                </a>
+                <a style="position:fixed;top:2.8em;left:62.5em;">
+                    <input type="button" id="WF_ButtonINSERT" value="新規登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:67em;">
                     <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />

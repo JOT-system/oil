@@ -107,13 +107,13 @@ div {
         box-sizing: border-box;
         width: 100%;
         padding: 0.3em;
+        padding-left: 1.3em;
         transition: 0.3s;
         letter-spacing: 1px;
         border-color: rgba(176, 176, 276, 0.6);
         border-style: solid;
         border-width: thin;
         /*    border: 1px solid #1b2538; */
-
     }
 
 
@@ -143,8 +143,6 @@ div {
     overflow: hidden;
     background-color: rgb(217,222,228);
 }
-
-
 
 /* 実行画面 明細部 */
 

@@ -12,7 +12,7 @@
     background-position: 1px;
 }
 
-/* 空回日報(検索)画面 */
+/* 受注(検索)画面 */
 /* #################１行目 ################# */
 /* 営業所(ラベル) */
 #WF_OFFICECODE_LABEL {
@@ -67,8 +67,8 @@
 }
 
 /* #################２行目 ################# */
-/* 積込日(ラベル) */
-#WF_LOADINGDATE_LABEL {
+/* 年月日(ラベル) */
+#WF_DATE_LABEL {
     position: fixed;
     height: 50px;
     width: 70px;
@@ -84,8 +84,8 @@
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
-/* 積込日 */
-#WF_LOADINGDATE {
+/* 年月日 */
+#WF_DATE {
     position: fixed;
     height: 50px;
     width: 140px;
@@ -101,12 +101,12 @@
     width: 10em;
 */
 }
-    #WF_LOADINGDATE input[type='text'] {
+    #WF_DATE input[type='text'] {
         Height: 2.1em;
         Width: 10em;
     }
-/* 積込日(記号) */
-#WF_LOADINGDATE_SYMBOL {
+/* 年月日(記号) */
+#WF_DATE_SYMBOL {
     position: fixed;
     top: calc(32% - 50px/2);
     left: calc(55% - 50px/2);
@@ -158,4 +158,113 @@
         Height: 2.1em;
         Width: 10em;
     }
+
+/* #################４行目 ################# */
+/* 荷卸地(ラベル) */
+#WF_UNLOADING_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(51% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*荷卸地コードinput tag*/
+#WF_UNLOADING {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(55% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+
+    #WF_UNLOADING input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* 荷卸地名称*/
+#WF_UNLOADING_TEXT {
+    position: fixed;
+    top: calc(56% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
+
+
+/* #################５行目 ################# */
+/* 状態(ラベル) */
+#WF_STATUS_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(63% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*
+    position:fixed; 
+    top:5em; 
+    left:40em; 
+    color:#737373;
+*/
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*状態コードinput tag*/
+#WF_STATUS {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(67% - 50px/2);
+    left: calc(46% - 140px/2);
+    /*
+    top: 6.5em;
+    left: 40em;
+    height: 2em;
+    width: 10em;
+    border-radius: 3px;
+    padding-left: 21px;
+*/
+}
+
+    #WF_STATUS input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/* 状態名称*/
+#WF_STATUS_TEXT {
+    position: fixed;
+    top: calc(68% - 50px/2);
+    left: calc(55% - 50px/2);
+    /*
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+*/
+}
 

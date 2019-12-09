@@ -211,7 +211,7 @@ div {
     left: 0em;
     width: 0em;
     overflow: hidden;
-    background-color: gray;
+    background-color: rgba(242, 242, 242,1);
     z-index: 20;
 }
 
@@ -574,9 +574,22 @@ div {
 }
 
 
+/*カレンダーのスタイルシート*/
+#carendabox {
+    border: none;
+    border-radius:2px;
+}
+
+
+/* 左リストボックス  カレンダー*/
+#Calendar {
+    background-color: rgba(153, 102, 0, 0.3);
+}
+
+
+
 
 /* 左テーブル */
-
 #pnlLeftList_H {
     position: fixed;
     top: 5.5em;

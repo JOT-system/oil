@@ -24,6 +24,9 @@
 
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
+            <a style="position:fixed;top:2.8em;left:62.5em;">
+                <input type="button" id="WF_ButtonINSERT" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+            </a>
             <a style="position:fixed;top:2.8em;left:67em;">
                 <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
             </a>
@@ -236,6 +239,8 @@
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- 権限 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <!-- 新規・更新切替用フラグ -->
+            <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         </div>
 </asp:Content>
 

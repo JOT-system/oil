@@ -35,7 +35,7 @@
                         <table border="0">
                             <tr>
                                 <td colspan="3">
-                                    <table border="1" >
+                                    <table border="0" >
                                         <tr>
                                             <td>
                                                 <div id="carenda" ></div>

@@ -48,6 +48,10 @@
     padding-left: 21px;
 */
 }
+    #WF_OFFICECODE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
 
 /* 営業所名称*/
 #WF_OFFICECODE_TEXT {

@@ -385,8 +385,12 @@ Public Class OIS0001UserSearch
             Case "WF_STYMD"             '有効年月日(From)
                 Dim WW_DATE As Date
                 Try
-                    Date.TryParse(WW_SelectValue, WW_DATE)
-                    WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        WF_STYMD.Text = ""
+                    Else
+                        WF_STYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                    End If
                 Catch ex As Exception
                 End Try
                 WF_STYMD.Focus()
@@ -394,9 +398,14 @@ Public Class OIS0001UserSearch
             Case "WF_ENDYMD"            '有効年月日(To)
                 Dim WW_DATE As Date
                 Try
-                    Date.TryParse(WW_SelectValue, WW_DATE)
-                    WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        WF_ENDYMD.Text = ""
+                    Else
+                        WF_ENDYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                    End If
                 Catch ex As Exception
+
                 End Try
                 WF_ENDYMD.Focus()
 

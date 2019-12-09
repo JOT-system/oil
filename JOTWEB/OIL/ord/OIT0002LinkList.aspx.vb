@@ -330,11 +330,13 @@ Public Class OIT0002LinkList
         '　検索説明
         '     条件指定に従い該当データを貨車連結順序表テーブルから取得する
         Dim SQLStr As String =
-                  " Select " _
+                  " SELECT" _
                 & "    0                                                   AS LINECNT " _
                 & "    , ''                                                AS OPERATION " _
                 & "    , 1                                                 AS 'SELECT' " _
                 & "    , 0                                                 AS HIDDEN " _
+                & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
+                & "    , ISNULL(IF(OIT0004.EMPARRDATE <> '',FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'),IF(OIT0004.EMPARRDATE <> '',FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'))),'') AS TMPYMD " _
                 & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')      AS INITYMD " _
                 & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                    AS STATUS " _
                 & "    , ISNULL(RTRIM(OIT0004.INFO), '')                    AS INFO " _
@@ -398,8 +400,9 @@ Public Class OIT0002LinkList
         End If
 
         SQLStr &=
-              "GROUP BY " _
-            & "	    TRAINNO " _
+              " GROUP BY " _
+            & "     LINKNO " _
+            & "	    ,TRAINNO " _
             & "	    ,INITYMD " _
             & "	    ,STATUS " _
             & "	    ,INFO " _
@@ -409,8 +412,8 @@ Public Class OIT0002LinkList
             & "	    ,RETSTATIONNAME " _
             & "	    ,EMPARRDATE " _
             & "	    ,ACTUALEMPARRDATE " _
-            & " ORDER BY" _
-            & "     OIT0004.TRAINNO"
+            & " ORDER BY " _
+            & "     TRAINNO "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

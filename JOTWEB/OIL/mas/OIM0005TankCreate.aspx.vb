@@ -171,6 +171,7 @@ Public Class OIM0005TankCreate
 
         'JOT車番
         WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER2.Text
+        CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_DUMMY)
 
         '原籍所有者C
         WF_ORIGINOWNERCODE.Text = work.WF_SEL_ORIGINOWNERCODE.Text
@@ -961,7 +962,7 @@ Public Class OIM0005TankCreate
                         Select Case WF_FIELD.Value
                             Case "WF_TANKNUMBER"       'タンク車番号
                                 prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER")
-                            Case "WF_MENUROLE"       'タンク車型式
+                            Case "WF_MODEL"       'タンク車型式
                                 prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKMODEL")
                         End Select
 
@@ -1002,6 +1003,172 @@ Public Class OIM0005TankCreate
                     WF_DELFLG.Text = WW_SelectValue
                     WF_DELFLG_TEXT.Text = WW_SelectText
                     WF_DELFLG.Focus()
+
+                Case "WF_TANKNUMBER"               'JOT車番
+                    WF_TANKNUMBER.Text = WW_SelectValue
+                    WF_TANKNUMBER_TEXT.Text = WW_SelectText
+                    WF_TANKNUMBER.Focus()
+
+                Case "WF_LEASESTYMD"             'リース開始年月日
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_LEASESTYMD.Text = ""
+                        Else
+                            WF_LEASESTYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_LEASESTYMD.Focus()
+
+                Case "WF_LEASEENDYMD"             'リース満了年月日
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_LEASEENDYMD.Text = ""
+                        Else
+                            WF_LEASEENDYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_LEASEENDYMD.Focus()
+
+                Case "WF_USERLIMIT"            '第三者使用期限
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_USERLIMIT.Text = ""
+                        Else
+                            WF_USERLIMIT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_USERLIMIT.Focus()
+
+                Case "WF_LIMITTEXTRADIARYSTATION"             '臨時常備駅期限
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_LIMITTEXTRADIARYSTATION.Text = ""
+                        Else
+                            WF_LIMITTEXTRADIARYSTATION.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_LIMITTEXTRADIARYSTATION.Focus()
+
+                Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_EXTRADINARYLIMIT.Text = ""
+                        Else
+                            WF_EXTRADINARYLIMIT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_EXTRADINARYLIMIT.Focus()
+
+                Case "WF_ALLINSPECTIONDATE"             '取得年月日
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_ALLINSPECTIONDATE.Text = ""
+                        Else
+                            WF_ALLINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_ALLINSPECTIONDATE.Focus()
+
+                Case "WF_TRANSFERDATE"            '車籍編入年月日
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_TRANSFERDATE.Text = ""
+                        Else
+                            WF_TRANSFERDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_TRANSFERDATE.Focus()
+
+                Case "WF_MODEL"               '型式
+                    WF_MODEL.Text = WW_SelectValue
+                    'WF_MODEL_TEXT.Text = WW_SelectText
+                    WF_MODEL.Focus()
+
+                Case "WF_SPECIFIEDDATE"             '次回指定年月日
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_SPECIFIEDDATE.Text = ""
+                        Else
+                            WF_SPECIFIEDDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_SPECIFIEDDATE.Focus()
+
+                Case "WF_JRALLINSPECTIONDATE"            '次回全検年月日(JR)
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_JRALLINSPECTIONDATE.Text = ""
+                        Else
+                            WF_JRALLINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_JRALLINSPECTIONDATE.Focus()
+
+                Case "WF_JRINSPECTIONDATE"             '次回交検年月日(JR）
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_JRINSPECTIONDATE.Text = ""
+                        Else
+                            WF_JRINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_JRINSPECTIONDATE.Focus()
+
+                Case "WF_INSPECTIONDATE"            '次回交検年月日
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_INSPECTIONDATE.Text = ""
+                        Else
+                            WF_INSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_INSPECTIONDATE.Focus()
+
+                Case "WF_JRSPECIFIEDDATE"            '次回指定年月日(JR)
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            WF_JRSPECIFIEDDATE.Text = ""
+                        Else
+                            WF_JRSPECIFIEDDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    WF_JRSPECIFIEDDATE.Focus()
             End Select
         Else
         End If
@@ -1023,9 +1190,50 @@ Public Class OIM0005TankCreate
         '○ フォーカスセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除フラグ
-                Case "WF_DELFLG"
+                Case "WF_DELFLG"                '削除フラグ
                     WF_DELFLG.Focus()
+
+                Case "WF_TANKNUMBER"               'JOT車番
+                    WF_TANKNUMBER.Focus()
+
+                Case "WF_LEASESTYMD"             'リース開始年月日
+                    WF_LEASESTYMD.Focus()
+
+                Case "WF_LEASEENDYMD"             'リース満了年月日
+                    WF_LEASEENDYMD.Focus()
+
+                Case "WF_USERLIMIT"            '第三者使用期限
+                    WF_USERLIMIT.Focus()
+
+                Case "WF_LIMITTEXTRADIARYSTATION"             '臨時常備駅期限
+                    WF_LIMITTEXTRADIARYSTATION.Focus()
+
+                Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
+                    WF_EXTRADINARYLIMIT.Focus()
+
+                Case "WF_ALLINSPECTIONDATE"             '取得年月日
+                    WF_ALLINSPECTIONDATE.Focus()
+
+                Case "WF_TRANSFERDATE"            '車籍編入年月日
+                    WF_TRANSFERDATE.Focus()
+
+                Case "WF_MODEL"               '型式
+                    WF_MODEL.Focus()
+
+                Case "WF_SPECIFIEDDATE"             '次回指定年月日
+                    WF_SPECIFIEDDATE.Focus()
+
+                Case "WF_JRALLINSPECTIONDATE"            '次回全検年月日(JR)
+                    WF_JRALLINSPECTIONDATE.Focus()
+
+                Case "WF_JRINSPECTIONDATE"             '次回交検年月日(JR）
+                    WF_JRINSPECTIONDATE.Focus()
+
+                Case "WF_INSPECTIONDATE"            '次回交検年月日
+                    WF_INSPECTIONDATE.Focus()
+
+                Case "WF_JRSPECIFIEDDATE"            '次回指定年月日(JR)
+                    WF_JRSPECIFIEDDATE.Focus()
             End Select
         Else
         End If
@@ -1710,9 +1918,15 @@ Public Class OIM0005TankCreate
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "DELFLG"           '削除フラグ
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
-
+                Case "ORG"             '運用部署
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "TANKNUMBER"        'JOT車番
+                    prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "MODEL"        '型式
+                    prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

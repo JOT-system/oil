@@ -60,3 +60,15 @@ function ChangeCheckBox() {
         }
     }
 }
+
+// ○チェックボックス選択
+function SelectCheckBox(obj, lineCnt) {
+
+    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+        document.getElementById("WF_SelectedIndex").value = lineCnt
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.body.style.cursor = "wait";
+        document.forms[0].submit();
+    }
+
+}

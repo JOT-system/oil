@@ -131,7 +131,7 @@ function carenda(num,calId) {
 
     editMsg = "";
  //   editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:white' align='center' onclick='carenda(1)'><b style='font-size:large;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:white'><b stylr='font-size:x-large'>" + year + "年" + month + "月</b></td><td style='cursor:pointer;background:white' align='center' onclick='carenda(2)'><b style='font-size:large'>&gt;&gt;</b></td></tr>\n";
-    editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38)' align='center' onclick='carenda(1)'><b style='font-size:large;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:rgba(255, 255, 255, 0.38)'><b stylr='font-size:x-large'>" + usmonth + "&nbsp" + year + "</b></td><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38)' align='center' onclick='carenda(2)'><b style='font-size:large'>&gt;&gt;</b></td></tr>\n";
+    editMsg += "<table id='Calendar' border=0 cellspacing=3><tr><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(1)'><b style='font-size:1em;'>&lt;&lt;</b></td><td colspan='5' align='center' style='background:rgba(255, 255, 255, 0.38);border-radius:15px'><b stylr='font-size:1em'>" + usmonth + "&nbsp" + year + "</b></td><td style='cursor:pointer;background:rgba(255, 255, 255, 0.38);border-radius:15px' align='center' onclick='carenda(2)'><b style='font-size:1em'>&gt;&gt;</b></td></tr>\n";
 
     editMsg += "<tr>" + defTD("Su", "#383838", kabe_sun) + defTD("Mo", "#383838", kabe_mon) + defTD("Tu", "#383838", kabe_tue) + defTD("We", "black", kabe_wed) + defTD("Th", "#383838", kabe_thu) + defTD("Fr", "#383838", kabe_fri) + defTD("Sa", "#383838", kabe_sat) + "</tr>\n";
     editMsg += "<tr>";
@@ -206,7 +206,7 @@ function carenda(num,calId) {
             if (gyouji_tbl[j * 4 + 1] == month && gyouji_tbl[j * 4 + 2] == i) {
                 //祝日
                 if (gyouji_tbl[j * 4] == 1) {
-                    fontColor = "red";
+                    fontColor = "#F27398";
                 } else {
                     kabeColor = "lightgreen";
                 }
@@ -243,22 +243,24 @@ function carenda(num,calId) {
 }
 
 function defTD(str, iro, kabe) {
-    return "<td style='cursor:default;width:35px;hight:30px;background:" + kabe + "; color:" + iro + ";' align='center' ><b style='font-size: large;'>" + str + "</b></td>";
+    return "<td style='cursor:default;width:35px;hight:30px;border-radius:20px; background:" + kabe + "; color:" + iro + ";' align='center' ><b style='font-size: large;'>" + str + "</b></td>";
 }
 function defTD2(str, iro, kabe, altYMD, altMsg) {
     var editHTML = "";
-    editHTML += "<td id='" + altYMD + "' style='cursor:default;width:35px;hight:30px;background:" + kabe + "; color:" + iro + ";' align='center' ";
+    editHTML += "<td id='" + altYMD + "' style='cursor:default;width:35px;hight:30px;border-radius:20px;background:" + kabe + "; color:" + iro + ";' align='center' ";
     editHTML += "onclick=setDate('" + altYMD + "') ";
     editHTML += "onMouseOver=setAltMsg('" + altYMD + "','" + altMsg + "');setColor('" + altYMD + "',1); ";
     editHTML += "onMouseOut=setAltMsg('" + firstAltYMD + "','" + firstAltMsg + "');setColor('" + altYMD + "',2);>";
-    editHTML += "<b style='font-size: large'>" + str + "</b></td>";
+    editHTML += "<b style='font-size: 1em'>" + str + "</b></td>";
     return editHTML;
 }
+
+
 function setAltMsg(altYMD, altMsg) {
     var editAltMsg = "";
-    editAltMsg += "<b stryle='font-size: xx-large'>" + altYMD + "</b>";
+    editAltMsg += "<b stryle='font-size: 1em'>" + altYMD + "</b>";
     editAltMsg += "<br>";
-    editAltMsg += "<b stryle='font-size: xx-large'>" + altMsg + "</b>";
+    editAltMsg += "<b stryle='font-size: 1em'>" + altMsg + "</b>";
     document.getElementById("altMsg").innerHTML = editAltMsg;
 }
 function setDate(altYMD) {
@@ -273,8 +275,8 @@ function setColor(altYMD, event) {
         saveBgColor = Element.style.background;
         saveFgColor = Element.style.color;
 
-        Element.style.background = 'blue';
-        Element.style.color = 'white';
+        Element.style.background = 'rgba(14, 122, 196, 0.3)';
+        Element.style.color = 'rgba(153, 102, 0, 0.3)';
     } else {
         Element.style.background = saveBgColor;
         Element.style.color = saveFgColor;

@@ -100,6 +100,7 @@ Public Class OIT0002LinkSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORG", WF_ORG.Text)                '組織コード
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "DEPSTATION", WF_DEPSTATION.Text)   '空車発駅
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD.Text)             '有効年月日(From)
+            WF_STYMD.Text = Format(CDate(WF_STYMD.Text).AddDays(1), "yyyy/MM/dd")
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text)           '有効年月日(To)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO.Text)         '本線列車
 

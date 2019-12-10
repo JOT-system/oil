@@ -1907,25 +1907,25 @@ Public Class OIT0001EmptyTurnDairyDetail
             OIT0001INPtbl.Rows.Add(OIT0001INProw)
         Next
 
-        ''○ 項目チェック
-        'INPTableCheck(WW_ERR_SW)
+        '○ 項目チェック
+        INPTableCheck(WW_ERR_SW)
 
-        ''○ 入力値のテーブル反映
-        'OIT0001tbl_UPD()
+        '○ 入力値のテーブル反映
+        OIT0001tbl_UPD()
 
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0001tbl)
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
 
-        ''○ メッセージ表示
-        'If isNormal(WW_ERR_SW) Then
-        '    Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-        'Else
-        '    Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
-        'End If
+        '○ メッセージ表示
+        If isNormal(WW_ERR_SW) Then
+            Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        Else
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+        End If
 
-        ''○ Close
-        'CS0023XLSUPLOAD.TBLDATA.Dispose()
-        'CS0023XLSUPLOAD.TBLDATA.Clear()
+        '○ Close
+        CS0023XLSUPLOAD.TBLDATA.Dispose()
+        CS0023XLSUPLOAD.TBLDATA.Clear()
 
     End Sub
 
@@ -3525,6 +3525,254 @@ Public Class OIT0001EmptyTurnDairyDetail
         Master.SaveTable(OIT0001tbl)
 
         'WF_Sel_LINECNT.Text = ""            'LINECNT
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  共通処理                                                              ***
+    ' ******************************************************************************
+
+    ''' <summary>
+    ''' 入力値チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub INPTableCheck(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+
+        Dim WW_LINE_ERR As String = ""
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+
+        '○ 画面操作権限チェック
+        '権限チェック(操作者がデータ内USERの更新権限があるかチェック
+        '　※権限判定時点：現在
+        CS0025AUTHORget.USERID = CS0050SESSION.USERID
+        CS0025AUTHORget.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
+        CS0025AUTHORget.CODE = Master.MAPID
+        CS0025AUTHORget.STYMD = Date.Now
+        CS0025AUTHORget.ENDYMD = Date.Now
+        CS0025AUTHORget.CS0025AUTHORget()
+        If isNormal(CS0025AUTHORget.ERR) AndAlso CS0025AUTHORget.PERMITCODE = C_PERMISSION.UPDATE Then
+        Else
+            WW_CheckMES1 = "・更新できないレコード(ユーザ更新権限なし)です。"
+            WW_CheckMES2 = ""
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            WW_LINE_ERR = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            Exit Sub
+        End If
+
+        '○ 単項目チェック
+        For Each OIT0001INProw As DataRow In OIT0001INPtbl.Rows
+
+            WW_LINE_ERR = ""
+
+            '削除フラグ(バリデーションチェック）
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIT0001INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("DELFLG", OIT0001INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '油種(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OILCODE", OIT0001INProw("OILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "油種入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            'タンク車(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TANKNO", OIT0001INProw("TANKNO"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                WW_CheckMES1 = "タンク車入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            If WW_LINE_ERR = "" Then
+                If OIT0001INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
+                    OIT0001INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                End If
+            Else
+                If WW_LINE_ERR = CONST_PATTERNERR Then
+                    '関連チェックエラーをセット
+                    OIT0001INProw.Item("OPERATION") = CONST_PATTERNERR
+                Else
+                    '単項目チェックエラーをセット
+                    OIT0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                End If
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' OIT0001tbl更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub OIT0001tbl_UPD()
+
+        '○ 画面状態設定
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+            Select Case OIT0001row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.NODISP
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            End Select
+        Next
+
+        '○ 追加変更判定
+        For Each OIT0001INProw As DataRow In OIT0001INPtbl.Rows
+
+            'エラーレコード読み飛ばし
+            If OIT0001INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
+                Continue For
+            End If
+
+            OIT0001INProw.Item("OPERATION") = CONST_INSERT
+
+            'KEY項目が等しい時
+            For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                If OIT0001row("ORDERNO") = OIT0001INProw("ORDERNO") AndAlso
+                    OIT0001row("DETAILNO") = OIT0001INProw("DETAILNO") Then
+                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    If OIT0001row("DELFLG") = OIT0001INProw("DELFLG") AndAlso
+                        OIT0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    Else
+                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        OIT0001INProw("OPERATION") = CONST_UPDATE
+                        Exit For
+                    End If
+
+                    Exit For
+
+                End If
+            Next
+        Next
+
+        '○ 変更有無判定　&　入力値反映
+        For Each OIT0001INProw As DataRow In OIT0001INPtbl.Rows
+            Select Case OIT0001INProw("OPERATION")
+                Case CONST_UPDATE
+                    TBL_UPDATE_SUB(OIT0001INProw)
+                Case CONST_INSERT
+                    TBL_INSERT_SUB(OIT0001INProw)
+                Case CONST_PATTERNERR
+                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
+                    TBL_INSERT_SUB(OIT0001INProw)
+                Case C_LIST_OPERATION_CODE.ERRORED
+                    TBL_ERR_SUB(OIT0001INProw)
+            End Select
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 更新予定データの一覧更新時処理
+    ''' </summary>
+    ''' <param name="OIT0001INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_UPDATE_SUB(ByRef OIT0001INProw As DataRow)
+
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+
+            '同一レコードか判定
+            If OIT0001INProw("ORDERNO") = OIT0001row("ORDERNO") AndAlso
+                OIT0001INProw("DETAILNO") = OIT0001row("DETAILNO") Then
+                '画面入力テーブル項目設定
+                OIT0001INProw("LINECNT") = OIT0001row("LINECNT")
+                OIT0001INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                OIT0001INProw("TIMSTP") = OIT0001row("TIMSTP")
+                OIT0001INProw("SELECT") = 1
+                OIT0001INProw("HIDDEN") = 0
+
+                '項目テーブル項目設定
+                OIT0001row.ItemArray = OIT0001INProw.ItemArray
+                Exit For
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 追加予定データの一覧登録時処理
+    ''' </summary>
+    ''' <param name="OIT0001INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_INSERT_SUB(ByRef OIT0001INProw As DataRow)
+
+        '○ 項目テーブル項目設定
+        Dim OIT0001row As DataRow = OIT0001tbl.NewRow
+        OIT0001row.ItemArray = OIT0001INProw.ItemArray
+
+        OIT0001row("LINECNT") = OIT0001tbl.Rows.Count + 1
+        If OIT0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+        Else
+            OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+        End If
+
+        OIT0001row("TIMSTP") = "0"
+        OIT0001row("SELECT") = 1
+        OIT0001row("HIDDEN") = 0
+
+        OIT0001tbl.Rows.Add(OIT0001row)
+
+    End Sub
+
+    ''' <summary>
+    ''' エラーデータの一覧登録時処理
+    ''' </summary>
+    ''' <param name="OIT0001INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_ERR_SUB(ByRef OIT0001INProw As DataRow)
+
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+
+            '同一レコードか判定
+            If OIT0001INProw("ORDERNO") = OIT0001row("ORDERNO") AndAlso
+               OIT0001INProw("DETAILNO") = OIT0001row("DETAILNO") Then
+                '画面入力テーブル項目設定
+                OIT0001INProw("LINECNT") = OIT0001row("LINECNT")
+                OIT0001INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                OIT0001INProw("TIMSTP") = OIT0001row("TIMSTP")
+                OIT0001INProw("SELECT") = 1
+                OIT0001INProw("HIDDEN") = 0
+
+                '項目テーブル項目設定
+                OIT0001row.ItemArray = OIT0001INProw.ItemArray
+                Exit For
+            End If
+        Next
 
     End Sub
 

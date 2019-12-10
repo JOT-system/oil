@@ -38,10 +38,10 @@
                     <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:5em;">
-                    <input type="button" id="WF_ButtonALLCANCEL" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLCANCEL');" />
+                    <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:9.5em;">
-                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:14em;">
                     <input type="button" id="WF_ButtonUPDATE" value="更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />

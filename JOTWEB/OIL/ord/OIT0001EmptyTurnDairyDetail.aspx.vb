@@ -2304,7 +2304,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車番号       =" & OIM0001row("TANKNO")
         End If
 
-        rightview.SetErrorReport(WW_ERR_MES)
+        rightview.AddErrorReport(WW_ERR_MES)
 
     End Sub
 

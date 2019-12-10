@@ -104,6 +104,13 @@ Public Class GRIS0005LeftBox
         LC_SALESOFFICE
         LC_TRAINNUMBER
         LC_PRODUCTLIST
+        LC_ORDERSTATUS
+        LC_ORDERINFO
+        LC_USEPROPRIETY
+        LC_BIGOILCODE
+        LC_MIDDLEOILCODE
+        LC_TRAINCLASS
+        LC_SPEEDCLASS
     End Enum
     ''' <summary>
     ''' パラメタ群
@@ -152,6 +159,13 @@ Public Class GRIS0005LeftBox
         LP_SALESOFFICE
         LP_TRAINNUMBER
         LP_PRODUCTLIST
+        LP_ORDERSTATUS
+        LP_ORDERINFO
+        LP_USEPROPRIETY
+        LP_BIGOILCODE
+        LP_MIDDLEOILCODE
+        LP_TRAINCLASS
+        LP_SPEEDCLASS
     End Enum
 
     ''' <summary>
@@ -444,6 +458,34 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST
                 '品種パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS
+                '受注進行ステータス
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORDERSTATUS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_ORDERINFO
+                '受注情報
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORDERINFO"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY
+                '利用可否
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "USEPROPRIETY"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BIGOILCODE
+                '油種大分類コード
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BIGOILCODE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_MIDDLEOILCODE
+                '油種中分類コード
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MIDDLEOILCODE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TRAINCLASS
+                '列車区分
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TRAINCLASS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_SPEEDCLASS
+                '高速列車区分
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SPEEDCLASS"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー

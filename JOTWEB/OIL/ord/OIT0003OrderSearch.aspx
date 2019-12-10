@@ -66,7 +66,10 @@
 
         <!-- 荷卸地 -->
         <a id="WF_UNLOADING_LABEL">荷卸地</a>
+<!--
         <a class="ef" id="WF_UNLOADING" ondblclick="Field_DBclick('TxtUnloading', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtUnloading');">
+-->
+        <a class="ef" id="WF_UNLOADING">
             <asp:TextBox CssClass="BoxIcon" ID="TxtUnloading" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a id="WF_UNLOADING_TEXT" >
@@ -75,7 +78,7 @@
 
         <!-- 状態 -->
         <a id="WF_STATUS_LABEL">状態</a>
-        <a class="ef" id="WF_STATUS" ondblclick="Field_DBclick('TxtStatus', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtStatus');">
+        <a class="ef" id="WF_STATUS" ondblclick="Field_DBclick('TxtStatus', <%=LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS%>);" onchange="TextBox_change('TxtStatus');">
             <asp:TextBox CssClass="BoxIcon" ID="TxtStatus" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a id="WF_STATUS_TEXT" >

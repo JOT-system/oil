@@ -22,10 +22,10 @@ Public Class OIT0003OrderSearch
                         WF_ButtonDO_Click()
                     Case "WF_ButtonEND"                 '戻るボタン押下
                         WF_ButtonEND_Click()
-                    'Case "WF_Field_DBClick"             'フィールドダブルクリック
-                    '    WF_FIELD_DBClick()
-                    'Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
-                    '    WF_FIELD_Change()
+                    Case "WF_Field_DBClick"             'フィールドダブルクリック
+                        WF_FIELD_DBClick()
+                    Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
+                        WF_FIELD_Change()
                     Case "WF_ButtonSel"                 '(左ボックス)選択ボタン押下
                         WF_ButtonSel_Click()
                     Case "WF_ButtonCan"                 '(左ボックス)キャンセルボタン押下
@@ -61,8 +61,80 @@ Public Class OIT0003OrderSearch
         Master.MAPID = OIT0003WRKINC.MAPIDS
         leftview.ActiveListBox()
 
-        ''○ 画面の値設定
-        'WW_MAPValueSet()
+        '○ 画面の値設定
+        WW_MAPValueSet()
+    End Sub
+
+    ''' <summary>
+    ''' 画面初期値設定処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_MAPValueSet()
+
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then         'メニューからの画面遷移
+            '〇画面間の情報クリア
+            work.Initialize()
+
+            '〇初期変数設定処理
+            '会社コード
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)
+            '運用部署
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "UORG", WF_UORG.Text)
+            '営業所
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text)
+            '年月日(開始)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "DATESTART", TxtDateStart.Text)
+            '列車番号
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", TxtTrainNumber.Text)
+            '荷卸地
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "UNLOADING", TxtUnloading.Text)
+            '状態
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STATUS", TxtStatus.Text)
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0001L Then   '一覧画面からの遷移
+            '〇画面項目設定処理
+            '会社コード
+            WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
+            '運用部署
+            WF_UORG.Text = work.WF_SEL_UORG.Text
+            '営業所
+            TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
+            '年月日(開始)
+            TxtDateStart.Text = work.WF_SEL_DATE.Text
+            '列車番号
+            TxtTrainNumber.Text = work.WF_SEL_TRAINNUMBER.Text
+            '荷卸地
+            TxtUnloading.Text = work.WF_SEL_UNLOADINGCODE.Text
+            '状態
+            TxtStatus.Text = work.WF_SEL_STATUS.Text
+
+        End If
+
+        '○ RightBox情報設定
+        rightview.MAPIDS = OIT0001WRKINC.MAPIDS
+        rightview.MAPID = OIT0001WRKINC.MAPIDL
+        rightview.COMPCODE = WF_CAMPCODE.Text
+        rightview.MAPVARI = Master.MAPvariant
+        rightview.PROFID = Master.PROF_VIEW
+
+        rightview.MENUROLE = Master.ROLE_MENU
+        rightview.MAPROLE = Master.ROLE_MAP
+        rightview.VIEWROLE = Master.ROLE_VIEWPROF
+        rightview.RPRTROLE = Master.ROLE_RPRTPROF
+
+        rightview.Initialize("画面レイアウト設定", WW_DUMMY)
+
+        '○ 名称設定処理
+        '会社コード
+        CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
+        '運用部署
+        CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_DUMMY)
+        '営業所
+        CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_DUMMY)
+        '荷卸地
+        CODENAME_get("UNLOADING", TxtUnloading.Text, LblUnloadingName.Text, WW_DUMMY)
+        '状態
+        CODENAME_get("STATUS", TxtStatus.Text, LblStatusName.Text, WW_DUMMY)
+
     End Sub
 
     ''' <summary>
@@ -134,6 +206,86 @@ Public Class OIT0003OrderSearch
         '○ 前画面遷移
         Master.TransitionPrevPage()
 
+    End Sub
+
+    ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+
+                    '会社コード
+                    Dim prmData As New Hashtable
+                    prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+
+                    '運用部署
+                    If WF_FIELD.Value = "WF_UORG" Then
+                        prmData = work.CreateUORGParam(WF_CAMPCODE.Text)
+                    End If
+
+                    '営業所
+                    If WF_FIELD.Value = "TxtSalesOffice" Then
+                        'prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                        prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
+                    End If
+
+                    .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                    .ActiveListBox()
+                Else
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        Case "TxtDateStart"
+                            .WF_Calendar.Text = TxtDateStart.Text
+                            'Case "TxtDateEnd"
+                            '    .WF_Calendar.Text = TxtDateEnd.Text
+                    End Select
+                    .ActiveCalendar()
+
+                End If
+            End With
+
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' フィールドチェンジ時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_Change()
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            '会社コード
+            Case "WF_CAMPCODE"
+                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            '運用部署
+            Case "WF_UORG"
+                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+            '営業所
+            Case "TxtSalesOffice"
+                CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+            '荷卸地
+            Case "TxtUnloading"
+                CODENAME_get("UNLOADING", TxtUnloading.Text, LblUnloadingName.Text, WW_RTN_SW)
+            '状態
+            Case "TxtStatus"
+                CODENAME_get("STATUS", TxtStatus.Text, LblStatusName.Text, WW_RTN_SW)
+        End Select
+
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+        End If
     End Sub
 
     ' ******************************************************************************
@@ -292,6 +444,9 @@ Public Class OIT0003OrderSearch
                 Case "OFFICECODE"       '営業所
                     prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STATUS"           '状態
+                    prmData = work.CreateORDERSTATUSParam(WF_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

@@ -64,12 +64,14 @@ Public Class OIT0002LinkList
                     Master.RecoverTable(OIT0002tbl)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click()
                         Case "WF_ButtonALLSELECT"　　　 '全選択ボタン押下
                             WF_ButtonALLSELECT_Click()
-                        Case "WF_ButtonALLCANCEL"　　　 '選択解除ボタン押下
-                            WF_ButtonALLCANCEL_Click()
-                        Case "WF_ButtonINSERT"          '行削除ボタン押下
-                            WF_ButtonINSERT_Click()
+                        Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
+                            WF_ButtonSELECT_LIFTED_Click()
+                        Case "WF_ButtonLINE_LIFTED"     '行削除ボタン押下
+                            WF_ButtonLINE_LIFTED_Click()
                         Case "WF_ButtonUPDATE"          '更新ボタン押下
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonCSV"             'ダウンロードボタン押下
@@ -198,64 +200,64 @@ Public Class OIT0002LinkList
             Master.RecoverTable(OIT0002tbl, work.WF_SEL_INPTBL.Text)
         End If
 
-        '○ 名称設定処理
-        '選択行
-        WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
+        ''○ 名称設定処理
+        ''選択行
+        'WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        '空車発駅
-        WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION2.Text
+        ''空車発駅
+        'WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION2.Text
 
-        '本線列車
-        WF_TRAINNO.Text = work.WF_SEL_TRAINNO2.Text
+        ''本線列車
+        'WF_TRAINNO.Text = work.WF_SEL_TRAINNO2.Text
 
-        '貨車連結順序表№
-        WF_LINKNO.Text = work.WF_SEL_LINKNO.Text
+        ''貨車連結順序表№
+        'WF_LINKNO.Text = work.WF_SEL_LINKNO.Text
 
-        '貨車連結順序表明細№
-        WF_LINKDETAILNO.Text = work.WF_SEL_LINKDETAILNO.Text
+        ''貨車連結順序表明細№
+        'WF_LINKDETAILNO.Text = work.WF_SEL_LINKDETAILNO.Text
 
-        'ステータス
-        WF_STATUS.Text = work.WF_SEL_STATUS.Text
+        ''ステータス
+        'WF_STATUS.Text = work.WF_SEL_STATUS.Text
 
-        '情報
-        WF_INFO.Text = work.WF_SEL_INFO.Text
+        ''情報
+        'WF_INFO.Text = work.WF_SEL_INFO.Text
 
-        '前回オーダー№
-        WF_PREORDERNO.Text = work.WF_SEL_PREORDERNO.Text
+        ''前回オーダー№
+        'WF_PREORDERNO.Text = work.WF_SEL_PREORDERNO.Text
 
-        '登録営業所コード
-        WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text
+        ''登録営業所コード
+        'WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text
 
-        '空車発駅名
-        WF_DEPSTATIONNAME.Text = work.WF_SEL_DEPSTATIONNAME.Text
+        ''空車発駅名
+        'WF_DEPSTATIONNAME.Text = work.WF_SEL_DEPSTATIONNAME.Text
 
-        '空車着駅コード
-        WF_RETSTATION.Text = work.WF_SEL_RETSTATION.Text
+        ''空車着駅コード
+        'WF_RETSTATION.Text = work.WF_SEL_RETSTATION.Text
 
-        '空車着駅名
-        WF_RETSTATIONNAME.Text = work.WF_SEL_RETSTATIONNAME.Text
+        ''空車着駅名
+        'WF_RETSTATIONNAME.Text = work.WF_SEL_RETSTATIONNAME.Text
 
-        '空車着日（予定）
-        WF_EMPARRDATE.Text = work.WF_SEL_EMPARRDATE.Text
+        ''空車着日（予定）
+        'WF_EMPARRDATE.Text = work.WF_SEL_EMPARRDATE.Text
 
-        '空車着日（実績）
-        WF_ACTUALEMPARRDATE.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
+        ''空車着日（実績）
+        'WF_ACTUALEMPARRDATE.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
 
-        '入線列車番号
-        WF_LINETRAINNO.Text = work.WF_SEL_LINETRAINNO.Text
+        ''入線列車番号
+        'WF_LINETRAINNO.Text = work.WF_SEL_LINETRAINNO.Text
 
-        '入線順
-        WF_LINEORDER.Text = work.WF_SEL_LINEORDER.Text
+        ''入線順
+        'WF_LINEORDER.Text = work.WF_SEL_LINEORDER.Text
 
-        'タンク車№
-        WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER.Text
+        ''タンク車№
+        'WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER.Text
 
-        '前回油種
-        WF_PREOILCODE.Text = work.WF_SEL_PREOILCODE.Text
+        ''前回油種
+        'WF_PREOILCODE.Text = work.WF_SEL_PREOILCODE.Text
 
-        '削除
-        WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        ''削除
+        'WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
+        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
     End Sub
 
@@ -330,21 +332,20 @@ Public Class OIT0002LinkList
         '　検索説明
         '     条件指定に従い該当データを貨車連結順序表テーブルから取得する
         Dim SQLStr As String =
-                  " SELECT" _
+                  " SELECT DISTINCT" _
                 & "    0                                                   AS LINECNT " _
                 & "    , ''                                                AS OPERATION " _
                 & "    , 1                                                 AS 'SELECT' " _
                 & "    , 0                                                 AS HIDDEN " _
+                & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')    AS INITYMD " _
                 & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
-                & "    , ISNULL(IF(OIT0004.EMPARRDATE <> '',FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'),IF(OIT0004.EMPARRDATE <> '',FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'))),'') AS TMPYMD " _
-                & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')      AS INITYMD " _
                 & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                    AS STATUS " _
-                & "    , ISNULL(RTRIM(OIT0004.INFO), '')                    AS INFO " _
-                & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                    AS PREORDERNO " _
-                & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                    AS TRAINNO " _
-                & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                    AS OFFICECODE " _
-                & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                    AS DEPSTATIONNAME " _
-                & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')                    AS RETSTATIONNAME " _
+                & "    , ISNULL(RTRIM(OIT0004.INFO), '')                      AS INFO " _
+                & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                AS PREORDERNO " _
+                & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                   AS TRAINNO " _
+                & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                AS OFFICECODE " _
+                & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')            AS DEPSTATIONNAME " _
+                & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')            AS RETSTATIONNAME " _
                 & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='1' Then 1 Else 0 End) AS RTANK " _
                 & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='2' Then 1 Else 0 End) AS HTANK " _
                 & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='3' Then 1 Else 0 End) AS TTANK " _
@@ -358,6 +359,7 @@ Public Class OIT0002LinkList
                 & "	   , SUM(CASE WHEN OIT0004.PREOILCODE <>'' Then 1 Else 0 End) AS TOTALTANK " _
                 & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
                 & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
+                & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
                 & " FROM " _
                 & "    OIL.OIT0004_LINK OIT0004 "
 
@@ -366,8 +368,8 @@ Public Class OIT0002LinkList
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.INITYMD      >= @P2" _
-                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    AND OIT0004.EMPARRDATE      >= @P2" _
+                & "    AND OIT0004.EMPARRDATE      <= @P3" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
@@ -375,8 +377,8 @@ Public Class OIT0002LinkList
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.INITYMD      >= @P2" _
-                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    AND OIT0004.EMPARRDATE      >= @P2" _
+                & "    AND OIT0004.EMPARRDATE      <= @P3" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
@@ -385,25 +387,25 @@ Public Class OIT0002LinkList
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.INITYMD      >= @P2" _
-                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    AND OIT0004.EMPARRDATE      >= @P2" _
+                & "    AND OIT0004.EMPARRDATE      <= @P3" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             Else
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.INITYMD      >= @P2" _
-                & "    AND OIT0004.INITYMD      <= @P3" _
+                & "    AND OIT0004.EMPARRDATE      >= @P2" _
+                & "    AND OIT0004.EMPARRDATE      <= @P3" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
         End If
 
         SQLStr &=
               " GROUP BY " _
-            & "     LINKNO " _
+            & "     INITYMD " _
+            & "     ,LINKNO " _
             & "	    ,TRAINNO " _
-            & "	    ,INITYMD " _
             & "	    ,STATUS " _
             & "	    ,INFO " _
             & "	    ,PREORDERNO " _
@@ -412,6 +414,7 @@ Public Class OIT0002LinkList
             & "	    ,RETSTATIONNAME " _
             & "	    ,EMPARRDATE " _
             & "	    ,ACTUALEMPARRDATE " _
+            & "	    ,DELFLG " _
             & " ORDER BY " _
             & "     TRAINNO "
 
@@ -570,7 +573,7 @@ Public Class OIT0002LinkList
     End Sub
 
     ''' <summary>
-    ''' 全選択ボタン処理
+    ''' 全選択ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonALLSELECT_Click()
@@ -591,10 +594,10 @@ Public Class OIT0002LinkList
     End Sub
 
     ''' <summary>
-    ''' 選択解除ボタン処理
+    ''' 選択解除ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonALLCANCEL_Click()
+    Protected Sub WF_ButtonSELECT_LIFTED_Click()
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0002tbl)
@@ -612,105 +615,86 @@ Public Class OIT0002LinkList
     End Sub
 
     ''' <summary>
-    ''' 追加ボタン押下時処理
+    ''' 行削除ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonINSERT_Click()
+    Protected Sub WF_ButtonLINE_LIFTED_Click()
 
-        '選択行
-        WF_Sel_LINECNT.Text = ""
-        work.WF_SEL_LINECNT.Text = ""
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0002tbl)
 
-        '貨車連結順序表№
-        WF_LINKNO.Text = ""
-        work.WF_SEL_LINKNO.Text = ""
+        '■■■ OIT0001tbl関連の受注・受注明細を論理削除 ■■■
 
-        '貨車連結順序表明細№
-        WF_LINKDETAILNO.Text = ""
-        work.WF_SEL_LINKDETAILNO.Text = ""
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
 
-        'ステータス
-        WF_STATUS.Text = ""
-        work.WF_SEL_STATUS.Text = ""
+            '更新SQL文･･･受注・受注明細を一括論理削除
+            Dim SQLStr As String =
+                      " UPDATE OIL.OIT0004_LINK        " _
+                    & "    SET UPDYMD      = @P11,      " _
+                    & "        UPDUSER     = @P12,      " _
+                    & "        UPDTERMID   = @P13,      " _
+                    & "        RECEIVEYMD  = @P14,      " _
+                    & "        DELFLG      = '1'        " _
+                    & "  WHERE LINKNO     = @P01       " _
+                    & "    AND DELFLG     <> '1'       ;"
 
-        '情報
-        WF_INFO.Text = ""
-        work.WF_SEL_INFO.Text = ""
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
 
-        '前回オーダー№
-        WF_PREORDERNO.Text = ""
-        work.WF_SEL_PREORDERNO.Text = ""
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
 
-        '本線列車
-        WF_TRAINNO.Text = ""
-        work.WF_SEL_TRAINNO2.Text = ""
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
 
-        '登録営業所コード
-        WF_OFFICECODE.Text = ""
-        work.WF_SEL_OFFICECODE.Text = ""
+            '選択されている行は削除対象
+            Dim i As Integer = 0
+            Dim j As Integer = 9000
+            For Each OIT0002UPDrow In OIT0002tbl.Rows
+                If OIT0002UPDrow("OPERATION") = "on" Then
+                    j += 1
+                    OIT0002UPDrow("LINECNT") = j        'LINECNT
+                    OIT0002UPDrow("DELFLG") = C_DELETE_FLG.DELETE
+                    OIT0002UPDrow("HIDDEN") = 1
 
-        '空車発駅コード
-        WF_DEPSTATION.Text = ""
-        work.WF_SEL_DEPSTATION2.Text = ""
+                    PARA01.Value = OIT0002UPDrow("LINKNO")
+                    PARA11.Value = Date.Now
+                    PARA12.Value = Master.USERID
+                    PARA13.Value = Master.USERTERMID
+                    PARA14.Value = C_DEFAULT_YMD
 
-        '空車発駅名
-        WF_DEPSTATIONNAME.Text = ""
-        work.WF_SEL_DEPSTATIONNAME.Text = ""
+                    SQLcmd.ExecuteNonQuery()
+                Else
+                    i += 1
+                    OIT0002UPDrow("LINECNT") = i        'LINECNT
+                End If
+            Next
 
-        '空車着駅コード
-        WF_RETSTATION.Text = ""
-        work.WF_SEL_RETSTATION.Text = ""
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
 
-        '空車着駅名
-        WF_RETSTATIONNAME.Text = ""
-        work.WF_SEL_RETSTATIONNAME.Text = ""
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
 
-        '空車着日（予定）
-        WF_EMPARRDATE.Text = ""
-        work.WF_SEL_EMPARRDATE.Text = ""
-
-        '空車着日（実績）
-        WF_ACTUALEMPARRDATE.Text = ""
-        work.WF_SEL_ACTUALEMPARRDATE.Text = ""
-
-        '入線列車番号
-        WF_LINETRAINNO.Text = ""
-        work.WF_SEL_LINETRAINNO.Text = ""
-
-        '入線順
-        WF_LINEORDER.Text = ""
-        work.WF_SEL_LINEORDER.Text = ""
-
-        'タンク車№
-        WF_TANKNUMBER.Text = ""
-        work.WF_SEL_TANKNUMBER.Text = ""
-
-        '前回油種
-        WF_PREOILCODE.Text = ""
-        work.WF_SEL_PREOILCODE.Text = ""
-
-        '削除
-        WF_DELFLG.Text = "0"
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
-
-        '○画面切替設定
-        WF_BOXChange.Value = "detailbox"
+        End Try
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0002tbl)
 
-        WF_GridDBclick.Text = ""
-
-        work.WF_SEL_DELFLG.Text = "0"
-
-        '○ 遷移先(登録画面)退避データ保存先の作成
-        WW_CreateXMLSaveFile()
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0002tbl, work.WF_SEL_INPTBL.Text)
-
-        '○ 次ページ遷移
-        Master.TransitionPage()
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -1248,9 +1232,9 @@ Public Class OIT0002LinkList
         WF_LINKNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKNO")
         work.WF_SEL_LINKNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKNO")
 
-        '貨車連結順序表明細№
-        WF_LINKDETAILNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKDETAILNO")
-        work.WF_SEL_LINKDETAILNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKDETAILNO")
+        ''貨車連結順序表明細№
+        'WF_LINKDETAILNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKDETAILNO")
+        'work.WF_SEL_LINKDETAILNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKDETAILNO")
 
         'ステータス
         WF_STATUS.Text = OIT0002tbl.Rows(WW_LINECNT)("STATUS")
@@ -1272,17 +1256,17 @@ Public Class OIT0002LinkList
         WF_OFFICECODE.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")
         work.WF_SEL_OFFICECODE.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")
 
-        '空車発駅コード
-        WF_DEPSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
-        work.WF_SEL_DEPSTATION2.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
+        ''空車発駅コード
+        'WF_DEPSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
+        'work.WF_SEL_DEPSTATION2.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
 
         '空車発駅名
         WF_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
         work.WF_SEL_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
 
-        '空車着駅コード
-        WF_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
-        work.WF_SEL_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
+        ''空車着駅コード
+        'WF_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
+        'work.WF_SEL_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
 
         '空車着駅名
         WF_RETSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATIONNAME")
@@ -1296,21 +1280,21 @@ Public Class OIT0002LinkList
         WF_ACTUALEMPARRDATE.Text = OIT0002tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
         work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0002tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
 
-        '入線列車番号
-        WF_LINETRAINNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINETRAINNO")
-        work.WF_SEL_LINETRAINNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINETRAINNO")
+        ''入線列車番号
+        'WF_LINETRAINNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINETRAINNO")
+        'work.WF_SEL_LINETRAINNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINETRAINNO")
 
-        '入線順
-        WF_LINEORDER.Text = OIT0002tbl.Rows(WW_LINECNT)("LINEORDER")
-        work.WF_SEL_LINEORDER.Text = OIT0002tbl.Rows(WW_LINECNT)("LINEORDER")
+        ''入線順
+        'WF_LINEORDER.Text = OIT0002tbl.Rows(WW_LINECNT)("LINEORDER")
+        'work.WF_SEL_LINEORDER.Text = OIT0002tbl.Rows(WW_LINECNT)("LINEORDER")
 
-        'タンク車№
-        WF_TANKNUMBER.Text = OIT0002tbl.Rows(WW_LINECNT)("TANKNUMBER")
-        work.WF_SEL_TANKNUMBER.Text = OIT0002tbl.Rows(WW_LINECNT)("TANKNUMBER")
+        ''タンク車№
+        'WF_TANKNUMBER.Text = OIT0002tbl.Rows(WW_LINECNT)("TANKNUMBER")
+        'work.WF_SEL_TANKNUMBER.Text = OIT0002tbl.Rows(WW_LINECNT)("TANKNUMBER")
 
-        '前回油種
-        WF_PREOILCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("PREOILCODE")
-        work.WF_SEL_PREOILCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("PREOILCODE")
+        ''前回油種
+        'WF_PREOILCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("PREOILCODE")
+        'work.WF_SEL_PREOILCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("PREOILCODE")
 
         '削除フラグ
         WF_DELFLG.Text = OIT0002tbl.Rows(WW_LINECNT)("DELFLG")

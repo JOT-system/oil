@@ -73,6 +73,8 @@ Public Class OIM0004StationCreate
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
+                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                            WF_FIELD_Change()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
@@ -533,6 +535,32 @@ Public Class OIM0004StationCreate
 
     End Sub
 
+    ''' <summary>
+    ''' フィールドチェンジ時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_Change()
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            ''会社コード
+            'Case "WF_CAMPCODE"
+            '    CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            ''運用部署
+            'Case "WF_UORG"
+            '    CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+            '削除フラグ
+            Case "WF_DELFLG"
+                CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
+
+        End Select
+
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+        End If
+    End Sub
 
     ' ******************************************************************************
     ' ***  leftBOX関連操作                                                       ***

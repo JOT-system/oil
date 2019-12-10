@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0001EmptyTurnDairySearch
+Partial Public Class OIT0003OrderSearch
     
     '''<summary>
     '''WF_CAMPCODE コントロール。
@@ -68,13 +68,13 @@ Partial Public Class OIT0001EmptyTurnDairySearch
     Protected WithEvents LblSalesOfficeName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtLoadingDateStart コントロール。
+    '''TxtDateStart コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtLoadingDateStart As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtDateStart As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtTrainNumber コントロール。
@@ -84,6 +84,42 @@ Partial Public Class OIT0001EmptyTurnDairySearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtTrainNumber As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtUnloading コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtUnloading As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblUnloadingName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblUnloadingName As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtStatus コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtStatus As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblStatusName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblStatusName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''rightview コントロール。
@@ -102,7 +138,7 @@ Partial Public Class OIT0001EmptyTurnDairySearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-    
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -110,8 +146,8 @@ Partial Public Class OIT0001EmptyTurnDairySearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIT0001WRKINC
-    
+    Protected WithEvents work As Global.JOTWEB.OIT0003WRKINC
+
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>

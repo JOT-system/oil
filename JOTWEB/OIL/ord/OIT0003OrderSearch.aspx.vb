@@ -90,7 +90,7 @@ Public Class OIT0003OrderSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "UNLOADING", TxtUnloading.Text)
             '状態
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STATUS", TxtStatus.Text)
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0001L Then   '一覧画面からの遷移
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0003L Then   '一覧画面からの遷移
             '〇画面項目設定処理
             '会社コード
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
@@ -159,11 +159,11 @@ Public Class OIT0003OrderSearch
         '状態
         Master.EraseCharToIgnore(TxtStatus.Text)
 
-        ''○ チェック処理
-        'WW_Check(WW_ERR_SW)
-        'If WW_ERR_SW = "ERR" Then
-        '    Exit Sub
-        'End If
+        '○ チェック処理
+        WW_Check(WW_ERR_SW)
+        If WW_ERR_SW = "ERR" Then
+            Exit Sub
+        End If
 
         '○ 条件選択画面の入力値退避
         '会社コード
@@ -194,6 +194,125 @@ Public Class OIT0003OrderSearch
             '画面遷移
             Master.TransitionPage()
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' チェック処理
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_Check(ByRef O_RTN As String)
+
+        O_RTN = ""
+        Dim WW_TEXT As String = ""
+        Dim WW_STYMD As Date
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+
+        '○ 単項目チェック
+        '会社コード
+        Master.CheckField(WF_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE.Text)
+                WF_CAMPCODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_CAMPCODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '運用部署
+        WW_TEXT = WF_UORG.Text
+        Master.CheckField(WF_CAMPCODE.Text, "UORG", WF_UORG.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            If WW_TEXT = "" Then
+                WF_UORG.Text = ""
+            Else
+                '存在チェック
+                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "運用部署 : " & WF_UORG.Text)
+                    WF_UORG.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_UORG.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '営業所
+        If TxtSalesOffice.Text <> "" Then
+            Master.CheckField(WF_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                TxtSalesOffice.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '年月日(開始)
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STYMD", TxtDateStart.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            Try
+                Date.TryParse(TxtDateStart.Text, WW_STYMD)
+            Catch ex As Exception
+                WW_STYMD = C_DEFAULT_YMD
+            End Try
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            TxtDateStart.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '列車番号
+        If TxtTrainNumber.Text <> "" Then
+            Master.CheckField(WF_CAMPCODE.Text, "TRAINNUMBER", TxtTrainNumber.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                TxtTrainNumber.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        ''荷卸地
+        'If TxtUnloading.Text <> "" Then
+        '    Master.CheckField(WF_CAMPCODE.Text, "UNLOADING", TxtUnloading.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        '    If Not isNormal(WW_CS0024FCHECKERR) Then
+        '        Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+        '        TxtUnloading.Focus()
+        '        O_RTN = "ERR"
+        '        Exit Sub
+        '    End If
+        'End If
+
+        '状態
+        If TxtStatus.Text <> "" Then
+            Master.CheckField(WF_CAMPCODE.Text, "STATUS", TxtStatus.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                TxtStatus.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '○ 正常メッセージ
+        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
     End Sub
 

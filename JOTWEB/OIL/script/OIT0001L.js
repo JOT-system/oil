@@ -28,7 +28,6 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
-        document.getElementById("WF_ButtonINSERT").disabled = "disabled";
     };
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack);

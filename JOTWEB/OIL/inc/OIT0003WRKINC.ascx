@@ -30,7 +30,7 @@
     <!-- 登録日 -->
     <asp:TextBox ID="WF_SEL_REGISTRATIONDATE" runat="server"></asp:TextBox>
     <!-- ステータス -->
-    <asp:TextBox ID="WF_SEL_STATUS1" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_ORDERSTATUS" runat="server"></asp:TextBox>
 
     <!-- 情報 -->
     <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>

@@ -56,8 +56,8 @@
             <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtOrderOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
-            <!-- ■　本社列車　■ -->
-            <a id="WF_HEADOFFICETRAIN_LABEL">本社列車</a>
+            <!-- ■　本線列車　■ -->
+            <a id="WF_HEADOFFICETRAIN_LABEL">本線列車</a>
             <a class="ef" id="WF_HEADOFFICETRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>

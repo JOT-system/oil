@@ -1,5 +1,4 @@
-﻿'Imports System.Data.SqlClient
-Imports JOTWEB.GRIS0005LeftBox
+﻿Imports JOTWEB.GRIS0005LeftBox
 
 Public Class OIT0002WRKINC
     Inherits UserControl
@@ -7,9 +6,6 @@ Public Class OIT0002WRKINC
     Public Const MAPIDS As String = "OIT0002S"       'MAPID(検索)
     Public Const MAPIDL As String = "OIT0002L"       'MAPID(一覧)
     Public Const MAPIDD As String = "OIT0002D"       'MAPID(更新)
-
-    ''○ 共通関数宣言(BASEDLL)
-    'Private CS0050SESSION As New CS0050SESSION          'セッション情報操作処理
 
     '' <summary>
     '' ワークデータ初期化処理
@@ -49,6 +45,20 @@ Public Class OIT0002WRKINC
         prmData.Item(C_PARAMETERS.LP_SALESOFFICE) = I_SALESOFFICEPT
         prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
         CreateSALESOFFICEParam = prmData
+    End Function
+
+    ''' <summary>
+    ''' 貨物車パターンの取得
+    ''' </summary>
+    ''' <param name="I_STATIONPT"></param>
+    ''' <returns></returns>
+    ''' <remarks>全て</remarks>
+    Function CreateSTATIONPTParam(ByVal I_COMPCODE As String, ByVal I_STATIONPT As String) As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_STATIONCODE) = I_STATIONPT
+        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+        CreateSTATIONPTParam = prmData
     End Function
 
     '' <summary>

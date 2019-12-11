@@ -86,22 +86,22 @@ Partial Public Class OIT0002LinkDetail
     Protected WithEvents LblDepstationName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtArrstation コントロール。
+    '''TxtRetstation コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtArrstation As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtRetstation As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''LblArrstationName コントロール。
+    '''LblRetstationName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblArrstationName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents LblRetstationName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''TxtEmpDate コントロール。
@@ -381,6 +381,15 @@ Partial Public Class OIT0002LinkDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_CREATEFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_CREATEFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

@@ -42,4 +42,28 @@
     <asp:TextBox ID="WF_SEL_RECEIVEYMD" runat="server"></asp:TextBox>         <!-- 集信日時 -->
     <asp:TextBox ID="WF_SEL_TIMESTAMP" runat="server"></asp:TextBox>         <!-- タイムスタンプ -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>        <!-- 更新データ(退避用) -->
+
+        <!-- レギュラー(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_REGULAR_TANKCAR" runat="server"></asp:TextBox>
+    <!-- ハイオク(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_HIGHOCTANE_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 灯油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_KEROSENE_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 未添加灯油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_NOTADDED_KEROSENE_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 3号軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_NUM3DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 5号軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_NUM5DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 10号軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_NUM10DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- LSA(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LSA_TANKCAR" runat="server"></asp:TextBox>
+    <!-- A重油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_AHEAVY_TANKCAR" runat="server"></asp:TextBox>
+    <!-- タンク車合計 -->
+    <asp:TextBox ID="WF_SEL_TANKCARTOTAL" runat="server"></asp:TextBox>
+
 </div>

@@ -207,60 +207,60 @@ Public Class OIT0002LinkList
         ''選択行
         'WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        ''空車発駅
-        'WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION2.Text
+        '空車発駅
+        WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION2.Text
 
-        ''本線列車
-        'WF_TRAINNO.Text = work.WF_SEL_TRAINNO2.Text
+        '本線列車
+        WF_TRAINNO.Text = work.WF_SEL_TRAINNO2.Text
 
-        ''貨車連結順序表№
-        'WF_LINKNO.Text = work.WF_SEL_LINKNO.Text
+        '貨車連結順序表№
+        WF_LINKNO.Text = work.WF_SEL_LINKNO.Text
 
-        ''貨車連結順序表明細№
-        'WF_LINKDETAILNO.Text = work.WF_SEL_LINKDETAILNO.Text
+        '貨車連結順序表明細№
+        WF_LINKDETAILNO.Text = work.WF_SEL_LINKDETAILNO.Text
 
-        ''ステータス
-        'WF_STATUS.Text = work.WF_SEL_STATUS.Text
+        'ステータス
+        WF_STATUS.Text = work.WF_SEL_STATUS.Text
 
-        ''情報
-        'WF_INFO.Text = work.WF_SEL_INFO.Text
+        '情報
+        WF_INFO.Text = work.WF_SEL_INFO.Text
 
-        ''前回オーダー№
-        'WF_PREORDERNO.Text = work.WF_SEL_PREORDERNO.Text
+        '前回オーダー№
+        WF_PREORDERNO.Text = work.WF_SEL_PREORDERNO.Text
 
-        ''登録営業所コード
-        'WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text
+        '登録営業所コード
+        WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text
 
-        ''空車発駅名
-        'WF_DEPSTATIONNAME.Text = work.WF_SEL_DEPSTATIONNAME.Text
+        '空車発駅名
+        WF_DEPSTATIONNAME.Text = work.WF_SEL_DEPSTATIONNAME.Text
 
-        ''空車着駅コード
-        'WF_RETSTATION.Text = work.WF_SEL_RETSTATION.Text
+        '空車着駅コード
+        WF_RETSTATION.Text = work.WF_SEL_RETSTATION.Text
 
-        ''空車着駅名
-        'WF_RETSTATIONNAME.Text = work.WF_SEL_RETSTATIONNAME.Text
+        '空車着駅名
+        WF_RETSTATIONNAME.Text = work.WF_SEL_RETSTATIONNAME.Text
 
-        ''空車着日（予定）
-        'WF_EMPARRDATE.Text = work.WF_SEL_EMPARRDATE.Text
+        '空車着日（予定）
+        WF_EMPARRDATE.Text = work.WF_SEL_EMPARRDATE.Text
 
-        ''空車着日（実績）
-        'WF_ACTUALEMPARRDATE.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
+        '空車着日（実績）
+        WF_ACTUALEMPARRDATE.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
 
-        ''入線列車番号
-        'WF_LINETRAINNO.Text = work.WF_SEL_LINETRAINNO.Text
+        '入線列車番号
+        WF_LINETRAINNO.Text = work.WF_SEL_LINETRAINNO.Text
 
-        ''入線順
-        'WF_LINEORDER.Text = work.WF_SEL_LINEORDER.Text
+        '入線順
+        WF_LINEORDER.Text = work.WF_SEL_LINEORDER.Text
 
-        ''タンク車№
-        'WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER.Text
+        'タンク車№
+        WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER.Text
 
-        ''前回油種
-        'WF_PREOILCODE.Text = work.WF_SEL_PREOILCODE.Text
+        '前回油種
+        WF_PREOILCODE.Text = work.WF_SEL_PREOILCODE.Text
 
-        ''削除
-        'WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
-        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        '削除
+        WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
+        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
     End Sub
 
@@ -342,7 +342,7 @@ Public Class OIT0002LinkList
                 & "    , 0                                                 AS HIDDEN " _
                 & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')    AS INITYMD " _
                 & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
-                & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                    AS STATUS " _
+                & "    , CASE WHEN ISNULL(RTRIM(OIT0004.STATUS), '') ='1' Then '利用可' Else '利用不可' End AS STATUS " _
                 & "    , ISNULL(RTRIM(OIT0004.INFO), '')                      AS INFO " _
                 & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                AS PREORDERNO " _
                 & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                   AS TRAINNO " _
@@ -363,6 +363,8 @@ Public Class OIT0002LinkList
                 & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
                 & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
                 & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
+                & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')            AS DEPSTATION " _
+                & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')            AS RETSTATION " _
                 & " FROM " _
                 & "    OIL.OIT0004_LINK OIT0004 "
 
@@ -418,6 +420,8 @@ Public Class OIT0002LinkList
             & "	    ,EMPARRDATE " _
             & "	    ,ACTUALEMPARRDATE " _
             & "	    ,DELFLG " _
+            & "	    ,DEPSTATION " _
+            & "	    ,RETSTATION " _
             & " ORDER BY " _
             & "     TRAINNO "
 
@@ -640,19 +644,20 @@ Public Class OIT0002LinkList
                     & "        UPDUSER     = @P12,      " _
                     & "        UPDTERMID   = @P13,      " _
                     & "        RECEIVEYMD  = @P14,      " _
-                    & "        DELFLG      = '1'        " _
-                    & "  WHERE LINKNO     = @P01       " _
-                    & "    AND DELFLG     <> '1'       ;"
+                    & "        DELFLG      = @P02        " _
+                    & "  WHERE LINKNO      = @P01       " _
+                    & "    AND DELFLG     <> @P02       ;"
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
 
-            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)         '削除フラグ
 
-            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
-            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
-            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
-            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.DateTime)
 
             '選択されている行は削除対象
             Dim i As Integer = 0
@@ -665,6 +670,7 @@ Public Class OIT0002LinkList
                     OIT0002UPDrow("HIDDEN") = 1
 
                     PARA01.Value = OIT0002UPDrow("LINKNO")
+                    PARA02.Value = C_DELETE_FLG.DELETE
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
                     PARA13.Value = Master.USERTERMID
@@ -1332,14 +1338,14 @@ Public Class OIT0002LinkList
         '登録営業所コード
         work.WF_SEL_OFFICECODE.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")
 
-        ''空車発駅コード
-        'work.WF_SEL_DEPSTATION2.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
+        '空車発駅コード
+        work.WF_SEL_DEPSTATION2.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
 
         '空車発駅名
         work.WF_SEL_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
 
-        ''空車着駅コード
-        'work.WF_SEL_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
+        '空車着駅コード
+        work.WF_SEL_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
 
         '空車着駅名
         work.WF_SEL_RETSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATIONNAME")
@@ -1424,219 +1430,217 @@ Public Class OIT0002LinkList
 
     End Sub
 
+    '''' <summary>
+    '''' ファイルアップロード時処理
+    '''' </summary>
+    '''' <remarks></remarks>
+    'Protected Sub WF_FILEUPLOAD()
 
-    ''' <summary>
-    ''' ファイルアップロード時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_FILEUPLOAD()
+    '    '○ エラーレポート準備
+    '    rightview.SetErrorReport("")
 
-        '○ エラーレポート準備
-        rightview.SetErrorReport("")
+    '    '○ UPLOAD XLSデータ取得
+    '    CS0023XLSUPLOAD.CAMPCODE = work.WF_SEL_CAMPCODE.Text        '会社コード
+    '    CS0023XLSUPLOAD.MAPID = Master.MAPID                        '画面ID
+    '    CS0023XLSUPLOAD.CS0023XLSUPLOAD()
+    '    If isNormal(CS0023XLSUPLOAD.ERR) Then
+    '        If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
+    '            Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR)
+    '            Exit Sub
+    '        End If
+    '    Else
+    '        Master.Output(CS0023XLSUPLOAD.ERR, C_MESSAGE_TYPE.ABORT, "CS0023XLSUPLOAD")
+    '        Exit Sub
+    '    End If
 
-        '○ UPLOAD XLSデータ取得
-        CS0023XLSUPLOAD.CAMPCODE = work.WF_SEL_CAMPCODE.Text        '会社コード
-        CS0023XLSUPLOAD.MAPID = Master.MAPID                        '画面ID
-        CS0023XLSUPLOAD.CS0023XLSUPLOAD()
-        If isNormal(CS0023XLSUPLOAD.ERR) Then
-            If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
-                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR)
-                Exit Sub
-            End If
-        Else
-            Master.Output(CS0023XLSUPLOAD.ERR, C_MESSAGE_TYPE.ABORT, "CS0023XLSUPLOAD")
-            Exit Sub
-        End If
+    '    '○ CS0023XLSUPLOAD.TBLDATAの入力値整備
+    '    Dim WW_COLUMNS As New List(Of String)
+    '    For Each XLSTBLcol As DataColumn In CS0023XLSUPLOAD.TBLDATA.Columns
+    '        WW_COLUMNS.Add(XLSTBLcol.ColumnName.ToString())
+    '    Next
 
-        '○ CS0023XLSUPLOAD.TBLDATAの入力値整備
-        Dim WW_COLUMNS As New List(Of String)
-        For Each XLSTBLcol As DataColumn In CS0023XLSUPLOAD.TBLDATA.Columns
-            WW_COLUMNS.Add(XLSTBLcol.ColumnName.ToString())
-        Next
+    '    Dim CS0023XLSTBLrow As DataRow = CS0023XLSUPLOAD.TBLDATA.NewRow
+    '    For Each XLSTBLrow As DataRow In CS0023XLSUPLOAD.TBLDATA.Rows
+    '        CS0023XLSTBLrow.ItemArray = XLSTBLrow.ItemArray
 
-        Dim CS0023XLSTBLrow As DataRow = CS0023XLSUPLOAD.TBLDATA.NewRow
-        For Each XLSTBLrow As DataRow In CS0023XLSUPLOAD.TBLDATA.Rows
-            CS0023XLSTBLrow.ItemArray = XLSTBLrow.ItemArray
+    '        For Each XLSTBLcol As DataColumn In CS0023XLSUPLOAD.TBLDATA.Columns
+    '            If IsDBNull(CS0023XLSTBLrow.Item(XLSTBLcol)) OrElse IsNothing(CS0023XLSTBLrow.Item(XLSTBLcol)) Then
+    '                CS0023XLSTBLrow.Item(XLSTBLcol) = ""
+    '            End If
+    '        Next
 
-            For Each XLSTBLcol As DataColumn In CS0023XLSUPLOAD.TBLDATA.Columns
-                If IsDBNull(CS0023XLSTBLrow.Item(XLSTBLcol)) OrElse IsNothing(CS0023XLSTBLrow.Item(XLSTBLcol)) Then
-                    CS0023XLSTBLrow.Item(XLSTBLcol) = ""
-                End If
-            Next
+    '        XLSTBLrow.ItemArray = CS0023XLSTBLrow.ItemArray
+    '    Next
 
-            XLSTBLrow.ItemArray = CS0023XLSTBLrow.ItemArray
-        Next
+    '    '○ XLSUPLOAD明細⇒INPtbl
+    '    Master.CreateEmptyTable(OIT0002INPtbl)
 
-        '○ XLSUPLOAD明細⇒INPtbl
-        Master.CreateEmptyTable(OIT0002INPtbl)
+    '    For Each XLSTBLrow As DataRow In CS0023XLSUPLOAD.TBLDATA.Rows
+    '        Dim OIT0002INProw As DataRow = OIT0002INPtbl.NewRow
 
-        For Each XLSTBLrow As DataRow In CS0023XLSUPLOAD.TBLDATA.Rows
-            Dim OIT0002INProw As DataRow = OIT0002INPtbl.NewRow
+    '        '○ 初期クリア
+    '        For Each OIT0002INPcol As DataColumn In OIT0002INPtbl.Columns
+    '            If IsDBNull(OIT0002INProw.Item(OIT0002INPcol)) OrElse IsNothing(OIT0002INProw.Item(OIT0002INPcol)) Then
+    '                Select Case OIT0002INPcol.ColumnName
+    '                    Case "LINECNT"
+    '                        OIT0002INProw.Item(OIT0002INPcol) = 0
+    '                    Case "OPERATION"
+    '                        OIT0002INProw.Item(OIT0002INPcol) = C_LIST_OPERATION_CODE.NODATA
+    '                    Case "UPDTIMSTP"
+    '                        OIT0002INProw.Item(OIT0002INPcol) = 0
+    '                    Case "SELECT"
+    '                        OIT0002INProw.Item(OIT0002INPcol) = 1
+    '                    Case "HIDDEN"
+    '                        OIT0002INProw.Item(OIT0002INPcol) = 0
+    '                    Case Else
+    '                        OIT0002INProw.Item(OIT0002INPcol) = ""
+    '                End Select
+    '            End If
+    '        Next
 
-            '○ 初期クリア
-            For Each OIT0002INPcol As DataColumn In OIT0002INPtbl.Columns
-                If IsDBNull(OIT0002INProw.Item(OIT0002INPcol)) OrElse IsNothing(OIT0002INProw.Item(OIT0002INPcol)) Then
-                    Select Case OIT0002INPcol.ColumnName
-                        Case "LINECNT"
-                            OIT0002INProw.Item(OIT0002INPcol) = 0
-                        Case "OPERATION"
-                            OIT0002INProw.Item(OIT0002INPcol) = C_LIST_OPERATION_CODE.NODATA
-                        Case "UPDTIMSTP"
-                            OIT0002INProw.Item(OIT0002INPcol) = 0
-                        Case "SELECT"
-                            OIT0002INProw.Item(OIT0002INPcol) = 1
-                        Case "HIDDEN"
-                            OIT0002INProw.Item(OIT0002INPcol) = 0
-                        Case Else
-                            OIT0002INProw.Item(OIT0002INPcol) = ""
-                    End Select
-                End If
-            Next
+    '        ''○ 変更元情報をデフォルト設定
+    '        If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
+    '            WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
+    '            For Each OIT0002row As DataRow In OIT0002tbl.Rows
+    '                If XLSTBLrow("LINKNO") = OIT0002row("LINKNO") AndAlso
+    '                    XLSTBLrow("LINKDETAILNO") = OIT0002row("LINKDETAILNO") AndAlso
+    '                    XLSTBLrow("STATUS") = OIT0002row("STATUS") AndAlso
+    '                    XLSTBLrow("INFO") = OIT0002row("INFO") AndAlso
+    '                    XLSTBLrow("PREORDERNO") = OIT0002row("PREORDERNO") AndAlso
+    '                    XLSTBLrow("OFFICECODE") = OIT0002row("OFFICECODE") AndAlso
+    '                    XLSTBLrow("DEPSTATION") = OIT0002row("DEPSTATION") AndAlso
+    '                    XLSTBLrow("DEPSTATIONNAME") = OIT0002row("DEPSTATIONNAME") AndAlso
+    '                    XLSTBLrow("RETSTATION") = OIT0002row("RETSTATION") AndAlso
+    '                    XLSTBLrow("RETSTATIONNAME") = OIT0002row("RETSTATIONNAME") AndAlso
+    '                    XLSTBLrow("EMPARRDATE") = OIT0002row("EMPARRDATE") AndAlso
+    '                    XLSTBLrow("ACTUALEMPARRDATE") = OIT0002row("ACTUALEMPARRDATE") AndAlso
+    '                    XLSTBLrow("LINETRAINNO") = OIT0002row("LINETRAINNO") AndAlso
+    '                    XLSTBLrow("LINEORDER") = OIT0002row("LINEORDER") AndAlso
+    '                    XLSTBLrow("TANKNUMBER") = OIT0002row("TANKNUMBER") AndAlso
+    '                    XLSTBLrow("PREOILCODE") = OIT0002row("PREOILCODE") Then
+    '                    OIT0002INProw.ItemArray = OIT0002row.ItemArray
+    '                    Exit For
+    '                End If
+    '            Next
+    '        End If
 
-            ''○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
-                For Each OIT0002row As DataRow In OIT0002tbl.Rows
-                    If XLSTBLrow("LINKNO") = OIT0002row("LINKNO") AndAlso
-                        XLSTBLrow("LINKDETAILNO") = OIT0002row("LINKDETAILNO") AndAlso
-                        XLSTBLrow("STATUS") = OIT0002row("STATUS") AndAlso
-                        XLSTBLrow("INFO") = OIT0002row("INFO") AndAlso
-                        XLSTBLrow("PREORDERNO") = OIT0002row("PREORDERNO") AndAlso
-                        XLSTBLrow("OFFICECODE") = OIT0002row("OFFICECODE") AndAlso
-                        XLSTBLrow("DEPSTATION") = OIT0002row("DEPSTATION") AndAlso
-                        XLSTBLrow("DEPSTATIONNAME") = OIT0002row("DEPSTATIONNAME") AndAlso
-                        XLSTBLrow("RETSTATION") = OIT0002row("RETSTATION") AndAlso
-                        XLSTBLrow("RETSTATIONNAME") = OIT0002row("RETSTATIONNAME") AndAlso
-                        XLSTBLrow("EMPARRDATE") = OIT0002row("EMPARRDATE") AndAlso
-                        XLSTBLrow("ACTUALEMPARRDATE") = OIT0002row("ACTUALEMPARRDATE") AndAlso
-                        XLSTBLrow("LINETRAINNO") = OIT0002row("LINETRAINNO") AndAlso
-                        XLSTBLrow("LINEORDER") = OIT0002row("LINEORDER") AndAlso
-                        XLSTBLrow("TANKNUMBER") = OIT0002row("TANKNUMBER") AndAlso
-                        XLSTBLrow("PREOILCODE") = OIT0002row("PREOILCODE") Then
-                        OIT0002INProw.ItemArray = OIT0002row.ItemArray
-                        Exit For
-                    End If
-                Next
-            End If
+    '        '○ 項目セット
+    '        '貨車連結順序表№
+    '        If WW_COLUMNS.IndexOf("LINKNO") >= 0 Then
+    '            OIT0002INProw("LINKNO") = XLSTBLrow("LINKNO")
+    '        End If
 
-            '○ 項目セット
-            '貨車連結順序表№
-            If WW_COLUMNS.IndexOf("LINKNO") >= 0 Then
-                OIT0002INProw("LINKNO") = XLSTBLrow("LINKNO")
-            End If
+    '        '貨車連結順序表明細№
+    '        If WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
+    '            OIT0002INProw("LINKDETAILNO") = XLSTBLrow("LINKDETAILNO")
+    '        End If
 
-            '貨車連結順序表明細№
-            If WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
-                OIT0002INProw("LINKDETAILNO") = XLSTBLrow("LINKDETAILNO")
-            End If
+    '        'ステータス
+    '        If WW_COLUMNS.IndexOf("STATUS") >= 0 Then
+    '            OIT0002INProw("STATUS") = XLSTBLrow("STATUS")
+    '        End If
 
-            'ステータス
-            If WW_COLUMNS.IndexOf("STATUS") >= 0 Then
-                OIT0002INProw("STATUS") = XLSTBLrow("STATUS")
-            End If
+    '        '情報
+    '        If WW_COLUMNS.IndexOf("INFO") >= 0 Then
+    '            OIT0002INProw("INFO") = XLSTBLrow("INFO")
+    '        End If
 
-            '情報
-            If WW_COLUMNS.IndexOf("INFO") >= 0 Then
-                OIT0002INProw("INFO") = XLSTBLrow("INFO")
-            End If
+    '        '前回オーダー№
+    '        If WW_COLUMNS.IndexOf("PREORDERNO") >= 0 Then
+    '            OIT0002INProw("PREORDERNO") = XLSTBLrow("PREORDERNO")
+    '        End If
 
-            '前回オーダー№
-            If WW_COLUMNS.IndexOf("PREORDERNO") >= 0 Then
-                OIT0002INProw("PREORDERNO") = XLSTBLrow("PREORDERNO")
-            End If
+    '        '本線列車
+    '        If WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
+    '            OIT0002INProw("TRAINNO") = XLSTBLrow("TRAINNO")
+    '        End If
 
-            '本線列車
-            If WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
-                OIT0002INProw("TRAINNO") = XLSTBLrow("TRAINNO")
-            End If
+    '        '登録営業所コード
+    '        If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 Then
+    '            OIT0002INProw("OFFICECODE") = XLSTBLrow("OFFICECODE")
+    '        End If
 
-            '登録営業所コード
-            If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 Then
-                OIT0002INProw("OFFICECODE") = XLSTBLrow("OFFICECODE")
-            End If
+    '        '空車発駅コード
+    '        If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 Then
+    '            OIT0002INProw("DEPSTATION") = XLSTBLrow("DEPSTATION")
+    '        End If
 
-            '空車発駅コード
-            If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 Then
-                OIT0002INProw("DEPSTATION") = XLSTBLrow("DEPSTATION")
-            End If
+    '        '空車発駅名
+    '        If WW_COLUMNS.IndexOf("DEPSTATIONNAME") >= 0 Then
+    '            OIT0002INProw("DEPSTATIONNAME") = XLSTBLrow("DEPSTATIONNAME")
+    '        End If
 
-            '空車発駅名
-            If WW_COLUMNS.IndexOf("DEPSTATIONNAME") >= 0 Then
-                OIT0002INProw("DEPSTATIONNAME") = XLSTBLrow("DEPSTATIONNAME")
-            End If
+    '        '空車着駅コード
+    '        If WW_COLUMNS.IndexOf("RETSTATION") >= 0 Then
+    '            OIT0002INProw("RETSTATION") = XLSTBLrow("RETSTATION")
+    '        End If
 
-            '空車着駅コード
-            If WW_COLUMNS.IndexOf("RETSTATION") >= 0 Then
-                OIT0002INProw("RETSTATION") = XLSTBLrow("RETSTATION")
-            End If
+    '        '空車着駅名
+    '        If WW_COLUMNS.IndexOf("RETSTATIONNAME") >= 0 Then
+    '            OIT0002INProw("RETSTATIONNAME") = XLSTBLrow("RETSTATIONNAME")
+    '        End If
 
-            '空車着駅名
-            If WW_COLUMNS.IndexOf("RETSTATIONNAME") >= 0 Then
-                OIT0002INProw("RETSTATIONNAME") = XLSTBLrow("RETSTATIONNAME")
-            End If
+    '        '空車着日（予定）
+    '        If WW_COLUMNS.IndexOf("EMPARRDATE") >= 0 Then
+    '            OIT0002INProw("EMPARRDATE") = XLSTBLrow("EMPARRDATE")
+    '        End If
 
-            '空車着日（予定）
-            If WW_COLUMNS.IndexOf("EMPARRDATE") >= 0 Then
-                OIT0002INProw("EMPARRDATE") = XLSTBLrow("EMPARRDATE")
-            End If
+    '        '空車着日（実績）
+    '        If WW_COLUMNS.IndexOf("ACTUALEMPARRDATE") >= 0 Then
+    '            OIT0002INProw("ACTUALEMPARRDATE") = XLSTBLrow("ACTUALEMPARRDATE")
+    '        End If
 
-            '空車着日（実績）
-            If WW_COLUMNS.IndexOf("ACTUALEMPARRDATE") >= 0 Then
-                OIT0002INProw("ACTUALEMPARRDATE") = XLSTBLrow("ACTUALEMPARRDATE")
-            End If
+    '        '入線列車番号
+    '        If WW_COLUMNS.IndexOf("LINETRAINNO") >= 0 Then
+    '            OIT0002INProw("LINETRAINNO") = XLSTBLrow("LINETRAINNO")
+    '        End If
 
-            '入線列車番号
-            If WW_COLUMNS.IndexOf("LINETRAINNO") >= 0 Then
-                OIT0002INProw("LINETRAINNO") = XLSTBLrow("LINETRAINNO")
-            End If
+    '        '入線順
+    '        If WW_COLUMNS.IndexOf("LINEORDER") >= 0 Then
+    '            OIT0002INProw("LINEORDER") = XLSTBLrow("LINEORDER")
+    '        End If
 
-            '入線順
-            If WW_COLUMNS.IndexOf("LINEORDER") >= 0 Then
-                OIT0002INProw("LINEORDER") = XLSTBLrow("LINEORDER")
-            End If
+    '        'タンク車№
+    '        If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
+    '            OIT0002INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
+    '        End If
 
-            'タンク車№
-            If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
-                OIT0002INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
-            End If
+    '        '前回油種
+    '        If WW_COLUMNS.IndexOf("PREOILCODE") >= 0 Then
+    '            OIT0002INProw("PREOILCODE") = XLSTBLrow("PREOILCODE")
+    '        End If
 
-            '前回油種
-            If WW_COLUMNS.IndexOf("PREOILCODE") >= 0 Then
-                OIT0002INProw("PREOILCODE") = XLSTBLrow("PREOILCODE")
-            End If
+    '        '削除フラグ
+    '        If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+    '            OIT0002INProw("DELFLG") = XLSTBLrow("DELFLG")
+    '        Else
+    '            OIT0002INProw("DELFLG") = "0"
+    '        End If
 
-            '削除フラグ
-            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
-                OIT0002INProw("DELFLG") = XLSTBLrow("DELFLG")
-            Else
-                OIT0002INProw("DELFLG") = "0"
-            End If
+    '        OIT0002INPtbl.Rows.Add(OIT0002INProw)
+    '    Next
 
-            OIT0002INPtbl.Rows.Add(OIT0002INProw)
-        Next
+    '    '○ 項目チェック
+    '    INPTableCheck(WW_ERR_SW)
 
-        '○ 項目チェック
-        INPTableCheck(WW_ERR_SW)
+    '    '○ 入力値のテーブル反映
+    '    OIT0002tbl_UPD()
 
-        '○ 入力値のテーブル反映
-        OIT0002tbl_UPD()
+    '    '○ 画面表示データ保存
+    '    Master.SaveTable(OIT0002tbl)
 
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0002tbl)
+    '    '○ メッセージ表示
+    '    If isNormal(WW_ERR_SW) Then
+    '        Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+    '    Else
+    '        Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+    '    End If
 
-        '○ メッセージ表示
-        If isNormal(WW_ERR_SW) Then
-            Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-        Else
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
-        End If
+    '    '○ Close
+    '    CS0023XLSUPLOAD.TBLDATA.Dispose()
+    '    CS0023XLSUPLOAD.TBLDATA.Clear()
 
-        '○ Close
-        CS0023XLSUPLOAD.TBLDATA.Dispose()
-        CS0023XLSUPLOAD.TBLDATA.Clear()
-
-    End Sub
-
+    'End Sub
 
     ' ******************************************************************************
     ' ***  詳細表示関連操作                                                      ***

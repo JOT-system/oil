@@ -54,41 +54,41 @@
 
             <!-- ■　受注営業所　■ -->
             <a style="position:fixed; top:4.4em; left:4em; font-weight:bold;">受注営業所</a>
-            <a class="ef" style="position:fixed; top:4.4em; left:11em;" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
+            <a class="ef" style="position:fixed; top:4.4em; left:13.5em;" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
                 <asp:TextBox ID="TxtOrderOffice" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
 
-            <!-- ■　本社列車　■ -->
-            <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;">本社列車</a>
-            <a class="ef" style="position:fixed; top:7.7em; left:11em;" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
+            <!-- ■　本線列車　■ -->
+            <a style="position:fixed; top:6.6em; left:4em; font-weight:bold; text-decoration:underline;">本線列車</a>
+            <a class="ef" style="position:fixed; top:6.6em; left:13.5em;" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
                 <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
 
             <!-- ■　空車発駅　■ -->
-            <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;">発駅</a>
-            <a class="ef" style="position:fixed; top:9.9em; left:11em;" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
+            <a style="position:fixed; top:8.8em; left:4em; font-weight:bold; text-decoration:underline;">発駅</a>
+            <a class="ef" style="position:fixed; top:8.8em; left:13.5em;" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
                 <asp:TextBox ID="TxtDepstation" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
-            <a style="position:fixed; top:9.9em; left:20em;">
+            <a style="position:fixed; top:8.8em; left:22.5em;">
                 <asp:Label ID="LblDepstationName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
             </a>
             <!-- ■　空車着駅　■ -->
-            <a style="position:fixed; top:9.9em; left:38em; font-weight:bold; text-decoration:underline;">着駅</a>
-            <a class="ef" style="position:fixed; top:9.9em; left:43em;" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
+            <a style="position:fixed; top:8.8em; left:43em; font-weight:bold; text-decoration:underline;">着駅</a>
+            <a class="ef" style="position:fixed; top:8.8em; left:52.5em;" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
                 <asp:TextBox ID="TxtArrstation" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
-            <a style="position:fixed; top:9.9em; left:52em;">
+            <a style="position:fixed; top:8.8em; left:67em;">
                 <asp:Label ID="LblArrstationName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
             </a>
 
             <!-- ■　(予定)空車着日　■ -->
-            <a style="position:fixed; top:12.1em; left:4em; font-weight:bold; text-decoration:underline;">（予定）空車着日</a>
-            <a class="ef" style="position:fixed; top:12.1em; left:27em;" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <a style="position:fixed; top:11em; left:4em; font-weight:bold; text-decoration:underline;">（予定）空車着日</a>
+            <a class="ef" style="position:fixed; top:11em; left:13.5em;" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="TxtEmpDate" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(実績)空車着日　■ -->
-            <a style="position:fixed; top:12.1em; left:38em; font-weight:bold; text-decoration:underline;">（実績）空車着日</a>
-            <a class="ef" style="position:fixed; top:12.1em; left:43em;" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <a style="position:fixed; top:11em; left:43em; font-weight:bold; text-decoration:underline;">（実績）空車着日</a>
+            <a class="ef" style="position:fixed; top:11em; left:52.5em;" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="TxtActEmpDate" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
             </a>
 

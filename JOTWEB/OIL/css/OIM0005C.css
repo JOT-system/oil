@@ -1,16 +1,14 @@
 ﻿/* タンク車マスタ登録画面*/
 /*JOT車番見出し*/
-#WF_TANKNUMBER_LABEL {
+/*#WF_TANKNUMBER_LABEL {
     position: fixed;
     top: 5em;
     left: 40em;
     color: #737373;
-    /*    font-weight:bold; 
-    text-decoration:underline;*/
-}
+}*/
 
 /*JOT車番input tag*/
-#WF_TANKNUMBER {
+/*#WF_TANKNUMBER {
     position: fixed;
     top: 6.5em;
     left: 40em;
@@ -18,27 +16,27 @@
     padding-left: 21px;
     height: 2em;
     width: 10em;
-}
+}*/
 
 /*JOT車番名称*/
-#WF_TANKNUMBER_TEXT {
+/*#WF_TANKNUMBER_TEXT {
     position: fixed;
     top: 6.8em;
     left: 51em;
     height: 2em;
     width: 10em;
-}
+}*/
 
 /*型式見出し*/
-#WF_MODEL_LABEL {
+/*#WF_MODEL_LABEL {
     position: fixed;
     top: 9.5em;
     left: 40em;
     color: #737373;
-}
+}*/
 
 /*型式input tag*/
-#WF_MODEL {
+/*#WF_MODEL {
     position: fixed;
     top: 11em;
     left: 40em;
@@ -46,7 +44,7 @@
     padding-left: 21px;
     height: 2em;
     width: 10em;
-}
+}*/
 
 /*左Boxオープン用虫眼鏡アイコン*/
 .BoxIcon {

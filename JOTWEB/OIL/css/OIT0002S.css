@@ -1,6 +1,6 @@
-﻿/* ユーザーID検索画面*/
-/*会社コード見出し*/
-#WF_CAMPCODE_LABEL {
+﻿/* 貨車連結順序表検索画面*/
+/*空車発駅コード見出し*/
+#WF_DEPSTATION_LABEL {
     position: fixed;
     top: 5em;
     left: 40em;
@@ -9,8 +9,8 @@
     text-decoration:underline;*/
 }
 
-/*会社コードinput tag*/
-#WF_CAMPCODE {
+/*空車発駅コードinput tag*/
+#WF_DEPSTATION {
     position: fixed;
     top: 6.5em;
     left: 40em;
@@ -20,8 +20,8 @@
     width: 10em;
 }
 
-/*会社名称*/
-#WF_CAMPCODE_TEXT {
+/*空車発駅名称*/
+#WF_DEPSTATION_TEXT {
     position: fixed;
     top: 6.8em;
     left: 51em;
@@ -52,7 +52,7 @@
 /*終了年月日見出し*/
 #WF_ENDYMD_LABEL {
     position: fixed;
-    top: 13.5em;
+    top: 12.25em;
     left: 40em;
     color: #737373;
 }
@@ -60,7 +60,7 @@
 /*終了年月日input tag*/
 #WF_ENDYMD {
     position: fixed;
-    top: 15em;
+    top: 13.5em;
     left: 40em;
     border-radius: 3px;
     padding-left: 21px;
@@ -68,18 +68,18 @@
     width: 10em;
 }
 
-/*組織コード見出し*/
-#WF_ORG_LABEL {
+/*本線列車番号見出し*/
+#WF_TRAINNO_LABEL {
     position: fixed;
-    top: 18em;
+    top: 16.5em;
     left: 40em;
     color: #737373;
 }
 
-/*組織コードinput tag*/
-#WF_ORG {
+/*本線列車番号input tag*/
+#WF_TRAINNO {
     position: fixed;
-    top: 19.5em;
+    top: 18em;
     left: 40em;
     border-radius: 3px;
     padding-left: 21px;
@@ -88,13 +88,28 @@
 }
 
 
-/*組織名称*/
-#WF_ORG_TEXT {
+/*本線列車番号名称*/
+#WF_TRAINNO_TEXT {
     position: fixed;
-    top: 19.8em;
+    top: 18.8em;
     left: 51em;
     height: 2em;
     width: 10em;
+}
+
+/*ステータス見出し*/
+#WF_SW_LABEL {
+    position: fixed;
+    top: 21.5em;
+    left: 40em;
+    color: #737373;
+}
+
+/*ステータスボタン配置*/
+#checkbox {
+    position: fixed;
+    top: 23em;
+    left: 40em;
 }
 
 /*左Boxオープン用虫眼鏡アイコン*/

@@ -48,6 +48,10 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0003L As String = "ASP.OIL_ORD_OIT0003ORDERLIST_ASPX"
         ''' <summary>
+        ''' 受注明細
+        ''' </summary>
+        Public Const OIT0003D As String = "ASP.OIL_ORD_OIT0003ORDERDETAIL_ASPX"
+        ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"

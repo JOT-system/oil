@@ -487,11 +487,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", SqlDbType.Int)          '明細数(新規作成)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 9)  '荷主コード
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 10) '荷主コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 40) '荷主名
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 9)  '基地コード
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 40) '基地名
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 9)  '荷受人コード
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 10) '荷受人コード
                 Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 40) '荷受人名
 
                 PARA0.Value = O_INSCNT
@@ -1473,11 +1473,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Using
 
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 9)  '荷主コード
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 10) '荷主コード
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 40) '荷主名
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 9)  '基地コード
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 40) '基地名
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 9)  '荷受人コード
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10) '荷受人コード
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 40) '荷受人名
 
                 Dim strOrderNo As String = ""
@@ -2531,8 +2531,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , OTHER1OTANKCH, OTHER2OTANKCH   , OTHER3OTANKCH  , OTHER4OTANKCH       , OTHER5OTANKCH" _
             & "        , OTHER6OTANKCH, OTHER7OTANKCH   , OTHER8OTANKCH  , OTHER9OTANKCH       , OTHER10OTANKCH" _
             & "        , TOTALTANKCH" _
-            & "        , TANKRINKNO   , SALSE           , SALSETAX       , TOTALSALSE          , PAYMENT" _
-            & "        , PAYMENTTAX   , TOTALPAYMENT    , DELFLG" _
+            & "        , TANKRINKNO   , KEIJYOYMD       , SALSE          , SALSETAX            , TOTALSALSE" _
+            & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT   , DELFLG" _
             & "        , INITYMD      , INITUSER        , INITTERMID" _
             & "        , UPDYMD       , UPDUSER         , UPDTERMID      , RECEIVEYMD)" _
             & "    VALUES" _
@@ -2552,8 +2552,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P65, @P66, @P67, @P68, @P69" _
             & "        , @P70, @P71, @P72, @P73, @P74" _
             & "        , @P75" _
-            & "        , @P76, @P77, @P78, @P79, @P80" _
-            & "        , @P81, @P82, @P83" _
+            & "        , @P76, @P91, @P77, @P78, @P79" _
+            & "        , @P80, @P81, @P82, @P83" _
             & "        , @P84, @P85, @P86" _
             & "        , @P87, @P88, @P89, @P90) ;" _
             & " CLOSE hensuu ;" _
@@ -2638,6 +2638,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , OTHER10OTANKCH" _
             & "    , TOTALTANKCH" _
             & "    , TANKRINKNO" _
+            & "    , KEIJYOYMD" _
             & "    , SALSE" _
             & "    , SALSETAX" _
             & "    , TOTALSALSE" _
@@ -2666,11 +2667,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  '受注営業所コード
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '受注営業所名
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注パターン
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 9)  '荷主コード
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 10) '荷主コード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 40) '荷主名
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 9)  '基地コード
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '基地名
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 9)  '荷受人コード
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 10) '荷受人コード
                 Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 40) '荷受人名
                 Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 7)  '発駅コード
                 Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 40) '発駅名
@@ -2736,6 +2737,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA74 As SqlParameter = SQLcmd.Parameters.Add("@P74", SqlDbType.Int)          '変更後_車数（その他１０）
                 Dim PARA75 As SqlParameter = SQLcmd.Parameters.Add("@P75", SqlDbType.Int)          '変更後_合計車数
                 Dim PARA76 As SqlParameter = SQLcmd.Parameters.Add("@P76", SqlDbType.NVarChar, 11) '貨車連結順序表№
+                Dim PARA91 As SqlParameter = SQLcmd.Parameters.Add("@P91", SqlDbType.Date)         '計上日
                 Dim PARA77 As SqlParameter = SQLcmd.Parameters.Add("@P77", SqlDbType.Int)          '売上金額
                 Dim PARA78 As SqlParameter = SQLcmd.Parameters.Add("@P78", SqlDbType.Int)          '売上消費税額
                 Dim PARA79 As SqlParameter = SQLcmd.Parameters.Add("@P79", SqlDbType.Int)          '売上合計金額
@@ -2837,6 +2839,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA74.Value = "0"                                '変更後_車数（その他１０）
                     PARA75.Value = "0"                                '変更後_合計車数
                     PARA76.Value = ""                                 '貨車連結順序表№
+                    PARA91.Value = DBNull.Value                       '計上日
                     PARA77.Value = "0"                                '売上金額
                     PARA78.Value = "0"                                '売上消費税額
                     PARA79.Value = "0"                                '売上合計金額

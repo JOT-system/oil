@@ -192,7 +192,7 @@ Partial Public Class OIT0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_PREORDERNO As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_OFFICENAME コントロール。
     '''</summary>
@@ -201,7 +201,7 @@ Partial Public Class OIT0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OFFICENAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_OFFICECODE コントロール。
     '''</summary>
@@ -372,4 +372,103 @@ Partial Public Class OIT0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTBL As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_REGULAR_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_REGULAR_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_HIGHOCTANE_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_HIGHOCTANE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_KEROSENE_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_KEROSENE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_NOTADDED_KEROSENE_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_NOTADDED_KEROSENE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_DIESEL_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_NUM3DIESEL_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_NUM3DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_NUM5DIESEL_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_NUM5DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_NUM10DIESEL_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_NUM10DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_LSA_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_LSA_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_AHEAVY_TANKCAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_AHEAVY_TANKCAR As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_TANKCARTOTAL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TANKCARTOTAL As Global.System.Web.UI.WebControls.TextBox
 End Class

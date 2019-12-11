@@ -39,15 +39,15 @@
                 <p id="KEY_LINE_2">
                     <!-- 削除フラグ -->
                     <a class="ef" ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
-                        <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除フラグ" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_DELFLG" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除フラグ" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_DELFLG" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- JOT車番 -->
                     <a  class="ef" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
                         <asp:Label ID="WF_TANKNUMBER_L" runat="server" Text="JOT車番" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_TANKNUMBER" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_TANKNUMBER" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_TANKNUMBER_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
@@ -95,7 +95,7 @@
                     <!-- リース開始年月日 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_LEASESTYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_LEASESTYMD_L" runat="server" Text="リース開始年月日" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_LEASESTYMD" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LEASESTYMD" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_LEASESTYMD_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
@@ -104,7 +104,7 @@
                     <!-- リース満了年月日 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_LEASEENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_LEASEENDYMD_L" runat="server" Text="リース満了年月日" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_LEASEENDYMD" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LEASEENDYMD" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_LEASEENDYMD_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
@@ -136,14 +136,14 @@
                     <!-- 第三者使用期限 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_USERLIMIT', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_USERLIMIT_L" runat="server" Text="第三者使用期限" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_USERLIMIT" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_USERLIMIT" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_USERLIMIT_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- 臨時常備駅期限 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_LIMITTEXTRADIARYSTATION', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_LIMITTEXTRADIARYSTATION_L" runat="server" Text="臨時常備駅期限" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_LIMITTEXTRADIARYSTATION" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LIMITTEXTRADIARYSTATION" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_LIMITTEXTRADIARYSTATION_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
@@ -168,7 +168,7 @@
                     <!-- 臨時専用期限 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_EXTRADINARYLIMIT', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_EXTRADINARYLIMIT_L" runat="server" Text="臨時専用期限" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_EXTRADINARYLIMIT" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EXTRADINARYLIMIT" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYLIMIT_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
@@ -207,7 +207,7 @@
                     <!-- 取得年月日 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_ALLINSPECTIONDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_ALLINSPECTIONDATE_L" runat="server" Text="取得年月日" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_ALLINSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_ALLINSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_ALLINSPECTIONDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
@@ -216,7 +216,7 @@
                     <!-- 車籍編入年月日 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_TRANSFERDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_TRANSFERDATE_L" runat="server" Text="車籍編入年月日" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_TRANSFERDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_TRANSFERDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_TRANSFERDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
@@ -232,7 +232,7 @@
                     <!-- 形式 -->
                     <a  class="ef" ondblclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_TANKMODEL%>);" onchange="TextBox_change('WF_MODEL');">
                         <asp:Label ID="WF_MODEL_L" runat="server" Text="形式" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_MODEL" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_MODEL" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_MODEL_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
@@ -383,7 +383,7 @@
                     <!-- 次回指定年月日 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_SPECIFIEDDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_SPECIFIEDDATE_L" runat="server" Text="次回指定年月日" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_SPECIFIEDDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_SPECIFIEDDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_SPECIFIEDDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
@@ -392,7 +392,7 @@
                     <!-- 次回全検年月日(JR)  -->
                     <a class="ef" ondblclick="Field_DBclick('WF_JRALLINSPECTIONDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_JRALLINSPECTIONDATE_L" runat="server" Text="次回全検年月日(JR) " Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_JRALLINSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_JRALLINSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_JRALLINSPECTIONDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
@@ -415,7 +415,7 @@
                     <!-- 次回交検年月日(JR） -->
                     <a class="ef" ondblclick="Field_DBclick('WF_JRINSPECTIONDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_JRINSPECTIONDATE_L" runat="server" Text="次回交検年月日(JR）" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_JRINSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_JRINSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_JRINSPECTIONDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
@@ -424,14 +424,14 @@
                     <!-- 次回交検年月日 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_INSPECTIONDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_INSPECTIONDATE_L" runat="server" Text="次回交検年月日" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_INSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_INSPECTIONDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_INSPECTIONDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- 次回指定年月日(JR) -->
                     <a class="ef" ondblclick="Field_DBclick('WF_JRSPECIFIEDDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_JRSPECIFIEDDATE_L" runat="server" Text="次回指定年月日(JR)" Width="10.0em" CssClass="WF_TEXT_LABEL" Font-Underline="true"></asp:Label>
-                        <asp:TextBox ID="WF_JRSPECIFIEDDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_JRSPECIFIEDDATE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_JRSPECIFIEDDATE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>

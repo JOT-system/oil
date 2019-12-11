@@ -47,7 +47,7 @@
         <!-- JOT車番 -->
         <a id="WF_TANKNUMBER_LABEL">JOT車番</a>
 
-        <a  class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
+        <a class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
             <asp:TextBox CssClass="BoxIcon" ID="WF_TANKNUMBER" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;">

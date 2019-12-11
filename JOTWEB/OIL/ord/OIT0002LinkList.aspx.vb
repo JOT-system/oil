@@ -22,6 +22,7 @@ Public Class OIT0002LinkList
     Private OIT0002tbl As DataTable                                  '一覧格納用テーブル
     Private OIT0002INPtbl As DataTable                               'チェック用テーブル
     Private OIT0002UPDtbl As DataTable                               '更新用テーブル
+    Private OIT0002WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -76,6 +77,8 @@ Public Class OIT0002LinkList
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonCSV"             'ダウンロードボタン押下
                             WF_ButtonDownload_Click()
+                        Case "WF_ButtonINSERT"          '新規登録ボタン押下
+                            WF_ButtonINSERT_Click()
                         'Case "WF_ButtonPrint"           '一覧印刷ボタン押下
                         '    WF_ButtonPrint_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
@@ -1158,6 +1161,87 @@ Public Class OIT0002LinkList
     'End Sub
 
     ''' <summary>
+    ''' 新規登録ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonINSERT_Click()
+
+        '選択行
+        work.WF_SEL_LINECNT.Text = ""
+
+        '貨車連結順序表№
+        work.WF_SEL_LINKNO.Text = ""
+
+        '貨車連結順序表明細№
+        work.WF_SEL_LINKDETAILNO.Text = ""
+
+        'ステータス
+        work.WF_SEL_STATUS.Text = ""
+
+        '情報
+        work.WF_SEL_INFO.Text = ""
+
+        '前回オーダー№
+        work.WF_SEL_PREORDERNO.Text = ""
+
+        '本線列車
+        work.WF_SEL_TRAINNO.Text = ""
+
+        '登録営業所コード
+        work.WF_SEL_OFFICECODE.Text = ""
+
+        '空車発駅コード
+        work.WF_SEL_DEPSTATION.Text = ""
+
+        '空車発駅名
+        work.WF_SEL_DEPSTATIONNAME.Text = ""
+
+        '空車着駅コード
+        work.WF_SEL_RETSTATION.Text = ""
+
+        '空車着駅名
+        work.WF_SEL_RETSTATIONNAME.Text = ""
+
+        '空車着日（予定）
+        work.WF_SEL_EMPARRDATE.Text = ""
+
+        '空車着日（実績）
+        work.WF_SEL_ACTUALEMPARRDATE.Text = ""
+
+        '入線列車番号
+        work.WF_SEL_LINETRAINNO.Text = ""
+
+        '入線順
+        work.WF_SEL_LINEORDER.Text = ""
+
+        'タンク車№
+        work.WF_SEL_TANKNUMBER.Text = ""
+
+        '前回油種
+        work.WF_SEL_PREOILCODE.Text = ""
+
+        '削除フラグ
+        work.WF_SEL_DELFLG.Text = "0"
+        '作成フラグ(新規登録：1, 更新：2)
+        work.WF_SEL_CREATEFLG.Text = "1"
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0002tbl)
+
+        WF_GridDBclick.Text = ""
+
+        '○ 遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0002tbl, work.WF_SEL_INPTBL.Text)
+
+        '○ 次ページ遷移
+        Master.TransitionPage()
+
+    End Sub
+
+    ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -1225,81 +1309,63 @@ Public Class OIT0002LinkList
         End Try
 
         '選択行
-        WF_Sel_LINECNT.Text = OIT0002tbl.Rows(WW_LINECNT)("LINECNT")
         work.WF_SEL_LINECNT.Text = OIT0002tbl.Rows(WW_LINECNT)("LINECNT")
 
         '貨車連結順序表№
-        WF_LINKNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKNO")
         work.WF_SEL_LINKNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKNO")
 
         ''貨車連結順序表明細№
-        'WF_LINKDETAILNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKDETAILNO")
         'work.WF_SEL_LINKDETAILNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINKDETAILNO")
 
         'ステータス
-        WF_STATUS.Text = OIT0002tbl.Rows(WW_LINECNT)("STATUS")
         work.WF_SEL_STATUS.Text = OIT0002tbl.Rows(WW_LINECNT)("STATUS")
 
         '情報
-        WF_INFO.Text = OIT0002tbl.Rows(WW_LINECNT)("INFO")
         work.WF_SEL_INFO.Text = OIT0002tbl.Rows(WW_LINECNT)("INFO")
 
         '前回オーダー№
-        WF_PREORDERNO.Text = OIT0002tbl.Rows(WW_LINECNT)("PREORDERNO")
         work.WF_SEL_PREORDERNO.Text = OIT0002tbl.Rows(WW_LINECNT)("PREORDERNO")
 
         '本線列車
-        WF_TRAINNO.Text = OIT0002tbl.Rows(WW_LINECNT)("TRAINNO")
         work.WF_SEL_TRAINNO2.Text = OIT0002tbl.Rows(WW_LINECNT)("TRAINNO")
 
         '登録営業所コード
-        WF_OFFICECODE.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")
         work.WF_SEL_OFFICECODE.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")
 
         ''空車発駅コード
-        'WF_DEPSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
         'work.WF_SEL_DEPSTATION2.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
 
         '空車発駅名
-        WF_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
         work.WF_SEL_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
 
         ''空車着駅コード
-        'WF_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
         'work.WF_SEL_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
 
         '空車着駅名
-        WF_RETSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATIONNAME")
         work.WF_SEL_RETSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATIONNAME")
 
         '空車着日（予定）
-        WF_EMPARRDATE.Text = OIT0002tbl.Rows(WW_LINECNT)("EMPARRDATE")
         work.WF_SEL_EMPARRDATE.Text = OIT0002tbl.Rows(WW_LINECNT)("EMPARRDATE")
 
         '空車着日（実績）
-        WF_ACTUALEMPARRDATE.Text = OIT0002tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
         work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0002tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
 
         ''入線列車番号
-        'WF_LINETRAINNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINETRAINNO")
         'work.WF_SEL_LINETRAINNO.Text = OIT0002tbl.Rows(WW_LINECNT)("LINETRAINNO")
 
         ''入線順
-        'WF_LINEORDER.Text = OIT0002tbl.Rows(WW_LINECNT)("LINEORDER")
         'work.WF_SEL_LINEORDER.Text = OIT0002tbl.Rows(WW_LINECNT)("LINEORDER")
 
         ''タンク車№
-        'WF_TANKNUMBER.Text = OIT0002tbl.Rows(WW_LINECNT)("TANKNUMBER")
         'work.WF_SEL_TANKNUMBER.Text = OIT0002tbl.Rows(WW_LINECNT)("TANKNUMBER")
 
         ''前回油種
-        'WF_PREOILCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("PREOILCODE")
         'work.WF_SEL_PREOILCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("PREOILCODE")
 
         '削除フラグ
-        WF_DELFLG.Text = OIT0002tbl.Rows(WW_LINECNT)("DELFLG")
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
         work.WF_SEL_DELFLG.Text = OIT0002tbl.Rows(WW_LINECNT)("DELFLG")
+        '作成フラグ(新規登録：1, 更新：2)
+        work.WF_SEL_CREATEFLG.Text = "2"
 
         '○ 状態をクリア
         For Each OIT0002row As DataRow In OIT0002tbl.Rows

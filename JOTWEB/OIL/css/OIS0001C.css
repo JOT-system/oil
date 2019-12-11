@@ -1,2 +1,110 @@
-﻿body {
+﻿/* ユーザーID検索画面*/
+/*会社コード見出し*/
+/*#WF_CAMPCODE_LABEL {
+    position: fixed;
+    top: 5em;
+    left: 40em;
+    color: #737373;
+}*/
+
+/*会社コードinput tag*/
+/*#WF_CAMPCODE {
+    position: fixed;
+    top: 6.5em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+}*/
+
+/*会社名称*/
+/*#WF_CAMPCODE_TEXT {
+    position: fixed;
+    top: 6.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+}*/
+
+/*開始年月日見出し*/
+/*#WF_STYMD_LABEL {
+    position: fixed;
+    top: 9.5em;
+    left: 40em;
+    color: #737373;
+}*/
+
+/*開始年月日input tag*/
+/*#WF_STYMD {
+    position: fixed;
+    top: 11em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+}*/
+
+
+/*終了年月日見出し*/
+/*#WF_ENDYMD_LABEL {
+    position: fixed;
+    top: 13.5em;
+    left: 40em;
+    color: #737373;
+}*/
+
+/*終了年月日input tag*/
+/*#WF_ENDYMD {
+    position: fixed;
+    top: 15em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+}*/
+
+/*組織コード見出し*/
+/*#WF_ORG_LABEL {
+    position: fixed;
+    top: 18em;
+    left: 40em;
+    color: #737373;
+}*/
+
+/*組織コードinput tag*/
+/*#WF_ORG {
+    position: fixed;
+    top: 19.5em;
+    left: 40em;
+    border-radius: 3px;
+    padding-left: 21px;
+    height: 2em;
+    width: 10em;
+}*/
+
+
+/*組織名称*/
+/*#WF_ORG_TEXT {
+    position: fixed;
+    top: 19.8em;
+    left: 51em;
+    height: 2em;
+    width: 10em;
+}*/
+
+/*左Boxオープン用虫眼鏡アイコン*/
+.BoxIcon {
+    background-image: url(../img/leftbox.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/*カレンダーオープン用アイコン*/
+.CalendarIcon {
+    background-image: url(../img/calendar.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
 }

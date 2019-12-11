@@ -22,6 +22,7 @@
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>         <!-- ステータス -->
     <asp:TextBox ID="WF_SEL_INFO" runat="server"></asp:TextBox>         <!-- 情報 -->
     <asp:TextBox ID="WF_SEL_PREORDERNO" runat="server"></asp:TextBox>         <!-- 前回オーダー№ -->
+    <asp:TextBox ID="WF_SEL_OFFICENAME" runat="server"></asp:TextBox>         <!-- 登録営業所名 -->
     <asp:TextBox ID="WF_SEL_OFFICECODE" runat="server"></asp:TextBox>         <!-- 登録営業所コード -->
     <asp:TextBox ID="WF_SEL_DEPSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車発駅名 -->
     <asp:TextBox ID="WF_SEL_RETSTATION" runat="server"></asp:TextBox>         <!-- 空車着駅コード -->

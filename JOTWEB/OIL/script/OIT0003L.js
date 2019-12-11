@@ -20,14 +20,13 @@ function InitDisplay() {
         //活性
         document.getElementById("WF_ButtonALLSELECT").disabled = "";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
-        document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
+        document.getElementById("WF_ButtonORDER_CANCEL").disabled = "";
         document.getElementById("WF_ButtonINSERT").disabled = "";
     } else {
         //非活性 
         document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-        document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
-        document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+        document.getElementById("WF_ButtonORDER_CANCEL").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
     };
     /* 共通一覧のスクロールイベント紐づけ */

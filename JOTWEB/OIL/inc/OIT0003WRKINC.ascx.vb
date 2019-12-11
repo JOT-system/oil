@@ -5,6 +5,7 @@ Public Class OIT0003WRKINC
 
     Public Const MAPIDS As String = "OIT0003S"       'MAPID(検索)
     Public Const MAPIDL As String = "OIT0003L"       'MAPID(一覧)
+    Public Const MAPIDQ As String = "OIT0003Q"       'MAPID(貨車連結割当)
     Public Const MAPIDD As String = "OIT0003D"       'MAPID(明細)
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -49,6 +50,20 @@ Public Class OIT0003WRKINC
         prmData.Item(C_PARAMETERS.LP_SALESOFFICE) = I_SALESOFFICEPT
         prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
         CreateSALESOFFICEParam = prmData
+    End Function
+
+    ''' <summary>
+    ''' 状態の取得
+    ''' </summary>
+    ''' <param name="I_ORDERSTATUSPT"></param>
+    ''' <returns></returns>
+    ''' <remarks>全て</remarks>
+    Function CreateORDERSTATUSParam(ByVal I_COMPCODE As String, ByVal I_ORDERSTATUSPT As String) As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_ORDERSTATUS) = I_ORDERSTATUSPT
+        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+        CreateORDERSTATUSParam = prmData
     End Function
 
     ''' <summary>

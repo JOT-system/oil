@@ -48,7 +48,7 @@
                                             </td> 
                                         </tr>
                                         <tr>
-                                            <td id="altMsg" style="background:white">
+                                            <td id="altMsg" style="background:rgba(153, 102, 0, 0.3);border-radius:5px;">
                                                 <script type="text/JavaScript">
                                                 <!--    
                                                     setAltMsg(firstAltYMD, firstAltMsg);

@@ -66,7 +66,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TRAINNUMBER As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_UNLOADINGCODE コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_UNLOADINGCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_UNLOADING コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_UNLOADING As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STATUSCODE コントロール。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STATUSCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STATUS コントロール。
     '''</summary>
@@ -131,13 +131,13 @@ Partial Public Class OIT0003WRKINC
     Public WithEvents WF_SEL_REGISTRATIONDATE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_STATUS1 コントロール。
+    '''WF_SEL_ORDERSTATUS コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_STATUS1 As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_SEL_ORDERSTATUS As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_INFORMATION コントロール。

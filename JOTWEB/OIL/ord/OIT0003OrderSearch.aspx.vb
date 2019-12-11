@@ -105,13 +105,13 @@ Public Class OIT0003OrderSearch
             '荷卸地
             TxtUnloading.Text = work.WF_SEL_UNLOADINGCODE.Text
             '状態
-            TxtStatus.Text = work.WF_SEL_STATUS.Text
+            TxtStatus.Text = work.WF_SEL_STATUSCODE.Text
 
         End If
 
         '○ RightBox情報設定
-        rightview.MAPIDS = OIT0001WRKINC.MAPIDS
-        rightview.MAPID = OIT0001WRKINC.MAPIDL
+        rightview.MAPIDS = OIT0003WRKINC.MAPIDS
+        rightview.MAPID = OIT0003WRKINC.MAPIDL
         rightview.COMPCODE = WF_CAMPCODE.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW

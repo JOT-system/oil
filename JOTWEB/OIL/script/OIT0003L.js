@@ -34,6 +34,9 @@ function InitDisplay() {
 
     // チェックボックス
     ChangeCheckBox();
+
+    // 使用有無初期設定
+    ChangeOrgUse();
 };
 
 // ○チェックボックス変更
@@ -67,4 +70,25 @@ function SelectCheckBox(obj, lineCnt) {
         document.forms[0].submit();
     }
 
+}
+
+
+// ○使用有無変更
+function ChangeOrgUse(obj, lineCnt) {
+
+    // 一覧の内容を取得(右側のリスト)
+    let trlst = document.getElementById("pnlListArea_DR").getElementsByTagName("tr");
+
+    for (let i = 0; i < trlst.length; i++) {
+        // 一覧の項目(ステータス)の値を取得
+        var chkStatus = trlst[i].getElementsByTagName("td")[2].innerHTML;
+
+        if (chkStatus == "受注キャンセル") {
+            document.getElementById("chkpnlListAreaOPERATION" + (i + 1)).disabled = true
+            trlst[i].getElementsByTagName("td")[2].disabled = true
+        } else {
+            document.getElementById("chkpnlListAreaOPERATION" + (i + 1)).disabled = false
+            trlst[i].getElementsByTagName("td")[2].disabled = false
+        }
+    }
 }

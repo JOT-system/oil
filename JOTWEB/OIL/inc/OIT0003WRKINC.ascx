@@ -25,31 +25,45 @@
 
     <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>
-    <!-- 受注№ -->
-    <asp:TextBox ID="WF_SEL_ORDERNUMBER" runat="server"></asp:TextBox>
     <!-- 登録日 -->
     <asp:TextBox ID="WF_SEL_REGISTRATIONDATE" runat="server"></asp:TextBox>
-    <!-- ステータス -->
-    <asp:TextBox ID="WF_SEL_ORDERSTATUS" runat="server"></asp:TextBox>
-
-    <!-- 情報 -->
-    <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>
-    <!-- 受注営業所 -->
+    <!-- 受注営業所(コード) -->
+    <asp:TextBox ID="WF_SEL_ORDERSALESOFFICECODE" runat="server"></asp:TextBox>
+    <!-- 受注営業所(名) -->
     <asp:TextBox ID="WF_SEL_ORDERSALESOFFICE" runat="server"></asp:TextBox>
+    <!-- ステータス(コード) -->
+    <asp:TextBox ID="WF_SEL_ORDERSTATUS" runat="server"></asp:TextBox>
+    <!-- ステータス(名) -->
+    <asp:TextBox ID="WF_SEL_ORDERSTATUSNM" runat="server"></asp:TextBox>
+    <!-- 情報(コード) -->
+    <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>
+    <!-- 情報(名) -->
+    <asp:TextBox ID="WF_SEL_INFORMATIONNM" runat="server"></asp:TextBox>
+    <!-- 受注№ -->
+    <asp:TextBox ID="WF_SEL_ORDERNUMBER" runat="server"></asp:TextBox>
     <!-- 列車 -->
     <asp:TextBox ID="WF_SEL_TRAIN" runat="server"></asp:TextBox>
-    <!-- 発駅 -->
+    <!-- 荷主(コード) -->
+    <asp:TextBox ID="WF_SEL_SHIPPERSCODE" runat="server"></asp:TextBox>
+    <!-- 荷主(名) -->
+    <asp:TextBox ID="WF_SEL_SHIPPERSNAME" runat="server"></asp:TextBox>
+    <!-- 荷受人(コード) -->
+    <asp:TextBox ID="WF_SEL_CONSIGNEECODE" runat="server"></asp:TextBox>
+    <!-- 荷受人(名) -->
+    <asp:TextBox ID="WF_SEL_CONSIGNEENAME" runat="server"></asp:TextBox>
+    <!-- 発駅(コード) -->
     <asp:TextBox ID="WF_SEL_DEPARTURESTATION" runat="server"></asp:TextBox>
-    <!-- 向先 -->
+    <!-- 発駅(名) -->
+    <asp:TextBox ID="WF_SEL_DEPARTURESTATIONNM" runat="server"></asp:TextBox>
+    <!-- 着駅(コード) -->
     <asp:TextBox ID="WF_SEL_ARRIVALSTATION" runat="server"></asp:TextBox>
-    <!-- 積込日 -->
-    <asp:TextBox ID="WF_SEL_LOADINGDATE" runat="server"></asp:TextBox>
-    <!-- 積車発日 -->
-    <asp:TextBox ID="WF_SEL_LOADINGCAR_DEPARTUREDATE" runat="server"></asp:TextBox>
-    <!-- 積車着日 -->
-    <asp:TextBox ID="WF_SEL_LOADINGCAR_ARRIVALDATE" runat="server"></asp:TextBox>
-    <!-- 受入日 -->
-    <asp:TextBox ID="WF_SEL_RECEIPTDATE" runat="server"></asp:TextBox>
+    <!-- 着駅(名) -->
+    <asp:TextBox ID="WF_SEL_ARRIVALSTATIONNM" runat="server"></asp:TextBox>
+    <!-- 戻着駅(コード) -->
+    <asp:TextBox ID="WF_SEL_CANGERETSTATION" runat="server"></asp:TextBox>
+    <!-- 戻着駅(名) -->
+    <asp:TextBox ID="WF_SEL_CANGERETSTATIONNM" runat="server"></asp:TextBox>
+
     <!-- レギュラー(タンク車数) -->
     <asp:TextBox ID="WF_SEL_REGULAR_TANKCAR" runat="server"></asp:TextBox>
     <!-- ハイオク(タンク車数) -->
@@ -72,6 +86,44 @@
     <asp:TextBox ID="WF_SEL_AHEAVY_TANKCAR" runat="server"></asp:TextBox>
     <!-- タンク車合計 -->
     <asp:TextBox ID="WF_SEL_TANKCARTOTAL" runat="server"></asp:TextBox>
+
+    <!-- 積込日(予定) -->
+    <asp:TextBox ID="WF_SEL_LODDATE" runat="server"></asp:TextBox>
+    <!-- 積車発日(予定) -->
+    <asp:TextBox ID="WF_SEL_DEPDATE" runat="server"></asp:TextBox>
+    <!-- 積車着日(予定) -->
+    <asp:TextBox ID="WF_SEL_ARRDATE" runat="server"></asp:TextBox>
+    <!-- 受入日(予定) -->
+    <asp:TextBox ID="WF_SEL_ACCDATE" runat="server"></asp:TextBox>
+    <!-- 空車着日(予定) -->
+    <asp:TextBox ID="WF_SEL_EMPARRDATE" runat="server"></asp:TextBox>
+
+    <!-- 積込日(実績) -->
+    <asp:TextBox ID="WF_SEL_ACTUALLODDATE" runat="server"></asp:TextBox>
+    <!-- 積車発日(実績) -->
+    <asp:TextBox ID="WF_SEL_ACTUALDEPDATE" runat="server"></asp:TextBox>
+    <!-- 積車着日(実績) -->
+    <asp:TextBox ID="WF_SEL_ACTUALARRDATE" runat="server"></asp:TextBox>
+    <!-- 受入日(実績) -->
+    <asp:TextBox ID="WF_SEL_ACTUALACCDATE" runat="server"></asp:TextBox>
+    <!-- 空車着日(実績) -->
+    <asp:TextBox ID="WF_SEL_ACTUALEMPARRDATE" runat="server"></asp:TextBox>
+
+    <!-- 計上年月日 -->
+    <asp:TextBox ID="WF_SEL_KEIJYOYMD" runat="server"></asp:TextBox>
+    <!-- 売上金額 -->
+    <asp:TextBox ID="WF_SEL_SALSE" runat="server"></asp:TextBox>
+    <!-- 売上消費税額 -->
+    <asp:TextBox ID="WF_SEL_SALSETAX" runat="server"></asp:TextBox>
+    <!-- 売上合計金額 -->
+    <asp:TextBox ID="WF_SEL_TOTALSALSE" runat="server"></asp:TextBox>
+    <!-- 支払金額 -->
+    <asp:TextBox ID="WF_SEL_PAYMENT" runat="server"></asp:TextBox>
+    <!-- 支払消費税額 -->
+    <asp:TextBox ID="WF_SEL_PAYMENTTAX" runat="server"></asp:TextBox>
+    <!-- 支払合計金額 -->
+    <asp:TextBox ID="WF_SEL_TOTALPAYMENT" runat="server"></asp:TextBox>
+
     <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>
     <!-- 作成フラグ -->
@@ -79,17 +131,9 @@
 
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
-    <!-- 荷主コード -->
-    <asp:TextBox ID="WF_SEL_SHIPPERSCODE" runat="server"></asp:TextBox>
-    <!-- 荷主名 -->
-    <asp:TextBox ID="WF_SEL_SHIPPERSNAME" runat="server"></asp:TextBox>
     <!-- 基地コード -->
     <asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>
     <!-- 基地名 -->
     <asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>
-    <!-- 荷受人コード -->
-    <asp:TextBox ID="WF_SEL_CONSIGNEECODE" runat="server"></asp:TextBox>
-    <!-- 荷受人名 -->
-    <asp:TextBox ID="WF_SEL_CONSIGNEENAME" runat="server"></asp:TextBox>
 
 </div>

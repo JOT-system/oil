@@ -289,7 +289,7 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(OIT0002.CANGERETSTATION), '')         AS CANGERETSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.CANGERETSTATION), '')         AS CHANGERETSTATION" _
             & " , ISNULL(RTRIM(OIT0002.CHANGEARRSTATIONNAME), '')    AS CHANGEARRSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.HTANK), '')                   AS HTANK" _
@@ -567,7 +567,6 @@ Public Class OIT0003OrderList
 
     End Sub
 
-
     ''' <summary>
     ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
     ''' </summary>
@@ -595,31 +594,44 @@ Public Class OIT0003OrderList
 
         '選択行
         work.WF_SEL_LINECNT.Text = OIT0001tbl.Rows(WW_LINECNT)("LINECNT")
-        '受注№
-        work.WF_SEL_ORDERNUMBER.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERNO")
         '登録日
         work.WF_SEL_REGISTRATIONDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERYMD")
-        '受注進行ステータス
-        work.WF_SEL_STATUS.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERSTATUS")
-        '受注情報
-        work.WF_SEL_INFORMATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFO")
-        '受注営業所名
+        '受注営業所(名)
         work.WF_SEL_ORDERSALESOFFICE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICENAME")
+        '受注営業所(コード)
+        work.WF_SEL_ORDERSALESOFFICECODE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICECODE")
+        '受注進行ステータス(名)
+        work.WF_SEL_ORDERSTATUSNM.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERSTATUSNAME")
+        '受注進行ステータス(コード)
+        work.WF_SEL_ORDERSTATUS.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERSTATUS")
+        '受注情報(名)
+        work.WF_SEL_INFORMATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFONAME")
+        '受注情報(コード)
+        work.WF_SEL_INFORMATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFO")
+        '受注№
+        work.WF_SEL_ORDERNUMBER.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERNO")
         '本線列車
         work.WF_SEL_TRAIN.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNO")
-        '発駅
+        '荷主(名)
+        work.WF_SEL_SHIPPERSNAME.Text = OIT0001tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
+        '荷主(コード)
+        work.WF_SEL_SHIPPERSCODE.Text = OIT0001tbl.Rows(WW_LINECNT)("SHIPPERSCODE")
+        '荷受人(名)
+        work.WF_SEL_CONSIGNEENAME.Text = OIT0001tbl.Rows(WW_LINECNT)("CONSIGNEENAME")
+        '荷受人(コード)
+        work.WF_SEL_CONSIGNEECODE.Text = OIT0001tbl.Rows(WW_LINECNT)("CONSIGNEECODE")
+        '発駅(名)
+        work.WF_SEL_DEPARTURESTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
+        '発駅(コード)
         work.WF_SEL_DEPARTURESTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPSTATION")
-        '着駅
+        '着駅(名)
+        work.WF_SEL_ARRIVALSTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRSTATIONNAME")
+        '着駅(コード)
         work.WF_SEL_ARRIVALSTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRSTATION")
-
-        '積込日
-        work.WF_SEL_LOADINGDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("LODDATE")
-        '発日
-        work.WF_SEL_LOADINGCAR_DEPARTUREDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPDATE")
-        '着日
-        work.WF_SEL_LOADINGCAR_ARRIVALDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRDATE")
-        '受入日
-        work.WF_SEL_RECEIPTDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACCDATE")
+        '戻着駅(名)
+        work.WF_SEL_CANGERETSTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("CHANGERETSTATIONNAME")
+        '戻着駅(コード)
+        work.WF_SEL_CANGERETSTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("CHANGERETSTATION")
 
         '車数（レギュラー）
         work.WF_SEL_REGULAR_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("RTANK")
@@ -643,6 +655,42 @@ Public Class OIT0003OrderList
         work.WF_SEL_AHEAVY_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("ATANK")
         '合計車数
         work.WF_SEL_TANKCARTOTAL.Text = OIT0001tbl.Rows(WW_LINECNT)("TOTALTANK")
+
+        '積込日(予定)
+        work.WF_SEL_LODDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("LODDATE")
+        '発日(予定)
+        work.WF_SEL_DEPDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPDATE")
+        '着日(予定)
+        work.WF_SEL_ARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRDATE")
+        '受入日(予定)
+        work.WF_SEL_ACCDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACCDATE")
+        '空車着日(予定)
+        work.WF_SEL_EMPARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("EMPARRDATE")
+        '積込日(実績)
+        work.WF_SEL_ACTUALLODDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALLODDATE")
+        '発日(実績)
+        work.WF_SEL_ACTUALDEPDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALDEPDATE")
+        '着日(実績)
+        work.WF_SEL_ACTUALARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALARRDATE")
+        '受入日(実績)
+        work.WF_SEL_ACTUALACCDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALACCDATE")
+        '空車着日(実績)
+        work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
+
+        '計上年月日
+        work.WF_SEL_KEIJYOYMD.Text = OIT0001tbl.Rows(WW_LINECNT)("KEIJYOYMD")
+        '売上金額
+        work.WF_SEL_SALSE.Text = OIT0001tbl.Rows(WW_LINECNT)("SALSE")
+        '売上消費税額
+        work.WF_SEL_SALSETAX.Text = OIT0001tbl.Rows(WW_LINECNT)("SALSETAX")
+        '売上合計金額
+        work.WF_SEL_TOTALSALSE.Text = OIT0001tbl.Rows(WW_LINECNT)("TOTALSALSE")
+        '支払金額
+        work.WF_SEL_PAYMENT.Text = OIT0001tbl.Rows(WW_LINECNT)("PAYMENT")
+        '支払消費税額
+        work.WF_SEL_PAYMENTTAX.Text = OIT0001tbl.Rows(WW_LINECNT)("PAYMENTTAX")
+        '支払合計金額
+        work.WF_SEL_TOTALPAYMENT.Text = OIT0001tbl.Rows(WW_LINECNT)("TOTALPAYMENT")
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("DELFLG")

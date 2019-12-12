@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIT0001EmptyTurnDairyDetail.aspx.vb" Inherits="JOTWEB.OIT0001EmptyTurnDairyDetail" %>
+﻿<%@ Page Title="OIT0001D" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIT0001EmptyTurnDairyDetail.aspx.vb" Inherits="JOTWEB.OIT0001EmptyTurnDairyDetail" %>
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>

@@ -63,8 +63,8 @@ Public Class OIT0003OrderList
                             WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonORDER_CANCEL"     'キャンセルボタン押下
                             WF_ButtonORDER_CANCEL_Click()
-                        'Case "WF_ButtonINSERT"          '受注作成ボタン押下
-                        '    WF_ButtonINSERT_Click()
+                        Case "WF_ButtonINSERT"          '受注作成ボタン押下
+                            WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
@@ -558,6 +558,133 @@ Public Class OIT0003OrderList
     End Sub
 
     ''' <summary>
+    ''' 受注作成ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonINSERT_Click()
+
+        '選択行
+        work.WF_SEL_LINECNT.Text = ""
+        '登録日
+        work.WF_SEL_REGISTRATIONDATE.Text = ""
+        '受注営業所(名)
+        work.WF_SEL_ORDERSALESOFFICE.Text = ""
+        '受注営業所(コード)
+        work.WF_SEL_ORDERSALESOFFICECODE.Text = ""
+        '受注進行ステータス(名)
+        work.WF_SEL_ORDERSTATUSNM.Text = ""
+        '受注進行ステータス(コード)
+        work.WF_SEL_ORDERSTATUS.Text = ""
+        '受注情報(名)
+        work.WF_SEL_INFORMATIONNM.Text = ""
+        '受注情報(コード)
+        work.WF_SEL_INFORMATION.Text = ""
+        '受注№
+        work.WF_SEL_ORDERNUMBER.Text = ""
+        '本線列車
+        work.WF_SEL_TRAIN.Text = ""
+        '荷主(名)
+        work.WF_SEL_SHIPPERSNAME.Text = ""
+        '荷主(コード)
+        work.WF_SEL_SHIPPERSCODE.Text = ""
+        '荷受人(名)
+        work.WF_SEL_CONSIGNEENAME.Text = ""
+        '荷受人(コード)
+        work.WF_SEL_CONSIGNEECODE.Text = ""
+        '発駅(名)
+        work.WF_SEL_DEPARTURESTATIONNM.Text = ""
+        '発駅(コード)
+        work.WF_SEL_DEPARTURESTATION.Text = ""
+        '着駅(名)
+        work.WF_SEL_ARRIVALSTATIONNM.Text = ""
+        '着駅(コード)
+        work.WF_SEL_ARRIVALSTATION.Text = ""
+        '戻着駅(名)
+        work.WF_SEL_CANGERETSTATIONNM.Text = ""
+        '戻着駅(コード)
+        work.WF_SEL_CANGERETSTATION.Text = ""
+
+        '車数（レギュラー）
+        work.WF_SEL_REGULAR_TANKCAR.Text = "0"
+        '車数（ハイオク）
+        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = "0"
+        '車数（灯油）
+        work.WF_SEL_KEROSENE_TANKCAR.Text = "0"
+        '車数（未添加灯油）
+        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = "0"
+        '車数（軽油）
+        work.WF_SEL_DIESEL_TANKCAR.Text = "0"
+        '車数（３号軽油）
+        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = "0"
+        '車数（５号軽油）
+        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = "0"
+        '車数（１０号軽油）
+        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = "0"
+        '車数（LSA）
+        work.WF_SEL_LSA_TANKCAR.Text = "0"
+        '車数（A重油）
+        work.WF_SEL_AHEAVY_TANKCAR.Text = "0"
+        '合計車数
+        work.WF_SEL_TANKCARTOTAL.Text = "0"
+
+        '積込日(予定)
+        work.WF_SEL_LODDATE.Text = "0"
+        '発日(予定)
+        work.WF_SEL_DEPDATE.Text = "0"
+        '着日(予定)
+        work.WF_SEL_ARRDATE.Text = "0"
+        '受入日(予定)
+        work.WF_SEL_ACCDATE.Text = "0"
+        '空車着日(予定)
+        work.WF_SEL_EMPARRDATE.Text = "0"
+        '積込日(実績)
+        work.WF_SEL_ACTUALLODDATE.Text = "0"
+        '発日(実績)
+        work.WF_SEL_ACTUALDEPDATE.Text = "0"
+        '着日(実績)
+        work.WF_SEL_ACTUALARRDATE.Text = "0"
+        '受入日(実績)
+        work.WF_SEL_ACTUALACCDATE.Text = "0"
+        '空車着日(実績)
+        work.WF_SEL_ACTUALEMPARRDATE.Text = "0"
+
+        '計上年月日
+        work.WF_SEL_KEIJYOYMD.Text = ""
+        '売上金額
+        work.WF_SEL_SALSE.Text = "0"
+        '売上消費税額
+        work.WF_SEL_SALSETAX.Text = "0"
+        '売上合計金額
+        work.WF_SEL_TOTALSALSE.Text = "0"
+        '支払金額
+        work.WF_SEL_PAYMENT.Text = "0"
+        '支払消費税額
+        work.WF_SEL_PAYMENTTAX.Text = "0"
+        '支払合計金額
+        work.WF_SEL_TOTALPAYMENT.Text = "0"
+
+        '削除フラグ
+        work.WF_SEL_DELFLG.Text = "0"
+        '作成フラグ(新規登録：1, 更新：2)
+        work.WF_SEL_CREATEFLG.Text = "1"
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
+
+        WF_GridDBclick.Text = ""
+
+        '○ 遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
+
+        '○ 次ページ遷移
+        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
+
+    End Sub
+
+    ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -629,7 +756,7 @@ Public Class OIT0003OrderList
         '着駅(コード)
         work.WF_SEL_ARRIVALSTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRSTATION")
         '戻着駅(名)
-        work.WF_SEL_CANGERETSTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("CHANGERETSTATIONNAME")
+        work.WF_SEL_CANGERETSTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("CHANGEARRSTATIONNAME")
         '戻着駅(コード)
         work.WF_SEL_CANGERETSTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("CHANGERETSTATION")
 
@@ -743,7 +870,7 @@ Public Class OIT0003OrderList
         Master.SaveTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
 
         '登録画面ページへ遷移
-        Master.TransitionPage()
+        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
 
     End Sub
 

@@ -1,0 +1,635 @@
+﻿/*左Boxオープン用虫眼鏡アイコン*/
+.NoIcon {
+    background-image: url(../img/noicon.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/*左Boxオープン用虫眼鏡アイコン*/
+.BoxIcon {
+    background-image: url(../img/leftbox.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/*カレンダーオープン用アイコン*/
+.CalendarIcon {
+    background-image: url(../img/calendar.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/* 受注(明細)画面 */
+/* #################１行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 受注進行ステータス(ラベル) */
+#WF_ORDERSTATUS_LABEL {
+    position: fixed;
+    top: 4.5em;
+    left: 2em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*受注進行ステータス */
+#ORDERSTATUS {
+    position: fixed;
+    top: 4.5em;
+    left: 9em;
+    border-radius: 3px;
+    padding-left: 21px;
+    Height: 1.4em;
+}
+    #ORDERSTATUS input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------２列目 ----------------- */
+/*受注情報 */
+#WF_ORDERINFO {
+    position: fixed;
+    top: 4.5em;
+    left: 22em;
+    border-radius: 3px;
+    padding-left: 21px;
+    Height: 1.4em;
+}
+
+    #WF_ORDERINFO input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* #################２行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 受注パターン(ラベル) */
+#WF_ORDERTYPE_LABEL {
+    position: fixed;
+    top: 6.5em;
+    left: 2em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*受注パターン */
+#WF_ORDERTYPE {
+    position: fixed;
+    top: 6.5em;
+    left: 9em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+    #WF_ORDERTYPE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* #################３行目 ################# */
+/* -----------------１列目 ----------------- */
+/* オーダー№(ラベル) */
+#WF_ORDERNO_LABEL {
+    position: fixed;
+    top: 8.5em;
+    left: 2em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*オーダー№ */
+#WF_ORDERNO {
+    position: fixed;
+    top: 8.5em;
+    left: 9em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ORDERNO input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------２列目 ----------------- */
+/* 荷主(ラベル) */
+#WF_SHIPPERS_LABEL {
+    position: fixed;
+    top: 8.5em;
+    left: 21em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*荷主 */
+#WF_SHIPPERSCODE {
+    position: fixed;
+    top: 8.5em;
+    left: 22em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_SHIPPERSCODE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* 荷主名 */
+#WF_SHIPPERSNAME {
+    position: fixed;
+    top: 8.5em;
+    left: 33em;
+}
+
+    #WF_SHIPPERSNAME input[type=text] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------３列目 ----------------- */
+/* 荷受人(ラベル) */
+#WF_CONSIGNEE_LABEL {
+    position: fixed;
+    top: 8.5em;
+    left: 49em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* 荷受人 */
+#WF_CONSIGNEECODE {
+    position: fixed;
+    top: 8.5em;
+    left: 51em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_CONSIGNEECODE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* 荷受人名 */
+#WF_CONSIGNEENAME {
+    position: fixed;
+    top: 8.5em;
+    left: 62em;
+}
+
+    #WF_CONSIGNEENAME input[type=text] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* #################４行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 本線列車(ラベル) */
+#WF_TRAINNO_LABEL {
+    position: fixed;
+    top: 10.5em;
+    left: 2em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*本線列車 */
+#WF_TRAINNO {
+    position: fixed;
+    top: 10.5em;
+    left: 9em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_TRAINNO input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------２列目 ----------------- */
+/* (予定)発日(ラベル) */
+/* 発駅(ラベル) */
+#WF_DEPSTATION_LABEL {
+    position: fixed;
+    top: 10.5em;
+    left: 21em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*発駅コード */
+#WF_DEPSTATIONCODE {
+    position: fixed;
+    top: 10.5em;
+    left: 22em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_DEPSTATIONCODE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* 発駅名 */
+#WF_DEPSTATIONNAME {
+    position: fixed;
+    top: 10.5em;
+    left: 33em;
+}
+
+    #WF_DEPSTATIONNAME input[type=text] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------３列目 ----------------- */
+/* 着駅(ラベル) */
+#WF_ARRSTATION_LABEL {
+    position: fixed;
+    top: 10.5em;
+    left: 50em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*着駅 */
+#WF_ARRSTATIONCODE {
+    position: fixed;
+    top: 10.5em;
+    left: 51em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ARRSTATIONCODE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* 着駅名 */
+#WF_ARRSTATIONNAME {
+    position: fixed;
+    top: 10.5em;
+    left: 62em;
+}
+
+    #WF_ARRSTATIONNAME input[type=text] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+
+/* #################５行目 ################# */
+/* -----------------１列目 ----------------- */
+/* (予定)積込日(ラベル) */
+#WF_LOADINGDATE_LABEL {
+    position: fixed;
+    top: 13.5em;
+    left: 2em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*(予定)積込日 */
+#WF_LOADINGDATE {
+    position: fixed;
+    top: 13.5em;
+    left: 9em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_LOADINGDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------２列目 ----------------- */
+/* (予定)発日(ラベル) */
+#WF_DEPDATE_LABEL {
+    position: fixed;
+    top: 13.5em;
+    left: 21em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*(予定)発日 */
+#WF_DEPDATE {
+    position: fixed;
+    top: 13.5em;
+    left: 22em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_DEPDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------３列目 ----------------- */
+/* (予定)積車着日(ラベル) */
+#WF_ARRDATE_LABEL {
+    position: fixed;
+    top: 13.5em;
+    left: 34em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* (予定)積車着日 */
+#WF_ARRDATE {
+    position: fixed;
+    top: 13.5em;
+    left: 37em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ARRDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------４列目 ----------------- */
+/* (予定)受入日(ラベル) */
+#WF_ACCDATE_LABEL {
+    position: fixed;
+    top: 13.5em;
+    left: 49em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* (予定)受入日 */
+#WF_ACCDATE {
+    position: fixed;
+    top: 13.5em;
+    left: 51em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ACCDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------５列目 ----------------- */
+/* (予定)空車着日(ラベル) */
+#WF_EMPARRDATE_LABEL {
+    position: fixed;
+    top: 13.5em;
+    left: 63em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* (予定)空車着日 */
+#WF_EMPARRDATE {
+    position: fixed;
+    top: 13.5em;
+    left: 66em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_EMPARRDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+
+/* #################６行目 ################# */
+/* -----------------１列目 ----------------- */
+/* (実績)積込日(ラベル) */
+#WF_ACTUALLOADINGDATE_LABEL {
+    position: fixed;
+    top: 15.5em;
+    left: 2em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*(実績)積込日 */
+#WF_ACTUALLOADINGDATE {
+    position: fixed;
+    top: 15.5em;
+    left: 9em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ACTUALLOADINGDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------２列目 ----------------- */
+/* (実績)発日(ラベル) */
+#WF_ACTUALDEPDATE_LABEL {
+    position: fixed;
+    top: 15.5em;
+    left: 21em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*(実績)発日 */
+#WF_ACTUALDEPDATE {
+    position: fixed;
+    top: 15.5em;
+    left: 22em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ACTUALDEPDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------３列目 ----------------- */
+/* (実績)積車着日(ラベル) */
+#WF_ACTUALARRDATE_LABEL {
+    position: fixed;
+    top: 15.5em;
+    left: 34em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* (実績)積車着日 */
+#WF_ACTUALARRDATE {
+    position: fixed;
+    top: 15.5em;
+    left: 37em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ACTUALARRDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------４列目 ----------------- */
+/* (実績)受入日(ラベル) */
+#WF_ACTUALACCDATE_LABEL {
+    position: fixed;
+    top: 15.5em;
+    left: 49em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* (実績)受入日 */
+#WF_ACTUALACCDATE {
+    position: fixed;
+    top: 15.5em;
+    left: 51em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ACTUALACCDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------５列目 ----------------- */
+/* (実績)空車着日(ラベル) */
+#WF_ACTUALEMPARRDATE_LABEL {
+    position: fixed;
+    top: 15.5em;
+    left: 63em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* (実績)空車着日 */
+#WF_ACTUALEMPARRDATE {
+    position: fixed;
+    top: 15.5em;
+    left: 66em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_ACTUALEMPARRDATE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+
+
+
+
+/* ------------------------------
+   擬似フレーム　スタイル定義
+ ------------------------------ */
+#WF_Rep_DELFLG {
+    visibility: visible;
+}
+
+div[data-generated="1"] td,
+div[data-generated="1"] th {
+    height: 2.0rem;
+    font-size: 1.2rem;
+}
+
+.WF_Dtab {
+    text-align: center;
+    vertical-align: -1.3em;
+}
+
+.WF_DViewRep {
+    color: black;
+    margin-top: 0.5em;
+    margin-top: 0.5em;
+}
+
+span[class^="WF_DViewRep"][class$="_Area"] {
+    height: 10.8em;
+}
+
+
+
+
+/* 実行画面 ヘッダー部(詳細) */
+.Operation input[type='text'] {
+    padding-left: 1.3em;
+}
+
+.Operation2 {
+    margin-left: 2em;
+    margin-top: 0.5em;
+    height: 1.5em;
+}
+
+    .Operation2 a {
+        position: relative;
+        margin: 0em 0.7em 0em 0em;
+        top: -0.4em;
+    }
+
+
+/* 実行画面 ヘッダー部 */
+
+.headerbox {
+    top: 2.4em;
+    left: 0em;
+    height: calc(- 18.4em - 1.4em + 100%);
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(217,222,228);
+    min-width: 990px;
+}
+
+/* 実行画面 明細部 */
+/*
+.detailbox {
+    top: calc(-2.4em - 22.2em - 1.4em + 100%);
+    bottom: 1.4em;
+    left: 0em;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(237,237,237);
+}
+*/
+/* セルの設定(共通) */
+
+div[data-generated="1"] td,
+div[data-generated="1"] th {
+    border: 1px solid White;
+    height: 28px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+

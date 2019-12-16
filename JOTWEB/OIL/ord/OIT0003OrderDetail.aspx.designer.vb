@@ -11,572 +11,557 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0003WRKINC
-
+Partial Public Class OIT0003OrderDetail
+    
     '''<summary>
-    '''WF_SEL_CAMPCODE コントロール。
+    '''WF_CAMPCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_UORG コントロール。
+    '''WF_CAMPCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_UORG As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_CAMPCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_SALESOFFICECODE コントロール。
+    '''WF_UORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_SALESOFFICECODE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_UORG As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_SALESOFFICE コントロール。
+    '''WF_UORG_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_SALESOFFICE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_UORG_TEXT As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_DATE コントロール。
+    '''TxtOrderStatus コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtOrderStatus As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_TRAINNUMBER コントロール。
+    '''TxtOrderInfo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_TRAINNUMBER As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtOrderInfo As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_UNLOADINGCODE コントロール。
+    '''TxtOrderType コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_UNLOADINGCODE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtOrderType As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_UNLOADING コントロール。
+    '''TxtOrderNo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_UNLOADING As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtOrderNo As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_STATUSCODE コントロール。
+    '''TxtShippersCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_STATUSCODE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtShippersCode As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_STATUS コントロール。
+    '''LblShippersName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_STATUS As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents LblShippersName As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_LINECNT コントロール。
+    '''TxtConsigneeCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtConsigneeCode As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_REGISTRATIONDATE コントロール。
+    '''LblConsigneeName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_REGISTRATIONDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents LblConsigneeName As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_ORDERSALESOFFICECODE コントロール。
+    '''TxtTrainNo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ORDERSALESOFFICECODE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_ORDERSALESOFFICE コントロール。
+    '''TxtDepstationCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ORDERSALESOFFICE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtDepstationCode As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_ORDERSTATUS コントロール。
+    '''LblDepstationName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ORDERSTATUS As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents LblDepstationName As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_ORDERSTATUSNM コントロール。
+    '''TxtArrstationCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ORDERSTATUSNM As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtArrstationCode As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_INFORMATION コントロール。
+    '''LblArrstationName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_INFORMATION As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents LblArrstationName As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_INFORMATIONNM コントロール。
+    '''TxtLoadingDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_INFORMATIONNM As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtLoadingDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_ORDERNUMBER コントロール。
+    '''TxtDepDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ORDERNUMBER As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtDepDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_TRAIN コントロール。
+    '''TxtArrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_TRAIN As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtArrDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_SHIPPERSCODE コントロール。
+    '''TxtAccDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_SHIPPERSCODE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtAccDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_SHIPPERSNAME コントロール。
+    '''TxtEmparrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_SHIPPERSNAME As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtEmparrDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_CONSIGNEECODE コントロール。
+    '''TxtActualLoadingDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CONSIGNEECODE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtActualLoadingDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_CONSIGNEENAME コントロール。
+    '''TxtActualDepDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CONSIGNEENAME As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtActualDepDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_DEPARTURESTATION コントロール。
+    '''TxtActualArrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEPARTURESTATION As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtActualArrDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_DEPARTURESTATIONNM コントロール。
+    '''TxtActualAccDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEPARTURESTATIONNM As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtActualAccDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_ARRIVALSTATION コントロール。
+    '''TxtActualEmparrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ARRIVALSTATION As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents TxtActualEmparrDate As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_ARRIVALSTATIONNM コントロール。
+    '''WF_Dtab01 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ARRIVALSTATIONNM As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_Dtab01 As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_CANGERETSTATION コントロール。
+    '''WF_Dtab02 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CANGERETSTATION As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_Dtab02 As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_CANGERETSTATIONNM コントロール。
+    '''WF_Dtab03 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CANGERETSTATIONNM As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_Dtab03 As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_REGULAR_TANKCAR コントロール。
+    '''WF_Dtab04 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_REGULAR_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_Dtab04 As Global.System.Web.UI.WebControls.Label
+    
     '''<summary>
-    '''WF_SEL_HIGHOCTANE_TANKCAR コントロール。
+    '''WF_DetailMView コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_HIGHOCTANE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DetailMView As Global.System.Web.UI.WebControls.MultiView
+    
     '''<summary>
-    '''WF_SEL_KEROSENE_TANKCAR コントロール。
+    '''WF_DView1 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_KEROSENE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DView1 As Global.System.Web.UI.WebControls.View
+    
     '''<summary>
-    '''WF_SEL_NOTADDED_KEROSENE_TANKCAR コントロール。
+    '''WF_DViewRep1 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_NOTADDED_KEROSENE_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DViewRep1 As Global.System.Web.UI.WebControls.Repeater
+    
     '''<summary>
-    '''WF_SEL_DIESEL_TANKCAR コントロール。
+    '''WF_DView2 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DView2 As Global.System.Web.UI.WebControls.View
+    
     '''<summary>
-    '''WF_SEL_NUM3DIESEL_TANKCAR コントロール。
+    '''WF_DViewRep2 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_NUM3DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DViewRep2 As Global.System.Web.UI.WebControls.Repeater
+    
     '''<summary>
-    '''WF_SEL_NUM5DIESEL_TANKCAR コントロール。
+    '''WF_DView3 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_NUM5DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DView3 As Global.System.Web.UI.WebControls.View
+    
     '''<summary>
-    '''WF_SEL_NUM10DIESEL_TANKCAR コントロール。
+    '''WF_DViewRep3 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_NUM10DIESEL_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DViewRep3 As Global.System.Web.UI.WebControls.Repeater
+    
     '''<summary>
-    '''WF_SEL_LSA_TANKCAR コントロール。
+    '''WF_DView4 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_LSA_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DView4 As Global.System.Web.UI.WebControls.View
+    
     '''<summary>
-    '''WF_SEL_AHEAVY_TANKCAR コントロール。
+    '''WF_DViewRep4 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_AHEAVY_TANKCAR As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DViewRep4 As Global.System.Web.UI.WebControls.Repeater
+    
     '''<summary>
-    '''WF_SEL_TANKCARTOTAL コントロール。
+    '''pnlListArea コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_TANKCARTOTAL As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
+    
     '''<summary>
-    '''WF_SEL_LODDATE コントロール。
+    '''rightview コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_LODDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
+    
     '''<summary>
-    '''WF_SEL_DEPDATE コントロール。
+    '''leftview コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEPDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
+    
     '''<summary>
-    '''WF_SEL_ARRDATE コントロール。
+    '''work コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ARRDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents work As Global.JOTWEB.OIT0003WRKINC
+    
     '''<summary>
-    '''WF_SEL_ACCDATE コントロール。
+    '''WF_GridDBclick コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ACCDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_EMPARRDATE コントロール。
+    '''WF_GridPosition コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_EMPARRDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
+    
     '''<summary>
-    '''WF_SEL_ACTUALLODDATE コントロール。
+    '''WF_FIELD コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ACTUALLODDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_ACTUALDEPDATE コントロール。
+    '''WF_FIELD_REP コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ACTUALDEPDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_ACTUALARRDATE コントロール。
+    '''WF_SelectedIndex コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ACTUALARRDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_ACTUALACCDATE コントロール。
+    '''WF_DISP コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ACTUALACCDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DISP As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_ACTUALEMPARRDATE コントロール。
+    '''WF_LeftMViewChange コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_ACTUALEMPARRDATE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_KEIJYOYMD コントロール。
+    '''WF_LeftboxOpen コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_KEIJYOYMD As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_SALSE コントロール。
+    '''WF_RightViewChange コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_SALSE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_SALSETAX コントロール。
+    '''WF_RightboxOpen コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_SALSETAX As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_TOTALSALSE コントロール。
+    '''WF_PrintURL コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_TOTALSALSE As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_PAYMENT コントロール。
+    '''WF_BOXChange コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_PAYMENT As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_PAYMENTTAX コントロール。
+    '''WF_ButtonClick コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_PAYMENTTAX As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_TOTALPAYMENT コントロール。
+    '''WF_MAPpermitcode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_TOTALPAYMENT As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_DELFLG コントロール。
+    '''WF_CREATEFLG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_CREATEFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_CREATEFLG コントロール。
+    '''WF_DTAB_CHANGE_NO コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CREATEFLG As Global.System.Web.UI.WebControls.TextBox
-
+    Protected WithEvents WF_DTAB_CHANGE_NO As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
     '''<summary>
-    '''WF_SEL_INPTBL コントロール。
+    '''Master プロパティ。
     '''</summary>
     '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''自動生成されたプロパティ。
     '''</remarks>
-    Public WithEvents WF_SEL_INPTBL As Global.System.Web.UI.WebControls.TextBox
-
-    '''<summary>
-    '''WF_SEL_BASECODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_BASECODE As Global.System.Web.UI.WebControls.TextBox
-
-    '''<summary>
-    '''WF_SEL_BASENAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_BASENAME As Global.System.Web.UI.WebControls.TextBox
+    Public Shadows ReadOnly Property Master() As JOTWEB.OILMasterPage
+        Get
+            Return CType(MyBase.Master,JOTWEB.OILMasterPage)
+        End Get
+    End Property
 End Class

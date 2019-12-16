@@ -47,43 +47,37 @@
         <!-- 発駅コード -->
         <a id ="WF_DEPSTATION_LABEL">★発駅</a>
 
-        <a class="ef" style="position:fixed; top:7.7em; left:10em;" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_OILTANKCODE');">
-            <asp:TextBox CssClass="BoxIcon" ID="WF_DEPSTATION" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a class="ef" id="WF_DEPSTATION" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_OILTANKCODE');">
+            <asp:TextBox CssClass="BoxIcon" ID="WF_DEPSTATION_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:7.7em; left:27em;">
-            <asp:Label ID="WF_DEPSTATION_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        <a id="WF_DEPSTATION_TEXT">
+            <asp:Label ID="WF_DEPSTATION_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
 
         <!-- 年月日 -->
         <a id="WF_STYMD_LABEL">★年月日</a>
-        <a class="ef" style="position:fixed; top:9.9em; left:10em;" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-            <asp:TextBox CssClass="CalendarIcon" ID="WF_STYMD" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+
+        <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <asp:TextBox CssClass="CalendarIcon" ID="WF_STYMD_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
+
         <a id="WF_ENDYMD_LABEL">～</a>
-        <a class="ef" style="position:fixed; top:9.9em; left:20.5em;" ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-            <asp:TextBox CssClass="CalendarIcon" ID="WF_ENDYMD" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+
+        <a class="ef" id="WF_ENDYMD"  ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <asp:TextBox CssClass="CalendarIcon" ID="WF_ENDYMD_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
 
         <!-- 本線列車番号 -->
         <a id="WF_TRAINNO_LABEL">列車番号</a>
 
-        <a class="ef" style="position:fixed; top:12.1em; left:10em;">
-            <asp:TextBox ID="WF_TRAINNO" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a class="ef" id="WF_TRAINNO" >
+            <asp:TextBox ID="WF_TRAINNO_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:12.1em; left:27em;">
-            <asp:Label ID="WF_TRAINNO_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+
+        <a ID="WF_TRAINNO_TEXT">
+            <asp:Label ID="WF_TRAINNO_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
         
-<%--        <!-- 本線列車番号 -->
-        <a id="WF_TRAINNO_LABEL">列車番号</a>
-
-        <a class="ef" style="position:fixed; top:12.1em; left:10em;" ondblclick="Field_DBclick('WF_TRAINNO', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('WF_TRAINNO');">
-            <asp:TextBox CssClass="BoxIcon" ID="TextBox1" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
-        </a>
-        <a style="position:fixed; top:12.1em; left:27em;">
-            <asp:Label ID="Label1" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
-        </a>--%>
-
         <!-- ステータス選択 -->
         <a id="WF_SW_LABEL">ステータス選択</a>
        

@@ -43,10 +43,10 @@
     <asp:TextBox ID="WF_SEL_TIMESTAMP" runat="server"></asp:TextBox>         <!-- タイムスタンプ -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>        <!-- 更新データ(退避用) -->
 
-        <!-- レギュラー(タンク車数) -->
-    <asp:TextBox ID="WF_SEL_REGULAR_TANKCAR" runat="server"></asp:TextBox>
     <!-- ハイオク(タンク車数) -->
     <asp:TextBox ID="WF_SEL_HIGHOCTANE_TANKCAR" runat="server"></asp:TextBox>
+    <!-- レギュラー(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_REGULAR_TANKCAR" runat="server"></asp:TextBox>
     <!-- 灯油(タンク車数) -->
     <asp:TextBox ID="WF_SEL_KEROSENE_TANKCAR" runat="server"></asp:TextBox>
     <!-- 未添加灯油(タンク車数) -->

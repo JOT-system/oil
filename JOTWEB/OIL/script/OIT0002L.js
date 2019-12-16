@@ -9,6 +9,12 @@ function InitDisplay() {
         document.getElementById("LF_LEFTBOX").style.width = "26em";
     };
 
+    addLeftBoxExtention(leftListExtentionTarget);
+
+    if (document.getElementById('WF_RightboxOpen').value == "Open") {
+        document.getElementById("RF_RIGHTBOX").style.width = "26em";
+    };
+
     // ○画面切替用処理（表示/非表示切替「ヘッダー、ディティール」）
     if (document.getElementById('WF_BOXChange').value == "detailbox") {
         document.getElementById("headerbox").style.visibility = "hidden";
@@ -26,14 +32,20 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     };
 
-    ////更新ボタン活性／非活性
-    //if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
-    //    //活性
-    //    document.getElementById("WF_ButtonUPDATE").disabled = "";
-    //} else {
-    //    //非活性 
-    //    document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
-    //};
+    //更新ボタン活性／非活性
+    if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
+        //活性
+        document.getElementById("WF_ButtonALLSELECT").disabled = "";
+        document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
+        document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
+        document.getElementById("WF_ButtonINSERT").disabled = "";
+    } else {
+        //非活性 
+        document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
+        document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
+        document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
+        document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+    };
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack);
 

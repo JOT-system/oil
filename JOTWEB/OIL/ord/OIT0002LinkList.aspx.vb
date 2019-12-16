@@ -35,8 +35,8 @@ Public Class OIT0002LinkList
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
-    'Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
-    Private CS0013ProfView As New CS0013ProfView_TEST                    'Tableオブジェクト展開
+    Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
+    'Private CS0013ProfView As New CS0013ProfView_TEST                    'Tableオブジェクト展開
     Private CS0020JOURNAL As New CS0020JOURNAL                      '更新ジャーナル出力
     Private CS0023XLSUPLOAD As New CS0023XLSUPLOAD                  'XLSアップロード
     Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
@@ -294,8 +294,8 @@ Public Class OIT0002LinkList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        'CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView_TEST.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        'CS0013ProfView.SCROLLTYPE = CS0013ProfView_TEST.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -349,16 +349,16 @@ Public Class OIT0002LinkList
                 & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                AS OFFICECODE " _
                 & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')            AS DEPSTATIONNAME " _
                 & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')            AS RETSTATIONNAME " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='1' Then 1 Else 0 End) AS RTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='2' Then 1 Else 0 End) AS HTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='3' Then 1 Else 0 End) AS TTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='4' Then 1 Else 0 End) AS MTTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='5' Then 1 Else 0 End) AS KTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='6' Then 1 Else 0 End) AS K3TANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='7' Then 1 Else 0 End) AS K5TANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='8' Then 1 Else 0 End) AS K10TANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='9' Then 1 Else 0 End) AS LTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE ='10' Then 1 Else 0 End) AS ATANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL01 Then 1 Else 0 End) AS HTANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL02 Then 1 Else 0 End) AS RTANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL03 Then 1 Else 0 End) AS TTANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL04 Then 1 Else 0 End) AS MTTANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL05 Then 1 Else 0 End) AS KTANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL06 Then 1 Else 0 End) AS K3TANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL07 Then 1 Else 0 End) AS K5TANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL08 Then 1 Else 0 End) AS K10TANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL09 Then 1 Else 0 End) AS LTANK " _
+                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL10 Then 1 Else 0 End) AS ATANK " _
                 & "	   , SUM(CASE WHEN OIT0004.PREOILCODE <>'' Then 1 Else 0 End) AS TOTALTANK " _
                 & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
                 & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
@@ -440,6 +440,34 @@ Public Class OIT0002LinkList
                 PARA4.Value = work.WF_SEL_TRAINNO.Text
                 PARA5.Value = work.WF_SEL_SELECT.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
+
+                Dim OILPARA1 As SqlParameter = SQLcmd.Parameters.Add("@OIL01", SqlDbType.NVarChar, 4)    '油種(ハイオク)
+                Dim OILPARA2 As SqlParameter = SQLcmd.Parameters.Add("@OIL02", SqlDbType.NVarChar, 4)    '油種(レギュラー)
+                Dim OILPARA3 As SqlParameter = SQLcmd.Parameters.Add("@OIL03", SqlDbType.NVarChar, 4)    '油種(灯油)
+                Dim OILPARA4 As SqlParameter = SQLcmd.Parameters.Add("@OIL04", SqlDbType.NVarChar, 4)    '油種(未添加灯油)
+                Dim OILPARA5 As SqlParameter = SQLcmd.Parameters.Add("@OIL05", SqlDbType.NVarChar, 4)    '油種(軽油)
+                Dim OILPARA6 As SqlParameter = SQLcmd.Parameters.Add("@OIL06", SqlDbType.NVarChar, 4)    '３号軽油
+                Dim OILPARA7 As SqlParameter = SQLcmd.Parameters.Add("@OIL07", SqlDbType.NVarChar, 4)    '５号軽油
+                Dim OILPARA8 As SqlParameter = SQLcmd.Parameters.Add("@OIL08", SqlDbType.NVarChar, 4)    '１０号軽油
+                Dim OILPARA9 As SqlParameter = SQLcmd.Parameters.Add("@OIL09", SqlDbType.NVarChar, 4)    'ＬＳＡ
+                Dim OILPARA10 As SqlParameter = SQLcmd.Parameters.Add("@OIL10", SqlDbType.NVarChar, 4)   'Ａ重油
+                'Dim OILPARA11 As SqlParameter = SQLcmd.Parameters.Add("@OIL11", SqlDbType.NVarChar, 4)
+                'Dim OILPARA12 As SqlParameter = SQLcmd.Parameters.Add("@OIL12", SqlDbType.NVarChar, 4)
+                'Dim OILPARA13 As SqlParameter = SQLcmd.Parameters.Add("@OIL13", SqlDbType.NVarChar, 4)
+
+                OILPARA1.Value = "1001"                 '油種(ハイオク)
+                OILPARA2.Value = "1101"                 '油種(レギュラー)
+                OILPARA3.Value = "1301"                 '油種(灯油)
+                OILPARA4.Value = "1302"                 '油種(未添加灯油)
+                OILPARA5.Value = "1401"                 '油種(軽油)
+                OILPARA6.Value = "1404"                 '３号軽油
+                OILPARA7.Value = "1402"                 '５号軽油
+                OILPARA8.Value = "1403"                 '１０号軽油
+                OILPARA9.Value = "2201"                 'ＬＳＡ
+                OILPARA10.Value = "2101"                'Ａ重油
+                'OILPARA11.Value = "1405"
+                'OILPARA12.Value = "1406"
+                'OILPARA13.Value = "2202"
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -535,8 +563,8 @@ Public Class OIT0002LinkList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        'CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView_TEST.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        'CS0013ProfView.SCROLLTYPE = CS0013ProfView_TEST.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -1191,13 +1219,13 @@ Public Class OIT0002LinkList
         work.WF_SEL_PREORDERNO.Text = ""
 
         '本線列車
-        work.WF_SEL_TRAINNO.Text = ""
+        work.WF_SEL_TRAINNO2.Text = ""
 
         '登録営業所コード
         work.WF_SEL_OFFICECODE.Text = ""
 
         '空車発駅コード
-        work.WF_SEL_DEPSTATION.Text = ""
+        work.WF_SEL_DEPSTATION2.Text = ""
 
         '空車発駅名
         work.WF_SEL_DEPSTATIONNAME.Text = ""
@@ -1225,6 +1253,29 @@ Public Class OIT0002LinkList
 
         '前回油種
         work.WF_SEL_PREOILCODE.Text = ""
+
+        'ハイオク(タンク車数)
+        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = "0"
+        'レギュラー(タンク車数)
+        work.WF_SEL_REGULAR_TANKCAR.Text = "0"
+        '灯油(タンク車数)
+        work.WF_SEL_KEROSENE_TANKCAR.Text = "0"
+        '未添加灯油(タンク車数)
+        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = "0"
+        '軽油(タンク車数)
+        work.WF_SEL_DIESEL_TANKCAR.Text = "0"
+        '3号軽油(タンク車数)
+        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = "0"
+        '5号軽油(タンク車数)
+        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = "0"
+        '10号軽油(タンク車数)
+        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = "0"
+        'LSA(タンク車数)
+        work.WF_SEL_LSA_TANKCAR.Text = "0"
+        'A重油(タンク車数)
+        work.WF_SEL_AHEAVY_TANKCAR.Text = "0"
+        'タンク車合計
+        work.WF_SEL_TANKCARTOTAL.Text = "0"
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = "0"
@@ -1367,6 +1418,29 @@ Public Class OIT0002LinkList
 
         ''前回油種
         'work.WF_SEL_PREOILCODE.Text = OIT0002tbl.Rows(WW_LINECNT)("PREOILCODE")
+
+        'ハイオク(タンク車数)
+        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("HTANK")
+        'レギュラー(タンク車数)
+        work.WF_SEL_REGULAR_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("RTANK")
+        '灯油(タンク車数)
+        work.WF_SEL_KEROSENE_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("TTANK")
+        '未添加灯油(タンク車数)
+        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("MTTANK")
+        '軽油(タンク車数)
+        work.WF_SEL_DIESEL_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("KTANK")
+        '3号軽油(タンク車数)
+        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("K3TANK")
+        '5号軽油(タンク車数)
+        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("K5TANK")
+        '10号軽油(タンク車数)
+        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("K10TANK")
+        'LSA(タンク車数)
+        work.WF_SEL_LSA_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("LTANK")
+        'A重油(タンク車数)
+        work.WF_SEL_AHEAVY_TANKCAR.Text = OIT0002tbl.Rows(WW_LINECNT)("ATANK")
+        'タンク車合計
+        work.WF_SEL_TANKCARTOTAL.Text = OIT0002tbl.Rows(WW_LINECNT)("TOTALTANK")
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIT0002tbl.Rows(WW_LINECNT)("DELFLG")

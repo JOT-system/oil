@@ -2,8 +2,10 @@
 /*JOT車番見出し*/
 #WF_TANKNUMBER_LABEL {
     position: fixed;
-    top: 5em;
-    left: 40em;
+    height: 50px;
+    width: 70px;
+    top: calc(15% - 50px/2);
+    left: calc(43.5% - 70px/2);
     color: #737373;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -12,41 +14,47 @@
 /*JOT車番input tag*/
 #WF_TANKNUMBER {
     position: fixed;
-    top: 6.5em;
-    left: 40em;
-    border-radius: 3px;
-    padding-left: 21px;
-    height: 2em;
-    width: 10em;
+    height: 50px;
+    width: 140px;
+    top: calc(19% - 50px/2);
+    left: calc(46% - 140px/2);
 }
+
+    #WF_TANKNUMBER input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
 
 /*JOT車番名称*/
 #WF_TANKNUMBER_TEXT {
     position: fixed;
-    top: 6.8em;
-    left: 51em;
-    height: 2em;
-    width: 10em;
+    top: calc(20% - 50px/2);
+    left: calc(55% - 50px/2);
 }
 
 /*型式見出し*/
 #WF_MODEL_LABEL {
     position: fixed;
-    top: 9.5em;
-    left: 40em;
+    height: 50px;
+    width: 70px;
+    top: calc(27% - 50px/2);
+    left: calc(43.5% - 70px/2);
     color: #737373;
 }
 
 /*型式input tag*/
 #WF_MODEL {
     position: fixed;
-    top: 11em;
-    left: 40em;
-    border-radius: 3px;
-    padding-left: 21px;
-    height: 2em;
-    width: 10em;
+    height: 50px;
+    width: 140px;
+    top: calc(31% - 50px/2);
+    left: calc(46% - 140px/2);
 }
+
+    #WF_MODEL input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
 
 /*左Boxオープン用虫眼鏡アイコン*/
 .BoxIcon {

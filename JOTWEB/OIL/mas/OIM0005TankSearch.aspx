@@ -47,20 +47,18 @@
         <!-- JOT車番 -->
         <a id="WF_TANKNUMBER_LABEL">JOT車番</a>
 
-        <a class="ef" style="position:fixed; top:7.7em; left:18em;" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
-            <asp:TextBox CssClass="BoxIcon" ID="WF_TANKNUMBER" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
+        <a class="ef" id="WF_TANKNUMBER" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
+            <asp:TextBox CssClass="BoxIcon" ID="WF_TANKNUMBER_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a style="position:fixed; top:7.7em; left:27em;">
-            <asp:Label ID="WF_TANKNUMBER_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        <a id="WF_TANKNUMBER_TEXT">
+            <asp:Label ID="WF_TANKNUMBER_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
+
         <!-- 型式 -->
         <a id="WF_MODEL_LABEL">型式</a>
 
-        <a  class="ef" style="position:fixed; top:9.9em; left:18em;" ondblclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_TANKMODEL%>);" onchange="TextBox_change('WF_MODEL');">
-            <asp:TextBox CssClass="BoxIcon" ID="WF_MODEL" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
-        </a>
-        <a style="position:fixed; top:9.9em; left:27em;">
-            <asp:Label ID="WF_MODEL_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+        <a class="ef"  id="WF_MODEL" ondblclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_TANKMODEL%>);" onchange="TextBox_change('WF_MODEL');">
+            <asp:TextBox CssClass="BoxIcon" ID="WF_MODEL_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
     </div>
 

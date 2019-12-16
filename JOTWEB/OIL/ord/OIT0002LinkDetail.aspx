@@ -25,7 +25,7 @@
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
             <a style="position:fixed;top:2.8em;left:0.5em;">
-                <input type="button" id="WF_ButtonRegister" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                <input type="button" id="WF_ButtonRegister" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonRegister');" />
             </a>
 
             <a style="position:fixed;top:2.8em;left:67em;">
@@ -81,7 +81,7 @@
             
             <!-- ■　(予定)空車着日　■ -->
             <a id="WF_EMPARRDATE_LABEL">（予定）空車着日</a>
-            <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(実績)空車着日　■ -->

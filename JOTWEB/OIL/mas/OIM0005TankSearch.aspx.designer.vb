@@ -50,40 +50,31 @@ Partial Public Class OIM0005TankSearch
     Protected WithEvents WF_ORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_TANKNUMBER コントロール。
+    '''WF_TANKNUMBER_CODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TANKNUMBER As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_TANKNUMBER_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_TANKNUMBER_TEXT コントロール。
+    '''WF_TANKNUMBER_NAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TANKNUMBER_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_TANKNUMBER_NAME As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_MODEL コントロール。
+    '''WF_MODEL_CODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_MODEL As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_MODEL_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_MODEL_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MODEL_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''rightview コントロール。

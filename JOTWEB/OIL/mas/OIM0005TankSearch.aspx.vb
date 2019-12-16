@@ -98,14 +98,14 @@ Public Class OIM0005TankSearch
             '初期変数設定処理
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
             Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)       '組織コード
-            Master.GetFirstValue(work.WF_SEL_TANKNUMBER.Text, "TANKNUMBER", WF_TANKNUMBER.Text)       'JOT車番
-            Master.GetFirstValue(work.WF_SEL_MODEL.Text, "MODEL", WF_MODEL.Text)       '型式
+            Master.GetFirstValue(work.WF_SEL_TANKNUMBER.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text)       'JOT車番
+            Master.GetFirstValue(work.WF_SEL_MODEL.Text, "MODEL", WF_MODEL_CODE.Text)       '型式
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
             WF_ORG.Text = work.WF_SEL_ORG.Text            '組織コード
-            WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER.Text            'JOT車番
-            WF_MODEL.Text = work.WF_SEL_MODEL.Text            '型式
+            WF_TANKNUMBER_CODE.Text = work.WF_SEL_TANKNUMBER.Text            'JOT車番
+            WF_MODEL_CODE.Text = work.WF_SEL_MODEL.Text            '型式
         End If
 
         '○ RightBox情報設定
@@ -127,8 +127,8 @@ Public Class OIM0005TankSearch
         '○ 名称設定処理
         CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
         CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
-        CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_DUMMY)         'JOT車番
-        CODENAME_get("MODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_DUMMY)         '型式
+        CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_DUMMY)         'JOT車番
+        'CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_DUMMY)         '型式
 
     End Sub
 
@@ -140,8 +140,8 @@ Public Class OIM0005TankSearch
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_TANKNUMBER.Text)          'JOT車番
-        Master.EraseCharToIgnore(WF_MODEL.Text)          '型式
+        Master.EraseCharToIgnore(WF_TANKNUMBER_CODE.Text)          'JOT車番
+        Master.EraseCharToIgnore(WF_MODEL_CODE.Text)          '型式
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -152,8 +152,8 @@ Public Class OIM0005TankSearch
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
         work.WF_SEL_ORG.Text = WF_ORG.Text        '組織コード
-        work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER.Text        'JOT車番
-        work.WF_SEL_MODEL.Text = WF_MODEL.Text        '型式
+        work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER_CODE.Text        'JOT車番
+        work.WF_SEL_MODEL.Text = WF_MODEL_CODE.Text        '型式
 
 
         '○ 画面レイアウト設定
@@ -188,66 +188,66 @@ Public Class OIM0005TankSearch
 
         '○ 単項目チェック
         'JOT車番(バリデーションチェック)　★★★お試し★★★
-        If WF_TANKNUMBER.Text <> "" Then
-            If 0 <= Asc(WF_TANKNUMBER.Text) And Asc(WF_TANKNUMBER.Text) <= 255 Then
+        If WF_TANKNUMBER_CODE.Text <> "" Then
+            If 0 <= Asc(WF_TANKNUMBER_CODE.Text) And Asc(WF_TANKNUMBER_CODE.Text) <= 255 Then
                 If Not isNormal(WW_CS0024FCHECKERR) Then
-                    Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
-                    WF_TANKNUMBER.Focus()
+                    Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text)
+                    WF_TANKNUMBER_CODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             Else
-                Master.Output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
-                WF_TANKNUMBER.Focus()
+                Master.Output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text)
+                WF_TANKNUMBER_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         End If
 
         '型式(バリデーションチェック)　★★★お試し★★★
-        If WF_TANKNUMBER.Text <> "" Then
+        If WF_TANKNUMBER_CODE.Text <> "" Then
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
-                WF_MODEL.Focus()
+                Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL_CODE.Text)
+                WF_MODEL_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         End If
 
         ''JOT車番
-        'Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        'Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         'If isNormal(WW_CS0024FCHECKERR) Then
         '    '存在チェック
-        '    CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
+        '    CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
         '    If Not isNormal(WW_RTN_SW) Then
-        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER.Text)
-        '        WF_TANKNUMBER.Focus()
+        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text)
+        '        WF_TANKNUMBER_CODE.Focus()
         '        O_RTN = "ERR"
         '        Exit Sub
         '    End If
         'Else
         '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-        '    WF_TANKNUMBER.Focus()
+        '    WF_TANKNUMBER_CODE.Focus()
         '    O_RTN = "ERR"
         '    Exit Sub
         'End If
 
         ''型式
-        'Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        'Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         'If isNormal(WW_CS0024FCHECKERR) Then
         '    '存在チェック
-        '    CODENAME_get("MODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
+        '    CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_RTN_SW)
         '    If Not isNormal(WW_RTN_SW) Then
-        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL.Text)
-        '        WF_MODEL.Focus()
+        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL_CODE.Text)
+        '        WF_MODEL_CODE.Focus()
         '        O_RTN = "ERR"
         '        Exit Sub
         '    End If
         'Else
         '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-        '    WF_MODEL.Focus()
+        '    WF_MODEL_CODE.Focus()
         '    O_RTN = "ERR"
         '    Exit Sub
         'End If
@@ -313,9 +313,9 @@ Public Class OIM0005TankSearch
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
             Case "WF_TANKNUMBER"        'JOT車番
-                CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
-            Case "WF_MODEL"             '型式
-                CODENAME_get("TANKMODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
+                'Case "WF_MODEL"             '型式
+                '    CODENAME_get("TANKMODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -351,14 +351,14 @@ Public Class OIM0005TankSearch
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
             Case "WF_TANKNUMBER"          'JOT車番
-                WF_TANKNUMBER.Text = WW_SelectValue
-                WF_TANKNUMBER_TEXT.Text = WW_SelectText
-                WF_TANKNUMBER.Focus()
+                WF_TANKNUMBER_CODE.Text = WW_SelectValue
+                WF_TANKNUMBER_NAME.Text = WW_SelectText
+                WF_TANKNUMBER_CODE.Focus()
 
             Case "WF_MODEL"          '型式
-                WF_MODEL.Text = WW_SelectValue
-                WF_MODEL_TEXT.Text = WW_SelectText
-                WF_MODEL.Focus()
+                WF_MODEL_CODE.Text = WW_SelectValue
+                'WF_MODEL_NAME.Text = WW_SelectText
+                WF_MODEL_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -377,9 +377,9 @@ Public Class OIM0005TankSearch
         '○ フォーカスセット
         Select Case WF_FIELD.Value
             Case "WF_TANKNUMBER"          'JOT車番
-                WF_TANKNUMBER.Focus()
+                WF_TANKNUMBER_CODE.Focus()
             Case "WF_MODEL"          '型式
-                WF_MODEL.Focus()
+                WF_MODEL_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -454,7 +454,7 @@ Public Class OIM0005TankSearch
                     prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "MODEL"        '型式
-                    prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
+                    prmData = work.CreateTankParam(WF_MODEL_CODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

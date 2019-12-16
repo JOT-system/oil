@@ -183,7 +183,7 @@
 /* 油種別タンク車数(車)(ラベル) */
 #WF_OILTANKCNT_LABEL {
     position: fixed;
-    top: 13em;
+    top: 15em;
     left: 2em;
     color: #000000;
     /*    font-weight:bold; 
@@ -194,7 +194,7 @@
 /* 合計車数(ラベル) */
 #WF_TOTALTANK_LABEL {
     position: fixed;
-    top: 13em;
+    top: 15em;
     left: 14em;
     color: #000000;
     /*    font-weight:bold; 

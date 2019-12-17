@@ -19,7 +19,9 @@
     background-position: 1px;
 }
 
-/* 受注(明細)画面 */
+/* /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+/* 受注(明細)画面                            */
+/* /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
 /* #################１行目 ################# */
 /* -----------------１列目 ----------------- */
 /* 受注進行ステータス(ラベル) */
@@ -543,7 +545,433 @@
     }
 
 
+/* /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+/* 受注(明細)タブ１画面(タンク車割当)        */
+/* /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
+/* -----------------１列目 ----------------- */
+/* #################１行目 ################# */
+/* 油種別タンク車数(車)(ラベル) */
+#WF_OILTANKCNT_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0.2em;
+    top: -1em;
+    left: 2.7em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* #################２行目 ################# */
+/* 車数（ハイオク）(ラベル) */
+#WF_HTANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0.2em;
+    top: 0em;
+    left: 12.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（ハイオク） */
+#WF_HTANK {
+    position: relative;
+    margin: 0em 0em 0em 0.2em;
+    top: -1em;
+    left: 0em;
+    border-radius: 3px;
+    padding-left: 35px;
+}
 
+    #WF_HTANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+/* #################３行目 ################# */
+/* 車数（レギュラー）(ラベル) */
+#WF_RTANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 12.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（レギュラー） */
+#WF_RTANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -0.4em;
+    border-radius: 3px;
+}
+
+    #WF_RTANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4.5em;
+    }
+
+/* #################４行目 ################# */
+/* 車数（灯油）(ラベル) */
+#WF_TTANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 12.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（灯油） */
+#WF_TTANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -0.7em;
+    border-radius: 3px;
+}
+
+    #WF_TTANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################５行目 ################# */
+/* 車数（未添加灯油）(ラベル) */
+#WF_MTTANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 12.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（未添加灯油） */
+#WF_MTTANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -1.1em;
+    border-radius: 3px;
+}
+
+    #WF_MTTANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4.5em;
+    }
+
+/* #################６行目 ################# */
+/* 車数（軽油）(ラベル) */
+#WF_KTANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 12.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（軽油） */
+#WF_KTANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -1.5em;
+    border-radius: 3px;
+}
+
+    #WF_KTANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################７行目 ################# */
+/* 車数（３号軽油）(ラベル) */
+#WF_K3TANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 12.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（３号軽油） */
+#WF_K3TANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -1.9em;
+    border-radius: 3px;
+}
+
+    #WF_K3TANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################８行目 ################# */
+/* 車数（５号軽油）(ラベル) */
+#WF_K5TANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 13em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（５号軽油） */
+#WF_K5TANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -2.2em;
+    border-radius: 3px;
+}
+
+    #WF_K5TANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################９行目 ################# */
+/* 車数（１０号軽油）(ラベル) */
+#WF_K10TANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 13em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（１０号軽油） */
+#WF_K10TANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -2.6em;
+    border-radius: 3px;
+}
+
+    #WF_K10TANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4.5em;
+    }
+
+/* #################１０行目 ################# */
+/* 車数（LSA）(ラベル) */
+#WF_LTANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 13em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（LSA） */
+#WF_LTANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -3em;
+    border-radius: 3px;
+}
+
+    #WF_LTANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################１１行目 ################# */
+#WF_ATANK_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 0em;
+    left: 12.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（A重油） */
+#WF_ATANK {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1em;
+    left: -3.4em;
+    border-radius: 3px;
+}
+
+    #WF_ATANK input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+
+
+/* -----------------２列目 ----------------- */
+/* #################１行目 ################# */
+/* 油種別タンク車数(車)割当後(ラベル) */
+#WF_OILTANKCNT_W_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0.2em;
+    top: -2em;
+    left: -1.3em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* #################２行目 ################# */
+/* 車数（ハイオク） */
+#WF_HTANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -1.6em;
+    border-radius: 3px;
+}
+
+    #WF_HTANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 3.9em;
+    }
+/* #################３行目 ################# */
+/* 車数（レギュラー） */
+#WF_RTANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -1.95em;
+    border-radius: 3px;
+}
+
+    #WF_RTANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4.5em;
+    }
+
+/* #################４行目 ################# */
+/* 車数（灯油） */
+#WF_TTANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -2.25em;
+    border-radius: 3px;
+}
+
+    #WF_TTANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################５行目 ################# */
+/* 車数（未添加灯油） */
+#WF_MTTANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -2.6em;
+    border-radius: 3px;
+}
+
+    #WF_MTTANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4.5em;
+    }
+
+/* #################６行目 ################# */
+/* 車数（軽油） */
+#WF_KTANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -3.05em;
+    border-radius: 3px;
+}
+
+    #WF_KTANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################７行目 ################# */
+/* 車数（３号軽油） */
+#WF_K3TANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -3.45em;
+    border-radius: 3px;
+}
+
+    #WF_K3TANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4.05em;
+    }
+
+/* #################８行目 ################# */
+/* 車数（５号軽油） */
+#WF_K5TANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -3.8em;
+    border-radius: 3px;
+}
+
+    #WF_K5TANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 3.95em;
+    }
+
+/* #################９行目 ################# */
+/* 車数（１０号軽油） */
+#WF_K10TANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -4.1em;
+    border-radius: 3px;
+}
+
+    #WF_K10TANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4.4em;
+    }
+
+/* #################１０行目 ################# */
+/* 車数（LSA） */
+#WF_LTANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -4.5em;
+    border-radius: 3px;
+}
+
+    #WF_LTANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* #################１１行目 ################# */
+/* 車数（A重油） */
+#WF_ATANK_W {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: -1.95em;
+    left: -4.85em;
+    border-radius: 3px;
+}
+
+    #WF_ATANK_W input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
 
 
 /* ------------------------------
@@ -594,7 +1022,6 @@ span[class^="WF_DViewRep"][class$="_Area"] {
         top: -0.4em;
     }
 
-
 /* 実行画面 ヘッダー部 */
 
 .headerbox {
@@ -609,9 +1036,9 @@ span[class^="WF_DViewRep"][class$="_Area"] {
 }
 
 /* 実行画面 明細部 */
-/*
+
 .detailbox {
-    top: calc(-2.4em - 22.2em - 1.4em + 100%);
+    top: calc(-2.4em - 17.4em - 1.4em + 100%);
     bottom: 1.4em;
     left: 0em;
     height: 100%;
@@ -620,7 +1047,19 @@ span[class^="WF_DViewRep"][class$="_Area"] {
     overflow: hidden;
     background-color: rgb(237,237,237);
 }
-*/
+
+/*.WF_DView1 {
+    top: calc(-2.4em - 17.4em - 1.4em + 100%);
+    bottom: 1.4em;
+    left: 0em;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
+    background-color: rgb(237,237,237);
+}*/
+
+
 /* セルの設定(共通) */
 
 div[data-generated="1"] td,

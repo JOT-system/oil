@@ -2016,6 +2016,23 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End If
 
             Case "TANKNO"            '(一覧)タンク車№
+
+                '入力が空の場合は、対象項目を空文字で設定する。
+                If WW_ListValue = "" Then
+                    'タンク車№
+                    updHeader.Item("TANKNO") = ""
+                    '前回油種
+                    updHeader.Item("LASTOILCODE") = ""
+                    updHeader.Item("LASTOILNAME") = ""
+                    '交検日
+                    updHeader.Item("JRINSPECTIONDATE") = ""
+                    updHeader.Item("JRINSPECTIONALERT") = ""
+                    '全検日
+                    updHeader.Item("JRALLINSPECTIONDATE") = ""
+                    updHeader.Item("JRALLINSPECTIONALERT") = ""
+                    Exit Select
+                End If
+
                 WW_FixvalueMasterSearch("", "TANKNUMBER", WW_ListValue, WW_GetValue)
 
                 'タンク車№
@@ -2046,10 +2063,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Select Case WW_JRINSPECTIONFLG
                         Case "1"
                             updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                         Case "2"
                             updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                         Case "3"
                             updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                     End Select
                 Else
                     updHeader.Item("JRINSPECTIONALERT") = ""
@@ -2072,10 +2092,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Select Case WW_JRALLINSPECTIONFLG
                         Case "1"
                             updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                         Case "2"
                             updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                         Case "3"
                             updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                     End Select
                 Else
                     updHeader.Item("JRALLINSPECTIONALERT") = ""

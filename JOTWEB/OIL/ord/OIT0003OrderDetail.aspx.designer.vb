@@ -311,6 +311,186 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_DView1 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
+    '''TxtHTank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtHTank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtRTank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtRTank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTTank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTTank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtMTTank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtMTTank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtKTank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtKTank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtK3Tank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtK3Tank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtK5Tank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtK5Tank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtK10Tank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtK10Tank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtLTank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtLTank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtATank コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtATank As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtHTank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtHTank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtRTank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtRTank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTTank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTTank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtMTTank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtMTTank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtKTank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtKTank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtK3Tank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtK3Tank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtK5Tank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtK5Tank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtK10Tank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtK10Tank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtLTank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtLTank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtATank_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtATank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''pnlListArea1 コントロール。
     '''</summary>
     '''<remarks>

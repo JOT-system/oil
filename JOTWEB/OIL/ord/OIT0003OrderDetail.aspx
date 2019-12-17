@@ -193,9 +193,142 @@
         </div> 
 
         <asp:MultiView ID="WF_DetailMView" runat="server">
-
             <!-- ■ Tab No1　タンク車割当　■ -->
             <asp:View ID="WF_DView1" runat="server" >
+                <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+                    <!-- ■　車数（ハイオク）　■ -->
+                    <a id="WF_HTANK_LABEL">ハイオク</a>
+                    <!-- ■　車数（レギュラー）　■ -->
+                    <a id="WF_RTANK_LABEL">レギュラー</a>
+                    <!-- ■　車数（灯油）　■ -->
+                    <a id="WF_TTANK_LABEL">　灯油　</a>
+                    <!-- ■　車数（未添加灯油）　■ -->
+                    <a id="WF_MTTANK_LABEL">未添加灯油</a>
+                    <!-- ■　車数（軽油）　■ -->
+                    <a id="WF_KTANK_LABEL">　軽油　</a>
+                    <!-- ■　車数（３号軽油）　■ -->
+                    <a id="WF_K3TANK_LABEL">３号軽油</a>
+                    <!-- ■　車数（５号軽油）　■ -->
+                    <a id="WF_K5TANK_LABEL">５号軽油</a>
+                    <!-- ■　車数（１０号軽油）　■ -->
+                    <a id="WF_K10TANK_LABEL">１０号軽油</a>
+                    <!-- ■　車数（LSA）　■ -->
+                    <a id="WF_LTANK_LABEL">ＬＳＡ　　</a>
+                    <!-- ■　車数（A重油）　■ -->
+                    <a id="WF_ATANK_LABEL">Ａ重油</a>
+                </div>
+                <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+                    <!-- ■　油種別タンク車数(車)　■ -->
+                    <a id="WF_OILTANKCNT_LABEL">油種別タンク車数(車)</a>
+                    <!-- ■　車数（ハイオク）　■ -->
+                    <a class="ef" id="WF_HTANK">
+                        <asp:TextBox ID="TxtHTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（レギュラー）　■ -->
+                    <a class="ef" id="WF_RTANK">
+                        <asp:TextBox ID="TxtRTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（灯油）　■ -->
+                    <a class="ef" id="WF_TTANK">
+                        <asp:TextBox ID="TxtTTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（未添加灯油）　■ -->
+                    <a class="ef" id="WF_MTTANK">
+                        <asp:TextBox ID="TxtMTTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（軽油）　■ -->
+                    <a class="ef" id="WF_KTANK">
+                        <asp:TextBox ID="TxtKTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（３号軽油）　■ -->
+                    <a class="ef" id="WF_K3TANK">
+                        <asp:TextBox ID="TxtK3Tank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（５号軽油）　■ -->
+                    <a class="ef" id="WF_K5TANK">
+                        <asp:TextBox ID="TxtK5Tank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（１０号軽油）　■ -->
+                    <a class="ef" id="WF_K10TANK">
+                        <asp:TextBox ID="TxtK10Tank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（LSA）　■ -->
+                    <a class="ef" id="WF_LTANK">
+                        <asp:TextBox ID="TxtLTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（A重油）　■ -->
+                    <a class="ef" id="WF_ATANK">
+                        <asp:TextBox ID="TxtATank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                </div>
+                <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+
+                    <!-- #############################-->
+                    <!-- 割当後                       -->
+                    <!-- #############################-->
+                    <!-- ■　油種別タンク車数(車)　■ -->
+                    <a id="WF_OILTANKCNT_W_LABEL">割当後　油種別タンク車数(車)</a>
+                    <!-- ■　車数（ハイオク）　■ -->
+                    <a class="ef" id="WF_HTANK_W">
+                        <asp:TextBox ID="TxtHTank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（レギュラー）　■ -->
+                    <a class="ef" id="WF_RTANK_W">
+                        <asp:TextBox ID="TxtRTank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（灯油）　■ -->
+                    <a class="ef" id="WF_TTANK_W">
+                        <asp:TextBox ID="TxtTTank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（未添加灯油）　■ -->
+                    <a class="ef" id="WF_MTTANK_W">
+                        <asp:TextBox ID="TxtMTTank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（軽油）　■ -->
+                    <a class="ef" id="WF_KTANK_W">
+                        <asp:TextBox ID="TxtKTank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（３号軽油）　■ -->
+                    <a class="ef" id="WF_K3TANK_W">
+                        <asp:TextBox ID="TxtK3Tank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（５号軽油）　■ -->
+                    <a class="ef" id="WF_K5TANK_W">
+                        <asp:TextBox ID="TxtK5Tank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（１０号軽油）　■ -->
+                    <a class="ef" id="WF_K10TANK_W">
+                        <asp:TextBox ID="TxtK10Tank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（LSA）　■ -->
+                    <a class="ef" id="WF_LTANK_W">
+                        <asp:TextBox ID="TxtLTank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                    <!-- ■　車数（A重油）　■ -->
+                    <a class="ef" id="WF_ATANK_W">
+                        <asp:TextBox ID="TxtATank_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                    </a>
+                </div>
+
+                <div id="detailbuttonbox" class="detailbuttonbox">
+                    <!-- ボタン -->
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                    </a>
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                    </a>
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                    </a>
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonLINE_ADD" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />
+                    </a>
+                    <a style="left:43.5em;">
+                        <input type="button" id="WF_ButtonUPDATE" value="割当確定"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                    </a>
+                </div>
+
                 <!-- 一覧レイアウト -->
                 <div id="divListArea1">
                     <asp:panel id="pnlListArea1" runat="server" ></asp:panel>

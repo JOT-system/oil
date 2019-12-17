@@ -311,13 +311,13 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_DView1 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
-    '''WF_DViewRep1 コントロール。
+    '''pnlListArea1 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DViewRep1 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents pnlListArea1 As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
     '''WF_DView2 コントロール。
@@ -329,13 +329,13 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_DView2 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
-    '''WF_DViewRep2 コントロール。
+    '''pnlListArea2 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DViewRep2 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents pnlListArea2 As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
     '''WF_DView3 コントロール。
@@ -347,13 +347,13 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_DView3 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
-    '''WF_DViewRep3 コントロール。
+    '''pnlListArea3 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DViewRep3 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents pnlListArea3 As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
     '''WF_DView4 コントロール。
@@ -365,22 +365,13 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_DView4 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
-    '''WF_DViewRep4 コントロール。
+    '''pnlListArea4 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DViewRep4 As Global.System.Web.UI.WebControls.Repeater
-    
-    '''<summary>
-    '''pnlListArea コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
+    Protected WithEvents pnlListArea4 As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
     '''rightview コントロール。

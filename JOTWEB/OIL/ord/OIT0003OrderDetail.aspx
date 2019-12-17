@@ -11,7 +11,10 @@
     <link href='<%=ResolveUrl("~/OIL/css/OIT0003D.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0003D.js")%>'></script>
     <script type="text/javascript">
-        var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
+        var pnlListAreaId1 = '<%=Me.pnlListArea1.ClientID%>';
+        var pnlListAreaId2 = '<%=Me.pnlListArea2.ClientID%>';
+        var pnlListAreaId3 = '<%=Me.pnlListArea3.ClientID%>';
+        var pnlListAreaId4 = '<%=Me.pnlListArea4.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
     </script>
 </asp:Content>
@@ -193,198 +196,37 @@
 
             <!-- ■ Tab No1　タンク車割当　■ -->
             <asp:View ID="WF_DView1" runat="server" >
-                <span class="WF_DViewRep1_Area" id="WF_DViewRep1_Area">
-                    <asp:Repeater ID="WF_DViewRep1" runat="server">
-                        <HeaderTemplate>
-                            <table>
-                        </HeaderTemplate>
-                        <ItemTemplate>
-                            <tr>
-                            <%-- 非表示項目(左Box処理用・Repeater内行位置) --%>
-                            <td>
-                                <asp:TextBox ID="WF_Rep1_MEISAINO" runat="server"></asp:TextBox>  
-                                <asp:TextBox ID="WF_Rep1_LINEPOSITION" runat="server"></asp:TextBox>  
-                            </td>
-                            <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　左Side --%>
-                            <td><asp:Label   ID="WF_Rep1_FIELDNM_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_Label1_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_FIELD_1"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:TextBox ID="WF_Rep1_VALUE_1"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                            <td><asp:Label   ID="WF_Rep1_Label2_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_VALUE_TEXT_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_Label3_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　中央 --%>
-                            <td><asp:Label   ID="WF_Rep1_FIELDNM_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_Label1_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_FIELD_2"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:TextBox ID="WF_Rep1_VALUE_2"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                            <td><asp:Label   ID="WF_Rep1_Label2_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_VALUE_TEXT_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_Label3_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　右 --%>
-                            <td><asp:Label   ID="WF_Rep1_FIELDNM_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_Label1_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_FIELD_3"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:TextBox ID="WF_Rep1_VALUE_3"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                            <td><asp:Label   ID="WF_Rep1_Label2_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_VALUE_TEXT_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep1_Label3_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            </tr>
-                        </ItemTemplate>
-                        <FooterTemplate>
-                            </table>
-                        </FooterTemplate>
-                    </asp:Repeater>
-                </span>
+                <!-- 一覧レイアウト -->
+                <div id="divListArea1">
+                    <asp:panel id="pnlListArea1" runat="server" ></asp:panel>
+                </div>
             </asp:View>
 
             <!-- ■ Tab No2　タンク車明細　■ -->
             <asp:View ID="WF_DView2" runat="server">
-                    <span class="WF_DViewRep2_Area" id="WF_DViewRep2_Area">
-                    <asp:Repeater ID="WF_DViewRep2" runat="server">
-                        <HeaderTemplate>
-                            <table>
-                        </HeaderTemplate>
-                        <ItemTemplate>
-                            <tr>
-                            <%-- 非表示項目(左Box処理用・Repeater内行位置) --%>
-                            <td>
-                                <asp:TextBox ID="WF_Rep2_MEISAINO" runat="server"></asp:TextBox>  
-                                <asp:TextBox ID="WF_Rep2_LINEPOSITION" runat="server"></asp:TextBox>  
-                            </td>
-                            <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　左Side --%>
-                            <td><asp:Label   ID="WF_Rep2_FIELDNM_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_Label1_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_FIELD_1"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:TextBox ID="WF_Rep2_VALUE_1"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                            <td><asp:Label   ID="WF_Rep2_Label2_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_VALUE_TEXT_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_Label3_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　中央 --%>
-                            <td><asp:Label   ID="WF_Rep2_FIELDNM_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_Label1_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_FIELD_2"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:TextBox ID="WF_Rep2_VALUE_2"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                            <td><asp:Label   ID="WF_Rep2_Label2_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_VALUE_TEXT_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_Label3_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　右 --%>
-                            <td><asp:Label   ID="WF_Rep2_FIELDNM_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_Label1_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_FIELD_3"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:TextBox ID="WF_Rep2_VALUE_3"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                            <td><asp:Label   ID="WF_Rep2_Label2_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_VALUE_TEXT_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            <td><asp:Label   ID="WF_Rep2_Label3_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                            </tr>
-                        </ItemTemplate>
-                        <FooterTemplate>
-                            </table>
-                        </FooterTemplate>
-                    </asp:Repeater>
-                </span>
+                <!-- 一覧レイアウト -->
+                <div id="divListArea2">
+                    <asp:panel id="pnlListArea2" runat="server" ></asp:panel>
+                </div>
             </asp:View>
 
-                <!-- ■ Tab No3　入換・積込指示　■ -->
-                <asp:View ID="WF_DView3" runat="server">
-                     <span class="WF_DViewRep3_Area" id="WF_DViewRep3_Area">
-                        <asp:Repeater ID="WF_DViewRep3" runat="server">
-                            <HeaderTemplate>
-                                <table>
-                            </HeaderTemplate>
-                            <ItemTemplate>
-                                <tr>
-                                <%-- 非表示項目(左Box処理用・Repeater内行位置) --%>
-                                <td>
-                                    <asp:TextBox ID="WF_Rep3_MEISAINO" runat="server"></asp:TextBox>  
-                                    <asp:TextBox ID="WF_Rep3_LINEPOSITION" runat="server"></asp:TextBox>  
-                                </td>
-                                <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　左Side --%>
-                                <td><asp:Label   ID="WF_Rep3_FIELDNM_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_Label1_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_FIELD_1"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:TextBox ID="WF_Rep3_VALUE_1"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                                <td><asp:Label   ID="WF_Rep3_Label2_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_VALUE_TEXT_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_Label3_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　中央 --%>
-                                <td><asp:Label   ID="WF_Rep3_FIELDNM_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_Label1_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_FIELD_2"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:TextBox ID="WF_Rep3_VALUE_2"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                                <td><asp:Label   ID="WF_Rep3_Label2_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_VALUE_TEXT_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_Label3_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　右 --%>
-                                <td><asp:Label   ID="WF_Rep3_FIELDNM_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_Label1_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_FIELD_3"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:TextBox ID="WF_Rep3_VALUE_3"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                                <td><asp:Label   ID="WF_Rep3_Label2_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_VALUE_TEXT_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep3_Label3_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                </tr>
-                            </ItemTemplate>
-                            <FooterTemplate>
-                                </table>
-                            </FooterTemplate>
-                        </asp:Repeater>
-                    </span>
-                </asp:View>
+            <!-- ■ Tab No3　入換・積込指示　■ -->
+            <asp:View ID="WF_DView3" runat="server">
+                <!-- 一覧レイアウト -->
+                <div id="divListArea3">
+                    <asp:panel id="pnlListArea3" runat="server" ></asp:panel>
+                </div>
+            </asp:View>
 
-                <!-- ■ Tab No4　費用入力　■ -->
-                <asp:View ID="WF_DView4" runat="server">
-                     <span class="WF_DViewRep4_Area" id="WF_DViewRep4_Area">
-                        <asp:Repeater ID="WF_DViewRep4" runat="server">
-                            <HeaderTemplate>
-                                <table>
-                            </HeaderTemplate>
-                            <ItemTemplate>
-                                <tr>
-                                <%-- 非表示項目(左Box処理用・Repeater内行位置) --%>
-                                <td>
-                                    <asp:TextBox ID="WF_Rep4_MEISAINO" runat="server"></asp:TextBox>  
-                                    <asp:TextBox ID="WF_Rep4_LINEPOSITION" runat="server"></asp:TextBox>  
-                                </td>
-                                <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　左Side --%>
-                                <td><asp:Label   ID="WF_Rep4_FIELDNM_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_Label1_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_FIELD_1"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:TextBox ID="WF_Rep4_VALUE_1"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                                <td><asp:Label   ID="WF_Rep4_Label2_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_VALUE_TEXT_1" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_Label3_1"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　中央 --%>
-                                <td><asp:Label   ID="WF_Rep4_FIELDNM_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_Label1_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_FIELD_2"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:TextBox ID="WF_Rep4_VALUE_2"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                                <td><asp:Label   ID="WF_Rep4_Label2_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_VALUE_TEXT_2" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_Label3_2"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <%-- 項目(名称・必須表記・項目・値・スペース・フィールド・スペース)　右 --%>
-                                <td><asp:Label   ID="WF_Rep4_FIELDNM_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_Label1_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_FIELD_3"   runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:TextBox ID="WF_Rep4_VALUE_3"   runat="server" Text="" CssClass="WF_TEXTBOX_repCSS"></asp:TextBox></td>
-                                <td><asp:Label   ID="WF_Rep4_Label2_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_VALUE_TEXT_3" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                <td><asp:Label   ID="WF_Rep4_Label3_3"  runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label></td>
-                                </tr>
-                            </ItemTemplate>
-                            <FooterTemplate>
-                                </table>
-                            </FooterTemplate>
-                        </asp:Repeater>
-                    </span>
-
-                </asp:View>
+            <!-- ■ Tab No4　費用入力　■ -->
+            <asp:View ID="WF_DView4" runat="server">
+                <!-- 一覧レイアウト -->
+                <div id="divListArea4">
+                    <asp:panel id="pnlListArea4" runat="server" ></asp:panel>
+                </div>
+            </asp:View>
         </asp:MultiView>
 
-            <!-- 一覧レイアウト -->
-            <div id="divListArea">
-                <asp:panel id="pnlListArea" runat="server" ></asp:panel>
-            </div>
     </div>
 
     <!-- rightbox レイアウト -->

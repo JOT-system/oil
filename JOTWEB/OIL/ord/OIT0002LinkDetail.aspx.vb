@@ -428,10 +428,10 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN '' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P8 " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P5 " _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P9 " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P10 " _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P6 " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P7 " _
             & "   END                                                                      AS JRALLINSPECTIONALERTSTR " _
             & " , ISNULL(RTRIM(OIT0004.DELFLG), '')              AS DELFLG " _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')             AS LINKNO " _
@@ -473,19 +473,13 @@ Public Class OIT0002LinkDetail
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 7)  '空車発駅コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 7)  '空車着駅コード
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 20)  '赤丸（交検日）
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20)  '黄丸（交検日）
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 20)  '緑丸（交検日）
-                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 20)  '赤丸（全検日）
-                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 20)  '黄丸（全検日）
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '緑丸（全検日）
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 20)  '赤丸
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20)  '黄丸
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 20)  '緑丸
 
-                PARA5.Value = C_INSPECTIONALERT.ALERT_JR_RED
-                PARA6.Value = C_INSPECTIONALERT.ALERT_JR_YELLOW
-                PARA7.Value = C_INSPECTIONALERT.ALERT_JR_GREEN
-                PARA8.Value = C_INSPECTIONALERT.ALERT_JRALL_RED
-                PARA9.Value = C_INSPECTIONALERT.ALERT_JRALL_YELLOW
-                PARA10.Value = C_INSPECTIONALERT.ALERT_JRALL_GREEN
+                PARA5.Value = C_INSPECTIONALERT.ALERT_RED
+                PARA6.Value = C_INSPECTIONALERT.ALERT_YELLOW
+                PARA7.Value = C_INSPECTIONALERT.ALERT_GREEN
 
                 If work.WF_SEL_PANEL.Value <> "1" Then
                     PARA0.Value = O_INSCNT

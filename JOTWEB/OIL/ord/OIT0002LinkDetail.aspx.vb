@@ -1634,7 +1634,10 @@ Public Class OIT0002LinkDetail
 
             '登録日
             If WW_COLUMNS.IndexOf("INITYMD") >= 0 Then
-                OIT0002INProw("INITYMD") = Date.Now
+                OIT0002INProw("INITYMD") = XLSTBLrow("INITYMD")
+                If OIT0002INProw("INITYMD") = "" Then
+                    OIT0002INProw("INITYMD") = Left(Date.Now, 10)
+                End If
             End If
 
             '削除フラグ

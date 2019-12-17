@@ -379,8 +379,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS LASTOILCODE" _
             & " , ''                                             AS LASTOILNAME" _
             & " , ''                                             AS JRINSPECTIONALERT" _
+            & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
             & " , ''                                             AS JRALLINSPECTIONALERT" _
+            & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINT" _
@@ -422,6 +424,13 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
             & "   END                                                                      AS JRINSPECTIONALERT" _
+            & " , CASE" _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P9" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P10" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P11" _
+            & "   END                                                                      AS JRINSPECTIONALERTSTR" _
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), '')               AS JRINSPECTIONDATE" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
@@ -430,6 +439,13 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
             & "   END                                                                      AS JRALLINSPECTIONALERT" _
+            & " , CASE" _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P9" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P10" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P11" _
+            & "   END                                                                      AS JRALLINSPECTIONALERTSTR" _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE" _
             & " , ISNULL(RTRIM(OIT0003.RETURNDATETRAIN), '')                               AS RETURNDATETRAIN" _
             & " , ISNULL(RTRIM(OIT0003.JOINT), '')               AS JOINT" _
@@ -493,6 +509,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 40) '基地名
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 10) '荷受人コード
                 Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 40) '荷受人名
+                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 20)  '赤丸
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '黄丸
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)  '緑丸
 
                 PARA0.Value = O_INSCNT
                 PARA3.Value = work.WF_SEL_SHIPPERSCODE.Text
@@ -501,6 +520,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 PARA6.Value = work.WF_SEL_BASENAME.Text
                 PARA7.Value = work.WF_SEL_CONSIGNEECODE.Text
                 PARA8.Value = work.WF_SEL_CONSIGNEENAME.Text
+                PARA9.Value = C_INSPECTIONALERT.ALERT_RED
+                PARA10.Value = C_INSPECTIONALERT.ALERT_YELLOW
+                PARA11.Value = C_INSPECTIONALERT.ALERT_GREEN
                 If work.WF_SEL_CREATEFLG.Text = 1 Then
 
                     For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
@@ -1442,8 +1464,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS LASTOILCODE" _
             & " , ''                                             AS LASTOILNAME" _
             & " , ''                                             AS JRINSPECTIONALERT" _
+            & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
             & " , ''                                             AS JRALLINSPECTIONALERT" _
+            & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINT" _

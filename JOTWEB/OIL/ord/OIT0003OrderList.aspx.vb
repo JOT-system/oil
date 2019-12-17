@@ -628,25 +628,25 @@ Public Class OIT0003OrderList
         work.WF_SEL_TANKCARTOTAL.Text = "0"
 
         '積込日(予定)
-        work.WF_SEL_LODDATE.Text = "0"
+        work.WF_SEL_LODDATE.Text = ""
         '発日(予定)
-        work.WF_SEL_DEPDATE.Text = "0"
+        work.WF_SEL_DEPDATE.Text = ""
         '着日(予定)
-        work.WF_SEL_ARRDATE.Text = "0"
+        work.WF_SEL_ARRDATE.Text = ""
         '受入日(予定)
-        work.WF_SEL_ACCDATE.Text = "0"
+        work.WF_SEL_ACCDATE.Text = ""
         '空車着日(予定)
-        work.WF_SEL_EMPARRDATE.Text = "0"
+        work.WF_SEL_EMPARRDATE.Text = ""
         '積込日(実績)
-        work.WF_SEL_ACTUALLODDATE.Text = "0"
+        work.WF_SEL_ACTUALLODDATE.Text = ""
         '発日(実績)
-        work.WF_SEL_ACTUALDEPDATE.Text = "0"
+        work.WF_SEL_ACTUALDEPDATE.Text = ""
         '着日(実績)
-        work.WF_SEL_ACTUALARRDATE.Text = "0"
+        work.WF_SEL_ACTUALARRDATE.Text = ""
         '受入日(実績)
-        work.WF_SEL_ACTUALACCDATE.Text = "0"
+        work.WF_SEL_ACTUALACCDATE.Text = ""
         '空車着日(実績)
-        work.WF_SEL_ACTUALEMPARRDATE.Text = "0"
+        work.WF_SEL_ACTUALEMPARRDATE.Text = ""
 
         '計上年月日
         work.WF_SEL_KEIJYOYMD.Text = ""

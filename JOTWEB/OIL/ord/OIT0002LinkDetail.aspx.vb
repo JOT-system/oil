@@ -25,7 +25,8 @@ Public Class OIT0002LinkDetail
     Private OIT0002WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
+    Private Const CONST_INIT_ROWS As Integer = 18                   '新規登録時初期行数
+    Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
 
     Private Const CONST_TxtHTank As String = "1001"                 '油種(ハイオク)
@@ -372,8 +373,10 @@ Public Class OIT0002LinkDetail
             & " , @P4                                            AS RETSTATION " _
             & " , ''                                             AS JRINSPECTIONALERT " _
             & " , ''                                             AS JRINSPECTIONDATE " _
+            & " , ''                                             AS JRINSPECTIONALERTSTR " _
             & " , ''                                             AS JRALLINSPECTIONALERT " _
             & " , ''                                             AS JRALLINSPECTIONDATE " _
+            & " , ''                                             AS JRALLINSPECTIONALERTSTR " _
             & " , @P2                                            AS DELFLG " _
             & " , 'L' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS LINKNO " _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS LINKDETAILNO " _
@@ -409,6 +412,13 @@ Public Class OIT0002LinkDetail
             & "   END                                                                      AS JRINSPECTIONALERT " _
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), '')               AS JRINSPECTIONDATE " _
             & " , CASE " _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN '' " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P5 " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4 " _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P6 " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P7 " _
+            & "   END                                                                      AS JRINSPECTIONALERTSTR " _
+            & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN '' " _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>' " _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
@@ -416,6 +426,13 @@ Public Class OIT0002LinkDetail
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>' " _
             & "   END                                                                      AS JRALLINSPECTIONALERT " _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE " _
+            & " , CASE " _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN '' " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P8 " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P9 " _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P10 " _
+            & "   END                                                                      AS JRALLINSPECTIONALERTSTR " _
             & " , ISNULL(RTRIM(OIT0004.DELFLG), '')              AS DELFLG " _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')             AS LINKNO " _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')            AS LINKDETAILNO " _
@@ -456,13 +473,26 @@ Public Class OIT0002LinkDetail
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 7)  '空車発駅コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 7)  '空車着駅コード
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 20)  '赤丸（交検日）
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20)  '黄丸（交検日）
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 20)  '緑丸（交検日）
+                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 20)  '赤丸（全検日）
+                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 20)  '黄丸（全検日）
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '緑丸（全検日）
+
+                PARA5.Value = C_INSPECTIONALERT.ALERT_JR_RED
+                PARA6.Value = C_INSPECTIONALERT.ALERT_JR_YELLOW
+                PARA7.Value = C_INSPECTIONALERT.ALERT_JR_GREEN
+                PARA8.Value = C_INSPECTIONALERT.ALERT_JRALL_RED
+                PARA9.Value = C_INSPECTIONALERT.ALERT_JRALL_YELLOW
+                PARA10.Value = C_INSPECTIONALERT.ALERT_JRALL_GREEN
 
                 If work.WF_SEL_PANEL.Value <> "1" Then
                     PARA0.Value = O_INSCNT
                     PARA3.Value = ""
                     PARA4.Value = ""
                 Else
-                    PARA0.Value = 18
+                    PARA0.Value = CONST_INIT_ROWS
                     PARA3.Value = TxtDepstation.Text
                     PARA4.Value = TxtRetstation.Text
                 End If
@@ -848,7 +878,6 @@ Public Class OIT0002LinkDetail
                 TxtOrderOffice.Focus()
 
             Case "TxtHeadOfficeTrain"   '本線列車
-                '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
                 TxtHeadOfficeTrain.Text = WW_SelectValue
                 FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
@@ -896,7 +925,7 @@ Public Class OIT0002LinkDetail
                 End Try
                 TxtActEmpDate.Focus()
 
-            Case "OILNAME", "TANKNUMBER"   '(一覧)油種, (一覧)タンク車№
+            Case "TANKNUMBER"   '(一覧)タンク車№
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -914,13 +943,8 @@ Public Class OIT0002LinkDetail
                 If IsNothing(updHeader) Then Exit Sub
 
                 '〇 一覧項目へ設定
-                '油種名を一覧に設定
-                If WF_FIELD.Value = "OILNAME" Then
-                    updHeader.Item("OILCODE") = WW_SETVALUE
-                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
-
-                    'タンク車№を一覧に設定
-                ElseIf WF_FIELD.Value = "TANKNUMBER" Then
+                'タンク車№を一覧に設定
+                If WF_FIELD.Value = "TANKNUMBER" Then
                     'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
                     Dim WW_TANKNUMBER As String = WW_SETVALUE
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
@@ -986,7 +1010,6 @@ Public Class OIT0002LinkDetail
                         updHeader.Item("JRALLINSPECTIONALERT") = ""
                     End If
                 End If
-                'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
 
                 '○ 画面表示データ保存
                 If Not Master.SaveTable(OIT0002tbl) Then Exit Sub
@@ -1007,7 +1030,7 @@ Public Class OIT0002LinkDetail
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"          '会社コード
                 WF_CAMPCODE.Focus()
-            Case "WF_ORG"              '運用部署
+            Case "WF_ORG"               '運用部署
                 WF_ORG.Focus()
             Case "TxtHeadOfficeTrain"   '本線列車
                 TxtHeadOfficeTrain.Focus()
@@ -1015,9 +1038,9 @@ Public Class OIT0002LinkDetail
                 TxtDepstation.Focus()
             Case "TxtRetstation"        '空車着駅
                 TxtRetstation.Focus()
-            Case "TxtEmpDate"       '(予定)空車着日
+            Case "TxtEmpDate"           '(予定)空車着日
                 TxtEmpDate.Focus()
-            Case "TxtActEmpDate"           '(実績)空車着日
+            Case "TxtActEmpDate"        '(実績)空車着日
                 TxtActEmpDate.Focus()
         End Select
 
@@ -1229,8 +1252,10 @@ Public Class OIT0002LinkDetail
             & " , @P03                                           AS RETSTATION " _
             & " , ''                                             AS JRINSPECTIONALERT " _
             & " , ''                                             AS JRINSPECTIONDATE " _
+            & " , ''                                             AS JRINSPECTIONALERTSTR " _
             & " , ''                                             AS JRALLINSPECTIONALERT " _
             & " , ''                                             AS JRALLINSPECTIONDATE " _
+            & " , ''                                             AS JRALLINSPECTIONALERTSTR " _
             & " , @P00                                           AS DELFLG" _
             & " , 'L' + FORMAT(GETDATE(),'yyyyMMdd') + @P01      AS LINKNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS LINKDETAILNO" _
@@ -1273,19 +1298,12 @@ Public Class OIT0002LinkDetail
                 Next
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    ''○ フィールド名とフィールドの型を取得
-                    'For index As Integer = 0 To SQLdr.FieldCount - 1
-                    '    OIT0002WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    'Next
-
                     '○ テーブル検索結果をテーブル格納
                     OIT0002tbl.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
                 Dim j As Integer = 9000
-                'Dim intDetailNo As Integer
-                'Dim strOrderNoBak As String = ""
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
                     '行追加データに既存の受注№を設定する。
@@ -1308,7 +1326,6 @@ Public Class OIT0002LinkDetail
                         i += 1
                         OIT0002row("LINECNT") = i        'LINECNT
                     End If
-                    'strOrderNoBak = OIT0002row("ORDERNO")
                     intDetailNo += 1
                 Next
             End Using
@@ -1338,30 +1355,6 @@ Public Class OIT0002LinkDetail
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDownload_Click()
 
-        Dim str As String
-        For Each OIT0002row As DataRow In OIT0002tbl.Rows
-            str = OIT0002row("JRINSPECTIONALERT")
-            Select Case str
-                Case str.IndexOf("red") >= 0
-                    OIT0002row("JRINSPECTIONALERT") = "交検日まで後、3日のタンク車"
-                Case str.Contains("yellow")
-                    OIT0002row("JRINSPECTIONALERT") = "交検日まで後、4日～6日のタンク車"
-                Case str.Contains("green")
-                    OIT0002row("JRINSPECTIONALERT") = "交検日まで後、7日以上のタンク車"
-            End Select
-        Next
-
-        For Each OIT0002row As DataRow In OIT0002tbl.Rows
-            Select Case OIT0002row("JRALLINSPECTIONALERT")
-                Case 0 <= OIT0002row("JRALLINSPECTIONALERT").ToString.IndexOf("red")
-                    OIT0002row("JRALLINSPECTIONALERT") = "全検日まで後、3日のタンク車"
-                Case 0 <= OIT0002row("JRALLINSPECTIONALERT").ToString.IndexOf("yellow")
-                    OIT0002row("JRALLINSPECTIONALERT") = "全検日まで後、4日～6日のタンク車"
-                Case 0 <= OIT0002row("JRALLINSPECTIONALERT").ToString.IndexOf("green")
-                    OIT0002row("JRALLINSPECTIONALERT") = "全検日まで後、7日以上のタンク車"
-            End Select
-        Next
-
         '○ 帳票出力
         CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
         CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
@@ -1378,28 +1371,6 @@ Public Class OIT0002LinkDetail
             End If
             Exit Sub
         End If
-
-        For Each OIT0002row As DataRow In OIT0002tbl.Rows
-            Select Case OIT0002row("JRINSPECTIONALERT")
-                Case 0 <= OIT0002row("JRINSPECTIONALERT").ToString.IndexOf("3日")
-                    OIT0002row("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
-                Case 0 <= OIT0002row("JRINSPECTIONALERT").ToString.IndexOf("4日～6日")
-                    OIT0002row("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
-                Case 0 <= OIT0002row("JRINSPECTIONALERT").ToString.IndexOf("7日")
-                    OIT0002row("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
-            End Select
-        Next
-
-        For Each OIT0002row As DataRow In OIT0002tbl.Rows
-            Select Case OIT0002row("JRALLINSPECTIONALERT")
-                Case 0 <= OIT0002row("JRALLINSPECTIONALERT").ToString.IndexOf("3日")
-                    OIT0002row("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
-                Case 0 <= OIT0002row("JRALLINSPECTIONALERT").ToString.IndexOf("4日～6日")
-                    OIT0002row("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
-                Case 0 <= OIT0002row("JRALLINSPECTIONALERT").ToString.IndexOf("7日")
-                    OIT0002row("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
-            End Select
-        Next
 
         '○ 別画面でExcelを表示
         WF_PrintURL.Value = CS0030REPORT.URL
@@ -1439,17 +1410,7 @@ Public Class OIT0002LinkDetail
                 WW_OrderListTBLSet(SQLcon)
             End Using
 
-            ''貨車連結表(明細)画面表示データ取得
-            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            '    SQLcon.Open()       'DataBase接続
-            '    work.WF_SEL_CREATEFLG.Text = 2
-            '    MAPDataGet(SQLcon, 0)
-            'End Using
-
         End If
-
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0002tbl)
 
         '○ GridView初期設定
         '○ 画面表示データ再取得(貨車連結表(明細)画面表示データ取得)
@@ -1681,7 +1642,6 @@ Public Class OIT0002LinkDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0002tbl)
-
 
         '○ メッセージ表示
         If isNormal(WW_ERR_SW) Then
@@ -2064,7 +2024,7 @@ Public Class OIT0002LinkDetail
                 & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
-                & " AND VIW0001.DELFLG <> @P03"
+                & " AND VIW0001.DELFLG <> @P02"
 
             '○ 条件指定で指定されたものでSQLで可能なものを追加する
             '会社コード
@@ -2083,12 +2043,10 @@ Public Class OIT0002LinkDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
 
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
-                'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
-                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
 
                 PARA01.Value = I_CLASS
-                'PARA02.Value = I_KEYCODE
-                PARA03.Value = C_DELETE_FLG.DELETE
+                PARA02.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -2129,73 +2087,6 @@ Public Class OIT0002LinkDetail
     End Sub
 
     ''' <summary>
-    ''' 画面表示設定処理
-    ''' </summary>
-    Protected Sub WW_ScreenEnabledSet()
-
-        '〇各営業者で管理している油種を取得
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", ""}
-        FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue)
-
-        '〇初期化
-        'ハイオク
-        TxtHTank.Enabled = False
-        'レギュラー
-        TxtRTank.Enabled = False
-        '灯油
-        TxtTTank.Enabled = False
-        '未添加灯油
-        TxtMTTank.Enabled = False
-        '軽油
-        TxtKTank.Enabled = False
-        '３号軽油
-        TxtK3Tank.Enabled = False
-        '軽油５
-        TxtK5Tank.Enabled = False
-        '軽油１０
-        TxtK10Tank.Enabled = False
-        'ＬＳＡ
-        TxtLTank.Enabled = False
-        'Ａ重油
-        TxtATank.Enabled = False
-
-        For i As Integer = 0 To WW_GetValue.Length - 1
-            Select Case WW_GetValue(i)
-                    'ハイオク
-                Case "1001"
-                    TxtHTank.Enabled = True
-                    'レギュラー
-                Case "1101"
-                    TxtRTank.Enabled = True
-                    '灯油
-                Case "1301"
-                    TxtTTank.Enabled = True
-                    '未添加灯油
-                Case "1302"
-                    TxtMTTank.Enabled = True
-                    '軽油
-                Case "1401", "1406"
-                    TxtKTank.Enabled = True
-                    '３号軽油
-                Case "1404", "1405"
-                    TxtK3Tank.Enabled = True
-                    '軽油５
-                Case "1402"
-                    TxtK5Tank.Enabled = True
-                    '軽油１０
-                Case "1403"
-                    TxtK10Tank.Enabled = True
-                    'ＬＳＡ
-                Case "2201", "2202"
-                    TxtLTank.Enabled = True
-                    'Ａ重油
-                Case "2101"
-                    TxtATank.Enabled = True
-            End Select
-        Next
-    End Sub
-
-    ''' <summary>
     ''' 貨車連結表TBL登録更新
     ''' </summary>
     ''' <param name="SQLcon"></param>
@@ -2208,13 +2099,13 @@ Public Class OIT0002LinkDetail
         Dim LNG_TxtTTank As Long = "0"                  '油種(灯油)
         Dim LNG_TxtMTTank As Long = "0"            '油種(未添加灯油)
         Dim LNG_TxtKTank1 As Long = "0"            '油種(軽油)
-        Dim LNG_TxtKTank2 As Long = "0"
+        'Dim LNG_TxtKTank2 As Long = "0"
         Dim LNG_TxtK3Tank1 As Long = "0"              '３号軽油
-        Dim LNG_TxtK3Tank2 As Long = "0"
+        'Dim LNG_TxtK3Tank2 As Long = "0"
         Dim LNG_TxtK5Tank As Long = "0"              '５号軽油
         Dim LNG_TxtK10Tank As Long = "0"               '１０号軽油
         Dim LNG_TxtLTank1 As Long = "0"                'ＬＳＡ
-        Dim LNG_TxtLTank2 As Long = "0"
+        'Dim LNG_TxtLTank2 As Long = "0"
         Dim LNG_TxtATank As Long = "0"               'Ａ重油
         Dim CNT_Total As Long = "0"      '合計
 
@@ -2641,30 +2532,30 @@ Public Class OIT0002LinkDetail
                 PARA5.Value = work.WF_SEL_SELECT.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
 
-                Dim OILPARA1 As SqlParameter = SQLcmd.Parameters.Add("@OIL01", SqlDbType.NVarChar, 4)    '油種(ハイオク)
-                Dim OILPARA2 As SqlParameter = SQLcmd.Parameters.Add("@OIL02", SqlDbType.NVarChar, 4)    '油種(レギュラー)
-                Dim OILPARA3 As SqlParameter = SQLcmd.Parameters.Add("@OIL03", SqlDbType.NVarChar, 4)    '油種(灯油)
-                Dim OILPARA4 As SqlParameter = SQLcmd.Parameters.Add("@OIL04", SqlDbType.NVarChar, 4)    '油種(未添加灯油)
-                Dim OILPARA5 As SqlParameter = SQLcmd.Parameters.Add("@OIL05", SqlDbType.NVarChar, 4)    '油種(軽油)
-                Dim OILPARA6 As SqlParameter = SQLcmd.Parameters.Add("@OIL06", SqlDbType.NVarChar, 4)    '３号軽油
-                Dim OILPARA7 As SqlParameter = SQLcmd.Parameters.Add("@OIL07", SqlDbType.NVarChar, 4)    '５号軽油
-                Dim OILPARA8 As SqlParameter = SQLcmd.Parameters.Add("@OIL08", SqlDbType.NVarChar, 4)    '１０号軽油
-                Dim OILPARA9 As SqlParameter = SQLcmd.Parameters.Add("@OIL09", SqlDbType.NVarChar, 4)    'ＬＳＡ
+                Dim OILPARA01 As SqlParameter = SQLcmd.Parameters.Add("@OIL01", SqlDbType.NVarChar, 4)    '油種(ハイオク)
+                Dim OILPARA02 As SqlParameter = SQLcmd.Parameters.Add("@OIL02", SqlDbType.NVarChar, 4)    '油種(レギュラー)
+                Dim OILPARA03 As SqlParameter = SQLcmd.Parameters.Add("@OIL03", SqlDbType.NVarChar, 4)    '油種(灯油)
+                Dim OILPARA04 As SqlParameter = SQLcmd.Parameters.Add("@OIL04", SqlDbType.NVarChar, 4)    '油種(未添加灯油)
+                Dim OILPARA05 As SqlParameter = SQLcmd.Parameters.Add("@OIL05", SqlDbType.NVarChar, 4)    '油種(軽油)
+                Dim OILPARA06 As SqlParameter = SQLcmd.Parameters.Add("@OIL06", SqlDbType.NVarChar, 4)    '３号軽油
+                Dim OILPARA07 As SqlParameter = SQLcmd.Parameters.Add("@OIL07", SqlDbType.NVarChar, 4)    '５号軽油
+                Dim OILPARA08 As SqlParameter = SQLcmd.Parameters.Add("@OIL08", SqlDbType.NVarChar, 4)    '１０号軽油
+                Dim OILPARA09 As SqlParameter = SQLcmd.Parameters.Add("@OIL09", SqlDbType.NVarChar, 4)    'ＬＳＡ
                 Dim OILPARA10 As SqlParameter = SQLcmd.Parameters.Add("@OIL10", SqlDbType.NVarChar, 4)   'Ａ重油
                 'Dim OILPARA11 As SqlParameter = SQLcmd.Parameters.Add("@OIL11", SqlDbType.NVarChar, 4)
                 'Dim OILPARA12 As SqlParameter = SQLcmd.Parameters.Add("@OIL12", SqlDbType.NVarChar, 4)
                 'Dim OILPARA13 As SqlParameter = SQLcmd.Parameters.Add("@OIL13", SqlDbType.NVarChar, 4)
 
-                OILPARA1.Value = "1001"                 '油種(ハイオク)
-                OILPARA2.Value = "1101"                 '油種(レギュラー)
-                OILPARA3.Value = "1301"                 '油種(灯油)
-                OILPARA4.Value = "1302"                 '油種(未添加灯油)
-                OILPARA5.Value = "1401"                 '油種(軽油)
-                OILPARA6.Value = "1404"                 '３号軽油
-                OILPARA7.Value = "1402"                 '５号軽油
-                OILPARA8.Value = "1403"                 '１０号軽油
-                OILPARA9.Value = "2201"                 'ＬＳＡ
-                OILPARA10.Value = "2101"                'Ａ重油
+                OILPARA01.Value = "1001"                 '油種(ハイオク)
+                OILPARA02.Value = "1101"                 '油種(レギュラー)
+                OILPARA03.Value = "1301"                 '油種(灯油)
+                OILPARA04.Value = "1302"                 '油種(未添加灯油)
+                OILPARA05.Value = "1401"                 '油種(軽油)
+                OILPARA06.Value = "1404"                 '３号軽油
+                OILPARA07.Value = "1402"                 '５号軽油
+                OILPARA08.Value = "1403"                 '１０号軽油
+                OILPARA09.Value = "2201"                 'ＬＳＡ
+                OILPARA10.Value = "2101"                 'Ａ重油
                 'OILPARA11.Value = "1405"
                 'OILPARA12.Value = "1406"
                 'OILPARA13.Value = "2202"
@@ -2736,8 +2627,6 @@ Public Class OIT0002LinkDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0002tbl)
-
-        'WF_Sel_LINECNT.Text = ""            'LINECNT
 
     End Sub
 

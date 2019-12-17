@@ -171,6 +171,36 @@ Public Module BaseDllConst
         Public Const WARNING As String = "警告"
     End Class
     ''' <summary>
+    ''' 検査日に対応したアラート用コード
+    ''' </summary>
+    Public Class C_INSPECTIONALERT
+        ''' <summary>
+        ''' 赤丸（交検日）
+        ''' </summary>
+        Public Const ALERT_JR_RED As String = "交検日まで後、3日のタンク車"
+        ''' <summary>
+        ''' 黄丸（交検日）
+        ''' </summary>
+        Public Const ALERT_JR_YELLOW As String = "交検日まで後、4日～6日のタンク車"
+        ''' <summary>
+        ''' 緑丸（交検日）
+        ''' </summary>
+        Public Const ALERT_JR_GREEN As String = "交検日まで後、7日以上のタンク車"
+
+        ''' <summary>
+        ''' 赤丸（全検日）
+        ''' </summary>
+        Public Const ALERT_JRALL_RED As String = "全検日まで後、3日のタンク車"
+        ''' <summary>
+        ''' 黄丸（全検日）
+        ''' </summary>
+        Public Const ALERT_JRALL_YELLOW As String = "全検日まで後、4日～6日のタンク車"
+        ''' <summary>
+        ''' 緑丸（全検日）
+        ''' </summary>
+        Public Const ALERT_JRALL_GREEN As String = "全検日まで後、7日以上のタンク車"
+    End Class
+    ''' <summary>
     ''' 端末分類（OIS0001_TERM TERMCLASS）
     ''' </summary>
     Public Class C_TERMCLASS

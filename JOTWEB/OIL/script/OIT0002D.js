@@ -98,15 +98,12 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_GridDBclick').value = Line;
         document.getElementById('WF_FIELD').value = fieldNM;
-
-        if (fieldNM == "TANKNO") {
+        
+        if (fieldNM == "TANKNUMBER") {
             document.getElementById('WF_LeftMViewChange').value = 20;
         }
         else if (fieldNM == "OILNAME") {
             document.getElementById('WF_LeftMViewChange').value = 24;
-        }
-        else if (fieldNM == "RETURNDATETRAIN") {
-            document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";

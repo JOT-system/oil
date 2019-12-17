@@ -72,7 +72,7 @@ Public Class OIS0001UserSearch
         '○ 画面ID設定
         Master.MAPID = OIS0001WRKINC.MAPIDS
 
-        WF_CAMPCODE.Focus()
+        WF_CAMPCODE_CODE.Focus()
         WF_FIELD.Value = ""
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""
@@ -96,22 +96,22 @@ Public Class OIS0001UserSearch
             work.Initialize()
 
             '初期変数設定処理
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD.Text)             '有効年月日(From)
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text)           '有効年月日(To)
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORG", WF_ORG.Text)                 '組織コード
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE_CODE.Text)       '会社コード
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD_CODE.Text)             '有効年月日(From)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD_CODE.Text)           '有効年月日(To)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORG", WF_ORG_CODE.Text)                 '組織コード
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIS0001L Then   '実行画面からの遷移
             '画面項目設定処理
-            WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
-            WF_STYMD.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
-            WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
-            WF_ORG.Text = work.WF_SEL_ORG.Text                  '組織コード
+            WF_CAMPCODE_CODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
+            WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
+            WF_ENDYMD_CODE.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
+            WF_ORG_CODE.Text = work.WF_SEL_ORG.Text                  '組織コード
         End If
 
         '○ RightBox情報設定
         rightview.MAPIDS = OIS0001WRKINC.MAPIDS
         rightview.MAPID = OIS0001WRKINC.MAPIDL
-        rightview.COMPCODE = WF_CAMPCODE.Text
+        rightview.COMPCODE = WF_CAMPCODE_CODE.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
         rightview.MENUROLE = Master.ROLE_MENU
@@ -122,8 +122,8 @@ Public Class OIS0001UserSearch
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
-        CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
-        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)                        '組織コード
+        CODENAME_get("CAMPCODE", WF_CAMPCODE_CODE.Text, WF_CAMPCODE_NAME.Text, WW_DUMMY)         '会社コード
+        CODENAME_get("ORG", WF_ORG_CODE.Text, WF_ORG_NAME.Text, WW_DUMMY)                        '組織コード
 
     End Sub
 
@@ -135,10 +135,10 @@ Public Class OIS0001UserSearch
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_CAMPCODE.Text)          '会社コード
-        Master.EraseCharToIgnore(WF_STYMD.Text)             '有効年月日(From)
-        Master.EraseCharToIgnore(WF_ENDYMD.Text)            '有効年月日(To)
-        Master.EraseCharToIgnore(WF_ORG.Text)               '組織コード
+        Master.EraseCharToIgnore(WF_CAMPCODE_CODE.Text)          '会社コード
+        Master.EraseCharToIgnore(WF_STYMD_CODE.Text)             '有効年月日(From)
+        Master.EraseCharToIgnore(WF_ENDYMD_CODE.Text)            '有効年月日(To)
+        Master.EraseCharToIgnore(WF_ORG_CODE.Text)               '組織コード
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -147,21 +147,21 @@ Public Class OIS0001UserSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
-        work.WF_SEL_STYMD.Text = WF_STYMD.Text              '有効年月日(From)
-        If WF_ENDYMD.Text = "" Then
-            work.WF_SEL_ENDYMD.Text = WF_STYMD.Text         '有効年月日(From) → 有効年月日(To)
+        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE_CODE.Text        '会社コード
+        work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text              '有効年月日(From)
+        If WF_ENDYMD_CODE.Text = "" Then
+            work.WF_SEL_ENDYMD.Text = WF_STYMD_CODE.Text         '有効年月日(From) → 有効年月日(To)
         Else
-            work.WF_SEL_ENDYMD.Text = WF_ENDYMD.Text        '有効年月日(To)
+            work.WF_SEL_ENDYMD.Text = WF_ENDYMD_CODE.Text        '有効年月日(To)
         End If
-        work.WF_SEL_ORG.Text = WF_ORG.Text                  '組織コード
+        work.WF_SEL_ORG.Text = WF_ORG_CODE.Text                  '組織コード
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
-            Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
+            Master.VIEWID = rightview.GetViewId(WF_CAMPCODE_CODE.Text)
         End If
 
-        Master.CheckParmissionCode(WF_CAMPCODE.Text)
+        Master.CheckParmissionCode(WF_CAMPCODE_CODE.Text)
         If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
             '画面遷移
             Master.TransitionPage()
@@ -188,82 +188,82 @@ Public Class OIS0001UserSearch
 
         '○ 単項目チェック
         '会社コード
-        Master.CheckField(WF_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(WF_CAMPCODE_CODE.Text, "CAMPCODE", WF_CAMPCODE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
-            CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            CODENAME_get("CAMPCODE", WF_CAMPCODE_CODE.Text, WF_CAMPCODE_NAME.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE.Text)
-                WF_CAMPCODE.Focus()
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE_CODE.Text)
+                WF_CAMPCODE_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            WF_CAMPCODE.Focus()
+            WF_CAMPCODE_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '有効年月日(From)
-        Master.CheckField(WF_CAMPCODE.Text, "STYMD", WF_STYMD.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(WF_CAMPCODE_CODE.Text, "STYMD", WF_STYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If Not isNormal(WW_CS0024FCHECKERR) Then
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(From) : " & WF_STYMD.Text)
-            WF_STYMD.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(From) : " & WF_STYMD_CODE.Text)
+            WF_STYMD_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '有効年月日(To)
-        Master.CheckField(WF_CAMPCODE.Text, "ENDYMD", WF_ENDYMD.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(WF_CAMPCODE_CODE.Text, "ENDYMD", WF_ENDYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If Not isNormal(WW_CS0024FCHECKERR) Then
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(To) : " & WF_ENDYMD.Text)
-            WF_ENDYMD.Focus()
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(To) : " & WF_ENDYMD_CODE.Text)
+            WF_ENDYMD_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '日付大小チェック
-        If WF_STYMD.Text <> "" AndAlso WF_ENDYMD.Text <> "" Then
+        If WF_STYMD_CODE.Text <> "" AndAlso WF_ENDYMD_CODE.Text <> "" Then
             Dim WW_DATE_ST As Date
             Dim WW_DATE_END As Date
             Try
-                Date.TryParse(WF_STYMD.Text, WW_DATE_ST)
-                Date.TryParse(WF_ENDYMD.Text, WW_DATE_END)
+                Date.TryParse(WF_STYMD_CODE.Text, WW_DATE_ST)
+                Date.TryParse(WF_ENDYMD_CODE.Text, WW_DATE_END)
 
                 If WW_DATE_ST > WW_DATE_END Then
                     Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR)
-                    WF_STYMD.Focus()
+                    WF_STYMD_CODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD.Text & ":" & WF_ENDYMD.Text)
-                WF_STYMD.Focus()
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD_CODE.Text & ":" & WF_ENDYMD_CODE.Text)
+                WF_STYMD_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End Try
         End If
 
         '組織コード
-        WW_TEXT = WF_ORG.Text
-        Master.CheckField(WF_CAMPCODE.Text, "ORG", WF_ORG.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        WW_TEXT = WF_ORG_CODE.Text
+        Master.CheckField(WF_CAMPCODE_CODE.Text, "ORG", WF_ORG_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             If WW_TEXT = "" Then
-                WF_ORG.Text = ""
+                WF_ORG_CODE.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("ORG", WF_ORG_CODE.Text, WF_ORG_NAME.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & WF_ORG.Text)
-                    WF_ORG.Focus()
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & WF_ORG_CODE.Text)
+                    WF_ORG_CODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             End If
         Else
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
-            WF_ORG.Focus()
+            WF_ORG_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
@@ -305,21 +305,21 @@ Public Class OIS0001UserSearch
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_STYMD.Text
+                                .WF_Calendar.Text = WF_STYMD_CODE.Text
                             Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_ENDYMD.Text
+                                .WF_Calendar.Text = WF_ENDYMD_CODE.Text
                         End Select
                         .ActiveCalendar()
 
                     Case Else
                         '以外
                         Dim prmData As New Hashtable
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE_CODE.Text
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
                             Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                                prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text)
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -340,9 +340,9 @@ Public Class OIS0001UserSearch
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"          '会社コード
-                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("CAMPCODE", WF_CAMPCODE_CODE.Text, WF_CAMPCODE_NAME.Text, WW_RTN_SW)
             Case "WF_ORG"               '組織コード
-                CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("ORG", WF_ORG_CODE.Text, WF_ORG_NAME.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -378,41 +378,41 @@ Public Class OIS0001UserSearch
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"          '会社コード
-                WF_CAMPCODE.Text = WW_SelectValue
-                WF_CAMPCODE_TEXT.Text = WW_SelectText
-                WF_CAMPCODE.Focus()
+                WF_CAMPCODE_CODE.Text = WW_SelectValue
+                WF_CAMPCODE_NAME.Text = WW_SelectText
+                WF_CAMPCODE_CODE.Focus()
 
             Case "WF_STYMD"             '有効年月日(From)
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
                     If WW_DATE < C_DEFAULT_YMD Then
-                        WF_STYMD.Text = ""
+                        WF_STYMD_CODE.Text = ""
                     Else
-                        WF_STYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        WF_STYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
                 End Try
-                WF_STYMD.Focus()
+                WF_STYMD_CODE.Focus()
 
             Case "WF_ENDYMD"            '有効年月日(To)
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
                     If WW_DATE < C_DEFAULT_YMD Then
-                        WF_ENDYMD.Text = ""
+                        WF_ENDYMD_CODE.Text = ""
                     Else
-                        WF_ENDYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        WF_ENDYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
 
                 End Try
-                WF_ENDYMD.Focus()
+                WF_ENDYMD_CODE.Focus()
 
             Case "WF_ORG"               '組織コード
-                WF_ORG.Text = WW_SelectValue
-                WF_ORG_TEXT.Text = WW_SelectText
-                WF_ORG.Focus()
+                WF_ORG_CODE.Text = WW_SelectValue
+                WF_ORG_NAME.Text = WW_SelectText
+                WF_ORG_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -432,13 +432,13 @@ Public Class OIS0001UserSearch
         '○ フォーカスセット
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"          '会社コード
-                WF_CAMPCODE.Focus()
+                WF_CAMPCODE_CODE.Focus()
             Case "WF_STYMD"             '有効年月日(From)
-                WF_STYMD.Focus()
+                WF_STYMD_CODE.Focus()
             Case "WF_ENDYMD"            '有効年月日(To)
-                WF_ENDYMD.Focus()
+                WF_ENDYMD_CODE.Focus()
             Case "WF_ORG"               '組織コード
-                WF_ORG.Focus()
+                WF_ORG_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -455,7 +455,7 @@ Public Class OIS0001UserSearch
     ''' <remarks></remarks>
     Protected Sub WF_RIGHTBOX_DBClick()
 
-        rightview.InitViewID(WF_CAMPCODE.Text, WW_DUMMY)
+        rightview.InitViewID(WF_CAMPCODE_CODE.Text, WW_DUMMY)
 
     End Sub
 
@@ -504,14 +504,14 @@ Public Class OIS0001UserSearch
         End If
 
         Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE_CODE.Text
 
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORG"              '組織コード
-                    prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                    prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

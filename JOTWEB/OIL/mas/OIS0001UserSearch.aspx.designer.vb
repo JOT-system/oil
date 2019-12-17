@@ -14,58 +14,58 @@ Option Explicit On
 Partial Public Class OIS0001UserSearch
     
     '''<summary>
-    '''WF_CAMPCODE コントロール。
+    '''WF_CAMPCODE_CODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_CAMPCODE_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_CAMPCODE_TEXT コントロール。
+    '''WF_CAMPCODE_NAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CAMPCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CAMPCODE_NAME As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_STYMD コントロール。
+    '''WF_STYMD_CODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_STYMD As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_STYMD_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ENDYMD コントロール。
+    '''WF_ENDYMD_CODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ENDYMD As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_ENDYMD_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ORG コントロール。
+    '''WF_ORG_CODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ORG As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_ORG_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ORG_TEXT コントロール。
+    '''WF_ORG_NAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ORG_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_ORG_NAME As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''rightview コントロール。

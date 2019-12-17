@@ -239,15 +239,10 @@ Public Class OIT0002LinkDetail
         '車数（A重油）
         TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
 
-        '新規作成の場合(油種別タンク車数のテキストボックスの入力を可とする。)
+        '新規作成の場合
         If work.WF_SEL_CREATEFLG.Text = 1 Then
-
-            ''画面表示設定
-            'WW_ScreenEnabledSet()
-
             TxtOrderOffice.ReadOnly = True
         Else
-
             '既存データの修正については、登録営業所は入力不可とする。
             TxtOrderOffice.Enabled = False
         End If
@@ -712,6 +707,10 @@ Public Class OIT0002LinkDetail
                         '空車着駅
                         Case "TxtRetstation"
                             prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text, TxtRetstation.Text)
+
+                        'タンク車№
+                        Case "TANKNUMBER"
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
                     End Select
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -948,9 +947,9 @@ Public Class OIT0002LinkDetail
 
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
-                    updHeader.Item("LASTOILCODE") = WW_GetValue(1)
+                    updHeader.Item("PREOILCODE") = WW_GetValue(1)
                     CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                    updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+                    updHeader.Item("PREOILNAME") = WW_LASTOILNAME
 
                     '交検日
                     Dim WW_JRINSPECTIONCNT As String
@@ -1494,7 +1493,7 @@ Public Class OIT0002LinkDetail
                             OIT0002INProw.Item(OIT0002INPcol) = 0
                         Case "OPERATION"
                             OIT0002INProw.Item(OIT0002INPcol) = C_LIST_OPERATION_CODE.NODATA
-                        Case "TIMSTP"
+                        Case "UPDTIMSTP"
                             OIT0002INProw.Item(OIT0002INPcol) = 0
                         Case "SELECT"
                             OIT0002INProw.Item(OIT0002INPcol) = 1
@@ -1507,97 +1506,44 @@ Public Class OIT0002LinkDetail
             Next
 
             '○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
+            If WW_COLUMNS.IndexOf("LINETRAINNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LINEORDER") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("PREOILCODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("RETSTATION") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRINSPECTIONALERTSTR") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRALLINSPECTIONALERTSTR") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("INITYMD") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("DELFLG") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LINKNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
-                    If XLSTBLrow("LINKNO") = OIT0002row("LINKNO") AndAlso
-                        XLSTBLrow("LINKDETAILNO") = OIT0002row("LINKDETAILNO") AndAlso
-                        XLSTBLrow("STATUS") = OIT0002row("STATUS") AndAlso
-                        XLSTBLrow("INFO") = OIT0002row("INFO") AndAlso
-                        XLSTBLrow("PREORDERNO") = OIT0002row("PREORDERNO") AndAlso
-                        XLSTBLrow("OFFICECODE") = OIT0002row("OFFICECODE") AndAlso
-                        XLSTBLrow("DEPSTATION") = OIT0002row("DEPSTATION") AndAlso
-                        XLSTBLrow("DEPSTATIONNAME") = OIT0002row("DEPSTATIONNAME") AndAlso
-                        XLSTBLrow("RETSTATION") = OIT0002row("RETSTATION") AndAlso
-                        XLSTBLrow("RETSTATIONNAME") = OIT0002row("RETSTATIONNAME") AndAlso
-                        XLSTBLrow("EMPARRDATE") = OIT0002row("EMPARRDATE") AndAlso
-                        XLSTBLrow("ACTUALEMPARRDATE") = OIT0002row("ACTUALEMPARRDATE") AndAlso
-                        XLSTBLrow("LINETRAINNO") = OIT0002row("LINETRAINNO") AndAlso
+                    If XLSTBLrow("LINETRAINNO") = OIT0002row("LINETRAINNO") AndAlso
                         XLSTBLrow("LINEORDER") = OIT0002row("LINEORDER") AndAlso
                         XLSTBLrow("TANKNUMBER") = OIT0002row("TANKNUMBER") AndAlso
-                        XLSTBLrow("PREOILCODE") = OIT0002row("PREOILCODE") Then
+                        XLSTBLrow("PREOILCODE") = OIT0002row("PREOILCODE") AndAlso
+                        XLSTBLrow("DEPSTATION") = OIT0002row("DEPSTATION") AndAlso
+                        XLSTBLrow("RETSTATION") = OIT0002row("RETSTATION") AndAlso
+                        XLSTBLrow("JRINSPECTIONALERTSTR") = OIT0002row("JRINSPECTIONALERTSTR") AndAlso
+                        XLSTBLrow("JRINSPECTIONDATE") = OIT0002row("JRINSPECTIONDATE") AndAlso
+                        XLSTBLrow("JRALLINSPECTIONALERTSTR") = OIT0002row("JRALLINSPECTIONALERTSTR") AndAlso
+                        XLSTBLrow("JRALLINSPECTIONDATE") = OIT0002row("JRALLINSPECTIONDATE") AndAlso
+                        XLSTBLrow("INITYMD") = OIT0002row("INITYMD") AndAlso
+                        XLSTBLrow("DELFLG") = OIT0002row("DELFLG") AndAlso
+                        XLSTBLrow("LINKNO") = OIT0002row("LINKNO") AndAlso
+                        XLSTBLrow("LINKDETAILNO") = OIT0002row("LINKDETAILNO") Then
                         OIT0002INProw.ItemArray = OIT0002row.ItemArray
                         Exit For
                     End If
                 Next
             End If
 
+            Dim WW_GetValue() As String = {"", "", "", "", ""}
+
             '○ 項目セット
-            '貨車連結順序表№
-            If WW_COLUMNS.IndexOf("LINKNO") >= 0 Then
-                OIT0002INProw("LINKNO") = XLSTBLrow("LINKNO")
-            End If
-
-            '貨車連結順序表明細№
-            If WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
-                OIT0002INProw("LINKDETAILNO") = XLSTBLrow("LINKDETAILNO")
-            End If
-
-            'ステータス
-            If WW_COLUMNS.IndexOf("STATUS") >= 0 Then
-                OIT0002INProw("STATUS") = XLSTBLrow("STATUS")
-            End If
-
-            '情報
-            If WW_COLUMNS.IndexOf("INFO") >= 0 Then
-                OIT0002INProw("INFO") = XLSTBLrow("INFO")
-            End If
-
-            '前回オーダー№
-            If WW_COLUMNS.IndexOf("PREORDERNO") >= 0 Then
-                OIT0002INProw("PREORDERNO") = XLSTBLrow("PREORDERNO")
-            End If
-
-            '本線列車
-            If WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
-                OIT0002INProw("TRAINNO") = XLSTBLrow("TRAINNO")
-            End If
-
-            '登録営業所コード
-            If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 Then
-                OIT0002INProw("OFFICECODE") = XLSTBLrow("OFFICECODE")
-            End If
-
-            '空車発駅コード
-            If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 Then
-                OIT0002INProw("DEPSTATION") = XLSTBLrow("DEPSTATION")
-            End If
-
-            '空車発駅名
-            If WW_COLUMNS.IndexOf("DEPSTATIONNAME") >= 0 Then
-                OIT0002INProw("DEPSTATIONNAME") = XLSTBLrow("DEPSTATIONNAME")
-            End If
-
-            '空車着駅コード
-            If WW_COLUMNS.IndexOf("RETSTATION") >= 0 Then
-                OIT0002INProw("RETSTATION") = XLSTBLrow("RETSTATION")
-            End If
-
-            '空車着駅名
-            If WW_COLUMNS.IndexOf("RETSTATIONNAME") >= 0 Then
-                OIT0002INProw("RETSTATIONNAME") = XLSTBLrow("RETSTATIONNAME")
-            End If
-
-            '空車着日（予定）
-            If WW_COLUMNS.IndexOf("EMPARRDATE") >= 0 Then
-                OIT0002INProw("EMPARRDATE") = XLSTBLrow("EMPARRDATE")
-            End If
-
-            '空車着日（実績）
-            If WW_COLUMNS.IndexOf("ACTUALEMPARRDATE") >= 0 Then
-                OIT0002INProw("ACTUALEMPARRDATE") = XLSTBLrow("ACTUALEMPARRDATE")
-            End If
-
             '入線列車番号
             If WW_COLUMNS.IndexOf("LINETRAINNO") >= 0 Then
                 OIT0002INProw("LINETRAINNO") = XLSTBLrow("LINETRAINNO")
@@ -1611,11 +1557,84 @@ Public Class OIT0002LinkDetail
             'タンク車№
             If WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 Then
                 OIT0002INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
+
+                '●タンク車№から対象データを自動で設定
+                FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0002INProw("TANKNUMBER"), WW_GetValue)
+                OIT0002INProw("PREOILCODE") = WW_GetValue(1)
+
+                '交検日
+                OIT0002INProw("JRINSPECTIONDATE") = WW_GetValue(2)
+
+                '交検日アラート
+                If WW_GetValue(2) <> "" Then
+                    Dim WW_JRINSPECTIONCNT As String = DateDiff(DateInterval.Day, Date.Parse(Now.ToString("yyyy/MM/dd")), Date.Parse(WW_GetValue(2)))
+                    Dim WW_JRINSPECTIONFLG As String
+                    If WW_JRINSPECTIONCNT <= 3 Then
+                        WW_JRINSPECTIONFLG = "1"
+                    ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                        WW_JRINSPECTIONFLG = "2"
+                    Else
+                        WW_JRINSPECTIONFLG = "3"
+                    End If
+                    Select Case WW_JRINSPECTIONFLG
+                        Case "1"
+                            OIT0002INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            OIT0002INProw("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                        Case "2"
+                            OIT0002INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            OIT0002INProw("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                        Case "3"
+                            OIT0002INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            OIT0002INProw("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                    End Select
+                Else
+                    OIT0002INProw("JRINSPECTIONALERT") = ""
+                End If
+
+                '全検日
+                OIT0002INProw("JRALLINSPECTIONDATE") = WW_GetValue(3)
+
+                '全検日アラート
+                If WW_GetValue(3) <> "" Then
+                    Dim WW_JRALLINSPECTIONCNT As String = DateDiff(DateInterval.Day, Date.Parse(Now.ToString("yyyy/MM/dd")), Date.Parse(WW_GetValue(3)))
+                    Dim WW_JRALLINSPECTIONFLG As String
+                    If WW_JRALLINSPECTIONCNT <= 3 Then
+                        WW_JRALLINSPECTIONFLG = "1"
+                    ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                        WW_JRALLINSPECTIONFLG = "2"
+                    Else
+                        WW_JRALLINSPECTIONFLG = "3"
+                    End If
+                    Select Case WW_JRALLINSPECTIONFLG
+                        Case "1"
+                            OIT0002INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            OIT0002INProw("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                        Case "2"
+                            OIT0002INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            OIT0002INProw("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                        Case "3"
+                            OIT0002INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            OIT0002INProw("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                    End Select
+                Else
+                    OIT0002INProw("JRALLINSPECTIONALERT") = ""
+                End If
+
+                '前回油種名(前回油種コードから油種名を取得し設定)
+                WW_GetValue = {"", "", "", "", ""}
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN", OIT0002INProw("PREOILCODE"), WW_GetValue)
+                OIT0002INProw("PREOILNAME") = WW_GetValue(0)
             End If
 
-            '前回油種
-            If WW_COLUMNS.IndexOf("PREOILCODE") >= 0 Then
-                OIT0002INProw("PREOILCODE") = XLSTBLrow("PREOILCODE")
+            '空車発駅
+            OIT0002INProw("DEPSTATION") = TxtDepstation.Text
+
+            '空車着駅
+            OIT0002INProw("RETSTATION") = TxtRetstation.Text
+
+            '登録日
+            If WW_COLUMNS.IndexOf("INITYMD") >= 0 Then
+                OIT0002INProw("INITYMD") = Date.Now
             End If
 
             '削除フラグ
@@ -1623,6 +1642,16 @@ Public Class OIT0002LinkDetail
                 OIT0002INProw("DELFLG") = XLSTBLrow("DELFLG")
             Else
                 OIT0002INProw("DELFLG") = "0"
+            End If
+
+            '貨車連結順序表№
+            If WW_COLUMNS.IndexOf("LINKNO") >= 0 Then
+                OIT0002INProw("LINKNO") = XLSTBLrow("LINKNO")
+            End If
+
+            '貨車連結順序表明細№
+            If WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
+                OIT0002INProw("LINKDETAILNO") = XLSTBLrow("LINKDETAILNO")
             End If
 
             OIT0002INPtbl.Rows.Add(OIT0002INProw)
@@ -1700,16 +1729,6 @@ Public Class OIT0002LinkDetail
         Dim WW_GetValue() As String = {"", "", "", "", ""}
 
         Select Case WF_FIELD.Value
-            'Case "OILNAME"           '(一覧)油種
-            '    If WW_ListValue <> "" Then
-            '        FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN_N", WW_ListValue, WW_GetValue)
-            '        updHeader.Item("OILCODE") = WW_GetValue(0)
-            '        updHeader.Item(WF_FIELD.Value) = WW_ListValue
-            '    Else
-            '        updHeader.Item("OILCODE") = ""
-            '        updHeader.Item(WF_FIELD.Value) = ""
-            '    End If
-
             Case "LINETRAINNO"            '入線番号
                 updHeader.Item("LINETRAINNO") = WW_ListValue
 
@@ -1717,70 +1736,80 @@ Public Class OIT0002LinkDetail
                 updHeader.Item("LINEORDER") = WW_ListValue
 
             Case "TANKNUMBER"            '(一覧)タンク車№
-                FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                If WW_ListValue <> "" Then
+                    FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
 
-                'タンク車№
-                updHeader.Item("TANKNUMBER") = WW_ListValue
+                    'タンク車№
+                    updHeader.Item("TANKNUMBER") = WW_ListValue
 
-                '前回油種
-                Dim WW_LASTOILNAME As String = ""
-                updHeader.Item("PREOILCODE") = WW_GetValue(1)
-                CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                updHeader.Item("PREOILNAME") = WW_LASTOILNAME
+                    '前回油種
+                    Dim WW_LASTOILNAME As String = ""
+                    updHeader.Item("PREOILCODE") = WW_GetValue(1)
+                    CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                    updHeader.Item("PREOILNAME") = WW_LASTOILNAME
 
-                '交検日
-                Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
-                Dim WW_JRINSPECTIONCNT As String
-                updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                If WW_GetValue(2) <> "" Then
-                    WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+                    '交検日
+                    Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
+                    Dim WW_JRINSPECTIONCNT As String
+                    updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
+                    If WW_GetValue(2) <> "" Then
+                        WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
 
-                    Dim WW_JRINSPECTIONFLG As String
-                    If WW_JRINSPECTIONCNT <= 3 Then
-                        WW_JRINSPECTIONFLG = "1"
-                    ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
-                        WW_JRINSPECTIONFLG = "2"
+                        Dim WW_JRINSPECTIONFLG As String
+                        If WW_JRINSPECTIONCNT <= 3 Then
+                            WW_JRINSPECTIONFLG = "1"
+                        ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                            WW_JRINSPECTIONFLG = "2"
+                        Else
+                            WW_JRINSPECTIONFLG = "3"
+                        End If
+                        Select Case WW_JRINSPECTIONFLG
+                            Case "1"
+                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            Case "2"
+                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            Case "3"
+                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                        End Select
                     Else
-                        WW_JRINSPECTIONFLG = "3"
+                        updHeader.Item("JRINSPECTIONALERT") = ""
                     End If
-                    Select Case WW_JRINSPECTIONFLG
-                        Case "1"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
-                        Case "2"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
-                        Case "3"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
-                    End Select
-                Else
-                    updHeader.Item("JRINSPECTIONALERT") = ""
-                End If
 
-                '全検日
-                Dim WW_JRALLINSPECTIONCNT As String
-                updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                If WW_GetValue(3) <> "" Then
-                    WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+                    '全検日
+                    Dim WW_JRALLINSPECTIONCNT As String
+                    updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
+                    If WW_GetValue(3) <> "" Then
+                        WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
 
-                    Dim WW_JRALLINSPECTIONFLG As String
-                    If WW_JRALLINSPECTIONCNT <= 3 Then
-                        WW_JRALLINSPECTIONFLG = "1"
-                    ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
-                        WW_JRALLINSPECTIONFLG = "2"
+                        Dim WW_JRALLINSPECTIONFLG As String
+                        If WW_JRALLINSPECTIONCNT <= 3 Then
+                            WW_JRALLINSPECTIONFLG = "1"
+                        ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                            WW_JRALLINSPECTIONFLG = "2"
+                        Else
+                            WW_JRALLINSPECTIONFLG = "3"
+                        End If
+                        Select Case WW_JRALLINSPECTIONFLG
+                            Case "1"
+                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            Case "2"
+                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            Case "3"
+                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                        End Select
                     Else
-                        WW_JRALLINSPECTIONFLG = "3"
+                        updHeader.Item("JRALLINSPECTIONALERT") = ""
                     End If
-                    Select Case WW_JRALLINSPECTIONFLG
-                        Case "1"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
-                        Case "2"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
-                        Case "3"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
-                    End Select
                 Else
-                    updHeader.Item("JRALLINSPECTIONALERT") = ""
+                    'タンク車№が空の場合
+                    updHeader.Item("TANKNUMBER") = WW_ListValue
+                    updHeader.Item("PREOILCODE") = WW_ListValue
+                    updHeader.Item("PREOILNAME") = WW_ListValue
+                    updHeader.Item("JRINSPECTIONDATE") = WW_ListValue
+                    updHeader.Item("JRINSPECTIONALERT") = WW_ListValue
+                    updHeader.Item("JRALLINSPECTIONDATE") = WW_ListValue
+                    updHeader.Item("JRALLINSPECTIONALERT") = WW_ListValue
                 End If
-
         End Select
 
         '○ 画面表示データ保存
@@ -1970,8 +1999,8 @@ Public Class OIT0002LinkDetail
             WW_ERR_MES &= ControlChars.NewLine & "  --> 入線順             =" & OIT0002row("LINEORDER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車番号       =" & OIT0002row("TANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 前回油種　　       =" & OIT0002row("PREOILCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 空車発駅名 　　　　=" & OIT0002row("DEPSTATIONNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 空車着駅名 　　　　=" & OIT0002row("RETSTATIONNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 空車発駅   　　　　=" & OIT0002row("DEPSTATION") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 空車着駅   　　　　=" & OIT0002row("RETSTATION") & " , "
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
@@ -2688,7 +2717,7 @@ Public Class OIT0002LinkDetail
             End If
 
             '油種(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OILCODE", OIT0002INProw("OILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "PREOILCODE", OIT0002INProw("PREOILCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "油種入力エラー。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -2758,8 +2787,8 @@ Public Class OIT0002LinkDetail
 
             'KEY項目が等しい時
             For Each OIT0002row As DataRow In OIT0002tbl.Rows
-                If OIT0002row("ORDERNO") = OIT0002INProw("ORDERNO") AndAlso
-                    OIT0002row("DETAILNO") = OIT0002INProw("DETAILNO") Then
+                If OIT0002row("LINKNO") = OIT0002INProw("LINKNO") AndAlso
+                    OIT0002row("LINKDETAILNO") = OIT0002INProw("LINKDETAILNO") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
                     If OIT0002row("DELFLG") = OIT0002INProw("DELFLG") AndAlso
                         OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
@@ -2802,12 +2831,12 @@ Public Class OIT0002LinkDetail
         For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
             '同一レコードか判定
-            If OIT0002INProw("ORDERNO") = OIT0002row("ORDERNO") AndAlso
-                OIT0002INProw("DETAILNO") = OIT0002row("DETAILNO") Then
+            If OIT0002INProw("LINKNO") = OIT0002row("LINKNO") AndAlso
+                OIT0002INProw("LINKDETAILNO") = OIT0002row("LINKDETAILNO") Then
                 '画面入力テーブル項目設定
                 OIT0002INProw("LINECNT") = OIT0002row("LINECNT")
                 OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-                OIT0002INProw("TIMSTP") = OIT0002row("TIMSTP")
+                OIT0002INProw("UPDTIMSTP") = OIT0002row("UPDTIMSTP")
                 OIT0002INProw("SELECT") = 1
                 OIT0002INProw("HIDDEN") = 0
 
@@ -2837,7 +2866,7 @@ Public Class OIT0002LinkDetail
             OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
         End If
 
-        OIT0002row("TIMSTP") = "0"
+        OIT0002row("UPDTIMSTP") = "0"
         OIT0002row("SELECT") = 1
         OIT0002row("HIDDEN") = 0
 
@@ -2855,12 +2884,12 @@ Public Class OIT0002LinkDetail
         For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
             '同一レコードか判定
-            If OIT0002INProw("ORDERNO") = OIT0002row("ORDERNO") AndAlso
-               OIT0002INProw("DETAILNO") = OIT0002row("DETAILNO") Then
+            If OIT0002INProw("LINKNO") = OIT0002row("LINKNO") AndAlso
+               OIT0002INProw("LINKDETAILNO") = OIT0002row("LINKDETAILNO") Then
                 '画面入力テーブル項目設定
                 OIT0002INProw("LINECNT") = OIT0002row("LINECNT")
                 OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-                OIT0002INProw("TIMSTP") = OIT0002row("TIMSTP")
+                OIT0002INProw("UPDTIMSTP") = OIT0002row("UPDTIMSTP")
                 OIT0002INProw("SELECT") = 1
                 OIT0002INProw("HIDDEN") = 0
 

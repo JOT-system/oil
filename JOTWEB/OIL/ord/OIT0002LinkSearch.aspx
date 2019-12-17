@@ -47,7 +47,7 @@
         <!-- 発駅コード -->
         <a id ="WF_DEPSTATION_LABEL">★発駅</a>
 
-        <a class="ef" id="WF_DEPSTATION" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_OILTANKCODE');">
+        <a class="ef" id="WF_DEPSTATION" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_DEPSTATION');">
             <asp:TextBox CssClass="BoxIcon" ID="WF_DEPSTATION_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a id="WF_DEPSTATION_TEXT">

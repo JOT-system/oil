@@ -118,6 +118,13 @@
                         <asp:Label ID="WF_STATUS_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
 
+                    <!-- 表示ステータス -->
+                    <a class="ef">
+                        <asp:Label ID="WF_STATUSNOW_L" runat="server" Text="表示ステータス" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_STATUSNOW" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_STATUSNOW_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                    </a>
+
                     <!-- 情報 -->
                     <a class="ef">
                         <asp:Label ID="WF_INFO_L" runat="server" Text="情報" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>

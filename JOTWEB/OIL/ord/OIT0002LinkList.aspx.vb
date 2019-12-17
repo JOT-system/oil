@@ -222,6 +222,9 @@ Public Class OIT0002LinkList
         'ステータス
         WF_STATUS.Text = work.WF_SEL_STATUS.Text
 
+        '表示ステータス
+        WF_STATUSNOW.Text = work.WF_SEL_STATUSNOW.Text
+
         '情報
         WF_INFO.Text = work.WF_SEL_INFO.Text
 
@@ -342,7 +345,8 @@ Public Class OIT0002LinkList
                 & "    , 0                                                 AS HIDDEN " _
                 & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')    AS INITYMD " _
                 & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
-                & "    , CASE WHEN ISNULL(RTRIM(OIT0004.STATUS), '') ='1' Then '利用可' Else '利用不可' End AS STATUS " _
+                & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                      AS STATUS " _
+                & "    , CASE WHEN ISNULL(RTRIM(OIT0004.STATUS), '') ='1' Then '利用可' Else '利用不可' End AS STATUSNOW " _
                 & "    , ISNULL(RTRIM(OIT0004.INFO), '')                      AS INFO " _
                 & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                AS PREORDERNO " _
                 & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                   AS TRAINNO " _
@@ -1212,6 +1216,9 @@ Public Class OIT0002LinkList
         'ステータス
         work.WF_SEL_STATUS.Text = ""
 
+        '表示ステータス
+        work.WF_SEL_STATUSNOW.Text = ""
+
         '情報
         work.WF_SEL_INFO.Text = ""
 
@@ -1376,6 +1383,9 @@ Public Class OIT0002LinkList
 
         'ステータス
         work.WF_SEL_STATUS.Text = OIT0002tbl.Rows(WW_LINECNT)("STATUS")
+
+        '表示ステータス
+        work.WF_SEL_STATUSNOW.Text = OIT0002tbl.Rows(WW_LINECNT)("STATUSNOW")
 
         '情報
         work.WF_SEL_INFO.Text = OIT0002tbl.Rows(WW_LINECNT)("INFO")
@@ -1840,6 +1850,8 @@ Public Class OIT0002LinkList
 
         OIT0002INProw("STATUS") = WF_STATUS.Text              'ステータス
 
+        OIT0002INProw("STATUSNOW") = WF_STATUSNOW.Text              '表示ステータス
+
         OIT0002INProw("INFO") = WF_INFO.Text              '情報
 
         OIT0002INProw("PREORDERNO") = WF_PREORDERNO.Text              '前回オーダー№
@@ -1934,6 +1946,7 @@ Public Class OIT0002LinkList
         WF_LINKNO.Text = ""            '貨車連結順序表№
         WF_LINKDETAILNO.Text = ""            '貨車連結順序表明細№
         WF_STATUS.Text = ""            'ステータス
+        WF_STATUSNOW.Text = ""            '表示ステータス
         WF_INFO.Text = ""            '情報
         WF_PREORDERNO.Text = ""            '前回オーダー№
         WF_TRAINNO.Text = ""            '本線列車

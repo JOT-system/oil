@@ -486,10 +486,10 @@ Public Class OIT0002LinkSearch
                 Case "ORG"             '組織コード
                     prmData = work.CreateORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "STATIONPATTERN"       '空車発駅
+                Case "DEPSTATION"       '空車発駅
                     prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "STATIONPATTERN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "WF_TRAINNO"           '本線列車
+                Case "TRAINNO"           '本線列車
                     prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select

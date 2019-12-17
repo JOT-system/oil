@@ -235,5 +235,6 @@
 
             <!-- 新規・更新切替用フラグ -->
             <input id="WF_CREATEFLG" runat="server" value="" type="text" />
+
         </div>
 </asp:Content>

@@ -129,11 +129,17 @@ Public Class OIT0002LinkDetail
                 WF_MAPpermitcode.Value = "FALSE"
             End If
 
-            '○ 作成モード(１：新規登録, ２：更新)設定
+            '○ 作成モード(１：新規登録, ２：更新)設定 
             If work.WF_SEL_CREATEFLG.Text = "1" Then
                 WF_CREATEFLG.Value = "1"
+                If WF_PANELFLG.Value <> "1" Then
+                    WF_PANELFLG.Value = "2"
+                End If
             Else
                 WF_CREATEFLG.Value = "2"
+                If WF_PANELFLG.Value <> "1" Then
+                    WF_PANELFLG.Value = "1"
+                End If
             End If
         Finally
             '○ 格納Table Close
@@ -201,6 +207,7 @@ Public Class OIT0002LinkDetail
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
+        'Grid情報保存先のファイル名
         Master.CreateXMLSaveFile()
 
         '登録営業所
@@ -635,6 +642,8 @@ Public Class OIT0002LinkDetail
         'パネルロックを解除
         work.WF_SEL_PANEL.Value = "1"
 
+        WF_PANELFLG.Value = "1"
+
         '○ GridView初期設定
         '○ 画面表示データ再取得(貨車連結表(明細)画面表示データ取得)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -905,7 +914,7 @@ Public Class OIT0002LinkDetail
                 End Try
                 TxtEmpDate.Focus()
 
-            Case "TxtDepDate"           '(実績)空車着日
+            Case "TxtActEmpDate"           '(実績)空車着日
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
@@ -2248,10 +2257,14 @@ Public Class OIT0002LinkDetail
                 Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表№
                 Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
 
+                Dim CNT_ROWS As Long = 0
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     If Trim(OIT0002row("LINETRAINNO")) <> "" And
                         Trim(OIT0002row("LINEORDER")) <> "" And
                         Trim(OIT0002row("TANKNUMBER")) <> "" Then
+
+                        CNT_ROWS += 1
+
                         Dim WW_DATENOW As DateTime = Date.Now
 
                         'DB更新
@@ -2289,6 +2302,47 @@ Public Class OIT0002LinkDetail
                         PARA16.Value = OIT0002row("LINEORDER")            '入線順
                         PARA17.Value = OIT0002row("TANKNUMBER")       　　'タンク車№
                         PARA18.Value = OIT0002row("PREOILCODE")           '前回油種　
+                        Select Case PARA18.Value
+                            Case CONST_TxtHTank                 '油種(ハイオク)
+                                LNG_TxtHTank += 1
+                                CNT_Total += 1
+                            Case CONST_TxtRTank                  '油種(レギュラー)
+                                LNG_TxtRTank += 1
+                                CNT_Total += 1
+                            Case CONST_TxtTTank                  '油種(灯油)
+                                LNG_TxtTTank += 1
+                                CNT_Total += 1
+                            Case CONST_TxtMTTank            '油種(未添加灯油)
+                                LNG_TxtMTTank += 1
+                                CNT_Total += 1
+                            Case CONST_TxtKTank1            '油種(軽油)
+                                LNG_TxtKTank1 += 1
+                                CNT_Total += 1
+                        'Case CONST_TxtKTank2
+                            'LNG_TxtKTank2 += 1
+                            'CNT_Total += 1
+                            Case CONST_TxtK3Tank1              '３号軽油
+                                LNG_TxtK3Tank1 += 1
+                                CNT_Total += 1
+                        'Case CONST_TxtK3Tank2
+                            'LNG_TxtK3Tank2 += 1
+                            'CNT_Total += 1
+                            Case CONST_TxtK5Tank              '５号軽油
+                                LNG_TxtK5Tank += 1
+                                CNT_Total += 1
+                            Case CONST_TxtK10Tank               '１０号軽油
+                                LNG_TxtK10Tank += 1
+                                CNT_Total += 1
+                            Case CONST_TxtLTank1                'ＬＳＡ
+                                LNG_TxtLTank1 += 1
+                                CNT_Total += 1
+                        'Case CONST_TxtLTank2
+                            'LNG_TxtLTank2 += 1
+                            'CNT_Total += 1
+                            Case CONST_TxtATank               'Ａ重油
+                                LNG_TxtATank += 1
+                                CNT_Total += 1
+                        End Select
                         PARA83.Value = OIT0002row("DELFLG")               '削除フラグ
                         PARA84.Value = WW_DATENOW                         '登録年月日
                         PARA85.Value = Master.USERID                      '登録ユーザーID
@@ -2298,52 +2352,9 @@ Public Class OIT0002LinkDetail
                         PARA89.Value = Master.USERTERMID                  '更新端末
                         PARA90.Value = C_DEFAULT_YMD
 
+                        OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                         SQLcmd.CommandTimeout = 300
                         SQLcmd.ExecuteNonQuery()
-
-                        OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-
-                        Select Case PARA18.Value
-                            Case CONST_TxtHTank                 '油種(ハイオク)
-                                LNG_TxtHTank = LNG_TxtHTank + 1
-                                CNT_Total = CNT_Total + 1
-                            Case CONST_TxtRTank                  '油種(レギュラー)
-                                LNG_TxtRTank = LNG_TxtRTank + 1
-                                CNT_Total = CNT_Total + 1
-                            Case CONST_TxtTTank                  '油種(灯油)
-                                LNG_TxtTTank = LNG_TxtTTank + 1
-                                CNT_Total = CNT_Total + 1
-                            Case CONST_TxtMTTank            '油種(未添加灯油)
-                                LNG_TxtMTTank = LNG_TxtMTTank + 1
-                                CNT_Total = CNT_Total + 1
-                            Case CONST_TxtKTank1            '油種(軽油)
-                                LNG_TxtKTank1 = LNG_TxtKTank1 + 1
-                                CNT_Total = CNT_Total + 1
-                            'Case CONST_TxtKTank2
-                                'LNG_TxtKTank2 = LNG_TxtKTank2 + 1
-                                'CNT_Total = CNT_Total + 1
-                            Case CONST_TxtK3Tank1              '３号軽油
-                                LNG_TxtK3Tank1 = LNG_TxtK3Tank1 + 1
-                                CNT_Total = CNT_Total + 1
-                            'Case CONST_TxtK3Tank2
-                                'LNG_TxtK3Tank2 = LNG_TxtK3Tank2 + 1
-                                'CNT_Total = CNT_Total + 1
-                            Case CONST_TxtK5Tank              '５号軽油
-                                LNG_TxtK5Tank = LNG_TxtK5Tank + 1
-                                CNT_Total = CNT_Total + 1
-                            Case CONST_TxtK10Tank               '１０号軽油
-                                LNG_TxtK10Tank = LNG_TxtK10Tank + 1
-                                CNT_Total = CNT_Total + 1
-                            Case CONST_TxtLTank1                'ＬＳＡ
-                                LNG_TxtLTank1 = LNG_TxtLTank1 + 1
-                                CNT_Total = CNT_Total + 1
-                            'Case CONST_TxtLTank2
-                                'LNG_TxtLTank2 = LNG_TxtLTank2 + 1
-                                'CNT_Total = CNT_Total + 1
-                            Case CONST_TxtATank               'Ａ重油
-                                LNG_TxtATank = LNG_TxtATank + 1
-                                CNT_Total = CNT_Total + 1
-                        End Select
 
                         '更新ジャーナル出力
                         JPARA01.Value = OIT0002row("LINKNO")
@@ -2381,6 +2392,18 @@ Public Class OIT0002LinkDetail
                         Next
                     End If
                 Next
+
+                If CNT_ROWS = 0 Then
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")
+
+                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+                    CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
+                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                    CS0011LOGWrite.TEXT = "必須項目エラー"
+                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+                    Exit Sub
+                End If
 
                 '油種(ハイオク)
                 TxtHTank.Text = LNG_TxtHTank

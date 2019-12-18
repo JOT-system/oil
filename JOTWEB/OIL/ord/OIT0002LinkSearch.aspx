@@ -70,11 +70,11 @@
         <!-- 本線列車番号 -->
         <a id="WF_TRAINNO_LABEL">列車番号</a>
 
-        <a class="ef" id="WF_TRAINNO" >
+        <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('WF_TRAINNO', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('WF_TRAINNO');">
             <asp:TextBox ID="WF_TRAINNO_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
 
-        <a ID="WF_TRAINNO_TEXT">
+        <a id="WF_TRAINNO_TEXT">
             <asp:Label ID="WF_TRAINNO_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
         

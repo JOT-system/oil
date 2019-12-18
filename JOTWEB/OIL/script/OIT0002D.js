@@ -27,7 +27,7 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
             document.getElementById("WF_ButtonCSV").disabled = "disabled";
-            document.getElementById("WF_ButtonUPDATE").disabled = "";
+            document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
             document.getElementById("pnlListArea").display = "none";
         } else if (document.getElementById('WF_CREATEFLG').value == "2") {
             //非活性
@@ -38,7 +38,6 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
             document.getElementById("WF_ButtonLINE_ADD").disabled = "";
             document.getElementById("WF_ButtonCSV").disabled = "";
-            document.getElementById("WF_ButtonUPDATE").disabled = "";
         };
 
     } else {
@@ -48,6 +47,13 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
+    };
+
+    if (document.getElementById('WF_PANELFLG').value == "1") {
+        //活性
+        document.getElementById("WF_ButtonUPDATE").disabled = "";
+    } else {
+        //非活性 
         document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     };
 

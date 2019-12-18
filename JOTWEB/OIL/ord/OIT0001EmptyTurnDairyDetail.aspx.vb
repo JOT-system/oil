@@ -246,14 +246,14 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         '〇営業所配下情報を取得・設定
-        Dim WW_GetValue() As String = {"", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", work.WF_SEL_SALESOFFICECODE.Text, WW_GetValue)
         work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
         work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
         work.WF_SEL_BASECODE.Text = WW_GetValue(2)
         work.WF_SEL_BASENAME.Text = WW_GetValue(3)
         work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-        work.WF_SEL_CONSIGNEENAME.Text = ""
+        work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
 
         '○ 名称設定処理
         '会社コード
@@ -673,7 +673,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End Using
 
         '〇画面で設定された油種コードを取得
-        Dim WW_GetValue() As String = {"", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
         Dim arrTankCode(intTankCnt) As String
         Dim arrTankName(intTankCnt) As String
         Dim z As Integer = 0
@@ -895,7 +895,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
             '本社列車
             Case "TxtHeadOfficeTrain"
-                Dim WW_GetValue() As String = {"", "", "", "", ""}
+                Dim WW_GetValue() As String = {"", "", "", "", "", ""}
                 WW_FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
                 '発駅
@@ -932,7 +932,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Protected Sub WF_ButtonSel_Click()
         Dim WW_SelectValue As String = ""
         Dim WW_SelectText As String = ""
-        Dim WW_GetValue() As String = {"", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
@@ -1802,7 +1802,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Next
             End If
 
-            Dim WW_GetValue() As String = {"", "", "", "", ""}
+            Dim WW_GetValue() As String = {"", "", "", "", "", ""}
 
             '○ 項目セット
             ''会社コード
@@ -1890,7 +1890,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End If
 
                 '前回油種名(前回油種コードから油種名を取得し設定)
-                WW_GetValue = {"", "", "", "", ""}
+                WW_GetValue = {"", "", "", "", "", ""}
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", OIT0001INProw("LASTOILCODE"), WW_GetValue)
                 OIT0001INProw("LASTOILNAME") = WW_GetValue(0)
 
@@ -2000,7 +2000,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         '○ 設定項目取得
         '対象フォーム項目取得
         Dim WW_ListValue = Request.Form("txt" & pnlListArea.ID & WF_FIELD.Value & WF_GridDBclick.Text)
-        Dim WW_GetValue() As String = {"", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
             Case "TxtOrderOffice"    '受注営業所
@@ -2392,6 +2392,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 & " , ISNULL(RTRIM(VIW0001.VALUE3), '   ')   AS VALUE3" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE4), '   ')   AS VALUE4" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE5), '   ')   AS VALUE5" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE6), '   ')   AS VALUE6" _
                 & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
@@ -2444,6 +2445,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         O_VALUE(2) = OIT0001WKrow("VALUE3")
                         O_VALUE(3) = OIT0001WKrow("VALUE4")
                         O_VALUE(4) = OIT0001WKrow("VALUE5")
+                        O_VALUE(5) = OIT0001WKrow("VALUE6")
                     Next
                 End If
             End Using

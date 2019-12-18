@@ -1048,17 +1048,18 @@ span[class^="WF_DViewRep"][class$="_Area"] {
     background-color: rgb(237,237,237);
 }
 
-/*.WF_DView1 {
-    top: calc(-2.4em - 17.4em - 1.4em + 100%);
-    bottom: 1.4em;
-    left: 0em;
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    overflow: hidden;
-    background-color: rgb(237,237,237);
-}*/
 
+/* 明細部 ボタン */
+
+#detailbuttonbox {
+    z-index: 10;
+}
+    #detailbuttonbox a {
+        position: relative;
+        margin: 0em 0em 0em 0.2em;
+        top: -1.5em;
+        left: 48.8em;
+    }
 
 /* セルの設定(共通) */
 

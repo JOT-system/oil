@@ -238,5 +238,8 @@
 
             <!-- パネルロック・解除フラグ -->
             <input id="WF_PANELFLG" runat="server" value="" type="text" />
+
+            <!-- TBLアップデートエラーフラグ -->
+            <input id="WF_UPDERRFLG" runat="server" value="" type="text" />
         </div>
 </asp:Content>

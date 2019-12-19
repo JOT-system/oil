@@ -361,6 +361,12 @@ Public Class OIM0005TankList
             work.WF_SEL_MODEL.Text = "" Then
             SQLStr &=
               " WHERE OIM0005.DELFLG      <> @P3"
+        ElseIf work.WF_SEL_TANKNUMBER.Text <> "" And
+            work.WF_SEL_MODEL.Text <> "" Then
+            SQLStr &=
+              " WHERE OIM0005.TANKNUMBER = @P1" _
+            & "   AND OIM0005.MODEL = @P2" _
+            & "   AND OIM0005.DELFLG      <> @P3"
         Else
             SQLStr &=
               " WHERE OIM0005.TANKNUMBER = @P1" _

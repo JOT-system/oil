@@ -20,6 +20,10 @@ Public Class GL0002OrgList
         ''' </summary>
         NO_AUTHORITY_WITH_ORG
         ''' <summary>
+        ''' 権限確認無/全部署
+        ''' </summary>
+        NO_AUTHORITY_WITH_ALL
+        ''' <summary>
         ''' ユーザ権限確認
         ''' </summary>
         USER
@@ -158,6 +162,8 @@ Public Class GL0002OrgList
             '    getOrgListWithBothAuth(SQLcon)
             'Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ORG
             '    getOrgRelationList(SQLcon)
+            Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ALL
+                getOrgAllList(SQLcon)
             Case Else
                 getOrgList(SQLcon)
         End Select
@@ -167,12 +173,13 @@ Public Class GL0002OrgList
         SQLcon = Nothing
 
     End Sub
+
     ''' <summary>
     ''' 部署一覧取得
     ''' </summary>
     Protected Sub getOrgList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用部署取得
-        '○ User権限によりDB(OIS0010_AUTHOR)検索
+        '○ User権限によりDB(OIM0002_ORG)検索
         Try
             '検索SQL文
             Dim SQLStr As String =
@@ -271,7 +278,74 @@ Public Class GL0002OrgList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+            CS0011LOGWRITE.INFPOSI = "DB:OIM0002_ORG Select"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+            ERR = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
+
+        ERR = C_MESSAGE_NO.NORMAL
+
+    End Sub
+
+    ''' <summary>
+    ''' 全部署一覧取得
+    ''' </summary>
+    Protected Sub getOrgAllList(ByVal SQLcon As SqlConnection)
+        '●Leftボックス用部署取得
+        '○ User権限によりDB(OIM0002_ORG)検索
+        Try
+            '検索SQL文
+            Dim SQLStr As String =
+                  " SELECT                                 " _
+                & "   rtrim(A.ORGCODE)     as CODE      ,  " _
+                & "   rtrim(A.NAME)        as NAMES     ,  " _
+                & "   rtrim(A.ORGCODE)     as CATEGORY  ,  " _
+                & "   ''                   as SEQ          " _
+                & " FROM       OIL.OIM0002_ORG A           " _
+                & " Where                                  " _
+                & "         A.STYMD   <= @P1               " _
+                & "   and   A.ENDYMD  >= @P2               " _
+                & "   and   A.DELFLG  <> @P3               "
+            If Not String.IsNullOrEmpty(CAMPCODE) Then SQLStr = SQLStr & " and A.CAMPCODE = @P1 "
+            SQLStr = SQLStr & " GROUP BY A.ORGCODE , A.NAME , A.ORGCODE "
+            '〇ソート条件追加
+            Select Case DEFAULT_SORT
+                Case C_DEFAULT_SORT.CODE
+                    SQLStr = SQLStr & " ORDER BY A.ORGCODE , A.NAME "
+                Case C_DEFAULT_SORT.NAMES
+                    SQLStr = SQLStr & " ORDER BY A.NAME, A.ORGCODE "
+                Case C_DEFAULT_SORT.SEQ, String.Empty
+                    SQLStr = SQLStr & " ORDER BY A.ORGCODE , A.NAME "
+                Case Else
+            End Select
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.Date)
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 1)
+
+                PARA1.Value = STYMD
+                PARA2.Value = ENDYMD
+                PARA3.Value = C_DELETE_FLG.DELETE
+
+                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+
+                '○出力編集
+                addListData(SQLdr)
+
+                'Close
+                SQLdr.Close() 'Reader(Close)
+                SQLdr = Nothing
+
+            End Using
+        Catch ex As Exception
+            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+            CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "DB:OIM0002_ORG Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -373,7 +447,7 @@ Public Class GL0002OrgList
     '    Catch ex As Exception
     '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
     '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0002_ORG Select"
     '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
     '        CS0011LOGWRITE.TEXT = ex.ToString()
     '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -391,7 +465,7 @@ Public Class GL0002OrgList
     '''' </summary>
     'Protected Sub getOrgListWithUserAuth(ByVal SQLcon As SqlConnection)
     '    '●Leftボックス用会社取得
-    '    '○ User権限によりDB(OIS0010_AUTHOR)検索
+    '    '○ User権限によりDB(OIM0002_ORG)検索
     '    Try
     '        '検索SQL文
     '        Dim SQLStr As String =
@@ -466,7 +540,7 @@ Public Class GL0002OrgList
     '    Catch ex As Exception
     '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
     '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0002_ORG Select"
     '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
     '        CS0011LOGWRITE.TEXT = ex.ToString()
     '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -484,7 +558,7 @@ Public Class GL0002OrgList
     '''' </summary>
     'Protected Sub getOrgListWithTermAuth(ByVal SQLcon As SqlConnection)
     '    '●Leftボックス用会社取得
-    '    '○ User権限によりDB(OIS0010_AUTHOR)検索
+    '    '○ User権限によりDB(OIM0002_ORG)検索
     '    Try
     '        '検索SQL文
     '        Dim SQLStr As String =
@@ -570,7 +644,7 @@ Public Class GL0002OrgList
     '    Catch ex As Exception
     '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
     '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0002_ORG Select"
     '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
     '        CS0011LOGWRITE.TEXT = ex.ToString()
     '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -588,7 +662,7 @@ Public Class GL0002OrgList
     '''' </summary>
     'Protected Sub getOrgListWithBothAuth(ByVal SQLcon As SqlConnection)
     '    '●Leftボックス用会社取得
-    '    '○ User権限によりDB(OIS0010_AUTHOR)検索
+    '    '○ User権限によりDB(OIM0002_ORG)検索
     '    Try
     '        '検索SQL文
     '        Dim SQLStr As String =
@@ -682,7 +756,7 @@ Public Class GL0002OrgList
     '    Catch ex As Exception
     '        Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
     '        CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0001_CAMP Select"
+    '        CS0011LOGWRITE.INFPOSI = "DB:OIM0002_ORG Select"
     '        CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
     '        CS0011LOGWRITE.TEXT = ex.ToString()
     '        CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

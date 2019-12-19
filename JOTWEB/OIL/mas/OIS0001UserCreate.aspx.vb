@@ -696,7 +696,7 @@ Public Class OIS0001UserCreate
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
                             Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text)
+                                prmData = work.CreateORGParam(WF_CAMPCODE.Text, 0)
                             Case "WF_MENUROLE"       'メニュー表示制御ロール
                                 prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MENU")
                             Case "WF_MAPROLE"       '画面参照更新制御ロール
@@ -1276,7 +1276,7 @@ Public Class OIS0001UserCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "ORG"         '組織コード
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, 0)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MENU"           'メニュー表示制御ロール

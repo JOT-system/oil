@@ -17,10 +17,23 @@ Imports JOTWEB.GRIS0005LeftBox
 Public Class OIS0001UserSearch
     Inherits Page
 
-    '○ 共通処理結果
+    ''' <summary>
+    ''' ユーザ情報取得
+    ''' </summary>
+    Private CS0051UserInfo As New CS0051UserInfo            'ユーザ情報取得
+
+    ''' <summary>
+    ''' 共通処理結果
+    ''' </summary>
     Private WW_ERR_SW As String
     Private WW_RTN_SW As String
     Private WW_DUMMY As String
+
+    ''' <summary>
+    ''' 定数
+    ''' </summary>
+    Private Const CONST_ORGCODE_INFOSYS As String = "010006"                '1画面表示用
+    Private Const CONST_ORGCODE_OIL As String = "010007"                   '新規登録時初期行数
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -312,14 +325,24 @@ Public Class OIS0001UserSearch
                         .ActiveCalendar()
 
                     Case Else
-                        '以外
-                        Dim prmData As New Hashtable
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE_CODE.Text
-
                         'フィールドによってパラメータを変える
+                        Dim prmData As New Hashtable
+
                         Select Case WF_FIELD.Value
+                            Case "WF_CAMPCODE"       '会社コード
+                                If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
+                                End If
+                                prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE_CODE.Text
+
                             Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text)
+                                Dim AUTHORITYALL_FLG As String = "0"
+                                If WF_CAMPCODE_CODE.Text = "" Then '会社コードが空の場合
+                                    If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                                        AUTHORITYALL_FLG = "1"
+                                    End If
+                                End If
+                                prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text, AUTHORITYALL_FLG)
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -511,7 +534,7 @@ Public Class OIS0001UserSearch
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORG"              '組織コード
-                    prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text)
+                    prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text, 0)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

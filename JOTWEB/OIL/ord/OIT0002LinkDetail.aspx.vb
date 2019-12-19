@@ -70,7 +70,6 @@ Public Class OIT0002LinkDetail
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     Master.RecoverTable(OIT0002tbl)
-
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonRegister"        '登録ボタン押下
                             WF_ButtonINSERT_Click()
@@ -117,6 +116,10 @@ Public Class OIT0002LinkDetail
                     '○ 一覧再表示処理
                     DisplayGrid()
                 End If
+
+                'If WF_UPDERRFLG.Value = "1" Then
+                '    Exit Sub
+                'End If
             Else
                 '○ 初期化処理
                 Initialize()
@@ -160,6 +163,9 @@ Public Class OIT0002LinkDetail
                 OIT0002UPDtbl.Dispose()
                 OIT0002UPDtbl = Nothing
             End If
+
+            WF_UPDERRFLG.Value = "0"
+
         End Try
     End Sub
 
@@ -483,7 +489,8 @@ Public Class OIT0002LinkDetail
                 PARA6.Value = C_INSPECTIONALERT.ALERT_YELLOW
                 PARA7.Value = C_INSPECTIONALERT.ALERT_GREEN
 
-                If work.WF_SEL_PANEL.Value <> "1" Then
+                If work.WF_SEL_PANEL.Value <> "1" Or
+                    work.WF_SEL_CREATEFLG.Text <> "1" Then
                     PARA0.Value = O_INSCNT
                     PARA3.Value = ""
                     PARA4.Value = ""
@@ -1397,31 +1404,50 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End If
 
+        '○ 画面表示データ一時保存
+        Dim OIT0002Tmptbl As DataTable = OIT0002tbl.Copy
+        Master.SaveTable(OIT0002Tmptbl)
+
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
             '貨車連結表DB追加・更新
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
 
+                WF_UPDERRFLG.Value = "0"
+
                 WW_UpdateOrder(SQLcon)
             End Using
 
-            '貨車連結表(一覧)画面表示データ取得
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-                WW_OrderListTBLSet(SQLcon)
-            End Using
-
+            If WF_UPDERRFLG.Value <> "1" Then
+                '貨車連結表(一覧)画面表示データ取得
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+                    WW_OrderListTBLSet(SQLcon)
+                End Using
+            End If
         End If
 
         '○ GridView初期設定
         '○ 画面表示データ再取得(貨車連結表(明細)画面表示データ取得)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+        If WF_UPDERRFLG.Value <> "1" Then
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            work.WF_SEL_CREATEFLG.Text = 2
-            MAPDataGet(SQLcon, 0)
-        End Using
+                MAPDataGet(SQLcon, 0)
+            End Using
+        End If
+
+        If WF_UPDERRFLG.Value = "1" Then
+            '○ 画面表示一時データ復元
+            OIT0002tbl = OIT0002Tmptbl.Copy
+            '○ 一時格納Table Close
+            If Not IsNothing(OIT0002tbl) Then
+                OIT0002Tmptbl.Clear()
+                OIT0002Tmptbl.Dispose()
+                OIT0002Tmptbl = Nothing
+            End If
+        End If
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0002tbl)
@@ -2259,151 +2285,156 @@ Public Class OIT0002LinkDetail
 
                 Dim CNT_ROWS As Long = 0
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
-                    If Trim(OIT0002row("LINETRAINNO")) <> "" And
-                        Trim(OIT0002row("LINEORDER")) <> "" And
-                        Trim(OIT0002row("TANKNUMBER")) <> "" Then
+                    '必須項目が全部空白の行はスキップする
+                    If Trim(OIT0002row("LINETRAINNO")) = "" And
+                        Trim(OIT0002row("LINEORDER")) = "" And
+                        Trim(OIT0002row("TANKNUMBER")) = "" Then
+                        '何もしない
+                    Else    '必須項目が1～2個空白の行がある場合、エラーを出す
+                        If Trim(OIT0002row("LINETRAINNO")) = "" Or
+                            Trim(OIT0002row("LINEORDER")) = "" Or
+                            Trim(OIT0002row("TANKNUMBER")) = "" Then
 
-                        CNT_ROWS += 1
+                            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")
 
-                        Dim WW_DATENOW As DateTime = Date.Now
+                            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+                            CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
+                            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                            CS0011LOGWrite.TEXT = "必須項目エラー"
+                            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.PREREQUISITE_ERROR
+                            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+                            WF_UPDERRFLG.Value = "1"
+                            Exit Sub
+                        Else '必須項目が入力されている行のカウント
+                            CNT_ROWS += 1
+                            Dim WW_DATENOW As DateTime = Date.Now
 
-                        'DB更新
-                        PARA01.Value = work.WF_SEL_LINKNO.Text       　　 '貨車連結順序表№
-                        PARA02.Value = OIT0002row("LINKDETAILNO")         '貨車連結順序表明細№
-                        If work.WF_SEL_STATUS.Text <> "" Then             'ステータス
-                            PARA03.Value = work.WF_SEL_STATUS.Text
-                        Else
-                            PARA03.Value = "1"
-                        End If
-                        If work.WF_SEL_INFO.Text <> "" Then             '情報
-                            PARA04.Value = work.WF_SEL_INFO.Text
-                        Else
-                            PARA04.Value = ""
-                        End If
-                        If work.WF_SEL_PREORDERNO.Text <> "" Then             '前回オーダー№
-                            PARA05.Value = work.WF_SEL_PREORDERNO.Text
-                        Else
-                            PARA05.Value = "XXXXXXXXXXX"
-                        End If
-                        PARA06.Value = TxtHeadOfficeTrain.Text      　　　'本線列車
-                        PARA07.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
-                        'PARA08.Value = TxtOrderOffice.Text        　　　　'登録営業所名
-                        PARA09.Value = TxtDepstation.Text                 '空車発駅コード
-                        PARA10.Value = LblDepstationName.Text             '空車発駅名
-                        PARA11.Value = TxtRetstation.Text                 '空車着駅コード
-                        PARA12.Value = LblRetstationName.Text             '空車着駅名
-                        PARA13.Value = RTrim(CDate(TxtEmpDate.Text).ToString("yyyy/MM/dd"))       '(予定)空車着日
-                        If TxtActEmpDate.Text <> "" Then                                    '(実績)空車着日
-                            PARA14.Value = CDate(TxtActEmpDate.Text).ToString("yyyy/MM/dd")
-                        Else
-                            PARA14.Value = C_DEFAULT_YMD
-                        End If
-                        PARA15.Value = OIT0002row("LINETRAINNO")          '入線列車番号
-                        PARA16.Value = OIT0002row("LINEORDER")            '入線順
-                        PARA17.Value = OIT0002row("TANKNUMBER")       　　'タンク車№
-                        PARA18.Value = OIT0002row("PREOILCODE")           '前回油種　
-                        Select Case PARA18.Value
-                            Case CONST_TxtHTank                 '油種(ハイオク)
-                                LNG_TxtHTank += 1
-                                CNT_Total += 1
-                            Case CONST_TxtRTank                  '油種(レギュラー)
-                                LNG_TxtRTank += 1
-                                CNT_Total += 1
-                            Case CONST_TxtTTank                  '油種(灯油)
-                                LNG_TxtTTank += 1
-                                CNT_Total += 1
-                            Case CONST_TxtMTTank            '油種(未添加灯油)
-                                LNG_TxtMTTank += 1
-                                CNT_Total += 1
-                            Case CONST_TxtKTank1            '油種(軽油)
-                                LNG_TxtKTank1 += 1
-                                CNT_Total += 1
-                        'Case CONST_TxtKTank2
-                            'LNG_TxtKTank2 += 1
-                            'CNT_Total += 1
-                            Case CONST_TxtK3Tank1              '３号軽油
-                                LNG_TxtK3Tank1 += 1
-                                CNT_Total += 1
-                        'Case CONST_TxtK3Tank2
-                            'LNG_TxtK3Tank2 += 1
-                            'CNT_Total += 1
-                            Case CONST_TxtK5Tank              '５号軽油
-                                LNG_TxtK5Tank += 1
-                                CNT_Total += 1
-                            Case CONST_TxtK10Tank               '１０号軽油
-                                LNG_TxtK10Tank += 1
-                                CNT_Total += 1
-                            Case CONST_TxtLTank1                'ＬＳＡ
-                                LNG_TxtLTank1 += 1
-                                CNT_Total += 1
-                        'Case CONST_TxtLTank2
-                            'LNG_TxtLTank2 += 1
-                            'CNT_Total += 1
-                            Case CONST_TxtATank               'Ａ重油
-                                LNG_TxtATank += 1
-                                CNT_Total += 1
-                        End Select
-                        PARA83.Value = OIT0002row("DELFLG")               '削除フラグ
-                        PARA84.Value = WW_DATENOW                         '登録年月日
-                        PARA85.Value = Master.USERID                      '登録ユーザーID
-                        PARA86.Value = Master.USERTERMID                  '登録端末
-                        PARA87.Value = WW_DATENOW                         '更新年月日
-                        PARA88.Value = Master.USERID                      '更新ユーザーID
-                        PARA89.Value = Master.USERTERMID                  '更新端末
-                        PARA90.Value = C_DEFAULT_YMD
-
-                        OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-
-                        '更新ジャーナル出力
-                        JPARA01.Value = OIT0002row("LINKNO")
-                        JPARA02.Value = OIT0002row("LINKDETAILNO")
-
-                        Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
-                            If IsNothing(OIT0002UPDtbl) Then
-                                OIT0002UPDtbl = New DataTable
-
-                                For index As Integer = 0 To SQLdr.FieldCount - 1
-                                    OIT0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                                Next
+                            'DB更新
+                            PARA01.Value = work.WF_SEL_LINKNO.Text          '貨車連結順序表№
+                            PARA02.Value = OIT0002row("LINKDETAILNO")         '貨車連結順序表明細№
+                            If work.WF_SEL_STATUS.Text <> "" Then             'ステータス
+                                PARA03.Value = work.WF_SEL_STATUS.Text
+                            Else
+                                PARA03.Value = "1"
                             End If
-
-                            OIT0002UPDtbl.Clear()
-                            OIT0002UPDtbl.Load(SQLdr)
-                        End Using
-
-                        For Each OIT0002UPDrow As DataRow In OIT0002UPDtbl.Rows
-                            CS0020JOURNAL.TABLENM = "OIT0002D"
-                            CS0020JOURNAL.ACTION = "UPDATE_INSERT"
-                            CS0020JOURNAL.ROW = OIT0002UPDrow
-                            CS0020JOURNAL.CS0020JOURNAL()
-                            If Not isNormal(CS0020JOURNAL.ERR) Then
-                                Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
-
-                                CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
-                                CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
-                                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                                CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
-                                CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
-                                CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
-                                Exit Sub
+                            If work.WF_SEL_INFO.Text <> "" Then             '情報
+                                PARA04.Value = work.WF_SEL_INFO.Text
+                            Else
+                                PARA04.Value = ""
                             End If
-                        Next
+                            If work.WF_SEL_PREORDERNO.Text <> "" Then             '前回オーダー№
+                                PARA05.Value = work.WF_SEL_PREORDERNO.Text
+                            Else
+                                PARA05.Value = "XXXXXXXXXXX"
+                            End If
+                            PARA06.Value = TxtHeadOfficeTrain.Text         '本線列車
+                            PARA07.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
+                            'PARA08.Value = TxtOrderOffice.Text        　　　　'登録営業所名
+                            PARA09.Value = TxtDepstation.Text                 '空車発駅コード
+                            PARA10.Value = LblDepstationName.Text             '空車発駅名
+                            PARA11.Value = TxtRetstation.Text                 '空車着駅コード
+                            PARA12.Value = LblRetstationName.Text             '空車着駅名
+                            PARA13.Value = RTrim(CDate(TxtEmpDate.Text).ToString("yyyy/MM/dd"))       '(予定)空車着日
+                            If TxtActEmpDate.Text <> "" Then                                    '(実績)空車着日
+                                PARA14.Value = CDate(TxtActEmpDate.Text).ToString("yyyy/MM/dd")
+                            Else
+                                PARA14.Value = C_DEFAULT_YMD
+                            End If
+                            PARA15.Value = OIT0002row("LINETRAINNO")          '入線列車番号
+                            PARA16.Value = OIT0002row("LINEORDER")            '入線順
+                            PARA17.Value = OIT0002row("TANKNUMBER")         'タンク車№
+                            PARA18.Value = OIT0002row("PREOILCODE")           '前回油種　
+                            Select Case PARA18.Value
+                                Case CONST_TxtHTank                 '油種(ハイオク)
+                                    LNG_TxtHTank += 1
+                                    CNT_Total += 1
+                                Case CONST_TxtRTank                  '油種(レギュラー)
+                                    LNG_TxtRTank += 1
+                                    CNT_Total += 1
+                                Case CONST_TxtTTank                  '油種(灯油)
+                                    LNG_TxtTTank += 1
+                                    CNT_Total += 1
+                                Case CONST_TxtMTTank            '油種(未添加灯油)
+                                    LNG_TxtMTTank += 1
+                                    CNT_Total += 1
+                                Case CONST_TxtKTank1            '油種(軽油)
+                                    LNG_TxtKTank1 += 1
+                                    CNT_Total += 1
+                            'Case CONST_TxtKTank2
+                                'LNG_TxtKTank2 += 1
+                                'CNT_Total += 1
+                                Case CONST_TxtK3Tank1              '３号軽油
+                                    LNG_TxtK3Tank1 += 1
+                                    CNT_Total += 1
+                            'Case CONST_TxtK3Tank2
+                                'LNG_TxtK3Tank2 += 1
+                                'CNT_Total += 1
+                                Case CONST_TxtK5Tank              '５号軽油
+                                    LNG_TxtK5Tank += 1
+                                    CNT_Total += 1
+                                Case CONST_TxtK10Tank               '１０号軽油
+                                    LNG_TxtK10Tank += 1
+                                    CNT_Total += 1
+                                Case CONST_TxtLTank1                'ＬＳＡ
+                                    LNG_TxtLTank1 += 1
+                                    CNT_Total += 1
+                            'Case CONST_TxtLTank2
+                                'LNG_TxtLTank2 += 1
+                                'CNT_Total += 1
+                                Case CONST_TxtATank               'Ａ重油
+                                    LNG_TxtATank += 1
+                                    CNT_Total += 1
+                            End Select
+                            PARA83.Value = OIT0002row("DELFLG")               '削除フラグ
+                            PARA84.Value = WW_DATENOW                         '登録年月日
+                            PARA85.Value = Master.USERID                      '登録ユーザーID
+                            PARA86.Value = Master.USERTERMID                  '登録端末
+                            PARA87.Value = WW_DATENOW                         '更新年月日
+                            PARA88.Value = Master.USERID                      '更新ユーザーID
+                            PARA89.Value = Master.USERTERMID                  '更新端末
+                            PARA90.Value = C_DEFAULT_YMD
+
+                            OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                            SQLcmd.CommandTimeout = 300
+                            SQLcmd.ExecuteNonQuery()
+
+                            '更新ジャーナル出力
+                            JPARA01.Value = OIT0002row("LINKNO")
+                            JPARA02.Value = OIT0002row("LINKDETAILNO")
+
+                            Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                                If IsNothing(OIT0002UPDtbl) Then
+                                    OIT0002UPDtbl = New DataTable
+
+                                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                                        OIT0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                                    Next
+                                End If
+
+                                OIT0002UPDtbl.Clear()
+                                OIT0002UPDtbl.Load(SQLdr)
+                            End Using
+
+                            For Each OIT0002UPDrow As DataRow In OIT0002UPDtbl.Rows
+                                CS0020JOURNAL.TABLENM = "OIT0002D"
+                                CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                                CS0020JOURNAL.ROW = OIT0002UPDrow
+                                CS0020JOURNAL.CS0020JOURNAL()
+                                If Not isNormal(CS0020JOURNAL.ERR) Then
+                                    Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                                    CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                                    CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                                    CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                                    CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                                    Exit Sub
+                                End If
+                            Next
+                        End If
                     End If
                 Next
-
-                If CNT_ROWS = 0 Then
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = "必須項目エラー"
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-                    Exit Sub
-                End If
 
                 '油種(ハイオク)
                 TxtHTank.Text = LNG_TxtHTank
@@ -2434,6 +2465,20 @@ Public Class OIT0002LinkDetail
                 'タンク車合計
                 TxtTotalTank.Text = CNT_Total
 
+                If CNT_ROWS = 0 Then　'必須項目が入力されている行がない場合のエラー
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")
+
+                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+                    CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
+                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                    CS0011LOGWrite.TEXT = "必須項目エラー"
+                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+                    WF_UPDERRFLG.Value = "1"
+                    Exit Sub
+                End If
+
+                work.WF_SEL_CREATEFLG.Text = 2 'エラーが発生しなかった場合、更新モードに切り替える
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")

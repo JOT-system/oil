@@ -24,11 +24,15 @@ Public Class OIS0001WRKINC
     '' <param name="I_COMPCODE"></param>
     '' <returns></returns>
     '' <remarks></remarks>
-    Public Function CreateORGParam(ByVal I_COMPCODE As String) As Hashtable
+    Public Function CreateORGParam(ByVal I_COMPCODE As String, ByVal AUTHORITYALL_FLG As String) As Hashtable
 
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
-        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY
+        If AUTHORITYALL_FLG = "1" Then
+            prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ALL
+        Else
+            prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY
+        End If
         prmData.Item(C_PARAMETERS.LP_PERMISSION) = C_PERMISSION.INVALID
         prmData.Item(C_PARAMETERS.LP_ORG_CATEGORYS) = New String() {
             GL0002OrgList.C_CATEGORY_LIST.CARAGE}

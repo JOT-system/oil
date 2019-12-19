@@ -102,19 +102,19 @@ Public Class GL0001CompList
             Dim SQLStr As String =
                   " SELECT                        " _
                 & " rtrim(A.CAMPCODE) as CODE  ,  " _
-                & " rtrim(A.NAMES)    as NAMES    " _
+                & " rtrim(A.NAME)    as NAMES    " _
                 & " FROM  OIL.OIM0001_CAMP A        " _
                 & " WHERE                         " _
                 & "       A.STYMD   <= @P4        " _
                 & "   and A.ENDYMD  >= @P3        " _
                 & "   and A.DELFLG  <> @P5        " _
-                & " GROUP BY A.CAMPCODE , A.NAMES "
+                & " GROUP BY A.CAMPCODE , A.NAME "
             '〇ソート条件追加
             Select Case DEFAULT_SORT
                 Case C_DEFAULT_SORT.CODE, String.Empty
-                    SQLStr = SQLStr & " ORDER BY A.CAMPCODE, A.NAMES "
+                    SQLStr = SQLStr & " ORDER BY A.CAMPCODE, A.NAME "
                 Case C_DEFAULT_SORT.NAMES
-                    SQLStr = SQLStr & " ORDER BY A.NAMES, A.CAMPCODE "
+                    SQLStr = SQLStr & " ORDER BY A.NAME, A.CAMPCODE "
                 Case C_DEFAULT_SORT.SEQ
                 Case Else
             End Select

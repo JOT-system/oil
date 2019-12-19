@@ -77,6 +77,15 @@ Partial Public Class OIM0005TankSearch
     Protected WithEvents WF_MODEL_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_MODEL_NAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MODEL_NAME As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

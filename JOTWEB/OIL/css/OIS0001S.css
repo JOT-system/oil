@@ -3,7 +3,7 @@
 #WF_CAMPCODE_LABEL {
     position: fixed;
     height: 50px;
-    width: 70px;
+    width: 140px;
     top: calc(15% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
@@ -34,7 +34,7 @@
 #WF_STYMD_LABEL {
     position: fixed;
     height: 50px;
-    width: 70px;
+    width: 210px;
     top: calc(27% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
@@ -45,7 +45,7 @@
     position: fixed;
     height: 50px;
     width: 140px;
-    top: calc(31% - 50px/2);
+    top: calc(30% - 50px/2);
     left: calc(46% - 140px/2);
 }
 
@@ -58,7 +58,7 @@
 #WF_ENDYMD_LABEL {
     position: fixed;
     height: 50px;
-    width: 70px;
+    width: 210px;
     top: calc(36% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
@@ -82,7 +82,7 @@
 #WF_ORG_LABEL {
     position: fixed;
     height: 50px;
-    width: 70px;
+    width: 140px;
     top: calc(48% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;

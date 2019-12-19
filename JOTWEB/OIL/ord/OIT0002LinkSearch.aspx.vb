@@ -233,6 +233,34 @@ Public Class OIT0002LinkSearch
             Exit Sub
         End If
 
+        '空車発駅
+        Master.CheckField(WF_CAMPCODE.Text, "DEPSTATION", WF_DEPSTATION_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("DEPSTATION", WF_DEPSTATION_CODE.Text, WF_DEPSTATION_NAME.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+                              "空車発駅 : " & WF_DEPSTATION_CODE.Text)
+                WF_DEPSTATION_CODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            WF_DEPSTATION_CODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '開始日
+        '存在チェック
+        If WF_STYMD_CODE.Text = "" Then
+            Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, "年月日")
+            WF_STYMD_CODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
         '日付大小チェック
         If WF_STYMD_CODE.Text <> "" AndAlso WF_ENDYMD_CODE.Text <> "" Then
             Dim WW_DATE_ST As Date
@@ -255,6 +283,16 @@ Public Class OIT0002LinkSearch
             End Try
         End If
 
+        '本線列車
+        If WF_TRAINNO_CODE.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                WF_TRAINNO_CODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -489,9 +527,9 @@ Public Class OIT0002LinkSearch
                 Case "DEPSTATION"       '空車発駅
                     prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "STATIONPATTERN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TRAINNO"           '本線列車
-                    prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
+                    'Case "TRAINNO"           '本線列車
+                    '    prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
+                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

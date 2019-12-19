@@ -236,5 +236,7 @@
             <!-- 新規・更新切替用フラグ -->
             <input id="WF_CREATEFLG" runat="server" value="" type="text" />
 
+            <!-- パネルロック・解除フラグ -->
+            <input id="WF_PANELFLG" runat="server" value="" type="text" />
         </div>
 </asp:Content>

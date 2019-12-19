@@ -157,5 +157,6 @@
     #WF_TRAINNO input[type='text'] {
         Height: 2.1em;
         Width: 10em;
+        padding-left: 0em;
     }
 

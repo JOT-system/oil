@@ -14,14 +14,13 @@ Public Class OIT0003OrderDetail
     Private OIT0001WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    'Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
-    'Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部タブID
+    Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
+    Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部タブID
 
     'Private Const CONST_DSPROWCOUNT As Integer = 45                '１画面表示対象
-    Private Const CONST_SCROLLROWCOUNT As Integer = 10              'マウススクロール時の増分
-    Private Const CONST_DETAIL_TABID As String = "DTL1"             '詳細部タブID
+    'Private Const CONST_SCROLLROWCOUNT As Integer = 10              'マウススクロール時の増分
+    'Private Const CONST_DETAIL_TABID As String = "DTL1"             '詳細部タブID
     Private Const CONST_MAX_TABID As Integer = 4                    '詳細タブ数
-
 
     Private Const CONST_TxtHTank As String = "1001"                 '油種(ハイオク)
     Private Const CONST_TxtRTank As String = "1101"                 '油種(レギュラー)
@@ -260,14 +259,14 @@ Public Class OIT0003OrderDetail
         CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
         '運用部署
         CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_UORG_TEXT.Text, WW_DUMMY)
-        '荷主
-        CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_DUMMY)
-        '荷受人
-        CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_DUMMY)
-        '発駅
-        CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
-        '着駅
-        CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
+        ''荷主
+        'CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_DUMMY)
+        ''荷受人
+        'CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_DUMMY)
+        ''発駅
+        'CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
+        ''着駅
+        'CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
 
     End Sub
 
@@ -755,7 +754,7 @@ Public Class OIT0003OrderDetail
         WF_Dtab01.Style.Remove("color")
         WF_Dtab01.Style.Add("color", "black")
         WF_Dtab01.Style.Remove("background-color")
-        WF_Dtab01.Style.Add("background-color", "rgb(174,170,170)")
+        WF_Dtab01.Style.Add("background-color", "rgb(211, 211, 211)")
         WF_Dtab01.Style.Remove("border")
         WF_Dtab01.Style.Add("border", "1px solid black")
         WF_Dtab01.Style.Remove("font-weight")
@@ -795,9 +794,9 @@ Public Class OIT0003OrderDetail
             Case 0
                 'タンク車割当
                 WF_Dtab01.Style.Remove("color")
-                WF_Dtab01.Style.Add("color", "blue")
+                WF_Dtab01.Style.Add("color", "black")
                 WF_Dtab01.Style.Remove("background-color")
-                WF_Dtab01.Style.Add("background-color", "rgb(174,170,170)")
+                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
                 WF_Dtab01.Style.Remove("border")
                 WF_Dtab01.Style.Add("border", "1px solid blue")
                 WF_Dtab01.Style.Remove("font-weight")
@@ -805,9 +804,9 @@ Public Class OIT0003OrderDetail
             Case 1
                 'タンク車明細
                 WF_Dtab02.Style.Remove("color")
-                WF_Dtab02.Style.Add("color", "blue")
+                WF_Dtab02.Style.Add("color", "black")
                 WF_Dtab02.Style.Remove("background-color")
-                WF_Dtab02.Style.Add("background-color", "rgb(174,170,170)")
+                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
                 WF_Dtab02.Style.Remove("border")
                 WF_Dtab02.Style.Add("border", "1px solid blue")
                 WF_Dtab02.Style.Remove("font-weight")
@@ -815,9 +814,9 @@ Public Class OIT0003OrderDetail
             Case 2
                 '入換・積込指示
                 WF_Dtab03.Style.Remove("color")
-                WF_Dtab03.Style.Add("color", "blue")
+                WF_Dtab03.Style.Add("color", "black")
                 WF_Dtab03.Style.Remove("background-color")
-                WF_Dtab03.Style.Add("background-color", "rgb(174,170,170)")
+                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
                 WF_Dtab03.Style.Remove("border")
                 WF_Dtab03.Style.Add("border", "1px solid blue")
                 WF_Dtab03.Style.Remove("font-weight")
@@ -825,9 +824,9 @@ Public Class OIT0003OrderDetail
             Case 3
                 '費用入力
                 WF_Dtab04.Style.Remove("color")
-                WF_Dtab04.Style.Add("color", "blue")
+                WF_Dtab04.Style.Add("color", "black")
                 WF_Dtab04.Style.Remove("background-color")
-                WF_Dtab04.Style.Add("background-color", "rgb(174,170,170)")
+                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
                 WF_Dtab04.Style.Remove("border")
                 WF_Dtab04.Style.Add("border", "1px solid blue")
                 WF_Dtab04.Style.Remove("font-weight")

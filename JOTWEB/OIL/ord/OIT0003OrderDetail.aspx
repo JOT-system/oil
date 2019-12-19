@@ -27,10 +27,10 @@
 
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
-            <a style="position:fixed;top:2.8em;left:62.5em;">
+            <a style="position:fixed;top:2.8em;left:78em;">
                 <input type="button" id="WF_ButtonINSERT" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
             </a>
-            <a style="position:fixed;top:2.8em;left:67em;">
+            <a style="position:fixed;top:2.8em;left:83.5em;">
                 <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
             </a>
 
@@ -82,7 +82,7 @@
                 <asp:TextBox CssClass="NoIcon" ID="TxtShippersCode" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a id="WF_SHIPPERSNAME">
-                <asp:Label ID="LblShippersName" runat="server" Width="17em" CssClass="WF_TEXT">JXTG</asp:Label>
+                <asp:Label ID="LblShippersName" runat="server" Width="17em">JXTG</asp:Label>
             </a>
             <!-- ■　荷受人　■ -->
             <a id="WF_CONSIGNEE_LABEL">荷受人</a>
@@ -90,7 +90,7 @@
                 <asp:TextBox CssClass="NoIcon" ID="TxtConsigneeCode" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a id="WF_CONSIGNEENAME">
-                <asp:Label ID="LblConsigneeName" runat="server" Width="17em" CssClass="WF_TEXT">JXTG</asp:Label>
+                <asp:Label ID="LblConsigneeName" runat="server" Width="17em">JXTG</asp:Label>
             </a>
 
             <!-- ■　本線列車　■ -->
@@ -104,7 +104,7 @@
                 <asp:TextBox CssClass="NoIcon" ID="TxtDepstationCode" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a id="WF_DEPSTATIONNAME">
-                <asp:Label ID="LblDepstationName" runat="server" Width="17em" CssClass="WF_TEXT">JXTG</asp:Label>
+                <asp:Label ID="LblDepstationName" runat="server" Width="17em">JXTG</asp:Label>
             </a>
             <!-- ■　着駅　■ -->
             <a id="WF_ARRSTATION_LABEL">着駅</a>
@@ -112,7 +112,7 @@
                 <asp:TextBox CssClass="NoIcon" ID="TxtArrstationCode" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a id="WF_ARRSTATIONNAME">
-                <asp:Label ID="LblArrstationName" runat="server" Width="17em" CssClass="WF_TEXT">JXTG</asp:Label>
+                <asp:Label ID="LblArrstationName" runat="server" Width="17em">JXTG</asp:Label>
             </a>
 
             <!-- ■　(予定)積込日　■ -->
@@ -167,6 +167,117 @@
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtActualEmparrDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
         </div>
+        <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+            <!-- ■　車数（ハイオク）　■ -->
+            <a id="WF_HTANK_LABEL_C">ハイオク</a>
+            <!-- ■　車数（レギュラー）　■ -->
+            <a id="WF_RTANK_LABEL_C">レギュラー</a>
+            <!-- ■　車数（灯油）　■ -->
+            <a id="WF_TTANK_LABEL_C">　灯油　</a>
+            <!-- ■　車数（未添加灯油）　■ -->
+            <a id="WF_MTTANK_LABEL_C">未添加灯油</a>
+            <!-- ■　車数（軽油）　■ -->
+            <a id="WF_KTANK_LABEL_C">　軽油　</a>
+            <!-- ■　車数（３号軽油）　■ -->
+            <a id="WF_K3TANK_LABEL_C">３号軽油</a>
+            <!-- ■　車数（５号軽油）　■ -->
+            <a id="WF_K5TANK_LABEL_C">５号軽油</a>
+            <!-- ■　車数（１０号軽油）　■ -->
+            <a id="WF_K10TANK_LABEL_C">１０号軽油</a>
+            <!-- ■　車数（LSA）　■ -->
+            <a id="WF_LTANK_LABEL_C">ＬＳＡ　　</a>
+            <!-- ■　車数（A重油）　■ -->
+            <a id="WF_ATANK_LABEL_C">Ａ重油</a>
+        </div>
+        <div class="Operation2" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+            <!-- ■　油種別タンク車数(車)　■ -->
+            <a id="WF_OILTANKCNT_LABEL_C">油種別タンク車数(車)</a>
+            <!-- ■　車数（ハイオク）　■ -->
+            <a class="ef" id="WF_HTANK_C">
+                <asp:TextBox ID="TxtHTank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（レギュラー）　■ -->
+            <a class="ef" id="WF_RTANK_C">
+                <asp:TextBox ID="TxtRTank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（灯油）　■ -->
+            <a class="ef" id="WF_TTANK_C">
+                <asp:TextBox ID="TxtTTank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（未添加灯油）　■ -->
+            <a class="ef" id="WF_MTTANK_C">
+                <asp:TextBox ID="TxtMTTank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（軽油）　■ -->
+            <a class="ef" id="WF_KTANK_C">
+                <asp:TextBox ID="TxtKTank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（３号軽油）　■ -->
+            <a class="ef" id="WF_K3TANK_C">
+                <asp:TextBox ID="TxtK3Tank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（５号軽油）　■ -->
+            <a class="ef" id="WF_K5TANK_C">
+                <asp:TextBox ID="TxtK5Tank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（１０号軽油）　■ -->
+            <a class="ef" id="WF_K10TANK_C">
+                <asp:TextBox ID="TxtK10Tank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（LSA）　■ -->
+            <a class="ef" id="WF_LTANK_C">
+                <asp:TextBox ID="TxtLTank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（A重油）　■ -->
+            <a class="ef" id="WF_ATANK_C">
+                <asp:TextBox ID="TxtATank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+        </div>
+        <div class="Operation2" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+            <!-- ■　油種別タンク車数(車)　■ -->
+            <a id="WF_OILTANKCNT_LABEL_C2">　　　　積込数量(kl)</a>
+            <!-- ■　車数（ハイオク）　■ -->
+            <a class="ef" id="WF_HTANK_C2">
+                <asp:TextBox ID="TxtHTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（レギュラー）　■ -->
+            <a class="ef" id="WF_RTANK_C2">
+                <asp:TextBox ID="TxtRTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（灯油）　■ -->
+            <a class="ef" id="WF_TTANK_C2">
+                <asp:TextBox ID="TxtTTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（未添加灯油）　■ -->
+            <a class="ef" id="WF_MTTANK_C2">
+                <asp:TextBox ID="TxtMTTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（軽油）　■ -->
+            <a class="ef" id="WF_KTANK_C2">
+                <asp:TextBox ID="TxtKTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（３号軽油）　■ -->
+            <a class="ef" id="WF_K3TANK_C2">
+                <asp:TextBox ID="TxtK3Tank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（５号軽油）　■ -->
+            <a class="ef" id="WF_K5TANK_C2">
+                <asp:TextBox ID="TxtK5Tank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（１０号軽油）　■ -->
+            <a class="ef" id="WF_K10TANK_C2">
+                <asp:TextBox ID="TxtK10Tank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（LSA）　■ -->
+            <a class="ef" id="WF_LTANK_C2">
+                <asp:TextBox ID="TxtLTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　車数（A重油）　■ -->
+            <a class="ef" id="WF_ATANK_C2">
+                <asp:TextBox ID="TxtATank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+        </div>
+
     </div>
 
     <!-- 全体レイアウト　detailbox -->
@@ -175,7 +286,7 @@
             <p id="KEY_LINE_1">
                 <!-- ■　Dタブ　■ -->
                 <a onclick="DtabChange('0')">
-                    <asp:Label BackColor="LightSkyBlue" BorderStyle="Groove" ID="WF_Dtab01" runat="server" Text="タンク車割当" Height="1.3em" Width="6.9em" CssClass="WF_Dtab" Font-Size="small"></asp:Label>
+                    <asp:Label BackColor="LightGray" BorderStyle="Groove" ID="WF_Dtab01" runat="server" Text="タンク車割当" Height="1.3em" Width="6.9em" CssClass="WF_Dtab" Font-Size="small"></asp:Label>
                 </a>
 
                 <a onclick="DtabChange('1')">
@@ -217,7 +328,7 @@
                     <!-- ■　車数（A重油）　■ -->
                     <a id="WF_ATANK_LABEL">Ａ重油</a>
                 </div>
-                <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+                <div class="Operation2" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
                     <!-- ■　油種別タンク車数(車)　■ -->
                     <a id="WF_OILTANKCNT_LABEL">油種別タンク車数(車)</a>
                     <!-- ■　車数（ハイオク）　■ -->
@@ -261,7 +372,7 @@
                         <asp:TextBox ID="TxtATank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                     </a>
                 </div>
-                <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+                <div class="Operation2" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
 
                     <!-- #############################-->
                     <!-- 割当後                       -->
@@ -313,19 +424,19 @@
                 <div id="detailbuttonbox" class="detailbuttonbox">
                     <!-- ボタン -->
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                        <input type="button" id="WF_ButtonALLSELECT_TAB1" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT_TAB1');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB1" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB1');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB1" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB1');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonLINE_ADD" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />
+                        <input type="button" id="WF_ButtonLINE_ADD_TAB1" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD_TAB1');" />
                     </a>
                     <a style="left:43.5em;">
-                        <input type="button" id="WF_ButtonUPDATE" value="割当確定"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                        <input type="button" id="WF_ButtonUPDATE_TAB1" value="割当確定"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
                     </a>
                 </div>
 
@@ -337,6 +448,24 @@
 
             <!-- ■ Tab No2　タンク車明細　■ -->
             <asp:View ID="WF_DView2" runat="server">
+                <div id="detailbuttonbox2" class="detailbuttonbox">
+                    <!-- ボタン -->
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonALLSELECT_TAB2" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT_TAB2');" />
+                    </a>
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB2" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB2');" />
+                    </a>
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB2" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB2');" />
+                    </a>
+                    <a style="left:2.5em;">
+                        <input type="button" id="WF_ButtonLINE_ADD_TAB2" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD_TAB2');" />
+                    </a>
+                    <a style="left:43.5em;">
+                        <input type="button" id="WF_ButtonUPDATE_TAB2" value="明細更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE_TAB2');" />
+                    </a>
+                </div>
                 <!-- 一覧レイアウト -->
                 <div id="divListArea2">
                     <asp:panel id="pnlListArea2" runat="server" ></asp:panel>
@@ -345,6 +474,15 @@
 
             <!-- ■ Tab No3　入換・積込指示　■ -->
             <asp:View ID="WF_DView3" runat="server">
+                <div id="detailbuttonbox3" class="detailbuttonbox">
+                    <!-- ボタン -->
+                    <a style="left:60.0em;">
+                        <input type="button" id="WF_ButtonUPDATE_TAB3" value="入力内容登録"  style="Width:7em" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
+                    </a>
+                    <a style="left:60.0em;">
+                        <input type="button" id="WF_ButtonFILLINGALL_TAB3" value="充填ポイントの全体を見る"  style="Width:12em" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
+                    </a>
+                </div>
                 <!-- 一覧レイアウト -->
                 <div id="divListArea3">
                     <asp:panel id="pnlListArea3" runat="server" ></asp:panel>

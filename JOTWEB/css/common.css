@@ -1372,3 +1372,96 @@ span[class^="WF_DViewRep"] table {
     border-color: transparent;
     z-index: 0;
 }
+/* ------------------------------
+共通メッセージボックススタイル
+------------------------------ */
+/* マルチラインテキスト入力ポップアップ */
+#pnlCommonMessageWrapper {
+    /* position: absolute; */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+}
+
+#pnlCommonMessageContents {
+    position: fixed;
+    top: 100px;
+    text-align: left;
+    min-width: 500px;
+    left: calc(50% - 250px);
+    background-color: rgb(240,240,240);
+    box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
+}
+
+#pnlCommonMessageTitle {
+    width: calc(100% - 20px);
+    font-weight: bold;
+    padding: 10px;
+    height: 20px;
+    background-color: #8BACCD;
+}
+
+    #pnlCommonMessageTitle input[type=button] {
+        min-width: 70px;
+        margin-right: 10px;
+    }
+
+#pnlCommonMessageText {
+    padding: 10px 10px 15px 15px;
+    min-height: 50px;
+}
+
+    #pnlCommonMessageText #lblCommonMessageText[data-naeiw="I"]:before,
+    #pnlCommonMessageText #lblCommonMessageText[data-naeiw="N"]:before {
+        width: 32px;
+        height: 32px;
+        content: "";
+        display: table-cell;
+        background-image: url('../oil/img/iconInfo.png');
+        background-repeat: no-repeat;
+        background-size: contain;
+        float: left;
+        margin-right: 10px;
+    }
+
+    #pnlCommonMessageText #lblCommonMessageText[data-naeiw="W"]:before {
+        width: 32px;
+        height: 32px;
+        content: "";
+        display: table-cell;
+        background-image: url('../oil/img/iconWarn.png');
+        background-repeat: no-repeat;
+        background-size: contain;
+        float: left;
+        margin-right: 10px;
+    }
+
+    #pnlCommonMessageText #lblCommonMessageText[data-naeiw="E"]:before,
+    #pnlCommonMessageText #lblCommonMessageText[data-naeiw="A"]:before {
+        width: 32px;
+        height: 32px;
+        content: "";
+        display: table-cell;
+        background-image: url('../oil/img/404cat.png');
+        background-repeat: no-repeat;
+        background-size: contain;
+        float: left;
+        margin-right: 10px;
+    }
+
+    #pnlCommonMessageText #lblCommonMessageText {
+        display: table-cell;
+        word-break: break-all;
+        min-width: 300px;
+        max-width: 800px;
+        padding-top: 5px;
+        vertical-align: middle;
+    }

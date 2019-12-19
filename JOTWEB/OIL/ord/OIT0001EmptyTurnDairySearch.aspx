@@ -73,7 +73,7 @@
 
     <!-- Work レイアウト -->
     <MSINC:wrklist id="work" runat="server" />
-
+    
     <!-- イベント用 -->
     <div hidden="hidden">
         <input id="WF_FIELD" runat="server" value="" type="text" />                 <!-- Textbox DBクリックフィールド -->

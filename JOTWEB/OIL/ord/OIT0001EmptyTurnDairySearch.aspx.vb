@@ -2,6 +2,7 @@
 'Option Explicit On
 
 Imports JOTWEB.GRIS0005LeftBox
+Imports JOTWEB.GRIS0002Footer
 
 ''' <summary>
 ''' 空回日報検索画面
@@ -265,6 +266,9 @@ Public Class OIT0001EmptyTurnDairySearch
                 Exit Sub
             End If
         Else
+            'ポップアップを表示
+            ShowMessage(WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT, pageObject:=Me)
+
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
             TxtSalesOffice.Focus()
             O_RTN = "ERR"

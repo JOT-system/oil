@@ -19,6 +19,19 @@ window.addEventListener('load', function () {
             }
         });
     }
+
+    //ポップアップ背面を使用不可に変更
+    var popUpObj = document.getElementById('pnlCommonMessageWrapper');
+    if (popUpObj !== null) {
+        if (popUpObj.style.display !== 'none') {
+            // 現在のフォーカスをポップアップに移動
+            if (document.activeElement !== null) {
+                document.activeElement.blur();
+            }
+            commonDisableModalBg(popUpObj.id);
+            popUpObj.focus();
+        }
+    }
 });
 
 // 処理後カーソルを戻す

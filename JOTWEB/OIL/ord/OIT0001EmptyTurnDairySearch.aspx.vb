@@ -266,10 +266,8 @@ Public Class OIT0001EmptyTurnDairySearch
                 Exit Sub
             End If
         Else
-            'ポップアップを表示
-            ShowMessage(WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT, pageObject:=Me)
-
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            'ポップアップを表示(needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所", needsPopUp:=True)
             TxtSalesOffice.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -284,7 +282,8 @@ Public Class OIT0001EmptyTurnDairySearch
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            'ポップアップを表示(needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "積込日", needsPopUp:=True)
             TxtLoadingDateStart.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -294,7 +293,8 @@ Public Class OIT0001EmptyTurnDairySearch
         If TxtTrainNumber.Text <> "" Then
             Master.CheckField(WF_CAMPCODE.Text, "TRAINNUMBER", TxtTrainNumber.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                'ポップアップを表示(needsPopUp:=True)
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 TxtTrainNumber.Focus()
                 O_RTN = "ERR"
                 Exit Sub

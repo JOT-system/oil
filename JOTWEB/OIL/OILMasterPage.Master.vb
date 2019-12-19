@@ -357,9 +357,18 @@ Public Class OILMasterPage
     ''' <param name="msgType"></param>
     ''' <param name="I_PARA01"></param>
     ''' <param name="I_PARA02"></param>
+    ''' <param name="needsPopUp">ポップアップ表示有無(初期値：False(表示しない))</param>
+    ''' <param name="messageBoxTitle">疑似メッセージボックスのタイトルバー文字(初期値：メッセージ,needsPopUpがTrueでなければ意味なし)</param>
     ''' <remarks></remarks>
-    Public Sub Output(ByVal msgNo As String, ByVal msgType As String, Optional ByVal I_PARA01 As String = Nothing, Optional ByVal I_PARA02 As String = Nothing)
-        footer.Output(msgNo, msgType, I_PARA01, I_PARA02)
+    Public Sub Output(ByVal msgNo As String,
+                      ByVal msgType As String,
+                      Optional ByVal I_PARA01 As String = Nothing,
+                      Optional ByVal I_PARA02 As String = Nothing,
+                      Optional ByVal needsPopUp As Boolean = False,
+                      Optional ByVal messageBoxTitle As String = "メッセージ")
+
+        footer.Output(msgNo, msgType, I_PARA01, I_PARA02, needsPopUp, messageBoxTitle)
+
     End Sub
     ''' <summary>
     ''' メッセージの設定処理

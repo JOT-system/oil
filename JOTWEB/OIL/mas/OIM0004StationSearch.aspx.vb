@@ -250,7 +250,8 @@ Public Class OIM0004StationSearch
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            'ポップアップを表示(needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             TxtStationCode.Focus()
             O_RTN = "ERR"
             Exit Sub

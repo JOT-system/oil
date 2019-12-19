@@ -127,6 +127,9 @@
     <Content Include="img\矢印R.png" />
     <Content Include="OIL\img\calendar.png" />
     <Content Include="OIL\img\datalink.png" />
+    <Content Include="OIL\img\iconError.png" />
+    <Content Include="OIL\img\iconInfo.png" />
+    <Content Include="OIL\img\iconWarn.png" />
     <Content Include="OIL\img\noicon.png" />
     <Content Include="OIL\img\foward.png" />
     <Content Include="OIL\img\leftbox.png" />

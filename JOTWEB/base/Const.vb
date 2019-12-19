@@ -281,6 +281,42 @@ Public Module BaseDllConst
         ''' </summary>
         Public Const COMPLETE As String = "11"
     End Class
+
+    ''' <summary>
+    ''' メッセージタイプ
+    ''' </summary>
+    Public Class C_NAEIW
+        ''' <summary>
+        ''' 正常メッセージ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared ReadOnly Property NORMAL As String = "N"
+        ''' <summary>
+        ''' アブノーマルエラー
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared ReadOnly Property ABNORMAL As String = "A"
+        ''' <summary>
+        ''' エラー
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared ReadOnly Property [ERROR] As String = "E"
+        ''' <summary>
+        ''' 情報
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared ReadOnly Property INFORMATION As String = "I"
+        ''' <summary>
+        ''' 警告
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared ReadOnly Property WARNING As String = "W"
+        ''' <summary>
+        ''' 確認
+        ''' </summary>
+        ''' <returns></returns>
+        Public Shared ReadOnly Property QUESTION As String = "Q"
+    End Class
 #End Region
 
 End Module 'End BaseDllConst

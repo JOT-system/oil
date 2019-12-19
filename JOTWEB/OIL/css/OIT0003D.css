@@ -120,7 +120,7 @@
 #WF_SHIPPERS_LABEL {
     position: fixed;
     top: 8.5em;
-    left: 21em;
+    left: 24em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -130,7 +130,7 @@
 #WF_SHIPPERSCODE {
     position: fixed;
     top: 8.5em;
-    left: 22em;
+    left: 25em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -144,7 +144,7 @@
 #WF_SHIPPERSNAME {
     position: fixed;
     top: 8.5em;
-    left: 33em;
+    left: 39em;
 }
 
     #WF_SHIPPERSNAME input[type=text] {
@@ -157,7 +157,7 @@
 #WF_CONSIGNEE_LABEL {
     position: fixed;
     top: 8.5em;
-    left: 49em;
+    left: 58em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -167,7 +167,7 @@
 #WF_CONSIGNEECODE {
     position: fixed;
     top: 8.5em;
-    left: 51em;
+    left: 60em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -181,7 +181,7 @@
 #WF_CONSIGNEENAME {
     position: fixed;
     top: 8.5em;
-    left: 62em;
+    left: 74em;
 }
 
     #WF_CONSIGNEENAME input[type=text] {
@@ -221,7 +221,7 @@
 #WF_DEPSTATION_LABEL {
     position: fixed;
     top: 10.5em;
-    left: 21em;
+    left: 24em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -231,7 +231,7 @@
 #WF_DEPSTATIONCODE {
     position: fixed;
     top: 10.5em;
-    left: 22em;
+    left: 25em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -245,7 +245,7 @@
 #WF_DEPSTATIONNAME {
     position: fixed;
     top: 10.5em;
-    left: 33em;
+    left: 39em;
 }
 
     #WF_DEPSTATIONNAME input[type=text] {
@@ -258,7 +258,7 @@
 #WF_ARRSTATION_LABEL {
     position: fixed;
     top: 10.5em;
-    left: 50em;
+    left: 58em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -268,7 +268,7 @@
 #WF_ARRSTATIONCODE {
     position: fixed;
     top: 10.5em;
-    left: 51em;
+    left: 60em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -282,7 +282,7 @@
 #WF_ARRSTATIONNAME {
     position: fixed;
     top: 10.5em;
-    left: 62em;
+    left: 74em;
 }
 
     #WF_ARRSTATIONNAME input[type=text] {
@@ -322,7 +322,7 @@
 #WF_DEPDATE_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 21em;
+    left: 24em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -332,7 +332,7 @@
 #WF_DEPDATE {
     position: fixed;
     top: 13.5em;
-    left: 22em;
+    left: 25em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -347,7 +347,7 @@
 #WF_ARRDATE_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 34em;
+    left: 40em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -357,7 +357,7 @@
 #WF_ARRDATE {
     position: fixed;
     top: 13.5em;
-    left: 37em;
+    left: 43em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -372,7 +372,7 @@
 #WF_ACCDATE_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 49em;
+    left: 58em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -382,7 +382,7 @@
 #WF_ACCDATE {
     position: fixed;
     top: 13.5em;
-    left: 51em;
+    left: 60em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -397,7 +397,7 @@
 #WF_EMPARRDATE_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 63em;
+    left: 75em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -407,7 +407,7 @@
 #WF_EMPARRDATE {
     position: fixed;
     top: 13.5em;
-    left: 66em;
+    left: 78em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -449,7 +449,7 @@
 #WF_ACTUALDEPDATE_LABEL {
     position: fixed;
     top: 15.5em;
-    left: 21em;
+    left: 24em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -459,7 +459,7 @@
 #WF_ACTUALDEPDATE {
     position: fixed;
     top: 15.5em;
-    left: 22em;
+    left: 25em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -474,7 +474,7 @@
 #WF_ACTUALARRDATE_LABEL {
     position: fixed;
     top: 15.5em;
-    left: 34em;
+    left: 40em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -484,7 +484,7 @@
 #WF_ACTUALARRDATE {
     position: fixed;
     top: 15.5em;
-    left: 37em;
+    left: 43em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -499,7 +499,7 @@
 #WF_ACTUALACCDATE_LABEL {
     position: fixed;
     top: 15.5em;
-    left: 49em;
+    left: 58em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -509,7 +509,7 @@
 #WF_ACTUALACCDATE {
     position: fixed;
     top: 15.5em;
-    left: 51em;
+    left: 60em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -524,7 +524,7 @@
 #WF_ACTUALEMPARRDATE_LABEL {
     position: fixed;
     top: 15.5em;
-    left: 63em;
+    left: 75em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -534,7 +534,7 @@
 #WF_ACTUALEMPARRDATE {
     position: fixed;
     top: 15.5em;
-    left: 66em;
+    left: 78em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -543,6 +543,436 @@
         Height: 1.4em;
         Width: 10em;
     }
+
+
+/* #################７行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 油種別タンク車数(車)(ラベル) */
+#WF_OILTANKCNT_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -1em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/* -----------------２列目 ----------------- */
+/* 車数（ハイオク）(ラベル) */
+#WF_HTANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0.2em;
+    top: 12.5em;
+    left: 9.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（ハイオク） */
+#WF_HTANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0.2em;
+    top: 11.5em;
+    left: -3.5em;
+    border-radius: 3px;
+    padding-left: 35px;
+}
+
+    #WF_HTANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+/* -----------------３列目 ----------------- */
+/* 車数（レギュラー）(ラベル) */
+#WF_RTANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（レギュラー） */
+#WF_RTANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -3.8em;
+    border-radius: 3px;
+}
+
+    #WF_RTANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 5em;
+    }
+
+/* -----------------４列目 ----------------- */
+/* 車数（灯油）(ラベル) */
+#WF_TTANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（灯油） */
+#WF_TTANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -4.3em;
+    border-radius: 3px;
+}
+
+    #WF_TTANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------５列目 ----------------- */
+/* 車数（未添加灯油）(ラベル) */
+#WF_MTTANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（未添加灯油） */
+#WF_MTTANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -4.6em;
+    border-radius: 3px;
+}
+
+    #WF_MTTANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 5em;
+    }
+
+/* -----------------６列目 ----------------- */
+/* 車数（軽油）(ラベル) */
+#WF_KTANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（軽油） */
+#WF_KTANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -5em;
+    border-radius: 3px;
+}
+
+    #WF_KTANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------７列目 ----------------- */
+/* 車数（３号軽油）(ラベル) */
+#WF_K3TANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（３号軽油） */
+#WF_K3TANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -5.4em;
+    border-radius: 3px;
+}
+
+    #WF_K3TANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------８列目 ----------------- */
+/* 車数（５号軽油）(ラベル) */
+#WF_K5TANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.8em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（５号軽油） */
+#WF_K5TANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -5.8em;
+    border-radius: 3px;
+}
+
+    #WF_K5TANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------９列目 ----------------- */
+/* 車数（１０号軽油）(ラベル) */
+#WF_K10TANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.8em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（１０号軽油） */
+#WF_K10TANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -6.2em;
+    border-radius: 3px;
+}
+
+    #WF_K10TANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4.5em;
+    }
+
+/* -----------------１０列目 ----------------- */
+/* 車数（LSA）(ラベル) */
+#WF_LTANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 9.8em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（LSA） */
+#WF_LTANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -6.6em;
+    border-radius: 3px;
+}
+
+    #WF_LTANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------１１列目 ----------------- */
+#WF_ATANK_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 8.8em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（A重油） */
+#WF_ATANK_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -6.9em;
+    border-radius: 3px;
+}
+
+    #WF_ATANK_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+
+/* #################８行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 油種別タンク車数(車)(ラベル) */
+#WF_OILTANKCNT_LABEL_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.0em;
+    left: -1em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* -----------------２列目 ----------------- */
+/* 車数（ハイオク） */
+#WF_HTANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -3.05em;
+    border-radius: 3px;
+    padding-left: 35px;
+}
+
+    #WF_HTANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4.05em;
+    }
+
+/* -----------------３列目 ----------------- */
+/* 車数（レギュラー） */
+#WF_RTANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -3.4em;
+    border-radius: 3px;
+}
+
+    #WF_RTANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 5em;
+    }
+
+/* -----------------４列目 ----------------- */
+/* 車数（灯油） */
+#WF_TTANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -3.9em;
+    border-radius: 3px;
+}
+
+    #WF_TTANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4.05em;
+    }
+
+/* -----------------５列目 ----------------- */
+/* 車数（未添加灯油） */
+#WF_MTTANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -4.25em;
+    border-radius: 3px;
+}
+
+    #WF_MTTANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4.95em;
+    }
+
+/* -----------------６列目 ----------------- */
+/* 車数（軽油） */
+#WF_KTANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -4.6em;
+    border-radius: 3px;
+}
+
+    #WF_KTANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------７列目 ----------------- */
+/* 車数（３号軽油） */
+#WF_K3TANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -5em;
+    border-radius: 3px;
+}
+
+    #WF_K3TANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------８列目 ----------------- */
+/* 車数（５号軽油） */
+#WF_K5TANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -5.4em;
+    border-radius: 3px;
+}
+
+    #WF_K5TANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
+
+/* -----------------９列目 ----------------- */
+/* 車数（１０号軽油） */
+#WF_K10TANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -5.75em;
+    border-radius: 3px;
+}
+
+    #WF_K10TANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4.4em;
+    }
+
+/* -----------------１０列目 ----------------- */
+/* 車数（LSA） */
+#WF_LTANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -6.1em;
+    border-radius: 3px;
+}
+
+    #WF_LTANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4.1em;
+    }
+
+/* -----------------１１列目 ----------------- */
+/* 車数（A重油） */
+#WF_ATANK_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -6.5em;
+    border-radius: 3px;
+}
+
+    #WF_ATANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4.05em;
+    }
+
+
+
 
 
 /* /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ */
@@ -1004,8 +1434,33 @@ span[class^="WF_DViewRep"][class$="_Area"] {
 
 
 
+/* ブラウザのデフォルト初期化 */
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    font-size: 1.6em;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+div {
+    position: relative;
+}
 
 /* 実行画面 ヘッダー部(詳細) */
+.Operation {
+    margin-left: 2em;
+    margin-top: 0.5em;
+    height: 1.5em;
+    font-size: 0.8em;
+}
+
+    .Operation a {
+        position: relative;
+        margin: 0em 0.7em 0em 0em;
+        top: -0.4em;
+    }
 .Operation input[type='text'] {
     padding-left: 1.3em;
 }
@@ -1014,6 +1469,7 @@ span[class^="WF_DViewRep"][class$="_Area"] {
     margin-left: 2em;
     margin-top: 0.5em;
     height: 1.5em;
+    font-size: 0.8em;
 }
 
     .Operation2 a {
@@ -1027,7 +1483,7 @@ span[class^="WF_DViewRep"][class$="_Area"] {
 .headerbox {
     top: 2.4em;
     left: 0em;
-    height: calc(- 18.4em - 1.4em + 100%);
+    height: calc(-2.4em - 15.4em - 1.4em + 100%);
     width: 100%;
     position: fixed;
     overflow: hidden;
@@ -1038,7 +1494,7 @@ span[class^="WF_DViewRep"][class$="_Area"] {
 /* 実行画面 明細部 */
 
 .detailbox {
-    top: calc(-2.4em - 17.4em - 1.4em + 100%);
+    top: calc(-2.4em - 13.4em - 1.4em + 100%);
     bottom: 1.4em;
     left: 0em;
     height: 100%;
@@ -1049,7 +1505,7 @@ span[class^="WF_DViewRep"][class$="_Area"] {
 }
 
 
-/* 明細部 ボタン */
+/* 明細部 ボタン(TAB1) */
 
 #detailbuttonbox {
     z-index: 10;
@@ -1058,6 +1514,31 @@ span[class^="WF_DViewRep"][class$="_Area"] {
         position: relative;
         margin: 0em 0em 0em 0.2em;
         top: -1.5em;
+        left: 48.8em;
+    }
+
+/* 明細部 ボタン(TAB2) */
+
+#detailbuttonbox2 {
+    z-index: 10;
+}
+    #detailbuttonbox2 a {
+        position: relative;
+        margin: 0em 0em 0em 0.2em;
+        top: 0.5em;
+        left: 48.8em;
+    }
+
+/* 明細部 ボタン(TAB3) */
+
+#detailbuttonbox3 {
+    z-index: 10;
+}
+
+    #detailbuttonbox3 a {
+        position: relative;
+        margin: 0em 0em 0em 0.2em;
+        top: 0.5em;
         left: 48.8em;
     }
 

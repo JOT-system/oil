@@ -517,6 +517,7 @@
 /* 実行画面 ヘッダー部(詳細) */
 .Operation input[type='text'] {
     padding-left: 1.3em;
+    border-radius: 3px;
 }
 
 .Operation2 {

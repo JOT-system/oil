@@ -255,7 +255,6 @@ Public Class OIT0001EmptyTurnDairyList
             & " , 1                                                  AS 'SELECT'" _
             & " , 0                                                  AS HIDDEN" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
-            & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '   ')          AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
@@ -289,6 +288,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.OTHER9OTANK), '')             AS OTHER9OTANK" _
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANK), '')            AS OTHER10OTANK" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')               AS TOTALTANK" _
+            & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE = @P1" _
@@ -333,6 +333,10 @@ Public Class OIT0001EmptyTurnDairyList
                     i += 1
                     OIT0001row("LINECNT") = i        'LINECNT
 
+                    '受注進行ステータス
+                    CODENAME_get("ORDERSTATUS", OIT0001row("ORDERSTATUS"), OIT0001row("ORDERSTATUS"), WW_DUMMY)
+                    '受注情報
+                    CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFO"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -898,6 +902,10 @@ Public Class OIT0001EmptyTurnDairyList
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+                Case "ORDERSTATUS"      '
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERSTATUS"))
+                Case "ORDERINFO"        '
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
 
             End Select
         Catch ex As Exception

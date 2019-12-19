@@ -558,7 +558,11 @@ Public Class OIM0004StationCreate
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            If WF_FIELD.Value = "WF_DELFLG" Then
+                Master.Output(C_MESSAGE_NO.OIL_DELFLG_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Else
+                Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            End If
         End If
     End Sub
 

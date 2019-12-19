@@ -251,7 +251,7 @@ Public Class OIM0004StationSearch
             End If
         Else
             'ポップアップを表示(needsPopUp:=True)
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "貨物駅コード", needsPopUp:=True)
             TxtStationCode.Focus()
             O_RTN = "ERR"
             Exit Sub

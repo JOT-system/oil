@@ -359,6 +359,28 @@ Public Module Messages
         ''' </summary>
         Public Const FTP_EXPORT_SUCCESSFUL As String = "11007"
 
+#Region "石油向け"
+        ''' <summary>
+        ''' 削除フラグ未存在
+        ''' </summary>
+        Public Const OIL_DELFLG_NOTFOUND As String = "20000"
+
+        ''' <summary>
+        ''' 削除行未存在
+        ''' </summary>
+        Public Const OIL_DELLINE_NOTFOUND As String = "20001"
+
+        ''' <summary>
+        ''' 貨物駅マスタ未存在
+        ''' </summary>
+        Public Const OIL_STATION_MASTER_NOTFOUND As String = "20002"
+
+        ''' <summary>
+        ''' 列車マスタ未存在
+        ''' </summary>
+        Public Const OIL_TRAIN_MASTER_NOTFOUND As String = "20003"
+#End Region
+
 
         Shared Function REPORTID() As String
             Throw New NotImplementedException

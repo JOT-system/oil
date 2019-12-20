@@ -50,6 +50,9 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private WW_RTN_SW As String = ""
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
+    Private WW_ORDERINFOFLG As Boolean = False                      '受注情報セット可否
+    Private WW_ORDERINFO_10 As String = "10"                        '受注情報(10:積置)用格納
+    Private WW_ORDERINFONAME_10 As String = "積置"                  '受注情報(10:積置)用格納
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -2386,6 +2389,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Protected Sub WW_CheckValidityDate(ByRef O_RTN As String)
 
         O_RTN = C_MESSAGE_NO.NORMAL
+        WW_ORDERINFOFLG = False
         Dim WW_TEXT As String = ""
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
@@ -2409,6 +2413,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
+        ElseIf iresult = -1 Then    '(予定)積込日 < (予定)発日の場合
+            WW_ORDERINFOFLG = True
         End If
 
         '(予定)発日 と　(予定)積車着日を比較
@@ -2631,34 +2637,34 @@ Public Class OIT0001EmptyTurnDairyDetail
         For i As Integer = 0 To WW_GetValue.Length - 1
             Select Case WW_GetValue(i)
                     'ハイオク
-                Case "1001"
+                Case CONST_TxtHTank
                     TxtHTank.Enabled = True
                     'レギュラー
-                Case "1101"
+                Case CONST_TxtRTank
                     TxtRTank.Enabled = True
                     '灯油
-                Case "1301"
+                Case CONST_TxtTTank
                     TxtTTank.Enabled = True
                     '未添加灯油
-                Case "1302"
+                Case CONST_TxtMTTank
                     TxtMTTank.Enabled = True
                     '軽油
-                Case "1401", "1406"
+                Case CONST_TxtKTank1, CONST_TxtKTank2
                     TxtKTank.Enabled = True
                     '３号軽油
-                Case "1404", "1405"
+                Case CONST_TxtK3Tank1, CONST_TxtK3Tank2
                     TxtK3Tank.Enabled = True
                     '軽油５
-                Case "1402"
+                Case CONST_TxtK5Tank
                     TxtK5Tank.Enabled = True
                     '軽油１０
-                Case "1403"
+                Case CONST_TxtK10Tank
                     TxtK10Tank.Enabled = True
                     'ＬＳＡ
-                Case "2201", "2202"
+                Case CONST_TxtLTank1, CONST_TxtLTank2
                     TxtLTank.Enabled = True
                     'Ａ重油
-                Case "2101"
+                Case CONST_TxtATank
                     TxtATank.Enabled = True
             End Select
         Next
@@ -2692,6 +2698,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , TRAINNO    = @P02" _
             & "        , DEPSTATION = @P13    , DEPSTATIONNAME = @P14" _
             & "        , ARRSTATION = @P15    , ARRSTATIONNAME = @P16" _
+            & "        , ORDERINFO  = @P22" _
             & "        , LODDATE    = @P24    , DEPDATE        = @P25" _
             & "        , ARRDATE    = @P26    , ACCDATE        = @P27" _
             & "        , UPDYMD     = @P87    , UPDUSER        = @P88" _
@@ -2969,7 +2976,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA19.Value = ""                                 '空車着駅コード(変更後)
                     PARA20.Value = ""                                 '空車着駅名(変更後)
                     PARA21.Value = "100"                              '受注進行ステータス(100:受注受付)
-                    PARA22.Value = ""                                 '受注情報
+                    '積込日<発日の場合は、「10:積込」を設定
+                    If WW_ORDERINFOFLG = True Then                    '受注情報
+                        PARA22.Value = WW_ORDERINFO_10
+                    Else
+                        PARA22.Value = ""
+                    End If
                     PARA23.Value = "0"                                '利用可否フラグ(0:利用可能)
                     PARA24.Value = TxtLoadingDate.Text                '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                    '発日（予定）
@@ -3659,6 +3671,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                     i += 1
                     OIT0001row("LINECNT") = i        'LINECNT
 
+                    '受注進行ステータス
+                    CODENAME_get("ORDERSTATUS", OIT0001row("ORDERSTATUS"), OIT0001row("ORDERSTATUS"), WW_DUMMY)
+                    '受注情報
+                    CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFO"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -4006,6 +4022,11 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 Case "PRODUCTPATTERN"   '油種
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN"))
+
+                Case "ORDERSTATUS"      '受注進行ステータス
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERSTATUS"))
+                Case "ORDERINFO"        '受注情報
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
 
             End Select
         Catch ex As Exception

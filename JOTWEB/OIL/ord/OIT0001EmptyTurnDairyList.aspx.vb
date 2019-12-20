@@ -912,9 +912,9 @@ Public Class OIT0001EmptyTurnDairyList
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
-                Case "ORDERSTATUS"      '
+                Case "ORDERSTATUS"      '受注進行ステータス
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERSTATUS"))
-                Case "ORDERINFO"        '
+                Case "ORDERINFO"        '受注情報
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
 
             End Select

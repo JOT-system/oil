@@ -1473,3 +1473,16 @@ span[class^="WF_DViewRep"] table {
 input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
     padding-left: 0em;
 }
+
+/* 必須マーク表示 */
+.requiredMark:after {
+    color: rgb(255,0,0);
+    display: inline-block;
+    font-size: 12px !important;
+    text-decoration: none !important;
+    font-weight: bold;
+    content: "\00a0★";
+    /*vertical-align: middle;*/
+    height: 15.5px;
+    overflow-y: hidden;
+}

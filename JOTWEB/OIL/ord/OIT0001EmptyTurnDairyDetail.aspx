@@ -52,12 +52,12 @@
             </a>
 
             <!-- ■　受注営業所　■ -->
-            <a id="WF_OFFICECODE_LABEL">受注営業所</a>
+            <a id="WF_OFFICECODE_LABEL" class="requiredMark">受注営業所</a>
             <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtOrderOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　本線列車　■ -->
-            <a id="WF_HEADOFFICETRAIN_LABEL">本線列車</a>
+            <a id="WF_HEADOFFICETRAIN_LABEL" class="requiredMark">本線列車</a>
             <a class="ef" id="WF_HEADOFFICETRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
@@ -113,56 +113,56 @@
             <!-- ■　車数（ハイオク）　■ -->
             <a id="WF_HTANK_LABEL">ハイオク</a>
             <a class="ef" id="WF_HTANK">
-                <asp:TextBox ID="TxtHTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtHTank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
             <!-- ■　車数（レギュラー）　■ -->
             <a id="WF_RTANK_LABEL">レギュラー</a>
             <a class="ef" id="WF_RTANK">
-                <asp:TextBox ID="TxtRTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtRTank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
 
             <!-- ■　車数（灯油）　■ -->
             <a id="WF_TTANK_LABEL">灯油</a>
             <a class="ef" id="WF_TTANK">
-                <asp:TextBox ID="TxtTTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtTTank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
             <!-- ■　車数（未添加灯油）　■ -->
             <a id="WF_MTTANK_LABEL">未添加灯油</a>
             <a class="ef" id="WF_MTTANK">
-                <asp:TextBox ID="TxtMTTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtMTTank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
 
             <!-- ■　車数（軽油）　■ -->
             <a id="WF_KTANK_LABEL">軽油</a>
             <a class="ef" id="WF_KTANK">
-                <asp:TextBox ID="TxtKTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtKTank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
             <!-- ■　車数（３号軽油）　■ -->
             <a id="WF_K3TANK_LABEL">３号軽油</a>
             <a class="ef" id="WF_K3TANK">
-                <asp:TextBox ID="TxtK3Tank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtK3Tank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
 
             <!-- ■　車数（５号軽油）　■ -->
             <a id="WF_K5TANK_LABEL">５号軽油</a>
             <a class="ef" id="WF_K5TANK">
-                <asp:TextBox ID="TxtK5Tank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtK5Tank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
             <!-- ■　車数（１０号軽油）　■ -->
             <a id="WF_K10TANK_LABEL">１０号軽油</a>
             <a class="ef" id="WF_K10TANK">
-                <asp:TextBox ID="TxtK10Tank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtK10Tank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
 
             <!-- ■　車数（LSA）　■ -->
             <a id="WF_LTANK_LABEL">ＬＳＡ</a>
             <a class="ef" id="WF_LTANK">
-                <asp:TextBox ID="TxtLTank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtLTank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
             <!-- ■　車数（A重油）　■ -->
             <a id="WF_ATANK_LABEL">Ａ重油</a>
             <a class="ef" id="WF_ATANK">
-                <asp:TextBox ID="TxtATank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                <asp:TextBox ID="TxtATank" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2"></asp:TextBox>
             </a>
         </div>
     </div>

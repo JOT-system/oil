@@ -1476,7 +1476,8 @@ input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
 
 /* 必須マーク表示 */
 .requiredMark:after {
-    color: rgb(255,0,0);
+    /*color: rgb(255,0,0);*/
+    color: #f0134d;
     display: inline-block;
     font-size: 12px !important;
     text-decoration: none !important;

@@ -42,7 +42,7 @@
             <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 貨物駅コード -->
-        <a id="WF_STATIONCODE_LABEL">貨物駅コード</a>
+        <a id="WF_STATIONCODE_LABEL" class="requiredMark">貨物駅コード</a>
 
         <a class="ef" id="WF_STATIONCODE" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
             <asp:TextBox CssClass="BoxIcon" ID="TxtStationCode" runat="server" onblur="MsgClear();"></asp:TextBox>

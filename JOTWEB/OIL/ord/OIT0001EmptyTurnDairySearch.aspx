@@ -43,7 +43,7 @@
             <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 営業所 -->
-        <a id="WF_OFFICECODE_LABEL">★営業所</a>
+        <a id="WF_OFFICECODE_LABEL" class="requiredMark">営業所</a>
         <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
             <asp:TextBox CssClass="BoxIcon" ID="TxtSalesOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
@@ -52,7 +52,7 @@
         </a>
 
         <!-- 積込日 -->
-        <a id="WF_LOADINGDATE_LABEL">★積込日</a>
+        <a id="WF_LOADINGDATE_LABEL" class="requiredMark">積込日</a>
         <a class="ef" id="WF_LOADINGDATE" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox CssClass="CalendarIcon" ID="TxtLoadingDateStart" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>

@@ -28,7 +28,7 @@
         <a id="WF_CAMPCODE_LABEL" >会社コード</a>
 
         <a class="ef" id="WF_CAMPCODE" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
-            <asp:TextBox  CssClass="BoxIcon" ID="WF_CAMPCODE_CODE" runat="server"  onblur="MsgClear();"></asp:TextBox>
+            <asp:TextBox CssClass="BoxIcon" ID="WF_CAMPCODE_CODE" runat="server"  onblur="MsgClear();"></asp:TextBox>
         </a>
         <a id="WF_CAMPCODE_TEXT">
             <asp:Label ID="WF_CAMPCODE_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>

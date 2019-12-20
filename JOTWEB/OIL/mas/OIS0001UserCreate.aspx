@@ -33,7 +33,7 @@
                     <!-- 選択No -->
                     <a>
                         <asp:Label ID="WF_Sel_LINECNT_L" runat="server" Text="選択No" Width="15.0em" CssClass="WF_TEXT_LEFT" Font-Bold="true"></asp:Label>
-                        <asp:Label ID="WF_Sel_LINECNT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                        <asp:Label ID="WF_Sel_LINECNT" runat="server" CssClass="WF_TEXT"></asp:Label>
                     </a>
                 </p>
                 <p id="KEY_LINE_2">

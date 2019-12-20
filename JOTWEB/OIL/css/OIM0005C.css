@@ -46,6 +46,16 @@
     width: 10em;
 }*/
 
+/*貨物駅コードinput tag*/
+input[type='text'] {
+    padding-left: 1.25em;
+}
+
+    input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
+        padding-left: 0;
+        padding-right: 1.25em;
+    }
+
 /*左Boxオープン用虫眼鏡アイコン*/
 .BoxIcon {
     background-image: url(../img/leftbox.png);

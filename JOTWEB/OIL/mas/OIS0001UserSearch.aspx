@@ -25,7 +25,7 @@
 
         <!-- ○ 変動項目 ○ -->
         <!-- 会社コード -->
-        <a id="WF_CAMPCODE_LABEL" >会社コード</a>
+        <a id="WF_CAMPCODE_LABEL" class="requiredMark">会社コード</a>
 
         <a class="ef" id="WF_CAMPCODE" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
             <asp:TextBox CssClass="BoxIcon" ID="WF_CAMPCODE_CODE" runat="server"  onblur="MsgClear();"></asp:TextBox>
@@ -35,7 +35,7 @@
         </a>
 
         <!-- 有効年月日(開始） -->
-        <a id="WF_STYMD_LABEL" >有効年月日（開始）</a>
+        <a id="WF_STYMD_LABEL" class="requiredMark">有効年月日（開始）</a>
 
         <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox CssClass="CalendarIcon" ID="WF_STYMD_CODE" runat="server"  onblur="MsgClear();"></asp:TextBox>

@@ -14,7 +14,7 @@
 #WF_OFFICECODE {
     position: fixed;
     top: 4.5em;
-    left: 9em;
+    left: 10em;
     border-radius: 3px;
     padding-left: 21px;
     Height: 1.4em;
@@ -40,7 +40,7 @@
 #WF_TRAINCODE {
     position: fixed;
     top: 6.5em;
-    left: 9em;
+    left: 10em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -66,7 +66,7 @@
 #WF_DEPSTATIONCODE {
     position: fixed;
     top: 8.5em;
-    left: 9em;
+    left: 10em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -80,7 +80,7 @@
 #WF_DEPSTATIONNAME {
     position: fixed;
     top: 8.5em;
-    left: 20em;
+    left: 21em;
 }
 
     #WF_DEPSTATIONNAME input[type=text] {
@@ -141,7 +141,7 @@
 #WF_EMPARRDATE {
     position: fixed;
     top: 10.5em;
-    left: 9em;
+    left: 10em;
     border-radius: 3px;
     padding-left: 21px;
 }

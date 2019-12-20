@@ -95,6 +95,20 @@
     width: 10em;
 }*/
 
+/*テキストコードinput tag*/
+input[type='text'] {
+    padding-left: 1.25em;
+}
+
+    input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
+        padding-right: 1.25em;
+    }
+
+    input[type='password'] {
+        padding-right: 1.25em;
+    }
+    
+
 /*左Boxオープン用虫眼鏡アイコン*/
 .BoxIcon {
     background-image: url(../img/leftbox.png);

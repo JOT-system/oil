@@ -108,7 +108,7 @@
     #WF_BRANCH input[type='text'] {
         Height: 2.1em;
         Width: 10em;
-        padding-left: 0em;
+        /*padding-left: 0em;*/
     }
 
 /* 貨物駅コード枝番名称*/

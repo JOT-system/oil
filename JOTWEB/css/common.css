@@ -1465,3 +1465,11 @@ span[class^="WF_DViewRep"] table {
         padding-top: 5px;
         vertical-align: middle;
     }
+
+/* ------------------------------
+共通テキストボックススタイル
+------------------------------ */
+/* BoxIcon,CalendarIconを指定していない場合(左に余白はあけない。) */
+input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
+    padding-left: 0em;
+}

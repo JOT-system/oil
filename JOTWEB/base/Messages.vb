@@ -379,6 +379,21 @@ Public Module Messages
         ''' 列車マスタ未存在
         ''' </summary>
         Public Const OIL_TRAIN_MASTER_NOTFOUND As String = "20003"
+
+        ''' <summary>
+        ''' 閏年未存在
+        ''' </summary>
+        Public Const OIL_LEAPYEAR_NOTFOUND As String = "20004"
+
+        ''' <summary>
+        ''' 月日範囲エラー
+        ''' </summary>
+        Public Const OIL_MONTH_DAY_OVER_ERROR As String = "20005"
+
+        ''' <summary>
+        ''' 年月日妥当性エラー
+        ''' </summary>
+        Public Const OIL_DATE_VALIDITY_ERROR As String = "20006"
 #End Region
 
 

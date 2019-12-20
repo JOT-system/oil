@@ -12,32 +12,6 @@
     background-position: 1px;
 }
 
-
-/*貨物駅コードinput tag*/
-#WF_STATIONCODE input[type='text'] {
-    padding-left: 0em;
-}
-/*貨物コード枝番input tag*/
-#WF_BRANCH input[type='text'] {
-    padding-left: 0em;
-}
-/*貨物駅名称input tag*/
-#WF_STATIONNAME input[type='text'] {
-    padding-left: 0em;
-}
-/*貨物駅名称カナinput tag*/
-#WF_STATIONNAMEKANA input[type='text'] {
-    padding-left: 0em;
-}
-/*貨物駅種別名称input tag*/
-#WF_STATIONTYPENAME input[type='text'] {
-    padding-left: 0em;
-}
-/*貨物駅種別名称カナinput tag*/
-#WF_STATIONTYPENAMEKANA input[type='text'] {
-    padding-left: 0em;
-}
-
 /* 実行画面 ヘッダー部(詳細) */
 .detailboxOnly input[type='text'] {
     padding-left: 1.3em;

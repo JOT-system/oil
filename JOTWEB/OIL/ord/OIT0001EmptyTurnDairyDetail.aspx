@@ -25,7 +25,7 @@
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
             <a style="position:fixed;top:2.8em;left:62.5em;">
-                <input type="button" id="WF_ButtonINSERT" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                <input type="button" id="WF_ButtonINSERT" value="明細作成" style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
             </a>
             <a style="position:fixed;top:2.8em;left:67em;">
                 <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
@@ -187,8 +187,8 @@
             <a style="left:0.5em;">
                 <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
             </a>
-            <a style="left:43.5em;">
-                <input type="button" id="WF_ButtonUPDATE" value="明細更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+            <a style="left:41.5em;">
+                <input type="button" id="WF_ButtonUPDATE" value="空回日報確定"  style="Width:7em" onclick="ButtonClick('WF_ButtonUPDATE');" />
             </a>
         </div>
         </div>

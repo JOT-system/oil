@@ -220,6 +220,12 @@ Public Class OIS0001UserSearch
 
         '有効年月日(From)
         Master.CheckField(WF_CAMPCODE_CODE.Text, "STYMD", WF_STYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If WF_STYMD_CODE.Text = "" Then
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(From) : " & "")
+            WF_STYMD_CODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
         If Not isNormal(WW_CS0024FCHECKERR) Then
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(From) : " & WF_STYMD_CODE.Text)
             WF_STYMD_CODE.Focus()

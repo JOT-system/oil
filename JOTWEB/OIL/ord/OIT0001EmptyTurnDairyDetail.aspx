@@ -24,8 +24,8 @@
 
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
-            <a style="position:fixed;top:2.8em;left:62.5em;">
-                <input type="button" id="WF_ButtonINSERT" value="明細作成" style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+            <a style="position:fixed;top:2.8em;left:61.5em;">
+                <input type="button" id="WF_ButtonINSERT" value="油種数登録" style="Width:6em" onclick="ButtonClick('WF_ButtonINSERT');" />
             </a>
             <a style="position:fixed;top:2.8em;left:67em;">
                 <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
@@ -70,7 +70,7 @@
                 <asp:Label ID="LblDepstationName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
             </a>
             <!-- ■　着駅　■ -->
-            <a id="WF_ARRSTATION_LABEL">着駅</a>
+            <a id="WF_ARRSTATION_LABEL" class="requiredMark">着駅</a>
             <a class="ef" id="WF_ARRSTATION" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtArrstation" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
@@ -84,17 +84,17 @@
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtLoadingDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(予定)発日　■ -->
-            <a id="WF_DEPDATE_LABEL">発日</a>
+            <a id="WF_DEPDATE_LABEL" class="requiredMark">発日</a>
             <a class="ef" id="WF_DEPDATE" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtDepDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(予定)積車着日　■ -->
-            <a id="WF_ARRDATE_LABEL">積車着日</a>
+            <a id="WF_ARRDATE_LABEL" class="requiredMark">積車着日</a>
             <a class="ef" id="WF_ARRDATE" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtArrDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(予定)受入日　■ -->
-            <a id="WF_ACCDATE_LABEL">受入日</a>
+            <a id="WF_ACCDATE_LABEL" class="requiredMark">受入日</a>
             <a class="ef" id="WF_ACCDATE" ondblclick="Field_DBclick('TxtAccDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtAccDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
@@ -102,7 +102,7 @@
 
         <div class="Operation2" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
             <!-- ■　油種別タンク車数(車)　■ -->
-            <a id="WF_OILTANKCNT_LABEL">油種別タンク車数(車)</a>
+            <a id="WF_OILTANKCNT_LABEL" class="requiredMark">油種別タンク車数(車)</a>
 
             <!-- ■　合計車数　■ -->
             <a id="WF_TOTALTANK_LABEL">合計</a>

@@ -18,7 +18,7 @@
 #WF_STATIONCODE_LABEL {
     position: fixed;
     height: 50px;
-    width: 100px;
+    width: 120px;
     top: calc(15% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;

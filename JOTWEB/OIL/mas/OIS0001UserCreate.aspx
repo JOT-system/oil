@@ -43,6 +43,13 @@
                         <asp:TextBox ID="WF_DELFLG" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
+
+                    <!-- 画面ＩＤ -->
+                    <a class="ef" style="display:none;">
+                        <asp:Label ID="WF_MAPID_L" runat="server" Text="画面ＩＤ" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="WF_MAPID" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_MAPID_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </a>
                 </p>
 
                 <p id="KEY_LINE_3">
@@ -69,11 +76,11 @@
                         <asp:Label ID="WF_STAFFNAMEL_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
-                    <!-- 画面ＩＤ -->
+                    <!-- 誤り回数 -->
                     <a class="ef">
-                        <asp:Label ID="WF_MAPID_L" runat="server" Text="画面ＩＤ" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="WF_MAPID" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
-                        <asp:Label ID="WF_MAPID_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_MISSCNT_L" runat="server" Text="誤り回数" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="WF_MISSCNT" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_MISSCNT_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
 
@@ -85,15 +92,6 @@
                         <asp:Label ID="WF_PASSWORD_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                    </a>
 
-                    <!-- 誤り回数 -->
-                    <a class="ef">
-                        <asp:Label ID="WF_MISSCNT_L" runat="server" Text="誤り回数" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="WF_MISSCNT" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
-                        <asp:Label ID="WF_MISSCNT_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </a>
-                </p>
-
-                <p id="KEY_LINE_6">
                     <!-- パスワード有効期限 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_PASSENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_PASSENDYMD_L" runat="server" Text="パスワード有効期限" Width="15.0em" CssClass="WF_TEXT_LEFT" Font-Bold="true" Font-Underline="true"></asp:Label>
@@ -102,7 +100,7 @@
                     </a>
                 </p>
 
-                <p id="KEY_LINE_7">
+                <p id="KEY_LINE_6">
                     <!-- 開始年月日 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
                         <asp:Label ID="WF_STYMD_L" runat="server" Text="開始年月日" Width="15.0em" CssClass="WF_TEXT_LEFT" Font-Bold="true" Font-Underline="true"></asp:Label>
@@ -118,11 +116,11 @@
                     </a>
                 </p>
 
-                <p id="KEY_LINE_8">
+                <p id="KEY_LINE_7">
                     <!-- 会社コード -->
-                    <a class="ef">
-                        <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="WF_CAMPCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                    <a class="ef" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+                        <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" Width="15.0em" CssClass="WF_TEXT_LEFT" Font-Bold="true" Font-Underline="true"></asp:Label>
+                        <asp:TextBox ID="WF_CAMPCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
@@ -134,7 +132,7 @@
                     </a>
                 </p>
 
-                <p id="KEY_LINE_9">
+                <p id="KEY_LINE_8">
                     <!-- メールアドレス -->
                     <a class="ef">
                         <asp:Label ID="WF_EMAIL_L" runat="server" Text="メールアドレス" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -143,7 +141,7 @@
                     </a>
                 </p>
 
-                <p id="KEY_LINE_10">
+                <p id="KEY_LINE_9">
                     <!-- メニュー表示制御ロール -->
                     <a class="ef" ondblclick="Field_DBclick('WF_MENUROLE', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_MENUROLE');">
                         <asp:Label ID="WF_MENUROLE_L" runat="server" Text="メニュー表示制御ロール" Width="15.0em" CssClass="WF_TEXT_LEFT" Font-Bold="true" Font-Underline="true"></asp:Label>
@@ -159,7 +157,7 @@
                     </a>
                 </p>
 
-                <p id="KEY_LINE_11">
+                <p id="KEY_LINE_10">
                     <!-- 画面表示項目制御ロール -->
                     <a class="ef" ondblclick="Field_DBclick('WF_VIEWPROFID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_VIEWPROFID');">
                         <asp:Label ID="WF_VIEWPROFID_L" runat="server" Text="画面表示項目制御ロール" Width="15.0em" CssClass="WF_TEXT_LEFT" Font-Bold="true" Font-Underline="true"></asp:Label>
@@ -175,7 +173,7 @@
                     </a>
                 </p>
 
-                <p id="KEY_LINE_12">
+                <p id="KEY_LINE_11">
                     <!-- 画面初期値ロール -->
                     <a class="ef">
                         <asp:Label ID="WF_VARIANT_L" runat="server" Text="画面初期値ロール" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>

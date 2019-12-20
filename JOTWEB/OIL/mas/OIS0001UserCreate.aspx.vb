@@ -18,11 +18,21 @@ Imports JOTWEB.GRIS0005LeftBox
 Public Class OIS0001UserCreate
     Inherits Page
 
+    ''' <summary>
+    ''' ユーザ情報取得
+    ''' </summary>
+    Private CS0051UserInfo As New CS0051UserInfo            'ユーザ情報取得
+
     '○ 検索結果格納Table
     Private OIS0001tbl As DataTable                                  '一覧格納用テーブル
     Private OIS0001INPtbl As DataTable                               'チェック用テーブル
     Private OIS0001UPDtbl As DataTable                               '更新用テーブル
 
+    ''' <summary>
+    ''' 定数
+    ''' </summary>
+    Private Const CONST_ORGCODE_INFOSYS As String = "010006"        '組織コード_情報システム部
+    Private Const CONST_ORGCODE_OIL As String = "010007"            '組織コード_石油部
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
@@ -69,7 +79,7 @@ Public Class OIS0001UserCreate
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
+                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
                             WF_FIELD_Change()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
@@ -181,7 +191,7 @@ Public Class OIS0001UserCreate
         WF_STAFFNAMEL.Text = work.WF_SEL_STAFFNAMEL.Text
 
         '画面ＩＤ
-        WF_MAPID.Text = work.WF_SEL_MAPID.Text
+        WF_MAPID.Text = "M00001"
 
         'パスワード
         WF_PASSWORD.Text = work.WF_SEL_PASSWORD.Text
@@ -640,7 +650,7 @@ Public Class OIS0001UserCreate
         WF_USERID.Text = ""            'ユーザID
         WF_STAFFNAMES.Text = ""            '社員名（短）
         WF_STAFFNAMEL.Text = ""            '社員名（長）
-        WF_MAPID.Text = ""            '画面ＩＤ
+        WF_MAPID.Text = "M00001"            '画面ＩＤ
         WF_PASSWORD.Text = ""            'パスワード
         WF_MISSCNT.Text = ""            '誤り回数
         WF_PASSENDYMD.Text = ""            'パスワード有効期限
@@ -689,14 +699,28 @@ Public Class OIS0001UserCreate
                         .ActiveCalendar()
 
                     Case Else
-                        '以外
                         Dim prmData As New Hashtable
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
+                            Case "WF_CAMPCODE"       '会社コード
+                                If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
+                                Else
+                                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ROLE
+                                End If
+                                prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+
                             Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text, 0)
+                                Dim AUTHORITYALL_FLG As String = "0"
+                                If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                                    If WF_CAMPCODE.Text = "" Then '会社コードが空の場合
+                                        AUTHORITYALL_FLG = "1"
+                                    Else '会社コードに入力済みの場合
+                                        AUTHORITYALL_FLG = "2"
+                                    End If
+                                End If
+                                prmData = work.CreateORGParam(WF_CAMPCODE.Text, AUTHORITYALL_FLG)
                             Case "WF_MENUROLE"       'メニュー表示制御ロール
                                 prmData = work.CreateRoleList(WF_CAMPCODE.Text, "MENU")
                             Case "WF_MAPROLE"       '画面参照更新制御ロール
@@ -726,8 +750,8 @@ Public Class OIS0001UserCreate
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            'Case "WF_CAMPCODE"          '会社コード
-            '    CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            Case "WF_CAMPCODE"          '会社コード
+                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
 
             Case "WF_ORG"               '組織コード
                 CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
@@ -829,6 +853,11 @@ Public Class OIS0001UserCreate
 
                     End Try
                     WF_ENDYMD.Focus()
+
+                Case "WF_CAMPCODE"               '会社コード
+                    WF_CAMPCODE.Text = WW_SelectValue
+                    WF_CAMPCODE_TEXT.Text = WW_SelectText
+                    WF_CAMPCODE.Focus()
 
                 Case "WF_ORG"               '組織コード
                     WF_ORG.Text = WW_SelectValue

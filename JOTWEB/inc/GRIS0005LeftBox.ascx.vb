@@ -111,7 +111,18 @@ Public Class GRIS0005LeftBox
         LC_MIDDLEOILCODE
         LC_TRAINCLASS
         LC_SPEEDCLASS
+        LC_ORIGINOWNER
+        LC_OWNER
+        LC_LEASE
+        LC_LEASECLASS
+        LC_THIRDUSER
+        LC_DEDICATETYPE
+        LC_EXTRADINARYTYPE
+        LC_BASE
+        LC_COLOR
+        LC_OBTAINED
     End Enum
+
     ''' <summary>
     ''' パラメタ群
     ''' </summary>
@@ -166,6 +177,16 @@ Public Class GRIS0005LeftBox
         LP_MIDDLEOILCODE
         LP_TRAINCLASS
         LP_SPEEDCLASS
+        LP_ORIGINOWNER
+        LP_OWNER
+        LP_LEASE
+        LP_LEASECLASS
+        LP_THIRDUSER
+        LP_DEDICATETYPE
+        LP_EXTRADINARYTYPE
+        LP_BASE
+        LP_COLOR
+        LP_OBTAINED
     End Enum
 
     ''' <summary>
@@ -486,6 +507,46 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_SPEEDCLASS
                 '高速列車区分
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SPEEDCLASS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_ORIGINOWNER
+                '原籍所有者
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORIGINOWNER"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_OWNER
+                '名義所有者
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OWNER"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_LEASE
+                'リース先
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "LEASE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_LEASECLASS
+                'リース区分
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "LEASECLASS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_THIRDUSER
+                '第三者使用者
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "THIRDUSER"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_DEDICATETYPE
+                '原専用種別
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "DEDICATETYPE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_EXTRADINARYTYPE
+                '臨時専用種別
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "EXTRADINARYTYPE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BASE
+                '運用基地
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BASE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_COLOR
+                '塗色
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "COLOR"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_OBTAINED
+                '取得先
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OBTAINED"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー

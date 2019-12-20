@@ -32,8 +32,8 @@ Public Class OIS0001UserSearch
     ''' <summary>
     ''' 定数
     ''' </summary>
-    Private Const CONST_ORGCODE_INFOSYS As String = "010006"                '1画面表示用
-    Private Const CONST_ORGCODE_OIL As String = "010007"                   '新規登録時初期行数
+    Private Const CONST_ORGCODE_INFOSYS As String = "010006"        '組織コード_情報システム部
+    Private Const CONST_ORGCODE_OIL As String = "010007"            '組織コード_石油部
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -332,14 +332,18 @@ Public Class OIS0001UserSearch
                             Case "WF_CAMPCODE"       '会社コード
                                 If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
                                     prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
+                                Else
+                                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ROLE
                                 End If
                                 prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE_CODE.Text
 
                             Case "WF_ORG"       '組織コード
                                 Dim AUTHORITYALL_FLG As String = "0"
-                                If WF_CAMPCODE_CODE.Text = "" Then '会社コードが空の場合
-                                    If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                                If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                                    If WF_CAMPCODE_CODE.Text = "" Then '会社コードが空の場合
                                         AUTHORITYALL_FLG = "1"
+                                    Else '会社コードに入力済みの場合
+                                        AUTHORITYALL_FLG = "2"
                                     End If
                                 End If
                                 prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text, AUTHORITYALL_FLG)

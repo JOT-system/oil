@@ -54,14 +54,14 @@
 
                 <p id="KEY_LINE_3">
                     <!-- 原籍所有者C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_ORIGINOWNERCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORIGINOWNER%>);" onchange="TextBox_change('WF_ORIGINOWNERCODE');">
                         <asp:Label ID="WF_ORIGINOWNERCODE_L" runat="server" Text="原籍所有者C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_ORIGINOWNERCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_ORIGINOWNERCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- 名義所有者C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_OWNERCODE', <%=LIST_BOX_CLASSIFICATION.LC_OWNER%>);" onchange="TextBox_change('WF_OWNERCODE');">
                         <asp:Label ID="WF_OWNERCODE_L" runat="server" Text="名義所有者C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_OWNERCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_OWNERCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -70,14 +70,14 @@
 
                 <p id="KEY_LINE_4">
                     <!-- リース先C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_LEASECODE', <%=LIST_BOX_CLASSIFICATION.LC_LEASE%>);" onchange="TextBox_change('WF_LEASECODE');">
                         <asp:Label ID="WF_LEASECODE_L" runat="server" Text="リース先C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_LEASECODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_LEASECODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- リース区分C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_LEASECLASS', <%=LIST_BOX_CLASSIFICATION.LC_LEASECLASS%>);" onchange="TextBox_change('WF_LEASECLASS');">
                         <asp:Label ID="WF_LEASECLASS_L" runat="server" Text="リース区分C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_LEASECLASS" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_LEASECLASS_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -109,7 +109,7 @@
                     </a>
 
                     <!-- 第三者使用者C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_USERCODE', <%=LIST_BOX_CLASSIFICATION.LC_THIRDUSER%>);" onchange="TextBox_change('WF_USERCODE');">
                         <asp:Label ID="WF_USERCODE_L" runat="server" Text="第三者使用者C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_USERCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_USERCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -118,14 +118,14 @@
 
                 <p id="KEY_LINE_7">
                     <!-- 原常備駅C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_CURRENTSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_CURRENTSTATIONCODE');">
                         <asp:Label ID="WF_CURRENTSTATIONCODE_L" runat="server" Text="原常備駅C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_CURRENTSTATIONCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_CURRENTSTATIONCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- 臨時常備駅C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_EXTRADINARYSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_EXTRADINARYSTATIONCODE');">
                         <asp:Label ID="WF_EXTRADINARYSTATIONCODE_L" runat="server" Text="臨時常備駅C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_EXTRADINARYSTATIONCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYSTATIONCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -150,14 +150,14 @@
 
                 <p id="KEY_LINE_9">
                     <!-- 原専用種別C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_DEDICATETYPECODE', <%=LIST_BOX_CLASSIFICATION.LC_DEDICATETYPE%>);" onchange="TextBox_change('WF_DEDICATETYPECODE');">
                         <asp:Label ID="WF_DEDICATETYPECODE_L" runat="server" Text="原専用種別C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_DEDICATETYPECODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_DEDICATETYPECODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- 臨時専用種別C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_EXTRADINARYTYPECODE', <%=LIST_BOX_CLASSIFICATION.LC_EXTRADINARYTYPE%>);" onchange="TextBox_change('WF_DEDICATETYPECODE');">
                         <asp:Label ID="WF_EXTRADINARYTYPECODE_L" runat="server" Text="臨時専用種別C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_EXTRADINARYTYPECODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYTYPECODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -173,7 +173,7 @@
                     </a>
 
                     <!-- 運用基地C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_OPERATIONBASECODE', <%=LIST_BOX_CLASSIFICATION.LC_BASE%>);" onchange="TextBox_change('WF_OPERATIONBASECODE');">
                         <asp:Label ID="WF_OPERATIONBASECODE_L" runat="server" Text="運用基地C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_OPERATIONBASECODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_OPERATIONBASECODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -182,7 +182,7 @@
 
                 <p id="KEY_LINE_11">
                     <!-- 塗色C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_COLORCODE', <%=LIST_BOX_CLASSIFICATION.LC_COLOR%>);" onchange="TextBox_change('WF_COLORCODE');">
                         <asp:Label ID="WF_COLORCODE_L" runat="server" Text="塗色C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_COLORCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_COLORCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -221,7 +221,7 @@
                     </a>
 
                     <!-- 取得先C -->
-                    <a class="ef">
+                    <a class="ef" ondblclick="Field_DBclick('WF_OBTAINEDCODE', <%=LIST_BOX_CLASSIFICATION.LC_OBTAINED%>);" onchange="TextBox_change('WF_OBTAINEDCODE');">
                         <asp:Label ID="WF_OBTAINEDCODE_L" runat="server" Text="取得先C" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_OBTAINEDCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_OBTAINEDCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>

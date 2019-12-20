@@ -59,6 +59,33 @@ Partial Public Class OIS0001UserCreate
     Protected WithEvents WF_DELFLG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_MAPID_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MAPID_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_MAPID コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MAPID As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_MAPID_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MAPID_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_USERID_L コントロール。
     '''</summary>
     '''<remarks>
@@ -140,31 +167,31 @@ Partial Public Class OIS0001UserCreate
     Protected WithEvents WF_STAFFNAMEL_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_MAPID_L コントロール。
+    '''WF_MISSCNT_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_MAPID_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MISSCNT_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_MAPID コントロール。
+    '''WF_MISSCNT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_MAPID As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_MISSCNT As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_MAPID_TEXT コントロール。
+    '''WF_MISSCNT_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_MAPID_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MISSCNT_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_PASSWORD_L コントロール。
@@ -192,33 +219,6 @@ Partial Public Class OIS0001UserCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_PASSWORD_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_MISSCNT_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_MISSCNT_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_MISSCNT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_MISSCNT As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_MISSCNT_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_MISSCNT_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_PASSENDYMD_L コントロール。

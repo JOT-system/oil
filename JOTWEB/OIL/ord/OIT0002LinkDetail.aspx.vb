@@ -116,10 +116,6 @@ Public Class OIT0002LinkDetail
                     '○ 一覧再表示処理
                     DisplayGrid()
                 End If
-
-                'If WF_UPDERRFLG.Value = "1" Then
-                '    Exit Sub
-                'End If
             Else
                 '○ 初期化処理
                 Initialize()
@@ -165,7 +161,6 @@ Public Class OIT0002LinkDetail
             End If
 
             WF_UPDERRFLG.Value = "0"
-
         End Try
     End Sub
 
@@ -253,9 +248,7 @@ Public Class OIT0002LinkDetail
         TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
 
         '新規作成の場合
-        If work.WF_SEL_CREATEFLG.Text = 1 Then
-            TxtOrderOffice.ReadOnly = True
-        Else
+        If work.WF_SEL_CREATEFLG.Text <> "1" Then
             '既存データの修正については、登録営業所は入力不可とする。
             TxtOrderOffice.Enabled = False
         End If
@@ -465,7 +458,6 @@ Public Class OIT0002LinkDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdNum As New SqlCommand(SQLStrNum, SQLcon)
-
                 Using SQLdrNum As SqlDataReader = SQLcmdNum.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdrNum.FieldCount - 1
@@ -713,7 +705,6 @@ Public Class OIT0002LinkDetail
 
                         '本線列車
                         Case "TxtHeadOfficeTrain"
-                            '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, TxtHeadOfficeTrain.Text + work.WF_SEL_ORG.Text)
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, TxtHeadOfficeTrain.Text)
 
                         '空車発駅
@@ -954,7 +945,6 @@ Public Class OIT0002LinkDetail
                 '〇 一覧項目へ設定
                 'タンク車№を一覧に設定
                 If WF_FIELD.Value = "TANKNUMBER" Then
-                    'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
                     Dim WW_TANKNUMBER As String = WW_SETVALUE
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                     updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
@@ -1767,13 +1757,13 @@ Public Class OIT0002LinkDetail
         Dim WW_GetValue() As String = {"", "", "", "", ""}
 
         Select Case WF_FIELD.Value
-            Case "LINETRAINNO"            '入線番号
+            Case "LINETRAINNO"          '入線番号
                 updHeader.Item("LINETRAINNO") = WW_ListValue
 
             Case "LINEORDER"            '入線順序
                 updHeader.Item("LINEORDER") = WW_ListValue
 
-            Case "TANKNUMBER"            '(一覧)タンク車№
+            Case "TANKNUMBER"           '(一覧)タンク車№
                 If WW_ListValue <> "" Then
                     FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
 

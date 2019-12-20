@@ -105,7 +105,7 @@
 #WF_ARRSTATION_LABEL {
     position: fixed;
     top: 8.5em;
-    left: 40em;
+    left: 39em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -168,7 +168,7 @@
 #WF_DEPDATE_LABEL {
     position: fixed;
     top: 10.5em;
-    left: 23em;
+    left: 22em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -193,7 +193,7 @@
 #WF_ARRDATE_LABEL {
     position: fixed;
     top: 10.5em;
-    left: 38em;
+    left: 37em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -218,7 +218,7 @@
 #WF_ACCDATE_LABEL {
     position: fixed;
     top: 10.5em;
-    left: 55em;
+    left: 54em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/

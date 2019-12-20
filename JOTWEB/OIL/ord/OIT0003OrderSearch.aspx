@@ -52,7 +52,7 @@
         </a>
 
         <!-- 年月日 -->
-        <a id="WF_DATE_LABEL">★年月日</a>
+        <a id="WF_DATE_LABEL" class="requiredMark">年月日</a>
         <a class="ef" id="WF_DATE" ondblclick="Field_DBclick('TxtDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox CssClass="CalendarIcon" ID="TxtDateStart" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>

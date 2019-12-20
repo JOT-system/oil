@@ -893,10 +893,17 @@ Public Class OIT0001EmptyTurnDairyDetail
             '運用部署
             Case "WF_UORG"
                 CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
-            '本社列車
+            '本線列車
             Case "TxtHeadOfficeTrain"
                 Dim WW_GetValue() As String = {"", "", "", "", "", ""}
                 WW_FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+
+                '指定された本線列車№で値が取得できない場合はエラー判定
+                If WW_GetValue(0) = "" Then
+                    WW_RTN_SW = C_MESSAGE_NO.OIL_TRAIN_MASTER_NOTFOUND
+                Else
+                    WW_RTN_SW = C_MESSAGE_NO.NORMAL
+                End If
 
                 '発駅
                 TxtDepstation.Text = WW_GetValue(1)
@@ -918,7 +925,16 @@ Public Class OIT0001EmptyTurnDairyDetail
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            Select Case WF_FIELD.Value
+                Case "TxtHeadOfficeTrain"
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+                Case "TxtDepstation"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "発駅")
+                Case "TxtArrstation"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "着駅")
+                Case Else
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            End Select
         End If
     End Sub
 
@@ -2220,7 +2236,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)積込日")
             TxtLoadingDate.Focus()
             WW_CheckMES1 = "積込日入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
@@ -2238,7 +2254,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)発日")
             TxtDepDate.Focus()
             WW_CheckMES1 = "発日入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
@@ -2256,7 +2272,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)積車着日")
             TxtArrDate.Focus()
             WW_CheckMES1 = "積車着日入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
@@ -2274,7 +2290,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)受入日")
             TxtAccDate.Focus()
             WW_CheckMES1 = "受入日入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR

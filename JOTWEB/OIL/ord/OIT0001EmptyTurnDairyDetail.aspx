@@ -62,7 +62,7 @@
                 <asp:TextBox CssClass="BoxIcon" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　発駅　■ -->
-            <a id="WF_DEPSTATION_LABEL">発駅</a>
+            <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
             <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtDepstation" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
@@ -79,7 +79,7 @@
             </a>
 
             <!-- ■　(予定)積込日　■ -->
-            <a id="WF_LOADINGDATE_LABEL">(予定)積込日</a>
+            <a id="WF_LOADINGDATE_LABEL" class="requiredMark">(予定)積込日</a>
             <a class="ef" id="WF_LOADINGDATE" ondblclick="Field_DBclick('TxtLoadingDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtLoadingDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>

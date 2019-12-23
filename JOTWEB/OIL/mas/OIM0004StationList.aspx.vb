@@ -27,10 +27,6 @@ Public Class OIM0004StationList
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
 
-    'Private Const CONST_PATTERN1 As String = "1"                    'モデル距離パターン　届先のみ
-    'Private Const CONST_PATTERN2 As String = "2"                    'モデル距離パターン　届先、出荷場所
-    'Private Const CONST_PATTERN3 As String = "3"                    'モデル距離パターン　出荷場所
-
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
     Private Const CONST_UPDATE As String = "Update"                 'データ更新
@@ -89,18 +85,6 @@ Public Class OIM0004StationList
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                             WF_FILEUPLOAD()
-                        'Case "WF_UPDATE"                '表更新ボタン押下
-                        '    WF_UPDATE_Click()
-                        'Case "WF_CLEAR"                 'クリアボタン押下
-                        '    WF_CLEAR_Click()
-                        'Case "WF_Field_DBClick"         'フィールドダブルクリック
-                        '    WF_FIELD_DBClick()
-                        'Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
-                        '    WF_ButtonSel_Click()
-                        'Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
-                        '    WF_ButtonCan_Click()
-                        'Case "WF_ListboxDBclick"        '左ボックスダブルクリック
-                        '    WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -971,9 +955,6 @@ Public Class OIM0004StationList
 
         WF_GridDBclick.Text = ""
 
-        '############# おためし #############
-        'work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
-        '    Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
         '遷移先(登録画面)退避データ保存先の作成
         WW_CreateXMLSaveFile()
 

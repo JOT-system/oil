@@ -381,6 +381,9 @@ div {
         margin: 0em 1em 0em 0em;
     }
 
+    #detailkeybox input[type='text'] {
+        border-radius: 3px;
+    }
 
 
 /* テキストボックス */

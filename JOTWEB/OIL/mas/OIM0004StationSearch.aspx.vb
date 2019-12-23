@@ -239,16 +239,18 @@ Public Class OIM0004StationSearch
         '貨物駅コード
         Master.CheckField(WF_CAMPCODE.Text, "STATIONCODE", TxtStationCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("STATIONCODE", TxtStationCode.Text & TxtBranch.Text, LblStationCode.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
-                              "貨物駅コード : " & TxtStationCode.Text & "　" &
-                              "貨物コード枝番 : " & TxtBranch.Text)
-                TxtStationCode.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            '### like検索を実施するため、存在チェックは外す(20191223) ###########################################
+            ''存在チェック
+            'CODENAME_get("STATIONCODE", TxtStationCode.Text & TxtBranch.Text, LblStationCode.Text, WW_RTN_SW)
+            'If Not isNormal(WW_RTN_SW) Then
+            '    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+            '                  "貨物駅コード : " & TxtStationCode.Text & "　" &
+            '                  "貨物コード枝番 : " & TxtBranch.Text)
+            '    TxtStationCode.Focus()
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
+            '####################################################################################################
         Else
             'ポップアップを表示(needsPopUp:=True)
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "貨物駅コード", needsPopUp:=True)
@@ -338,7 +340,14 @@ Public Class OIM0004StationSearch
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            Select Case WF_FIELD.Value
+                '### like検索を実施するため、存在チェックは外す(20191223) ###########################################
+                '貨物駅コード
+                Case "TxtStationCode"
+                    '何もしない(like検索をするにあたって、「マスタが存在しない」旨を未出力とするため)
+                Case Else
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            End Select
         End If
 
     End Sub

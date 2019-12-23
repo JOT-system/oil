@@ -290,14 +290,16 @@ Public Class OIM0004StationList
             & " , ISNULL(RTRIM(OIM0004.TYPENAMEKANA), '')    AS TYPENAMEKANA" _
             & " , ISNULL(RTRIM(OIM0004.DELFLG), '')          AS DELFLG" _
             & " FROM OIL.OIM0004_STATION OIM0004 " _
-            & " WHERE OIM0004.STATIONCODE = @P1" _
+            & " WHERE OIM0004.STATIONCODE like @P1" _
             & "   AND OIM0004.DELFLG      <> @P3"
+        '            & " WHERE OIM0004.STATIONCODE = @P1" _
         '            & "   AND OIM0004.BRANCH      = @P2" _
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '貨物コード枝番
         If Not String.IsNullOrEmpty(work.WF_SEL_BRANCH.Text) Then
-            SQLStr &= String.Format("    AND OIM0004.BRANCH = '{0}'", work.WF_SEL_BRANCH.Text)
+            'SQLStr &= String.Format("    AND OIM0004.BRANCH = '{0}'", work.WF_SEL_BRANCH.Text)
+            SQLStr &= String.Format("    AND OIM0004.BRANCH like '%{0}%'", work.WF_SEL_BRANCH.Text)
         End If
 
         SQLStr &=
@@ -311,7 +313,8 @@ Public Class OIM0004StationList
                 '                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 3)        '貨物コード枝番
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
 
-                PARA1.Value = work.WF_SEL_STATIONCODE.Text
+                PARA1.Value = work.WF_SEL_STATIONCODE.Text + "%"
+                '                PARA1.Value = work.WF_SEL_STATIONCODE.Text
                 '                PARA2.Value = work.WF_SEL_BRANCH.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
 

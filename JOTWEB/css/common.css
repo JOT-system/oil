@@ -113,6 +113,7 @@ div {
         border-color: rgba(176, 176, 276, 0.6);
         border-style: solid;
         border-width: thin;
+        border-radius: 3px;
         /*    border: 1px solid #1b2538; */
     }
 
@@ -167,7 +168,7 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(220,230,240);
+    background-color: rgba(240,240,240,0.43);
 }
 
 
@@ -309,7 +310,7 @@ div {
 /* 右ボックス表示 */
 
 .WF_rightboxSW {
-    height: 6%;
+    height: 5%;
     overflow: hidden;
     position: fixed;
     top: 0px;
@@ -380,6 +381,14 @@ div {
         margin: 0em 1em 0em 0em;
     }
 
+    #detailkeybox input[type='text'] {
+        border-radius: 3px;
+    }
+        #detailkeybox input[type='text']:focus {
+            border: 1px solid rgba(1,60,65, .5);
+            outline: none;
+            box-shadow: 0 0 5px 1px rgba(218,60,65, .5);
+        }
 
 
 /* テキストボックス */
@@ -1487,3 +1496,29 @@ input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
     height: 15.5px;
     overflow-y: hidden;
 }
+
+
+
+
+/*ボタンCSS*/
+
+
+.btn-sticky {
+    text-decoration: none;
+    height: 25px;
+    width: 120px;
+    line-height: 23px;
+    text-align: center;
+    color: #2bb6c1;
+    border: solid 1px #2bb6c1;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -o-transition: 0.3s;
+    -ms-transition: 0.3s;
+    transition: 0.3s;
+}
+
+    .btn-sticky:hover {
+        background: #2bb6c1;
+        color: #fff;
+    }

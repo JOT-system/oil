@@ -319,7 +319,7 @@ function addLeftBoxFilter(ListObj) {
         '  <tr>\n' +
         '    <td><input id="WF_LEFTBOXFILTER" type="text" value="" title="Filter Condition" />\n' +
         '    </td>\n' +
-        '    <td><input id="WF_buttonFilter" type="button" value="検 索" />\n' +
+        '    <td><input id="WF_buttonFilter"  class="btn-sticky" type="button" value="検 索" />\n' +
         '    </td>\n' +
         '  </tr>\n' +
         '</table>\n';

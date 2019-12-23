@@ -24,7 +24,7 @@
 
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
-            <a style="position:fixed;top:2.8em;left:0.5em;">
+            <a style="position:fixed;top:2.8em;left:62.5em;">
                 <input type="button" id="WF_ButtonRegister" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonRegister');" />
             </a>
 
@@ -53,17 +53,17 @@
             </a>
 
             <!-- ■　登録営業所　■ -->
-            <a id="WF_OFFICECODE_LABEL">登録営業所</a>
+            <a id="WF_OFFICECODE_LABEL" class="requiredMark">登録営業所</a>
             <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtOrderOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　本線列車　■ -->
-            <a id="WF_TRAIN_LABEL">本線列車</a>
+            <a id="WF_TRAIN_LABEL" class="requiredMark">本線列車</a>
             <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　空車発駅　■ -->
-            <a id="WF_DEPSTATION_LABEL">空車発駅</a>
+            <a id="WF_DEPSTATION_LABEL" class="requiredMark">空車発駅</a>
             <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtDepstation" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
@@ -71,7 +71,7 @@
                 <asp:Label ID="LblDepstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
             </a>
             <!-- ■　空車着駅　■ -->
-            <a id="WF_RETSTATION_LABEL">空車着駅</a>
+            <a id="WF_RETSTATION_LABEL" class="requiredMark">空車着駅</a>
             <a class="ef" id="WF_RETSTATIONCODE" ondblclick="Field_DBclick('TxtRetstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtRetstation');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtRetstation" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
@@ -80,7 +80,7 @@
             </a>
             
             <!-- ■　(予定)空車着日　■ -->
-            <a id="WF_EMPARRDATE_LABEL">（予定）空車着日</a>
+            <a id="WF_EMPARRDATE_LABEL" class="requiredMark">（予定）空車着日</a>
             <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox CssClass="CalendarIcon" ID="TxtEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>

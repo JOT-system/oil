@@ -63,7 +63,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Master.RecoverTable(OIT0001tbl)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonINSERT"          '明細作成ボタン押下
+                        Case "WF_ButtonINSERT"          '油種数登録ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
@@ -661,7 +661,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     End Sub
 
     ''' <summary>
-    ''' 明細作成ボタン押下時処理
+    ''' 油種数登録ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
@@ -679,6 +679,12 @@ Public Class OIT0001EmptyTurnDairyDetail
         intTankCnt += Integer.Parse(TxtLTank.Text)
         intTankCnt += Integer.Parse(TxtATank.Text)
         TxtTotalTank.Text = intTankCnt.ToString()
+
+        '油種数が１つも入力されていない場合
+        If TxtTotalTank.Text = "0" Then
+            Master.Output(C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            TxtHTank.Focus()
+        End If
 
         '○ 画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection

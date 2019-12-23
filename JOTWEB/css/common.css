@@ -113,6 +113,7 @@ div {
         border-color: rgba(176, 176, 276, 0.6);
         border-style: solid;
         border-width: thin;
+        border-radius: 3px;
         /*    border: 1px solid #1b2538; */
     }
 
@@ -380,6 +381,9 @@ div {
         margin: 0em 1em 0em 0em;
     }
 
+    #detailkeybox input[type='text'] {
+        border-radius: 3px;
+    }
 
 
 /* テキストボックス */

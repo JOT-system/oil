@@ -48,7 +48,7 @@
             <asp:TextBox CssClass="BoxIcon" ID="TxtStationCode" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a  id="WF_STATIONCODE_TEXT">
-            <asp:Label ID="LblStationCode" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+            <asp:Label ID="LblStationCode" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
         <!-- 貨物コード枝番 -->
         <a id="WF_BRANCH_LABEL">貨物コード枝番</a>
@@ -56,7 +56,7 @@
             <asp:TextBox ID="TxtBranch" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a id="WF_BRANCH_TEXT">
-            <asp:Label ID="LblBranch" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
+            <asp:Label ID="LblBranch" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
     </div>
 

@@ -31,19 +31,19 @@
 
                 <!-- ボタン -->
                 <a style="position:fixed;top:2.8em;left:49em;">
-                    <input type="button" id="WF_ButtonINSERT" value="追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                    <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:53.5em;">
-                    <input type="button" id="WF_ButtonUPDATE" value="DB更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                    <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="DB更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:58em;">
-                    <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
+                    <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:62.5em;">
-                    <input type="button" id="WF_ButtonPrint" value="一覧印刷"  style="Width:5em" onclick="ButtonClick('WF_ButtonPrint');" />
+                    <input type="button" id="WF_ButtonPrint" class="btn-sticky" value="一覧印刷"  style="Width:5em" onclick="ButtonClick('WF_ButtonPrint');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:67em;">
-                    <input type="button" id="WF_ButtonEND" value="終了"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                    <input type="button" id="WF_ButtonEND" class="btn-sticky" value="終了"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
                 </a>
                 <a style="position:fixed;top:3.2em;left:75em;">
                     <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />

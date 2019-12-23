@@ -381,10 +381,12 @@ div {
         margin: 0em 1em 0em 0em;
     }
 
-    #detailkeybox input[type='text'] {
+    #detailkeybox input[type='text'],
+    #detailkeybox input[type='password']{
         border-radius: 3px;
     }
-        #detailkeybox input[type='text']:focus {
+        #detailkeybox input[type='text']:focus,
+        #detailkeybox input[type='password']:focus{
             border: 1px solid rgba(1,60,65, .5);
             outline: none;
             box-shadow: 0 0 5px 1px rgba(218,60,65, .5);

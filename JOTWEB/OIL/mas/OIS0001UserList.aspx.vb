@@ -659,7 +659,7 @@ Public Class OIS0001UserList
 
         '○ メッセージ表示
         If Not isNormal(WW_ERRCODE) Then
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
     End Sub
@@ -719,7 +719,7 @@ Public Class OIS0001UserList
                     Date.TryParse(OIS0001chk("STYMD"), WW_DATE_ST2)
                     Date.TryParse(OIS0001chk("ENDYMD"), WW_DATE_END2)
                 Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+                    Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                     Exit Sub
                 End Try
 
@@ -1396,7 +1396,7 @@ Public Class OIS0001UserList
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Else
                 Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
             End If
@@ -1425,7 +1425,7 @@ Public Class OIS0001UserList
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Else
                 Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
             End If
@@ -1661,7 +1661,7 @@ Public Class OIS0001UserList
         CS0023XLSUPLOAD.CS0023XLSUPLOAD()
         If isNormal(CS0023XLSUPLOAD.ERR) Then
             If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
-                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR)
+                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 Exit Sub
             End If
         Else
@@ -1831,7 +1831,7 @@ Public Class OIS0001UserList
         If isNormal(WW_ERR_SW) Then
             Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         Else
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
         '○ Close
@@ -1883,7 +1883,7 @@ Public Class OIS0001UserList
             If isNormal(WW_ERR_SW) Then
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
             Else
-                Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+                Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             End If
         End If
 
@@ -1907,7 +1907,7 @@ Public Class OIS0001UserList
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
             String.IsNullOrEmpty(WF_DELFLG.Text) Then
-            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail")
+            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
 
             CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
             CS0011LOGWrite.INFPOSI = "non Detail"

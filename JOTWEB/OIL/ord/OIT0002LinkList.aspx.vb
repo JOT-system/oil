@@ -659,6 +659,8 @@ Public Class OIT0002LinkList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonLINE_LIFTED_Click()
 
+        Dim SelectChk As Boolean = False
+
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0002tbl)
 
@@ -696,6 +698,10 @@ Public Class OIT0002LinkList
             Dim j As Integer = 9000
             For Each OIT0002UPDrow In OIT0002tbl.Rows
                 If OIT0002UPDrow("OPERATION") = "on" Then
+                    If OIT0002UPDrow("LINECNT") < 9000 Then
+                        SelectChk = True
+                    End If
+
                     j += 1
                     OIT0002UPDrow("LINECNT") = j        'LINECNT
                     OIT0002UPDrow("DELFLG") = C_DELETE_FLG.DELETE
@@ -735,7 +741,11 @@ Public Class OIT0002LinkList
         Master.SaveTable(OIT0002tbl)
 
         '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If SelectChk = False Then
+            Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        Else
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 
@@ -784,7 +794,7 @@ Public Class OIT0002LinkList
 
         '○ メッセージ表示
         If Not isNormal(WW_ERRCODE) Then
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
     End Sub
@@ -1156,7 +1166,7 @@ Public Class OIT0002LinkList
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Else
                 Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
             End If
@@ -1185,7 +1195,7 @@ Public Class OIT0002LinkList
     '    CS0030REPORT.CS0030REPORT()
     '    If Not isNormal(CS0030REPORT.ERR) Then
     '        If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-    '            Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+    '            Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
     '        Else
     '            Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
     '        End If
@@ -1529,7 +1539,7 @@ Public Class OIT0002LinkList
     '    CS0023XLSUPLOAD.CS0023XLSUPLOAD()
     '    If isNormal(CS0023XLSUPLOAD.ERR) Then
     '        If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
-    '            Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR)
+    '            Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
     '            Exit Sub
     '        End If
     '    Else
@@ -1717,7 +1727,7 @@ Public Class OIT0002LinkList
     '    If isNormal(WW_ERR_SW) Then
     '        Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
     '    Else
-    '        Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+    '        Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
     '    End If
 
     '    '○ Close
@@ -1768,7 +1778,7 @@ Public Class OIT0002LinkList
             If isNormal(WW_ERR_SW) Then
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
             Else
-                Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+                Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             End If
         End If
 
@@ -1792,7 +1802,7 @@ Public Class OIT0002LinkList
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
             String.IsNullOrEmpty(WF_DELFLG.Text) Then
-            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail")
+            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
 
             CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
             CS0011LOGWrite.INFPOSI = "non Detail"

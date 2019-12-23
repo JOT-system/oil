@@ -187,48 +187,19 @@ Public Class OIM0005TankSearch
         Dim WW_LINE_ERR As String = ""
 
         '○ 単項目チェック
-        ''JOT車番(バリデーションチェック)　★★★お試し★★★
-        'If WF_TANKNUMBER_CODE.Text <> "" Then
-        '    If 0 <= Asc(WF_TANKNUMBER_CODE.Text) And Asc(WF_TANKNUMBER_CODE.Text) <= 255 Then
-        '        If Not isNormal(WW_CS0024FCHECKERR) Then
-        '            Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text)
-        '            WF_TANKNUMBER_CODE.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    Else
-        '        Master.Output(C_MESSAGE_NO.INVALID_SELECTION_DATA, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text)
-        '        WF_TANKNUMBER_CODE.Focus()
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    End If
-        'End If
-
-        ''型式(バリデーションチェック)　★★★お試し★★★
-        'If WF_TANKNUMBER_CODE.Text <> "" Then
-        '    If Not isNormal(WW_CS0024FCHECKERR) Then
-        '        Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL_CODE.Text)
-        '        WF_MODEL_CODE.Focus()
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    End If
-        'End If
-
         'JOT車番
         Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
             CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text)
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text, needsPopUp:=True)
                 WF_TANKNUMBER_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             WF_TANKNUMBER_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -240,13 +211,13 @@ Public Class OIM0005TankSearch
             '存在チェック
             CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL_CODE.Text)
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL_CODE.Text, needsPopUp:=True)
                 WF_MODEL_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             WF_MODEL_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -322,7 +293,7 @@ Public Class OIM0005TankSearch
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
     End Sub

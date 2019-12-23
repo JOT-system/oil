@@ -212,7 +212,7 @@ Public Class OIT0002LinkDetail
         Master.CreateXMLSaveFile()
 
         '登録営業所
-        'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
+        TxtOrderOffice.Text = work.WF_SEL_OFFICECODE.Text
         '本線列車
         TxtHeadOfficeTrain.Text = work.WF_SEL_TRAINNO2.Text
         '空車発駅
@@ -661,7 +661,7 @@ Public Class OIT0002LinkDetail
 
         '○ メッセージ表示
         If Not isNormal(WW_ERRCODE) Then
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
     End Sub
@@ -773,7 +773,7 @@ Public Class OIT0002LinkDetail
         Select Case WF_FIELD.Value
             '会社コード
             Case "WF_CAMPCODE"
-                CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("CAMPCODE", TxtOrderOffice.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
             '登録営業所
             Case "TxtOrderOffice"
                 CODENAME_get("ORG", TxtHeadOfficeTrain.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
@@ -802,7 +802,16 @@ Public Class OIT0002LinkDetail
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            Select Case WF_FIELD.Value
+                Case "TxtHeadOfficeTrain"
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Case "TxtDepstation"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "発駅", needsPopUp:=True)
+                Case "TxtRetstation"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "着駅", needsPopUp:=True)
+                Case Else
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            End Select
         End If
     End Sub
 
@@ -1364,7 +1373,7 @@ Public Class OIT0002LinkDetail
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Else
                 Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
             End If
@@ -1449,7 +1458,7 @@ Public Class OIT0002LinkDetail
 
         '○ メッセージ表示
         If Not isNormal(WW_ERRCODE) Then
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
     End Sub
@@ -1477,7 +1486,7 @@ Public Class OIT0002LinkDetail
         CS0023XLSUPLOAD.CS0023XLSUPLOAD()
         If isNormal(CS0023XLSUPLOAD.ERR) Then
             If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
-                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR)
+                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 Exit Sub
             End If
         Else
@@ -1698,7 +1707,7 @@ Public Class OIT0002LinkDetail
         If isNormal(WW_ERR_SW) Then
             Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         Else
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
         '○ Close
@@ -1862,22 +1871,22 @@ Public Class OIT0002LinkDetail
 
         '○ 単項目チェック
         '登録営業所
-        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", work.WF_SEL_OFFICECODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtOrderOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
             CODENAME_get("SALESOFFICE", work.WF_SEL_OFFICECODE.Text, TxtOrderOffice.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
                 Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
-                              "登録営業所 : " & work.WF_SEL_OFFICECODE.Text)
+                              "登録営業所 : " & work.WF_SEL_OFFICECODE.Text, needsPopUp:=True)
                 TxtOrderOffice.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="登録営業所", needsPopUp:=True)
             TxtOrderOffice.Focus()
             WW_CheckMES1 = "登録営業所入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -1886,10 +1895,10 @@ Public Class OIT0002LinkDetail
         '本線列車
         Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", TxtHeadOfficeTrain.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If Not isNormal(WW_CS0024FCHECKERR) Then
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="本線列車", needsPopUp:=True)
             TxtHeadOfficeTrain.Focus()
             WW_CheckMES1 = "本線列車入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -1902,16 +1911,16 @@ Public Class OIT0002LinkDetail
             CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
                 Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
-                              "発駅 : " & TxtDepstation.Text)
+                              "空車発駅 : " & TxtDepstation.Text, needsPopUp:=True)
                 TxtDepstation.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="空車発駅", needsPopUp:=True)
             TxtDepstation.Focus()
             WW_CheckMES1 = "空車発駅入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -1924,16 +1933,16 @@ Public Class OIT0002LinkDetail
             CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
                 Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
-                              "着駅 : " & TxtRetstation.Text)
+                              "空車着駅 : " & TxtRetstation.Text, needsPopUp:=True)
                 TxtRetstation.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="空車着駅", needsPopUp:=True)
             TxtRetstation.Focus()
             WW_CheckMES1 = "空車着駅入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -1948,10 +1957,10 @@ Public Class OIT0002LinkDetail
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="(予定)空車着日", needsPopUp:=True)
             TxtEmpDate.Focus()
             WW_CheckMES1 = "(予定)空車着日入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -1966,10 +1975,10 @@ Public Class OIT0002LinkDetail
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="(実績)空車着日", needsPopUp:=True)
             TxtActEmpDate.Focus()
             WW_CheckMES1 = "(実績)空車着日入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -2285,7 +2294,7 @@ Public Class OIT0002LinkDetail
                             Trim(OIT0002row("LINEORDER")) = "" Or
                             Trim(OIT0002row("TANKNUMBER")) = "" Then
 
-                            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")
+                            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER" & " （入線列車番号、入線順序、タンク車番号のいずれかが未入力です）")
 
                             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
                             CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
@@ -2456,7 +2465,7 @@ Public Class OIT0002LinkDetail
                 TxtTotalTank.Text = CNT_Total
 
                 If CNT_ROWS = 0 Then　'必須項目が入力されている行がない場合のエラー
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER" & " （入力済みの行が存在しません）")
 
                     CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
                     CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"

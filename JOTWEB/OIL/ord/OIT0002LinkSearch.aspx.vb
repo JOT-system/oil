@@ -221,13 +221,13 @@ Public Class OIT0002LinkSearch
             '存在チェック
             CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE.Text)
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE.Text, needsPopUp:=True)
                 WF_CAMPCODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             WF_CAMPCODE.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -240,13 +240,13 @@ Public Class OIT0002LinkSearch
             CODENAME_get("DEPSTATION", WF_DEPSTATION_CODE.Text, WF_DEPSTATION_NAME.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
                 Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
-                              "空車発駅 : " & WF_DEPSTATION_CODE.Text)
+                              "空車発駅 : " & WF_DEPSTATION_CODE.Text, needsPopUp:=True)
                 WF_DEPSTATION_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             WF_DEPSTATION_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -255,7 +255,7 @@ Public Class OIT0002LinkSearch
         '開始日
         '存在チェック
         If WF_STYMD_CODE.Text = "" Then
-            Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, "年月日")
+            Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, "年月日", needsPopUp:=True)
             WF_STYMD_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -270,7 +270,7 @@ Public Class OIT0002LinkSearch
                 Date.TryParse(WF_ENDYMD_CODE.Text, WW_DATE_END)
 
                 If WW_DATE_ST > WW_DATE_END Then
-                    Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR)
+                    Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                     WF_STYMD_CODE.Focus()
                     O_RTN = "ERR"
                     Exit Sub
@@ -287,7 +287,7 @@ Public Class OIT0002LinkSearch
         If WF_TRAINNO_CODE.Text <> "" Then
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 WF_TRAINNO_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
@@ -372,7 +372,7 @@ Public Class OIT0002LinkSearch
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
     End Sub

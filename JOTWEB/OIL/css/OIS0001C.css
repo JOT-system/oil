@@ -107,10 +107,13 @@ input[type='text'] {
     input[type='password'] {
         padding-right: 1.25em;
     }
-    
 
-/*左Boxオープン用虫眼鏡アイコン*/
-.BoxIcon {
+.WF_TEXTBOX_CSS:not(.BoxIcon):not(.CalendarIcon)::-ms-clear {
+    margin-right: -1.25em;
+} 
+
+    /*左Boxオープン用虫眼鏡アイコン*/
+    .BoxIcon {
     background-image: url(../img/leftbox.png);
     background-repeat: no-repeat;
     background-position: 1px;

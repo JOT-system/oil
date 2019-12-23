@@ -570,4 +570,8 @@ div[data-generated="1"] th {
     overflow: hidden;
 }
 
-
+/* 交付アラート、全検アラートのツールチップをOFFにする */
+div[data-generated="1"] td:nth-child(6),
+div[data-generated="1"] td:nth-child(8){
+    pointer-events:none;
+}

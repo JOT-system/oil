@@ -16,3 +16,8 @@ div[data-generated="1"] div[id$="_DL"] {
 div[data-generated="1"] div[id$="_DR"] {
     top: 37px;
 }
+
+/* 受付情報のツールチップをOFFにする */
+div[data-generated="1"] td:nth-child(4) {
+    pointer-events: none;
+}

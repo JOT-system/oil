@@ -167,7 +167,7 @@ div {
     width: 100%;
     position: fixed;
     overflow: hidden;
-    background-color: rgb(220,230,240);
+    background-color: rgba(240,240,240,0.43);
 }
 
 
@@ -309,7 +309,7 @@ div {
 /* 右ボックス表示 */
 
 .WF_rightboxSW {
-    height: 6%;
+    height: 5%;
     overflow: hidden;
     position: fixed;
     top: 0px;

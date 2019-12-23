@@ -394,6 +394,11 @@ Public Module Messages
         ''' 年月日妥当性エラー
         ''' </summary>
         Public Const OIL_DATE_VALIDITY_ERROR As String = "20006"
+
+        ''' <summary>
+        ''' 油種別タンク車数入力エラー
+        ''' </summary>
+        Public Const OIL_OILTANK_INPUT_ERROR As String = "20007"
 #End Region
 
 

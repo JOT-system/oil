@@ -521,3 +521,9 @@ div[data-generated="1"] th {
     background-repeat: no-repeat;
     background-position: 1px;
 }
+
+/* 交付アラート、全検アラートのツールチップをOFFにする */
+div[data-generated="1"] td:nth-child(7),
+div[data-generated="1"] td:nth-child(9) {
+    pointer-events: none;
+}

@@ -538,8 +538,8 @@ Public Class OIS0001UserList
         work.WF_SEL_PASSWORD.Text = ""
 
         '誤り回数
-        WF_MISSCNT.Text = ""
-        work.WF_SEL_MISSCNT.Text = ""
+        WF_MISSCNT.Text = "0"
+        work.WF_SEL_MISSCNT.Text = "0"
 
         'パスワード有効期限
         WF_PASSENDYMD.Text = ""

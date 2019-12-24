@@ -270,15 +270,15 @@ Public Class OIT0001EmptyTurnDairyDetail
             TxtOrderOffice.Enabled = False
         End If
 
-        '〇営業所配下情報を取得・設定
-        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", work.WF_SEL_SALESOFFICECODE.Text, WW_GetValue)
-        work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-        work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
-        work.WF_SEL_BASECODE.Text = WW_GetValue(2)
-        work.WF_SEL_BASENAME.Text = WW_GetValue(3)
-        work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-        work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+        ''〇営業所配下情報を取得・設定
+        'Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", work.WF_SEL_SALESOFFICECODE.Text, WW_GetValue)
+        'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+        'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+        'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+        'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+        'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+        'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
 
         '○ 名称設定処理
         '会社コード
@@ -676,6 +676,26 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
+        '着駅コードが未設定の場合
+        '※一覧を作成するにあたり、基地コード・荷受人を取得するために、
+        '　着駅コードは必須となるため
+        If TxtArrstation.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "着駅", needsPopUp:=True)
+            TxtArrstation.Focus()
+            WW_CheckERR("着駅入力エラー。", C_MESSAGE_NO.PREREQUISITE_ERROR)
+            Exit Sub
+        End If
+
+        '〇営業所配下情報を取得・設定
+        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+        work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+        work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+        work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+        work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+        work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+        work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+
         'タンク車数の件数カウント用
         Dim intTankCnt As Integer = 0
         intTankCnt += Integer.Parse(TxtHTank.Text)
@@ -704,7 +724,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End Using
 
         '〇画面で設定された油種コードを取得
-        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        WW_GetValue = {"", "", "", "", "", ""}
         Dim arrTankCode(intTankCnt) As String
         Dim arrTankName(intTankCnt) As String
         Dim z As Integer = 0
@@ -832,7 +852,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '本線列車
                     If WF_FIELD.Value = "TxtHeadOfficeTrain" Then
-                        '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, TxtHeadOfficeTrain.Text + work.WF_SEL_UORG.Text)
+                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, TxtHeadOfficeTrain.Text + work.WF_SEL_UORG.Text)
                         prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtHeadOfficeTrain.Text)
                     End If
 
@@ -846,9 +866,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                         prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtArrstation.Text)
                     End If
 
+                    ''荷主名
+                    'If WF_FIELD.Value = "SHIPPERSNAME" Then
+                    '    'prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                    '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                    'End If
+
                     '油種
                     If WF_FIELD.Value = "OILNAME" Then
-                        '                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
                         prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                     End If
 
@@ -1028,13 +1054,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtATank.Text = "0"
 
                     '〇営業所配下情報を取得・設定
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", work.WF_SEL_SALESOFFICECODE.Text, WW_GetValue)
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
                     work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
                     work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
                     work.WF_SEL_BASECODE.Text = WW_GetValue(2)
                     work.WF_SEL_BASENAME.Text = WW_GetValue(3)
                     work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-                    work.WF_SEL_CONSIGNEENAME.Text = ""
+                    work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
 
                     '○ 一覧の初期化画面表示データ取得
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1067,6 +1093,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 CODENAME_get("ARRSTATION", TxtArrstation.Text, LblArrstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
 
+                '〇営業所配下情報を取得・設定
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+                work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+
             Case "TxtDepstation"        '発駅
                 TxtDepstation.Text = WW_SelectValue
                 LblDepstationName.Text = WW_SelectText
@@ -1076,6 +1111,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtArrstation.Text = WW_SelectValue
                 LblArrstationName.Text = WW_SelectText
                 TxtArrstation.Focus()
+
+                '〇営業所配下情報を取得・設定
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+                work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
 
             Case "TxtLoadingDate"       '(予定)積込日
                 Dim WW_DATE As Date
@@ -1126,7 +1170,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Try
                 TxtAccDate.Focus()
 
-            Case "OILNAME", "TANKNO", "RETURNDATETRAIN"   '(一覧)油種, (一覧)タンク車№, (一覧)返送日列車
+                '(一覧)荷主, (一覧)油種, (一覧)タンク車№, (一覧)返送日列車
+            Case "SHIPPERSNAME", "OILNAME", "TANKNO", "RETURNDATETRAIN"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -1144,8 +1189,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 If IsNothing(updHeader) Then Exit Sub
 
                 '〇 一覧項目へ設定
-                '油種名を一覧に設定
-                If WF_FIELD.Value = "OILNAME" Then
+                '荷主名を一覧に設定
+                If WF_FIELD.Value = "SHIPPERSNAME" Then
+                    'updHeader.Item("SHIPPERSCODE") = WW_SETVALUE
+                    'updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                    'work.WF_SEL_SHIPPERSCODE.Text = WW_SETVALUE
+                    'work.WF_SEL_SHIPPERSNAME.Text = WW_SETTEXT
+
+                    '油種名を一覧に設定
+                ElseIf WF_FIELD.Value = "OILNAME" Then
                     updHeader.Item("OILCODE") = WW_SETVALUE
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
@@ -2048,6 +2101,19 @@ Public Class OIT0001EmptyTurnDairyDetail
         Select Case WF_FIELD.Value
             Case "TxtOrderOffice"    '受注営業所
 
+            Case "SHIPPERSNAME"      '(一覧)荷主
+                'If WW_ListValue <> "" Then
+                '    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "SHIPPERSMASTER_N", WW_ListValue, WW_GetValue)
+                '    updHeader.Item("SHIPPERSCODE") = WW_GetValue(0)
+                '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+                '    work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                '    work.WF_SEL_SHIPPERSNAME.Text = WW_ListValue
+                'Else
+                '    updHeader.Item("SHIPPERSCODE") = ""
+                '    updHeader.Item(WF_FIELD.Value) = ""
+                'End If
+
             Case "OILNAME"           '(一覧)油種
                 If WW_ListValue <> "" Then
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_N", WW_ListValue, WW_GetValue)
@@ -2723,15 +2789,18 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0002_ORDER" _
             & "    SET" _
-            & "        OFFICECODE   = @P04    , OFFICENAME     = @P05" _
-            & "        , TRAINNO    = @P02" _
-            & "        , DEPSTATION = @P13    , DEPSTATIONNAME = @P14" _
-            & "        , ARRSTATION = @P15    , ARRSTATIONNAME = @P16" _
-            & "        , ORDERINFO  = @P22" _
-            & "        , LODDATE    = @P24    , DEPDATE        = @P25" _
-            & "        , ARRDATE    = @P26    , ACCDATE        = @P27" _
-            & "        , UPDYMD     = @P87    , UPDUSER        = @P88" _
-            & "        , UPDTERMID  = @P89    , RECEIVEYMD     = @P90" _
+            & "        OFFICECODE      = @P04    , OFFICENAME     = @P05" _
+            & "        , TRAINNO       = @P02" _
+            & "        , SHIPPERSCODE  = @P07    , SHIPPERSNAME   = @P08" _
+            & "        , BASECODE      = @P09    , BASENAME       = @P10" _
+            & "        , CONSIGNEECODE = @P11    , CONSIGNEENAME  = @P12" _
+            & "        , DEPSTATION    = @P13    , DEPSTATIONNAME = @P14" _
+            & "        , ARRSTATION    = @P15    , ARRSTATIONNAME = @P16" _
+            & "        , ORDERINFO     = @P22" _
+            & "        , LODDATE       = @P24    , DEPDATE        = @P25" _
+            & "        , ARRDATE       = @P26    , ACCDATE        = @P27" _
+            & "        , UPDYMD        = @P87    , UPDUSER        = @P88" _
+            & "        , UPDTERMID     = @P89    , RECEIVEYMD     = @P90" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & " IF (@@FETCH_STATUS <> 0)" _

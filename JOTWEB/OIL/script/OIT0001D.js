@@ -104,6 +104,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM == "OILNAME") {
             document.getElementById('WF_LeftMViewChange').value = 24;
         }
+        else if (fieldNM == "SHIPPERSNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 42;
+        }
         else if (fieldNM == "RETURNDATETRAIN") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }

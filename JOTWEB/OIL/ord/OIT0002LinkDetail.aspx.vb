@@ -370,8 +370,10 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS TANKNUMBER " _
             & " , ''                                             AS PREOILCODE " _
             & " , ''                                             AS PREOILNAME " _
-            & " , @P3                                            AS DEPSTATION " _
-            & " , @P4                                            AS RETSTATION " _
+            & " , ''                                             AS DEPSTATION " _
+            & " , @P3                                            AS DEPSTATIONNAME " _
+            & " , ''                                             AS RETSTATION " _
+            & " , @P4                                            AS RETSTATIONNAME " _
             & " , ''                                             AS JRINSPECTIONALERT " _
             & " , ''                                             AS JRINSPECTIONDATE " _
             & " , ''                                             AS JRINSPECTIONALERTSTR " _
@@ -403,7 +405,9 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0005.LASTOILCODE), '')        AS PREOILCODE " _
             & " , ISNULL(RTRIM(OIM0003.OILNAME), '')            AS PREOILNAME " _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATION), '')         AS DEPSTATION " _
+            & " , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')     AS DEPSTATIONNAME " _
             & " , ISNULL(RTRIM(OIT0004.RETSTATION), '')         AS RETSTATION " _
+            & " , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')     AS RETSTATIONNAME " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN '' " _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>' " _
@@ -488,8 +492,8 @@ Public Class OIT0002LinkDetail
                     PARA4.Value = ""
                 Else
                     PARA0.Value = CONST_INIT_ROWS
-                    PARA3.Value = TxtDepstation.Text
-                    PARA4.Value = TxtRetstation.Text
+                    PARA3.Value = LblDepstationName.Text
+                    PARA4.Value = LblRetstationName.Text
                 End If
 
                 If work.WF_SEL_CREATEFLG.Text = 1 Then
@@ -784,17 +788,17 @@ Public Class OIT0002LinkDetail
 
                 '空車発駅
                 TxtDepstation.Text = WW_GetValue(1)
-                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+                CODENAME_get("RETSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
                 '空車着駅
                 TxtRetstation.Text = WW_GetValue(2)
-                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
+                CODENAME_get("DEPSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
             '空車発駅
             Case "TxtDepstation"
-                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_RTN_SW)
+                CODENAME_get("RETSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_RTN_SW)
             '空車着駅
             Case "TxtRetstation"
-                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_RTN_SW)
+                CODENAME_get("DEPSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_RTN_SW)
 
         End Select
 
@@ -891,11 +895,11 @@ Public Class OIT0002LinkDetail
                 FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 '空車発駅
-                TxtDepstation.Text = WW_GetValue(1)
-                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+                TxtDepstation.Text = WW_GetValue(2)
+                CODENAME_get("RETSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
                 '空車着駅
-                TxtRetstation.Text = WW_GetValue(2)
-                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
+                TxtRetstation.Text = WW_GetValue(1)
+                CODENAME_get("DEPSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
 
             Case "TxtDepstation"        '空車発駅
@@ -1865,12 +1869,18 @@ Public Class OIT0002LinkDetail
         Dim WW_TEXT As String = ""
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
-        Dim WW_STYMD As Date
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim dateErrFlag As String = ""
 
         '○ 単項目チェック
         '登録営業所
+        If TxtOrderOffice.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "登録営業所", needsPopUp:=True)
+            TxtOrderOffice.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
         Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtOrderOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
@@ -1893,6 +1903,12 @@ Public Class OIT0002LinkDetail
         End If
 
         '本線列車
+        If TxtHeadOfficeTrain.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "本線列車", needsPopUp:=True)
+            TxtHeadOfficeTrain.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
         Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", TxtHeadOfficeTrain.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If Not isNormal(WW_CS0024FCHECKERR) Then
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="本線列車", needsPopUp:=True)
@@ -1905,6 +1921,12 @@ Public Class OIT0002LinkDetail
         End If
 
         '空車発駅
+        If TxtDepstation.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "空車発駅", needsPopUp:=True)
+            TxtDepstation.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
         Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEPSTATION", TxtDepstation.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
@@ -1927,6 +1949,12 @@ Public Class OIT0002LinkDetail
         End If
 
         '空車着駅
+        If TxtRetstation.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "空車着駅", needsPopUp:=True)
+            TxtRetstation.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
         Master.CheckField(work.WF_SEL_CAMPCODE.Text, "RETSTATION", TxtRetstation.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
@@ -1949,43 +1977,109 @@ Public Class OIT0002LinkDetail
         End If
 
         '(予定)空車着日
-        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EMPARRDATE", TxtEmpDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            Try
-                Date.TryParse(TxtEmpDate.Text, WW_STYMD)
-            Catch ex As Exception
-                WW_STYMD = C_DEFAULT_YMD
-            End Try
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="(予定)空車着日", needsPopUp:=True)
+        If TxtEmpDate.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
+            TxtEmpDate.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+        '年月日チェック
+        WW_CheckDate(TxtEmpDate.Text, "(予定)空車着日", WW_CS0024FCHECKERR, dateErrFlag)
+        If dateErrFlag = "1" Then
             TxtEmpDate.Focus()
             WW_CheckMES1 = "(予定)空車着日入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '(実績)空車着日
-        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALEMPARRDATE", TxtActEmpDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            Try
-                Date.TryParse(TxtActEmpDate.Text, WW_STYMD)
-            Catch ex As Exception
-                WW_STYMD = C_DEFAULT_YMD
-            End Try
+        If TxtActEmpDate.Text = "" Then
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="(実績)空車着日", needsPopUp:=True)
-            TxtActEmpDate.Focus()
-            WW_CheckMES1 = "(実績)空車着日入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
+            '年月日チェック
+            WW_CheckDate(TxtActEmpDate.Text, "(実績)空車着日", WW_CS0024FCHECKERR, dateErrFlag)
+            If dateErrFlag = "1" Then
+                TxtActEmpDate.Focus()
+                WW_CheckMES1 = "(実績)空車着日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
+
+        '(一覧)タンク車No(重複チェック)
+        Dim OIT0002tbl_DUMMY As DataTable = OIT0002tbl.Copy
+        Dim OIT0002tbl_dv As DataView = New DataView(OIT0002tbl_DUMMY)
+        Dim chkTankNo As String = ""
+
+        'タンク車Noでソートし、重複がないかチェックする。
+        OIT0002tbl_dv.Sort = "TANKNUMBER"
+        For Each drv As DataRowView In OIT0002tbl_dv
+            If drv("TANKNUMBER") <> "" AndAlso chkTankNo = drv("TANKNUMBER") Then
+                Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "タンク車№重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            chkTankNo = drv("TANKNUMBER")
+        Next
+
+        '入線順序でソートし、重複がないかチェックする。
+        OIT0002tbl_dv.Sort = "LINEORDER"
+        For Each drv As DataRowView In OIT0002tbl_dv
+            If drv("LINEORDER") <> "" AndAlso chkTankNo = drv("LINEORDER") Then
+                Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "入線順序重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            chkTankNo = drv("LINEORDER")
+        Next
 
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+
+    End Sub
+
+
+    ''' <summary>
+    ''' 年月日チェック
+    ''' </summary>
+    ''' <param name="I_DATE"></param>
+    ''' <param name="I_DATENAME"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckDate(ByVal I_DATE As String, ByVal I_DATENAME As String, ByVal I_VALUE As String, ByRef dateErrFlag As String)
+
+        dateErrFlag = "1"
+        Try
+            '年取得
+            Dim chkLeapYear As String = I_DATE.Substring(0, 4)
+            '月日を取得
+            Dim getMMDD As String = I_DATE.Remove(0, I_DATE.IndexOf("/") + 1)
+            '月取得
+            Dim getMonth As String = getMMDD.Remove(getMMDD.IndexOf("/"))
+            '日取得
+            Dim getDay As String = getMMDD.Remove(0, getMMDD.IndexOf("/") + 1)
+
+            '閏年の場合はその旨のメッセージを出力
+            If Not DateTime.IsLeapYear(chkLeapYear) _
+            AndAlso (getMonth = "2" OrElse getMonth = "02") AndAlso getDay = "29" Then
+                Master.Output(C_MESSAGE_NO.OIL_LEAPYEAR_NOTFOUND, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+                '月と日の範囲チェック
+            ElseIf getMonth >= 13 OrElse getDay >= 32 Then
+                Master.Output(C_MESSAGE_NO.OIL_MONTH_DAY_OVER_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+            Else
+                'Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+                'エラーなし
+                dateErrFlag = "0"
+            End If
+        Catch ex As Exception
+            Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+        End Try
 
     End Sub
 
@@ -3005,10 +3099,10 @@ Public Class OIT0002LinkDetail
                 Case "SALESOFFICE"      '登録営業所
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
 
-                Case "DEPSTATION"       '空車発駅
+                Case "DEPSTATION"       '発駅　（空車着駅）
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPSTATION"))
 
-                Case "RETSTATION"       '空車着駅
+                Case "RETSTATION"       '着駅　（空車発駅）
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "RETSTATION"))
 
                 Case "PRODUCTPATTERN"   '油種

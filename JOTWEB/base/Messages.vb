@@ -404,6 +404,11 @@ Public Module Messages
         ''' タンク車№重複エラー
         ''' </summary>
         Public Const OIL_OILTANKNO_REPEAT_ERROR As String = "20008"
+
+        ''' <summary>
+        ''' 入線順序重複エラー
+        ''' </summary>
+        Public Const OIL_LINEORDER_REPEAT_ERROR As String = "20009"
 #End Region
 
 

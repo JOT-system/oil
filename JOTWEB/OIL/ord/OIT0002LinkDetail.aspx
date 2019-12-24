@@ -25,11 +25,11 @@
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
             <a style="position:fixed;top:2.8em;left:62.5em;">
-                <input type="button" id="WF_ButtonRegister" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonRegister');" />
+                <input type="button" id="WF_ButtonRegister" value="登録"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonRegister');" />
             </a>
 
             <a style="position:fixed;top:2.8em;left:67em;">
-                <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                <input type="button" id="WF_ButtonEND" value="戻る"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
             </a>
 
             <!-- ○ 変動項目 ○ -->
@@ -164,22 +164,22 @@
         <div id="detailbuttonbox" class="detailbuttonbox">
             <!-- ボタン -->
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                <input type="button" id="WF_ButtonALLSELECT" value="全選択"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonLINE_ADD" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />
+                <input type="button" id="WF_ButtonLINE_ADD" value="行追加"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
+                <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
             </a>
             <a style="left:43.5em;">
-                <input type="button" id="WF_ButtonUPDATE" value="明細更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                <input type="button" id="WF_ButtonUPDATE" value="明細更新"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
             </a>
         </div>
         </div>

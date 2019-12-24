@@ -121,6 +121,7 @@ Public Class GRIS0005LeftBox
         LC_BASE
         LC_COLOR
         LC_OBTAINED
+        LC_SHIPPERSLIST
     End Enum
 
     ''' <summary>
@@ -187,6 +188,7 @@ Public Class GRIS0005LeftBox
         LP_BASE
         LP_COLOR
         LP_OBTAINED
+        LP_SHIPPERSLIST
     End Enum
 
     ''' <summary>
@@ -547,6 +549,10 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_OBTAINED
                 '取得先
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OBTAINED"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST
+                '荷主
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SHIPPERSMASTER"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー

@@ -270,15 +270,15 @@ Public Class OIT0001EmptyTurnDairyDetail
             TxtOrderOffice.Enabled = False
         End If
 
-        ''〇営業所配下情報を取得・設定
-        'Dim WW_GetValue() As String = {"", "", "", "", "", ""}
-        'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", work.WF_SEL_SALESOFFICECODE.Text, WW_GetValue)
-        'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-        'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
-        'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
-        'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
-        'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
-        'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+        '〇営業所配下情報を取得・設定
+        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+        work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+        work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+        work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+        work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+        work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+        work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
 
         '○ 名称設定処理
         '会社コード
@@ -431,8 +431,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '')            AS ORDERYMD" _
-            & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '   ')     AS SHIPPERSCODE" _
-            & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '   ')     AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '   ')     AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '   ')     AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '   ')         AS BASECODE" _
             & " , ISNULL(RTRIM(OIT0002.BASENAME), '   ')         AS BASENAME" _
             & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '   ')    AS CONSIGNEECODE" _
@@ -866,11 +866,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                         prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtArrstation.Text)
                     End If
 
-                    ''荷主名
-                    'If WF_FIELD.Value = "SHIPPERSNAME" Then
-                    '    'prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
-                    '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
-                    'End If
+                    '荷主名
+                    If WF_FIELD.Value = "SHIPPERSNAME" Then
+                        'prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                    End If
 
                     '油種
                     If WF_FIELD.Value = "OILNAME" Then
@@ -953,7 +953,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             '本線列車
             Case "TxtHeadOfficeTrain"
                 Dim WW_GetValue() As String = {"", "", "", "", "", ""}
-                WW_FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+                'WW_FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
                 '指定された本線列車№で値が取得できない場合はエラー判定
                 If WW_GetValue(0) = "" Then
@@ -1191,11 +1192,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '〇 一覧項目へ設定
                 '荷主名を一覧に設定
                 If WF_FIELD.Value = "SHIPPERSNAME" Then
-                    'updHeader.Item("SHIPPERSCODE") = WW_SETVALUE
-                    'updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
-
-                    'work.WF_SEL_SHIPPERSCODE.Text = WW_SETVALUE
-                    'work.WF_SEL_SHIPPERSNAME.Text = WW_SETTEXT
+                    updHeader.Item("SHIPPERSCODE") = WW_SETVALUE
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
                     '油種名を一覧に設定
                 ElseIf WF_FIELD.Value = "OILNAME" Then
@@ -2102,17 +2100,14 @@ Public Class OIT0001EmptyTurnDairyDetail
             Case "TxtOrderOffice"    '受注営業所
 
             Case "SHIPPERSNAME"      '(一覧)荷主
-                'If WW_ListValue <> "" Then
-                '    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "SHIPPERSMASTER_N", WW_ListValue, WW_GetValue)
-                '    updHeader.Item("SHIPPERSCODE") = WW_GetValue(0)
-                '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
-
-                '    work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
-                '    work.WF_SEL_SHIPPERSNAME.Text = WW_ListValue
-                'Else
-                '    updHeader.Item("SHIPPERSCODE") = ""
-                '    updHeader.Item(WF_FIELD.Value) = ""
-                'End If
+                If WW_ListValue <> "" Then
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "SHIPPERSMASTER_N", WW_ListValue, WW_GetValue)
+                    updHeader.Item("SHIPPERSCODE") = WW_GetValue(0)
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                Else
+                    updHeader.Item("SHIPPERSCODE") = ""
+                    updHeader.Item(WF_FIELD.Value) = ""
+                End If
 
             Case "OILNAME"           '(一覧)油種
                 If WW_ListValue <> "" Then
@@ -3253,21 +3248,24 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        TANKNO      = @P03, OILCODE    = @P05, RETURNDATETRAIN = @P07, JOINT = @P08" _
-            & "        , UPDYMD    = @P19, UPDUSER    = @P20" _
-            & "        , UPDTERMID = @P21, RECEIVEYMD = @P22" _
+            & "        TANKNO      = @P03, SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
+            & "        , OILCODE   = @P05, RETURNDATETRAIN = @P07, JOINT = @P08" _
+            & "        , UPDYMD    = @P19, UPDUSER         = @P20" _
+            & "        , UPDTERMID = @P21, RECEIVEYMD      = @P22" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO   , DETAILNO        , TANKNO     , KAMOKU       , OILCODE" _
-            & "        , CARSNUMBER, RETURNDATETRAIN , JOINT      , SALSE        , SALSETAX" _
-            & "        , TOTALSALSE, PAYMENT         , PAYMENTTAX , TOTALPAYMENT , DELFLG" _
-            & "        , INITYMD   , INITUSER        , INITTERMID" _
-            & "        , UPDYMD    , UPDUSER         , UPDTERMID  , RECEIVEYMD)" _
+            & "        ( ORDERNO     , DETAILNO        , TANKNO     , KAMOKU" _
+            & "        , SHIPPERSCODE, SHIPPERSNAME    , OILCODE" _
+            & "        , CARSNUMBER  , RETURNDATETRAIN , JOINT      , SALSE        , SALSETAX" _
+            & "        , TOTALSALSE  , PAYMENT         , PAYMENTTAX , TOTALPAYMENT , DELFLG" _
+            & "        , INITYMD     , INITUSER        , INITTERMID" _
+            & "        , UPDYMD      , UPDUSER         , UPDTERMID  , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02, @P03, @P04, @P05" _
+            & "        ( @P01, @P02, @P03, @P04" _
+            & "        , @P23, @P24, @P05" _
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15" _
             & "        , @P16, @P17, @P18" _
@@ -3287,6 +3285,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , DETAILNO" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
+            & "    , SHIPPERSCODE" _
+            & "    , SHIPPERSNAME" _
             & "    , OILCODE" _
             & "    , CARSNUMBER" _
             & "    , RETURNDATETRAIN" _
@@ -3320,6 +3320,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 4)   '油種コード
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
@@ -3356,6 +3358,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA02.Value = OIT0001row("DETAILNO")             '受注明細№
                     PARA03.Value = OIT0001row("TANKNO")               'タンク車№
                     PARA04.Value = OIT0001row("KAMOKU")               '費用科目
+                    PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
+                    PARA24.Value = OIT0001row("SHIPPERSNAME")         '荷主名
                     PARA05.Value = OIT0001row("OILCODE")              '油種コード
                     PARA06.Value = "1"                                '車数
                     If OIT0001row("RETURNDATETRAIN") <> "" Then

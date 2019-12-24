@@ -578,8 +578,16 @@ Public Class CS0013ProfView
                                 outCell.Text = Convert.ToString(dataRow(fieldName))
                         End Select
                         'outCell.Text = I_SRCDATA(i)(fieldName)
+
+                        '交付アラート、全検アラート対応
+                        '(ツールチップを非表示にする)
                         If TITLEOPT = True Then
-                            outCell.Attributes.Add("Title", outCell.Text)
+                            If 0 <= outCell.Text.IndexOf("<div") Then
+                                '何もしない
+                                'outCell.Attributes.Add("Title", "")
+                            Else
+                                outCell.Attributes.Add("Title", outCell.Text)
+                            End If
                         End If
                         outCell.Style.Add("text-align", Convert.ToString(profRow("ALIGN")))
                     Case "1" 'CheckBox

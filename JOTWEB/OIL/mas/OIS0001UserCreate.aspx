@@ -21,10 +21,10 @@
         <div class="detailboxOnly" id="detailbox" style="overflow-y: auto;">
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
-                    <input type="button" id="WF_UPDATE" value="表更新" style="Width:5em" onclick="ButtonClick('WF_UPDATE');" />
+                    <input type="button" id="WF_UPDATE" class="btn-sticky" value="表更新" style="Width:5em" onclick="ButtonClick('WF_UPDATE');" />
                 </a>
                 <a>
-                    <input type="button" id="WF_CLEAR" value="クリア" style="Width:5em" onclick="ButtonClick('WF_CLEAR');" />
+                    <input type="button" id="WF_CLEAR" class="btn-sticky" value="クリア" style="Width:5em" onclick="ButtonClick('WF_CLEAR');" />
                 </a>
             </div>
 

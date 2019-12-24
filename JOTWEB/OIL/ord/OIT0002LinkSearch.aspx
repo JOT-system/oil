@@ -17,10 +17,10 @@
     <div class="searchbox" id="searchbox">
         <!-- ○ 固定項目 ○ -->
         <a style="position:fixed;top:2.8em;left:62.5em;">
-            <input type="button" id="WF_ButtonDO" value="検索"  style="Width:5em" onclick="ButtonClick('WF_ButtonDO');" />
+            <input type="button" id="WF_ButtonDO" value="検索"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonDO');" />
         </a>
         <a style="position:fixed;top:2.8em;left:67em;">
-            <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+            <input type="button" id="WF_ButtonEND" value="戻る"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
         </a>
 
         <!-- ○ 変動項目 ○ -->

@@ -2007,6 +2007,39 @@ Public Class OIT0002LinkDetail
             End If
         End If
 
+        '(一覧)タンク車No(重複チェック)
+        Dim OIT0002tbl_DUMMY As DataTable = OIT0002tbl.Copy
+        Dim OIT0002tbl_dv As DataView = New DataView(OIT0002tbl_DUMMY)
+        Dim chkTankNo As String = ""
+
+        'タンク車Noでソートし、重複がないかチェックする。
+        OIT0002tbl_dv.Sort = "TANKNUMBER"
+        For Each drv As DataRowView In OIT0002tbl_dv
+            If drv("TANKNUMBER") <> "" AndAlso chkTankNo = drv("TANKNUMBER") Then
+                Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "タンク車№重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            chkTankNo = drv("TANKNUMBER")
+        Next
+
+        '入線順序でソートし、重複がないかチェックする。
+        OIT0002tbl_dv.Sort = "LINEORDER"
+        For Each drv As DataRowView In OIT0002tbl_dv
+            If drv("LINEORDER") <> "" AndAlso chkTankNo = drv("LINEORDER") Then
+                Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "入線順序重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            chkTankNo = drv("LINEORDER")
+        Next
+
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 

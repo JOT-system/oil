@@ -35,25 +35,25 @@
 
                 <!-- ボタン -->
                 <a style="position:fixed;top:2.8em;left:0.5em;">
-                    <input type="button" id="WF_ButtonALLSELECT" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                    <input type="button" id="WF_ButtonALLSELECT" value="全選択"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:5em;">
-                    <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                    <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:9.5em;">
-                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:14em;">
-                    <input type="button" id="WF_ButtonUPDATE" value="更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                    <input type="button" id="WF_ButtonUPDATE" value="更新"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:18.5em;">
-                    <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
+                    <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:62.5em;">
-                    <input type="button" id="WF_ButtonINSERT" value="新規登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                    <input type="button" id="WF_ButtonINSERT" value="新規登録"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:67em;">
-                    <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                    <input type="button" id="WF_ButtonEND" value="戻る"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
                 </a>
                 <a style="position:fixed;top:3.2em;left:75em;">
                     <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />

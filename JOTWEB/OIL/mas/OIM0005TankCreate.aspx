@@ -21,10 +21,10 @@
         <div class="detailboxOnly" id="detailbox" style="overflow-y: auto;">
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
-                    <input type="button" id="WF_UPDATE" value="更新／追加" style="Width:7em" onclick="ButtonClick('WF_UPDATE');" />
+                    <input type="button" id="WF_UPDATE" class="btn-sticky" value="更新／追加" style="Width:7em" onclick="ButtonClick('WF_UPDATE');" />
                 </a>
                 <a>
-                    <input type="button" id="WF_CLEAR" value="クリア" style="Width:7em" onclick="ButtonClick('WF_CLEAR');" />
+                    <input type="button" id="WF_CLEAR" class="btn-sticky" value="クリア" style="Width:7em" onclick="ButtonClick('WF_CLEAR');" />
                 </a>
             </div>
             <div id="detailkeybox">
@@ -120,14 +120,14 @@
                     <!-- 原常備駅C -->
                     <a class="ef" ondblclick="Field_DBclick('WF_CURRENTSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_CURRENTSTATIONCODE');">
                         <asp:Label ID="WF_CURRENTSTATIONCODE_L" runat="server" Text="原常備駅C" Width="10.0em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_CURRENTSTATIONCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_CURRENTSTATIONCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_CURRENTSTATIONCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
 
                     <!-- 臨時常備駅C -->
                     <a class="ef" ondblclick="Field_DBclick('WF_EXTRADINARYSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_EXTRADINARYSTATIONCODE');">
                         <asp:Label ID="WF_EXTRADINARYSTATIONCODE_L" runat="server" Text="臨時常備駅C" Width="10.0em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_EXTRADINARYSTATIONCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EXTRADINARYSTATIONCODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYSTATIONCODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>
@@ -175,7 +175,7 @@
                     <!-- 運用基地C -->
                     <a class="ef" ondblclick="Field_DBclick('WF_OPERATIONBASECODE', <%=LIST_BOX_CLASSIFICATION.LC_BASE%>);" onchange="TextBox_change('WF_OPERATIONBASECODE');">
                         <asp:Label ID="WF_OPERATIONBASECODE_L" runat="server" Text="運用基地C" Width="10.0em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_OPERATIONBASECODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OPERATIONBASECODE" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_OPERATIONBASECODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>
                 </p>

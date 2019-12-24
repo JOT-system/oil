@@ -1030,31 +1030,6 @@ Public Class OIS0001UserCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '一意制約チェック
-            '同一レコードの更新の場合、チェック対象外
-            If OIS0001INProw("USERID") = work.WF_SEL_USERID.Text Then
-
-            Else
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    'DataBase接続
-                    SQLcon.Open()
-
-                    '一意制約チェック
-                    UniqueKeyCheck(SQLcon, WW_UniqueKeyCHECK)
-                End Using
-
-                If Not isNormal(WW_UniqueKeyCHECK) Then
-                    WW_CheckMES1 = "一意制約違反（ユーザID）。"
-                    WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
-                                       "([" & OIS0001INProw("USERID") & "]" &
-                                       " [" & OIS0001INProw("STYMD") & "])" &
-                                       " [" & OIS0001INProw("ENDYMD") & "])"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
-                End If
-            End If
-
             '社員名（短）(バリデーションチェック）
             If OIS0001INProw("STAFFNAMES") = "" Then
                 WW_CheckMES1 = "・社員名（短）入力エラー。"
@@ -1274,6 +1249,33 @@ Public Class OIS0001UserCreate
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
+
+
+            '一意制約チェック
+            '同一レコードの更新の場合、チェック対象外
+            If OIS0001INProw("USERID") = work.WF_SEL_USERID.Text Then
+
+            Else
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    'DataBase接続
+                    SQLcon.Open()
+
+                    '一意制約チェック
+                    UniqueKeyCheck(SQLcon, WW_UniqueKeyCHECK)
+                End Using
+
+                If Not isNormal(WW_UniqueKeyCHECK) Then
+                    WW_CheckMES1 = "一意制約違反（ユーザID）。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
+                                       "([" & OIS0001INProw("USERID") & "]" &
+                                       " [" & OIS0001INProw("STYMD") & "])" &
+                                       " [" & OIS0001INProw("ENDYMD") & "])"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                End If
+            End If
+
 
             If WW_LINE_ERR = "" Then
                 If OIS0001INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then

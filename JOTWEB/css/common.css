@@ -1524,3 +1524,9 @@ input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
         background: #2bb6c1;
         color: #fff;
     }
+
+    .btn-sticky:disabled {
+        background-image: none;
+        background-color: #ccc;
+        border-color: #ccc;
+    }

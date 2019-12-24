@@ -28,10 +28,10 @@
             <!-- ○ 固定項目 ○ -->
             <!-- ボタン -->
             <a style="position:fixed;top:2.8em;left:78em;">
-                <input type="button" id="WF_ButtonINSERT" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="登録"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
             </a>
             <a style="position:fixed;top:2.8em;left:83.5em;">
-                <input type="button" id="WF_ButtonEND" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
             </a>
 
             <!-- ○ 変動項目 ○ -->
@@ -424,19 +424,19 @@
                 <div id="detailbuttonbox" class="detailbuttonbox">
                     <!-- ボタン -->
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonALLSELECT_TAB1" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT_TAB1');" />
+                        <input type="button" id="WF_ButtonALLSELECT_TAB1" class="btn-sticky" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT_TAB1');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB1" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB1');" />
+                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB1" class="btn-sticky" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB1');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB1" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB1');" />
+                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB1" class="btn-sticky" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB1');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonLINE_ADD_TAB1" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD_TAB1');" />
+                        <input type="button" id="WF_ButtonLINE_ADD_TAB1" class="btn-sticky" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD_TAB1');" />
                     </a>
                     <a style="left:43.5em;">
-                        <input type="button" id="WF_ButtonUPDATE_TAB1" value="割当確定"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
+                        <input type="button" id="WF_ButtonUPDATE_TAB1" class="btn-sticky" value="割当確定"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
                     </a>
                 </div>
 
@@ -451,19 +451,19 @@
                 <div id="detailbuttonbox2" class="detailbuttonbox">
                     <!-- ボタン -->
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonALLSELECT_TAB2" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT_TAB2');" />
+                        <input type="button" id="WF_ButtonALLSELECT_TAB2" class="btn-sticky" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT_TAB2');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB2" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB2');" />
+                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB2" class="btn-sticky" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB2');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB2" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB2');" />
+                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB2" class="btn-sticky" value="行削除"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB2');" />
                     </a>
                     <a style="left:2.5em;">
-                        <input type="button" id="WF_ButtonLINE_ADD_TAB2" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD_TAB2');" />
+                        <input type="button" id="WF_ButtonLINE_ADD_TAB2" class="btn-sticky" value="行追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD_TAB2');" />
                     </a>
                     <a style="left:43.5em;">
-                        <input type="button" id="WF_ButtonUPDATE_TAB2" value="明細更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE_TAB2');" />
+                        <input type="button" id="WF_ButtonUPDATE_TAB2" class="btn-sticky" value="明細更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE_TAB2');" />
                     </a>
                 </div>
                 <!-- 一覧レイアウト -->
@@ -477,10 +477,10 @@
                 <div id="detailbuttonbox3" class="detailbuttonbox">
                     <!-- ボタン -->
                     <a style="left:60.0em;">
-                        <input type="button" id="WF_ButtonUPDATE_TAB3" value="入力内容登録"  style="Width:7em" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
+                        <input type="button" id="WF_ButtonUPDATE_TAB3" class="btn-sticky" value="入力内容登録"  style="Width:7em" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
                     </a>
                     <a style="left:60.0em;">
-                        <input type="button" id="WF_ButtonFILLINGALL_TAB3" value="充填ポイントの全体を見る"  style="Width:12em" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
+                        <input type="button" id="WF_ButtonFILLINGALL_TAB3" class="btn-sticky" value="充填ポイントの全体を見る"  style="Width:12em" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
                     </a>
                 </div>
                 <!-- 一覧レイアウト -->

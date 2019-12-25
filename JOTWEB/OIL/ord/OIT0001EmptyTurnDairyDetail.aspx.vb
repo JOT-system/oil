@@ -1728,6 +1728,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
+        '〇前回油種と油種の整合性チェック
+        WW_CheckLastOilConsistency(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
             '受注DB追加・更新
@@ -2148,8 +2154,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim WW_LASTOILNAME As String = ""
                 updHeader.Item("LASTOILCODE") = WW_GetValue(1)
                 CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue)
                 updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+
+                'Dim WW_GetValue2() As String = {"", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch("", "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue2)
+                'updHeader.Item("LASTOILNAME") = WW_GetValue2(0)
 
                 '交検日
                 Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
@@ -2530,6 +2539,37 @@ Public Class OIT0001EmptyTurnDairyDetail
             O_RTN = "ERR"
             Exit Sub
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 前回油種と油種の整合性チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckLastOilConsistency(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_GetValue = {"", "", "", "", "", ""}
+
+        '前回油種と油種の整合性チェック
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+            WW_FixvalueMasterSearch(OIT0001row("LASTOILCODE"), "LASTOILCONSISTENCY", OIT0001row("OILCODE"), WW_GetValue)
+
+            If WW_GetValue(2) = "1" Then
+                Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+                WW_CheckMES1 = "前回油種と油種の整合性エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Next
 
     End Sub
 

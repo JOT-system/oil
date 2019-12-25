@@ -409,6 +409,11 @@ Public Module Messages
         ''' 入線順序重複エラー
         ''' </summary>
         Public Const OIL_LINEORDER_REPEAT_ERROR As String = "20009"
+
+        ''' <summary>
+        ''' 前回油種と油種の整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTOIL_CONSISTENCY_ERROR As String = "20010"
 #End Region
 
 

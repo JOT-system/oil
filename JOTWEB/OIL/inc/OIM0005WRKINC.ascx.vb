@@ -48,6 +48,19 @@ Public Class OIM0005WRKINC
     End Function
 
     '' <summary>
+    '' 基地マスタから一覧の取得
+    '' </summary>
+    '' <param name="I_BASERPT"></param>
+    '' <returns></returns>
+    '' <remarks>全て</remarks>
+    Function CreateBaseParam(ByVal I_COMPCODE As String, ByVal I_BASE As String) As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_BASE) = I_BASE
+        CreateBaseParam = prmData
+    End Function
+
+    '' <summary>
     '' 固定値マスタから一覧の取得
     '' </summary>
     '' <param name="COMPCODE"></param>

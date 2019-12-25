@@ -966,6 +966,10 @@ Public Class OIM0005TankCreate
                                 prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER")
                             Case "WF_MODEL"       'タンク車型式
                                 prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKMODEL")
+                            Case "WF_CURRENTSTATIONCODE", "WF_EXTRADINARYSTATIONCODE"      '原常備駅C、臨時常備駅C
+                                prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN")
+                            Case "WF_OPERATIONBASECODE"      '運用基地
+                                prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, "BASE")
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -990,6 +994,12 @@ Public Class OIM0005TankCreate
                 CODENAME_get("TANKMODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
             Case "WF_DELFLG"             '削除フラグ
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
+            Case "WF_CURRENTSTATIONCODE"     '原常備駅C
+                CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
+            Case "WF_EXTRADINARYSTATIONCODE"      '臨時常備駅C
+                CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
+            Case "WF_OPERATIONBASECODE"      '運用基地
+                CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -1062,6 +1072,16 @@ Public Class OIM0005TankCreate
                     End Try
                     WF_LEASEENDYMD.Focus()
 
+                Case "WF_CURRENTSTATIONCODE"               '原常備駅C
+                    WF_CURRENTSTATIONCODE.Text = WW_SelectValue
+                    WF_CURRENTSTATIONCODE_TEXT.Text = WW_SelectText
+                    WF_CURRENTSTATIONCODE.Focus()
+
+                Case "WF_EXTRADINARYSTATIONCODE"               '臨時常備駅C
+                    WF_EXTRADINARYSTATIONCODE.Text = WW_SelectValue
+                    WF_EXTRADINARYSTATIONCODE_TEXT.Text = WW_SelectText
+                    WF_EXTRADINARYSTATIONCODE.Focus()
+
                 Case "WF_USERLIMIT"            '第三者使用期限
                     Dim WW_DATE As Date
                     Try
@@ -1100,6 +1120,11 @@ Public Class OIM0005TankCreate
                     Catch ex As Exception
                     End Try
                     WF_EXTRADINARYLIMIT.Focus()
+
+                Case "WF_OPERATIONBASECODE"               '運用基地
+                    WF_OPERATIONBASECODE.Text = WW_SelectValue
+                    WF_OPERATIONBASECODE_TEXT.Text = WW_SelectText
+                    WF_OPERATIONBASECODE.Focus()
 
                 Case "WF_ALLINSPECTIONDATE"             '取得年月日
                     Dim WW_DATE As Date
@@ -1229,6 +1254,12 @@ Public Class OIM0005TankCreate
                 Case "WF_LEASEENDYMD"             'リース満了年月日
                     WF_LEASEENDYMD.Focus()
 
+                Case "WF_CURRENTSTATIONCODE"               '原常備駅C
+                    WF_CURRENTSTATIONCODE.Focus()
+
+                Case "WF_EXTRADINARYSTATIONCODE"               '臨時常備駅C
+                    WF_EXTRADINARYSTATIONCODE.Focus()
+
                 Case "WF_USERLIMIT"            '第三者使用期限
                     WF_USERLIMIT.Focus()
 
@@ -1237,6 +1268,9 @@ Public Class OIM0005TankCreate
 
                 Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
                     WF_EXTRADINARYLIMIT.Focus()
+
+                Case "WF_OPERATIONBASECODE"               '運用基地
+                    WF_OPERATIONBASECODE.Focus()
 
                 Case "WF_ALLINSPECTIONDATE"             '取得年月日
                     WF_ALLINSPECTIONDATE.Focus()
@@ -2141,6 +2175,12 @@ Public Class OIM0005TankCreate
                 Case "MODEL"        '型式
                     prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STATIONPATTERN"　 '原常備駅C、臨時常備駅C
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BASE"      '運用基地
+                    prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
             End Select

@@ -63,6 +63,14 @@ Public Class OIT0002LinkDetail
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
+    Private WW_ORDERINFOALERMFLG_80 As Boolean = False                   '受注情報セット可否(警告(80:タンク車数オーバー))
+    Private WW_ORDERINFOALERM_80 As String = "80"                        '受注情報(80:タンク車数オーバー)用格納
+    Private WW_ORDERINFOALERMNAME_80 As String = "タンク車数オーバー"
+
+    Private WW_ORDERINFOALERMFLG_82 As Boolean = False                   '受注情報セット可否(警告(82:検査間近あり))
+    Private WW_ORDERINFOALERM_82 As String = "82"                        '受注情報(82:検査間近あり)用格納
+    Private WW_ORDERINFOALERMNAME_82 As String = "検査間近あり"
+
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             If IsPostBack Then
@@ -213,6 +221,8 @@ Public Class OIT0002LinkDetail
 
         '登録営業所
         TxtOrderOffice.Text = work.WF_SEL_OFFICECODE.Text
+        '利用可能日
+        AvailableYMD.Text = work.WF_SEL_AVAILABLEYMD.Text
         '本線列車
         TxtHeadOfficeTrain.Text = work.WF_SEL_TRAINNO2.Text
         '空車発駅
@@ -354,7 +364,7 @@ Public Class OIT0002LinkDetail
         '     条件指定に従い該当データを受注、受注明細等のマスタから取得する
         Dim SQLStr As String = ""
 
-        '新規登録ボタン押下
+        '登録ボタン押下
         If work.WF_SEL_CREATEFLG.Text = 1 Then
 
             SQLStr =
@@ -364,7 +374,6 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS UPDTIMSTP " _
             & " , 1                                              AS 'SELECT' " _
             & " , 0                                              AS HIDDEN " _
-            & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS INITYMD " _
             & " , ''                                             AS LINETRAINNO " _
             & " , ''                                             AS LINEORDER " _
             & " , ''                                             AS TANKNUMBER " _
@@ -380,6 +389,7 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS JRALLINSPECTIONALERT " _
             & " , ''                                             AS JRALLINSPECTIONDATE " _
             & " , ''                                             AS JRALLINSPECTIONALERTSTR " _
+            & " , @P8                                            AS AVAILABLEYMD " _
             & " , @P2                                            AS DELFLG " _
             & " , 'L' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS LINKNO " _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS LINKDETAILNO " _
@@ -393,12 +403,11 @@ Public Class OIT0002LinkDetail
         ElseIf work.WF_SEL_CREATEFLG.Text = 2 Then
             SQLStr =
               " SELECT " _
-            & "   0                                              AS LINECNT " _
-            & " , ''                                             AS OPERATION " _
-            & " , CAST(OIT0004.UPDTIMSTP AS bigint)              AS UPDTIMSTP " _
-            & " , 1                                              AS 'SELECT' " _
-            & " , 0                                              AS HIDDEN " _
-            & " , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')            AS INITYMD " _
+            & "   0                                             AS LINECNT " _
+            & " , ''                                            AS OPERATION " _
+            & " , CAST(OIT0004.UPDTIMSTP AS bigint)             AS UPDTIMSTP " _
+            & " , 1                                             AS 'SELECT' " _
+            & " , 0                                             AS HIDDEN " _
             & " , ISNULL(RTRIM(OIT0004.LINETRAINNO), '   ')     AS LINETRAINNO " _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '   ')       AS LINEORDER " _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')         AS TANKNUMBER " _
@@ -410,34 +419,35 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')     AS RETSTATIONNAME " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN '' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4 " _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4 " _
+            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>' " _
             & "   END                                                                      AS JRINSPECTIONALERT " _
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), '')               AS JRINSPECTIONDATE " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN '' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P5 " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4 " _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P6 " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P7 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P5 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4 " _
+            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P6 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P7 " _
             & "   END                                                                      AS JRINSPECTIONALERTSTR " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN '' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
+            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>' " _
             & "   END                                                                      AS JRALLINSPECTIONALERT " _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN '' " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P5 " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P6 " _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P7 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P5 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
+            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P6 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P7 " _
             & "   END                                                                      AS JRALLINSPECTIONALERTSTR " _
+            & " , ISNULL(FORMAT(OIT0004.AVAILABLEYMD, 'yyyy/MM/dd'), '')            AS AVAILABLEYMD " _
             & " , ISNULL(RTRIM(OIT0004.DELFLG), '')              AS DELFLG " _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')             AS LINKNO " _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')            AS LINKDETAILNO " _
@@ -477,9 +487,10 @@ Public Class OIT0002LinkDetail
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 7)  '空車発駅コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 7)  '空車着駅コード
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 20)  '赤丸
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20)  '黄丸
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 20)  '緑丸
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 20) '赤丸
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20) '黄丸
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 20) '緑丸
+                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 20) '利用可能日
 
                 PARA5.Value = C_INSPECTIONALERT.ALERT_RED
                 PARA6.Value = C_INSPECTIONALERT.ALERT_YELLOW
@@ -490,10 +501,12 @@ Public Class OIT0002LinkDetail
                     PARA0.Value = O_INSCNT
                     PARA3.Value = ""
                     PARA4.Value = ""
+                    PARA8.Value = ""
                 Else
                     PARA0.Value = CONST_INIT_ROWS
                     PARA3.Value = LblDepstationName.Text
                     PARA4.Value = LblRetstationName.Text
+                    PARA8.Value = AvailableYMD.Text
                 End If
 
                 If work.WF_SEL_CREATEFLG.Text = 1 Then
@@ -729,6 +742,9 @@ Public Class OIT0002LinkDetail
                 Else
                     '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                     Select Case WF_FIELD.Value
+                        '利用可能日
+                        Case "AvailableYMD"
+                            .WF_Calendar.Text = AvailableYMD.Text
                         '(予定)空車着日
                         Case "TxtEmpDate"
                             .WF_Calendar.Text = TxtEmpDate.Text
@@ -809,10 +825,12 @@ Public Class OIT0002LinkDetail
             Select Case WF_FIELD.Value
                 Case "TxtHeadOfficeTrain"
                     Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Case "AvailableYMD"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "利用可能日", needsPopUp:=True)
                 Case "TxtDepstation"
-                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "発駅", needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "空車着駅", needsPopUp:=True)
                 Case "TxtRetstation"
-                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "着駅", needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "空車発駅", needsPopUp:=True)
                 Case Else
                     Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             End Select
@@ -895,12 +913,25 @@ Public Class OIT0002LinkDetail
                 FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 '空車発駅
-                TxtDepstation.Text = WW_GetValue(2)
-                CODENAME_get("RETSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+                TxtDepstation.Text = WW_GetValue(1)
+                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
                 '空車着駅
-                TxtRetstation.Text = WW_GetValue(1)
-                CODENAME_get("DEPSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
+                TxtRetstation.Text = WW_GetValue(2)
+                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
+
+            Case "AvailableYMD"       '利用可能日
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        AvailableYMD.Text = ""
+                    Else
+                        AvailableYMD.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                AvailableYMD.Focus()
 
             Case "TxtDepstation"        '空車発駅
                 TxtDepstation.Text = WW_SelectValue
@@ -1045,6 +1076,8 @@ Public Class OIT0002LinkDetail
             Case "WF_ORG"               '運用部署
                 WF_ORG.Focus()
             Case "TxtHeadOfficeTrain"   '本線列車
+                TxtHeadOfficeTrain.Focus()
+            Case "AvailableYMD"         '利用可能日
                 TxtHeadOfficeTrain.Focus()
             Case "TxtDepstation"        '空車発駅
                 TxtDepstation.Focus()
@@ -1254,20 +1287,22 @@ Public Class OIT0002LinkDetail
             & " , '0'                                            AS UPDTIMSTP " _
             & " , 1                                              AS 'SELECT' " _
             & " , 0                                              AS HIDDEN " _
-            & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS INITYMD " _
             & " , ''                                             AS LINETRAINNO " _
             & " , ''                                             AS LINEORDER " _
             & " , ''                                             AS TANKNUMBER " _
             & " , ''                                             AS PREOILCODE " _
             & " , ''                                             AS PREOILNAME " _
-            & " , @P02                                           AS DEPSTATION " _
-            & " , @P03                                           AS RETSTATION " _
+            & " , ''                                             AS DEPSTATION " _
+            & " , @P02                                           AS DEPSTATIONNAME " _
+            & " , ''                                             AS RETSTATION " _
+            & " , @P03                                           AS RETSTATIONNAME " _
             & " , ''                                             AS JRINSPECTIONALERT " _
             & " , ''                                             AS JRINSPECTIONDATE " _
             & " , ''                                             AS JRINSPECTIONALERTSTR " _
             & " , ''                                             AS JRALLINSPECTIONALERT " _
             & " , ''                                             AS JRALLINSPECTIONDATE " _
             & " , ''                                             AS JRALLINSPECTIONALERTSTR " _
+            & " , @P04                                           AS AVAILABLEYMD " _
             & " , @P00                                           AS DELFLG" _
             & " , 'L' + FORMAT(GETDATE(),'yyyyMMdd') + @P01      AS LINKNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS LINKDETAILNO" _
@@ -1293,8 +1328,9 @@ Public Class OIT0002LinkDetail
 
                 Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表受注№
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 7)  '空車発駅コード
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 7)  '空車着駅コード
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)  '空車発駅名
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)  '空車着駅名
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)  '利用可能日
 
                 Dim strOrderNo As String = ""
                 Dim intDetailNo As Integer = 0
@@ -1305,8 +1341,9 @@ Public Class OIT0002LinkDetail
                     strOrderNo = OIT0002WKrow("LINKNO")
                     intDetailNo = OIT0002WKrow("LINKDETAILNO")
                     PARA1.Value = OIT0002WKrow("LINKNO")
-                    PARA2.Value = work.WF_SEL_DEPSTATION2.Text
-                    PARA3.Value = work.WF_SEL_RETSTATION.Text
+                    PARA2.Value = LblDepstationName.Text
+                    PARA3.Value = LblRetstationName.Text
+                    PARA4.Value = AvailableYMD.Text
                 Next
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -1548,13 +1585,13 @@ Public Class OIT0002LinkDetail
                 WW_COLUMNS.IndexOf("LINEORDER") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("TANKNUMBER") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("PREOILCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("RETSTATION") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("DEPSTATIONNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("RETSTATIONNAME") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("JRINSPECTIONALERTSTR") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("JRALLINSPECTIONALERTSTR") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("INITYMD") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("AVAILABLEYMD") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("DELFLG") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("LINKNO") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
@@ -1563,13 +1600,13 @@ Public Class OIT0002LinkDetail
                         XLSTBLrow("LINEORDER") = OIT0002row("LINEORDER") AndAlso
                         XLSTBLrow("TANKNUMBER") = OIT0002row("TANKNUMBER") AndAlso
                         XLSTBLrow("PREOILCODE") = OIT0002row("PREOILCODE") AndAlso
-                        XLSTBLrow("DEPSTATION") = OIT0002row("DEPSTATION") AndAlso
-                        XLSTBLrow("RETSTATION") = OIT0002row("RETSTATION") AndAlso
+                        XLSTBLrow("DEPSTATIONNAME") = OIT0002row("DEPSTATIONNAME") AndAlso
+                        XLSTBLrow("RETSTATIONNAME") = OIT0002row("RETSTATIONNAME") AndAlso
                         XLSTBLrow("JRINSPECTIONALERTSTR") = OIT0002row("JRINSPECTIONALERTSTR") AndAlso
                         XLSTBLrow("JRINSPECTIONDATE") = OIT0002row("JRINSPECTIONDATE") AndAlso
                         XLSTBLrow("JRALLINSPECTIONALERTSTR") = OIT0002row("JRALLINSPECTIONALERTSTR") AndAlso
                         XLSTBLrow("JRALLINSPECTIONDATE") = OIT0002row("JRALLINSPECTIONDATE") AndAlso
-                        XLSTBLrow("INITYMD") = OIT0002row("INITYMD") AndAlso
+                        XLSTBLrow("AVAILABLEYMD") = OIT0002row("AVAILABLEYMD") AndAlso
                         XLSTBLrow("DELFLG") = OIT0002row("DELFLG") AndAlso
                         XLSTBLrow("LINKNO") = OIT0002row("LINKNO") AndAlso
                         XLSTBLrow("LINKDETAILNO") = OIT0002row("LINKDETAILNO") Then
@@ -1665,18 +1702,13 @@ Public Class OIT0002LinkDetail
             End If
 
             '空車発駅
-            OIT0002INProw("DEPSTATION") = TxtDepstation.Text
+            OIT0002INProw("DEPSTATIONNAME") = LblDepstationName.Text
 
             '空車着駅
-            OIT0002INProw("RETSTATION") = TxtRetstation.Text
+            OIT0002INProw("RETSTATIONNAME") = LblRetstationName.Text
 
-            '登録日
-            If WW_COLUMNS.IndexOf("INITYMD") >= 0 Then
-                OIT0002INProw("INITYMD") = XLSTBLrow("INITYMD")
-                If OIT0002INProw("INITYMD") = "" Then
-                    OIT0002INProw("INITYMD") = Left(Date.Now, 10)
-                End If
-            End If
+            '利用可能日
+            OIT0002INProw("AVAILABLEYMD") = AvailableYMD.Text
 
             '削除フラグ
             If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
@@ -1920,6 +1952,23 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End If
 
+        '利用可能日
+        If AvailableYMD.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "利用可能日", needsPopUp:=True)
+            AvailableYMD.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+        '年月日チェック
+        WW_CheckDate(AvailableYMD.Text, "利用可能日", WW_CS0024FCHECKERR, dateErrFlag)
+        If dateErrFlag = "1" Then
+            AvailableYMD.Focus()
+            WW_CheckMES1 = "利用可能日入力エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
         '空車発駅
         If TxtDepstation.Text = "" Then
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "空車発駅", needsPopUp:=True)
@@ -2098,7 +2147,8 @@ Public Class OIT0002LinkDetail
         End If
 
         WW_ERR_MES &= ControlChars.NewLine & "  --> 登録営業所         =" & TxtOrderOffice.Text & " , "
-        WW_ERR_MES &= ControlChars.NewLine & "  --> 本社列車           =" & TxtHeadOfficeTrain.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> 本線列車           =" & TxtHeadOfficeTrain.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> 利用可能日         =" & AvailableYMD.Text & " , "
         WW_ERR_MES &= ControlChars.NewLine & "  --> 空車発駅           =" & TxtDepstation.Text & " , "
         WW_ERR_MES &= ControlChars.NewLine & "  --> 空車着駅           =" & TxtRetstation.Text & " , "
         WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)空車着日     =" & TxtEmpDate.Text & " , "
@@ -2125,7 +2175,7 @@ Public Class OIT0002LinkDetail
 
         If Not IsNothing(OIT0002row) Then
             WW_ERR_MES &= ControlChars.NewLine & "  --> 項番               =" & OIT0002row("LINECNT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 登録日             =" & OIT0002row("INITYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 利用可能日             =" & OIT0002row("AVAILABLEYMD") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 入線列車番号       =" & OIT0002row("LINETRAINNO") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 入線順             =" & OIT0002row("LINEORDER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車番号       =" & OIT0002row("TANKNUMBER") & " , "
@@ -2279,30 +2329,30 @@ Public Class OIT0002LinkDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0004_LINK" _
             & "    SET" _
-            & "          STATUS      = @P03" _
-            & "        , INFO        = @P04    , PREORDERNO       = @P05" _
-            & "        , TRAINNO     = @P06    , OFFICECODE       = @P07" _
-            & "        , DEPSTATION  = @P09    , DEPSTATIONNAME   = @P10" _
-            & "        , RETSTATION  = @P11    , RETSTATIONNAME   = @P12" _
-            & "        , EMPARRDATE  = @P13    , ACTUALEMPARRDATE = @P14" _
-            & "        , LINETRAINNO = @P15    , LINEORDER        = @P16" _
-            & "        , TANKNUMBER  = @P17    , PREOILCODE       = @P18" _
-            & "        , UPDYMD      = @P87    , UPDUSER          = @P88" _
-            & "        , UPDTERMID   = @P89    , RECEIVEYMD       = @P90" _
+            & "          AVAILABLEYMD  = @P03    , STATUS           = @P04" _
+            & "        , INFO          = @P05    , PREORDERNO       = @P06" _
+            & "        , TRAINNO       = @P07    , OFFICECODE       = @P08" _
+            & "        , DEPSTATION    = @P09    , DEPSTATIONNAME   = @P10" _
+            & "        , RETSTATION    = @P11    , RETSTATIONNAME   = @P12" _
+            & "        , EMPARRDATE    = @P13    , ACTUALEMPARRDATE = @P14" _
+            & "        , LINETRAINNO   = @P15    , LINEORDER        = @P16" _
+            & "        , TANKNUMBER    = @P17    , PREOILCODE       = @P18" _
+            & "        , UPDYMD        = @P87    , UPDUSER          = @P88" _
+            & "        , UPDTERMID     = @P89    , RECEIVEYMD       = @P90" _
             & "    WHERE" _
             & "        LINKNO            = @P01 " _
             & "        AND  LINKDETAILNO = @P02 " _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0004_LINK" _
-            & "        ( LINKNO       , LINKDETAILNO    , STATUS         , INFO                , PREORDERNO     " _
-            & "        , TRAINNO      , OFFICECODE                       , DEPSTATION          , DEPSTATIONNAME " _
-            & "        , RETSTATION   , RETSTATIONNAME  , EMPARRDATE     , ACTUALEMPARRDATE    , LINETRAINNO    " _
+            & "        ( LINKNO       , LINKDETAILNO    , AVAILABLEYMD   , STATUS            , INFO           " _
+            & "        , PREORDERNO   , TRAINNO         , OFFICECODE     , DEPSTATION        , DEPSTATIONNAME " _
+            & "        , RETSTATION   , RETSTATIONNAME  , EMPARRDATE     , ACTUALEMPARRDATE  , LINETRAINNO    " _
             & "        , LINEORDER    , TANKNUMBER      , PREOILCODE " _
             & "        , DELFLG       , INITYMD         , INITUSER       , INITTERMID " _
             & "        , UPDYMD       , UPDUSER         , UPDTERMID      , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P03, @P04, @P05" _
-            & "        , @P06, @P07,       @P09, @P10" _
+            & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15" _
             & "        , @P16, @P17, @P18" _
             & "        , @P83, @P84, @P85, @P86" _
@@ -2313,8 +2363,9 @@ Public Class OIT0002LinkDetail
         '○ 更新ジャーナル出力
         Dim SQLJnl As String =
             " SELECT" _
-            & "    LINKNO" _
+            & "      LINKNO" _
             & "    , LINKDETAILNO" _
+            & "    , AVAILABLEYMD" _
             & "    , STATUS" _
             & "    , INFO" _
             & "    , PREORDERNO" _
@@ -2348,12 +2399,12 @@ Public Class OIT0002LinkDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
-                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)  'ステータス
-                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20) '情報
-                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 11) '前回オーダー№
-                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 7)  '本線列車
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 6)  '登録営業所コード
-                'Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 20) '登録営業所名
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '利用可能日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'ステータス
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '情報
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 11) '前回オーダー№
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 7)  '本線列車
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 6)  '登録営業所コード
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 7)  '空車発駅コード
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '空車発駅名
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 7)  '空車着駅コード
@@ -2377,6 +2428,9 @@ Public Class OIT0002LinkDetail
                 Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '貨車連結順序表明細№
 
                 Dim CNT_ROWS As Long = 0
+
+                Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     '必須項目が全部空白の行はスキップする
                     If Trim(OIT0002row("LINETRAINNO")) = "" And
@@ -2388,7 +2442,7 @@ Public Class OIT0002LinkDetail
                             Trim(OIT0002row("LINEORDER")) = "" Or
                             Trim(OIT0002row("TANKNUMBER")) = "" Then
 
-                            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER" & " （入線列車番号、入線順序、タンク車番号のいずれかが未入力です）")
+                            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER" & " （入線列車番号、入線順序、タンク車番号のいずれかが未入力です）", needsPopUp:=True)
 
                             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
                             CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
@@ -2403,26 +2457,41 @@ Public Class OIT0002LinkDetail
                             Dim WW_DATENOW As DateTime = Date.Now
 
                             'DB更新
-                            PARA01.Value = work.WF_SEL_LINKNO.Text          '貨車連結順序表№
+                            PARA01.Value = work.WF_SEL_LINKNO.Text            '貨車連結順序表№
                             PARA02.Value = OIT0002row("LINKDETAILNO")         '貨車連結順序表明細№
+                            PARA03.Value = RTrim(CDate(AvailableYMD.Text).ToString("yyyy/MM/dd"))   '利用可能日
                             If work.WF_SEL_STATUS.Text <> "" Then             'ステータス
-                                PARA03.Value = work.WF_SEL_STATUS.Text
+                                PARA04.Value = work.WF_SEL_STATUS.Text
                             Else
-                                PARA03.Value = "1"
+                                PARA04.Value = "1"
                             End If
+
                             If work.WF_SEL_INFO.Text <> "" Then             '情報
-                                PARA04.Value = work.WF_SEL_INFO.Text
+                                PARA05.Value = work.WF_SEL_INFO.Text
                             Else
-                                PARA04.Value = ""
+                                PARA05.Value = ""
                             End If
+                            '受付情報が「検査間近有」の場合は優先して設定 
+                            If OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
+                                OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                                PARA05.Value = WW_ORDERINFOALERM_82
+
+                                'タンク車数が「最大牽引タンク車数」より大きい場合
+                            ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
+                                '80(タンク車数オーバー)を設定
+                                PARA05.Value = WW_ORDERINFOALERM_80
+
+                            ElseIf Integer.Parse(TxtTotalTank.Text) <= Integer.Parse(WW_GetValue(3)) Then
+                                PARA05.Value = ""
+                            End If
+
                             If work.WF_SEL_PREORDERNO.Text <> "" Then             '前回オーダー№
-                                PARA05.Value = work.WF_SEL_PREORDERNO.Text
+                                PARA06.Value = work.WF_SEL_PREORDERNO.Text
                             Else
-                                PARA05.Value = "XXXXXXXXXXX"
+                                PARA06.Value = "XXXXXXXXXXX"
                             End If
-                            PARA06.Value = TxtHeadOfficeTrain.Text         '本線列車
-                            PARA07.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
-                            'PARA08.Value = TxtOrderOffice.Text        　　　　'登録営業所名
+                            PARA07.Value = TxtHeadOfficeTrain.Text            '本線列車
+                            PARA08.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
                             PARA09.Value = TxtDepstation.Text                 '空車発駅コード
                             PARA10.Value = LblDepstationName.Text             '空車発駅名
                             PARA11.Value = TxtRetstation.Text                 '空車着駅コード
@@ -2574,7 +2643,7 @@ Public Class OIT0002LinkDetail
                 work.WF_SEL_CREATEFLG.Text = 2 'エラーが発生しなかった場合、更新モードに切り替える
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER", needsPopUp:=True)
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
@@ -2617,11 +2686,14 @@ Public Class OIT0002LinkDetail
                 & "    , ''                                                AS OPERATION " _
                 & "    , 1                                                 AS 'SELECT' " _
                 & "    , 0                                                 AS HIDDEN " _
-                & "    , ISNULL(FORMAT(OIT0004.INITYMD, 'yyyy/MM/dd'), '')    AS INITYMD " _
                 & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
                 & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                      AS STATUS " _
                 & "    , CASE WHEN ISNULL(RTRIM(OIT0004.STATUS), '') ='1' Then '利用可' Else '利用不可' End AS STATUSNOW " _
                 & "    , ISNULL(RTRIM(OIT0004.INFO), '')                      AS INFO " _
+                & "    , CASE " _
+                & "      WHEN ISNULL(RTRIM(OIT0004.INFO), '') ='80' Then 'タンク車数オーバー' " _
+                & "      WHEN  ISNULL(RTRIM(OIT0004.INFO), '') ='82' Then '検査間近あり' " _
+                & "      Else '' End AS INFONOW " _
                 & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '99999999999')                AS PREORDERNO " _
                 & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                   AS TRAINNO " _
                 & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                AS OFFICECODE " _
@@ -2640,6 +2712,7 @@ Public Class OIT0002LinkDetail
                 & "	   , SUM(CASE WHEN OIT0004.PREOILCODE <>'' Then 1 Else 0 End) AS TOTALTANK " _
                 & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
                 & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
+                & "    , ISNULL(FORMAT(OIT0004.AVAILABLEYMD, 'yyyy/MM/dd'), '')    AS AVAILABLEYMD " _
                 & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
                 & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')            AS DEPSTATION " _
                 & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')            AS RETSTATION " _
@@ -2651,8 +2724,8 @@ Public Class OIT0002LinkDetail
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.EMPARRDATE      >= @P2" _
-                & "    AND OIT0004.EMPARRDATE      <= @P3" _
+                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
+                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
@@ -2660,8 +2733,8 @@ Public Class OIT0002LinkDetail
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.EMPARRDATE      >= @P2" _
-                & "    AND OIT0004.EMPARRDATE      <= @P3" _
+                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
+                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
@@ -2670,24 +2743,23 @@ Public Class OIT0002LinkDetail
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.EMPARRDATE      >= @P2" _
-                & "    AND OIT0004.EMPARRDATE      <= @P3" _
+                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
+                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             Else
                 SQLStr &=
                   " WHERE" _
                 & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.EMPARRDATE      >= @P2" _
-                & "    AND OIT0004.EMPARRDATE      <= @P3" _
+                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
+                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
         End If
 
         SQLStr &=
               " GROUP BY " _
-            & "     INITYMD " _
-            & "     ,LINKNO " _
+            & "      LINKNO " _
             & "	    ,TRAINNO " _
             & "	    ,STATUS " _
             & "	    ,INFO " _
@@ -2697,6 +2769,7 @@ Public Class OIT0002LinkDetail
             & "	    ,RETSTATIONNAME " _
             & "	    ,EMPARRDATE " _
             & "	    ,ACTUALEMPARRDATE " _
+            & "     ,AVAILABLEYMD " _
             & "	    ,DELFLG " _
             & "	    ,DEPSTATION " _
             & "	    ,RETSTATION " _

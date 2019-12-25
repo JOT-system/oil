@@ -540,8 +540,7 @@ Public Class GRIS0005LeftBox
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_BASE
                 '運用基地
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BASE"
-                lbox = CreateFixValueList(Params, O_RTN)
+                lbox = CreateBaseList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_COLOR
                 '塗色
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "COLOR"
@@ -1051,6 +1050,35 @@ Public Class GRIS0005LeftBox
 
     '    Return If(Params.Item(C_PARAMETERS.LP_LIST), New ListBox)
     'End Function
+
+    ''' <summary>
+    ''' 基地コード一覧を作成する
+    ''' </summary>
+    ''' <param name="Params">取得用パラメータ</param>
+    ''' <param name="O_RTN">成功可否</param>
+    ''' <returns>作成した一覧情報</returns>
+    ''' <remarks></remarks>
+    Protected Function CreateBaseList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+        Dim I_COMP = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
+
+        Dim key As String = I_COMP
+        If Not LbMap.ContainsKey(key) Then
+            Dim lsbx As New ListBox
+
+            Using GL0014PLANTList As New GL0014PLANTList With {
+                   .CAMPCODE = I_COMP _
+                 , .LIST = lsbx
+                }
+                GL0014PLANTList.getList()
+                O_RTN = GL0014PLANTList.ERR
+                lsbx = GL0014PLANTList.LIST
+                Dim cnt As Long = lsbx.Rows
+                LbMap.Add(key, lsbx)
+            End Using
+        End If
+
+        Return LbMap.Item(key)
+    End Function
 
     ''' <summary>
     ''' ListBox設定共通サブ

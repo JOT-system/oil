@@ -3,7 +3,7 @@
 #WF_DEPSTATION_LABEL {
     position: fixed;
     height: 50px;
-    width: 70px;
+    width: 140px;
     top: calc(15% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
@@ -34,7 +34,7 @@
 #WF_STYMD_LABEL {
     position: fixed;
     height: 50px;
-    width: 70px;
+    width: 140px;
     top: calc(27% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
@@ -140,12 +140,6 @@
     background-repeat: no-repeat;
     background-position: 1px;
 }
-
-/* ラジオボタン*/
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
 
 .inline-radio {
     display: flex;

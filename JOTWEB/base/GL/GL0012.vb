@@ -147,8 +147,8 @@ Public Class GL0012RoleList
             SQLcmd = Nothing
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
-            CS0011LOGWRITE.INFSUBCLASS = "GL0011"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"
+            CS0011LOGWRITE.INFSUBCLASS = "GL0012"                'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0009_ROLE Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

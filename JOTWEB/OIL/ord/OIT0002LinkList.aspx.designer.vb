@@ -176,6 +176,33 @@ Partial Public Class OIT0002LinkList
     Protected WithEvents WF_LINKDETAILNO_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_AVAILABLEYMD_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVAILABLEYMD_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_AVAILABLEYMD コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVAILABLEYMD As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_AVAILABLEYMD_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVAILABLEYMD_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_STATUS_L コントロール。
     '''</summary>
     '''<remarks>
@@ -255,6 +282,33 @@ Partial Public Class OIT0002LinkList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_INFO_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INFONOW_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INFONOW_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_INFONOW コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INFONOW As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_INFONOW_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_INFONOW_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_PREORDERNO_L コントロール。

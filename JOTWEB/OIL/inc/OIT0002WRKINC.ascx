@@ -19,9 +19,11 @@
     <asp:TextBox ID="WF_SEL_CREATEFLG" runat="server"></asp:TextBox>         <!-- 作成フラグ -->
     <asp:TextBox ID="WF_SEL_LINKNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表№ -->
     <asp:TextBox ID="WF_SEL_LINKDETAILNO" runat="server"></asp:TextBox>         <!-- 貨車連結順序表明細№ -->
+    <asp:TextBox ID="WF_SEL_AVAILABLEYMD" runat="server"></asp:TextBox>         <!-- 利用可能日 -->
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>         <!-- ステータス -->
     <asp:TextBox ID="WF_SEL_STATUSNOW" runat="server"></asp:TextBox>         <!-- 表示ステータス -->
     <asp:TextBox ID="WF_SEL_INFO" runat="server"></asp:TextBox>         <!-- 情報 -->
+    <asp:TextBox ID="WF_SEL_INFONOW" runat="server"></asp:TextBox>         <!-- 表示情報 -->
     <asp:TextBox ID="WF_SEL_PREORDERNO" runat="server"></asp:TextBox>         <!-- 前回オーダー№ -->
     <asp:TextBox ID="WF_SEL_OFFICENAME" runat="server"></asp:TextBox>         <!-- 登録営業所名 -->
     <asp:TextBox ID="WF_SEL_OFFICECODE" runat="server"></asp:TextBox>         <!-- 登録営業所コード -->

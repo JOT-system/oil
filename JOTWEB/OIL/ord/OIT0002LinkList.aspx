@@ -108,6 +108,13 @@
                         <asp:TextBox ID="WF_LINKDETAILNO" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_LINKDETAILNO_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
+
+                    <!-- 利用可能日 -->
+                    <a class="ef">
+                        <asp:Label ID="WF_AVAILABLEYMD_L" runat="server" Text="利用可能日" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_AVAILABLEYMD" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_AVAILABLEYMD_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                    </a>
                 </p>
 
                 <p id="KEY_LINE_3">
@@ -130,6 +137,13 @@
                         <asp:Label ID="WF_INFO_L" runat="server" Text="情報" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_INFO" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_INFO_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                    </a>
+
+                    <!-- 表示情報 -->
+                    <a class="ef">
+                        <asp:Label ID="WF_INFONOW_L" runat="server" Text="表示情報" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_INFONOW" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_INFONOW_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
                 </p>
 

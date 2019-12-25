@@ -141,12 +141,6 @@
     background-position: 1px;
 }
 
-/* ラジオボタン*/
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
-
 .inline-radio {
     display: flex;
     border-radius: 0.1em;

@@ -438,7 +438,7 @@ Public Class OIT0002LinkSearch
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
         End If
 
     End Sub

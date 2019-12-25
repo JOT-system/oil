@@ -26,6 +26,7 @@
     }
 
 /* #################２行目 ################# */
+/* -----------------１列目 ----------------- */
 /* 本社列車(ラベル) */
 #WF_TRAIN_LABEL {
     position: fixed;
@@ -50,50 +51,38 @@
         Width: 10em;
     }
 
-/* #################３行目 ################# */
-/* -----------------１列目 ----------------- */
-/* 空車発駅(ラベル) */
-#WF_DEPSTATION_LABEL {
+/* -----------------２列目 ----------------- */
+/* 利用可能日(ラベル) */
+#WF_AVAILABLEYMD_LABEL {
     position: fixed;
-    top: 8.5em;
-    left: 2em;
+    top: 6.5em;
+    left: 48em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
 
-/*空車発駅コード */
-#WF_DEPSTATIONCODE {
+/*利用可能日 */
+#WF_AVAILABLEYMD {
     position: fixed;
-    top: 8.5em;
-    left: 10em;
+    top: 6.5em;
+    left: 57em;
     border-radius: 3px;
     padding-left: 21px;
 }
 
-    #WF_DEPSTATIONCODE input[type='text'] {
+    #WF_AVAILABLEYMD input[type='text'] {
         Height: 1.4em;
         Width: 10em;
     }
 
-/* 空車発駅名 */
-#WF_DEPSTATIONNAME {
-    position: fixed;
-    top: 8.5em;
-    left: 21em;
-}
-
-    #WF_DEPSTATIONNAME input[type=text] {
-        Height: 1.4em;
-        Width: 10em;
-    }
-
-/* -----------------２列目 ----------------- */
+/* #################３行目 ################# */
+/* -----------------１列目 ----------------- */
 /* 空車着駅(ラベル) */
 #WF_RETSTATION_LABEL {
     position: fixed;
     top: 8.5em;
-    left: 48em;
+    left: 2em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -103,7 +92,7 @@
 #WF_RETSTATIONCODE {
     position: fixed;
     top: 8.5em;
-    left: 57em;
+    left: 10em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -117,10 +106,47 @@
 #WF_RETSTATIONNAME {
     position: fixed;
     top: 8.5em;
-    left: 68em;
+    left: 21em;
 }
 
     #WF_RETSTATIONNAME input[type=text] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------２列目 ----------------- */
+/* 空車発駅(ラベル) */
+#WF_DEPSTATION_LABEL {
+    position: fixed;
+    top: 8.5em;
+    left: 48em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*空車発駅コード */
+#WF_DEPSTATIONCODE {
+    position: fixed;
+    top: 8.5em;
+    left: 57em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_DEPSTATIONCODE input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* 空車発駅名 */
+#WF_DEPSTATIONNAME {
+    position: fixed;
+    top: 8.5em;
+    left: 68em;
+}
+
+    #WF_DEPSTATIONNAME input[type=text] {
         Height: 1.4em;
         Width: 10em;
     }

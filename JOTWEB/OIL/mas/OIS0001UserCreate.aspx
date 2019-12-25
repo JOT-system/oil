@@ -87,14 +87,14 @@
                 <p id="KEY_LINE_5">
                     <!-- パスワード -->
                     <a class="ef">
-                        <asp:Label ID="WF_PASSWORD_L" runat="server" Text="パスワード" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_PASSWORD_L" runat="server" Text="パスワード" Width="15.0em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <asp:TextBox ID="WF_PASSWORD" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS" TextMode="Password"></asp:TextBox>
                         <asp:Label ID="WF_PASSWORD_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                    </a>
 
                     <!-- パスワード有効期限 -->
                     <a class="ef" ondblclick="Field_DBclick('WF_PASSENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
-                        <asp:Label ID="WF_PASSENDYMD_L" runat="server" Text="パスワード有効期限" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:Label ID="WF_PASSENDYMD_L" runat="server" Text="パスワード有効期限" Width="15.0em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <asp:TextBox ID="WF_PASSENDYMD" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS CalendarIcon"></asp:TextBox>
                         <asp:Label ID="WF_PASSENDYMD_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>

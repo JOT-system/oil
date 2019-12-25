@@ -44,8 +44,8 @@
             <asp:Label ID="WF_ORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
 
-        <!-- 発駅コード -->
-        <a id ="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
+        <!-- 空車着駅コード -->
+        <a id ="WF_DEPSTATION_LABEL" class="requiredMark">空車着駅</a>
 
         <a class="ef" id="WF_DEPSTATION" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_DEPSTATION');">
             <asp:TextBox CssClass="BoxIcon" ID="WF_DEPSTATION_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
@@ -54,8 +54,8 @@
             <asp:Label ID="WF_DEPSTATION_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
 
-        <!-- 年月日 -->
-        <a id="WF_STYMD_LABEL" class="requiredMark">年月日</a>
+        <!-- 利用可能日 -->
+        <a id="WF_STYMD_LABEL" class="requiredMark">利用可能日</a>
 
         <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox CssClass="CalendarIcon" ID="WF_STYMD_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>

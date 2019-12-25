@@ -1048,9 +1048,22 @@ Public Class OIS0001UserCreate
                 O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
             End If
 
-            'パスワード有効期限
+            'パスワード(バリデーションチェック）
+            If OIS0001INProw("PASSWORD") = "" Then
+                WW_CheckMES1 = "・パスワード入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            End If
+
+            'パスワード有効期限(バリデーションチェック）
             If OIS0001INProw("PASSENDYMD") = "" Then
-                '何もしない
+                WW_CheckMES1 = "・パスワード有効期限入力エラー。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
             Else
                 '年月日チェック
                 WW_CheckDate(OIS0001INProw("PASSENDYMD"), "パスワード有効期限", WW_CS0024FCHECKERR, dateErrFlag)
@@ -1063,7 +1076,7 @@ Public Class OIS0001UserCreate
                 End If
             End If
 
-            '開始年月日
+            '開始年月日(バリデーションチェック）
             If OIS0001INProw("STYMD") = "" Then
                 WW_CheckMES1 = "・開始年月日入力エラー。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1082,7 +1095,7 @@ Public Class OIS0001UserCreate
                 End If
             End If
 
-            '終了年月日
+            '終了年月日(バリデーションチェック）
             If OIS0001INProw("ENDYMD") = "" Then
                 WW_CheckMES1 = "・終了年月日入力エラー。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT

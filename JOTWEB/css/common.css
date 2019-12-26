@@ -1499,12 +1499,9 @@ input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
     overflow-y: hidden;
 }
 
-
-
-
-/*ボタンCSS*/
-
-
+/* ------------------------------
+共通ボタンスタイル
+------------------------------ */
 .btn-sticky {
     text-decoration: none;
     height: 25px;

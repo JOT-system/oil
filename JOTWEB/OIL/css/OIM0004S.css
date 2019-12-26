@@ -1,16 +1,16 @@
 ﻿/*左Boxオープン用虫眼鏡アイコン*/
-.BoxIcon {
+/*.BoxIcon {
     background-image: url(../img/leftbox.png);
     background-repeat: no-repeat;
     background-position: 1px;
-}
+}*/
 
 /*カレンダーオープン用アイコン*/
-.CalendarIcon {
+/*.CalendarIcon {
     background-image: url(../img/calendar.png);
     background-repeat: no-repeat;
     background-position: 1px;
-}
+}*/
 
 /* 貨物車マスタ(検索)画面 */
 /* #################１行目 ################# */
@@ -30,6 +30,16 @@
 */
     /*    font-weight:bold; 
     text-decoration:underline;*/
+}
+
+/*貨物駅コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_STATIONCODE_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
 }
 
 /*貨物駅コードinput tag*/

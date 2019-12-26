@@ -44,8 +44,12 @@
         </a>
         <!-- 営業所 -->
         <a id="WF_OFFICECODE_LABEL" class="requiredMark">営業所</a>
+        <a id="WF_OFFICECODE_ICON" onclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);">
+            <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
+        </a>
         <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
-            <asp:TextBox CssClass="BoxIcon" ID="TxtSalesOffice" runat="server" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+            <%--<asp:TextBox CssClass="BoxIcon" ID="TxtSalesOffice" runat="server" onblur="MsgClear();" MaxLength="6"></asp:TextBox>--%>
+            <asp:TextBox ID="TxtSalesOffice" runat="server" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
         </a>
         <a id="WF_OFFICECODE_TEXT" >
             <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -53,8 +57,12 @@
 
         <!-- 積込日 -->
         <a id="WF_LOADINGDATE_LABEL" class="requiredMark">積込日</a>
+        <a id="WF_LOADINGDATE_ICON" onclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+            <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
+        </a>
         <a class="ef" id="WF_LOADINGDATE" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-            <asp:TextBox CssClass="CalendarIcon" ID="TxtLoadingDateStart" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <%--<asp:TextBox CssClass="CalendarIcon" ID="TxtLoadingDateStart" runat="server" onblur="MsgClear();"></asp:TextBox>--%>
+            <asp:TextBox ID="TxtLoadingDateStart" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a id="WF_LOADINGDATE_SYMBOL">～</a>
 

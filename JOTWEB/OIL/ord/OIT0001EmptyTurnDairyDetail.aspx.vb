@@ -267,6 +267,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             '画面表示設定
             WW_ScreenEnabledSet()
 
+            '新規データの作成については、受注営業所は読取専用とする。
             TxtOrderOffice.ReadOnly = True
         Else
 

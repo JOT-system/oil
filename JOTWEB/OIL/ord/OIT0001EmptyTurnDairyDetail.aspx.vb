@@ -858,12 +858,14 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '発駅
                     If WF_FIELD.Value = "TxtDepstation" Then
-                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtDepstation.Text)
+                        'prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtDepstation.Text)
+                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", TxtDepstation.Text)
                     End If
 
                     '着駅
                     If WF_FIELD.Value = "TxtArrstation" Then
-                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtArrstation.Text)
+                        'prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtArrstation.Text)
+                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", TxtArrstation.Text)
                     End If
 
                     '荷主名

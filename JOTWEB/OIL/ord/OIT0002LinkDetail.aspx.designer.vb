@@ -77,24 +77,6 @@ Partial Public Class OIT0002LinkDetail
     Protected WithEvents AvailableYMD As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtRetstation コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtRetstation As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''LblRetstationName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents LblRetstationName As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''TxtDepstation コントロール。
     '''</summary>
     '''<remarks>
@@ -111,6 +93,24 @@ Partial Public Class OIT0002LinkDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents LblDepstationName As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtRetstation コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtRetstation As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblRetstationName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblRetstationName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''TxtEmpDate コントロール。

@@ -183,7 +183,7 @@
 
                     <!-- 承認権限ロール -->
                     <a class="ef" ondblclick="Field_DBclick('WF_APPROVALID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_APPROVALID');">
-                        <asp:Label ID="WF_APPROVALID_L" runat="server" Text="承認権限ロール" Width="15.0em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="WF_APPROVALID_L" runat="server" Text="承認権限ロール" Width="15.0em" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="WF_APPROVALID" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon"></asp:TextBox>
                         <asp:Label ID="WF_APPROVALID_TEXT" runat="server" Width="15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </a>

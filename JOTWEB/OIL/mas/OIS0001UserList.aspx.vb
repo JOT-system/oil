@@ -227,6 +227,7 @@ Public Class OIS0001UserList
 
         '会社コード
         WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+        CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
 
         '組織コード
         WF_ORG.Text = work.WF_SEL_ORG2.Text
@@ -368,14 +369,18 @@ Public Class OIS0001UserList
             & "        AND OIS0005.DELFLG  <> @P6" _
             & " WHERE" _
             & "    OIS0004.CAMPCODE    = @P1" _
-            & "    AND OIS0004.STYMD  <= @P4" _
-            & "    AND OIS0004.ENDYMD >= @P5" _
+            & "    AND OIS0004.STYMD  >= @P4" _
             & "    AND OIS0004.DELFLG <> @P6"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '組織コード
         If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
             SQLStr &= String.Format("    AND OIS0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
+        End If
+
+        '有効年月日（終了）
+        If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
+            SQLStr &= String.Format("    AND OIS0004.ENDYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
         End If
 
         SQLStr &=
@@ -387,12 +392,10 @@ Public Class OIS0001UserList
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.Date)                '有効年月日(To)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)                '有効年月日(From)
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
-                PARA4.Value = work.WF_SEL_ENDYMD.Text
-                PARA5.Value = work.WF_SEL_STYMD.Text
+                PARA4.Value = work.WF_SEL_STYMD.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -778,8 +781,7 @@ Public Class OIS0001UserList
             & "        COM.OIS0004_USER" _
             & "    WHERE" _
             & "        USERID       = @P01" _
-            & "        AND STYMD    = @P08" _
-            & "        AND CAMPCODE = @P10 ;" _
+            & "        AND STYMD    = @P08 ;" _
             & " OPEN hensuu ;" _
             & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
             & " IF (@@FETCH_STATUS = 0)" _
@@ -798,17 +800,13 @@ Public Class OIS0001UserList
             & "        , RPRTPROFID = @P16" _
             & "        , VARIANT = @P17" _
             & "        , APPROVALID = @P18" _
-            & "        , INITYMD = @P19" _
-            & "        , INITUSER = @P20" _
-            & "        , INITTERMID = @P21" _
             & "        , UPDYMD = @P22" _
             & "        , UPDUSER = @P23" _
             & "        , UPDTERMID = @P24" _
             & "        , RECEIVEYMD = @P25" _
             & "    WHERE" _
             & "        USERID       = @P01" _
-            & "        AND STYMD    = @P08" _
-            & "        AND CAMPCODE = @P10 ;" _
+            & "        AND STYMD    = @P08 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO COM.OIS0004_USER" _
             & "        (DELFLG" _
@@ -892,8 +890,7 @@ Public Class OIS0001UserList
             & "    COM.OIS0004_USER" _
             & " WHERE" _
             & "        USERID       = @P01" _
-            & "        AND STYMD    = @P08" _
-            & "        AND CAMPCODE = @P10"
+            & "        AND STYMD    = @P08"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
@@ -1117,9 +1114,6 @@ Public Class OIS0001UserList
             & "        , PASSWORD = EncryptByKey(Key_GUID('loginpasskey')  , @P05)" _
             & "        , MISSCNT = @P06" _
             & "        , PASSENDYMD = @P07" _
-            & "        , INITYMD = @P19" _
-            & "        , INITUSER = @P20" _
-            & "        , INITTERMID = @P21" _
             & "        , UPDYMD = @P22" _
             & "        , UPDUSER = @P23" _
             & "        , UPDTERMID = @P24" _
@@ -1715,7 +1709,8 @@ Public Class OIS0001UserList
             Next
 
             '○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("USERID") >= 0 Then
+            If WW_COLUMNS.IndexOf("USERID") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("STYMD") >= 0 Then
                 For Each OIS0001row As DataRow In OIS0001tbl.Rows
                     If XLSTBLrow("USERID") = OIS0001row("USERID") AndAlso
                         XLSTBLrow("STAFFNAMES") = OIS0001row("STAFFNAMES") AndAlso
@@ -2357,7 +2352,7 @@ Public Class OIS0001UserList
             'ユーザID(バリデーションチェック)
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIS0001INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "ユーザID入力エラー。"
+                WW_CheckMES1 = "ユーザID入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -2467,8 +2462,7 @@ Public Class OIS0001UserList
             'KEY項目が等しい時
             For Each OIS0001row As DataRow In OIS0001tbl.Rows
                 If OIS0001row("USERID") = OIS0001INProw("USERID") AndAlso
-                    OIS0001row("STYMD") = OIS0001INProw("STYMD") AndAlso
-                    OIS0001row("ENDYMD") = OIS0001INProw("ENDYMD") Then
+                    OIS0001row("STYMD") = OIS0001INProw("STYMD") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
                     If OIS0001row("DELFLG") = OIS0001INProw("DELFLG") AndAlso
                         OIS0001row("STAFFNAMES") = OIS0001INProw("STAFFNAMES") AndAlso
@@ -2477,6 +2471,7 @@ Public Class OIS0001UserList
                         OIS0001row("PASSWORD") = OIS0001INProw("PASSWORD") AndAlso
                         OIS0001row("MISSCNT") = OIS0001INProw("MISSCNT") AndAlso
                         OIS0001row("PASSENDYMD") = OIS0001INProw("PASSENDYMD") AndAlso
+                        OIS0001row("ENDYMD") = OIS0001INProw("ENDYMD") AndAlso
                         OIS0001row("CAMPCODE") = OIS0001INProw("CAMPCODE") AndAlso
                         OIS0001row("ORG") = OIS0001INProw("ORG") AndAlso
                         OIS0001row("EMAIL") = OIS0001INProw("EMAIL") AndAlso
@@ -2526,7 +2521,8 @@ Public Class OIS0001UserList
         For Each OIS0001row As DataRow In OIS0001tbl.Rows
 
             '同一レコードか判定
-            If OIS0001INProw("USERID") = OIS0001row("USERID") Then
+            If OIS0001INProw("USERID") = OIS0001row("USERID") AndAlso
+                OIS0001INProw("STYMD") = OIS0001row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIS0001INProw("LINECNT") = OIS0001row("LINECNT")
                 OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -2578,18 +2574,19 @@ Public Class OIS0001UserList
         For Each OIS0001row As DataRow In OIS0001tbl.Rows
 
             '同一レコードか判定
-            If OIS0001INProw("USERID") = OIS0001row("USERID") Then
+            If OIS0001INProw("USERID") = OIS0001row("USERID") AndAlso
+                OIS0001INProw("STYMD") = OIS0001row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIS0001INProw("LINECNT") = OIS0001row("LINECNT")
-                OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-                OIS0001INProw("UPDTIMSTP") = OIS0001row("UPDTIMSTP")
-                OIS0001INProw("SELECT") = 1
-                OIS0001INProw("HIDDEN") = 0
+                    OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    OIS0001INProw("UPDTIMSTP") = OIS0001row("UPDTIMSTP")
+                    OIS0001INProw("SELECT") = 1
+                    OIS0001INProw("HIDDEN") = 0
 
-                '項目テーブル項目設定
-                OIS0001row.ItemArray = OIS0001INProw.ItemArray
-                Exit For
-            End If
+                    '項目テーブル項目設定
+                    OIS0001row.ItemArray = OIS0001INProw.ItemArray
+                    Exit For
+                End If
         Next
 
     End Sub

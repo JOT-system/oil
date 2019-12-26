@@ -201,9 +201,11 @@ Public Class OIM0005TankCreate
 
         '原常備駅C
         WF_CURRENTSTATIONCODE.Text = work.WF_SEL_CURRENTSTATIONCODE.Text
+        CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
 
         '臨時常備駅C
         WF_EXTRADINARYSTATIONCODE.Text = work.WF_SEL_EXTRADINARYSTATIONCODE.Text
+        CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
 
         '第三者使用期限
         WF_USERLIMIT.Text = work.WF_SEL_USERLIMIT.Text
@@ -222,6 +224,7 @@ Public Class OIM0005TankCreate
 
         '運用基地C
         WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE.Text
+        CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
 
         '塗色C
         WF_COLORCODE.Text = work.WF_SEL_COLORCODE.Text
@@ -1006,7 +1009,7 @@ Public Class OIM0005TankCreate
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
         End If
 
     End Sub
@@ -1403,25 +1406,15 @@ Public Class OIM0005TankCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            'JOT車番(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIM0005INProw("TANKNUMBER"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '値存在チェック
-                CODENAME_get("TANKNUMBER", OIM0005INProw("TANKNUMBER"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・JOT車番入力エラーです。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-            Else
-                WW_CheckMES1 = "・JOT車番入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''JOT車番(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIM0005INProw("TANKNUMBER"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "JOT車番入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
             '原籍所有者C(バリデーションチェック)
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE", OIM0005INProw("ORIGINOWNERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -1795,10 +1788,9 @@ Public Class OIM0005TankCreate
                 End Using
 
                 If Not isNormal(WW_UniqueKeyCHECK) Then
-                    WW_CheckMES1 = "一意制約違反。"
+                    WW_CheckMES1 = "一意制約違反（JOT車番）。"
                     WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
-                                       "([" & OIM0005INProw("TANKNUMBER") & "]" &
-                                       " [" & OIM0005INProw("MODEL") & "])"
+                                       "([" & OIM0005INProw("TANKNUMBER") & "]"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR

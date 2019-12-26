@@ -908,9 +908,6 @@ Public Class OIM0005TankList
             & "        , FUJITANKNUMBER = @P55" _
             & "        , SHELLTANKNUMBER = @P56" _
             & "        , RESERVE3 = @P57" _
-            & "        , INITYMD = @P58" _
-            & "        , INITUSER = @P59" _
-            & "        , INITTERMID = @P60" _
             & "        , UPDYMD = @P61" _
             & "        , UPDUSER = @P62" _
             & "        , UPDTERMID = @P63" _

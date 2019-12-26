@@ -162,11 +162,7 @@ Public Class OIS0001UserSearch
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE_CODE.Text        '会社コード
         work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text              '有効年月日(From)
-        If WF_ENDYMD_CODE.Text = "" Then
-            work.WF_SEL_ENDYMD.Text = WF_STYMD_CODE.Text         '有効年月日(From) → 有効年月日(To)
-        Else
-            work.WF_SEL_ENDYMD.Text = WF_ENDYMD_CODE.Text        '有効年月日(To)
-        End If
+        work.WF_SEL_ENDYMD.Text = WF_ENDYMD_CODE.Text            '有効年月日(To)
         work.WF_SEL_ORG.Text = WF_ORG_CODE.Text                  '組織コード
 
         '○ 画面レイアウト設定
@@ -243,7 +239,7 @@ Public Class OIS0001UserSearch
         WW_CheckDate(WF_STYMD_CODE.Text, "有効年月日（開始）", WW_CS0024FCHECKERR, dateErrFlag)
         If dateErrFlag = "1" Then
             WF_STYMD_CODE.Focus()
-            WW_CheckMES1 = "有効年月日（開始）入力エラー。"
+            WW_CheckMES1 = "有効年月日（開始）入力エラーです。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             O_RTN = "ERR"
             Exit Sub
@@ -263,7 +259,7 @@ Public Class OIS0001UserSearch
             WW_CheckDate(WF_ENDYMD_CODE.Text, "有効年月日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
             If dateErrFlag = "1" Then
                 WF_ENDYMD_CODE.Focus()
-                WW_CheckMES1 = "有効年月日(終了)入力エラー。"
+                WW_CheckMES1 = "有効年月日(終了)入力エラーです。"
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 O_RTN = "ERR"
                 Exit Sub

@@ -1,6 +1,6 @@
 ﻿/* 貨車連結順序表検索画面*/
-/*空車発駅コード見出し*/
-#WF_DEPSTATION_LABEL {
+/*空車着駅コード見出し*/
+#WF_RETSTATION_LABEL {
     position: fixed;
     height: 50px;
     width: 140px;
@@ -9,8 +9,8 @@
     color: #737373;
 }
 
-/*空車発駅コードinput tag*/
-#WF_DEPSTATION {
+/*空車着駅コードinput tag*/
+#WF_RETSTATION {
     position: fixed;
     height: 50px;
     width: 140px;
@@ -18,13 +18,13 @@
     left: calc(46% - 140px/2);
 }
 
-    #WF_DEPSTATION input[type='text'] {
+    #WF_RETSTATION input[type='text'] {
         Height: 2.1em;
         Width: 10em;
     }
 
-/*空車発駅名称*/
-#WF_DEPSTATION_TEXT {
+/*空車着駅名称*/
+#WF_RETSTATION_TEXT {
     position: fixed;
     top: calc(20% - 50px/2);
     left: calc(55% - 50px/2);

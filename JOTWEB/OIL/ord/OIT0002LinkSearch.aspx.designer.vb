@@ -50,22 +50,40 @@ Partial Public Class OIT0002LinkSearch
     Protected WithEvents WF_ORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_DEPSTATION_CODE コントロール。
+    '''WF_RETSTATION_CODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEPSTATION_CODE As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_RETSTATION_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_DEPSTATION_NAME コントロール。
+    '''WF_RETSTATION_NAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEPSTATION_NAME As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_RETSTATION_NAME As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TextBox1 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TextBox1 As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''Label1 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents Label1 As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_STYMD_CODE コントロール。

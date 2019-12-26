@@ -171,7 +171,14 @@
                         <asp:Label ID="WF_OFFICECODE_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
 
-                    <!-- 空車発駅コード -->
+                    <!-- 登録営業所 -->
+                    <a class="ef">
+                        <asp:Label ID="WF_OFFICENAME_L" runat="server" Text="登録営業所" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_OFFICENAME" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:Label ID="WF_OFFICENAME_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
+                    </a>
+
+                    <!-- 空車発駅（着駅）コード -->
                     <a class="ef">
                         <asp:Label ID="WF_DEPSTATION_L" runat="server" Text="空車発駅コード" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_DEPSTATION" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
@@ -180,14 +187,14 @@
                 </p>
 
                 <p id="KEY_LINE_6">
-                    <!-- 空車発駅名 -->
+                    <!-- 空車発駅（着駅）名 -->
                     <a class="ef">
                         <asp:Label ID="WF_DEPSTATIONNAME_L" runat="server" Text="空車発駅名" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_DEPSTATIONNAME" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
                         <asp:Label ID="WF_DEPSTATIONNAME_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
 
-                    <!-- 空車着駅コード -->
+                    <!-- 空車着駅（発駅）コード -->
                     <a class="ef">
                         <asp:Label ID="WF_RETSTATION_L" runat="server" Text="空車着駅コード" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_RETSTATION" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
@@ -196,7 +203,7 @@
                 </p>
 
                 <p id="KEY_LINE_7">
-                    <!-- 空車着駅名 -->
+                    <!-- 空車着駅（発駅）名 -->
                     <a class="ef">
                         <asp:Label ID="WF_RETSTATIONNAME_L" runat="server" Text="空車着駅名" Width="10.0em" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_RETSTATIONNAME" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>

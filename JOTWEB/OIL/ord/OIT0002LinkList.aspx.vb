@@ -207,8 +207,8 @@ Public Class OIT0002LinkList
         ''選択行
         'WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        '空車発駅
-        WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION2.Text
+        '空車着駅（発駅）コード
+        WF_RETSTATION.Text = work.WF_SEL_RETSTATION2.Text
 
         '本線列車
         WF_TRAINNO.Text = work.WF_SEL_TRAINNO2.Text
@@ -240,13 +240,16 @@ Public Class OIT0002LinkList
         '登録営業所コード
         WF_OFFICECODE.Text = work.WF_SEL_OFFICECODE.Text
 
-        '空車発駅名
+        ''登録営業所
+        'WF_OFFICENAME.Text = work.WF_SEL_OFFICENAME.Text
+
+        '空車発駅（着駅）コード
+        WF_DEPSTATION.Text = work.WF_SEL_DEPSTATION.Text
+
+        '空車発駅（着駅）名
         WF_DEPSTATIONNAME.Text = work.WF_SEL_DEPSTATIONNAME.Text
 
-        '空車着駅コード
-        WF_RETSTATION.Text = work.WF_SEL_RETSTATION.Text
-
-        '空車着駅名
+        '空車着駅（発駅）名
         WF_RETSTATIONNAME.Text = work.WF_SEL_RETSTATIONNAME.Text
 
         '空車着日（予定）
@@ -388,18 +391,16 @@ Public Class OIT0002LinkList
             If work.WF_SEL_SELECT.Text = "1" Then
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             Else
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
@@ -407,19 +408,23 @@ Public Class OIT0002LinkList
             If work.WF_SEL_SELECT.Text = "1" Then
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             Else
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
+        End If
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '有効年月日（終了）
+        If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
+            SQLStr &= String.Format("    AND OIT0004.AVAILABLEYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
         End If
 
         SQLStr &=
@@ -443,16 +448,14 @@ Public Class OIT0002LinkList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 7)         '空車発駅コード
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 7)         '空車着駅（発駅）コード
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.Date)                '有効年月日(To)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Date)                '有効年月日(From)
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)         '本線列車
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 1)         'ステータス
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
-                PARA1.Value = work.WF_SEL_DEPSTATION.Text
+                PARA1.Value = work.WF_SEL_RETSTATION.Text
                 PARA2.Value = work.WF_SEL_STYMD.Text
-                PARA3.Value = work.WF_SEL_ENDYMD.Text
                 PARA4.Value = work.WF_SEL_TRAINNO.Text
                 PARA5.Value = work.WF_SEL_SELECT.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
@@ -772,8 +775,8 @@ Public Class OIT0002LinkList
 
         Dim WW_RESULT As String = ""
 
-        '○関連チェック
-        RelatedCheck(WW_ERRCODE)
+        ''○関連チェック
+        'RelatedCheck(WW_ERRCODE)
 
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
@@ -818,46 +821,46 @@ Public Class OIT0002LinkList
     ''' <remarks></remarks>
     Protected Sub RelatedCheck(ByRef O_RTNCODE As String)
 
-        '○初期値設定
-        O_RTNCODE = C_MESSAGE_NO.NORMAL
+        ''○初期値設定
+        'O_RTNCODE = C_MESSAGE_NO.NORMAL
 
-        Dim WW_LINEERR_SW As String = ""
-        Dim WW_DUMMY As String = ""
-        Dim WW_CheckMES1 As String = ""
-        Dim WW_CheckMES2 As String = ""
-        Dim WW_LINE_ERR As String = ""
-        Dim WW_CheckMES As String = ""
+        'Dim WW_LINEERR_SW As String = ""
+        'Dim WW_DUMMY As String = ""
+        'Dim WW_CheckMES1 As String = ""
+        'Dim WW_CheckMES2 As String = ""
+        'Dim WW_LINE_ERR As String = ""
+        'Dim WW_CheckMES As String = ""
 
-        '○ 日付重複チェック
-        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+        ''○ 日付重複チェック
+        'For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
-            '読み飛ばし
-            If (OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING AndAlso
-                OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED) OrElse
-                OIT0002row("DELFLG") = C_DELETE_FLG.DELETE Then
-                Continue For
-            End If
+        '    '読み飛ばし
+        '    If (OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING AndAlso
+        '        OIT0002row("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED) OrElse
+        '        OIT0002row("DELFLG") = C_DELETE_FLG.DELETE Then
+        '        Continue For
+        '    End If
 
-            WW_LINE_ERR = ""
+        '    WW_LINE_ERR = ""
 
-            'チェック
-            For Each OIT0002Dhk As DataRow In OIT0002tbl.Rows
+        '    'チェック
+        '    For Each OIT0002Dhk As DataRow In OIT0002tbl.Rows
 
-                '同一KEY以外は読み飛ばし
-                If OIT0002row("CAMPCODE") <> OIT0002Dhk("CAMPCODE") OrElse
-                    OIT0002row("DEPSTATION") <> OIT0002Dhk("DEPSTATION") OrElse
-                    OIT0002row("TRAINNO") <> OIT0002Dhk("TRAINNO") OrElse
-                    OIT0002Dhk("DELFLG") = C_DELETE_FLG.DELETE Then
-                    Continue For
-                End If
-            Next
+        '        '同一KEY以外は読み飛ばし
+        '        If OIT0002row("CAMPCODE") <> OIT0002Dhk("CAMPCODE") OrElse
+        '            OIT0002row("RETSTATION") <> OIT0002Dhk("RETSTATION") OrElse
+        '            OIT0002row("TRAINNO") <> OIT0002Dhk("TRAINNO") OrElse
+        '            OIT0002Dhk("DELFLG") = C_DELETE_FLG.DELETE Then
+        '            Continue For
+        '        End If
+        '    Next
 
-            If WW_LINE_ERR = "" Then
-                OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-            Else
-                OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-            End If
-        Next
+        '    If WW_LINE_ERR = "" Then
+        '        OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+        '    Else
+        '        OIT0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+        '    End If
+        'Next
 
     End Sub
 
@@ -961,10 +964,10 @@ Public Class OIT0002LinkList
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 11) '前回オーダー№
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 7)  '本線列車
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 6)  '登録営業所コード
-                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 7)  '空車発駅コード
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '空車発駅名
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 7)  '空車着駅コード
-                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 40) '空車着駅名
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 7)  '空車発駅（着駅）コード
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '空車発駅（着駅）名
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 7)  '空車着駅（発駅）コード
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 40) '空車着駅（発駅）名
                 Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Date)         '空車着日（予定）
                 Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.Date)         '空車着日（実績）
                 Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 4)  '入線列車番号
@@ -1170,16 +1173,19 @@ Public Class OIT0002LinkList
         '登録営業所コード
         work.WF_SEL_OFFICECODE.Text = ""
 
-        '空車発駅コード
-        work.WF_SEL_DEPSTATION2.Text = ""
+        ''登録営業所
+        'work.WF_SEL_OFFICENAME.Text = ""
 
-        '空車発駅名
+        '空車発駅（着駅）コード
+        work.WF_SEL_DEPSTATION.Text = ""
+
+        '空車発駅（着駅）名
         work.WF_SEL_DEPSTATIONNAME.Text = ""
 
-        '空車着駅コード
-        work.WF_SEL_RETSTATION.Text = ""
+        '空車着駅（発駅）コード
+        work.WF_SEL_RETSTATION2.Text = ""
 
-        '空車着駅名
+        '空車着駅（発駅）名
         work.WF_SEL_RETSTATIONNAME.Text = ""
 
         '空車着日（予定）
@@ -1344,16 +1350,19 @@ Public Class OIT0002LinkList
         '登録営業所コード
         work.WF_SEL_OFFICECODE.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")
 
-        '空車発駅コード
-        work.WF_SEL_DEPSTATION2.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
+        ''登録営業所
+        'work.WF_SEL_OFFICENAME.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")
 
-        '空車発駅名
+        '空車発駅（着駅）コード
+        work.WF_SEL_DEPSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATION")
+
+        '空車発駅（着駅）名
         work.WF_SEL_DEPSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
 
-        '空車着駅コード
-        work.WF_SEL_RETSTATION.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
+        '空車着駅（発駅）コード
+        work.WF_SEL_RETSTATION2.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATION")
 
-        '空車着駅名
+        '空車着駅（発駅）名
         work.WF_SEL_RETSTATIONNAME.Text = OIT0002tbl.Rows(WW_LINECNT)("RETSTATIONNAME")
 
         '空車着日（予定）
@@ -1528,7 +1537,7 @@ Public Class OIT0002LinkList
     '        Next
 
     '        ''○ 変更元情報をデフォルト設定
-    '        If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 AndAlso
+    '        If WW_COLUMNS.IndexOf("RETSTATION") >= 0 AndAlso
     '            WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
     '            For Each OIT0002row As DataRow In OIT0002tbl.Rows
     '                If XLSTBLrow("LINKNO") = OIT0002row("LINKNO") AndAlso
@@ -1589,22 +1598,22 @@ Public Class OIT0002LinkList
     '            OIT0002INProw("OFFICECODE") = XLSTBLrow("OFFICECODE")
     '        End If
 
-    '        '空車発駅コード
+    '        '空車発駅（着駅）コード
     '        If WW_COLUMNS.IndexOf("DEPSTATION") >= 0 Then
     '            OIT0002INProw("DEPSTATION") = XLSTBLrow("DEPSTATION")
     '        End If
 
-    '        '空車発駅名
+    '        '空車発駅（着駅）名
     '        If WW_COLUMNS.IndexOf("DEPSTATIONNAME") >= 0 Then
     '            OIT0002INProw("DEPSTATIONNAME") = XLSTBLrow("DEPSTATIONNAME")
     '        End If
 
-    '        '空車着駅コード
+    '        '空車着駅（発駅）コード
     '        If WW_COLUMNS.IndexOf("RETSTATION") >= 0 Then
     '            OIT0002INProw("RETSTATION") = XLSTBLrow("RETSTATION")
     '        End If
 
-    '        '空車着駅名
+    '        '空車着駅（発駅）名
     '        If WW_COLUMNS.IndexOf("RETSTATIONNAME") >= 0 Then
     '            OIT0002INProw("RETSTATIONNAME") = XLSTBLrow("RETSTATIONNAME")
     '        End If
@@ -1809,13 +1818,13 @@ Public Class OIT0002LinkList
 
         OIT0002INProw("OFFICECODE") = WF_OFFICECODE.Text              '登録営業所コード
 
-        OIT0002INProw("DEPSTATION") = WF_DEPSTATION.Text              '空車発駅コード
+        OIT0002INProw("DEPSTATION") = WF_DEPSTATION.Text              '空車発駅（着駅）コード
 
-        OIT0002INProw("DEPSTATIONNAME") = WF_DEPSTATIONNAME.Text              '空車発駅名
+        OIT0002INProw("DEPSTATIONNAME") = WF_DEPSTATIONNAME.Text              '空車発駅（着駅）名
 
-        OIT0002INProw("RETSTATION") = WF_RETSTATION.Text              '空車着駅コード
+        OIT0002INProw("RETSTATION") = WF_RETSTATION.Text              '空車着駅（発駅）コード
 
-        OIT0002INProw("RETSTATIONNAME") = WF_RETSTATIONNAME.Text              '空車着駅名
+        OIT0002INProw("RETSTATIONNAME") = WF_RETSTATIONNAME.Text              '空車着駅（発駅）名
 
         OIT0002INProw("EMPARRDATE") = WF_EMPARRDATE.Text              '空車着日（予定）
 
@@ -1902,10 +1911,10 @@ Public Class OIT0002LinkList
         WF_PREORDERNO.Text = ""            '前回オーダー№
         WF_TRAINNO.Text = ""            '本線列車
         WF_OFFICECODE.Text = ""            '登録営業所コード
-        WF_DEPSTATION.Text = ""            '空車発駅コード
-        WF_DEPSTATIONNAME.Text = ""            '空車発駅名
-        WF_RETSTATION.Text = ""            '空車着駅コード
-        WF_RETSTATIONNAME.Text = ""            '空車着駅名
+        WF_DEPSTATION.Text = ""            '空車発駅（着駅）コード
+        WF_DEPSTATIONNAME.Text = ""            '空車発駅（着駅）名
+        WF_RETSTATION.Text = ""            '空車着駅（発駅）コード
+        WF_RETSTATIONNAME.Text = ""            '空車着駅（発駅）名
         WF_EMPARRDATE.Text = ""            '空車着日（予定）
         WF_ACTUALEMPARRDATE.Text = ""            '空車着日（実績）
         WF_LINETRAINNO.Text = ""            '入線列車番号
@@ -2256,17 +2265,17 @@ Public Class OIT0002LinkList
 
             'KEY項目が等しい時
             For Each OIT0002row As DataRow In OIT0002tbl.Rows
-                If OIT0002row("TRAINNO") = OIT0002INProw("TRAINNO") AndAlso
-                    OIT0002row("DEPSTATION") = OIT0002INProw("DEPSTATION") Then
+                If OIT0002row("LINKNO") = OIT0002INProw("LINKNO") AndAlso
+                         OIT0002row("LINKDETAILNO") = OIT0002INProw("LINKDETAILNO") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
                     If OIT0002row("DELFLG") = OIT0002INProw("DELFLG") AndAlso
-                        OIT0002row("LINKNO") = OIT0002INProw("LINKNO") AndAlso
-                        OIT0002row("LINKDETAILNO") = OIT0002INProw("LINKDETAILNO") AndAlso
                         OIT0002row("AVAILABLEYMD") = OIT0002INProw("AVAILABLEYMD") AndAlso
                         OIT0002row("STATUS") = OIT0002INProw("STATUS") AndAlso
                         OIT0002row("INFO") = OIT0002INProw("INFO") AndAlso
                         OIT0002row("PREORDERNO") = OIT0002INProw("PREORDERNO") AndAlso
+                        OIT0002row("TRAINNO") = OIT0002INProw("TRAINNO") AndAlso
                         OIT0002row("OFFICECODE") = OIT0002INProw("OFFICECODE") AndAlso
+                        OIT0002row("DEPSTATION") = OIT0002INProw("DEPSTATION") AndAlso
                         OIT0002row("DEPSTATIONNAME") = OIT0002INProw("DEPSTATIONNAME") AndAlso
                         OIT0002row("RETSTATION") = OIT0002INProw("RETSTATION") AndAlso
                         OIT0002row("RETSTATIONNAME") = OIT0002INProw("RETSTATIONNAME") AndAlso
@@ -2316,7 +2325,8 @@ Public Class OIT0002LinkList
         For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
             '同一レコードか判定
-            If OIT0002INProw("LINKNO") = OIT0002row("LINKNO") Then
+            If OIT0002INProw("LINKNO") = OIT0002row("LINKNO") AndAlso
+                OIT0002INProw("LINKDETAILNO") = OIT0002row("LINKDETAILNO") Then
                 '画面入力テーブル項目設定
                 OIT0002INProw("LINECNT") = OIT0002row("LINECNT")
                 OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -2368,7 +2378,8 @@ Public Class OIT0002LinkList
         For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
             '同一レコードか判定
-            If OIT0002INProw("USERID") = OIT0002row("USERID") Then
+            If OIT0002INProw("LINKNO") = OIT0002row("LINKNO") AndAlso
+                OIT0002INProw("LINKDETAILNO") = OIT0002row("LINKDETAILNO") Then
                 '画面入力テーブル項目設定
                 OIT0002INProw("LINECNT") = OIT0002row("LINECNT")
                 OIT0002INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
@@ -2410,6 +2421,9 @@ Public Class OIT0002LinkList
 
                 Case "DELFLG"           '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+
+                Case "SALESOFFICE"      '登録営業所
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

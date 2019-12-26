@@ -392,6 +392,33 @@ Partial Public Class OIT0002LinkList
     Protected WithEvents WF_OFFICECODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_OFFICENAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OFFICENAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_OFFICENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OFFICENAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_OFFICENAME_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_OFFICENAME_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_DEPSTATION_L コントロール。
     '''</summary>
     '''<remarks>

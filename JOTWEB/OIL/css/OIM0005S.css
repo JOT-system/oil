@@ -20,10 +20,19 @@
     left: calc(46% - 140px/2);
 }
 
-    #WF_TANKNUMBER input[type='text'] {
-        Height: 2.1em;
-        Width: 10em;
-    }
+#WF_TANKNUMBER input[type='text'] {
+    Height: 2.1em;
+    Width: 10em;
+}
+
+/*左Boxオープン用虫眼鏡アイコン ※ワンクリック用*/
+#WF_TANKNUMBER_ICON {
+    position: fixed;
+    height: 50px;
+    width: 50px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+}
 
 /*JOT車番名称*/
 #WF_TANKNUMBER_TEXT {
@@ -51,10 +60,19 @@
     left: calc(46% - 140px/2);
 }
 
-    #WF_MODEL input[type='text'] {
+#WF_MODEL input[type='text'] {
         Height: 2.1em;
         Width: 10em;
-    }
+}
+
+/*左Boxオープン用虫眼鏡アイコン ※ワンクリック用*/
+#WF_MODEL_ICON {
+    position: fixed;
+    height: 50px;
+    width: 50px;
+    top: calc(32.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+}
 
 /*左Boxオープン用虫眼鏡アイコン*/
 .BoxIcon {

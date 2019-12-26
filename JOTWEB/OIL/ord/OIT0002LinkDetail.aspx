@@ -67,21 +67,22 @@
             <a class="ef" id="WF_AVAILABLEYMD" ondblclick="Field_DBclick('AvailableYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox CssClass="CalendarIcon" ID="AvailableYMD" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
-            <!-- ■　空車着駅　■ -->
-            <a id="WF_RETSTATION_LABEL" class="requiredMark">空車着駅</a>
-            <a class="ef" id="WF_RETSTATIONCODE" ondblclick="Field_DBclick('TxtRetstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtRetstation');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtRetstation" runat="server" onblur="MsgClear();"></asp:TextBox>
-            </a>
-            <a id="WF_RETSTATIONNAME">
-                <asp:Label ID="LblRetstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
-            </a>
-            <!-- ■　空車発駅　■ -->
+
+            <!-- ■　空車発駅（着駅）　■ -->
             <a id="WF_DEPSTATION_LABEL" class="requiredMark">空車発駅</a>
             <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
                 <asp:TextBox CssClass="BoxIcon" ID="TxtDepstation" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <a id="WF_DEPSTATIONNAME">
                 <asp:Label ID="LblDepstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
+            </a>
+            <!-- ■　空車着駅（発駅）　■ -->
+            <a id="WF_RETSTATION_LABEL" class="requiredMark">空車着駅</a>
+            <a class="ef" id="WF_RETSTATIONCODE" ondblclick="Field_DBclick('TxtRetstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtRetstation');">
+                <asp:TextBox CssClass="BoxIcon" ID="TxtRetstation" runat="server" onblur="MsgClear();"></asp:TextBox>
+            </a>
+            <a id="WF_RETSTATIONNAME">
+                <asp:Label ID="LblRetstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
             </a>
             
             <!-- ■　(予定)空車着日　■ -->

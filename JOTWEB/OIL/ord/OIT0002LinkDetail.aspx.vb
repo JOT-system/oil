@@ -219,16 +219,16 @@ Public Class OIT0002LinkDetail
         'Grid情報保存先のファイル名
         Master.CreateXMLSaveFile()
 
-        '登録営業所
-        TxtOrderOffice.Text = work.WF_SEL_OFFICECODE.Text
+        ''登録営業所
+        'TxtOrderOffice.Text = work.WF_SEL_OFFICENAME.Text
         '利用可能日
         AvailableYMD.Text = work.WF_SEL_AVAILABLEYMD.Text
         '本線列車
         TxtHeadOfficeTrain.Text = work.WF_SEL_TRAINNO2.Text
-        '空車発駅
-        TxtDepstation.Text = work.WF_SEL_DEPSTATION2.Text
-        '空車着駅
-        TxtRetstation.Text = work.WF_SEL_RETSTATION.Text
+        '空車発駅（着駅）
+        TxtDepstation.Text = work.WF_SEL_DEPSTATION.Text
+        '空車着駅（発駅）
+        TxtRetstation.Text = work.WF_SEL_RETSTATION2.Text
         '空車着日（予定）
         TxtEmpDate.Text = work.WF_SEL_EMPARRDATE.Text
         '空車着日（実績）
@@ -271,9 +271,9 @@ Public Class OIT0002LinkDetail
         '登録営業所
         CODENAME_get("SALESOFFICE", work.WF_SEL_OFFICECODE.Text, TxtOrderOffice.Text, WW_DUMMY)
         'work.WF_SEL_OFFICECODE.Text = TxtOrderOffice.Text
-        '空車発駅
+        '空車発駅（着駅）
         CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
-        '空車着駅
+        '空車着駅（発駅）
         CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
 
     End Sub
@@ -724,13 +724,13 @@ Public Class OIT0002LinkDetail
                         Case "TxtHeadOfficeTrain"
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, TxtHeadOfficeTrain.Text)
 
-                        '空車発駅
+                        '空車発駅（着駅）
                         Case "TxtDepstation"
-                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text, TxtDepstation.Text)
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text + "2", TxtDepstation.Text)
 
-                        '空車着駅
+                        '空車着駅（発駅）
                         Case "TxtRetstation"
-                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text, TxtRetstation.Text)
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text + "1", TxtRetstation.Text)
 
                         'タンク車№
                         Case "TANKNUMBER"
@@ -802,19 +802,19 @@ Public Class OIT0002LinkDetail
                 Dim WW_GetValue() As String = {"", "", "", "", ""}
                 FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
-                '空車発駅
-                TxtDepstation.Text = WW_GetValue(1)
-                CODENAME_get("RETSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
-                '空車着駅
-                TxtRetstation.Text = WW_GetValue(2)
-                CODENAME_get("DEPSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
+                '空車発駅（着駅）
+                TxtDepstation.Text = WW_GetValue(2)
+                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+                '空車着駅（発駅）
+                TxtRetstation.Text = WW_GetValue(1)
+                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
-            '空車発駅
+            '空車発駅（着駅）
             Case "TxtDepstation"
-                CODENAME_get("RETSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_RTN_SW)
-            '空車着駅
+                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_RTN_SW)
+            '空車着駅（発駅）
             Case "TxtRetstation"
-                CODENAME_get("DEPSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_RTN_SW)
+                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_RTN_SW)
 
         End Select
 
@@ -824,15 +824,15 @@ Public Class OIT0002LinkDetail
         Else
             Select Case WF_FIELD.Value
                 Case "TxtHeadOfficeTrain"
-                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, "登録営業所")
                 Case "AvailableYMD"
-                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "利用可能日", needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "利用可能日")
                 Case "TxtDepstation"
-                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "空車着駅", needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "空車発駅")
                 Case "TxtRetstation"
-                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "空車発駅", needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "空車着駅")
                 Case Else
-                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
             End Select
         End If
     End Sub
@@ -875,7 +875,7 @@ Public Class OIT0002LinkDetail
                     work.WF_SEL_OFFICECODE.Text = WW_SelectValue
                     work.WF_SEL_OFFICENAME.Text = WW_SelectText
 
-                    '本線列車, 発駅, 着駅のテキストボックスを初期化
+                    '本線列車, 空車発駅, 空車着駅のテキストボックスを初期化
                     TxtHeadOfficeTrain.Text = ""
                     TxtDepstation.Text = ""
                     LblDepstationName.Text = ""
@@ -912,11 +912,11 @@ Public Class OIT0002LinkDetail
                 TxtHeadOfficeTrain.Text = WW_SelectValue
                 FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
-                '空車発駅
-                TxtDepstation.Text = WW_GetValue(1)
+                '空車発駅（着駅）
+                TxtDepstation.Text = WW_GetValue(2)
                 CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
-                '空車着駅
-                TxtRetstation.Text = WW_GetValue(2)
+                '空車着駅（発駅）
+                TxtRetstation.Text = WW_GetValue(1)
                 CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
 
@@ -933,12 +933,12 @@ Public Class OIT0002LinkDetail
                 End Try
                 AvailableYMD.Focus()
 
-            Case "TxtDepstation"        '空車発駅
+            Case "TxtDepstation"        '空車発駅（着駅）
                 TxtDepstation.Text = WW_SelectValue
                 LblDepstationName.Text = WW_SelectText
                 TxtDepstation.Focus()
 
-            Case "TxtRetstation"        '空車着駅
+            Case "TxtRetstation"        '空車着駅（発駅）
                 TxtRetstation.Text = WW_SelectValue
                 LblRetstationName.Text = WW_SelectText
                 TxtRetstation.Focus()
@@ -1079,9 +1079,9 @@ Public Class OIT0002LinkDetail
                 TxtHeadOfficeTrain.Focus()
             Case "AvailableYMD"         '利用可能日
                 TxtHeadOfficeTrain.Focus()
-            Case "TxtDepstation"        '空車発駅
+            Case "TxtDepstation"        '空車発駅（着駅）
                 TxtDepstation.Focus()
-            Case "TxtRetstation"        '空車着駅
+            Case "TxtRetstation"        '空車着駅（発駅）
                 TxtRetstation.Focus()
             Case "TxtEmpDate"           '(予定)空車着日
                 TxtEmpDate.Focus()
@@ -1701,10 +1701,10 @@ Public Class OIT0002LinkDetail
                 OIT0002INProw("PREOILNAME") = WW_GetValue(0)
             End If
 
-            '空車発駅
+            '空車発駅（着駅）
             OIT0002INProw("DEPSTATIONNAME") = LblDepstationName.Text
 
-            '空車着駅
+            '空車着駅（発駅）
             OIT0002INProw("RETSTATIONNAME") = LblRetstationName.Text
 
             '利用可能日
@@ -1969,7 +1969,7 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End If
 
-        '空車発駅
+        '空車発駅（着駅）
         If TxtDepstation.Text = "" Then
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "空車発駅", needsPopUp:=True)
             TxtDepstation.Focus()
@@ -1997,7 +1997,7 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End If
 
-        '空車着駅
+        '空車着駅（発駅）
         If TxtRetstation.Text = "" Then
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "空車着駅", needsPopUp:=True)
             TxtRetstation.Focus()
@@ -2492,10 +2492,10 @@ Public Class OIT0002LinkDetail
                             End If
                             PARA07.Value = TxtHeadOfficeTrain.Text            '本線列車
                             PARA08.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
-                            PARA09.Value = TxtDepstation.Text                 '空車発駅コード
-                            PARA10.Value = LblDepstationName.Text             '空車発駅名
-                            PARA11.Value = TxtRetstation.Text                 '空車着駅コード
-                            PARA12.Value = LblRetstationName.Text             '空車着駅名
+                            PARA09.Value = TxtDepstation.Text                 '空車発駅（着駅）コード
+                            PARA10.Value = LblDepstationName.Text             '空車発駅（着駅）名
+                            PARA11.Value = TxtRetstation.Text                 '空車着駅（発駅）コード
+                            PARA12.Value = LblRetstationName.Text             '空車着駅（発駅）名
                             PARA13.Value = RTrim(CDate(TxtEmpDate.Text).ToString("yyyy/MM/dd"))       '(予定)空車着日
                             If TxtActEmpDate.Text <> "" Then                                    '(実績)空車着日
                                 PARA14.Value = CDate(TxtActEmpDate.Text).ToString("yyyy/MM/dd")
@@ -2723,18 +2723,16 @@ Public Class OIT0002LinkDetail
             If work.WF_SEL_SELECT.Text = "1" Then
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             Else
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.TRAINNO       = @P4" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
@@ -2742,19 +2740,23 @@ Public Class OIT0002LinkDetail
             If work.WF_SEL_SELECT.Text = "1" Then
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.STATUS        = @P5" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             Else
                 SQLStr &=
                   " WHERE" _
-                & "    OIT0004.DEPSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD      >= @P2" _
-                & "    AND OIT0004.AVAILABLEYMD      <= @P3" _
+                & "    OIT0004.RETSTATION        = @P1" _
+                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
                 & "    AND OIT0004.DELFLG       <> @P6"
             End If
+        End If
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '有効年月日（終了）
+        If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
+            SQLStr &= String.Format("    AND OIT0004.AVAILABLEYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
         End If
 
         SQLStr &=
@@ -2778,16 +2780,14 @@ Public Class OIT0002LinkDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 7)         '空車発駅コード
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 7)         '空車着駅（発駅）コード
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.Date)                '有効年月日(To)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Date)                '有効年月日(From)
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)         '本線列車
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 1)         'ステータス
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
-                PARA1.Value = TxtDepstation.Text
+                PARA1.Value = TxtRetstation.Text
                 PARA2.Value = work.WF_SEL_STYMD.Text
-                PARA3.Value = work.WF_SEL_ENDYMD.Text
                 PARA4.Value = TxtHeadOfficeTrain.Text
                 PARA5.Value = work.WF_SEL_SELECT.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
@@ -3172,11 +3172,11 @@ Public Class OIT0002LinkDetail
                 Case "SALESOFFICE"      '登録営業所
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
 
-                Case "DEPSTATION"       '発駅　（空車着駅）
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPSTATION"))
+                Case "DEPSTATION"       '空車発駅　（着駅）
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "2", "DEPSTATION"))
 
-                Case "RETSTATION"       '着駅　（空車発駅）
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "RETSTATION"))
+                Case "RETSTATION"       '空車着駅　（発駅）
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "1", "RETSTATION"))
 
                 Case "PRODUCTPATTERN"   '油種
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN"))

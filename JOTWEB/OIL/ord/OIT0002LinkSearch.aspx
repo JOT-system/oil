@@ -44,14 +44,24 @@
             <asp:Label ID="WF_ORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
         </a>
 
-        <!-- 空車着駅コード -->
-        <a id ="WF_DEPSTATION_LABEL" class="requiredMark">空車着駅</a>
+        <!-- 空車着駅（発駅）コード -->
+        <a id ="WF_RETSTATION_LABEL" class="requiredMark">空車着駅</a>
 
-        <a class="ef" id="WF_DEPSTATION" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_DEPSTATION');">
-            <asp:TextBox CssClass="BoxIcon" ID="WF_DEPSTATION_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
+        <a class="ef" id="WF_RETSTATION" ondblclick="Field_DBclick('WF_RETSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_RETSTATION');">
+            <asp:TextBox CssClass="BoxIcon" ID="WF_RETSTATION_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
-        <a id="WF_DEPSTATION_TEXT">
-            <asp:Label ID="WF_DEPSTATION_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
+        <a id="WF_RETSTATION_TEXT">
+            <asp:Label ID="WF_RETSTATION_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
+        </a>
+
+        <!-- 空車発駅（着駅）コード -->
+        <a style="display:none;" id ="WF_DEPSTATION_LABEL" class="requiredMark">空車発駅</a>
+
+        <a style="display:none;" class="ef" id="WF_DEPSTATION" ondblclick="Field_DBclick('WF_DEPSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_DEPSTATION');">
+            <asp:TextBox CssClass="BoxIcon" ID="TextBox1" runat="server" onblur="MsgClear();"></asp:TextBox>
+        </a>
+        <a style="display:none;" id="WF_DEPSTATION_TEXT">
+            <asp:Label ID="Label1" runat="server" CssClass="WF_TEXT"></asp:Label>
         </a>
 
         <!-- 利用可能日 -->

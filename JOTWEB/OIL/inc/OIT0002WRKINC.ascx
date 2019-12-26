@@ -5,8 +5,8 @@
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>         <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_ORG" runat="server"></asp:TextBox>         <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_INCLUDUSED" runat="server"></asp:TextBox>         <!-- 利用済含む -->
-    <asp:TextBox ID="WF_SEL_DEPSTATION" runat="server"></asp:TextBox>         <!-- 空車発駅コード -->
-    <asp:TextBox ID="WF_SEL_DEPSTATION2" runat="server"></asp:TextBox>         <!-- 空車発駅コード2 -->
+    <asp:TextBox ID="WF_SEL_RETSTATION" runat="server"></asp:TextBox>         <!-- 空車着駅（発駅）コード -->
+    <asp:TextBox ID="WF_SEL_RETSTATION2" runat="server"></asp:TextBox>         <!-- 空車着駅（発駅）コード2 -->
     <asp:TextBox ID="WF_SEL_STYMD" runat="server"></asp:TextBox>         <!-- 開始年月日 -->
     <asp:TextBox ID="WF_SEL_STYMD2" runat="server"></asp:TextBox>         <!-- 開始年月日2 -->
     <asp:TextBox ID="WF_SEL_ENDYMD" runat="server"></asp:TextBox>         <!-- 終了年月日 -->
@@ -27,9 +27,9 @@
     <asp:TextBox ID="WF_SEL_PREORDERNO" runat="server"></asp:TextBox>         <!-- 前回オーダー№ -->
     <asp:TextBox ID="WF_SEL_OFFICENAME" runat="server"></asp:TextBox>         <!-- 登録営業所名 -->
     <asp:TextBox ID="WF_SEL_OFFICECODE" runat="server"></asp:TextBox>         <!-- 登録営業所コード -->
-    <asp:TextBox ID="WF_SEL_DEPSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車発駅名 -->
-    <asp:TextBox ID="WF_SEL_RETSTATION" runat="server"></asp:TextBox>         <!-- 空車着駅コード -->
-    <asp:TextBox ID="WF_SEL_RETSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車着駅名 -->
+    <asp:TextBox ID="WF_SEL_DEPSTATION" runat="server"></asp:TextBox>         <!-- 空車発駅（着駅）コード -->
+    <asp:TextBox ID="WF_SEL_DEPSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車発駅（着駅）名 -->
+    <asp:TextBox ID="WF_SEL_RETSTATIONNAME" runat="server"></asp:TextBox>         <!-- 空車着駅（発駅）名 -->
     <asp:TextBox ID="WF_SEL_EMPARRDATE" runat="server"></asp:TextBox>         <!-- 空車着日（予定） -->
     <asp:TextBox ID="WF_SEL_ACTUALEMPARRDATE" runat="server"></asp:TextBox>         <!-- 空車着日（実績） -->
     <asp:TextBox ID="WF_SEL_LINETRAINNO" runat="server"></asp:TextBox>         <!-- 入線列車番号 -->

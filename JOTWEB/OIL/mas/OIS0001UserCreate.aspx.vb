@@ -67,6 +67,7 @@ Public Class OIS0001UserCreate
 
         Try
             If IsPostBack Then
+                WF_PASSWORD.Attributes("Value") = WF_PASSWORD.Text
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
@@ -211,6 +212,7 @@ Public Class OIS0001UserCreate
 
         '会社コード
         WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+        CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
 
         '組織コード
         WF_ORG.Text = work.WF_SEL_ORG2.Text
@@ -304,14 +306,18 @@ Public Class OIS0001UserCreate
             & "        AND OIS0005.DELFLG  <> @P6" _
             & " WHERE" _
             & "    OIS0004.CAMPCODE    = @P1" _
-            & "    AND OIS0004.STYMD  <= @P4" _
-            & "    AND OIS0004.ENDYMD >= @P5" _
+            & "    AND OIS0004.STYMD  >= @P4" _
             & "    AND OIS0004.DELFLG <> @P6"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '組織コード
         If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
             SQLStr &= String.Format("    AND OIS0004.ORG     = '{0}'", work.WF_SEL_ORG.Text)
+        End If
+
+        '有効年月日（終了）
+        If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
+            SQLStr &= String.Format("    AND OIS0004.ENDYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
         End If
 
         SQLStr &=
@@ -323,12 +329,10 @@ Public Class OIS0001UserCreate
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.Date)                '有効年月日(To)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)                '有効年月日(From)
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
-                PARA4.Value = work.WF_SEL_ENDYMD.Text
-                PARA5.Value = work.WF_SEL_STYMD.Text
+                PARA4.Value = work.WF_SEL_STYMD.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -375,16 +379,18 @@ Public Class OIS0001UserCreate
               " SELECT " _
             & "     USERID " _
             & "    , STYMD" _
-            & "    , ENDYMD" _
             & " FROM" _
             & "    COM.OIS0004_USER" _
             & " WHERE" _
-            & "     USERID      = @P01"
+            & "     USERID      = @P01" _
+            & "    AND STYMD    = @P02"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20)            'JOT車番
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)            'JOT車番
                 PARA1.Value = WF_USERID.Text
+                PARA2.Value = WF_STYMD.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
@@ -651,7 +657,8 @@ Public Class OIS0001UserCreate
         WF_STAFFNAMES.Text = ""            '社員名（短）
         WF_STAFFNAMEL.Text = ""            '社員名（長）
         WF_MAPID.Text = "M00001"            '画面ＩＤ
-        WF_PASSWORD.Text = ""            'パスワード
+        WF_PASSWORD.Text = ""                   'パスワード
+        WF_PASSWORD.Attributes("Value") = ""
         WF_MISSCNT.Text = ""            '誤り回数
         WF_PASSENDYMD.Text = ""            'パスワード有効期限
         WF_STYMD.Text = ""            '開始年月日
@@ -731,6 +738,9 @@ Public Class OIS0001UserCreate
                                 prmData = work.CreateRoleList(WF_CAMPCODE.Text, "XML")
                             Case "WF_APPROVALID"       '承認権限ロール
                                 prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
+                            Case "WF_DELFLG"
+                                prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
+                                prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -774,13 +784,16 @@ Public Class OIS0001UserCreate
             Case "WF_DELFLG"               '削除フラグ
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
+            Case "WF_PASSWORD"
+                WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
+
         End Select
 
         '○ メッセージ表示
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
         End If
 
     End Sub
@@ -1006,7 +1019,7 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("DELFLG", OIS0001INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・削除コード入力エラー。"
+                    WW_CheckMES1 = "・削除コード入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
@@ -1023,7 +1036,7 @@ Public Class OIS0001UserCreate
             'ユーザID(バリデーションチェック)
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIS0001INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・ユーザID入力エラー。"
+                WW_CheckMES1 = "・ユーザID入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1032,7 +1045,7 @@ Public Class OIS0001UserCreate
 
             '社員名（短）(バリデーションチェック）
             If OIS0001INProw("STAFFNAMES") = "" Then
-                WW_CheckMES1 = "・社員名（短）入力エラー。"
+                WW_CheckMES1 = "・社員名（短）入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1041,7 +1054,7 @@ Public Class OIS0001UserCreate
 
             '社員名（長）(バリデーションチェック）
             If OIS0001INProw("STAFFNAMEL") = "" Then
-                WW_CheckMES1 = "・社員名（長）入力エラー。"
+                WW_CheckMES1 = "・社員名（長）入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1050,7 +1063,7 @@ Public Class OIS0001UserCreate
 
             'パスワード(バリデーションチェック）
             If OIS0001INProw("PASSWORD") = "" Then
-                WW_CheckMES1 = "・パスワード入力エラー。"
+                WW_CheckMES1 = "・パスワード入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1059,7 +1072,7 @@ Public Class OIS0001UserCreate
 
             'パスワード有効期限(バリデーションチェック）
             If OIS0001INProw("PASSENDYMD") = "" Then
-                WW_CheckMES1 = "・パスワード有効期限入力エラー。"
+                WW_CheckMES1 = "・パスワード有効期限入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1068,7 +1081,7 @@ Public Class OIS0001UserCreate
                 '年月日チェック
                 WW_CheckDate(OIS0001INProw("PASSENDYMD"), "パスワード有効期限", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・パスワード有効期限入力エラー。"
+                    WW_CheckMES1 = "・パスワード有効期限入力エラーです。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
@@ -1078,7 +1091,7 @@ Public Class OIS0001UserCreate
 
             '開始年月日(バリデーションチェック）
             If OIS0001INProw("STYMD") = "" Then
-                WW_CheckMES1 = "・開始年月日入力エラー。"
+                WW_CheckMES1 = "・開始年月日入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1087,7 +1100,7 @@ Public Class OIS0001UserCreate
                 '年月日チェック
                 WW_CheckDate(OIS0001INProw("STYMD"), "有効年月日（開始）", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・開始年月日入力エラー。"
+                    WW_CheckMES1 = "・開始年月日入力エラーです。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
@@ -1097,7 +1110,7 @@ Public Class OIS0001UserCreate
 
             '終了年月日(バリデーションチェック）
             If OIS0001INProw("ENDYMD") = "" Then
-                WW_CheckMES1 = "・終了年月日入力エラー。"
+                WW_CheckMES1 = "・終了年月日入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1106,7 +1119,7 @@ Public Class OIS0001UserCreate
                 '年月日チェック
                 WW_CheckDate(OIS0001INProw("ENDYMD"), "有効年月日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・終了年月日入力エラー。"
+                    WW_CheckMES1 = "・終了年月日入力エラーです。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
@@ -1120,14 +1133,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("CAMPCODE", OIS0001INProw("CAMPCODE"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・会社コード入力エラー。"
+                    WW_CheckMES1 = "・会社コード入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・会社コード入力エラー。"
+                WW_CheckMES1 = "・会社コード入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1140,14 +1153,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("ORG", OIS0001INProw("ORG"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・組織コード入力エラー。"
+                    WW_CheckMES1 = "・組織コード入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・組織コード入力エラー。"
+                WW_CheckMES1 = "・組織コード入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1156,7 +1169,7 @@ Public Class OIS0001UserCreate
 
             'メールアドレス(バリデーションチェック）
             If OIS0001INProw("EMAIL") = "" Then
-                WW_CheckMES1 = "・メールアドレス入力エラー。"
+                WW_CheckMES1 = "・メールアドレス入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1169,14 +1182,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("MENU", OIS0001INProw("MENUROLE"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・メニュー表示制御ロール入力エラー。"
+                    WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・メニュー表示制御ロール入力エラー。"
+                WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1189,14 +1202,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("MAP", OIS0001INProw("MAPROLE"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・画面参照更新制御ロール入力エラー。"
+                    WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・画面参照更新制御ロール入力エラー。"
+                WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1209,14 +1222,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("VIEW", OIS0001INProw("VIEWPROFID"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・画面表示項目制御ロール入力エラー。"
+                    WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・画面表示項目制御ロール入力エラー。"
+                WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1229,14 +1242,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("XML", OIS0001INProw("RPRTPROFID"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・エクセル出力制御ロール入力エラー。"
+                    WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・エクセル出力制御ロール入力エラー。"
+                WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1244,23 +1257,26 @@ Public Class OIS0001UserCreate
             End If
 
             '承認権限ロール(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "APPROVALID", OIS0001INProw("APPROVALID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                '値存在チェック
-                CODENAME_get("APPROVAL", OIS0001INProw("APPROVALID"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・承認権限ロール入力エラー。"
-                    WW_CheckMES2 = "マスタに存在しません。"
+            If OIS0001INProw("APPROVALID") = "" Then
+            Else
+                Master.CheckField(work.WF_SEL_CAMPCODE.Text, "APPROVALID", OIS0001INProw("APPROVALID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                If isNormal(WW_CS0024FCHECKERR) Then
+                    '値存在チェック
+                    CODENAME_get("APPROVAL", OIS0001INProw("APPROVALID"), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・承認権限ロール入力エラーです。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                Else
+                    WW_CheckMES1 = "・承認権限ロール入力エラーです。"
+                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
-            Else
-                WW_CheckMES1 = "・承認権限ロール入力エラー。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
 
@@ -1278,11 +1294,10 @@ Public Class OIS0001UserCreate
                 End Using
 
                 If Not isNormal(WW_UniqueKeyCHECK) Then
-                    WW_CheckMES1 = "一意制約違反（ユーザID）。"
+                    WW_CheckMES1 = "一意制約違反（ユーザID & 開始年月日）。"
                     WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
                                        "([" & OIS0001INProw("USERID") & "]" &
-                                       " [" & OIS0001INProw("STYMD") & "])" &
-                                       " [" & OIS0001INProw("ENDYMD") & "])"
+                                       " [" & OIS0001INProw("STYMD") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
@@ -1421,8 +1436,7 @@ Public Class OIS0001UserCreate
             'KEY項目が等しい時
             For Each OIS0001row As DataRow In OIS0001tbl.Rows
                 If OIS0001row("USERID") = OIS0001INProw("USERID") AndAlso
-                    OIS0001row("STYMD") = OIS0001INProw("STYMD") AndAlso
-                    OIS0001row("ENDYMD") = OIS0001INProw("ENDYMD") Then
+                    OIS0001row("STYMD") = OIS0001INProw("STYMD") Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
                     If OIS0001row("DELFLG") = OIS0001INProw("DELFLG") AndAlso
                         OIS0001row("STAFFNAMES") = OIS0001INProw("STAFFNAMES") AndAlso
@@ -1431,6 +1445,7 @@ Public Class OIS0001UserCreate
                         OIS0001row("PASSWORD") = OIS0001INProw("PASSWORD") AndAlso
                         OIS0001row("MISSCNT") = OIS0001INProw("MISSCNT") AndAlso
                         OIS0001row("PASSENDYMD") = OIS0001INProw("PASSENDYMD") AndAlso
+                        OIS0001row("ENDYMD") = OIS0001INProw("ENDYMD") AndAlso
                         OIS0001row("CAMPCODE") = OIS0001INProw("CAMPCODE") AndAlso
                         OIS0001row("ORG") = OIS0001INProw("ORG") AndAlso
                         OIS0001row("EMAIL") = OIS0001INProw("EMAIL") AndAlso
@@ -1481,8 +1496,7 @@ Public Class OIS0001UserCreate
 
             '同一レコードか判定
             If OIS0001INProw("USERID") = OIS0001row("USERID") AndAlso
-                OIS0001INProw("STYMD") = OIS0001row("STYMD") AndAlso
-                OIS0001INProw("ENDYMD") = OIS0001row("ENDYMD") Then
+                OIS0001INProw("STYMD") = OIS0001row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIS0001INProw("LINECNT") = OIS0001row("LINECNT")
                 OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -1536,8 +1550,7 @@ Public Class OIS0001UserCreate
 
             '同一レコードか判定
             If OIS0001INProw("USERID") = OIS0001row("USERID") AndAlso
-                OIS0001INProw("STYMD") = OIS0001row("STYMD") AndAlso
-                OIS0001INProw("ENDYMD") = OIS0001row("ENDYMD") Then
+                OIS0001INProw("STYMD") = OIS0001row("STYMD") Then
                 '画面入力テーブル項目設定
                 OIS0001INProw("LINECNT") = OIS0001row("LINECNT")
                 OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
@@ -1578,7 +1591,15 @@ Public Class OIS0001UserCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "ORG"         '組織コード
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, 0)
+                    Dim AUTHORITYALL_FLG As String = "0"
+                    If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                        If WF_CAMPCODE.Text = "" Then '会社コードが空の場合
+                            AUTHORITYALL_FLG = "1"
+                        Else '会社コードに入力済みの場合
+                            AUTHORITYALL_FLG = "2"
+                        End If
+                    End If
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, AUTHORITYALL_FLG)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MENU"           'メニュー表示制御ロール

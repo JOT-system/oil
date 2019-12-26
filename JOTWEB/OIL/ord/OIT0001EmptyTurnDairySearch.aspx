@@ -45,7 +45,7 @@
         <!-- 営業所 -->
         <a id="WF_OFFICECODE_LABEL" class="requiredMark">営業所</a>
         <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
-            <asp:TextBox CssClass="BoxIcon" ID="TxtSalesOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <asp:TextBox CssClass="BoxIcon" ID="TxtSalesOffice" runat="server" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
         </a>
         <a id="WF_OFFICECODE_TEXT" >
             <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -61,7 +61,7 @@
         <!-- 列車番号 -->
         <a id="WF_TRAINNO_LABEL">列車番号</a>
         <a class="ef" id="WF_TRAINNO">
-            <asp:TextBox ID="TxtTrainNumber" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <asp:TextBox ID="TxtTrainNumber" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
         </a>
     </div>
 

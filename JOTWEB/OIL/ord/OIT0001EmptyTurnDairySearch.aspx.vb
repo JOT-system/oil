@@ -119,6 +119,10 @@ Public Class OIT0001EmptyTurnDairySearch
 
         End If
 
+        '営業所・列車番号を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtSalesOffice.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtTrainNumber.Attributes("onkeyPress") = "CheckNum()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIT0001WRKINC.MAPIDS
         rightview.MAPID = OIT0001WRKINC.MAPIDL

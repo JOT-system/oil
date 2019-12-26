@@ -108,6 +108,10 @@ Public Class OIM0004StationSearch
 
         End If
 
+        '貨物駅コード・貨物コード枝番を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtStationCode.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtBranch.Attributes("onkeyPress") = "CheckNum()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIM0004WRKINC.MAPIDS
         rightview.MAPID = OIM0004WRKINC.MAPIDL

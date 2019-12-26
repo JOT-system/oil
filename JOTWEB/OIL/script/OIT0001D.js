@@ -128,9 +128,9 @@ function ListField_Change(pnlList, Line, fieldNM) {
     };
 };
 
-// 〇数値のみ入力可能
-function CheckNum() {
-    if (((event.keyCode < 48) || (event.keyCode > 57))) {
-        window.event.returnValue = false;
-    }
-}
+//// 〇数値のみ入力可能
+//function CheckNum() {
+//    if (((event.keyCode < 48) || (event.keyCode > 57))) {
+//        window.event.returnValue = false;
+//    }
+//}

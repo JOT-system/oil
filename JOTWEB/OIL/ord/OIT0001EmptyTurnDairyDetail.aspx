@@ -54,17 +54,17 @@
             <!-- ■　受注営業所　■ -->
             <a id="WF_OFFICECODE_LABEL" class="requiredMark">受注営業所</a>
             <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtOrderOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="BoxIcon" ID="TxtOrderOffice" runat="server" onblur="MsgClear();" MaxLength="20"></asp:TextBox>
             </a>
             <!-- ■　本線列車　■ -->
             <a id="WF_HEADOFFICETRAIN_LABEL" class="requiredMark">本線列車</a>
             <a class="ef" id="WF_HEADOFFICETRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="BoxIcon" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
             </a>
             <!-- ■　発駅　■ -->
             <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
             <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtDepstation" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="BoxIcon" ID="TxtDepstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
             </a>
             <a id="WF_DEPSTATIONNAME">
                 <asp:Label ID="LblDepstationName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
@@ -72,7 +72,7 @@
             <!-- ■　着駅　■ -->
             <a id="WF_ARRSTATION_LABEL" class="requiredMark">着駅</a>
             <a class="ef" id="WF_ARRSTATION" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtArrstation" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="BoxIcon" ID="TxtArrstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
             </a>
             <a id="WF_ARRSTATIONNAME">
                 <asp:Label ID="LblArrstationName" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>

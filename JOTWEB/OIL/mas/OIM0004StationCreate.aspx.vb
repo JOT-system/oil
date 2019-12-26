@@ -179,6 +179,11 @@ Public Class OIM0004StationCreate
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
         'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署
 
+        '貨物駅コード・貨物コード枝番・削除フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtStationCode.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtBranch.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_DELFLG.Attributes("onkeyPress") = "CheckNum()"
+
         '選択行
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 

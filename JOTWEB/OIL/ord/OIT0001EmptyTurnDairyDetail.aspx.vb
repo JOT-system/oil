@@ -245,6 +245,10 @@ Public Class OIT0001EmptyTurnDairyDetail
         '車数（A重油）
         TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
 
+        '本線列車・発駅・着駅を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtHeadOfficeTrain.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtDepstation.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtArrstation.Attributes("onkeyPress") = "CheckNum()"
         '車数を入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtHTank.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtRTank.Attributes("onkeyPress") = "CheckNum()"
@@ -858,12 +862,14 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '発駅
                     If WF_FIELD.Value = "TxtDepstation" Then
-                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtDepstation.Text)
+                        'prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtDepstation.Text)
+                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", TxtDepstation.Text)
                     End If
 
                     '着駅
                     If WF_FIELD.Value = "TxtArrstation" Then
-                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtArrstation.Text)
+                        'prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text, TxtArrstation.Text)
+                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", TxtArrstation.Text)
                     End If
 
                     '荷主名

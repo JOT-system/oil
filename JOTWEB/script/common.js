@@ -361,7 +361,11 @@ function addLeftBoxFilter(ListObj) {
 
     // リストボックスのクローンのダブルクリックイベントバインド
     // 本物のリストのダブルクリックイベントを発火させる
-    leftListClone.ondblclick = (function (ListObj) {
+
+    //######ワンクリックに変更　2019/12/26 #######
+    //leftListClone.ondblclick = (function (ListObj) {
+    leftListClone.onclick = (function (ListObj) {
+    //######ワンクリックに変更　2019/12/26 #######
         return function () {
             ListboxDBclick();
         };
@@ -1232,5 +1236,12 @@ function commonHideWait() {
     if (hasElm !== null) {
         commonCloseModal('');
         document.body.removeChild(hasElm);
+    }
+}
+
+// 〇数値のみ入力可能
+function CheckNum() {
+    if (((event.keyCode < 48) || (event.keyCode > 57))) {
+        window.event.returnValue = false;
     }
 }

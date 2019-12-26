@@ -45,7 +45,7 @@
         <a id="WF_STATIONCODE_LABEL" class="requiredMark">貨物駅コード</a>
 
         <a class="ef" id="WF_STATIONCODE" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
-            <asp:TextBox CssClass="BoxIcon" ID="TxtStationCode" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <asp:TextBox CssClass="BoxIcon" ID="TxtStationCode" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
         </a>
         <a  id="WF_STATIONCODE_TEXT">
             <asp:Label ID="LblStationCode" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -53,7 +53,7 @@
         <!-- 貨物コード枝番 -->
         <a id="WF_BRANCH_LABEL">貨物コード枝番</a>
         <a class="ef" id="WF_BRANCH" onchange="TextBox_change('TxtStationCode');">
-            <asp:TextBox ID="TxtBranch" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <asp:TextBox ID="TxtBranch" runat="server" onblur="MsgClear();" MaxLength="3"></asp:TextBox>
         </a>
         <a id="WF_BRANCH_TEXT">
             <asp:Label ID="LblBranch" runat="server" CssClass="WF_TEXT"></asp:Label>

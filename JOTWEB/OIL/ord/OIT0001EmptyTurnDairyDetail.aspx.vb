@@ -245,6 +245,10 @@ Public Class OIT0001EmptyTurnDairyDetail
         '車数（A重油）
         TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
 
+        '本線列車・発駅・着駅を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtHeadOfficeTrain.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtDepstation.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtArrstation.Attributes("onkeyPress") = "CheckNum()"
         '車数を入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtHTank.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtRTank.Attributes("onkeyPress") = "CheckNum()"

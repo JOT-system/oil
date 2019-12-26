@@ -1234,3 +1234,10 @@ function commonHideWait() {
         document.body.removeChild(hasElm);
     }
 }
+
+// 〇数値のみ入力可能
+function CheckNum() {
+    if (((event.keyCode < 48) || (event.keyCode > 57))) {
+        window.event.returnValue = false;
+    }
+}

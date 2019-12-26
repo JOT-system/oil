@@ -198,24 +198,16 @@ Public Class OIS0001UserSearch
 
         '○ 単項目チェック
         '会社コード
-        Master.CheckField(WF_CAMPCODE_CODE.Text, "CAMPCODE", WF_CAMPCODE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If WF_CAMPCODE_CODE.Text = "" Then
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "会社コード", needsPopUp:=True)
             WF_CAMPCODE_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("CAMPCODE", WF_CAMPCODE_CODE.Text, WF_CAMPCODE_NAME.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE_CODE.Text, needsPopUp:=True)
-                WF_CAMPCODE_CODE.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '存在チェック
+        CODENAME_get("CAMPCODE", WF_CAMPCODE_CODE.Text, WF_CAMPCODE_NAME.Text, WW_RTN_SW)
+        If Not isNormal(WW_RTN_SW) Then
+            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE_CODE.Text, needsPopUp:=True)
             WF_CAMPCODE_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -290,25 +282,17 @@ Public Class OIS0001UserSearch
 
         '組織コード
         WW_TEXT = WF_ORG_CODE.Text
-        Master.CheckField(WF_CAMPCODE_CODE.Text, "ORG", WF_ORG_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            If WW_TEXT = "" Then
-                WF_ORG_CODE.Text = ""
-            Else
-                '存在チェック
-                CODENAME_get("ORG", WF_ORG_CODE.Text, WF_ORG_NAME.Text, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & WF_ORG_CODE.Text, needsPopUp:=True)
-                    WF_ORG_CODE.Focus()
-                    O_RTN = "ERR"
-                    Exit Sub
-                End If
-            End If
+        If WW_TEXT = "" Then
+            '何もしない
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            WF_ORG_CODE.Focus()
-            O_RTN = "ERR"
-            Exit Sub
+            '存在チェック
+            CODENAME_get("ORG", WF_ORG_CODE.Text, WF_ORG_NAME.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & WF_ORG_CODE.Text, needsPopUp:=True)
+                WF_ORG_CODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
 
         '○ 正常メッセージ
@@ -602,10 +586,24 @@ Public Class OIS0001UserSearch
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
+                    If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
+                    Else
+                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ROLE
+                    End If
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORG"              '組織コード
-                    prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text, 0)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                    Dim AUTHORITYALL_FLG As String = "0"
+                    If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                        If WF_CAMPCODE_CODE.Text = "" Then '会社コードが空の場合
+                            AUTHORITYALL_FLG = "1"
+                        Else '会社コードに入力済みの場合
+                            AUTHORITYALL_FLG = "2"
+                        End If
+                        prmData = work.CreateORGParam(WF_CAMPCODE_CODE.Text, AUTHORITYALL_FLG)
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                    Else
+                    End If
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

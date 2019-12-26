@@ -602,10 +602,10 @@ Public Class OIM0004StationList
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIM0004_STATION" _
             & "    SET" _
-            & "        STATONNAME   = @P3  , STATIONNAMEKANA = @P4" _
-            & "        , TYPENAME   = @P5  , TYPENAMEKANA = @P6" _
+            & "        STATONNAME   = @P3        , STATIONNAMEKANA = @P4" _
+            & "        , TYPENAME   = @P5        , TYPENAMEKANA    = @P6" _
             & "        , DELFLG     = @P7" _
-            & "        , UPDYMD     = @P11 , UPDUSER = @P12 , UPDTERMID = @P13" _
+            & "        , UPDYMD     = @P11       , UPDUSER         = @P12 , UPDTERMID = @P13" _
             & "        , RECEIVEYMD = @P14" _
             & "    WHERE" _
             & "        STATIONCODE       = @P1" _
@@ -614,14 +614,14 @@ Public Class OIM0004StationList
             & "    INSERT INTO OIL.OIM0004_STATION" _
             & "        ( STATIONCODE , BRANCH" _
             & "        , STATONNAME , STATIONNAMEKANA" _
-            & "        , TYPENAME   , TYPENAMEKANA  , DELFLG" _
+            & "        , TYPENAME   , TYPENAMEKANA  , DEPARRSTATIONFLG, DELFLG" _
             & "        , INITYMD    , INITUSER      , INITTERMID" _
             & "        , UPDYMD     , UPDUSER       , UPDTERMID" _
             & "        , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P1  , @P2" _
             & "        , @P3  , @P4" _
-            & "        , @P5  , @P6 , @P7" _
+            & "        , @P5  , @P6 , @P15 , @P7" _
             & "        , @P8  , @P9 , @P10" _
             & "        , @P11 , @P12, @P13" _
             & "        , @P14) ;" _
@@ -637,6 +637,7 @@ Public Class OIM0004StationList
             & "    , STATIONNAMEKANA" _
             & "    , TYPENAME" _
             & "    , TYPENAMEKANA" _
+            & "    , DEPARRSTATIONFLG" _
             & "    , DELFLG" _
             & "    , INITYMD" _
             & "    , INITUSER" _
@@ -660,6 +661,7 @@ Public Class OIM0004StationList
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 100)          '貨物駅名称カナ
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 40)           '貨物駅種別名称
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20)           '貨物駅種別名称カナ
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 1)          '発着駅フラグ
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 1)            '削除フラグ
                 Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.DateTime)               '登録年月日
                 Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 20)           '登録ユーザーID
@@ -686,6 +688,7 @@ Public Class OIM0004StationList
                         PARA4.Value = OIM0004row("STATIONNAMEKANA")
                         PARA5.Value = OIM0004row("TYPENAME")
                         PARA6.Value = OIM0004row("TYPENAMEKANA")
+                        PARA15.Value = ""
                         PARA7.Value = OIM0004row("DELFLG")
                         PARA8.Value = WW_DATENOW
                         PARA9.Value = Master.USERID

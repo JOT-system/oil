@@ -37,9 +37,15 @@
                 </p>
                 <p id="KEY_LINE_2">
                     <!-- 削除フラグ -->
-                    <a class="ef" ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
-                        <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" Width="10.0em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_DELFLG" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon" MaxLength="1"></asp:TextBox>
+                    <a>
+                        <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" Width="6.65em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
+                        <a id="WF_DELFLG_ICON" class="ef" onclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)">
+                            <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
+                        </a>
+                        <a class="ef" ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
+                        <%--<asp:TextBox ID="WF_DELFLG" runat="server" Width="15em" CssClass="WF_TEXTBOX_CSS BoxIcon" MaxLength="1"></asp:TextBox>--%>
+                            <asp:TextBox ID="WF_DELFLG" runat="server" Width="16.4em" CssClass="WF_TEXTBOX_CSS" MaxLength="1"></asp:TextBox>
+                        </a>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="15em" CssClass="WF_TEXT"></asp:Label>
                     </a>
                 </p>

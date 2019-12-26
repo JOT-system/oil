@@ -21,13 +21,17 @@ function InitDisplay() {
         if (document.getElementById('WF_CREATEFLG').value == "1") {
             //活性
             document.getElementById("WF_ButtonINSERT").disabled = "";
+            document.getElementById("WF_ButtonUPDATE").disabled = "";
             //非活性 
             document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
             document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
             document.getElementById("WF_ButtonCSV").disabled = "disabled";
-            document.getElementById("WF_ButtonUPDATE").disabled = "";
+
+            //受注営業所のアイコンの上にあるラベルを非表示とする。
+            document.getElementById("WF_OFFICECODE_DUMMY").style.display = "none";
+
         } else if (document.getElementById('WF_CREATEFLG').value == "2") {
             //非活性
             document.getElementById("WF_ButtonINSERT").disabled = "disabled";
@@ -38,6 +42,9 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_ADD").disabled = "";
             document.getElementById("WF_ButtonCSV").disabled = "";
             document.getElementById("WF_ButtonUPDATE").disabled = "";
+
+            //受注営業所のアイコンを非表示とする。
+            document.getElementById("WF_OFFICECODE_ICON").style.display = "none";
         };
 
     } else {

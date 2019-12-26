@@ -32,6 +32,7 @@
     width: 50px;
     top: calc(20.5% - 50px/2);
     left: calc(44.5% - 140px/2);
+    cursor: pointer;
 }
 
 /*JOT車番名称*/
@@ -72,6 +73,7 @@
     width: 50px;
     top: calc(32.5% - 50px/2);
     left: calc(44.5% - 140px/2);
+    cursor: pointer;
 }
 
 /*左Boxオープン用虫眼鏡アイコン*/

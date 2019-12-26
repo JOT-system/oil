@@ -602,12 +602,10 @@ Public Class OIM0004StationList
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIM0004_STATION" _
             & "    SET" _
-            & "        STATONNAME   = @P3     , STATIONNAMEKANA = @P4" _
-            & "        , TYPENAME   = @P5     , TYPENAMEKANA = @P6" _
+            & "        STATONNAME   = @P3  , STATIONNAMEKANA = @P4" _
+            & "        , TYPENAME   = @P5  , TYPENAMEKANA = @P6" _
             & "        , DELFLG     = @P7" _
-            & "        , INITYMD    = @P8     , INITUSER   = @P9" _
-            & "        , INITTERMID = @P10    , UPDYMD    = @P11" _
-            & "        , UPDUSER    = @P12    , UPDTERMID = @P13" _
+            & "        , UPDYMD     = @P11 , UPDUSER = @P12 , UPDTERMID = @P13" _
             & "        , RECEIVEYMD = @P14" _
             & "    WHERE" _
             & "        STATIONCODE       = @P1" _

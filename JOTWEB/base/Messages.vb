@@ -414,6 +414,12 @@ Public Module Messages
         ''' 前回油種と油種の整合性エラー
         ''' </summary>
         Public Const OIL_LASTOIL_CONSISTENCY_ERROR As String = "20010"
+
+        ''' <summary>
+        ''' 年月日妥当性エラー(過去日付)
+        ''' </summary>
+        Public Const OIL_DATE_PASTDATE_ERROR As String = "20011"
+
 #End Region
 
 

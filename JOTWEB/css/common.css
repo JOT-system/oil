@@ -1526,4 +1526,5 @@ input[type='text']:not(.BoxIcon):not(.CalendarIcon) {
         background-image: none;
         background-color: #ccc;
         border-color: #ccc;
+        color: #2bb6c1;
     }

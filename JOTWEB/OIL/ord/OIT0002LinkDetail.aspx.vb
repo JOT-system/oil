@@ -2473,7 +2473,9 @@ Public Class OIT0002LinkDetail
                             End If
                             '受付情報が「検査間近有」の場合は優先して設定 
                             If OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
-                                OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                               OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Or
+                               OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
+                                OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Then
                                 PARA05.Value = WW_ORDERINFOALERM_82
 
                                 'タンク車数が「最大牽引タンク車数」より大きい場合

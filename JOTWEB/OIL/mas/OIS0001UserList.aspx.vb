@@ -23,6 +23,11 @@ Public Class OIS0001UserList
     Private OIS0001INPtbl As DataTable                               'チェック用テーブル
     Private OIS0001UPDtbl As DataTable                               '更新用テーブル
 
+    ''' <summary>
+    ''' 定数
+    ''' </summary>
+    Private Const CONST_ORGCODE_INFOSYS As String = "010006"        '組織コード_情報システム部
+    Private Const CONST_ORGCODE_OIL As String = "010007"            '組織コード_石油部
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
@@ -2613,10 +2618,23 @@ Public Class OIS0001UserList
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
+                    If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
+                    Else
+                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ROLE
+                    End If
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "ORG"         '組織コード
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, 0)
+                    Dim AUTHORITYALL_FLG As String = "0"
+                    If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
+                        If WF_CAMPCODE.Text = "" Then '会社コードが空の場合
+                            AUTHORITYALL_FLG = "1"
+                        Else '会社コードに入力済みの場合
+                            AUTHORITYALL_FLG = "2"
+                        End If
+                    End If
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, AUTHORITYALL_FLG)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MENU"           'メニュー表示制御ロール

@@ -1158,9 +1158,9 @@ Public Class OIT0002LinkDetail
                     & "        UPDTERMID   = @P13,      " _
                     & "        RECEIVEYMD  = @P14,      " _
                     & "        DELFLG      = @P03       " _
-                    & "  WHERE LINKNO     = @P01       " _
-                    & "    AND LINKDETAILNO    = @P02       " _
-                    & "    AND DELFLG     <> @P03       ;"
+                    & "  WHERE LINKNO       = @P01       " _
+                    & "    AND LINKDETAILNO = @P02       " _
+                    & "    AND DELFLG      <> @P03       ;"
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
@@ -1304,7 +1304,7 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS JRALLINSPECTIONALERTSTR " _
             & " , @P04                                           AS AVAILABLEYMD " _
             & " , @P00                                           AS DELFLG" _
-            & " , 'L' + FORMAT(GETDATE(),'yyyyMMdd') + @P01      AS LINKNO" _
+            & " , @P01                                           AS LINKNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS LINKDETAILNO" _
             & " FROM sys.all_objects "
         SQLStr &=
@@ -1326,11 +1326,11 @@ Public Class OIT0002LinkDetail
                     OIT0002WKtbl.Load(SQLdrNum)
                 End Using
 
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)  '削除フラグ
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表受注№
+                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   '削除フラグ
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '貨車連結順序表受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)  '空車発駅名
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)  '空車着駅名
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)  '利用可能日
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 11)  '利用可能日
 
                 Dim strOrderNo As String = ""
                 Dim intDetailNo As Integer = 0
@@ -1338,7 +1338,7 @@ Public Class OIT0002LinkDetail
                 PARA0.Value = C_DELETE_FLG.ALIVE
 
                 For Each OIT0002WKrow As DataRow In OIT0002WKtbl.Rows
-                    strOrderNo = OIT0002WKrow("LINKNO")
+                    'strOrderNo = OIT0002WKrow("LINKNO")
                     intDetailNo = OIT0002WKrow("LINKDETAILNO")
                     PARA1.Value = OIT0002WKrow("LINKNO")
                     PARA2.Value = LblDepstationName.Text
@@ -1351,31 +1351,37 @@ Public Class OIT0002LinkDetail
                     OIT0002tbl.Load(SQLdr)
                 End Using
 
+                Dim cnt As Integer = 0
                 Dim i As Integer = 0
                 Dim j As Integer = 9000
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    cnt += 1
 
-                    '行追加データに既存の受注№を設定する。
-                    '既存データがなく新規データの場合は、SQLでの項目[受注№]を利用
-                    If OIT0002row("LINECNT") = 0 Then
-                        If work.WF_SEL_CREATEFLG.Text = "1" Then
-                            OIT0002row("LINKNO") = strOrderNo
-                            OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
-                        Else
-                            OIT0002row("LINKNO") = work.WF_SEL_LINKNO.Text
-                            OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
-                        End If
+                    If cnt = intDetailNo Then
+                        OIT0002row("LINECNT") = intDetailNo
+                        OIT0002row("LINKDETAILNO") = Format(intDetailNo, "000")
                     End If
+                    ''行追加データに既存の受注№を設定する。
+                    ''既存データがなく新規データの場合は、SQLでの項目[受注№]を利用
+                    'If OIT0002row("LINECNT") = 0 Then
+                    '    If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '        OIT0002row("LINKNO") = strOrderNo
+                    '        OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
+                    '    Else
+                    '        OIT0002row("LINKNO") = work.WF_SEL_LINKNO.Text
+                    '        OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
+                    '    End If
+                    'End If
 
-                    '削除対象データと通常データとそれぞれでLINECNTを振り分ける
-                    If OIT0002row("HIDDEN") = 1 Then
-                        j += 1
-                        OIT0002row("LINECNT") = j        'LINECNT
-                    Else
-                        i += 1
-                        OIT0002row("LINECNT") = i        'LINECNT
-                    End If
-                    intDetailNo += 1
+                    ''削除対象データと通常データとそれぞれでLINECNTを振り分ける
+                    'If OIT0002row("HIDDEN") = 1 Then
+                    '    j += 1
+                    '    OIT0002row("LINECNT") = j        'LINECNT
+                    'Else
+                    '    i += 1
+                    '    OIT0002row("LINECNT") = i        'LINECNT
+                    'End If
+                    'intDetailNo += 1
                 Next
             End Using
         Catch ex As Exception
@@ -2494,16 +2500,44 @@ Public Class OIT0002LinkDetail
 
                 Dim WW_GetValue() As String = {"", "", "", "", "", ""}
                 FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+
+                '先にアラームの確認を行う
+                Dim info As String = ""
+                For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    If Trim(OIT0002row("LINETRAINNO")) = "" Or
+                                Trim(OIT0002row("LINEORDER")) = "" Or
+                                Trim(OIT0002row("TANKNUMBER")) = "" Then
+                        'エラー行は何もしない
+                    Else
+                        '受付情報が「検査間近有」の場合は優先して設定 
+                        If OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
+                                   OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Or
+                                   OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
+                                    OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Then
+                            info = WW_ORDERINFOALERM_82
+                            Exit For '優先度最大なので、判定にかかった段階でForループを抜ける
+
+                            'タンク車数が「最大牽引タンク車数」より大きい場合
+                        ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
+                            '80(タンク車数オーバー)を設定
+                            info = WW_ORDERINFOALERM_80
+
+                        Else
+                            '何もしない
+                        End If
+                    End If
+                Next
+
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     '必須項目が全部空白の行はスキップする
                     If Trim(OIT0002row("LINETRAINNO")) = "" And
-                        Trim(OIT0002row("LINEORDER")) = "" And
-                        Trim(OIT0002row("TANKNUMBER")) = "" Then
+                            Trim(OIT0002row("LINEORDER")) = "" And
+                            Trim(OIT0002row("TANKNUMBER")) = "" Then
                         '何もしない
                     Else    '必須項目が1～2個空白の行がある場合、エラーを出す
                         If Trim(OIT0002row("LINETRAINNO")) = "" Or
-                            Trim(OIT0002row("LINEORDER")) = "" Or
-                            Trim(OIT0002row("TANKNUMBER")) = "" Then
+                                Trim(OIT0002row("LINEORDER")) = "" Or
+                                Trim(OIT0002row("TANKNUMBER")) = "" Then
 
                             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER" & " （入線列車番号、入線順序、タンク車番号のいずれかが未入力です）", needsPopUp:=True)
 
@@ -2529,32 +2563,22 @@ Public Class OIT0002LinkDetail
                                 PARA04.Value = "1"
                             End If
 
-                            If work.WF_SEL_INFO.Text <> "" Then             '情報
-                                PARA05.Value = work.WF_SEL_INFO.Text
+                            If info = "" Then
+                                If work.WF_SEL_INFO.Text <> "" Then             '情報
+                                    PARA05.Value = work.WF_SEL_INFO.Text
+                                Else
+                                    PARA05.Value = ""
+                                End If
                             Else
-                                PARA05.Value = ""
-                            End If
-                            '受付情報が「検査間近有」の場合は優先して設定 
-                            If OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
-                               OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Or
-                               OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
-                                OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Then
-                                PARA05.Value = WW_ORDERINFOALERM_82
-
-                                'タンク車数が「最大牽引タンク車数」より大きい場合
-                            ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
-                                '80(タンク車数オーバー)を設定
-                                PARA05.Value = WW_ORDERINFOALERM_80
-
-                            ElseIf Integer.Parse(TxtTotalTank.Text) <= Integer.Parse(WW_GetValue(3)) Then
-                                PARA05.Value = ""
+                                PARA05.Value = info
                             End If
 
                             If work.WF_SEL_PREORDERNO.Text <> "" Then             '前回オーダー№
                                 PARA06.Value = work.WF_SEL_PREORDERNO.Text
                             Else
-                                PARA06.Value = "XXXXXXXXXXX"
+                                PARA06.Value = ""
                             End If
+
                             PARA07.Value = TxtHeadOfficeTrain.Text            '本線列車
                             PARA08.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
                             PARA09.Value = TxtDepstation.Text                 '空車発駅（着駅）コード
@@ -2588,14 +2612,14 @@ Public Class OIT0002LinkDetail
                                     LNG_TxtKTank1 += 1
                                     CNT_Total += 1
                             'Case CONST_TxtKTank2
-                                'LNG_TxtKTank2 += 1
-                                'CNT_Total += 1
+                            'LNG_TxtKTank2 += 1
+                            'CNT_Total += 1
                                 Case CONST_TxtK3Tank1              '３号軽油
                                     LNG_TxtK3Tank1 += 1
                                     CNT_Total += 1
                             'Case CONST_TxtK3Tank2
-                                'LNG_TxtK3Tank2 += 1
-                                'CNT_Total += 1
+                            'LNG_TxtK3Tank2 += 1
+                            'CNT_Total += 1
                                 Case CONST_TxtK5Tank              '５号軽油
                                     LNG_TxtK5Tank += 1
                                     CNT_Total += 1
@@ -2606,8 +2630,8 @@ Public Class OIT0002LinkDetail
                                     LNG_TxtLTank1 += 1
                                     CNT_Total += 1
                             'Case CONST_TxtLTank2
-                                'LNG_TxtLTank2 += 1
-                                'CNT_Total += 1
+                            'LNG_TxtLTank2 += 1
+                            'CNT_Total += 1
                                 Case CONST_TxtATank               'Ａ重油
                                     LNG_TxtATank += 1
                                     CNT_Total += 1

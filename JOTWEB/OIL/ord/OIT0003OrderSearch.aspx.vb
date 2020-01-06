@@ -357,6 +357,16 @@ Public Class OIT0003OrderSearch
                         prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
                     End If
 
+                    '荷卸地
+                    If WF_FIELD.Value = "TxtUnloading" Then
+                        'prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                        If TxtSalesOffice.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam("01", "")
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(TxtSalesOffice.Text, "")
+                        End If
+                    End If
+
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .ActiveListBox()
                 Else
@@ -563,6 +573,9 @@ Public Class OIT0003OrderSearch
                 Case "OFFICECODE"       '営業所
                     prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "UNLOADING"        '荷受人
+                    prmData = work.CreateORDERSTATUSParam(WF_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "STATUS"           '状態
                     prmData = work.CreateORDERSTATUSParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, prmData)

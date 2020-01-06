@@ -122,6 +122,7 @@ Public Class GRIS0005LeftBox
         LC_COLOR
         LC_OBTAINED
         LC_SHIPPERSLIST
+        LC_CONSIGNEELIST
         LC_STATION
     End Enum
 
@@ -190,6 +191,7 @@ Public Class GRIS0005LeftBox
         LP_COLOR
         LP_OBTAINED
         LP_SHIPPERSLIST
+        LP_CONSIGNEELIST
         LP_STATION
     End Enum
 
@@ -554,6 +556,10 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST
                 '荷主
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SHIPPERSMASTER"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST
+                '荷受人
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "CONSIGNEEPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_STATION
                 '貨物駅

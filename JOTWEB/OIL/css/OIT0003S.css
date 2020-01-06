@@ -32,6 +32,16 @@
     text-decoration:underline;*/
 }
 
+/*営業所コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_OFFICECODE_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
 /*営業所コードinput tag*/
 #WF_OFFICECODE {
     position: fixed;
@@ -84,6 +94,17 @@
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
+
+/*年月日(カレンダーアイコン ※ワンクリック用)*/
+#WF_DATE_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(32.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
 /* 年月日 */
 #WF_DATE {
     position: fixed;
@@ -178,6 +199,16 @@
     text-decoration:underline;*/
 }
 
+/*荷卸地コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_UNLOADING_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(56.2% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
 /*荷卸地コードinput tag*/
 #WF_UNLOADING {
     position: fixed;
@@ -232,6 +263,17 @@
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
+
+/*状態コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_STATUS_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(68.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
 
 /*状態コードinput tag*/
 #WF_STATUS {

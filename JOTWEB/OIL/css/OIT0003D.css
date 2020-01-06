@@ -83,6 +83,7 @@
     left: 9em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
     #WF_ORDERTYPE input[type='text'] {
         Height: 1.4em;
@@ -108,6 +109,7 @@
     left: 9em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ORDERNO input[type='text'] {
@@ -126,13 +128,25 @@
     text-decoration:underline;*/
 }
 
+/*荷主(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_SHIPPERS_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 8.7em;
+    left: 28em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /*荷主 */
 #WF_SHIPPERSCODE {
     position: fixed;
     top: 8.5em;
-    left: 25em;
+    left: 28em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_SHIPPERSCODE input[type='text'] {
@@ -143,8 +157,8 @@
 /* 荷主名 */
 #WF_SHIPPERSNAME {
     position: fixed;
-    top: 8.5em;
-    left: 39em;
+    top: 8.7em;
+    left: 41em;
 }
 
     #WF_SHIPPERSNAME input[type=text] {
@@ -157,19 +171,31 @@
 #WF_CONSIGNEE_LABEL {
     position: fixed;
     top: 8.5em;
-    left: 58em;
+    left: 62em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
+}
+
+/*荷受人(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_CONSIGNEE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 8.7em;
+    left: 67em;
+    cursor: pointer;
+    z-index: 2;
 }
 
 /* 荷受人 */
 #WF_CONSIGNEECODE {
     position: fixed;
     top: 8.5em;
-    left: 60em;
+    left: 67em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_CONSIGNEECODE input[type='text'] {
@@ -180,8 +206,8 @@
 /* 荷受人名 */
 #WF_CONSIGNEENAME {
     position: fixed;
-    top: 8.5em;
-    left: 74em;
+    top: 8.7em;
+    left: 80em;
 }
 
     #WF_CONSIGNEENAME input[type=text] {
@@ -201,6 +227,17 @@
     text-decoration:underline;*/
 }
 
+/*本線列車(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_TRAINNO_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 10.7em;
+    left: 9em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /*本線列車 */
 #WF_TRAINNO {
     position: fixed;
@@ -208,6 +245,7 @@
     left: 9em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_TRAINNO input[type='text'] {
@@ -227,13 +265,25 @@
     text-decoration:underline;*/
 }
 
+/*発駅コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_DEPSTATION_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 10.7em;
+    left: 28em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /*発駅コード */
 #WF_DEPSTATIONCODE {
     position: fixed;
     top: 10.5em;
-    left: 25em;
+    left: 28em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_DEPSTATIONCODE input[type='text'] {
@@ -244,8 +294,8 @@
 /* 発駅名 */
 #WF_DEPSTATIONNAME {
     position: fixed;
-    top: 10.5em;
-    left: 39em;
+    top: 10.7em;
+    left: 41em;
 }
 
     #WF_DEPSTATIONNAME input[type=text] {
@@ -258,19 +308,31 @@
 #WF_ARRSTATION_LABEL {
     position: fixed;
     top: 10.5em;
-    left: 58em;
+    left: 62em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
+}
+
+/*着駅(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_ARRSTATION_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 10.7em;
+    left: 67em;
+    cursor: pointer;
+    z-index: 2;
 }
 
 /*着駅 */
 #WF_ARRSTATIONCODE {
     position: fixed;
     top: 10.5em;
-    left: 60em;
+    left: 67em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ARRSTATIONCODE input[type='text'] {
@@ -281,8 +343,8 @@
 /* 着駅名 */
 #WF_ARRSTATIONNAME {
     position: fixed;
-    top: 10.5em;
-    left: 74em;
+    top: 10.7em;
+    left: 80em;
 }
 
     #WF_ARRSTATIONNAME input[type=text] {
@@ -303,13 +365,25 @@
     text-decoration:underline;*/
 }
 
+/*(予定)積込日(カレンダーアイコン ※ワンクリック用)*/
+#WF_LOADINGDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 13.5em;
+    left: 9em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /*(予定)積込日 */
 #WF_LOADINGDATE {
     position: fixed;
-    top: 13.5em;
+    top: 13.3em;
     left: 9em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_LOADINGDATE input[type='text'] {
@@ -328,13 +402,25 @@
     text-decoration:underline;*/
 }
 
+/*(予定)発日(カレンダーアイコン ※ワンクリック用)*/
+#WF_DEPDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 13.5em;
+    left: 28em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /*(予定)発日 */
 #WF_DEPDATE {
     position: fixed;
-    top: 13.5em;
-    left: 25em;
+    top: 13.3em;
+    left: 28em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_DEPDATE input[type='text'] {
@@ -347,19 +433,31 @@
 #WF_ARRDATE_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 40em;
+    left: 42em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
 
+/*(予定)積車着日(カレンダーアイコン ※ワンクリック用)*/
+#WF_ARRDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 13.5em;
+    left: 48em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /* (予定)積車着日 */
 #WF_ARRDATE {
     position: fixed;
-    top: 13.5em;
-    left: 43em;
+    top: 13.3em;
+    left: 48em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ARRDATE input[type='text'] {
@@ -372,19 +470,31 @@
 #WF_ACCDATE_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 58em;
+    left: 62em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
 
+/*(予定)受入日(カレンダーアイコン ※ワンクリック用)*/
+#WF_ACCDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 13.5em;
+    left: 67em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /* (予定)受入日 */
 #WF_ACCDATE {
     position: fixed;
-    top: 13.5em;
-    left: 60em;
+    top: 13.3em;
+    left: 67em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ACCDATE input[type='text'] {
@@ -397,19 +507,31 @@
 #WF_EMPARRDATE_LABEL {
     position: fixed;
     top: 13.5em;
-    left: 75em;
+    left: 81em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
 
+/*(予定)空車着日(カレンダーアイコン ※ワンクリック用)*/
+#WF_EMPARRDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 13.5em;
+    left: 87em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /* (予定)空車着日 */
 #WF_EMPARRDATE {
     position: fixed;
-    top: 13.5em;
-    left: 78em;
+    top: 13.3em;
+    left: 87em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_EMPARRDATE input[type='text'] {
@@ -430,13 +552,25 @@
     text-decoration:underline;*/
 }
 
+/*(実績)積込日(カレンダーアイコン ※ワンクリック用)*/
+#WF_ACTUALLOADINGDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 15.5em;
+    left: 9em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /*(実績)積込日 */
 #WF_ACTUALLOADINGDATE {
     position: fixed;
-    top: 15.5em;
+    top: 15.3em;
     left: 9em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ACTUALLOADINGDATE input[type='text'] {
@@ -455,13 +589,25 @@
     text-decoration:underline;*/
 }
 
+/*(実績)発日(カレンダーアイコン ※ワンクリック用)*/
+#WF_ACTUALDEPDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 15.5em;
+    left: 28em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /*(実績)発日 */
 #WF_ACTUALDEPDATE {
     position: fixed;
-    top: 15.5em;
-    left: 25em;
+    top: 15.3em;
+    left: 28em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ACTUALDEPDATE input[type='text'] {
@@ -474,19 +620,31 @@
 #WF_ACTUALARRDATE_LABEL {
     position: fixed;
     top: 15.5em;
-    left: 40em;
+    left: 42em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
 
+/*(実績)積車着日(カレンダーアイコン ※ワンクリック用)*/
+#WF_ACTUALARRDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 15.5em;
+    left: 48em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /* (実績)積車着日 */
 #WF_ACTUALARRDATE {
     position: fixed;
-    top: 15.5em;
-    left: 43em;
+    top: 15.3em;
+    left: 48em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ACTUALARRDATE input[type='text'] {
@@ -499,19 +657,31 @@
 #WF_ACTUALACCDATE_LABEL {
     position: fixed;
     top: 15.5em;
-    left: 58em;
+    left: 62em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
 }
 
+/*(実績)受入日(カレンダーアイコン ※ワンクリック用)*/
+#WF_ACTUALACCDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 15.5em;
+    left: 67em;
+    cursor: pointer;
+    z-index: 2;
+}
+
 /* (実績)受入日 */
 #WF_ACTUALACCDATE {
     position: fixed;
-    top: 15.5em;
-    left: 60em;
+    top: 15.3em;
+    left: 67em;
     border-radius: 3px;
     padding-left: 21px;
+    z-index: 1;
 }
 
     #WF_ACTUALACCDATE input[type='text'] {
@@ -524,17 +694,28 @@
 #WF_ACTUALEMPARRDATE_LABEL {
     position: fixed;
     top: 15.5em;
-    left: 75em;
+    left: 81em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
+}
+
+/*(実績)空車着日(カレンダーアイコン ※ワンクリック用)*/
+#WF_ACTUALEMPARRDATE_ICON {
+    position: fixed;
+    height: 10px;
+    width: 10px;
+    top: 15.5em;
+    left: 87em;
+    cursor: pointer;
+    z-index: 2;
 }
 
 /* (実績)空車着日 */
 #WF_ACTUALEMPARRDATE {
     position: fixed;
     top: 15.5em;
-    left: 78em;
+    left: 87em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -972,6 +1153,133 @@
     }
 
 
+/* #################９行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 計上月(ラベル) */
+#WF_BUDGETMONTH_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11em;
+    left: 5em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 計上月 */
+#WF_BUDGETMONTH {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11em;
+    left: 6em;
+    border-radius: 3px;
+}
+
+    #WF_BUDGETMONTH input[type='text'] {
+        Height: 1.4em;
+        Width: 6em;
+    }
+
+/* -----------------２列目 ----------------- */
+/* 売上合計金額(ラベル) */
+#WF_TOTALSALES_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11em;
+    left: 8em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 売上合計金額 */
+#WF_TOTALSALES {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11em;
+    left: 8em;
+    border-radius: 3px;
+}
+
+    #WF_TOTALSALES input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------３列目 ----------------- */
+/* 支払合計金額(ラベル) */
+#WF_TOTALPAYMENT_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11em;
+    left: 10em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 支払合計金額 */
+#WF_TOTALPAYMENT {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11em;
+    left: 10em;
+    border-radius: 3px;
+}
+
+    #WF_TOTALPAYMENT input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+
+/* #################９行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 売上合計金額(ラベル) */
+#WF_TOTALSALES2_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.4em;
+    left: 18.1em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 売上合計金額 */
+#WF_TOTALSALES2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.4em;
+    left: 18.1em;
+    border-radius: 3px;
+}
+
+    #WF_TOTALSALES2 input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* -----------------２列目 ----------------- */
+/* 支払合計金額(ラベル) */
+#WF_TOTALPAYMENT2_LABEL {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.4em;
+    left: 20.1em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 支払合計金額 */
+#WF_TOTALPAYMENT2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.4em;
+    left: 20.1em;
+    border-radius: 3px;
+}
+
+    #WF_TOTALPAYMENT2 input[type='text'] {
+        Height: 1.4em;
+        Width: 10em;
+    }
 
 
 
@@ -996,7 +1304,7 @@
     position: relative;
     margin: 0em 0em 0em 0.2em;
     top: 0em;
-    left: 12.5em;
+    left: 12.8em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -1021,7 +1329,7 @@
     position: relative;
     margin: 0em 0em 0em 0em;
     top: 0em;
-    left: 12.5em;
+    left: 12.9em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -1071,7 +1379,7 @@
     position: relative;
     margin: 0em 0em 0em 0em;
     top: 0em;
-    left: 12.5em;
+    left: 12.8em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -1121,7 +1429,7 @@
     position: relative;
     margin: 0em 0em 0em 0em;
     top: 0em;
-    left: 12.5em;
+    left: 12.3em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -1146,7 +1454,7 @@
     position: relative;
     margin: 0em 0em 0em 0em;
     top: 0em;
-    left: 13em;
+    left: 12.6em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -1171,7 +1479,7 @@
     position: relative;
     margin: 0em 0em 0em 0em;
     top: 0em;
-    left: 13em;
+    left: 12.5em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -1220,7 +1528,7 @@
     position: relative;
     margin: 0em 0em 0em 0em;
     top: 0em;
-    left: 12.5em;
+    left: 12em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -1259,22 +1567,22 @@
 #WF_HTANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -1.6em;
+    top: -1.57em;
+    left: -1.05em;
     border-radius: 3px;
 }
 
     #WF_HTANK_W input[type='text'] {
         Height: 1.4em;
-        Width: 3.9em;
+        Width: 4em;
     }
 /* #################３行目 ################# */
 /* 車数（レギュラー） */
 #WF_RTANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -1.95em;
+    top: -1.57em;
+    left: -1.4em;
     border-radius: 3px;
 }
 
@@ -1288,8 +1596,8 @@
 #WF_TTANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -2.25em;
+    top: -1.57em;
+    left: -1.8em;
     border-radius: 3px;
 }
 
@@ -1303,8 +1611,8 @@
 #WF_MTTANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -2.6em;
+    top: -1.57em;
+    left: -2.2em;
     border-radius: 3px;
 }
 
@@ -1318,8 +1626,8 @@
 #WF_KTANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -3.05em;
+    top: -1.57em;
+    left: -2.5em;
     border-radius: 3px;
 }
 
@@ -1333,8 +1641,8 @@
 #WF_K3TANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -3.45em;
+    top: -1.57em;
+    left: -3em;
     border-radius: 3px;
 }
 
@@ -1348,8 +1656,8 @@
 #WF_K5TANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -3.8em;
+    top: -1.57em;
+    left: -3.35em;
     border-radius: 3px;
 }
 
@@ -1363,14 +1671,14 @@
 #WF_K10TANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -4.1em;
+    top: -1.57em;
+    left: -3.65em;
     border-radius: 3px;
 }
 
     #WF_K10TANK_W input[type='text'] {
         Height: 1.4em;
-        Width: 4.4em;
+        Width: 4.45em;
     }
 
 /* #################１０行目 ################# */
@@ -1378,14 +1686,14 @@
 #WF_LTANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -4.5em;
+    top: -1.57em;
+    left: -3.95em;
     border-radius: 3px;
 }
 
     #WF_LTANK_W input[type='text'] {
         Height: 1.4em;
-        Width: 4em;
+        Width: 3.9em;
     }
 
 /* #################１１行目 ################# */
@@ -1393,8 +1701,8 @@
 #WF_ATANK_W {
     position: relative;
     margin: 0em 0em 0em 0em;
-    top: -1.95em;
-    left: -4.85em;
+    top: -1.57em;
+    left: -4.3em;
     border-radius: 3px;
 }
 
@@ -1483,7 +1791,7 @@ div {
 .headerbox {
     top: 2.4em;
     left: 0em;
-    height: calc(-2.4em - 15.4em - 1.4em + 100%);
+    height: calc(-2.4em - 14.4em - 1.4em + 100%);
     width: 100%;
     position: fixed;
     overflow: hidden;
@@ -1494,7 +1802,7 @@ div {
 /* 実行画面 明細部 */
 
 .detailbox {
-    top: calc(-2.4em - 13.4em - 1.4em + 100%);
+    top: calc(-2.4em - 14.4em - 1.4em + 100%);
     bottom: 1.4em;
     left: 0em;
     height: 100%;

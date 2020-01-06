@@ -437,6 +437,51 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtATank_c2 As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtBudgetMonth コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtBudgetMonth As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTotalSales コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotalSales As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTitalPayment コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTitalPayment As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTotalSales2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotalSales2 As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTitalPayment2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTitalPayment2 As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_Dtab01 コントロール。
     '''</summary>
     '''<remarks>

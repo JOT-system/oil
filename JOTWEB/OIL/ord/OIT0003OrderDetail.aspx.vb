@@ -225,7 +225,7 @@ Public Class OIT0003OrderDetail
         TxtShippersCode.Text = work.WF_SEL_SHIPPERSCODE.Text
         '荷受人
         TxtConsigneeCode.Text = work.WF_SEL_CONSIGNEECODE.Text
-        '本社列車
+        '本線列車
         TxtTrainNo.Text = work.WF_SEL_TRAIN.Text
         '発駅
         TxtDepstationCode.Text = work.WF_SEL_DEPARTURESTATION.Text

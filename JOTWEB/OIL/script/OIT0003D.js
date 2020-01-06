@@ -20,34 +20,34 @@ function InitDisplay() {
         //更新ボタン活性／非活性(新規登録、更新で切り分け)
         if (document.getElementById('WF_CREATEFLG').value == "1") {
             //活性
-            document.getElementById("WF_ButtonINSERT").disabled = "";
+            //document.getElementById("WF_ButtonINSERT").disabled = "";
             //非活性 
-            document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
-            document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-            document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
-            document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
-            document.getElementById("WF_ButtonCSV").disabled = "disabled";
-            document.getElementById("WF_ButtonUPDATE").disabled = "";
+            //document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
+            //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
+            //document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
+            //document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
+            //document.getElementById("WF_ButtonCSV").disabled = "disabled";
+            //document.getElementById("WF_ButtonUPDATE").disabled = "";
         } else if (document.getElementById('WF_CREATEFLG').value == "2") {
             //非活性
-            document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+            //document.getElementById("WF_ButtonINSERT").disabled = "disabled";
             //活性 
-            document.getElementById("WF_ButtonALLSELECT").disabled = "";
-            document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
-            document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
-            document.getElementById("WF_ButtonLINE_ADD").disabled = "";
-            document.getElementById("WF_ButtonCSV").disabled = "";
-            document.getElementById("WF_ButtonUPDATE").disabled = "";
+            //document.getElementById("WF_ButtonALLSELECT").disabled = "";
+            //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
+            //document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
+            //document.getElementById("WF_ButtonLINE_ADD").disabled = "";
+            //document.getElementById("WF_ButtonCSV").disabled = "";
+            //document.getElementById("WF_ButtonUPDATE").disabled = "";
         };
 
     } else {
         //非活性 
-        document.getElementById("WF_ButtonINSERT").disabled = "disabled";
-        document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
-        document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-        document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
-        document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
-        document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
+        //document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+        //document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
+        //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
+        //document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
+        //document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
+        //document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     };
     
     /* 共通一覧のスクロールイベント紐づけ */

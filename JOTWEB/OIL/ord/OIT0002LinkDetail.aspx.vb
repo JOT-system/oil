@@ -1158,9 +1158,9 @@ Public Class OIT0002LinkDetail
                     & "        UPDTERMID   = @P13,      " _
                     & "        RECEIVEYMD  = @P14,      " _
                     & "        DELFLG      = @P03       " _
-                    & "  WHERE LINKNO     = @P01       " _
-                    & "    AND LINKDETAILNO    = @P02       " _
-                    & "    AND DELFLG     <> @P03       ;"
+                    & "  WHERE LINKNO       = @P01       " _
+                    & "    AND LINKDETAILNO = @P02       " _
+                    & "    AND DELFLG      <> @P03       ;"
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
@@ -1304,7 +1304,7 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS JRALLINSPECTIONALERTSTR " _
             & " , @P04                                           AS AVAILABLEYMD " _
             & " , @P00                                           AS DELFLG" _
-            & " , 'L' + FORMAT(GETDATE(),'yyyyMMdd') + @P01      AS LINKNO" _
+            & " , @P01                                           AS LINKNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS LINKDETAILNO" _
             & " FROM sys.all_objects "
         SQLStr &=
@@ -1326,11 +1326,11 @@ Public Class OIT0002LinkDetail
                     OIT0002WKtbl.Load(SQLdrNum)
                 End Using
 
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)  '削除フラグ
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表受注№
+                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)   '削除フラグ
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '貨車連結順序表受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)  '空車発駅名
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)  '空車着駅名
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)  '利用可能日
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 11)  '利用可能日
 
                 Dim strOrderNo As String = ""
                 Dim intDetailNo As Integer = 0
@@ -1338,7 +1338,7 @@ Public Class OIT0002LinkDetail
                 PARA0.Value = C_DELETE_FLG.ALIVE
 
                 For Each OIT0002WKrow As DataRow In OIT0002WKtbl.Rows
-                    strOrderNo = OIT0002WKrow("LINKNO")
+                    'strOrderNo = OIT0002WKrow("LINKNO")
                     intDetailNo = OIT0002WKrow("LINKDETAILNO")
                     PARA1.Value = OIT0002WKrow("LINKNO")
                     PARA2.Value = LblDepstationName.Text
@@ -1351,31 +1351,37 @@ Public Class OIT0002LinkDetail
                     OIT0002tbl.Load(SQLdr)
                 End Using
 
+                Dim cnt As Integer = 0
                 Dim i As Integer = 0
                 Dim j As Integer = 9000
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    cnt += 1
 
-                    '行追加データに既存の受注№を設定する。
-                    '既存データがなく新規データの場合は、SQLでの項目[受注№]を利用
-                    If OIT0002row("LINECNT") = 0 Then
-                        If work.WF_SEL_CREATEFLG.Text = "1" Then
-                            OIT0002row("LINKNO") = strOrderNo
-                            OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
-                        Else
-                            OIT0002row("LINKNO") = work.WF_SEL_LINKNO.Text
-                            OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
-                        End If
+                    If cnt = intDetailNo Then
+                        OIT0002row("LINECNT") = intDetailNo
+                        OIT0002row("LINKDETAILNO") = Format(intDetailNo, "000")
                     End If
+                    ''行追加データに既存の受注№を設定する。
+                    ''既存データがなく新規データの場合は、SQLでの項目[受注№]を利用
+                    'If OIT0002row("LINECNT") = 0 Then
+                    '    If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '        OIT0002row("LINKNO") = strOrderNo
+                    '        OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
+                    '    Else
+                    '        OIT0002row("LINKNO") = work.WF_SEL_LINKNO.Text
+                    '        OIT0002row("LINKDETAILNO") = intDetailNo.ToString("000")
+                    '    End If
+                    'End If
 
-                    '削除対象データと通常データとそれぞれでLINECNTを振り分ける
-                    If OIT0002row("HIDDEN") = 1 Then
-                        j += 1
-                        OIT0002row("LINECNT") = j        'LINECNT
-                    Else
-                        i += 1
-                        OIT0002row("LINECNT") = i        'LINECNT
-                    End If
-                    intDetailNo += 1
+                    ''削除対象データと通常データとそれぞれでLINECNTを振り分ける
+                    'If OIT0002row("HIDDEN") = 1 Then
+                    '    j += 1
+                    '    OIT0002row("LINECNT") = j        'LINECNT
+                    'Else
+                    '    i += 1
+                    '    OIT0002row("LINECNT") = i        'LINECNT
+                    'End If
+                    'intDetailNo += 1
                 Next
             End Using
         Catch ex As Exception
@@ -2553,7 +2559,7 @@ Public Class OIT0002LinkDetail
                             If work.WF_SEL_PREORDERNO.Text <> "" Then             '前回オーダー№
                                 PARA06.Value = work.WF_SEL_PREORDERNO.Text
                             Else
-                                PARA06.Value = "XXXXXXXXXXX"
+                                PARA06.Value = ""
                             End If
                             PARA07.Value = TxtHeadOfficeTrain.Text            '本線列車
                             PARA08.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード

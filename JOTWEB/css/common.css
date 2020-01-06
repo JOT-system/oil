@@ -570,7 +570,7 @@ div {
 
 .WF_ListBoxArea {
     position: relative;
-    top: 1.5em;
+    top: 3em;
     left: 1.2em;
     height: calc(100% - 12em);
     width: 25em;
@@ -626,8 +626,19 @@ div {
 
 
 #WF_LEFTBOXFILTER {
-    width: 342px;
+    width: 12em;
+    height: 2.1em;
     font-size: 1.2rem;
+    font: 16px/23px sans-serif;
+    color: #737373;
+    box-sizing: border-box;
+    padding: 0.3em;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    border-color: rgba(176, 176, 276, 0.6);
+    border-style: solid;
+    border-width: thin;
+    border-radius: 3px;
 }
 
 

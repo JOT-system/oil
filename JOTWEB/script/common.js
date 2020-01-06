@@ -317,8 +317,8 @@ function addLeftBoxFilter(ListObj) {
     // フィルタテキスト及びフィルタ実行ボタンを生成するタグ
     var filterTable = '<table id="WF_LeftBoxFilter">\n' +
         '  <tr>\n' +
-        '    <td><input id="WF_LEFTBOXFILTER" type="text" value="" title="Filter Condition" />\n' +
-        '    </td>\n' +
+        '    <td><a class="ef"><input id="WF_LEFTBOXFILTER" type="text" value="" title="Filter Condition" />\n' +
+        '    </a></td>\n' +
         '    <td><input id="WF_buttonFilter"  class="btn-sticky" type="button" value="検 索" />\n' +
         '    </td>\n' +
         '  </tr>\n' +

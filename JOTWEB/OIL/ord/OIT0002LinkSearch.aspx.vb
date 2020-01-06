@@ -271,6 +271,27 @@ Public Class OIT0002LinkSearch
             O_RTN = "ERR"
             Exit Sub
         End If
+        '日付過去チェック
+        If WF_STYMD_CODE.Text <> "" Then
+            Dim WW2_DATE_ST As Date
+            Try
+                Date.TryParse(WF_STYMD_CODE.Text, WW2_DATE_ST)
+
+                If WW2_DATE_ST < Today Then
+                    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WF_STYMD_CODE.Focus()
+                    WW_CheckMES1 = "利用可能日（開始）入力エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD_CODE.Text)
+                WF_STYMD_CODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End Try
+        End If
 
         '終了日
         '年月日チェック

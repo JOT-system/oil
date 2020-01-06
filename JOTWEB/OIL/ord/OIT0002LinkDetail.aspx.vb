@@ -1968,6 +1968,27 @@ Public Class OIT0002LinkDetail
             O_RTN = "ERR"
             Exit Sub
         End If
+        '日付過去チェック
+        If AvailableYMD.Text <> "" Then
+            Dim WW_DATE_AD As Date
+            Try
+                Date.TryParse(AvailableYMD.Text, WW_DATE_AD)
+
+                If WW_DATE_AD < Today Then
+                    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="利用可能日", needsPopUp:=True)
+                    AvailableYMD.Focus()
+                    WW_CheckMES1 = "利用可能日入力エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, AvailableYMD.Text)
+                AvailableYMD.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End Try
+        End If
 
         '空車発駅（着駅）
         If TxtDepstation.Text = "" Then
@@ -2041,6 +2062,27 @@ Public Class OIT0002LinkDetail
             O_RTN = "ERR"
             Exit Sub
         End If
+        '日付過去チェック
+        If TxtEmpDate.Text <> "" Then
+            Dim WW_DATE_ED As Date
+            Try
+                Date.TryParse(TxtEmpDate.Text, WW_DATE_ED)
+
+                If WW_DATE_ED < Today Then
+                    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="(予定)空車着日", needsPopUp:=True)
+                    TxtEmpDate.Focus()
+                    WW_CheckMES1 = "(予定)空車着日入力エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, TxtEmpDate.Text)
+                TxtEmpDate.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End Try
+        End If
 
         '(実績)空車着日
         If TxtActEmpDate.Text = "" Then
@@ -2054,6 +2096,27 @@ Public Class OIT0002LinkDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
+        End If
+        '日付過去チェック
+        If TxtActEmpDate.Text <> "" Then
+            Dim WW_DATE_AED As Date
+            Try
+                Date.TryParse(TxtActEmpDate.Text, WW_DATE_AED)
+
+                If WW_DATE_AED < Today Then
+                    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="(実績)空車着日", needsPopUp:=True)
+                    TxtActEmpDate.Focus()
+                    WW_CheckMES1 = "(実績)空車着日入力エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Catch ex As Exception
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, TxtActEmpDate.Text)
+                TxtActEmpDate.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End Try
         End If
 
         '(一覧)タンク車No(重複チェック)

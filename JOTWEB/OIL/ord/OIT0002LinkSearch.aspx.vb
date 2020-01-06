@@ -403,7 +403,7 @@ Public Class OIT0002LinkSearch
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
                             Case "WF_RETSTATION"       '空車着駅（発駅）
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "STATIONPATTERN")
+                                prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, "STATIONPATTERN", "1")
                             Case "WF_TRAINNO"          '本線列車
                                 prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
                         End Select

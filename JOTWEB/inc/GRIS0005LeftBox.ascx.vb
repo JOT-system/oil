@@ -122,6 +122,7 @@ Public Class GRIS0005LeftBox
         LC_COLOR
         LC_OBTAINED
         LC_SHIPPERSLIST
+        LC_STATION
     End Enum
 
     ''' <summary>
@@ -189,6 +190,7 @@ Public Class GRIS0005LeftBox
         LP_COLOR
         LP_OBTAINED
         LP_SHIPPERSLIST
+        LP_STATION
     End Enum
 
     ''' <summary>
@@ -553,6 +555,9 @@ Public Class GRIS0005LeftBox
                 '荷主
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SHIPPERSMASTER"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_STATION
+                '貨物駅
+                lbox = CreateStationList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing
@@ -1073,6 +1078,37 @@ Public Class GRIS0005LeftBox
                 O_RTN = GL0014PLANTList.ERR
                 lsbx = GL0014PLANTList.LIST
                 Dim cnt As Long = lsbx.Rows
+                LbMap.Add(key, lsbx)
+            End Using
+        End If
+
+        Return LbMap.Item(key)
+    End Function
+
+    ''' <summary>
+    ''' 貨物駅一覧を作成する
+    ''' </summary>
+    ''' <param name="Params">取得用パラメータ</param>
+    ''' <param name="O_RTN">成功可否</param>
+    ''' <returns>作成した一覧情報</returns>
+    ''' <remarks></remarks>
+    Protected Function CreateStationList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
+        Dim I_COMP = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
+        Dim I_CLASS = Params.Item(C_PARAMETERS.LP_FIX_CLASS)
+        Dim I_DEPARRFLG = Params.Item(C_PARAMETERS.LP_STATION)
+        Dim key As String = I_COMP & If(I_CLASS = String.Empty, "ALLVALUE", I_CLASS)
+        If Not LbMap.ContainsKey(key) Then
+            Dim lsbx As New ListBox
+
+            Using GL0015StationList As New GL0015StationList With {
+                   .CAMPCODE = I_COMP _
+                 , .CLAS = I_CLASS _
+                 , .DEPARRSTATIONFLG = I_DEPARRFLG _
+                 , .LIST = lsbx
+                }
+                GL0015StationList.getList()
+                O_RTN = GL0015StationList.ERR
+                lsbx = GL0015StationList.LIST
                 LbMap.Add(key, lsbx)
             End Using
         End If

@@ -48,16 +48,16 @@ Public Class OIT0002WRKINC
     End Function
 
     ''' <summary>
-    ''' 貨物車パターンの取得
+    ''' 貨物駅マスタの取得
     ''' </summary>
-    ''' <param name="I_STATIONPT"></param>
+    ''' <param name="I_COMPCODE"></param>
     ''' <returns></returns>
     ''' <remarks>全て</remarks>
-    Function CreateSTATIONPTParam(ByVal I_COMPCODE As String, ByVal I_STATIONPT As String) As Hashtable
+    Function CreateSTATIONPTParam(ByVal I_COMPCODE As String, Optional ByVal I_FIXCODE As String = "", Optional ByVal I_DEPARRFLG As String = "") As Hashtable
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
-        prmData.Item(C_PARAMETERS.LP_STATIONCODE) = I_STATIONPT
-        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+        prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = I_FIXCODE
+        prmData.Item(C_PARAMETERS.LP_STATION) = I_DEPARRFLG
         CreateSTATIONPTParam = prmData
     End Function
 

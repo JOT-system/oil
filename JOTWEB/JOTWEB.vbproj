@@ -241,6 +241,7 @@
     <Compile Include="base\GL\GL0001.vb" />
     <Compile Include="base\GL\GL0002.vb" />
     <Compile Include="base\GL\GL0003.vb" />
+    <Compile Include="base\GL\GL0015.vb" />
     <Compile Include="base\GL\GL0014.vb" />
     <Compile Include="base\GL\GL0012.vb" />
     <Compile Include="base\GS\GS0000.vb" />

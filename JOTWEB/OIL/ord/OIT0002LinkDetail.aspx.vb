@@ -2500,16 +2500,44 @@ Public Class OIT0002LinkDetail
 
                 Dim WW_GetValue() As String = {"", "", "", "", "", ""}
                 FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+
+                '先にアラームの確認を行う
+                Dim info As String = ""
+                For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    If Trim(OIT0002row("LINETRAINNO")) = "" Or
+                                Trim(OIT0002row("LINEORDER")) = "" Or
+                                Trim(OIT0002row("TANKNUMBER")) = "" Then
+                        'エラー行は何もしない
+                    Else
+                        '受付情報が「検査間近有」の場合は優先して設定 
+                        If OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
+                                   OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Or
+                                   OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
+                                    OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Then
+                            info = WW_ORDERINFOALERM_82
+                            Exit For '優先度最大なので、判定にかかった段階でForループを抜ける
+
+                            'タンク車数が「最大牽引タンク車数」より大きい場合
+                        ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
+                            '80(タンク車数オーバー)を設定
+                            info = WW_ORDERINFOALERM_80
+
+                        Else
+                            '何もしない
+                        End If
+                    End If
+                Next
+
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     '必須項目が全部空白の行はスキップする
                     If Trim(OIT0002row("LINETRAINNO")) = "" And
-                        Trim(OIT0002row("LINEORDER")) = "" And
-                        Trim(OIT0002row("TANKNUMBER")) = "" Then
+                            Trim(OIT0002row("LINEORDER")) = "" And
+                            Trim(OIT0002row("TANKNUMBER")) = "" Then
                         '何もしない
                     Else    '必須項目が1～2個空白の行がある場合、エラーを出す
                         If Trim(OIT0002row("LINETRAINNO")) = "" Or
-                            Trim(OIT0002row("LINEORDER")) = "" Or
-                            Trim(OIT0002row("TANKNUMBER")) = "" Then
+                                Trim(OIT0002row("LINEORDER")) = "" Or
+                                Trim(OIT0002row("TANKNUMBER")) = "" Then
 
                             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER" & " （入線列車番号、入線順序、タンク車番号のいずれかが未入力です）", needsPopUp:=True)
 
@@ -2535,25 +2563,14 @@ Public Class OIT0002LinkDetail
                                 PARA04.Value = "1"
                             End If
 
-                            If work.WF_SEL_INFO.Text <> "" Then             '情報
-                                PARA05.Value = work.WF_SEL_INFO.Text
+                            If info = "" Then
+                                If work.WF_SEL_INFO.Text <> "" Then             '情報
+                                    PARA05.Value = work.WF_SEL_INFO.Text
+                                Else
+                                    PARA05.Value = ""
+                                End If
                             Else
-                                PARA05.Value = ""
-                            End If
-                            '受付情報が「検査間近有」の場合は優先して設定 
-                            If OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
-                               OIT0002row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Or
-                               OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Or
-                                OIT0002row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW Then
-                                PARA05.Value = WW_ORDERINFOALERM_82
-
-                                'タンク車数が「最大牽引タンク車数」より大きい場合
-                            ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
-                                '80(タンク車数オーバー)を設定
-                                PARA05.Value = WW_ORDERINFOALERM_80
-
-                            ElseIf Integer.Parse(TxtTotalTank.Text) <= Integer.Parse(WW_GetValue(3)) Then
-                                PARA05.Value = ""
+                                PARA05.Value = info
                             End If
 
                             If work.WF_SEL_PREORDERNO.Text <> "" Then             '前回オーダー№
@@ -2561,6 +2578,7 @@ Public Class OIT0002LinkDetail
                             Else
                                 PARA06.Value = ""
                             End If
+
                             PARA07.Value = TxtHeadOfficeTrain.Text            '本線列車
                             PARA08.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
                             PARA09.Value = TxtDepstation.Text                 '空車発駅（着駅）コード
@@ -2594,14 +2612,14 @@ Public Class OIT0002LinkDetail
                                     LNG_TxtKTank1 += 1
                                     CNT_Total += 1
                             'Case CONST_TxtKTank2
-                                'LNG_TxtKTank2 += 1
-                                'CNT_Total += 1
+                            'LNG_TxtKTank2 += 1
+                            'CNT_Total += 1
                                 Case CONST_TxtK3Tank1              '３号軽油
                                     LNG_TxtK3Tank1 += 1
                                     CNT_Total += 1
                             'Case CONST_TxtK3Tank2
-                                'LNG_TxtK3Tank2 += 1
-                                'CNT_Total += 1
+                            'LNG_TxtK3Tank2 += 1
+                            'CNT_Total += 1
                                 Case CONST_TxtK5Tank              '５号軽油
                                     LNG_TxtK5Tank += 1
                                     CNT_Total += 1
@@ -2612,8 +2630,8 @@ Public Class OIT0002LinkDetail
                                     LNG_TxtLTank1 += 1
                                     CNT_Total += 1
                             'Case CONST_TxtLTank2
-                                'LNG_TxtLTank2 += 1
-                                'CNT_Total += 1
+                            'LNG_TxtLTank2 += 1
+                            'CNT_Total += 1
                                 Case CONST_TxtATank               'Ａ重油
                                     LNG_TxtATank += 1
                                     CNT_Total += 1

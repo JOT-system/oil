@@ -1,9 +1,6 @@
 ﻿.logonbox {
-    top: 6%;
-    bottom: 1.4em;
     width: 100%;
-    position: fixed;
-    left: 0em;
+    height:100%;
     background: -moz-linear-gradient(65deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
     background: -webkit-linear-gradient(65deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
     background: linear-gradient(25deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
@@ -20,11 +17,10 @@
 
 .logonkeybox {
     width: 350px;
-    margin-top: 8%;
+    padding-top: 8%;
     margin-right: auto;
     margin-bottom: 0px;
     margin-left: auto;
-    position: relative;
 }
 
     .logonkeybox p {

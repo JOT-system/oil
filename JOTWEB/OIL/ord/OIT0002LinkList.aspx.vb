@@ -424,7 +424,7 @@ Public Class OIT0002LinkList
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '有効年月日（終了）
         If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
-            SQLStr &= String.Format("    AND OIT0004.AVAILABLEYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
+            SQLStr &= "    AND OIT0004.AVAILABLEYMD     <= @P3"
         End If
 
         SQLStr &=
@@ -450,12 +450,14 @@ Public Class OIT0002LinkList
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 7)         '空車着駅（発駅）コード
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.Date)                '有効年月日(To)
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Date)                '有効年月日(From)
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)         '本線列車
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 1)         'ステータス
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
                 PARA1.Value = work.WF_SEL_RETSTATION.Text
                 PARA2.Value = work.WF_SEL_STYMD.Text
+                PARA3.Value = work.WF_SEL_ENDYMD.Text
                 PARA4.Value = work.WF_SEL_TRAINNO.Text
                 PARA5.Value = work.WF_SEL_SELECT.Text
                 PARA6.Value = C_DELETE_FLG.DELETE

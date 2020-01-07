@@ -74,48 +74,11 @@
     }
 
 /* -----------------２列目 ----------------- */
-/* 利用可能日(ラベル) */
-#WF_AVAILABLEYMD_LABEL {
-    position: fixed;
-    top: 6.5em;
-    left: 49.5em;
-    color: #000000;
-    /*    font-weight:bold; 
-    text-decoration:underline;*/
-}
-
-/*利用可能日(虫眼鏡アイコン ※ワンクリック用)*/
-#WF_AVAILABLEYMD_ICON {
-    position: fixed;
-    height: 20px;
-    width: 20px;
-    top: 6.7em;
-    left: 58.5em;
-    cursor: pointer;
-    z-index: 2;
-}
-
-/*利用可能日 */
-#WF_AVAILABLEYMD {
-    position: fixed;
-    top: 6.5em;
-    left: 58.5em;
-    border-radius: 3px;
-    padding-left: 21px;
-}
-
-    #WF_AVAILABLEYMD input[type='text'] {
-        Height: 1.4em;
-        Width: 10em;
-    }
-
-/* #################３行目 ################# */
-/* -----------------１列目 ----------------- */
 /* 空車発駅(ラベル) */
 #WF_DEPSTATION_LABEL {
     position: fixed;
-    top: 8.5em;
-    left: 2em;
+    top: 6.5em;
+    left: 22.5em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -126,8 +89,8 @@
     position: fixed;
     height: 20px;
     width: 20px;
-    top: 8.7em;
-    left: 11.5em;
+    top: 6.7em;
+    left: 31.5em;
     cursor: pointer;
     z-index: 2;
 }
@@ -135,8 +98,8 @@
 /*空車発駅コード */
 #WF_DEPSTATIONCODE {
     position: fixed;
-    top: 8.5em;
-    left: 11.5em;
+    top: 6.5em;
+    left: 31.5em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -149,11 +112,48 @@
 /* 空車発駅名 */
 #WF_DEPSTATIONNAME {
     position: fixed;
-    top: 8.5em;
-    left: 21.5em;
+    top: 6.5em;
+    left: 41.5em;
 }
 
     #WF_DEPSTATIONNAME input[type=text] {
+        Height: 1.4em;
+        Width: 10em;
+    }
+
+/* #################３行目 ################# */
+/* -----------------１列目 ----------------- */
+/* 利用可能日(ラベル) */
+#WF_AVAILABLEYMD_LABEL {
+    position: fixed;
+    top: 8.5em;
+    left: 2.0em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*利用可能日(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_AVAILABLEYMD_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: 8.7em;
+    left: 11.5em;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/*利用可能日 */
+#WF_AVAILABLEYMD {
+    position: fixed;
+    top: 8.5em;
+    left: 11.5em;
+    border-radius: 3px;
+    padding-left: 21px;
+}
+
+    #WF_AVAILABLEYMD input[type='text'] {
         Height: 1.4em;
         Width: 10em;
     }
@@ -163,7 +163,7 @@
 #WF_RETSTATION_LABEL {
     position: fixed;
     top: 8.5em;
-    left: 49.5em;
+    left: 22.5em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -175,7 +175,7 @@
     height: 20px;
     width: 20px;
     top: 8.7em;
-    left: 58.5em;
+    left: 31.5em;
     cursor: pointer;
     z-index: 2;
 }
@@ -184,7 +184,7 @@
 #WF_RETSTATIONCODE {
     position: fixed;
     top: 8.5em;
-    left: 58.5em;
+    left: 31.5em;
     border-radius: 3px;
     padding-left: 21px;
 }
@@ -198,7 +198,7 @@
 #WF_RETSTATIONNAME {
     position: fixed;
     top: 8.5em;
-    left: 68.5em;
+    left: 41.5em;
 }
 
     #WF_RETSTATIONNAME input[type=text] {
@@ -248,7 +248,7 @@
 #WF_ACTUALEMPARRDATE_LABEL {
     position: fixed;
     top: 10.5em;
-    left: 49.5em;
+    left: 22.5em;
     color: #000000;
     /*    font-weight:bold; 
     text-decoration:underline;*/
@@ -260,7 +260,7 @@
     height: 20px;
     width: 20px;
     top: 10.7em;
-    left: 58.5em;
+    left: 31.5em;
     cursor: pointer;
     z-index: 2;
 }
@@ -269,7 +269,7 @@
 #WF_ACTUALEMPARRDATE {
     position: fixed;
     top: 10.5em;
-    left: 58.5em;
+    left: 31.5em;
     border-radius: 3px;
     padding-left: 21px;
 }

@@ -3,94 +3,211 @@
     全体スタイル初期値定義
 
 ------------------------------ */
-
-
-
 /* ブラウザのデフォルト初期化 */
 
 * {
     margin: 0;
     padding: 0;
 }
-
-
-
 html {
+    height: 100%;
     font-size: 62.5%;
 }
-
-
-
 /* ブラウザのデフォルト初期化 */
-
 body {
     margin: 0;
     padding: 0;
     overflow: auto;
     font-size: 1.6em;
+}
+/* フォント共通定義 */
+body, td, th {
     font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
 }
 
-
-
-div {
+/* なんでもかんでもDIVはRelativeになるのでやめましょう */
+/*div {
     position: relative;
+}*/
+/* ボタンマウスオーバー時(アイコンを選択マークに変更) */
+input[type=button]:hover,
+input[type=submit]:hover,
+button:hover{
+    cursor: pointer;
 }
-
-
-
+/* ボタン使用不可の場合はカーソルを通常に変更 */
+input[type=button][disabled=disabled]:hover,
+input[type=button][disabled=""]:hover,
+input[type=submit][disabled=disabled]:hover,
+input[type=submit][disabled=""]:hover,
+button[disabled=disabled]:hover,
+button[disabled=""]:hover {
+    cursor: default;
+}
+/* 下部の隠しフィールド */
+#divHidden {
+    display: none;
+}
 /* ------------------------------
 
     擬似フレーム　スタイル定義
 
 ------------------------------ */
-
-
-
-/* タイトル部分 */
-
+/* 全要素をくくるdiv */
+#divContainer {
+    position: relative;
+    min-height: 100%;
+    height: auto !important; /* min-heightがないブラウザの対処 */
+    height: 100%;
+}
+/* ******************** */
+/* 共通ヘッダースタイル */
+/* ******************** */
+/* ヘッダー全体ボックス(タイトル部分) */
 #titlebox {
+    position: fixed;
+    height: 2.4em;
+    min-width: 600px;
     width: 100%;
-    margin: 0 auto 0 auto;
-    top: 0px;
+    top: 0;
+    overflow: hidden;
+    background-color: rgb(217,222,228);
+}
+/* 画面ID、タイトル等各文言を格納する表定義 */
+#tblTitlebox {
+    /* table-layout: fixed; */
+    width: 100%;
+    height: 2.4em;
+    border-collapse: collapse;
+    border: 0;
+    overflow: hidden;
+    border-spacing: 0;
+}
+/* 表内文言の共通定義個別は次のスタイル定義 */
+#tblTitlebox td {
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: small;
+    color: #2A3F54;
+    vertical-align: middle;
+    text-align: left;
+    white-space: nowrap;
+    border-spacing: 0;
+    overflow: hidden;
+}
+#tblTitlebox tr:nth-child(1) td:nth-child(3),
+#tblTitlebox tr:nth-child(2) td:nth-child(1){
+    height:1.2em;
+}
+/* 画面ID */
+#tblTitlebox tr:nth-child(1) td:nth-child(1) {
+    padding-left:10px;
+    vertical-align: top;
+    width: 180px;
+}
+
+/* 画面名称 */
+#tblTitlebox tr:nth-child(1) td:nth-child(2) {
+    font-size: x-large;
+    vertical-align: middle;
+    text-align: center;
+}
+#tblTitlebox tr:nth-child(1) td:nth-child(3) {
+    vertical-align:top;
+    text-align:left;
+    width:13em;
+}
+#tblTitlebox tr:nth-child(2) td:nth-child(1) {
+    text-align: left;
+}
+/* 右開閉アイコン */
+#tblTitlebox tr:nth-child(1) td:nth-child(4) {
+    width:32px;
+}
+/* 画面全体ヘッダーの右ボックス表示ボタンスタイル */
+#divShowRightBox {
+    width: 100%;
+    height: 100%;
+}
+#rightb {
+    display: block;
+    right: 2px;
+    bottom: 2px;
+    height: 90%;
+    //width: 28px;
+    background-image: url('../img/right.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.5;
+    filter: alpha(opacity=5);
+}
+#rightb:hover{
+    cursor: pointer;
+    opacity: 1;
+    filter: alpha(opacity=1);
+}
+/* ********************** */
+/* 共通コンテンツスタイル */
+/* ********************** */
+/* コンテンツのボックス */
+#divContensbox {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 2.4em; /* ヘッダーBOXのHeightに合わせる*/
+    bottom: 1.4em; /* フッターBOXのHeightに合わせる*/
+    overflow: auto;
+}
+/* コンテンツ直下のdivタグのPositionFixedは打ち消す*/
+/* 暫定です、コンテンツ直下のスタイル指定を正しくすれば不要になります */
+#divContensbox>div {
+    /*position:static !important;
+    height:100% !important;*/
+}
+/* ********** */
+/* フッター部 */
+/* ********** */
+.footerbox {
+    bottom: 0em;
+    height: 1.4em;
     left: 0em;
-    position: fixed;
-    overflow: hidden;
-    background-color: rgb(217,222,228);
-    text-align: center;
-}
-
-
-
-.titlebox_TEST {
-    top: 0px;
-    left: 0px;
-    height: 2.4em;
-    width: 100px;
-    margin: 0 auto 0 auto;
-    position: fixed;
-    overflow: hidden;
-    background-color: rgb(217,222,228);
-    text-align: center;
-}
-
-
-
-.titlebox_HONSHA {
-    top: 0px;
-    left: 0px;
-    height: 2.4em;
     width: 100%;
     position: fixed;
     overflow: hidden;
     background-color: rgb(217,222,228);
-    text-align: center;
+    vertical-align: middle;
+    z-index: 30;
 }
-
-
-
+/* フッターメッセージ情報 */
+.WF_MESSAGE {
+    display: inline-block;
+    margin-left: 1.5em;
+    height: 100%;
+    overflow: hidden;
+    color: blue;
+    font-size: small;
+    vertical-align: middle;
+}
+#WF_HELPIMG {
+    display: inline-block;
+    position: fixed;
+    right: 2px;
+    bottom: 2px;
+    height: 17px;
+    width: 17px;
+    background-image: url('../img/ヘルプ.jpg');
+    background-repeat: no-repeat;
+    z-index: 1;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+}
+/* ?ボタンマウスオーバー時 */
+#WF_HELPIMG:hover {
+    cursor: pointer;
+    opacity: 1;
+    filter: alpha(opacity=1);
+}
 /* 条件画面 */
-
 .searchbox {
     top: 2.4em;
     bottom: 1.4em;
@@ -101,21 +218,21 @@ div {
     background-color: rgb(255,255,255);
 }
 
-    .searchbox input[type='text'] {
-        font: 16px/23px sans-serif;
-        color: #737373;
-        box-sizing: border-box;
-        width: 100%;
-        padding: 0.3em;
-        padding-left: 1.3em;
-        transition: 0.3s;
-        letter-spacing: 1px;
-        border-color: rgba(176, 176, 276, 0.6);
-        border-style: solid;
-        border-width: thin;
-        border-radius: 3px;
-        /*    border: 1px solid #1b2538; */
-    }
+.searchbox input[type='text'] {
+    font: 16px/23px sans-serif;
+    color: #737373;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.3em;
+    padding-left: 1.3em;
+    transition: 0.3s;
+    letter-spacing: 1px;
+    border-color: rgba(176, 176, 276, 0.6);
+    border-style: solid;
+    border-width: thin;
+    border-radius: 3px;
+    /*    border: 1px solid #1b2538; */
+}
 
 
 .ef input[type='text']:focus {
@@ -187,18 +304,6 @@ div {
 
 
 
-/* フッター部 */
-
-.footerbox {
-    bottom: 0em;
-    height: 1.4em;
-    left: 0em;
-    width: 100%;
-    position: fixed;
-    overflow: hidden;
-    background-color: rgb(217,222,228);
-}
-
 
 
 /* 左ボックス */
@@ -227,82 +332,6 @@ div {
     overflow: hidden;
     background-color: gray;
     z-index: 21;
-}
-
-
-
-/* ------------------------------
-
-    画面共通項目 スタイル定義
-
------------------------------- */
-
-
-
-/* 画面ID */
-
-.WF_TITLEID {
-    height: 1em;
-    width: 18em;
-    overflow: hidden;
-    position: fixed;
-    left: 1em;
-    color: #2A3F54;
-    font-size: small;
-    vertical-align: middle;
-    text-align: left;
-}
-
-
-
-/* 画面名称 */
-
-.WF_TITLETEXT {
-    height: 30px;
-    width: 80%;
-    position: fixed;
-    top: 3px;
-    left: 3em;
-    color: #2A3F54;
-    overflow: hidden;
-    font-size: x-large;
-    vertical-align: middle;
-    text-align: center;
-    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
-}
-
-
-
-/* 会社名 */
-
-.WF_TITLECAMP {
-    height: 30px;
-    width: 18em;
-    overflow: hidden;
-    position: fixed;
-    top: 2px;
-    left: 82%;
-    color: #2A3F54;
-    font-size: small;
-    vertical-align: middle;
-    text-align: left;
-}
-
-
-
-/* 現在日時 */
-
-.WF_TITLEDATE {
-    height: 15px;
-    width: 13em;
-    overflow: hidden;
-    position: fixed;
-    top: 18px;
-    left: 82%;
-    color: #2A3F54;
-    font-size: small;
-    vertical-align: middle;
-    text-align: left;
 }
 
 
@@ -517,18 +546,6 @@ div {
 
 
 
-/* フッターメッセージ情報 */
-
-.WF_MESSAGE {
-    height: 16px;
-    overflow: hidden;
-    position: fixed;
-    left: 1.5em;
-    right: 1.5em;
-    color: blue;
-    font-size: small;
-    vertical-align: middle;
-}
 
 
 
@@ -593,7 +610,6 @@ div {
 #Calendar {
     background-color: rgba(153, 102, 0, 0.3);
     font-size: 1em;
-    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
     border-radius:5px;
 }
 

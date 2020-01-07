@@ -12,7 +12,7 @@
             , ['<%= pnlLeftList.ClientID%>', '<%= LF_SORTING_CODE%>', '<%= LF_FILTER_CODE%>','<%=LF_PARAM_DATA%>']
         ];
        </script>
-        <div class="LF_LEFTBOX" id="LF_LEFTBOX" >
+        <div class="LF_LEFTBOX" id="LF_LEFTBOX" style="width:24em;" >
             <div class="button" id="button">
                 <input type="hidden" id="WF_ButtonSel" class="btn-sticky" value="　選　択　"  onclick="ButtonClick('WF_ButtonSel');" />
                 <input type="button" id="WF_ButtonCan" class="btn-sticky" value="閉 じ る"  onclick="ButtonClick('WF_ButtonCan');" />

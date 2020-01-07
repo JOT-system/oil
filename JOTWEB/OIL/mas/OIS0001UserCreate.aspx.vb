@@ -306,7 +306,7 @@ Public Class OIS0001UserCreate
             & "        AND OIS0005.DELFLG  <> @P6" _
             & " WHERE" _
             & "    OIS0004.CAMPCODE    = @P1" _
-            & "    AND OIS0004.STYMD  >= @P4" _
+            & "    AND OIS0004.STYMD  <= @P4" _
             & "    AND OIS0004.DELFLG <> @P6"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
@@ -317,7 +317,7 @@ Public Class OIS0001UserCreate
 
         '有効年月日（終了）
         If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
-            SQLStr &= String.Format("    AND OIS0004.ENDYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
+            SQLStr &= "    AND OIS0004.ENDYMD     >= @P5"
         End If
 
         SQLStr &=
@@ -329,6 +329,10 @@ Public Class OIS0001UserCreate
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.Date)                '有効年月日(To)
+                If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
+                    Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)            '有効年月日(From)
+                    PARA5.Value = work.WF_SEL_ENDYMD.Text
+                End If
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
@@ -697,11 +701,11 @@ Public Class OIS0001UserCreate
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_PASSENDYMD"         'パスワード有効期限
-                                .WF_Calendar.Text = WF_PASSENDYMD.Text
+                                .WF_Calendar.Text = CDate(WF_PASSENDYMD.Text).ToString("yyyy/MM/dd")
                             Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_STYMD.Text
+                                .WF_Calendar.Text = CDate(WF_STYMD.Text).ToString("yyyy/MM/dd")
                             Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_ENDYMD.Text
+                                .WF_Calendar.Text = CDate(WF_ENDYMD.Text).ToString("yyyy/MM/dd")
                         End Select
                         .ActiveCalendar()
 
@@ -786,7 +790,6 @@ Public Class OIS0001UserCreate
 
             Case "WF_PASSWORD"
                 WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
-
         End Select
 
         '○ メッセージ表示
@@ -1086,6 +1089,8 @@ Public Class OIS0001UserCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIS0001INProw("PASSENDYMD") = CDate(OIS0001INProw("PASSENDYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1105,6 +1110,8 @@ Public Class OIS0001UserCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIS0001INProw("STYMD") = CDate(OIS0001INProw("STYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1124,6 +1131,8 @@ Public Class OIS0001UserCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIS0001INProw("ENDYMD") = CDate(OIS0001INProw("ENDYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 

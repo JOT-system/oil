@@ -208,7 +208,8 @@ div {
     top: 2.4em;
     bottom: 1.4em;
     left: 0em;
-    width: 0em;
+    width: 23em;
+    height:auto;
     overflow: hidden;
     background-color: rgba(242, 242, 242,1);
     z-index: 20;
@@ -573,13 +574,17 @@ div {
     top: 3em;
     left: 1.2em;
     height: calc(100% - 12em);
-    width: 25em;
+    width: 20.6em;
     overflow: hidden;
     overflow-y: auto;
     color: black;
     z-index: 30;
-    border: 2px solid blue;
-    background-color: #ccffff;
+    border: 1px solid;
+    border-color: rgba(176, 176, 276, 0.6);
+    background-color: rgba(255, 255, 255, 1);
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    font-size: 1em;
+    border-radius: 3px;
 }
 
 
@@ -626,7 +631,7 @@ div {
 
 
 #WF_LEFTBOXFILTER {
-    width: 12em;
+    width: 17em;
     height: 2.1em;
     font-size: 1.2rem;
     font: 16px/23px sans-serif;
@@ -644,7 +649,7 @@ div {
 
 
 #WF_buttonFilter {
-    width: 50px;
+    width: 60px;
     min-height: 22px;
 }
 

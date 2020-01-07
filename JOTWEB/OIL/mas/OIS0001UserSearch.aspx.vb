@@ -235,6 +235,8 @@ Public Class OIS0001UserSearch
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             O_RTN = "ERR"
             Exit Sub
+        Else
+            WF_STYMD_CODE.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
         End If
 
         '有効年月日(To)
@@ -247,6 +249,7 @@ Public Class OIS0001UserSearch
         'End If
         '年月日チェック
         If WF_ENDYMD_CODE.Text = "" Then
+            '何もしない
         Else
             WW_CheckDate(WF_ENDYMD_CODE.Text, "有効年月日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
             If dateErrFlag = "1" Then
@@ -255,6 +258,8 @@ Public Class OIS0001UserSearch
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 O_RTN = "ERR"
                 Exit Sub
+            Else
+                WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
             End If
         End If
 

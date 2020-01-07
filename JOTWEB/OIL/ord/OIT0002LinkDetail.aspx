@@ -54,32 +54,48 @@
 
             <!-- ■　登録営業所　■ -->
             <a id="WF_OFFICECODE_LABEL" class="requiredMark">登録営業所</a>
-            <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtOrderOffice" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <a id="WF_OFFICECODE_ICON" onclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);">
+                <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
             </a>
+            <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
+                <asp:TextBox CssClass="TextBox" ID="TxtOrderOffice" runat="server" onblur="MsgClear();" MaxLength="20"></asp:TextBox>
+            </a>
+
             <!-- ■　本線列車　■ -->
             <a id="WF_TRAIN_LABEL" class="requiredMark">本線列車</a>
+            <a id="WF_TRAIN_ICON" onclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);">
+                <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
+            </a>
             <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="TextBox" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
             </a>
             <!-- ■　利用可能日　■ -->
             <a id="WF_AVAILABLEYMD_LABEL" class="requiredMark">利用可能日</a>
+            <a id="WF_AVAILABLEYMD_ICON" onclick="Field_DBclick('AvailableYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
+            </a>
             <a class="ef" id="WF_AVAILABLEYMD" ondblclick="Field_DBclick('AvailableYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox CssClass="CalendarIcon" ID="AvailableYMD" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="TextBox" ID="AvailableYMD" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
 
             <!-- ■　空車発駅（着駅）　■ -->
             <a id="WF_DEPSTATION_LABEL" class="requiredMark">空車発駅</a>
+            <a id="WF_DEPSTATION_ICON" onclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);">
+                <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
+            </a>
             <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtDepstation" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="TextBox" ID="TxtDepstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
             </a>
             <a id="WF_DEPSTATIONNAME">
                 <asp:Label ID="LblDepstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
             </a>
             <!-- ■　空車着駅（発駅）　■ -->
             <a id="WF_RETSTATION_LABEL" class="requiredMark">空車着駅</a>
+            <a id="WF_RETSTATION_ICON" onclick="Field_DBclick('TxtRetstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);">
+                <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
+            </a>
             <a class="ef" id="WF_RETSTATIONCODE" ondblclick="Field_DBclick('TxtRetstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtRetstation');">
-                <asp:TextBox CssClass="BoxIcon" ID="TxtRetstation" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="TextBox" ID="TxtRetstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
             </a>
             <a id="WF_RETSTATIONNAME">
                 <asp:Label ID="LblRetstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -87,13 +103,19 @@
             
             <!-- ■　(予定)空車着日　■ -->
             <a id="WF_EMPARRDATE_LABEL" class="requiredMark">（予定）空車着日</a>
+            <a id="WF_EMPARRDATE_ICON" onclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
+            </a>
             <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox CssClass="CalendarIcon" ID="TxtEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="TextBox" ID="TxtEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(実績)空車着日　■ -->
             <a id="WF_ACTUALEMPARRDATE_LABEL">（実績）空車着日</a>
+            <a id="WF_ACTUALEMPARRDATE_ICON" onclick="Field_DBclick('TxtActEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
+            </a>
             <a class="ef" id="WF_ACTUALEMPARRDATE" ondblclick="Field_DBclick('TxtActEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox CssClass="CalendarIcon" ID="TxtActEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox CssClass="TextBox" ID="TxtActEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
         </div>
 

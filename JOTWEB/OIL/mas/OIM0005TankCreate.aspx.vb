@@ -1482,6 +1482,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("LEASESTYMD") = CDate(OIM0005INProw("LEASESTYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1501,6 +1503,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("LEASEENDYMD") = CDate(OIM0005INProw("LEASEENDYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1550,6 +1554,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("USERLIMIT") = CDate(OIM0005INProw("USERLIMIT")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1569,6 +1575,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("LIMITTEXTRADIARYSTATION") = CDate(OIM0005INProw("LIMITTEXTRADIARYSTATION")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1608,6 +1616,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("EXTRADINARYLIMIT") = CDate(OIM0005INProw("EXTRADINARYLIMIT")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1667,6 +1677,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("ALLINSPECTIONDATE") = CDate(OIM0005INProw("ALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1686,6 +1698,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("TRANSFERDATE") = CDate(OIM0005INProw("TRANSFERDATE")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1711,6 +1725,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("SPECIFIEDDATE") = CDate(OIM0005INProw("SPECIFIEDDATE")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1726,6 +1742,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("JRALLINSPECTIONDATE") = CDate(OIM0005INProw("JRALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1741,6 +1759,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("JRINSPECTIONDATE") = CDate(OIM0005INProw("JRINSPECTIONDATE")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1756,6 +1776,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("INSPECTIONDATE") = CDate(OIM0005INProw("INSPECTIONDATE")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1771,6 +1793,8 @@ Public Class OIM0005TankCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIM0005INProw("JRSPECIFIEDDATE") = CDate(OIM0005INProw("JRSPECIFIEDDATE")).ToString("yyyy/MM/dd")
                 End If
             End If
 

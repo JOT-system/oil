@@ -270,6 +270,8 @@ Public Class OIT0002LinkSearch
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             O_RTN = "ERR"
             Exit Sub
+        Else
+            WF_STYMD_CODE.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
         End If
         '日付過去チェック
         If WF_STYMD_CODE.Text <> "" Then
@@ -304,6 +306,8 @@ Public Class OIT0002LinkSearch
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 O_RTN = "ERR"
                 Exit Sub
+            Else
+                WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
             End If
         End If
 
@@ -411,9 +415,9 @@ Public Class OIT0002LinkSearch
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_STYMD_CODE.Text
+                                .WF_Calendar.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
                             Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_ENDYMD_CODE.Text
+                                .WF_Calendar.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
                         End Select
                         .ActiveCalendar()
                     Case Else

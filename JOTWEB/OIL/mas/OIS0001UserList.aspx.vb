@@ -385,7 +385,7 @@ Public Class OIS0001UserList
 
         '有効年月日（終了）
         If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
-            SQLStr &= String.Format("    AND OIS0004.ENDYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
+            SQLStr &= "    AND OIS0004.ENDYMD     <= @P5"
         End If
 
         SQLStr &=
@@ -397,10 +397,12 @@ Public Class OIS0001UserList
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)        '会社コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.Date)                '有効年月日(To)
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)                '有効年月日(From)
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
                 PARA1.Value = work.WF_SEL_CAMPCODE.Text
                 PARA4.Value = work.WF_SEL_STYMD.Text
+                PARA5.Value = work.WF_SEL_ENDYMD.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()

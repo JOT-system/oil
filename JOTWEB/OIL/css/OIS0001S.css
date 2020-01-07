@@ -9,6 +9,16 @@
     color: #737373;
 }
 
+/*会社コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_CAMPCODE_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
 /*会社コードinput tag*/
 #WF_CAMPCODE {
     position: fixed;
@@ -40,6 +50,16 @@
     color: #737373;
 }
 
+/*開始年月日(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_STYMD_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(31.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
 /*開始年月日input tag*/
 #WF_STYMD {
     position: fixed;
@@ -64,6 +84,16 @@
     color: #737373;
 }
 
+/*終了年月日(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_ENDYMD_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(40.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
 /*終了年月日input tag*/
 #WF_ENDYMD {
     position: fixed;
@@ -86,6 +116,16 @@
     top: calc(48% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
+}
+
+/*組織コード(虫眼鏡アイコン ※ワンクリック用)*/
+#WF_ORG_ICON {
+    position: fixed;
+    height: 20px;
+    width: 20px;
+    top: calc(53.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
 }
 
 /*組織コードinput tag*/

@@ -697,11 +697,11 @@ Public Class OIS0001UserCreate
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_PASSENDYMD"         'パスワード有効期限
-                                .WF_Calendar.Text = WF_PASSENDYMD.Text
+                                .WF_Calendar.Text = CDate(WF_PASSENDYMD.Text).ToString("yyyy/MM/dd")
                             Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_STYMD.Text
+                                .WF_Calendar.Text = CDate(WF_STYMD.Text).ToString("yyyy/MM/dd")
                             Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_ENDYMD.Text
+                                .WF_Calendar.Text = CDate(WF_ENDYMD.Text).ToString("yyyy/MM/dd")
                         End Select
                         .ActiveCalendar()
 
@@ -786,7 +786,6 @@ Public Class OIS0001UserCreate
 
             Case "WF_PASSWORD"
                 WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
-
         End Select
 
         '○ メッセージ表示
@@ -1086,6 +1085,8 @@ Public Class OIS0001UserCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIS0001INProw("PASSENDYMD") = CDate(OIS0001INProw("PASSENDYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1105,6 +1106,8 @@ Public Class OIS0001UserCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIS0001INProw("STYMD") = CDate(OIS0001INProw("STYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 
@@ -1124,6 +1127,8 @@ Public Class OIS0001UserCreate
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                Else
+                    OIS0001INProw("ENDYMD") = CDate(OIS0001INProw("ENDYMD")).ToString("yyyy/MM/dd")
                 End If
             End If
 

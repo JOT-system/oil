@@ -734,7 +734,8 @@ Public Class OIT0002LinkDetail
 
                         'タンク車№
                         Case "TANKNUMBER"
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                            'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, "")
                     End Select
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -815,7 +816,6 @@ Public Class OIT0002LinkDetail
             '空車着駅（発駅）
             Case "TxtRetstation"
                 CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_RTN_SW)
-
         End Select
 
         '○ メッセージ表示
@@ -927,7 +927,7 @@ Public Class OIT0002LinkDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         AvailableYMD.Text = ""
                     Else
-                        AvailableYMD.Text = leftview.WF_Calendar.Text
+                        AvailableYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
                 End Try
@@ -950,7 +950,7 @@ Public Class OIT0002LinkDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         TxtEmpDate.Text = ""
                     Else
-                        TxtEmpDate.Text = leftview.WF_Calendar.Text
+                        TxtEmpDate.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
                 End Try
@@ -963,7 +963,7 @@ Public Class OIT0002LinkDetail
                     If WW_DATE < C_DEFAULT_YMD Then
                         TxtActEmpDate.Text = ""
                     Else
-                        TxtActEmpDate.Text = leftview.WF_Calendar.Text
+                        TxtActEmpDate.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
                 End Try
@@ -1964,6 +1964,8 @@ Public Class OIT0002LinkDetail
             AvailableYMD.Focus()
             O_RTN = "ERR"
             Exit Sub
+        Else
+            AvailableYMD.Text = CDate(AvailableYMD.Text).ToString("yyyy/MM/dd")
         End If
         '年月日チェック
         WW_CheckDate(AvailableYMD.Text, "利用可能日", WW_CS0024FCHECKERR, dateErrFlag)
@@ -2058,6 +2060,8 @@ Public Class OIT0002LinkDetail
             TxtEmpDate.Focus()
             O_RTN = "ERR"
             Exit Sub
+        Else
+            TxtEmpDate.Text = CDate(TxtEmpDate.Text).ToString("yyyy/MM/dd")
         End If
         '年月日チェック
         WW_CheckDate(TxtEmpDate.Text, "(予定)空車着日", WW_CS0024FCHECKERR, dateErrFlag)
@@ -2092,7 +2096,9 @@ Public Class OIT0002LinkDetail
 
         '(実績)空車着日
         If TxtActEmpDate.Text = "" Then
+            '何もしない
         Else
+            TxtActEmpDate.Text = CDate(TxtActEmpDate.Text).ToString("yyyy/MM/dd")
             '年月日チェック
             WW_CheckDate(TxtActEmpDate.Text, "(実績)空車着日", WW_CS0024FCHECKERR, dateErrFlag)
             If dateErrFlag = "1" Then

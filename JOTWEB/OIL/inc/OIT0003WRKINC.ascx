@@ -2,6 +2,7 @@
 
 <!-- Work レイアウト -->
 <div hidden="hidden">
+    <!-- ■受注検索用 -->
     <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>
     <!-- 運用部署 -->
@@ -23,6 +24,7 @@
     <!-- 状態名 -->
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>
 
+    <!-- ■受注一覧用 -->
     <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>
     <!-- 登録日 -->
@@ -126,11 +128,67 @@
 
     <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>
+
+    <!-- ■受注タンク車割当用 -->
+    <!-- 選択行 -->
+    <asp:TextBox ID="WF_SEL_LINK_LINECNT" runat="server"></asp:TextBox>
+    <!-- 登録日 -->
+    <asp:TextBox ID="WF_SEL_LINK_REGISTRATIONDATE" runat="server"></asp:TextBox>
+    <!-- ステータス -->
+    <asp:TextBox ID="WF_SEL_LINK_ORDERSTATUS" runat="server"></asp:TextBox>
+    <!-- 情報 -->
+    <asp:TextBox ID="WF_SEL_LINK_INFORMATION" runat="server"></asp:TextBox>
+    <!-- 前回オーダー№ -->
+    <asp:TextBox ID="WF_SEL_LINK_PREORDERNO" runat="server"></asp:TextBox>
+    <!-- 列車 -->
+    <asp:TextBox ID="WF_SEL_LINK_TRAIN" runat="server"></asp:TextBox>
+    <!-- 担当営業所 -->
+    <asp:TextBox ID="WF_SEL_LINK_ORDERSALESOFFICE" runat="server"></asp:TextBox>
+    <!-- 空車発駅(名) -->
+    <asp:TextBox ID="WF_SEL_LINK_DEPARTURESTATION" runat="server"></asp:TextBox>
+    <!-- 空車着駅(名) -->
+    <asp:TextBox ID="WF_SEL_LINK_ARRIVALSTATION" runat="server"></asp:TextBox>
+    <!-- レギュラー(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_REGULAR_TANKCAR" runat="server"></asp:TextBox>
+    <!-- ハイオク(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_HIGHOCTANE_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 灯油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_KEROSENE_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 未添加灯油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_NOTADDED_KEROSENE_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 3号軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_NUM3DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 5号軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_NUM5DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 10号軽油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_NUM10DIESEL_TANKCAR" runat="server"></asp:TextBox>
+    <!-- LSA(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_LSA_TANKCAR" runat="server"></asp:TextBox>
+    <!-- A重油(タンク車数) -->
+    <asp:TextBox ID="WF_SEL_LINK_AHEAVY_TANKCAR" runat="server"></asp:TextBox>
+    <!-- タンク車合計 -->
+    <asp:TextBox ID="WF_SEL_LINK_TANKCARTOTAL" runat="server"></asp:TextBox>
+    <!-- 空車着日（予定） -->
+    <asp:TextBox ID="WF_SEL_LINK_EMPARRDATE" runat="server"></asp:TextBox>
+    <!-- 空車着日（実績） -->
+    <asp:TextBox ID="WF_SEL_LINK_ACTUALEMPARRDATE" runat="server"></asp:TextBox>
+
+    <!-- 削除フラグ -->
+    <asp:TextBox ID="WF_SEL_LINK_DELFLG" runat="server"></asp:TextBox>
+
+    <!-- ■共通 -->
     <!-- 作成フラグ -->
     <asp:TextBox ID="WF_SEL_CREATEFLG" runat="server"></asp:TextBox>
+    <!-- 作成(貨車連結用)フラグ -->
+    <asp:TextBox ID="WF_SEL_CREATELINKFLG" runat="server"></asp:TextBox>
 
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
+    <!-- 貨車連結用更新データ(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPLINKTBL" runat="server"></asp:TextBox>
+
     <!-- 基地コード -->
     <%--<asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>--%>
     <!-- 基地名 -->

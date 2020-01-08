@@ -55,7 +55,7 @@ Public Class OIT0003OrderLinkQuota
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
-                            'WF_Grid_DBClick()
+                            WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
@@ -67,7 +67,7 @@ Public Class OIT0003OrderLinkQuota
                     End Select
 
                     '○ 一覧再表示処理
-                    'DisplayGrid()
+                    DisplayGrid()
                 End If
             Else
                 '○ 初期化処理
@@ -381,7 +381,132 @@ Public Class OIT0003OrderLinkQuota
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
 
-        Master.TransitionPrevPage()
+        Master.TransitionPrevPage(work.WF_SEL_CAMPCODE.Text + "1")
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_Grid_DBClick()
+
+        Dim WW_LINECNT As Integer = 0
+        Dim WW_FIELD_OBJ As Object = Nothing
+        Dim WW_VALUE As String = ""
+        Dim WW_TEXT As String = ""
+
+        '○ LINECNT取得
+        Try
+            Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT)
+            WW_LINECNT -= 1
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        ''〇 受注進行ステータスが"900(受注キャンセル)"の場合は何もしない
+        'WW_ORDERSTATUS = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUS")
+        'If WW_ORDERSTATUS = CONST_ORDERSTS_CAN Then
+        '    Exit Sub
+        'End If
+
+        '選択行
+        work.WF_SEL_LINK_LINECNT.Text = OIT0003tbl.Rows(WW_LINECNT)("LINECNT")
+        '登録日
+        work.WF_SEL_LINK_REGISTRATIONDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("AVAILABLEYMD")
+        '受注進行ステータス
+        work.WF_SEL_LINK_ORDERSTATUS.Text = OIT0003tbl.Rows(WW_LINECNT)("STATUS")
+        '受注情報
+        work.WF_SEL_LINK_INFORMATION.Text = OIT0003tbl.Rows(WW_LINECNT)("INFO")
+        '前回オーダー№
+        work.WF_SEL_LINK_PREORDERNO.Text = OIT0003tbl.Rows(WW_LINECNT)("PREORDERNO")
+        '本線列車
+        work.WF_SEL_LINK_TRAIN.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNO")
+        '担当営業所
+        work.WF_SEL_LINK_ORDERSALESOFFICE.Text = OIT0003tbl.Rows(WW_LINECNT)("OFFICECODE")
+        '空車発駅(名)
+        work.WF_SEL_LINK_DEPARTURESTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
+        '空車着駅(名)
+        work.WF_SEL_LINK_ARRIVALSTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("RETSTATIONNAME")
+        '車数（レギュラー）
+        work.WF_SEL_LINK_REGULAR_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("RTANK")
+        '車数（ハイオク）
+        work.WF_SEL_LINK_HIGHOCTANE_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("HTANK")
+        '車数（灯油）
+        work.WF_SEL_LINK_KEROSENE_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("TTANK")
+        '車数（未添加灯油）
+        work.WF_SEL_LINK_NOTADDED_KEROSENE_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("MTTANK")
+        '車数（軽油）
+        work.WF_SEL_LINK_DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("KTANK")
+        '車数（３号軽油）
+        work.WF_SEL_LINK_NUM3DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K3TANK")
+        '車数（５号軽油）
+        work.WF_SEL_LINK_NUM5DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K5TANK")
+        '車数（１０号軽油）
+        work.WF_SEL_LINK_NUM10DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K10TANK")
+        '車数（LSA）
+        work.WF_SEL_LINK_LSA_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("LTANK")
+        '車数（A重油）
+        work.WF_SEL_LINK_AHEAVY_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("ATANK")
+        '合計車数
+        work.WF_SEL_LINK_TANKCARTOTAL.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALTANK")
+        '空車着日（予定）
+        work.WF_SEL_LINK_EMPARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("EMPARRDATE")
+        '空車着日（実績）
+        work.WF_SEL_LINK_ACTUALEMPARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
+
+        '削除フラグ
+        work.WF_SEL_LINK_DELFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELFLG")
+        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        work.WF_SEL_CREATELINKFLG.Text = "2"
+
+        '○ 状態をクリア
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            Select Case OIT0003row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.NODISP
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            End Select
+
+        Next
+
+        '○ 選択明細の状態を設定
+        Select Case OIT0003tbl.Rows(WW_LINECNT)("OPERATION")
+            Case C_LIST_OPERATION_CODE.NODATA
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            Case C_LIST_OPERATION_CODE.NODISP
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            Case C_LIST_OPERATION_CODE.SELECTED
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+            Case C_LIST_OPERATION_CODE.UPDATING
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+            Case C_LIST_OPERATION_CODE.ERRORED
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+        End Select
+
+        '○画面切替設定
+        WF_BOXChange.Value = "detailbox"
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+        WF_GridDBclick.Text = ""
+
+        '遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
+
+        '画面表示データ保存(遷移先(登録画面)向け)
+        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPLINKTBL.Text)
+
+        '登録画面ページへ遷移
+        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
 
     End Sub
 
@@ -422,6 +547,85 @@ Public Class OIT0003OrderLinkQuota
 
     End Sub
 
+    ''' <summary>
+    ''' 一覧再表示処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DisplayGrid()
+
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            If OIT0003row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIT0003row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 表示LINECNT取得
+        If WF_GridPosition.Text = "" Then
+            WW_GridPosition = 1
+        Else
+            Try
+                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
+            Catch ex As Exception
+                WW_GridPosition = 1
+            End Try
+        End If
+
+        '○ 表示格納位置決定
+
+        '表示開始_格納位置決定(次頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelUp" Then
+            If (WW_GridPosition + CONST_SCROLLCOUNT) <= WW_DataCNT Then
+                WW_GridPosition += CONST_SCROLLCOUNT
+            End If
+        End If
+
+        '表示開始_格納位置決定(前頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelDown" Then
+            If (WW_GridPosition - CONST_SCROLLCOUNT) > 0 Then
+                WW_GridPosition -= CONST_SCROLLCOUNT
+            Else
+                WW_GridPosition = 1
+            End If
+        End If
+
+        '○ 画面(GridView)表示
+        Dim TBLview As DataView = New DataView(OIT0003tbl)
+
+        '○ ソート
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        '○ 一覧作成
+        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -466,6 +670,16 @@ Public Class OIT0003OrderLinkQuota
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
             Exit Sub
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 遷移先(登録画面)退避データ保存先の作成
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_CreateXMLSaveFile()
+        work.WF_SEL_INPLINKTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
+            Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPLINKTBL.txt"
 
     End Sub
 

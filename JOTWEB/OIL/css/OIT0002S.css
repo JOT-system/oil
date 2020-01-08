@@ -1,4 +1,5 @@
 ﻿/* 貨車連結順序表検索画面*/
+/* #################１行目 ################# */
 /*空車着駅コード見出し*/
 #WF_RETSTATION_LABEL {
     position: fixed;
@@ -40,6 +41,7 @@
     left: calc(55% - 50px/2);
 }
 
+/* #################２行目 ################# */
 /*開始年月日見出し*/
 #WF_STYMD_LABEL {
     position: fixed;
@@ -79,41 +81,42 @@
     position: fixed;
     height: 50px;
     width: 70px;
-    top: calc(36% - 50px/2);
-    left: calc(43.5% - 70px/2);
+    top: calc(32% - 50px/2);
+    left: calc(55% - 50px/2);
     color: #737373;
 }
 
 /*終了年月日(虫眼鏡アイコン ※ワンクリック用)*/
-#WF_ENDYMD_ICON {
+/*#WF_ENDYMD_ICON {
     position: fixed;
     height: 20px;
     width: 20px;
     top: calc(40.5% - 50px/2);
     left: calc(44.5% - 140px/2);
     cursor: pointer;
-}
+}*/
 
 /*終了年月日input tag*/
-#WF_ENDYMD {
+/*#WF_ENDYMD {
     position: fixed;
     height: 50px;
     width: 140px;
     top: calc(39% - 50px/2);
     left: calc(46% - 140px/2);
-}
+}*/
 
-    #WF_ENDYMD input[type='text'] {
+    /*#WF_ENDYMD input[type='text'] {
         Height: 2.1em;
         Width: 10em;
-    }
+    }*/
 
+/* #################３行目 ################# */
 /*本線列車番号見出し*/
 #WF_TRAINNO_LABEL {
     position: fixed;
     height: 50px;
     width: 70px;
-    top: calc(48% - 50px/2);
+    top: calc(39% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
 }
@@ -123,7 +126,7 @@
     position: fixed;
     height: 50px;
     width: 140px;
-    top: calc(52% - 50px/2);
+    top: calc(43% - 50px/2);
     left: calc(46% - 140px/2);
 }
 
@@ -133,18 +136,19 @@
     }
 
 /*本線列車番号名称*/
-#WF_TRAINNO_TEXT {
+/*#WF_TRAINNO_TEXT {
     position: fixed;
-    top: calc(53% - 50px/2);
+    top: calc(44% - 50px/2);
     left: calc(55% - 140px/2);
-}
+}*/
 
+/* #################４行目 ################# */
 /*ステータス見出し*/
 #WF_SW_LABEL {
     position: fixed;
     height: 50px;
     width: 210px;
-    top: calc(60% - 50px/2);
+    top: calc(51% - 50px/2);
     left: calc(43.5% - 70px/2);
     color: #737373;
 }
@@ -153,7 +157,7 @@
 #checkbox {
     position: fixed;
     height: 35px;
-    top: calc(64% - 50px/2);
+    top: calc(55% - 50px/2);
     left: calc(43.5% - 70px/2);
 }
 

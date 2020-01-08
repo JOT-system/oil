@@ -50,6 +50,15 @@ Partial Public Class OIS0001UserList
     Protected WithEvents WF_SEL_ORGNAME As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_ListCNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ListCNT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_ButtonFIRST2 コントロール。
     '''</summary>
     '''<remarks>

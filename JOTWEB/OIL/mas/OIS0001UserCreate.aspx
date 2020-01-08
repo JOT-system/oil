@@ -43,7 +43,7 @@
                         <a id="WF_DELFLG_ICON" class="ICON" onclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_DELFLG" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_DELFLG" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="1"></asp:TextBox>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="16.15em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -59,14 +59,14 @@
                     <!-- ユーザID -->
                     <span class="ef">
                         <asp:Label ID="WF_USERID_L" runat="server" Text="ユーザID" Width="14.85em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_USERID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_USERID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_USERID_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 社員名（短） -->
                     <span class="ef">
                         <asp:Label ID="WF_STAFFNAMES_L" runat="server" Text="社員名（短）" Width="14.85em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_STAFFNAMES" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_STAFFNAMES" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"  MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_STAFFNAMES_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -75,7 +75,7 @@
                     <!-- 社員名（長） -->
                     <span class="ef">
                         <asp:Label ID="WF_STAFFNAMEL_L" runat="server" Text="社員名（長）" Width="14.85em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_STAFFNAMEL" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_STAFFNAMEL" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                         <asp:Label ID="WF_STAFFNAMEL_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -91,7 +91,7 @@
                     <!-- パスワード -->
                     <span class="ef">
                         <asp:Label ID="WF_PASSWORD_L" runat="server" Text="パスワード" Width="14.85em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_PASSWORD" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" TextMode="Password"></asp:TextBox>
+                        <asp:TextBox ID="WF_PASSWORD" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" TextMode="Password" MaxLength="200"></asp:TextBox>
                         <asp:Label ID="WF_PASSWORD_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                    </span>
 
@@ -135,7 +135,7 @@
                         <a id="WF_CAMPCODE_ICON" class="ICON" onclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_CAMPCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_CAMPCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                         <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -145,7 +145,7 @@
                         <a id="WF_ORG_ICON" class="ICON" onclick="Field_DBclick('WF_ORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_ORG" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_ORG" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
                         <asp:Label ID="WF_ORG_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -154,7 +154,7 @@
                     <!-- メールアドレス -->
                     <span class="ef">
                         <asp:Label ID="WF_EMAIL_L" runat="server" Text="メールアドレス" Width="14.85em" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_EMAIL" runat="server" Width="29.5em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EMAIL" runat="server" Width="29.5em" CssClass="WF_TEXTBOX_CSS" MaxLength="128"></asp:TextBox>
                         <asp:Label ID="WF_EMAIL_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -166,7 +166,7 @@
                         <a id="WF_MENUROLE_ICON" class="ICON" onclick="Field_DBclick('WF_MENUROLE', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_MENUROLE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_MENUROLE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_MENUROLE_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -176,7 +176,7 @@
                         <a id="WF_MAPROLE_ICON" class="ICON" onclick="Field_DBclick('WF_MAPROLE', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_MAPROLE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_MAPROLE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_MAPROLE_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -188,7 +188,7 @@
                         <a id="WF_VIEWPROFID_ICON" class="ICON" onclick="Field_DBclick('WF_VIEWPROFID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_VIEWPROFID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_VIEWPROFID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_VIEWPROFID_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -198,7 +198,7 @@
                         <a id="WF_RPRTPROFID_ICON" class="ICON" onclick="Field_DBclick('WF_RPRTPROFID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_RPRTPROFID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_RPRTPROFID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_RPRTPROFID_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -207,7 +207,7 @@
                     <!-- 画面初期値ロール -->
                     <span class="ef">
                         <asp:Label ID="WF_VARIANT_L" runat="server" Text="画面初期値ロール" Width="14.85em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="WF_VARIANT" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_VARIANT" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_VARIANT_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -217,7 +217,7 @@
                         <a id="WF_APPROVALID_ICON" class="ICON" onclick="Field_DBclick('WF_APPROVALID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_APPROVALID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_APPROVALID" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_APPROVALID_TEXT" runat="server" Width="15.0em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>

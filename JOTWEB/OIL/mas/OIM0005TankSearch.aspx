@@ -52,7 +52,7 @@
         </a>
 
         <a class="ef" id="WF_TANKNUMBER" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
-            <asp:TextBox  ID="WF_TANKNUMBER_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <asp:TextBox  ID="WF_TANKNUMBER_CODE" runat="server" onblur="MsgClear();" MaxLength="8"></asp:TextBox>
         </a>
         <a id="WF_TANKNUMBER_TEXT">
             <asp:Label ID="WF_TANKNUMBER_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -64,7 +64,7 @@
             <asp:Image runat="server" ImageUrl="../img/leftbox.png"  />
         </a>
         <a class="ef"  id="WF_MODEL"  ondblclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_TANKMODEL%>);" onchange="TextBox_change('WF_MODEL');">
-            <asp:TextBox  ID="WF_MODEL_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
+            <asp:TextBox  ID="WF_MODEL_CODE" runat="server" onblur="MsgClear();" MaxLength="20"></asp:TextBox>
         </a>
         <a id="WF_MODEL_TEXT">
             <asp:Label ID="WF_MODEL_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>

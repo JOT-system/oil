@@ -217,6 +217,9 @@ Public Class OIM0005TankList
         '○ 画面表示データ保存
         Master.SaveTable(OIM0005tbl)
 
+        '〇 一覧の件数を取得
+        Me.WF_ListCNT.Text = "件数：" + OIM0005tbl.Rows.Count.ToString()
+
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(OIM0005tbl)
 

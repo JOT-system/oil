@@ -289,6 +289,9 @@ Public Class OIS0001UserList
         '○ 画面表示データ保存
         Master.SaveTable(OIS0001tbl)
 
+        '〇 一覧の件数を取得
+        Me.WF_ListCNT.Text = "件数：" + OIS0001tbl.Rows.Count.ToString()
+
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(OIS0001tbl)
 

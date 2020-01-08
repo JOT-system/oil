@@ -101,7 +101,7 @@ Public Class OIT0002LinkSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "RETSTATION", WF_RETSTATION_CODE.Text)   '空車着駅
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD_CODE.Text)             '有効年月日(From)
             WF_STYMD_CODE.Text = Format(CDate(WF_STYMD_CODE.Text).AddDays(1), "yyyy/MM/dd")
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD_CODE.Text)           '有効年月日(To)
+            'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD_CODE.Text)           '有効年月日(To)
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO_CODE.Text)         '本線列車
 
             'ステータス選択
@@ -113,7 +113,7 @@ Public Class OIT0002LinkSearch
             WF_ORG.Text = work.WF_SEL_ORG.Text        　　　　　'組織コード
             WF_RETSTATION_CODE.Text = work.WF_SEL_RETSTATION.Text    '空車着駅
             WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
-            WF_ENDYMD_CODE.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
+            'WF_ENDYMD_CODE.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
             WF_TRAINNO_CODE.Text = work.WF_SEL_TRAINNO.Text          '本線列車
 
             'ステータス選択
@@ -157,7 +157,7 @@ Public Class OIT0002LinkSearch
         Master.EraseCharToIgnore(WF_CAMPCODE.Text)          '会社コード
         Master.EraseCharToIgnore(WF_RETSTATION_CODE.Text)        '空着発駅
         Master.EraseCharToIgnore(WF_STYMD_CODE.Text)             '有効年月日(From)
-        Master.EraseCharToIgnore(WF_ENDYMD_CODE.Text)            '有効年月日(To)
+        'Master.EraseCharToIgnore(WF_ENDYMD_CODE.Text)            '有効年月日(To)
         Master.EraseCharToIgnore(WF_TRAINNO_CODE.Text)           '本線列車
 
         '○ チェック処理
@@ -171,7 +171,7 @@ Public Class OIT0002LinkSearch
         work.WF_SEL_ORG.Text = WF_ORG.Text        　　　　　'組織コード
         work.WF_SEL_RETSTATION.Text = WF_RETSTATION_CODE.Text    '空着着駅
         work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text              '有効年月日(From)
-        work.WF_SEL_ENDYMD.Text = WF_ENDYMD_CODE.Text      　'有効年月日(To)
+        'work.WF_SEL_ENDYMD.Text = WF_ENDYMD_CODE.Text      　'有効年月日(To)
         work.WF_SEL_TRAINNO.Text = WF_TRAINNO_CODE.Text    　　　'本線列車
         If WF_SW1.Checked = True Then
             work.WF_SEL_SELECT.Text = "1"                   '利用可のみ表示
@@ -296,42 +296,42 @@ Public Class OIT0002LinkSearch
         End If
 
         '終了日
-        '年月日チェック
-        If WF_ENDYMD_CODE.Text = "" Then
-        Else
-            WW_CheckDate(WF_ENDYMD_CODE.Text, "利用可能日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
-            If dateErrFlag = "1" Then
-                WF_ENDYMD_CODE.Focus()
-                WW_CheckMES1 = "利用可能日(終了)入力エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                O_RTN = "ERR"
-                Exit Sub
-            Else
-                WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
-            End If
-        End If
+        ''年月日チェック
+        'If WF_ENDYMD_CODE.Text = "" Then
+        'Else
+        '    WW_CheckDate(WF_ENDYMD_CODE.Text, "利用可能日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
+        '    If dateErrFlag = "1" Then
+        '        WF_ENDYMD_CODE.Focus()
+        '        WW_CheckMES1 = "利用可能日(終了)入力エラー。"
+        '        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+        '        O_RTN = "ERR"
+        '        Exit Sub
+        '    Else
+        '        WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
+        '    End If
+        'End If
 
-        '日付大小チェック
-        If WF_STYMD_CODE.Text <> "" AndAlso WF_ENDYMD_CODE.Text <> "" Then
-            Dim WW_DATE_ST As Date
-            Dim WW_DATE_END As Date
-            Try
-                Date.TryParse(WF_STYMD_CODE.Text, WW_DATE_ST)
-                Date.TryParse(WF_ENDYMD_CODE.Text, WW_DATE_END)
+        ''日付大小チェック
+        'If WF_STYMD_CODE.Text <> "" AndAlso WF_ENDYMD_CODE.Text <> "" Then
+        '    Dim WW_DATE_ST As Date
+        '    Dim WW_DATE_END As Date
+        '    Try
+        '        Date.TryParse(WF_STYMD_CODE.Text, WW_DATE_ST)
+        '        Date.TryParse(WF_ENDYMD_CODE.Text, WW_DATE_END)
 
-                If WW_DATE_ST > WW_DATE_END Then
-                    Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                    WF_STYMD_CODE.Focus()
-                    O_RTN = "ERR"
-                    Exit Sub
-                End If
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD_CODE.Text & ":" & WF_ENDYMD_CODE.Text)
-                WF_STYMD_CODE.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End Try
-        End If
+        '        If WW_DATE_ST > WW_DATE_END Then
+        '            Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '            WF_STYMD_CODE.Focus()
+        '            O_RTN = "ERR"
+        '            Exit Sub
+        '        End If
+        '    Catch ex As Exception
+        '        Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD_CODE.Text & ":" & WF_ENDYMD_CODE.Text)
+        '        WF_STYMD_CODE.Focus()
+        '        O_RTN = "ERR"
+        '        Exit Sub
+        '    End Try
+        'End If
 
         '本線列車
         If WF_TRAINNO_CODE.Text <> "" Then
@@ -416,8 +416,8 @@ Public Class OIT0002LinkSearch
                         Select Case WF_FIELD.Value
                             Case "WF_STYMD"         '有効年月日(From)
                                 .WF_Calendar.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
-                            Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
+                                'Case "WF_ENDYMD"        '有効年月日(To)
+                                '    .WF_Calendar.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
                         End Select
                         .ActiveCalendar()
                     Case Else
@@ -505,18 +505,18 @@ Public Class OIT0002LinkSearch
                 End Try
                 WF_STYMD_CODE.Focus()
 
-            Case "WF_ENDYMD"            '有効年月日(To)
-                Dim WW_DATE As Date
-                Try
-                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                    If WW_DATE < C_DEFAULT_YMD Then
-                        WF_ENDYMD_CODE.Text = ""
-                    Else
-                        WF_ENDYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                    End If
-                Catch ex As Exception
-                End Try
-                WF_ENDYMD_CODE.Focus()
+            'Case "WF_ENDYMD"            '有効年月日(To)
+            '    Dim WW_DATE As Date
+            '    Try
+            '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+            '        If WW_DATE < C_DEFAULT_YMD Then
+            '            WF_ENDYMD_CODE.Text = ""
+            '        Else
+            '            WF_ENDYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+            '        End If
+            '    Catch ex As Exception
+            '    End Try
+            '    WF_ENDYMD_CODE.Focus()
 
             Case "WF_TRAINNO"           '本線列車
                 WF_TRAINNO_CODE.Text = WW_SelectValue
@@ -544,8 +544,8 @@ Public Class OIT0002LinkSearch
                 WF_RETSTATION_CODE.Focus()
             Case "WF_STYMD"             '有効年月日(From)
                 WF_STYMD_CODE.Focus()
-            Case "WF_ENDYMD"            '有効年月日(To)
-                WF_ENDYMD_CODE.Focus()
+            'Case "WF_ENDYMD"            '有効年月日(To)
+            '    WF_ENDYMD_CODE.Focus()
             Case "WF_TRAINNO"           '本線列車
                 WF_TRAINNO_CODE.Focus()
         End Select

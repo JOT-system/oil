@@ -43,7 +43,7 @@
                         <a id="WF_DELFLG_ICON" class="ICON" onclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_DELFLG" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_DELFLG" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="1"></asp:TextBox>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -53,7 +53,7 @@
                         <a id="WF_TANKNUMBER_ICON" class="ICON" onclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_TANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_TANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
                         <a style="display:none;">
                         <asp:Label ID="WF_TANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                         </a>
@@ -67,7 +67,7 @@
                         <a id="WF_ORIGINOWNERCODE_ICON" class="ICON" onclick="Field_DBclick('WF_ORIGINOWNERCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORIGINOWNER%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_ORIGINOWNERCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_ORIGINOWNERCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_ORIGINOWNERCODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -77,7 +77,7 @@
                         <a id="WF_OWNERCODE_ICON" class="ICON" onclick="Field_DBclick('WF_OWNERCODE', <%=LIST_BOX_CLASSIFICATION.LC_OWNER%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_OWNERCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OWNERCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_OWNERCODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -89,7 +89,7 @@
                         <a id="WF_LEASECODE_ICON" class="ICON" onclick="Field_DBclick('WF_LEASECODE', <%=LIST_BOX_CLASSIFICATION.LC_LEASE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_LEASECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LEASECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_LEASECODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -99,7 +99,7 @@
                         <a id="WF_LEASECLASS_ICON" class="ICON" onclick="Field_DBclick('WF_LEASECLASS', <%=LIST_BOX_CLASSIFICATION.LC_LEASECLASS%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_LEASECLASS" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LEASECLASS" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_LEASECLASS_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -108,7 +108,7 @@
                     <!-- 自動延長 -->
                     <span class="ef">
                         <asp:Label ID="WF_AUTOEXTENTION_L" runat="server" Text="自動延長" Width="10.275em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_AUTOEXTENTION" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_AUTOEXTENTION" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_AUTOEXTENTION_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -139,7 +139,7 @@
                         <a id="WF_USERCODE_ICON" class="ICON" onclick="Field_DBclick('WF_USERCODE', <%=LIST_BOX_CLASSIFICATION.LC_THIRDUSER%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_USERCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_USERCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_USERCODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -151,7 +151,7 @@
                         <a id="WF_CURRENTSTATIONCODE_ICON" class="ICON" onclick="Field_DBclick('WF_CURRENTSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_CURRENTSTATIONCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_CURRENTSTATIONCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_CURRENTSTATIONCODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -161,7 +161,7 @@
                         <a id="WF_EXTRADINARYSTATIONCODE_ICON" class="ICON" onclick="Field_DBclick('WF_EXTRADINARYSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_EXTRADINARYSTATIONCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EXTRADINARYSTATIONCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYSTATIONCODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -195,7 +195,7 @@
                         <a id="WF_DEDICATETYPECODE_ICON" class="ICON" onclick="Field_DBclick('WF_DEDICATETYPECODE', <%=LIST_BOX_CLASSIFICATION.LC_DEDICATETYPE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_DEDICATETYPECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_DEDICATETYPECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_DEDICATETYPECODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -205,7 +205,7 @@
                         <a id="WF_EXTRADINARYTYPECODE_ICON" class="ICON" onclick="Field_DBclick('WF_EXTRADINARYTYPECODE', <%=LIST_BOX_CLASSIFICATION.LC_EXTRADINARYTYPE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_EXTRADINARYTYPECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EXTRADINARYTYPECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYTYPECODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -227,7 +227,7 @@
                         <a id="WF_OPERATIONBASECODE_ICON" class="ICON" onclick="Field_DBclick('WF_OPERATIONBASECODE', <%=LIST_BOX_CLASSIFICATION.LC_BASE%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_OPERATIONBASECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OPERATIONBASECODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_OPERATIONBASECODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -239,14 +239,14 @@
                         <a id="WF_COLORCODE_ICON" class="ICON" onclick="Field_DBclick('WF_COLORCODE', <%=LIST_BOX_CLASSIFICATION.LC_COLOR%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_COLORCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_COLORCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_COLORCODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- エネオス -->
                     <span class="ef">
                         <asp:Label ID="WF_ENEOS_L" runat="server" Text="エネオス" Width="10.275em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_ENEOS" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_ENEOS" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_ENEOS_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -255,7 +255,7 @@
                     <!-- エコレール -->
                     <span class="ef">
                         <asp:Label ID="WF_ECO_L" runat="server" Text="エコレール" Width="10.275em" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_ECO" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_ECO" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_ECO_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -287,7 +287,7 @@
                         <a id="WF_OBTAINEDCODE_ICON" class="ICON" onclick="Field_DBclick('WF_OBTAINEDCODE', <%=LIST_BOX_CLASSIFICATION.LC_OBTAINED%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_OBTAINEDCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OBTAINEDCODE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_OBTAINEDCODE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -299,14 +299,14 @@
                         <a id="WF_MODEL_ICON" class="ICON" onclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_TANKMODEL%>);">
                             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
                         </a>
-                        <asp:TextBox ID="WF_MODEL" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_MODEL" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_MODEL_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 形式カナ -->
                     <span class="ef">
                         <asp:Label ID="WF_MODELKANA_L" runat="server" Text="形式カナ" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_MODELKANA" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_MODELKANA" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
                         <asp:Label ID="WF_MODELKANA_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -322,7 +322,7 @@
                     <!-- 荷重単位 -->
                     <span class="ef">
                         <asp:Label ID="WF_LOADUNIT_L" runat="server" Text="荷重単位" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_LOADUNIT" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LOADUNIT" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                         <asp:Label ID="WF_LOADUNIT_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -338,7 +338,7 @@
                     <!-- 容積単位 -->
                     <span class="ef">
                         <asp:Label ID="WF_VOLUMEUNIT_L" runat="server" Text="容積単位" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_VOLUMEUNIT" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_VOLUMEUNIT" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                         <asp:Label ID="WF_VOLUMEUNIT_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -347,14 +347,14 @@
                     <!-- 原籍所有者 -->
                     <span class="ef">
                         <asp:Label ID="WF_ORIGINOWNERNAME_L" runat="server" Text="原籍所有者" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_ORIGINOWNERNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_ORIGINOWNERNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_ORIGINOWNERNAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 名義所有者 -->
                     <span class="ef">
                         <asp:Label ID="WF_OWNERNAME_L" runat="server" Text="名義所有者" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_OWNERNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OWNERNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_OWNERNAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -363,14 +363,14 @@
                     <!-- リース先 -->
                     <span class="ef">
                         <asp:Label ID="WF_LEASENAME_L" runat="server" Text="リース先" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_LEASENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LEASENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_LEASENAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- リース区分 -->
                     <span class="ef">
                         <asp:Label ID="WF_LEASECLASSNEMAE_L" runat="server" Text="リース区分" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_LEASECLASSNEMAE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_LEASECLASSNEMAE" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_LEASECLASSNEMAE_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -379,14 +379,14 @@
                     <!-- 第三者使用者 -->
                     <span class="ef">
                         <asp:Label ID="WF_USERNAME_L" runat="server" Text="第三者使用者" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_USERNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_USERNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_USERNAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 原常備駅 -->
                     <span class="ef">
                         <asp:Label ID="WF_CURRENTSTATIONNAME_L" runat="server" Text="原常備駅" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_CURRENTSTATIONNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_CURRENTSTATIONNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_CURRENTSTATIONNAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -395,14 +395,14 @@
                     <!-- 臨時常備駅 -->
                     <span class="ef">
                         <asp:Label ID="WF_EXTRADINARYSTATIONNAME_L" runat="server" Text="臨時常備駅" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_EXTRADINARYSTATIONNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EXTRADINARYSTATIONNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYSTATIONNAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 原専用種別 -->
                     <span class="ef">
                         <asp:Label ID="WF_DEDICATETYPENAME_L" runat="server" Text="原専用種別" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_DEDICATETYPENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_DEDICATETYPENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_DEDICATETYPENAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -411,14 +411,14 @@
                     <!-- 臨時専用種別 -->
                     <span class="ef">
                         <asp:Label ID="WF_EXTRADINARYTYPENAME_L" runat="server" Text="臨時専用種別" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_EXTRADINARYTYPENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EXTRADINARYTYPENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_EXTRADINARYTYPENAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 運用場所 -->
                     <span class="ef">
                         <asp:Label ID="WF_OPERATIONBASENAME_L" runat="server" Text="運用場所" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_OPERATIONBASENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OPERATIONBASENAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_OPERATIONBASENAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -427,14 +427,14 @@
                     <!-- 塗色 -->
                     <span class="ef">
                         <asp:Label ID="WF_COLORNAME_L" runat="server" Text="塗色" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_COLORNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_COLORNAME" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_COLORNAME_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 予備1 -->
                     <span class="ef">
                         <asp:Label ID="WF_RESERVE1_L" runat="server" Text="予備1" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_RESERVE1" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_RESERVE1" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_RESERVE1_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -443,7 +443,7 @@
                     <!-- 予備2 -->
                     <span class="ef">
                         <asp:Label ID="WF_RESERVE2_L" runat="server" Text="予備2" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_RESERVE2" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_RESERVE2" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_RESERVE2_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -522,14 +522,14 @@
                     <!-- JR車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_JRTANKNUMBER_L" runat="server" Text="JR車番" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_JRTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_JRTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_JRTANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 旧JOT車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_OLDTANKNUMBER_L" runat="server" Text="旧JOT車番" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_OLDTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OLDTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_OLDTANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -538,14 +538,14 @@
                     <!-- OT車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_OTTANKNUMBER_L" runat="server" Text="OT車番" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_OTTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_OTTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_OTTANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- JXTG車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_JXTGTANKNUMBER_L" runat="server" Text="JXTG車番" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_JXTGTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_JXTGTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_JXTGTANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -554,14 +554,14 @@
                     <!-- コスモ車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_COSMOTANKNUMBER_L" runat="server" Text="コスモ車番" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_COSMOTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_COSMOTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_COSMOTANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 富士石油車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_FUJITANKNUMBER_L" runat="server" Text="富士石油車番" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_FUJITANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_FUJITANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_FUJITANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -570,14 +570,14 @@
                     <!-- 出光昭シ車番 -->
                     <span class="ef">
                         <asp:Label ID="WF_SHELLTANKNUMBER_L" runat="server" Text="出光昭シ車番" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_SHELLTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_SHELLTANKNUMBER" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_SHELLTANKNUMBER_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 予備 -->
                     <span class="ef">
                         <asp:Label ID="WF_RESERVE3_L" runat="server" Text="予備" Width="10.275em" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_RESERVE3" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_RESERVE3" runat="server" Width="15.0em" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_RESERVE3_TEXT" runat="server" Width="13.5em" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>

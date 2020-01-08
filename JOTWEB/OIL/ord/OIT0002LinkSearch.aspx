@@ -81,11 +81,11 @@
         </a>
 
         <a id="WF_ENDYMD_LABEL">～</a>
-        <a id="WF_ENDYMD_ICON" onclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+        <a  style="display:none;" id="WF_ENDYMD_ICON" onclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
         </a>
 
-        <a class="ef" id="WF_ENDYMD"  ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+        <a style="display:none;"class="ef" id="WF_ENDYMD"  ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
             <asp:TextBox ID="WF_ENDYMD_CODE" runat="server" onblur="MsgClear();"></asp:TextBox>
         </a>
 

@@ -22,12 +22,15 @@
         <div class="headerboxOnly" id="headerbox">
             <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
                 <!-- 会社 -->
-                <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
-                <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
+                <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
 
                 <!-- 運用部署 -->
-                <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Font-Bold="True" Font-Underline="false"></asp:Label>
-                <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
+                <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
+
+                <!-- 一覧件数 -->
+                <asp:Label ID="WF_ListCNT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
 
                 <!-- ボタン -->
                 <a style="position:fixed;top:2.8em;left:49em;">

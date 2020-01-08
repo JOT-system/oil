@@ -241,6 +241,10 @@ button[disabled=""]:hover {
     box-shadow: 0 0 5px 1px rgba(218,60,65, .5);
 }
 
+.ef input[type='text']::-webkit-input-placeholder {
+    color: #DDDDDD;
+}
+
 /* 条件画面 チェックボックス */
 .searchbox input[type=checkbox] {
     top:0em;

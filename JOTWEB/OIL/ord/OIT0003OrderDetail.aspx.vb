@@ -8,10 +8,10 @@ Public Class OIT0003OrderDetail
     Inherits System.Web.UI.Page
 
     '○ 検索結果格納Table
-    Private OIT0001tbl As DataTable                                 '一覧格納用テーブル
-    Private OIT0001INPtbl As DataTable                              'チェック用テーブル
-    Private OIT0001UPDtbl As DataTable                              '更新用テーブル
-    Private OIT0001WKtbl As DataTable                               '作業用テーブル
+    Private OIT0003tbl As DataTable                                 '一覧格納用テーブル
+    Private OIT0003INPtbl As DataTable                              'チェック用テーブル
+    Private OIT0003UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0003WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -63,7 +63,7 @@ Public Class OIT0003OrderDetail
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(OIT0001tbl)
+                    Master.RecoverTable(OIT0003tbl)
 
                     Select Case WF_ButtonClick.Value
                         'Case "WF_ButtonINSERT"          '登録ボタン押下
@@ -134,22 +134,22 @@ Public Class OIT0003OrderDetail
             End If
         Finally
             '○ 格納Table Close
-            If Not IsNothing(OIT0001tbl) Then
-                OIT0001tbl.Clear()
-                OIT0001tbl.Dispose()
-                OIT0001tbl = Nothing
+            If Not IsNothing(OIT0003tbl) Then
+                OIT0003tbl.Clear()
+                OIT0003tbl.Dispose()
+                OIT0003tbl = Nothing
             End If
 
-            If Not IsNothing(OIT0001INPtbl) Then
-                OIT0001INPtbl.Clear()
-                OIT0001INPtbl.Dispose()
-                OIT0001INPtbl = Nothing
+            If Not IsNothing(OIT0003INPtbl) Then
+                OIT0003INPtbl.Clear()
+                OIT0003INPtbl.Dispose()
+                OIT0003INPtbl = Nothing
             End If
 
-            If Not IsNothing(OIT0001UPDtbl) Then
-                OIT0001UPDtbl.Clear()
-                OIT0001UPDtbl.Dispose()
-                OIT0001UPDtbl = Nothing
+            If Not IsNothing(OIT0003UPDtbl) Then
+                OIT0003UPDtbl.Clear()
+                OIT0003UPDtbl.Dispose()
+                OIT0003UPDtbl = Nothing
             End If
         End Try
     End Sub
@@ -161,7 +161,12 @@ Public Class OIT0003OrderDetail
     Protected Sub Initialize()
 
         '○画面ID設定
-        Master.MAPID = OIT0003WRKINC.MAPIDD
+        If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.OIT0003L Then
+            Master.MAPID = OIT0003WRKINC.MAPIDD + "MAIN"
+        Else
+            Master.MAPID = OIT0003WRKINC.MAPIDD
+        End If
+
         '○HELP表示有無設定
         Master.dispHelp = False
         '○D&D有無設定
@@ -287,10 +292,10 @@ Public Class OIT0003OrderDetail
         End If
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
         '○ 一覧表示データ編集(性能対策)
-        Dim TBLview As DataView = New DataView(OIT0001tbl)
+        Dim TBLview As DataView = New DataView(OIT0003tbl)
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
@@ -327,15 +332,15 @@ Public Class OIT0003OrderDetail
     ''' <remarks></remarks>
     Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
 
-        If IsNothing(OIT0001tbl) Then
-            OIT0001tbl = New DataTable
+        If IsNothing(OIT0003tbl) Then
+            OIT0003tbl = New DataTable
         End If
 
-        If OIT0001tbl.Columns.Count <> 0 Then
-            OIT0001tbl.Columns.Clear()
+        If OIT0003tbl.Columns.Count <> 0 Then
+            OIT0003tbl.Columns.Clear()
         End If
 
-        OIT0001tbl.Clear()
+        OIT0003tbl.Clear()
 
         '○ 検索SQL
         '　検索説明
@@ -473,17 +478,17 @@ Public Class OIT0003OrderDetail
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0001tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        OIT0003tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0001tbl.Load(SQLdr)
+                    OIT0003tbl.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
-                For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
-                    OIT0001row("LINECNT") = i        'LINECNT
+                    OIT0003row("LINECNT") = i        'LINECNT
 
                 Next
             End Using
@@ -517,17 +522,17 @@ Public Class OIT0003OrderDetail
     Protected Sub WF_ButtonALLSELECT_Click()
 
         '○ 画面表示データ復元
-        Master.RecoverTable(OIT0001tbl)
+        Master.RecoverTable(OIT0003tbl)
 
         '全チェックボックスON
-        For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
-            If OIT0001tbl.Rows(i)("HIDDEN") = "0" Then
-                OIT0001tbl.Rows(i)("OPERATION") = "on"
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0003tbl.Rows(i)("OPERATION") = "on"
             End If
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -537,17 +542,17 @@ Public Class OIT0003OrderDetail
     Protected Sub WF_ButtonSELECT_LIFTED_Click()
 
         '○ 画面表示データ復元
-        Master.RecoverTable(OIT0001tbl)
+        Master.RecoverTable(OIT0003tbl)
 
         '全チェックボックスOFF
-        For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
-            If OIT0001tbl.Rows(i)("HIDDEN") = "0" Then
-                OIT0001tbl.Rows(i)("OPERATION") = ""
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0003tbl.Rows(i)("OPERATION") = ""
             End If
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 

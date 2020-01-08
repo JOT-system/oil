@@ -49,7 +49,7 @@
         </a>
         <a class="ef" id="WF_STATIONCODE" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
             <%--<asp:TextBox CssClass="BoxIcon" ID="TxtStationCode" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>--%>
-            <asp:TextBox ID="TxtStationCode" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
+            <asp:TextBox ID="TxtStationCode" runat="server" onblur="MsgClear();" MaxLength="4" placeholder="前方一致で検索"></asp:TextBox>
         </a>
         <a  id="WF_STATIONCODE_TEXT">
             <asp:Label ID="LblStationCode" runat="server" CssClass="WF_TEXT"></asp:Label>

@@ -29,20 +29,6 @@ Public Class OIT0002LinkDetail
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
 
-    Private Const CONST_TxtHTank As String = "1001"                 '油種(ハイオク)
-    Private Const CONST_TxtRTank As String = "1101"                 '油種(レギュラー)
-    Private Const CONST_TxtTTank As String = "1301"                 '油種(灯油)
-    Private Const CONST_TxtMTTank As String = "1302"                '油種(未添加灯油)
-    Private Const CONST_TxtKTank1 As String = "1401"                '油種(軽油)
-    Private Const CONST_TxtKTank2 As String = "1406"
-    Private Const CONST_TxtK3Tank1 As String = "1404"               '３号軽油
-    Private Const CONST_TxtK3Tank2 As String = "1405"
-    Private Const CONST_TxtK5Tank As String = "1402"                '５号軽油
-    Private Const CONST_TxtK10Tank As String = "1403"               '１０号軽油
-    Private Const CONST_TxtLTank1 As String = "2201"                'ＬＳＡ
-    Private Const CONST_TxtLTank2 As String = "2202"
-    Private Const CONST_TxtATank As String = "2101"                 'Ａ重油
-
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
     Private Const CONST_UPDATE As String = "Update"                 'データ更新
@@ -2602,43 +2588,43 @@ Public Class OIT0002LinkDetail
                             PARA17.Value = OIT0002row("TANKNUMBER")         'タンク車№
                             PARA18.Value = OIT0002row("PREOILCODE")           '前回油種　
                             Select Case PARA18.Value
-                                Case CONST_TxtHTank                 '油種(ハイオク)
+                                Case BaseDllConst.CONST_HTank                 '油種(ハイオク)
                                     LNG_TxtHTank += 1
                                     CNT_Total += 1
-                                Case CONST_TxtRTank                  '油種(レギュラー)
+                                Case BaseDllConst.CONST_RTank                  '油種(レギュラー)
                                     LNG_TxtRTank += 1
                                     CNT_Total += 1
-                                Case CONST_TxtTTank                  '油種(灯油)
+                                Case BaseDllConst.CONST_TTank                  '油種(灯油)
                                     LNG_TxtTTank += 1
                                     CNT_Total += 1
-                                Case CONST_TxtMTTank            '油種(未添加灯油)
+                                Case BaseDllConst.CONST_MTTank            '油種(未添加灯油)
                                     LNG_TxtMTTank += 1
                                     CNT_Total += 1
-                                Case CONST_TxtKTank1            '油種(軽油)
+                                Case BaseDllConst.CONST_KTank1            '油種(軽油)
                                     LNG_TxtKTank1 += 1
                                     CNT_Total += 1
-                            'Case CONST_TxtKTank2
+                            'Case BaseDllConst.CONST_KTank2
                             'LNG_TxtKTank2 += 1
                             'CNT_Total += 1
-                                Case CONST_TxtK3Tank1              '３号軽油
+                                Case BaseDllConst.CONST_K3Tank1              '３号軽油
                                     LNG_TxtK3Tank1 += 1
                                     CNT_Total += 1
-                            'Case CONST_TxtK3Tank2
+                            'Case BaseDllConst.CONST_K3Tank2
                             'LNG_TxtK3Tank2 += 1
                             'CNT_Total += 1
-                                Case CONST_TxtK5Tank              '５号軽油
+                                Case BaseDllConst.CONST_K5Tank              '５号軽油
                                     LNG_TxtK5Tank += 1
                                     CNT_Total += 1
-                                Case CONST_TxtK10Tank               '１０号軽油
+                                Case BaseDllConst.CONST_K10Tank               '１０号軽油
                                     LNG_TxtK10Tank += 1
                                     CNT_Total += 1
-                                Case CONST_TxtLTank1                'ＬＳＡ
+                                Case BaseDllConst.CONST_LTank1                'ＬＳＡ
                                     LNG_TxtLTank1 += 1
                                     CNT_Total += 1
-                            'Case CONST_TxtLTank2
+                            'Case BaseDllConst.CONST_LTank2
                             'LNG_TxtLTank2 += 1
                             'CNT_Total += 1
-                                Case CONST_TxtATank               'Ａ重油
+                                Case BaseDllConst.CONST_ATank               'Ａ重油
                                     LNG_TxtATank += 1
                                     CNT_Total += 1
                             End Select

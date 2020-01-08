@@ -228,6 +228,52 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const C_MAX_YMD As String = "2099/12/31"
 
+#Region "油種"
+    ''' <summary>
+    ''' 油種(ハイオク)
+    ''' </summary>
+    Public Const CONST_HTank As String = "1001"
+    ''' <summary>
+    ''' 油種(レギュラー)
+    ''' </summary>
+    Public Const CONST_RTank As String = "1101"
+    ''' <summary>
+    ''' 油種(灯油)
+    ''' </summary>
+    Public Const CONST_TTank As String = "1301"
+    ''' <summary>
+    ''' 油種(未添加灯油)
+    ''' </summary>
+    Public Const CONST_MTTank As String = "1302"
+    ''' <summary>
+    ''' 油種(軽油)
+    ''' </summary>
+    Public Const CONST_KTank1 As String = "1401"
+    Public Const CONST_KTank2 As String = "1406"
+    ''' <summary>
+    ''' ３号軽油
+    ''' </summary>
+    Public Const CONST_K3Tank1 As String = "1404"
+    Public Const CONST_K3Tank2 As String = "1405"
+    ''' <summary>
+    ''' ５号軽油
+    ''' </summary>
+    Public Const CONST_K5Tank As String = "1402"
+    ''' <summary>
+    ''' １０号軽油
+    ''' </summary>
+    Public Const CONST_K10Tank As String = "1403"
+    ''' <summary>
+    ''' ＬＳＡ
+    ''' </summary>
+    Public Const CONST_LTank1 As String = "2201"
+    Public Const CONST_LTank2 As String = "2202"
+    ''' <summary>
+    ''' Ａ重油
+    ''' </summary>
+    Public Const CONST_ATank As String = "2101"
+#End Region
+
 
 #Region "海外向け"
     ''' <summary>

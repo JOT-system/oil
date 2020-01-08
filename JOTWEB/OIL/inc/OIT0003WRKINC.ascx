@@ -132,8 +132,8 @@
     <!-- 更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
     <!-- 基地コード -->
-    <asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>
+    <%--<asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>--%>
     <!-- 基地名 -->
-    <asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>
+    <%--<asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>--%>
 
 </div>

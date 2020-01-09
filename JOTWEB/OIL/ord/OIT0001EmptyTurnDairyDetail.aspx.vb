@@ -18,20 +18,6 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
 
-    Private Const CONST_TxtHTank As String = "1001"                 '油種(ハイオク)
-    Private Const CONST_TxtRTank As String = "1101"                 '油種(レギュラー)
-    Private Const CONST_TxtTTank As String = "1301"                 '油種(灯油)
-    Private Const CONST_TxtMTTank As String = "1302"                '油種(未添加灯油)
-    Private Const CONST_TxtKTank1 As String = "1401"                '油種(軽油)
-    Private Const CONST_TxtKTank2 As String = "1406"
-    Private Const CONST_TxtK3Tank1 As String = "1404"               '３号軽油
-    Private Const CONST_TxtK3Tank2 As String = "1405"
-    Private Const CONST_TxtK5Tank As String = "1402"                '軽油５
-    Private Const CONST_TxtK10Tank As String = "1403"               '軽油１０
-    Private Const CONST_TxtLTank1 As String = "2201"                'ＬＳＡ
-    Private Const CONST_TxtLTank2 As String = "2202"
-    Private Const CONST_TxtATank As String = "2101"                 'Ａ重油
-
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
     Private Const CONST_UPDATE As String = "Update"                 'データ更新
@@ -734,63 +720,63 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim arrTankName(intTankCnt) As String
         Dim z As Integer = 0
 
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtHTank, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_HTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtHTank.Text) - 1
-            arrTankCode(z) = CONST_TxtHTank
+            arrTankCode(z) = BaseDllConst.CONST_HTank
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtRTank, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_RTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtRTank.Text) - 1
-            arrTankCode(z) = CONST_TxtRTank
+            arrTankCode(z) = BaseDllConst.CONST_RTank
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtTTank, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_TTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtTTank.Text) - 1
-            arrTankCode(z) = CONST_TxtTTank
+            arrTankCode(z) = BaseDllConst.CONST_TTank
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtMTTank, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_MTTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtMTTank.Text) - 1
-            arrTankCode(z) = CONST_TxtMTTank
+            arrTankCode(z) = BaseDllConst.CONST_MTTank
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtKTank1, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_KTank1, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtKTank.Text) - 1
-            arrTankCode(z) = CONST_TxtKTank1
+            arrTankCode(z) = BaseDllConst.CONST_KTank1
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtK3Tank1, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K3Tank1, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtK3Tank.Text) - 1
-            arrTankCode(z) = CONST_TxtK3Tank1
+            arrTankCode(z) = BaseDllConst.CONST_K3Tank1
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtK5Tank, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K5Tank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtK5Tank.Text) - 1
-            arrTankCode(z) = CONST_TxtK5Tank
+            arrTankCode(z) = BaseDllConst.CONST_K5Tank
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtK10Tank, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K10Tank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtK10Tank.Text) - 1
-            arrTankCode(z) = CONST_TxtK10Tank
+            arrTankCode(z) = BaseDllConst.CONST_K10Tank
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtLTank1, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_LTank1, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtLTank.Text) - 1
-            arrTankCode(z) = CONST_TxtLTank1
+            arrTankCode(z) = BaseDllConst.CONST_LTank1
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", CONST_TxtATank, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_ATank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtATank.Text) - 1
-            arrTankCode(z) = CONST_TxtATank
+            arrTankCode(z) = BaseDllConst.CONST_ATank
             arrTankName(z) = WW_GetValue(0)
             z += 1
         Next
@@ -2829,34 +2815,34 @@ Public Class OIT0001EmptyTurnDairyDetail
         For i As Integer = 0 To WW_GetValue.Length - 1
             Select Case WW_GetValue(i)
                     'ハイオク
-                Case CONST_TxtHTank
+                Case BaseDllConst.CONST_HTank
                     TxtHTank.Enabled = True
                     'レギュラー
-                Case CONST_TxtRTank
+                Case BaseDllConst.CONST_RTank
                     TxtRTank.Enabled = True
                     '灯油
-                Case CONST_TxtTTank
+                Case BaseDllConst.CONST_TTank
                     TxtTTank.Enabled = True
                     '未添加灯油
-                Case CONST_TxtMTTank
+                Case BaseDllConst.CONST_MTTank
                     TxtMTTank.Enabled = True
                     '軽油
-                Case CONST_TxtKTank1, CONST_TxtKTank2
+                Case BaseDllConst.CONST_KTank1, BaseDllConst.CONST_KTank2
                     TxtKTank.Enabled = True
                     '３号軽油
-                Case CONST_TxtK3Tank1, CONST_TxtK3Tank2
+                Case BaseDllConst.CONST_K3Tank1, BaseDllConst.CONST_K3Tank2
                     TxtK3Tank.Enabled = True
                     '軽油５
-                Case CONST_TxtK5Tank
+                Case BaseDllConst.CONST_K5Tank
                     TxtK5Tank.Enabled = True
                     '軽油１０
-                Case CONST_TxtK10Tank
+                Case BaseDllConst.CONST_K10Tank
                     TxtK10Tank.Enabled = True
                     'ＬＳＡ
-                Case CONST_TxtLTank1, CONST_TxtLTank2
+                Case BaseDllConst.CONST_LTank1, BaseDllConst.CONST_LTank2
                     TxtLTank.Enabled = True
                     'Ａ重油
-                Case CONST_TxtATank
+                Case BaseDllConst.CONST_ATank
                     TxtATank.Enabled = True
             End Select
         Next
@@ -3741,34 +3727,34 @@ Public Class OIT0001EmptyTurnDairyDetail
                 For Each OIT0001UPDrow As DataRow In OIT0001WKtbl.Rows
 
                     Select Case OIT0001UPDrow("OILCODE")
-                        Case CONST_TxtHTank
+                        Case BaseDllConst.CONST_HTank
                             PARAUP11.Value = OIT0001UPDrow("CNT")
                             TxtHTank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtRTank
+                        Case BaseDllConst.CONST_RTank
                             PARAUP12.Value = OIT0001UPDrow("CNT")
                             TxtRTank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtTTank
+                        Case BaseDllConst.CONST_TTank
                             PARAUP13.Value = OIT0001UPDrow("CNT")
                             TxtTTank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtMTTank
+                        Case BaseDllConst.CONST_MTTank
                             PARAUP14.Value = OIT0001UPDrow("CNT")
                             TxtMTTank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtKTank1, CONST_TxtKTank2
+                        Case BaseDllConst.CONST_KTank1, BaseDllConst.CONST_KTank2
                             PARAUP15.Value = OIT0001UPDrow("CNT")
                             TxtKTank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtK3Tank1, CONST_TxtK3Tank2
+                        Case BaseDllConst.CONST_K3Tank1, BaseDllConst.CONST_K3Tank2
                             PARAUP16.Value = OIT0001UPDrow("CNT")
                             TxtK3Tank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtK5Tank
+                        Case BaseDllConst.CONST_K5Tank
                             PARAUP17.Value = OIT0001UPDrow("CNT")
                             TxtK5Tank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtK10Tank
+                        Case BaseDllConst.CONST_K10Tank
                             PARAUP18.Value = OIT0001UPDrow("CNT")
                             TxtK10Tank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtLTank1, CONST_TxtLTank2
+                        Case BaseDllConst.CONST_LTank1, BaseDllConst.CONST_LTank2
                             PARAUP19.Value = OIT0001UPDrow("CNT")
                             TxtLTank.Text = OIT0001UPDrow("CNT")
-                        Case CONST_TxtATank
+                        Case BaseDllConst.CONST_ATank
                             PARAUP20.Value = OIT0001UPDrow("CNT")
                             TxtATank.Text = OIT0001UPDrow("CNT")
                     End Select

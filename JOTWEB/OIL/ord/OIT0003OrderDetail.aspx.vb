@@ -22,20 +22,6 @@ Public Class OIT0003OrderDetail
     'Private Const CONST_DETAIL_TABID As String = "DTL1"             '詳細部タブID
     Private Const CONST_MAX_TABID As Integer = 4                    '詳細タブ数
 
-    Private Const CONST_TxtHTank As String = "1001"                 '油種(ハイオク)
-    Private Const CONST_TxtRTank As String = "1101"                 '油種(レギュラー)
-    Private Const CONST_TxtTTank As String = "1301"                 '油種(灯油)
-    Private Const CONST_TxtMTTank As String = "1302"                '油種(未添加灯油)
-    Private Const CONST_TxtKTank1 As String = "1401"                '油種(軽油)
-    Private Const CONST_TxtKTank2 As String = "1406"
-    Private Const CONST_TxtK3Tank1 As String = "1404"               '３号軽油
-    Private Const CONST_TxtK3Tank2 As String = "1405"
-    Private Const CONST_TxtK5Tank As String = "1402"                '軽油５
-    Private Const CONST_TxtK10Tank As String = "1403"               '軽油１０
-    Private Const CONST_TxtLTank1 As String = "2201"                'ＬＳＡ
-    Private Const CONST_TxtLTank2 As String = "2202"
-    Private Const CONST_TxtATank As String = "2101"                 'Ａ重油
-
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
     Private Const CONST_UPDATE As String = "Update"                 'データ更新
@@ -161,10 +147,10 @@ Public Class OIT0003OrderDetail
     Protected Sub Initialize()
 
         '○画面ID設定
-        If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.OIT0003L Then
-            Master.MAPID = OIT0003WRKINC.MAPIDD + "MAIN"
-        Else
+        If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.MENU Then
             Master.MAPID = OIT0003WRKINC.MAPIDD
+        Else
+            Master.MAPID = OIT0003WRKINC.MAPIDD + "MAIN"
         End If
 
         '○HELP表示有無設定
@@ -264,14 +250,14 @@ Public Class OIT0003OrderDetail
         CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
         '運用部署
         CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_UORG_TEXT.Text, WW_DUMMY)
-        ''荷主
-        'CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_DUMMY)
-        ''荷受人
-        'CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_DUMMY)
-        ''発駅
-        'CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
-        ''着駅
-        'CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
+        '荷主
+        CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_DUMMY)
+        '荷受人
+        CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_DUMMY)
+        '発駅
+        CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
+        '着駅
+        CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
 
     End Sub
 
@@ -899,10 +885,10 @@ Public Class OIT0003OrderDetail
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
 
                 Case "SHIPPERS"         '荷主
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SHIPPERS"))
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SHIPPERS"))
 
                 Case "CONSIGNEE"        '荷受人
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SHIPPERS"))
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "CONSIGNEE"))
 
                 Case "DEPSTATION"       '発駅
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPSTATION"))

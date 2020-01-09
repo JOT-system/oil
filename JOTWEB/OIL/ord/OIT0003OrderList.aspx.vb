@@ -12,10 +12,10 @@ Public Class OIT0003OrderList
     Inherits System.Web.UI.Page
 
     '○ 検索結果格納Table
-    Private OIT0001tbl As DataTable                                 '一覧格納用テーブル
-    Private OIT0001INPtbl As DataTable                              'チェック用テーブル
-    Private OIT0001UPDtbl As DataTable                              '更新用テーブル
-    Private OIT0001WKtbl As DataTable                               '作業用テーブル
+    Private OIT0003tbl As DataTable                                 '一覧格納用テーブル
+    Private OIT0003INPtbl As DataTable                              'チェック用テーブル
+    Private OIT0003UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0003WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -52,7 +52,7 @@ Public Class OIT0003OrderList
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(OIT0001tbl)
+                    Master.RecoverTable(OIT0003tbl)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
@@ -96,22 +96,22 @@ Public Class OIT0003OrderList
 
         Finally
             '○ 格納Table Close
-            If Not IsNothing(OIT0001tbl) Then
-                OIT0001tbl.Clear()
-                OIT0001tbl.Dispose()
-                OIT0001tbl = Nothing
+            If Not IsNothing(OIT0003tbl) Then
+                OIT0003tbl.Clear()
+                OIT0003tbl.Dispose()
+                OIT0003tbl = Nothing
             End If
 
-            If Not IsNothing(OIT0001INPtbl) Then
-                OIT0001INPtbl.Clear()
-                OIT0001INPtbl.Dispose()
-                OIT0001INPtbl = Nothing
+            If Not IsNothing(OIT0003INPtbl) Then
+                OIT0003INPtbl.Clear()
+                OIT0003INPtbl.Dispose()
+                OIT0003INPtbl = Nothing
             End If
 
-            If Not IsNothing(OIT0001UPDtbl) Then
-                OIT0001UPDtbl.Clear()
-                OIT0001UPDtbl.Dispose()
-                OIT0001UPDtbl = Nothing
+            If Not IsNothing(OIT0003UPDtbl) Then
+                OIT0003UPDtbl.Clear()
+                OIT0003UPDtbl.Dispose()
+                OIT0003UPDtbl = Nothing
             End If
         End Try
 
@@ -167,7 +167,7 @@ Public Class OIT0003OrderList
             Master.CreateXMLSaveFile()
 
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0003D Then
-            Master.RecoverTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
+            Master.RecoverTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
         End If
 
         ''○ 名称設定処理
@@ -193,10 +193,10 @@ Public Class OIT0003OrderList
         End If
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
         '○ 一覧表示データ編集(性能対策)
-        Dim TBLview As DataView = New DataView(OIT0001tbl)
+        Dim TBLview As DataView = New DataView(OIT0003tbl)
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
@@ -240,15 +240,15 @@ Public Class OIT0003OrderList
     ''' <remarks></remarks>
     Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
 
-        If IsNothing(OIT0001tbl) Then
-            OIT0001tbl = New DataTable
+        If IsNothing(OIT0003tbl) Then
+            OIT0003tbl = New DataTable
         End If
 
-        If OIT0001tbl.Columns.Count <> 0 Then
-            OIT0001tbl.Columns.Clear()
+        If OIT0003tbl.Columns.Count <> 0 Then
+            OIT0003tbl.Columns.Clear()
         End If
 
-        OIT0001tbl.Clear()
+        OIT0003tbl.Clear()
 
         '○ 検索SQL
         '　検索説明
@@ -386,17 +386,17 @@ Public Class OIT0003OrderList
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0001tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        OIT0003tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0001tbl.Load(SQLdr)
+                    OIT0003tbl.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
-                For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
-                    OIT0001row("LINECNT") = i        'LINECNT
+                    OIT0003row("LINECNT") = i        'LINECNT
 
                 Next
             End Using
@@ -420,21 +420,21 @@ Public Class OIT0003OrderList
     Protected Sub WF_CheckBoxSELECT_Click()
 
         '○ 画面表示データ復元
-        Master.RecoverTable(OIT0001tbl)
+        Master.RecoverTable(OIT0003tbl)
 
         'チェックボックス判定
-        For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
-            If OIT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                If OIT0001tbl.Rows(i)("OPERATION") = "" AndAlso OIT0001tbl.Rows(i)("ORDERSTATUS") <> "900" Then
-                    OIT0001tbl.Rows(i)("OPERATION") = "on"
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                If OIT0003tbl.Rows(i)("OPERATION") = "" AndAlso OIT0003tbl.Rows(i)("ORDERSTATUS") <> "900" Then
+                    OIT0003tbl.Rows(i)("OPERATION") = "on"
                 Else
-                    OIT0001tbl.Rows(i)("OPERATION") = ""
+                    OIT0003tbl.Rows(i)("OPERATION") = ""
                 End If
             End If
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -444,17 +444,17 @@ Public Class OIT0003OrderList
     Protected Sub WF_ButtonALLSELECT_Click()
 
         '○ 画面表示データ復元
-        Master.RecoverTable(OIT0001tbl)
+        Master.RecoverTable(OIT0003tbl)
 
         '全チェックボックスON
-        For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
-            If OIT0001tbl.Rows(i)("HIDDEN") = "0" AndAlso OIT0001tbl.Rows(i)("ORDERSTATUS") <> "900" Then
-                OIT0001tbl.Rows(i)("OPERATION") = "on"
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" AndAlso OIT0003tbl.Rows(i)("ORDERSTATUS") <> "900" Then
+                OIT0003tbl.Rows(i)("OPERATION") = "on"
             End If
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -464,17 +464,17 @@ Public Class OIT0003OrderList
     Protected Sub WF_ButtonSELECT_LIFTED_Click()
 
         '○ 画面表示データ復元
-        Master.RecoverTable(OIT0001tbl)
+        Master.RecoverTable(OIT0003tbl)
 
         '全チェックボックスOFF
-        For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
-            If OIT0001tbl.Rows(i)("HIDDEN") = "0" Then
-                OIT0001tbl.Rows(i)("OPERATION") = ""
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0003tbl.Rows(i)("OPERATION") = ""
             End If
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -484,9 +484,9 @@ Public Class OIT0003OrderList
     Protected Sub WF_ButtonORDER_CANCEL_Click()
 
         '○ 画面表示データ復元
-        Master.RecoverTable(OIT0001tbl)
+        Master.RecoverTable(OIT0003tbl)
 
-        '■■■ OIT0001tbl関連の受注TBLの「受注進行ステータス」を「900:受注キャンセル」に更新 ■■■
+        '■■■ OIT0003tbl関連の受注TBLの「受注進行ステータス」を「900:受注キャンセル」に更新 ■■■
 
         Try
             'DataBase接続文字
@@ -516,9 +516,9 @@ Public Class OIT0003OrderList
             Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", System.Data.SqlDbType.NVarChar)
 
             '選択されている行の受注進行ステータスを「900:受注キャンセル」に更新
-            For Each OIT0001UPDrow In OIT0001tbl.Rows
-                If OIT0001UPDrow("OPERATION") = "on" Then
-                    PARA01.Value = OIT0001UPDrow("ORDERNO")
+            For Each OIT0003UPDrow In OIT0003tbl.Rows
+                If OIT0003UPDrow("OPERATION") = "on" Then
+                    PARA01.Value = OIT0003UPDrow("ORDERNO")
 
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
@@ -526,8 +526,8 @@ Public Class OIT0003OrderList
                     PARA14.Value = C_DEFAULT_YMD
                     PARA15.Value = CONST_ORDERSTS_CAN
 
-                    OIT0001UPDrow("ORDERSTATUS") = CONST_ORDERSTS_CAN
-                    OIT0001UPDrow("ORDERSTATUSNAME") = CONST_ORDERSTS_CANNM
+                    OIT0003UPDrow("ORDERSTATUS") = CONST_ORDERSTS_CAN
+                    OIT0003UPDrow("ORDERSTATUSNAME") = CONST_ORDERSTS_CANNM
 
                     SQLcmd.ExecuteNonQuery()
                 End If
@@ -538,9 +538,9 @@ Public Class OIT0003OrderList
             SQLcmd = Nothing
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D DELETE")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D DELETE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0001D DELETE"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D DELETE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -550,7 +550,7 @@ Public Class OIT0003OrderList
         End Try
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
@@ -669,7 +669,7 @@ Public Class OIT0003OrderList
         work.WF_SEL_CREATEFLG.Text = "1"
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
         WF_GridDBclick.Text = ""
 
@@ -677,7 +677,7 @@ Public Class OIT0003OrderList
         WW_CreateXMLSaveFile()
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
+        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
 
         '○ 次ページ遷移
         Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
@@ -714,152 +714,152 @@ Public Class OIT0003OrderList
         End Try
 
         '〇 受注進行ステータスが"900(受注キャンセル)"の場合は何もしない
-        WW_ORDERSTATUS = OIT0001tbl.Rows(WW_LINECNT)("ORDERSTATUS")
+        WW_ORDERSTATUS = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUS")
         If WW_ORDERSTATUS = CONST_ORDERSTS_CAN Then
             Exit Sub
         End If
 
         '選択行
-        work.WF_SEL_LINECNT.Text = OIT0001tbl.Rows(WW_LINECNT)("LINECNT")
+        work.WF_SEL_LINECNT.Text = OIT0003tbl.Rows(WW_LINECNT)("LINECNT")
         '登録日
-        work.WF_SEL_REGISTRATIONDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERYMD")
+        work.WF_SEL_REGISTRATIONDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERYMD")
         '受注営業所(名)
-        work.WF_SEL_ORDERSALESOFFICE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICENAME")
+        work.WF_SEL_ORDERSALESOFFICE.Text = OIT0003tbl.Rows(WW_LINECNT)("OFFICENAME")
         '受注営業所(コード)
-        work.WF_SEL_ORDERSALESOFFICECODE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICECODE")
+        work.WF_SEL_ORDERSALESOFFICECODE.Text = OIT0003tbl.Rows(WW_LINECNT)("OFFICECODE")
         '受注進行ステータス(名)
-        work.WF_SEL_ORDERSTATUSNM.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERSTATUSNAME")
+        work.WF_SEL_ORDERSTATUSNM.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUSNAME")
         '受注進行ステータス(コード)
-        work.WF_SEL_ORDERSTATUS.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERSTATUS")
+        work.WF_SEL_ORDERSTATUS.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUS")
         '受注情報(名)
-        work.WF_SEL_INFORMATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFONAME")
+        work.WF_SEL_INFORMATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME")
         '受注情報(コード)
-        work.WF_SEL_INFORMATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFO")
+        work.WF_SEL_INFORMATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFO")
         '受注№
-        work.WF_SEL_ORDERNUMBER.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERNO")
+        work.WF_SEL_ORDERNUMBER.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERNO")
         '本線列車
-        work.WF_SEL_TRAIN.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNO")
+        work.WF_SEL_TRAIN.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNO")
         '荷主(名)
-        work.WF_SEL_SHIPPERSNAME.Text = OIT0001tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
+        work.WF_SEL_SHIPPERSNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
         '荷主(コード)
-        work.WF_SEL_SHIPPERSCODE.Text = OIT0001tbl.Rows(WW_LINECNT)("SHIPPERSCODE")
+        work.WF_SEL_SHIPPERSCODE.Text = OIT0003tbl.Rows(WW_LINECNT)("SHIPPERSCODE")
         '荷受人(名)
-        work.WF_SEL_CONSIGNEENAME.Text = OIT0001tbl.Rows(WW_LINECNT)("CONSIGNEENAME")
+        work.WF_SEL_CONSIGNEENAME.Text = OIT0003tbl.Rows(WW_LINECNT)("CONSIGNEENAME")
         '荷受人(コード)
-        work.WF_SEL_CONSIGNEECODE.Text = OIT0001tbl.Rows(WW_LINECNT)("CONSIGNEECODE")
+        work.WF_SEL_CONSIGNEECODE.Text = OIT0003tbl.Rows(WW_LINECNT)("CONSIGNEECODE")
         '発駅(名)
-        work.WF_SEL_DEPARTURESTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
+        work.WF_SEL_DEPARTURESTATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
         '発駅(コード)
-        work.WF_SEL_DEPARTURESTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPSTATION")
+        work.WF_SEL_DEPARTURESTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("DEPSTATION")
         '着駅(名)
-        work.WF_SEL_ARRIVALSTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRSTATIONNAME")
+        work.WF_SEL_ARRIVALSTATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("ARRSTATIONNAME")
         '着駅(コード)
-        work.WF_SEL_ARRIVALSTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRSTATION")
+        work.WF_SEL_ARRIVALSTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ARRSTATION")
         '戻着駅(名)
-        work.WF_SEL_CANGERETSTATIONNM.Text = OIT0001tbl.Rows(WW_LINECNT)("CHANGEARRSTATIONNAME")
+        work.WF_SEL_CANGERETSTATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("CHANGEARRSTATIONNAME")
         '戻着駅(コード)
-        work.WF_SEL_CANGERETSTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("CHANGERETSTATION")
+        work.WF_SEL_CANGERETSTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("CHANGERETSTATION")
 
         '車数（レギュラー）
-        work.WF_SEL_REGULAR_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("RTANK")
+        work.WF_SEL_REGULAR_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("RTANK")
         '車数（ハイオク）
-        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("HTANK")
+        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("HTANK")
         '車数（灯油）
-        work.WF_SEL_KEROSENE_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("TTANK")
+        work.WF_SEL_KEROSENE_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("TTANK")
         '車数（未添加灯油）
-        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("MTTANK")
+        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("MTTANK")
         '車数（軽油）
-        work.WF_SEL_DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("KTANK")
+        work.WF_SEL_DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("KTANK")
         '車数（３号軽油）
-        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("K3TANK")
+        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K3TANK")
         '車数（５号軽油）
-        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("K5TANK")
+        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K5TANK")
         '車数（１０号軽油）
-        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("K10TANK")
+        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K10TANK")
         '車数（LSA）
-        work.WF_SEL_LSA_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("LTANK")
+        work.WF_SEL_LSA_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("LTANK")
         '車数（A重油）
-        work.WF_SEL_AHEAVY_TANKCAR.Text = OIT0001tbl.Rows(WW_LINECNT)("ATANK")
+        work.WF_SEL_AHEAVY_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("ATANK")
         '合計車数
-        work.WF_SEL_TANKCARTOTAL.Text = OIT0001tbl.Rows(WW_LINECNT)("TOTALTANK")
+        work.WF_SEL_TANKCARTOTAL.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALTANK")
 
         '積込日(予定)
-        work.WF_SEL_LODDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("LODDATE")
+        work.WF_SEL_LODDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("LODDATE")
         '発日(予定)
-        work.WF_SEL_DEPDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPDATE")
+        work.WF_SEL_DEPDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("DEPDATE")
         '着日(予定)
-        work.WF_SEL_ARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ARRDATE")
+        work.WF_SEL_ARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ARRDATE")
         '受入日(予定)
-        work.WF_SEL_ACCDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACCDATE")
+        work.WF_SEL_ACCDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACCDATE")
         '空車着日(予定)
-        work.WF_SEL_EMPARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("EMPARRDATE")
+        work.WF_SEL_EMPARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("EMPARRDATE")
         '積込日(実績)
-        work.WF_SEL_ACTUALLODDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALLODDATE")
+        work.WF_SEL_ACTUALLODDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALLODDATE")
         '発日(実績)
-        work.WF_SEL_ACTUALDEPDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALDEPDATE")
+        work.WF_SEL_ACTUALDEPDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALDEPDATE")
         '着日(実績)
-        work.WF_SEL_ACTUALARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALARRDATE")
+        work.WF_SEL_ACTUALARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALARRDATE")
         '受入日(実績)
-        work.WF_SEL_ACTUALACCDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALACCDATE")
+        work.WF_SEL_ACTUALACCDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALACCDATE")
         '空車着日(実績)
-        work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0001tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
+        work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
 
         '計上年月日
-        work.WF_SEL_KEIJYOYMD.Text = OIT0001tbl.Rows(WW_LINECNT)("KEIJYOYMD")
+        work.WF_SEL_KEIJYOYMD.Text = OIT0003tbl.Rows(WW_LINECNT)("KEIJYOYMD")
         '売上金額
-        work.WF_SEL_SALSE.Text = OIT0001tbl.Rows(WW_LINECNT)("SALSE")
+        work.WF_SEL_SALSE.Text = OIT0003tbl.Rows(WW_LINECNT)("SALSE")
         '売上消費税額
-        work.WF_SEL_SALSETAX.Text = OIT0001tbl.Rows(WW_LINECNT)("SALSETAX")
+        work.WF_SEL_SALSETAX.Text = OIT0003tbl.Rows(WW_LINECNT)("SALSETAX")
         '売上合計金額
-        work.WF_SEL_TOTALSALSE.Text = OIT0001tbl.Rows(WW_LINECNT)("TOTALSALSE")
+        work.WF_SEL_TOTALSALSE.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALSALSE")
         '支払金額
-        work.WF_SEL_PAYMENT.Text = OIT0001tbl.Rows(WW_LINECNT)("PAYMENT")
+        work.WF_SEL_PAYMENT.Text = OIT0003tbl.Rows(WW_LINECNT)("PAYMENT")
         '支払消費税額
-        work.WF_SEL_PAYMENTTAX.Text = OIT0001tbl.Rows(WW_LINECNT)("PAYMENTTAX")
+        work.WF_SEL_PAYMENTTAX.Text = OIT0003tbl.Rows(WW_LINECNT)("PAYMENTTAX")
         '支払合計金額
-        work.WF_SEL_TOTALPAYMENT.Text = OIT0001tbl.Rows(WW_LINECNT)("TOTALPAYMENT")
+        work.WF_SEL_TOTALPAYMENT.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALPAYMENT")
 
         '削除フラグ
-        work.WF_SEL_DELFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("DELFLG")
+        work.WF_SEL_DELFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELFLG")
         '作成フラグ(新規登録：1, 更新：2)
         work.WF_SEL_CREATEFLG.Text = "2"
 
         '○ 状態をクリア
-        For Each OIT0001row As DataRow In OIT0001tbl.Rows
-            Select Case OIT0001row("OPERATION")
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            Select Case OIT0003row("OPERATION")
                 Case C_LIST_OPERATION_CODE.NODATA
-                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.NODISP
-                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED
-                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-                    OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
             End Select
 
         Next
 
         '○ 選択明細の状態を設定
-        Select Case OIT0001tbl.Rows(WW_LINECNT)("OPERATION")
+        Select Case OIT0003tbl.Rows(WW_LINECNT)("OPERATION")
             Case C_LIST_OPERATION_CODE.NODATA
-                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
             Case C_LIST_OPERATION_CODE.NODISP
-                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
             Case C_LIST_OPERATION_CODE.SELECTED
-                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
             Case C_LIST_OPERATION_CODE.UPDATING
-                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
             Case C_LIST_OPERATION_CODE.ERRORED
-                OIT0001tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                OIT0003tbl.Rows(WW_LINECNT)("OPERATION") = C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
         End Select
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0001tbl)
+        Master.SaveTable(OIT0003tbl)
 
         WF_GridDBclick.Text = ""
 
@@ -867,7 +867,7 @@ Public Class OIT0003OrderList
         WW_CreateXMLSaveFile()
 
         '画面表示データ保存(遷移先(登録画面)向け)
-        Master.SaveTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
+        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
 
         '登録画面ページへ遷移
         Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
@@ -921,11 +921,11 @@ Public Class OIT0003OrderList
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
         '○ 表示対象行カウント(絞り込み対象)
-        For Each OIT0001row As DataRow In OIT0001tbl.Rows
-            If OIT0001row("HIDDEN") = 0 Then
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            If OIT0003row("HIDDEN") = 0 Then
                 WW_DataCNT += 1
                 '行(LINECNT)を再設定する。既存項目(SELECT)を利用
-                OIT0001row("SELECT") = WW_DataCNT
+                OIT0003row("SELECT") = WW_DataCNT
             End If
         Next
 
@@ -959,7 +959,7 @@ Public Class OIT0003OrderList
         End If
 
         '○ 画面(GridView)表示
-        Dim TBLview As DataView = New DataView(OIT0001tbl)
+        Dim TBLview As DataView = New DataView(OIT0003tbl)
 
         '○ ソート
         TBLview.Sort = "LINECNT"

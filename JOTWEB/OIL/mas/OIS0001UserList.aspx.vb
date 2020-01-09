@@ -172,7 +172,7 @@ Public Class OIS0001UserList
         '右Boxへの値設定
         rightview.MAPID = Master.MAPID
         rightview.MAPVARI = Master.MAPvariant
-        rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
+        rightview.COMPCODE = Master.USERCAMP
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize(WW_DUMMY)
 
@@ -297,7 +297,7 @@ Public Class OIS0001UserList
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
         CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
@@ -498,7 +498,7 @@ Public Class OIS0001UserList
         TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
 
         '○ 一覧作成
-        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
         CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID

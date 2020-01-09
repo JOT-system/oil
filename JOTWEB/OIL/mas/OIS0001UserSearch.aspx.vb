@@ -124,7 +124,7 @@ Public Class OIS0001UserSearch
         '○ RightBox情報設定
         rightview.MAPIDS = OIS0001WRKINC.MAPIDS
         rightview.MAPID = OIS0001WRKINC.MAPIDL
-        rightview.COMPCODE = WF_CAMPCODE_CODE.Text
+        rightview.COMPCODE = Master.USERCAMP
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
         rightview.MENUROLE = Master.ROLE_MENU
@@ -167,7 +167,7 @@ Public Class OIS0001UserSearch
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
-            Master.VIEWID = rightview.GetViewId(WF_CAMPCODE_CODE.Text)
+            Master.VIEWID = rightview.GetViewId(Master.USERCAMP)
         End If
 
         Master.CheckParmissionCode(WF_CAMPCODE_CODE.Text)
@@ -537,7 +537,7 @@ Public Class OIS0001UserSearch
     ''' <remarks></remarks>
     Protected Sub WF_RIGHTBOX_DBClick()
 
-        rightview.InitViewID(WF_CAMPCODE_CODE.Text, WW_DUMMY)
+        rightview.InitViewID(Master.USERCAMP, WW_DUMMY)
 
     End Sub
 

@@ -44,6 +44,7 @@
 
             <div id="divHidden">
                 <asp:HiddenField ID="MF_USERID" runat="server" />                   <%-- ユーザID              --%>
+                <asp:HiddenField ID="MF_USERCAMP" runat="server" />                 <%-- ユーザ所属会社        --%>
                 <asp:HiddenField ID="MF_COMP_ROLE" runat="server" />                <%-- 会社権限ロール        --%>
                 <asp:HiddenField ID="MF_ORG_ROLE" runat="server" />                 <%-- 組織権限ロール        --%>
                 <asp:HiddenField ID="MF_MENU_ROLE" runat="server" />                <%-- メニュー権限ロール    --%>

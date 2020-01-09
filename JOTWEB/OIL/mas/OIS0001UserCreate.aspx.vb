@@ -157,7 +157,7 @@ Public Class OIS0001UserCreate
         '右Boxへの値設定
         rightview.MAPID = Master.MAPID
         rightview.MAPVARI = Master.MAPvariant
-        rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
+        rightview.COMPCODE = Master.USERCAMP
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize(WW_DUMMY)
 

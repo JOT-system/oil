@@ -225,17 +225,17 @@ Public Class OIS0001UserList
         WF_PASSENDYMD.Text = work.WF_SEL_PASSENDYMD.Text
 
         '開始年月日
-        WF_STYMD.Text = work.WF_SEL_STYMD2.Text
+        WF_STYMD.Text = work.WF_SEL_STYMD.Text
 
         '終了年月日
-        WF_ENDYMD.Text = work.WF_SEL_ENDYMD2.Text
+        WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text
 
         '会社コード
-        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE2.Text
+        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
         CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
 
         '組織コード
-        WF_ORG.Text = work.WF_SEL_ORG2.Text
+        WF_ORG.Text = work.WF_SEL_ORG.Text
         CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)
 
         'メールアドレス

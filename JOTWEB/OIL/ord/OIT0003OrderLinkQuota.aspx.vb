@@ -51,7 +51,7 @@ Public Class OIT0003OrderLinkQuota
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"          'タンク車割当ボタン押下
-                            'WF_ButtonINSERT_Click()
+                            WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
@@ -287,7 +287,8 @@ Public Class OIT0003OrderLinkQuota
             & "  FROM OIL.OIT0004_LINK OIT0004 " _
             & "  WHERE OIT0004.OFFICECODE = @P1" _
             & "    AND OIT0004.AVAILABLEYMD < @P2" _
-            & "    AND OIT0004.DELFLG <> @P3" _
+            & "    AND OIT0004.TRAINNO = @P3" _
+            & "    AND OIT0004.DELFLG <> @P4" _
             & "  ) OIT0004 " _
             & " WHERE OIT0004.RNUM = 1"
         '& " WHERE OIT0004.OFFICECODE = @P1" _
@@ -308,24 +309,26 @@ Public Class OIT0003OrderLinkQuota
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6) '登録営業所コード
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.DateTime)    '利用可能日
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1) '削除フラグ
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 4) '本線列車
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 1) '削除フラグ
                 PARA1.Value = work.WF_SEL_SALESOFFICECODE.Text
                 PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
-                PARA3.Value = C_DELETE_FLG.DELETE
+                PARA3.Value = work.WF_SEL_TRAIN.Text
+                PARA4.Value = C_DELETE_FLG.DELETE
 
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '油種(ハイオク)
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 40) '油種(レギュラー)
-                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 40) '油種(灯油)
-                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 40) '油種(未添加灯油)
-                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 40) '油種(軽油)
-                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 40) '油種(軽油)
-                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 40) '油種(３号軽油)
-                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 40) '油種(３号軽油)
-                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 40) '油種(５号軽油)
-                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 40) '油種(１０号軽油)
-                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40) '油種(ＬＳＡ)
-                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 40) '油種(ＬＳＡ)
-                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 40) '油種(Ａ重油)
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 4) '油種(ハイオク)
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 4) '油種(レギュラー)
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 4) '油種(灯油)
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 4) '油種(未添加灯油)
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 4) '油種(軽油)
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 4) '油種(軽油)
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 4) '油種(３号軽油)
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 4) '油種(３号軽油)
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 4) '油種(５号軽油)
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 4) '油種(１０号軽油)
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 4) '油種(Ａ重油)
                 PARA10.Value = BaseDllConst.CONST_HTank
                 PARA11.Value = BaseDllConst.CONST_RTank
                 PARA12.Value = BaseDllConst.CONST_TTank
@@ -376,6 +379,31 @@ Public Class OIT0003OrderLinkQuota
     End Sub
 
     ''' <summary>
+    ''' 受注作成ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonINSERT_Click()
+
+        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        work.WF_SEL_CREATELINKFLG.Text = "1"
+
+        ''○ 画面表示データ保存
+        'Master.SaveTable(OIT0003tbl)
+
+        'WF_GridDBclick.Text = ""
+
+        ''○ 遷移先(登録画面)退避データ保存先の作成
+        'WW_CreateXMLSaveFile()
+
+        ''○ 画面表示データ保存
+        'Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
+
+        '○ 次ページ遷移
+        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
+
+    End Sub
+
+    ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -412,6 +440,8 @@ Public Class OIT0003OrderLinkQuota
 
         '選択行
         work.WF_SEL_LINK_LINECNT.Text = OIT0003tbl.Rows(WW_LINECNT)("LINECNT")
+        '貨車連結順序表№
+        work.WF_SEL_LINK_LINKNO.Text = OIT0003tbl.Rows(WW_LINECNT)("LINKNO")
         '登録日
         work.WF_SEL_LINK_REGISTRATIONDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("AVAILABLEYMD")
         '受注進行ステータス

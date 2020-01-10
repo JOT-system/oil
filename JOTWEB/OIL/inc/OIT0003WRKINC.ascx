@@ -89,6 +89,29 @@
     <!-- タンク車合計 -->
     <asp:TextBox ID="WF_SEL_TANKCARTOTAL" runat="server"></asp:TextBox>
 
+    <!-- レギュラー(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_REGULARCH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- ハイオク(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_HIGHOCTANECH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 灯油(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_KEROSENECH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 未添加灯油(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_NOTADDED_KEROSENECH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 軽油(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_DIESELCH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 3号軽油(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_NUM3DIESELCH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 5号軽油(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_NUM5DIESELCH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- 10号軽油(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_NUM10DIESELCH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- LSA(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_LSACH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- A重油(タンク車数)割当 -->
+    <asp:TextBox ID="WF_SEL_AHEAVYCH_TANKCAR" runat="server"></asp:TextBox>
+    <!-- タンク車合計(割当) -->
+    <asp:TextBox ID="WF_SEL_TANKCARTOTALCH" runat="server"></asp:TextBox>
+
     <!-- 積込日(予定) -->
     <asp:TextBox ID="WF_SEL_LODDATE" runat="server"></asp:TextBox>
     <!-- 積車発日(予定) -->
@@ -132,6 +155,8 @@
     <!-- ■受注タンク車割当用 -->
     <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_LINK_LINECNT" runat="server"></asp:TextBox>
+    <!-- 貨車連結順序表№ -->
+    <asp:TextBox ID="WF_SEL_LINK_LINKNO" runat="server"></asp:TextBox>
     <!-- 登録日 -->
     <asp:TextBox ID="WF_SEL_LINK_REGISTRATIONDATE" runat="server"></asp:TextBox>
     <!-- ステータス -->
@@ -190,8 +215,8 @@
     <asp:TextBox ID="WF_SEL_INPLINKTBL" runat="server"></asp:TextBox>
 
     <!-- 基地コード -->
-    <%--<asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>--%>
+    <asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>
     <!-- 基地名 -->
-    <%--<asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>--%>
+    <asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>
 
 </div>

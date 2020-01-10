@@ -52,6 +52,21 @@ Public Class OIT0003WRKINC
         CreateSALESOFFICEParam = prmData
     End Function
 
+
+    ''' <summary>
+    ''' 貨物車パターンの取得
+    ''' </summary>
+    ''' <param name="I_STATIONPT"></param>
+    ''' <returns></returns>
+    ''' <remarks>全て</remarks>
+    Function CreateSTATIONPTParam(ByVal I_COMPCODE As String, ByVal I_STATIONPT As String) As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_STATIONCODE) = I_STATIONPT
+        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+        CreateSTATIONPTParam = prmData
+    End Function
+
     ''' <summary>
     ''' 状態の取得
     ''' </summary>

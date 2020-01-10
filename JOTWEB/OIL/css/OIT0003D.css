@@ -965,6 +965,7 @@
     }
 
 /* -----------------１１列目 ----------------- */
+/* 車数（A重油）(ラベル) */
 #WF_ATANK_LABEL_C {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -988,10 +989,34 @@
         Width: 4em;
     }
 
+/* -----------------１２列目 ----------------- */
+/* 車数（合計）(ラベル) */
+#WF_TOTAL_LABEL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 12.5em;
+    left: 10em;
+    color: #000000;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+/* 車数（合計） */
+#WF_TOTAL_C {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 11.5em;
+    left: -7.2em;
+    border-radius: 3px;
+}
+
+    #WF_TOTAL_C input[type='text'] {
+        Height: 1.4em;
+        Width: 4em;
+    }
 
 /* #################８行目 ################# */
 /* -----------------１列目 ----------------- */
-/* 油種別タンク車数(車)(ラベル) */
+/* 積込数量(kl)(ラベル) */
 #WF_OILTANKCNT_LABEL_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1002,7 +1027,7 @@
     text-decoration:underline;*/
 }
 /* -----------------２列目 ----------------- */
-/* 車数（ハイオク） */
+/* 数量（ハイオク） */
 #WF_HTANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1018,7 +1043,7 @@
     }
 
 /* -----------------３列目 ----------------- */
-/* 車数（レギュラー） */
+/* 数量（レギュラー） */
 #WF_RTANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1033,7 +1058,7 @@
     }
 
 /* -----------------４列目 ----------------- */
-/* 車数（灯油） */
+/* 数量（灯油） */
 #WF_TTANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1048,7 +1073,7 @@
     }
 
 /* -----------------５列目 ----------------- */
-/* 車数（未添加灯油） */
+/* 数量（未添加灯油） */
 #WF_MTTANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1063,7 +1088,7 @@
     }
 
 /* -----------------６列目 ----------------- */
-/* 車数（軽油） */
+/* 数量（軽油） */
 #WF_KTANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1078,7 +1103,7 @@
     }
 
 /* -----------------７列目 ----------------- */
-/* 車数（３号軽油） */
+/* 数量（３号軽油） */
 #WF_K3TANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1093,7 +1118,7 @@
     }
 
 /* -----------------８列目 ----------------- */
-/* 車数（５号軽油） */
+/* 数量（５号軽油） */
 #WF_K5TANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1108,7 +1133,7 @@
     }
 
 /* -----------------９列目 ----------------- */
-/* 車数（１０号軽油） */
+/* 数量（１０号軽油） */
 #WF_K10TANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1123,7 +1148,7 @@
     }
 
 /* -----------------１０列目 ----------------- */
-/* 車数（LSA） */
+/* 数量（LSA） */
 #WF_LTANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1138,7 +1163,7 @@
     }
 
 /* -----------------１１列目 ----------------- */
-/* 車数（A重油） */
+/* 数量（A重油） */
 #WF_ATANK_C2 {
     position: relative;
     margin: 0em 0em 0em 0em;
@@ -1148,6 +1173,21 @@
 }
 
     #WF_ATANK_C2 input[type='text'] {
+        Height: 1.4em;
+        Width: 4.05em;
+    }
+
+/* -----------------１２列目 ----------------- */
+/* 数量（合計） */
+#WF_TOTALCNT_C2 {
+    position: relative;
+    margin: 0em 0em 0em 0em;
+    top: 10.9em;
+    left: -6.82em;
+    border-radius: 3px;
+}
+
+    #WF_TOTALCNT_C2 input[type='text'] {
         Height: 1.4em;
         Width: 4.05em;
     }
@@ -1753,7 +1793,7 @@ body {
 }
 
 div {
-    position: relative;
+    /*position: relative;*/
 }
 
 /* 実行画面 ヘッダー部(詳細) */
@@ -1850,15 +1890,29 @@ div {
         left: 48.8em;
     }
 
-/* セルの設定(共通) */
-
-div[data-generated="1"] td,
-div[data-generated="1"] th {
-    border: 1px solid White;
-    height: 28px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+/* 左ヘッダー行スタイル */
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 37px;
 }
 
+/* 右ヘッダー行スタイル */
+div[data-generated="1"] div[id$="_HR"] table tr {
+    height: 37px;
+}
 
+/* 左(固定行テーブル用)DIV */
+div[data-generated="1"] div[id$="_HL"] {
+    top: 140px;
+}
+/* 右(可変行テーブル用)DIV */
+div[data-generated="1"] div[id$="_HR"] {
+    top: 140px;
+}
+/* 左(固定データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"] {
+    top: 175px;
+}
+/* 右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DR"] {
+    top: 175px;
+}

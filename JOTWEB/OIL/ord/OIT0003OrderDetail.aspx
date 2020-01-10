@@ -258,6 +258,8 @@
             <a id="WF_LTANK_LABEL_C">ＬＳＡ　　</a>
             <!-- ■　車数（A重油）　■ -->
             <a id="WF_ATANK_LABEL_C">Ａ重油</a>
+            <!-- ■　車数（合計）　■ -->
+            <a id="WF_TOTAL_LABEL_C">合計</a>
         </div>
         <div class="Operation2" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
             <!-- ■　油種別タンク車数(車)　■ -->
@@ -302,49 +304,57 @@
             <a class="ef" id="WF_ATANK_C">
                 <asp:TextBox ID="TxtATank_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
+            <!-- ■　車数（合計）　■ -->
+            <a class="ef" id="WF_TOTAL_C">
+                <asp:TextBox ID="TxtTotal_c" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
         </div>
         <div class="Operation2" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
-            <!-- ■　油種別タンク車数(車)　■ -->
+            <!-- ■　積込数量(kl)　■ -->
             <a id="WF_OILTANKCNT_LABEL_C2">　　　　積込数量(kl)</a>
-            <!-- ■　車数（ハイオク）　■ -->
+            <!-- ■　数量（ハイオク）　■ -->
             <a class="ef" id="WF_HTANK_C2">
                 <asp:TextBox ID="TxtHTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（レギュラー）　■ -->
+            <!-- ■　数量（レギュラー）　■ -->
             <a class="ef" id="WF_RTANK_C2">
                 <asp:TextBox ID="TxtRTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（灯油）　■ -->
+            <!-- ■　数量（灯油）　■ -->
             <a class="ef" id="WF_TTANK_C2">
                 <asp:TextBox ID="TxtTTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（未添加灯油）　■ -->
+            <!-- ■　数量（未添加灯油）　■ -->
             <a class="ef" id="WF_MTTANK_C2">
                 <asp:TextBox ID="TxtMTTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（軽油）　■ -->
+            <!-- ■　数量（軽油）　■ -->
             <a class="ef" id="WF_KTANK_C2">
                 <asp:TextBox ID="TxtKTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（３号軽油）　■ -->
+            <!-- ■　数量（３号軽油）　■ -->
             <a class="ef" id="WF_K3TANK_C2">
                 <asp:TextBox ID="TxtK3Tank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（５号軽油）　■ -->
+            <!-- ■　数量（５号軽油）　■ -->
             <a class="ef" id="WF_K5TANK_C2">
                 <asp:TextBox ID="TxtK5Tank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（１０号軽油）　■ -->
+            <!-- ■　数量（１０号軽油）　■ -->
             <a class="ef" id="WF_K10TANK_C2">
                 <asp:TextBox ID="TxtK10Tank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（LSA）　■ -->
+            <!-- ■　数量（LSA）　■ -->
             <a class="ef" id="WF_LTANK_C2">
                 <asp:TextBox ID="TxtLTank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
-            <!-- ■　車数（A重油）　■ -->
+            <!-- ■　数量（A重油）　■ -->
             <a class="ef" id="WF_ATANK_C2">
                 <asp:TextBox ID="TxtATank_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+            </a>
+            <!-- ■　数量（合計）　■ -->
+            <a class="ef" id="WF_TOTALCNT_C2">
+                <asp:TextBox ID="TxtTotalCnt_c2" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
             </a>
         </div>
 
@@ -548,6 +558,7 @@
                 <div id="divListArea1">
                     <asp:panel id="pnlListArea1" runat="server" ></asp:panel>
                 </div>
+
             </asp:View>
 
             <!-- ■ Tab No2　タンク車明細　■ -->
@@ -650,6 +661,8 @@
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 新規・更新切替用フラグ -->
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
+        <!-- 貨車連結切替用フラグ -->
+        <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
         <!-- DetailBox Mview切替 -->
         <input id="WF_DTAB_CHANGE_NO" runat="server" value="" type="text"/>
 

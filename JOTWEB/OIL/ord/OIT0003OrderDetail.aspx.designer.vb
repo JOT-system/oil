@@ -347,6 +347,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtATank_c As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtTotal_c コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotal_c As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtHTank_c2 コントロール。
     '''</summary>
     '''<remarks>
@@ -435,6 +444,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtATank_c2 As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTotalCnt_c2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotalCnt_c2 As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtBudgetMonth コントロール。
@@ -939,6 +957,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CREATEFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_CREATELINKFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_CREATELINKFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_DTAB_CHANGE_NO コントロール。

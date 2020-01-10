@@ -283,6 +283,8 @@ Public Class OIT0003OrderList
             & "   END                                                AS TRAINNO" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')            AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(OIT0002.BASECODE), '')                AS BASECODE" _
+            & " , ISNULL(RTRIM(OIT0002.BASENAME), '')                AS BASENAME" _
             & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')           AS CONSIGNEECODE" _
             & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')           AS CONSIGNEENAME" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
@@ -315,6 +317,27 @@ Public Class OIT0003OrderList
             & "   WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TOTALTANK), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIT0002.TOTALTANK), '')" _
             & "   END                                                AS TOTALTANK" _
+            & " , ISNULL(RTRIM(OIT0002.RTANKCH), '')                 AS RTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.HTANKCH), '')                 AS HTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.TTANKCH), '')                 AS TTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.MTTANKCH), '')                AS MTTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.KTANKCH), '')                 AS KTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.K3TANKCH), '')                AS K3TANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.K5TANKCH), '')                AS K5TANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.K10TANKCH), '')               AS K10TANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.LTANKCH), '')                 AS LTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.ATANKCH), '')                 AS ATANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER1OTANKCH), '')           AS OTHER1OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER2OTANKCH), '')           AS OTHER2OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER3OTANKCH), '')           AS OTHER3OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER4OTANKCH), '')           AS OTHER4OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER5OTANKCH), '')           AS OTHER5OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER6OTANKCH), '')           AS OTHER6OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER7OTANKCH), '')           AS OTHER7OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER8OTANKCH), '')           AS OTHER8OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER9OTANKCH), '')           AS OTHER9OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.OTHER10OTANKCH), '')          AS OTHER10OTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
@@ -667,6 +690,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_DELFLG.Text = "0"
         '作成フラグ(新規登録：1, 更新：2)
         work.WF_SEL_CREATEFLG.Text = "1"
+        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        work.WF_SEL_CREATELINKFLG.Text = "1"
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
@@ -743,6 +768,10 @@ Public Class OIT0003OrderList
         work.WF_SEL_SHIPPERSNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
         '荷主(コード)
         work.WF_SEL_SHIPPERSCODE.Text = OIT0003tbl.Rows(WW_LINECNT)("SHIPPERSCODE")
+        '基地(名)
+        work.WF_SEL_BASENAME.Text = OIT0003tbl.Rows(WW_LINECNT)("BASENAME")
+        '基地(コード)
+        work.WF_SEL_BASECODE.Text = OIT0003tbl.Rows(WW_LINECNT)("BASECODE")
         '荷受人(名)
         work.WF_SEL_CONSIGNEENAME.Text = OIT0003tbl.Rows(WW_LINECNT)("CONSIGNEENAME")
         '荷受人(コード)
@@ -782,6 +811,29 @@ Public Class OIT0003OrderList
         work.WF_SEL_AHEAVY_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("ATANK")
         '合計車数
         work.WF_SEL_TANKCARTOTAL.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALTANK")
+
+        '車数（レギュラー）割当
+        work.WF_SEL_REGULARCH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("RTANKCH")
+        '車数（ハイオク）割当
+        work.WF_SEL_HIGHOCTANECH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("HTANKCH")
+        '車数（灯油）割当
+        work.WF_SEL_KEROSENECH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("TTANKCH")
+        '車数（未添加灯油）割当
+        work.WF_SEL_NOTADDED_KEROSENECH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("MTTANKCH")
+        '車数（軽油）割当
+        work.WF_SEL_DIESELCH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("KTANKCH")
+        '車数（３号軽油）割当
+        work.WF_SEL_NUM3DIESELCH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K3TANKCH")
+        '車数（５号軽油）割当
+        work.WF_SEL_NUM5DIESELCH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K5TANKCH")
+        '車数（１０号軽油）割当
+        work.WF_SEL_NUM10DIESELCH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("K10TANKCH")
+        '車数（LSA）割当
+        work.WF_SEL_LSACH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("LTANKCH")
+        '車数（A重油）割当
+        work.WF_SEL_AHEAVYCH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("ATANKCH")
+        '合計車数（割当）
+        work.WF_SEL_TANKCARTOTALCH.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALTANKCH")
 
         '積込日(予定)
         work.WF_SEL_LODDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("LODDATE")

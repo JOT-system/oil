@@ -68,6 +68,15 @@ Partial Public Class OILMasterPage
     Protected WithEvents MF_USERID As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''MF_USERCAMP コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_USERCAMP As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''MF_COMP_ROLE コントロール。
     '''</summary>
     '''<remarks>

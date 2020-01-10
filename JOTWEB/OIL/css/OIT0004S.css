@@ -1,0 +1,91 @@
+﻿/* タンク車マスタ検索画面*/
+/*油槽所見出し*/
+#WF_CONSIGNEECODE_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(15% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+    /*    font-weight:bold; 
+    text-decoration:underline;*/
+}
+
+/*油槽所input tag*/
+#WF_CONSIGNEECODE {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(19% - 50px/2);
+    left: calc(46% - 140px/2);
+}
+
+    #WF_CONSIGNEECODE input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+    }
+
+/*左Boxオープン用虫眼鏡アイコン ※ワンクリック用*/
+#WF_CONSIGNEECODE_ICON {
+    position: fixed;
+    height: 50px;
+    width: 50px;
+    top: calc(20.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+/*油槽所名称*/
+#WF_CONSIGNEECODE_TEXT {
+    position: fixed;
+    top: calc(20% - 50px/2);
+    left: calc(55% - 50px/2);
+}
+
+/*年月日見出し*/
+#WF_STYMD_LABEL {
+    position: fixed;
+    height: 50px;
+    width: 70px;
+    top: calc(27% - 50px/2);
+    left: calc(43.5% - 70px/2);
+    color: #737373;
+}
+
+/*年月日input tag*/
+#WF_STYMD {
+    position: fixed;
+    height: 50px;
+    width: 140px;
+    top: calc(31% - 50px/2);
+    left: calc(46% - 140px/2);
+}
+
+#WF_STYMD input[type='text'] {
+        Height: 2.1em;
+        Width: 10em;
+}
+
+/*左Boxオープン用虫眼鏡アイコン ※ワンクリック用*/
+#WF_STYMD_ICON {
+    position: fixed;
+    height: 50px;
+    width: 50px;
+    top: calc(32.5% - 50px/2);
+    left: calc(44.5% - 140px/2);
+    cursor: pointer;
+}
+
+/*左Boxオープン用虫眼鏡アイコン*/
+.BoxIcon {
+    background-image: url(../img/leftbox.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}
+
+/*カレンダーオープン用アイコン*/
+.CalendarIcon {
+    background-image: url(../img/calendar.png);
+    background-repeat: no-repeat;
+    background-position: 1px;
+}

@@ -1,7 +1,7 @@
 ﻿''************************************************************
-' 貨車連結順序表テーブル検索画面
-' 作成日 2019/11/14
-' 更新日 2019/11/14
+' 在庫管理表検索画面
+' 作成日 2019/11/08
+' 更新日 2019/11/08
 ' 作成者 JOT遠藤
 ' 更新車 JOT遠藤
 '
@@ -11,10 +11,10 @@
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' 貨車連結順序表テーブル登録（条件）
+''' 在庫管理表登録（条件）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIT0002LinkSearch
+Public Class OIT0004OilStockSearch
     Inherits Page
 
     '○ 共通処理結果
@@ -70,7 +70,7 @@ Public Class OIT0002LinkSearch
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = OIT0002WRKINC.MAPIDS
+        Master.MAPID = OIT0004WRKINC.MAPIDS
 
         WF_CAMPCODE.Focus()
         WF_FIELD.Value = ""
@@ -97,38 +97,20 @@ Public Class OIT0002LinkSearch
 
             '初期変数設定処理
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ORG", WF_ORG.Text)                '組織コード
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "RETSTATION", WF_RETSTATION_CODE.Text)   '空車着駅
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STYMD", WF_STYMD_CODE.Text)             '有効年月日(From)
-            WF_STYMD_CODE.Text = Format(CDate(WF_STYMD_CODE.Text).AddDays(1), "yyyy/MM/dd")
-            'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", WF_ENDYMD_CODE.Text)           '有効年月日(To)
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO_CODE.Text)         '本線列車
-
-            'ステータス選択
-            WF_SW1.Checked = True
-            WF_SW2.Checked = False
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0002L Then   '一覧画面からの遷移
+            Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)       '組織コード
+            Master.GetFirstValue(work.WF_SEL_CONSIGNEE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text)       '油槽所
+            Master.GetFirstValue(work.WF_SEL_STYMD.Text, "STYMD", WF_STYMD_CODE.Text)       '年月日
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004C Then   '実行画面からの遷移
             '画面項目設定処理
-            WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text        '会社コード
-            WF_ORG.Text = work.WF_SEL_ORG.Text        　　　　　'組織コード
-            WF_RETSTATION_CODE.Text = work.WF_SEL_RETSTATION.Text    '空車着駅
-            WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text              '有効年月日(From)
-            'WF_ENDYMD_CODE.Text = work.WF_SEL_ENDYMD.Text            '有効年月日(To)
-            WF_TRAINNO_CODE.Text = work.WF_SEL_TRAINNO.Text          '本線列車
-
-            'ステータス選択
-            If work.WF_SEL_SELECT.Text = "1" Then
-                WF_SW1.Checked = True
-                WF_SW2.Checked = False
-            Else
-                WF_SW1.Checked = False
-                WF_SW2.Checked = True
-            End If
+            WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
+            WF_ORG.Text = work.WF_SEL_ORG.Text            '組織コード
+            WF_CONSIGNEE_CODE.Text = work.WF_SEL_CONSIGNEE.Text            '油槽所
+            WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text            '年月日
         End If
 
         '○ RightBox情報設定
-        rightview.MAPIDS = OIT0002WRKINC.MAPIDS
-        rightview.MAPID = OIT0002WRKINC.MAPIDL
+        rightview.MAPIDS = OIT0004WRKINC.MAPIDS
+        rightview.MAPID = OIT0004WRKINC.MAPIDC
         rightview.COMPCODE = WF_CAMPCODE.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
@@ -136,29 +118,25 @@ Public Class OIT0002LinkSearch
         rightview.MAPROLE = Master.ROLE_MAP
         rightview.VIEWROLE = Master.ROLE_VIEWPROF
         rightview.RPRTROLE = Master.ROLE_RPRTPROF
-
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
         CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
-        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         　　　　　　　 '組織コード
-        CODENAME_get("RETSTATION", WF_RETSTATION_CODE.Text, WF_RETSTATION_NAME.Text, WW_DUMMY)   '空車発駅
-        CODENAME_get("TRAINNO", WF_TRAINNO_CODE.Text, WF_TRAINNO_NAME.Text, WW_DUMMY)         　 '本線列車
+        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
+        CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_DUMMY)         '油槽所
 
     End Sub
 
+
     ''' <summary>
-    ''' 検索ボタン押下時処理
+    ''' 実行ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_CAMPCODE.Text)          '会社コード
-        Master.EraseCharToIgnore(WF_RETSTATION_CODE.Text)        '空着発駅
-        Master.EraseCharToIgnore(WF_STYMD_CODE.Text)             '有効年月日(From)
-        'Master.EraseCharToIgnore(WF_ENDYMD_CODE.Text)            '有効年月日(To)
-        Master.EraseCharToIgnore(WF_TRAINNO_CODE.Text)           '本線列車
+        Master.EraseCharToIgnore(WF_CONSIGNEE_CODE.Text)          '油槽所
+        Master.EraseCharToIgnore(WF_STYMD_CODE.Text)          '年月日
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -168,17 +146,10 @@ Public Class OIT0002LinkSearch
 
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
-        work.WF_SEL_ORG.Text = WF_ORG.Text        　　　　　'組織コード
-        work.WF_SEL_RETSTATION.Text = WF_RETSTATION_CODE.Text    '空着着駅
-        work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text              '有効年月日(From)
-        'work.WF_SEL_ENDYMD.Text = WF_ENDYMD_CODE.Text      　'有効年月日(To)
-        work.WF_SEL_TRAINNO.Text = WF_TRAINNO_CODE.Text    　　　'本線列車
-        If WF_SW1.Checked = True Then
-            work.WF_SEL_SELECT.Text = "1"                   '利用可のみ表示
-        End If
-        If WF_SW2.Checked = True Then
-            work.WF_SEL_SELECT.Text = "0"                   '全て表示
-        End If
+        work.WF_SEL_ORG.Text = WF_ORG.Text        '組織コード
+        work.WF_SEL_CONSIGNEE.Text = WF_CONSIGNEE_CODE.Text        '油槽所
+        work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text        '年月日
+
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -212,61 +183,36 @@ Public Class OIT0002LinkSearch
         Dim WW_LINE_ERR As String = ""
 
         '○ 単項目チェック
-        '会社コード
-        Master.CheckField(WF_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        '油槽所
+        Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
-            CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE.Text, needsPopUp:=True)
-                WF_CAMPCODE.Focus()
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "油槽所 : " & WF_CONSIGNEE_CODE.Text, needsPopUp:=True)
+                WF_CONSIGNEE_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End If
         Else
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            WF_CAMPCODE.Focus()
+            WF_CONSIGNEE_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
-        '空車着駅（発駅）
-        If WF_RETSTATION_CODE.Text = "" Then
-            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "空車着駅", needsPopUp:=True)
-            WF_RETSTATION_CODE.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-        Master.CheckField(WF_CAMPCODE.Text, "RETSTATION", WF_RETSTATION_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            '存在チェック
-            CODENAME_get("RETSTATION", WF_RETSTATION_CODE.Text, WF_RETSTATION_NAME.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
-                              "空車着駅 : " & WF_RETSTATION_CODE.Text, needsPopUp:=True)
-                WF_RETSTATION_CODE.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            WF_RETSTATION_CODE.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-
-        '開始日
+        '年月日
         '存在チェック
         If WF_STYMD_CODE.Text = "" Then
-            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "利用可能日", needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "年月日", needsPopUp:=True)
             WF_STYMD_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
-        WW_CheckDate(WF_STYMD_CODE.Text, "利用可能日（開始）", WW_CS0024FCHECKERR, dateErrFlag)
+        WW_CheckDate(WF_STYMD_CODE.Text, "年月日", WW_CS0024FCHECKERR, dateErrFlag)
         If dateErrFlag = "1" Then
             WF_STYMD_CODE.Focus()
-            WW_CheckMES1 = "利用可能日（開始）入力エラー。"
+            WW_CheckMES1 = "年月日入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             O_RTN = "ERR"
             Exit Sub
@@ -274,54 +220,6 @@ Public Class OIT0002LinkSearch
             WF_STYMD_CODE.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
         End If
 
-        '終了日
-        ''年月日チェック
-        'If WF_ENDYMD_CODE.Text = "" Then
-        'Else
-        '    WW_CheckDate(WF_ENDYMD_CODE.Text, "利用可能日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
-        '    If dateErrFlag = "1" Then
-        '        WF_ENDYMD_CODE.Focus()
-        '        WW_CheckMES1 = "利用可能日(終了)入力エラー。"
-        '        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    Else
-        '        WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
-        '    End If
-        'End If
-
-        ''日付大小チェック
-        'If WF_STYMD_CODE.Text <> "" AndAlso WF_ENDYMD_CODE.Text <> "" Then
-        '    Dim WW_DATE_ST As Date
-        '    Dim WW_DATE_END As Date
-        '    Try
-        '        Date.TryParse(WF_STYMD_CODE.Text, WW_DATE_ST)
-        '        Date.TryParse(WF_ENDYMD_CODE.Text, WW_DATE_END)
-
-        '        If WW_DATE_ST > WW_DATE_END Then
-        '            Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-        '            WF_STYMD_CODE.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    Catch ex As Exception
-        '        Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD_CODE.Text & ":" & WF_ENDYMD_CODE.Text)
-        '        WF_STYMD_CODE.Focus()
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    End Try
-        'End If
-
-        '本線列車
-        If WF_TRAINNO_CODE.Text <> "" Then
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                WF_TRAINNO_CODE.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -393,29 +291,25 @@ Public Class OIT0002LinkSearch
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "WF_STYMD"         '有効年月日(From)
+                            Case "WF_STYMD"         '年月日
                                 .WF_Calendar.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
-                                'Case "WF_ENDYMD"        '有効年月日(To)
-                                '    .WF_Calendar.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
                         End Select
                         .ActiveCalendar()
                     Case Else
-                        '以外
+                        '会社コード
                         Dim prmData As New Hashtable
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
-                        'フィールドによってパラメータを変える
-                        Select Case WF_FIELD.Value
-                            Case "WF_RETSTATION"       '空車着駅（発駅）
-                                prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, "STATIONPATTERN", "1")
-                            Case "WF_TRAINNO"          '本線列車
-                                prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
-                        End Select
+                        '油槽所
+                        If WF_FIELD.Value = "WF_CONSIGNEE" Then
+                            prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
+                        End If
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
                 End Select
             End With
+
         End If
 
     End Sub
@@ -428,10 +322,8 @@ Public Class OIT0002LinkSearch
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "WF_RETSTATION"          '空車着駅（発駅）
-                CODENAME_get("RETSTATION", WF_RETSTATION_CODE.Text, WF_RETSTATION_NAME.Text, WW_RTN_SW)
-            Case "WF_TRAINNO"          '本線列車
-                CODENAME_get("TRAINNO", WF_TRAINNO_CODE.Text, WF_TRAINNO_NAME.Text, WW_RTN_SW)
+            Case "WF_CONSIGNEE"        '油槽所
+                CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -466,12 +358,12 @@ Public Class OIT0002LinkSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "WF_RETSTATION"        '空着着駅（発駅）
-                WF_RETSTATION_CODE.Text = WW_SelectValue
-                WF_RETSTATION_NAME.Text = WW_SelectText
-                WF_RETSTATION_CODE.Focus()
+            Case "WF_CONSIGNEE"          '油槽所
+                WF_CONSIGNEE_CODE.Text = WW_SelectValue
+                WF_CONSIGNEE_NAME.Text = WW_SelectText
+                WF_CONSIGNEE_CODE.Focus()
 
-            Case "WF_STYMD"             '有効年月日(From)
+            Case "WF_STYMD"             '年月日
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
@@ -483,30 +375,11 @@ Public Class OIT0002LinkSearch
                 Catch ex As Exception
                 End Try
                 WF_STYMD_CODE.Focus()
-
-            'Case "WF_ENDYMD"            '有効年月日(To)
-            '    Dim WW_DATE As Date
-            '    Try
-            '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-            '        If WW_DATE < C_DEFAULT_YMD Then
-            '            WF_ENDYMD_CODE.Text = ""
-            '        Else
-            '            WF_ENDYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-            '        End If
-            '    Catch ex As Exception
-            '    End Try
-            '    WF_ENDYMD_CODE.Focus()
-
-            Case "WF_TRAINNO"           '本線列車
-                WF_TRAINNO_CODE.Text = WW_SelectValue
-                WF_TRAINNO_NAME.Text = WW_SelectText
-                WF_TRAINNO_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
-        'WF_LeftMViewChange.Value = ""  '★
 
     End Sub
 
@@ -519,20 +392,15 @@ Public Class OIT0002LinkSearch
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "WF_RETSTATION"        '空車着駅（発駅）
-                WF_RETSTATION_CODE.Focus()
-            Case "WF_STYMD"             '有効年月日(From)
+            Case "WF_CONSIGNEE"          '油槽所
+                WF_CONSIGNEE_CODE.Focus()
+            Case "WF_STYMD"          '年月日
                 WF_STYMD_CODE.Focus()
-            'Case "WF_ENDYMD"            '有効年月日(To)
-            '    WF_ENDYMD_CODE.Focus()
-            Case "WF_TRAINNO"           '本線列車
-                WF_TRAINNO_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
-        'WF_LeftMViewChange.Value = ""
 
     End Sub
 
@@ -595,15 +463,12 @@ Public Class OIT0002LinkSearch
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"             '組織コード
+                Case "ORG"             '運用部署
                     prmData = work.CreateORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "RETSTATION"       '空車着駅（発駅）
-                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "STATIONPATTERN")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                    'Case "TRAINNO"           '本線列車
-                    '    prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "CONSIGNEE"        '油槽所
+                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

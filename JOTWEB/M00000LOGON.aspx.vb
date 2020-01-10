@@ -210,6 +210,7 @@ Public Class M00000LOGON
         '○ 画面UserIDのDB(OIS0004_USER)存在チェック
         Dim WW_USERID As String = String.Empty
         Dim WW_PASSWORD As String = String.Empty
+        Dim WW_USERCAMP As String = String.Empty
         Dim WW_ORG As String = String.Empty
         Dim WW_STYMD As Date = Date.Now
         Dim WW_ENDYMD As Date = Date.Now
@@ -258,6 +259,7 @@ Public Class M00000LOGON
                 Dim SQL_Str As String =
                      "SELECT " _
                    & " rtrim(A.USERID)   as USERID    , " _
+                   & " rtrim(A.CAMPCODE) as CAMPCODE  , " _
                    & " rtrim(A.ORG)      as ORG       , " _
                    & " A.STYMD                        , " _
                    & " A.ENDYMD                       , " _
@@ -298,6 +300,7 @@ Public Class M00000LOGON
                     If SQLdr.Read Then
                         WW_USERID = SQLdr("USERID")
                         WW_PASSWORD = SQLdr("PASSWORD")
+                        WW_USERCAMP = SQLdr("CAMPCODE")
                         WW_ORG = SQLdr("ORG")
                         WW_STYMD = SQLdr("STYMD")
                         WW_ENDYMD = SQLdr("ENDYMD")
@@ -518,6 +521,7 @@ Public Class M00000LOGON
         CS0050Session.VIEW_PERMIT = ""
 
         Master.MAPID = WW_MAPID
+        Master.USERCAMP = WW_USERCAMP
         '20191101-追加-START
         Master.ROLE_MENU = WW_MENUROLE
         Master.ROLE_MAP = WW_MAPID

@@ -52,6 +52,14 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0003D As String = "ASP.OIL_ORD_OIT0003ORDERDETAIL_ASPX"
         ''' <summary>
+        ''' 在庫管理表検索
+        ''' </summary>
+        Public Const OIT0004S As String = "ASP.OIL_INV_OIT0004OILSTOCKSEARCH_ASPX"
+        ''' <summary>
+        ''' 在庫管理表登録
+        ''' </summary>
+        Public Const OIT0004C As String = "ASP.OIL_INV_OIT0004OILSTOCKCREATE_ASPX"
+        ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"

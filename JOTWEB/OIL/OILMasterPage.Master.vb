@@ -169,6 +169,7 @@ Public Class OILMasterPage
                 With Page.PreviousPage.Master
                     '〇前画面のMF退避
                     MF_MAPID.Value = DirectCast(.FindControl("MF_MAPID"), HiddenField).Value                         'MAPID
+                    MF_USERCAMP.Value = DirectCast(.FindControl("MF_USERCAMP"), HiddenField).Value                         'MAPID
                     MF_MAPvariant.Value = DirectCast(.FindControl("MF_MAPvariant"), HiddenField).Value               'MAP変数
                     MF_MAPpermitcode.Value = DirectCast(.FindControl("MF_MAPpermitcode"), HiddenField).Value         'MAP権限
                     '20191101-追加-STRAT
@@ -254,6 +255,7 @@ Public Class OILMasterPage
 
                 '〇ユーザ権限情報取得
                 MF_USERID.Value = DirectCast(.FindControl("MF_USERID"), HiddenField).Value
+                MF_USERCAMP.Value = DirectCast(.FindControl("MF_USERCAMP"), HiddenField).Value                         'MAPID
                 '                MF_COMP_ROLE.Value = DirectCast(.FindControl("MF_COMP_ROLE"), HiddenField).Value
                 '                MF_ORG_ROLE.Value = DirectCast(.FindControl("MF_ORG_ROLE"), HiddenField).Value
                 MF_PROF_REPORT.Value = DirectCast(.FindControl("MF_PROF_REPORT"), HiddenField).Value             '帳票プロフID
@@ -886,6 +888,17 @@ Public Class OILMasterPage
         End Get
         Set(value As String)
             MF_MAPID.Value = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' USERCAMP
+    ''' </summary>
+    Property USERCAMP As String
+        Get
+            Return MF_USERCAMP.Value
+        End Get
+        Set(value As String)
+            MF_USERCAMP.Value = value
         End Set
     End Property
 

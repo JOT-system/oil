@@ -162,6 +162,7 @@
     <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\css\ex\nprogress.css" />
     <Content Include="OIL\ex\page_404.html" />
+    <Content Include="OIL\M00002MENU.aspx" />
     <Content Include="OIL\mas\OIM0004StationCreate.aspx" />
     <Content Include="OIL\mas\OIM0005TankCreate.aspx" />
     <Content Include="OIL\mas\OIM0005TankList.aspx" />
@@ -299,6 +300,13 @@
     </Compile>
     <Compile Include="OIL\inc\OIT0001WRKINC.ascx.vb">
       <DependentUpon>OIT0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\M00002MENU.aspx.designer.vb">
+      <DependentUpon>M00002MENU.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\M00002MENU.aspx.vb">
+      <DependentUpon>M00002MENU.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\mas\OIS0001UserCreate.aspx.designer.vb">

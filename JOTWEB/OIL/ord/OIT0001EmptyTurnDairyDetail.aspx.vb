@@ -1635,6 +1635,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                             OIT0001row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text
                             OIT0001row("DETAILNO") = intDetailNo.ToString("000")
                         End If
+                        intDetailNo += 1
                     End If
 
                     '削除対象データと通常データとそれぞれでLINECNTを振り分ける
@@ -1646,7 +1647,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                         OIT0001row("LINECNT") = i        'LINECNT
                     End If
                     'strOrderNoBak = OIT0001row("ORDERNO")
-                    intDetailNo += 1
+                    If OIT0001row("DETAILNO") = intDetailNo Then
+                        intDetailNo += 1
+                    End If
                 Next
             End Using
         Catch ex As Exception
@@ -2410,7 +2413,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         'タンク車Noでソートし、重複がないかチェックする。
         OIT0001tbl_dv.Sort = "TANKNO"
         For Each drv As DataRowView In OIT0001tbl_dv
-            If drv("TANKNO") <> "" AndAlso chkTankNo = drv("TANKNO") Then
+            If drv("HIDDEN") <> "1" AndAlso drv("TANKNO") <> "" AndAlso chkTankNo = drv("TANKNO") Then
                 Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 WW_CheckMES1 = "タンク車№重複エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
@@ -2418,7 +2421,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
-            chkTankNo = drv("TANKNO")
+
+            '行削除したデータの場合は退避しない。
+            If drv("HIDDEN") <> "1" Then
+                chkTankNo = drv("TANKNO")
+            End If
         Next
 
         ''(一覧)タンク車No

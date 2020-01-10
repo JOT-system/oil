@@ -40,13 +40,16 @@
                 <a style="position:fixed;top:2.8em;left:9.5em;">
                     <input type="button" id="WF_ButtonORDER_CANCEL" class="btn-sticky" value="キャンセル"  style="Width:5em" onclick="ButtonClick('WF_ButtonORDER_CANCEL');" />←選択した受注のキャンセル
                 </a>
+                <a style="position:fixed;top:2.8em;left:56.5em;">
+                    <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成"  style="Width:7em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                </a>
                 <a style="position:fixed;top:2.8em;left:62.5em;">
-                    <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注作成"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                    <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択"  style="Width:7em" onclick="ButtonClick('WF_ButtonLinkINSERT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:62.5em;display:none;"">
                     <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
                 </a>
-                <a style="position:fixed;top:2.8em;left:67em;">
+                <a style="position:fixed;top:2.8em;left:68.5em;">
                     <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
                 </a>
                 <a style="position:fixed;top:3.2em;left:75em;display:none;">

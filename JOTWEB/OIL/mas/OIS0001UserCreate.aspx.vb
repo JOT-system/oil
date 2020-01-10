@@ -743,7 +743,7 @@ Public Class OIS0001UserCreate
                             Case "WF_APPROVALID"       '承認権限ロール
                                 prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
                             Case "WF_DELFLG"
-                                prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
+                                prmData.Item(C_PARAMETERS.LP_COMPANY) = Master.USERCAMP
                                 prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
                         End Select
 
@@ -1017,7 +1017,7 @@ Public Class OIS0001UserCreate
             WW_LINE_ERR = ""
 
             '削除フラグ(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIS0001INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "DELFLG", OIS0001INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
                 CODENAME_get("DELFLG", OIS0001INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
@@ -1037,7 +1037,7 @@ Public Class OIS0001UserCreate
             End If
 
             'ユーザID(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERID", OIS0001INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "USERID", OIS0001INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "・ユーザID入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1137,7 +1137,7 @@ Public Class OIS0001UserCreate
             End If
 
             '会社コード(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", OIS0001INProw("CAMPCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "CAMPCODE", OIS0001INProw("CAMPCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
                 CODENAME_get("CAMPCODE", OIS0001INProw("CAMPCODE"), WW_DUMMY, WW_RTN_SW)
@@ -1157,7 +1157,7 @@ Public Class OIS0001UserCreate
             End If
 
             '組織コード(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORG", OIS0001INProw("ORG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "ORG", OIS0001INProw("ORG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
                 CODENAME_get("ORG", OIS0001INProw("ORG"), WW_DUMMY, WW_RTN_SW)
@@ -1186,7 +1186,7 @@ Public Class OIS0001UserCreate
             End If
 
             'メニュー表示制御ロール(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MENUROLE", OIS0001INProw("MENUROLE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "MENUROLE", OIS0001INProw("MENUROLE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
                 CODENAME_get("MENU", OIS0001INProw("MENUROLE"), WW_DUMMY, WW_RTN_SW)
@@ -1206,7 +1206,7 @@ Public Class OIS0001UserCreate
             End If
 
             '画面参照更新制御ロール(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MAPROLE", OIS0001INProw("MAPROLE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "MAPROLE", OIS0001INProw("MAPROLE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
                 CODENAME_get("MAP", OIS0001INProw("MAPROLE"), WW_DUMMY, WW_RTN_SW)
@@ -1226,7 +1226,7 @@ Public Class OIS0001UserCreate
             End If
 
             '画面表示項目制御ロール(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "VIEWPROFID", OIS0001INProw("VIEWPROFID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "VIEWPROFID", OIS0001INProw("VIEWPROFID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
                 CODENAME_get("VIEW", OIS0001INProw("VIEWPROFID"), WW_DUMMY, WW_RTN_SW)
@@ -1246,7 +1246,7 @@ Public Class OIS0001UserCreate
             End If
 
             'エクセル出力制御ロール(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "RPRTPROFID", OIS0001INProw("RPRTPROFID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(Master.USERCAMP, "RPRTPROFID", OIS0001INProw("RPRTPROFID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
                 CODENAME_get("XML", OIS0001INProw("RPRTPROFID"), WW_DUMMY, WW_RTN_SW)
@@ -1268,7 +1268,7 @@ Public Class OIS0001UserCreate
             '承認権限ロール(バリデーションチェック）
             If OIS0001INProw("APPROVALID") = "" Then
             Else
-                Master.CheckField(work.WF_SEL_CAMPCODE.Text, "APPROVALID", OIS0001INProw("APPROVALID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                Master.CheckField(Master.USERCAMP, "APPROVALID", OIS0001INProw("APPROVALID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
                 If isNormal(WW_CS0024FCHECKERR) Then
                     '値存在チェック
                     CODENAME_get("APPROVAL", OIS0001INProw("APPROVALID"), WW_DUMMY, WW_RTN_SW)
@@ -1613,31 +1613,31 @@ Public Class OIS0001UserCreate
                             AUTHORITYALL_FLG = "2"
                         End If
                     End If
-                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, AUTHORITYALL_FLG)
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE2.Text, AUTHORITYALL_FLG)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MENU"           'メニュー表示制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "MAP"         '画面参照更新制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "VIEW"         '画面表示項目制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "XML"         'エクセル出力制御ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "APPROVAL"         '承認権限ロール
-                    prmData = work.CreateRoleList(work.WF_SEL_CAMPCODE.Text, I_FIELD)
+                    prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "DELFLG"           '削除フラグ
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, "DELFLG"))
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

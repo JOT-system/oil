@@ -20,52 +20,43 @@
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
-            <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
-                <!-- 会社コード -->
-                <a style="display:none;">
-                    <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-                    <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
-                </a>
+            <div class="Operation">
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        <!-- ↓ これも使ってないなら消す！ ↓ --> 
+                        <!-- 会社コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
 
-                <!-- 組織コード -->
-                <a style="display:none;">
-                    <asp:Label ID="WF_SEL_ORG" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-                    <asp:Label ID="WF_SEL_ORGNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
-                </a>
+                        <!-- 組織コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SEL_ORG" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SEL_ORGNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
+                        <!-- ↑ これも使ってないなら消す！ ↑ --> 
 
-                <!-- 一覧件数 -->
-                <asp:Label ID="WF_ListCNT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <!-- 一覧件数 -->
+                        <asp:Label ID="WF_ListCNT" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                    </div>
+                    <div class="rightSide">
+                        <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="追加"    onclick ="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="DB更新"  onclick="ButtonClick('WF_ButtonUPDATE');" />
+                        <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
+                        <input type="button" id="WF_ButtonPrint" class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPrint');" />
+                        <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"       onclick="ButtonClick('WF_ButtonEND');" />
+                        <div id="WF_ButtonFIRST" class="firstPage" runat="server"                    onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                        <div id="WF_ButtonLAST" class="lastPage" runat="server"                      onclick="ButtonClick('WF_ButtonLAST');"></div>
+                    </div>
+                </div> <!-- End class=actionButtonBox -->
 
-                <!-- ボタン -->
-                <a style="position:fixed;top:2.8em;left:49em;">
-                    <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="追加"  style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:53.5em;">
-                    <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="DB更新"  style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:58em;">
-                    <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:62.5em;">
-                    <input type="button" id="WF_ButtonPrint" class="btn-sticky" value="一覧印刷"  style="Width:5em" onclick="ButtonClick('WF_ButtonPrint');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:67em;">
-                    <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
-                </a>
-                <a style="position:fixed;top:3.2em;left:75em;">
-                    <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />
-                </a>
-                <a style="position:fixed;top:3.2em;left:77em;">
-                    <asp:Image ID="WF_ButtonLAST2" runat="server" ImageUrl="~/img/最終頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonLAST');" Height="1em" ImageAlign="AbsMiddle" />
-                </a>
-            </div>
-                <div id="divListArea">
-                    <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
-                </div>
+            </div> <!-- End class="Operation" -->
+            <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div>
 
-        <!-- 全体レイアウト　detailbox -->
-        <div class="detailboxOnly" id="detailbox">
+        <!--↓↓(20200109- 消す予定だが一旦画面映らなくする) 全体レイアウト　detailbox -->
+        <div class="detailboxOnly" id="detailbox" style="display:none;" >
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
                     <input type="button" id="WF_UPDATE" value="表更新" style="Width:5em" onclick="ButtonClick('WF_UPDATE');" />
@@ -240,7 +231,7 @@
                 </p>
             </div>
         </div>
-
+        <!--↑↑(20200109- 消す予定だが一旦画面映らなくする) 全体レイアウト　detailbox -->
         <!-- rightbox レイアウト -->
         <MSINC:rightview ID="rightview" runat="server" />
 
@@ -251,7 +242,7 @@
         <MSINC:wrklist ID="work" runat="server" />
 
         <!-- イベント用 -->
-        <div hidden="hidden">
+        <div style="display:none;">
             <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
             <!-- GridView DBクリック-->
             <asp:TextBox ID="WF_GridPosition" Text="" runat="server"></asp:TextBox>

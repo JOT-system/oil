@@ -21,7 +21,7 @@
     <asp:ContentPlaceHolder ID="head" runat="server" />
 </head>
 
-<body onload ="InitDisplay(); AutoCursor(); ConfirmWindow();">
+<body spellcheck="false">
 
     <form id="OILMasterPage" runat="server"
                 ondragstart="f_dragEventCancel(event)"

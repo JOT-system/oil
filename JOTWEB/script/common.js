@@ -1,9 +1,8 @@
 ﻿/**
  * @fileoverview システム共通JavaScript処理
  */
-
 /**
- * 戻るボタン押下を無効
+ * ロード時処理
  * @param {object} なし
  * @return {undefined} なし
  */
@@ -33,6 +32,30 @@ window.addEventListener('load', function () {
         }
     }
 });
+/**
+ * DOM読み込み完了時時処理(ロードより先に実行される)
+ * @param {object} なし
+ * @return {undefined} なし
+ */
+window.addEventListener('DOMContentLoaded', function () {
+    // 画面初期処理(個別のInitDisplay関数未定義の場合はスキップ)
+    if (typeof InitDisplay === 'function') {
+        InitDisplay();
+    }
+    // マウスポインタ戻す
+    AutoCursor();
+    // 確認ウィンドウ
+    ConfirmWindow();
+
+    /* ******************************** */
+    /* 虫眼鏡・検索のオブジェクトを付与 */
+    /* ******************************** */
+    // 対象オブジェクトの検索(inputタグのclass属性に'boxIcon'または'calendarIcon'が設定されているもの)
+    var targetTextBoxList = document.querySelectorAll('input.boxIcon,input.calendarIcon');
+    if (targetTextBoxList !== null) {
+        commonAppendInputBoxIcon(targetTextBoxList);
+    }
+});
 
 // 処理後カーソルを戻す
 function AutoCursor() {
@@ -42,10 +65,10 @@ function AutoCursor() {
 // ポップアップ確認
 function ConfirmWindow() {
 
-    if (document.getElementById("MF_SUBMIT").value == "FALSE" &&
-        document.getElementById("MF_ALERT").value == "TRUE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE" &&
+        document.getElementById("MF_ALERT").value === "TRUE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";        //親画面を操作不可にする
-        document.getElementById("MF_ALERT").value == "FALSE";
+        document.getElementById("MF_ALERT").value = "FALSE";
 
         //確認ウィンドウ表示
         var btn = document.getElementById("MF_AGAIN").value;
@@ -59,7 +82,7 @@ function ConfirmWindow() {
         var interval = setInterval(function () {
             if (win.closed) {
                 clearInterval(interval);
-                if (document.getElementById("MF_ALERT").value == "OK") {
+                if (document.getElementById("MF_ALERT").value === "OK") {
                     document.body.style.cursor = "wait";
                     document.forms[0].submit();
                 } else {
@@ -99,21 +122,21 @@ function ConfirmWindow() {
 // 拡張機能によりリストが切れてしまう場合、各画面のリストボックスを<p>タグから<a>タグに変更してみてください。
 function addLeftBoxExtention(TargetListBoxes) {
     // 引数未指定や配列がない場合は終了
-    if (TargetListBoxes == null) {
+    if (TargetListBoxes === null) {
         return;
     }
-    if (TargetListBoxes.length == 0) {
+    if (TargetListBoxes.length === 0) {
         return;
     }
     // 左ボックスがない場合はそのまま終了
     var LeftBoxObj = document.getElementById('LF_LEFTBOX');
-    if (LeftBoxObj == null) {
+    if (LeftBoxObj === null) {
         return;
     }
     // 対象一覧のループ
     for (let i = 0; i < TargetListBoxes.length; i++) {
         // オブジェクトの存在チェック(存在しない場合はスキップ)
-        if (document.getElementById(TargetListBoxes[i][0]) == null) {
+        if (document.getElementById(TargetListBoxes[i][0]) === null) {
             continue;
         }
 
@@ -124,29 +147,29 @@ function addLeftBoxExtention(TargetListBoxes) {
         var SubmitParam = TargetListBoxes[i][3];     //フィルタ機能　パラメータ
 
         // フラグが両方無しの場合意味がないので終了
-        if (SortFlag == '0' && FilterFlag == '0') {
+        if (SortFlag === '0' && FilterFlag === '0') {
             return;
         }
 
         // ソート拡張機能を追加
-        if (SortFlag == '1' || SortFlag == '2' || SortFlag == '3') {
+        if (SortFlag === '1' || SortFlag === '2' || SortFlag === '3') {
             addLeftBoxSort(ListObj, SortFlag);
         }
 
         // フィルタ拡張機能を追加
-        if (FilterFlag == '1') {
+        if (FilterFlag === '1') {
             addLeftBoxFilter(ListObj);
-        } else if (FilterFlag == '2') {
-            addLeftBoxsubmit(ListObj, SubmitParam)
+        } else if (FilterFlag === '2') {
+            addLeftBoxsubmit(ListObj, SubmitParam);
         }
 
- //       // ソートデフォルトを名称検索状態にする
- //       if (SortFlag == '1' || SortFlag == '3') {
- //           var nameSortChkObj = document.getElementById('WF_LeftBoxSortNameASC');
- //           if (nameSortChkObj != null) {
- //               nameSortChkObj.click();
- //           }
- //       }
+        //       // ソートデフォルトを名称検索状態にする
+        //       if (SortFlag == '1' || SortFlag == '3') {
+        //           var nameSortChkObj = document.getElementById('WF_LeftBoxSortNameASC');
+        //           if (nameSortChkObj != null) {
+        //               nameSortChkObj.click();
+        //           }
+        //       }
 
         // 1リストしか存在しえないので見つかったら処理終了
         return;
@@ -157,7 +180,7 @@ function addLeftBoxExtention(TargetListBoxes) {
 //  ※ソート機能フラグ(0:無し, 1:名称のみ, 2:コードのみ, 3:両方)
 function addLeftBoxSort(ListObj, SortFlag) {
     // オブジェクトの存在チェック(存在しない場合はスキップ)
-    if (ListObj == null || ListObj == undefined) {
+    if (ListObj === null || ListObj === undefined) {
         return;
     }
 
@@ -165,7 +188,7 @@ function addLeftBoxSort(ListObj, SortFlag) {
     var orderChooseTable = '<table id="WF_LeftBoxSortType">\n';
 
     // コード検索用ラジオボタン追加
-    if (SortFlag == '2' || SortFlag == '3') {
+    if (SortFlag === '2' || SortFlag === '3') {
         orderChooseTable = orderChooseTable + '  <tr>\n' +
             '    <td><input name="WF_LeftBoxSort" id="WF_LeftBoxSortCodeASC"  type="radio" value="CodeASC" />\n' +
             '        <label for="WF_LeftBoxSortCodeASC">コード昇順</label>\n' +
@@ -177,11 +200,11 @@ function addLeftBoxSort(ListObj, SortFlag) {
     }
 
     // 名称検索用ラジオボタン追加
-    if (SortFlag == '1' || SortFlag == '3') {
-//        let checkVal = ''; // 名称検索のみの場合はNameAscにデフォルトチェックをあてる
-//        if (SortFlag == '1') {
-//            checkVal = 'checked="checked"';
-//        }
+    if (SortFlag === '1' || SortFlag === '3') {
+        //        let checkVal = ''; // 名称検索のみの場合はNameAscにデフォルトチェックをあてる
+        //        if (SortFlag == '1') {
+        //            checkVal = 'checked="checked"';
+        //        }
         orderChooseTable = orderChooseTable + '  <tr>\n' +
             '    <td><input name="WF_LeftBoxSort" id="WF_LeftBoxSortNameASC"  type="radio" value="NameASC"  />\n' +
             '        <label for="WF_LeftBoxSortNameASC">名称昇順</label>\n' +
@@ -254,7 +277,7 @@ function leftListBoxSort(listBoxObjId, rbObj) {
 
     // フィルタ機能が有効な場合、画面で見えているクローンにも反映させる
     var cloneList = document.getElementById('WF_ListBoxCLONE');
-    if (cloneList != null) {
+    if (cloneList !== null) {
         leftListBoxFilter(cloneList, listBoxObjId);
     }
 
@@ -263,9 +286,9 @@ function leftListBoxSort(listBoxObjId, rbObj) {
         if (a.value > b.value) {
             return 1;
         } else if (a.value < b.value) {
-            return -1
+            return -1;
         } else {
-            return 0
+            return 0;
         }
     }
 
@@ -276,9 +299,9 @@ function leftListBoxSort(listBoxObjId, rbObj) {
         if (displayStringAPart > displayStringBPart) {
             return 1;
         } else if (displayStringAPart < displayStringBPart) {
-            return -1
+            return -1;
         } else {
-            return 0
+            return 0;
         }
     }
 
@@ -287,9 +310,9 @@ function leftListBoxSort(listBoxObjId, rbObj) {
         if (a.value < b.value) {
             return 1;
         } else if (a.value > b.value) {
-            return -1
+            return -1;
         } else {
-            return 0
+            return 0;
         }
     }
 
@@ -300,9 +323,9 @@ function leftListBoxSort(listBoxObjId, rbObj) {
         if (displayStringAPart < displayStringBPart) {
             return 1;
         } else if (displayStringAPart > displayStringBPart) {
-            return -1
+            return -1;
         } else {
-            return 0
+            return 0;
         }
     }
 }
@@ -310,7 +333,7 @@ function leftListBoxSort(listBoxObjId, rbObj) {
 
 // 左ボックスフィルタ拡張機能を追加
 function addLeftBoxFilter(ListObj) {
-    if (ListObj == null || ListObj == undefined) {
+    if (ListObj === null || ListObj === undefined) {
         return;
     }
 
@@ -365,7 +388,7 @@ function addLeftBoxFilter(ListObj) {
     //######ワンクリックに変更　2019/12/26 #######
     //leftListClone.ondblclick = (function (ListObj) {
     leftListClone.onclick = (function (ListObj) {
-    //######ワンクリックに変更　2019/12/26 #######
+        //######ワンクリックに変更　2019/12/26 #######
         return function () {
             ListboxDBclick();
         };
@@ -376,7 +399,7 @@ function addLeftBoxFilter(ListObj) {
 // 左ボックスフィルタイベント
 function leftListBoxFilter(leftListClone, listBoxObjId) {
     var filterCond = document.getElementById('WF_LEFTBOXFILTER').value.trim();
-    if (filterCond == "") {
+    if (filterCond === "") {
         filterCond = '.*';
     } else {
         filterCond = '.*' + filterCond.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&') + '.*';
@@ -413,13 +436,13 @@ function leftListBoxFilter(leftListClone, listBoxObjId) {
 //  ※機能フラグ(0:無し, 1:項目指定)
 function addLeftBoxsubmit(ListObj, SubmitParam) {
     // オブジェクトの存在チェック(存在しない場合はスキップ)
-    if (ListObj == null || ListObj == undefined) {
+    if (ListObj === null || ListObj === undefined) {
         return;
     }
 
     // 名称検索用ラジオボタン追加
     var orderChooseTable = '<table id="WF_LeftBoxSubmit">\n' +
-            '<tr>\n' +
+        '<tr>\n' +
         '    <td><input name="WF_LeftBoxParam" id="WF_LeftBoxParam"  type="text" value="' + SubmitParam + '"  title="Filter Param" />\n' +
         '    </td>\n' +
         '    <td><input id="WF_LeftBoxSubmit" type="button" value="検 索" onclick="ButtonClick(\'WF_LeftBoxSubmit\')" />\n' +
@@ -437,7 +460,7 @@ function addLeftBoxsubmit(ListObj, SubmitParam) {
 
 // ○左Box用処理（左Box表示/非表示切り替え）
 function REF_Field_DBclick(repfield, fieldNM, tabNo) {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_FIELD_REP').value = repfield;
         document.getElementById('WF_FIELD').value = fieldNM;
@@ -446,11 +469,11 @@ function REF_Field_DBclick(repfield, fieldNM, tabNo) {
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
-    };
-};
+    }
+}
 // ○左Box用処理（左Box表示/非表示切り替え）
 function Field_DBclick(fieldNM, tabNo) {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_FIELD').value = fieldNM;
         document.getElementById('WF_LeftMViewChange').value = tabNo;
@@ -459,12 +482,12 @@ function Field_DBclick(fieldNM, tabNo) {
         document.getElementById("WF_ButtonClick").value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
-    };
-};
+    }
+}
 
 // ○左BOX用処理（DBクリック選択+値反映）
 function ListboxDBclick() {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_LeftboxOpen').value = "";
         document.getElementById("WF_ButtonClick").value = "WF_ListboxDBclick";
@@ -474,7 +497,7 @@ function ListboxDBclick() {
 }
 // ○左BOX用処理（DBクリック選択+値反映）
 function WF_TableF_DbClick(index) {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_LeftboxOpen').value = "";
         document.getElementById('WF_TBL_SELECT').value = index;
@@ -485,7 +508,7 @@ function WF_TableF_DbClick(index) {
 }
 // ○左BOX用処理（TextBox変更時、名称取得）
 function TextBox_change(fieldNM) {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_FIELD').value = fieldNM;
         document.getElementById('WF_ButtonClick').value = "WF_LeftBoxSelectClick";
@@ -496,7 +519,7 @@ function TextBox_change(fieldNM) {
 
 // ○右Box用処理（右Box表示/非表示切り替え）
 function r_boxDisplay() {
-    if (document.getElementById("RF_RIGHTBOX").style.width == "0em") {
+    if (document.getElementById("RF_RIGHTBOX").style.width === "0em") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
         document.getElementById('WF_RightboxOpen').value = "Open";
         document.getElementById("WF_ButtonClick").value = "WF_RIGHT_VIEW_DBClick";
@@ -505,12 +528,12 @@ function r_boxDisplay() {
     } else {
         document.getElementById("RF_RIGHTBOX").style.width = "0em";
         document.getElementById('WF_RightboxOpen').value = "";
-    };
-};
+    }
+}
 
 // ○右BOX用処理（ラジオボタン）
 function rightboxChange(tabNo) {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_RightViewChange').value = tabNo;
         document.getElementById('WF_RightboxOpen').value = "Open";
@@ -522,7 +545,7 @@ function rightboxChange(tabNo) {
 
 // ○右BOX用処理（メモ変更）
 function MEMOChange() {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById("WF_ButtonClick").value = "WF_MEMOChange";
         document.getElementById('WF_RightboxOpen').value = "Open";
@@ -553,12 +576,12 @@ function f_dragEvent(e) {
     var xhr = new XMLHttpRequest();
 
     // 「POST メソッド」「接続先 URL」を指定
-    xhr.open("POST", "../../inc/GRCO0100XLSUP.ashx", false)
+    xhr.open("POST", "../../inc/GRCO0100XLSUP.ashx", false);
 
     // イベント設定
     // ⇒XHR 送信正常で実行されるイベント
     xhr.onload = function (e) {
-        if (e.currentTarget.status == 200) {
+        if (e.currentTarget.status === 200) {
             document.getElementById('WF_ButtonClick').value = "WF_EXCEL_UPLOAD";
             document.body.style.cursor = "wait";
             document.forms[0].submit();                             //aspx起動
@@ -601,35 +624,35 @@ function MsgClear() {
 
 // ○ヘルプBox用処理
 function HelpDisplay() {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById("WF_ButtonClick").value = "HELP";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
-    };
-};
+    }
+}
 
 // ○ドロップ処理（処理抑止）
 function f_dragEventCancel(event) {
     event.preventDefault();  //イベントをキャンセル
-};
+}
 
 
 // ○ダウンロード処理
 function f_ExcelPrint() {
     // リンク参照
     window.open(document.getElementById("WF_PrintURL").value, "view", "_blank");
-};
+}
 
 function f_PDFPrint() {
     // リンク参照
     window.open(document.getElementById("WF_PrintURL").value + "?" + (new Date()).getTime(), "view", "_blank");
-};
+}
 
 // ○各ボタン押下処理
 function ButtonClick(btn) {
     //サーバー未処理（MF_SUBMIT="FALSE"）のときのみ、SUBMIT
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         //押下されたボタンを設定
         document.getElementById("WF_ButtonClick").value = btn;
@@ -638,11 +661,11 @@ function ButtonClick(btn) {
     } else {
         return false;
     }
-};
+}
 
 // ○ディテール(タブ切替)処理
 function DtabChange(tabNo) {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_DTAB_CHANGE_NO').value = tabNo;
         document.getElementById('WF_ButtonClick').value = "WF_DTAB_Click";
@@ -653,24 +676,24 @@ function DtabChange(tabNo) {
 
 // ○ディテール(PDF表示)処理
 function DtabPDFdisplay(filename) {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_DTAB_PDF_DISP_FILE').value = filename;
         document.getElementById('WF_ButtonClick').value = "WF_DTAB_PDF_Click";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
-    };
-};
+    }
+}
 
 // ○ディテール(PDF表示)処理
 function PDFselectChange() {
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_ButtonClick').value = "WF_DTAB_PDF_Change";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
-    };
-};
+    }
+}
 
 
 /**
@@ -699,7 +722,7 @@ function getTargetColumnNoTable(colName, listId) {
     // 左固定列のカラム名検索
     if (leftHeaderDiv !== null && leftHeaderDiv.getElementsByTagName("table") !== null) {
         let leftHeaderTable = leftHeaderDiv.getElementsByTagName("table")[0];
-        let leftHeaderRow = leftHeaderTable.rows[0]
+        let leftHeaderRow = leftHeaderTable.rows[0];
         for (let i = 0; i < leftHeaderRow.cells.length; i++) {
             let targetCell = leftHeaderRow.cells[i];
             if (targetCell.getAttribute("cellfiedlname") === colName) {
@@ -712,7 +735,7 @@ function getTargetColumnNoTable(colName, listId) {
     // 右動的列のカラム名検索
     if (rightHeaderDiv !== null && rightHeaderDiv.getElementsByTagName("table") !== null) {
         let rightHeaderTable = rightHeaderDiv.getElementsByTagName("table")[0];
-        let rightHeaderRow = rightHeaderTable.rows[0]
+        let rightHeaderRow = rightHeaderTable.rows[0];
         for (let i = 0; i < rightHeaderRow.cells.length; i++) {
             let targetCell = rightHeaderRow.cells[i];
             if (targetCell.getAttribute("cellfiedlname") === colName) {
@@ -804,8 +827,8 @@ function bindListCommonEvents(listObjId, isPostBack, adjustHeight, keepHScrollWh
                         document.body.style.cursor = "wait";
                         document.forms[0].submit();  //aspx起動
                         return false;
-                    };
-                };
+                    }
+                }
                 // ↓キー押下時
                 if (window.event.keyCode === 40) {
                     if (objSubmit.value === 'FALSE') {
@@ -815,8 +838,8 @@ function bindListCommonEvents(listObjId, isPostBack, adjustHeight, keepHScrollWh
                         document.body.style.cursor = "wait";
                         document.forms[0].submit();  //aspx起動
                         return false;
-                    };
-                };
+                    }
+                }
             };
         })(), false);
     }
@@ -909,7 +932,6 @@ function commonListScroll(listObj) {
 /**
  * リストの高さを調節する
  * @param {string}listId リスト全体のオブジェクトID
- * @return {string} リスト設定文字
  * @example 個別ページからの使用想定はなし(bindListCommonEventsから設定)
  */
 function commonListAdjustHeight(listId) {
@@ -920,15 +942,15 @@ function commonListAdjustHeight(listId) {
         //IE
     } else if (userAgent.indexOf('edge') !== -1) {
         //Edge
-    } else if (userAgent.indexOf('chrome') != -1) {
+    } else if (userAgent.indexOf('chrome') !== -1) {
         //Chrome
         //browserAjust = -10;
 
-    } else if (userAgent.indexOf('safari') != -1) {
+    } else if (userAgent.indexOf('safari') !== -1) {
         //Safari
-    } else if (userAgent.indexOf('firefox') != -1) {
+    } else if (userAgent.indexOf('firefox') !== -1) {
         //FireFox
-    } else if (userAgent.indexOf('opera') != -1) {
+    } else if (userAgent.indexOf('opera') !== -1) {
         //Opera
     }
 
@@ -940,7 +962,7 @@ function commonListAdjustHeight(listId) {
     var listHeight = parentRect.top + listObjParent.clientHeight - listRect.top;
 
     //alert(parentBottom);
-    listObj.style.height = (listHeight + browserAjust) + 'px';
+    listObj.style.height = (listHeight + browserAjust).toString() + 'px';
 }
 /**
  * リストの横スクロール位置をwebStrage(セッションストレージ)に保持した値より取得する
@@ -971,6 +993,7 @@ function setCommonListScrollXpos(listId, val) {
 /**
  * 一覧表のマウスホイールイベント
  * @param {Event}event 未使用
+ * @returns {boolean} Boolean
  * @example サーバーにポストしスクロール分の一覧データを表示
  */
 function commonListMouseWheel(event) {
@@ -1004,6 +1027,7 @@ function commonListMouseWheel(event) {
  * リストのソートイベント
  * @param {string}listId 対象リストのID
  * @param {string}fieldId ソート対象のフィールド
+ * @returns {boolean} Boolean
  * @example ソート設定を記載しサーバーへサブミット
  */
 function commonListSortClick(listId, fieldId) {
@@ -1025,7 +1049,7 @@ function commonListSortClick(listId, fieldId) {
             sortOrderValueArray = sortOrderValue.split(',');
         }
         var keyValueSort = {};
-        for (var i = 0; i < sortOrderValueArray.length; i++) {
+        for (let i = 0; i < sortOrderValueArray.length; i++) {
             var sortOrder = sortOrderValueArray[i];
             keyValueSort[sortOrder.split(' ')[0]] = { sort: i, value: sortOrder.split(' ')[1] };
         }
@@ -1033,7 +1057,7 @@ function commonListSortClick(listId, fieldId) {
         if (keyValueSort[fieldId]) {
             if (keyValueSort[fieldId].value === "ASC") {
                 keyValueSort[fieldId].value = "DESC";
-            } else if ((keyValueSort[fieldId].value === "DESC")) {
+            } else if (keyValueSort[fieldId].value === "DESC") {
                 delete keyValueSort[fieldId];
             }
         } else {
@@ -1049,7 +1073,7 @@ function commonListSortClick(listId, fieldId) {
             return 0;
         });
         sortOrderValue = '';
-        for (var i = 0; i < retArray.length; i++) {
+        for (let i = 0; i < retArray.length; i++) {
             if (sortOrderValue === '') {
                 sortOrderValue = retArray[i].field + ' ' + retArray[i].value;
             } else {
@@ -1090,6 +1114,64 @@ function ListDbClick(obj, lineCnt) {
         objEventHandler.value = "WF_GridDBclick";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
+    }
+}
+/**
+ * Inputタグで虫眼鏡を表示するオブジェクトに対して虫眼鏡、カレンダーアイコン
+ * のタグを追加する
+ * @param {object} targetTextBoxList Inputタグオブジェクト
+ * @return {undefined} なし
+ * @description 詳細エリアのタブ変更時イベント
+ */
+function commonAppendInputBoxIcon(targetTextBoxList) {
+    // オブジェクトが無ければ終了
+    if (targetTextBoxList.length === 0) {
+        return;
+    }
+    //対象のオブジェクトをループ
+    for (let i = 0; i < targetTextBoxList.length; i++) {
+        let inputObj = targetTextBoxList[i];
+        // 対象オブジェクトが使用不可(または読み取り)の場合は設定しない
+        if (inputObj.disabled || inputObj.readOnly) {
+            continue;
+        }
+
+        let parentObj = inputObj.parentElement;
+        parentObj.style.position = 'relative';
+        let additionalClass = 'calendarIconArea';
+        if (inputObj.classList.contains('boxIcon')) {
+            additionalClass = 'boxIconArea';
+        }
+        let iconElm = document.createElement('div');
+        let inputObjId = inputObj.id;
+        let orgWidth = inputObj.scrollWidth;
+        let objId = inputObjId + 'commonIcon';
+        let iconElmImage = document.createElement('div');
+        iconElm.appendChild(iconElmImage);
+        iconElm.id = objId;
+        iconElm.classList.add(additionalClass);
+        //parentObj.appendChild(iconElm);
+        parentObj.insertBefore(iconElm, inputObj);
+        // Iconオブジェクトを再取得しイベントバインド(再取得しないとバインドできない)
+        iconElm = document.getElementById(objId);
+        iconElm.addEventListener('click', (function (inputObjId) {
+            return function () {
+                // 画像クリック時にテキストボックスのダブルクリックイベント発火
+                var evt = document.createEvent('MouseEvent');
+                evt.initMouseEvent('dblclick', !0, !0, window, 0, 0, 0, 0, 0, !1, !1, !1, !1, 0, null);
+                //evt.dataTransfer = data;
+                elm = document.getElementById(inputObjId);
+                elm.dispatchEvent(evt);
+            };
+        })(inputObjId), false);
+        // アイコン配置後のテキストボックスのサイズを補正(アイコンが無い状態に合わせる)
+        inputObj = document.getElementById(inputObj.id);
+        iconElm = document.getElementById(objId);
+        let currentWidth = inputObj.scrollWidth;
+        let cstyle = window.getComputedStyle(iconElm);
+        currentWidth = currentWidth - 14;
+        //currentWidth = iconElm.getComputedStyle()
+        inputObj.style.width = "calc(100% + 1px)";
     }
 }
 /**
@@ -1170,11 +1252,11 @@ function commonDisableModalBg(modalWapperId) {
                     // ↑キー押下時
                     if (window.event.keyCode === 38) {
                         window.event.stopPropagation(); //フォームのキーダウンイベントに↑キー伝達抑止
-                    };
+                    }
                     // ↓キー押下時
                     if (window.event.keyCode === 40) {
                         window.event.stopPropagation(); //フォームのキーダウンイベントに↓キー伝達抑止
-                    };
+                    }
                 };
             })(event), false);
         }
@@ -1222,7 +1304,7 @@ function commonDispWait() {
     forsubObj.onblur = (function (forsubObj) {
         return function () {
             forsubObj.select();
-        }
+        };
     }(forsubObj));
     commonDisableModalBg('comloading');
 }
@@ -1241,7 +1323,7 @@ function commonHideWait() {
 
 // 〇数値のみ入力可能
 function CheckNum() {
-    if (((event.keyCode < 48) || (event.keyCode > 57))) {
+    if (event.keyCode < 48 || event.keyCode > 57) {
         window.event.returnValue = false;
     }
 }

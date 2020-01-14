@@ -18,19 +18,19 @@ function InitDisplay() {
     //更新ボタン活性／非活性
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //活性
-        document.getElementById("WF_ButtonALLSELECT").disabled = "";
-        document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
-        document.getElementById("WF_ButtonORDER_CANCEL").disabled = "";
+        //document.getElementById("WF_ButtonALLSELECT").disabled = "";
+        //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
+        //document.getElementById("WF_ButtonORDER_CANCEL").disabled = "";
         document.getElementById("WF_ButtonINSERT").disabled = "";
     } else {
         //非活性 
-        document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
-        document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-        document.getElementById("WF_ButtonORDER_CANCEL").disabled = "disabled";
+        //document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
+        //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
+        //document.getElementById("WF_ButtonORDER_CANCEL").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
     }
     /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack);
+    bindListCommonEvents(pnlListAreaId, IsPostBack,true);
 
     // チェックボックス
     ChangeCheckBox();
@@ -82,13 +82,19 @@ function ChangeOrgUse(obj, lineCnt) {
     for (let i = 0; i < trlst.length; i++) {
         // 一覧の項目(ステータス)の値を取得
         var chkStatus = trlst[i].getElementsByTagName("td")[2].innerHTML;
-
+        // chkpnlListAreaOPERATIONx をオブジェクト変数に設定
+        var chkObj = document.getElementById("chkpnlListAreaOPERATION" + (i + 1));
+        var chkDisabled = false;
         if (chkStatus === "受注キャンセル") {
-            document.getElementById("chkpnlListAreaOPERATION" + (i + 1)).disabled = true;
+            chkDisabled = true;
             trlst[i].getElementsByTagName("td")[2].disabled = true;
         } else {
-            document.getElementById("chkpnlListAreaOPERATION" + (i + 1)).disabled = false;
+            chkDisabled = false;
             trlst[i].getElementsByTagName("td")[2].disabled = false;
+        }
+        //chkpnlListAreaOPERATIONx が存在している場合Disabledプロパティを設定 
+        if (chkObj) {
+            chkObj.disabled = chkDisabled;
         }
     }
 }

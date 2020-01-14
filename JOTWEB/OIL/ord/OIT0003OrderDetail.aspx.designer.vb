@@ -14,6 +14,15 @@ Option Explicit On
 Partial Public Class OIT0003OrderDetail
     
     '''<summary>
+    '''pnlHeaderInput コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlHeaderInput As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''WF_CAMPCODE コントロール。
     '''</summary>
     '''<remarks>
@@ -975,6 +984,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DTAB_CHANGE_NO As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''hdnDispBottomItems コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDispBottomItems As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''Master プロパティ。

@@ -21,3 +21,11 @@ div[data-generated="1"] div[id$="_DR"] {
 div[data-generated="1"] td:nth-child(4) {
     pointer-events: none;
 }
+/* Operetion枠の左マージンを個別指定 */
+.Operation {
+    margin-left: 0.7em;
+}
+/* 横スクロールを出す最小幅を個別指定 */
+.headerboxOnly {
+    min-width: 750px; /* (共通指定 650pxだと小さすぎる為) */
+}

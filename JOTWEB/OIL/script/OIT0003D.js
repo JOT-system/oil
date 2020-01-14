@@ -51,10 +51,14 @@ function InitDisplay() {
     }
     
     /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack);
+    // リストオブジェクト変数「pnlListAreaId」が未定義の場合はスキップ
+    if (typeof pnlListAreaId !== 'undefined') {
+        bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+        // チェックボックスもリストオブジェクトが無いとワークしないのでこのIf内に
+        ChangeCheckBox();
+    }
 
-    // チェックボックス
-    ChangeCheckBox();
+
 }
 
 

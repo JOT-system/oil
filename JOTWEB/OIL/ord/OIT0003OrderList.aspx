@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIT0003WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="OIT0003LH" ContentPlaceHolderID="head" runat="server">
-    <!-- <link href='<%=ResolveUrl("~/OIL/css/OIT0003L.css")%>' rel="stylesheet" type="text/css" /> -->
+    <link href='<%=ResolveUrl("~/OIL/css/OIT0003L.css")%>' rel="stylesheet" type="text/css" /> 
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0003L.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
@@ -47,12 +47,10 @@
                         <div id="WF_ButtonFIRST" class="firstPage" runat="server"                    onclick="ButtonClick('WF_ButtonFIRST');"></div>
                         <div id="WF_ButtonLAST" class="lastPage" runat="server"                      onclick="ButtonClick('WF_ButtonLAST');"></div>
                     </div>
-                </div>
- 
-            </div>
-            <div id="divListArea">
-                <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
-            </div>
+                </div> <!-- End class=actionButtonBox -->
+            </div> <!-- End class="Operation" -->
+            <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
+
         </div>
 
         <!-- rightbox レイアウト -->

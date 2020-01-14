@@ -30,7 +30,7 @@ function InitDisplay() {
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
     }
     /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
     // チェックボックス
     ChangeCheckBox();

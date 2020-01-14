@@ -2,21 +2,21 @@
 function InitDisplay() {
 
     // 全部消す
-    document.getElementById("LF_LEFTBOX").style.width = "0em";
+    //document.getElementById("LF_LEFTBOX").style.width = "0em";
     document.getElementById("RF_RIGHTBOX").style.width = "0em";
 
-    if (document.getElementById('WF_LeftboxOpen').value == "Open") {
-        document.getElementById("LF_LEFTBOX").style.width = "26em";
-    };
+    if (document.getElementById('WF_LeftboxOpen').value === "Open") {
+        document.getElementById("LF_LEFTBOX").style.display = "block";
+    }
 
     addLeftBoxExtention(leftListExtentionTarget);
 
-    if (document.getElementById('WF_RightboxOpen').value == "Open") {
+    if (document.getElementById('WF_RightboxOpen').value === "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
-    };
+    }
 
     // ○画面切替用処理（表示/非表示切替「ヘッダー、ディティール」）
-    if (document.getElementById('WF_BOXChange').value == "detailbox") {
+    if (document.getElementById('WF_BOXChange').value === "detailbox") {
         document.getElementById("headerbox").style.visibility = "hidden";
         document.getElementById("detailbox").style.visibility = "visible";
         document.getElementById('WF_BOXChange').value = "detailbox";
@@ -24,16 +24,16 @@ function InitDisplay() {
         document.getElementById("headerbox").style.visibility = "visible";
         document.getElementById("detailbox").style.visibility = "hidden";
         document.getElementById('WF_BOXChange').value = "headerbox";
-    };
+    }
 
     addLeftBoxExtention(leftListExtentionTarget);
 
-    if (document.getElementById('WF_RightboxOpen').value == "Open") {
+    if (document.getElementById('WF_RightboxOpen').value === "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
-    };
+    }
 
     //更新ボタン活性／非活性
-    if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
+    if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //活性
         document.getElementById("WF_ButtonALLSELECT").disabled = "";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
@@ -45,13 +45,14 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
-    };
+    }
+
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack);
 
     // チェックボックス
     ChangeCheckBox();
-};
+}
 
 // ○チェックボックス変更
 function ChangeCheckBox() {
@@ -64,7 +65,7 @@ function ChangeCheckBox() {
     for (let i = 0; i < chkObjs.length; i++) {
 
         if (chkObjs[i] !== null) {
-            if (spnObjs[i].innerText == "on") {
+            if (spnObjs[i].innerText === "on") {
                 chkObjs[i].checked = true;
             } else {
                 chkObjs[i].checked = false;
@@ -74,9 +75,9 @@ function ChangeCheckBox() {
 }
 
 // ○チェックボックス選択
-function SelectCheckBox(obj, lineCnt) {
+function SelectCheckBox(lineCnt) {
 
-    if (document.getElementById("MF_SUBMIT").value == "FALSE") {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("WF_SelectedIndex").value = lineCnt
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
         document.body.style.cursor = "wait";

@@ -359,7 +359,7 @@ Public Class OIT0002LinkSearch
                 dateErrFlag = "0"
             End If
         Catch ex As Exception
-            Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
         End Try
 
     End Sub

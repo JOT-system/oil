@@ -7,13 +7,13 @@ function InitDisplay() {
 
     if (document.getElementById('WF_LeftboxOpen').value === "Open") {
         document.getElementById("LF_LEFTBOX").style.display = "block";
-    };
+    }
 
     addLeftBoxExtention(leftListExtentionTarget);
 
     if (document.getElementById('WF_RightboxOpen').value === "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
-    };
+    }
 
     //更新ボタン活性／非活性
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
@@ -28,9 +28,10 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
-    };
+    }
     /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack);
+    //bindListCommonEvents(pnlListAreaId, IsPostBack);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
     // チェックボックス
     ChangeCheckBox();

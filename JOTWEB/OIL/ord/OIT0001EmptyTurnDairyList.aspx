@@ -20,18 +20,53 @@
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
-            <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+            <div class="Operation">
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        <!-- ↓ これも使ってないなら消す！ ↓ --> 
+                        <!-- 会社コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
+
+                        <!-- 組織コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
+                        <!-- ↑ これも使ってないなら消す！ ↑ --> 
+
+                        <!-- 一覧件数 -->
+                        <%--<asp:Label ID="WF_ListCNT" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>--%>
+                    </div>
+
+                    <div class="rightSide">
+                        <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"       onclick  ="ButtonClick('WF_ButtonALLSELECT');" />
+                        <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick ="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                        <input type="button" id="WF_ButtonLINE_LIFTED" class="btn-sticky" value="行削除"     onclick ="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                        <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="新規登録"        onclick ="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"           onclick="ButtonClick('WF_ButtonCSV');" />
+                        <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"               onclick="ButtonClick('WF_ButtonEND');" />
+                        <div style="display:none;" id="WF_ButtonFIRST" class="firstPage" runat="server"      onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                        <div style="display:none;" id="WF_ButtonLAST" class="lastPage" runat="server"        onclick="ButtonClick('WF_ButtonLAST');"></div>
+                    </div>
+                </div> <!-- End class=actionButtonBox -->
+            </div> <!-- End class="Operation" -->
+            <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
+
+            <%--<div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">--%>
 
                 <!-- 会社 -->
-                <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-                <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
+<%--                <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
+                <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>--%>
 
                 <!-- 運用部署 -->
-                <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-                <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
+<%--                <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
+                <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>--%>
 
                 <!-- ボタン -->
-                <a style="position:fixed;top:2.8em;left:0.5em;">
+<%--                <a style="position:fixed;top:2.8em;left:0.5em;">
                     <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
                 </a>
                 <a style="position:fixed;top:2.8em;left:5em;">
@@ -54,11 +89,11 @@
                 </a>
                 <a style="position:fixed;top:3.2em;left:77em;display:none;">
                     <asp:Image ID="WF_ButtonLAST2" runat="server" ImageUrl="~/img/最終頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonLAST');" Height="1em" ImageAlign="AbsMiddle" />
-                </a>
-            </div>
-            <div id="divListArea">
+                </a>--%>
+            <%--</div>--%>
+<%--            <div id="divListArea">
                 <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
-            </div>
+            </div>--%>
         </div>
 
         <!-- rightbox レイアウト -->

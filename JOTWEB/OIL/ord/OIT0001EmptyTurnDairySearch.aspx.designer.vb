@@ -77,6 +77,15 @@ Partial Public Class OIT0001EmptyTurnDairySearch
     Protected WithEvents TxtLoadingDateStart As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''LblLoadingDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblLoadingDate As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''TxtTrainNumber コントロール。
     '''</summary>
     '''<remarks>

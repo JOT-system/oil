@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIT0003WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="OIT0003LH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIT0003L.css")%>' rel="stylesheet" type="text/css" />
+    <link href='<%=ResolveUrl("~/OIL/css/OIT0003L.css")%>' rel="stylesheet" type="text/css" /> 
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0003L.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
@@ -20,48 +20,39 @@
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
-            <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
+            <div class="Operation">
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        <!-- 会社 -->
+                        <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Visible="false"></asp:Label>
+                        <asp:Label ID="WF_SEL_CAMPNAME" runat="server" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
 
-                <!-- 会社 -->
-                <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-                <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
-
-                <!-- 運用部署 -->
-                <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-                <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
-
-                <!-- ボタン -->
-                <a style="position:fixed;top:2.8em;left:0.5em;">
-                    <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"  style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:5em;">
-                    <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除"  style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:9.5em;">
-                    <input type="button" id="WF_ButtonORDER_CANCEL" class="btn-sticky" value="キャンセル"  style="Width:5em" onclick="ButtonClick('WF_ButtonORDER_CANCEL');" />←選択した受注のキャンセル
-                </a>
-                <a style="position:fixed;top:2.8em;left:56.5em;">
-                    <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成"  style="Width:7em" onclick="ButtonClick('WF_ButtonINSERT');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:62.5em;">
-                    <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択"  style="Width:7em" onclick="ButtonClick('WF_ButtonLinkINSERT');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:62.5em;display:none;"">
-                    <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"  style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:68.5em;">
-                    <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
-                </a>
-                <a style="position:fixed;top:3.2em;left:75em;display:none;">
-                    <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />
-                </a>
-                <a style="position:fixed;top:3.2em;left:77em;display:none;">
-                    <asp:Image ID="WF_ButtonLAST2" runat="server" ImageUrl="~/img/最終頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonLAST');" Height="1em" ImageAlign="AbsMiddle" />
-                </a>
+                        <!-- 運用部署 -->
+                        <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Visible="false"></asp:Label>
+                        <asp:Label ID="WF_SELUORG_TEXT" runat="server" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
+                        <!-- 左ボタン -->
+                        <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                        <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                        <input type="button" id="WF_ButtonORDER_CANCEL" class="btn-sticky" value="キャンセル"  onclick="ButtonClick('WF_ButtonORDER_CANCEL');" />←選択した受注のキャンセル
+                    </div>
+                    <div class="rightSide">
+                        <!-- 右ボタン -->
+                        <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonLinkINSERT');" />
+                        <a style="display:none;">
+                            <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
+                        </a>
+                        <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"   onclick="ButtonClick('WF_ButtonEND');" />
+                        <!-- 先頭行・末尾行ボタンを表示させる場合は divの括りを無くして WF_ButtonXXXを外だしにすれば出ます -->
+                        <div style="display:none;">
+                            <div id="WF_ButtonFIRST" class="firstPage" runat="server"                    onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                            <div id="WF_ButtonLAST" class="lastPage" runat="server"                      onclick="ButtonClick('WF_ButtonLAST');"></div>
+                        </div>
+                    </div>
+                </div>
+ 
             </div>
-            <div id="divListArea">
-                <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
-            </div>
+            <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div>
 
         <!-- rightbox レイアウト -->

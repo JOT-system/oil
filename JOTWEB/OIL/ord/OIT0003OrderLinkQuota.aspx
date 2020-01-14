@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIT0003WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="OIT0003QH" ContentPlaceHolderID="head" runat="server">
-    <!-- <link href='<%=ResolveUrl("~/OIL/css/OIT0003Q.css")%>' rel="stylesheet" type="text/css" /> -->
+    <%--<link href='<%=ResolveUrl("~/OIL/css/OIT0003Q.css")%>' rel="stylesheet" type="text/css" />--%>
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0003Q.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
@@ -20,27 +20,31 @@
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
-            <div class="Operation">
+            <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <!-- ↓個別にvisible=falseを設定している -->
                         <!-- 会社 -->
-                        <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Visible="false"></asp:Label>
+                        <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
                         <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
 
                         <!-- 運用部署 -->
-                        <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Visible="false"></asp:Label>
+                        <asp:Label ID="WF_SELUORG_L" runat="server" Text="運用部署" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
                         <asp:Label ID="WF_SELUORG_TEXT" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
+
+                        <!-- 左ボタン -->
                     </div>
                     <div class="rightSide">
-                        <!-- ボタン -->
-                        <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="ﾀﾝｸ車割当"  onclick="ButtonClick('WF_ButtonINSERT');" />
-                        <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"  onclick="ButtonClick('WF_ButtonEND');" />
+                        <!-- 右ボタン -->
+                        <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="ﾀﾝｸ車割当"  style="Width:7em" onclick="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
+                        <span style="display:none;"></span>
+                        <div id="WF_ButtonFIRST" class="firstPage" runat="server" onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                        <div id="WF_ButtonLAST" class="lastPage" runat="server" onclick="ButtonClick('WF_ButtonLAST');"></div>
                     </div>
-                </div>
-
-            </div>
+                </div> <!-- End class=actionButtonBox -->
+            </div> <!-- End class="Operation" -->
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
+
         </div>
 
         <!-- rightbox レイアウト -->

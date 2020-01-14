@@ -2,15 +2,15 @@
 function InitDisplay() {
 
     // 全部消す
-    document.getElementById("LF_LEFTBOX").style.width = "0em";
+    //document.getElementById("LF_LEFTBOX").style.width = "0em";
     document.getElementById("RF_RIGHTBOX").style.width = "0em";
 
-    if (document.getElementById('WF_LeftboxOpen').value == "Open") {
-        document.getElementById("LF_LEFTBOX").style.width = "26em";
+    if (document.getElementById('WF_LeftboxOpen').value === "Open") {
+        document.getElementById("LF_LEFTBOX").style.display = "block";
     };
 
     // ○画面切替用処理（表示/非表示切替「ヘッダー、ディティール」）
-    if (document.getElementById('WF_BOXChange').value == "detailbox") {
+    if (document.getElementById('WF_BOXChange').value === "detailbox") {
         document.getElementById("headerbox").style.visibility = "hidden";
         document.getElementById("detailbox").style.visibility = "visible";
         document.getElementById('WF_BOXChange').value = "detailbox";
@@ -22,7 +22,7 @@ function InitDisplay() {
 
     addLeftBoxExtention(leftListExtentionTarget);
 
-    if (document.getElementById('WF_RightboxOpen').value == "Open") {
+    if (document.getElementById('WF_RightboxOpen').value === "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     };
 
@@ -38,8 +38,8 @@ function InitDisplay() {
         document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     };
     /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack);
+    //bindListCommonEvents(pnlListAreaId, IsPostBack);
 
 
-};
+}
 

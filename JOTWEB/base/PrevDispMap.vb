@@ -16,6 +16,10 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const MENU As String = "ASP.OIL_M00001MENU_ASPX"
         ''' <summary>
+        ''' サブメニュー画面
+        ''' </summary>
+        Public Const SUBMENU As String = "ASP.OIL_M00002MENU_ASPX"
+        ''' <summary>
         ''' 空回日報検索
         ''' </summary>
         Public Const OIT0001S As String = "ASP.OIL_ORD_OIT0001EMPTYTURNDAIRYSEARCH_ASPX"

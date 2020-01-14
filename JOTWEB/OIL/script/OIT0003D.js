@@ -2,23 +2,23 @@
 function InitDisplay() {
 
     // 全部消す
-    document.getElementById("LF_LEFTBOX").style.width = "0em";
+    //document.getElementById("LF_LEFTBOX").style.width = "0em";
     document.getElementById("RF_RIGHTBOX").style.width = "0em";
 
-    if (document.getElementById('WF_LeftboxOpen').value == "Open") {
-        document.getElementById("LF_LEFTBOX").style.width = "26em";
+    if (document.getElementById('WF_LeftboxOpen').value === "Open") {
+        document.getElementById("LF_LEFTBOX").style.display = "block";
     };
 
     addLeftBoxExtention(leftListExtentionTarget);
 
-    if (document.getElementById('WF_RightboxOpen').value == "Open") {
+    if (document.getElementById('WF_RightboxOpen').value === "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     };
 
     //更新ボタン活性／非活性
-    if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
+    if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //更新ボタン活性／非活性(新規登録、更新で切り分け)
-        if (document.getElementById('WF_CREATEFLG').value == "1") {
+        if (document.getElementById('WF_CREATEFLG').value === "1") {
             //活性
             //document.getElementById("WF_ButtonINSERT").disabled = "";
             //非活性 
@@ -28,7 +28,7 @@ function InitDisplay() {
             //document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
             //document.getElementById("WF_ButtonCSV").disabled = "disabled";
             //document.getElementById("WF_ButtonUPDATE").disabled = "";
-        } else if (document.getElementById('WF_CREATEFLG').value == "2") {
+        } else if (document.getElementById('WF_CREATEFLG').value === "2") {
             //非活性
             //document.getElementById("WF_ButtonINSERT").disabled = "disabled";
             //活性 
@@ -55,7 +55,7 @@ function InitDisplay() {
 
     // チェックボックス
     ChangeCheckBox();
-};
+}
 
 
 // ○チェックボックス変更
@@ -112,7 +112,7 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     };
-};
+}
 
 // ○一覧用処理（チェンジイベント）
 function ListField_Change(pnlList, Line, fieldNM) {
@@ -123,4 +123,4 @@ function ListField_Change(pnlList, Line, fieldNM) {
         document.getElementById('WF_ButtonClick').value = "WF_ListChange";
         document.forms[0].submit();
     };
-};
+}

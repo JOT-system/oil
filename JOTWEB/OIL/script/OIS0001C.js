@@ -7,7 +7,7 @@ function InitDisplay() {
 
     if (document.getElementById('WF_LeftboxOpen').value === "Open") {
         document.getElementById("LF_LEFTBOX").style.display = "block";
-    };
+    }
 
     addLeftBoxExtention(leftListExtentionTarget);
 
@@ -27,5 +27,5 @@ function InitDisplay() {
     //bindListCommonEvents(pnlListAreaId, IsPostBack);
 
 
-};
+}
 

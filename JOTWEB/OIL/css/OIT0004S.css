@@ -1,6 +1,6 @@
 ﻿/* タンク車マスタ検索画面*/
 /*油槽所見出し*/
-#WF_CONSIGNEECODE_LABEL {
+#WF_CONSIGNEE_LABEL {
     position: fixed;
     height: 50px;
     width: 70px;
@@ -12,7 +12,7 @@
 }
 
 /*油槽所input tag*/
-#WF_CONSIGNEECODE {
+#WF_CONSIGNEE {
     position: fixed;
     height: 50px;
     width: 140px;
@@ -20,13 +20,13 @@
     left: calc(46% - 140px/2);
 }
 
-    #WF_CONSIGNEECODE input[type='text'] {
+    #WF_CONSIGNEE input[type='text'] {
         Height: 2.1em;
         Width: 10em;
     }
 
 /*左Boxオープン用虫眼鏡アイコン ※ワンクリック用*/
-#WF_CONSIGNEECODE_ICON {
+#WF_CONSIGNEE_ICON {
     position: fixed;
     height: 50px;
     width: 50px;
@@ -36,7 +36,7 @@
 }
 
 /*油槽所名称*/
-#WF_CONSIGNEECODE_TEXT {
+#WF_CONSIGNEE_TEXT {
     position: fixed;
     top: calc(20% - 50px/2);
     left: calc(55% - 50px/2);

@@ -1950,8 +1950,6 @@ Public Class OIT0002LinkDetail
             AvailableYMD.Focus()
             O_RTN = "ERR"
             Exit Sub
-        Else
-            AvailableYMD.Text = CDate(AvailableYMD.Text).ToString("yyyy/MM/dd")
         End If
         '年月日チェック
         WW_CheckDate(AvailableYMD.Text, "利用可能日", WW_CS0024FCHECKERR, dateErrFlag)
@@ -1961,6 +1959,8 @@ Public Class OIT0002LinkDetail
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             O_RTN = "ERR"
             Exit Sub
+        Else
+            AvailableYMD.Text = CDate(AvailableYMD.Text).ToString("yyyy/MM/dd")
         End If
         '日付過去チェック
         If AvailableYMD.Text <> "" Then
@@ -2046,8 +2046,6 @@ Public Class OIT0002LinkDetail
             TxtEmpDate.Focus()
             O_RTN = "ERR"
             Exit Sub
-        Else
-            TxtEmpDate.Text = CDate(TxtEmpDate.Text).ToString("yyyy/MM/dd")
         End If
         '年月日チェック
         WW_CheckDate(TxtEmpDate.Text, "(予定)空車着日", WW_CS0024FCHECKERR, dateErrFlag)
@@ -2057,6 +2055,8 @@ Public Class OIT0002LinkDetail
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             O_RTN = "ERR"
             Exit Sub
+        Else
+            TxtEmpDate.Text = CDate(TxtEmpDate.Text).ToString("yyyy/MM/dd")
         End If
         '日付過去チェック
         If TxtEmpDate.Text <> "" Then
@@ -2084,7 +2084,6 @@ Public Class OIT0002LinkDetail
         If TxtActEmpDate.Text = "" Then
             '何もしない
         Else
-            TxtActEmpDate.Text = CDate(TxtActEmpDate.Text).ToString("yyyy/MM/dd")
             '年月日チェック
             WW_CheckDate(TxtActEmpDate.Text, "(実績)空車着日", WW_CS0024FCHECKERR, dateErrFlag)
             If dateErrFlag = "1" Then
@@ -2093,6 +2092,8 @@ Public Class OIT0002LinkDetail
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 O_RTN = "ERR"
                 Exit Sub
+            Else
+                TxtActEmpDate.Text = CDate(TxtActEmpDate.Text).ToString("yyyy/MM/dd")
             End If
         End If
         '日付過去チェック
@@ -2188,7 +2189,7 @@ Public Class OIT0002LinkDetail
                 dateErrFlag = "0"
             End If
         Catch ex As Exception
-            Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
         End Try
 
     End Sub

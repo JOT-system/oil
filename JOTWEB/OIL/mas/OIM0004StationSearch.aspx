@@ -27,12 +27,12 @@
         <!-- ○ 変動項目 ○ -->
         <div class="inputBox">
             <!-- 会社コード -->
-            <div class="inputItem">
-                <a id="WF_CAMPCODE_LABEL" class="requiredMark" style="display:none">会社コード</a>
-                <a class="ef" id="WF_CAMPCODE_CODE" style="display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+            <div class="inputItem" style="display:none">
+                <a id="WF_CAMPCODE_LABEL" class="requiredMark">会社コード</a>
+                <a class="ef" id="WF_CAMPCODE_CODE" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
                     <asp:TextBox ID="WF_CAMPCODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox>
                 </a>
-                <a id="WF_CAMPCODE_NAME" style="display:none">
+                <a id="WF_CAMPCODE_NAME">
                     <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>

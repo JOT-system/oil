@@ -2,21 +2,21 @@
 function InitDisplay() {
 
     // 全部消す
-    document.getElementById("LF_LEFTBOX").style.width = "0em";
+    //document.getElementById("LF_LEFTBOX").style.width = "0em";
     document.getElementById("RF_RIGHTBOX").style.width = "0em";
 
-    if (document.getElementById('WF_LeftboxOpen').value == "Open") {
-        document.getElementById("LF_LEFTBOX").style.width = "26em";
+    if (document.getElementById('WF_LeftboxOpen').value === "Open") {
+        document.getElementById("LF_LEFTBOX").style.display = "block";
     };
 
     addLeftBoxExtention(leftListExtentionTarget);
 
-    if (document.getElementById('WF_RightboxOpen').value == "Open") {
+    if (document.getElementById('WF_RightboxOpen').value === "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     };
 
     //更新ボタン活性／非活性
-    if (document.getElementById('WF_MAPpermitcode').value == "TRUE") {
+    if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //活性
         document.getElementById("WF_ButtonALLSELECT").disabled = "";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
@@ -34,7 +34,7 @@ function InitDisplay() {
 
     // チェックボックス
     ChangeCheckBox();
-};
+}
 
 // ○チェックボックス変更
 function ChangeCheckBox() {

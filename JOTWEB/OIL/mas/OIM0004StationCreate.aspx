@@ -63,7 +63,7 @@
 
                     <!-- 貨物コード枝番 -->
                     <span class="ef" id="WF_BRANCH">
-                        <asp:Label ID="LblBranch" runat="server" Text="貨物コード枝番" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="LblBranch" runat="server" Text="貨物コード枝番" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtBranch" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="3"></asp:TextBox>
                         <asp:Label ID="LblBranchText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -72,14 +72,14 @@
                 <p id="KEY_LINE_4">
                     <!-- 貨物駅名称 -->
                     <span class="ef" id="WF_STATIONNAME">
-                        <asp:Label ID="LblStationName" runat="server" Text="貨物駅名称" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="LblStationName" runat="server" Text="貨物駅名称" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtStationName" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="200"></asp:TextBox>
                         <asp:Label ID="LblStationNameText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 貨物駅名称カナ -->
                     <span class="ef" id="WF_STATIONNAMEKANA">
-                        <asp:Label ID="LblStationNameKana" runat="server" Text="貨物駅名称カナ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="LblStationNameKana" runat="server" Text="貨物駅名称カナ" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtStationNameKana" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="100"></asp:TextBox>
                         <asp:Label ID="LblStationNameKanaText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -88,14 +88,14 @@
                 <p id="KEY_LINE_5">
                     <!-- 貨物駅種別名称 -->
                     <span class="ef" id="WF_STATIONTYPENAME">
-                        <asp:Label ID="LblTypeName" runat="server" Text="貨物駅種別名称" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="LblTypeName" runat="server" Text="貨物駅種別名称" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtTypeName" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="40"></asp:TextBox>
                         <asp:Label ID="LblTypeNameText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 貨物駅種別名称カナ -->
                     <span class="ef" id="WF_STATIONTYPENAMEKANA">
-                        <asp:Label ID="LblTypeNameKana" runat="server" Text="貨物駅種別名称カナ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="LblTypeNameKana" runat="server" Text="貨物駅種別名称カナ" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtTypeNameKana" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="LblTypeNameKanaText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>

@@ -72,7 +72,7 @@
 
             <!-- 列車番号 -->
             <div class="inputItem">
-                <a id="WF_TRAINNO_LABEL" class="requiredMark">列車番号</a>
+                <a id="WF_TRAINNO_LABEL">列車番号</a>
                 <a class="ef" id="WF_TRAINNO">
                     <asp:TextBox ID="TxtTrainNumber" runat="server" CssClass="" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
                 </a>

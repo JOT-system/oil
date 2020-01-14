@@ -425,36 +425,37 @@ Public Class OIM0004StationList
     Protected Sub WF_ButtonINSERT_Click()
 
         '選択行
-        WF_Sel_LINECNT.Text = ""
+        'WF_Sel_LINECNT.Text = ""
         work.WF_SEL_LINECNT.Text = ""
 
         '貨物車コード
-        TxtStationCode.Text = ""
+        'TxtStationCode.Text = ""
         work.WF_SEL_STATIONCODE2.Text = ""
 
         '貨物コード枝番
-        TxtBranch.Text = ""
+        'TxtBranch.Text = ""
         work.WF_SEL_BRANCH2.Text = ""
 
         '貨物駅名称
-        TxtStationName.Text = ""
+        'TxtStationName.Text = ""
         work.WF_SEL_STATONNAME.Text = ""
 
         '貨物駅名称カナ
-        TxtStationNameKana.Text = ""
+        'TxtStationNameKana.Text = ""
         work.WF_SEL_STATIONNAMEKANA.Text = ""
 
         '貨物駅種別名称
-        TxtTypeName.Text = ""
+        'TxtTypeName.Text = ""
         work.WF_SEL_TYPENAME.Text = ""
 
         '貨物駅種別名称
-        TxtTypeNameKana.Text = ""
+        'TxtTypeNameKana.Text = ""
         work.WF_SEL_TYPENAMEKANA.Text = ""
 
         '削除
-        WF_DELFLG.Text = "0"
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        'WF_DELFLG.Text = "0"
+        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        work.WF_SEL_DELFLG.Text = "0"
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -463,9 +464,6 @@ Public Class OIM0004StationList
         Master.SaveTable(OIM0004tbl)
 
         WF_GridDBclick.Text = ""
-
-        '############# おためし #############
-        work.WF_SEL_DELFLG.Text = "0"
 
         '○ 遷移先(登録画面)退避データ保存先の作成
         WW_CreateXMLSaveFile()
@@ -888,36 +886,36 @@ Public Class OIM0004StationList
         End Try
 
         '選択行
-        WF_Sel_LINECNT.Text = OIM0004tbl.Rows(WW_LINECNT)("LINECNT")
+        'WF_Sel_LINECNT.Text = OIM0004tbl.Rows(WW_LINECNT)("LINECNT")
         work.WF_SEL_LINECNT.Text = OIM0004tbl.Rows(WW_LINECNT)("LINECNT")
 
         '貨物車コード
-        TxtStationCode.Text = OIM0004tbl.Rows(WW_LINECNT)("STATIONCODE")
+        'TxtStationCode.Text = OIM0004tbl.Rows(WW_LINECNT)("STATIONCODE")
         work.WF_SEL_STATIONCODE2.Text = OIM0004tbl.Rows(WW_LINECNT)("STATIONCODE")
 
         '貨物コード枝番
-        TxtBranch.Text = OIM0004tbl.Rows(WW_LINECNT)("BRANCH")
+        'TxtBranch.Text = OIM0004tbl.Rows(WW_LINECNT)("BRANCH")
         work.WF_SEL_BRANCH2.Text = OIM0004tbl.Rows(WW_LINECNT)("BRANCH")
 
         '貨物駅名称
-        TxtStationName.Text = OIM0004tbl.Rows(WW_LINECNT)("STATONNAME")
+        'TxtStationName.Text = OIM0004tbl.Rows(WW_LINECNT)("STATONNAME")
         work.WF_SEL_STATONNAME.Text = OIM0004tbl.Rows(WW_LINECNT)("STATONNAME")
 
         '貨物駅名称カナ
-        TxtStationNameKana.Text = OIM0004tbl.Rows(WW_LINECNT)("STATIONNAMEKANA")
+        'TxtStationNameKana.Text = OIM0004tbl.Rows(WW_LINECNT)("STATIONNAMEKANA")
         work.WF_SEL_STATIONNAMEKANA.Text = OIM0004tbl.Rows(WW_LINECNT)("STATIONNAMEKANA")
 
         '貨物駅種別名称
-        TxtTypeName.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAME")
+        'TxtTypeName.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAME")
         work.WF_SEL_TYPENAME.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAME")
 
         '貨物駅種別名称カナ
-        TxtTypeNameKana.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAMEKANA")
+        'TxtTypeNameKana.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAMEKANA")
         work.WF_SEL_TYPENAMEKANA.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAMEKANA")
 
         '削除フラグ
-        WF_DELFLG.Text = OIM0004tbl.Rows(WW_LINECNT)("DELFLG")
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        'WF_DELFLG.Text = OIM0004tbl.Rows(WW_LINECNT)("DELFLG")
+        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
         work.WF_SEL_DELFLG.Text = OIM0004tbl.Rows(WW_LINECNT)("DELFLG")
 
         '○ 状態をクリア
@@ -1146,145 +1144,138 @@ Public Class OIM0004StationList
     ' ***  詳細表示関連操作                                                      ***
     ' ******************************************************************************
 
-    ''' <summary>
-    ''' 詳細画面-表更新ボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_UPDATE_Click()
+    '''' <summary>
+    '''' 詳細画面-表更新ボタン押下時処理
+    '''' </summary>
+    '''' <remarks></remarks>
+    'Protected Sub WF_UPDATE_Click()
 
-        '○ エラーレポート準備
-        rightview.SetErrorReport("")
+    '    '○ エラーレポート準備
+    '    rightview.SetErrorReport("")
 
-        '○ DetailBoxをINPtblへ退避
-        DetailBoxToOIM0004INPtbl(WW_ERR_SW)
-        If Not isNormal(WW_ERR_SW) Then
-            Exit Sub
-        End If
+    '    '○ DetailBoxをINPtblへ退避
+    '    DetailBoxToOIM0004INPtbl(WW_ERR_SW)
+    '    If Not isNormal(WW_ERR_SW) Then
+    '        Exit Sub
+    '    End If
 
-        '○ 項目チェック
-        INPTableCheck(WW_ERR_SW)
+    '    '○ 項目チェック
+    '    INPTableCheck(WW_ERR_SW)
 
-        '○ 入力値のテーブル反映
-        If isNormal(WW_ERR_SW) Then
-            OIM0004tbl_UPD()
-        End If
+    '    '○ 入力値のテーブル反映
+    '    If isNormal(WW_ERR_SW) Then
+    '        OIM0004tbl_UPD()
+    '    End If
 
-        '○ 画面表示データ保存
-        Master.SaveTable(OIM0004tbl)
+    '    '○ 画面表示データ保存
+    '    Master.SaveTable(OIM0004tbl)
 
-        '○ 詳細画面初期化
-        If isNormal(WW_ERR_SW) Then
-            DetailBoxClear()
-        End If
+    '    '○ 詳細画面初期化
+    '    If isNormal(WW_ERR_SW) Then
+    '        DetailBoxClear()
+    '    End If
 
-        '○ メッセージ表示
-        If WW_ERR_SW = "" Then
-            Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
-        Else
-            If isNormal(WW_ERR_SW) Then
-                Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-            Else
-                Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
-            End If
+    '    '○ メッセージ表示
+    '    If WW_ERR_SW = "" Then
+    '        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+    '    Else
+    '        If isNormal(WW_ERR_SW) Then
+    '            Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+    '        Else
+    '            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+    '        End If
 
 
-        End If
+    '    End If
 
-        '○画面切替設定
-        WF_BOXChange.Value = "headerbox"
+    '    '○画面切替設定
+    '    WF_BOXChange.Value = "headerbox"
 
-    End Sub
+    'End Sub
 
-    ''' <summary>
-    ''' 詳細画面-テーブル退避
-    ''' </summary>
-    ''' <param name="O_RTN"></param>
-    ''' <remarks></remarks>
-    Protected Sub DetailBoxToOIM0004INPtbl(ByRef O_RTN As String)
+    '''' <summary>
+    '''' 詳細画面-テーブル退避
+    '''' </summary>
+    '''' <param name="O_RTN"></param>
+    '''' <remarks></remarks>
+    'Protected Sub DetailBoxToOIM0004INPtbl(ByRef O_RTN As String)
 
-        O_RTN = C_MESSAGE_NO.NORMAL
+    '    O_RTN = C_MESSAGE_NO.NORMAL
 
-        '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除
+    '    '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
+    '    Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除
 
-        '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
-        If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
-            String.IsNullOrEmpty(WF_DELFLG.Text) Then
-            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail")
+    '    '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
+    '    If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
+    '        String.IsNullOrEmpty(WF_DELFLG.Text) Then
+    '        Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail")
 
-            CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "non Detail"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
-            CS0011LOGWrite.TEXT = "non Detail"
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+    '        CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
+    '        CS0011LOGWrite.INFPOSI = "non Detail"
+    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
+    '        CS0011LOGWrite.TEXT = "non Detail"
+    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
+    '        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
 
-            O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-            Exit Sub
-        End If
+    '        O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
+    '        Exit Sub
+    '    End If
 
-        Master.CreateEmptyTable(OIM0004INPtbl)
-        Dim OIM0004INProw As DataRow = OIM0004INPtbl.NewRow
+    '    Master.CreateEmptyTable(OIM0004INPtbl)
+    '    Dim OIM0004INProw As DataRow = OIM0004INPtbl.NewRow
 
-        '○ 初期クリア
-        For Each OIM0004INPcol As DataColumn In OIM0004INPtbl.Columns
-            If IsDBNull(OIM0004INProw.Item(OIM0004INPcol)) OrElse IsNothing(OIM0004INProw.Item(OIM0004INPcol)) Then
-                Select Case OIM0004INPcol.ColumnName
-                    Case "LINECNT"
-                        OIM0004INProw.Item(OIM0004INPcol) = 0
-                    Case "OPERATION"
-                        OIM0004INProw.Item(OIM0004INPcol) = C_LIST_OPERATION_CODE.NODATA
-                    Case "TIMSTP"
-                        OIM0004INProw.Item(OIM0004INPcol) = 0
-                    Case "SELECT"
-                        OIM0004INProw.Item(OIM0004INPcol) = 1
-                    Case "HIDDEN"
-                        OIM0004INProw.Item(OIM0004INPcol) = 0
-                    Case Else
-                        OIM0004INProw.Item(OIM0004INPcol) = ""
-                End Select
-            End If
-        Next
+    '    '○ 初期クリア
+    '    For Each OIM0004INPcol As DataColumn In OIM0004INPtbl.Columns
+    '        If IsDBNull(OIM0004INProw.Item(OIM0004INPcol)) OrElse IsNothing(OIM0004INProw.Item(OIM0004INPcol)) Then
+    '            Select Case OIM0004INPcol.ColumnName
+    '                Case "LINECNT"
+    '                    OIM0004INProw.Item(OIM0004INPcol) = 0
+    '                Case "OPERATION"
+    '                    OIM0004INProw.Item(OIM0004INPcol) = C_LIST_OPERATION_CODE.NODATA
+    '                Case "TIMSTP"
+    '                    OIM0004INProw.Item(OIM0004INPcol) = 0
+    '                Case "SELECT"
+    '                    OIM0004INProw.Item(OIM0004INPcol) = 1
+    '                Case "HIDDEN"
+    '                    OIM0004INProw.Item(OIM0004INPcol) = 0
+    '                Case Else
+    '                    OIM0004INProw.Item(OIM0004INPcol) = ""
+    '            End Select
+    '        End If
+    '    Next
 
-        'LINECNT
-        If WF_Sel_LINECNT.Text = "" Then
-            OIM0004INProw("LINECNT") = 0
-        Else
-            Try
-                Integer.TryParse(WF_Sel_LINECNT.Text, OIM0004INProw("LINECNT"))
-            Catch ex As Exception
-                OIM0004INProw("LINECNT") = 0
-            End Try
-        End If
+    '    'LINECNT
+    '    If WF_Sel_LINECNT.Text = "" Then
+    '        OIM0004INProw("LINECNT") = 0
+    '    Else
+    '        Try
+    '            Integer.TryParse(WF_Sel_LINECNT.Text, OIM0004INProw("LINECNT"))
+    '        Catch ex As Exception
+    '            OIM0004INProw("LINECNT") = 0
+    '        End Try
+    '    End If
 
-        OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        OIM0004INProw("TIMSTP") = 0
-        OIM0004INProw("SELECT") = 1
-        OIM0004INProw("HIDDEN") = 0
+    '    OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+    '    OIM0004INProw("TIMSTP") = 0
+    '    OIM0004INProw("SELECT") = 1
+    '    OIM0004INProw("HIDDEN") = 0
 
-        'OIM0004INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text        '会社コード
-        'OIM0004INProw("UORG") = work.WF_SEL_UORG.Text                '運用部署
+    '    'OIM0004INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text        '会社コード
+    '    'OIM0004INProw("UORG") = work.WF_SEL_UORG.Text                '運用部署
 
-        OIM0004INProw("DELFLG") = WF_DELFLG.Text                     '削除
+    '    OIM0004INProw("DELFLG") = WF_DELFLG.Text                     '削除
 
-        OIM0004INProw("STATIONCODE") = TxtStationCode.Text           '貨物駅コード
-        OIM0004INProw("BRANCH") = TxtBranch.Text                     '貨物コード枝番
-        OIM0004INProw("STATONNAME") = TxtStationName.Text            '貨物駅名称
-        OIM0004INProw("STATIONNAMEKANA") = TxtStationNameKana.Text   '貨物駅名称カナ
-        OIM0004INProw("TypeName") = TxtTypeName.Text                 '貨物駅種別名称
-        OIM0004INProw("TYPENAMEKANA") = TxtTypeNameKana.Text         '貨物駅種別名称カナ
+    '    OIM0004INProw("STATIONCODE") = TxtStationCode.Text           '貨物駅コード
+    '    OIM0004INProw("BRANCH") = TxtBranch.Text                     '貨物コード枝番
+    '    OIM0004INProw("STATONNAME") = TxtStationName.Text            '貨物駅名称
+    '    OIM0004INProw("STATIONNAMEKANA") = TxtStationNameKana.Text   '貨物駅名称カナ
+    '    OIM0004INProw("TypeName") = TxtTypeName.Text                 '貨物駅種別名称
+    '    OIM0004INProw("TYPENAMEKANA") = TxtTypeNameKana.Text         '貨物駅種別名称カナ
 
-        '○ 名称取得
-        'CODENAME_get("TORICODES", OIM0004INProw("TORICODES"), OIM0004INProw("TORINAMES"), WW_DUMMY)           '取引先名称(出荷先)
-        'CODENAME_get("SHUKABASHO", OIM0004INProw("SHUKABASHO"), OIM0004INProw("SHUKABASHONAMES"), WW_DUMMY)   '出荷場所名称
+    '    '○ チェック用テーブルに登録する
+    '    OIM0004INPtbl.Rows.Add(OIM0004INProw)
 
-        'CODENAME_get("TORICODET", OIM0004INProw("TORICODET"), OIM0004INProw("TORINAMET"), WW_DUMMY)           '取引先名称(届先)
-        'CODENAME_get("TODOKECODE", OIM0004INProw("TODOKECODE"), OIM0004INProw("TODOKENAME"), WW_DUMMY)        '届先名称
-
-        '○ チェック用テーブルに登録する
-        OIM0004INPtbl.Rows.Add(OIM0004INProw)
-
-    End Sub
+    'End Sub
 
 
     ''' <summary>
@@ -1343,15 +1334,15 @@ Public Class OIM0004StationList
         '○ 画面表示データ保存
         Master.SaveTable(OIM0004tbl)
 
-        WF_Sel_LINECNT.Text = ""            'LINECNT
-        TxtStationCode.Text = ""            '貨物駅コード
-        TxtBranch.Text = ""                 '貨物コード枝番
-        TxtStationName.Text = ""            '貨物駅名称
-        TxtStationNameKana.Text = ""        '貨物駅名称カナ
-        TxtTypeName.Text = ""               '貨物駅種別名称
-        TxtTypeNameKana.Text = ""           '貨物駅種別名称カナ
-        WF_DELFLG.Text = ""                 '削除
-        WF_DELFLG_TEXT.Text = ""            '削除名称
+        'WF_Sel_LINECNT.Text = ""            'LINECNT
+        'TxtStationCode.Text = ""            '貨物駅コード
+        'TxtBranch.Text = ""                 '貨物コード枝番
+        'TxtStationName.Text = ""            '貨物駅名称
+        'TxtStationNameKana.Text = ""        '貨物駅名称カナ
+        'TxtTypeName.Text = ""               '貨物駅種別名称
+        'TxtTypeNameKana.Text = ""           '貨物駅種別名称カナ
+        'WF_DELFLG.Text = ""                 '削除
+        'WF_DELFLG_TEXT.Text = ""            '削除名称
 
     End Sub
 
@@ -1399,127 +1390,127 @@ Public Class OIM0004StationList
     ' ***  leftBOX関連操作                                                       ***
     ' ******************************************************************************
 
-    ''' <summary>
-    ''' LeftBox選択時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonSel_Click()
+    '''' <summary>
+    '''' LeftBox選択時処理
+    '''' </summary>
+    '''' <remarks></remarks>
+    'Protected Sub WF_ButtonSel_Click()
 
-        Dim WW_SelectValue As String = ""
-        Dim WW_SelectText As String = ""
+    '    Dim WW_SelectValue As String = ""
+    '    Dim WW_SelectText As String = ""
 
-        '○ 選択内容を取得
-        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
-        End If
+    '    '○ 選択内容を取得
+    '    If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+    '        WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+    '        WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+    '        WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+    '    End If
 
-        '○ 選択内容を画面項目へセット
-        If WF_FIELD_REP.Value = "" Then
-            Select Case WF_FIELD.Value
-                '削除
-                Case "WF_DELFLG"
-                    WF_DELFLG.Text = WW_SelectValue
-                    WF_DELFLG_TEXT.Text = WW_SelectText
-                    WF_DELFLG.Focus()
+    '    '○ 選択内容を画面項目へセット
+    '    If WF_FIELD_REP.Value = "" Then
+    '        Select Case WF_FIELD.Value
+    '            '削除
+    '            Case "WF_DELFLG"
+    '                WF_DELFLG.Text = WW_SelectValue
+    '                WF_DELFLG_TEXT.Text = WW_SelectText
+    '                WF_DELFLG.Focus()
 
-                    '貨物駅コード
-                Case "STATIONCODE"
-                    TxtStationCode.Text = WW_SelectValue
-                    LblStationCodeText.Text = WW_SelectText
-                    TxtStationCode.Focus()
+    '                '貨物駅コード
+    '            Case "STATIONCODE"
+    '                TxtStationCode.Text = WW_SelectValue
+    '                LblStationCodeText.Text = WW_SelectText
+    '                TxtStationCode.Focus()
 
-                    '貨物コード枝番
-                Case "BRANCH"
-                    TxtBranch.Text = WW_SelectValue
-                    LblBranchText.Text = WW_SelectText
-                    TxtBranch.Focus()
+    '                '貨物コード枝番
+    '            Case "BRANCH"
+    '                TxtBranch.Text = WW_SelectValue
+    '                LblBranchText.Text = WW_SelectText
+    '                TxtBranch.Focus()
 
-                    '貨物駅名称
-                Case "STATONNAME"
-                    TxtStationName.Text = WW_SelectValue
-                    LblStationNameText.Text = WW_SelectText
-                    TxtStationName.Focus()
+    '                '貨物駅名称
+    '            Case "STATONNAME"
+    '                TxtStationName.Text = WW_SelectValue
+    '                LblStationNameText.Text = WW_SelectText
+    '                TxtStationName.Focus()
 
-                    '貨物駅名称カナ
-                Case "STATIONNAMEKANA"
-                    TxtStationNameKana.Text = WW_SelectValue
-                    LblStationNameKanaText.Text = WW_SelectText
-                    TxtStationNameKana.Focus()
+    '                '貨物駅名称カナ
+    '            Case "STATIONNAMEKANA"
+    '                TxtStationNameKana.Text = WW_SelectValue
+    '                LblStationNameKanaText.Text = WW_SelectText
+    '                TxtStationNameKana.Focus()
 
-                    '貨物駅種別名称
-                Case "TYPENAME"
-                    TxtTypeName.Text = WW_SelectValue
-                    LblTypeNameText.Text = WW_SelectText
-                    TxtTypeName.Focus()
+    '                '貨物駅種別名称
+    '            Case "TYPENAME"
+    '                TxtTypeName.Text = WW_SelectValue
+    '                LblTypeNameText.Text = WW_SelectText
+    '                TxtTypeName.Focus()
 
-                    '貨物駅種別名称カナ
-                Case "TYPENAMEKANA"
-                    TxtTypeNameKana.Text = WW_SelectValue
-                    LblTypeNameKanaText.Text = WW_SelectText
-                    TxtTypeNameKana.Focus()
+    '                '貨物駅種別名称カナ
+    '            Case "TYPENAMEKANA"
+    '                TxtTypeNameKana.Text = WW_SelectValue
+    '                LblTypeNameKanaText.Text = WW_SelectText
+    '                TxtTypeNameKana.Focus()
 
-            End Select
-        Else
-        End If
+    '        End Select
+    '    Else
+    '    End If
 
-        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        WF_FIELD.Value = ""
-        WF_FIELD_REP.Value = ""
-        WF_LeftboxOpen.Value = ""
-        WF_RightboxOpen.Value = ""
+    '    '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+    '    WF_FIELD.Value = ""
+    '    WF_FIELD_REP.Value = ""
+    '    WF_LeftboxOpen.Value = ""
+    '    WF_RightboxOpen.Value = ""
 
-    End Sub
+    'End Sub
 
-    ''' <summary>
-    ''' LeftBoxキャンセルボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonCan_Click()
+    '''' <summary>
+    '''' LeftBoxキャンセルボタン押下時処理
+    '''' </summary>
+    '''' <remarks></remarks>
+    'Protected Sub WF_ButtonCan_Click()
 
-        '○ フォーカスセット
-        If WF_FIELD_REP.Value = "" Then
-            Select Case WF_FIELD.Value
-                '削除
-                Case "WF_DELFLG"
-                    WF_DELFLG.Focus()
+    '    '○ フォーカスセット
+    '    If WF_FIELD_REP.Value = "" Then
+    '        Select Case WF_FIELD.Value
+    '            '削除
+    '            Case "WF_DELFLG"
+    '                WF_DELFLG.Focus()
 
-                    '貨物駅コード
-                Case "STATIONCODE"
-                    TxtStationCode.Focus()
+    '                '貨物駅コード
+    '            Case "STATIONCODE"
+    '                TxtStationCode.Focus()
 
-                    '貨物コード枝番
-                Case "BRANCH"
-                    TxtBranch.Focus()
+    '                '貨物コード枝番
+    '            Case "BRANCH"
+    '                TxtBranch.Focus()
 
-                    '貨物駅名称
-                Case "STATONNAME"
-                    TxtStationName.Focus()
+    '                '貨物駅名称
+    '            Case "STATONNAME"
+    '                TxtStationName.Focus()
 
-                    '貨物駅名称カナ
-                Case "STATIONNAMEKANA"
-                    TxtStationNameKana.Focus()
+    '                '貨物駅名称カナ
+    '            Case "STATIONNAMEKANA"
+    '                TxtStationNameKana.Focus()
 
-                    '貨物駅種別名称
-                Case "TYPENAME"
-                    TxtTypeName.Focus()
+    '                '貨物駅種別名称
+    '            Case "TYPENAME"
+    '                TxtTypeName.Focus()
 
-                    '貨物駅種別名称カナ
-                Case "TYPENAMEKANA"
-                    TxtTypeNameKana.Focus()
+    '                '貨物駅種別名称カナ
+    '            Case "TYPENAMEKANA"
+    '                TxtTypeNameKana.Focus()
 
-            End Select
-        Else
-        End If
+    '        End Select
+    '    Else
+    '    End If
 
-        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        WF_FIELD.Value = ""
-        WF_FIELD_REP.Value = ""
-        WF_LeftboxOpen.Value = ""
-        WF_RightboxOpen.Value = ""
+    '    '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+    '    WF_FIELD.Value = ""
+    '    WF_FIELD_REP.Value = ""
+    '    WF_LeftboxOpen.Value = ""
+    '    WF_RightboxOpen.Value = ""
 
-    End Sub
+    'End Sub
 
 
     ''' <summary>

@@ -51,24 +51,58 @@ function InitDisplay() {
     }
     
     /* 共通一覧のスクロールイベント紐づけ */
-    // リストオブジェクト変数「pnlListAreaId」が未定義の場合はスキップ
-    if (typeof pnlListAreaId !== 'undefined') {
-        bindListCommonEvents(pnlListAreaId, IsPostBack, true);
-        // チェックボックスもリストオブジェクトが無いとワークしないのでこのIf内に
-        ChangeCheckBox();
+    /* 対象の一覧表IDを配列に格納 */
+    let arrListId = new Array();
+    if (typeof pnlListAreaId1 !== 'undefined') {
+        arrListId.push(pnlListAreaId1);
+    }
+    if (typeof pnlListAreaId2 !== 'undefined') {
+        arrListId.push(pnlListAreaId2);
+    }
+    if (typeof pnlListAreaId3 !== 'undefined') {
+        arrListId.push(pnlListAreaId3);
+    }
+    if (typeof pnlListAreaId4 !== 'undefined') {
+        arrListId.push(pnlListAreaId4);
+    }
+    /* 対象の一覧表IDをループ */
+    for (let i = 0, len = arrListId.length; i < len; ++i) {
+        let listObj = document.getElementById(arrListId[i]);
+        // 対象の一覧表が未存在（レンダリングされていなければ）ならスキップ
+        if (listObj === null) {
+            continue;
+        }
+        // 一覧表のイベントバインド
+        bindListCommonEvents(arrListId[i], IsPostBack, true);
+        // チェックボックス変更
+        ChangeCheckBox(arrListId[i]);
     }
 
-
+    // 上部 表示/非表示イベントバインド
+    let showHideButtonObj = document.getElementById('hideHeader');
+    if (showHideButtonObj !== null) {
+        //クリックイベントのバインド
+        showHideButtonObj.addEventListener('click',
+            function () {
+                hideHeader_click();
+            });
+        //ロード時は必ず上部 表示/非表示処理を行う
+        showHideHeader();
+    }
 }
 
 
 // ○チェックボックス変更
-function ChangeCheckBox() {
+// 20200115(三宅弘)複数の一覧表に対応するように引数を加え対応しました
+function ChangeCheckBox(listId) {
+    var objDataLeftSide = document.getElementById(listId + "_DL");
+    if (objDataLeftSide === null) {
+        return;
+    }
+    var objTable = objDataLeftSide.children[0];
 
-    var objTable = document.getElementById("pnlListArea_DL").children[0];
-
-    var chkObjs = objTable.querySelectorAll("input[id^='chkpnlListAreaOPERATION']");
-    var spnObjs = objTable.querySelectorAll("span[id^='hchkpnlListAreaOPERATION']");
+    var chkObjs = objTable.querySelectorAll("input[id^='chk" + listId + "OPERATION']");
+    var spnObjs = objTable.querySelectorAll("span[id^='hchk" + listId + "OPERATION']");
 
     for (let i = 0; i < chkObjs.length; i++) {
 
@@ -126,5 +160,38 @@ function ListField_Change(pnlList, Line, fieldNM) {
         document.getElementById('WF_FIELD').value = fieldNM;
         document.getElementById('WF_ButtonClick').value = "WF_ListChange";
         document.forms[0].submit();
+    }
+}
+// 〇表示/非表示ボタンクリック時
+function hideHeader_click() {
+    let headerStateObj = document.getElementById('hdnDispHeaderItems');
+    //表示/非表示のフラグ切替
+    headerStateObj.value = Math.abs(Number(headerStateObj.value) - 1);
+    //切替処理の実行
+    showHideHeader();
+} 
+// 〇上部表示/非表示処理
+function showHideHeader() {
+    let headerStateObj = document.getElementById('hdnDispHeaderItems');
+    let showHideButtonObj = document.getElementById('hideHeader');
+    let headerObj = document.getElementById('headerDispArea');
+    // 操作対象のオブジェクトが無い場合はそのまま終了
+    if (headerStateObj === null) {
+        return;
+    }
+    if (showHideButtonObj === null) {
+        return;
+    }
+    if (headerObj === null) {
+        return;
+    }
+
+    // ヘッダーの表示/非表示切替
+    showHideButtonObj.classList.remove('hideHeader');
+    headerObj.classList.remove('hideHeader');
+    if (headerStateObj.value === '0') {
+        //ヘッダー非表示の場合(対象のCssクラスにhideHeader付与)
+        showHideButtonObj.classList.add('hideHeader');
+        headerObj.classList.add('hideHeader');
     }
 }

@@ -1169,86 +1169,27 @@ Public Class OIT0003OrderDetail
         '初期値（書式）変更
 
         'タンク車割当
-        WF_Dtab01.Style.Remove("color")
-        WF_Dtab01.Style.Add("color", "black")
-        WF_Dtab01.Style.Remove("background-color")
-        WF_Dtab01.Style.Add("background-color", "rgb(211, 211, 211)")
-        WF_Dtab01.Style.Remove("border")
-        WF_Dtab01.Style.Add("border", "1px solid black")
-        WF_Dtab01.Style.Remove("font-weight")
-        WF_Dtab01.Style.Add("font-weight", "normal")
-
+        WF_Dtab01.CssClass = ""
         'タンク車明細
-        WF_Dtab02.Style.Remove("color")
-        WF_Dtab02.Style.Add("color", "black")
-        WF_Dtab02.Style.Remove("background-color")
-        WF_Dtab02.Style.Add("background-color", "rgb(174,170,170)")
-        WF_Dtab02.Style.Remove("border")
-        WF_Dtab02.Style.Add("border", "1px solid black")
-        WF_Dtab02.Style.Remove("font-weight")
-        WF_Dtab02.Style.Add("font-weight", "normal")
-
+        WF_Dtab02.CssClass = ""
         '入換・積込指示
-        WF_Dtab03.Style.Remove("color")
-        WF_Dtab03.Style.Add("color", "black")
-        WF_Dtab03.Style.Remove("background-color")
-        WF_Dtab03.Style.Add("background-color", "rgb(174,170,170)")
-        WF_Dtab03.Style.Remove("border")
-        WF_Dtab03.Style.Add("border", "1px solid black")
-        WF_Dtab03.Style.Remove("font-weight")
-        WF_Dtab03.Style.Add("font-weight", "normal")
-
+        WF_Dtab03.CssClass = ""
         '費用入力
-        WF_Dtab04.Style.Remove("color")
-        WF_Dtab04.Style.Add("color", "black")
-        WF_Dtab04.Style.Remove("background-color")
-        WF_Dtab04.Style.Add("background-color", "rgb(174,170,170)")
-        WF_Dtab04.Style.Remove("border")
-        WF_Dtab04.Style.Add("border", "1px solid black")
-        WF_Dtab04.Style.Remove("font-weight")
-        WF_Dtab04.Style.Add("font-weight", "normal")
+        WF_Dtab04.CssClass = ""
 
         Select Case WF_DetailMView.ActiveViewIndex
             Case 0
                 'タンク車割当
-                WF_Dtab01.Style.Remove("color")
-                WF_Dtab01.Style.Add("color", "black")
-                WF_Dtab01.Style.Remove("background-color")
-                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
-                WF_Dtab01.Style.Remove("border")
-                WF_Dtab01.Style.Add("border", "1px solid blue")
-                WF_Dtab01.Style.Remove("font-weight")
-                WF_Dtab01.Style.Add("font-weight", "bold")
+                WF_Dtab01.CssClass = "selected"
             Case 1
                 'タンク車明細
-                WF_Dtab02.Style.Remove("color")
-                WF_Dtab02.Style.Add("color", "black")
-                WF_Dtab02.Style.Remove("background-color")
-                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
-                WF_Dtab02.Style.Remove("border")
-                WF_Dtab02.Style.Add("border", "1px solid blue")
-                WF_Dtab02.Style.Remove("font-weight")
-                WF_Dtab02.Style.Add("font-weight", "bold")
+                WF_Dtab02.CssClass = "selected"
             Case 2
                 '入換・積込指示
-                WF_Dtab03.Style.Remove("color")
-                WF_Dtab03.Style.Add("color", "black")
-                WF_Dtab03.Style.Remove("background-color")
-                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
-                WF_Dtab03.Style.Remove("border")
-                WF_Dtab03.Style.Add("border", "1px solid blue")
-                WF_Dtab03.Style.Remove("font-weight")
-                WF_Dtab03.Style.Add("font-weight", "bold")
+                WF_Dtab03.CssClass = "selected"
             Case 3
                 '費用入力
-                WF_Dtab04.Style.Remove("color")
-                WF_Dtab04.Style.Add("color", "black")
-                WF_Dtab04.Style.Remove("background-color")
-                WF_Dtab01.Style.Add("background-color", "rgb(220, 230, 240)")
-                WF_Dtab04.Style.Remove("border")
-                WF_Dtab04.Style.Add("border", "1px solid blue")
-                WF_Dtab04.Style.Remove("font-weight")
-                WF_Dtab04.Style.Add("font-weight", "bold")
+                WF_Dtab04.CssClass = "selected"
         End Select
     End Sub
 

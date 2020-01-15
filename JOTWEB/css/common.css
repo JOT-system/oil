@@ -130,8 +130,16 @@ input[type=password]:focus,
 textarea:focus {
     border-color: rgba(1,60,65, .5);
     background-image:none;
-    box-shadow: 0 0 5px 1px rgba(218,60,65, .5);
+    //box-shadow: 0 0 5px 1px rgba(218,60,65, .5);
 }
+input[type=text][disabled]:hover,
+input[type=password][disabled]:hover,
+textarea[disabled]:hover {
+    background-image: none;
+    border-color: skyblue;
+    box-shadow:none;
+}
+
 /* InputTextのPlaceholderの色 IEだと濃い黒の為、ブラウザごとの差異をなくす
     placeholderのcolorはすべて同一に
     カンマで区切るとワークしないので個別に指定すること
@@ -560,24 +568,20 @@ input[type=text][readonly].calendarIcon {
 
 /* 実行画面 ヘッダー部 */
 .headerbox {
-    top: 2.4em;
-    left: 0em;
-    height: calc(-2.4em - 18.4em - 1.4em + 100%);
     width: 100%;
-    position: fixed;
+    height: auto;
     overflow: hidden;
     background-color: rgb(217,222,228);
+    position: relative;
 }
 
 /* 実行画面 明細部 */
 .detailbox {
-    top: calc(-1.4em - 18.4em + 100%);
-    bottom: 1.4em;
-    left: 0em;
     width: 100%;
-    position: fixed;
+    height: auto;
     overflow: hidden;
     background-color: rgb(237,237,237);
+    position: relative;
 }
 
 /* 実行画面 ヘッダー部のみ */

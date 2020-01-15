@@ -59,7 +59,7 @@
 
         <!--↓↓(20200109- 消す予定だが一旦画面映らなくする) 全体レイアウト　detailbox -->
         <!-- 全体レイアウト　detailbox -->
-        <div class="detailboxOnly" id="detailbox" style="display:none;" >
+<%--        <div class="detailboxOnly" id="detailbox" style="display:none;" >
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
                     <input type="button" id="WF_UPDATE" value="表更新" style="Width:5em" onclick="ButtonClick('WF_UPDATE');" />
@@ -130,7 +130,7 @@
                     </a>
                 </p>
             </div>
-        </div>
+        </div>--%>
 
         <!-- rightbox レイアウト -->
         <MSINC:rightview ID="rightview" runat="server" />

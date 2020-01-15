@@ -463,7 +463,7 @@ Public Class OIT0003OrderDetail
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P10" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P11" _
             & "   END                                                           AS JRINSPECTIONALERTSTR" _
-            & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), '')    AS JRINSPECTIONDATE" _
+            & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), NULL)    AS JRINSPECTIONDATE" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
@@ -478,7 +478,7 @@ Public Class OIT0003OrderDetail
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P10" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P11" _
             & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
-            & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '') AS JRALLINSPECTIONDATE" _
+            & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
             & " , ISNULL(RTRIM(OIT0005.LASTOILCODE), '')                        AS LASTOILCODE" _
             & " , ISNULL(RTRIM(OIM0003_PAST.OILNAME), '')                       AS LASTOILNAME" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                             AS DELFLG" _
@@ -620,19 +620,42 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
             & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
             & " , CASE" _
-            & "   WHEN TMP0001.TANKNO IS NULL AND TMP0001.OILNAME IS NULL THEN '残車'" _
-            & "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILNAME = '' THEN '不可'" _
-            & "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILCODE = OIT0004.PREOILCODE THEN '割当'" _
-            & "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILCODE <> OIT0004.PREOILCODE THEN '前回油種確認'" _
+            & "   WHEN TMP0001.TANKNO IS NULL AND TMP0001.OILNAME IS NULL THEN @P04" _
+            & "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILNAME = '' THEN @P05" _
+            & "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILCODE = OIT0004.PREOILCODE THEN @P06" _
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')                         AS TANKNO" _
-            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERT), '')                  AS JRINSPECTIONALERT" _
-            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERTSTR), '')               AS JRINSPECTIONALERTSTR" _
-            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONDATE), '')                   AS JRINSPECTIONDATE" _
-            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERT), '')               AS JRALLINSPECTIONALERT" _
-            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERTSTR), '')            AS JRALLINSPECTIONALERTSTR" _
-            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONDATE), '')                AS JRALLINSPECTIONDATE" _
+            & " , CASE" _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "   END                                                           AS JRINSPECTIONALERT" _
+            & " , CASE" _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P08" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P09" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P10" _
+            & "   END                                                           AS JRINSPECTIONALERTSTR" _
+            & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), NULL)    AS JRINSPECTIONDATE" _
+            & " , CASE" _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "   END                                                           AS JRALLINSPECTIONALERT" _
+            & " , CASE" _
+            & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P08" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P09" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P10" _
+            & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
+            & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
             & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')                         AS LASTOILCODE" _
             & " , ISNULL(RTRIM(OIM0003_PAST.OILNAME), '')                       AS LASTOILNAME" _
             & " , ISNULL(RTRIM(OIT0004.DELFLG), '')                             AS DELFLG" _
@@ -640,37 +663,86 @@ Public Class OIT0003OrderDetail
             & " LEFT JOIN OIL.TMP0001ORDER TMP0001 ON " _
             & "       OIT0004.TANKNUMBER = TMP0001.TANKNO " _
             & "       AND TMP0001.DELFLG <> @P03" _
+            & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+            & "       OIT0004.TANKNUMBER = OIM0005.TANKNUMBER" _
+            & "       AND OIM0005.DELFLG <> @P02" _
             & " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
-            & "       OIM0003_PAST.OFFICECODE = @P10" _
-            & "       AND OIM0003_PAST.SHIPPERCODE = @P11" _
-            & "       AND OIM0003_PAST.PLANTCODE  = @P12" _
+            & "       OIM0003_PAST.OFFICECODE = @P11" _
+            & "       AND OIM0003_PAST.SHIPPERCODE = @P12" _
+            & "       AND OIM0003_PAST.PLANTCODE  = @P13" _
             & "       AND OIT0004.PREOILCODE = OIM0003_PAST.OILCODE" _
             & "       AND OIM0003_PAST.DELFLG <> @P03" _
             & " WHERE OIT0004.LINKNO = @P01" _
             & " AND OIT0004.TRAINNO = @P02" _
             & " AND OIT0004.DELFLG <> @P03"
+        '& "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILCODE <> OIT0004.PREOILCODE THEN '前回油種確認'" _
 
         SQLStr &=
-              " ORDER BY" _
-            & "    OIT0004.LINKNO"
+              " " _
+            & " UNION ALL " _
+            & " SELECT" _
+            & "   0                                                             AS LINECNT" _
+            & " , ''                                                            AS OPERATION" _
+            & " , CAST(OIT0004.UPDTIMSTP AS bigint)                             AS TIMSTP" _
+            & " , 1                                                             AS 'SELECT'" _
+            & " , 0                                                             AS HIDDEN" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINFONAME), '')                      AS ORDERINFONAME" _
+            & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
+            & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
+            & " , @P07                                                          AS TANKQUOTA" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
+            & " , ISNULL(RTRIM(TMP0001.TANKNO), '')                             AS TANKNO" _
+            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERT), '')                  AS JRINSPECTIONALERT" _
+            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERTSTR), '')               AS JRINSPECTIONALERTSTR" _
+            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONDATE), '')                   AS JRINSPECTIONDATE" _
+            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERT), '')               AS JRALLINSPECTIONALERT" _
+            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERTSTR), '')            AS JRALLINSPECTIONALERTSTR" _
+            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONDATE), '')                AS JRALLINSPECTIONDATE" _
+            & " , ''                                                            AS LASTOILCODE" _
+            & " , ''                                                            AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.DELFLG), '')                             AS DELFLG" _
+            & " FROM OIL.TMP0001ORDER TMP0001 " _
+            & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
+            & "       OIT0004.TANKNUMBER = TMP0001.TANKNO " _
+            & "       AND OIT0004.LINKNO = @P01" _
+            & "       AND OIT0004.TRAINNO = @P02" _
+            & "       AND OIT0004.DELFLG <> @P03" _
+            & " WHERE OIT0004.TANKNUMBER IS NULL"
+
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0004.LINKNO"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '貨車連結順序表№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)  '削除フラグ
-
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 6)  '営業所コード
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 10) '荷主コード
-                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 9)  '基地コード
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  'タンク車割当状況(残車)
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  'タンク車割当状況(不可)
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 6)  'タンク車割当状況(割当)
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 6)  'タンク車割当状況(未割当)
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 20) '赤丸
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20) '黄丸
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20) '緑丸
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 6)  '営業所コード
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 10) '荷主コード
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 9)  '基地コード
 
                 PARA01.Value = work.WF_SEL_LINK_LINKNO.Text
                 PARA02.Value = work.WF_SEL_LINK_TRAIN.Text
                 PARA03.Value = C_DELETE_FLG.DELETE
-
-                PARA10.Value = work.WF_SEL_ORDERSALESOFFICECODE.Text
-                PARA11.Value = work.WF_SEL_SHIPPERSCODE.Text
-                PARA12.Value = work.WF_SEL_BASECODE.Text
+                PARA04.Value = CONST_TANKNO_STATUS_ZAN
+                PARA05.Value = CONST_TANKNO_STATUS_FUKA
+                PARA06.Value = CONST_TANKNO_STATUS_WARI
+                PARA07.Value = CONST_TANKNO_STATUS_MIWARI
+                PARA08.Value = C_INSPECTIONALERT.ALERT_RED
+                PARA09.Value = C_INSPECTIONALERT.ALERT_YELLOW
+                PARA10.Value = C_INSPECTIONALERT.ALERT_GREEN
+                PARA11.Value = work.WF_SEL_ORDERSALESOFFICECODE.Text
+                PARA12.Value = work.WF_SEL_SHIPPERSCODE.Text
+                PARA13.Value = work.WF_SEL_BASECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

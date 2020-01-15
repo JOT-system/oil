@@ -39,12 +39,14 @@
 
                         <!-- 一覧件数 -->
                         <%--<asp:Label ID="WF_ListCNT" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>--%>
-                    </div>
 
-                    <div class="rightSide">
                         <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"       onclick  ="ButtonClick('WF_ButtonALLSELECT');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick ="ButtonClick('WF_ButtonSELECT_LIFTED');" />
                         <input type="button" id="WF_ButtonLINE_LIFTED" class="btn-sticky" value="行削除"     onclick ="ButtonClick('WF_ButtonLINE_LIFTED');" />
+
+                    </div>
+
+                    <div class="rightSide">
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="新規登録"        onclick ="ButtonClick('WF_ButtonINSERT');" />
                         <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"           onclick="ButtonClick('WF_ButtonCSV');" />
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"               onclick="ButtonClick('WF_ButtonEND');" />

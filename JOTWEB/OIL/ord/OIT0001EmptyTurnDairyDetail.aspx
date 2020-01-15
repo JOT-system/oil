@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIT0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="OIT0001DH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIT0001D.css")%>' rel="stylesheet" type="text/css" />
+    <%--<link href='<%=ResolveUrl("~/OIL/css/OIT0001D.css")%>' rel="stylesheet" type="text/css" />--%>
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0001D.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';

@@ -61,7 +61,7 @@
 
             <!-- 貨物コード枝番 -->
             <div class="inputItem">
-                <a id="WF_BRANCH_LABEL" class="requiredMark">貨物コード枝番</a>
+                <a id="WF_BRANCH_LABEL">貨物コード枝番</a>
                 <a class="ef" id="WF_BRANCH">
                     <asp:TextBox ID="TxtBranch" runat="server" CssClass="" onblur="MsgClear();" MaxLength="3"></asp:TextBox>
                 </a>

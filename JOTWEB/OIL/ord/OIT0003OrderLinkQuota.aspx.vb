@@ -234,7 +234,7 @@ Public Class OIT0003OrderLinkQuota
         '     条件指定に従い該当データを受注テーブルから取得する
 
         Dim SQLStr As String =
-              " SELECT" _
+              " SELECT DISTINCT" _
             & "   0                                                           AS LINECNT" _
             & " , ''                                                          AS OPERATION" _
             & " , CAST(OIT0004.UPDTIMSTP AS bigint)                           AS TIMSTP" _
@@ -283,7 +283,7 @@ Public Class OIT0003OrderLinkQuota
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE = @P20 OR OIT0004.PREOILCODE = @P21 THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS LTANK " _
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE = @P22 THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS ATANK " _
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE <>'' THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS TOTALTANK " _
-            & "  , ROW_NUMBER() OVER (PARTITION BY OIT0004.OFFICECODE ORDER BY OIT0004.AVAILABLEYMD DESC) RNUM" _
+            & "  , ROW_NUMBER() OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.AVAILABLEYMD ORDER BY OIT0004.AVAILABLEYMD DESC) RNUM" _
             & "  FROM OIL.OIT0004_LINK OIT0004 " _
             & "  WHERE OIT0004.OFFICECODE = @P1" _
             & "    AND OIT0004.AVAILABLEYMD < @P2"
@@ -303,9 +303,9 @@ Public Class OIT0003OrderLinkQuota
             & "  ) OIT0004 " _
             & " WHERE OIT0004.RNUM = 1"
 
-        SQLStr &=
-              " ORDER BY" _
-            & "    OIT0004.LINKNO"
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0004.LINKNO"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

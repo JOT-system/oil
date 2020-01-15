@@ -49,7 +49,19 @@ function InitDisplay() {
         //document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
         //document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     }
-    
+
+    // 上部 表示/非表示イベントバインド
+    let showHideButtonObj = document.getElementById('hideHeader');
+    if (showHideButtonObj !== null) {
+        //クリックイベントのバインド
+        showHideButtonObj.addEventListener('click',
+            function () {
+                hideHeader_click();
+            });
+        //ロード時は必ず上部 表示/非表示処理を行う
+        showHideHeader();
+    }
+
     /* 共通一覧のスクロールイベント紐づけ */
     /* 対象の一覧表IDを配列に格納 */
     let arrListId = new Array();
@@ -73,22 +85,12 @@ function InitDisplay() {
             continue;
         }
         // 一覧表のイベントバインド
-        bindListCommonEvents(arrListId[i], IsPostBack, true);
+        bindListCommonEvents(arrListId[i], IsPostBack,true);
         // チェックボックス変更
         ChangeCheckBox(arrListId[i]);
     }
 
-    // 上部 表示/非表示イベントバインド
-    let showHideButtonObj = document.getElementById('hideHeader');
-    if (showHideButtonObj !== null) {
-        //クリックイベントのバインド
-        showHideButtonObj.addEventListener('click',
-            function () {
-                hideHeader_click();
-            });
-        //ロード時は必ず上部 表示/非表示処理を行う
-        showHideHeader();
-    }
+
 }
 
 
@@ -175,6 +177,7 @@ function showHideHeader() {
     let headerStateObj = document.getElementById('hdnDispHeaderItems');
     let showHideButtonObj = document.getElementById('hideHeader');
     let headerObj = document.getElementById('headerDispArea');
+    let detailBoxOjb = document.getElementById('detailbox');
     // 操作対象のオブジェクトが無い場合はそのまま終了
     if (headerStateObj === null) {
         return;
@@ -185,7 +188,9 @@ function showHideHeader() {
     if (headerObj === null) {
         return;
     }
-
+    if (detailBoxOjb === null) {
+        return;
+    }
     // ヘッダーの表示/非表示切替
     showHideButtonObj.classList.remove('hideHeader');
     headerObj.classList.remove('hideHeader');
@@ -194,4 +199,12 @@ function showHideHeader() {
         showHideButtonObj.classList.add('hideHeader');
         headerObj.classList.add('hideHeader');
     }
+    /* 下部の高さを定義 */
+    let top = detailBoxOjb.offsetTop;
+    let footer = 22.22;
+    detailBoxOjb.style.height = "calc(100% - " + top + "px)";
+    /* 一覧表の幅をヘッダー有無で可変にする為、ウィンドウのリサイズイベントを発火 */
+    var resizeEvent = window.document.createEvent('UIEvents');
+    resizeEvent.initUIEvent('resize', true, false, window, 0);
+    window.dispatchEvent(resizeEvent);
 }

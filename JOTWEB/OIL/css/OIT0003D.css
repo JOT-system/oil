@@ -20,12 +20,18 @@ input[type=text] {
 _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     margin-top: calc(100% - 12.5px);
 }
-/* コンテンツの最小横幅 */
+#divContensbox{
+    height:calc(100% - 2.4em - 1.4em);
+}
+ /* コンテンツの最小横幅 */
 .headerbox, .detailbox,#tabBox {
     min-width: 1160px;
 }
+.detailbox a {
+    font-size:12.8px;
+}
 .headerbox a {
-    font-size:0.8em;
+    font-size: 0.8em;
 }
 .actionButtonBox {
     padding:5px;
@@ -165,7 +171,11 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 /* 詳細部         */
 /* ************** */
 #detailbox {
-    font-size :13.5px;
+    font-size: 13.5px;
+    //height: calc(100% - 1.4em); /* コンテンツ全体のフッターメッセージのサイズを引く */
+     position:relative;
+     bottom:0px;
+     min-height:230px;
 }
 /* ************** */
 /* タブレイアウト */
@@ -254,18 +264,49 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 #headerDispArea.hideHeader {
     display:none;
 }
+/* ************** */
+/* 下段共通レイアウト */
+/* ************** */
+detailBottom {
+    width:100%;
+    height:100%;
+}
+/* 一覧表のくずれ補正 */
+div[id^=pnlListArea] {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin-left: 2px;
+}
+div[data-generated='1'] div[id$='_HR'] {
+    position: relative;
+}
+div[data-generated='1'] tr td > div[style] {
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+}
+/* 一覧表ヘッダー部の２行補正 */
+/* 左ヘッダー行スタイル,右ヘッダー行スタイル*/
+div[data-generated="1"] div[id$="_HR"] table tr,
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 37px;
+}
+/* 左(固定データテーブル用)DIV,右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"],
+div[data-generated="1"] div[id$="_DR"] {
+    top: 37px; /* ヘッダー行スタイルのheightに合わせる */
+}
+
 /* ******************************** */
-/* タブ「タンク車割当関連レイアウト */
+/* タブ「タンク車割当」関連レイアウト */
 /* ******************************** */
 .summaryTable.wariate {
-    margin-left:5px;
+    margin-left: 5px;
 }
-/* 車数・kl表一列目の幅 */
+/* 車数・kl表一列目の幅(「割当後」文言分大きくとる) */
 .summaryTable.wariate:nth-child(2) div a:nth-child(1) {
-    width: 225px;
-}
-/* 一旦隠す */
-div[id^=pnlListArea] {
-    display: block;
-    position:relative;
+    width: 190px;
+    padding-right:5px;
+    text-align:right;
 }

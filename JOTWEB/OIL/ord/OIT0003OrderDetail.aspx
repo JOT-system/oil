@@ -548,31 +548,25 @@
                     </div>
                 </div>
                 <!-- 一覧レイアウト -->
-                <div>
+                
                     <asp:panel id="pnlListArea1" runat="server" ></asp:panel>
-                </div>
+                
 
             </asp:View>
 
             <!-- ■ Tab No2　タンク車明細　■ -->
             <asp:View ID="WF_DView2" runat="server">
-                <div id="detailbuttonbox2" class="detailbuttonbox">
-                    <!-- ボタン -->
-                    <a>
+                <!-- ボタン -->
+                <div class="actionButtonBox">
+                    <div class="leftSide">
                         <input type="button" id="WF_ButtonALLSELECT_TAB2" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT_TAB2');" />
-                    </a>
-                    <a>
                         <input type="button" id="WF_ButtonSELECT_LIFTED_TAB2" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB2');" />
-                    </a>
-                    <a>
                         <input type="button" id="WF_ButtonLINE_LIFTED_TAB2" class="btn-sticky" value="行削除" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB2');" />
-                    </a>
-                    <a>
                         <input type="button" id="WF_ButtonLINE_ADD_TAB2" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB2');" />
-                    </a>
-                    <a>
                         <input type="button" id="WF_ButtonUPDATE_TAB2" class="btn-sticky" value="明細更新"  onclick="ButtonClick('WF_ButtonUPDATE_TAB2');" />
-                    </a>
+                    </div>
+                    <div class="rightSide">
+                    </div>
                 </div>
                 <!-- 一覧レイアウト -->
                 <asp:panel id="pnlListArea2" runat="server" ></asp:panel>
@@ -580,14 +574,13 @@
 
             <!-- ■ Tab No3　入換・積込指示　■ -->
             <asp:View ID="WF_DView3" runat="server">
-                <div id="detailbuttonbox3" class="detailbuttonbox">
-                    <!-- ボタン -->
-                    <a>
+                <div class="actionButtonBox">
+                    <div class="leftSide">
                         <input type="button" id="WF_ButtonUPDATE_TAB3" class="btn-sticky" value="入力内容登録" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
-                    </a>
-                    <a>
                         <input type="button" id="WF_ButtonFILLINGALL_TAB3" class="btn-sticky" value="充填ポイントの全体を見る"  onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
-                    </a>
+                    </div>
+                    <div class="rightSide">
+                    </div>
                 </div>
                 <!-- 一覧レイアウト -->
                 <asp:panel id="pnlListArea3" runat="server" ></asp:panel>
@@ -599,7 +592,7 @@
                 <asp:panel id="pnlListArea4" runat="server" ></asp:panel>
             </asp:View>
         </asp:MultiView>
-
+        <!-- <div class="detailBottom"></div> -->
     </div>
 
     <!-- rightbox レイアウト -->

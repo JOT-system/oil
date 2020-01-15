@@ -512,8 +512,10 @@ input[type=text][readonly].calendarIcon {
     box-sizing: border-box;
 }
 .actionButtonBox .btn-sticky{
-    width:5em;
     min-width:5em;
+    width:auto;
+    padding-left:5px;
+    padding-right:5px;
 }
 /* ******************************** */
 /* 条件画面設定                     */

@@ -82,12 +82,16 @@ function ChangeOrgUse(obj, lineCnt) {
     for (let i = 0; i < trlst.length; i++) {
         // 一覧の項目(ステータス)の値を取得
         var chkStatus = trlst[i].getElementsByTagName("td")[2].innerHTML;
+        var chkObj = document.getElementById("chkpnlListAreaOPERATION" + (i + 1));
+        if (chkObj === null) {
+            continue;
+        }
 
         if (chkStatus === "受注キャンセル") {
-            document.getElementById("chkpnlListAreaOPERATION" + (i + 1)).disabled = true;
+            chkObj.disabled = true;
             trlst[i].getElementsByTagName("td")[2].disabled = true;
         } else {
-            document.getElementById("chkpnlListAreaOPERATION" + (i + 1)).disabled = false;
+            chkObj.disabled = false;
             trlst[i].getElementsByTagName("td")[2].disabled = false;
         }
     }

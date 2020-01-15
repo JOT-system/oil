@@ -177,7 +177,12 @@ input::-ms-input-placeholder {
         margin-top: -0.5em;
     }
 }
-
+/* 一覧表内のテキストボックス補正 */
+div[data-generated='1'] input[type=text],
+div[data-generated='1'] input[type=password] {
+    width: calc(100% - 4px) !important;
+    height: calc(100% - 4px) !important;
+}
 .WF_TEXTBOX_CSS {
     ime-mode: inactive;
 }

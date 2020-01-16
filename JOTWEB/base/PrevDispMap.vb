@@ -16,10 +16,6 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const MENU As String = "ASP.OIL_M00001MENU_ASPX"
 
-        ''' メニュー画面(マスタメンテ）
-        ''' </summary>
-        Public Const MENU2 As String = "ASP.OIL_M00002MENU_ASPX"
-
         ''' <summary>
         ''' サブメニュー画面
         ''' </summary>

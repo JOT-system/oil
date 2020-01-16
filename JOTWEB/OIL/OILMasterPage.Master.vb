@@ -162,7 +162,8 @@ Public Class OILMasterPage
     Public Sub SetMAPValue()
 
         If Context.Handler.ToString().ToUpper = C_PREV_MAP_LIST.LOGIN OrElse
-           Context.Handler.ToString().ToUpper = C_PREV_MAP_LIST.MENU Then                                                      'メニューからの画面遷移
+            Context.Handler.ToString().ToUpper = C_PREV_MAP_LIST.MENU2 OrElse
+            Context.Handler.ToString().ToUpper = C_PREV_MAP_LIST.MENU Then                                                      'メニューからの画面遷移
             Dim USRCOMPCODE As String = String.Empty
             'メニュー情報のWF_SEL退避　
             If Not IsNothing(Page.PreviousPage) AndAlso Not IsNothing(Page.PreviousPage.Master) Then

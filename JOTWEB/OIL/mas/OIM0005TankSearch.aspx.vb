@@ -91,7 +91,7 @@ Public Class OIM0005TankSearch
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then         'メニューからの画面遷移
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU2 Then         'メニューからの画面遷移
             '画面間の情報クリア
             work.Initialize()
 

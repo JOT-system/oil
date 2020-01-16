@@ -598,9 +598,9 @@ Public Class OIT0003OrderList
         '受注営業所(コード)
         work.WF_SEL_ORDERSALESOFFICECODE.Text = ""
         '受注進行ステータス(名)
-        work.WF_SEL_ORDERSTATUSNM.Text = ""
+        work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
         '受注進行ステータス(コード)
-        work.WF_SEL_ORDERSTATUS.Text = ""
+        work.WF_SEL_ORDERSTATUS.Text = "100"
         '受注情報(名)
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)
@@ -713,7 +713,7 @@ Public Class OIT0003OrderList
     End Sub
 
     ''' <summary>
-    ''' 受注新規作成ボタン押下時処理
+    ''' 貨車連結選択ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonLinkINSERT_Click()
@@ -727,9 +727,9 @@ Public Class OIT0003OrderList
         '受注営業所(コード)
         work.WF_SEL_ORDERSALESOFFICECODE.Text = ""
         '受注進行ステータス(名)
-        work.WF_SEL_ORDERSTATUSNM.Text = ""
+        work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
         '受注進行ステータス(コード)
-        work.WF_SEL_ORDERSTATUS.Text = ""
+        work.WF_SEL_ORDERSTATUS.Text = "100"
         '受注情報(名)
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)
@@ -820,8 +820,8 @@ Public Class OIT0003OrderList
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = "0"
-        ''作成フラグ(新規登録：1, 更新：2)
-        'work.WF_SEL_CREATEFLG.Text = "1"
+        '作成フラグ(新規登録：1, 更新：2)
+        work.WF_SEL_CREATEFLG.Text = "1"
         '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
         work.WF_SEL_CREATELINKFLG.Text = "2"
 
@@ -1009,6 +1009,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_DELFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELFLG")
         '作成フラグ(新規登録：1, 更新：2)
         work.WF_SEL_CREATEFLG.Text = "2"
+        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        work.WF_SEL_CREATELINKFLG.Text = "1"
 
         '○ 状態をクリア
         For Each OIT0003row As DataRow In OIT0003tbl.Rows

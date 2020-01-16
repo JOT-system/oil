@@ -63,7 +63,7 @@
                 <span>
                     <a id="WF_ORDERSTATUS_LABEL">ステータス</a>
                     <a class="ef" id="ORDERSTATUS">
-                        <asp:TextBox ID="TxtOrderStatus" runat="server" onblur="MsgClear();" Enabled="true"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderStatus" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                     </a>
                 </span>
 
@@ -87,7 +87,7 @@
                 <span>
                     <a id="WF_ORDERNO_LABEL" class="requiredMark">オーダー№</a>
                     <a class="ef" id="WF_ORDERNO">
-                        <asp:TextBox ID="TxtOrderNo" runat="server" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderNo" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                     </a>
                 </span>
 
@@ -101,21 +101,21 @@
                 <span>
                     <span>
                         <a id="WF_SHIPPERSNAME">
-                            <asp:Label ID="LblShippersName" runat="server">JXTG</asp:Label>
+                            <asp:Label ID="LblShippersName" runat="server"></asp:Label>
                         </a>
                     </span>
                 </span>
                 <!-- ■　荷受人　■ -->
                 <span>
                     <a id="WF_CONSIGNEE_LABEL" class="requiredMark">荷受人</a>
-                    <a class="ef" id="WF_CONSIGNEECODE" ondblclick="Field_DBclick('TxtConsigneeCode', <%=LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST%>);">
+                    <a class="ef" id="WF_CONSIGNEECODE" ondblclick="Field_DBclick('TxtConsigneeCode', <%=LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST%>);">
                         <asp:TextBox ID="TxtConsigneeCode" runat="server" CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
                     </a>
                 </span>
                 <span>
                     <span>
                         <a id="WF_CONSIGNEENAME">
-                            <asp:Label ID="LblConsigneeName" runat="server">JXTG</asp:Label>
+                            <asp:Label ID="LblConsigneeName" runat="server"></asp:Label>
                         </a>
                     </span>
                 </span>

@@ -77,15 +77,6 @@ Partial Public Class OIM0005TankCreate
     Protected WithEvents WF_TANKNUMBER As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_TANKNUMBER_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TANKNUMBER_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''WF_ORIGINOWNERCODE_L コントロール。
     '''</summary>
     '''<remarks>

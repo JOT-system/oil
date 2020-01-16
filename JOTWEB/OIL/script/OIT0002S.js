@@ -18,7 +18,7 @@ function InitDisplay() {
     // 左ボックス拡張機能追加
     addLeftBoxExtention(leftListExtentionTarget);
 
-};
+}
 
 if ('addEventListener' in document) {
     document.addEventListener('DOMContentLoaded', function () {

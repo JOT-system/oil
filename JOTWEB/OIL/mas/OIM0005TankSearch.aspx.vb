@@ -72,7 +72,7 @@ Public Class OIM0005TankSearch
         '○ 画面ID設定
         Master.MAPID = OIM0005WRKINC.MAPIDS
 
-        WF_CAMPCODE.Focus()
+        WF_TANKNUMBER_CODE.Focus()
         WF_FIELD.Value = ""
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""

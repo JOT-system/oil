@@ -20,55 +20,42 @@
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
-            <div class="Operation" style="margin-left: 3em; margin-top: 0.5em; height: 1.8em;">
-                <!-- 会社コード -->
-                <a style="display:none;">
-                    <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
-                    <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                </a>
+            <div class="Operation">
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        <!-- 会社コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SEL_CAMPNAME" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
 
-                <!-- 組織コード -->
-                <a style="display:none;">
-                    <asp:Label ID="WF_SEL_ORG" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
-                    <asp:Label ID="WF_SEL_ORGNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT"></asp:Label>
-                </a>
+                        <!-- 組織コード -->
+                        <a style="display:none;">
+                            <asp:Label ID="WF_SEL_ORG" runat="server" Text="運用組織" Font-Bold="True" Font-Underline="false"></asp:Label>
+                            <asp:Label ID="WF_SEL_ORGNAME" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        </a>
 
-                <!-- ボタン -->
-                <a style="position:fixed;top:2.8em;left:0.5em;">
-                    <input type="button" id="WF_ButtonALLSELECT" value="全選択"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:5em;">
-                    <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:9.5em;">
-                    <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:14em;">
-                    <input type="button" id="WF_ButtonUPDATE" value="更新"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:18.5em;">
-                    <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:62.5em;">
-                    <input type="button" id="WF_ButtonINSERT" value="新規登録"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonINSERT');" />
-                </a>
-                <a style="position:fixed;top:2.8em;left:67em;">
-                    <input type="button" id="WF_ButtonEND" value="戻る"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
-                </a>
-                <a style="position:fixed;top:3.2em;left:75em;">
-                    <asp:Image ID="WF_ButtonFIRST2" runat="server" ImageUrl="~/img/先頭頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonFIRST');" Height="1em" ImageAlign="AbsMiddle" />
-                </a>
-                <a style="position:fixed;top:3.2em;left:77em;">
-                    <asp:Image ID="WF_ButtonLAST2" runat="server" ImageUrl="~/img/最終頁.png" Width="1.5em" onclick="ButtonClick('WF_ButtonLAST');" Height="1em" ImageAlign="AbsMiddle" />
-                </a>
-            </div>
-                <div id="divListArea">
-                    <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
-                </div>
+                        <!-- ボタン -->
+                            <input type="button" id="WF_ButtonALLSELECT"     class="btn-sticky" value="全選択"   onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                            <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                            <input type="button" id="WF_ButtonLINE_LIFTED"   class="btn-sticky" value="行削除"   onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                    </div>
+
+                    <div class="rightSide">
+                            <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="更新"     onclick="ButtonClick('WF_ButtonUPDATE');" />
+                            <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+                            <input type="button" id="WF_ButtonINSERT"        class="btn-sticky" value="新規登録" onclick="ButtonClick('WF_ButtonINSERT');" />
+                            <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
+                            <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                            <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   onclick="ButtonClick('WF_ButtonLAST');"></div>
+                    </div>
+                </div> <!-- End class=actionButtonBox -->
+            </div> <!-- End class="Operation" -->
+            <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div>
 
         <!-- 全体レイアウト　detailbox -->
-        <div class="detailboxOnly" id="detailbox">
+        <div class="detailboxOnly" id="detailbox" style="display:none;">
             <div id="detailbuttonbox" class="detailbuttonbox">
                 <a>
                     <input type="button" id="WF_UPDATE" value="表更新" style="Width:5em" onclick="ButtonClick('WF_UPDATE');" />
@@ -271,7 +258,7 @@
         <MSINC:wrklist ID="work" runat="server" />
 
         <!-- イベント用 -->
-        <div hidden="hidden">
+        <div style="display:none;">
             <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
             <!-- GridView DBクリック-->
             <asp:TextBox ID="WF_GridPosition" Text="" runat="server"></asp:TextBox>

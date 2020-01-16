@@ -240,15 +240,18 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     border-right: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
     border-top: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
 }
+[data-itemelm=tab].aspNetDisabled {
+    pointer-events:none; /* クリックイベントを発生させない */
+}
 #hideHeader:after {
     color: white;
-    text-decoration-color :white;
+    text-decoration-color: white;
     font-weight: bold;
     font-size: 13.5px;
     height: 100%;
     display: block;
     vertical-align: middle;
-    padding-right:5px;
+    padding-right: 5px;
     content: "上部隠す"
 }
 #hideHeader.hideHeader:after {

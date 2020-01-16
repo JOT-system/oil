@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIT0002WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="OIT0002DH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIT0002D.css")%>' rel="stylesheet" type="text/css" />
+<%--    <link href='<%=ResolveUrl("~/OIL/css/OIT0002D.css")%>' rel="stylesheet" type="text/css" />--%>
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0002D.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
@@ -55,10 +55,13 @@
             <!-- ■　登録営業所　■ -->
             <a id="WF_OFFICECODE_LABEL" class="requiredMark">登録営業所</a>
             <a id="WF_OFFICECODE_ICON" onclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);">
-                <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
+                <asp:Image ID="imgOrderOffice" runat="server" ImageUrl="../img/leftbox.png"/>
+            </a>
+            <a id="WF_OFFICECODE_DUMMY">
+                <asp:Label ID="lblOrderOffice_dummy" runat="server"></asp:Label>
             </a>
             <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
-                <asp:TextBox CssClass="TextBox" ID="TxtOrderOffice" runat="server" onblur="MsgClear();" MaxLength="20"></asp:TextBox>
+                <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" MaxLength="20"></asp:TextBox>
             </a>
 
             <!-- ■　本線列車　■ -->
@@ -67,7 +70,7 @@
                 <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
             </a>
             <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
-                <asp:TextBox CssClass="TextBox" ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
+                <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
             </a>
             <!-- ■　利用可能日　■ -->
             <a id="WF_AVAILABLEYMD_LABEL" class="requiredMark">利用可能日</a>
@@ -75,7 +78,7 @@
                 <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
             </a>
             <a class="ef" id="WF_AVAILABLEYMD" ondblclick="Field_DBclick('AvailableYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox CssClass="TextBox" ID="AvailableYMD" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox ID="AvailableYMD" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
 
             <!-- ■　空車発駅（着駅）　■ -->
@@ -84,7 +87,7 @@
                 <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
             </a>
             <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
-                <asp:TextBox CssClass="TextBox" ID="TxtDepstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
+                <asp:TextBox ID="TxtDepstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
             </a>
             <a id="WF_DEPSTATIONNAME">
                 <asp:Label ID="LblDepstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -95,7 +98,7 @@
                 <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
             </a>
             <a class="ef" id="WF_RETSTATIONCODE" ondblclick="Field_DBclick('TxtRetstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtRetstation');">
-                <asp:TextBox CssClass="TextBox" ID="TxtRetstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
+                <asp:TextBox ID="TxtRetstation" runat="server" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
             </a>
             <a id="WF_RETSTATIONNAME">
                 <asp:Label ID="LblRetstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -107,7 +110,7 @@
                 <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
             </a>
             <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox CssClass="TextBox" ID="TxtEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox ID="TxtEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
             <!-- ■　(実績)空車着日　■ -->
             <a id="WF_ACTUALEMPARRDATE_LABEL">(実績)空車着日</a>
@@ -115,7 +118,7 @@
                 <asp:Image runat="server" ImageUrl="../img/calendar.png"/>
             </a>
             <a class="ef" id="WF_ACTUALEMPARRDATE" ondblclick="Field_DBclick('TxtActEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox CssClass="TextBox" ID="TxtActEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
+                <asp:TextBox ID="TxtActEmpDate" runat="server" onblur="MsgClear();"></asp:TextBox>
             </a>
         </div>
 
@@ -192,22 +195,22 @@
         <div id="detailbuttonbox" class="detailbuttonbox">
             <!-- ボタン -->
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonALLSELECT" value="全選択"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                <input type="button" id="WF_ButtonALLSELECT"     class="btn-sticky" value="全選択"   style="Width:5em" onclick="ButtonClick('WF_ButtonALLSELECT');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonSELECT_LIFTED" value="選択解除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" style="Width:5em" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonLINE_LIFTED" value="行削除"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
+                <input type="button" id="WF_ButtonLINE_LIFTED"   class="btn-sticky" value="行削除"   style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonLINE_ADD" value="行追加"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />
+                <input type="button" id="WF_ButtonLINE_ADD"      class="btn-sticky" value="行追加"   style="Width:5em" onclick="ButtonClick('WF_ButtonLINE_ADD');" />
             </a>
             <a style="left:0.5em;">
-                <input type="button" id="WF_ButtonCSV" value="ﾀﾞｳﾝﾛｰﾄﾞ"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
+                <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" style="Width:5em" onclick="ButtonClick('WF_ButtonCSV');" />
             </a>
             <a style="left:43.5em;">
-                <input type="button" id="WF_ButtonUPDATE" value="明細更新"  class="btn-sticky" style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="明細更新" style="Width:5em" onclick="ButtonClick('WF_ButtonUPDATE');" />
             </a>
         </div>
         </div>
@@ -226,7 +229,7 @@
     <MSINC:wrklist id="work" runat="server" />
 
     <!-- イベント用 -->
-        <div hidden="hidden">
+        <div style="display:none;">
             <!-- GridView DBクリック-->
             <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
             <!-- GridView表示位置フィールド -->

@@ -51,7 +51,10 @@ window.addEventListener('DOMContentLoaded', function () {
     /* 虫眼鏡・検索のオブジェクトを付与 */
     /* ******************************** */
     // 対象オブジェクトの検索(inputタグのclass属性に'boxIcon'または'calendarIcon'が設定されているもの)
-    var targetTextBoxList = document.querySelectorAll('input.boxIcon,input.calendarIcon');
+    let queryString = "input.boxIcon,input.calendarIcon";
+    // 暫定（日付をやるならvb側をいじる）グリッド内のテキストボックス(グリッド内のtdにダブルクリックイベントがあるテキストボックス)
+    queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=text]";
+    var targetTextBoxList = document.querySelectorAll(queryString);
     if (targetTextBoxList !== null) {
         commonAppendInputBoxIcon(targetTextBoxList);
     }
@@ -1138,9 +1141,12 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
 
         let parentObj = inputObj.parentElement;
         parentObj.style.position = 'relative';
-        let additionalClass = 'calendarIconArea';
-        if (inputObj.classList.contains('boxIcon')) {
-            additionalClass = 'boxIconArea';
+        let additionalClass = 'boxIconArea';
+        if (inputObj.classList.contains('calendarIcon')) {
+            additionalClass = 'calendarIconArea';
+        }
+        if (parentObj.tagName === 'TD') {
+            inputObj.classList.add('boxIcon');
         }
         let iconElm = document.createElement('div');
         let inputObjId = inputObj.id;

@@ -1,9 +1,2 @@
-﻿/*虫眼鏡アイコン ※ワンクリック用*/
-.ICON {
-    position: fixed;
-    height: 50px;
-    width: 50px;
-    top: 4px;
-    left: 15px;
-    cursor: pointer;
+﻿body {
 }

@@ -72,7 +72,7 @@ Public Class OIM0005TankSearch
         '○ 画面ID設定
         Master.MAPID = OIM0005WRKINC.MAPIDS
 
-        WF_CAMPCODE.Focus()
+        WF_TANKNUMBER_CODE.Focus()
         WF_FIELD.Value = ""
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""
@@ -91,7 +91,7 @@ Public Class OIM0005TankSearch
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then         'メニューからの画面遷移
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then         'メニューからの画面遷移
             '画面間の情報クリア
             work.Initialize()
 
@@ -221,7 +221,7 @@ Public Class OIM0005TankSearch
                 End If
             End If
         Else
-                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "型式", needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "型式", needsPopUp:=True)
             WF_MODEL_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub

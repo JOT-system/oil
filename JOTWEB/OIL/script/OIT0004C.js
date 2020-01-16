@@ -14,3 +14,6 @@ function InitDisplay() {
     if (document.getElementById('WF_RightboxOpen').value === "Open") {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
+
+}
+

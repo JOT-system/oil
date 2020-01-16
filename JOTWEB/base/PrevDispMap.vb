@@ -15,6 +15,7 @@ Public Module PrevDispMap
         ''' メニュー画面
         ''' </summary>
         Public Const MENU As String = "ASP.OIL_M00001MENU_ASPX"
+
         ''' <summary>
         ''' サブメニュー画面
         ''' </summary>

@@ -173,7 +173,6 @@ Public Class OIM0005TankCreate
 
         'JOT車番
         WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER2.Text
-        CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_DUMMY)
 
         '原籍所有者C
         WF_ORIGINOWNERCODE.Text = work.WF_SEL_ORIGINOWNERCODE.Text
@@ -991,8 +990,8 @@ Public Class OIM0005TankCreate
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "WF_TANKNUMBER"        'JOT車番
-                CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
+            'Case "WF_TANKNUMBER"        'JOT車番
+            '    CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
             Case "WF_MODEL"             '型式
                 CODENAME_get("TANKMODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
             Case "WF_DELFLG"             '削除フラグ
@@ -1046,7 +1045,7 @@ Public Class OIM0005TankCreate
 
                 Case "WF_TANKNUMBER"               'JOT車番
                     WF_TANKNUMBER.Text = WW_SelectValue
-                    WF_TANKNUMBER_TEXT.Text = WW_SelectText
+                    'WF_TANKNUMBER_TEXT.Text = WW_SelectText
                     WF_TANKNUMBER.Focus()
 
                 Case "WF_LEASESTYMD"             'リース開始年月日

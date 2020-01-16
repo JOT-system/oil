@@ -314,6 +314,10 @@ div[data-generated='1'] input[type=password] {
     opacity: 0.8;
     filter: alpha(opacity=8);
 }
+/* グリッド内の補正 */
+div[data-generated='1'] .boxIconArea div {
+    margin-top: calc(100% - 12px);
+}
 /* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     .calendarIconArea div,
@@ -325,6 +329,11 @@ div[data-generated='1'] input[type=password] {
 _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     margin-top: calc(100% - 8px);
 }
+/* Edgeグリッド内の補正 */
+_:-ms-lang(x)::backdrop, div[data-generated='1'] .boxIconArea div {
+    margin-top: calc(100% - 12px);
+}
+
 .boxIconArea div:hover,
 .calendarIconArea div:hover{
     cursor:pointer;
@@ -552,6 +561,14 @@ input[type=text][readonly].calendarIcon {
 .searchbox .inputItem a:nth-child(1) {
     text-align:left;
     width:100%;
+}
+.searchbox .inputItem a:nth-child(2) {
+    display:block;
+    text-align:left;
+    width:180px;
+}
+.searchbox .inputItem a:nth-child(2) input[type=text] {
+    width:calc(100%) !important;
 }
 /* 文言要素 */
 .searchbox .inputItem a:nth-child(2n+1) {

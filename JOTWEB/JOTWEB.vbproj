@@ -148,6 +148,7 @@
     <Content Include="OIL\img\pay.png" />
     <Content Include="OIL\img\statistics.png" />
     <Content Include="OIL\img\tank.png" />
+    <Content Include="OIL\inc\GRM00002WRKINC.ascx" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />
     <Content Include="inc\GRIS0001Title.ascx" />
     <Content Include="inc\GRIS0002Footer.ascx" />
@@ -265,6 +266,13 @@
     <Compile Include="base\YDF.vb" />
     <Compile Include="inc\GRCO0100XLSUP.ashx.vb">
       <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\GRM00002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\GRM00002WRKINC.ascx.vb">
+      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\OIT0004WRKINC.ascx.designer.vb">
       <DependentUpon>OIT0004WRKINC.ascx</DependentUpon>

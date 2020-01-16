@@ -23,15 +23,6 @@ Partial Public Class M00002MENU
     Protected WithEvents Repeater_Menu_L As Global.System.Web.UI.WebControls.Repeater
 
     '''<summary>
-    '''Repeater_Menu_L2 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents Repeater_Menu_L2 As Global.System.Web.UI.WebControls.Repeater
-
-    '''<summary>
     '''Repeater_Menu_R コントロール。
     '''</summary>
     '''<remarks>
@@ -39,51 +30,6 @@ Partial Public Class M00002MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents Repeater_Menu_R As Global.System.Web.UI.WebControls.Repeater
-
-    '''<summary>
-    '''Repeater_Menu_R2 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents Repeater_Menu_R2 As Global.System.Web.UI.WebControls.Repeater
-
-    '''<summary>
-    '''Repeater_Menu_L3 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents Repeater_Menu_L3 As Global.System.Web.UI.WebControls.Repeater
-
-    '''<summary>
-    '''Repeater_Menu_L4 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents Repeater_Menu_L4 As Global.System.Web.UI.WebControls.Repeater
-
-    '''<summary>
-    '''Repeater_Menu_R3 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents Repeater_Menu_R3 As Global.System.Web.UI.WebControls.Repeater
-
-    '''<summary>
-    '''Repeater_Menu_R4 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents Repeater_Menu_R4 As Global.System.Web.UI.WebControls.Repeater
 
     '''<summary>
     '''WF_ButtonClick コントロール。
@@ -101,7 +47,7 @@ Partial Public Class M00002MENU
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.GRM00001WRKINC
+    Protected WithEvents work As Global.JOTWEB.GRM00002WRKINC
 
     '''<summary>
     '''Master プロパティ。

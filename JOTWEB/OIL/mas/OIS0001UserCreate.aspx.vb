@@ -1038,8 +1038,18 @@ Public Class OIS0001UserCreate
 
             'ユーザID(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "USERID", OIS0001INProw("USERID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "・ユーザID入力エラーです。"
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ''値存在チェック
+                'CODENAME_get("USERID", OIS0001INProw("USERID"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(ユーザID入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(ユーザID入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1047,93 +1057,148 @@ Public Class OIS0001UserCreate
             End If
 
             '社員名（短）(バリデーションチェック）
-            If OIS0001INProw("STAFFNAMES") = "" Then
-                WW_CheckMES1 = "・社員名（短）入力エラーです。"
+            Master.CheckField(Master.USERCAMP, "STAFFNAMES", OIS0001INProw("STAFFNAMES"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ''値存在チェック
+                'CODENAME_get("STAFFNAMES", OIS0001INProw("STAFFNAMES"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(社員名（短）入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(社員名（短）入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             '社員名（長）(バリデーションチェック）
-            If OIS0001INProw("STAFFNAMEL") = "" Then
-                WW_CheckMES1 = "・社員名（長）入力エラーです。"
+            Master.CheckField(Master.USERCAMP, "STAFFNAMEL", OIS0001INProw("STAFFNAMEL"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ''値存在チェック
+                'CODENAME_get("STAFFNAMEL", OIS0001INProw("STAFFNAMEL"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(社員名（長）入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(社員名（長）入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '誤り回数(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "MISSCNT", OIS0001INProw("MISSCNT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ''値存在チェック
+                'If OIS0001INProw("MISSCNT") <> "" Then
+                'CODENAME_get("MISSCNT", OIS0001INProw("MISSCNT"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(誤り回数入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+                'End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(誤り回数入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             'パスワード(バリデーションチェック）
-            If OIS0001INProw("PASSWORD") = "" Then
-                WW_CheckMES1 = "・パスワード入力エラーです。"
+            Master.CheckField(Master.USERCAMP, "PASSWORD", OIS0001INProw("PASSWORD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ''値存在チェック
+                'CODENAME_get("PASSWORD", OIS0001INProw("PASSWORD"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(パスワード入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(パスワード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             'パスワード有効期限(バリデーションチェック）
-            If OIS0001INProw("PASSENDYMD") = "" Then
-                WW_CheckMES1 = "・パスワード有効期限入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
+            Master.CheckField(Master.USERCAMP, "PASSENDYMD", OIS0001INProw("PASSENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 '年月日チェック
-                WW_CheckDate(OIS0001INProw("PASSENDYMD"), "パスワード有効期限", WW_CS0024FCHECKERR, dateErrFlag)
+                WW_CheckDate(OIS0001INProw("PASSENDYMD"), "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・パスワード有効期限入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckMES1 = "・更新できないレコード(パスワード有効期限エラー)です。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    O_RTN = "ERR"
+                    Exit Sub
                 Else
                     OIS0001INProw("PASSENDYMD") = CDate(OIS0001INProw("PASSENDYMD")).ToString("yyyy/MM/dd")
                 End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(パスワード有効期限エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                WW_LINE_ERR = "ERR"
             End If
 
             '開始年月日(バリデーションチェック）
-            If OIS0001INProw("STYMD") = "" Then
-                WW_CheckMES1 = "・開始年月日入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
+            Master.CheckField(Master.USERCAMP, "STYMD", OIS0001INProw("STYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
                 '年月日チェック
-                WW_CheckDate(OIS0001INProw("STYMD"), "有効年月日（開始）", WW_CS0024FCHECKERR, dateErrFlag)
+                WW_CheckDate(OIS0001INProw("STYMD"), "開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・開始年月日入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckMES1 = "・更新できないレコード(開始年月日エラー)です。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    O_RTN = "ERR"
+                    Exit Sub
                 Else
                     OIS0001INProw("STYMD") = CDate(OIS0001INProw("STYMD")).ToString("yyyy/MM/dd")
                 End If
-            End If
-
-            '終了年月日(バリデーションチェック）
-            If OIS0001INProw("ENDYMD") = "" Then
-                WW_CheckMES1 = "・終了年月日入力エラーです。"
+            Else
+                WW_CheckMES1 = "・更新できないレコード(開始年月日エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '終了年月日(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "ENDYMD", OIS0001INProw("ENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
                 '年月日チェック
-                WW_CheckDate(OIS0001INProw("ENDYMD"), "有効年月日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
+                WW_CheckDate(OIS0001INProw("ENDYMD"), "終了年月日", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・終了年月日入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckMES1 = "・更新できないレコード(終了年月日エラー)です。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    O_RTN = "ERR"
+                    Exit Sub
                 Else
                     OIS0001INProw("ENDYMD") = CDate(OIS0001INProw("ENDYMD")).ToString("yyyy/MM/dd")
                 End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(終了年月日エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             '会社コード(バリデーションチェック）
@@ -1142,14 +1207,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("CAMPCODE", OIS0001INProw("CAMPCODE"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・会社コード入力エラーです。"
+                    WW_CheckMES1 = "・更新できないレコード(会社コード入力エラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・会社コード入力エラーです。"
+                WW_CheckMES1 = "・更新できないレコード(会社コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1162,14 +1227,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("ORG", OIS0001INProw("ORG"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・組織コード入力エラーです。"
+                    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・組織コード入力エラーです。"
+                WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1177,12 +1242,23 @@ Public Class OIS0001UserCreate
             End If
 
             'メールアドレス(バリデーションチェック）
-            If OIS0001INProw("EMAIL") = "" Then
-                WW_CheckMES1 = "・メールアドレス入力エラーです。"
+            Master.CheckField(Master.USERCAMP, "EMAIL", OIS0001INProw("EMAIL"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ''値存在チェック
+                'CODENAME_get("EMAIL", OIS0001INProw("EMAIL"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(メールアドレス入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(メールアドレス入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             'メニュー表示制御ロール(バリデーションチェック）
@@ -1191,14 +1267,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("MENU", OIS0001INProw("MENUROLE"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
+                    WW_CheckMES1 = "・更新できないレコード(メニュー表示制御ロール入力エラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
+                WW_CheckMES1 = "・更新できないレコード(メニュー表示制御ロール入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1211,14 +1287,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("MAP", OIS0001INProw("MAPROLE"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
+                    WW_CheckMES1 = "・更新できないレコード(画面参照更新制御ロール入力エラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
+                WW_CheckMES1 = "・更新できないレコード(画面参照更新制御ロール入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1231,14 +1307,14 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("VIEW", OIS0001INProw("VIEWPROFID"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
+                    WW_CheckMES1 = "・更新できないレコード(画面表示項目制御ロール入力エラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
+                WW_CheckMES1 = "・更新できないレコード(画面表示項目制御ロール入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1251,14 +1327,36 @@ Public Class OIS0001UserCreate
                 '値存在チェック
                 CODENAME_get("XML", OIS0001INProw("RPRTPROFID"), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
+                    WW_CheckMES1 = "・更新できないレコード(エクセル出力制御ロール入力エラー)です。"
                     WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             Else
-                WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
+                WW_CheckMES1 = "・更新できないレコード(エクセル出力制御ロール入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '画面初期値ロール(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "VARIANT", OIS0001INProw("VARIANT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                ''値存在チェック
+                'If OIS0001INProw("VARIANT") <> "" Then
+                'CODENAME_get("VARIANT", OIS0001INProw("VARIANT"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(画面初期値ロール入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+                'End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(画面初期値ロール入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
@@ -1266,28 +1364,24 @@ Public Class OIS0001UserCreate
             End If
 
             '承認権限ロール(バリデーションチェック）
-            If OIS0001INProw("APPROVALID") = "" Then
-            Else
-                Master.CheckField(Master.USERCAMP, "APPROVALID", OIS0001INProw("APPROVALID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-                If isNormal(WW_CS0024FCHECKERR) Then
-                    '値存在チェック
-                    CODENAME_get("APPROVAL", OIS0001INProw("APPROVALID"), WW_DUMMY, WW_RTN_SW)
-                    If Not isNormal(WW_RTN_SW) Then
-                        WW_CheckMES1 = "・承認権限ロール入力エラーです。"
-                        WW_CheckMES2 = "マスタに存在しません。"
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                        WW_LINE_ERR = "ERR"
-                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    End If
-                Else
-                    WW_CheckMES1 = "・承認権限ロール入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            Master.CheckField(Master.USERCAMP, "APPROVALID", OIS0001INProw("APPROVALID"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("APPROVAL", OIS0001INProw("APPROVALID"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(承認権限ロール入力エラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(承認権限ロール入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-
 
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
@@ -1363,7 +1457,7 @@ Public Class OIS0001UserCreate
                 dateErrFlag = "0"
             End If
         Catch ex As Exception
-            Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
         End Try
 
     End Sub

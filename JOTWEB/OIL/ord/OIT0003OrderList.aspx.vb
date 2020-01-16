@@ -63,8 +63,10 @@ Public Class OIT0003OrderList
                             WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonORDER_CANCEL"     'キャンセルボタン押下
                             WF_ButtonORDER_CANCEL_Click()
-                        Case "WF_ButtonINSERT"          '受注作成ボタン押下
+                        Case "WF_ButtonINSERT"          '受注新規作成ボタン押下
                             WF_ButtonINSERT_Click()
+                        Case "WF_ButtonLinkINSERT"      '貨車連結選択ボタン押下
+                            WF_ButtonLinkINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
@@ -281,6 +283,7 @@ Public Class OIT0003OrderList
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIT0002.TRAINNO), '')" _
             & "   END                                                AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')               AS ORDERTYPE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')            AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '')                AS BASECODE" _
@@ -581,7 +584,7 @@ Public Class OIT0003OrderList
     End Sub
 
     ''' <summary>
-    ''' 受注作成ボタン押下時処理
+    ''' 受注新規作成ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
@@ -595,9 +598,9 @@ Public Class OIT0003OrderList
         '受注営業所(コード)
         work.WF_SEL_ORDERSALESOFFICECODE.Text = ""
         '受注進行ステータス(名)
-        work.WF_SEL_ORDERSTATUSNM.Text = ""
+        work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
         '受注進行ステータス(コード)
-        work.WF_SEL_ORDERSTATUS.Text = ""
+        work.WF_SEL_ORDERSTATUS.Text = "100"
         '受注情報(名)
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)
@@ -710,6 +713,135 @@ Public Class OIT0003OrderList
     End Sub
 
     ''' <summary>
+    ''' 貨車連結選択ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonLinkINSERT_Click()
+
+        '選択行
+        work.WF_SEL_LINECNT.Text = ""
+        '登録日
+        work.WF_SEL_REGISTRATIONDATE.Text = DateTime.Now.ToString("d")
+        '受注営業所(名)
+        work.WF_SEL_ORDERSALESOFFICE.Text = ""
+        '受注営業所(コード)
+        work.WF_SEL_ORDERSALESOFFICECODE.Text = ""
+        '受注進行ステータス(名)
+        work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
+        '受注進行ステータス(コード)
+        work.WF_SEL_ORDERSTATUS.Text = "100"
+        '受注情報(名)
+        work.WF_SEL_INFORMATIONNM.Text = ""
+        '受注情報(コード)
+        work.WF_SEL_INFORMATION.Text = ""
+        '受注№
+        work.WF_SEL_ORDERNUMBER.Text = ""
+        '本線列車
+        work.WF_SEL_TRAIN.Text = ""
+        '荷主(名)
+        work.WF_SEL_SHIPPERSNAME.Text = ""
+        '荷主(コード)
+        work.WF_SEL_SHIPPERSCODE.Text = ""
+        '荷受人(名)
+        work.WF_SEL_CONSIGNEENAME.Text = ""
+        '荷受人(コード)
+        work.WF_SEL_CONSIGNEECODE.Text = ""
+        '発駅(名)
+        work.WF_SEL_DEPARTURESTATIONNM.Text = ""
+        '発駅(コード)
+        work.WF_SEL_DEPARTURESTATION.Text = ""
+        '着駅(名)
+        work.WF_SEL_ARRIVALSTATIONNM.Text = ""
+        '着駅(コード)
+        work.WF_SEL_ARRIVALSTATION.Text = ""
+        '戻着駅(名)
+        work.WF_SEL_CANGERETSTATIONNM.Text = ""
+        '戻着駅(コード)
+        work.WF_SEL_CANGERETSTATION.Text = ""
+
+        '車数（レギュラー）
+        work.WF_SEL_REGULAR_TANKCAR.Text = "0"
+        '車数（ハイオク）
+        work.WF_SEL_HIGHOCTANE_TANKCAR.Text = "0"
+        '車数（灯油）
+        work.WF_SEL_KEROSENE_TANKCAR.Text = "0"
+        '車数（未添加灯油）
+        work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text = "0"
+        '車数（軽油）
+        work.WF_SEL_DIESEL_TANKCAR.Text = "0"
+        '車数（３号軽油）
+        work.WF_SEL_NUM3DIESEL_TANKCAR.Text = "0"
+        '車数（５号軽油）
+        work.WF_SEL_NUM5DIESEL_TANKCAR.Text = "0"
+        '車数（１０号軽油）
+        work.WF_SEL_NUM10DIESEL_TANKCAR.Text = "0"
+        '車数（LSA）
+        work.WF_SEL_LSA_TANKCAR.Text = "0"
+        '車数（A重油）
+        work.WF_SEL_AHEAVY_TANKCAR.Text = "0"
+        '合計車数
+        work.WF_SEL_TANKCARTOTAL.Text = "0"
+
+        '積込日(予定)
+        work.WF_SEL_LODDATE.Text = ""
+        '発日(予定)
+        work.WF_SEL_DEPDATE.Text = ""
+        '着日(予定)
+        work.WF_SEL_ARRDATE.Text = ""
+        '受入日(予定)
+        work.WF_SEL_ACCDATE.Text = ""
+        '空車着日(予定)
+        work.WF_SEL_EMPARRDATE.Text = ""
+        '積込日(実績)
+        work.WF_SEL_ACTUALLODDATE.Text = ""
+        '発日(実績)
+        work.WF_SEL_ACTUALDEPDATE.Text = ""
+        '着日(実績)
+        work.WF_SEL_ACTUALARRDATE.Text = ""
+        '受入日(実績)
+        work.WF_SEL_ACTUALACCDATE.Text = ""
+        '空車着日(実績)
+        work.WF_SEL_ACTUALEMPARRDATE.Text = ""
+
+        '計上年月日
+        work.WF_SEL_KEIJYOYMD.Text = ""
+        '売上金額
+        work.WF_SEL_SALSE.Text = "0"
+        '売上消費税額
+        work.WF_SEL_SALSETAX.Text = "0"
+        '売上合計金額
+        work.WF_SEL_TOTALSALSE.Text = "0"
+        '支払金額
+        work.WF_SEL_PAYMENT.Text = "0"
+        '支払消費税額
+        work.WF_SEL_PAYMENTTAX.Text = "0"
+        '支払合計金額
+        work.WF_SEL_TOTALPAYMENT.Text = "0"
+
+        '削除フラグ
+        work.WF_SEL_DELFLG.Text = "0"
+        '作成フラグ(新規登録：1, 更新：2)
+        work.WF_SEL_CREATEFLG.Text = "1"
+        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        work.WF_SEL_CREATELINKFLG.Text = "2"
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+        WF_GridDBclick.Text = ""
+
+        '○ 遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
+
+        '○ 次ページ遷移
+        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
+
+    End Sub
+
+    ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -764,6 +896,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_ORDERNUMBER.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERNO")
         '本線列車
         work.WF_SEL_TRAIN.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNO")
+        '受注パターン
+        work.WF_SEL_PATTERNCODE.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERTYPE")
         '荷主(名)
         work.WF_SEL_SHIPPERSNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
         '荷主(コード)
@@ -875,6 +1009,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_DELFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELFLG")
         '作成フラグ(新規登録：1, 更新：2)
         work.WF_SEL_CREATEFLG.Text = "2"
+        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        work.WF_SEL_CREATELINKFLG.Text = "1"
 
         '○ 状態をクリア
         For Each OIT0003row As DataRow In OIT0003tbl.Rows

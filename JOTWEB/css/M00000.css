@@ -50,50 +50,6 @@
         background-color: white;
     }
 
-#UserID {
-    /* input要素全部に対して装飾 */
-    background-image: linear-gradient(0deg, #F0F8FF, F8F8FF); /* グラデーション */
-    border: 1px solid #3c7fb1; /* 枠線 */
-    border-radius: 0.5em; /* 角丸 */
-    height: 50px;
-    font-size: 22px;
-    font-family: Meiryo;
-}
-
-    #UserID:hover {
-        /* マウスが上に載ったとき */
-        background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
-        border: 1px solid #2c628b;
-    }
-
-    #UserID:active {
-        /* 押されたとき */
-        background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
-        border: 1px solid skyblue;
-    }
-
-#PassWord {
-    /* input要素全部に対して装飾 */
-    background-image: linear-gradient(0deg, #F0F8FF, F8F8FF); /* グラデーション */
-    border: 1px solid #3c7fb1; /* 枠線 */
-    border-radius: 0.5em; /* 角丸 */
-    height: 50px;
-    font-size: 22px;
-    font-family: Meiryo;
-}
-
-    #PassWord:hover {
-        /* マウスが上に載ったとき */
-        background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
-        border: 1px solid #2c628b;
-    }
-
-    #PassWord:active {
-        /* 押されたとき */
-        background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
-        border: 1px solid skyblue;
-    }
-
 #OK {
     /* input要素全部に対して装飾 */
     background-image: linear-gradient(0deg, #F0F8FF, F8F8FF); /* グラデーション */

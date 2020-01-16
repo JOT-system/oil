@@ -198,69 +198,61 @@ Public Class OIS0001UserSearch
 
         '○ 単項目チェック
         '会社コード
-        If WF_CAMPCODE_CODE.Text = "" Then
+        Master.CheckField(Master.USERCAMP, "CAMPCODE", WF_CAMPCODE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("CAMPCODE", WF_CAMPCODE_CODE.Text, WF_CAMPCODE_NAME.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE_CODE.Text, needsPopUp:=True)
+                WF_CAMPCODE_CODE.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "会社コード", needsPopUp:=True)
-            WF_CAMPCODE_CODE.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-        '存在チェック
-        CODENAME_get("CAMPCODE", WF_CAMPCODE_CODE.Text, WF_CAMPCODE_NAME.Text, WW_RTN_SW)
-        If Not isNormal(WW_RTN_SW) Then
-            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & WF_CAMPCODE_CODE.Text, needsPopUp:=True)
             WF_CAMPCODE_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
 
         '有効年月日(From)
-        'Master.CheckField(WF_CAMPCODE_CODE.Text, "STYMD", WF_STYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If WF_STYMD_CODE.Text = "" Then
-            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(開始) : ", needsPopUp:=True)
-            WF_STYMD_CODE.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-        'If Not isNormal(WW_CS0024FCHECKERR) Then
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(開始) : " & WF_STYMD_CODE.Text, needsPopUp:=True)
-        '    WF_STYMD_CODE.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-        '年月日チェック
-        WW_CheckDate(WF_STYMD_CODE.Text, "有効年月日（開始）", WW_CS0024FCHECKERR, dateErrFlag)
-        If dateErrFlag = "1" Then
-            WF_STYMD_CODE.Focus()
-            WW_CheckMES1 = "有効年月日（開始）入力エラーです。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-            O_RTN = "ERR"
-            Exit Sub
-        Else
-            WF_STYMD_CODE.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
-        End If
-
-        '有効年月日(To)
-        'Master.CheckField(WF_CAMPCODE_CODE.Text, "ENDYMD", WF_ENDYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If Not isNormal(WW_CS0024FCHECKERR) Then
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "有効年月日(終了) : " & WF_ENDYMD_CODE.Text, needsPopUp:=True)
-        '    WF_ENDYMD_CODE.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-        '年月日チェック
-        If WF_ENDYMD_CODE.Text = "" Then
-            '何もしない
-        Else
-            WW_CheckDate(WF_ENDYMD_CODE.Text, "有効年月日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
+        Master.CheckField(Master.USERCAMP, "STYMD", WF_STYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '年月日チェック
+            WW_CheckDate(WF_STYMD_CODE.Text, "有効年月日（開始）", WW_CS0024FCHECKERR, dateErrFlag)
             If dateErrFlag = "1" Then
-                WF_ENDYMD_CODE.Focus()
-                WW_CheckMES1 = "有効年月日(終了)入力エラーです。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WF_STYMD_CODE.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             Else
-                WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
+                WF_STYMD_CODE.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
             End If
+        Else
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(From)", needsPopUp:=True)
+            WF_STYMD_CODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '有効年月日(To)
+        Master.CheckField(Master.USERCAMP, "ENDYMD", WF_ENDYMD_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            If WF_ENDYMD_CODE.Text <> "" Then
+                '年月日チェック
+                WW_CheckDate(WF_ENDYMD_CODE.Text, "有効年月日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
+                If dateErrFlag = "1" Then
+                    WF_ENDYMD_CODE.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                Else
+                    WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
+                End If
+            End If
+        Else
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(To)", needsPopUp:=True)
+            WF_ENDYMD_CODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
         End If
 
         '日付大小チェック
@@ -286,18 +278,23 @@ Public Class OIS0001UserSearch
         End If
 
         '組織コード
-        WW_TEXT = WF_ORG_CODE.Text
-        If WW_TEXT = "" Then
-            '何もしない
-        Else
-            '存在チェック
-            CODENAME_get("ORG", WF_ORG_CODE.Text, WF_ORG_NAME.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & WF_ORG_CODE.Text, needsPopUp:=True)
-                WF_ORG_CODE.Focus()
-                O_RTN = "ERR"
-                Exit Sub
+        Master.CheckField(Master.USERCAMP, "ORG", WF_ORG_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            If WF_ORG_CODE.Text <> "" Then
+                '存在チェック
+                CODENAME_get("ORG", WF_ORG_CODE.Text, WF_ORG_NAME.Text, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & WF_ORG_CODE.Text, needsPopUp:=True)
+                    WF_ORG_CODE.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
             End If
+        Else
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "組織コード", needsPopUp:=True)
+            WF_ORG_CODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
         End If
 
         '○ 正常メッセージ
@@ -337,7 +334,7 @@ Public Class OIS0001UserSearch
                 dateErrFlag = "0"
             End If
         Catch ex As Exception
-            Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
         End Try
 
     End Sub

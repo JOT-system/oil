@@ -82,7 +82,8 @@ Public Class OIM0004StationSearch
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU2 Then         'メニューからの画面遷移
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU _
+            OrElse Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then         'メニューからの画面遷移
             '〇画面間の情報クリア
             work.Initialize()
 

@@ -50,6 +50,24 @@ Partial Public Class OIT0003OrderLinkQuota
     Protected WithEvents WF_SELUORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_ButtonFIRST コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''WF_ButtonLAST コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
     '''pnlListArea コントロール。
     '''</summary>
     '''<remarks>

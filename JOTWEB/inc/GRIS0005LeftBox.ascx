@@ -12,12 +12,11 @@
             , ['<%= pnlLeftList.ClientID%>', '<%= LF_SORTING_CODE%>', '<%= LF_FILTER_CODE%>','<%=LF_PARAM_DATA%>']
         ];
        </script>
-        <div class="LF_LEFTBOX" id="LF_LEFTBOX" style="width:24em;" >
+        <div class="LF_LEFTBOX" id="LF_LEFTBOX">
             <div class="button" id="button">
                 <input type="hidden" id="WF_ButtonSel" class="btn-sticky" value="　選　択　"  onclick="ButtonClick('WF_ButtonSel');" />
                 <input type="button" id="WF_ButtonCan" class="btn-sticky" value="閉 じ る"  onclick="ButtonClick('WF_ButtonCan');" />
             </div>
-            <br />
             <asp:MultiView ID="WF_LEFTMView" runat="server">
                 <!-- 　リストボックス　 -->
                 <asp:View id="tabL" runat="server" >
@@ -27,9 +26,10 @@
                 </asp:View>
                 <!-- 　カレンダー　 -->
                 <asp:View id="tabC" runat="server" >
-                <a  style="position:relative;top:-2em; left: 3em; height: 30.5em; width:24.7em;overflow: hidden;">
+                <div id="calWrap" class="calWrap">
+                    <a>
                         <asp:textbox ID="WF_Calendar" runat="server" type="hidden"/>
-                        <div id="dValue" style="position:absolute; visibility:hidden">
+                        <div id="dValue">
 
                         </div> 
                         <table border="0">
@@ -48,7 +48,7 @@
                                             </td> 
                                         </tr>
                                         <tr>
-                                            <td id="altMsg" style="background:rgba(153, 102, 0, 0.3);border-radius:5px;">
+                                            <td id="altMsg">
                                                 <script type="text/JavaScript">
                                                 <!--    
                                                     setAltMsg(firstAltYMD, firstAltMsg);
@@ -61,6 +61,8 @@
                             </tr>
                         </table>
                     </a>
+
+                </div>
                 </asp:View>
                 <!-- 　テーブル　 -->
                 <asp:View id="tabT" runat="server" >

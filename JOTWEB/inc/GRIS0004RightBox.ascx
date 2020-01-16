@@ -16,7 +16,7 @@
                     <asp:View id="RF_VIEW1" runat="server" >
                         <a id="RF_RIGHTBOX_ERROR_REPORT">
                             <span id="RF_ERROR_REPORT" style="position:relative;left:1em;top:2em;" >
-                            <asp:TextBox ID="RF_ERR_REPORT" runat="server" Width="28.4em" Height="16.9em" TextMode="MultiLine"></asp:TextBox>
+                            <asp:TextBox ID="RF_ERR_REPORT" runat="server" Width="23.6em" Height="16.9em" TextMode="MultiLine"></asp:TextBox>
                             </span>
                             <br />
                         </a>

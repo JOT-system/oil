@@ -50,6 +50,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_UORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''pnlHeaderInput コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlHeaderInput As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''TxtOrderStatus コントロール。
     '''</summary>
     '''<remarks>
@@ -255,6 +264,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtActualEmparrDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''pnlSummaryArea コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlSummaryArea As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
     '''TxtHTank_c コントロール。
@@ -975,6 +993,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DTAB_CHANGE_NO As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''hdnDispHeaderItems コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDispHeaderItems As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''Master プロパティ。

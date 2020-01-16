@@ -84,5 +84,9 @@
     <asp:TextBox ID="WF_SEL_CONSIGNEECODE" runat="server"></asp:TextBox>
     <!-- 荷受人名 -->
     <asp:TextBox ID="WF_SEL_CONSIGNEENAME" runat="server"></asp:TextBox>
+    <!-- パターンコード -->
+    <asp:TextBox ID="WF_SEL_PATTERNCODE" runat="server"></asp:TextBox>
+    <!-- パターン名 -->
+    <asp:TextBox ID="WF_SEL_PATTERNNAME" runat="server"></asp:TextBox>
 
 </div>

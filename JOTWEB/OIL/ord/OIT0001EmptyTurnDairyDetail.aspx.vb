@@ -262,7 +262,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         '〇営業所配下情報を取得・設定
-        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
         work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
         work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -270,6 +270,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         work.WF_SEL_BASENAME.Text = WW_GetValue(3)
         work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
         work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+        work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+        work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
 
         '○ 名称設定処理
         '会社コード
@@ -678,7 +680,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         '〇営業所配下情報を取得・設定
-        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
         work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
         work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -686,6 +688,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         work.WF_SEL_BASENAME.Text = WW_GetValue(3)
         work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
         work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+        work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+        work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
 
         'タンク車数の件数カウント用
         Dim intTankCnt As Integer = 0
@@ -715,7 +719,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End Using
 
         '〇画面で設定された油種コードを取得
-        WW_GetValue = {"", "", "", "", "", ""}
+        WW_GetValue = {"", "", "", "", "", "", "", ""}
         Dim arrTankCode(intTankCnt) As String
         Dim arrTankName(intTankCnt) As String
         Dim z As Integer = 0
@@ -945,7 +949,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
             '本線列車
             Case "TxtHeadOfficeTrain"
-                Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
                 'WW_FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
@@ -999,7 +1003,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Protected Sub WF_ButtonSel_Click()
         Dim WW_SelectValue As String = ""
         Dim WW_SelectText As String = ""
-        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
@@ -1635,6 +1639,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                             OIT0001row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text
                             OIT0001row("DETAILNO") = intDetailNo.ToString("000")
                         End If
+                        intDetailNo += 1
                     End If
 
                     '削除対象データと通常データとそれぞれでLINECNTを振り分ける
@@ -1646,7 +1651,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                         OIT0001row("LINECNT") = i        'LINECNT
                     End If
                     'strOrderNoBak = OIT0001row("ORDERNO")
-                    intDetailNo += 1
+                    If OIT0001row("DETAILNO") = intDetailNo Then
+                        intDetailNo += 1
+                    End If
                 Next
             End Using
         Catch ex As Exception
@@ -1895,7 +1902,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Next
             End If
 
-            Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
 
             '○ 項目セット
             ''会社コード
@@ -1983,7 +1990,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End If
 
                 '前回油種名(前回油種コードから油種名を取得し設定)
-                WW_GetValue = {"", "", "", "", "", ""}
+                WW_GetValue = {"", "", "", "", "", "", "", ""}
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", OIT0001INProw("LASTOILCODE"), WW_GetValue)
                 OIT0001INProw("LASTOILNAME") = WW_GetValue(0)
 
@@ -2093,7 +2100,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         '○ 設定項目取得
         '対象フォーム項目取得
         Dim WW_ListValue = Request.Form("txt" & pnlListArea.ID & WF_FIELD.Value & WF_GridDBclick.Text)
-        Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
             Case "TxtOrderOffice"    '受注営業所
@@ -2410,7 +2417,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         'タンク車Noでソートし、重複がないかチェックする。
         OIT0001tbl_dv.Sort = "TANKNO"
         For Each drv As DataRowView In OIT0001tbl_dv
-            If drv("TANKNO") <> "" AndAlso chkTankNo = drv("TANKNO") Then
+            If drv("HIDDEN") <> "1" AndAlso drv("TANKNO") <> "" AndAlso chkTankNo = drv("TANKNO") Then
                 Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 WW_CheckMES1 = "タンク車№重複エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
@@ -2418,7 +2425,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
-            chkTankNo = drv("TANKNO")
+
+            '行削除したデータの場合は退避しない。
+            If drv("HIDDEN") <> "1" Then
+                chkTankNo = drv("TANKNO")
+            End If
         Next
 
         ''(一覧)タンク車No
@@ -2602,7 +2613,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim WW_CheckMES2 As String = ""
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
-        Dim WW_GetValue = {"", "", "", "", "", ""}
+        Dim WW_GetValue = {"", "", "", "", "", "", "", ""}
 
         '前回油種と油種の整合性チェック
         For Each OIT0001row As DataRow In OIT0001tbl.Rows
@@ -2713,6 +2724,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 & " , ISNULL(RTRIM(VIW0001.VALUE4), '   ')   AS VALUE4" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE5), '   ')   AS VALUE5" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE6), '   ')   AS VALUE6" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE7), '   ')   AS VALUE7" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE8), '   ')   AS VALUE8" _
                 & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
@@ -2766,6 +2779,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                         O_VALUE(3) = OIT0001WKrow("VALUE4")
                         O_VALUE(4) = OIT0001WKrow("VALUE5")
                         O_VALUE(5) = OIT0001WKrow("VALUE6")
+                        O_VALUE(6) = OIT0001WKrow("VALUE7")
+                        O_VALUE(7) = OIT0001WKrow("VALUE8")
                     Next
                 End If
             End Using
@@ -2873,13 +2888,13 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    UPDATE OIL.OIT0002_ORDER" _
             & "    SET" _
             & "        OFFICECODE      = @P04    , OFFICENAME     = @P05" _
-            & "        , TRAINNO       = @P02" _
+            & "        , TRAINNO       = @P02    , ORDERTYPE      = @P06" _
             & "        , SHIPPERSCODE  = @P07    , SHIPPERSNAME   = @P08" _
             & "        , BASECODE      = @P09    , BASENAME       = @P10" _
             & "        , CONSIGNEECODE = @P11    , CONSIGNEENAME  = @P12" _
             & "        , DEPSTATION    = @P13    , DEPSTATIONNAME = @P14" _
             & "        , ARRSTATION    = @P15    , ARRSTATIONNAME = @P16" _
-            & "        , ORDERINFO     = @P22" _
+            & "        , ORDERINFO     = @P22    , STACKINGFLG    = @P92" _
             & "        , LODDATE       = @P24    , DEPDATE        = @P25" _
             & "        , ARRDATE       = @P26    , ACCDATE        = @P27" _
             & "        , UPDYMD        = @P87    , UPDUSER        = @P88" _
@@ -2892,7 +2907,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME   , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION     , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , RETSTATION   , RETSTATIONNAME  , CANGERETSTATION, CHANGEARRSTATIONNAME, ORDERSTATUS" _
-            & "        , ORDERINFO    , USEPROPRIETYFLG , LODDATE        , DEPDATE             , ARRDATE" _
+            & "        , ORDERINFO    , STACKINGFLG     , USEPROPRIETYFLG, LODDATE             , DEPDATE    , ARRDATE" _
             & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE  , ACTUALDEPDATE       , ACTUALARRDATE" _
             & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK          , HTANK               , TTANK" _
             & "        , MTTANK       , KTANK           , K3TANK         , K5TANK              , K10TANK" _
@@ -2913,7 +2928,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
             & "        , @P17, @P18, @P19, @P20, @P21" _
-            & "        , @P22, @P23, @P24, @P25, @P26" _
+            & "        , @P22, @P92, @P23, @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30, @P31" _
             & "        , @P32, @P33, @P34, @P35, @P36" _
             & "        , @P37, @P38, @P39, @P40, @P41" _
@@ -2957,6 +2972,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , CHANGEARRSTATIONNAME" _
             & "    , ORDERSTATUS" _
             & "    , ORDERINFO" _
+            & "    , STACKINGFLG" _
             & "    , USEPROPRIETYFLG" _
             & "    , LODDATE" _
             & "    , DEPDATE" _
@@ -3056,6 +3072,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40) '空車着駅名(変更後)
                 Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 2)  '受注情報
+                Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)         '積込日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)         '発日（予定）
@@ -3126,7 +3143,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA89 As SqlParameter = SQLcmd.Parameters.Add("@P89", SqlDbType.NVarChar, 20) '更新端末
                 Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.DateTime)     '集信日時
 
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 4) '受注№
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
 
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
                     'If Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
@@ -3141,7 +3158,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA03.Value = OIT0001row("ORDERYMD")             '受注登録日
                     PARA04.Value = work.WF_SEL_SALESOFFICECODE.Text   '受注営業所コード
                     PARA05.Value = work.WF_SEL_SALESOFFICE.Text       '受注営業所名
-                    PARA06.Value = ""                                 '受注パターン
+                    PARA06.Value = work.WF_SEL_PATTERNCODE.Text       '受注パターン
                     PARA07.Value = work.WF_SEL_SHIPPERSCODE.Text      '荷主コード
                     PARA08.Value = work.WF_SEL_SHIPPERSNAME.Text      '荷主名
                     PARA09.Value = work.WF_SEL_BASECODE.Text          '基地コード
@@ -3185,7 +3202,8 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     End If
 
-                    PARA23.Value = "0"                                '利用可否フラグ(0:利用可能)
+                    PARA92.Value = "2"                                '利用可否フラグ(2:積置なし)
+                    PARA23.Value = "1"                                '利用可否フラグ(1:利用可能)
                     PARA24.Value = TxtLoadingDate.Text                '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                    '発日（予定）
                     PARA26.Value = TxtArrDate.Text                    '積車着日（予定）
@@ -3345,18 +3363,24 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO     , DETAILNO        , TANKNO     , KAMOKU" _
-            & "        , SHIPPERSCODE, SHIPPERSNAME    , OILCODE" _
-            & "        , CARSNUMBER  , RETURNDATETRAIN , JOINT      , SALSE        , SALSETAX" _
-            & "        , TOTALSALSE  , PAYMENT         , PAYMENTTAX , TOTALPAYMENT , DELFLG" _
-            & "        , INITYMD     , INITUSER        , INITTERMID" _
-            & "        , UPDYMD      , UPDUSER         , UPDTERMID  , RECEIVEYMD)" _
+            & "        ( ORDERNO         , DETAILNO            , TANKNO             , KAMOKU" _
+            & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE" _
+            & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINT" _
+            & "        , CHANGETRAINNO   , SECONDCONSIGNEECODE , SECONDCONSIGNEENAME" _
+            & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CANGERETSTATION    , CHANGEARRSTATIONNAME" _
+            & "        , SALSE           , SALSETAX" _
+            & "        , TOTALSALSE      , PAYMENT             , PAYMENTTAX         , TOTALPAYMENT" _
+            & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
+            & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P03, @P04" _
             & "        , @P23, @P24, @P05" _
-            & "        , @P06, @P07, @P08, @P09, @P10" _
-            & "        , @P11, @P12, @P13, @P14, @P15" _
-            & "        , @P16, @P17, @P18" _
+            & "        , @P06, @P25, @P07, @P08" _
+            & "        , @P26, @P27, @P28" _
+            & "        , @P29, @P30, @P31, @P32" _
+            & "        , @P09, @P10" _
+            & "        , @P11, @P12, @P13, @P14" _
+            & "        , @P15, @P16, @P17, @P18" _
             & "        , @P19, @P20, @P21, @P22) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
@@ -3377,8 +3401,16 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , SHIPPERSNAME" _
             & "    , OILCODE" _
             & "    , CARSNUMBER" _
+            & "    , CARSAMOUNT" _
             & "    , RETURNDATETRAIN" _
             & "    , JOINT" _
+            & "    , CHANGETRAINNO" _
+            & "    , SECONDCONSIGNEECODE" _
+            & "    , SECONDCONSIGNEENAME" _
+            & "    , SECONDARRSTATION" _
+            & "    , SECONDARRSTATIONNAME" _
+            & "    , CANGERETSTATION" _
+            & "    , CHANGEARRSTATIONNAME" _
             & "    , SALSE" _
             & "    , SALSETAX" _
             & "    , TOTALSALSE" _
@@ -3412,8 +3444,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 4)   '油種コード
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 4)   '本線列車（変更後）
+                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 10)  '第2荷受人コード
+                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.NVarChar, 40)  '第2荷受人名
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 7)   '第2着駅コード
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 40)  '第2着駅名
+                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 7)   '空車着駅コード（変更後）
+                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 40)  '空車着駅名（変更後）
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Int)           '売上金額
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Int)           '売上消費税額
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Int)           '売上合計金額
@@ -3450,12 +3490,20 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA24.Value = OIT0001row("SHIPPERSNAME")         '荷主名
                     PARA05.Value = OIT0001row("OILCODE")              '油種コード
                     PARA06.Value = "1"                                '車数
+                    PARA25.Value = "0"                                '数量
                     If OIT0001row("RETURNDATETRAIN") <> "" Then
                         PARA07.Value = OIT0001row("RETURNDATETRAIN")  '返送日列車
                     Else
                         PARA07.Value = DBNull.Value
                     End If
                     PARA08.Value = OIT0001row("JOINT")                'ジョイント
+                    PARA26.Value = ""                                 '本線列車（変更後）
+                    PARA27.Value = ""                                 '第2荷受人コード
+                    PARA28.Value = ""                                 '第2荷受人名
+                    PARA29.Value = ""                                 '第2着駅コード
+                    PARA30.Value = ""                                 '第2着駅名
+                    PARA31.Value = ""                                 '空車着駅コード（変更後）
+                    PARA32.Value = ""                                 '空車着駅名（変更後）
                     PARA09.Value = "0"                                '売上金額
                     PARA10.Value = "0"                                '売上消費税額
                     PARA11.Value = "0"                                '売上合計金額

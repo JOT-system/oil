@@ -8,7 +8,7 @@
 <%@ Register Src="~/OIL/inc/OIM0004WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content id="OIM0004SH" contentplaceholderid="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIM0004S.css")%>' rel="stylesheet" type="text/css" />
+    <!-- <link href='<%=ResolveUrl("~/OIL/css/OIM0004S.css")%>' rel="stylesheet" type="text/css" /> -->
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0004S.js")%>'></script>
 </asp:Content>
 
@@ -16,53 +16,100 @@
     <!-- 全体レイアウト　searchbox -->
     <div class="searchbox" id="searchbox">
         <!-- ○ 固定項目 ○ -->
-        <a style="position:fixed;top:2.8em;left:62.5em;">
-            <input type="button" id="WF_ButtonDO" class="btn-sticky" value="検索"  style="Width:5em" onclick="ButtonClick('WF_ButtonDO');" />
-        </a>
-        <a style="position:fixed;top:2.8em;left:67em;">
-            <input type="button" id="WF_ButtonEND" class="btn-sticky" value="終了"  style="Width:5em" onclick="ButtonClick('WF_ButtonEND');" />
-        </a>
+        <div class="actionButtonBox">
+            <div class="leftSide"></div>
+            <div class="rightSide">
+                <input type="button" id="WF_ButtonDO" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonDO');" />
+                <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
+            </div>
+        </div> <!-- End actionButtonBox -->
 
         <!-- ○ 変動項目 ○ -->
+        <div class="inputBox">
+            <!-- 会社コード -->
+            <div class="inputItem" style="display:none">
+                <a id="WF_CAMPCODE_LABEL" class="requiredMark">会社コード</a>
+                <a class="ef" id="WF_CAMPCODE_CODE" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+                    <asp:TextBox ID="WF_CAMPCODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox>
+                </a>
+                <a id="WF_CAMPCODE_NAME">
+                    <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+
+            <!-- 運用部署 -->
+            <div class="inputItem">
+                <a id="WF_UORG_LABEL" class="requiredMark" style="display:none">運用部署</a>
+                <a class="ef" id="WF_UORG_CODE" style="display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
+                    <asp:TextBox ID="WF_UORG" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                </a>
+                <a id="WF_UORG_NAME" style="display:none">
+                    <asp:Label ID="WF_UORG_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+
+            <!-- 貨物駅コード -->
+            <div class="inputItem">
+                <a id="WF_STATIONCODE_LABEL" class="requiredMark">貨物駅コード</a>
+                <a class="ef" id="WF_STATIONCODE" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
+                    <asp:TextBox ID="TxtStationCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="4" placeholder="前方一致で検索"></asp:TextBox>
+                </a>
+                <a id="WF_STATIONCODE_TEXT">
+                    <asp:Label ID="LblStationCode" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+
+            <!-- 貨物コード枝番 -->
+            <div class="inputItem">
+                <a id="WF_BRANCH_LABEL">貨物コード枝番</a>
+                <a class="ef" id="WF_BRANCH">
+                    <asp:TextBox ID="TxtBranch" runat="server" CssClass="" onblur="MsgClear();" MaxLength="3"></asp:TextBox>
+                </a>
+                <a id="WF_BRANCH_TEXT">
+                    <asp:Label ID="LblBranch" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+
+        </div> <!-- End inputBox -->
+
         <!-- 会社コード -->
-        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;display:none">会社コード</a>
+<%--        <a style="position:fixed; top:7.7em; left:4em; font-weight:bold; text-decoration:underline;display:none">会社コード</a>
         <a style="position:fixed; top:7.7em; left:18em;display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
             <asp:TextBox ID="WF_CAMPCODE" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:7.7em; left:27em;display:none">
             <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
-        </a>
+        </a>--%>
         <!-- 運用部署 -->
-        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;display:none">運用部署</a>
+<%--        <a style="position:fixed; top:9.9em; left:4em; font-weight:bold; text-decoration:underline;display:none">運用部署</a>
 
         <a style="position:fixed; top:9.9em; left:18em;display:none" ondblclick="Field_DBclick('WF_UORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_UORG');">
             <asp:TextBox ID="WF_UORG" runat="server" Height="1.4em" Width="10em" onblur="MsgClear();"></asp:TextBox>
         </a>
         <a style="position:fixed; top:9.9em; left:27em;display:none">
             <asp:Label ID="WF_UORG_TEXT" runat="server" Width="17em" CssClass="WF_TEXT"></asp:Label>
-        </a>
+        </a>--%>
         <!-- 貨物駅コード -->
-        <a id="WF_STATIONCODE_LABEL" class="requiredMark">貨物駅コード</a>
+<%--        <a id="WF_STATIONCODE_LABEL" class="requiredMark">貨物駅コード</a>
 
         <a id="WF_STATIONCODE_ICON" onclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);">
             <asp:Image runat="server" ImageUrl="../img/leftbox.png"/>
         </a>
         <a class="ef" id="WF_STATIONCODE" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
-            <%--<asp:TextBox CssClass="BoxIcon" ID="TxtStationCode" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>--%>
             <asp:TextBox ID="TxtStationCode" runat="server" onblur="MsgClear();" MaxLength="4" placeholder="前方一致で検索"></asp:TextBox>
         </a>
         <a  id="WF_STATIONCODE_TEXT">
             <asp:Label ID="LblStationCode" runat="server" CssClass="WF_TEXT"></asp:Label>
-        </a>
+        </a>--%>
         <!-- 貨物コード枝番 -->
-        <a id="WF_BRANCH_LABEL">貨物コード枝番</a>
+<%--        <a id="WF_BRANCH_LABEL">貨物コード枝番</a>
         <a class="ef" id="WF_BRANCH" onchange="TextBox_change('TxtStationCode');">
             <asp:TextBox ID="TxtBranch" runat="server" onblur="MsgClear();" MaxLength="3"></asp:TextBox>
         </a>
         <a id="WF_BRANCH_TEXT">
             <asp:Label ID="LblBranch" runat="server" CssClass="WF_TEXT"></asp:Label>
-        </a>
-    </div>
+        </a>--%>
+    </div> <!-- End searchbox -->
 
     <!-- rightbox レイアウト -->
     <MSINC:rightview id="rightview" runat="server" />

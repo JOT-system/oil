@@ -683,7 +683,7 @@ Public Class OIT0003OrderDetail
             & " SELECT" _
             & "   0                                                             AS LINECNT" _
             & " , ''                                                            AS OPERATION" _
-            & " , CAST(OIT0004.UPDTIMSTP AS bigint)                             AS TIMSTP" _
+            & " , 0                             AS TIMSTP" _
             & " , 1                                                             AS 'SELECT'" _
             & " , 0                                                             AS HIDDEN" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _

@@ -90,18 +90,6 @@ Public Class OIS0001UserList
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                             WF_FILEUPLOAD()
-                        Case "WF_UPDATE"                '表更新ボタン押下
-                            WF_UPDATE_Click()
-                        Case "WF_CLEAR"                 'クリアボタン押下
-                            WF_CLEAR_Click()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
-                            WF_FIELD_DBClick()
-                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
-                            WF_ButtonSel_Click()
-                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
-                            WF_ButtonCan_Click()
-                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
-                            WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -197,76 +185,6 @@ Public Class OIS0001UserList
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIS0001C Then
             Master.RecoverTable(OIS0001tbl, work.WF_SEL_INPTBL.Text)
         End If
-
-        '○ 名称設定処理
-        '選択行
-        WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
-
-        'ユーザID
-        WF_USERID.Text = work.WF_SEL_USERID.Text
-
-        '社員名（短）
-        WF_STAFFNAMES.Text = work.WF_SEL_STAFFNAMES.Text
-
-        '社員名（長）
-        WF_STAFFNAMEL.Text = work.WF_SEL_STAFFNAMEL.Text
-
-        '画面ＩＤ
-        WF_MAPID.Text = work.WF_SEL_MAPID.Text
-
-        'パスワード
-        WF_PASSWORD.Text = work.WF_SEL_PASSWORD.Text
-        WF_PASSWORD.Attributes("Value") = work.WF_SEL_PASSWORD.Text
-
-        '誤り回数
-        WF_MISSCNT.Text = work.WF_SEL_MISSCNT.Text
-
-        'パスワード有効期限
-        WF_PASSENDYMD.Text = work.WF_SEL_PASSENDYMD.Text
-
-        '開始年月日
-        WF_STYMD.Text = work.WF_SEL_STYMD.Text
-
-        '終了年月日
-        WF_ENDYMD.Text = work.WF_SEL_ENDYMD.Text
-
-        '会社コード
-        WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text
-        CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
-
-        '組織コード
-        WF_ORG.Text = work.WF_SEL_ORG.Text
-        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)
-
-        'メールアドレス
-        WF_EMAIL.Text = work.WF_SEL_EMAIL.Text
-
-        'メニュー表示制御ロール
-        WF_MENUROLE.Text = work.WF_SEL_MENUROLE.Text
-        CODENAME_get("MENU", WF_MENUROLE.Text, WF_MENUROLE_TEXT.Text, WW_DUMMY)
-
-        '画面参照更新制御ロール
-        WF_MAPROLE.Text = work.WF_SEL_MAPROLE.Text
-        CODENAME_get("MAP", WF_MAPROLE.Text, WF_MAPROLE_TEXT.Text, WW_DUMMY)
-
-        '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = work.WF_SEL_VIEWPROFID.Text
-        CODENAME_get("VIEW", WF_VIEWPROFID.Text, WF_VIEWPROFID_TEXT.Text, WW_DUMMY)
-
-        'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = work.WF_SEL_RPRTPROFID.Text
-        CODENAME_get("XML", WF_RPRTPROFID.Text, WF_RPRTPROFID_TEXT.Text, WW_DUMMY)
-
-        '画面初期値ロール
-        WF_VARIANT.Text = work.WF_SEL_VARIANT.Text
-
-        '承認権限ロール
-        WF_APPROVALID.Text = work.WF_SEL_APPROVALID.Text
-        CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
-
-        '削除
-        WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
     End Sub
 
@@ -529,84 +447,64 @@ Public Class OIS0001UserList
     Protected Sub WF_ButtonINSERT_Click()
 
         '選択行
-        WF_Sel_LINECNT.Text = ""
         work.WF_SEL_LINECNT.Text = ""
 
         'ユーザID
-        WF_USERID.Text = ""
         work.WF_SEL_USERID.Text = ""
 
         '社員名（短）
-        WF_STAFFNAMES.Text = ""
         work.WF_SEL_STAFFNAMES.Text = ""
 
         '社員名（長）
-        WF_STAFFNAMEL.Text = ""
         work.WF_SEL_STAFFNAMEL.Text = ""
 
         '画面ＩＤ
-        WF_MAPID.Text = ""
         work.WF_SEL_MAPID.Text = ""
 
         'パスワード
-        WF_PASSWORD.Text = ""
         work.WF_SEL_PASSWORD.Text = ""
 
         '誤り回数
-        WF_MISSCNT.Text = "0"
         work.WF_SEL_MISSCNT.Text = "0"
 
         'パスワード有効期限
-        WF_PASSENDYMD.Text = ""
         work.WF_SEL_PASSENDYMD.Text = ""
 
         '開始年月日
-        WF_STYMD.Text = ""
         work.WF_SEL_STYMD2.Text = ""
 
         '終了年月日
-        WF_ENDYMD.Text = ""
         work.WF_SEL_ENDYMD2.Text = ""
 
         '会社コード
-        WF_CAMPCODE.Text = ""
         work.WF_SEL_CAMPCODE2.Text = ""
 
         '組織コード
-        WF_ORG.Text = ""
         work.WF_SEL_ORG2.Text = ""
 
         'メールアドレス
-        WF_EMAIL.Text = ""
         work.WF_SEL_EMAIL.Text = ""
 
         'メニュー表示制御ロール
-        WF_MENUROLE.Text = ""
         work.WF_SEL_MENUROLE.Text = ""
 
         '画面参照更新制御ロール
-        WF_MAPROLE.Text = ""
         work.WF_SEL_MAPROLE.Text = ""
 
         '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = ""
         work.WF_SEL_VIEWPROFID.Text = ""
 
         'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = ""
         work.WF_SEL_RPRTPROFID.Text = ""
 
         '画面初期値ロール
-        WF_VARIANT.Text = ""
         work.WF_SEL_VARIANT.Text = ""
 
         '承認権限ロール
-        WF_APPROVALID.Text = ""
         work.WF_SEL_APPROVALID.Text = ""
 
         '削除
-        WF_DELFLG.Text = "0"
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        work.WF_SEL_DELFLG.Text = "0"
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -615,8 +513,6 @@ Public Class OIS0001UserList
         Master.SaveTable(OIS0001tbl)
 
         WF_GridDBclick.Text = ""
-
-        work.WF_SEL_DELFLG.Text = "0"
 
         '○ 遷移先(登録画面)退避データ保存先の作成
         WW_CreateXMLSaveFile()
@@ -1514,84 +1410,63 @@ Public Class OIS0001UserList
         End Try
 
         '選択行
-        WF_Sel_LINECNT.Text = OIS0001tbl.Rows(WW_LINECNT)("LINECNT")
         work.WF_SEL_LINECNT.Text = OIS0001tbl.Rows(WW_LINECNT)("LINECNT")
 
         'ユーザID
-        WF_USERID.Text = OIS0001tbl.Rows(WW_LINECNT)("USERID")
         work.WF_SEL_USERID.Text = OIS0001tbl.Rows(WW_LINECNT)("USERID")
 
         '社員名（短）
-        WF_STAFFNAMES.Text = OIS0001tbl.Rows(WW_LINECNT)("STAFFNAMES")
         work.WF_SEL_STAFFNAMES.Text = OIS0001tbl.Rows(WW_LINECNT)("STAFFNAMES")
 
         '社員名（長）
-        WF_STAFFNAMEL.Text = OIS0001tbl.Rows(WW_LINECNT)("STAFFNAMEL")
         work.WF_SEL_STAFFNAMEL.Text = OIS0001tbl.Rows(WW_LINECNT)("STAFFNAMEL")
 
         '画面ＩＤ
-        WF_MAPID.Text = OIS0001tbl.Rows(WW_LINECNT)("MAPID")
         work.WF_SEL_MAPID.Text = OIS0001tbl.Rows(WW_LINECNT)("MAPID")
 
         'パスワード
-        WF_PASSWORD.Text = OIS0001tbl.Rows(WW_LINECNT)("PASSWORD")
         work.WF_SEL_PASSWORD.Text = OIS0001tbl.Rows(WW_LINECNT)("PASSWORD")
 
         '誤り回数
-        WF_MISSCNT.Text = OIS0001tbl.Rows(WW_LINECNT)("MISSCNT")
         work.WF_SEL_MISSCNT.Text = OIS0001tbl.Rows(WW_LINECNT)("MISSCNT")
 
         'パスワード有効期限
-        WF_PASSENDYMD.Text = OIS0001tbl.Rows(WW_LINECNT)("PASSENDYMD")
         work.WF_SEL_PASSENDYMD.Text = OIS0001tbl.Rows(WW_LINECNT)("PASSENDYMD")
 
         '開始年月日
-        WF_STYMD.Text = OIS0001tbl.Rows(WW_LINECNT)("STYMD")
         work.WF_SEL_STYMD2.Text = OIS0001tbl.Rows(WW_LINECNT)("STYMD")
 
         '終了年月日
-        WF_ENDYMD.Text = OIS0001tbl.Rows(WW_LINECNT)("ENDYMD")
         work.WF_SEL_ENDYMD2.Text = OIS0001tbl.Rows(WW_LINECNT)("ENDYMD")
 
         '会社コード
-        WF_CAMPCODE.Text = OIS0001tbl.Rows(WW_LINECNT)("CAMPCODE")
         work.WF_SEL_CAMPCODE2.Text = OIS0001tbl.Rows(WW_LINECNT)("CAMPCODE")
 
         '組織コード
-        WF_ORG.Text = OIS0001tbl.Rows(WW_LINECNT)("ORG")
         work.WF_SEL_ORG2.Text = OIS0001tbl.Rows(WW_LINECNT)("ORG")
 
         'メールアドレス
-        WF_EMAIL.Text = OIS0001tbl.Rows(WW_LINECNT)("EMAIL")
         work.WF_SEL_EMAIL.Text = OIS0001tbl.Rows(WW_LINECNT)("EMAIL")
 
         'メニュー表示制御ロール
-        WF_MENUROLE.Text = OIS0001tbl.Rows(WW_LINECNT)("MENUROLE")
         work.WF_SEL_MENUROLE.Text = OIS0001tbl.Rows(WW_LINECNT)("MENUROLE")
 
         '画面参照更新制御ロール
-        WF_MAPROLE.Text = OIS0001tbl.Rows(WW_LINECNT)("MAPROLE")
         work.WF_SEL_MAPROLE.Text = OIS0001tbl.Rows(WW_LINECNT)("MAPROLE")
 
         '画面表示項目制御ロール
-        WF_VIEWPROFID.Text = OIS0001tbl.Rows(WW_LINECNT)("VIEWPROFID")
         work.WF_SEL_VIEWPROFID.Text = OIS0001tbl.Rows(WW_LINECNT)("VIEWPROFID")
 
         'エクセル出力制御ロール
-        WF_RPRTPROFID.Text = OIS0001tbl.Rows(WW_LINECNT)("RPRTPROFID")
         work.WF_SEL_RPRTPROFID.Text = OIS0001tbl.Rows(WW_LINECNT)("RPRTPROFID")
 
         '画面初期値ロール
-        WF_VARIANT.Text = OIS0001tbl.Rows(WW_LINECNT)("VARIANT")
         work.WF_SEL_VARIANT.Text = OIS0001tbl.Rows(WW_LINECNT)("VARIANT")
 
         '承認権限ロール
-        WF_APPROVALID.Text = OIS0001tbl.Rows(WW_LINECNT)("APPROVALID")
         work.WF_SEL_APPROVALID.Text = OIS0001tbl.Rows(WW_LINECNT)("APPROVALID")
 
         '削除フラグ
-        WF_DELFLG.Text = OIS0001tbl.Rows(WW_LINECNT)("DELFLG")
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
         work.WF_SEL_DELFLG.Text = OIS0001tbl.Rows(WW_LINECNT)("DELFLG")
 
         '○ 状態をクリア
@@ -1745,6 +1620,13 @@ Public Class OIS0001UserList
             End If
 
             '○ 項目セット
+            '削除フラグ
+            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                OIS0001INProw("DELFLG") = XLSTBLrow("DELFLG")
+            Else
+                OIS0001INProw("DELFLG") = "0"
+            End If
+
             'ユーザID
             If WW_COLUMNS.IndexOf("USERID") >= 0 Then
                 OIS0001INProw("USERID") = XLSTBLrow("USERID")
@@ -1815,13 +1697,6 @@ Public Class OIS0001UserList
                 OIS0001INProw("APPROVALID") = XLSTBLrow("APPROVALID")
             End If
 
-            '削除フラグ
-            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
-                OIS0001INProw("DELFLG") = XLSTBLrow("DELFLG")
-            Else
-                OIS0001INProw("DELFLG") = "0"
-            End If
-
             OIS0001INPtbl.Rows.Add(OIS0001INProw)
         Next
 
@@ -1844,189 +1719,6 @@ Public Class OIS0001UserList
         '○ Close
         CS0023XLSUPLOAD.TBLDATA.Dispose()
         CS0023XLSUPLOAD.TBLDATA.Clear()
-
-    End Sub
-
-
-    ' ******************************************************************************
-    ' ***  詳細表示関連操作                                                      ***
-    ' ******************************************************************************
-
-    ''' <summary>
-    ''' 詳細画面-表更新ボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_UPDATE_Click()
-
-        '○ エラーレポート準備
-        rightview.SetErrorReport("")
-
-        '○ DetailBoxをINPtblへ退避
-        DetailBoxToOIS0001INPtbl(WW_ERR_SW)
-        If Not isNormal(WW_ERR_SW) Then
-            Exit Sub
-        End If
-
-        '○ 項目チェック
-        INPTableCheck(WW_ERR_SW)
-
-        '○ 入力値のテーブル反映
-        If isNormal(WW_ERR_SW) Then
-            OIS0001tbl_UPD()
-        End If
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIS0001tbl)
-
-        '○ 詳細画面初期化
-        If isNormal(WW_ERR_SW) Then
-            DetailBoxClear()
-        End If
-
-        '○ メッセージ表示
-        If WW_ERR_SW = "" Then
-            Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
-        Else
-            If isNormal(WW_ERR_SW) Then
-                Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-            Else
-                Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            End If
-        End If
-
-        '○画面切替設定
-        WF_BOXChange.Value = "headerbox"
-
-    End Sub
-
-    ''' <summary>
-    ''' 詳細画面-テーブル退避
-    ''' </summary>
-    ''' <param name="O_RTN"></param>
-    ''' <remarks></remarks>
-    Protected Sub DetailBoxToOIS0001INPtbl(ByRef O_RTN As String)
-
-        O_RTN = C_MESSAGE_NO.NORMAL
-
-        '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除フラグ
-
-        '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
-        If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
-            String.IsNullOrEmpty(WF_DELFLG.Text) Then
-            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
-
-            CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "non Detail"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
-            CS0011LOGWrite.TEXT = "non Detail"
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
-
-            O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-            Exit Sub
-        End If
-
-        Master.CreateEmptyTable(OIS0001INPtbl)
-        Dim OIS0001INProw As DataRow = OIS0001INPtbl.NewRow
-
-        '○ 初期クリア
-        For Each OIS0001INPcol As DataColumn In OIS0001INPtbl.Columns
-            If IsDBNull(OIS0001INProw.Item(OIS0001INPcol)) OrElse IsNothing(OIS0001INProw.Item(OIS0001INPcol)) Then
-                Select Case OIS0001INPcol.ColumnName
-                    Case "LINECNT"
-                        OIS0001INProw.Item(OIS0001INPcol) = 0
-                    Case "OPERATION"
-                        OIS0001INProw.Item(OIS0001INPcol) = C_LIST_OPERATION_CODE.NODATA
-                    Case "UPDTIMSTP"
-                        OIS0001INProw.Item(OIS0001INPcol) = 0
-                    Case "SELECT"
-                        OIS0001INProw.Item(OIS0001INPcol) = 1
-                    Case "HIDDEN"
-                        OIS0001INProw.Item(OIS0001INPcol) = 0
-                    Case Else
-                        OIS0001INProw.Item(OIS0001INPcol) = ""
-                End Select
-            End If
-        Next
-
-        'LINECNT
-        If WF_Sel_LINECNT.Text = "" Then
-            OIS0001INProw("LINECNT") = 0
-        Else
-            Try
-                Integer.TryParse(WF_Sel_LINECNT.Text, OIS0001INProw("LINECNT"))
-            Catch ex As Exception
-                OIS0001INProw("LINECNT") = 0
-            End Try
-        End If
-
-        OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        OIS0001INProw("UPDTIMSTP") = 0
-        OIS0001INProw("SELECT") = 1
-        OIS0001INProw("HIDDEN") = 0
-
-        OIS0001INProw("USERID") = WF_USERID.Text              'ユーザID
-
-        OIS0001INProw("STAFFNAMES") = WF_STAFFNAMES.Text              '社員名（短）
-
-        OIS0001INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text              '社員名（長）
-
-        OIS0001INProw("MAPID") = WF_MAPID.Text              '画面ＩＤ
-
-        OIS0001INProw("PASSWORD") = WF_PASSWORD.Text              'パスワード
-
-        OIS0001INProw("MISSCNT") = WF_MISSCNT.Text              '誤り回数
-
-        OIS0001INProw("PASSENDYMD") = WF_PASSENDYMD.Text              'パスワード有効期限
-
-        OIS0001INProw("STYMD") = WF_STYMD.Text              '開始年月日
-
-        OIS0001INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
-
-        OIS0001INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
-
-        OIS0001INProw("ORG") = WF_ORG.Text              '組織コード
-
-        OIS0001INProw("EMAIL") = WF_EMAIL.Text              'メールアドレス
-
-        OIS0001INProw("MENUROLE") = WF_MENUROLE.Text              'メニュー表示制御ロール
-
-        OIS0001INProw("MAPROLE") = WF_MAPROLE.Text              '画面参照更新制御ロール
-
-        OIS0001INProw("VIEWPROFID") = WF_VIEWPROFID.Text              '画面表示項目制御ロール
-
-        OIS0001INProw("RPRTPROFID") = WF_RPRTPROFID.Text              'エクセル出力制御ロール
-
-        OIS0001INProw("VARIANT") = WF_VARIANT.Text              '画面初期値ロール
-
-        OIS0001INProw("APPROVALID") = WF_APPROVALID.Text              '承認権限ロール
-
-        '○ チェック用テーブルに登録する
-        OIS0001INPtbl.Rows.Add(OIS0001INProw)
-
-    End Sub
-
-
-    ''' <summary>
-    ''' 詳細画面-クリアボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_CLEAR_Click()
-
-        '○ 詳細画面初期化
-        DetailBoxClear()
-
-        '○ メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_CLEAR_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-        '○画面切替設定
-        WF_BOXChange.Value = "headerbox"
-
-        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        WF_FIELD.Value = ""
-        WF_FIELD_REP.Value = ""
-        WF_LeftboxOpen.Value = ""
 
     End Sub
 
@@ -2064,209 +1756,7 @@ Public Class OIS0001UserList
         '○ 画面表示データ保存
         Master.SaveTable(OIS0001tbl)
 
-        WF_Sel_LINECNT.Text = ""            'LINECNT
-
-        WF_USERID.Text = ""            'ユーザID
-        WF_STAFFNAMES.Text = ""            '社員名（短）
-        WF_STAFFNAMEL.Text = ""            '社員名（長）
-        WF_MAPID.Text = ""            '画面ＩＤ
-        WF_PASSWORD.Text = ""            'パスワード
-        WF_MISSCNT.Text = ""            '誤り回数
-        WF_PASSENDYMD.Text = ""            'パスワード有効期限
-        WF_STYMD.Text = ""            '開始年月日
-        WF_ENDYMD.Text = ""            '終了年月日
-        WF_CAMPCODE.Text = ""            '会社コード
-        WF_ORG.Text = ""            '組織コード
-        WF_EMAIL.Text = ""            'メールアドレス
-        WF_MENUROLE.Text = ""            'メニュー表示制御ロール
-        WF_MAPROLE.Text = ""            '画面参照更新制御ロール
-        WF_VIEWPROFID.Text = ""            '画面表示項目制御ロール
-        WF_RPRTPROFID.Text = ""            'エクセル出力制御ロール
-        WF_VARIANT.Text = ""            '画面初期値ロール
-        WF_APPROVALID.Text = ""            '承認権限ロール
-        WF_DELFLG.Text = ""                 '削除フラグ
-        WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
-
     End Sub
-
-
-    ''' <summary>
-    ''' フィールドダブルクリック時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_FIELD_DBClick()
-
-        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
-            Try
-                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
-            Catch ex As Exception
-                Exit Sub
-            End Try
-
-            With leftview
-                Select Case WF_LeftMViewChange.Value
-                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
-                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
-                        Select Case WF_FIELD.Value
-                            Case "WF_PASSENDYMD"         'パスワード有効期限
-                                .WF_Calendar.Text = WF_PASSENDYMD.Text
-                            Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_STYMD.Text
-                            Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_ENDYMD.Text
-                        End Select
-                        .ActiveCalendar()
-
-                    Case Else
-                        '以外
-                        Dim prmData As New Hashtable
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
-
-                        'フィールドによってパラメータを変える
-                        Select Case WF_FIELD.Value
-                            Case "WF_ORG"       '組織コード
-                                prmData = work.CreateORGParam(WF_CAMPCODE.Text, 0)
-                            Case "WF_MENUROLE"       'メニュー表示制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_MAPROLE"       '画面参照更新制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_VIEWPROFID"       '画面表示項目制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_RPRTPROFID"       'エクセル出力制御ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                            Case "WF_APPROVALID"       '承認権限ロール
-                                prmData = work.CreateFIXParam(WF_CAMPCODE.Text)
-                        End Select
-
-                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                        .ActiveListBox()
-                End Select
-            End With
-        End If
-
-    End Sub
-
-
-    ' ******************************************************************************
-    ' ***  leftBOX関連操作                                                       ***
-    ' ******************************************************************************
-
-    ''' <summary>
-    ''' LeftBox選択時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonSel_Click()
-
-        Dim WW_SelectValue As String = ""
-        Dim WW_SelectText As String = ""
-
-        '○ 選択内容を取得
-        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
-        End If
-
-        '○ 選択内容を画面項目へセット
-        If WF_FIELD_REP.Value = "" Then
-            Select Case WF_FIELD.Value
-                Case "WF_DELFLG"            '削除フラグ
-                    WF_DELFLG.Text = WW_SelectValue
-                    WF_DELFLG_TEXT.Text = WW_SelectText
-                    WF_DELFLG.Focus()
-
-                Case "WF_PASSENDYMD"             'パスワード有効期限
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_PASSENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_PASSENDYMD.Focus()
-
-                Case "WF_STYMD"             '有効年月日(From)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_STYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_STYMD.Focus()
-
-                Case "WF_ENDYMD"            '有効年月日(To)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(WW_SelectValue, WW_DATE)
-                        WF_ENDYMD.Text = WW_DATE.ToString("yyyy/MM/dd")
-                    Catch ex As Exception
-                    End Try
-                    WF_ENDYMD.Focus()
-
-                Case "WF_ORG"               '組織コード
-                    WF_ORG.Text = WW_SelectValue
-                    WF_ORG_TEXT.Text = WW_SelectText
-                    WF_ORG.Focus()
-
-                Case "WF_MENUROLE"               'メニュー表示制御ロール
-                    WF_MENUROLE.Text = WW_SelectValue
-                    WF_MENUROLE_TEXT.Text = WW_SelectText
-                    WF_MENUROLE.Focus()
-
-                Case "WF_MAPROLE"               '画面参照更新制御ロール
-                    WF_MAPROLE.Text = WW_SelectValue
-                    WF_MAPROLE_TEXT.Text = WW_SelectText
-                    WF_MAPROLE.Focus()
-
-                Case "WF_VIEWPROFID"               '画面表示項目制御ロール
-                    WF_VIEWPROFID.Text = WW_SelectValue
-                    WF_VIEWPROFID_TEXT.Text = WW_SelectText
-                    WF_VIEWPROFID.Focus()
-
-                Case "WF_RPRTPROFID"               'エクセル出力制御ロール
-                    WF_RPRTPROFID.Text = WW_SelectValue
-                    WF_RPRTPROFID_TEXT.Text = WW_SelectText
-                    WF_RPRTPROFID.Focus()
-
-                Case "WF_APPROVALID"               '承認権限ロール
-                    WF_APPROVALID.Text = WW_SelectValue
-                    WF_APPROVALID_TEXT.Text = WW_SelectText
-                    WF_APPROVALID.Focus()
-            End Select
-        Else
-        End If
-
-        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        WF_FIELD.Value = ""
-        WF_FIELD_REP.Value = ""
-        WF_LeftboxOpen.Value = ""
-        WF_RightboxOpen.Value = ""
-
-    End Sub
-
-    ''' <summary>
-    ''' LeftBoxキャンセルボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonCan_Click()
-
-        '○ フォーカスセット
-        If WF_FIELD_REP.Value = "" Then
-            Select Case WF_FIELD.Value
-                '削除フラグ
-                Case "WF_DELFLG"
-                    WF_DELFLG.Focus()
-            End Select
-        Else
-        End If
-
-        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        WF_FIELD.Value = ""
-        WF_FIELD_REP.Value = ""
-        WF_LeftboxOpen.Value = ""
-        WF_RightboxOpen.Value = ""
-
-    End Sub
-
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
@@ -2422,68 +1912,68 @@ Public Class OIS0001UserList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '誤り回数(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "MISSCNT", OIS0001INProw("MISSCNT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'If OIS0001INProw("MISSCNT") <> "" Then
-                'CODENAME_get("MISSCNT", OIS0001INProw("MISSCNT"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(誤り回数入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(誤り回数入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''誤り回数(バリデーションチェック）
+            'Master.CheckField(Master.USERCAMP, "MISSCNT", OIS0001INProw("MISSCNT"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If isNormal(WW_CS0024FCHECKERR) Then
+            '    ''値存在チェック
+            '    'If OIS0001INProw("MISSCNT") <> "" Then
+            '    'CODENAME_get("MISSCNT", OIS0001INProw("MISSCNT"), WW_DUMMY, WW_RTN_SW)
+            '    'If Not isNormal(WW_RTN_SW) Then
+            '    '    WW_CheckMES1 = "・更新できないレコード(誤り回数入力エラー)です。"
+            '    '    WW_CheckMES2 = "マスタに存在しません。"
+            '    '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+            '    '    WW_LINE_ERR = "ERR"
+            '    '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            '    'End If
+            '    'End If
+            'Else
+            '    WW_CheckMES1 = "・更新できないレコード(誤り回数入力エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            'パスワード(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "PASSWORD", OIS0001INProw("PASSWORD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                ''値存在チェック
-                'CODENAME_get("PASSWORD", OIS0001INProw("PASSWORD"), WW_DUMMY, WW_RTN_SW)
-                'If Not isNormal(WW_RTN_SW) Then
-                '    WW_CheckMES1 = "・更新できないレコード(パスワード入力エラー)です。"
-                '    WW_CheckMES2 = "マスタに存在しません。"
-                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                '    WW_LINE_ERR = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(パスワード入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''パスワード(バリデーションチェック）
+            'Master.CheckField(Master.USERCAMP, "PASSWORD", OIS0001INProw("PASSWORD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If isNormal(WW_CS0024FCHECKERR) Then
+            '    ''値存在チェック
+            '    'CODENAME_get("PASSWORD", OIS0001INProw("PASSWORD"), WW_DUMMY, WW_RTN_SW)
+            '    'If Not isNormal(WW_RTN_SW) Then
+            '    '    WW_CheckMES1 = "・更新できないレコード(パスワード入力エラー)です。"
+            '    '    WW_CheckMES2 = "マスタに存在しません。"
+            '    '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+            '    '    WW_LINE_ERR = "ERR"
+            '    '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            '    'End If
+            'Else
+            '    WW_CheckMES1 = "・更新できないレコード(パスワード入力エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            'パスワード有効期限(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "PASSENDYMD", OIS0001INProw("PASSENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                '年月日チェック
-                WW_CheckDate(OIS0001INProw("PASSENDYMD"), "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・更新できないレコード(パスワード有効期限エラー)です。"
-                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    O_RTN = "ERR"
-                    Exit Sub
-                Else
-                    OIS0001INProw("PASSENDYMD") = CDate(OIS0001INProw("PASSENDYMD")).ToString("yyyy/MM/dd")
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(パスワード有効期限エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
-                WW_LINE_ERR = "ERR"
-            End If
+            ''パスワード有効期限(バリデーションチェック）
+            'Master.CheckField(Master.USERCAMP, "PASSENDYMD", OIS0001INProw("PASSENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If isNormal(WW_CS0024FCHECKERR) Then
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            '    '年月日チェック
+            '    WW_CheckDate(OIS0001INProw("PASSENDYMD"), "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・更新できないレコード(パスワード有効期限エラー)です。"
+            '        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '        O_RTN = "ERR"
+            '        Exit Sub
+            '    Else
+            '        OIS0001INProw("PASSENDYMD") = CDate(OIS0001INProw("PASSENDYMD")).ToString("yyyy/MM/dd")
+            '    End If
+            'Else
+            '    WW_CheckMES1 = "・更新できないレコード(パスワード有効期限エラー)です。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+            '    WW_LINE_ERR = "ERR"
+            'End If
 
             '開始年月日(バリデーションチェック）
             Master.CheckField(Master.USERCAMP, "STYMD", OIS0001INProw("STYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -3010,7 +2500,7 @@ Public Class OIS0001UserList
                 Case "ORG"         '組織コード
                     Dim AUTHORITYALL_FLG As String = "0"
                     If Master.USER_ORG = CONST_ORGCODE_INFOSYS Or CONST_ORGCODE_OIL Then   '情報システムか石油部の場合
-                        If WF_CAMPCODE.Text = "" Then '会社コードが空の場合
+                        If work.WF_SEL_CAMPCODE2.Text = "" Then '会社コードが空の場合
                             AUTHORITYALL_FLG = "1"
                         Else '会社コードに入力済みの場合
                             AUTHORITYALL_FLG = "2"

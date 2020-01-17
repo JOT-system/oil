@@ -23,12 +23,6 @@
             <div class="Operation">
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <!-- 会社 -->
-                        <a style="display:none;">
-                            <asp:Label ID="WF_SEL_CAMPCODE" runat="server" Text="会社" Font-Bold="True" Font-Underline="false" Visible="false"></asp:Label>
-                            <asp:Label ID="WF_SEL_CAMPNAME" runat="server" Width="12em" CssClass="WF_TEXT_LEFT" Visible="false"></asp:Label>
-                        </a>
-
                         <!-- 一覧件数 -->
                         <asp:Label ID="WF_ListCNT" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
                     </div>

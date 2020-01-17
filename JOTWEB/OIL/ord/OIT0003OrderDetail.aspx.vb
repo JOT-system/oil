@@ -159,10 +159,13 @@ Public Class OIT0003OrderDetail
     Protected Sub Initialize()
 
         '○画面ID設定
+        Master.MAPID = OIT0003WRKINC.MAPIDD
         If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.MENU Then
-            Master.MAPID = OIT0003WRKINC.MAPIDD
+            'Master.MAPID = OIT0003WRKINC.MAPIDD
+            work.WF_SEL_MAPIDBACKUP.Text = OIT0003WRKINC.MAPIDD
         Else
-            Master.MAPID = OIT0003WRKINC.MAPIDD + "MAIN"
+            'Master.MAPID = OIT0003WRKINC.MAPIDD + "MAIN"
+            work.WF_SEL_MAPIDBACKUP.Text = OIT0003WRKINC.MAPIDD + "MAIN"
         End If
 
         '○HELP表示有無設定
@@ -215,7 +218,12 @@ Public Class OIT0003OrderDetail
         Master.CreateXMLSaveFile()
 
         'ステータス
+        If work.WF_SEL_ORDERSTATUSNM.Text = "" Then
+            work.WF_SEL_ORDERSTATUS.Text = "100"
+            work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
+        End If
         TxtOrderStatus.Text = work.WF_SEL_ORDERSTATUSNM.Text
+
         '情報
         TxtOrderInfo.Text = work.WF_SEL_INFORMATIONNM.Text
         '###################################################
@@ -333,9 +341,6 @@ Public Class OIT0003OrderDetail
         'A重油(タンク車数)
         TxtATank_w.Text = work.WF_SEL_AHEAVYCH_TANKCAR.Text
 
-        '〇画面表示設定処理
-        WW_ScreenEnabledSet()
-
         '○ 名称設定処理
         '会社コード
         CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
@@ -359,14 +364,42 @@ Public Class OIT0003OrderDetail
     Protected Sub GridViewInitialize()
 
         '登録画面からの遷移の場合はテーブルから取得しない
-        If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.OIT0003D Then
-            '○ 画面表示データ取得
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
+        'If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.MENU Then
+        '    '○ 画面表示データ取得
+        '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+        '        SQLcon.Open()       'DataBase接続
 
-                MAPDataGet(SQLcon, 0)
-            End Using
+        '        MAPDataGet(SQLcon, 0)
+        '    End Using
+        'Else
+        '    work.WF_SEL_CREATEFLG.Text = "1"
+        '    work.WF_SEL_CREATELINKFLG.Text = "1"
+        'End If
+
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then
+            '作成フラグ(新規登録：1, 更新：2)
+            work.WF_SEL_CREATEFLG.Text = "1"
+            '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+            work.WF_SEL_CREATELINKFLG.Text = "1"
+
+            '○ 画面レイアウト設定
+            If Master.VIEWID = "" Then
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "SCREENLAYOUT", Master.MAPID, WW_GetValue)
+
+                Master.VIEWID = WW_GetValue(0)
+            End If
         End If
+
+        '〇画面表示設定処理
+        WW_ScreenEnabledSet()
+
+        '○ 画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGet(SQLcon, 0)
+        End Using
 
         '貨車連結を使用する場合
         If work.WF_SEL_CREATELINKFLG.Text = "2" Then
@@ -440,7 +473,7 @@ Public Class OIT0003OrderDetail
                 & " INSERT INTO OIL.TMP0001ORDER "
 
         '新規登録ボタン押下
-        If work.WF_SEL_CREATEFLG.Text = 1 Then
+        If work.WF_SEL_CREATEFLG.Text = "1" Then
             SQLStr =
               " SELECT TOP (@P00)" _
             & "   0                                              AS LINECNT" _
@@ -472,7 +505,7 @@ Public Class OIT0003OrderDetail
             '    & "    LINECNT"
 
             '明細データダブルクリック
-        ElseIf work.WF_SEL_CREATEFLG.Text = 2 Then
+        ElseIf work.WF_SEL_CREATEFLG.Text = "2" Then
             SQLStr =
                   " SELECT" _
                 & "   0                                                  AS LINECNT" _
@@ -921,6 +954,7 @@ Public Class OIT0003OrderDetail
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
 
+        Master.MAPID = work.WF_SEL_MAPIDBACKUP.Text
         Master.TransitionPrevPage()
 
     End Sub
@@ -958,39 +992,67 @@ Public Class OIT0003OrderDetail
 
                     '荷主名
                     If WF_FIELD.Value = "TxtShippersCode" Then
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtShippersCode.Text)
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtShippersCode.Text)
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtShippersCode.Text)
+                        End If
                     End If
 
                     '荷受人名
                     If WF_FIELD.Value = "TxtConsigneeCode" Then
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtConsigneeCode.Text)
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtConsigneeCode.Text)
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtConsigneeCode.Text)
+                        End If
                     End If
 
                     '本線列車
                     If WF_FIELD.Value = "TxtTrainNo" Then
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtTrainNo.Text)
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtTrainNo.Text)
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtTrainNo.Text)
+                        End If
                     End If
 
                     '発駅
                     If WF_FIELD.Value = "TxtDepstationCode" Then
-                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", TxtDepstationCode.Text)
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "1", TxtDepstationCode.Text)
+                        Else
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", TxtDepstationCode.Text)
+                        End If
                     End If
 
                     '着駅
                     If WF_FIELD.Value = "TxtArrstationCode" Then
-                        prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", TxtArrstationCode.Text)
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "2", TxtArrstationCode.Text)
+                        Else
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", TxtArrstationCode.Text)
+                        End If
                     End If
 
                     '油種
                     If WF_FIELD.Value = "OILNAME" Then
-                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                            'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                        End If
                     End If
 
                     'タンク車№
                     If WF_FIELD.Value = "TANKNO" Then
-                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                        Else
+                            'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                        End If
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -1706,7 +1768,12 @@ Public Class OIT0003OrderDetail
                 '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
                 TxtTrainNo.Text = WW_SelectValue
                 'WW_FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                End If
 
                 '発駅
                 TxtDepstationCode.Text = WW_GetValue(1)
@@ -1717,13 +1784,38 @@ Public Class OIT0003OrderDetail
                 TxtTrainNo.Focus()
 
                 '〇営業所配下情報を取得・設定
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                WW_GetValue = {"", "", "", "", "", "", "", ""}
+
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                End If
+
+                '荷主
+                TxtShippersCode.Text = WW_GetValue(0)
+                LblShippersName.Text = WW_GetValue(1)
+                '荷受人
+                TxtConsigneeCode.Text = WW_GetValue(4)
+                LblConsigneeName.Text = WW_GetValue(5)
+                '受注パターン
+                TxtOrderType.Text = WW_GetValue(7)
+
+                '〇 (予定)の日付を設定
+                TxtLoadingDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtDepDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtArrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtAccDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtEmparrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+
                 work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
                 work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
                 work.WF_SEL_BASECODE.Text = WW_GetValue(2)
                 work.WF_SEL_BASENAME.Text = WW_GetValue(3)
                 work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
                 work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
 
             Case "TxtDepstationCode"        '発駅
                 TxtDepstationCode.Text = WW_SelectValue
@@ -1736,13 +1828,25 @@ Public Class OIT0003OrderDetail
                 TxtArrstationCode.Focus()
 
                 '〇営業所配下情報を取得・設定
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                End If
+                TxtShippersCode.Text = WW_GetValue(0)
+                LblShippersName.Text = WW_GetValue(1)
+                TxtConsigneeCode.Text = WW_GetValue(4)
+                LblConsigneeName.Text = WW_GetValue(5)
+                TxtOrderType.Text = WW_GetValue(7)
+
                 work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
                 work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
                 work.WF_SEL_BASECODE.Text = WW_GetValue(2)
                 work.WF_SEL_BASENAME.Text = WW_GetValue(3)
                 work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
                 work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
 
             Case "TxtLoadingDate"       '(予定)積込日
                 Dim WW_DATE As Date
@@ -2140,8 +2244,32 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     Protected Sub WW_ScreenEnabledSet()
 
+        '〇 タブの使用可否制御
+        If work.WF_SEL_ORDERSTATUS.Text = "100" Then
+            WF_Dtab01.Enabled = True
+            WF_Dtab02.Enabled = False
+            WF_Dtab03.Enabled = False
+            WF_Dtab04.Enabled = False
 
-        WF_Dtab02.Enabled = False
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = "200" _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = "210" _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = "220" _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = "230" _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = "240" _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = "250" _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = "260" Then
+            WF_Dtab01.Enabled = True
+            WF_Dtab02.Enabled = False
+            WF_Dtab03.Enabled = True
+            WF_Dtab04.Enabled = False
+
+        Else
+            WF_Dtab01.Enabled = False
+            WF_Dtab02.Enabled = True
+            WF_Dtab03.Enabled = False
+            WF_Dtab04.Enabled = False
+
+        End If
 
         '○ 油種別タンク車数(車)、積込数量(kl)、計上月、売上金額、支払金額の表示・非表示制御
         '権限コードが更新の場合は表示設定

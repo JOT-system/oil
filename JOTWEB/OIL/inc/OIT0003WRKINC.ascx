@@ -7,6 +7,8 @@
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>
     <!-- 運用部署 -->
     <asp:TextBox ID="WF_SEL_UORG" runat="server"></asp:TextBox>
+    <!-- 営業所コード(検索退避用) -->
+    <asp:TextBox ID="WF_SEL_SALESOFFICECODEMAP" runat="server"></asp:TextBox>
     <!-- 営業所コード -->
     <asp:TextBox ID="WF_SEL_SALESOFFICECODE" runat="server"></asp:TextBox>
     <!-- 営業所名 -->
@@ -223,4 +225,6 @@
     <!-- 基地名 -->
     <asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>
 
+    <!-- MAPID退避(受注明細画面への遷移制御のため) -->
+    <asp:TextBox ID="WF_SEL_MAPIDBACKUP" runat="server"></asp:TextBox>
 </div>

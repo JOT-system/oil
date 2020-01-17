@@ -1152,9 +1152,8 @@ Public Class OIS0001UserCreate
             'パスワード有効期限(バリデーションチェック）
             Master.CheckField(Master.USERCAMP, "PASSENDYMD", OIS0001INProw("PASSENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 '年月日チェック
-                WW_CheckDate(OIS0001INProw("PASSENDYMD"), "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                WW_CheckDate(OIS0001INProw("PASSENDYMD"), "パスワード有効期限", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
                     WW_CheckMES1 = "・更新できないレコード(パスワード有効期限エラー)です。"
                     WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
@@ -1168,6 +1167,7 @@ Public Class OIS0001UserCreate
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                 WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             '開始年月日(バリデーションチェック）

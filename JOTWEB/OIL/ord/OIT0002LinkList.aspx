@@ -23,19 +23,24 @@
             <div class="Operation">
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <!-- ボタン -->
-                        <input type="button" id="WF_ButtonALLSELECT"     class="btn-sticky" value="全選択"   onclick="ButtonClick('WF_ButtonALLSELECT');" />
-                        <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
-                        <input type="button" id="WF_ButtonLINE_LIFTED"   class="btn-sticky" value="行削除"   onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
-                    </div>
 
-                    <div class="rightSide">
-                        <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="更新"     onclick="ButtonClick('WF_ButtonUPDATE');" />
-                        <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
-                        <input type="button" id="WF_ButtonINSERT"        class="btn-sticky" value="新規登録" onclick="ButtonClick('WF_ButtonINSERT');" />
-                        <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
-                        <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   onclick="ButtonClick('WF_ButtonFIRST');"></div>
-                        <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   onclick="ButtonClick('WF_ButtonLAST');"></div>
+                        <a >在庫維持日数</a>
+                        <a class="ef">
+                            <asp:TextBox ID="WF_INVENTORYDAYS" runat="server"onblur="MsgClear();"></asp:TextBox>
+                        </a>
+                        <!-- ボタン -->
+                        <input type="button" id="WF_ButtonAUTOSUGGESTION" class="btn-sticky" value="自動提案"     onclick="ButtonClick('WF_ButtonAUTOSUGGESTION');" />
+                        <input type="button" id="WF_ButtonORDERLIST"      class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
+                        <input type="button" id="WF_ButtonINPUTCLEAR"     class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
+                    </div>                                                
+                                                                          
+                    <div class="rightSide">                               
+                        <input type="button" id="WF_ButtonUPDATE"         class="btn-sticky" value="更新"         onclick="ButtonClick('WF_ButtonUPDATE');" />
+                        <input type="button" id="WF_ButtonCSV"            class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"     onclick="ButtonClick('WF_ButtonCSV');" />
+                        <input type="button" id="WF_ButtonINSERT"         class="btn-sticky" value="新規登録"     onclick="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonEND"            class="btn-sticky" value="戻る"         onclick="ButtonClick('WF_ButtonEND');" />
+                        <div                 id="WF_ButtonFIRST"          class="firstPage"  runat="server"       onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                        <div                 id="WF_ButtonLAST"           class="lastPage"   runat="server"       onclick="ButtonClick('WF_ButtonLAST');"></div>
                     </div>
                 </div> <!-- End class=actionButtonBox -->
             </div> <!-- End class="Operation" -->
@@ -52,7 +57,7 @@
         <MSINC:wrklist ID="work" runat="server" />
 
         <!-- イベント用 -->
-        <div hidden="hidden">
+        <div style="display:none;">
             <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
             <!-- GridView DBクリック-->
             <asp:TextBox ID="WF_GridPosition" Text="" runat="server"></asp:TextBox>

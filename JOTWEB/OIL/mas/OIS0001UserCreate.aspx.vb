@@ -323,7 +323,7 @@ Public Class OIS0001UserCreate
         SQLStr &=
               " ORDER BY" _
             & "    OIS0004.ORG" _
-            & "    , OIS0004.USERID"
+            & "  , OIS0004.USERID"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -386,15 +386,19 @@ Public Class OIS0001UserCreate
             & " FROM" _
             & "    COM.OIS0004_USER" _
             & " WHERE" _
-            & "     USERID      = @P01" _
-            & "    AND STYMD    = @P02"
+            & "     USERID   = @P1" _
+            & " AND STYMD    = @P2" _
+            & " AND DELFLG   = @P3"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20)            'JOT車番
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)            'JOT車番
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20) 'ユーザーID
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20) '利用開始日
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)  '削除フラグ
+
                 PARA1.Value = WF_USERID.Text
                 PARA2.Value = WF_STYMD.Text
+                PARA3.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
@@ -695,17 +699,24 @@ Public Class OIS0001UserCreate
                 Exit Sub
             End Try
 
+            Dim WW_FIELD As String = ""
+            If WF_FIELD_REP.Value = "" Then
+                WW_FIELD = WF_FIELD.Value
+            Else
+                WW_FIELD = WF_FIELD_REP.Value
+            End If
+
             With leftview
                 Select Case WF_LeftMViewChange.Value
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "WF_PASSENDYMD"         'パスワード有効期限
-                                .WF_Calendar.Text = CDate(WF_PASSENDYMD.Text).ToString("yyyy/MM/dd")
+                            Case "WF_PASSENDYMD"    'パスワード有効期限
+                                .WF_Calendar.Text = WF_PASSENDYMD.Text
                             Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = CDate(WF_STYMD.Text).ToString("yyyy/MM/dd")
+                                .WF_Calendar.Text = WF_STYMD.Text
                             Case "WF_ENDYMD"        '有効年月日(To)
-                                .WF_Calendar.Text = CDate(WF_ENDYMD.Text).ToString("yyyy/MM/dd")
+                                .WF_Calendar.Text = WF_ENDYMD.Text
                         End Select
                         .ActiveCalendar()
 

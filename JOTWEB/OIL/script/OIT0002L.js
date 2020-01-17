@@ -57,7 +57,7 @@ function ChangeCheckBox() {
 }
 
 // ○チェックボックス選択
-function SelectCheckBox(lineCnt) {
+function SelectCheckBox(obj, lineCnt) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("WF_SelectedIndex").value = lineCnt

@@ -274,44 +274,6 @@ Public Class OIT0002LinkSearch
             WF_STYMD_CODE.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
         End If
 
-        '終了日
-        ''年月日チェック
-        'If WF_ENDYMD_CODE.Text = "" Then
-        'Else
-        '    WW_CheckDate(WF_ENDYMD_CODE.Text, "利用可能日（終了）", WW_CS0024FCHECKERR, dateErrFlag)
-        '    If dateErrFlag = "1" Then
-        '        WF_ENDYMD_CODE.Focus()
-        '        WW_CheckMES1 = "利用可能日(終了)入力エラー。"
-        '        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    Else
-        '        WF_ENDYMD_CODE.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
-        '    End If
-        'End If
-
-        ''日付大小チェック
-        'If WF_STYMD_CODE.Text <> "" AndAlso WF_ENDYMD_CODE.Text <> "" Then
-        '    Dim WW_DATE_ST As Date
-        '    Dim WW_DATE_END As Date
-        '    Try
-        '        Date.TryParse(WF_STYMD_CODE.Text, WW_DATE_ST)
-        '        Date.TryParse(WF_ENDYMD_CODE.Text, WW_DATE_END)
-
-        '        If WW_DATE_ST > WW_DATE_END Then
-        '            Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-        '            WF_STYMD_CODE.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    Catch ex As Exception
-        '        Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_STYMD_CODE.Text & ":" & WF_ENDYMD_CODE.Text)
-        '        WF_STYMD_CODE.Focus()
-        '        O_RTN = "ERR"
-        '        Exit Sub
-        '    End Try
-        'End If
-
         '本線列車
         If WF_TRAINNO_CODE.Text <> "" Then
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TRAINNO", WF_TRAINNO_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -394,9 +356,7 @@ Public Class OIT0002LinkSearch
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_STYMD"         '有効年月日(From)
-                                .WF_Calendar.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
-                                'Case "WF_ENDYMD"        '有効年月日(To)
-                                '    .WF_Calendar.Text = CDate(WF_ENDYMD_CODE.Text).ToString("yyyy/MM/dd")
+                                .WF_Calendar.Text = WF_STYMD_CODE.Text
                         End Select
                         .ActiveCalendar()
                     Case Else
@@ -483,19 +443,6 @@ Public Class OIT0002LinkSearch
                 Catch ex As Exception
                 End Try
                 WF_STYMD_CODE.Focus()
-
-            'Case "WF_ENDYMD"            '有効年月日(To)
-            '    Dim WW_DATE As Date
-            '    Try
-            '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-            '        If WW_DATE < C_DEFAULT_YMD Then
-            '            WF_ENDYMD_CODE.Text = ""
-            '        Else
-            '            WF_ENDYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-            '        End If
-            '    Catch ex As Exception
-            '    End Try
-            '    WF_ENDYMD_CODE.Focus()
 
             Case "WF_TRAINNO"           '本線列車
                 WF_TRAINNO_CODE.Text = WW_SelectValue
@@ -601,9 +548,6 @@ Public Class OIT0002LinkSearch
                 Case "RETSTATION"       '空車着駅（発駅）
                     prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "STATIONPATTERN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                    'Case "TRAINNO"           '本線列車
-                    '    prmData = work.CreateFIXParam(WF_ORG.Text, "TRAINNUMBER")
-                    '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

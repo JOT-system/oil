@@ -468,8 +468,8 @@ Public Class OIM0005TankCreate
               " WHERE OIM0005.DELFLG      <> @P3"
         Else
             SQLStr &=
-              " WHERE OIM0005.TANKNUMBER = @P1" _
-            & "   OR OIM0005.MODEL = @P2" _
+              " WHERE (OIM0005.TANKNUMBER = @P1" _
+            & "   OR OIM0005.MODEL = @P2)" _
             & "   AND OIM0005.DELFLG      <> @P3"
         End If
 
@@ -530,12 +530,15 @@ Public Class OIM0005TankCreate
             & " FROM" _
             & "    OIL.OIM0005_TANK" _
             & " WHERE" _
-            & "     TANKNUMBER      = @P01"
+            & "     TANKNUMBER   = @P1" _
+            & " AND DELFLG      <> @P2"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20)            'JOT車番
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)  'JOT車番
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)   '削除フラグ
                 PARA1.Value = WF_TANKNUMBER.Text
+                PARA2.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 

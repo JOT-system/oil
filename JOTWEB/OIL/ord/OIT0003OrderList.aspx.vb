@@ -617,6 +617,10 @@ Public Class OIT0003OrderList
         work.WF_SEL_CONSIGNEENAME.Text = ""
         '荷受人(コード)
         work.WF_SEL_CONSIGNEECODE.Text = ""
+        'パターンコード(名)
+        work.WF_SEL_PATTERNNAME.Text = ""
+        'パターンコード
+        work.WF_SEL_PATTERNCODE.Text = ""
         '発駅(名)
         work.WF_SEL_DEPARTURESTATIONNM.Text = ""
         '発駅(コード)

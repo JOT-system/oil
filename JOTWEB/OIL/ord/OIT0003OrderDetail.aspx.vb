@@ -67,8 +67,8 @@ Public Class OIT0003OrderDetail
                             WF_FIELD_DBClick()
                         Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click()
-                        'Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
-                        '    WF_FIELD_Change()
+                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                            WF_FIELD_Change()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
@@ -124,12 +124,12 @@ Public Class OIT0003OrderDetail
                 WF_CREATEFLG.Value = "2"
             End If
 
-            ''○ 作成モード(１：貨車連結未使用, ２：貨車連結使用)設定
-            'If work.WF_SEL_CREATELINKFLG.Text = "1" Then
-            '    WF_CREATELINKFLG.Value = "1"
-            'Else
-            '    WF_CREATELINKFLG.Value = "2"
-            'End If
+            '○ 作成モード(１：貨車連結未使用, ２：貨車連結使用)設定
+            If work.WF_SEL_CREATELINKFLG.Text = "1" Then
+                WF_CREATELINKFLG.Value = "1"
+            Else
+                WF_CREATELINKFLG.Value = "2"
+            End If
         Finally
             '○ 格納Table Close
             If Not IsNothing(OIT0003tbl) Then
@@ -985,9 +985,13 @@ Public Class OIT0003OrderDetail
 
                     '########################################
                     '受注パターン
-                    'If WF_FIELD.Value = "TxtOrderType" Then
-                    '    prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderType.Text)
-                    'End If
+                    If WF_FIELD.Value = "TxtOrderType" Then
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderType.Text)
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtOrderType.Text)
+                        End If
+                    End If
                     '########################################
 
                     '荷主名
@@ -1121,6 +1125,134 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
 
+    End Sub
+
+    ''' <summary>
+    ''' フィールドチェンジ時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_Change()
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            '会社コード
+            Case "WF_CAMPCODE"
+                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            '運用部署
+            Case "WF_UORG"
+                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+
+            '荷主
+            Case "TxtShippersCode"
+                CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_RTN_SW)
+
+            '荷受人
+            Case "TxtConsigneeCode"
+                CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_RTN_SW)
+
+            '本線列車
+            Case "TxtTrainNo"
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+
+                ''指定された本線列車№で値が取得できない場合はエラー判定
+                'If WW_GetValue(0) = "" Then
+                '    WW_RTN_SW = C_MESSAGE_NO.OIL_TRAIN_MASTER_NOTFOUND
+                'Else
+                '    WW_RTN_SW = C_MESSAGE_NO.NORMAL
+                'End If
+
+                ''発駅
+                'TxtDepstationCode.Text = WW_GetValue(1)
+                'CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
+                ''着駅
+                'TxtArrstationCode.Text = WW_GetValue(2)
+                'CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
+                'TxtTrainNo.Focus()
+
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                End If
+
+                '指定された本線列車№で値が取得できない場合はエラー判定
+                If WW_GetValue(0) = "" Then
+                    WW_RTN_SW = C_MESSAGE_NO.OIL_TRAIN_MASTER_NOTFOUND
+                Else
+                    WW_RTN_SW = C_MESSAGE_NO.NORMAL
+                End If
+
+                '発駅
+                TxtDepstationCode.Text = WW_GetValue(1)
+                CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
+                '着駅
+                TxtArrstationCode.Text = WW_GetValue(2)
+                CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
+                TxtTrainNo.Focus()
+
+                '〇営業所配下情報を取得・設定
+                WW_GetValue = {"", "", "", "", "", "", "", ""}
+
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                End If
+
+                '荷主
+                TxtShippersCode.Text = WW_GetValue(0)
+                LblShippersName.Text = WW_GetValue(1)
+                '荷受人
+                TxtConsigneeCode.Text = WW_GetValue(4)
+                LblConsigneeName.Text = WW_GetValue(5)
+                '受注パターン
+                TxtOrderType.Text = WW_GetValue(7)
+
+                '〇 (予定)の日付を設定
+                TxtLoadingDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtDepDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtArrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtAccDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtEmparrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+
+                work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+
+            '発駅
+            Case "TxtDepstationCode"
+                CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_RTN_SW)
+
+            '着駅
+            Case "TxtArrstationCode"
+                CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_RTN_SW)
+
+        End Select
+
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Select Case WF_FIELD.Value
+                Case "TxtShippersCode"
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+                Case "TxtConsigneeCode"
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+                Case "TxtTrainNo"
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+                Case "TxtDepstationCode"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "発駅")
+                Case "TxtArrstationCode"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "着駅")
+                Case Else
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            End Select
+        End If
     End Sub
 
     ''' <summary>
@@ -1770,7 +1902,7 @@ Public Class OIT0003OrderDetail
                 'WW_FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                    WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
                 Else
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
                 End If
@@ -2136,7 +2268,11 @@ Public Class OIT0003OrderDetail
     ''' <param name="I_CLASS"></param>
     ''' <param name="I_KEYCODE"></param>
     ''' <param name="O_VALUE"></param>
-    Protected Sub WW_FixvalueMasterSearch(ByVal I_CODE As String, ByVal I_CLASS As String, ByVal I_KEYCODE As String, ByRef O_VALUE() As String)
+    Protected Sub WW_FixvalueMasterSearch(ByVal I_CODE As String,
+                                          ByVal I_CLASS As String,
+                                          ByVal I_KEYCODE As String,
+                                          ByRef O_VALUE() As String,
+                                          Optional ByVal I_PARA01 As String = Nothing)
 
         If IsNothing(OIT0003Fixvaltbl) Then
             OIT0003Fixvaltbl = New DataTable
@@ -2214,6 +2350,20 @@ Public Class OIT0003OrderDetail
                         O_VALUE(i) = OIT0001WKrow("KEYCODE")
                         i += 1
                     Next
+                    '    '〇〇部、支店対応
+                    'ElseIf I_PARA01 <> "" Then
+                    '    For Each OIT0001WKrow As DataRow In OIT0003Fixvaltbl.Rows
+                    '        If OIT0001WKrow("VALUE8") = I_PARA01 Then
+                    '            O_VALUE(0) = OIT0001WKrow("VALUE1")
+                    '            O_VALUE(1) = OIT0001WKrow("VALUE2")
+                    '            O_VALUE(2) = OIT0001WKrow("VALUE3")
+                    '            O_VALUE(3) = OIT0001WKrow("VALUE4")
+                    '            O_VALUE(4) = OIT0001WKrow("VALUE5")
+                    '            O_VALUE(5) = OIT0001WKrow("VALUE6")
+                    '            O_VALUE(6) = OIT0001WKrow("VALUE7")
+                    '            O_VALUE(7) = OIT0001WKrow("VALUE8")
+                    '        End If
+                    '    Next
                 Else
                     For Each OIT0001WKrow As DataRow In OIT0003Fixvaltbl.Rows
                         O_VALUE(0) = OIT0001WKrow("VALUE1")

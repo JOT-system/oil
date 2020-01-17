@@ -64,7 +64,18 @@ window.addEventListener('DOMContentLoaded', function () {
 function AutoCursor() {
     document.body.style.cursor = "auto";
 }
-
+// 上下構成の２段コンテンツのフッターサイズ調整
+function AdjustHeaderFooterContents(footerContentsId) {
+    let footerContentObj = document.getElementById(footerContentsId);
+    if (footerContentObj === null) {
+        return;
+    }
+    /* 下部の高さを定義 */
+    var footerClientRect = footerContentObj.getBoundingClientRect();
+    /* 12はWrapperObjのPadding-Bottom*/ 
+    let otherContntsHeight = footerContentObj.offsetTop;
+    footerContentObj.style.height = "calc(100% - " + otherContntsHeight + "px)";
+}
 // ポップアップ確認
 function ConfirmWindow() {
 
@@ -1134,12 +1145,19 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
     //対象のオブジェクトをループ
     for (let i = 0; i < targetTextBoxList.length; i++) {
         let inputObj = targetTextBoxList[i];
-        // 対象オブジェクトが使用不可(または読み取り)の場合は設定しない
+        let parentObj = inputObj.parentElement;
+        // 対象オブジェクトが使用不可(または読み取り)の場合は
+        // ダブルクリックをワークさせない
         if (inputObj.disabled || inputObj.readOnly) {
+            parentObj.ondblclick = ""; /* 親要素のダブルクリックを排除 */
+            inputObj.addEventListener('dblclick', function (e) {
+                e.stopPropagation(); /* テキストボックスのダブルクリック伝達を抑止 */
+            });
+            inputObj.style.width = "100%";
             continue;
         }
 
-        let parentObj = inputObj.parentElement;
+        
         parentObj.style.position = 'relative';
         let additionalClass = 'boxIconArea';
         if (inputObj.classList.contains('calendarIcon')) {

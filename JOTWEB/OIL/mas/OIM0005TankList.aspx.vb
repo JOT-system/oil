@@ -85,18 +85,10 @@ Public Class OIM0005TankList
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                             WF_FILEUPLOAD()
-                        'Case "WF_UPDATE"                '表更新ボタン押下
-                        '    WF_UPDATE_Click()
                         Case "WF_CLEAR"                 'クリアボタン押下
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        'Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
-                        '    WF_ButtonSel_Click()
-                        'Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
-                        '    WF_ButtonCan_Click()
-                        'Case "WF_ListboxDBclick"        '左ボックスダブルクリック
-                        '    WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -691,8 +683,6 @@ Public Class OIM0005TankList
 
         WF_GridDBclick.Text = ""
 
-        work.WF_SEL_DELFLG.Text = "0"
-
         '○ 遷移先(登録画面)退避データ保存先の作成
         WW_CreateXMLSaveFile()
 
@@ -1235,9 +1225,17 @@ Public Class OIM0005TankList
                         PARA23.Value = OIM0005row("OBTAINEDCODE")
                         PARA24.Value = OIM0005row("MODEL")
                         PARA25.Value = OIM0005row("MODELKANA")
-                        PARA26.Value = OIM0005row("LOAD")
+                        If OIM0005row("LOAD") <> "" Then
+                            PARA26.Value = OIM0005row("LOAD")
+                        Else
+                            PARA26.Value = "0.0"
+                        End If
                         PARA27.Value = OIM0005row("LOADUNIT")
-                        PARA28.Value = OIM0005row("VOLUME")
+                        If OIM0005row("VOLUME") <> "" Then
+                            PARA28.Value = OIM0005row("VOLUME")
+                        Else
+                            PARA28.Value = "0.0"
+                        End If
                         PARA29.Value = OIM0005row("VOLUMEUNIT")
                         PARA30.Value = OIM0005row("ORIGINOWNERNAME")
                         PARA31.Value = OIM0005row("OWNERNAME")
@@ -2059,12 +2057,12 @@ Public Class OIM0005TankList
                 OIM0005INProw("OBTAINEDCODE") = XLSTBLrow("OBTAINEDCODE")
             End If
 
-            '削除フラグ
-            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
-                OIM0005INProw("DELFLG") = XLSTBLrow("DELFLG")
-            Else
-                OIM0005INProw("DELFLG") = "0"
-            End If
+            ''削除フラグ
+            'If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+            '    OIM0005INProw("DELFLG") = XLSTBLrow("DELFLG")
+            'Else
+            '    OIM0005INProw("DELFLG") = "0"
+            'End If
 
             OIM0005INPtbl.Rows.Add(OIM0005INProw)
         Next
@@ -2090,179 +2088,6 @@ Public Class OIM0005TankList
         CS0023XLSUPLOAD.TBLDATA.Clear()
 
     End Sub
-
-    '' ******************************************************************************
-    '' ***  詳細表示関連操作                                                      ***
-    '' ******************************************************************************
-
-    '''' <summary>
-    '''' 詳細画面-表更新ボタン押下時処理
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Protected Sub WF_UPDATE_Click()
-
-    '    '○ エラーレポート準備
-    '    rightview.SetErrorReport("")
-
-    '    '○ DetailBoxをINPtblへ退避
-    '    DetailBoxToOIM0005INPtbl(WW_ERR_SW)
-    '    If Not isNormal(WW_ERR_SW) Then
-    '        Exit Sub
-    '    End If
-
-    '    '○ 項目チェック
-    '    INPTableCheck(WW_ERR_SW)
-
-    '    '○ 入力値のテーブル反映
-    '    If isNormal(WW_ERR_SW) Then
-    '        OIM0005tbl_UPD()
-    '    End If
-
-    '    '○ 画面表示データ保存
-    '    Master.SaveTable(OIM0005tbl)
-
-    '    '○ 詳細画面初期化
-    '    If isNormal(WW_ERR_SW) Then
-    '        DetailBoxClear()
-    '    End If
-
-    '    '○ メッセージ表示
-    '    If WW_ERR_SW = "" Then
-    '        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
-    '    Else
-    '        If isNormal(WW_ERR_SW) Then
-    '            Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-    '        Else
-    '            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-    '        End If
-    '    End If
-
-    '    '○画面切替設定
-    '    WF_BOXChange.Value = "headerbox"
-
-    'End Sub
-
-    '''' <summary>
-    '''' 詳細画面-テーブル退避
-    '''' </summary>
-    '''' <param name="O_RTN"></param>
-    '''' <remarks></remarks>
-    'Protected Sub DetailBoxToOIM0005INPtbl(ByRef O_RTN As String)
-
-    '    O_RTN = C_MESSAGE_NO.NORMAL
-
-    '    '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-    '    Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除フラグ
-
-    '    '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
-    '    If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
-    '        String.IsNullOrEmpty(WF_DELFLG.Text) Then
-    '        Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
-
-    '        CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
-    '        CS0011LOGWrite.INFPOSI = "non Detail"
-    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
-    '        CS0011LOGWrite.TEXT = "non Detail"
-    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-    '        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
-
-    '        O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-    '        Exit Sub
-    '    End If
-
-    '    Master.CreateEmptyTable(OIM0005INPtbl)
-    '    Dim OIM0005INProw As DataRow = OIM0005INPtbl.NewRow
-
-    '    '○ 初期クリア
-    '    For Each OIM0005INPcol As DataColumn In OIM0005INPtbl.Columns
-    '        If IsDBNull(OIM0005INProw.Item(OIM0005INPcol)) OrElse IsNothing(OIM0005INProw.Item(OIM0005INPcol)) Then
-    '            Select Case OIM0005INPcol.ColumnName
-    '                Case "LINECNT"
-    '                    OIM0005INProw.Item(OIM0005INPcol) = 0
-    '                Case "OPERATION"
-    '                    OIM0005INProw.Item(OIM0005INPcol) = C_LIST_OPERATION_CODE.NODATA
-    '                Case "UPDTIMSTP"
-    '                    OIM0005INProw.Item(OIM0005INPcol) = 0
-    '                Case "SELECT"
-    '                    OIM0005INProw.Item(OIM0005INPcol) = 1
-    '                Case "HIDDEN"
-    '                    OIM0005INProw.Item(OIM0005INPcol) = 0
-    '                Case Else
-    '                    OIM0005INProw.Item(OIM0005INPcol) = ""
-    '            End Select
-    '        End If
-    '    Next
-
-    '    'LINECNT
-    '    If WF_Sel_LINECNT.Text = "" Then
-    '        OIM0005INProw("LINECNT") = 0
-    '    Else
-    '        Try
-    '            Integer.TryParse(WF_Sel_LINECNT.Text, OIM0005INProw("LINECNT"))
-    '        Catch ex As Exception
-    '            OIM0005INProw("LINECNT") = 0
-    '        End Try
-    '    End If
-
-    '    OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-    '    OIM0005INProw("UPDTIMSTP") = 0
-    '    OIM0005INProw("SELECT") = 1
-    '    OIM0005INProw("HIDDEN") = 0
-
-    '    OIM0005INProw("TANKNUMBER") = WF_TANKNUMBER.Text        'JOT車番
-    '    OIM0005INProw("MODEL") = WF_MODEL.Text        '型式
-
-    '    OIM0005INProw("DELFLG") = WF_DELFLG.Text                     '削除フラグ
-
-    '    OIM0005INProw("ORIGINOWNERCODE") = WF_ORIGINOWNERCODE.Text              '原籍所有者C
-
-    '    OIM0005INProw("OWNERCODE") = WF_OWNERCODE.Text              '名義所有者C
-
-    '    OIM0005INProw("LEASECODE") = WF_LEASECODE.Text              'リース先C
-
-    '    OIM0005INProw("LEASECLASS") = WF_LEASECLASS.Text              'リース区分C
-
-    '    OIM0005INProw("AUTOEXTENTION") = WF_AUTOEXTENTION.Text              '自動延長
-
-    '    OIM0005INProw("LEASESTYMD") = WF_LEASESTYMD.Text              'リース開始年月日
-
-    '    OIM0005INProw("LEASEENDYMD") = WF_LEASEENDYMD.Text              'リース満了年月日
-
-    '    OIM0005INProw("USERCODE") = WF_USERCODE.Text              '第三者使用者C
-
-    '    OIM0005INProw("CURRENTSTATIONCODE") = WF_CURRENTSTATIONCODE.Text              '原常備駅C
-
-    '    OIM0005INProw("EXTRADINARYSTATIONCODE") = WF_EXTRADINARYSTATIONCODE.Text              '臨時常備駅C
-
-    '    OIM0005INProw("USERLIMIT") = WF_USERLIMIT.Text              '第三者使用期限
-
-    '    OIM0005INProw("LIMITTEXTRADIARYSTATION") = WF_LIMITTEXTRADIARYSTATION.Text              '臨時常備駅期限
-
-    '    OIM0005INProw("DEDICATETYPECODE") = WF_DEDICATETYPECODE.Text              '原専用種別C
-
-    '    OIM0005INProw("EXTRADINARYTYPECODE") = WF_EXTRADINARYTYPECODE.Text              '臨時専用種別C
-
-    '    OIM0005INProw("EXTRADINARYLIMIT") = WF_EXTRADINARYLIMIT.Text              '臨時専用期限
-
-    '    OIM0005INProw("OPERATIONBASECODE") = WF_OPERATIONBASECODE.Text              '運用基地C
-
-    '    OIM0005INProw("COLORCODE") = WF_COLORCODE.Text              '塗色C
-
-    '    OIM0005INProw("ENEOS") = WF_ENEOS.Text              'エネオス
-
-    '    OIM0005INProw("ECO") = WF_ECO.Text              'エコレール
-
-    '    OIM0005INProw("ALLINSPECTIONDATE") = WF_ALLINSPECTIONDATE.Text              '取得年月日
-
-    '    OIM0005INProw("TRANSFERDATE") = WF_TRANSFERDATE.Text              '車籍編入年月日
-
-    '    OIM0005INProw("OBTAINEDCODE") = WF_OBTAINEDCODE.Text              '取得先C
-
-    '    '○ チェック用テーブルに登録する
-    '    OIM0005INPtbl.Rows.Add(OIM0005INProw)
-
-    'End Sub
-
 
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
@@ -2320,37 +2145,7 @@ Public Class OIM0005TankList
         '○ 画面表示データ保存
         Master.SaveTable(OIM0005tbl)
 
-        'WF_Sel_LINECNT.Text = ""            'LINECNT
-
-        'WF_TANKNUMBER.Text = ""            'JOT車番
-        'WF_MODEL.Text = ""            '型式
-        'WF_ORIGINOWNERCODE.Text = ""            '原籍所有者C
-        'WF_OWNERCODE.Text = ""            '名義所有者C
-        'WF_LEASECODE.Text = ""            'リース先C
-        'WF_LEASECLASS.Text = ""            'リース区分C
-        'WF_AUTOEXTENTION.Text = ""            '自動延長
-        'WF_LEASESTYMD.Text = ""            'リース開始年月日
-        'WF_LEASEENDYMD.Text = ""            'リース満了年月日
-        'WF_USERCODE.Text = ""            '第三者使用者C
-        'WF_CURRENTSTATIONCODE.Text = ""            '原常備駅C
-        'WF_EXTRADINARYSTATIONCODE.Text = ""            '臨時常備駅C
-        'WF_USERLIMIT.Text = ""            '第三者使用期限
-        'WF_LIMITTEXTRADIARYSTATION.Text = ""            '臨時常備駅期限
-        'WF_DEDICATETYPECODE.Text = ""            '原専用種別C
-        'WF_EXTRADINARYTYPECODE.Text = ""            '臨時専用種別C
-        'WF_EXTRADINARYLIMIT.Text = ""            '臨時専用期限
-        'WF_OPERATIONBASECODE.Text = ""            '運用基地C
-        'WF_COLORCODE.Text = ""            '塗色C
-        'WF_ENEOS.Text = ""            'エネオス
-        'WF_ECO.Text = ""            'エコレール
-        'WF_ALLINSPECTIONDATE.Text = ""            '取得年月日
-        'WF_TRANSFERDATE.Text = ""            '車籍編入年月日
-        'WF_OBTAINEDCODE.Text = ""            '取得先C
-        'WF_DELFLG.Text = ""                 '削除フラグ
-        'WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
-
     End Sub
-
 
     ''' <summary>
     ''' フィールドダブルクリック時処理
@@ -2389,71 +2184,6 @@ Public Class OIM0005TankList
         End If
 
     End Sub
-
-    '' ******************************************************************************
-    '' ***  leftBOX関連操作                                                       ***
-    '' ******************************************************************************
-
-    '''' <summary>
-    '''' LeftBox選択時処理
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Protected Sub WF_ButtonSel_Click()
-
-    '    Dim WW_SelectValue As String = ""
-    '    Dim WW_SelectText As String = ""
-
-    '    '○ 選択内容を取得
-    '    If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-    '        WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-    '        WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-    '        WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
-    '    End If
-
-    '    '○ 選択内容を画面項目へセット
-    '    If WF_FIELD_REP.Value = "" Then
-    '        Select Case WF_FIELD.Value
-    '            '削除フラグ
-    '            Case "WF_DELFLG"
-    '                WF_DELFLG.Text = WW_SelectValue
-    '                WF_DELFLG_TEXT.Text = WW_SelectText
-    '                WF_DELFLG.Focus()
-    '        End Select
-    '    Else
-    '    End If
-
-    '    '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-    '    WF_FIELD.Value = ""
-    '    WF_FIELD_REP.Value = ""
-    '    WF_LeftboxOpen.Value = ""
-    '    WF_RightboxOpen.Value = ""
-
-    'End Sub
-
-    '''' <summary>
-    '''' LeftBoxキャンセルボタン押下時処理
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Protected Sub WF_ButtonCan_Click()
-
-    '    '○ フォーカスセット
-    '    If WF_FIELD_REP.Value = "" Then
-    '        Select Case WF_FIELD.Value
-    '            '削除フラグ
-    '            Case "WF_DELFLG"
-    '                WF_DELFLG.Focus()
-    '        End Select
-    '    Else
-    '    End If
-
-    '    '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-    '    WF_FIELD.Value = ""
-    '    WF_FIELD_REP.Value = ""
-    '    WF_LeftboxOpen.Value = ""
-    '    WF_RightboxOpen.Value = ""
-
-    'End Sub
-
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理
@@ -2999,7 +2729,7 @@ Public Class OIM0005TankList
 
             '取得先C(バリデーションチェック)
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OBTAINEDCODE", OIM0005INProw("OBTAINEDCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
+            If isNormal(WW_CS0024FCHECKERR) Then
                 ''値存在チェック
                 'CODENAME_get("OBTAINEDCODE", OIM0005INProw("OBTAINEDCODE"), WW_DUMMY, WW_RTN_SW)
                 'If Not isNormal(WW_RTN_SW) Then
@@ -3386,10 +3116,20 @@ Public Class OIM0005TankList
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "DELFLG"           '削除フラグ
+                Case "ORG"             '運用部署
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "TANKNUMBER"        'JOT車番
+                    prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "STATIONPATTERN"　 '原常備駅C、臨時常備駅C
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BASE"      '運用基地
+                    prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
-
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR

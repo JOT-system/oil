@@ -30,12 +30,12 @@
                     </div>                                                
                                                                           
                     <div class="rightSide">                               
-                        <input type="button" id="WF_ButtonUPDATE"         class="btn-sticky" value="更新"         onclick="ButtonClick('WF_ButtonUPDATE');" />
-                        <input type="button" id="WF_ButtonCSV"            class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"     onclick="ButtonClick('WF_ButtonCSV');" />
-                        <input type="button" id="WF_ButtonINSERT"         class="btn-sticky" value="新規登録"     onclick="ButtonClick('WF_ButtonINSERT');" />
-                        <input type="button" id="WF_ButtonEND"            class="btn-sticky" value="戻る"         onclick="ButtonClick('WF_ButtonEND');" />
-                        <div                 id="WF_ButtonFIRST"          class="firstPage"  runat="server"       onclick="ButtonClick('WF_ButtonFIRST');"></div>
-                        <div                 id="WF_ButtonLAST"           class="lastPage"   runat="server"       onclick="ButtonClick('WF_ButtonLAST');"></div>
+                        <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="更新"     onclick="ButtonClick('WF_ButtonUPDATE');" />
+                        <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+                        <input type="button" id="WF_ButtonINSERT"        class="btn-sticky" value="新規登録" onclick="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
+                        <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                        <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   onclick="ButtonClick('WF_ButtonLAST');"></div>
                     </div>
                 </div> <!-- End class=actionButtonBox -->
             </div> <!-- End class="Operation" -->

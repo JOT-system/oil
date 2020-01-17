@@ -23,15 +23,10 @@
             <div class="Operation">
                 <div class="actionButtonBox">
                     <div class="leftSide">
-
-                        <a >在庫維持日数</a>
-                        <a class="ef">
-                            <asp:TextBox ID="WF_INVENTORYDAYS" runat="server"onblur="MsgClear();"></asp:TextBox>
-                        </a>
                         <!-- ボタン -->
-                        <input type="button" id="WF_ButtonAUTOSUGGESTION" class="btn-sticky" value="自動提案"     onclick="ButtonClick('WF_ButtonAUTOSUGGESTION');" />
-                        <input type="button" id="WF_ButtonORDERLIST"      class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
-                        <input type="button" id="WF_ButtonINPUTCLEAR"     class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
+                        <input type="button" id="WF_ButtonALLSELECT"     class="btn-sticky" value="全選択"   onclick="ButtonClick('WF_ButtonALLSELECT');" />
+                        <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                        <input type="button" id="WF_ButtonLINE_LIFTED"   class="btn-sticky" value="行削除"   onclick="ButtonClick('WF_ButtonLINE_LIFTED');" />
                     </div>                                                
                                                                           
                     <div class="rightSide">                               

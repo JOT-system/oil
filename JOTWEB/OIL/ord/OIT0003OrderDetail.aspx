@@ -85,7 +85,7 @@
                 <span class="doubleItem">
                     <a id="WF_ORDERTYPE_LABEL" class="requiredMark">受注パターン</a>
                     <a class="ef" id="WF_ORDERTYPE">
-                        <asp:TextBox ID="TxtOrderType" runat="server" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderType" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                     </a>
                 </span>
                 <!-- <span></span> -->

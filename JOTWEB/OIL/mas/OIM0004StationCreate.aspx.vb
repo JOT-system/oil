@@ -225,7 +225,8 @@ Public Class OIM0004StationCreate
             & " FROM" _
             & "    OIL.OIM0004_STATION" _
             & " WHERE" _
-            & "        STATIONCODE      = @P1"
+            & "        STATIONCODE      = @P1" _
+            & "    AND DELFLG           <> @P2"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '貨物コード枝番
@@ -238,7 +239,10 @@ Public Class OIM0004StationCreate
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 4)            '貨物駅コード
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)            '削除フラグ
+
                 PARA1.Value = TxtStationCode.Text
+                PARA2.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
@@ -254,7 +258,7 @@ Public Class OIM0004StationCreate
 
                     If OIM0004Chk.Rows.Count > 0 Then
                         '重複データエラー
-                        O_MESSAGENO = Messages.C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                        O_MESSAGENO = Messages.C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                     Else
                         '正常終了時
                         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -318,8 +322,13 @@ Public Class OIM0004StationCreate
         Else
             If isNormal(WW_ERR_SW) Then
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+            ElseIf WW_ERR_SW = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR Then
+                Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "貨物駅コード", needsPopUp:=True)
+
             Else
                 Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
             End If
         End If
 
@@ -837,7 +846,7 @@ Public Class OIM0004StationCreate
                                    " [" & OIM0004INProw("BRANCH") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
                     WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                    O_RTN = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                 End If
             End If
 

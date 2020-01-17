@@ -481,6 +481,12 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS TIMSTP" _
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
+            & " , @P12                                           AS SHIPPERSCODE" _
+            & " , @P13                                           AS SHIPPERSNAME" _
+            & " , @P14                                           AS BASECODE" _
+            & " , @P15                                           AS BASENAME" _
+            & " , @P16                                           AS CONSIGNEECODE" _
+            & " , @P17                                           AS CONSIGNEENAME" _
             & " , ''                                             AS ORDERINFO" _
             & " , ''                                             AS ORDERINFONAME" _
             & " , ''                                             AS OILCODE" _
@@ -513,6 +519,12 @@ Public Class OIT0003OrderDetail
                 & " , CAST(OIT0002.UPDTIMSTP AS bigint)                  AS TIMSTP" _
                 & " , 1                                                  AS 'SELECT'" _
                 & " , 0                                                  AS HIDDEN" _
+                & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
+                & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')            AS SHIPPERSNAME" _
+                & " , ISNULL(RTRIM(OIT0002.BASECODE), '')                AS BASECODE" _
+                & " , ISNULL(RTRIM(OIT0002.BASENAME), '')                AS BASENAME" _
+                & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')           AS CONSIGNEECODE" _
+                & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')           AS CONSIGNEENAME" _
                 & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
                 & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
                 & "   WHEN '10' THEN '<div style=""letter-spacing:normal;color:blue;"">' + ISNULL(RTRIM(OIS0015_2.VALUE1), '') + '</div>'" _
@@ -612,6 +624,12 @@ Public Class OIT0003OrderDetail
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)  '赤丸
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '黄丸
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)  '緑丸
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 10)  '荷主コード
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 40)  '荷主名
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 9)   '基地コード
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 40)  '基地名
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 10)  '荷受人コード
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 40)  '荷受人名
 
                 PARA00.Value = O_INSCNT
                 PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
@@ -623,6 +641,12 @@ Public Class OIT0003OrderDetail
                 PARA09.Value = C_INSPECTIONALERT.ALERT_RED
                 PARA10.Value = C_INSPECTIONALERT.ALERT_YELLOW
                 PARA11.Value = C_INSPECTIONALERT.ALERT_GREEN
+                PARA12.Value = work.WF_SEL_SHIPPERSCODE.Text
+                PARA13.Value = work.WF_SEL_SHIPPERSNAME.Text
+                PARA14.Value = work.WF_SEL_BASECODE.Text
+                PARA15.Value = work.WF_SEL_BASENAME.Text
+                PARA16.Value = work.WF_SEL_CONSIGNEECODE.Text
+                PARA17.Value = work.WF_SEL_CONSIGNEENAME.Text
 
                 'tmp作成用
                 Dim PARATMP00 As SqlParameter = SQLTMPcmd.Parameters.Add("@P00", SqlDbType.Int)          '明細数(新規作成)
@@ -635,6 +659,12 @@ Public Class OIT0003OrderDetail
                 Dim PARATMP09 As SqlParameter = SQLTMPcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)  '赤丸
                 Dim PARATMP10 As SqlParameter = SQLTMPcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '黄丸
                 Dim PARATMP11 As SqlParameter = SQLTMPcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)  '緑丸
+                Dim PARATMP12 As SqlParameter = SQLTMPcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 10)  '荷主コード
+                Dim PARATMP13 As SqlParameter = SQLTMPcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 40)  '荷主名
+                Dim PARATMP14 As SqlParameter = SQLTMPcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 9)   '基地コード
+                Dim PARATMP15 As SqlParameter = SQLTMPcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 40)  '基地名
+                Dim PARATMP16 As SqlParameter = SQLTMPcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 10)  '荷受人コード
+                Dim PARATMP17 As SqlParameter = SQLTMPcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 40)  '荷受人名
 
                 PARATMP00.Value = O_INSCNT
                 PARATMP01.Value = work.WF_SEL_ORDERNUMBER.Text
@@ -646,6 +676,12 @@ Public Class OIT0003OrderDetail
                 PARATMP09.Value = C_INSPECTIONALERT.ALERT_RED
                 PARATMP10.Value = C_INSPECTIONALERT.ALERT_YELLOW
                 PARATMP11.Value = C_INSPECTIONALERT.ALERT_GREEN
+                PARATMP12.Value = work.WF_SEL_SHIPPERSCODE.Text
+                PARATMP13.Value = work.WF_SEL_SHIPPERSNAME.Text
+                PARATMP14.Value = work.WF_SEL_BASECODE.Text
+                PARATMP15.Value = work.WF_SEL_BASENAME.Text
+                PARATMP16.Value = work.WF_SEL_CONSIGNEECODE.Text
+                PARATMP17.Value = work.WF_SEL_CONSIGNEENAME.Text
 
                 SQLTMPcmd.ExecuteNonQuery()
 

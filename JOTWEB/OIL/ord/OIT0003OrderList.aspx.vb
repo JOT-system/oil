@@ -893,7 +893,7 @@ Public Class OIT0003OrderList
         '受注進行ステータス(コード)
         work.WF_SEL_ORDERSTATUS.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUS")
         '受注情報(名)
-        work.WF_SEL_INFORMATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME")
+        work.WF_SEL_INFORMATIONNM.Text = Regex.Replace(OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME"), "<[^>]*?>", "")
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFO")
         '受注№
@@ -902,6 +902,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_TRAIN.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNO")
         '受注パターン
         work.WF_SEL_PATTERNCODE.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERTYPE")
+        '受注パターン(名)
+        work.WF_SEL_PATTERNNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERTYPE")
         '荷主(名)
         work.WF_SEL_SHIPPERSNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
         '荷主(コード)

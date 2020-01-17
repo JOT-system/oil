@@ -385,6 +385,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
             & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS ORDERYMD" _
+            & " , @P12                                           AS ORDERTYPE" _
+            & " , @P13                                           AS ORDERTYPENAME" _
             & " , @P3                                            AS SHIPPERSCODE" _
             & " , @P4                                            AS SHIPPERSNAME" _
             & " , @P5                                            AS BASECODE" _
@@ -424,6 +426,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '')            AS ORDERYMD" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '   ')        AS ORDERTYPE" _
+            & " , ''                                             AS ORDERTYPENAME" _
             & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '   ')     AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '   ')     AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '   ')         AS BASECODE" _
@@ -518,18 +522,20 @@ Public Class OIT0001EmptyTurnDairyDetail
                     OIT0001WKtbl.Load(SQLdrNum)
                 End Using
 
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", SqlDbType.Int)          '明細数(新規作成)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 11) '受注№
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 10) '荷主コード
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 40) '荷主名
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 9)  '基地コード
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 40) '基地名
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 10) '荷受人コード
-                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 40) '荷受人名
-                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 20)  '赤丸
+                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", SqlDbType.Int)             '明細数(新規作成)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 11)    '受注№
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)     '削除フラグ
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 10)    '荷主コード
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 40)    '荷主名
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 9)     '基地コード
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 40)    '基地名
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 10)    '荷受人コード
+                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 40)    '荷受人名
+                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 20)    '赤丸
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '黄丸
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)  '緑丸
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 9)   '受注パターン
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 100) '受注パターン名
 
                 PARA0.Value = O_INSCNT
                 PARA3.Value = work.WF_SEL_SHIPPERSCODE.Text
@@ -541,6 +547,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 PARA9.Value = C_INSPECTIONALERT.ALERT_RED
                 PARA10.Value = C_INSPECTIONALERT.ALERT_YELLOW
                 PARA11.Value = C_INSPECTIONALERT.ALERT_GREEN
+                PARA12.Value = work.WF_SEL_PATTERNCODE.Text
+                PARA13.Value = work.WF_SEL_PATTERNNAME.Text
                 If work.WF_SEL_CREATEFLG.Text = 1 Then
 
                     For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
@@ -1092,6 +1100,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtHeadOfficeTrain.Focus()
 
                 '〇営業所配下情報を取得・設定
+                WW_GetValue = {"", "", "", "", "", "", "", ""}
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
                 work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
                 work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -1099,6 +1108,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 work.WF_SEL_BASENAME.Text = WW_GetValue(3)
                 work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
                 work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
 
             Case "TxtDepstation"        '発駅
                 TxtDepstation.Text = WW_SelectValue
@@ -1118,6 +1129,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 work.WF_SEL_BASENAME.Text = WW_GetValue(3)
                 work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
                 work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
 
             Case "TxtLoadingDate"       '(予定)積込日
                 Dim WW_DATE As Date
@@ -1204,7 +1217,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                     updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
 
-                    WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
 
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
@@ -3055,7 +3069,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '受注登録日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  '受注営業所コード
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '受注営業所名
-                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注パターン
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 7)  '受注パターン
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 10) '荷主コード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 40) '荷主名
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 9)  '基地コード
@@ -3202,7 +3216,13 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     End If
 
-                    PARA92.Value = "2"                                '利用可否フラグ(2:積置なし)
+                    '〇 積込日 < 発日 の場合 
+                    If WW_ORDERINFOFLG_10 = True Then
+                        PARA92.Value = "1"                                '利用可否フラグ(1:積置あり)
+                    Else
+                        PARA92.Value = "2"                                '利用可否フラグ(2:積置なし)
+                    End If
+
                     PARA23.Value = "1"                                '利用可否フラグ(1:利用可能)
                     PARA24.Value = TxtLoadingDate.Text                '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                    '発日（予定）
@@ -3769,7 +3789,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Using
 
                 Dim i As Integer = 0
-                Dim WW_GetValue() As String = {"", "", "", "", "", ""}
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
                 For Each OIT0001UPDrow As DataRow In OIT0001WKtbl.Rows

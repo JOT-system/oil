@@ -420,6 +420,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_DATE_PASTDATE_ERROR As String = "20011"
 
+        ''' <summary>
+        ''' 一意制約エラー
+        ''' </summary>
+        Public Const OIL_PRIMARYKEY_REPEAT_ERROR As String = "20012"
+
 #End Region
 
 

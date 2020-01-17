@@ -56,7 +56,9 @@ window.addEventListener('DOMContentLoaded', function () {
     queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=text]";
     var targetTextBoxList = document.querySelectorAll(queryString);
     if (targetTextBoxList !== null) {
+        document.forms[0].style.display = 'none'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
         commonAppendInputBoxIcon(targetTextBoxList);
+        document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     }
 });
 

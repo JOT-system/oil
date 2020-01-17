@@ -55,7 +55,8 @@ function InitDisplay() {
         //非活性 
         document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     }
-
+    /* フッターの高さ調整 */
+    AdjustHeaderFooterContents('detailbox');
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack);
 

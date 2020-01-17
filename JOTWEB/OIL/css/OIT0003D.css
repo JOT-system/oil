@@ -46,7 +46,7 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 .headerInput {
     display: flex;
     flex-wrap: wrap;
-    width: 1160px;
+    width: 1190px;
     box-sizing: border-box;
 }
 /* 1項目のサイズ */
@@ -56,20 +56,25 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     white-space:nowrap;
     margin:1px;
 }
-.headerInput > span:nth-child(5n+1) {
+.headerInput > span.left {
     width:250px;
 }
+.headerInput > span.doubleItem {
+    width:470px;
+}
+
 .headerInput > span > a {
-    display:inline-block;
-    vertical-align:middle;
-    padding:1px;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 1px;
 }
 /* ヘッダー入力欄の項目名 */
 .headerInput > span > a:nth-child(1) {
     width:65px;
 }
 /* 最も左に来る列の項目名サイズ */
-.headerInput > span:nth-child(5n+1) > a:nth-child(1){
+.headerInput > span.left > a:nth-child(1),
+.headerInput > span.doubleItem > a:nth-child(1) {
     width:95px;
 }
 
@@ -79,9 +84,14 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     white-space:nowrap;
     overflow:hidden;
 }
+/* 【受注パターン】のテキストボックスの長さ */
+.headerInput > span.doubleItem > a:nth-child(2) {
+    width:365px;
+}
 .headerInput > span > a:nth-child(2) input[type=text] {
     width: 100% !important;
 }
+
 /* ************************** */
 /* ヘッダーエリアの合計欄     */
 /* ************************** */

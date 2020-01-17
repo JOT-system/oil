@@ -59,6 +59,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents pnlHeaderInput As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
+    '''TxtOrderNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOrderNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtOrderStatus コントロール。
     '''</summary>
     '''<remarks>
@@ -77,13 +86,13 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtOrderInfo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtOrderNo コントロール。
+    '''TxtOrderType コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOrderNo As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtOrderType As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtTrainNo コントロール。
@@ -129,15 +138,6 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents LblConsigneeName As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtOrderType コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtOrderType As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtDepstationCode コントロール。

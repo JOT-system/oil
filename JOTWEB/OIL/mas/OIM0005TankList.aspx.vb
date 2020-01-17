@@ -85,10 +85,6 @@ Public Class OIM0005TankList
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                             WF_FILEUPLOAD()
-                        Case "WF_CLEAR"                 'クリアボタン押下
-                            WF_CLEAR_Click()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
-                            WF_FIELD_DBClick()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -184,9 +180,6 @@ Public Class OIM0005TankList
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005C Then
             Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
         End If
-
-        '○ 名称設定処理
-        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
 
     End Sub
 
@@ -364,8 +357,8 @@ Public Class OIM0005TankList
             & "   AND OIM0005.DELFLG      <> @P3"
         Else
             SQLStr &=
-              " WHERE OIM0005.TANKNUMBER = @P1" _
-            & "   OR OIM0005.MODEL = @P2" _
+              " WHERE (OIM0005.TANKNUMBER = @P1" _
+            & "   OR OIM0005.MODEL = @P2)" _
             & "   AND OIM0005.DELFLG      <> @P3"
         End If
 
@@ -2090,28 +2083,6 @@ Public Class OIM0005TankList
     End Sub
 
     ''' <summary>
-    ''' 詳細画面-クリアボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_CLEAR_Click()
-
-        '○ 詳細画面初期化
-        DetailBoxClear()
-
-        '○ メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_CLEAR_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-        '○画面切替設定
-        WF_BOXChange.Value = "headerbox"
-
-        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        WF_FIELD.Value = ""
-        WF_FIELD_REP.Value = ""
-        WF_LeftboxOpen.Value = ""
-
-    End Sub
-
-    ''' <summary>
     ''' 詳細画面初期化
     ''' </summary>
     ''' <remarks></remarks>
@@ -2144,44 +2115,6 @@ Public Class OIM0005TankList
 
         '○ 画面表示データ保存
         Master.SaveTable(OIM0005tbl)
-
-    End Sub
-
-    ''' <summary>
-    ''' フィールドダブルクリック時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_FIELD_DBClick()
-
-        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
-            Try
-                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
-            Catch ex As Exception
-                Exit Sub
-            End Try
-
-            Dim WW_FIELD As String = ""
-            If WF_FIELD_REP.Value = "" Then
-                WW_FIELD = WF_FIELD.Value
-            Else
-                WW_FIELD = WF_FIELD_REP.Value
-            End If
-
-            With leftview
-                '会社コード
-                Dim prmData As New Hashtable
-
-                'フィールドによってパラメーターを変える
-                Select Case WW_FIELD
-                    Case "WF_DELFLG"
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
-                End Select
-
-                .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                .ActiveListBox()
-            End With
-        End If
 
     End Sub
 

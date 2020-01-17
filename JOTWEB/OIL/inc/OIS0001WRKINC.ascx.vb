@@ -54,8 +54,8 @@ Public Class OIS0001WRKINC
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
         prmData.Item(C_PARAMETERS.LP_CLASSCODE) = I_OBJCODE
-        prmData.Item(C_PARAMETERS.LP_STYMD) = WF_SEL_STYMD2.Text
-        prmData.Item(C_PARAMETERS.LP_ENDYMD) = WF_SEL_ENDYMD2.Text
+        'prmData.Item(C_PARAMETERS.LP_STYMD) = WF_SEL_STYMD2.Text
+        'prmData.Item(C_PARAMETERS.LP_ENDYMD) = WF_SEL_ENDYMD2.Text
         CreateRoleList = prmData
     End Function
 

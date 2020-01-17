@@ -692,58 +692,56 @@ Public Class OIT0002LinkDetail
             End Try
 
             With leftview
-                If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
-                    '会社コード
-                    Dim prmData As New Hashtable
-                    prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
-
-                    Select Case WF_FIELD.Value
-                        '運用部署
-                        Case "WF_ORG"
-                            prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
-
-                        '登録営業所
-                        Case "TxtOrderOffice"
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
-
-                        '本線列車
-                        Case "TxtHeadOfficeTrain"
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, TxtHeadOfficeTrain.Text)
-
-                        '空車発駅（着駅）
-                        Case "TxtDepstation"
-                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text + "2", TxtDepstation.Text)
-
-                        '空車着駅（発駅）
-                        Case "TxtRetstation"
-                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text + "1", TxtRetstation.Text)
-
-                        'タンク車№
-                        Case "TANKNUMBER"
-                            'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, "")
-                    End Select
-
-                    .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-                    .ActiveListBox()
-                Else
-                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
-                    Select Case WF_FIELD.Value
-                        '利用可能日
-                        Case "AvailableYMD"
-                            .WF_Calendar.Text = AvailableYMD.Text
+                Select Case WF_LeftMViewChange.Value
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
+                            '利用可能日
+                            Case "AvailableYMD"
+                                .WF_Calendar.Text = AvailableYMD.Text
                         '(予定)空車着日
-                        Case "TxtEmpDate"
-                            .WF_Calendar.Text = TxtEmpDate.Text
+                            Case "TxtEmpDate"
+                                .WF_Calendar.Text = TxtEmpDate.Text
                         '(実績)空車着日
-                        Case "TxtActEmpDate"
-                            .WF_Calendar.Text = TxtActEmpDate.Text
-                    End Select
-                    .ActiveCalendar()
+                            Case "TxtActEmpDate"
+                                .WF_Calendar.Text = TxtActEmpDate.Text
+                        End Select
+                        .ActiveCalendar()
+                    Case Else   '以外
+                        '会社コード
+                        Dim prmData As New Hashtable
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
 
-                End If
+                        'フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            '運用部署
+                            Case "WF_ORG"
+                                prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
+
+                            '登録営業所
+                            Case "TxtOrderOffice"
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
+
+                            '本線列車
+                            Case "TxtHeadOfficeTrain"
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, TxtHeadOfficeTrain.Text)
+
+                            '空車発駅（着駅）
+                            Case "TxtDepstation"
+                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text + "2", TxtDepstation.Text)
+
+                            '空車着駅（発駅）
+                            Case "TxtRetstation"
+                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_OFFICECODE.Text + "1", TxtRetstation.Text)
+
+                            'タンク車№
+                            Case "TANKNUMBER"
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, "")
+                        End Select
+                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                        .ActiveListBox()
+                End Select
             End With
-
         End If
     End Sub
 

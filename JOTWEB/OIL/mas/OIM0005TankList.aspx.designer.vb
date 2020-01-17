@@ -14,24 +14,6 @@ Option Explicit On
 Partial Public Class OIM0005TankList
     
     '''<summary>
-    '''WF_SEL_CAMPCODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_SEL_CAMPNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''WF_ListCNT コントロール。
     '''</summary>
     '''<remarks>

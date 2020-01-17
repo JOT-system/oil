@@ -75,14 +75,6 @@
                     </a>
                 </span>
                 <span></span><span></span><span></span>
-                <!-- ■　受注パターン　■ -->
-                <span>
-                    <a id="WF_ORDERTYPE_LABEL" class="requiredMark">受注パターン</a>
-                    <a class="ef" id="WF_ORDERTYPE">
-                        <asp:TextBox ID="TxtOrderType" runat="server" onblur="MsgClear();"></asp:TextBox>
-                    </a>
-                </span>
-                <span></span><span></span><span></span><span></span>
                 <!-- ■　オーダー№　■ -->
                 <span>
                     <a id="WF_ORDERNO_LABEL" class="requiredMark">オーダー№</a>
@@ -90,7 +82,15 @@
                         <asp:TextBox ID="TxtOrderNo" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                     </a>
                 </span>
+                <span></span><span></span><span></span><span></span>
 
+                <!-- ■　本線列車　■ -->
+                <span>
+                    <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
+                    <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);">
+                        <asp:TextBox ID="TxtTrainNo" runat="server" CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
+                    </a>
+                </span>
                 <!-- ■　荷主　■ -->
                 <span>
                     <a id="WF_SHIPPERS_LABEL" class="requiredMark">荷主</a>
@@ -119,11 +119,11 @@
                         </a>
                     </span>
                 </span>
-                <!-- ■　本線列車　■ -->
+                <!-- ■　受注パターン　■ -->
                 <span>
-                    <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
-                    <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);">
-                        <asp:TextBox ID="TxtTrainNo" runat="server" CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
+                    <a id="WF_ORDERTYPE_LABEL" class="requiredMark">受注パターン</a>
+                    <a class="ef" id="WF_ORDERTYPE">
+                        <asp:TextBox ID="TxtOrderType" runat="server" onblur="MsgClear();"></asp:TextBox>
                     </a>
                 </span>
                 <!-- ■　発駅　■ -->
@@ -360,7 +360,7 @@
                     </div>
                 </div>
                 <!-- 合計金額エリア -->
-                <div class="summaryAmount">
+                <div class="summaryAmount" style="display:none">
                     <!-- ■　計上月　■ -->
                     <a id="WF_BUDGETMONTH_LABEL">計上月</a>
                     <a class="ef" id="WF_BUDGETMONTH">
@@ -379,7 +379,7 @@
                         <asp:TextBox ID="TxtTitalPayment" runat="server" onblur="MsgClear();"></asp:TextBox>
                     </a>
                 </div>
-                <div class="summaryAmount">
+                <div class="summaryAmount" style="display:none">
                     <a></a>
                     <a></a>
                     <!-- ■　売上合計金額(税額)　■ -->

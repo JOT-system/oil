@@ -97,7 +97,7 @@ Public Class OIT0003OrderSearch
             '運用部署
             WF_UORG.Text = work.WF_SEL_UORG.Text
             '営業所
-            TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
+            TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODEMAP.Text
             '年月日(開始)
             TxtDateStart.Text = work.WF_SEL_DATE.Text
             '列車番号
@@ -171,8 +171,15 @@ Public Class OIT0003OrderSearch
         '運用部署
         work.WF_SEL_UORG.Text = WF_UORG.Text
         '営業所
-        work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
-        work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
+        work.WF_SEL_SALESOFFICECODEMAP.Text = TxtSalesOffice.Text
+        If TxtSalesOffice.Text = "" Then
+            'work.WF_SEL_SALESOFFICECODE.Text = Master.USER_ORG
+            ''営業所
+            'CODENAME_get("OFFICECODE", work.WF_SEL_SALESOFFICECODE.Text, LblSalesOfficeName.Text, WW_DUMMY)
+        Else
+            work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
+            work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
+        End If
         '年月日
         work.WF_SEL_DATE.Text = TxtDateStart.Text
         '列車番号
@@ -256,7 +263,7 @@ Public Class OIT0003OrderSearch
         If TxtSalesOffice.Text <> "" Then
             Master.CheckField(WF_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
-                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所", needsPopUp:=True)
                 TxtSalesOffice.Focus()
                 O_RTN = "ERR"
                 Exit Sub
@@ -272,7 +279,7 @@ Public Class OIT0003OrderSearch
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "年月日", needsPopUp:=True)
             TxtDateStart.Focus()
             O_RTN = "ERR"
             Exit Sub

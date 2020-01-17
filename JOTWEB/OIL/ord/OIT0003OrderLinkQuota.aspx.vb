@@ -285,8 +285,13 @@ Public Class OIT0003OrderLinkQuota
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE <>'' THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS TOTALTANK " _
             & "  , ROW_NUMBER() OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.AVAILABLEYMD ORDER BY OIT0004.AVAILABLEYMD DESC) RNUM" _
             & "  FROM OIL.OIT0004_LINK OIT0004 " _
-            & "  WHERE OIT0004.OFFICECODE = @P1" _
-            & "    AND OIT0004.AVAILABLEYMD < @P2"
+            & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
+            & "        VIW0003.ORGCODE    = @P1" _
+            & "    AND VIW0003.OFFICECODE = OIT0004.OFFICECODE " _
+            & "  WHERE OIT0004.AVAILABLEYMD < @P2"
+
+        '& "  WHERE OIT0004.OFFICECODE = @P1" _
+        '& "    AND OIT0004.AVAILABLEYMD < @P2"
         '& "    AND OIT0004.TRAINNO = @P3" _
         '& "    AND OIT0004.DELFLG <> @P4" _
         '& "  ) OIT0004 " _
@@ -313,7 +318,8 @@ Public Class OIT0003OrderLinkQuota
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.DateTime)    '利用可能日
                 'Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 4) '本線列車
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 1) '削除フラグ
-                PARA1.Value = work.WF_SEL_SALESOFFICECODE.Text
+                PARA1.Value = Master.USER_ORG
+                'PARA1.Value = work.WF_SEL_SALESOFFICECODE.Text
                 PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
                 'PARA3.Value = work.WF_SEL_TRAIN.Text
                 PARA4.Value = C_DELETE_FLG.DELETE

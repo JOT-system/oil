@@ -18,4 +18,4 @@ function InitDisplay() {
     // 左ボックス拡張機能追加
     addLeftBoxExtention(leftListExtentionTarget);
 
-};
+}

@@ -101,6 +101,10 @@ body:before {
     text-align:right;
     height:32px;
 }
+/* 表名称を除き項目名は中央寄せ */
+.summaryArea > span:nth-child(n + 2) > a:nth-child(1) {
+    text-align:center;
+}
 #pnlListArea {
     position: static;
     min-height: 90px;
@@ -112,4 +116,9 @@ body:before {
     width: calc(100% - 20px);
     padding-bottom: 12px;
     margin-left:20px;
+}
+/* 上部の入力欄の項目名の右寄せ */
+#WF_DEPDATE_LABEL, #WF_ARRSTATION_LABEL,
+#WF_ARRDATE_LABEL, #WF_ACCDATE_LABEL {
+    text-align:right;
 }

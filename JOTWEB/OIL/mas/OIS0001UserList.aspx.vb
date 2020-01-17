@@ -312,7 +312,7 @@ Public Class OIS0001UserList
         SQLStr &=
               " ORDER BY" _
             & "    OIS0004.ORG" _
-            & "    , OIS0004.USERID"
+            & "  , OIS0004.USERID"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

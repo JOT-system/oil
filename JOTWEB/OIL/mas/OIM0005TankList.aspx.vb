@@ -357,8 +357,8 @@ Public Class OIM0005TankList
             & "   AND OIM0005.DELFLG      <> @P3"
         Else
             SQLStr &=
-              " WHERE OIM0005.TANKNUMBER = @P1" _
-            & "   OR OIM0005.MODEL = @P2" _
+              " WHERE (OIM0005.TANKNUMBER = @P1" _
+            & "   OR OIM0005.MODEL = @P2)" _
             & "   AND OIM0005.DELFLG      <> @P3"
         End If
 

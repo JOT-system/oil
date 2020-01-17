@@ -121,8 +121,8 @@ Public Class OIT0004OilStockSearch
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
-        CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
-        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
+        'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
+        'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
         CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_DUMMY)         '油槽所
 
     End Sub
@@ -135,7 +135,7 @@ Public Class OIT0004OilStockSearch
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_CONSIGNEE_CODE.Text)          '油槽所
+        Master.EraseCharToIgnore(WF_CONSIGNEE_CODE.Text)      '油槽所
         Master.EraseCharToIgnore(WF_STYMD_CODE.Text)          '年月日
 
         '○ チェック処理
@@ -146,9 +146,9 @@ Public Class OIT0004OilStockSearch
 
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
-        work.WF_SEL_ORG.Text = WF_ORG.Text        '組織コード
-        work.WF_SEL_CONSIGNEE.Text = WF_CONSIGNEE_CODE.Text        '油槽所
-        work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text        '年月日
+        work.WF_SEL_ORG.Text = WF_ORG.Text                  '組織コード
+        work.WF_SEL_CONSIGNEE.Text = WF_CONSIGNEE_CODE.Text '油槽所
+        work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text         '年月日
 
 
         '○ 画面レイアウト設定

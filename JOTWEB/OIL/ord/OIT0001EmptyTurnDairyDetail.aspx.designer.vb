@@ -50,15 +50,6 @@ Partial Public Class OIT0001EmptyTurnDairyDetail
     Protected WithEvents WF_UORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''imgOrderOffice コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents imgOrderOffice As Global.System.Web.UI.WebControls.Image
-    
-    '''<summary>
     '''lblOrderOffice_dummy コントロール。
     '''</summary>
     '''<remarks>

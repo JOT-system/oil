@@ -125,8 +125,8 @@ Public Class OIM0005TankSearch
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
-        CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
-        CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
+        'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
+        'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
         CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_DUMMY)         'JOT車番
         'CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_DUMMY)         '型式
 
@@ -140,7 +140,7 @@ Public Class OIM0005TankSearch
     Protected Sub WF_ButtonDO_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_TANKNUMBER_CODE.Text)          'JOT車番
+        Master.EraseCharToIgnore(WF_TANKNUMBER_CODE.Text)     'JOT車番
         Master.EraseCharToIgnore(WF_MODEL_CODE.Text)          '型式
 
         '○ チェック処理
@@ -150,10 +150,10 @@ Public Class OIM0005TankSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
-        work.WF_SEL_ORG.Text = WF_ORG.Text        '組織コード
-        work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER_CODE.Text        'JOT車番
-        work.WF_SEL_MODEL.Text = WF_MODEL_CODE.Text        '型式
+        work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text          '会社コード
+        work.WF_SEL_ORG.Text = WF_ORG.Text                    '組織コード
+        work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER_CODE.Text 'JOT車番
+        work.WF_SEL_MODEL.Text = WF_MODEL_CODE.Text           '型式
 
 
         '○ 画面レイアウト設定

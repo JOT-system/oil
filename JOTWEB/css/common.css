@@ -769,7 +769,7 @@ input[type=text][readonly].calendarIcon {
 .WF_ListBoxArea {
     margin-top: 5px;
     margin-bottom: 5px;
-    height: calc(100% - 8em);
+    height: calc(100% - 8.5em);
     min-height: 100px;
     width: 23.4em;
     overflow: hidden;
@@ -858,10 +858,55 @@ input[type=text][readonly].calendarIcon {
 #divPnlListArea_HLShowHideDetailBox.hideDetail:before {
     content: "HIDE INPUT";
 }
+/* ************************ */
+/* 上下構えの共通定義       */
+/* ************************ */
+/* ******************* */
+/* 上部入力エリア共通  */
+/* ******************* */
+.commonHeaderInput input[type=text] {
+    font-size:13.5px;
+}
+.commonHeaderInput {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    box-sizing: border-box;
+}
+/* 1項目のサイズ */
+.commonHeaderInput > span {
+    display: inline-block;
+    width: 280px;
+    white-space: nowrap;
+    margin: 1px;
+}
+.commonHeaderInput > span > a {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 1px;
+}
+.commonHeaderInput {
+    width: 1177px;
+}
+
+/* ヘッダー入力欄の項目名 */
+.commonHeaderInput > span > a:nth-child(1) {
+    width:115px;
+}
+.commonHeaderInput > span > a:nth-child(2) {
+    width:155px;
+}
 
 /* ************************ */
 /* 一覧表                 */
 /* ************************ */
+.listWrapper {
+    position: relative;
+    height: calc(100% - 48px);
+    width: calc(100% - 20px);
+    padding-bottom: 12px;
+    margin-left: 20px;
+}
 #pnlListArea {
     margin-left: 10px;
     margin-right: 10px;
@@ -873,7 +918,10 @@ input[type=text][readonly].calendarIcon {
     white-space: nowrap; /* 折り返させない */
     text-overflow: ellipsis; /* 領域越を点々表示 */
 }
-
+div[data-generated="1"] td, div[data-generated="1"] th {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 /* ------------------------------
    CS0013ProfViewでの生成Table
    スタイル定義
@@ -1059,9 +1107,19 @@ div[data-generated="1"] th:before{
     white-space:nowrap;
 
 }*/
-
-
-
+/* 表内の●補正、他の方法に変更する場合注意 */
+div[data-generated='1'] tr td > div[style] {
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+}
+div[data-generated='1'] input[type=text] {
+    height: 1.6em;
+    font-size: 13.5px;
+    box-sizing: border-box;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
 /* ------------------------------
 CS0013ProfViewでの生成Tableの
 SCROLL TYPE個別設定

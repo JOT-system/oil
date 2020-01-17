@@ -2,7 +2,6 @@
 function InitDisplay() {
 
     // 全部消す
-    //document.getElementById("LF_LEFTBOX").style.width = "0em";
     document.getElementById("RF_RIGHTBOX").style.width = "0em";
 
     if (document.getElementById('WF_LeftboxOpen').value === "Open") {
@@ -31,7 +30,6 @@ function InitDisplay() {
     }
 
     /* 共通一覧のスクロールイベント紐づけ */
-    //bindListCommonEvents(pnlListAreaId, IsPostBack);
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
     // チェックボックス
@@ -59,7 +57,7 @@ function ChangeCheckBox() {
 }
 
 // ○チェックボックス選択
-function SelectCheckBox(lineCnt) {
+function SelectCheckBox(obj, lineCnt) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("WF_SelectedIndex").value = lineCnt

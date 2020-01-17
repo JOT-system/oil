@@ -2,7 +2,6 @@
 function InitDisplay() {
 
     // 全部消す
-    //document.getElementById("LF_LEFTBOX").style.width = "0em";
     document.getElementById("RF_RIGHTBOX").style.width = "0em";
 
     if (document.getElementById('WF_LeftboxOpen').value === "Open") {
@@ -56,7 +55,8 @@ function InitDisplay() {
         //非活性 
         document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     }
-
+    /* フッターの高さ調整 */
+    AdjustHeaderFooterContents('detailbox');
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack);
 
@@ -87,7 +87,7 @@ function ChangeCheckBox() {
 
 
 // ○チェックボックス選択
-function SelectCheckBox(lineCnt) {
+function SelectCheckBox(obj, lineCnt) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("WF_SelectedIndex").value = lineCnt
@@ -99,7 +99,7 @@ function SelectCheckBox(lineCnt) {
 }
 
 // ○左Box用処理（左Box表示/非表示切り替え）
-function ListField_DBclick(Line, fieldNM) {
+function ListField_DBclick(pnlList, Line, fieldNM) {
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_GridDBclick').value = Line;
@@ -116,7 +116,7 @@ function ListField_DBclick(Line, fieldNM) {
 }
 
 // ○一覧用処理（チェンジイベント）
-function ListField_Change(Line, fieldNM) {
+function ListField_Change(pnlList, Line, fieldNM) {
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_GridDBclick').value = Line;

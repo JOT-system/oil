@@ -414,7 +414,7 @@ Public Class OIS0001UserCreate
 
                     If OIS0001Chk.Rows.Count > 0 Then
                         '重複データエラー
-                        O_MESSAGENO = Messages.C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                        O_MESSAGENO = Messages.C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                     Else
                         '正常終了時
                         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -481,6 +481,10 @@ Public Class OIS0001UserCreate
         Else
             If isNormal(WW_ERR_SW) Then
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+            ElseIf WW_ERR_SW = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR Then
+                Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "ユーザIDコードかつ開始日年月日", needsPopUp:=True)
+
             Else
                 Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             End If
@@ -1414,7 +1418,7 @@ Public Class OIS0001UserCreate
                                        " [" & OIS0001INProw("STYMD") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
                     WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                    O_RTN = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                 End If
             End If
 

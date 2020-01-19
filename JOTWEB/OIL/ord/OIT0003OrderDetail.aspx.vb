@@ -228,6 +228,7 @@ Public Class OIT0003OrderDetail
         TxtOrderInfo.Text = work.WF_SEL_INFORMATIONNM.Text
         '###################################################
         '受注パターン
+        CODENAME_get("ORDERTYPE", work.WF_SEL_PATTERNCODE.Text, work.WF_SEL_PATTERNNAME.Text, WW_DUMMY)
         TxtOrderType.Text = work.WF_SEL_PATTERNNAME.Text
         '###################################################
         'オーダー№
@@ -1613,6 +1614,9 @@ Public Class OIT0003OrderDetail
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+
+                Case "ORDERTYPE"        '受注パターン
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERTYPE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE"))
 
                 Case "SHIPPERS"         '荷主
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SHIPPERS"))

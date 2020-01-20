@@ -903,7 +903,7 @@ Public Class OIT0003OrderList
         '受注パターン
         work.WF_SEL_PATTERNCODE.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERTYPE")
         '受注パターン(名)
-        work.WF_SEL_PATTERNNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERTYPE")
+        work.WF_SEL_PATTERNNAME.Text = ""
         '荷主(名)
         work.WF_SEL_SHIPPERSNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
         '荷主(コード)

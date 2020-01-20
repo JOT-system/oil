@@ -95,11 +95,11 @@ Public Class OIT0003OrderDetail
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
-                            'Case "WF_ListChange"            'リスト変更
-                            '    WF_ListChange()
-                        Case "WF_DTAB_Click" '○DetailTab切替処理
+                        Case "WF_ListChange"            'リスト変更
+                            WF_ListChange()
+                        Case "WF_DTAB_Click"            '○DetailTab切替処理
                             WF_Detail_TABChange()
-                            TAB_DisplayCTRL()
+                            'TAB_DisplayCTRL()
                     End Select
 
                     '○ 一覧再表示処理
@@ -228,6 +228,7 @@ Public Class OIT0003OrderDetail
         TxtOrderInfo.Text = work.WF_SEL_INFORMATIONNM.Text
         '###################################################
         '受注パターン
+        CODENAME_get("ORDERTYPE", work.WF_SEL_PATTERNCODE.Text, work.WF_SEL_PATTERNNAME.Text, WW_DUMMY)
         TxtOrderType.Text = work.WF_SEL_PATTERNNAME.Text
         '###################################################
         'オーダー№
@@ -481,6 +482,8 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS TIMSTP" _
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
+            & " , @P01                                           AS ORDERNO" _
+            & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
             & " , @P12                                           AS SHIPPERSCODE" _
             & " , @P13                                           AS SHIPPERSNAME" _
             & " , @P14                                           AS BASECODE" _
@@ -492,6 +495,8 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS OILCODE" _
             & " , ''                                             AS OILNAME" _
             & " , ''                                             AS TANKQUOTA" _
+            & " , ''                                             AS LINKNO" _
+            & " , ''                                             AS LINKDETAILNO" _
             & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS TANKNO" _
             & " , ''                                             AS JRINSPECTIONALERT" _
@@ -519,6 +524,8 @@ Public Class OIT0003OrderDetail
                 & " , CAST(OIT0002.UPDTIMSTP AS bigint)                  AS TIMSTP" _
                 & " , 1                                                  AS 'SELECT'" _
                 & " , 0                                                  AS HIDDEN" _
+                & " , ISNULL(RTRIM(OIT0003.ORDERNO), '')                 AS ORDERNO" _
+                & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')                AS DETAILNO" _
                 & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
                 & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')            AS SHIPPERSNAME" _
                 & " , ISNULL(RTRIM(OIT0002.BASECODE), '')                AS BASECODE" _
@@ -538,10 +545,14 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIM0003_NOW.OILNAME), '')             AS OILNAME" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIT0003.TANKNO), '') <> '' THEN @P03" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P04" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P04" _
+                & "   WHEN OIT0003.TANKNO <> '' " _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P04" _
+                & "   WHEN OIT0003.TANKNO <> '' " _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P04" _
                 & "   ELSE @P05" _
                 & "   END                                                AS TANKQUOTA" _
+                & " , ''                                                 AS LINKNO" _
+                & " , ''                                                 AS LINKDETAILNO" _
                 & " , ''                                                 AS LINEORDER" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
                 & " , CASE" _
@@ -743,16 +754,29 @@ Public Class OIT0003OrderDetail
             & " , CAST(OIT0004.UPDTIMSTP AS bigint)                             AS TIMSTP" _
             & " , 1                                                             AS 'SELECT'" _
             & " , 0                                                             AS HIDDEN" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERNO), '')                            AS ORDERNO" _
+            & " , ISNULL(RTRIM(TMP0001.DETAILNO), '')                           AS DETAILNO" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPPERSCODE), '')                       AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPPERSNAME), '')                       AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(TMP0001.BASECODE), '')                           AS BASECODE" _
+            & " , ISNULL(RTRIM(TMP0001.BASENAME), '')                           AS BASENAME" _
+            & " , ISNULL(RTRIM(TMP0001.CONSIGNEECODE), '')                      AS CONSIGNEECODE" _
+            & " , ISNULL(RTRIM(TMP0001.CONSIGNEENAME), '')                      AS CONSIGNEENAME" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFONAME), '')                      AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
             & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
             & " , CASE" _
-            & "   WHEN TMP0001.TANKNO IS NULL AND TMP0001.OILNAME IS NULL THEN @P04" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P05" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P05" _
-            & "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILCODE = OIT0004.PREOILCODE THEN @P06" _
+            & "   WHEN OIT0004.TANKNUMBER IS NULL AND TMP0001.OILNAME IS NULL THEN @P04" _
+            & "   WHEN OIT0004.TANKNUMBER <> '' " _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P05" _
+            & "   WHEN OIT0004.TANKNUMBER <> '' " _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P05" _
+            & "   WHEN OIT0004.TANKNUMBER IS NOT NULL AND TMP0001.OILCODE IS NULL THEN @P04" _
+            & "   WHEN OIT0004.TANKNUMBER IS NOT NULL AND TMP0001.OILCODE = OIT0004.PREOILCODE THEN @P06" _
             & "   END                                                           AS TANKQUOTA" _
+            & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')                         AS TANKNO" _
             & " , CASE" _
@@ -794,7 +818,7 @@ Public Class OIT0003OrderDetail
             & "       AND TMP0001.DELFLG <> @P03" _
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "       OIT0004.TANKNUMBER = OIM0005.TANKNUMBER" _
-            & "       AND OIM0005.DELFLG <> @P02" _
+            & "       AND OIM0005.DELFLG <> @P03" _
             & " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
             & "       OIM0003_PAST.OFFICECODE = @P11" _
             & "       AND OIM0003_PAST.SHIPPERCODE = @P12" _
@@ -815,11 +839,21 @@ Public Class OIT0003OrderDetail
             & " , 0                             AS TIMSTP" _
             & " , 1                                                             AS 'SELECT'" _
             & " , 0                                                             AS HIDDEN" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERNO), '')                            AS ORDERNO" _
+            & " , ISNULL(RTRIM(TMP0001.DETAILNO), '')                           AS DETAILNO" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPPERSCODE), '')                       AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPPERSNAME), '')                       AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(TMP0001.BASECODE), '')                           AS BASECODE" _
+            & " , ISNULL(RTRIM(TMP0001.BASENAME), '')                           AS BASENAME" _
+            & " , ISNULL(RTRIM(TMP0001.CONSIGNEECODE), '')                      AS CONSIGNEECODE" _
+            & " , ISNULL(RTRIM(TMP0001.CONSIGNEENAME), '')                      AS CONSIGNEENAME" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFONAME), '')                      AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
             & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
             & " , @P07                                                          AS TANKQUOTA" _
+            & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
             & " , ISNULL(RTRIM(TMP0001.TANKNO), '')                             AS TANKNO" _
             & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERT), '')                  AS JRINSPECTIONALERT" _
@@ -910,6 +944,33 @@ Public Class OIT0003OrderDetail
     ''' <remarks></remarks>
     Protected Sub DisplayGrid()
 
+        '〇 選択されたタブの一覧を再表示
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            DisplayGrid_TAB1()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            DisplayGrid_TAB2()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            DisplayGrid_TAB3()
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            DisplayGrid_TAB4()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧再表示処理(タブ「タンク車割当」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DisplayGrid_TAB1()
+
         Dim WW_GridPosition As Integer          '表示位置(開始)
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
@@ -981,6 +1042,30 @@ Public Class OIT0003OrderDetail
 
         TBLview.Dispose()
         TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧再表示処理(タブ「タンク車明細」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DisplayGrid_TAB2()
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧再表示処理(タブ「入換・積込指示」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DisplayGrid_TAB3()
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧再表示処理(タブ「費用入力」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DisplayGrid_TAB4()
 
     End Sub
 
@@ -1188,22 +1273,6 @@ Public Class OIT0003OrderDetail
             '本線列車
             Case "TxtTrainNo"
                 Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
-                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
-
-                ''指定された本線列車№で値が取得できない場合はエラー判定
-                'If WW_GetValue(0) = "" Then
-                '    WW_RTN_SW = C_MESSAGE_NO.OIL_TRAIN_MASTER_NOTFOUND
-                'Else
-                '    WW_RTN_SW = C_MESSAGE_NO.NORMAL
-                'End If
-
-                ''発駅
-                'TxtDepstationCode.Text = WW_GetValue(1)
-                'CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
-                ''着駅
-                'TxtArrstationCode.Text = WW_GetValue(2)
-                'CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
-                'TxtTrainNo.Focus()
 
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                     WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
@@ -1365,6 +1434,171 @@ Public Class OIT0003OrderDetail
     Protected Sub WF_RIGHTBOX_Change()
 
         rightview.Save(Master.USERID, Master.USERTERMID, WW_DUMMY)
+
+    End Sub
+
+    ''' <summary>
+    ''' リスト変更時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListChange()
+
+        '○ LINECNT取得
+        Dim WW_LINECNT As Integer = 0
+        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0003tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        '○ 設定項目取得
+        '対象フォーム項目取得
+        Dim WW_ListValue = Request.Form("txt" & pnlListArea1.ID & WF_FIELD.Value & WF_GridDBclick.Text)
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+
+        Select Case WF_FIELD.Value
+            Case "SHIPPERSNAME"      '(一覧)荷主
+                If WW_ListValue <> "" Then
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "SHIPPERSMASTER_N", WW_ListValue, WW_GetValue)
+                    updHeader.Item("SHIPPERSCODE") = WW_GetValue(0)
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                Else
+                    updHeader.Item("SHIPPERSCODE") = ""
+                    updHeader.Item(WF_FIELD.Value) = ""
+                End If
+
+            Case "OILNAME"           '(一覧)油種
+                '〇油種が設定されている場合
+                If WW_ListValue <> "" Then
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_N", WW_ListValue, WW_GetValue)
+                    updHeader.Item("OILCODE") = WW_GetValue(0)
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                Else
+                    updHeader.Item("OILCODE") = ""
+                    updHeader.Item(WF_FIELD.Value) = ""
+                End If
+
+                '〇 タンク車割当状況チェック
+                WW_TANKQUOTACHK(updHeader)
+                ''タンク車割当状況＝"割当"の場合
+                'If updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI Then
+
+                '    '油種が削除("")の場合
+                '    If updHeader.Item("OILCODE") = "" Then
+                '        'タンク車割当状況＝"残車"に設定
+                '        updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN
+                '    End If
+
+                '    'タンク車割当状況＝"残車"の場合
+                'ElseIf updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN Then
+                '    '油種が設定された場合
+                '    If updHeader.Item("OILCODE") <> "" Then
+                '        'タンク車割当状況＝"割当"に設定
+                '        updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI
+                '    End If
+                'End If
+
+            Case "TANKNO"            '(一覧)タンク車№
+
+                '入力が空の場合は、対象項目を空文字で設定する。
+                If WW_ListValue = "" Then
+                    'タンク車№
+                    updHeader.Item("TANKNO") = ""
+                    '前回油種
+                    updHeader.Item("LASTOILCODE") = ""
+                    updHeader.Item("LASTOILNAME") = ""
+                    '交検日
+                    updHeader.Item("JRINSPECTIONDATE") = ""
+                    updHeader.Item("JRINSPECTIONALERT") = ""
+                    updHeader.Item("JRINSPECTIONALERTSTR") = ""
+                    '全検日
+                    updHeader.Item("JRALLINSPECTIONDATE") = ""
+                    updHeader.Item("JRALLINSPECTIONALERT") = ""
+                    updHeader.Item("JRALLINSPECTIONALERTSTR") = ""
+                    Exit Select
+                End If
+
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+
+                'タンク車№
+                updHeader.Item("TANKNO") = WW_ListValue
+
+                '前回油種
+                Dim WW_LASTOILNAME As String = ""
+                updHeader.Item("LASTOILCODE") = WW_GetValue(1)
+                CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+
+                'Dim WW_GetValue2() As String = {"", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch("", "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue2)
+                'updHeader.Item("LASTOILNAME") = WW_GetValue2(0)
+
+                '交検日
+                Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
+                Dim WW_JRINSPECTIONCNT As String
+                updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
+                If WW_GetValue(2) <> "" Then
+                    WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+
+                    Dim WW_JRINSPECTIONFLG As String
+                    If WW_JRINSPECTIONCNT <= 3 Then
+                        WW_JRINSPECTIONFLG = "1"
+                    ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                        WW_JRINSPECTIONFLG = "2"
+                    Else
+                        WW_JRINSPECTIONFLG = "3"
+                    End If
+                    Select Case WW_JRINSPECTIONFLG
+                        Case "1"
+                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                        Case "2"
+                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                        Case "3"
+                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                    End Select
+                Else
+                    updHeader.Item("JRINSPECTIONALERT") = ""
+                    updHeader.Item("JRINSPECTIONALERTSTR") = ""
+                End If
+
+                '全検日
+                Dim WW_JRALLINSPECTIONCNT As String
+                updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
+                If WW_GetValue(3) <> "" Then
+                    WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+
+                    Dim WW_JRALLINSPECTIONFLG As String
+                    If WW_JRALLINSPECTIONCNT <= 3 Then
+                        WW_JRALLINSPECTIONFLG = "1"
+                    ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                        WW_JRALLINSPECTIONFLG = "2"
+                    Else
+                        WW_JRALLINSPECTIONFLG = "3"
+                    End If
+                    Select Case WW_JRALLINSPECTIONFLG
+                        Case "1"
+                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                        Case "2"
+                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                        Case "3"
+                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                    End Select
+                Else
+                    updHeader.Item("JRALLINSPECTIONALERT") = ""
+                    updHeader.Item("JRALLINSPECTIONALERTSTR") = ""
+                End If
+
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -1613,6 +1847,9 @@ Public Class OIT0003OrderDetail
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+
+                Case "ORDERTYPE"        '受注パターン
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERTYPE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE"))
 
                 Case "SHIPPERS"         '荷主
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SHIPPERS"))
@@ -2169,6 +2406,27 @@ Public Class OIT0003OrderDetail
                     updHeader.Item("OILCODE") = WW_SETVALUE
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
+                    '〇 タンク車割当状況チェック
+                    WW_TANKQUOTACHK(updHeader)
+
+                    ''タンク車割当状況＝"割当"の場合
+                    'If updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI Then
+
+                    '    '油種が削除("")の場合
+                    '    If updHeader.Item("OILCODE") = "" Then
+                    '        'タンク車割当状況＝"残車"に設定
+                    '        updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN
+                    '    End If
+
+                    '    'タンク車割当状況＝"残車"の場合
+                    'ElseIf updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN Then
+                    '    '油種が設定された場合
+                    '    If updHeader.Item("OILCODE") <> "" Then
+                    '        'タンク車割当状況＝"割当"に設定
+                    '        updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI
+                    '    End If
+                    'End If
+
                     'タンク車№を一覧に設定
                 ElseIf WF_FIELD.Value = "TANKNO" Then
                     'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
@@ -2430,32 +2688,32 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     Protected Sub WW_ScreenEnabledSet()
 
-        '〇 タブの使用可否制御
-        If work.WF_SEL_ORDERSTATUS.Text = "100" Then
-            WF_Dtab01.Enabled = True
-            WF_Dtab02.Enabled = False
-            WF_Dtab03.Enabled = False
-            WF_Dtab04.Enabled = False
+        ''〇 タブの使用可否制御
+        'If work.WF_SEL_ORDERSTATUS.Text = "100" Then
+        '    WF_Dtab01.Enabled = True
+        '    WF_Dtab02.Enabled = False
+        '    WF_Dtab03.Enabled = False
+        '    WF_Dtab04.Enabled = False
 
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = "200" _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = "210" _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = "220" _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = "230" _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = "240" _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = "250" _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = "260" Then
-            WF_Dtab01.Enabled = True
-            WF_Dtab02.Enabled = False
-            WF_Dtab03.Enabled = True
-            WF_Dtab04.Enabled = False
+        'ElseIf work.WF_SEL_ORDERSTATUS.Text = "200" _
+        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "210" _
+        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "220" _
+        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "230" _
+        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "240" _
+        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "250" _
+        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "260" Then
+        '    WF_Dtab01.Enabled = True
+        '    WF_Dtab02.Enabled = False
+        '    WF_Dtab03.Enabled = True
+        '    WF_Dtab04.Enabled = False
 
-        Else
-            WF_Dtab01.Enabled = False
-            WF_Dtab02.Enabled = True
-            WF_Dtab03.Enabled = False
-            WF_Dtab04.Enabled = False
+        'Else
+        '    WF_Dtab01.Enabled = False
+        '    WF_Dtab02.Enabled = True
+        '    WF_Dtab03.Enabled = False
+        '    WF_Dtab04.Enabled = False
 
-        End If
+        'End If
 
         '○ 油種別タンク車数(車)、積込数量(kl)、計上月、売上金額、支払金額の表示・非表示制御
         '権限コードが更新の場合は表示設定
@@ -2501,6 +2759,31 @@ Public Class OIT0003OrderDetail
             TxtActualAccDate.Enabled = True
             '(実績)空車着日
             TxtActualEmparrDate.Enabled = True
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' タンク車割当状況チェック
+    ''' </summary>
+    Protected Sub WW_TANKQUOTACHK(ByVal I_updHeader As DataRow)
+
+        'タンク車割当状況＝"割当"の場合
+        If I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI Then
+
+            '油種が削除("")の場合
+            If I_updHeader.Item("OILCODE") = "" Then
+                'タンク車割当状況＝"残車"に設定
+                I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN
+            End If
+
+            'タンク車割当状況＝"残車"の場合
+        ElseIf I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN Then
+            '油種が設定された場合
+            If I_updHeader.Item("OILCODE") <> "" Then
+                'タンク車割当状況＝"割当"に設定
+                I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI
+            End If
         End If
 
     End Sub

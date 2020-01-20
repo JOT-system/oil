@@ -12,7 +12,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
-    Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル
+    Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -59,45 +59,57 @@ Public Class OIT0003OrderDetail
                     Master.RecoverTable(OIT0003tbl)
 
                     Select Case WF_ButtonClick.Value
-                        'Case "WF_ButtonINSERT"          '登録ボタン押下
-                        '    WF_ButtonINSERT_Click()
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonINSERT"          '油種数登録ボタン押下
+                            WF_ButtonINSERT_Click()
+                        Case "WF_ButtonEND"                   '戻るボタン押下
                             WF_ButtonEND_Click()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                        Case "WF_Field_DBClick"               'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
+                        Case "WF_CheckBoxSELECT"              'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click()
-                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                        Case "WF_LeftBoxSelectClick"          'フィールドチェンジ
                             WF_FIELD_Change()
-                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                        Case "WF_ButtonSel"                   '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
-                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                        Case "WF_ButtonCan"                   '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
-                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                        Case "WF_ListboxDBclick"              '左ボックスダブルクリック
                             WF_ButtonSel_Click()
-                        Case "WF_ButtonALLSELECT"       '全選択ボタン押下
+                        Case "WF_ButtonALLSELECT_TAB1",       '全選択ボタン押下
+                             "WF_ButtonALLSELECT_TAB2",
+                             "WF_ButtonALLSELECT_TAB3",
+                             "WF_ButtonALLSELECT_TAB4"
                             WF_ButtonALLSELECT_Click()
-                        Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
+                        Case "WF_ButtonSELECT_LIFTED_TAB1",   '選択解除ボタン押下
+                             "WF_ButtonSELECT_LIFTED_TAB2",
+                             "WF_ButtonSELECT_LIFTED_TAB3",
+                             "WF_ButtonSELECT_LIFTED_TAB4"
                             WF_ButtonSELECT_LIFTED_Click()
-                        'Case "WF_ButtonLINE_LIFTED"     '行削除ボタン押下
-                        '    WF_ButtonLINE_LIFTED_Click()
-                        'Case "WF_ButtonLINE_ADD"        '行追加ボタン押下
-                        '    WF_ButtonLINE_ADD_Click()
+                        Case "WF_ButtonLINE_LIFTED_TAB1",     '行削除ボタン押下
+                             "WF_ButtonLINE_LIFTED_TAB2",
+                             "WF_ButtonLINE_LIFTED_TAB3",
+                             "WF_ButtonLINE_LIFTED_TAB4"
+                            WF_ButtonLINE_LIFTED_Click()
+                        Case "WF_ButtonLINE_ADD_TAB1",        '行追加ボタン押下
+                             "WF_ButtonLINE_ADD_TAB2",
+                             "WF_ButtonLINE_ADD_TAB3",
+                             "WF_ButtonLINE_ADD_TAB4"
+                            WF_ButtonLINE_ADD_Click()
                         'Case "WF_ButtonUPDATE"          '割当確定ボタン押下
                         '    WF_ButtonUPDATE_Click()
-                        Case "WF_MouseWheelUp"          'マウスホイール(Up)
+                        Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
-                        Case "WF_MouseWheelDown"        'マウスホイール(Down)
+                        Case "WF_MouseWheelDown"              'マウスホイール(Down)
                             WF_Grid_Scroll()
                         'Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                         '    WF_FILEUPLOAD()
-                        Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
+                        Case "WF_RadioButonClick"             '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
-                        Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
+                        Case "WF_MEMOChange"                  '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
-                        Case "WF_ListChange"            'リスト変更
+                        Case "WF_ListChange"                  'リスト変更
                             WF_ListChange()
-                        Case "WF_DTAB_Click"            '○DetailTab切替処理
+                        Case "WF_DTAB_Click"                  '○DetailTab切替処理
                             WF_Detail_TABChange()
                             'TAB_DisplayCTRL()
                     End Select
@@ -1070,6 +1082,27 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 油種数登録ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonINSERT_Click()
+
+        '着駅コードが未設定の場合
+        '※一覧を作成するにあたり、基地コード・荷受人を取得するために、
+        '　着駅コードは必須となるため
+        If TxtArrstationCode.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "着駅", needsPopUp:=True)
+            TxtArrstationCode.Focus()
+            WW_CheckERR("着駅入力エラー。", C_MESSAGE_NO.PREREQUISITE_ERROR)
+            Exit Sub
+        End If
+
+
+
+
+    End Sub
+
+    ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -1365,6 +1398,31 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     Protected Sub WF_ButtonALLSELECT_Click()
 
+        '〇 選択されたタブ一覧の全解除を制御
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            WW_ButtonALLSELECT_TAB1()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            WW_ButtonALLSELECT_TAB2()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            WW_ButtonALLSELECT_TAB3()
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            WW_ButtonALLSELECT_TAB4()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 全選択ボタン押下時処理(タブ「タンク車割当」)
+    ''' </summary>
+    Protected Sub WW_ButtonALLSELECT_TAB1()
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
 
@@ -1381,9 +1439,56 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 全選択ボタン押下時処理(タブ「タンク車明細」)
+    ''' </summary>
+    Protected Sub WW_ButtonALLSELECT_TAB2()
+
+    End Sub
+
+    ''' <summary>
+    ''' 全選択ボタン押下時処理(タブ「入換・積込指示」)
+    ''' </summary>
+    Protected Sub WW_ButtonALLSELECT_TAB3()
+
+    End Sub
+
+    ''' <summary>
+    ''' 全選択ボタン押下時処理(タブ「費用入力」)
+    ''' </summary>
+    Protected Sub WW_ButtonALLSELECT_TAB4()
+
+    End Sub
+
+    ''' <summary>
     ''' 全解除ボタン押下時処理
     ''' </summary>
     Protected Sub WF_ButtonSELECT_LIFTED_Click()
+
+        '〇 選択されたタブ一覧の全解除を制御
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            WW_ButtonSELECT_LIFTED_TAB1()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            WW_ButtonSELECT_LIFTED_TAB2()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            WW_ButtonSELECT_LIFTED_TAB3()
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            WW_ButtonSELECT_LIFTED_TAB4()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 全解除ボタン押下時処理(タブ「タンク車割当」)
+    ''' </summary>
+    Protected Sub WW_ButtonSELECT_LIFTED_TAB1()
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
@@ -1397,6 +1502,391 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 全解除ボタン押下時処理(タブ「タンク車明細」)
+    ''' </summary>
+    Protected Sub WW_ButtonSELECT_LIFTED_TAB2()
+
+    End Sub
+
+    ''' <summary>
+    ''' 全解除ボタン押下時処理(タブ「入換・積込指示」)
+    ''' </summary>
+    Protected Sub WW_ButtonSELECT_LIFTED_TAB3()
+
+    End Sub
+
+    ''' <summary>
+    ''' 全解除ボタン押下時処理(タブ「費用入力」)
+    ''' </summary>
+    Protected Sub WW_ButtonSELECT_LIFTED_TAB4()
+
+    End Sub
+
+    ''' <summary>
+    ''' 行削除ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonLINE_LIFTED_Click()
+
+        '〇 選択されたタブ一覧の行削除を制御
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            WW_ButtonLINE_LIFTED_TAB1()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            WW_ButtonLINE_LIFTED_TAB2()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            WW_ButtonLINE_LIFTED_TAB3()
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            WW_ButtonLINE_LIFTED_TAB4()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 行削除ボタン押下時処理(タブ「タンク車割当」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_LIFTED_TAB1()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        '■■■ OIT0001tbl関連の受注・受注明細を論理削除 ■■■
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注明細・貨車連結表を一括論理削除
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0003_DETAIL         " _
+                    & "    SET UPDYMD      = @P11,      " _
+                    & "        UPDUSER     = @P12,      " _
+                    & "        UPDTERMID   = @P13,      " _
+                    & "        RECEIVEYMD  = @P14,      " _
+                    & "        DELFLG      = '1'        " _
+                    & "  WHERE ORDERNO     = @P01       " _
+                    & "    AND DETAILNO    = @P02       " _
+                    & "    AND DELFLG     <> '1'       ;"
+
+            SQLStr &=
+                    " UPDATE OIL.OIT0004_LINK           " _
+                    & "    SET UPDYMD      = @P11,      " _
+                    & "        UPDUSER     = @P12,      " _
+                    & "        UPDTERMID   = @P13,      " _
+                    & "        RECEIVEYMD  = @P14,      " _
+                    & "        DELFLG      = '1'        " _
+                    & "  WHERE LINKNO       = @P03      " _
+                    & "    AND LINKDETAILNO = @P04      " _
+                    & "    AND DELFLG      <> '1'      ;"
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            '選択されている行は削除対象
+            Dim i As Integer = 0
+            Dim j As Integer = 9000
+            For Each OIT0001UPDrow In OIT0003tbl.Rows
+                If OIT0001UPDrow("OPERATION") = "on" Then
+                    j += 1
+                    OIT0001UPDrow("LINECNT") = j        'LINECNT
+                    OIT0001UPDrow("DELFLG") = C_DELETE_FLG.DELETE
+                    OIT0001UPDrow("HIDDEN") = 1
+
+                    PARA01.Value = OIT0001UPDrow("ORDERNO")
+                    PARA02.Value = OIT0001UPDrow("DETAILNO")
+                    PARA03.Value = OIT0001UPDrow("LINKNO")
+                    PARA04.Value = OIT0001UPDrow("LINKDETAILNO")
+
+                    PARA11.Value = Date.Now
+                    PARA12.Value = Master.USERID
+                    PARA13.Value = Master.USERTERMID
+                    PARA14.Value = C_DEFAULT_YMD
+
+                    SQLcmd.ExecuteNonQuery()
+                Else
+                    i += 1
+                    OIT0001UPDrow("LINECNT") = i        'LINECNT
+                End If
+            Next
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB1 DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 行削除ボタン押下時処理(タブ「タンク車明細」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_LIFTED_TAB2()
+
+    End Sub
+
+    ''' <summary>
+    ''' 行削除ボタン押下時処理(タブ「入換・積込指示」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_LIFTED_TAB3()
+
+    End Sub
+
+    ''' <summary>
+    ''' 行削除ボタン押下時処理(タブ「費用入力」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_LIFTED_TAB4()
+
+    End Sub
+
+    ''' <summary>
+    ''' 行追加ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonLINE_ADD_Click()
+        '〇 選択されたタブ一覧の行追加を制御
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            WW_ButtonLINE_ADD_TAB1()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            WW_ButtonLINE_ADD_TAB2()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            WW_ButtonLINE_ADD_TAB3()
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            WW_ButtonLINE_ADD_TAB4()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 行追加ボタン押下時処理(タブ「タンク車割当」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_ADD_TAB1()
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
+        'DataBase接続文字
+        Dim SQLcon = CS0050SESSION.getConnection
+        SQLcon.Open() 'DataBase接続(Open)
+
+        Dim SQLStrNum As String
+
+        'If work.WF_SEL_ORDERNUMBER.Text = "" Then
+        '○ 作成モード(１：新規登録, ２：更新)設定
+        If work.WF_SEL_CREATEFLG.Text = "1" Then
+            SQLStrNum =
+            " SELECT " _
+            & "  @P01   AS ORDERNO" _
+            & ", '001'  AS DETAILNO"
+
+        Else
+            SQLStrNum =
+            " SELECT " _
+            & "  ISNULL(OIT0003.ORDERNO,'')                                     AS ORDERNO" _
+            & ", ISNULL(FORMAT(CONVERT(INT, OIT0003.DETAILNO) + 1,'000'),'000') AS DETAILNO" _
+            & " FROM (" _
+            & "  SELECT OIT0003.ORDERNO" _
+            & "       , OIT0003.DETAILNO" _
+            & "       , ROW_NUMBER() OVER(PARTITION BY OIT0003.ORDERNO ORDER BY OIT0003.ORDERNO, OIT0003.DETAILNO DESC) RNUM" _
+            & "  FROM OIL.OIT0003_DETAIL OIT0003" _
+            & "  WHERE OIT0003.ORDERNO = @P01" _
+            & " ) OIT0003 " _
+            & " WHERE OIT0003.RNUM = 1"
+
+        End If
+
+        '○ 追加SQL
+        '　 説明　：　行追加用SQL
+        Dim SQLStr As String =
+              " SELECT TOP (1)" _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , @P01                                           AS ORDERNO" _
+            & " , @P08                                           AS DETAILNO" _
+            & " , @P02                                           AS SHIPPERSCODE" _
+            & " , @P03                                           AS SHIPPERSNAME" _
+            & " , @P04                                           AS BASECODE" _
+            & " , @P05                                           AS BASENAME" _
+            & " , @P06                                           AS CONSIGNEECODE" _
+            & " , @P07                                           AS CONSIGNEENAME" _
+            & " , ''                                             AS ORDERINFO" _
+            & " , ''                                             AS ORDERINFONAME" _
+            & " , ''                                             AS OILCODE" _
+            & " , ''                                             AS OILNAME" _
+            & " , ''                                             AS TANKQUOTA" _
+            & " , ''                                             AS LINKNO" _
+            & " , ''                                             AS LINKDETAILNO" _
+            & " , ''                                             AS LINEORDER" _
+            & " , ''                                             AS TANKNO" _
+            & " , ''                                             AS JRINSPECTIONALERT" _
+            & " , ''                                             AS JRINSPECTIONALERTSTR" _
+            & " , ''                                             AS JRINSPECTIONDATE" _
+            & " , ''                                             AS JRALLINSPECTIONALERT" _
+            & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
+            & " , ''                                             AS JRALLINSPECTIONDATE" _
+            & " , ''                                             AS LASTOILCODE" _
+            & " , ''                                             AS LASTOILNAME" _
+            & " , '0'                                            AS DELFLG" _
+            & " FROM sys.all_objects "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdNum As New SqlCommand(SQLStrNum, SQLcon)
+                Dim PARANUM1 As SqlParameter = SQLcmdNum.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                PARANUM1.Value = work.WF_SEL_ORDERNUMBER.Text
+
+                Using SQLdrNum As SqlDataReader = SQLcmdNum.ExecuteReader()
+
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdrNum.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLdrNum.GetName(index), SQLdrNum.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLdrNum)
+                End Using
+
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 3)  '受注明細№
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 10) '荷主コード
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 40) '荷主名
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 9)  '基地コード
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 40) '基地名
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10) '荷受人コード
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 40) '荷受人名
+
+                Dim intDetailNo As Integer = 0
+                For Each OIT0001WKrow As DataRow In OIT0003WKtbl.Rows
+                    intDetailNo = OIT0001WKrow("DETAILNO")
+                    PARA1.Value = OIT0001WKrow("ORDERNO")
+                    PARA8.Value = OIT0001WKrow("DETAILNO")
+                    PARA2.Value = work.WF_SEL_SHIPPERSCODE.Text
+                    PARA3.Value = work.WF_SEL_SHIPPERSNAME.Text
+                    PARA4.Value = work.WF_SEL_BASECODE.Text
+                    PARA5.Value = work.WF_SEL_BASENAME.Text
+                    PARA6.Value = work.WF_SEL_CONSIGNEECODE.Text
+                    PARA7.Value = work.WF_SEL_CONSIGNEENAME.Text
+                Next
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003tbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                Dim j As Integer = 9000
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+                    '行追加データに既存の受注№を設定する。
+                    '既存データがなく新規データの場合は、SQLでの項目[受注№]を利用
+                    If OIT0003row("LINECNT") = 0 Then
+                        OIT0003row("DETAILNO") = intDetailNo.ToString("000")
+
+                    ElseIf OIT0003row("DETAILNO") = intDetailNo.ToString("000") Then
+                        intDetailNo += 1
+
+                    End If
+
+                    '削除対象データと通常データとそれぞれでLINECNTを振り分ける
+                    If OIT0003row("HIDDEN") = 1 Then
+                        j += 1
+                        OIT0003row("LINECNT") = j        'LINECNT
+                    Else
+                        i += 1
+                        OIT0003row("LINECNT") = i        'LINECNT
+                    End If
+
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB1 SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 行追加ボタン押下時処理(タブ「タンク車明細」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_ADD_TAB2()
+
+    End Sub
+
+    ''' <summary>
+    ''' 行追加ボタン押下時処理(タブ「入換・積込指示」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_ADD_TAB3()
+
+    End Sub
+
+    ''' <summary>
+    ''' 行追加ボタン押下時処理(タブ「費用入力」)
+    ''' </summary>
+    Protected Sub WW_ButtonLINE_ADD_TAB4()
 
     End Sub
 
@@ -2785,6 +3275,35 @@ Public Class OIT0003OrderDetail
                 I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI
             End If
         End If
+
+    End Sub
+
+
+    ''' <summary>
+    ''' エラーレポート編集
+    ''' </summary>
+    ''' <param name="MESSAGE1"></param>
+    ''' <param name="MESSAGE2"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String)
+
+        Dim WW_ERR_MES As String = ""
+        WW_ERR_MES = MESSAGE1
+        If MESSAGE2 <> "" Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+        End If
+
+        WW_ERR_MES &= ControlChars.NewLine & "  --> オーダー№         =" & TxtOrderNo.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> 本線列車           =" & TxtTrainNo.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> 発駅               =" & TxtDepstationCode.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> 着駅               =" & TxtArrstationCode.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)積込日       =" & TxtLoadingDate.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)発日         =" & TxtDepDate.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)積車着日     =" & TxtArrDate.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)受入日       =" & TxtAccDate.Text
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)空車着日     =" & TxtEmparrDate.Text
+
+        rightview.SetErrorReport(WW_ERR_MES)
 
     End Sub
 

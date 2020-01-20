@@ -22,32 +22,36 @@ function InitDisplay() {
             //活性
             document.getElementById("WF_ButtonINSERT").disabled = "";
             //非活性 
-            //document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
-            //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-            //document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
-            //document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
+            //タブ１
+            document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
             //document.getElementById("WF_ButtonCSV").disabled = "disabled";
-            //document.getElementById("WF_ButtonUPDATE").disabled = "";
+            document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+
         } else if (document.getElementById('WF_CREATEFLG').value === "2") {
             //非活性
             document.getElementById("WF_ButtonINSERT").disabled = "disabled";
             //活性 
-            //document.getElementById("WF_ButtonALLSELECT").disabled = "";
-            //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
-            //document.getElementById("WF_ButtonLINE_LIFTED").disabled = "";
-            //document.getElementById("WF_ButtonLINE_ADD").disabled = "";
+            //タブ１
+            document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";
+            document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "";
+            document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
+            document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
             //document.getElementById("WF_ButtonCSV").disabled = "";
-            //document.getElementById("WF_ButtonUPDATE").disabled = "";
+            document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
         }
 
     } else {
         //非活性 
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
-        //document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
-        //document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-        //document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
-        //document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
-        //document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
+        //タブ１
+        document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
+        document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
+        document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
+        document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+        document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
     }
 
     // 上部 表示/非表示イベントバインド

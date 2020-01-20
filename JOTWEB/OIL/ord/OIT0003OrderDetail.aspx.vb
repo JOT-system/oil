@@ -2665,7 +2665,8 @@ Public Class OIT0003OrderDetail
                 'WW_FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
+                    WW_FixvalueMasterSearch(Master.USER_ORG + WF_SelectedIndex.Value, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
+                    'WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
                 Else
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
                 End If
@@ -3089,6 +3090,7 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(VIW0001.VALUE6), '   ')   AS VALUE6" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE7), '   ')   AS VALUE7" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE8), '   ')   AS VALUE8" _
+                & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '   ')   AS SYSTEMKEYFLG" _
                 & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
@@ -3137,7 +3139,7 @@ Public Class OIT0003OrderDetail
                     '    '〇〇部、支店対応
                     'ElseIf I_PARA01 <> "" Then
                     '    For Each OIT0001WKrow As DataRow In OIT0003Fixvaltbl.Rows
-                    '        If OIT0001WKrow("VALUE8") = I_PARA01 Then
+                    '        If OIT0001WKrow("SYSTEMKEYFLG") = I_PARA01 Then
                     '            O_VALUE(0) = OIT0001WKrow("VALUE1")
                     '            O_VALUE(1) = OIT0001WKrow("VALUE2")
                     '            O_VALUE(2) = OIT0001WKrow("VALUE3")

@@ -18,7 +18,6 @@ window.addEventListener('load', function () {
             }
         });
     }
-
     //ポップアップ背面を使用不可に変更
     var popUpObj = document.getElementById('pnlCommonMessageWrapper');
     if (popUpObj !== null) {
@@ -44,9 +43,40 @@ window.addEventListener('DOMContentLoaded', function () {
     }
     // マウスポインタ戻す
     AutoCursor();
+    //フォーカス合わせ
+    let leftView = document.getElementById('LF_LEFTBOX');
+    if (leftView !== null) {
+        if (leftView.style.display !== 'block') {
+            let saveKey = document.title + "currentItemId";
+            var tergetItemId = sessionStorage.getItem(saveKey);
+            if (tergetItemId !== null) {
+                let varItem = document.getElementById(tergetItemId);
+                if (varItem !== null) {
+                    //IEだと通常のフォーカスメソッドだけだと機能しないためタイマーで稼働させる
+                    //IEを無視するなら「varItem.focus();」で良い
+                    setTimeout(function () {
+                        document.getElementById(tergetItemId).focus();
+                        var divContensboxObj = document.getElementById("divContensbox");
+                        if (divContensboxObj !== null) {
+                            let saveScrollKey = document.title + "contentsXpos";
+                            let contentsScrollX = sessionStorage.getItem(saveScrollKey);
+                            divContensboxObj.scrollLeft = contentsScrollX;
+                            sessionStorage.removeItem(saveScrollKey);
+                        }
+                    }, 10);
+                }
+            }
+            sessionStorage.removeItem(saveKey);
+        }
+        var divContensboxObj = document.getElementById("divContensbox");
+        if (divContensboxObj !== null) {
+            let saveScrollKey = document.title + "contentsXpos";
+            let contentsScrollX = sessionStorage.getItem(saveScrollKey);
+            divContensboxObj.scrollLeft = contentsScrollX;
+        }
+    }
     // 確認ウィンドウ
     ConfirmWindow();
-
     /* ******************************** */
     /* 虫眼鏡・検索のオブジェクトを付与 */
     /* ******************************** */
@@ -60,6 +90,7 @@ window.addEventListener('DOMContentLoaded', function () {
         commonAppendInputBoxIcon(targetTextBoxList);
         document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     }
+
 });
 
 // 処理後カーソルを戻す
@@ -74,7 +105,7 @@ function AdjustHeaderFooterContents(footerContentsId) {
     }
     /* 下部の高さを定義 */
     var footerClientRect = footerContentObj.getBoundingClientRect();
-    /* 12はWrapperObjのPadding-Bottom*/ 
+    /* 12はWrapperObjのPadding-Bottom*/
     let otherContntsHeight = footerContentObj.offsetTop;
     footerContentObj.style.height = "calc(100% - " + otherContntsHeight + "px)";
 }
@@ -1144,6 +1175,7 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
     if (targetTextBoxList.length === 0) {
         return;
     }
+
     //対象のオブジェクトをループ
     for (let i = 0; i < targetTextBoxList.length; i++) {
         let inputObj = targetTextBoxList[i];
@@ -1159,7 +1191,7 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
             continue;
         }
 
-        
+
         parentObj.style.position = 'relative';
         let additionalClass = 'boxIconArea';
         if (inputObj.classList.contains('calendarIcon')) {
@@ -1190,6 +1222,18 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
                 elm.dispatchEvent(evt);
             };
         })(inputObjId), false);
+        //フォーカス保持用
+        parentObj.addEventListener('dblclick', (function (inputObjId) {
+            return function () {
+                var saveKey = document.title + "currentItemId";
+                sessionStorage.setItem(saveKey, inputObjId);
+                var divContensboxObj = document.getElementById("divContensbox");
+                if (divContensboxObj !== null) {
+                    saveScrollKey = document.title + "contentsXpos";
+                    sessionStorage.setItem(saveScrollKey, divContensboxObj.scrollLeft);
+                }
+            };
+        })(inputObjId), true);
         // アイコン配置後のテキストボックスのサイズを補正(アイコンが無い状態に合わせる)
         inputObj = document.getElementById(inputObj.id);
         iconElm = document.getElementById(objId);

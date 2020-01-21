@@ -210,7 +210,7 @@ Public Class OIT0003OrderDetail
 
         '○ 詳細-画面初期設定
         'Repeater_INIT()
-        'WF_DTAB_CHANGE_NO.Value = "0"
+        WF_DTAB_CHANGE_NO.Value = "0"
 
         '〇 タブ切替
         WF_Detail_TABChange()
@@ -231,13 +231,11 @@ Public Class OIT0003OrderDetail
 
         '受注営業所
         'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
-        If work.WF_SEL_CREATEFLG.Text = "1" Then        '作成モード(１：新規登録)
-            TxtOrderOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
-        Else                                            '作成モード(２：更新)
+        If work.WF_SEL_CREATEFLG.Text = "2" Then        '作成モード(２：更新)
             TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
+        Else                                            '作成モード(１：新規登録)
+            TxtOrderOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
         End If
-        ''受注営業所は読取専用とする。
-        'TxtOrderOffice.ReadOnly = True
 
         'ステータス
         If work.WF_SEL_ORDERSTATUSNM.Text = "" Then
@@ -247,7 +245,14 @@ Public Class OIT0003OrderDetail
         TxtOrderStatus.Text = work.WF_SEL_ORDERSTATUSNM.Text
 
         '情報
-        TxtOrderInfo.Text = work.WF_SEL_INFORMATIONNM.Text
+        'TxtOrderInfo.Text = work.WF_SEL_INFORMATIONNM.Text
+        '〇 積置可否フラグ(１：積置あり, ２：積置なし)
+        If work.WF_SEL_STACKINGFLG.Text = "1" Then
+            chkOrderInfo.Checked = True
+        Else
+            chkOrderInfo.Checked = False
+        End If
+
         '###################################################
         '受注パターン
         CODENAME_get("ORDERTYPE", work.WF_SEL_PATTERNCODE.Text, work.WF_SEL_PATTERNNAME.Text, WW_DUMMY)
@@ -1107,8 +1112,15 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        '○ 画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
 
+            MAPDataGet(SQLcon, "18")
+        End Using
 
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -1269,8 +1281,10 @@ Public Class OIT0003OrderDetail
                         End If
                     End If
 
-                    '油種
-                    If WF_FIELD.Value = "OILNAME" Then
+                    '(一覧)荷主名, (一覧)油種, (一覧)タンク車№
+                    If WF_FIELD.Value = "SHIPPERSNAME" _
+                        OrElse WF_FIELD.Value = "OILNAME" _
+                        OrElse WF_FIELD.Value = "TANKNO" Then
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
@@ -1281,25 +1295,40 @@ Public Class OIT0003OrderDetail
                             End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
-                            'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
                         End If
                     End If
 
-                    'タンク車№
-                    If WF_FIELD.Value = "TANKNO" Then
-                        '〇 検索(営業所).テキストボックスが未設定
-                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            '〇 画面(受注営業所).テキストボックスが未設定
-                            If TxtOrderOffice.Text = "" Then
-                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
-                            Else
-                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "")
-                            End If
-                        Else
-                            'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
-                        End If
-                    End If
+                    ''(一覧)油種
+                    'If WF_FIELD.Value = "OILNAME" Then
+                    '    '〇 検索(営業所).テキストボックスが未設定
+                    '    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    '        '〇 画面(受注営業所).テキストボックスが未設定
+                    '        If TxtOrderOffice.Text = "" Then
+                    '            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                    '        Else
+                    '            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "")
+                    '        End If
+                    '    Else
+                    '        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                    '        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                    '    End If
+                    'End If
+
+                    ''(一覧)タンク車№
+                    'If WF_FIELD.Value = "TANKNO" Then
+                    '    '〇 検索(営業所).テキストボックスが未設定
+                    '    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    '        '〇 画面(受注営業所).テキストボックスが未設定
+                    '        If TxtOrderOffice.Text = "" Then
+                    '            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                    '        Else
+                    '            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "")
+                    '        End If
+                    '    Else
+                    '        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
+                    '        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                    '    End If
+                    'End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .ActiveListBox()
@@ -1969,7 +1998,10 @@ Public Class OIT0003OrderDetail
                     If OIT0003row("LINECNT") = 0 Then
                         OIT0003row("DETAILNO") = intDetailNo.ToString("000")
 
-                    ElseIf OIT0003row("DETAILNO") = intDetailNo.ToString("000") Then
+                    ElseIf OIT0003row("DETAILNO") >= intDetailNo.ToString("000") Then
+                        intDetailNo += 1
+
+                    ElseIf OIT0003row("HIDDEN") = 1 Then
                         intDetailNo += 1
 
                     End If

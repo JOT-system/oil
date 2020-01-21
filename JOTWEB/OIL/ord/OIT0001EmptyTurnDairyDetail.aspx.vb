@@ -1665,7 +1665,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                         OIT0001row("LINECNT") = i        'LINECNT
                     End If
                     'strOrderNoBak = OIT0001row("ORDERNO")
-                    If OIT0001row("DETAILNO") = intDetailNo Then
+                    If OIT0001row("DETAILNO") >= intDetailNo Then
+                        intDetailNo += 1
+                    ElseIf OIT0001row("HIDDEN") = 1 Then
                         intDetailNo += 1
                     End If
                 Next

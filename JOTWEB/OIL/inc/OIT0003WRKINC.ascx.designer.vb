@@ -30,7 +30,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_UORG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SALESOFFICECODEMAP コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SALESOFFICECODEMAP As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SALESOFFICECODE コントロール。
     '''</summary>
@@ -183,7 +183,25 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INFORMATIONNM As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_STACKINGFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_STACKINGFLG As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_USEPROPRIETYFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_USEPROPRIETYFLG As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_ORDERNUMBER コントロール。
     '''</summary>

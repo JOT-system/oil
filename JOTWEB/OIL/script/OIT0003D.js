@@ -16,7 +16,7 @@ function InitDisplay() {
     }
 
     //更新ボタン活性／非活性
-    var objDtabNo = document.getElementById("WF_DTAB_CHANGE_NO");
+    let objDtabNo = document.getElementById("WF_DTAB_CHANGE_NO").value;
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //更新ボタン活性／非活性(新規登録、更新で切り分け)
         if (document.getElementById('WF_CREATEFLG').value === "1") {
@@ -182,6 +182,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         }
         else if (fieldNM === "OILNAME") {
             document.getElementById('WF_LeftMViewChange').value = 24;
+        }
+        else if (fieldNM === "SHIPPERSNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 42;
         }
         else if (fieldNM === "RETURNDATETRAIN") {
             document.getElementById('WF_LeftMViewChange').value = 17;

@@ -77,13 +77,13 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtOrderStatus As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtOrderInfo コントロール。
+    '''chkOrderInfo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOrderInfo As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents chkOrderInfo As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
     '''TxtOrderType コントロール。

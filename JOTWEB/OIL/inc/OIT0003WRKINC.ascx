@@ -43,6 +43,10 @@
     <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>
     <!-- 情報(名) -->
     <asp:TextBox ID="WF_SEL_INFORMATIONNM" runat="server"></asp:TextBox>
+    <!-- 積置可否フラグ -->
+    <asp:TextBox ID="WF_SEL_STACKINGFLG" runat="server"></asp:TextBox>
+    <!-- 利用可否フラグ -->
+    <asp:TextBox ID="WF_SEL_USEPROPRIETYFLG" runat="server"></asp:TextBox>
     <!-- 受注№ -->
     <asp:TextBox ID="WF_SEL_ORDERNUMBER" runat="server"></asp:TextBox>
     <!-- 列車 -->

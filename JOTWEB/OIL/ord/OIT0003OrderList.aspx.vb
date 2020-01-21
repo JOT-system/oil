@@ -277,6 +277,8 @@ Public Class OIT0003OrderList
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIS0015_2.VALUE1), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIS0015_2.VALUE1), '')" _
             & "   END                                                AS ORDERINFONAME" _
+            & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
+            & " , ISNULL(RTRIM(OIT0002.USEPROPRIETYFLG), '')   　    AS USEPROPRIETYFLG" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
             & "   WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
@@ -605,6 +607,10 @@ Public Class OIT0003OrderList
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = ""
+        '積置可否フラグ(１：積置あり, ２：積置なし)
+        work.WF_SEL_STACKINGFLG.Text = "2"
+        '利用可否フラグ(１：利用可, ２：利用不可)
+        work.WF_SEL_USEPROPRIETYFLG.Text = "1"
         '受注№
         work.WF_SEL_ORDERNUMBER.Text = ""
         '本線列車
@@ -896,6 +902,10 @@ Public Class OIT0003OrderList
         work.WF_SEL_INFORMATIONNM.Text = Regex.Replace(OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME"), "<[^>]*?>", "")
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFO")
+        '積置可否フラグ
+        work.WF_SEL_STACKINGFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("STACKINGFLG")
+        '利用可否フラグ
+        work.WF_SEL_USEPROPRIETYFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("USEPROPRIETYFLG")
         '受注№
         work.WF_SEL_ORDERNUMBER.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERNO")
         '本線列車

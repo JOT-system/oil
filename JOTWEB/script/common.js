@@ -1182,7 +1182,9 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
         let parentObj = inputObj.parentElement;
         // 対象オブジェクトが使用不可(または読み取り)の場合は
         // ダブルクリックをワークさせない
-        if (inputObj.disabled || inputObj.readOnly) {
+        let iconOnly = false;
+  
+        if (inputObj.disabled || (inputObj.readOnly && !inputObj.classList.contains('iconOnly'))) {
             parentObj.ondblclick = ""; /* 親要素のダブルクリックを排除 */
             inputObj.addEventListener('dblclick', function (e) {
                 e.stopPropagation(); /* テキストボックスのダブルクリック伝達を抑止 */

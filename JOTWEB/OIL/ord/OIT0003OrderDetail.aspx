@@ -94,7 +94,7 @@
                 <span class="left">
                     <a id="WF_OFFICECODE_LABEL" class="requiredMark">受注営業所</a>
                     <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
-                        <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="20"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" CssClass="boxIcon iconOnly" MaxLength="20"></asp:TextBox>
                     </a>
                 </span>
                 <!-- ■　本線列車　■ -->

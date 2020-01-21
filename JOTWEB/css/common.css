@@ -348,8 +348,8 @@ input[type=text].calendarIcon {
 }
 input[type=text][disabled].boxIcon,
 input[type=text][disabled].calendarIcon,
-input[type=text][readonly].boxIcon,
-input[type=text][readonly].calendarIcon {
+input[type=text][readonly].boxIcon:not(.iconOnly),
+input[type=text][readonly].calendarIcon:not(.iconOnly) {
     padding-left: 0.3em;
 }
 /* ------------------------------

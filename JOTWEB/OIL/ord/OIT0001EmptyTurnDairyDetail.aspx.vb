@@ -326,6 +326,18 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        For Each rowitem As TableRow In tblObj.Rows
+            For Each cellObj As TableCell In rowitem.Controls
+                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") Then
+                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                End If
+            Next
+        Next
+
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
 
@@ -658,6 +670,18 @@ Public Class OIT0001EmptyTurnDairyDetail
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
+
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        For Each rowitem As TableRow In tblObj.Rows
+            For Each cellObj As TableCell In rowitem.Controls
+                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") Then
+                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                End If
+            Next
+        Next
 
         '○ クリア
         If TBLview.Count = 0 Then

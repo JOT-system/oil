@@ -33,7 +33,7 @@
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
         </div>
-        <div style="display=none;" data-comment="わからないので退避">
+        <div style="display:none;" data-comment="わからないので退避">
             <!-- 会社コード -->
             <div style="display:none">
                 <a>会社コード</a>
@@ -96,6 +96,7 @@
                     <a id="WF_OFFICECODE_LABEL" class="requiredMark">受注営業所</a>
                     <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
                         <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="20"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderOfficeCode" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                     </a>
                 </span>
                 <!-- ■　本線列車　■ -->

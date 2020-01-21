@@ -104,6 +104,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtOrderOffice As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtOrderOfficeCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOrderOfficeCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtTrainNo コントロール。
     '''</summary>
     '''<remarks>

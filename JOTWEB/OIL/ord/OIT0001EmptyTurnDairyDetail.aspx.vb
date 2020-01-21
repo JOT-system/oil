@@ -39,8 +39,8 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
     Private WW_ORDERINFOFLG_10 As Boolean = False                        '受注情報セット可否(情報(10:積置))
-    Private WW_ORDERINFO_10 As String = "10"                             '受注情報(10:積置)用格納
-    Private WW_ORDERINFONAME_10 As String = "積置"
+    'Private WW_ORDERINFO_10 As String = "10"                             '受注情報(10:積置)用格納
+    'Private WW_ORDERINFONAME_10 As String = "積置"
 
     Private WW_ORDERINFOALERMFLG_80 As Boolean = False                   '受注情報セット可否(警告(80:タンク車数オーバー))
     Private WW_ORDERINFOALERM_80 As String = "80"                        '受注情報(80:タンク車数オーバー)用格納
@@ -3233,9 +3233,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                     If WW_ORDERINFOALERMFLG_82 = True Then
                         PARA22.Value = WW_ORDERINFOALERM_82
 
-                        '〇 積込日 < 発日 の場合 
-                    ElseIf WW_ORDERINFOFLG_10 = True AndAlso WW_ORDERINFOALERMFLG_82 = False Then
-                        PARA22.Value = WW_ORDERINFO_10
+                        '    '〇 積込日 < 発日 の場合 
+                        'ElseIf WW_ORDERINFOFLG_10 = True AndAlso WW_ORDERINFOALERMFLG_82 = False Then
+                        '    PARA22.Value = WW_ORDERINFO_10
 
                         '〇 上記以外
                     ElseIf WW_ORDERINFOALERMFLG_82 = False Then

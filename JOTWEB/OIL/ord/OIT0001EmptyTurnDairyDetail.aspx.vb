@@ -1947,8 +1947,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 OIT0001INProw("TANKNO") = XLSTBLrow("TANKNO")
 
                 '●タンク車№から対象データを自動で設定
-                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
-                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
+                'WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
                 OIT0001INProw("LASTOILCODE") = WW_GetValue(1)
 
                 '交検日
@@ -2159,7 +2159,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Exit Select
                 End If
 
-                WW_FixvalueMasterSearch("", "TANKNUMBER", WW_ListValue, WW_GetValue)
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_ListValue, WW_GetValue)
 
                 'タンク車№
                 updHeader.Item("TANKNO") = WW_ListValue

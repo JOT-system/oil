@@ -1128,6 +1128,19 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_DBClick()
+
+        '〇 受注営業所チェック
+        '受注営業所が選択されていない場合は、他の検索(LEFTBOX)は表示させない制御をする
+        '※受注営業所は他の検索するためのKEYとして使用するため
+        If WF_FIELD.Value <> "TxtOrderOffice" AndAlso TxtOrderOffice.Text = "" Then
+            Master.Output(C_MESSAGE_NO.OIL_ORDEROFFICE_UNSELECT, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            TxtArrstationCode.Focus()
+            WW_CheckERR("受注営業所が未選択。", C_MESSAGE_NO.OIL_ORDEROFFICE_UNSELECT)
+            WF_LeftboxOpen.Value = ""   'LeftBoxを表示させない
+            TxtOrderOffice.Focus()
+            Exit Sub
+        End If
+
         If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
             Try
                 Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
@@ -1150,28 +1163,32 @@ Public Class OIT0003OrderDetail
                     '########################################
                     '受注営業所
                     If WF_FIELD.Value = "TxtOrderOffice" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
+
+                            ''〇 画面(受注営業所).テキストボックスが未設定
+                            'If TxtOrderOffice.Text = "" Then
+                            '    prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
+                            'Else
+                            '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtOrderOffice.Text)
+                            'End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtOrderOffice.Text)
                         End If
                     End If
                     '########################################
 
-                    '〇 受注営業所チェック
-                    '受注営業所が選択されていない場合は、他の検索(LEFTBOX)は表示させない制御をする
-                    '※受注営業所は他の検索するためのKEYとして使用するため
-                    If TxtOrderOffice.Text = "" Then
-                        Master.Output(C_MESSAGE_NO.OIL_ORDEROFFICE_UNSELECT, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                        TxtArrstationCode.Focus()
-                        WW_CheckERR("受注営業所が未選択。", C_MESSAGE_NO.OIL_ORDEROFFICE_UNSELECT)
-                        Exit Sub
-                    End If
-
                     '受注パターン
                     If WF_FIELD.Value = "TxtOrderType" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderType.Text)
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderType.Text)
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtOrderType.Text)
+                            End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtOrderType.Text)
                         End If
@@ -1179,8 +1196,14 @@ Public Class OIT0003OrderDetail
 
                     '荷主名
                     If WF_FIELD.Value = "TxtShippersCode" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtShippersCode.Text)
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtShippersCode.Text)
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtShippersCode.Text)
+                            End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtShippersCode.Text)
                         End If
@@ -1188,8 +1211,14 @@ Public Class OIT0003OrderDetail
 
                     '荷受人名
                     If WF_FIELD.Value = "TxtConsigneeCode" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtConsigneeCode.Text)
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtConsigneeCode.Text)
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtConsigneeCode.Text)
+                            End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtConsigneeCode.Text)
                         End If
@@ -1197,8 +1226,14 @@ Public Class OIT0003OrderDetail
 
                     '本線列車
                     If WF_FIELD.Value = "TxtTrainNo" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtTrainNo.Text)
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtTrainNo.Text)
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtTrainNo.Text)
+                            End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtTrainNo.Text)
                         End If
@@ -1206,8 +1241,14 @@ Public Class OIT0003OrderDetail
 
                     '発駅
                     If WF_FIELD.Value = "TxtDepstationCode" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "1", TxtDepstationCode.Text)
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "1", TxtDepstationCode.Text)
+                            Else
+                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_ORDERSALESOFFICECODE.Text + "1", TxtDepstationCode.Text)
+                            End If
                         Else
                             prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", TxtDepstationCode.Text)
                         End If
@@ -1215,8 +1256,14 @@ Public Class OIT0003OrderDetail
 
                     '着駅
                     If WF_FIELD.Value = "TxtArrstationCode" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "2", TxtArrstationCode.Text)
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "2", TxtArrstationCode.Text)
+                            Else
+                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_ORDERSALESOFFICECODE.Text + "2", TxtArrstationCode.Text)
+                            End If
                         Else
                             prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", TxtArrstationCode.Text)
                         End If
@@ -1224,8 +1271,14 @@ Public Class OIT0003OrderDetail
 
                     '油種
                     If WF_FIELD.Value = "OILNAME" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "")
+                            End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                             'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
@@ -1234,8 +1287,14 @@ Public Class OIT0003OrderDetail
 
                     'タンク車№
                     If WF_FIELD.Value = "TANKNO" Then
+                        '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "")
+                            End If
                         Else
                             'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
@@ -1372,8 +1431,14 @@ Public Class OIT0003OrderDetail
 
                 Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
 
+                '〇 検索(営業所).テキストボックスが未設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                    End If
                 Else
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
                 End If
@@ -1396,8 +1461,14 @@ Public Class OIT0003OrderDetail
                 '〇営業所配下情報を取得・設定
                 WW_GetValue = {"", "", "", "", "", "", "", ""}
 
+                '〇 検索(営業所).テキストボックスが未設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    End If
                 Else
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
                 End If
@@ -2074,7 +2145,18 @@ Public Class OIT0003OrderDetail
                     Exit Select
                 End If
 
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                '〇 検索(営業所).テキストボックスが未設定
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                    End If
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                End If
 
                 'タンク車№
                 updHeader.Item("TANKNO") = WW_ListValue
@@ -2084,10 +2166,6 @@ Public Class OIT0003OrderDetail
                 updHeader.Item("LASTOILCODE") = WW_GetValue(1)
                 CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
                 updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
-
-                'Dim WW_GetValue2() As String = {"", "", "", "", "", ""}
-                'WW_FixvalueMasterSearch("", "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue2)
-                'updHeader.Item("LASTOILNAME") = WW_GetValue2(0)
 
                 '交検日
                 Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
@@ -2730,9 +2808,16 @@ Public Class OIT0003OrderDetail
                 TxtTrainNo.Text = WW_SelectValue
                 'WW_FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
+                '〇 検索(営業所).テキストボックスが未設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    'WW_FixvalueMasterSearch(Master.USER_ORG + WF_SelectedIndex.Value, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
-                    WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        'WW_FixvalueMasterSearch(Master.USER_ORG + WF_SelectedIndex.Value, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue, I_PARA01:=WF_SelectedIndex.Value)
+                    End If
+
                 Else
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
                 End If
@@ -2748,8 +2833,14 @@ Public Class OIT0003OrderDetail
                 '〇営業所配下情報を取得・設定
                 WW_GetValue = {"", "", "", "", "", "", "", ""}
 
+                '〇 検索(営業所).テキストボックスが未設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    End If
                 Else
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
                 End If
@@ -2791,7 +2882,12 @@ Public Class OIT0003OrderDetail
 
                 '〇営業所配下情報を取得・設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    End If
                 Else
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
                 End If
@@ -2991,7 +3087,18 @@ Public Class OIT0003OrderDetail
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                     updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
 
-                    WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    '〇 検索(営業所).テキストボックスが未設定
+                    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                        '〇 画面(受注営業所).テキストボックスが未設定
+                        If TxtOrderOffice.Text = "" Then
+                            WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                        Else
+                            WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                        End If
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    End If
 
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""

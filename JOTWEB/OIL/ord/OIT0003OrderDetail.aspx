@@ -90,14 +90,21 @@
                 </span>
                 <!-- <span></span> -->
 
-                <!-- ■　本線列車　■ -->
+                <!-- ■　受注営業所　■ -->
                 <span class="left">
+                    <a id="WF_OFFICECODE_LABEL" class="requiredMark">受注営業所</a>
+                    <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
+                        <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="20"></asp:TextBox>
+                    </a>
+                </span>
+                <!-- ■　本線列車　■ -->
+                <span>
                     <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
                     <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">
                         <asp:TextBox ID="TxtTrainNo" runat="server" CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
                     </a>
                 </span>
-                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span>
 
                 <!-- ■　荷主　■ -->
                 <span class="left">

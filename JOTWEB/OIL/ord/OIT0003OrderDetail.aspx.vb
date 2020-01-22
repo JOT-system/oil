@@ -112,7 +112,7 @@ Public Class OIT0003OrderDetail
                              "WF_ButtonUPDATE_TAB2",
                              "WF_ButtonUPDATE_TAB3",
                              "WF_ButtonUPDATE_TAB4"
-                            'WF_ButtonUPDATE_Click()
+                            WF_ButtonUPDATE_Click()
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"              'マウスホイール(Down)
@@ -564,6 +564,13 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS LASTOILCODE" _
             & " , ''                                             AS LASTOILNAME" _
+            & " , ''                                             AS CHANGETRAINNO" _
+            & " , ''                                             AS SECONDCONSIGNEECODE" _
+            & " , ''                                             AS SECONDCONSIGNEENAME" _
+            & " , ''                                             AS SECONDARRSTATION" _
+            & " , ''                                             AS SECONDARRSTATIONNAME" _
+            & " , ''                                             AS CANGERETSTATION" _
+            & " , ''                                             AS CHANGEARRSTATIONNAME" _
             & " , '0'                                            AS DELFLG" _
             & " FROM sys.all_objects "
 
@@ -644,6 +651,13 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
                 & " , ISNULL(RTRIM(OIT0005.LASTOILCODE), '')                        AS LASTOILCODE" _
                 & " , ISNULL(RTRIM(OIM0003_PAST.OILNAME), '')                       AS LASTOILNAME" _
+                & " , ISNULL(RTRIM(OIT0003.CHANGETRAINNO), '')                      AS CHANGETRAINNO" _
+                & " , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEECODE), '')                AS SECONDCONSIGNEECODE" _
+                & " , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
+                & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
+                & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
+                & " , ISNULL(RTRIM(OIT0003.CANGERETSTATION), '')                    AS CANGERETSTATION" _
+                & " , ISNULL(RTRIM(OIT0003.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
                 & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                             AS DELFLG" _
                 & " FROM OIL.OIT0002_ORDER OIT0002 " _
                 & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
@@ -868,6 +882,13 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
             & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')                         AS LASTOILCODE" _
             & " , ISNULL(RTRIM(OIM0003_PAST.OILNAME), '')                       AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGETRAINNO), '')                      AS CHANGETRAINNO" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEECODE), '')                AS SECONDCONSIGNEECODE" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CANGERETSTATION), '')                    AS CANGERETSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0004.DELFLG), '')                             AS DELFLG" _
             & " FROM OIL.OIT0004_LINK OIT0004 " _
             & " LEFT JOIN OIL.TMP0001ORDER TMP0001 ON " _
@@ -919,8 +940,15 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERT), '')               AS JRALLINSPECTIONALERT" _
             & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERTSTR), '')            AS JRALLINSPECTIONALERTSTR" _
             & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONDATE), '')                AS JRALLINSPECTIONDATE" _
-            & " , ''                                                            AS LASTOILCODE" _
-            & " , ''                                                            AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.LASTOILCODE), '')                        AS LASTOILCODE" _
+            & " , ISNULL(RTRIM(TMP0001.LASTOILNAME), '')                        AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGETRAINNO), '')                      AS CHANGETRAINNO" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEECODE), '')                AS SECONDCONSIGNEECODE" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CANGERETSTATION), '')                    AS CANGERETSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
             & " , ISNULL(RTRIM(TMP0001.DELFLG), '')                             AS DELFLG" _
             & " FROM OIL.TMP0001ORDER TMP0001 " _
             & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
@@ -2542,6 +2570,9 @@ Public Class OIT0003OrderDetail
                 Case "ARRSTATION"       '着駅
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ARRSTATION"))
 
+                Case "TANKNO"           'タンク車
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "TANKNO"))
+
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
@@ -4048,13 +4079,15 @@ Public Class OIT0003OrderDetail
 
         '○ 単項目チェック
         '受注営業所
-        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", work.WF_SEL_SALESOFFICECODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtOrderOfficeCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", work.WF_SEL_SALESOFFICECODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
-            CODENAME_get("SALESOFFICE", work.WF_SEL_SALESOFFICECODE.Text, TxtOrderOffice.Text, WW_RTN_SW)
+            CODENAME_get("SALESOFFICE", TxtOrderOfficeCode.Text, TxtOrderOffice.Text, WW_RTN_SW)
+            'CODENAME_get("SALESOFFICE", work.WF_SEL_SALESOFFICECODE.Text, TxtOrderOffice.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
                 Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
-                              "受注営業所 : " & work.WF_SEL_SALESOFFICECODE.Text)
+                              "受注営業所 : " & TxtOrderOfficeCode.Text)
                 TxtOrderOffice.Focus()
                 O_RTN = "ERR"
                 Exit Sub
@@ -4075,6 +4108,50 @@ Public Class OIT0003OrderDetail
             Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "本線列車", needsPopUp:=True)
             TxtTrainNo.Focus()
             WW_CheckMES1 = "本線列車入力エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '荷主
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SHIPPERSCODE", TxtShippersCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+                              "荷主 : " & TxtShippersCode.Text)
+                TxtShippersCode.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            TxtShippersCode.Focus()
+            WW_CheckMES1 = "荷主入力エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '荷受人
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CONSIGNEECODE", TxtConsigneeCode.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+                              "荷受人 : " & TxtConsigneeCode.Text)
+                TxtConsigneeCode.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
+            TxtConsigneeCode.Focus()
+            WW_CheckMES1 = "荷受人入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
@@ -4206,6 +4283,142 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        '(予定)空車着日
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EMPARRDATE", TxtEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            Try
+                Date.TryParse(TxtEmparrDate.Text, WW_STYMD)
+            Catch ex As Exception
+                WW_STYMD = C_DEFAULT_YMD
+            End Try
+        Else
+            '年月日チェック
+            WW_CheckDate(TxtEmparrDate.Text, "(予定)空車着日", WW_CS0024FCHECKERR)
+            'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
+            TxtEmparrDate.Focus()
+            WW_CheckMES1 = "空車着日入力エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '〇 (実績)の日付は入力されていた場合チェックする。
+        '(実績)積込日
+        If TxtActualLoadingDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALLODDATE", TxtActualLoadingDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualLoadingDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualLoadingDate.Text, "(実績)積込日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
+                TxtActualLoadingDate.Focus()
+                WW_CheckMES1 = "積込日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)発日
+        If TxtActualDepDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALDEPDATE", TxtActualDepDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualDepDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualDepDate.Text, "(実績)発日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
+                TxtActualDepDate.Focus()
+                WW_CheckMES1 = "発日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)積車着日
+        If TxtActualArrDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALARRDATE", TxtActualArrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualArrDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualArrDate.Text, "(実績)積車着日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)積車着日", needsPopUp:=True)
+                TxtActualArrDate.Focus()
+                WW_CheckMES1 = "積車着日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)受入日
+        If TxtActualAccDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALACCDATE", TxtActualAccDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualAccDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualAccDate.Text, "(実績)受入日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)受入日", needsPopUp:=True)
+                TxtActualAccDate.Focus()
+                WW_CheckMES1 = "受入日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)空車着日
+        If TxtActualEmparrDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALEMPARRDATE", TxtActualEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualEmparrDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualEmparrDate.Text, "(実績)空車着日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+                TxtActualEmparrDate.Focus()
+                WW_CheckMES1 = "空車着日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
         '(一覧)タンク車No(重複チェック)
         Dim OIT0003tbl_DUMMY As DataTable = OIT0003tbl.Copy
         Dim OIT0003tbl_dv As DataView = New DataView(OIT0003tbl_DUMMY)
@@ -4230,13 +4443,13 @@ Public Class OIT0003OrderDetail
         Next
 
         ''(一覧)タンク車No
-        'For Each OIT0001row As DataRow In OIT0001tbl.Rows
-        '    If OIT0001row("TANKNO").Equals("") And OIT0001row("DELFLG") = "0" Then
+        'For Each OIT0003row As DataRow In OIT0003tbl.Rows
+        '    If OIT0003row("TANKNO").Equals("") And OIT0003row("DELFLG") = "0" Then
         '        Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR)
 
         '        WW_CheckMES1 = "タンク車No入力エラー。"
         '        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-        '        WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
+        '        WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
         '        O_RTN = "ERR"
         '        Exit Sub
         '    End If

@@ -114,6 +114,8 @@ Public Class OIT0004OilStockCreate
             '3.在庫表
             repStockDate.DataSource = dispDataObj.StockDate
             repStockDate.DataBind()
+            repStockOilTypeItem.DataSource = dispDataObj.StockList
+            repStockOilTypeItem.DataBind()
             '**********************************************
             '↑●Demo用
             '**********************************************
@@ -247,7 +249,7 @@ Public Class OIT0004OilStockCreate
             '******************************
             '表示用ヘッダー日付生成
             Me.StockDate = New Dictionary(Of String, Date)
-            For i = 0 To 6 'Demo用一旦7日間ここを29にすれば30日間になる
+            For i = 0 To 6 'Demo用一旦6指定で7日間ここを29にすれば30日間になる
                 Dim targetDate As Date = baseDtm.AddDays(i)
                 Me.StockDate.Add(targetDate.ToString("yyyy/M/d"), targetDate)
             Next
@@ -438,7 +440,7 @@ Public Class OIT0004OilStockCreate
                 Me.OilTypeName = oilTypeItem.Value
                 '２列目から４列目のタンク容量～前週出荷平均については
                 '一旦0
-                Me.TankCapacity = 0
+                Me.TankCapacity = 12345.6
                 Me.TargetStock = 0
                 Me.TargetStockRate = 0
                 Me.Stock80 = 0
@@ -504,7 +506,7 @@ Public Class OIT0004OilStockCreate
             Public Sub New(dispDate As String)
                 Me.DispDate = dispDate
                 'Demo用、実際イメージ沸いてから値のコンストラクタ引数追加など仕込み方は考える
-                Me.LastEveningStock = 0
+                Me.LastEveningStock = 12345
                 Me.Retentiondays = 0
                 Me.MorningStock = 0
                 Me.Receive = 0

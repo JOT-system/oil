@@ -158,52 +158,117 @@
                 <div id="divStockList">
                     <!-- 1・2行目のヘッダー -->
                     <div class="header"> 
-                        <div class="col1"></div>
-                        <div class="col1"></div>
-                        <div class="col2"></div>
-                        <div class="col2"></div>
-                        <div class="col3"></div>
-                        <div class="col3"></div>
-                        <div class="col4"></div>
-                        <div class="col4"></div>
-                        <div class="col5"></div>
-                        <div class="col5"></div>
-                        <div class="col6"></div>
-                        <div class="col6"></div>
+                        <div class="emptyBox"></div>
                         <!-- 動的日付部の生成 -->
                         <asp:Repeater ID="repStockDate" runat="server">
+                            <HeaderTemplate>
+                                <div class="headerDate">
+                                    <div class="colStockInfoTopRow"><span>日付</span></div>
+                                    <div class="dateItem">
+                            </HeaderTemplate>
                             <ItemTemplate>
-                                <div class="colStockInfo">
-                                    <span><%# If(Container.ItemIndex = 0, "日付", "")  %></span>
-                                </div>
-                                <div class="colStockInfo">
+                                <div class="colStockInfo date">
                                     <span><%# Eval("Key") %></span>
                                 </div>
                             </ItemTemplate>
+                            <FooterTemplate>
+                                </div> <!-- End class="dateItem" -->
+                                </div> <!-- End class="headerDate" -->
+                            </FooterTemplate>
                         </asp:Repeater>
+                        <div class="lastMargin"></div>
                     </div> <!-- End 1・2行目のヘッダー -->
                     <!-- End 油種ごとのデータ生成部 -->
-                    <asp:Repeater ID="repStockOilTyleItem" runat="server" ViewStateMode="Disabled">
+                    <asp:Repeater ID="repStockOilTypeItem" runat="server" ViewStateMode="Disabled">
                         <ItemTemplate>
                             <div class="oilTypeData">
                                 <div class="col1">
-                                    <span><%#DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %></span>
+                                    <div><span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %></span></div>
                                 </div>
-                                <div class="col2"><span>タンク容量</span></div>
-                                <div class="col2"><span>目標在庫</span></div>
-                                <div class="col2"><span>目標在庫率</span></div>
-                                <div class="col3"> <%--タンク容量値 --%>
-                                    <span><%#DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TankCapacity %></span>
+                                <div class="col2">
+                                    <div><span>タンク容量</span></div>
+                                    <div><span>目標在庫</span></div>
+                                    <div><span>目標在庫率</span></div>
                                 </div>
-                                <div class="col3"> <%--目標在庫値 --%>
-                                    <span><%#DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TargetStock %></span>
+
+                                <div class="col3">
+                                    <div> <%--タンク容量値 --%>
+                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TankCapacity %></span>
+                                    </div>
+                                    <div> <%--目標在庫値 --%>
+                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TargetStock %></span>
+                                    </div>
+                                    <div> <%--目標在庫率値 --%>
+                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TargetStockRate %></span>
+                                    </div>
                                 </div>
-                                <div class="col3"> <%--目標在庫率値 --%>
-                                    <span><%#DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TargetStockRate %></span>
+                                <div class="col4">
+                                    <div><span>80%在庫</span></div>
+                                    <div><span>D/S</span></div>
+                                    <div><span>前週出荷 平均</span></div>
                                 </div>
-                                <div class="col4"><span>タンク容量</span></div>
-                                <div class="col4"><span>目標在庫</span></div>
-                                <div class="col4"><span>目標在庫率</span></div>
+
+                                <div class="col5">
+                                    <div> <%--80%在庫 --%>
+                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).Stock80 %></span>
+                                    </div>
+                                    <div> <%-- D/S --%>
+                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).DS %></span>
+                                    </div>
+                                    <div> <%--前週出荷平均 --%>
+                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).LastShipmentAve %></span>
+                                    </div>
+                                </div>
+                                <div class="col6">
+                                    <div>前日夕在庫</div>
+                                    <div>保持日数</div>
+                                    <div>朝在庫</div>
+                                    <div>受入</div>
+                                    <div>払出</div>
+                                    <div>夕在庫</div>
+                                    <div>夕在庫D/S除</div>
+                                    <div>空容量</div>
+                                    <div>在庫率</div>
+                                </div>
+
+                                <%-- 日付毎の各値 --%>
+                                <asp:Repeater ID="repStockValues" runat="server" ViewStateMode="Disabled" DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).StockItemList %>'>
+                                    <ItemTemplate>
+                                        <div class="colStockValue">
+                                            <div><%--前日夕在庫--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).LastEveningStock.ToString("#,###") %></span>
+                                            </div>
+                                            <div><%--保持日数--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).Retentiondays %></span>
+                                            </div>
+                                            <div><%--朝在庫--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).MorningStock %></span>
+                                            </div>
+                                            <div><%--受入--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).Receive %></span>
+                                            </div>
+                                            <div><%--払出--%>
+                                                <span>
+                                                    <asp:TextBox ID="txtSend" runat="server" Text='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).Send %>'></asp:TextBox>
+                                                </span>
+                                            </div>
+                                            <div><%--夕在庫--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).EveningStock %></span>
+                                            </div>
+                                            <div><%--夕在庫D/S除--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).EveningStockWithoutDS %></span>
+                                            </div>
+                                            <div><%--空容量--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).FreeSpace %></span>
+                                            </div>
+                                            <div><%--在庫率--%>
+                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).StockRate %></span>
+                                            </div>
+                                        </div>
+
+                                    </ItemTemplate>
+                                </asp:Repeater>
+                                <div class="lastMargin"></div>
                             </div>
                         </ItemTemplate>
                     </asp:Repeater>

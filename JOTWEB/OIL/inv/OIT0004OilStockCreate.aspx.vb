@@ -15,7 +15,7 @@ Imports JOTWEB.GRIS0005LeftBox
 ''' タンク車マスタ登録（実行）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class OIM0005TankCreate
+Public Class OIT0004OilStockCreate
     Inherits Page
 
     '○ 検索結果格納Table
@@ -63,31 +63,60 @@ Public Class OIM0005TankCreate
                     Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_UPDATE"                '表更新ボタン押下
-                            WF_UPDATE_Click()
-                        Case "WF_CLEAR"                 'クリアボタン押下
-                            WF_CLEAR_Click()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
-                            WF_FIELD_DBClick()
-                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
-                            WF_FIELD_Change()
-                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
-                            WF_ButtonSel_Click()
-                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
-                            WF_ButtonCan_Click()
-                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
-                            WF_ButtonSel_Click()
-                        Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
-                            WF_RadioButton_Click()
-                        Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
-                            WF_RIGHTBOX_Change()
+
+                        'Case "WF_UPDATE"                '表更新ボタン押下
+                        '    WF_UPDATE_Click()
+                        'Case "WF_CLEAR"                 'クリアボタン押下
+                        '    WF_CLEAR_Click()
+                        'Case "WF_Field_DBClick"         'フィールドダブルクリック
+                        '    WF_FIELD_DBClick()
+                        'Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                        '    WF_FIELD_Change()
+                        'Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                        '    WF_ButtonSel_Click()
+                        'Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                        '    WF_ButtonCan_Click()
+                        'Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                        '    WF_ButtonSel_Click()
+                        'Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
+                        '    WF_RadioButton_Click()
+                        'Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
+                        '    WF_RIGHTBOX_Change()
+                        Case "WF_ButtonEND"                 '戻るボタン押下
+                            WF_ButtonEND_Click()
                     End Select
                 End If
             Else
                 '○ 初期化処理
                 Initialize()
             End If
-
+            '**********************************************
+            '↓●Demo用
+            '**********************************************
+            Dim baseDate = work.WF_SEL_STYMD.Text
+            'Demo用なのでこの辺もベタうちは考えて
+            Dim trainList As New List(Of String) From {"5972", "5282", "8072"}
+            Dim oilCodes As New List(Of String)
+            If {"30"}.Contains(work.WF_SEL_CONSIGNEE.Text) Then
+                oilCodes.AddRange({"1001", "1101", "1301", "1302", "1401", "2101", "2201"})
+            Else
+                oilCodes.AddRange({"1001", "1101", "1301", "1401", "2101", "2201"})
+            End If
+            '画面データクラス
+            Dim dispDataObj = New DemoDispDataClass(baseDate, trainList, oilCodes)
+            'コンストラクタで生成したデータを画面に貼り付け
+            '1.提案リスト
+            frvSuggest.DataSource = New Object() {dispDataObj}
+            frvSuggest.DataBind()
+            '2.比重リスト
+            repWeightList.DataSource = dispDataObj.WeightList
+            repWeightList.DataBind()
+            '3.在庫表
+            repStockDate.DataSource = dispDataObj.StockDate
+            repStockDate.DataBind()
+            '**********************************************
+            '↑●Demo用
+            '**********************************************
             '○ 画面モード(更新・参照)設定
             If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
                 WF_MAPpermitcode.Value = "TRUE"
@@ -119,7 +148,431 @@ Public Class OIM0005TankCreate
         End Try
 
     End Sub
+#Region "Demo用"
+    ''' <summary>
+    ''' 在庫管理表検索データクラス
+    ''' </summary>
+    ''' <remarks>デモ用ですが画面オブジェクト及び外部の変数へは直接アクセスしなこと
+    ''' （コンストラクタや引数で受け渡しさせる、別ファイルに外だしした時もワークするように考慮する）
+    ''' 当クラス及びサブクラス内でDB操作をする際はきっちりデストラクタ(Finalize)を仕込む
+    ''' 場合によってはUsingをサポートするように記述する</remarks>
+    Public Class DemoDispDataClass
+        Public Const SUMMARY_CODE As String = "Summary"
+        Public Property testVal As String = "test"
+        ''' <summary>
+        ''' 受注提案タンク車数リストプロパティ
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Key=日付 Value=列車、油種、チェックボックス、受入数を加味したリスト</remarks>
+        Public Property SuggestList As New Dictionary(Of String, SuggestItem)
+        ''' <summary>
+        ''' 油種名のディクショナリ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property SuggestOilNameList As New Dictionary(Of String, String)
+        ''' <summary>
+        ''' 比重リストアイテム
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property WeightList As New Dictionary(Of String, WeightListItem)
+        ''' <summary>
+        ''' 比重一覧日付部分
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property StockDate As Dictionary(Of String, Date)
+        ''' <summary>
+        ''' 在庫一覧データ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property StockList As Dictionary(Of String, StockListCollection)
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="baseDay">基準日</param>
+        ''' <param name="trainList">列車IDリスト</param>
+        ''' <param name="oilCodes">対象油種リスト</param>
+        Public Sub New(baseDay As String, trainList As List(Of String), oilCodes As List(Of String))
+            '******************************
+            'コンストラクタ引数チェック
+            '(一旦呼出し元にスローします)
+            '******************************
+            Dim baseDtm As Date
+            '引数が日付に変換できない場合エラー
+            If Date.TryParse(baseDay, baseDtm) = False Then
+                Throw New Exception("baseDay dose not convert to date.")
+            End If
+            If trainList Is Nothing OrElse trainList.Count = 0 Then
+                Throw New Exception("trainList is empty.")
+            End If
+            If oilCodes Is Nothing OrElse oilCodes.Count = 0 Then
+                Throw New Exception("oilCodes is empty.")
+            End If
+            '******************************
+            ' 提案リスト縦軸の油種名を生成
+            '******************************
+            Me.SuggestOilNameList = CreateSuggestOilNameList(oilCodes)
+            '******************************
+            ' 基準日～基準日＋7 
+            ' 提案リスト
+            ' 日付ごとのSuggestItemを生成
+            '******************************
+            Me.SuggestList = New Dictionary(Of String, SuggestItem)
+            For i = 0 To 6
+                Dim targetDate As Date = baseDtm.AddDays(i)
+                Dim keyDate As String = targetDate.ToString("yyyy/MM/dd")
+                '列車Noのループ
+                Dim suggestItem = New SuggestItem(targetDate)
+                For Each trainId In trainList
+                    suggestItem.Add(trainId, oilCodes)
+                Next trainId
+                Me.SuggestList.Add(keyDate, suggestItem)
+            Next i
+            '******************************
+            ' 比重リスト生成
+            '******************************
+            'Demo用仮作成DB等より比重を取ること
+            Me.WeightList = New Dictionary(Of String, WeightListItem)
+            For Each oilNameItem In Me.SuggestOilNameList
+                If oilNameItem.Key = SUMMARY_CODE Then
+                    Continue For
+                End If
+                Dim item As New WeightListItem
+                item.OilTypeCode = oilNameItem.Key
+                item.OilTypeName = oilNameItem.Value
+                item.Weight = 0.75 '本来DBなどから取得
+                Me.WeightList.Add(item.OilTypeCode, item)
+            Next
+            '******************************
+            ' 在庫リスト生成
+            '******************************
+            '表示用ヘッダー日付生成
+            Me.StockDate = New Dictionary(Of String, Date)
+            For i = 0 To 6 'Demo用一旦7日間ここを29にすれば30日間になる
+                Dim targetDate As Date = baseDtm.AddDays(i)
+                Me.StockDate.Add(targetDate.ToString("yyyy/M/d"), targetDate)
+            Next
+            Me.StockList = New Dictionary(Of String, StockListCollection)
+            For Each oilNameItem In Me.SuggestOilNameList
+                If oilNameItem.Key = SUMMARY_CODE Then
+                    Continue For
+                End If
+                Dim item As New StockListCollection(oilNameItem, Me.StockDate)
+                Me.StockList.Add(oilNameItem.Key, item)
+            Next 'oilNameItem
+        End Sub
+        ''' <summary>
+        ''' 油種名、油種コードリストを生成
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>この辺は検討現状、Demoの為コードでベタ打ち。
+        ''' 「あらかじめコードと名称でそろった状態で渡す」や
+        ''' 「ここで名称を取得する（都度都度抽出になる）」
+        ''' は検討という意味</remarks>
+        Private Function CreateSuggestOilNameList(oilCodes As List(Of String)) As Dictionary(Of String, String)
+            Dim retVal As New Dictionary(Of String, String)
+            Dim dicFullOilList As New Dictionary(Of String, String) _
+                From {{"1001", "ハイオク"}, {"1101", "レギュラー"},
+                      {"1301", "灯油"}, {"1302", "未添加灯油"}, {"1401", "軽油"},
+                      {"1404", "３号軽油"}, {"2201", "ＬＳＡ"},
+                      {"2101", "Ａ重油"}}
+            For Each oilCode In oilCodes
+                Dim valName As String = ""
+                If dicFullOilList.ContainsKey(oilCode) Then
+                    valName = dicFullOilList(oilCode)
+                Else
+                    valName = String.Format("未定義({0})", oilCode)
+                End If
+                retVal.Add(oilCode, valName)
+            Next oilCode
 
+            '合計行の付与
+            retVal.Add(SUMMARY_CODE, "合計")
+            Return retVal
+        End Function
+
+        ''' <summary>
+        ''' 画面リピーターに仕込んだ値を取得する
+        ''' </summary>
+        ''' <param name="repSuggest"> 受注提案タンク車数用リピーター</param>
+        ''' <returns>取得したデータクラス</returns>
+        Public Function GetDispSuggestData(repSuggest As Repeater) As Dictionary(Of String, SuggestItem)
+
+        End Function
+
+        ''' <summary>
+        ''' 列車Noをキーに持つ受注提案アイテム
+        ''' </summary>
+        Public Class SuggestItem
+            ''' <summary>
+            ''' 対象日付
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property ThisDate As String
+            ''' <summary>
+            ''' 画面表示用日付（対象日付のフォーマット違い）
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property DispDate As String
+
+            ''' <summary>
+            ''' 受入数情報格納用ディクショナリ
+            ''' </summary>
+            ''' <returns></returns>
+            ''' <remarks>Key=列車No,Value=一覧の値クラス</remarks>
+            Public Property SuggestOrderItem As Dictionary(Of String, SuggestValues)
+            ''' <summary>
+            ''' 積置き情報格納用ディクショナリ
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property SuggestLoadingItem As Dictionary(Of String, SuggestValues)
+
+
+            ''' <summary>
+            ''' コンストラクタ
+            ''' </summary>
+            ''' <param name="targetDate">対象日付</param>
+            Public Sub New(targetDate As Date)
+                '受入数一覧
+                Me.SuggestOrderItem = New Dictionary(Of String, SuggestValues)
+                '積置き一覧
+                Me.SuggestLoadingItem = New Dictionary(Of String, SuggestValues)
+
+                Me.ThisDate = targetDate.ToString("yyyy/MM/dd") '内部用の日付
+                Me.DispDate = targetDate.ToString("M月d日") '画面表示用の日付
+
+            End Sub
+            Public Sub Add(trainNo As String, oilCodes As List(Of String))
+                Dim orderValues = New SuggestValues
+                Dim loadingValues = New SuggestValues
+                For Each oilCode As String In oilCodes
+                    orderValues.Add(oilCode, 0)
+                    loadingValues.Add(oilCode, 0)
+                Next
+                orderValues.Add(SUMMARY_CODE, 0)
+                loadingValues.Add(SUMMARY_CODE, 0)
+                Me.SuggestOrderItem.Add(trainNo, orderValues)
+                Me.SuggestLoadingItem.Add(trainNo, loadingValues)
+            End Sub
+
+            ''' <summary>
+            ''' 受注提案タンク車数用数値情報格納クラス
+            ''' </summary>
+            Public Class SuggestValues
+                ''' <summary>
+                ''' 受注提案タンク車数用数値情報ディクショナリ
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property SuggestValuesItem As Dictionary(Of String, SuggestValue)
+                Public Property CheckValue As Boolean = False
+                ''' <summary>
+                ''' デフォルトプロパティ
+                ''' </summary>
+                ''' <param name="oilCode"></param>
+                ''' <returns></returns>
+                Default Public Property _item(oilCode As String) As SuggestValue
+                    Get
+                        Return Me.SuggestValuesItem(oilCode)
+                    End Get
+                    Set(value As SuggestValue)
+                        Me.SuggestValuesItem(oilCode) = value
+                    End Set
+                End Property
+                ''' <summary>
+                ''' コンストラクタ
+                ''' </summary>
+                Public Sub New()
+                    Me.SuggestValuesItem = New Dictionary(Of String, SuggestValue)
+                End Sub
+                Public Sub Add(oilCode As String, val As Integer)
+                    Me.SuggestValuesItem.Add(oilCode, New SuggestValue _
+                        With {.ItemValue = val, .OilCode = oilCode})
+                End Sub
+            End Class
+            ''' <summary>
+            ''' 提案値クラス
+            ''' </summary>
+            Public Class SuggestValue
+                ''' <summary>
+                ''' 油種コード
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property OilCode As String = ""
+                ''' <summary>
+                ''' 数
+                ''' </summary>
+                ''' <returns></returns>
+                ''' <remarks>精度が足りないならIntegerから拡張を</remarks>
+                Public Property ItemValue As Integer = 0
+            End Class
+        End Class
+        ''' <summary>
+        ''' 比重リストアイテムクラス
+        ''' </summary>
+        Public Class WeightListItem
+            ''' <summary>
+            ''' 油種コード
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property OilTypeCode As String = ""
+            ''' <summary>
+            ''' 油種名
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property OilTypeName As String = ""
+            ''' <summary>
+            ''' 比重
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Weight As Decimal = 0
+        End Class
+        ''' <summary>
+        ''' 在庫クラス
+        ''' </summary>
+        Public Class StockListCollection
+            ''' <summary>
+            ''' コンストラクタ
+            ''' </summary>
+            Public Sub New(oilTypeItem As KeyValuePair(Of String, String),
+                           dateItem As Dictionary(Of String, Date))
+                Me.OilTypeCode = oilTypeItem.Key
+                Me.OilTypeName = oilTypeItem.Value
+                '２列目から４列目のタンク容量～前週出荷平均については
+                '一旦0
+                Me.TankCapacity = 0
+                Me.TargetStock = 0
+                Me.TargetStockRate = 0
+                Me.Stock80 = 0
+                Me.DS = 0
+                Me.LastShipmentAve = 0
+                Me.StockItemList = New Dictionary(Of String, StockListItem)
+                For Each dateVal In dateItem
+                    Dim item = New StockListItem(dateVal.Key)
+                    Me.StockItemList.Add(dateVal.Key, item)
+                Next
+            End Sub
+
+            ''' <summary>
+            ''' 油種コード
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property OilTypeCode As String = ""
+            ''' <summary>
+            ''' 油種名
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property OilTypeName As String = ""
+            ''' <summary>
+            ''' タンク容量
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TankCapacity As Decimal
+            ''' <summary>
+            ''' 目標在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TargetStock As Decimal
+            ''' <summary>
+            ''' 目標在庫率
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TargetStockRate As Decimal
+            ''' <summary>
+            ''' 80%在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Stock80 As Decimal
+            ''' <summary>
+            ''' D/S
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property DS As Decimal
+            ''' <summary>
+            ''' 前週出荷平均
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property LastShipmentAve As Decimal
+            ''' <summary>
+            ''' 日付別の在庫データ
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property StockItemList As Dictionary(Of String, StockListItem)
+        End Class
+        Public Class StockListItem
+            ''' <summary>
+            ''' コンストラクタ
+            ''' </summary>
+            Public Sub New(dispDate As String)
+                Me.DispDate = dispDate
+                'Demo用、実際イメージ沸いてから値のコンストラクタ引数追加など仕込み方は考える
+                Me.LastEveningStock = 0
+                Me.Retentiondays = 0
+                Me.MorningStock = 0
+                Me.Receive = 0
+                Me.Send = 0
+                Me.EveningStock = 0
+                Me.EveningStockWithoutDS = 0
+                Me.FreeSpace = 0
+                Me.StockRate = 0
+            End Sub
+
+            ''' <summary>
+            ''' 日付
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property DispDate As String = ""
+            ''' <summary>
+            ''' 前日夕在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property LastEveningStock As Decimal
+            ''' <summary>
+            ''' 保有日数
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Retentiondays As Decimal
+            ''' <summary>
+            ''' 朝在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property MorningStock As Decimal
+            ''' <summary>
+            ''' 受入
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Receive As Decimal
+            ''' <summary>
+            ''' 払出
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Send As Decimal
+            ''' <summary>
+            ''' 夕在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property EveningStock As Decimal
+            ''' <summary>
+            ''' 夕在庫D/S除
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property EveningStockWithoutDS As Decimal
+            ''' <summary>
+            ''' 空容量
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property FreeSpace As Decimal
+            ''' <summary>
+            ''' 在庫率
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property StockRate As Decimal
+        End Class
+    End Class
+
+    Private Function DemoDispSuggestList(baseDay As String, trainList As List(Of String), oilCodes As List(Of String))
+
+    End Function
+
+#End Region
     ''' <summary>
     ''' 初期化処理
     ''' </summary>
@@ -127,7 +580,7 @@ Public Class OIM0005TankCreate
     Protected Sub Initialize()
 
         '○画面ID設定
-        Master.MAPID = OIM0005WRKINC.MAPIDC
+        Master.MAPID = OIT0004WRKINC.MAPIDC
         '○HELP表示有無設定
         Master.dispHelp = False
         '○D&D有無設定
@@ -154,7 +607,6 @@ Public Class OIM0005TankCreate
         WW_MAPValueSet()
 
     End Sub
-
     ''' <summary>
     ''' 画面初期値設定処理
     ''' </summary>
@@ -167,191 +619,200 @@ Public Class OIM0005TankCreate
             Master.CreateXMLSaveFile()
         End If
 
-        '○ 名称設定処理
-        '選択行
-        WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
+        ''○ 名称設定処理
+        ''選択行
+        'WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
-        'JOT車番
-        WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER2.Text
-        CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_DUMMY)
+        ''JOT車番
+        'WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER2.Text
+        'CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_DUMMY)
 
-        '原籍所有者C
-        WF_ORIGINOWNERCODE.Text = work.WF_SEL_ORIGINOWNERCODE.Text
+        ''原籍所有者C
+        'WF_ORIGINOWNERCODE.Text = work.WF_SEL_ORIGINOWNERCODE.Text
 
-        '名義所有者C
-        WF_OWNERCODE.Text = work.WF_SEL_OWNERCODE.Text
+        ''名義所有者C
+        'WF_OWNERCODE.Text = work.WF_SEL_OWNERCODE.Text
 
-        'リース先C
-        WF_LEASECODE.Text = work.WF_SEL_LEASECODE.Text
+        ''リース先C
+        'WF_LEASECODE.Text = work.WF_SEL_LEASECODE.Text
 
-        'リース区分C
-        WF_LEASECLASS.Text = work.WF_SEL_LEASECLASS.Text
+        ''リース区分C
+        'WF_LEASECLASS.Text = work.WF_SEL_LEASECLASS.Text
 
-        '自動延長
-        WF_AUTOEXTENTION.Text = work.WF_SEL_AUTOEXTENTION.Text
+        ''自動延長
+        'WF_AUTOEXTENTION.Text = work.WF_SEL_AUTOEXTENTION.Text
 
-        'リース開始年月日
-        WF_LEASESTYMD.Text = work.WF_SEL_LEASESTYMD.Text
+        ''リース開始年月日
+        'WF_LEASESTYMD.Text = work.WF_SEL_LEASESTYMD.Text
 
-        'リース満了年月日
-        WF_LEASEENDYMD.Text = work.WF_SEL_LEASEENDYMD.Text
+        ''リース満了年月日
+        'WF_LEASEENDYMD.Text = work.WF_SEL_LEASEENDYMD.Text
 
-        '第三者使用者C
-        WF_USERCODE.Text = work.WF_SEL_USERCODE.Text
+        ''第三者使用者C
+        'WF_USERCODE.Text = work.WF_SEL_USERCODE.Text
 
-        '原常備駅C
-        WF_CURRENTSTATIONCODE.Text = work.WF_SEL_CURRENTSTATIONCODE.Text
-        CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
+        ''原常備駅C
+        'WF_CURRENTSTATIONCODE.Text = work.WF_SEL_CURRENTSTATIONCODE.Text
+        'CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
 
-        '臨時常備駅C
-        WF_EXTRADINARYSTATIONCODE.Text = work.WF_SEL_EXTRADINARYSTATIONCODE.Text
-        CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
+        ''臨時常備駅C
+        'WF_EXTRADINARYSTATIONCODE.Text = work.WF_SEL_EXTRADINARYSTATIONCODE.Text
+        'CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
 
-        '第三者使用期限
-        WF_USERLIMIT.Text = work.WF_SEL_USERLIMIT.Text
+        ''第三者使用期限
+        'WF_USERLIMIT.Text = work.WF_SEL_USERLIMIT.Text
 
-        '臨時常備駅期限
-        WF_LIMITTEXTRADIARYSTATION.Text = work.WF_SEL_LIMITTEXTRADIARYSTATION.Text
+        ''臨時常備駅期限
+        'WF_LIMITTEXTRADIARYSTATION.Text = work.WF_SEL_LIMITTEXTRADIARYSTATION.Text
 
-        '原専用種別C
-        WF_DEDICATETYPECODE.Text = work.WF_SEL_DEDICATETYPECODE.Text
+        ''原専用種別C
+        'WF_DEDICATETYPECODE.Text = work.WF_SEL_DEDICATETYPECODE.Text
 
-        '臨時専用種別C
-        WF_EXTRADINARYTYPECODE.Text = work.WF_SEL_EXTRADINARYTYPECODE.Text
+        ''臨時専用種別C
+        'WF_EXTRADINARYTYPECODE.Text = work.WF_SEL_EXTRADINARYTYPECODE.Text
 
-        '臨時専用期限
-        WF_EXTRADINARYLIMIT.Text = work.WF_SEL_EXTRADINARYLIMIT.Text
+        ''臨時専用期限
+        'WF_EXTRADINARYLIMIT.Text = work.WF_SEL_EXTRADINARYLIMIT.Text
 
-        '運用基地C
-        WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE.Text
-        CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
+        ''運用基地C
+        'WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE.Text
+        'CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
 
-        '塗色C
-        WF_COLORCODE.Text = work.WF_SEL_COLORCODE.Text
+        ''塗色C
+        'WF_COLORCODE.Text = work.WF_SEL_COLORCODE.Text
 
-        'エネオス
-        WF_ENEOS.Text = work.WF_SEL_ENEOS.Text
+        ''エネオス
+        'WF_ENEOS.Text = work.WF_SEL_ENEOS.Text
 
-        'エコレール
-        WF_ECO.Text = work.WF_SEL_ECO.Text
+        ''エコレール
+        'WF_ECO.Text = work.WF_SEL_ECO.Text
 
-        '取得年月日
-        WF_ALLINSPECTIONDATE.Text = work.WF_SEL_ALLINSPECTIONDATE.Text
+        ''取得年月日
+        'WF_ALLINSPECTIONDATE.Text = work.WF_SEL_ALLINSPECTIONDATE.Text
 
-        '車籍編入年月日
-        WF_TRANSFERDATE.Text = work.WF_SEL_TRANSFERDATE.Text
+        ''車籍編入年月日
+        'WF_TRANSFERDATE.Text = work.WF_SEL_TRANSFERDATE.Text
 
-        '取得先C
-        WF_OBTAINEDCODE.Text = work.WF_SEL_OBTAINEDCODE.Text
+        ''取得先C
+        'WF_OBTAINEDCODE.Text = work.WF_SEL_OBTAINEDCODE.Text
 
-        '形式
-        WF_MODEL.Text = work.WF_SEL_MODEL2.Text
+        ''形式
+        'WF_MODEL.Text = work.WF_SEL_MODEL2.Text
 
-        '形式カナ
-        WF_MODELKANA.Text = work.WF_SEL_MODELKANA.Text
+        ''形式カナ
+        'WF_MODELKANA.Text = work.WF_SEL_MODELKANA.Text
 
-        '荷重
-        WF_LOAD.Text = work.WF_SEL_LOAD.Text
+        ''荷重
+        'WF_LOAD.Text = work.WF_SEL_LOAD.Text
 
-        '荷重単位
-        WF_LOADUNIT.Text = work.WF_SEL_LOADUNIT.Text
+        ''荷重単位
+        'WF_LOADUNIT.Text = work.WF_SEL_LOADUNIT.Text
 
-        '容積
-        WF_VOLUME.Text = work.WF_SEL_VOLUME.Text
+        ''容積
+        'WF_VOLUME.Text = work.WF_SEL_VOLUME.Text
 
-        '容積単位
-        WF_VOLUMEUNIT.Text = work.WF_SEL_VOLUMEUNIT.Text
+        ''容積単位
+        'WF_VOLUMEUNIT.Text = work.WF_SEL_VOLUMEUNIT.Text
 
-        '原籍所有者
-        WF_ORIGINOWNERNAME.Text = work.WF_SEL_ORIGINOWNERNAME.Text
+        ''原籍所有者
+        'WF_ORIGINOWNERNAME.Text = work.WF_SEL_ORIGINOWNERNAME.Text
 
-        '名義所有者
-        WF_OWNERNAME.Text = work.WF_SEL_OWNERNAME.Text
+        ''名義所有者
+        'WF_OWNERNAME.Text = work.WF_SEL_OWNERNAME.Text
 
-        'リース先
-        WF_LEASENAME.Text = work.WF_SEL_LEASENAME.Text
+        ''リース先
+        'WF_LEASENAME.Text = work.WF_SEL_LEASENAME.Text
 
-        'リース区分
-        WF_LEASECLASSNEMAE.Text = work.WF_SEL_LEASECLASSNEMAE.Text
+        ''リース区分
+        'WF_LEASECLASSNEMAE.Text = work.WF_SEL_LEASECLASSNEMAE.Text
 
-        '第三者使用者
-        WF_USERNAME.Text = work.WF_SEL_USERNAME.Text
+        ''第三者使用者
+        'WF_USERNAME.Text = work.WF_SEL_USERNAME.Text
 
-        '原常備駅
-        WF_CURRENTSTATIONNAME.Text = work.WF_SEL_CURRENTSTATIONNAME.Text
+        ''原常備駅
+        'WF_CURRENTSTATIONNAME.Text = work.WF_SEL_CURRENTSTATIONNAME.Text
 
-        '臨時常備駅
-        WF_EXTRADINARYSTATIONNAME.Text = work.WF_SEL_EXTRADINARYSTATIONNAME.Text
+        ''臨時常備駅
+        'WF_EXTRADINARYSTATIONNAME.Text = work.WF_SEL_EXTRADINARYSTATIONNAME.Text
 
-        '原専用種別
-        WF_DEDICATETYPENAME.Text = work.WF_SEL_DEDICATETYPENAME.Text
+        ''原専用種別
+        'WF_DEDICATETYPENAME.Text = work.WF_SEL_DEDICATETYPENAME.Text
 
-        '臨時専用種別
-        WF_EXTRADINARYTYPENAME.Text = work.WF_SEL_EXTRADINARYTYPENAME.Text
+        ''臨時専用種別
+        'WF_EXTRADINARYTYPENAME.Text = work.WF_SEL_EXTRADINARYTYPENAME.Text
 
-        '運用場所
-        WF_OPERATIONBASENAME.Text = work.WF_SEL_OPERATIONBASENAME.Text
+        ''運用場所
+        'WF_OPERATIONBASENAME.Text = work.WF_SEL_OPERATIONBASENAME.Text
 
-        '塗色
-        WF_COLORNAME.Text = work.WF_SEL_COLORNAME.Text
+        ''塗色
+        'WF_COLORNAME.Text = work.WF_SEL_COLORNAME.Text
 
-        '予備1
-        WF_RESERVE1.Text = work.WF_SEL_RESERVE1.Text
+        ''予備1
+        'WF_RESERVE1.Text = work.WF_SEL_RESERVE1.Text
 
-        '予備2
-        WF_RESERVE2.Text = work.WF_SEL_RESERVE2.Text
+        ''予備2
+        'WF_RESERVE2.Text = work.WF_SEL_RESERVE2.Text
 
-        '次回指定年月日
-        WF_SPECIFIEDDATE.Text = work.WF_SEL_SPECIFIEDDATE.Text
+        ''次回指定年月日
+        'WF_SPECIFIEDDATE.Text = work.WF_SEL_SPECIFIEDDATE.Text
 
-        '次回全検年月日(JR) 
-        WF_JRALLINSPECTIONDATE.Text = work.WF_SEL_JRALLINSPECTIONDATE.Text
+        ''次回全検年月日(JR) 
+        'WF_JRALLINSPECTIONDATE.Text = work.WF_SEL_JRALLINSPECTIONDATE.Text
 
-        '現在経年
-        WF_PROGRESSYEAR.Text = work.WF_SEL_PROGRESSYEAR.Text
+        ''現在経年
+        'WF_PROGRESSYEAR.Text = work.WF_SEL_PROGRESSYEAR.Text
 
-        '次回全検時経年
-        WF_NEXTPROGRESSYEAR.Text = work.WF_SEL_NEXTPROGRESSYEAR.Text
+        ''次回全検時経年
+        'WF_NEXTPROGRESSYEAR.Text = work.WF_SEL_NEXTPROGRESSYEAR.Text
 
-        '次回交検年月日(JR）
-        WF_JRINSPECTIONDATE.Text = work.WF_SEL_JRINSPECTIONDATE.Text
+        ''次回交検年月日(JR）
+        'WF_JRINSPECTIONDATE.Text = work.WF_SEL_JRINSPECTIONDATE.Text
 
-        '次回交検年月日
-        WF_INSPECTIONDATE.Text = work.WF_SEL_INSPECTIONDATE.Text
+        ''次回交検年月日
+        'WF_INSPECTIONDATE.Text = work.WF_SEL_INSPECTIONDATE.Text
 
-        '次回指定年月日(JR)
-        WF_JRSPECIFIEDDATE.Text = work.WF_SEL_JRSPECIFIEDDATE.Text
+        ''次回指定年月日(JR)
+        'WF_JRSPECIFIEDDATE.Text = work.WF_SEL_JRSPECIFIEDDATE.Text
 
-        'JR車番
-        WF_JRTANKNUMBER.Text = work.WF_SEL_JRTANKNUMBER.Text
+        ''JR車番
+        'WF_JRTANKNUMBER.Text = work.WF_SEL_JRTANKNUMBER.Text
 
-        '旧JOT車番
-        WF_OLDTANKNUMBER.Text = work.WF_SEL_OLDTANKNUMBER.Text
+        ''旧JOT車番
+        'WF_OLDTANKNUMBER.Text = work.WF_SEL_OLDTANKNUMBER.Text
 
-        'OT車番
-        WF_OTTANKNUMBER.Text = work.WF_SEL_OTTANKNUMBER.Text
+        ''OT車番
+        'WF_OTTANKNUMBER.Text = work.WF_SEL_OTTANKNUMBER.Text
 
-        'JXTG車番
-        WF_JXTGTANKNUMBER.Text = work.WF_SEL_JXTGTANKNUMBER.Text
+        ''JXTG車番
+        'WF_JXTGTANKNUMBER.Text = work.WF_SEL_JXTGTANKNUMBER.Text
 
-        'コスモ車番
-        WF_COSMOTANKNUMBER.Text = work.WF_SEL_COSMOTANKNUMBER.Text
+        ''コスモ車番
+        'WF_COSMOTANKNUMBER.Text = work.WF_SEL_COSMOTANKNUMBER.Text
 
-        '富士石油車番
-        WF_FUJITANKNUMBER.Text = work.WF_SEL_FUJITANKNUMBER.Text
+        ''富士石油車番
+        'WF_FUJITANKNUMBER.Text = work.WF_SEL_FUJITANKNUMBER.Text
 
-        '出光昭シ車番
-        WF_SHELLTANKNUMBER.Text = work.WF_SEL_SHELLTANKNUMBER.Text
+        ''出光昭シ車番
+        'WF_SHELLTANKNUMBER.Text = work.WF_SEL_SHELLTANKNUMBER.Text
 
-        '予備
-        WF_RESERVE3.Text = work.WF_SEL_RESERVE3.Text
+        ''予備
+        'WF_RESERVE3.Text = work.WF_SEL_RESERVE3.Text
 
-        '削除
-        WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
-        CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
+        ''削除
+        'WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
+        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
     End Sub
+    ''' <summary>
+    ''' 戻るボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonEND_Click()
 
+        '○ 前画面遷移
+        Master.TransitionPrevPage()
+
+    End Sub
     ''' <summary>
     ''' 画面表示データ取得
     ''' </summary>
@@ -536,7 +997,7 @@ Public Class OIM0005TankCreate
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20)            'JOT車番
-                PARA1.Value = WF_TANKNUMBER.Text
+                'PARA1.Value = WF_TANKNUMBER.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
@@ -640,181 +1101,181 @@ Public Class OIM0005TankCreate
 
         O_RTN = C_MESSAGE_NO.NORMAL
 
-        '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除フラグ
+        ''○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
+        'Master.EraseCharToIgnore(WF_DELFLG.Text)            '削除フラグ
 
-        '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
-        If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
-            String.IsNullOrEmpty(WF_DELFLG.Text) Then
-            Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
+        ''○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
+        'If String.IsNullOrEmpty(WF_Sel_LINECNT.Text) AndAlso
+        '    String.IsNullOrEmpty(WF_DELFLG.Text) Then
+        '    Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
 
-            CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "non Detail"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
-            CS0011LOGWrite.TEXT = "non Detail"
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+        '    CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"        'SUBクラス名
+        '    CS0011LOGWrite.INFPOSI = "non Detail"
+        '    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ERR
+        '    CS0011LOGWrite.TEXT = "non Detail"
+        '    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
+        '    CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
 
-            O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
-            Exit Sub
-        End If
+        '    O_RTN = C_MESSAGE_NO.INVALID_PROCCESS_ERROR
+        '    Exit Sub
+        'End If
 
-        Master.CreateEmptyTable(OIM0005INPtbl, work.WF_SEL_INPTBL.Text)
-        Dim OIM0005INProw As DataRow = OIM0005INPtbl.NewRow
+        'Master.CreateEmptyTable(OIM0005INPtbl, work.WF_SEL_INPTBL.Text)
+        'Dim OIM0005INProw As DataRow = OIM0005INPtbl.NewRow
 
-        '○ 初期クリア
-        For Each OIM0005INPcol As DataColumn In OIM0005INPtbl.Columns
-            If IsDBNull(OIM0005INProw.Item(OIM0005INPcol)) OrElse IsNothing(OIM0005INProw.Item(OIM0005INPcol)) Then
-                Select Case OIM0005INPcol.ColumnName
-                    Case "LINECNT"
-                        OIM0005INProw.Item(OIM0005INPcol) = 0
-                    Case "OPERATION"
-                        OIM0005INProw.Item(OIM0005INPcol) = C_LIST_OPERATION_CODE.NODATA
-                    Case "UPDTIMSTP"
-                        OIM0005INProw.Item(OIM0005INPcol) = 0
-                    Case "SELECT"
-                        OIM0005INProw.Item(OIM0005INPcol) = 1
-                    Case "HIDDEN"
-                        OIM0005INProw.Item(OIM0005INPcol) = 0
-                    Case Else
-                        OIM0005INProw.Item(OIM0005INPcol) = ""
-                End Select
-            End If
-        Next
+        ''○ 初期クリア
+        'For Each OIM0005INPcol As DataColumn In OIM0005INPtbl.Columns
+        '    If IsDBNull(OIM0005INProw.Item(OIM0005INPcol)) OrElse IsNothing(OIM0005INProw.Item(OIM0005INPcol)) Then
+        '        Select Case OIM0005INPcol.ColumnName
+        '            Case "LINECNT"
+        '                OIM0005INProw.Item(OIM0005INPcol) = 0
+        '            Case "OPERATION"
+        '                OIM0005INProw.Item(OIM0005INPcol) = C_LIST_OPERATION_CODE.NODATA
+        '            Case "UPDTIMSTP"
+        '                OIM0005INProw.Item(OIM0005INPcol) = 0
+        '            Case "SELECT"
+        '                OIM0005INProw.Item(OIM0005INPcol) = 1
+        '            Case "HIDDEN"
+        '                OIM0005INProw.Item(OIM0005INPcol) = 0
+        '            Case Else
+        '                OIM0005INProw.Item(OIM0005INPcol) = ""
+        '        End Select
+        '    End If
+        'Next
 
-        'LINECNT
-        If WF_Sel_LINECNT.Text = "" Then
-            OIM0005INProw("LINECNT") = 0
-        Else
-            Try
-                Integer.TryParse(WF_Sel_LINECNT.Text, OIM0005INProw("LINECNT"))
-            Catch ex As Exception
-                OIM0005INProw("LINECNT") = 0
-            End Try
-        End If
+        ''LINECNT
+        'If WF_Sel_LINECNT.Text = "" Then
+        '    OIM0005INProw("LINECNT") = 0
+        'Else
+        '    Try
+        '        Integer.TryParse(WF_Sel_LINECNT.Text, OIM0005INProw("LINECNT"))
+        '    Catch ex As Exception
+        '        OIM0005INProw("LINECNT") = 0
+        '    End Try
+        'End If
 
-        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        OIM0005INProw("UPDTIMSTP") = 0
-        OIM0005INProw("SELECT") = 1
-        OIM0005INProw("HIDDEN") = 0
+        'OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+        'OIM0005INProw("UPDTIMSTP") = 0
+        'OIM0005INProw("SELECT") = 1
+        'OIM0005INProw("HIDDEN") = 0
 
-        OIM0005INProw("TANKNUMBER") = WF_TANKNUMBER.Text        'JOT車番
-        OIM0005INProw("MODEL") = WF_MODEL.Text        '型式
+        'OIM0005INProw("TANKNUMBER") = WF_TANKNUMBER.Text        'JOT車番
+        'OIM0005INProw("MODEL") = WF_MODEL.Text        '型式
 
-        OIM0005INProw("DELFLG") = WF_DELFLG.Text                     '削除フラグ
+        'OIM0005INProw("DELFLG") = WF_DELFLG.Text                     '削除フラグ
 
-        OIM0005INProw("ORIGINOWNERCODE") = WF_ORIGINOWNERCODE.Text              '原籍所有者C
+        'OIM0005INProw("ORIGINOWNERCODE") = WF_ORIGINOWNERCODE.Text              '原籍所有者C
 
-        OIM0005INProw("OWNERCODE") = WF_OWNERCODE.Text              '名義所有者C
+        'OIM0005INProw("OWNERCODE") = WF_OWNERCODE.Text              '名義所有者C
 
-        OIM0005INProw("LEASECODE") = WF_LEASECODE.Text              'リース先C
+        'OIM0005INProw("LEASECODE") = WF_LEASECODE.Text              'リース先C
 
-        OIM0005INProw("LEASECLASS") = WF_LEASECLASS.Text              'リース区分C
+        'OIM0005INProw("LEASECLASS") = WF_LEASECLASS.Text              'リース区分C
 
-        OIM0005INProw("AUTOEXTENTION") = WF_AUTOEXTENTION.Text              '自動延長
+        'OIM0005INProw("AUTOEXTENTION") = WF_AUTOEXTENTION.Text              '自動延長
 
-        OIM0005INProw("LEASESTYMD") = WF_LEASESTYMD.Text              'リース開始年月日
+        'OIM0005INProw("LEASESTYMD") = WF_LEASESTYMD.Text              'リース開始年月日
 
-        OIM0005INProw("LEASEENDYMD") = WF_LEASEENDYMD.Text              'リース満了年月日
+        'OIM0005INProw("LEASEENDYMD") = WF_LEASEENDYMD.Text              'リース満了年月日
 
-        OIM0005INProw("USERCODE") = WF_USERCODE.Text              '第三者使用者C
+        'OIM0005INProw("USERCODE") = WF_USERCODE.Text              '第三者使用者C
 
-        OIM0005INProw("CURRENTSTATIONCODE") = WF_CURRENTSTATIONCODE.Text              '原常備駅C
+        'OIM0005INProw("CURRENTSTATIONCODE") = WF_CURRENTSTATIONCODE.Text              '原常備駅C
 
-        OIM0005INProw("EXTRADINARYSTATIONCODE") = WF_EXTRADINARYSTATIONCODE.Text              '臨時常備駅C
+        'OIM0005INProw("EXTRADINARYSTATIONCODE") = WF_EXTRADINARYSTATIONCODE.Text              '臨時常備駅C
 
-        OIM0005INProw("USERLIMIT") = WF_USERLIMIT.Text              '第三者使用期限
+        'OIM0005INProw("USERLIMIT") = WF_USERLIMIT.Text              '第三者使用期限
 
-        OIM0005INProw("LIMITTEXTRADIARYSTATION") = WF_LIMITTEXTRADIARYSTATION.Text              '臨時常備駅期限
+        'OIM0005INProw("LIMITTEXTRADIARYSTATION") = WF_LIMITTEXTRADIARYSTATION.Text              '臨時常備駅期限
 
-        OIM0005INProw("DEDICATETYPECODE") = WF_DEDICATETYPECODE.Text              '原専用種別C
+        'OIM0005INProw("DEDICATETYPECODE") = WF_DEDICATETYPECODE.Text              '原専用種別C
 
-        OIM0005INProw("EXTRADINARYTYPECODE") = WF_EXTRADINARYTYPECODE.Text              '臨時専用種別C
+        'OIM0005INProw("EXTRADINARYTYPECODE") = WF_EXTRADINARYTYPECODE.Text              '臨時専用種別C
 
-        OIM0005INProw("EXTRADINARYLIMIT") = WF_EXTRADINARYLIMIT.Text              '臨時専用期限
+        'OIM0005INProw("EXTRADINARYLIMIT") = WF_EXTRADINARYLIMIT.Text              '臨時専用期限
 
-        OIM0005INProw("OPERATIONBASECODE") = WF_OPERATIONBASECODE.Text              '運用基地C
+        'OIM0005INProw("OPERATIONBASECODE") = WF_OPERATIONBASECODE.Text              '運用基地C
 
-        OIM0005INProw("COLORCODE") = WF_COLORCODE.Text              '塗色C
+        'OIM0005INProw("COLORCODE") = WF_COLORCODE.Text              '塗色C
 
-        OIM0005INProw("ENEOS") = WF_ENEOS.Text              'エネオス
+        'OIM0005INProw("ENEOS") = WF_ENEOS.Text              'エネオス
 
-        OIM0005INProw("ECO") = WF_ECO.Text              'エコレール
+        'OIM0005INProw("ECO") = WF_ECO.Text              'エコレール
 
-        OIM0005INProw("ALLINSPECTIONDATE") = WF_ALLINSPECTIONDATE.Text              '取得年月日
+        'OIM0005INProw("ALLINSPECTIONDATE") = WF_ALLINSPECTIONDATE.Text              '取得年月日
 
-        OIM0005INProw("TRANSFERDATE") = WF_TRANSFERDATE.Text              '車籍編入年月日
+        'OIM0005INProw("TRANSFERDATE") = WF_TRANSFERDATE.Text              '車籍編入年月日
 
-        OIM0005INProw("OBTAINEDCODE") = WF_OBTAINEDCODE.Text              '取得先C
+        'OIM0005INProw("OBTAINEDCODE") = WF_OBTAINEDCODE.Text              '取得先C
 
-        OIM0005INProw("MODELKANA") = WF_MODELKANA.Text              '形式カナ
+        'OIM0005INProw("MODELKANA") = WF_MODELKANA.Text              '形式カナ
 
-        OIM0005INProw("LOAD") = WF_LOAD.Text              '荷重
+        'OIM0005INProw("LOAD") = WF_LOAD.Text              '荷重
 
-        OIM0005INProw("LOADUNIT") = WF_LOADUNIT.Text              '荷重単位
+        'OIM0005INProw("LOADUNIT") = WF_LOADUNIT.Text              '荷重単位
 
-        OIM0005INProw("VOLUME") = WF_VOLUME.Text              '容積
+        'OIM0005INProw("VOLUME") = WF_VOLUME.Text              '容積
 
-        OIM0005INProw("VOLUMEUNIT") = WF_VOLUMEUNIT.Text              '容積単位
+        'OIM0005INProw("VOLUMEUNIT") = WF_VOLUMEUNIT.Text              '容積単位
 
-        OIM0005INProw("ORIGINOWNERNAME") = WF_ORIGINOWNERNAME.Text              '原籍所有者
+        'OIM0005INProw("ORIGINOWNERNAME") = WF_ORIGINOWNERNAME.Text              '原籍所有者
 
-        OIM0005INProw("OWNERNAME") = WF_OWNERNAME.Text              '名義所有者
+        'OIM0005INProw("OWNERNAME") = WF_OWNERNAME.Text              '名義所有者
 
-        OIM0005INProw("LEASENAME") = WF_LEASENAME.Text              'リース先
+        'OIM0005INProw("LEASENAME") = WF_LEASENAME.Text              'リース先
 
-        OIM0005INProw("LEASECLASSNEMAE") = WF_LEASECLASSNEMAE.Text              'リース区分
+        'OIM0005INProw("LEASECLASSNEMAE") = WF_LEASECLASSNEMAE.Text              'リース区分
 
-        OIM0005INProw("USERNAME") = WF_USERNAME.Text              '第三者使用者
+        'OIM0005INProw("USERNAME") = WF_USERNAME.Text              '第三者使用者
 
-        OIM0005INProw("CURRENTSTATIONNAME") = WF_CURRENTSTATIONNAME.Text              '原常備駅
+        'OIM0005INProw("CURRENTSTATIONNAME") = WF_CURRENTSTATIONNAME.Text              '原常備駅
 
-        OIM0005INProw("EXTRADINARYSTATIONNAME") = WF_EXTRADINARYSTATIONNAME.Text              '臨時常備駅
+        'OIM0005INProw("EXTRADINARYSTATIONNAME") = WF_EXTRADINARYSTATIONNAME.Text              '臨時常備駅
 
-        OIM0005INProw("DEDICATETYPENAME") = WF_DEDICATETYPENAME.Text              '原専用種別
+        'OIM0005INProw("DEDICATETYPENAME") = WF_DEDICATETYPENAME.Text              '原専用種別
 
-        OIM0005INProw("EXTRADINARYTYPENAME") = WF_EXTRADINARYTYPENAME.Text              '臨時専用種別
+        'OIM0005INProw("EXTRADINARYTYPENAME") = WF_EXTRADINARYTYPENAME.Text              '臨時専用種別
 
-        OIM0005INProw("OPERATIONBASENAME") = WF_OPERATIONBASENAME.Text              '運用場所
+        'OIM0005INProw("OPERATIONBASENAME") = WF_OPERATIONBASENAME.Text              '運用場所
 
-        OIM0005INProw("COLORNAME") = WF_COLORNAME.Text              '塗色
+        'OIM0005INProw("COLORNAME") = WF_COLORNAME.Text              '塗色
 
-        OIM0005INProw("RESERVE1") = WF_RESERVE1.Text              '予備1
+        'OIM0005INProw("RESERVE1") = WF_RESERVE1.Text              '予備1
 
-        OIM0005INProw("RESERVE2") = WF_RESERVE2.Text              '予備2
+        'OIM0005INProw("RESERVE2") = WF_RESERVE2.Text              '予備2
 
-        OIM0005INProw("SPECIFIEDDATE") = WF_SPECIFIEDDATE.Text              '次回指定年月日
+        'OIM0005INProw("SPECIFIEDDATE") = WF_SPECIFIEDDATE.Text              '次回指定年月日
 
-        OIM0005INProw("JRALLINSPECTIONDATE") = WF_JRALLINSPECTIONDATE.Text              '次回全検年月日(JR) 
+        'OIM0005INProw("JRALLINSPECTIONDATE") = WF_JRALLINSPECTIONDATE.Text              '次回全検年月日(JR) 
 
-        OIM0005INProw("PROGRESSYEAR") = WF_PROGRESSYEAR.Text              '現在経年
+        'OIM0005INProw("PROGRESSYEAR") = WF_PROGRESSYEAR.Text              '現在経年
 
-        OIM0005INProw("NEXTPROGRESSYEAR") = WF_NEXTPROGRESSYEAR.Text              '次回全検時経年
+        'OIM0005INProw("NEXTPROGRESSYEAR") = WF_NEXTPROGRESSYEAR.Text              '次回全検時経年
 
-        OIM0005INProw("JRINSPECTIONDATE") = WF_JRINSPECTIONDATE.Text              '次回交検年月日(JR）
+        'OIM0005INProw("JRINSPECTIONDATE") = WF_JRINSPECTIONDATE.Text              '次回交検年月日(JR）
 
-        OIM0005INProw("INSPECTIONDATE") = WF_INSPECTIONDATE.Text              '次回交検年月日
+        'OIM0005INProw("INSPECTIONDATE") = WF_INSPECTIONDATE.Text              '次回交検年月日
 
-        OIM0005INProw("JRSPECIFIEDDATE") = WF_JRSPECIFIEDDATE.Text              '次回指定年月日(JR)
+        'OIM0005INProw("JRSPECIFIEDDATE") = WF_JRSPECIFIEDDATE.Text              '次回指定年月日(JR)
 
-        OIM0005INProw("JRTANKNUMBER") = WF_JRTANKNUMBER.Text              'JR車番
+        'OIM0005INProw("JRTANKNUMBER") = WF_JRTANKNUMBER.Text              'JR車番
 
-        OIM0005INProw("OLDTANKNUMBER") = WF_OLDTANKNUMBER.Text              '旧JOT車番
+        'OIM0005INProw("OLDTANKNUMBER") = WF_OLDTANKNUMBER.Text              '旧JOT車番
 
-        OIM0005INProw("OTTANKNUMBER") = WF_OTTANKNUMBER.Text              'OT車番
+        'OIM0005INProw("OTTANKNUMBER") = WF_OTTANKNUMBER.Text              'OT車番
 
-        OIM0005INProw("JXTGTANKNUMBER") = WF_JXTGTANKNUMBER.Text              'JXTG車番
+        'OIM0005INProw("JXTGTANKNUMBER") = WF_JXTGTANKNUMBER.Text              'JXTG車番
 
-        OIM0005INProw("COSMOTANKNUMBER") = WF_COSMOTANKNUMBER.Text              'コスモ車番
+        'OIM0005INProw("COSMOTANKNUMBER") = WF_COSMOTANKNUMBER.Text              'コスモ車番
 
-        OIM0005INProw("FUJITANKNUMBER") = WF_FUJITANKNUMBER.Text              '富士石油車番
+        'OIM0005INProw("FUJITANKNUMBER") = WF_FUJITANKNUMBER.Text              '富士石油車番
 
-        OIM0005INProw("SHELLTANKNUMBER") = WF_SHELLTANKNUMBER.Text              '出光昭シ車番
+        'OIM0005INProw("SHELLTANKNUMBER") = WF_SHELLTANKNUMBER.Text              '出光昭シ車番
 
-        OIM0005INProw("RESERVE3") = WF_RESERVE3.Text              '予備
+        'OIM0005INProw("RESERVE3") = WF_RESERVE3.Text              '予備
 
         '○ チェック用テーブルに登録する
-        OIM0005INPtbl.Rows.Add(OIM0005INProw)
+        'OIM0005INPtbl.Rows.Add(OIM0005INProw)
 
     End Sub
 
@@ -874,34 +1335,34 @@ Public Class OIM0005TankCreate
         '○ 画面表示データ保存
         Master.SaveTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
 
-        WF_Sel_LINECNT.Text = ""            'LINECNT
+        'WF_Sel_LINECNT.Text = ""            'LINECNT
 
-        WF_TANKNUMBER.Text = ""            'JOT車番
-        WF_MODEL.Text = ""            '型式
-        WF_ORIGINOWNERCODE.Text = ""            '原籍所有者C
-        WF_OWNERCODE.Text = ""            '名義所有者C
-        WF_LEASECODE.Text = ""            'リース先C
-        WF_LEASECLASS.Text = ""            'リース区分C
-        WF_AUTOEXTENTION.Text = ""            '自動延長
-        WF_LEASESTYMD.Text = ""            'リース開始年月日
-        WF_LEASEENDYMD.Text = ""            'リース満了年月日
-        WF_USERCODE.Text = ""            '第三者使用者C
-        WF_CURRENTSTATIONCODE.Text = ""            '原常備駅C
-        WF_EXTRADINARYSTATIONCODE.Text = ""            '臨時常備駅C
-        WF_USERLIMIT.Text = ""            '第三者使用期限
-        WF_LIMITTEXTRADIARYSTATION.Text = ""            '臨時常備駅期限
-        WF_DEDICATETYPECODE.Text = ""            '原専用種別C
-        WF_EXTRADINARYTYPECODE.Text = ""            '臨時専用種別C
-        WF_EXTRADINARYLIMIT.Text = ""            '臨時専用期限
-        WF_OPERATIONBASECODE.Text = ""            '運用基地C
-        WF_COLORCODE.Text = ""            '塗色C
-        WF_ENEOS.Text = ""            'エネオス
-        WF_ECO.Text = ""            'エコレール
-        WF_ALLINSPECTIONDATE.Text = ""            '取得年月日
-        WF_TRANSFERDATE.Text = ""            '車籍編入年月日
-        WF_OBTAINEDCODE.Text = ""            '取得先C
-        WF_DELFLG.Text = ""                 '削除フラグ
-        WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
+        'WF_TANKNUMBER.Text = ""            'JOT車番
+        'WF_MODEL.Text = ""            '型式
+        'WF_ORIGINOWNERCODE.Text = ""            '原籍所有者C
+        'WF_OWNERCODE.Text = ""            '名義所有者C
+        'WF_LEASECODE.Text = ""            'リース先C
+        'WF_LEASECLASS.Text = ""            'リース区分C
+        'WF_AUTOEXTENTION.Text = ""            '自動延長
+        'WF_LEASESTYMD.Text = ""            'リース開始年月日
+        'WF_LEASEENDYMD.Text = ""            'リース満了年月日
+        'WF_USERCODE.Text = ""            '第三者使用者C
+        'WF_CURRENTSTATIONCODE.Text = ""            '原常備駅C
+        'WF_EXTRADINARYSTATIONCODE.Text = ""            '臨時常備駅C
+        'WF_USERLIMIT.Text = ""            '第三者使用期限
+        'WF_LIMITTEXTRADIARYSTATION.Text = ""            '臨時常備駅期限
+        'WF_DEDICATETYPECODE.Text = ""            '原専用種別C
+        'WF_EXTRADINARYTYPECODE.Text = ""            '臨時専用種別C
+        'WF_EXTRADINARYLIMIT.Text = ""            '臨時専用期限
+        'WF_OPERATIONBASECODE.Text = ""            '運用基地C
+        'WF_COLORCODE.Text = ""            '塗色C
+        'WF_ENEOS.Text = ""            'エネオス
+        'WF_ECO.Text = ""            'エコレール
+        'WF_ALLINSPECTIONDATE.Text = ""            '取得年月日
+        'WF_TRANSFERDATE.Text = ""            '車籍編入年月日
+        'WF_OBTAINEDCODE.Text = ""            '取得先C
+        'WF_DELFLG.Text = ""                 '削除フラグ
+        'WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
 
     End Sub
 
@@ -931,30 +1392,30 @@ Public Class OIM0005TankCreate
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "WF_LEASESTYMD"         'リース開始年月日
-                                .WF_Calendar.Text = WF_LEASESTYMD.Text
-                            Case "WF_LEASEENDYMD"         'リース満了年月日
-                                .WF_Calendar.Text = WF_LEASEENDYMD.Text
-                            Case "WF_USERLIMIT"         '第三者使用期限
-                                .WF_Calendar.Text = WF_USERLIMIT.Text
-                            Case "WF_LIMITTEXTRADIARYSTATION"         '臨時常備駅期限
-                                .WF_Calendar.Text = WF_LIMITTEXTRADIARYSTATION.Text
-                            Case "WF_EXTRADINARYLIMIT"         '臨時専用期限
-                                .WF_Calendar.Text = WF_EXTRADINARYLIMIT.Text
-                            Case "WF_ALLINSPECTIONDATE"         '取得年月日
-                                .WF_Calendar.Text = WF_ALLINSPECTIONDATE.Text
-                            Case "WF_TRANSFERDATE"         '車籍編入年月日
-                                .WF_Calendar.Text = WF_TRANSFERDATE.Text
-                            Case "WF_SPECIFIEDDATE"         '次回指定年月日
-                                .WF_Calendar.Text = WF_SPECIFIEDDATE.Text
-                            Case "WF_JRALLINSPECTIONDATE"         '次回全検年月日(JR)
-                                .WF_Calendar.Text = WF_JRALLINSPECTIONDATE.Text
-                            Case "WF_JRINSPECTIONDATE"         '次回交検年月日(JR）
-                                .WF_Calendar.Text = WF_JRINSPECTIONDATE.Text
-                            Case "WF_INSPECTIONDATE"         '次回交検年月日
-                                .WF_Calendar.Text = WF_INSPECTIONDATE.Text
-                            Case "WF_JRSPECIFIEDDATE"         '次回指定年月日(JR)
-                                .WF_Calendar.Text = WF_JRSPECIFIEDDATE.Text
+                            'Case "WF_LEASESTYMD"         'リース開始年月日
+                            '    .WF_Calendar.Text = WF_LEASESTYMD.Text
+                            'Case "WF_LEASEENDYMD"         'リース満了年月日
+                            '    .WF_Calendar.Text = WF_LEASEENDYMD.Text
+                            'Case "WF_USERLIMIT"         '第三者使用期限
+                            '    .WF_Calendar.Text = WF_USERLIMIT.Text
+                            'Case "WF_LIMITTEXTRADIARYSTATION"         '臨時常備駅期限
+                            '    .WF_Calendar.Text = WF_LIMITTEXTRADIARYSTATION.Text
+                            'Case "WF_EXTRADINARYLIMIT"         '臨時専用期限
+                            '    .WF_Calendar.Text = WF_EXTRADINARYLIMIT.Text
+                            'Case "WF_ALLINSPECTIONDATE"         '取得年月日
+                            '    .WF_Calendar.Text = WF_ALLINSPECTIONDATE.Text
+                            'Case "WF_TRANSFERDATE"         '車籍編入年月日
+                            '    .WF_Calendar.Text = WF_TRANSFERDATE.Text
+                            'Case "WF_SPECIFIEDDATE"         '次回指定年月日
+                            '    .WF_Calendar.Text = WF_SPECIFIEDDATE.Text
+                            'Case "WF_JRALLINSPECTIONDATE"         '次回全検年月日(JR)
+                            '    .WF_Calendar.Text = WF_JRALLINSPECTIONDATE.Text
+                            'Case "WF_JRINSPECTIONDATE"         '次回交検年月日(JR）
+                            '    .WF_Calendar.Text = WF_JRINSPECTIONDATE.Text
+                            'Case "WF_INSPECTIONDATE"         '次回交検年月日
+                            '    .WF_Calendar.Text = WF_INSPECTIONDATE.Text
+                            'Case "WF_JRSPECIFIEDDATE"         '次回指定年月日(JR)
+                            '    .WF_Calendar.Text = WF_JRSPECIFIEDDATE.Text
                         End Select
                         .ActiveCalendar()
 
@@ -965,14 +1426,14 @@ Public Class OIM0005TankCreate
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
-                            Case "WF_TANKNUMBER"       'タンク車番号
-                                prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER")
-                            Case "WF_MODEL"       'タンク車型式
-                                prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKMODEL")
-                            Case "WF_CURRENTSTATIONCODE", "WF_EXTRADINARYSTATIONCODE"      '原常備駅C、臨時常備駅C
-                                prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN")
-                            Case "WF_OPERATIONBASECODE"      '運用基地
-                                prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, "BASE")
+                            'Case "WF_TANKNUMBER"       'タンク車番号
+                            '    prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER")
+                            'Case "WF_MODEL"       'タンク車型式
+                            '    prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKMODEL")
+                            'Case "WF_CURRENTSTATIONCODE", "WF_EXTRADINARYSTATIONCODE"      '原常備駅C、臨時常備駅C
+                            '    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN")
+                            'Case "WF_OPERATIONBASECODE"      '運用基地
+                            '    prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, "BASE")
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -991,18 +1452,18 @@ Public Class OIM0005TankCreate
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "WF_TANKNUMBER"        'JOT車番
-                CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
-            Case "WF_MODEL"             '型式
-                CODENAME_get("TANKMODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
-            Case "WF_DELFLG"             '削除フラグ
-                CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
-            Case "WF_CURRENTSTATIONCODE"     '原常備駅C
-                CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
-            Case "WF_EXTRADINARYSTATIONCODE"      '臨時常備駅C
-                CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
-            Case "WF_OPERATIONBASECODE"      '運用基地
-                CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
+            'Case "WF_TANKNUMBER"        'JOT車番
+            '    CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
+            'Case "WF_MODEL"             '型式
+            '    CODENAME_get("TANKMODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
+            'Case "WF_DELFLG"             '削除フラグ
+            '    CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
+            'Case "WF_CURRENTSTATIONCODE"     '原常備駅C
+            '    CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
+            'Case "WF_EXTRADINARYSTATIONCODE"      '臨時常備駅C
+            '    CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
+            'Case "WF_OPERATIONBASECODE"      '運用基地
+            '    CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -1038,192 +1499,192 @@ Public Class OIM0005TankCreate
         '○ 選択内容を画面項目へセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除フラグ
-                Case "WF_DELFLG"
-                    WF_DELFLG.Text = WW_SelectValue
-                    WF_DELFLG_TEXT.Text = WW_SelectText
-                    WF_DELFLG.Focus()
+                ''削除フラグ
+                'Case "WF_DELFLG"
+                '    WF_DELFLG.Text = WW_SelectValue
+                '    WF_DELFLG_TEXT.Text = WW_SelectText
+                '    WF_DELFLG.Focus()
 
-                Case "WF_TANKNUMBER"               'JOT車番
-                    WF_TANKNUMBER.Text = WW_SelectValue
-                    WF_TANKNUMBER_TEXT.Text = WW_SelectText
-                    WF_TANKNUMBER.Focus()
+                'Case "WF_TANKNUMBER"               'JOT車番
+                '    WF_TANKNUMBER.Text = WW_SelectValue
+                '    WF_TANKNUMBER_TEXT.Text = WW_SelectText
+                '    WF_TANKNUMBER.Focus()
 
-                Case "WF_LEASESTYMD"             'リース開始年月日
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_LEASESTYMD.Text = ""
-                        Else
-                            WF_LEASESTYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_LEASESTYMD.Focus()
+                'Case "WF_LEASESTYMD"             'リース開始年月日
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_LEASESTYMD.Text = ""
+                '        Else
+                '            WF_LEASESTYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_LEASESTYMD.Focus()
 
-                Case "WF_LEASEENDYMD"             'リース満了年月日
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_LEASEENDYMD.Text = ""
-                        Else
-                            WF_LEASEENDYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_LEASEENDYMD.Focus()
+                'Case "WF_LEASEENDYMD"             'リース満了年月日
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_LEASEENDYMD.Text = ""
+                '        Else
+                '            WF_LEASEENDYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_LEASEENDYMD.Focus()
 
-                Case "WF_CURRENTSTATIONCODE"               '原常備駅C
-                    WF_CURRENTSTATIONCODE.Text = WW_SelectValue
-                    WF_CURRENTSTATIONCODE_TEXT.Text = WW_SelectText
-                    WF_CURRENTSTATIONCODE.Focus()
+                'Case "WF_CURRENTSTATIONCODE"               '原常備駅C
+                '    WF_CURRENTSTATIONCODE.Text = WW_SelectValue
+                '    WF_CURRENTSTATIONCODE_TEXT.Text = WW_SelectText
+                '    WF_CURRENTSTATIONCODE.Focus()
 
-                Case "WF_EXTRADINARYSTATIONCODE"               '臨時常備駅C
-                    WF_EXTRADINARYSTATIONCODE.Text = WW_SelectValue
-                    WF_EXTRADINARYSTATIONCODE_TEXT.Text = WW_SelectText
-                    WF_EXTRADINARYSTATIONCODE.Focus()
+                'Case "WF_EXTRADINARYSTATIONCODE"               '臨時常備駅C
+                '    WF_EXTRADINARYSTATIONCODE.Text = WW_SelectValue
+                '    WF_EXTRADINARYSTATIONCODE_TEXT.Text = WW_SelectText
+                '    WF_EXTRADINARYSTATIONCODE.Focus()
 
-                Case "WF_USERLIMIT"            '第三者使用期限
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_USERLIMIT.Text = ""
-                        Else
-                            WF_USERLIMIT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_USERLIMIT.Focus()
+                'Case "WF_USERLIMIT"            '第三者使用期限
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_USERLIMIT.Text = ""
+                '        Else
+                '            WF_USERLIMIT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_USERLIMIT.Focus()
 
-                Case "WF_LIMITTEXTRADIARYSTATION"             '臨時常備駅期限
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_LIMITTEXTRADIARYSTATION.Text = ""
-                        Else
-                            WF_LIMITTEXTRADIARYSTATION.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_LIMITTEXTRADIARYSTATION.Focus()
+                'Case "WF_LIMITTEXTRADIARYSTATION"             '臨時常備駅期限
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_LIMITTEXTRADIARYSTATION.Text = ""
+                '        Else
+                '            WF_LIMITTEXTRADIARYSTATION.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_LIMITTEXTRADIARYSTATION.Focus()
 
-                Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_EXTRADINARYLIMIT.Text = ""
-                        Else
-                            WF_EXTRADINARYLIMIT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_EXTRADINARYLIMIT.Focus()
+                'Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_EXTRADINARYLIMIT.Text = ""
+                '        Else
+                '            WF_EXTRADINARYLIMIT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_EXTRADINARYLIMIT.Focus()
 
-                Case "WF_OPERATIONBASECODE"               '運用基地
-                    WF_OPERATIONBASECODE.Text = WW_SelectValue
-                    WF_OPERATIONBASECODE_TEXT.Text = WW_SelectText
-                    WF_OPERATIONBASECODE.Focus()
+                'Case "WF_OPERATIONBASECODE"               '運用基地
+                '    WF_OPERATIONBASECODE.Text = WW_SelectValue
+                '    WF_OPERATIONBASECODE_TEXT.Text = WW_SelectText
+                '    WF_OPERATIONBASECODE.Focus()
 
-                Case "WF_ALLINSPECTIONDATE"             '取得年月日
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_ALLINSPECTIONDATE.Text = ""
-                        Else
-                            WF_ALLINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_ALLINSPECTIONDATE.Focus()
+                'Case "WF_ALLINSPECTIONDATE"             '取得年月日
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_ALLINSPECTIONDATE.Text = ""
+                '        Else
+                '            WF_ALLINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_ALLINSPECTIONDATE.Focus()
 
-                Case "WF_TRANSFERDATE"            '車籍編入年月日
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_TRANSFERDATE.Text = ""
-                        Else
-                            WF_TRANSFERDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_TRANSFERDATE.Focus()
+                'Case "WF_TRANSFERDATE"            '車籍編入年月日
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_TRANSFERDATE.Text = ""
+                '        Else
+                '            WF_TRANSFERDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_TRANSFERDATE.Focus()
 
-                Case "WF_MODEL"               '型式
-                    WF_MODEL.Text = WW_SelectValue
-                    'WF_MODEL_TEXT.Text = WW_SelectText
-                    WF_MODEL.Focus()
+                'Case "WF_MODEL"               '型式
+                '    WF_MODEL.Text = WW_SelectValue
+                '    'WF_MODEL_TEXT.Text = WW_SelectText
+                '    WF_MODEL.Focus()
 
-                Case "WF_SPECIFIEDDATE"             '次回指定年月日
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_SPECIFIEDDATE.Text = ""
-                        Else
-                            WF_SPECIFIEDDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_SPECIFIEDDATE.Focus()
+                'Case "WF_SPECIFIEDDATE"             '次回指定年月日
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_SPECIFIEDDATE.Text = ""
+                '        Else
+                '            WF_SPECIFIEDDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_SPECIFIEDDATE.Focus()
 
-                Case "WF_JRALLINSPECTIONDATE"            '次回全検年月日(JR)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_JRALLINSPECTIONDATE.Text = ""
-                        Else
-                            WF_JRALLINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_JRALLINSPECTIONDATE.Focus()
+                'Case "WF_JRALLINSPECTIONDATE"            '次回全検年月日(JR)
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_JRALLINSPECTIONDATE.Text = ""
+                '        Else
+                '            WF_JRALLINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_JRALLINSPECTIONDATE.Focus()
 
-                Case "WF_JRINSPECTIONDATE"             '次回交検年月日(JR）
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_JRINSPECTIONDATE.Text = ""
-                        Else
-                            WF_JRINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_JRINSPECTIONDATE.Focus()
+                'Case "WF_JRINSPECTIONDATE"             '次回交検年月日(JR）
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_JRINSPECTIONDATE.Text = ""
+                '        Else
+                '            WF_JRINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_JRINSPECTIONDATE.Focus()
 
-                Case "WF_INSPECTIONDATE"            '次回交検年月日
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_INSPECTIONDATE.Text = ""
-                        Else
-                            WF_INSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_INSPECTIONDATE.Focus()
+                'Case "WF_INSPECTIONDATE"            '次回交検年月日
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_INSPECTIONDATE.Text = ""
+                '        Else
+                '            WF_INSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_INSPECTIONDATE.Focus()
 
-                Case "WF_JRSPECIFIEDDATE"            '次回指定年月日(JR)
-                    Dim WW_DATE As Date
-                    Try
-                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                        If WW_DATE < C_DEFAULT_YMD Then
-                            WF_JRSPECIFIEDDATE.Text = ""
-                        Else
-                            WF_JRSPECIFIEDDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                        End If
-                    Catch ex As Exception
-                    End Try
-                    WF_JRSPECIFIEDDATE.Focus()
+                'Case "WF_JRSPECIFIEDDATE"            '次回指定年月日(JR)
+                '    Dim WW_DATE As Date
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                '        If WW_DATE < C_DEFAULT_YMD Then
+                '            WF_JRSPECIFIEDDATE.Text = ""
+                '        Else
+                '            WF_JRSPECIFIEDDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
+                '    End Try
+                '    WF_JRSPECIFIEDDATE.Focus()
             End Select
         Else
         End If
@@ -1245,59 +1706,59 @@ Public Class OIM0005TankCreate
         '○ フォーカスセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                Case "WF_DELFLG"                '削除フラグ
-                    WF_DELFLG.Focus()
+                'Case "WF_DELFLG"                '削除フラグ
+                '    WF_DELFLG.Focus()
 
-                Case "WF_TANKNUMBER"               'JOT車番
-                    WF_TANKNUMBER.Focus()
+                'Case "WF_TANKNUMBER"               'JOT車番
+                '    WF_TANKNUMBER.Focus()
 
-                Case "WF_LEASESTYMD"             'リース開始年月日
-                    WF_LEASESTYMD.Focus()
+                'Case "WF_LEASESTYMD"             'リース開始年月日
+                '    WF_LEASESTYMD.Focus()
 
-                Case "WF_LEASEENDYMD"             'リース満了年月日
-                    WF_LEASEENDYMD.Focus()
+                'Case "WF_LEASEENDYMD"             'リース満了年月日
+                '    WF_LEASEENDYMD.Focus()
 
-                Case "WF_CURRENTSTATIONCODE"               '原常備駅C
-                    WF_CURRENTSTATIONCODE.Focus()
+                'Case "WF_CURRENTSTATIONCODE"               '原常備駅C
+                '    WF_CURRENTSTATIONCODE.Focus()
 
-                Case "WF_EXTRADINARYSTATIONCODE"               '臨時常備駅C
-                    WF_EXTRADINARYSTATIONCODE.Focus()
+                'Case "WF_EXTRADINARYSTATIONCODE"               '臨時常備駅C
+                '    WF_EXTRADINARYSTATIONCODE.Focus()
 
-                Case "WF_USERLIMIT"            '第三者使用期限
-                    WF_USERLIMIT.Focus()
+                'Case "WF_USERLIMIT"            '第三者使用期限
+                '    WF_USERLIMIT.Focus()
 
-                Case "WF_LIMITTEXTRADIARYSTATION"             '臨時常備駅期限
-                    WF_LIMITTEXTRADIARYSTATION.Focus()
+                'Case "WF_LIMITTEXTRADIARYSTATION"             '臨時常備駅期限
+                '    WF_LIMITTEXTRADIARYSTATION.Focus()
 
-                Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
-                    WF_EXTRADINARYLIMIT.Focus()
+                'Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
+                '    WF_EXTRADINARYLIMIT.Focus()
 
-                Case "WF_OPERATIONBASECODE"               '運用基地
-                    WF_OPERATIONBASECODE.Focus()
+                'Case "WF_OPERATIONBASECODE"               '運用基地
+                '    WF_OPERATIONBASECODE.Focus()
 
-                Case "WF_ALLINSPECTIONDATE"             '取得年月日
-                    WF_ALLINSPECTIONDATE.Focus()
+                'Case "WF_ALLINSPECTIONDATE"             '取得年月日
+                '    WF_ALLINSPECTIONDATE.Focus()
 
-                Case "WF_TRANSFERDATE"            '車籍編入年月日
-                    WF_TRANSFERDATE.Focus()
+                'Case "WF_TRANSFERDATE"            '車籍編入年月日
+                '    WF_TRANSFERDATE.Focus()
 
-                Case "WF_MODEL"               '型式
-                    WF_MODEL.Focus()
+                'Case "WF_MODEL"               '型式
+                '    WF_MODEL.Focus()
 
-                Case "WF_SPECIFIEDDATE"             '次回指定年月日
-                    WF_SPECIFIEDDATE.Focus()
+                'Case "WF_SPECIFIEDDATE"             '次回指定年月日
+                '    WF_SPECIFIEDDATE.Focus()
 
-                Case "WF_JRALLINSPECTIONDATE"            '次回全検年月日(JR)
-                    WF_JRALLINSPECTIONDATE.Focus()
+                'Case "WF_JRALLINSPECTIONDATE"            '次回全検年月日(JR)
+                '    WF_JRALLINSPECTIONDATE.Focus()
 
-                Case "WF_JRINSPECTIONDATE"             '次回交検年月日(JR）
-                    WF_JRINSPECTIONDATE.Focus()
+                'Case "WF_JRINSPECTIONDATE"             '次回交検年月日(JR）
+                '    WF_JRINSPECTIONDATE.Focus()
 
-                Case "WF_INSPECTIONDATE"            '次回交検年月日
-                    WF_INSPECTIONDATE.Focus()
+                'Case "WF_INSPECTIONDATE"            '次回交検年月日
+                '    WF_INSPECTIONDATE.Focus()
 
-                Case "WF_JRSPECIFIEDDATE"            '次回指定年月日(JR)
-                    WF_JRSPECIFIEDDATE.Focus()
+                'Case "WF_JRSPECIFIEDDATE"            '次回指定年月日(JR)
+                '    WF_JRSPECIFIEDDATE.Focus()
             End Select
         Else
         End If
@@ -2185,18 +2646,18 @@ Public Class OIM0005TankCreate
                 Case "ORG"             '運用部署
                     prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TANKNUMBER"        'JOT車番
-                    prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "MODEL"        '型式
-                    prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "TANKNUMBER"        'JOT車番
+                '    prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "MODEL"        '型式
+                '    prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "STATIONPATTERN"　 '原常備駅C、臨時常備駅C
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "BASE"      '運用基地
-                    prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
+                'Case "BASE"      '運用基地
+                '    prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
             End Select

@@ -2814,14 +2814,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Next
                 Else
                     For Each OIT0001WKrow As DataRow In OIT0001Fixvaltbl.Rows
-                        O_VALUE(0) = OIT0001WKrow("VALUE1")
-                        O_VALUE(1) = OIT0001WKrow("VALUE2")
-                        O_VALUE(2) = OIT0001WKrow("VALUE3")
-                        O_VALUE(3) = OIT0001WKrow("VALUE4")
-                        O_VALUE(4) = OIT0001WKrow("VALUE5")
-                        O_VALUE(5) = OIT0001WKrow("VALUE6")
-                        O_VALUE(6) = OIT0001WKrow("VALUE7")
-                        O_VALUE(7) = OIT0001WKrow("VALUE8")
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = OIT0001WKrow("VALUE" & i.ToString())
+                        Next
+                        'O_VALUE(0) = OIT0001WKrow("VALUE1")
+                        'O_VALUE(1) = OIT0001WKrow("VALUE2")
+                        'O_VALUE(2) = OIT0001WKrow("VALUE3")
+                        'O_VALUE(3) = OIT0001WKrow("VALUE4")
+                        'O_VALUE(4) = OIT0001WKrow("VALUE5")
+                        'O_VALUE(5) = OIT0001WKrow("VALUE6")
+                        'O_VALUE(6) = OIT0001WKrow("VALUE7")
+                        'O_VALUE(7) = OIT0001WKrow("VALUE8")
                     Next
                 End If
             End Using

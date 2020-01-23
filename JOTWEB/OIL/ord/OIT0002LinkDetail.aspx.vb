@@ -2330,11 +2330,14 @@ Public Class OIT0002LinkDetail
                     Next
                 Else
                     For Each OIT0002WKrow As DataRow In OIT0002WKtbl.Rows
-                        O_VALUE(0) = OIT0002WKrow("VALUE1")
-                        O_VALUE(1) = OIT0002WKrow("VALUE2")
-                        O_VALUE(2) = OIT0002WKrow("VALUE3")
-                        O_VALUE(3) = OIT0002WKrow("VALUE4")
-                        O_VALUE(4) = OIT0002WKrow("VALUE5")
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = OIT0002WKrow("VALUE" & i.ToString())
+                        Next
+                        'O_VALUE(0) = OIT0002WKrow("VALUE1")
+                        'O_VALUE(1) = OIT0002WKrow("VALUE2")
+                        'O_VALUE(2) = OIT0002WKrow("VALUE3")
+                        'O_VALUE(3) = OIT0002WKrow("VALUE4")
+                        'O_VALUE(4) = OIT0002WKrow("VALUE5")
                     Next
                 End If
             End Using

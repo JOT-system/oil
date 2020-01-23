@@ -425,7 +425,21 @@ function addLeftBoxFilter(ListObj) {
     leftListClone.onchange = (function (leftListClone, ListObj) {
         return function () {
             var baseList = document.getElementById(ListObj.id);
+
             baseList.value = leftListClone.value;
+            let hdnObjId = 'commonLeftListSelectedText';
+            let hdnObj = document.getElementById(hdnObjId);
+            if (hdnObj === null) {
+                hdnObj = document.createElement('input');
+                hdnObj.type = 'hidden';
+                hdnObj.id = hdnObjId;
+                hdnObj.name = hdnObjId;
+                document.forms[0].appendChild(hdnObj);
+                hdnObj = document.getElementById(hdnObjId);
+            }
+            let selectIdx = leftListClone.selectedIndex;
+            hdnObj.value = leftListClone.options[selectIdx].text;
+            
         };
     })(leftListClone, ListObj);
 

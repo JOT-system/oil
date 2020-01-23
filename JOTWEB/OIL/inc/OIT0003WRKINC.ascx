@@ -224,6 +224,15 @@
     <!-- 貨車連結用更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPLINKTBL" runat="server"></asp:TextBox>
 
+    <!-- 明細画面(タブ１)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB1TBL" runat="server"></asp:TextBox>
+    <!-- 明細画面(タブ２)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB2TBL" runat="server"></asp:TextBox>
+    <!-- 明細画面(タブ３)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB3TBL" runat="server"></asp:TextBox>
+    <!-- 明細画面(タブ４)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB4TBL" runat="server"></asp:TextBox>
+
     <!-- 基地コード -->
     <asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>
     <!-- 基地名 -->

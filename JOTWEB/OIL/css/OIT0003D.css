@@ -315,7 +315,7 @@ div[id^=pnlListArea] {
     margin-left: 2px;
 }
 div[data-generated='1'] div[id$='_HR'] {
-    position: relative;
+    /*position: relative;*/
 }
 div[data-generated='1'] tr td > div[style] {
     overflow:hidden;

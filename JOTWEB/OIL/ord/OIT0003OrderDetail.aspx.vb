@@ -333,59 +333,118 @@ Public Class OIT0003OrderDetail
         Else
             TxtBudgetMonth.Text = work.WF_SEL_KEIJYOYMD.Text
         End If
-        '売上合計金額(税抜)
-        TxtTotalSales.Text = work.WF_SEL_SALSE.Text
-        '支払合計金額(税抜)
-        TxtTitalPayment.Text = work.WF_SEL_PAYMENT.Text
-        '売上合計金額(税額)
-        TxtTotalSales2.Text = work.WF_SEL_TOTALSALSE.Text
-        '支払合計金額(税額)
-        TxtTitalPayment2.Text = work.WF_SEL_TOTALPAYMENT.Text
+
+        If work.WF_SEL_CREATEFLG.Text = "1" Then
+            '売上合計金額(税抜)
+            TxtTotalSales.Text = "0"
+            '支払合計金額(税抜)
+            TxtTitalPayment.Text = "0"
+            '売上合計金額(税額)
+            TxtTotalSales2.Text = "0"
+            '支払合計金額(税額)
+            TxtTitalPayment2.Text = "0"
+        Else
+            '売上合計金額(税抜)
+            TxtTotalSales.Text = work.WF_SEL_SALSE.Text
+            '支払合計金額(税抜)
+            TxtTitalPayment.Text = work.WF_SEL_PAYMENT.Text
+            '売上合計金額(税額)
+            TxtTotalSales2.Text = work.WF_SEL_TOTALSALSE.Text
+            '支払合計金額(税額)
+            TxtTitalPayment2.Text = work.WF_SEL_TOTALPAYMENT.Text
+        End If
 
         '● タブ「タンク車割当」
         '　■油種別タンク車数(車)
-        'ハイオク(タンク車数)
-        TxtHTank.Text = work.WF_SEL_HIGHOCTANE_TANKCAR.Text
-        'レギュラー(タンク車数)
-        TxtRTank.Text = work.WF_SEL_REGULAR_TANKCAR.Text
-        '灯油(タンク車数)
-        TxtTTank.Text = work.WF_SEL_KEROSENE_TANKCAR.Text
-        '未添加灯油(タンク車数)
-        TxtMTTank.Text = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text
-        '軽油(タンク車数)
-        TxtKTank.Text = work.WF_SEL_DIESEL_TANKCAR.Text
-        '3号軽油(タンク車数)
-        TxtK3Tank.Text = work.WF_SEL_NUM3DIESEL_TANKCAR.Text
-        '5号軽油(タンク車数)
-        TxtK5Tank.Text = work.WF_SEL_NUM5DIESEL_TANKCAR.Text
-        '10号軽油(タンク車数)
-        TxtK10Tank.Text = work.WF_SEL_NUM10DIESEL_TANKCAR.Text
-        'LSA(タンク車数)
-        TxtLTank.Text = work.WF_SEL_LSA_TANKCAR.Text
-        'A重油(タンク車数)
-        TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
+        If work.WF_SEL_CREATEFLG.Text = "1" Then
+            'ハイオク(タンク車数)
+            TxtHTank.Text = "0"
+            'レギュラー(タンク車数)
+            TxtRTank.Text = "0"
+            '灯油(タンク車数)
+            TxtTTank.Text = "0"
+            '未添加灯油(タンク車数)
+            TxtMTTank.Text = "0"
+            '軽油(タンク車数)
+            TxtKTank.Text = "0"
+            '3号軽油(タンク車数)
+            TxtK3Tank.Text = "0"
+            '5号軽油(タンク車数)
+            TxtK5Tank.Text = "0"
+            '10号軽油(タンク車数)
+            TxtK10Tank.Text = "0"
+            'LSA(タンク車数)
+            TxtLTank.Text = "0"
+            'A重油(タンク車数)
+            TxtATank.Text = "0"
+        Else
+            'ハイオク(タンク車数)
+            TxtHTank.Text = work.WF_SEL_HIGHOCTANE_TANKCAR.Text
+            'レギュラー(タンク車数)
+            TxtRTank.Text = work.WF_SEL_REGULAR_TANKCAR.Text
+            '灯油(タンク車数)
+            TxtTTank.Text = work.WF_SEL_KEROSENE_TANKCAR.Text
+            '未添加灯油(タンク車数)
+            TxtMTTank.Text = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text
+            '軽油(タンク車数)
+            TxtKTank.Text = work.WF_SEL_DIESEL_TANKCAR.Text
+            '3号軽油(タンク車数)
+            TxtK3Tank.Text = work.WF_SEL_NUM3DIESEL_TANKCAR.Text
+            '5号軽油(タンク車数)
+            TxtK5Tank.Text = work.WF_SEL_NUM5DIESEL_TANKCAR.Text
+            '10号軽油(タンク車数)
+            TxtK10Tank.Text = work.WF_SEL_NUM10DIESEL_TANKCAR.Text
+            'LSA(タンク車数)
+            TxtLTank.Text = work.WF_SEL_LSA_TANKCAR.Text
+            'A重油(タンク車数)
+            TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
+        End If
+
 
         '　■割当後　油種別タンク車数(車)
-        'ハイオク(タンク車数)
-        TxtHTank_w.Text = work.WF_SEL_HIGHOCTANECH_TANKCAR.Text
-        'レギュラー(タンク車数)
-        TxtRTank_w.Text = work.WF_SEL_REGULARCH_TANKCAR.Text
-        '灯油(タンク車数)
-        TxtTTank_w.Text = work.WF_SEL_KEROSENECH_TANKCAR.Text
-        '未添加灯油(タンク車数)
-        TxtMTTank_w.Text = work.WF_SEL_NOTADDED_KEROSENECH_TANKCAR.Text
-        '軽油(タンク車数)
-        TxtKTank_w.Text = work.WF_SEL_DIESELCH_TANKCAR.Text
-        '3号軽油(タンク車数)
-        TxtK3Tank_w.Text = work.WF_SEL_NUM3DIESELCH_TANKCAR.Text
-        '5号軽油(タンク車数)
-        TxtK5Tank_w.Text = work.WF_SEL_NUM5DIESELCH_TANKCAR.Text
-        '10号軽油(タンク車数)
-        TxtK10Tank_w.Text = work.WF_SEL_NUM10DIESELCH_TANKCAR.Text
-        'LSA(タンク車数)
-        TxtLTank_w.Text = work.WF_SEL_LSACH_TANKCAR.Text
-        'A重油(タンク車数)
-        TxtATank_w.Text = work.WF_SEL_AHEAVYCH_TANKCAR.Text
+        If work.WF_SEL_CREATEFLG.Text = "1" Then
+            'ハイオク(タンク車数)
+            TxtHTank_w.Text = "0"
+            'レギュラー(タンク車数)
+            TxtRTank_w.Text = "0"
+            '灯油(タンク車数)
+            TxtTTank_w.Text = "0"
+            '未添加灯油(タンク車数)
+            TxtMTTank_w.Text = "0"
+            '軽油(タンク車数)
+            TxtKTank_w.Text = "0"
+            '3号軽油(タンク車数)
+            TxtK3Tank_w.Text = "0"
+            '5号軽油(タンク車数)
+            TxtK5Tank_w.Text = "0"
+            '10号軽油(タンク車数)
+            TxtK10Tank_w.Text = "0"
+            'LSA(タンク車数)
+            TxtLTank_w.Text = "0"
+            'A重油(タンク車数)
+            TxtATank_w.Text = "0"
+        Else
+            'ハイオク(タンク車数)
+            TxtHTank_w.Text = work.WF_SEL_HIGHOCTANECH_TANKCAR.Text
+            'レギュラー(タンク車数)
+            TxtRTank_w.Text = work.WF_SEL_REGULARCH_TANKCAR.Text
+            '灯油(タンク車数)
+            TxtTTank_w.Text = work.WF_SEL_KEROSENECH_TANKCAR.Text
+            '未添加灯油(タンク車数)
+            TxtMTTank_w.Text = work.WF_SEL_NOTADDED_KEROSENECH_TANKCAR.Text
+            '軽油(タンク車数)
+            TxtKTank_w.Text = work.WF_SEL_DIESELCH_TANKCAR.Text
+            '3号軽油(タンク車数)
+            TxtK3Tank_w.Text = work.WF_SEL_NUM3DIESELCH_TANKCAR.Text
+            '5号軽油(タンク車数)
+            TxtK5Tank_w.Text = work.WF_SEL_NUM5DIESELCH_TANKCAR.Text
+            '10号軽油(タンク車数)
+            TxtK10Tank_w.Text = work.WF_SEL_NUM10DIESELCH_TANKCAR.Text
+            'LSA(タンク車数)
+            TxtLTank_w.Text = work.WF_SEL_LSACH_TANKCAR.Text
+            'A重油(タンク車数)
+            TxtATank_w.Text = work.WF_SEL_AHEAVYCH_TANKCAR.Text
+        End If
 
         '○ 名称設定処理
         '会社コード
@@ -471,7 +530,7 @@ Public Class OIT0003OrderDetail
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea1
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Vertical
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
 
@@ -2555,6 +2614,9 @@ Public Class OIT0003OrderDetail
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
 
+                Case "SALESOFFICE"      '営業所
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
+
                 Case "ORDERTYPE"        '受注パターン
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERTYPE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE"))
 
@@ -2569,6 +2631,20 @@ Public Class OIT0003OrderDetail
 
                 Case "ARRSTATION"       '着駅
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ARRSTATION"))
+
+                Case "PRODUCTPATTERN"   '油種
+
+                    '〇 検索(営業所).テキストボックスが未設定
+                    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                        '〇 画面(受注営業所).テキストボックスが未設定
+                        If TxtOrderOffice.Text = "" Then
+                            leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USER_ORG, "PRODUCTPATTERN"))
+                        Else
+                            leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PRODUCTPATTERN"))
+                        End If
+                    Else
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN"))
+                    End If
 
                 Case "TANKNO"           'タンク車
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "TANKNO"))
@@ -3126,7 +3202,9 @@ Public Class OIT0003OrderDetail
                     PARA18.Value = ""                                 '空車着駅名
                     PARA19.Value = ""                                 '空車着駅コード(変更後)
                     PARA20.Value = ""                                 '空車着駅名(変更後)
-                    PARA21.Value = TxtOrderStatus.Text                '受注進行ステータス
+                    'PARA19.Value = OIT0003row("CANGERETSTATION")      '空車着駅コード(変更後)
+                    'PARA20.Value = OIT0003row("CHANGEARRSTATIONNAME") '空車着駅名(変更後)
+                    PARA21.Value = work.WF_SEL_ORDERSTATUS.Text       '受注進行ステータス
 
                     '# 受注情報
                     '交付アラートが「3日以内のタンク車」または「4日～6日のタンク車」の場合
@@ -3164,21 +3242,57 @@ Public Class OIT0003OrderDetail
                     PARA26.Value = TxtArrDate.Text                    '積車着日（予定）
                     PARA27.Value = TxtAccDate.Text                    '受入日（予定）
                     PARA28.Value = TxtEmparrDate.Text                 '空車着日（予定）
-                    PARA29.Value = TxtActualLoadingDate.Text          '積込日（実績）
-                    PARA30.Value = TxtActualDepDate.Text              '発日（実績）
-                    PARA31.Value = TxtActualArrDate.Text              '積車着日（実績）
-                    PARA32.Value = TxtActualAccDate.Text              '受入日（実績）
-                    PARA33.Value = TxtActualEmparrDate.Text           '空車着日（実績）
-                    PARA34.Value = work.WF_SEL_REGULAR_TANKCAR.Text   '車数（レギュラー）
-                    PARA35.Value = work.WF_SEL_HIGHOCTANE_TANKCAR.Text '車数（ハイオク）
-                    PARA36.Value = work.WF_SEL_KEROSENE_TANKCAR.Text  '車数（灯油）
-                    PARA37.Value = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text  '車数（未添加灯油）
-                    PARA38.Value = work.WF_SEL_DIESEL_TANKCAR.Text    '車数（軽油）
-                    PARA39.Value = work.WF_SEL_NUM3DIESEL_TANKCAR.Text  '車数（３号軽油）
-                    PARA40.Value = work.WF_SEL_NUM5DIESEL_TANKCAR.Text  '車数（５号軽油）
-                    PARA41.Value = work.WF_SEL_NUM10DIESEL_TANKCAR.Text '車数（１０号軽油）
-                    PARA42.Value = work.WF_SEL_LSA_TANKCAR.Text       '車数（LSA）
-                    PARA43.Value = work.WF_SEL_AHEAVY_TANKCAR.Text    '車数（A重油）
+                    '積込日（実績）
+                    If TxtActualLoadingDate.Text = "" Then
+                        PARA29.Value = DBNull.Value
+                    Else
+                        PARA29.Value = TxtActualLoadingDate.Text
+                    End If
+                    '発日（実績）
+                    If TxtActualLoadingDate.Text = "" Then
+                        PARA30.Value = DBNull.Value
+                    Else
+                        PARA30.Value = TxtActualDepDate.Text
+                    End If
+                    '積車着日（実績）
+                    If TxtActualArrDate.Text = "" Then
+                        PARA31.Value = DBNull.Value
+                    Else
+                        PARA31.Value = TxtActualArrDate.Text
+                    End If
+                    '受入日（実績）
+                    If TxtActualAccDate.Text = "" Then
+                        PARA32.Value = DBNull.Value
+                    Else
+                        PARA32.Value = TxtActualAccDate.Text
+                    End If
+                    '空車着日（実績）
+                    If TxtActualEmparrDate.Text = "" Then
+                        PARA33.Value = DBNull.Value
+                    Else
+                        PARA33.Value = TxtActualEmparrDate.Text
+                    End If
+
+                    PARA34.Value = TxtRTank.Text                      '車数（レギュラー）
+                    PARA35.Value = TxtHTank.Text                      '車数（ハイオク）
+                    PARA36.Value = TxtTTank.Text                      '車数（灯油）
+                    PARA37.Value = TxtMTTank.Text                     '車数（未添加灯油）
+                    PARA38.Value = TxtKTank.Text                      '車数（軽油）
+                    PARA39.Value = TxtK3Tank.Text                     '車数（３号軽油）
+                    PARA40.Value = TxtK5Tank.Text                     '車数（５号軽油）
+                    PARA41.Value = TxtK10Tank.Text                    '車数（１０号軽油）
+                    PARA42.Value = TxtLTank.Text                      '車数（LSA）
+                    PARA43.Value = TxtATank.Text                      '車数（A重油）
+                    'PARA34.Value = work.WF_SEL_REGULAR_TANKCAR.Text   '車数（レギュラー）
+                    'PARA35.Value = work.WF_SEL_HIGHOCTANE_TANKCAR.Text '車数（ハイオク）
+                    'PARA36.Value = work.WF_SEL_KEROSENE_TANKCAR.Text  '車数（灯油）
+                    'PARA37.Value = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text  '車数（未添加灯油）
+                    'PARA38.Value = work.WF_SEL_DIESEL_TANKCAR.Text    '車数（軽油）
+                    'PARA39.Value = work.WF_SEL_NUM3DIESEL_TANKCAR.Text  '車数（３号軽油）
+                    'PARA40.Value = work.WF_SEL_NUM5DIESEL_TANKCAR.Text  '車数（５号軽油）
+                    'PARA41.Value = work.WF_SEL_NUM10DIESEL_TANKCAR.Text '車数（１０号軽油）
+                    'PARA42.Value = work.WF_SEL_LSA_TANKCAR.Text       '車数（LSA）
+                    'PARA43.Value = work.WF_SEL_AHEAVY_TANKCAR.Text    '車数（A重油）
                     PARA44.Value = "0"                                '車数（その他１）
                     PARA45.Value = "0"                                '車数（その他２）
                     PARA46.Value = "0"                                '車数（その他３）
@@ -3213,13 +3327,20 @@ Public Class OIT0003OrderDetail
                     PARA75.Value = "0"                                '変更後_合計車数
                     PARA76.Value = work.WF_SEL_LINK_LINKNO.Text       '貨車連結順序表№
                     PARA91.Value = TxtBudgetMonth.Text                '計上日
-                    PARA77.Value = TxtTotalSales.Text                 '売上金額
-                    PARA78.Value = Integer.Parse(TxtTotalSales2.Text) - Integer.Parse(TxtTotalSales.Text) '売上消費税額
-                    PARA79.Value = TxtTotalSales2.Text                '売上合計金額
-                    PARA80.Value = TxtTitalPayment.Text               '支払金額
-                    PARA81.Value = Integer.Parse(TxtTitalPayment2.Text) - Integer.Parse(TxtTitalPayment.Text) '支払消費税額
-                    PARA82.Value = TxtTitalPayment2.Text              '支払合計金額
-                    PARA83.Value = OIT0003row("DELFLG")               '削除フラグ
+                    PARA77.Value = "0"                                '売上金額
+                    PARA78.Value = "0"                                '売上消費税額
+                    PARA79.Value = "0"                                '売上合計金額
+                    PARA80.Value = "0"                                '支払金額
+                    PARA81.Value = "0"                                '支払消費税額
+                    PARA82.Value = "0"                                '支払合計金額
+                    PARA83.Value = "0"                                '削除フラグ
+                    'PARA77.Value = TxtTotalSales.Text                 '売上金額
+                    'PARA78.Value = Integer.Parse(TxtTotalSales2.Text) - Integer.Parse(TxtTotalSales.Text) '売上消費税額
+                    'PARA79.Value = TxtTotalSales2.Text                '売上合計金額
+                    'PARA80.Value = TxtTitalPayment.Text               '支払金額
+                    'PARA81.Value = Integer.Parse(TxtTitalPayment2.Text) - Integer.Parse(TxtTitalPayment.Text) '支払消費税額
+                    'PARA82.Value = TxtTitalPayment2.Text              '支払合計金額
+                    'PARA83.Value = OIT0003row("DELFLG")               '削除フラグ
                     PARA84.Value = WW_DATENOW                         '登録年月日
                     PARA85.Value = Master.USERID                      '登録ユーザーID
                     PARA86.Value = Master.USERTERMID                  '登録端末

@@ -893,8 +893,18 @@ Public Class OIT0002LinkDetail
                 TxtOrderOffice.Focus()
 
             Case "TxtHeadOfficeTrain"   '本線列車
+
+                If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+                    Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
+                    Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
+                    WW_SelectValue = selectedItem.Value
+                    WW_SelectText = selectedItem.Text
+                End If
+
                 TxtHeadOfficeTrain.Text = WW_SelectValue
-                FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                TxtHeadOfficeTrainName.Text = WW_SelectText
+                'FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
 
                 '空車発駅（着駅）
                 TxtDepstation.Text = WW_GetValue(2)

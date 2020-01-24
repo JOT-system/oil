@@ -19,7 +19,8 @@ function InitDisplay() {
     let objDtabNo = document.getElementById("WF_DTAB_CHANGE_NO").value;
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //更新ボタン活性／非活性(新規登録、更新で切り分け)
-        if (document.getElementById('WF_CREATEFLG').value === "1") {
+        if (document.getElementById('WF_CREATEFLG').value === "1"
+            && document.getElementById('WF_SEL_CREATELINKFLG').value === "1") {
             //活性
             document.getElementById("WF_ButtonINSERT").disabled = "";
             //非活性 
@@ -43,7 +44,8 @@ function InitDisplay() {
             }
 
 
-        } else if (document.getElementById('WF_CREATEFLG').value === "2") {
+        } else if (document.getElementById('WF_CREATEFLG').value === "2" 
+                   || document.getElementById('WF_SEL_CREATELINKFLG').value === "2") {
             //非活性
             document.getElementById("WF_ButtonINSERT").disabled = "disabled";
             //活性 

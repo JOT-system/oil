@@ -249,7 +249,16 @@ Public Class OIT0003OrderDetail
 
         '受注営業所
         'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
-        If work.WF_SEL_CREATEFLG.Text = "2" Then        '作成モード(２：更新)
+        '#############################################################################################
+        If work.WF_SEL_CREATELINKFLG.Text = "2" Then        '作成(貨車連結用)フラグ(２：更新)
+            TxtOrderOfficeCode.Text = work.WF_SEL_LINK_ORDERSALESOFFICE.Text
+            CODENAME_get("SALESOFFICE", TxtOrderOfficeCode.Text, TxtOrderOffice.Text, WW_RTN_SW)
+
+            work.WF_SEL_ORDERSALESOFFICE.Text = TxtOrderOffice.Text
+            work.WF_SEL_ORDERSALESOFFICECODE.Text = TxtOrderOfficeCode.Text
+            '#############################################################################################
+
+        ElseIf work.WF_SEL_CREATEFLG.Text = "2" Then        '作成モード(２：更新)
             TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
             TxtOrderOfficeCode.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
             'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
@@ -885,7 +894,57 @@ Public Class OIT0003OrderDetail
         '　検索説明
         '     条件指定に従い該当データを受注テーブルから取得する
         Dim SQLStr As String =
-              " SELECT" _
+            " SELECT" _
+            & "   0                                                             AS LINECNT" _
+            & " , ''                                                            AS OPERATION" _
+            & " , 0                             AS TIMSTP" _
+            & " , 1                                                             AS 'SELECT'" _
+            & " , 0                                                             AS HIDDEN" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERNO), '')                            AS ORDERNO" _
+            & " , ISNULL(RTRIM(TMP0001.DETAILNO), '')                           AS DETAILNO" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPPERSCODE), '')                       AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPPERSNAME), '')                       AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(TMP0001.BASECODE), '')                           AS BASECODE" _
+            & " , ISNULL(RTRIM(TMP0001.BASENAME), '')                           AS BASENAME" _
+            & " , ISNULL(RTRIM(TMP0001.CONSIGNEECODE), '')                      AS CONSIGNEECODE" _
+            & " , ISNULL(RTRIM(TMP0001.CONSIGNEENAME), '')                      AS CONSIGNEENAME" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINFONAME), '')                      AS ORDERINFONAME" _
+            & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
+            & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
+            & " , @P07                                                          AS TANKQUOTA" _
+            & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
+            & " , ISNULL(RTRIM(TMP0001.TANKNO), '')                             AS TANKNO" _
+            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERT), '')                  AS JRINSPECTIONALERT" _
+            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERTSTR), '')               AS JRINSPECTIONALERTSTR" _
+            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONDATE), '')                   AS JRINSPECTIONDATE" _
+            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERT), '')               AS JRALLINSPECTIONALERT" _
+            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERTSTR), '')            AS JRALLINSPECTIONALERTSTR" _
+            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONDATE), '')                AS JRALLINSPECTIONDATE" _
+            & " , ISNULL(RTRIM(TMP0001.LASTOILCODE), '')                        AS LASTOILCODE" _
+            & " , ISNULL(RTRIM(TMP0001.LASTOILNAME), '')                        AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGETRAINNO), '')                      AS CHANGETRAINNO" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEECODE), '')                AS SECONDCONSIGNEECODE" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CANGERETSTATION), '')                    AS CANGERETSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(TMP0001.DELFLG), '')                             AS DELFLG" _
+            & " FROM OIL.TMP0001ORDER TMP0001 " _
+            & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
+            & "       OIT0004.TANKNUMBER = TMP0001.TANKNO " _
+            & "       AND OIT0004.LINKNO = @P01" _
+            & "       AND OIT0004.TRAINNO = @P02" _
+            & "       AND OIT0004.DELFLG <> @P03" _
+            & " WHERE OIT0004.TANKNUMBER IS NULL"
+
+        SQLStr &=
+              " " _
+            & " UNION ALL " _
+            & " SELECT" _
             & "   0                                                             AS LINECNT" _
             & " , ''                                                            AS OPERATION" _
             & " , CAST(OIT0004.UPDTIMSTP AS bigint)                             AS TIMSTP" _
@@ -974,56 +1033,6 @@ Public Class OIT0003OrderDetail
             & " AND OIT0004.DELFLG <> @P03"
         '& "   WHEN TMP0001.TANKNO IS NOT NULL AND TMP0001.OILCODE <> OIT0004.PREOILCODE THEN '前回油種確認'" _
 
-        SQLStr &=
-              " " _
-            & " UNION ALL " _
-            & " SELECT" _
-            & "   0                                                             AS LINECNT" _
-            & " , ''                                                            AS OPERATION" _
-            & " , 0                             AS TIMSTP" _
-            & " , 1                                                             AS 'SELECT'" _
-            & " , 0                                                             AS HIDDEN" _
-            & " , ISNULL(RTRIM(TMP0001.ORDERNO), '')                            AS ORDERNO" _
-            & " , ISNULL(RTRIM(TMP0001.DETAILNO), '')                           AS DETAILNO" _
-            & " , ISNULL(RTRIM(TMP0001.SHIPPERSCODE), '')                       AS SHIPPERSCODE" _
-            & " , ISNULL(RTRIM(TMP0001.SHIPPERSNAME), '')                       AS SHIPPERSNAME" _
-            & " , ISNULL(RTRIM(TMP0001.BASECODE), '')                           AS BASECODE" _
-            & " , ISNULL(RTRIM(TMP0001.BASENAME), '')                           AS BASENAME" _
-            & " , ISNULL(RTRIM(TMP0001.CONSIGNEECODE), '')                      AS CONSIGNEECODE" _
-            & " , ISNULL(RTRIM(TMP0001.CONSIGNEENAME), '')                      AS CONSIGNEENAME" _
-            & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _
-            & " , ISNULL(RTRIM(TMP0001.ORDERINFONAME), '')                      AS ORDERINFONAME" _
-            & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
-            & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
-            & " , @P07                                                          AS TANKQUOTA" _
-            & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
-            & " , ISNULL(RTRIM(TMP0001.TANKNO), '')                             AS TANKNO" _
-            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERT), '')                  AS JRINSPECTIONALERT" _
-            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERTSTR), '')               AS JRINSPECTIONALERTSTR" _
-            & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONDATE), '')                   AS JRINSPECTIONDATE" _
-            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERT), '')               AS JRALLINSPECTIONALERT" _
-            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONALERTSTR), '')            AS JRALLINSPECTIONALERTSTR" _
-            & " , ISNULL(RTRIM(TMP0001.JRALLINSPECTIONDATE), '')                AS JRALLINSPECTIONDATE" _
-            & " , ISNULL(RTRIM(TMP0001.LASTOILCODE), '')                        AS LASTOILCODE" _
-            & " , ISNULL(RTRIM(TMP0001.LASTOILNAME), '')                        AS LASTOILNAME" _
-            & " , ISNULL(RTRIM(TMP0001.CHANGETRAINNO), '')                      AS CHANGETRAINNO" _
-            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEECODE), '')                AS SECONDCONSIGNEECODE" _
-            & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
-            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
-            & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(TMP0001.CANGERETSTATION), '')                    AS CANGERETSTATION" _
-            & " , ISNULL(RTRIM(TMP0001.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(TMP0001.DELFLG), '')                             AS DELFLG" _
-            & " FROM OIL.TMP0001ORDER TMP0001 " _
-            & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
-            & "       OIT0004.TANKNUMBER = TMP0001.TANKNO " _
-            & "       AND OIT0004.LINKNO = @P01" _
-            & "       AND OIT0004.TRAINNO = @P02" _
-            & "       AND OIT0004.DELFLG <> @P03" _
-            & " WHERE OIT0004.TANKNUMBER IS NULL"
-
         'SQLStr &=
         '      " ORDER BY" _
         '    & "    OIT0004.LINKNO"
@@ -1069,9 +1078,29 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 Dim i As Integer = 0
+                Dim intDETAILNO As Integer = 0
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
+
+                    '受注明細№の退避
+                    If OIT0003row("DETAILNO") <> "" Then
+                        intDETAILNO = OIT0003row("DETAILNO")
+                    Else
+                        intDETAILNO += 1
+                    End If
+
+                    '受注No, 受注明細№の設定
+                    If OIT0003row("ORDERNO") = "" Then
+                        OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text
+                        OIT0003row("DETAILNO") = intDETAILNO.ToString("000")
+                        OIT0003row("SHIPPERSCODE") = work.WF_SEL_SHIPPERSCODE.Text
+                        OIT0003row("SHIPPERSNAME") = work.WF_SEL_SHIPPERSNAME.Text
+                        OIT0003row("BASECODE") = work.WF_SEL_BASECODE.Text
+                        OIT0003row("BASENAME") = work.WF_SEL_BASENAME.Text
+                        OIT0003row("CONSIGNEECODE") = work.WF_SEL_CONSIGNEECODE.Text
+                        OIT0003row("CONSIGNEENAME") = work.WF_SEL_CONSIGNEENAME.Text
+                    End If
 
                 Next
             End Using
@@ -1320,14 +1349,14 @@ Public Class OIT0003OrderDetail
                     If WF_FIELD.Value = "TxtOrderOffice" Then
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
+                            'prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
 
-                            ''〇 画面(受注営業所).テキストボックスが未設定
-                            'If TxtOrderOffice.Text = "" Then
-                            '    prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
-                            'Else
-                            '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtOrderOffice.Text)
-                            'End If
+                            '〇 画面(受注営業所).テキストボックスが未設定
+                            If work.WF_SEL_ORDERSALESOFFICECODE.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtOrderOffice.Text)
+                            End If
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtOrderOffice.Text)
                         End If

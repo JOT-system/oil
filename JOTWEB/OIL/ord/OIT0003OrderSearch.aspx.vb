@@ -172,14 +172,8 @@ Public Class OIT0003OrderSearch
         work.WF_SEL_UORG.Text = WF_UORG.Text
         '営業所
         work.WF_SEL_SALESOFFICECODEMAP.Text = TxtSalesOffice.Text
-        If TxtSalesOffice.Text = "" Then
-            'work.WF_SEL_SALESOFFICECODE.Text = Master.USER_ORG
-            ''営業所
-            'CODENAME_get("OFFICECODE", work.WF_SEL_SALESOFFICECODE.Text, LblSalesOfficeName.Text, WW_DUMMY)
-        Else
-            work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
-            work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
-        End If
+        work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
+        work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
         '年月日
         work.WF_SEL_DATE.Text = TxtDateStart.Text
         '列車番号

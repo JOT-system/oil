@@ -348,8 +348,8 @@ input[type=text].calendarIcon {
 }
 input[type=text][disabled].boxIcon,
 input[type=text][disabled].calendarIcon,
-input[type=text][readonly].boxIcon,
-input[type=text][readonly].calendarIcon {
+input[type=text][readonly].boxIcon:not(.iconOnly),
+input[type=text][readonly].calendarIcon:not(.iconOnly) {
     padding-left: 0.3em;
 }
 /* ------------------------------
@@ -515,10 +515,12 @@ input[type=text][readonly].calendarIcon {
     box-sizing: border-box;
     flex-wrap: nowrap; /* 小さくリサイズしても折り返さない設定 */
     white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
 }
 /* 左寄せの箱 */
 .actionButtonBox .leftSide {
     box-sizing: border-box;
+    margin-right:2px;
 }
 /* 右寄せの箱 */
 .actionButtonBox .rightSide {
@@ -1469,6 +1471,7 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     left: calc(50% - 250px);
     background-color: rgb(240,240,240);
     box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
+    border-radius:10px;
 }
 
 #pnlCommonMessageTitle {
@@ -1477,11 +1480,14 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     padding: 10px;
     height: 20px;
     background-color: #8BACCD;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
     #pnlCommonMessageTitle input[type=button] {
         min-width: 70px;
         margin-right: 10px;
+        padding:2px;
     }
 
 #pnlCommonMessageText {
@@ -1516,8 +1522,8 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
 
 #pnlCommonMessageText #lblCommonMessageText[data-naeiw="E"]:before,
 #pnlCommonMessageText #lblCommonMessageText[data-naeiw="A"]:before {
-    width: 32px;
-    height: 32px;
+    width: 60px;
+    height: 60px;
     content: "";
     display: table-cell;
     background-image: url('../oil/img/404cat.png');
@@ -1535,4 +1541,3 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     padding-top: 5px;
     vertical-align: middle;
 }
-

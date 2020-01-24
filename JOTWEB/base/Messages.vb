@@ -420,6 +420,16 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_DATE_PASTDATE_ERROR As String = "20011"
 
+        ''' <summary>
+        ''' 一意制約エラー
+        ''' </summary>
+        Public Const OIL_PRIMARYKEY_REPEAT_ERROR As String = "20012"
+
+        ''' <summary>
+        ''' 受注営業所未選択
+        ''' </summary>
+        Public Const OIL_ORDEROFFICE_UNSELECT As String = "20013"
+
 #End Region
 
 

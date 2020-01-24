@@ -554,7 +554,7 @@ Public Class OIM0005TankCreate
 
                     If OIM0005Chk.Rows.Count > 0 Then
                         '重複データエラー
-                        O_MESSAGENO = Messages.C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                        O_MESSAGENO = Messages.C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                     Else
                         '正常終了時
                         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -621,6 +621,10 @@ Public Class OIM0005TankCreate
         Else
             If isNormal(WW_ERR_SW) Then
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+            ElseIf WW_ERR_SW = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR Then
+                Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "JOT車番コード", needsPopUp:=True)
+
             Else
                 Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             End If
@@ -2655,7 +2659,7 @@ Public Class OIM0005TankCreate
                                        "([" & OIM0005INProw("TANKNUMBER") & "]"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
+                    O_RTN = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
                 End If
             End If
 

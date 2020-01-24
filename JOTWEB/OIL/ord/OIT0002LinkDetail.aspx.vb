@@ -893,8 +893,18 @@ Public Class OIT0002LinkDetail
                 TxtOrderOffice.Focus()
 
             Case "TxtHeadOfficeTrain"   '本線列車
+
+                If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+                    Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
+                    Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
+                    WW_SelectValue = selectedItem.Value
+                    WW_SelectText = selectedItem.Text
+                End If
+
                 TxtHeadOfficeTrain.Text = WW_SelectValue
-                FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                TxtHeadOfficeTrainName.Text = WW_SelectText
+                'FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
 
                 '空車発駅（着駅）
                 TxtDepstation.Text = WW_GetValue(2)
@@ -2330,11 +2340,14 @@ Public Class OIT0002LinkDetail
                     Next
                 Else
                     For Each OIT0002WKrow As DataRow In OIT0002WKtbl.Rows
-                        O_VALUE(0) = OIT0002WKrow("VALUE1")
-                        O_VALUE(1) = OIT0002WKrow("VALUE2")
-                        O_VALUE(2) = OIT0002WKrow("VALUE3")
-                        O_VALUE(3) = OIT0002WKrow("VALUE4")
-                        O_VALUE(4) = OIT0002WKrow("VALUE5")
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = OIT0002WKrow("VALUE" & i.ToString())
+                        Next
+                        'O_VALUE(0) = OIT0002WKrow("VALUE1")
+                        'O_VALUE(1) = OIT0002WKrow("VALUE2")
+                        'O_VALUE(2) = OIT0002WKrow("VALUE3")
+                        'O_VALUE(3) = OIT0002WKrow("VALUE4")
+                        'O_VALUE(4) = OIT0002WKrow("VALUE5")
                     Next
                 End If
             End Using

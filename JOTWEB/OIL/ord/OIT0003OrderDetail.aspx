@@ -29,11 +29,11 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
-                <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="登録" onclick="ButtonClick('WF_ButtonINSERT');" />
+                <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
         </div>
-        <div style="display=none;" data-comment="わからないので退避">
+        <div style="display:none;" data-comment="わからないので退避">
             <!-- 会社コード -->
             <div style="display:none">
                 <a>会社コード</a>
@@ -78,26 +78,35 @@
                 <span>
                     <a></a>
                     <a class="ef" id="WF_ORDERINFO">
-                        <asp:TextBox ID="TxtOrderInfo" runat="server" onblur="MsgClear();" Enabled="true"></asp:TextBox>
+                        <%--<asp:TextBox ID="TxtOrderInfo" runat="server" onblur="MsgClear();" Enabled="true"></asp:TextBox>--%>
+                        <asp:CheckBox ID="chkOrderInfo" runat="server" Text=" " Checked="true" Enabled ="false" />
                     </a>
                 </span>
                 <!-- ■　受注パターン　■ -->
                 <span class="doubleItem">
                     <a id="WF_ORDERTYPE_LABEL" class="requiredMark">受注パターン</a>
                     <a class="ef" id="WF_ORDERTYPE">
-                        <asp:TextBox ID="TxtOrderType" runat="server" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderType" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                     </a>
                 </span>
                 <!-- <span></span> -->
 
-                <!-- ■　本線列車　■ -->
+                <!-- ■　受注営業所　■ -->
                 <span class="left">
-                    <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
-                    <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">
-                        <asp:TextBox ID="TxtTrainNo" runat="server" CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
+                    <a id="WF_OFFICECODE_LABEL" class="requiredMark">受注営業所</a>
+                    <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
+                        <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="20"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderOfficeCode" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                     </a>
                 </span>
-                <span></span><span></span><span></span><span></span>
+                <!-- ■　本線列車　■ -->
+                <span>
+                    <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
+                    <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">
+                        <asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>
+                    </a>
+                </span>
+                <span></span><span></span><span></span>
 
                 <!-- ■　荷主　■ -->
                 <span class="left">

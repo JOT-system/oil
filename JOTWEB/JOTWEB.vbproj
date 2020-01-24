@@ -163,6 +163,7 @@
     <Content Include="OIL\inc\OIM0005WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0004WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0001WRKINC.ascx" />
+    <Content Include="OIL\inv\OIT0004OilStockCreate.aspx" />
     <Content Include="OIL\inv\OIT0004OilStockSearch.aspx" />
     <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\css\ex\nprogress.css" />
@@ -321,6 +322,13 @@
     </Compile>
     <Compile Include="OIL\inc\OIT0001WRKINC.ascx.vb">
       <DependentUpon>OIT0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inv\OIT0004OilStockCreate.aspx.designer.vb">
+      <DependentUpon>OIT0004OilStockCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inv\OIT0004OilStockCreate.aspx.vb">
+      <DependentUpon>OIT0004OilStockCreate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\M00002MENU.aspx.designer.vb">

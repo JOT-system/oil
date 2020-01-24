@@ -43,6 +43,10 @@
     <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>
     <!-- 情報(名) -->
     <asp:TextBox ID="WF_SEL_INFORMATIONNM" runat="server"></asp:TextBox>
+    <!-- 積置可否フラグ -->
+    <asp:TextBox ID="WF_SEL_STACKINGFLG" runat="server"></asp:TextBox>
+    <!-- 利用可否フラグ -->
+    <asp:TextBox ID="WF_SEL_USEPROPRIETYFLG" runat="server"></asp:TextBox>
     <!-- 受注№ -->
     <asp:TextBox ID="WF_SEL_ORDERNUMBER" runat="server"></asp:TextBox>
     <!-- 列車 -->
@@ -219,6 +223,15 @@
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
     <!-- 貨車連結用更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPLINKTBL" runat="server"></asp:TextBox>
+
+    <!-- 明細画面(タブ１)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB1TBL" runat="server"></asp:TextBox>
+    <!-- 明細画面(タブ２)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB2TBL" runat="server"></asp:TextBox>
+    <!-- 明細画面(タブ３)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB3TBL" runat="server"></asp:TextBox>
+    <!-- 明細画面(タブ４)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB4TBL" runat="server"></asp:TextBox>
 
     <!-- 基地コード -->
     <asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>

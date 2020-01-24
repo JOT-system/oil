@@ -1,2 +1,386 @@
-﻿body {
+﻿#divContensbox {
+    overflow-x:hidden;
+}
+.headerboxOnly {
+    padding: 10px;
+    position: static;
+    overflow: auto;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+}
+/* 各表名称のDiv */
+.listTitle {
+    margin-top:10px;
+}
+/* ********** */
+/* 提案表定義 */
+/* ********** */
+/* 提案表全体のボックス */
+#divSuggestList {
+    display: flex;
+    box-sizing: border-box;
+}
+/* 提案表の全てのDivタグ */
+#divSuggestList div {
+    height:24px; /* 高さ調整する場合、aspx(html)のheight計算を自動で行ってる箇所も修正 */
+    box-sizing: border-box;
+}
+/* 提案表の全てのテキストボックス */
+#divSuggestList input[type=text] {
+    text-align:right;
+    box-sizing: border-box;
+    height:calc(100% - 2px);
+    width:calc(100% - 2px);
+    padding-top:0px;
+    padding-bottom:0px; 
+
+}
+/* 提案表の文言「内訳」 */
+#divSuggestList div.leftColumn div:nth-child(1) {
+    height:calc(24px * 3);
+}
+/* 提案表直下のDivタグ */
+#divSuggestList > div {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+}
+/* 提案表2列目の油種などの文言幅 */
+#divSuggestList > div.oilTypeColumn {
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+}
+/* 提案表全体の枠調整、左に見えないボックスを追加し各項目が伸縮しないようにする */
+#divSuggestList > div:last-child {
+    margin-left:auto;
+}
+    /* 提案表日付ごとの列車No～テキストボックスをくくるDiv */
+#divSuggestList > div.dataColumn > div.values {
+    display:flex;
+    flex-direction:column;
+    flex-wrap:wrap;
+    height:auto;
+}
+/* 提案表列車No、油種チェックボックス、油種ごとのテキストボックスセルの幅 */
+#divSuggestList > div.dataColumn > div.values > div {
+    width:60px;
+    min-width:60px;
+    max-width:60px;
+}
+/* 提案表列車Noが3個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has3Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ３倍 */
+    width : calc(60px * 3);
+    min-width: calc(60px * 3);
+    max-width: calc(60px * 3);
+    display:flex;
+    flex-wrap:wrap;
+}
+/* 提案表列車Noが2個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has2Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ２倍 */
+    width : calc(60px * 2);
+    min-width: calc(60px * 2);
+    max-width: calc(60px * 2);
+    display:flex;
+    flex-wrap:wrap;
+}
+/* 提案表日付データ幅 一杯に伸ばす */
+#divSuggestList .suggestDate{
+    width:100%;
+}
+/* *********************** */
+/* 提案表 文字位置設定     */
+/* *********************** */
+#divSuggestList .suggestDate,
+#divSuggestList .values > div {
+    text-align:center;
+}
+#divSuggestList .values input[type=checkbox]{
+    margin-top:3px;
+}
+/* *********************** */
+/* 提案表 罫線設定         */
+/* *********************** */
+/* 提案表 罫線 */
+#divSuggestList div.leftColumn div,
+#divSuggestList div.oilTypeColumn div,
+#divSuggestList div.suggestDate,
+#divSuggestList div.values div {
+    padding-top:2px;
+    padding-left:3px;
+    border:1px solid darkgray; /* 太さ色はここで調整 */
+}
+/* BOX同士の重なりで線が太くなってしまうので調整 */
+#divSuggestList div.leftColumn div
+{
+    border-right:0px;
+}
+#divSuggestList div.leftColumn div:last-child {
+    display:none;
+}
+#divSuggestList div.leftColumn div:not(:nth-child(1)),
+#divSuggestList div.oilTypeColumn div:not(:nth-child(1)){
+    border-top:0px;
+}
+#divSuggestList div.oilTypeColumn div {
+    border-right:0px;
+}
+#divSuggestList div.leftColumn div:nth-child(n+2):not(:nth-last-child(2)) {
+    border-bottom:0px;
+}
+#divSuggestList div.values div {
+    border-top:0px;
+    border-right: 0px;
+}
+#divSuggestList div:not(:nth-last-child(2)).dataColumn div.suggestDate
+{
+   border-right: 0px;
+}
+#divSuggestList div:nth-last-child(2).dataColumn div.values:last-child div
+{
+    border-right: 1px solid darkgray;
+}
+/* *********************** */
+/* 比重表 設定             */
+/* *********************** */
+#weightListContainer {
+    display:flex;
+    flex-wrap:nowrap;
+}
+/* 一列の幅定義 */
+#weightListContainer > div {
+    width:90px;
+    min-width: 90px;
+    max-width: 90px;
+    box-sizing:border-box;
+}
+/* 全セルの線、内部テキストとの間隔調整 */
+#weightListContainer > div:not(:last-child) > div {
+    padding:2px;
+    border:1px solid darkgray;
+}
+#weightListContainer > div > div:last-child {
+    border-top:0;
+}
+#weightListContainer > div:not(:nth-last-child(2)) > div{
+    border-right:0;
+}
+#weightListContainer > div:last-child {
+    width:auto;
+    min-width:0;
+    max-width: none;
+    margin-left:auto;
+}
+#weightListContainer > div > div.weightListOilType {
+    text-align:center;
+}
+#weightListContainer > div > div.weightListValue {
+    text-align:right;
+}
+/* *********************** */
+/* 在庫表 設定             */
+/* *********************** */
+#pnlStockList {
+    margin-top:-20px;
+    margin-bottom:10px;
+    margin-right:10px;
+}
+#divStockList {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+#divStockList,
+#divStockList div{
+    box-sizing:border-box;
+    //padding:2px;
+}
+#divStockList > div.header,
+#divStockList > div.oilTypeData {
+    display:flex;
+    flex-wrap: nowrap;
+    //border:1px solid darkgray; /* 暫定 */
+}
+#divStockList div.lastMargin {
+    margin-left:auto;
+}
+/* ヘッダー行 日付（文言）、日付関連 */
+/* データ行の１～６列目の幅を足す
+   ※余白要素があるので手動でバランスとる */
+#divStockList div.emptyBox {
+    //width:411px;
+    width:calc(90px + 85px + 70px + 85px + 70px + 95px);
+    min-width:calc(90px + 85px + 70px + 85px + 70px + 95px);
+}
+#divStockList > div.header > div.headerDate {
+    display:flex;
+    flex-wrap: nowrap;
+    flex-direction:column;
+}
+#divStockList > div.header > div.headerDate div.dateItem {
+    display:flex;
+    flex-wrap: nowrap;
+}
+#divStockList div.oilTypeData {
+    align-items: stretch
+}
+/* 一列目 油種文言 */
+#divStockList div.col1 {
+    width:90px;
+    min-width:90px;
+}
+/* 二列目 ～ 四列目 調整 */
+#divStockList div.col2,
+#divStockList div.col3,
+#divStockList div.col4,
+#divStockList div.col5{
+    width:85px;
+    min-width:85px;
+    //text-align:center;
+    display:flex;
+    flex-wrap: nowrap;
+    flex-direction:column;
+}
+#divStockList div.col3,
+#divStockList div.col5{
+    width:70px;
+    min-width:70px;
+    text-align:right;
+}
+#divStockList div.col6 {
+    width:95px;
+    min-width:95px;
+    display:flex;
+    flex-wrap: nowrap;
+    flex-direction:column;
+}
+#divStockList div.colStockInfo.date, 
+#divStockList div.colStockValue > div {
+    text-align:center;
+    width:90px;
+    min-width:90px;
+}
+#divStockList div.colStockValue > div {
+    text-align:right;
+}
+#divStockList div.colStockValue > div:not(:nth-child(5)) {
+    padding-right:8px !important;
+}
+#divStockList div.col2 > div,
+#divStockList div.col3 > div,
+#divStockList div.col4 > div,
+#divStockList div.col5 > div{
+    height:calc(100% / 3);
+}
+#divStockList div.col2 > div > span,
+#divStockList div.col3 > div > span,
+#divStockList div.col4 > div > span,
+#divStockList div.col5 > div > span{
+    display:inline-block;
+    //margin-top:calc(100% / 3 - 5px);
+}
+#divStockList div.col3 > div > span,
+#divStockList div.col5 > div > span {
+    //margin-top:calc(100% / 3 + 1px);
+}
+#divStockList div.col3 > div > span,
+#divStockList div.col5 > div > span,
+#divStockList div.colStockValue > div:not(:nth-child(5)) span {
+    display:inline-block;
+    margin-top:2px;
+}
+@media all and (-ms-high-contrast: none) {
+    *::-ms-backdrop, 
+    #divStockList div.col3 > div > span,
+    #divStockList div.col5 > div > span,
+    #divStockList div.colStockValue > div:not(:nth-child(5)) span {
+        margin-top: 0px;
+    }
+}
+#divStockList div.col6 > div,
+#divStockList div.colStockValue > div{
+    height:calc(100% / 9);
+    max-height:24px;
+}
+#divStockList div.colStockInfoTopRow {
+    max-height:24px;
+}
+/* 在庫表の全てのテキストボックス */
+#divStockList input[type=text] {
+    text-align: right;
+    box-sizing: border-box;
+    height: calc(100% - 1px);
+    width: 100%;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+/* ************** */
+/* 在庫表罫線制御 */
+/* ************** */
+#divStockList div.col1 div {
+    height: 100%;
+}
+#divStockList div.colStockInfoTopRow,
+#divStockList div.col1 div,
+#divStockList div.col2 div,
+#divStockList div.col3 div,
+#divStockList div.col4 div,
+#divStockList div.col5 div,
+#divStockList div.col6 div,
+#divStockList div.colStockInfo.date, 
+#divStockList div.colStockValue > div
+{
+    border: 1px solid darkgray;
+    border-right: 0;
+    border-bottom:0;
+    padding-top:2px;
+    padding-left:2px;
+    padding-right:2px;
+    padding-bottom:1px;
+}
+#divStockList div.colStockInfo.date:nth-last-child(1),
+#divStockList div.colStockValue:nth-last-child(2) > div
+{
+    border-right: 1px solid darkgray;
+}
+#divStockList div.oilTypeData:nth-last-child(1) > div {
+    border-bottom: 1px solid darkgray;
+}
+#divStockList div.colStockInfoTopRow {
+    border-right: 1px solid darkgray;
+}
+/* ************** */
+/* 色の色         */
+/* ************** */
+/* 大見出し色 */
+#divStockList div.col1 div,
+#divStockList div.colStockInfoTopRow,
+#divStockList div.col6 div,
+#divStockList div.dateItem div,
+#divSuggestList div.oilTypeColumn div,
+#divSuggestList div.leftColumn div,
+#divSuggestList div.suggestDate,
+#divSuggestList div.values div:nth-child(1),
+#pnlWeightList div.weightListOilType
+{
+    background-color:#2B8E56;
+    color:#FFFFFF;
+}
+/* 見出し色 */
+#divStockList div.col2 div,
+#divStockList div.col4 div,
+#divSuggestList div.values div:nth-child(2){
+    background-color:#64A466;
+}
+/* 付帯情報色 */
+#divStockList div.col3 div,
+#divStockList div.col5 div{
+    background-color:#A6D5AE;
+}
+/* データ色 */
+#divStockList div.oilTypeData:nth-child(odd) div.colStockValue div:nth-child(even),
+#divStockList div.oilTypeData:nth-child(even) div.colStockValue div:nth-child(odd){
+    background-color: #DEF4E9;
 }

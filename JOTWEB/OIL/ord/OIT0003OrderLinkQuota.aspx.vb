@@ -241,7 +241,7 @@ Public Class OIT0003OrderLinkQuota
             & " , 1                                                           AS 'SELECT'" _
             & " , 0                                                           AS HIDDEN" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')   　                      AS LINKNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '   ')                  AS LINKDETAILNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                     AS LINKDETAILNO" _
             & " , ISNULL(FORMAT(OIT0004.AVAILABLEYMD, 'yyyy/MM/dd'), '')      AS AVAILABLEYMD" _
             & " , ISNULL(RTRIM(OIT0004.STATUS), '')                           AS STATUS" _
             & " , ISNULL(RTRIM(OIT0004.INFO), '')                             AS INFO" _
@@ -269,9 +269,11 @@ Public Class OIT0003OrderLinkQuota
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                        AS LINEORDER" _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')                       AS TANKNUMBER" _
             & " , ISNULL(RTRIM(OIT0004.DELFLG), '')                           AS DELFLG" _
+            & " , OIT0004.SORT_YMD                                            AS SORT_YMD" _
             & " FROM ( " _
             & "  SELECT " _
             & "    OIT0004.* " _
+            & "  , OIT0004.AVAILABLEYMD AS SORT_YMD " _
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE = @P10 THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS HTANK " _
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE = @P11 THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS RTANK " _
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE = @P12 THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS TTANK " _
@@ -298,6 +300,12 @@ Public Class OIT0003OrderLinkQuota
         '& " WHERE OIT0004.RNUM = 1"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '受注営業所
+        If Not String.IsNullOrEmpty(work.WF_SEL_ORDERSALESOFFICECODE.Text) Then
+            SQLStr &= String.Format("    AND OIT0004.OFFICECODE = '{0}'", work.WF_SEL_ORDERSALESOFFICECODE.Text)
+        ElseIf Not String.IsNullOrEmpty(work.WF_SEL_SALESOFFICECODE.Text) Then
+            SQLStr &= String.Format("    AND OIT0004.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODE.Text)
+        End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAIN.Text) Then
             SQLStr &= String.Format("    AND OIT0004.TRAINNO = '{0}'", work.WF_SEL_TRAIN.Text)
@@ -308,9 +316,9 @@ Public Class OIT0003OrderLinkQuota
             & "  ) OIT0004 " _
             & " WHERE OIT0004.RNUM = 1"
 
-        'SQLStr &=
-        '      " ORDER BY" _
-        '    & "    OIT0004.LINKNO"
+        SQLStr &=
+              " ORDER BY" _
+            & "    OIT0004.SORT_YMD"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

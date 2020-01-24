@@ -893,8 +893,18 @@ Public Class OIT0002LinkDetail
                 TxtOrderOffice.Focus()
 
             Case "TxtHeadOfficeTrain"   '本線列車
+
+                If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+                    Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
+                    Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
+                    WW_SelectValue = selectedItem.Value
+                    WW_SelectText = selectedItem.Text
+                End If
+
                 TxtHeadOfficeTrain.Text = WW_SelectValue
-                FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                TxtHeadOfficeTrainName.Text = WW_SelectText
+                'FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
 
                 '空車発駅（着駅）
                 TxtDepstation.Text = WW_GetValue(2)
@@ -2394,7 +2404,7 @@ Public Class OIT0002LinkDetail
             & "    SET" _
             & "          AVAILABLEYMD  = @P03    , STATUS           = @P04" _
             & "        , INFO          = @P05    , PREORDERNO       = @P06" _
-            & "        , TRAINNO       = @P07    , OFFICECODE       = @P08" _
+            & "        , TRAINNO       = @P07    , TRAINNAME        = @P19, OFFICECODE       = @P08" _
             & "        , DEPSTATION    = @P09    , DEPSTATIONNAME   = @P10" _
             & "        , RETSTATION    = @P11    , RETSTATIONNAME   = @P12" _
             & "        , EMPARRDATE    = @P13    , ACTUALEMPARRDATE = @P14" _
@@ -2408,14 +2418,14 @@ Public Class OIT0002LinkDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0004_LINK" _
             & "        ( LINKNO       , LINKDETAILNO    , AVAILABLEYMD   , STATUS            , INFO           " _
-            & "        , PREORDERNO   , TRAINNO         , OFFICECODE     , DEPSTATION        , DEPSTATIONNAME " _
+            & "        , PREORDERNO   , TRAINNO         , TRAINNAME      , OFFICECODE        , DEPSTATION , DEPSTATIONNAME " _
             & "        , RETSTATION   , RETSTATIONNAME  , EMPARRDATE     , ACTUALEMPARRDATE  , LINETRAINNO    " _
             & "        , LINEORDER    , TANKNUMBER      , PREOILCODE " _
             & "        , DELFLG       , INITYMD         , INITUSER       , INITTERMID " _
             & "        , UPDYMD       , UPDUSER         , UPDTERMID      , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P03, @P04, @P05" _
-            & "        , @P06, @P07, @P08, @P09, @P10" _
+            & "        , @P06, @P07, @P19, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15" _
             & "        , @P16, @P17, @P18" _
             & "        , @P83, @P84, @P85, @P86" _
@@ -2433,6 +2443,7 @@ Public Class OIT0002LinkDetail
             & "    , INFO" _
             & "    , PREORDERNO" _
             & "    , TRAINNO" _
+            & "    , TRAINNAME" _
             & "    , OFFICECODE" _
             & "    , DEPSTATION" _
             & "    , DEPSTATIONNAME" _
@@ -2467,6 +2478,7 @@ Public Class OIT0002LinkDetail
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '情報
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 11) '前回オーダー№
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 7)  '本線列車
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 20) '本線列車名
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 6)  '登録営業所コード
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 7)  '空車発駅コード
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '空車発駅名
@@ -2574,6 +2586,7 @@ Public Class OIT0002LinkDetail
                             End If
 
                             PARA07.Value = TxtHeadOfficeTrain.Text            '本線列車
+                            PARA19.Value = TxtHeadOfficeTrainName.Text        '本線列車名
                             PARA08.Value = work.WF_SEL_OFFICECODE.Text        '登録営業所コード
                             PARA09.Value = TxtDepstation.Text                 '空車発駅（着駅）コード
                             PARA10.Value = LblDepstationName.Text             '空車発駅（着駅）名

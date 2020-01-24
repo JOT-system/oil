@@ -69,6 +69,7 @@
                 <a id="WF_TRAIN_LABEL" class="requiredMark">本線列車</a>
                 <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
                     <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>
+                    <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" CssClass="boxIcon" Visible="false"></asp:TextBox>
                 </a>
             </span>
             <span></span>

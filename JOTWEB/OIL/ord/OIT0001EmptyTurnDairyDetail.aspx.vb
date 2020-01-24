@@ -1112,8 +1112,18 @@ Public Class OIT0001EmptyTurnDairyDetail
 
             Case "TxtHeadOfficeTrain"   '本線列車
                 '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
+
+                If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+                    Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
+                    Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
+                    WW_SelectValue = selectedItem.Value
+                    WW_SelectText = selectedItem.Text
+                End If
+
                 TxtHeadOfficeTrain.Text = WW_SelectValue
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                TxtHeadOfficeTrainName.Text = WW_SelectText
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 '発駅
                 TxtDepstation.Text = WW_GetValue(1)
@@ -2932,7 +2942,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    UPDATE OIL.OIT0002_ORDER" _
             & "    SET" _
             & "        OFFICECODE      = @P04    , OFFICENAME     = @P05" _
-            & "        , TRAINNO       = @P02    , ORDERTYPE      = @P06" _
+            & "        , TRAINNO       = @P02    , TRAINNAME      = @P93, ORDERTYPE      = @P06" _
             & "        , SHIPPERSCODE  = @P07    , SHIPPERSNAME   = @P08" _
             & "        , BASECODE      = @P09    , BASENAME       = @P10" _
             & "        , CONSIGNEECODE = @P11    , CONSIGNEENAME  = @P12" _
@@ -2947,7 +2957,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        ORDERNO          = @P01" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0002_ORDER" _
-            & "        ( ORDERNO      , TRAINNO         , ORDERYMD       , OFFICECODE          , OFFICENAME" _
+            & "        ( ORDERNO      , TRAINNO         , TRAINNAME      , ORDERYMD            , OFFICECODE , OFFICENAME" _
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME   , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION     , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , RETSTATION   , RETSTATIONNAME  , CANGERETSTATION, CHANGEARRSTATIONNAME, ORDERSTATUS" _
@@ -2968,7 +2978,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , INITYMD      , INITUSER        , INITTERMID" _
             & "        , UPDYMD       , UPDUSER         , UPDTERMID      , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02, @P03, @P04, @P05" _
+            & "        ( @P01, @P02, @P93, @P03, @P04, @P05" _
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
             & "        , @P17, @P18, @P19, @P20, @P21" _
@@ -2996,6 +3006,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             " SELECT" _
             & "    ORDERNO" _
             & "    , TRAINNO" _
+            & "    , TRAINNAME" _
             & "    , ORDERYMD" _
             & "    , OFFICECODE" _
             & "    , OFFICENAME" _
@@ -3096,6 +3107,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
+                Dim PARA93 As SqlParameter = SQLcmd.Parameters.Add("@P93", SqlDbType.NVarChar, 20) '本線列車名
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '受注登録日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  '受注営業所コード
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '受注営業所名
@@ -3199,6 +3211,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     'PARA01.Value = OIT0001row("ORDERNO")              '受注№
                     PARA02.Value = TxtHeadOfficeTrain.Text            '本線列車
+                    PARA93.Value = TxtHeadOfficeTrainName.Text        '本線列車名
                     PARA03.Value = OIT0001row("ORDERYMD")             '受注登録日
                     PARA04.Value = work.WF_SEL_SALESOFFICECODE.Text   '受注営業所コード
                     PARA05.Value = work.WF_SEL_SALESOFFICE.Text       '受注営業所名

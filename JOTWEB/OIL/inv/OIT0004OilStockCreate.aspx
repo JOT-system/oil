@@ -84,7 +84,7 @@
                         <ItemTemplate>
                             <div class='dataColumn has<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).SuggestOrderItem.Count %>Col'  >
                             <%-- 日付部分 --%>
-                            <div class="suggestDate">
+                            <div class='suggestDate week<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).WeekName %>'>
                                 <!-- -->
                                 <span><%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).DispDate %></span>
                                 <asp:HiddenField ID="hdnSuggestListKey" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
@@ -97,7 +97,7 @@
                                     <%--  列車 --%>
                                     <div>
                                         <span><%# Eval("Key") %>
-                                            <asp:HiddenField ID="hdnSuggestItemKey" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
+                                            <asp:HiddenField ID="hdnTrainId" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                                         </span>
                                     </div>
                                     <%--  チェック --%>
@@ -113,6 +113,7 @@
                                         <ItemTemplate>
                                             <%--  油種に紐づいた値 --%>
                                             <div class="num" data-oilcode='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode %>'>
+                                                <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode %>'  />
                                                 <asp:TextBox ID="txtSuggestValue" runat="server" 
                                                     Text='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
                                                     Enabled='<%# If(DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode = DemoDispDataClass.SUMMARY_CODE, "False", "True") %>'></asp:TextBox>
@@ -170,7 +171,7 @@
                                     <div class="dateItem">
                             </HeaderTemplate>
                             <ItemTemplate>
-                                <div class="colStockInfo date">
+                                <div class='colStockInfo date week<%# CInt(DirectCast(Eval("Value"), Date).DayOfWeek) %>'>
                                     <span><%# Eval("Key") %></span>
                                 </div>
                             </ItemTemplate>
@@ -187,6 +188,7 @@
                             <div class="oilTypeData">
                                 <div class="col1">
                                     <div><span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %></span></div>
+                                    <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %>' />
                                 </div>
                                 <div class="col2">
                                     <div><span>タンク容量</span></div>

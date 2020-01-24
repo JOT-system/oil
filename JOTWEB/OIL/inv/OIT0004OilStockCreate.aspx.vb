@@ -63,7 +63,7 @@ Public Class OIT0004OilStockCreate
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
+                    'Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
 
@@ -226,7 +226,7 @@ Public Class OIT0004OilStockCreate
             Me.StockDate = New Dictionary(Of String, Date)
             For i = 0 To 6 'Demo用一旦6指定で7日間ここを29にすれば30日間になる
                 Dim targetDate As Date = baseDtm.AddDays(i)
-                Me.StockDate.Add(targetDate.ToString("yyyy/M/d"), targetDate)
+                Me.StockDate.Add(targetDate.ToString("M月d日(<\span>ddd</\span>)"), targetDate)
             Next
             Me.StockList = New Dictionary(Of String, StockListCollection)
             For Each oilNameItem In Me.SuggestOilNameList
@@ -282,7 +282,7 @@ Public Class OIT0004OilStockCreate
             ''' </summary>
             ''' <returns></returns>
             Public Property DispDate As String
-
+            Public Property WeekName As String
             ''' <summary>
             ''' 受入数情報格納用ディクショナリ
             ''' </summary>
@@ -307,8 +307,8 @@ Public Class OIT0004OilStockCreate
                 Me.SuggestLoadingItem = New Dictionary(Of String, SuggestValues)
 
                 Me.ThisDate = targetDate.ToString("yyyy/MM/dd") '内部用の日付
-                Me.DispDate = targetDate.ToString("M月d日") '画面表示用の日付
-
+                Me.DispDate = targetDate.ToString("M月d日(<\span>ddd</\span>)") '画面表示用の日付
+                Me.WeekName = CInt(targetDate.DayOfWeek).ToString
             End Sub
             Public Sub Add(trainNo As String, oilCodes As List(Of String))
                 Dim orderValues = New SuggestValues
@@ -419,7 +419,7 @@ Public Class OIT0004OilStockCreate
                 Me.LastShipmentAve = 0
                 Me.StockItemList = New Dictionary(Of String, StockListItem)
                 For Each dateVal In dateItem
-                    Dim item = New StockListItem(dateVal.Key)
+                    Dim item = New StockListItem(dateVal.Key, dateVal.Value)
                     Me.StockItemList.Add(dateVal.Key, item)
                 Next
             End Sub
@@ -475,8 +475,9 @@ Public Class OIT0004OilStockCreate
             ''' <summary>
             ''' コンストラクタ
             ''' </summary>
-            Public Sub New(dispDate As String)
+            Public Sub New(dispDate As String, innerDate As Date)
                 Me.DispDate = dispDate
+                Me.WeekName = CInt(innerDate.DayOfWeek).ToString
                 'Demo用、実際イメージ沸いてから値のコンストラクタ引数追加など仕込み方は考える
                 Me.LastEveningStock = 12345
                 Me.Retentiondays = 0
@@ -494,6 +495,11 @@ Public Class OIT0004OilStockCreate
             ''' </summary>
             ''' <returns></returns>
             Public Property DispDate As String = ""
+            ''' <summary>
+            ''' 曜日名
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property WeekName As String = ""
             ''' <summary>
             ''' 前日夕在庫
             ''' </summary>
@@ -2526,7 +2532,7 @@ Public Class OIT0004OilStockCreate
         ViewState("THISSCREENVALUES") = dispDataClass
     End Sub
     ''' <summary>
-    ''' 画面入力を取得し画面情報保持クラスを復元
+    ''' 画面入力を取得し画面情報保持クラスに反映
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>一旦ViewStateに保存</remarks>
@@ -2534,26 +2540,87 @@ Public Class OIT0004OilStockCreate
         If ViewState("THISSCREENVALUES") Is Nothing Then
             Return Nothing
         End If
+        '画面情報クラスの復元
         Dim retVal As DemoDispDataClass = DirectCast(ViewState("THISSCREENVALUES"), DemoDispDataClass)
         '提案表 日付リピーター
         Dim repValArea As Repeater = DirectCast(frvSuggestObj.FindControl("repSuggestItem"), Repeater)
+        '提案表画面データの入力項目を画面情報保持クラスに反映
+        SetDispSuggestItemValue(retVal, repValArea)
+        '在庫表画面データの入力項目を画面情報保持クラスに反映
+        SetDispStockItemValue(retVal, repStockObj)
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 受注提案タンク車数の入力値取得
+    ''' </summary>
+    ''' <param name="dispDataClass">IN/OUT 画面情報クラス</param>
+    ''' <param name="repSuggestItem">提案数リピーターオブジェクト</param>
+    Private Sub SetDispSuggestItemValue(ByRef dispDataClass As DemoDispDataClass, repSuggestItem As Repeater)
         Dim hdnSuggestListKeyObj As HiddenField = Nothing
         Dim suggestListKey As String = ""
 
         Dim trainRepeater As Repeater = Nothing
+        Dim trainIdObj As HiddenField = Nothing
+        Dim trainId As String = ""
+        Dim chkObj As CheckBox = Nothing
+
         Dim oilTypeItemValue As Repeater = Nothing
-        For Each repSuggestListItem As RepeaterItem In repValArea.Items
+        Dim oilTypeCodeObj As HiddenField = Nothing
+        Dim oilTypeCode As String = ""
+        Dim suggestValObj As TextBox = Nothing
+        Dim suggestVal As String = ""
+
+        Dim dateValueClassItem As DemoDispDataClass.SuggestItem = Nothing
+        Dim trainValueClassItem As DemoDispDataClass.SuggestItem.SuggestValues = Nothing
+        Dim oilTypeValueClassItem As DemoDispDataClass.SuggestItem.SuggestValue = Nothing
+        '一段階目 日付別のリピーター
+        For Each repSuggestListItem As RepeaterItem In repSuggestItem.Items
             '提案リストの日付キーを取得
             hdnSuggestListKeyObj = DirectCast(repSuggestListItem.FindControl("hdnSuggestListKey"), HiddenField)
             suggestListKey = hdnSuggestListKeyObj.Value
+            dateValueClassItem = dispDataClass.SuggestList(suggestListKey)
             '二段階目の列車IDリピーターを取得
             trainRepeater = DirectCast(repSuggestListItem.FindControl("repSuggestTrainItem"), Repeater)
             For Each repSuggestTrainItem As RepeaterItem In trainRepeater.Items
-            Next repSuggestTrainItem
-            Dim aa = repSuggestListItem.DataItem
-        Next repSuggestListItem
-        Return retVal
-    End Function
+                '列車番号取得
+                trainIdObj = DirectCast(repSuggestTrainItem.FindControl("hdnTrainId"), HiddenField)
+                trainId = trainIdObj.Value
+                'チェックボックス取得
+                chkObj = DirectCast(repSuggestTrainItem.FindControl("chkSuggest"), CheckBox)
+                '列車番号別のクラスを取得
+                trainValueClassItem = dateValueClassItem.SuggestOrderItem(trainId)
+                '画面情報クラスに設定しているチェックOn/Offの情報を格納
+                trainValueClassItem.CheckValue = chkObj.Checked
+                '三段階目の油種別の提案数リピーターを取得
+                oilTypeItemValue = DirectCast(repSuggestTrainItem.FindControl("repSuggestValueItem"), Repeater)
+                For Each repOilTypeValItem As RepeaterItem In oilTypeItemValue.Items
+                    oilTypeCodeObj = DirectCast(repOilTypeValItem.FindControl("hdnOilTypeCode"), HiddenField)
+                    oilTypeCode = oilTypeCodeObj.Value
+                    suggestValObj = DirectCast(repOilTypeValItem.FindControl("txtSuggestValue"), TextBox)
+                    suggestVal = suggestValObj.Text
+                    oilTypeValueClassItem = trainValueClassItem(oilTypeCode)
+                    oilTypeValueClassItem.ItemValue = suggestVal
+                Next repOilTypeValItem '三段階目リピーター
+            Next repSuggestTrainItem '二段階目リピーター
+        Next repSuggestListItem '一段階目リピーター
+    End Sub
+    Private Sub SetDispStockItemValue(ByRef dispDataClass As DemoDispDataClass, repStockItemObj As Repeater)
+        Dim oilTypeCodeObj As HiddenField = Nothing
+        Dim oilTypeCode As String = ""
+
+        Dim repStockVal As Repeater = Nothing
+        Dim sendObj As TextBox = Nothing '画面払出テキストボックス
+        Dim sendVal As String = ""
+        For Each repOilTypeItem As RepeaterItem In repStockItemObj.Items
+            oilTypeCodeObj = DirectCast(repOilTypeItem.FindControl("hdnOilTypeCode"), HiddenField)
+            oilTypeCode = oilTypeCodeObj.Value
+            repStockVal = DirectCast(repOilTypeItem.FindControl("repStockValues"), Repeater)
+
+            For Each repStockValItem In repStockVal.Items
+                'sendObj = DirectCast()
+            Next repStockValItem
+        Next repOilTypeItem
+    End Sub
 
 #Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"
     '   "RepeaterでPoscBack時処理で使用するため保持させる必要上RepeaterのViewState使用停止するのは難しい"

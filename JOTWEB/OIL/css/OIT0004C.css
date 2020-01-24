@@ -259,8 +259,8 @@
 #divStockList div.colStockInfo.date, 
 #divStockList div.colStockValue > div {
     text-align:center;
-    width:90px;
-    min-width:90px;
+    width:105px;
+    min-width:105px;
 }
 #divStockList div.colStockValue > div {
     text-align:right;
@@ -387,3 +387,27 @@
 #divStockList div.oilTypeData:nth-child(even) div.colStockValue div:nth-child(odd){
     background-color: #DEF4E9;
 }
+/* ****************** */
+/* 日付部分の土日編集 */
+/* ****************** */
+/* 土曜 */
+#divSuggestList div.suggestDate.week6,
+#divStockList div.dateItem div.week6 {
+    background-color:blue;
+}
+/* 日曜 */
+#divSuggestList div.suggestDate.week0,
+#divStockList div.dateItem div.week0 {
+    background-color: red;
+}
+
+/* 土曜 */
+/*#divSuggestList div.suggestDate.week6 > span > span,
+#divStockList div.dateItem div.week6 > span > span {
+    color: blue;
+}*/
+/* 日曜 */
+/*#divSuggestList div.suggestDate.week0 > span > span,
+#divStockList div.dateItem div.week0 > span > span {
+    color: red;
+}*/

@@ -379,7 +379,10 @@
 #divStockList div.col5 div{
     background-color:#A6D5AE;
 }
-/* データ色 */
+/* データ色(１つの油種に対して行が9と奇数なので交互に表示させるためこの記載) 
+    「#divStockList div.oilTypeData div.colStockValue div」←単色にするなら
+    :nth-child(odd) = 奇数の要素 , :nth-child(even) = 偶数の要素
+*/
 #divStockList div.oilTypeData:nth-child(odd) div.colStockValue div:nth-child(even),
 #divStockList div.oilTypeData:nth-child(even) div.colStockValue div:nth-child(odd){
     background-color: #DEF4E9;

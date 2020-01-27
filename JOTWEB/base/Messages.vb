@@ -430,6 +430,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_ORDEROFFICE_UNSELECT As String = "20013"
 
+        ''' <summary>
+        ''' タンク車№未割当エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_MIWARIATE_ERROR As String = "20014"
+
 #End Region
 
 

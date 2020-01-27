@@ -247,6 +247,7 @@ Public Class OIT0003OrderLinkQuota
             & " , ISNULL(RTRIM(OIT0004.INFO), '')                             AS INFO" _
             & " , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                       AS PREORDERNO" _
             & " , ISNULL(RTRIM(OIT0004.TRAINNO), '')                          AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0004.TRAINNAME), '')                        AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                       AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                       AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                   AS DEPSTATIONNAME" _
@@ -285,7 +286,7 @@ Public Class OIT0003OrderLinkQuota
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE = @P20 OR OIT0004.PREOILCODE = @P21 THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS LTANK " _
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE = @P22 THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS ATANK " _
             & "  , SUM(CASE WHEN OIT0004.PREOILCODE <>'' THEN 1 ELSE 0 END) OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO) AS TOTALTANK " _
-            & "  , ROW_NUMBER() OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.AVAILABLEYMD ORDER BY OIT0004.AVAILABLEYMD DESC) RNUM" _
+            & "  , ROW_NUMBER() OVER (PARTITION BY OIT0004.OFFICECODE, OIT0004.LINKNO ORDER BY OIT0004.AVAILABLEYMD DESC) RNUM" _
             & "  FROM OIL.OIT0004_LINK OIT0004 " _
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
             & "        VIW0003.ORGCODE    = @P1" _
@@ -395,24 +396,72 @@ Public Class OIT0003OrderLinkQuota
     End Sub
 
     ''' <summary>
-    ''' 受注作成ボタン押下時処理
+    ''' タンク車割当ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
+        '選択行
+        work.WF_SEL_LINK_LINECNT.Text = ""
+        '貨車連結順序表№
+        work.WF_SEL_LINK_LINKNO.Text = ""
+        '登録日
+        work.WF_SEL_LINK_REGISTRATIONDATE.Text = ""
+        '受注進行ステータス
+        work.WF_SEL_LINK_ORDERSTATUS.Text = ""
+        '受注情報
+        work.WF_SEL_LINK_INFORMATION.Text = ""
+        '前回オーダー№
+        work.WF_SEL_LINK_PREORDERNO.Text = ""
+        '本線列車
+        work.WF_SEL_LINK_TRAIN.Text = ""
+        '本線列車名
+        work.WF_SEL_LINK_TRAINNAME.Text = ""
+        '担当営業所
+        work.WF_SEL_LINK_ORDERSALESOFFICE.Text = ""
+        '空車発駅(名)
+        work.WF_SEL_LINK_DEPARTURESTATION.Text = ""
+        '空車着駅(名)
+        work.WF_SEL_LINK_ARRIVALSTATION.Text = ""
+        '車数（レギュラー）
+        work.WF_SEL_LINK_REGULAR_TANKCAR.Text = "0"
+        '車数（ハイオク）
+        work.WF_SEL_LINK_HIGHOCTANE_TANKCAR.Text = "0"
+        '車数（灯油）
+        work.WF_SEL_LINK_KEROSENE_TANKCAR.Text = "0"
+        '車数（未添加灯油）
+        work.WF_SEL_LINK_NOTADDED_KEROSENE_TANKCAR.Text = "0"
+        '車数（軽油）
+        work.WF_SEL_LINK_DIESEL_TANKCAR.Text = "0"
+        '車数（３号軽油）
+        work.WF_SEL_LINK_NUM3DIESEL_TANKCAR.Text = "0"
+        '車数（５号軽油）
+        work.WF_SEL_LINK_NUM5DIESEL_TANKCAR.Text = "0"
+        '車数（１０号軽油）
+        work.WF_SEL_LINK_NUM10DIESEL_TANKCAR.Text = "0"
+        '車数（LSA）
+        work.WF_SEL_LINK_LSA_TANKCAR.Text = "0"
+        '車数（A重油）
+        work.WF_SEL_LINK_AHEAVY_TANKCAR.Text = "0"
+        '合計車数
+        work.WF_SEL_LINK_TANKCARTOTAL.Text = "0"
+        '空車着日（予定）
+        work.WF_SEL_LINK_EMPARRDATE.Text = ""
+        '空車着日（実績）
+        work.WF_SEL_LINK_ACTUALEMPARRDATE.Text = ""
+
+        '削除フラグ
+        work.WF_SEL_LINK_DELFLG.Text = "0"
         '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
         work.WF_SEL_CREATELINKFLG.Text = "1"
 
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0003tbl)
+        WF_GridDBclick.Text = ""
 
-        'WF_GridDBclick.Text = ""
+        '○ 遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
 
-        ''○ 遷移先(登録画面)退避データ保存先の作成
-        'WW_CreateXMLSaveFile()
-
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPLINKTBL.Text)
 
         '○ 次ページ遷移
         Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
@@ -468,6 +517,8 @@ Public Class OIT0003OrderLinkQuota
         work.WF_SEL_LINK_PREORDERNO.Text = OIT0003tbl.Rows(WW_LINECNT)("PREORDERNO")
         '本線列車
         work.WF_SEL_LINK_TRAIN.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNO")
+        '本線列車名
+        work.WF_SEL_LINK_TRAINNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNAME")
         '担当営業所
         work.WF_SEL_LINK_ORDERSALESOFFICE.Text = OIT0003tbl.Rows(WW_LINECNT)("OFFICECODE")
         '空車発駅(名)
@@ -541,7 +592,7 @@ Public Class OIT0003OrderLinkQuota
         WF_BOXChange.Value = "detailbox"
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl)
+        'Master.SaveTable(OIT0003tbl)
 
         WF_GridDBclick.Text = ""
 

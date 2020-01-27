@@ -221,6 +221,15 @@ Partial Public Class OIT0003WRKINC
     Public WithEvents WF_SEL_TRAIN As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_SEL_TRAINNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TRAINNAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_SEL_PATTERNCODE コントロール。
     '''</summary>
     '''<remarks>
@@ -750,7 +759,16 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LINK_TRAIN As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_LINK_TRAINNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_LINK_TRAINNAME As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_LINK_ORDERSALESOFFICE コントロール。
     '''</summary>
@@ -939,7 +957,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPLINKTBL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INPTAB1TBL コントロール。
     '''</summary>
@@ -948,7 +966,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTAB1TBL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INPTAB2TBL コントロール。
     '''</summary>
@@ -957,7 +975,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTAB2TBL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INPTAB3TBL コントロール。
     '''</summary>
@@ -966,7 +984,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTAB3TBL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INPTAB4TBL コントロール。
     '''</summary>
@@ -975,7 +993,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTAB4TBL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BASECODE コントロール。
     '''</summary>

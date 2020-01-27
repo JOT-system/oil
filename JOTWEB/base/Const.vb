@@ -228,6 +228,55 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const C_MAX_YMD As String = "2099/12/31"
 
+#Region "受注情報"
+    ''' <summary>
+    ''' 積置
+    ''' </summary>
+    Public Const CONST_ORDERINFO_10 As String = "10"
+    ''' <summary>
+    ''' スポット
+    ''' </summary>
+    Public Const CONST_ORDERINFO_11 As String = "11"
+    ''' <summary>
+    ''' スポット含
+    ''' </summary>
+    Public Const CONST_ORDERINFO_12 As String = "12"
+    ''' <summary>
+    ''' 複数着地
+    ''' </summary>
+    Public Const CONST_ORDERINFO_13 As String = "13"
+
+    ''' <summary>
+    ''' タンク車数オーバー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_80 As String = "80"
+    ''' <summary>
+    ''' 積込エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_81 As String = "81"
+    ''' <summary>
+    ''' 検査間近有
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_82 As String = "82"
+
+    ''' <summary>
+    ''' 失注（荷主都合）
+    ''' </summary>
+    Public Const CONST_ORDERINFO_CANCEL_50 As String = "50"
+    ''' <summary>
+    ''' 失注（荷受人都合）
+    ''' </summary>
+    Public Const CONST_ORDERINFO_CANCEL_51 As String = "51"
+    ''' <summary>
+    ''' 災害
+    ''' </summary>
+    Public Const CONST_ORDERINFO_CANCEL_52 As String = "52"
+    ''' <summary>
+    ''' 事故
+    ''' </summary>
+    Public Const CONST_ORDERINFO_CANCEL_53 As String = "53"
+#End Region
+
 #Region "油種"
     ''' <summary>
     ''' 油種(ハイオク)

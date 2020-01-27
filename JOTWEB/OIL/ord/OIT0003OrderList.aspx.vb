@@ -285,6 +285,7 @@ Public Class OIT0003OrderList
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIT0002.TRAINNO), '')" _
             & "   END                                                AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')               AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')               AS ORDERTYPE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')            AS SHIPPERSNAME" _
@@ -615,6 +616,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_ORDERNUMBER.Text = ""
         '本線列車
         work.WF_SEL_TRAIN.Text = ""
+        '本線列車名
+        work.WF_SEL_TRAINNAME.Text = ""
         '荷主(名)
         work.WF_SEL_SHIPPERSNAME.Text = ""
         '荷主(コード)
@@ -731,7 +734,8 @@ Public Class OIT0003OrderList
         '選択行
         work.WF_SEL_LINECNT.Text = ""
         '登録日
-        work.WF_SEL_REGISTRATIONDATE.Text = DateTime.Now.ToString("d")
+        'work.WF_SEL_REGISTRATIONDATE.Text = DateTime.Now.ToString("d")
+        work.WF_SEL_REGISTRATIONDATE.Text = work.WF_SEL_DATE.Text
         '受注営業所(名)
         work.WF_SEL_ORDERSALESOFFICE.Text = ""
         '受注営業所(コード)
@@ -748,6 +752,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_ORDERNUMBER.Text = ""
         '本線列車
         work.WF_SEL_TRAIN.Text = ""
+        '本線列車名
+        work.WF_SEL_TRAINNAME.Text = ""
         '荷主(名)
         work.WF_SEL_SHIPPERSNAME.Text = ""
         '荷主(コード)
@@ -899,6 +905,7 @@ Public Class OIT0003OrderList
         '受注進行ステータス(コード)
         work.WF_SEL_ORDERSTATUS.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUS")
         '受注情報(名)
+        'work.WF_SEL_INFORMATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME")
         work.WF_SEL_INFORMATIONNM.Text = Regex.Replace(OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME"), "<[^>]*?>", "")
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFO")
@@ -909,7 +916,10 @@ Public Class OIT0003OrderList
         '受注№
         work.WF_SEL_ORDERNUMBER.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERNO")
         '本線列車
-        work.WF_SEL_TRAIN.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNO")
+        'work.WF_SEL_TRAIN.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNO")
+        work.WF_SEL_TRAIN.Text = Regex.Replace(OIT0003tbl.Rows(WW_LINECNT)("TRAINNO"), "<[^>]*?>", "")
+        '本線列車名
+        work.WF_SEL_TRAINNAME.Text = OIT0003tbl.Rows(WW_LINECNT)("TRAINNAME")
         '受注パターン
         work.WF_SEL_PATTERNCODE.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERTYPE")
         '受注パターン(名)
@@ -960,7 +970,8 @@ Public Class OIT0003OrderList
         '車数（A重油）
         work.WF_SEL_AHEAVY_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("ATANK")
         '合計車数
-        work.WF_SEL_TANKCARTOTAL.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALTANK")
+        'work.WF_SEL_TANKCARTOTAL.Text = OIT0003tbl.Rows(WW_LINECNT)("TOTALTANK")
+        work.WF_SEL_TANKCARTOTAL.Text = Regex.Replace(OIT0003tbl.Rows(WW_LINECNT)("TOTALTANK"), "<[^>]*?>", "")
 
         '車数（レギュラー）割当
         work.WF_SEL_REGULARCH_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("RTANKCH")

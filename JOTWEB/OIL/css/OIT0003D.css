@@ -25,7 +25,7 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 }
  /* コンテンツの最小横幅 */
 .headerbox, .detailbox,#tabBox {
-    min-width: 1160px;
+    min-width: 1220px;
 }
 .detailbox a {
     font-size:12.8px;

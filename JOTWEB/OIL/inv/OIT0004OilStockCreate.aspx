@@ -43,10 +43,12 @@
                     <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   visible="false" onclick="ButtonClick('WF_ButtonLAST');"></div>
                 </div>
             </div> <!-- End class=actionButtonBox -->
+            <%-- マスタページ上でClientIDMode=Staticを設定し継承されるためリピーターには個別で設定
+                 設定しないとHTMLのルールであるIDがユニークではなく重複する --%>
             <!-- 受注提案タンク車数 (vbコード内で pnlSuggestList.Visible=Falseで消せる -->
-            <asp:Panel ID="pnlSuggestList" runat="server" ViewStateMode="Disabled" >
+            <asp:Panel ID="pnlSuggestList" runat="server"  >
             <div class="listTitle">受注提案タンク車数</div>
-            <asp:FormView ID="frvSuggest" runat="server" ViewStateMode="Disabled" RenderOuterTable="false">
+            <asp:FormView ID="frvSuggest" runat="server" RenderOuterTable="false" ClientIDMode="Predictable">
                 <HeaderTemplate>
                     <div id="divSuggestList" style='height:calc(<%# Eval("SuggestOilNameList").Count + 3  %> * 24px)'>
                 </HeaderTemplate>
@@ -59,7 +61,7 @@
                         <div>
                             <span>受入数</span>
                         </div>
-                        <asp:Repeater runat="server" ID="repOilTypeNameListEmpty" DataSource='<%# Eval("SuggestOilNameList") %>' ViewStateMode="Disabled">
+                        <asp:Repeater runat="server" ID="repOilTypeNameListEmpty" DataSource='<%# Eval("SuggestOilNameList") %>' >
                             <ItemTemplate >
                                 <div></div>
                             </ItemTemplate>
@@ -71,30 +73,31 @@
                         <div><span>日付</span></div>
                         <div><span>列車</span></div>
                         <div><span>油種</span></div>
-                        <asp:Repeater runat="server" ID="repOilTypeNameList" DataSource='<%# Eval("SuggestOilNameList") %>' ViewStateMode="Disabled">
+                        <asp:Repeater runat="server" ID="repOilTypeNameList" DataSource='<%# Eval("SuggestOilNameList") %>' >
                             <ItemTemplate >
                                 <div><span><%# Eval("Value") %></span></div>
                             </ItemTemplate>
                         </asp:Repeater>
                     </div>
                     <%-- 三列目以降 --%>
-                    <asp:Repeater ID="repSuggestItem" runat="server"  DataSource='<%# Eval("SuggestList") %>' ViewStateMode="Disabled">
+                    <asp:Repeater ID="repSuggestItem" runat="server"  DataSource='<%# Eval("SuggestList") %>' >
                         <ItemTemplate>
                             <div class='dataColumn has<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).SuggestOrderItem.Count %>Col'  >
-                            <!-- 日付部分 -->
-                            <div class="suggestDate">
+                            <%-- 日付部分 --%>
+                            <div class='suggestDate week<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).WeekName %>'>
                                 <!-- -->
                                 <span><%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).DispDate %></span>
+                                <asp:HiddenField ID="hdnSuggestListKey" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                             </div>
                             <%--列車・チェック・値のリピーター--%> 
-                            <asp:Repeater ID="repSuggestItem" runat="server"  
-                                DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).SuggestOrderItem %>' ViewStateMode="Disabled">
+                            <asp:Repeater ID="repSuggestTrainItem" runat="server"  
+                                DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).SuggestOrderItem %>' >
                                 <ItemTemplate>
                                     <div class="values">
                                     <%--  列車 --%>
                                     <div>
-                                        <span>
-                                        <%# Eval("Key") %>
+                                        <span><%# Eval("Key") %>
+                                            <asp:HiddenField ID="hdnTrainId" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                                         </span>
                                     </div>
                                     <%--  チェック --%>
@@ -105,12 +108,13 @@
                                         </span>
                                     </div>
                                     <%--  各種値 --%>
-                                    <asp:Repeater ID="repSuggestItem" runat="server"  
-                                        DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValues).SuggestValuesItem %>' ViewStateMode="Disabled">
+                                    <asp:Repeater ID="repSuggestValueItem" runat="server"  
+                                        DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValues).SuggestValuesItem %>' >
                                         <ItemTemplate>
                                             <%--  油種に紐づいた値 --%>
                                             <div class="num" data-oilcode='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode %>'>
-                                                <asp:TextBox ID="txtSuggestValue" runat="server" ViewStateMode="Disabled"
+                                                <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode %>'  />
+                                                <asp:TextBox ID="txtSuggestValue" runat="server" 
                                                     Text='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
                                                     Enabled='<%# If(DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode = DemoDispDataClass.SUMMARY_CODE, "False", "True") %>'></asp:TextBox>
                                             </div>
@@ -132,7 +136,7 @@
             <!-- 比重一覧 -->
             <asp:Panel ID="pnlWeightList" runat="server">
                 <div class="listTitle">比重</div>
-                <asp:Repeater ID="repWeightList" runat="server" ViewStateMode="Disabled">
+                <asp:Repeater ID="repWeightList" runat="server" ClientIDMode="Predictable">
                     <HeaderTemplate>
                         <div id="weightListContainer">
                     </HeaderTemplate>
@@ -153,7 +157,7 @@
                 </asp:Repeater>
             </asp:Panel>　<!-- End 比重一覧 -->
             <!-- 在庫表 -->
-            <asp:Panel ID="pnlStockList" runat="server" ViewStateMode="Disabled">
+            <asp:Panel ID="pnlStockList" runat="server" >
                 <div class="listTitle">在庫表</div>
                 <div id="divStockList">
                     <!-- 1・2行目のヘッダー -->
@@ -167,7 +171,7 @@
                                     <div class="dateItem">
                             </HeaderTemplate>
                             <ItemTemplate>
-                                <div class="colStockInfo date">
+                                <div class='colStockInfo date week<%# CInt(DirectCast(Eval("Value"), Date).DayOfWeek) %>'>
                                     <span><%# Eval("Key") %></span>
                                 </div>
                             </ItemTemplate>
@@ -178,12 +182,13 @@
                         </asp:Repeater>
                         <div class="lastMargin"></div>
                     </div> <!-- End 1・2行目のヘッダー -->
-                    <!-- End 油種ごとのデータ生成部 -->
-                    <asp:Repeater ID="repStockOilTypeItem" runat="server" ViewStateMode="Disabled">
+                    <!-- 油種ごとのデータ生成部 -->
+                    <asp:Repeater ID="repStockOilTypeItem" runat="server" ClientIDMode="Predictable">
                         <ItemTemplate>
                             <div class="oilTypeData">
                                 <div class="col1">
                                     <div><span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %></span></div>
+                                    <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %>' />
                                 </div>
                                 <div class="col2">
                                     <div><span>タンク容量</span></div>
@@ -232,7 +237,7 @@
                                 </div>
 
                                 <%-- 日付毎の各値 --%>
-                                <asp:Repeater ID="repStockValues" runat="server" ViewStateMode="Disabled" DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).StockItemList %>'>
+                                <asp:Repeater ID="repStockValues" runat="server" DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).StockItemList %>'>
                                     <ItemTemplate>
                                         <div class="colStockValue">
                                             <div><%--前日夕在庫--%>

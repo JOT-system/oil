@@ -1,9 +1,10 @@
-﻿''************************************************************
-' タンク車マスタメンテ登録画面
-' 作成日 2019/11/08
-' 更新日 2019/11/08
-' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+﻿Option Strict On '一旦On
+''************************************************************
+' 在庫表登録画面
+' 作成日 2020/01/20
+' 更新日 2020/01/20
+' 作成者 JOTxxxx
+' 更新車 JOTxxxx
 '
 ' 修正履歴:
 '         :
@@ -12,7 +13,7 @@ Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' タンク車マスタ登録（実行）
+''' 在庫表登録（実行）
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIT0004OilStockCreate
@@ -57,10 +58,12 @@ Public Class OIT0004OilStockCreate
 
         Try
             If IsPostBack Then
+                Dim dispDataObj As DemoDispDataClass
+                dispDataObj = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
+                    'Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
 
@@ -90,35 +93,6 @@ Public Class OIT0004OilStockCreate
                 '○ 初期化処理
                 Initialize()
             End If
-            '**********************************************
-            '↓●Demo用
-            '**********************************************
-            Dim baseDate = work.WF_SEL_STYMD.Text
-            'Demo用なのでこの辺もベタうちは考えて
-            Dim trainList As New List(Of String) From {"5972", "5282", "8072"}
-            Dim oilCodes As New List(Of String)
-            If {"30"}.Contains(work.WF_SEL_CONSIGNEE.Text) Then
-                oilCodes.AddRange({"1001", "1101", "1301", "1302", "1401", "2101", "2201"})
-            Else
-                oilCodes.AddRange({"1001", "1101", "1301", "1401", "2101", "2201"})
-            End If
-            '画面データクラス
-            Dim dispDataObj = New DemoDispDataClass(baseDate, trainList, oilCodes)
-            'コンストラクタで生成したデータを画面に貼り付け
-            '1.提案リスト
-            frvSuggest.DataSource = New Object() {dispDataObj}
-            frvSuggest.DataBind()
-            '2.比重リスト
-            repWeightList.DataSource = dispDataObj.WeightList
-            repWeightList.DataBind()
-            '3.在庫表
-            repStockDate.DataSource = dispDataObj.StockDate
-            repStockDate.DataBind()
-            repStockOilTypeItem.DataSource = dispDataObj.StockList
-            repStockOilTypeItem.DataBind()
-            '**********************************************
-            '↑●Demo用
-            '**********************************************
             '○ 画面モード(更新・参照)設定
             If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
                 WF_MAPpermitcode.Value = "TRUE"
@@ -158,6 +132,7 @@ Public Class OIT0004OilStockCreate
     ''' （コンストラクタや引数で受け渡しさせる、別ファイルに外だしした時もワークするように考慮する）
     ''' 当クラス及びサブクラス内でDB操作をする際はきっちりデストラクタ(Finalize)を仕込む
     ''' 場合によってはUsingをサポートするように記述する</remarks>
+    <Serializable>
     Public Class DemoDispDataClass
         Public Const SUMMARY_CODE As String = "Summary"
         Public Property testVal As String = "test"
@@ -241,7 +216,7 @@ Public Class OIT0004OilStockCreate
                 Dim item As New WeightListItem
                 item.OilTypeCode = oilNameItem.Key
                 item.OilTypeName = oilNameItem.Value
-                item.Weight = 0.75 '本来DBなどから取得
+                item.Weight = 0.75D '本来DBなどから取得
                 Me.WeightList.Add(item.OilTypeCode, item)
             Next
             '******************************
@@ -251,7 +226,7 @@ Public Class OIT0004OilStockCreate
             Me.StockDate = New Dictionary(Of String, Date)
             For i = 0 To 6 'Demo用一旦6指定で7日間ここを29にすれば30日間になる
                 Dim targetDate As Date = baseDtm.AddDays(i)
-                Me.StockDate.Add(targetDate.ToString("yyyy/M/d"), targetDate)
+                Me.StockDate.Add(targetDate.ToString("M月d日(<\span>ddd</\span>)"), targetDate)
             Next
             Me.StockList = New Dictionary(Of String, StockListCollection)
             For Each oilNameItem In Me.SuggestOilNameList
@@ -293,17 +268,9 @@ Public Class OIT0004OilStockCreate
         End Function
 
         ''' <summary>
-        ''' 画面リピーターに仕込んだ値を取得する
-        ''' </summary>
-        ''' <param name="repSuggest"> 受注提案タンク車数用リピーター</param>
-        ''' <returns>取得したデータクラス</returns>
-        Public Function GetDispSuggestData(repSuggest As Repeater) As Dictionary(Of String, SuggestItem)
-
-        End Function
-
-        ''' <summary>
         ''' 列車Noをキーに持つ受注提案アイテム
         ''' </summary>
+        <Serializable>
         Public Class SuggestItem
             ''' <summary>
             ''' 対象日付
@@ -315,7 +282,7 @@ Public Class OIT0004OilStockCreate
             ''' </summary>
             ''' <returns></returns>
             Public Property DispDate As String
-
+            Public Property WeekName As String
             ''' <summary>
             ''' 受入数情報格納用ディクショナリ
             ''' </summary>
@@ -340,18 +307,18 @@ Public Class OIT0004OilStockCreate
                 Me.SuggestLoadingItem = New Dictionary(Of String, SuggestValues)
 
                 Me.ThisDate = targetDate.ToString("yyyy/MM/dd") '内部用の日付
-                Me.DispDate = targetDate.ToString("M月d日") '画面表示用の日付
-
+                Me.DispDate = targetDate.ToString("M月d日(<\span>ddd</\span>)") '画面表示用の日付
+                Me.WeekName = CInt(targetDate.DayOfWeek).ToString
             End Sub
             Public Sub Add(trainNo As String, oilCodes As List(Of String))
                 Dim orderValues = New SuggestValues
                 Dim loadingValues = New SuggestValues
                 For Each oilCode As String In oilCodes
-                    orderValues.Add(oilCode, 0)
-                    loadingValues.Add(oilCode, 0)
+                    orderValues.Add(oilCode, "0")
+                    loadingValues.Add(oilCode, "0")
                 Next
-                orderValues.Add(SUMMARY_CODE, 0)
-                loadingValues.Add(SUMMARY_CODE, 0)
+                orderValues.Add(SUMMARY_CODE, "0")
+                loadingValues.Add(SUMMARY_CODE, "0")
                 Me.SuggestOrderItem.Add(trainNo, orderValues)
                 Me.SuggestLoadingItem.Add(trainNo, loadingValues)
             End Sub
@@ -359,6 +326,7 @@ Public Class OIT0004OilStockCreate
             ''' <summary>
             ''' 受注提案タンク車数用数値情報格納クラス
             ''' </summary>
+            <Serializable>
             Public Class SuggestValues
                 ''' <summary>
                 ''' 受注提案タンク車数用数値情報ディクショナリ
@@ -385,7 +353,7 @@ Public Class OIT0004OilStockCreate
                 Public Sub New()
                     Me.SuggestValuesItem = New Dictionary(Of String, SuggestValue)
                 End Sub
-                Public Sub Add(oilCode As String, val As Integer)
+                Public Sub Add(oilCode As String, val As String)
                     Me.SuggestValuesItem.Add(oilCode, New SuggestValue _
                         With {.ItemValue = val, .OilCode = oilCode})
                 End Sub
@@ -393,6 +361,7 @@ Public Class OIT0004OilStockCreate
             ''' <summary>
             ''' 提案値クラス
             ''' </summary>
+            <Serializable>
             Public Class SuggestValue
                 ''' <summary>
                 ''' 油種コード
@@ -403,13 +372,14 @@ Public Class OIT0004OilStockCreate
                 ''' 数
                 ''' </summary>
                 ''' <returns></returns>
-                ''' <remarks>精度が足りないならIntegerから拡張を</remarks>
-                Public Property ItemValue As Integer = 0
+                ''' <remarks>画面入力項目の為String</remarks>
+                Public Property ItemValue As String = "0"
             End Class
         End Class
         ''' <summary>
         ''' 比重リストアイテムクラス
         ''' </summary>
+        <Serializable>
         Public Class WeightListItem
             ''' <summary>
             ''' 油種コード
@@ -430,6 +400,7 @@ Public Class OIT0004OilStockCreate
         ''' <summary>
         ''' 在庫クラス
         ''' </summary>
+        <Serializable>
         Public Class StockListCollection
             ''' <summary>
             ''' コンストラクタ
@@ -440,7 +411,7 @@ Public Class OIT0004OilStockCreate
                 Me.OilTypeName = oilTypeItem.Value
                 '２列目から４列目のタンク容量～前週出荷平均については
                 '一旦0
-                Me.TankCapacity = 12345.6
+                Me.TankCapacity = 12345.6D
                 Me.TargetStock = 0
                 Me.TargetStockRate = 0
                 Me.Stock80 = 0
@@ -448,7 +419,7 @@ Public Class OIT0004OilStockCreate
                 Me.LastShipmentAve = 0
                 Me.StockItemList = New Dictionary(Of String, StockListItem)
                 For Each dateVal In dateItem
-                    Dim item = New StockListItem(dateVal.Key)
+                    Dim item = New StockListItem(dateVal.Key, dateVal.Value)
                     Me.StockItemList.Add(dateVal.Key, item)
                 Next
             End Sub
@@ -499,18 +470,20 @@ Public Class OIT0004OilStockCreate
             ''' <returns></returns>
             Public Property StockItemList As Dictionary(Of String, StockListItem)
         End Class
+        <Serializable>
         Public Class StockListItem
             ''' <summary>
             ''' コンストラクタ
             ''' </summary>
-            Public Sub New(dispDate As String)
+            Public Sub New(dispDate As String, innerDate As Date)
                 Me.DispDate = dispDate
+                Me.WeekName = CInt(innerDate.DayOfWeek).ToString
                 'Demo用、実際イメージ沸いてから値のコンストラクタ引数追加など仕込み方は考える
                 Me.LastEveningStock = 12345
                 Me.Retentiondays = 0
                 Me.MorningStock = 0
                 Me.Receive = 0
-                Me.Send = 0
+                Me.Send = "0" '画面入力項目の為文字
                 Me.EveningStock = 0
                 Me.EveningStockWithoutDS = 0
                 Me.FreeSpace = 0
@@ -522,6 +495,11 @@ Public Class OIT0004OilStockCreate
             ''' </summary>
             ''' <returns></returns>
             Public Property DispDate As String = ""
+            ''' <summary>
+            ''' 曜日名
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property WeekName As String = ""
             ''' <summary>
             ''' 前日夕在庫
             ''' </summary>
@@ -543,10 +521,10 @@ Public Class OIT0004OilStockCreate
             ''' <returns></returns>
             Public Property Receive As Decimal
             ''' <summary>
-            ''' 払出
+            ''' 払出(画面入力エリアの為文字列)
             ''' </summary>
             ''' <returns></returns>
-            Public Property Send As Decimal
+            Public Property Send As String
             ''' <summary>
             ''' 夕在庫
             ''' </summary>
@@ -570,9 +548,9 @@ Public Class OIT0004OilStockCreate
         End Class
     End Class
 
-    Private Function DemoDispSuggestList(baseDay As String, trainList As List(Of String), oilCodes As List(Of String))
+    'Private Function DemoDispSuggestList(baseDay As String, trainList As List(Of String), oilCodes As List(Of String))
 
-    End Function
+    'End Function
 
 #End Region
     ''' <summary>
@@ -588,7 +566,7 @@ Public Class OIT0004OilStockCreate
         '○D&D有無設定
         Master.eventDrop = True
         '○Grid情報保存先のファイル名
-        'Master.CreateXMLSaveFile()
+        Master.CreateXMLSaveFile()
 
         '○初期値設定
         WF_FIELD.Value = ""
@@ -621,189 +599,36 @@ Public Class OIT0004OilStockCreate
             Master.CreateXMLSaveFile()
         End If
 
-        ''○ 名称設定処理
-        ''選択行
-        'WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
-
-        ''JOT車番
-        'WF_TANKNUMBER.Text = work.WF_SEL_TANKNUMBER2.Text
-        'CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_DUMMY)
-
-        ''原籍所有者C
-        'WF_ORIGINOWNERCODE.Text = work.WF_SEL_ORIGINOWNERCODE.Text
-
-        ''名義所有者C
-        'WF_OWNERCODE.Text = work.WF_SEL_OWNERCODE.Text
-
-        ''リース先C
-        'WF_LEASECODE.Text = work.WF_SEL_LEASECODE.Text
-
-        ''リース区分C
-        'WF_LEASECLASS.Text = work.WF_SEL_LEASECLASS.Text
-
-        ''自動延長
-        'WF_AUTOEXTENTION.Text = work.WF_SEL_AUTOEXTENTION.Text
-
-        ''リース開始年月日
-        'WF_LEASESTYMD.Text = work.WF_SEL_LEASESTYMD.Text
-
-        ''リース満了年月日
-        'WF_LEASEENDYMD.Text = work.WF_SEL_LEASEENDYMD.Text
-
-        ''第三者使用者C
-        'WF_USERCODE.Text = work.WF_SEL_USERCODE.Text
-
-        ''原常備駅C
-        'WF_CURRENTSTATIONCODE.Text = work.WF_SEL_CURRENTSTATIONCODE.Text
-        'CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
-
-        ''臨時常備駅C
-        'WF_EXTRADINARYSTATIONCODE.Text = work.WF_SEL_EXTRADINARYSTATIONCODE.Text
-        'CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
-
-        ''第三者使用期限
-        'WF_USERLIMIT.Text = work.WF_SEL_USERLIMIT.Text
-
-        ''臨時常備駅期限
-        'WF_LIMITTEXTRADIARYSTATION.Text = work.WF_SEL_LIMITTEXTRADIARYSTATION.Text
-
-        ''原専用種別C
-        'WF_DEDICATETYPECODE.Text = work.WF_SEL_DEDICATETYPECODE.Text
-
-        ''臨時専用種別C
-        'WF_EXTRADINARYTYPECODE.Text = work.WF_SEL_EXTRADINARYTYPECODE.Text
-
-        ''臨時専用期限
-        'WF_EXTRADINARYLIMIT.Text = work.WF_SEL_EXTRADINARYLIMIT.Text
-
-        ''運用基地C
-        'WF_OPERATIONBASECODE.Text = work.WF_SEL_OPERATIONBASECODE.Text
-        'CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
-
-        ''塗色C
-        'WF_COLORCODE.Text = work.WF_SEL_COLORCODE.Text
-
-        ''エネオス
-        'WF_ENEOS.Text = work.WF_SEL_ENEOS.Text
-
-        ''エコレール
-        'WF_ECO.Text = work.WF_SEL_ECO.Text
-
-        ''取得年月日
-        'WF_ALLINSPECTIONDATE.Text = work.WF_SEL_ALLINSPECTIONDATE.Text
-
-        ''車籍編入年月日
-        'WF_TRANSFERDATE.Text = work.WF_SEL_TRANSFERDATE.Text
-
-        ''取得先C
-        'WF_OBTAINEDCODE.Text = work.WF_SEL_OBTAINEDCODE.Text
-
-        ''形式
-        'WF_MODEL.Text = work.WF_SEL_MODEL2.Text
-
-        ''形式カナ
-        'WF_MODELKANA.Text = work.WF_SEL_MODELKANA.Text
-
-        ''荷重
-        'WF_LOAD.Text = work.WF_SEL_LOAD.Text
-
-        ''荷重単位
-        'WF_LOADUNIT.Text = work.WF_SEL_LOADUNIT.Text
-
-        ''容積
-        'WF_VOLUME.Text = work.WF_SEL_VOLUME.Text
-
-        ''容積単位
-        'WF_VOLUMEUNIT.Text = work.WF_SEL_VOLUMEUNIT.Text
-
-        ''原籍所有者
-        'WF_ORIGINOWNERNAME.Text = work.WF_SEL_ORIGINOWNERNAME.Text
-
-        ''名義所有者
-        'WF_OWNERNAME.Text = work.WF_SEL_OWNERNAME.Text
-
-        ''リース先
-        'WF_LEASENAME.Text = work.WF_SEL_LEASENAME.Text
-
-        ''リース区分
-        'WF_LEASECLASSNEMAE.Text = work.WF_SEL_LEASECLASSNEMAE.Text
-
-        ''第三者使用者
-        'WF_USERNAME.Text = work.WF_SEL_USERNAME.Text
-
-        ''原常備駅
-        'WF_CURRENTSTATIONNAME.Text = work.WF_SEL_CURRENTSTATIONNAME.Text
-
-        ''臨時常備駅
-        'WF_EXTRADINARYSTATIONNAME.Text = work.WF_SEL_EXTRADINARYSTATIONNAME.Text
-
-        ''原専用種別
-        'WF_DEDICATETYPENAME.Text = work.WF_SEL_DEDICATETYPENAME.Text
-
-        ''臨時専用種別
-        'WF_EXTRADINARYTYPENAME.Text = work.WF_SEL_EXTRADINARYTYPENAME.Text
-
-        ''運用場所
-        'WF_OPERATIONBASENAME.Text = work.WF_SEL_OPERATIONBASENAME.Text
-
-        ''塗色
-        'WF_COLORNAME.Text = work.WF_SEL_COLORNAME.Text
-
-        ''予備1
-        'WF_RESERVE1.Text = work.WF_SEL_RESERVE1.Text
-
-        ''予備2
-        'WF_RESERVE2.Text = work.WF_SEL_RESERVE2.Text
-
-        ''次回指定年月日
-        'WF_SPECIFIEDDATE.Text = work.WF_SEL_SPECIFIEDDATE.Text
-
-        ''次回全検年月日(JR) 
-        'WF_JRALLINSPECTIONDATE.Text = work.WF_SEL_JRALLINSPECTIONDATE.Text
-
-        ''現在経年
-        'WF_PROGRESSYEAR.Text = work.WF_SEL_PROGRESSYEAR.Text
-
-        ''次回全検時経年
-        'WF_NEXTPROGRESSYEAR.Text = work.WF_SEL_NEXTPROGRESSYEAR.Text
-
-        ''次回交検年月日(JR）
-        'WF_JRINSPECTIONDATE.Text = work.WF_SEL_JRINSPECTIONDATE.Text
-
-        ''次回交検年月日
-        'WF_INSPECTIONDATE.Text = work.WF_SEL_INSPECTIONDATE.Text
-
-        ''次回指定年月日(JR)
-        'WF_JRSPECIFIEDDATE.Text = work.WF_SEL_JRSPECIFIEDDATE.Text
-
-        ''JR車番
-        'WF_JRTANKNUMBER.Text = work.WF_SEL_JRTANKNUMBER.Text
-
-        ''旧JOT車番
-        'WF_OLDTANKNUMBER.Text = work.WF_SEL_OLDTANKNUMBER.Text
-
-        ''OT車番
-        'WF_OTTANKNUMBER.Text = work.WF_SEL_OTTANKNUMBER.Text
-
-        ''JXTG車番
-        'WF_JXTGTANKNUMBER.Text = work.WF_SEL_JXTGTANKNUMBER.Text
-
-        ''コスモ車番
-        'WF_COSMOTANKNUMBER.Text = work.WF_SEL_COSMOTANKNUMBER.Text
-
-        ''富士石油車番
-        'WF_FUJITANKNUMBER.Text = work.WF_SEL_FUJITANKNUMBER.Text
-
-        ''出光昭シ車番
-        'WF_SHELLTANKNUMBER.Text = work.WF_SEL_SHELLTANKNUMBER.Text
-
-        ''予備
-        'WF_RESERVE3.Text = work.WF_SEL_RESERVE3.Text
-
-        ''削除
-        'WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
-        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
-
+        '**********************************************
+        '↓●Demo用
+        '**********************************************
+        Dim baseDate = work.WF_SEL_STYMD.Text
+        'Demo用なのでこの辺もベタうちは考えて
+        Dim trainList As New List(Of String) From {"5972", "5282", "8072"}
+        Dim oilCodes As New List(Of String)
+        If {"30"}.Contains(work.WF_SEL_CONSIGNEE.Text) Then
+            oilCodes.AddRange({"1001", "1101", "1301", "1302", "1401", "2101", "2201"})
+        Else
+            oilCodes.AddRange({"1001", "1101", "1301", "1401", "2101", "2201"})
+        End If
+        '画面データクラス
+        Dim dispDataObj = New DemoDispDataClass(baseDate, trainList, oilCodes)
+        'コンストラクタで生成したデータを画面に貼り付け
+        '1.提案リスト
+        frvSuggest.DataSource = New Object() {dispDataObj}
+        frvSuggest.DataBind()
+        '2.比重リスト
+        repWeightList.DataSource = dispDataObj.WeightList
+        repWeightList.DataBind()
+        '3.在庫表
+        repStockDate.DataSource = dispDataObj.StockDate
+        repStockDate.DataBind()
+        repStockOilTypeItem.DataSource = dispDataObj.StockList
+        repStockOilTypeItem.DataBind()
+        '**********************************************
+        '↑●Demo用
+        '**********************************************
+        SaveThisScreenValue(dispDataObj)
     End Sub
     ''' <summary>
     ''' 戻るボタン押下時処理
@@ -1311,7 +1136,7 @@ Public Class OIT0004OilStockCreate
 
         '○ 状態をクリア
         For Each OIM0005row As DataRow In OIM0005tbl.Rows
-            Select Case OIM0005row("OPERATION")
+            Select Case Convert.ToString(OIM0005row("OPERATION"))
                 Case C_LIST_OPERATION_CODE.NODATA
                     OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     WW_ERR_SW = C_LIST_OPERATION_CODE.NODATA
@@ -1334,8 +1159,8 @@ Public Class OIT0004OilStockCreate
             End Select
         Next
 
-        '○ 画面表示データ保存
-        Master.SaveTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
+        ''○ 画面表示データ保存
+        'Master.SaveTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
 
         'WF_Sel_LINECNT.Text = ""            'LINECNT
 
@@ -1377,7 +1202,10 @@ Public Class OIT0004OilStockCreate
 
         If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
             Try
-                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+                Dim intVal As Integer = 0
+                If Integer.TryParse(WF_LeftMViewChange.Value, intVal) Then
+                    WF_LeftMViewChange.Value = intVal.ToString
+                End If
             Catch ex As Exception
                 Exit Sub
             End Try
@@ -1390,7 +1218,7 @@ Public Class OIT0004OilStockCreate
             End If
 
             With leftview
-                Select Case WF_LeftMViewChange.Value
+                Select Case CInt(WF_LeftMViewChange.Value)
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
@@ -1437,8 +1265,8 @@ Public Class OIT0004OilStockCreate
                             'Case "WF_OPERATIONBASECODE"      '運用基地
                             '    prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, "BASE")
                         End Select
-
-                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                        Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                        .SetListBox(enumVal, WW_DUMMY, prmData)
                         .ActiveListBox()
                 End Select
             End With
@@ -1493,9 +1321,11 @@ Public Class OIT0004OilStockCreate
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex.ToString
+            With leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value))
+                WW_SelectValue = .Value
+                WW_SelectText = .Text
+            End With
         End If
 
         '○ 選択内容を画面項目へセット
@@ -1782,12 +1612,15 @@ Public Class OIT0004OilStockCreate
 
         If Not String.IsNullOrEmpty(WF_RightViewChange.Value) Then
             Try
-                Integer.TryParse(WF_RightViewChange.Value, WF_RightViewChange.Value)
+                Dim intVal As Integer = 0
+                If Integer.TryParse(WF_RightViewChange.Value, intVal) Then
+                    WF_RightViewChange.Value = intVal.ToString
+                End If
             Catch ex As Exception
                 Exit Sub
             End Try
-
-            rightview.SelectIndex(WF_RightViewChange.Value)
+            Dim enumVal = DirectCast([Enum].ToObject(GetType(GRIS0004RightBox.RIGHT_TAB_INDEX), CInt(WF_RightViewChange.Value)), GRIS0004RightBox.RIGHT_TAB_INDEX)
+            rightview.SelectIndex(enumVal)
             WF_RightViewChange.Value = ""
         End If
 
@@ -1831,8 +1664,8 @@ Public Class OIT0004OilStockCreate
         CS0025AUTHORget.USERID = CS0050SESSION.USERID
         CS0025AUTHORget.OBJCODE = C_ROLE_VARIANT.USER_PERTMIT
         CS0025AUTHORget.CODE = Master.MAPID
-        CS0025AUTHORget.STYMD = Date.Now
-        CS0025AUTHORget.ENDYMD = Date.Now
+        CS0025AUTHORget.STYMD = Date.Now.ToString("yyyy/MM/dd")
+        CS0025AUTHORget.ENDYMD = Date.Now.ToString("yyyy/MM/dd")
         CS0025AUTHORget.CS0025AUTHORget()
         If isNormal(CS0025AUTHORget.ERR) AndAlso CS0025AUTHORget.PERMITCODE = C_PERMISSION.UPDATE Then
         Else
@@ -1845,15 +1678,18 @@ Public Class OIT0004OilStockCreate
         End If
 
         '○ 単項目チェック
+        Dim ioVal As String
         For Each OIM0005INProw As DataRow In OIM0005INPtbl.Rows
 
             WW_LINE_ERR = ""
 
             '削除フラグ(バリデーションチェック）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIM0005INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("DELFLG"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("DELFLG") = ioVal
             If isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
-                CODENAME_get("DELFLG", OIM0005INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
+                CODENAME_get("DELFLG", Convert.ToString(OIM0005INProw("DELFLG")), WW_DUMMY, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
                     WW_CheckMES1 = "・削除コード入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -1880,7 +1716,9 @@ Public Class OIT0004OilStockCreate
             'End If
 
             '原籍所有者C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE", OIM0005INProw("ORIGINOWNERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("ORIGINOWNERCODE"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("ORIGINOWNERCODE") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "原籍所有者C入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1890,7 +1728,9 @@ Public Class OIT0004OilStockCreate
             End If
 
             '名義所有者C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OWNERCODE", OIM0005INProw("OWNERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("OWNERCODE"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OWNERCODE", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("OWNERCODE") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "名義所有者C入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1900,7 +1740,9 @@ Public Class OIT0004OilStockCreate
             End If
 
             'リース先C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECODE", OIM0005INProw("LEASECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("LEASECODE"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECODE", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("LEASECODE") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "リース先C入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1910,7 +1752,9 @@ Public Class OIT0004OilStockCreate
             End If
 
             'リース区分C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASS", OIM0005INProw("LEASECLASS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("LEASECLASS"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "LEASECLASS", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("LEASECLASS") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "リース区分C入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1920,7 +1764,9 @@ Public Class OIT0004OilStockCreate
             End If
 
             '自動延長(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTION", OIM0005INProw("AUTOEXTENTION"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("AUTOEXTENTION"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "AUTOEXTENTION", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("AUTOEXTENTION") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "自動延長入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1930,7 +1776,7 @@ Public Class OIT0004OilStockCreate
             End If
 
             'リース開始年月日(バリデーションチェック)
-            If OIM0005INProw("LEASESTYMD") = "" Then
+            If Convert.ToString(OIM0005INProw("LEASESTYMD")) = "" Then
                 WW_CheckMES1 = "・リース開始年月日入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
@@ -1938,7 +1784,7 @@ Public Class OIT0004OilStockCreate
                 O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
             Else
                 '年月日チェック
-                WW_CheckDate(OIM0005INProw("LEASESTYMD"), "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                WW_CheckDate(Convert.ToString(OIM0005INProw("LEASESTYMD")), "リース開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
                     WW_CheckMES1 = "・リース開始年月日入力エラーです。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1951,7 +1797,7 @@ Public Class OIT0004OilStockCreate
             End If
 
             'リース満了年月日(バリデーションチェック)
-            If OIM0005INProw("LEASEENDYMD") = "" Then
+            If Convert.ToString(OIM0005INProw("LEASEENDYMD")) = "" Then
                 WW_CheckMES1 = "・リース満了年月日入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
@@ -1959,7 +1805,7 @@ Public Class OIT0004OilStockCreate
                 O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
             Else
                 '年月日チェック
-                WW_CheckDate(OIM0005INProw("LEASEENDYMD"), "リース満了年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                WW_CheckDate(Convert.ToString(OIM0005INProw("LEASEENDYMD")), "リース満了年月日", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
                     WW_CheckMES1 = "・リース満了年月日入力エラーです。"
                     WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1972,7 +1818,9 @@ Public Class OIT0004OilStockCreate
             End If
 
             '第三者使用者C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERCODE", OIM0005INProw("USERCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("USERCODE"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USERCODE", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("USERCODE") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "第三者使用者C入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1982,7 +1830,9 @@ Public Class OIT0004OilStockCreate
             End If
 
             '原常備駅C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CURRENTSTATIONCODE", OIM0005INProw("CURRENTSTATIONCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("CURRENTSTATIONCODE"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CURRENTSTATIONCODE", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("CURRENTSTATIONCODE") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "原常備駅C入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -1992,7 +1842,9 @@ Public Class OIT0004OilStockCreate
             End If
 
             '臨時常備駅C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYSTATIONCODE", OIM0005INProw("EXTRADINARYSTATIONCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            ioVal = Convert.ToString(OIM0005INProw("EXTRADINARYSTATIONCODE"))
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYSTATIONCODE", ioVal, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            OIM0005INProw("EXTRADINARYSTATIONCODE") = ioVal
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 WW_CheckMES1 = "臨時常備駅C入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
@@ -2001,269 +1853,269 @@ Public Class OIT0004OilStockCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '第三者使用期限(バリデーションチェック)
-            If OIM0005INProw("USERLIMIT") = "" Then
-                WW_CheckMES1 = "・第三者使用期限入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("USERLIMIT"), "第三者使用期限", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・第三者使用期限入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("USERLIMIT") = CDate(OIM0005INProw("USERLIMIT")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''第三者使用期限(バリデーションチェック)
+            'If OIM0005INProw("USERLIMIT") = "" Then
+            '    WW_CheckMES1 = "・第三者使用期限入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("USERLIMIT"), "第三者使用期限", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・第三者使用期限入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("USERLIMIT") = CDate(OIM0005INProw("USERLIMIT")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '臨時常備駅期限(バリデーションチェック)
-            If OIM0005INProw("LIMITTEXTRADIARYSTATION") = "" Then
-                WW_CheckMES1 = "・臨時常備駅期限入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("LIMITTEXTRADIARYSTATION"), "臨時常備駅期限", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・臨時常備駅期限入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("LIMITTEXTRADIARYSTATION") = CDate(OIM0005INProw("LIMITTEXTRADIARYSTATION")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''臨時常備駅期限(バリデーションチェック)
+            'If OIM0005INProw("LIMITTEXTRADIARYSTATION") = "" Then
+            '    WW_CheckMES1 = "・臨時常備駅期限入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("LIMITTEXTRADIARYSTATION"), "臨時常備駅期限", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・臨時常備駅期限入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("LIMITTEXTRADIARYSTATION") = CDate(OIM0005INProw("LIMITTEXTRADIARYSTATION")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '原専用種別C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEDICATETYPECODE", OIM0005INProw("DEDICATETYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "原専用種別C入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''原専用種別C(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEDICATETYPECODE", OIM0005INProw("DEDICATETYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "原専用種別C入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            '臨時専用種別C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYTYPECODE", OIM0005INProw("EXTRADINARYTYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "臨時専用種別C入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''臨時専用種別C(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EXTRADINARYTYPECODE", OIM0005INProw("EXTRADINARYTYPECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "臨時専用種別C入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            '臨時専用期限(バリデーションチェック)
-            If OIM0005INProw("EXTRADINARYLIMIT") = "" Then
-                WW_CheckMES1 = "・臨時専用期限入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("EXTRADINARYLIMIT"), "臨時専用期限", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・臨時専用期限入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("EXTRADINARYLIMIT") = CDate(OIM0005INProw("EXTRADINARYLIMIT")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''臨時専用期限(バリデーションチェック)
+            'If OIM0005INProw("EXTRADINARYLIMIT") = "" Then
+            '    WW_CheckMES1 = "・臨時専用期限入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("EXTRADINARYLIMIT"), "臨時専用期限", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・臨時専用期限入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("EXTRADINARYLIMIT") = CDate(OIM0005INProw("EXTRADINARYLIMIT")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '運用基地C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASECODE", OIM0005INProw("OPERATIONBASECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "運用基地C入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''運用基地C(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OPERATIONBASECODE", OIM0005INProw("OPERATIONBASECODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "運用基地C入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            '塗色C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COLORCODE", OIM0005INProw("COLORCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "塗色C入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''塗色C(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "COLORCODE", OIM0005INProw("COLORCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "塗色C入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            'エネオス(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENEOS", OIM0005INProw("ENEOS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "エネオス入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''エネオス(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENEOS", OIM0005INProw("ENEOS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "エネオス入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            'エコレール(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ECO", OIM0005INProw("ECO"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "エコレール入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''エコレール(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ECO", OIM0005INProw("ECO"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "エコレール入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            '取得年月日(バリデーションチェック)
-            If OIM0005INProw("ALLINSPECTIONDATE") = "" Then
-                WW_CheckMES1 = "・取得年月日入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("ALLINSPECTIONDATE"), "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・取得年月日入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("ALLINSPECTIONDATE") = CDate(OIM0005INProw("ALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''取得年月日(バリデーションチェック)
+            'If OIM0005INProw("ALLINSPECTIONDATE") = "" Then
+            '    WW_CheckMES1 = "・取得年月日入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("ALLINSPECTIONDATE"), "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・取得年月日入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("ALLINSPECTIONDATE") = CDate(OIM0005INProw("ALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '車籍編入年月日(バリデーションチェック)
-            If OIM0005INProw("TRANSFERDATE") = "" Then
-                WW_CheckMES1 = "・車籍編入年月日入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("TRANSFERDATE"), "車籍編入年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・車籍編入年月日入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("TRANSFERDATE") = CDate(OIM0005INProw("TRANSFERDATE")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''車籍編入年月日(バリデーションチェック)
+            'If OIM0005INProw("TRANSFERDATE") = "" Then
+            '    WW_CheckMES1 = "・車籍編入年月日入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("TRANSFERDATE"), "車籍編入年月日", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・車籍編入年月日入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("TRANSFERDATE") = CDate(OIM0005INProw("TRANSFERDATE")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '取得先C(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OBTAINEDCODE", OIM0005INProw("OBTAINEDCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "取得先C入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''取得先C(バリデーションチェック)
+            'Master.CheckField(work.WF_SEL_CAMPCODE.Text, "OBTAINEDCODE", OIM0005INProw("OBTAINEDCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'If Not isNormal(WW_CS0024FCHECKERR) Then
+            '    WW_CheckMES1 = "取得先C入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '    WW_LINE_ERR = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
 
-            '次回指定年月日
-            If OIM0005INProw("SPECIFIEDDATE") = "" Then
-                '何もしない
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("SPECIFIEDDATE"), "次回指定年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・次回指定年月日入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("SPECIFIEDDATE") = CDate(OIM0005INProw("SPECIFIEDDATE")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''次回指定年月日
+            'If OIM0005INProw("SPECIFIEDDATE") = "" Then
+            '    '何もしない
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("SPECIFIEDDATE"), "次回指定年月日", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・次回指定年月日入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("SPECIFIEDDATE") = CDate(OIM0005INProw("SPECIFIEDDATE")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '次回全検年月日(JR)
-            If OIM0005INProw("JRALLINSPECTIONDATE") = "" Then
-                '何もしない
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("JRALLINSPECTIONDATE"), "次回全検年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・次回全検年月日(JR)入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("JRALLINSPECTIONDATE") = CDate(OIM0005INProw("JRALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''次回全検年月日(JR)
+            'If OIM0005INProw("JRALLINSPECTIONDATE") = "" Then
+            '    '何もしない
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("JRALLINSPECTIONDATE"), "次回全検年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・次回全検年月日(JR)入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("JRALLINSPECTIONDATE") = CDate(OIM0005INProw("JRALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '次回交検年月日(JR）
-            If OIM0005INProw("JRINSPECTIONDATE") = "" Then
-                '何もしない
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("JRINSPECTIONDATE"), "次回交検年月日(JR）", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・次回交検年月日(JR）入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("JRINSPECTIONDATE") = CDate(OIM0005INProw("JRINSPECTIONDATE")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''次回交検年月日(JR）
+            'If OIM0005INProw("JRINSPECTIONDATE") = "" Then
+            '    '何もしない
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("JRINSPECTIONDATE"), "次回交検年月日(JR）", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・次回交検年月日(JR）入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("JRINSPECTIONDATE") = CDate(OIM0005INProw("JRINSPECTIONDATE")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '次回交検年月日
-            If OIM0005INProw("INSPECTIONDATE") = "" Then
-                '何もしない
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("INSPECTIONDATE"), "次回交検年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・次回交検年月日入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("INSPECTIONDATE") = CDate(OIM0005INProw("INSPECTIONDATE")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''次回交検年月日
+            'If OIM0005INProw("INSPECTIONDATE") = "" Then
+            '    '何もしない
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("INSPECTIONDATE"), "次回交検年月日", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・次回交検年月日入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("INSPECTIONDATE") = CDate(OIM0005INProw("INSPECTIONDATE")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
-            '次回指定年月日(JR)
-            If OIM0005INProw("JRSPECIFIEDDATE") = "" Then
-                '何もしない
-            Else
-                '年月日チェック
-                WW_CheckDate(OIM0005INProw("JRSPECIFIEDDATE"), "次回指定年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
-                If dateErrFlag = "1" Then
-                    WW_CheckMES1 = "・次回指定年月日(JR)入力エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                Else
-                    OIM0005INProw("JRSPECIFIEDDATE") = CDate(OIM0005INProw("JRSPECIFIEDDATE")).ToString("yyyy/MM/dd")
-                End If
-            End If
+            ''次回指定年月日(JR)
+            'If OIM0005INProw("JRSPECIFIEDDATE") = "" Then
+            '    '何もしない
+            'Else
+            '    '年月日チェック
+            '    WW_CheckDate(OIM0005INProw("JRSPECIFIEDDATE"), "次回指定年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
+            '    If dateErrFlag = "1" Then
+            '        WW_CheckMES1 = "・次回指定年月日(JR)入力エラーです。"
+            '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+            '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+            '        WW_LINE_ERR = "ERR"
+            '        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    Else
+            '        OIM0005INProw("JRSPECIFIEDDATE") = CDate(OIM0005INProw("JRSPECIFIEDDATE")).ToString("yyyy/MM/dd")
+            '    End If
+            'End If
 
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
-            If OIM0005INProw("TANKNUMBER") = work.WF_SEL_TANKNUMBER2.Text Then
+            If Convert.ToString(OIM0005INProw("TANKNUMBER")) = work.WF_SEL_TANKNUMBER2.Text Then
 
             Else
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -2277,7 +2129,7 @@ Public Class OIT0004OilStockCreate
                 If Not isNormal(WW_UniqueKeyCHECK) Then
                     WW_CheckMES1 = "一意制約違反（JOT車番）。"
                     WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
-                                       "([" & OIM0005INProw("TANKNUMBER") & "]"
+                                       "([" & Convert.ToString(OIM0005INProw("TANKNUMBER")) & "]"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.OVERLAP_DATA_ERROR
@@ -2286,7 +2138,7 @@ Public Class OIT0004OilStockCreate
 
 
             If WW_LINE_ERR = "" Then
-                If OIM0005INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
+                If Convert.ToString(OIM0005INProw("OPERATION")) <> C_LIST_OPERATION_CODE.ERRORED Then
                     OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 End If
             Else
@@ -2322,11 +2174,11 @@ Public Class OIT0004OilStockCreate
             Dim getDay As String = getMMDD.Remove(0, getMMDD.IndexOf("/") + 1)
 
             '閏年の場合はその旨のメッセージを出力
-            If Not DateTime.IsLeapYear(chkLeapYear) _
+            If Not DateTime.IsLeapYear(CInt(chkLeapYear)) _
             AndAlso (getMonth = "2" OrElse getMonth = "02") AndAlso getDay = "29" Then
                 Master.Output(C_MESSAGE_NO.OIL_LEAPYEAR_NOTFOUND, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
                 '月と日の範囲チェック
-            ElseIf getMonth >= 13 OrElse getDay >= 32 Then
+            ElseIf CInt(getMonth) >= 13 OrElse CInt(getDay) >= 32 Then
                 Master.Output(C_MESSAGE_NO.OIL_MONTH_DAY_OVER_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
             Else
                 'Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
@@ -2355,64 +2207,64 @@ Public Class OIT0004OilStockCreate
         End If
 
         If Not IsNothing(OIM0005row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> JOT車番 =" & OIM0005row("TANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者C =" & OIM0005row("ORIGINOWNERCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者C =" & OIM0005row("OWNERCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース先C =" & OIM0005row("LEASECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分C =" & OIM0005row("LEASECLASS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 自動延長 =" & OIM0005row("AUTOEXTENTION") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース開始年月日 =" & OIM0005row("LEASESTYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース満了年月日 =" & OIM0005row("LEASEENDYMD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用者C =" & OIM0005row("USERCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原常備駅C =" & OIM0005row("CURRENTSTATIONCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅C =" & OIM0005row("EXTRADINARYSTATIONCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用期限 =" & OIM0005row("USERLIMIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅期限 =" & OIM0005row("LIMITTEXTRADIARYSTATION") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別C =" & OIM0005row("DEDICATETYPECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別C =" & OIM0005row("EXTRADINARYTYPECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用期限 =" & OIM0005row("EXTRADINARYLIMIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C =" & OIM0005row("OPERATIONBASECODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色C =" & OIM0005row("COLORCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エネオス =" & OIM0005row("ENEOS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エコレール =" & OIM0005row("ECO") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 取得年月日 =" & OIM0005row("ALLINSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 車籍編入年月日 =" & OIM0005row("TRANSFERDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 取得先C =" & OIM0005row("OBTAINEDCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 形式 =" & OIM0005row("MODEL") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 形式カナ =" & OIM0005row("MODELKANA") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷重 =" & OIM0005row("LOAD") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 荷重単位 =" & OIM0005row("LOADUNIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 容積 =" & OIM0005row("VOLUME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 容積単位 =" & OIM0005row("VOLUMEUNIT") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者 =" & OIM0005row("ORIGINOWNERNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者 =" & OIM0005row("OWNERNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース先 =" & OIM0005row("LEASENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分 =" & OIM0005row("LEASECLASSNEMAE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用者 =" & OIM0005row("USERNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原常備駅 =" & OIM0005row("CURRENTSTATIONNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅 =" & OIM0005row("EXTRADINARYSTATIONNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別 =" & OIM0005row("DEDICATETYPENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別 =" & OIM0005row("EXTRADINARYTYPENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 運用場所 =" & OIM0005row("OPERATIONBASENAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色 =" & OIM0005row("COLORNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 予備1 =" & OIM0005row("RESERVE1") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 予備2 =" & OIM0005row("RESERVE2") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回指定年月日 =" & OIM0005row("SPECIFIEDDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回全検年月日(JR)  =" & OIM0005row("JRALLINSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 現在経年 =" & OIM0005row("PROGRESSYEAR") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回全検時経年 =" & OIM0005row("NEXTPROGRESSYEAR") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回交検年月日(JR） =" & OIM0005row("JRINSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回交検年月日 =" & OIM0005row("INSPECTIONDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 次回指定年月日(JR) =" & OIM0005row("JRSPECIFIEDDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> JR車番 =" & OIM0005row("JRTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 旧JOT車番 =" & OIM0005row("OLDTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> OT車番 =" & OIM0005row("OTTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> JXTG車番 =" & OIM0005row("JXTGTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> コスモ車番 =" & OIM0005row("COSMOTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 富士石油車番 =" & OIM0005row("FUJITANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シ車番 =" & OIM0005row("SHELLTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 予備 =" & OIM0005row("RESERVE3") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0005row("DELFLG")
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> JOT車番 =" & OIM0005row("TANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者C =" & OIM0005row("ORIGINOWNERCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者C =" & OIM0005row("OWNERCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> リース先C =" & OIM0005row("LEASECODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分C =" & OIM0005row("LEASECLASS") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 自動延長 =" & OIM0005row("AUTOEXTENTION") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> リース開始年月日 =" & OIM0005row("LEASESTYMD") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> リース満了年月日 =" & OIM0005row("LEASEENDYMD") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用者C =" & OIM0005row("USERCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 原常備駅C =" & OIM0005row("CURRENTSTATIONCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅C =" & OIM0005row("EXTRADINARYSTATIONCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用期限 =" & OIM0005row("USERLIMIT") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅期限 =" & OIM0005row("LIMITTEXTRADIARYSTATION") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別C =" & OIM0005row("DEDICATETYPECODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別C =" & OIM0005row("EXTRADINARYTYPECODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用期限 =" & OIM0005row("EXTRADINARYLIMIT") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C =" & OIM0005row("OPERATIONBASECODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色C =" & OIM0005row("COLORCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> エネオス =" & OIM0005row("ENEOS") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> エコレール =" & OIM0005row("ECO") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 取得年月日 =" & OIM0005row("ALLINSPECTIONDATE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 車籍編入年月日 =" & OIM0005row("TRANSFERDATE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 取得先C =" & OIM0005row("OBTAINEDCODE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 形式 =" & OIM0005row("MODEL") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 形式カナ =" & OIM0005row("MODELKANA") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 荷重 =" & OIM0005row("LOAD") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 荷重単位 =" & OIM0005row("LOADUNIT") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 容積 =" & OIM0005row("VOLUME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 容積単位 =" & OIM0005row("VOLUMEUNIT") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 原籍所有者 =" & OIM0005row("ORIGINOWNERNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 名義所有者 =" & OIM0005row("OWNERNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> リース先 =" & OIM0005row("LEASENAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> リース区分 =" & OIM0005row("LEASECLASSNEMAE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 第三者使用者 =" & OIM0005row("USERNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 原常備駅 =" & OIM0005row("CURRENTSTATIONNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時常備駅 =" & OIM0005row("EXTRADINARYSTATIONNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 原専用種別 =" & OIM0005row("DEDICATETYPENAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用種別 =" & OIM0005row("EXTRADINARYTYPENAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 運用場所 =" & OIM0005row("OPERATIONBASENAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色 =" & OIM0005row("COLORNAME") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 予備1 =" & OIM0005row("RESERVE1") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 予備2 =" & OIM0005row("RESERVE2") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 次回指定年月日 =" & OIM0005row("SPECIFIEDDATE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 次回全検年月日(JR)  =" & OIM0005row("JRALLINSPECTIONDATE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 現在経年 =" & OIM0005row("PROGRESSYEAR") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 次回全検時経年 =" & OIM0005row("NEXTPROGRESSYEAR") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 次回交検年月日(JR） =" & OIM0005row("JRINSPECTIONDATE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 次回交検年月日 =" & OIM0005row("INSPECTIONDATE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 次回指定年月日(JR) =" & OIM0005row("JRSPECIFIEDDATE") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> JR車番 =" & OIM0005row("JRTANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 旧JOT車番 =" & OIM0005row("OLDTANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> OT車番 =" & OIM0005row("OTTANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> JXTG車番 =" & OIM0005row("JXTGTANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> コスモ車番 =" & OIM0005row("COSMOTANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 富士石油車番 =" & OIM0005row("FUJITANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シ車番 =" & OIM0005row("SHELLTANKNUMBER") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 予備 =" & OIM0005row("RESERVE3") & " , "
+            'WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0005row("DELFLG")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
@@ -2428,7 +2280,7 @@ Public Class OIT0004OilStockCreate
 
         '○ 画面状態設定
         For Each OIM0005row As DataRow In OIM0005tbl.Rows
-            Select Case OIM0005row("OPERATION")
+            Select Case Convert.ToString(OIM0005row("OPERATION"))
                 Case C_LIST_OPERATION_CODE.NODATA
                     OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.NODISP
@@ -2446,7 +2298,7 @@ Public Class OIT0004OilStockCreate
         For Each OIM0005INProw As DataRow In OIM0005INPtbl.Rows
 
             'エラーレコード読み飛ばし
-            If OIM0005INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
+            If Convert.ToString(OIM0005INProw("OPERATION")) <> C_LIST_OPERATION_CODE.UPDATING Then
                 Continue For
             End If
 
@@ -2454,66 +2306,66 @@ Public Class OIT0004OilStockCreate
 
             'KEY項目が等しい時
             For Each OIM0005row As DataRow In OIM0005tbl.Rows
-                If OIM0005row("TANKNUMBER") = OIM0005INProw("TANKNUMBER") Then
+                If OIM0005row("TANKNUMBER").Equals(OIM0005INProw("TANKNUMBER")) Then
                     'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-                    If OIM0005row("DELFLG") = OIM0005INProw("DELFLG") AndAlso
-                        OIM0005row("ORIGINOWNERCODE") = OIM0005INProw("ORIGINOWNERCODE") AndAlso
-                        OIM0005row("OWNERCODE") = OIM0005INProw("OWNERCODE") AndAlso
-                        OIM0005row("LEASECODE") = OIM0005INProw("LEASECODE") AndAlso
-                        OIM0005row("LEASECLASS") = OIM0005INProw("LEASECLASS") AndAlso
-                        OIM0005row("AUTOEXTENTION") = OIM0005INProw("AUTOEXTENTION") AndAlso
-                        OIM0005row("LEASESTYMD") = OIM0005INProw("LEASESTYMD") AndAlso
-                        OIM0005row("LEASEENDYMD") = OIM0005INProw("LEASEENDYMD") AndAlso
-                        OIM0005row("USERCODE") = OIM0005INProw("USERCODE") AndAlso
-                        OIM0005row("CURRENTSTATIONCODE") = OIM0005INProw("CURRENTSTATIONCODE") AndAlso
-                        OIM0005row("EXTRADINARYSTATIONCODE") = OIM0005INProw("EXTRADINARYSTATIONCODE") AndAlso
-                        OIM0005row("USERLIMIT") = OIM0005INProw("USERLIMIT") AndAlso
-                        OIM0005row("LIMITTEXTRADIARYSTATION") = OIM0005INProw("LIMITTEXTRADIARYSTATION") AndAlso
-                        OIM0005row("DEDICATETYPECODE") = OIM0005INProw("DEDICATETYPECODE") AndAlso
-                        OIM0005row("EXTRADINARYTYPECODE") = OIM0005INProw("EXTRADINARYTYPECODE") AndAlso
-                        OIM0005row("EXTRADINARYLIMIT") = OIM0005INProw("EXTRADINARYLIMIT") AndAlso
-                        OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
-                        OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
-                        OIM0005row("ENEOS") = OIM0005INProw("ENEOS") AndAlso
-                        OIM0005row("ECO") = OIM0005INProw("ECO") AndAlso
-                        OIM0005row("ALLINSPECTIONDATE") = OIM0005INProw("ALLINSPECTIONDATE") AndAlso
-                        OIM0005row("TRANSFERDATE") = OIM0005INProw("TRANSFERDATE") AndAlso
-                        OIM0005row("OBTAINEDCODE") = OIM0005INProw("OBTAINEDCODE") AndAlso
-                        OIM0005row("MODEL") = OIM0005INProw("MODEL") AndAlso
-                        OIM0005row("MODELKANA") = OIM0005INProw("MODELKANA") AndAlso
-                        OIM0005row("LOAD") = OIM0005INProw("LOAD") AndAlso
-                        OIM0005row("LOADUNIT") = OIM0005INProw("LOADUNIT") AndAlso
-                        OIM0005row("VOLUME") = OIM0005INProw("VOLUME") AndAlso
-                        OIM0005row("VOLUMEUNIT") = OIM0005INProw("VOLUMEUNIT") AndAlso
-                        OIM0005row("ORIGINOWNERNAME") = OIM0005INProw("ORIGINOWNERNAME") AndAlso
-                        OIM0005row("OWNERNAME") = OIM0005INProw("OWNERNAME") AndAlso
-                        OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
-                        OIM0005row("LEASECLASSNEMAE") = OIM0005INProw("LEASECLASSNEMAE") AndAlso
-                        OIM0005row("USERNAME") = OIM0005INProw("USERNAME") AndAlso
-                        OIM0005row("CURRENTSTATIONNAME") = OIM0005INProw("CURRENTSTATIONNAME") AndAlso
-                        OIM0005row("EXTRADINARYSTATIONNAME") = OIM0005INProw("EXTRADINARYSTATIONNAME") AndAlso
-                        OIM0005row("DEDICATETYPENAME") = OIM0005INProw("DEDICATETYPENAME") AndAlso
-                        OIM0005row("EXTRADINARYTYPENAME") = OIM0005INProw("EXTRADINARYTYPENAME") AndAlso
-                        OIM0005row("OPERATIONBASENAME") = OIM0005INProw("OPERATIONBASENAME") AndAlso
-                        OIM0005row("COLORNAME") = OIM0005INProw("COLORNAME") AndAlso
-                        OIM0005row("RESERVE1") = OIM0005INProw("RESERVE1") AndAlso
-                        OIM0005row("RESERVE2") = OIM0005INProw("RESERVE2") AndAlso
-                        OIM0005row("SPECIFIEDDATE") = OIM0005INProw("SPECIFIEDDATE") AndAlso
-                        OIM0005row("JRALLINSPECTIONDATE") = OIM0005INProw("JRALLINSPECTIONDATE") AndAlso
-                        OIM0005row("PROGRESSYEAR") = OIM0005INProw("PROGRESSYEAR") AndAlso
-                        OIM0005row("NEXTPROGRESSYEAR") = OIM0005INProw("NEXTPROGRESSYEAR") AndAlso
-                        OIM0005row("JRINSPECTIONDATE") = OIM0005INProw("JRINSPECTIONDATE") AndAlso
-                        OIM0005row("INSPECTIONDATE") = OIM0005INProw("INSPECTIONDATE") AndAlso
-                        OIM0005row("JRSPECIFIEDDATE") = OIM0005INProw("JRSPECIFIEDDATE") AndAlso
-                        OIM0005row("JRTANKNUMBER") = OIM0005INProw("JRTANKNUMBER") AndAlso
-                        OIM0005row("OLDTANKNUMBER") = OIM0005INProw("OLDTANKNUMBER") AndAlso
-                        OIM0005row("OTTANKNUMBER") = OIM0005INProw("OTTANKNUMBER") AndAlso
-                        OIM0005row("JXTGTANKNUMBER") = OIM0005INProw("JXTGTANKNUMBER") AndAlso
-                        OIM0005row("COSMOTANKNUMBER") = OIM0005INProw("COSMOTANKNUMBER") AndAlso
-                        OIM0005row("FUJITANKNUMBER") = OIM0005INProw("FUJITANKNUMBER") AndAlso
-                        OIM0005row("SHELLTANKNUMBER") = OIM0005INProw("SHELLTANKNUMBER") AndAlso
-                        OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
-                        OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    If OIM0005row("DELFLG").Equals(OIM0005INProw("DELFLG")) AndAlso
+                        OIM0005row("ORIGINOWNERCODE").Equals(OIM0005INProw("ORIGINOWNERCODE")) AndAlso
+                        OIM0005row("OWNERCODE").Equals(OIM0005INProw("OWNERCODE")) AndAlso
+                        OIM0005row("LEASECODE").Equals(OIM0005INProw("LEASECODE")) AndAlso
+                        OIM0005row("LEASECLASS").Equals(OIM0005INProw("LEASECLASS")) AndAlso
+                        OIM0005row("AUTOEXTENTION").Equals(OIM0005INProw("AUTOEXTENTION")) AndAlso
+                        OIM0005row("LEASESTYMD").Equals(OIM0005INProw("LEASESTYMD")) AndAlso
+                        OIM0005row("LEASEENDYMD").Equals(OIM0005INProw("LEASEENDYMD")) AndAlso
+                        OIM0005row("USERCODE").Equals(OIM0005INProw("USERCODE")) AndAlso
+                        OIM0005row("CURRENTSTATIONCODE").Equals(OIM0005INProw("CURRENTSTATIONCODE")) AndAlso
+                        OIM0005row("EXTRADINARYSTATIONCODE").Equals(OIM0005INProw("EXTRADINARYSTATIONCODE")) AndAlso
+                        OIM0005row("USERLIMIT").Equals(OIM0005INProw("USERLIMIT")) AndAlso
+                        OIM0005row("LIMITTEXTRADIARYSTATION").Equals(OIM0005INProw("LIMITTEXTRADIARYSTATION")) AndAlso
+                        OIM0005row("DEDICATETYPECODE").Equals(OIM0005INProw("DEDICATETYPECODE")) AndAlso
+                        OIM0005row("EXTRADINARYTYPECODE").Equals(OIM0005INProw("EXTRADINARYTYPECODE")) AndAlso
+                        OIM0005row("EXTRADINARYLIMIT").Equals(OIM0005INProw("EXTRADINARYLIMIT")) AndAlso
+                        OIM0005row("OPERATIONBASECODE").Equals(OIM0005INProw("OPERATIONBASECODE")) AndAlso
+                        OIM0005row("COLORCODE").Equals(OIM0005INProw("COLORCODE")) AndAlso
+                        OIM0005row("ENEOS").Equals(OIM0005INProw("ENEOS")) AndAlso
+                        OIM0005row("ECO").Equals(OIM0005INProw("ECO")) AndAlso
+                        OIM0005row("ALLINSPECTIONDATE").Equals(OIM0005INProw("ALLINSPECTIONDATE")) AndAlso
+                        OIM0005row("TRANSFERDATE").Equals(OIM0005INProw("TRANSFERDATE")) AndAlso
+                        OIM0005row("OBTAINEDCODE").Equals(OIM0005INProw("OBTAINEDCODE")) AndAlso
+                        OIM0005row("MODEL").Equals(OIM0005INProw("MODEL")) AndAlso
+                        OIM0005row("MODELKANA").Equals(OIM0005INProw("MODELKANA")) AndAlso
+                        OIM0005row("LOAD").Equals(OIM0005INProw("LOAD")) AndAlso
+                        OIM0005row("LOADUNIT").Equals(OIM0005INProw("LOADUNIT")) AndAlso
+                        OIM0005row("VOLUME").Equals(OIM0005INProw("VOLUME")) AndAlso
+                        OIM0005row("VOLUMEUNIT").Equals(OIM0005INProw("VOLUMEUNIT")) AndAlso
+                        OIM0005row("ORIGINOWNERNAME").Equals(OIM0005INProw("ORIGINOWNERNAME")) AndAlso
+                        OIM0005row("OWNERNAME").Equals(OIM0005INProw("OWNERNAME")) AndAlso
+                        OIM0005row("LEASENAME").Equals(OIM0005INProw("LEASENAME")) AndAlso
+                        OIM0005row("LEASECLASSNEMAE").Equals(OIM0005INProw("LEASECLASSNEMAE")) AndAlso
+                        OIM0005row("USERNAME").Equals(OIM0005INProw("USERNAME")) AndAlso
+                        OIM0005row("CURRENTSTATIONNAME").Equals(OIM0005INProw("CURRENTSTATIONNAME")) AndAlso
+                        OIM0005row("EXTRADINARYSTATIONNAME").Equals(OIM0005INProw("EXTRADINARYSTATIONNAME")) AndAlso
+                        OIM0005row("DEDICATETYPENAME").Equals(OIM0005INProw("DEDICATETYPENAME")) AndAlso
+                        OIM0005row("EXTRADINARYTYPENAME").Equals(OIM0005INProw("EXTRADINARYTYPENAME")) AndAlso
+                        OIM0005row("OPERATIONBASENAME").Equals(OIM0005INProw("OPERATIONBASENAME")) AndAlso
+                        OIM0005row("COLORNAME").Equals(OIM0005INProw("COLORNAME")) AndAlso
+                        OIM0005row("RESERVE1").Equals(OIM0005INProw("RESERVE1")) AndAlso
+                        OIM0005row("RESERVE2").Equals(OIM0005INProw("RESERVE2")) AndAlso
+                        OIM0005row("SPECIFIEDDATE").Equals(OIM0005INProw("SPECIFIEDDATE")) AndAlso
+                        OIM0005row("JRALLINSPECTIONDATE").Equals(OIM0005INProw("JRALLINSPECTIONDATE")) AndAlso
+                        OIM0005row("PROGRESSYEAR").Equals(OIM0005INProw("PROGRESSYEAR")) AndAlso
+                        OIM0005row("NEXTPROGRESSYEAR").Equals(OIM0005INProw("NEXTPROGRESSYEAR")) AndAlso
+                        OIM0005row("JRINSPECTIONDATE").Equals(OIM0005INProw("JRINSPECTIONDATE")) AndAlso
+                        OIM0005row("INSPECTIONDATE").Equals(OIM0005INProw("INSPECTIONDATE")) AndAlso
+                        OIM0005row("JRSPECIFIEDDATE").Equals(OIM0005INProw("JRSPECIFIEDDATE")) AndAlso
+                        OIM0005row("JRTANKNUMBER").Equals(OIM0005INProw("JRTANKNUMBER")) AndAlso
+                        OIM0005row("OLDTANKNUMBER").Equals(OIM0005INProw("OLDTANKNUMBER")) AndAlso
+                        OIM0005row("OTTANKNUMBER").Equals(OIM0005INProw("OTTANKNUMBER")) AndAlso
+                        OIM0005row("JXTGTANKNUMBER").Equals(OIM0005INProw("JXTGTANKNUMBER")) AndAlso
+                        OIM0005row("COSMOTANKNUMBER").Equals(OIM0005INProw("COSMOTANKNUMBER")) AndAlso
+                        OIM0005row("FUJITANKNUMBER").Equals(OIM0005INProw("FUJITANKNUMBER")) AndAlso
+                        OIM0005row("SHELLTANKNUMBER").Equals(OIM0005INProw("SHELLTANKNUMBER")) AndAlso
+                        OIM0005row("RESERVE3").Equals(OIM0005INProw("RESERVE3")) AndAlso
+                        Convert.ToString(OIM0005INProw("OPERATION")) = C_LIST_OPERATION_CODE.NODATA Then
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
                         OIM0005INProw("OPERATION") = CONST_UPDATE
@@ -2528,7 +2380,7 @@ Public Class OIT0004OilStockCreate
 
         '○ 変更有無判定　&　入力値反映
         For Each OIM0005INProw As DataRow In OIM0005INPtbl.Rows
-            Select Case OIM0005INProw("OPERATION")
+            Select Case Convert.ToString(OIM0005INProw("OPERATION"))
                 Case CONST_UPDATE
                     TBL_UPDATE_SUB(OIM0005INProw)
                 Case CONST_INSERT
@@ -2553,7 +2405,7 @@ Public Class OIT0004OilStockCreate
         For Each OIM0005row As DataRow In OIM0005tbl.Rows
 
             '同一レコードか判定
-            If OIM0005INProw("TANKNUMBER") = OIM0005row("TANKNUMBER") Then
+            If OIM0005INProw("TANKNUMBER").Equals(OIM0005row("TANKNUMBER")) Then
                 '画面入力テーブル項目設定
                 OIM0005INProw("LINECNT") = OIM0005row("LINECNT")
                 OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -2581,7 +2433,7 @@ Public Class OIT0004OilStockCreate
         OIM0005row.ItemArray = OIM0005INProw.ItemArray
 
         OIM0005row("LINECNT") = OIM0005tbl.Rows.Count + 1
-        If OIM0005INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+        If Convert.ToString(OIM0005INProw.Item("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING Then
             OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
         Else
             OIM0005row("OPERATION") = C_LIST_OPERATION_CODE.INSERTING
@@ -2606,7 +2458,7 @@ Public Class OIT0004OilStockCreate
         For Each OIM0005row As DataRow In OIM0005tbl.Rows
 
             '同一レコードか判定
-            If OIM0005INProw("TANKNUMBER") = OIM0005row("TANKNUMBER") Then
+            If OIM0005INProw("TANKNUMBER").Equals(OIM0005row("TANKNUMBER")) Then
                 '画面入力テーブル項目設定
                 OIM0005INProw("LINECNT") = OIM0005row("LINECNT")
                 OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
@@ -2669,5 +2521,153 @@ Public Class OIT0004OilStockCreate
         End Try
 
     End Sub
+    ''' <summary>
+    ''' 画面情報保持クラスを保存
+    ''' </summary>
+    ''' <param name="dispDataClass"></param>
+    ''' <remarks>一旦ViewStateに保存
+    ''' （重ければシリアライズ→Base64化→1レコード1フィールドのDataTableにBase64文字を格納に格納、
+    ''' 　共通関数で退避もやる余地はあり）</remarks>
+    Private Sub SaveThisScreenValue(dispDataClass As DemoDispDataClass)
+        ViewState("THISSCREENVALUES") = dispDataClass
+    End Sub
+    ''' <summary>
+    ''' 画面入力を取得し画面情報保持クラスに反映
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>一旦ViewStateに保存</remarks>
+    Private Function GetThisScreenData(frvSuggestObj As FormView, repStockObj As Repeater) As DemoDispDataClass
+        If ViewState("THISSCREENVALUES") Is Nothing Then
+            Return Nothing
+        End If
+        '画面情報クラスの復元
+        Dim retVal As DemoDispDataClass = DirectCast(ViewState("THISSCREENVALUES"), DemoDispDataClass)
+        '提案表 日付リピーター
+        Dim repValArea As Repeater = DirectCast(frvSuggestObj.FindControl("repSuggestItem"), Repeater)
+        '提案表画面データの入力項目を画面情報保持クラスに反映
+        SetDispSuggestItemValue(retVal, repValArea)
+        '在庫表画面データの入力項目を画面情報保持クラスに反映
+        SetDispStockItemValue(retVal, repStockObj)
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 受注提案タンク車数の入力値取得
+    ''' </summary>
+    ''' <param name="dispDataClass">IN/OUT 画面情報クラス</param>
+    ''' <param name="repSuggestItem">提案数リピーターオブジェクト</param>
+    Private Sub SetDispSuggestItemValue(ByRef dispDataClass As DemoDispDataClass, repSuggestItem As Repeater)
+        Dim hdnSuggestListKeyObj As HiddenField = Nothing
+        Dim suggestListKey As String = ""
 
+        Dim trainRepeater As Repeater = Nothing
+        Dim trainIdObj As HiddenField = Nothing
+        Dim trainId As String = ""
+        Dim chkObj As CheckBox = Nothing
+
+        Dim oilTypeItemValue As Repeater = Nothing
+        Dim oilTypeCodeObj As HiddenField = Nothing
+        Dim oilTypeCode As String = ""
+        Dim suggestValObj As TextBox = Nothing
+        Dim suggestVal As String = ""
+
+        Dim dateValueClassItem As DemoDispDataClass.SuggestItem = Nothing
+        Dim trainValueClassItem As DemoDispDataClass.SuggestItem.SuggestValues = Nothing
+        Dim oilTypeValueClassItem As DemoDispDataClass.SuggestItem.SuggestValue = Nothing
+        '一段階目 日付別のリピーター
+        For Each repSuggestListItem As RepeaterItem In repSuggestItem.Items
+            '提案リストの日付キーを取得
+            hdnSuggestListKeyObj = DirectCast(repSuggestListItem.FindControl("hdnSuggestListKey"), HiddenField)
+            suggestListKey = hdnSuggestListKeyObj.Value
+            dateValueClassItem = dispDataClass.SuggestList(suggestListKey)
+            '二段階目の列車IDリピーターを取得
+            trainRepeater = DirectCast(repSuggestListItem.FindControl("repSuggestTrainItem"), Repeater)
+            For Each repSuggestTrainItem As RepeaterItem In trainRepeater.Items
+                '列車番号取得
+                trainIdObj = DirectCast(repSuggestTrainItem.FindControl("hdnTrainId"), HiddenField)
+                trainId = trainIdObj.Value
+                'チェックボックス取得
+                chkObj = DirectCast(repSuggestTrainItem.FindControl("chkSuggest"), CheckBox)
+                '列車番号別のクラスを取得
+                trainValueClassItem = dateValueClassItem.SuggestOrderItem(trainId)
+                '画面情報クラスに設定しているチェックOn/Offの情報を格納
+                trainValueClassItem.CheckValue = chkObj.Checked
+                '三段階目の油種別の提案数リピーターを取得
+                oilTypeItemValue = DirectCast(repSuggestTrainItem.FindControl("repSuggestValueItem"), Repeater)
+                For Each repOilTypeValItem As RepeaterItem In oilTypeItemValue.Items
+                    oilTypeCodeObj = DirectCast(repOilTypeValItem.FindControl("hdnOilTypeCode"), HiddenField)
+                    oilTypeCode = oilTypeCodeObj.Value
+                    suggestValObj = DirectCast(repOilTypeValItem.FindControl("txtSuggestValue"), TextBox)
+                    suggestVal = suggestValObj.Text
+                    oilTypeValueClassItem = trainValueClassItem(oilTypeCode)
+                    oilTypeValueClassItem.ItemValue = suggestVal
+                Next repOilTypeValItem '三段階目リピーター
+            Next repSuggestTrainItem '二段階目リピーター
+        Next repSuggestListItem '一段階目リピーター
+    End Sub
+    Private Sub SetDispStockItemValue(ByRef dispDataClass As DemoDispDataClass, repStockItemObj As Repeater)
+        Dim oilTypeCodeObj As HiddenField = Nothing
+        Dim oilTypeCode As String = ""
+
+        Dim repStockVal As Repeater = Nothing
+        Dim sendObj As TextBox = Nothing '画面払出テキストボックス
+        Dim sendVal As String = ""
+        For Each repOilTypeItem As RepeaterItem In repStockItemObj.Items
+            oilTypeCodeObj = DirectCast(repOilTypeItem.FindControl("hdnOilTypeCode"), HiddenField)
+            oilTypeCode = oilTypeCodeObj.Value
+            repStockVal = DirectCast(repOilTypeItem.FindControl("repStockValues"), Repeater)
+
+            For Each repStockValItem In repStockVal.Items
+                'sendObj = DirectCast()
+            Next repStockValItem
+        Next repOilTypeItem
+    End Sub
+
+#Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"
+    '   "RepeaterでPoscBack時処理で使用するため保持させる必要上RepeaterのViewState使用停止するのは難しい"
+
+    Protected Overrides Sub SavePageStateToPersistenceMedium(ByVal viewState As Object)
+        Dim lofF As New LosFormatter
+        Using sw As New IO.StringWriter
+            lofF.Serialize(sw, viewState)
+            Dim viewStateString = sw.ToString()
+            Dim bytes = Convert.FromBase64String(viewStateString)
+            bytes = CompressByte(bytes)
+            ClientScript.RegisterHiddenField("__VSTATE", Convert.ToBase64String(bytes))
+        End Using
+    End Sub
+    Protected Overrides Function LoadPageStateFromPersistenceMedium() As Object
+        Dim viewState As String = Request.Form("__VSTATE")
+        Dim bytes = Convert.FromBase64String(viewState)
+        bytes = DeCompressByte(bytes)
+        Dim lofF = New LosFormatter()
+        Return lofF.Deserialize(Convert.ToBase64String(bytes))
+    End Function
+    ''' <summary>
+    ''' ByteDetaを圧縮
+    ''' </summary>
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function CompressByte(data As Byte()) As Byte()
+        Using ms As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(ms, IO.Compression.CompressionMode.Compress)
+            ds.Write(data, 0, data.Length)
+            ds.Close()
+            Return ms.ToArray
+        End Using
+    End Function
+    ''' <summary>
+    ''' Byteデータを解凍
+    ''' </summary>
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function DeCompressByte(data As Byte()) As Byte()
+        Using inpMs As New IO.MemoryStream(data),
+              outMs As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(inpMs, IO.Compression.CompressionMode.Decompress)
+            ds.CopyTo(outMs)
+            Return outMs.ToArray
+        End Using
+
+    End Function
+#End Region
 End Class

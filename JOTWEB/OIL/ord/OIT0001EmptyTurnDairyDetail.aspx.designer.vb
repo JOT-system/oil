@@ -77,6 +77,15 @@ Partial Public Class OIT0001EmptyTurnDairyDetail
     Protected WithEvents TxtHeadOfficeTrain As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtHeadOfficeTrainName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtHeadOfficeTrainName As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtDepstation コントロール。
     '''</summary>
     '''<remarks>

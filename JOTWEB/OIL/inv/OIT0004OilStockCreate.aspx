@@ -188,7 +188,7 @@
                             <div class="oilTypeData">
                                 <div class="col1">
                                     <div><span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %></span></div>
-                                    <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %>' />
+                                    <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeCode %>' />
                                 </div>
                                 <div class="col2">
                                     <div><span>タンク容量</span></div>
@@ -240,6 +240,7 @@
                                 <asp:Repeater ID="repStockValues" runat="server" DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).StockItemList %>'>
                                     <ItemTemplate>
                                         <div class="colStockValue">
+                                            <asp:HiddenField ID="hdnDateKey" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).DispDate %>' />
                                             <div><%--前日夕在庫--%>
                                                 <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).LastEveningStock.ToString("#,###") %></span>
                                             </div>

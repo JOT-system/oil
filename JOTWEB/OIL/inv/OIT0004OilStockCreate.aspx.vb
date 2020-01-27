@@ -58,14 +58,20 @@ Public Class OIT0004OilStockCreate
 
         Try
             If IsPostBack Then
-                Dim dispDataObj As DemoDispDataClass
-                dispDataObj = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+                'Dim dispDataObj As DemoDispDataClass
+                'dispDataObj = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     'Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonAUTOSUGGESTION" '自動提案ボタン押下
+                            WF_ButtonAUTOSUGGESTION_Click()
+                        Case "WF_ButtonORDERLIST" '受注作成ボタン押下
+                            WF_ButtonORDERLIST_Click()
+                        Case "WF_ButtonINPUTCLEAR" '入力値クリアボタン押下
+                            WF_ButtonINPUTCLEAR_Click()
 
                         'Case "WF_UPDATE"                '表更新ボタン押下
                         '    WF_UPDATE_Click()
@@ -237,6 +243,27 @@ Public Class OIT0004OilStockCreate
                 Me.StockList.Add(oilNameItem.Key, item)
             Next 'oilNameItem
         End Sub
+        ''' <summary>
+        ''' 入力項目を0クリア・チェックボックスを未チェックにするメソッド
+        ''' </summary>
+        Public Sub InputValueToZero()
+            '提案表クリア
+            For Each suggestItm In SuggestList.Values
+                For Each odrItem In suggestItm.SuggestOrderItem.Values
+                    odrItem.CheckValue = False 'チェックボックスを未チェック
+                    For Each itm In odrItem.SuggestValuesItem.Values
+                        itm.ItemValue = "0" 'テキストをすべて0
+                    Next
+                Next
+            Next
+            '在庫表クリア
+            For Each odrItem In Me.StockList.Values
+                For Each trainIdItem In odrItem.StockItemList.Values
+                    trainIdItem.Send = "0" '払い出し0クリア
+                Next
+            Next
+        End Sub
+
         ''' <summary>
         ''' 油種名、油種コードリストを生成
         ''' </summary>
@@ -605,6 +632,7 @@ Public Class OIT0004OilStockCreate
         Dim baseDate = work.WF_SEL_STYMD.Text
         'Demo用なのでこの辺もベタうちは考えて
         Dim trainList As New List(Of String) From {"5972", "5282", "8072"}
+        'trainList = New List(Of String) From {"5972", "5282"}
         Dim oilCodes As New List(Of String)
         If {"30"}.Contains(work.WF_SEL_CONSIGNEE.Text) Then
             oilCodes.AddRange({"1001", "1101", "1301", "1302", "1401", "2101", "2201"})
@@ -629,6 +657,37 @@ Public Class OIT0004OilStockCreate
         '↑●Demo用
         '**********************************************
         SaveThisScreenValue(dispDataObj)
+    End Sub
+    ''' <summary>
+    ''' 自動提案ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonAUTOSUGGESTION_Click()
+
+    End Sub
+    ''' <summary>
+    ''' 受注作成ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonORDERLIST_Click()
+
+    End Sub
+    ''' <summary>
+    ''' 入力値クリアボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonINPUTCLEAR_Click()
+        Dim dispValues = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+        dispValues.InputValueToZero()
+        'コンストラクタで生成したデータを画面に貼り付け
+        '1.提案リスト
+        frvSuggest.DataSource = New Object() {dispValues}
+        frvSuggest.DataBind()
+        '2.比重リスト
+        repWeightList.DataSource = dispValues.WeightList
+        repWeightList.DataBind()
+        '3.在庫表
+        repStockDate.DataSource = dispValues.StockDate
+        repStockDate.DataBind()
+        repStockOilTypeItem.DataSource = dispValues.StockList
+        repStockOilTypeItem.DataBind()
     End Sub
     ''' <summary>
     ''' 戻るボタン押下時処理
@@ -2609,15 +2668,27 @@ Public Class OIT0004OilStockCreate
         Dim oilTypeCode As String = ""
 
         Dim repStockVal As Repeater = Nothing
+        Dim dateKeyObj As HiddenField = Nothing
+        Dim dateKeyStr As String = ""
         Dim sendObj As TextBox = Nothing '画面払出テキストボックス
         Dim sendVal As String = ""
+
+        Dim stockListClass = dispDataClass.StockList
+        Dim stockListCol As DemoDispDataClass.StockListCollection = Nothing
+        Dim stockListItm As DemoDispDataClass.StockListItem = Nothing
         For Each repOilTypeItem As RepeaterItem In repStockItemObj.Items
             oilTypeCodeObj = DirectCast(repOilTypeItem.FindControl("hdnOilTypeCode"), HiddenField)
             oilTypeCode = oilTypeCodeObj.Value
             repStockVal = DirectCast(repOilTypeItem.FindControl("repStockValues"), Repeater)
+            stockListCol = stockListClass(oilTypeCode)
+            For Each repStockValItem As RepeaterItem In repStockVal.Items
+                dateKeyObj = DirectCast(repStockValItem.FindControl("hdnDateKey"), HiddenField)
+                dateKeyStr = dateKeyObj.Value
+                sendObj = DirectCast(repStockValItem.FindControl("txtSend"), TextBox)
+                sendVal = sendObj.Text
 
-            For Each repStockValItem In repStockVal.Items
-                'sendObj = DirectCast()
+                stockListItm = stockListCol.StockItemList(dateKeyStr)
+                stockListItm.Send = sendVal
             Next repStockValItem
         Next repOilTypeItem
     End Sub

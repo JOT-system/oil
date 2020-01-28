@@ -3,7 +3,7 @@
 ' 作成日 2019/11/08
 ' 更新日 2019/11/08
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新者 JOT遠藤
 '
 ' 修正履歴:
 '         :
@@ -210,7 +210,8 @@ Public Class OIT0004OilStockSearch
             Exit Sub
         End If
 
-        '油槽所
+        '油槽所 TxtSalesOffice.Text
+        'Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
@@ -516,7 +517,8 @@ Public Class OIT0004OilStockSearch
                     prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CONSIGNEE"        '油槽所
-                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
+                    'WF_CAMPCODE.Text
+                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

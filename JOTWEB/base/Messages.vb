@@ -416,7 +416,7 @@ Public Module Messages
         Public Const OIL_LASTOIL_CONSISTENCY_ERROR As String = "20010"
 
         ''' <summary>
-        ''' 年月日妥当性エラー(過去日付)
+        ''' 年月日妥当性エラー(現在日付より過去日付)
         ''' </summary>
         Public Const OIL_DATE_PASTDATE_ERROR As String = "20011"
 
@@ -429,6 +429,17 @@ Public Module Messages
         ''' 受注営業所未選択
         ''' </summary>
         Public Const OIL_ORDEROFFICE_UNSELECT As String = "20013"
+
+        ''' <summary>
+        ''' タンク車№未割当エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_MIWARIATE_ERROR As String = "20014"
+
+        ''' <summary>
+        ''' 年月日妥当性エラー(利用可能日より過去日付)
+        ''' </summary>
+        Public Const OIL_DATE_AVAILABLEDATE_ERROR As String = "20015"
+
 
 #End Region
 

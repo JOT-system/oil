@@ -417,8 +417,8 @@
             <div class="leftSide">
                 <!-- ■　Dタブ　■ -->
                 <asp:Label ID="WF_Dtab01" runat="server" Text="タンク車割当" data-itemelm="tab" onclick="DtabChange('0')" ></asp:Label>
-                <asp:Label ID="WF_Dtab02" runat="server" Text="タンク車明細" data-itemelm="tab" onclick="DtabChange('1')"></asp:Label>
-                <asp:Label ID="WF_Dtab03" runat="server" Text="入換・積込指示" data-itemelm="tab" onclick="DtabChange('2')" ></asp:Label>
+                <asp:Label ID="WF_Dtab02" runat="server" Text="入換・積込指示" data-itemelm="tab" onclick="DtabChange('1')" ></asp:Label>
+                <asp:Label ID="WF_Dtab03" runat="server" Text="タンク車明細" data-itemelm="tab" onclick="DtabChange('2')"></asp:Label>
                 <asp:Label ID="WF_Dtab04" runat="server" Text="費用入力" data-itemelm="tab" onclick="DtabChange('3')"></asp:Label>
             </div>
             <div class="rightSide">
@@ -566,16 +566,12 @@
 
             </asp:View>
 
-            <!-- ■ Tab No2　タンク車明細　■ -->
+            <!-- ■ Tab No2　入換・積込指示　■ -->
             <asp:View ID="WF_DView2" runat="server">
-                <!-- ボタン -->
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <input type="button" id="WF_ButtonALLSELECT_TAB2" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT_TAB2');" />
-                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB2" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB2');" />
-                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB2" class="btn-sticky" value="行削除" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB2');" />
-                        <input type="button" id="WF_ButtonLINE_ADD_TAB2" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB2');" />
-                        <input type="button" id="WF_ButtonUPDATE_TAB2" class="btn-sticky" value="明細更新"  onclick="ButtonClick('WF_ButtonUPDATE_TAB2');" />
+                        <input type="button" id="WF_ButtonUPDATE_TAB2" class="btn-sticky" value="入力内容登録" onclick="ButtonClick('WF_ButtonUPDATE_TAB2');" />
+                        <input type="button" id="WF_ButtonFILLINGALL_TAB2" class="btn-sticky" value="充填ポイントの全体を見る"  onclick="ButtonClick('WF_ButtonUPDATE_TAB2');" />
                     </div>
                     <div class="rightSide">
                     </div>
@@ -584,12 +580,16 @@
                 <asp:panel id="pnlListArea2" runat="server" ></asp:panel>
             </asp:View>
 
-            <!-- ■ Tab No3　入換・積込指示　■ -->
+            <!-- ■ Tab No3　タンク車明細　■ -->
             <asp:View ID="WF_DView3" runat="server">
+                <!-- ボタン -->
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <input type="button" id="WF_ButtonUPDATE_TAB3" class="btn-sticky" value="入力内容登録" onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
-                        <input type="button" id="WF_ButtonFILLINGALL_TAB3" class="btn-sticky" value="充填ポイントの全体を見る"  onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
+                        <input type="button" id="WF_ButtonALLSELECT_TAB3" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT_TAB3');" />
+                        <input type="button" id="WF_ButtonSELECT_LIFTED_TAB3" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB3');" />
+                        <input type="button" id="WF_ButtonLINE_LIFTED_TAB3" class="btn-sticky" value="行削除" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB3');" />
+                        <input type="button" id="WF_ButtonLINE_ADD_TAB3" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB3');" />
+                        <input type="button" id="WF_ButtonUPDATE_TAB3" class="btn-sticky" value="明細更新"  onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />
                     </div>
                     <div class="rightSide">
                     </div>

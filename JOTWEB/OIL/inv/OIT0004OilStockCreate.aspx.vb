@@ -632,7 +632,7 @@ Public Class OIT0004OilStockCreate
         Dim baseDate = work.WF_SEL_STYMD.Text
         'Demo用なのでこの辺もベタうちは考えて
         Dim trainList As New List(Of String) From {"5972", "5282", "8072"}
-        'trainList = New List(Of String) From {"5972", "5282"}
+        trainList = New List(Of String) From {"5972", "5282"}
         Dim oilCodes As New List(Of String)
         If {"30"}.Contains(work.WF_SEL_CONSIGNEE.Text) Then
             oilCodes.AddRange({"1001", "1101", "1301", "1302", "1401", "2101", "2201"})

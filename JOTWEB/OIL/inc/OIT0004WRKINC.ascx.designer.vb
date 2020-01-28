@@ -32,6 +32,33 @@ Partial Public Class OIT0004WRKINC
     Public WithEvents WF_SEL_ORG As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
+    '''WF_SEL_SALESOFFICECODEMAP コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SALESOFFICECODEMAP As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_SALESOFFICECODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SALESOFFICECODE As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_SALESOFFICE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SALESOFFICE As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
     '''WF_SEL_CONSIGNEE コントロール。
     '''</summary>
     '''<remarks>
@@ -39,7 +66,7 @@ Partial Public Class OIT0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CONSIGNEE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_CONSIGNEE2 コントロール。
     '''</summary>
@@ -48,7 +75,7 @@ Partial Public Class OIT0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CONSIGNEE2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STYMD コントロール。
     '''</summary>

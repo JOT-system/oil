@@ -508,66 +508,6 @@ Public Class OIT0003OrderDetail
         '〇タブ「入換・積込指示」表示用
         GridViewInitializeTab2()
 
-        ''○ 画面表示データ取得
-        'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '    SQLcon.Open()       'DataBase接続
-
-        '    MAPDataGet(SQLcon, 0)
-        'End Using
-
-        ''貨車連結を使用する場合
-        'If work.WF_SEL_CREATELINKFLG.Text = "2" Then
-        '    '○ 画面表示データ取得
-        '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '        SQLcon.Open()       'DataBase接続
-
-        '        MAPDataGetLinkTab1(SQLcon)
-        '    End Using
-        'End If
-
-        ''○ 画面表示データ保存
-        'Master.SaveTable(OIT0003tbl)
-
-        ''○ 一覧表示データ編集(性能対策)
-        'Dim TBLview As DataView = New DataView(OIT0003tbl)
-
-        'TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
-
-        'CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
-        'CS0013ProfView.PROFID = Master.PROF_VIEW
-        'CS0013ProfView.MAPID = Master.MAPID
-        'CS0013ProfView.VARI = Master.VIEWID
-        'CS0013ProfView.SRCDATA = TBLview.ToTable
-        'CS0013ProfView.TBLOBJ = pnlListArea1
-        'CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
-        'CS0013ProfView.LEVENT = "ondblclick"
-        'CS0013ProfView.LFUNC = "ListDbClick"
-
-        'CS0013ProfView.TITLEOPT = True
-        'CS0013ProfView.HIDEOPERATIONOPT = True
-        'CS0013ProfView.CS0013ProfView()
-        'If Not isNormal(CS0013ProfView.ERR) Then
-        '    Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
-        '    Exit Sub
-        'End If
-
-        ''〇 (一覧)テキストボックスの制御(読取専用)
-        'Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
-        'Dim tblObj = DirectCast(divObj.Controls(0), Table)
-        'For Each rowitem As TableRow In tblObj.Rows
-        '    For Each cellObj As TableCell In rowitem.Controls
-        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
-        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "OILNAME") Then
-        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-        '        End If
-        '    Next
-        'Next
-
-        ''○ 先頭行に合わせる
-        'WF_GridPosition.Text = "1"
-
-        'TBLview.Dispose()
-        'TBLview = Nothing
 
     End Sub
 
@@ -660,7 +600,7 @@ Public Class OIT0003OrderDetail
 
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.MAPID = Master.MAPID + "TAB2"
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea2
@@ -1269,6 +1209,7 @@ Public Class OIT0003OrderDetail
             & " , 1                                                  AS 'SELECT'" _
             & " , 0                                                  AS HIDDEN" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
+            & " , ''                                                 AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
             & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '')   AS LOADINGIRILINETRAINNO" _
             & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNAME), '') AS LOADINGIRILINETRAINNAME" _
@@ -1317,6 +1258,7 @@ Public Class OIT0003OrderDetail
                 For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
                     i += 1
                     OIT0003tab2row("LINECNT") = i        'LINECNT
+                    CODENAME_get("ORDERINFO", OIT0003tab2row("ORDERINFO"), OIT0003tab2row("ORDERINFONAME"), WW_DUMMY)
                     CODENAME_get("PRODUCTPATTERN", OIT0003tab2row("OILCODE"), OIT0003tab2row("OILNAME"), WW_DUMMY)
                 Next
 
@@ -1345,18 +1287,28 @@ Public Class OIT0003OrderDetail
         '〇 選択されたタブの一覧を再表示
         'タブ「タンク車割当」
         If WF_DetailMView.ActiveViewIndex = "0" Then
+            '○ 画面表示データ復元
+            'Master.RecoverTable(OIT0003tbl_tab1, work.WF_SEL_INPTAB1TBL.Text)
+
             DisplayGrid_TAB1()
 
             'タブ「入換・積込指示」
         ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            '○ 画面表示データ復元
+            Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
             DisplayGrid_TAB2()
 
             'タブ「タンク車明細」
         ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
             DisplayGrid_TAB3()
 
             'タブ「費用入力」
         ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
             DisplayGrid_TAB4()
 
         End If
@@ -1511,7 +1463,7 @@ Public Class OIT0003OrderDetail
         '○ 一覧作成
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.MAPID = Master.MAPID + "TAB2"
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea2
@@ -1601,7 +1553,7 @@ Public Class OIT0003OrderDetail
         '○ 一覧作成
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.MAPID = Master.MAPID + "TAB3"
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea3
@@ -1691,7 +1643,7 @@ Public Class OIT0003OrderDetail
         '○ 一覧作成
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.MAPID = Master.MAPID + "TAB4"
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea4
@@ -3171,6 +3123,9 @@ Public Class OIT0003OrderDetail
 
                 Case "ORDERTYPE"        '受注パターン
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERTYPE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERTYPE"))
+
+                Case "ORDERINFO"        '受注情報
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
 
                 Case "SHIPPERS"         '荷主
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SHIPPERS"))
@@ -4659,6 +4614,72 @@ Public Class OIT0003OrderDetail
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' (受注TBL)受注進行ステータス更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrderStatus(ByVal I_Value As String)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLの受注進行ステータスを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0002_ORDER          " _
+                    & "    SET ORDERSTATUS = @P03, " _
+                    & "        UPDYMD      = @P11, " _
+                    & "        UPDUSER     = @P12, " _
+                    & "        UPDTERMID   = @P13, " _
+                    & "        RECEIVEYMD  = @P14  " _
+                    & "  WHERE ORDERNO     = @P01  " _
+                    & "    AND DELFLG     <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+            PARA02.Value = C_DELETE_FLG.DELETE
+            PARA03.Value = I_Value
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDERSTATUS UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDERSTATUS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

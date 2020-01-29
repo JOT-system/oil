@@ -483,19 +483,7 @@ Public Class OIT0003OrderDetail
     ''' <remarks></remarks>
     Protected Sub GridViewInitialize()
 
-        '登録画面からの遷移の場合はテーブルから取得しない
-        'If Context.Handler.ToString().ToUpper() <> C_PREV_MAP_LIST.MENU Then
-        '    '○ 画面表示データ取得
-        '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '        SQLcon.Open()       'DataBase接続
-
-        '        MAPDataGet(SQLcon, 0)
-        '    End Using
-        'Else
-        '    work.WF_SEL_CREATEFLG.Text = "1"
-        '    work.WF_SEL_CREATELINKFLG.Text = "1"
-        'End If
-
+        'メニュー画面からの遷移の場合
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then
             '作成フラグ(新規登録：1, 更新：2)
             work.WF_SEL_CREATEFLG.Text = "1"
@@ -514,6 +502,80 @@ Public Class OIT0003OrderDetail
         '〇画面表示設定処理
         WW_ScreenEnabledSet()
 
+        '〇タブ「タンク車割当」表示用
+        GridViewInitializeTab1()
+
+        '〇タブ「入換・積込指示」表示用
+        GridViewInitializeTab2()
+
+        ''○ 画面表示データ取得
+        'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+        '    SQLcon.Open()       'DataBase接続
+
+        '    MAPDataGet(SQLcon, 0)
+        'End Using
+
+        ''貨車連結を使用する場合
+        'If work.WF_SEL_CREATELINKFLG.Text = "2" Then
+        '    '○ 画面表示データ取得
+        '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+        '        SQLcon.Open()       'DataBase接続
+
+        '        MAPDataGetLinkTab1(SQLcon)
+        '    End Using
+        'End If
+
+        ''○ 画面表示データ保存
+        'Master.SaveTable(OIT0003tbl)
+
+        ''○ 一覧表示データ編集(性能対策)
+        'Dim TBLview As DataView = New DataView(OIT0003tbl)
+
+        'TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+
+        'CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        'CS0013ProfView.PROFID = Master.PROF_VIEW
+        'CS0013ProfView.MAPID = Master.MAPID
+        'CS0013ProfView.VARI = Master.VIEWID
+        'CS0013ProfView.SRCDATA = TBLview.ToTable
+        'CS0013ProfView.TBLOBJ = pnlListArea1
+        'CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        'CS0013ProfView.LEVENT = "ondblclick"
+        'CS0013ProfView.LFUNC = "ListDbClick"
+
+        'CS0013ProfView.TITLEOPT = True
+        'CS0013ProfView.HIDEOPERATIONOPT = True
+        'CS0013ProfView.CS0013ProfView()
+        'If Not isNormal(CS0013ProfView.ERR) Then
+        '    Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
+        '    Exit Sub
+        'End If
+
+        ''〇 (一覧)テキストボックスの制御(読取専用)
+        'Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
+        'Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "OILNAME") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+
+        ''○ 先頭行に合わせる
+        'WF_GridPosition.Text = "1"
+
+        'TBLview.Dispose()
+        'TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' GridViewデータ設定(タブ「タンク車割当」表示用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GridViewInitializeTab1()
         '○ 画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
@@ -527,7 +589,7 @@ Public Class OIT0003OrderDetail
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
 
-                MAPDataGetLink(SQLcon)
+                MAPDataGetLinkTab1(SQLcon)
             End Using
         End If
 
@@ -574,8 +636,65 @@ Public Class OIT0003OrderDetail
 
         TBLview.Dispose()
         TBLview = Nothing
-
     End Sub
+
+    ''' <summary>
+    ''' GridViewデータ設定(タブ「入換・積込指示」表示用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GridViewInitializeTab2()
+        '○ 画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGetTab2(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
+        '○ 一覧表示データ編集(性能対策)
+        Dim TBLview As DataView = New DataView(OIT0003tbl_tab2)
+
+        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+
+        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea2
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+        If Not isNormal(CS0013ProfView.ERR) Then
+            Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
+            Exit Sub
+        End If
+
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        'Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
+        'Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "OILNAME") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+
+        '○ 先頭行に合わせる
+        WF_GridPosition.Text = "1"
+
+        TBLview.Dispose()
+        TBLview = Nothing
+    End Sub
+
 
     ''' <summary>
     ''' 画面表示データ取得
@@ -877,7 +996,7 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub MAPDataGetLink(ByVal SQLcon As SqlConnection)
+    Protected Sub MAPDataGetLinkTab1(ByVal SQLcon As SqlConnection)
 
         If IsNothing(OIT0003tbl) Then
             OIT0003tbl = New DataTable
@@ -1124,6 +1243,100 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 画面表示データ取得(タブ「入換・積込指示」一覧表示用)
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub MAPDataGetTab2(ByVal SQLcon As SqlConnection)
+        If IsNothing(OIT0003tbl_tab2) Then
+            OIT0003tbl_tab2 = New DataTable
+        End If
+
+        If OIT0003tbl_tab2.Columns.Count <> 0 Then
+            OIT0003tbl_tab2.Columns.Clear()
+        End If
+
+        OIT0003tbl_tab2.Clear()
+
+        '○ 一覧表示用検索SQL
+        '　一覧説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   0                                                  AS LINECNT" _
+            & " , ''                                                 AS OPERATION" _
+            & " , 0                                                  AS TIMSTP" _
+            & " , 1                                                  AS 'SELECT'" _
+            & " , 0                                                  AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
+            & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
+            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNO), '')   AS LOADINGIRILINETRAINNO" _
+            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINETRAINNAME), '') AS LOADINGIRILINETRAINNAME" _
+            & " , ISNULL(RTRIM(OIT0003.LOADINGIRILINEORDER), '')     AS LOADINGIRILINEORDER" _
+            & " , ISNULL(RTRIM(OIT0003.LINE), '')                    AS LINE" _
+            & " , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')            AS FILLINGPOINT" _
+            & " , ISNULL(RTRIM(OIT0003.OILCODE), '')                 AS OILCODE" _
+            & " , ''                                                 AS OILNAME" _
+            & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
+            & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNO), '')    AS LOADINGOUTLETTRAINNO" _
+            & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNAME), '')  AS LOADINGOUTLETTRAINNAME" _
+            & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETORDER), '')      AS LOADINGOUTLETORDER" _
+            & " , ISNULL(RTRIM(OIT0003.DELFLG), '')                  AS DELFLG" _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & " INNER JOIN OIL.OIT0002_ORDER OIT0002 ON " _
+            & "       OIT0002.ORDERNO = OIT0003.ORDERNO " _
+            & " INNER JOIN OIL.OIM0005_TANK OIM0005 ON " _
+            & "       OIT0003.TANKNO = OIM0005.TANKNUMBER" _
+            & "       AND OIM0005.DELFLG <> @P02" _
+            & " WHERE OIT0003.ORDERNO = @P01" _
+            & " AND OIT0003.DELFLG <> @P02"
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    RIGHT('00' + OIT0003.LINEORDER, 2) DESC"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003tbl_tab2.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003tbl_tab2.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
+                    i += 1
+                    OIT0003tab2row("LINECNT") = i        'LINECNT
+                    CODENAME_get("PRODUCTPATTERN", OIT0003tab2row("OILCODE"), OIT0003tab2row("OILNAME"), WW_DUMMY)
+                Next
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB2 SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB2 Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
     ''' 一覧再表示処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -1247,7 +1460,89 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub DisplayGrid_TAB2()
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
+            If OIT0003tab2row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIT0003tab2row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 表示LINECNT取得
+        If WF_GridPosition.Text = "" Then
+            WW_GridPosition = 1
+        Else
+            Try
+                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
+            Catch ex As Exception
+                WW_GridPosition = 1
+            End Try
+        End If
+
+        '○ 表示格納位置決定
+
+        '表示開始_格納位置決定(次頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelUp" Then
+            If (WW_GridPosition + CONST_SCROLLCOUNT) <= WW_DataCNT Then
+                WW_GridPosition += CONST_SCROLLCOUNT
+            End If
+        End If
+
+        '表示開始_格納位置決定(前頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelDown" Then
+            If (WW_GridPosition - CONST_SCROLLCOUNT) > 0 Then
+                WW_GridPosition -= CONST_SCROLLCOUNT
+            Else
+                WW_GridPosition = 1
+            End If
+        End If
+
+        '○ 画面(GridView)表示
+        Dim TBLview As DataView = New DataView(OIT0003tbl_tab2)
+
+        '○ ソート
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        '○ 一覧作成
+        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea2
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        'Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
+        'Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "OILNAME") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
     End Sub
 
     ''' <summary>
@@ -1255,7 +1550,89 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub DisplayGrid_TAB3()
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            If OIT0003tab3row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIT0003tab3row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 表示LINECNT取得
+        If WF_GridPosition.Text = "" Then
+            WW_GridPosition = 1
+        Else
+            Try
+                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
+            Catch ex As Exception
+                WW_GridPosition = 1
+            End Try
+        End If
+
+        '○ 表示格納位置決定
+
+        '表示開始_格納位置決定(次頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelUp" Then
+            If (WW_GridPosition + CONST_SCROLLCOUNT) <= WW_DataCNT Then
+                WW_GridPosition += CONST_SCROLLCOUNT
+            End If
+        End If
+
+        '表示開始_格納位置決定(前頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelDown" Then
+            If (WW_GridPosition - CONST_SCROLLCOUNT) > 0 Then
+                WW_GridPosition -= CONST_SCROLLCOUNT
+            Else
+                WW_GridPosition = 1
+            End If
+        End If
+
+        '○ 画面(GridView)表示
+        Dim TBLview As DataView = New DataView(OIT0003tbl_tab3)
+
+        '○ ソート
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        '○ 一覧作成
+        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea3
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        'Dim divObj = DirectCast(pnlListArea3.FindControl(pnlListArea3.ID & "_DR"), Panel)
+        'Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "OILNAME") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
     End Sub
 
     ''' <summary>
@@ -1263,7 +1640,89 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub DisplayGrid_TAB4()
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each OIT0003tab4row As DataRow In OIT0003tbl_tab4.Rows
+            If OIT0003tab4row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIT0003tab4row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 表示LINECNT取得
+        If WF_GridPosition.Text = "" Then
+            WW_GridPosition = 1
+        Else
+            Try
+                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
+            Catch ex As Exception
+                WW_GridPosition = 1
+            End Try
+        End If
+
+        '○ 表示格納位置決定
+
+        '表示開始_格納位置決定(次頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelUp" Then
+            If (WW_GridPosition + CONST_SCROLLCOUNT) <= WW_DataCNT Then
+                WW_GridPosition += CONST_SCROLLCOUNT
+            End If
+        End If
+
+        '表示開始_格納位置決定(前頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelDown" Then
+            If (WW_GridPosition - CONST_SCROLLCOUNT) > 0 Then
+                WW_GridPosition -= CONST_SCROLLCOUNT
+            Else
+                WW_GridPosition = 1
+            End If
+        End If
+
+        '○ 画面(GridView)表示
+        Dim TBLview As DataView = New DataView(OIT0003tbl_tab4)
+
+        '○ ソート
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        '○ 一覧作成
+        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea4
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        'Dim divObj = DirectCast(pnlListArea4.FindControl(pnlListArea4.ID & "_DR"), Panel)
+        'Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "OILNAME") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
     End Sub
 
     ''' <summary>

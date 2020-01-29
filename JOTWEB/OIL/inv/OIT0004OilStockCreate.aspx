@@ -98,7 +98,7 @@
                                     <div class="values">
                                     <%--  列車 --%>
                                     <div>
-                                        <span><%# Eval("Key") %>
+                                        <span data-tiptext='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.TrainName %>'><%# Eval("Key") %>
                                             <asp:HiddenField ID="hdnTrainId" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                                         </span>
                                     </div>
@@ -164,7 +164,7 @@
                 <div id="divStockList">
                     <!-- 1・2行目のヘッダー -->
                     <div class="header"> 
-                        <div class="emptyBox"></div>
+                        <div id="divEmptyBox" class="emptyBox"></div>
                         <!-- 動的日付部の生成 -->
                         <asp:Repeater ID="repStockDate" runat="server">
                             <HeaderTemplate>
@@ -187,7 +187,7 @@
                     <!-- 油種ごとのデータ生成部 -->
                     <asp:Repeater ID="repStockOilTypeItem" runat="server" ClientIDMode="Predictable">
                         <ItemTemplate>
-                            <div class="oilTypeData">
+                            <div class="oilTypeData" data-oilcode='<%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).OilTypeCode %>'>
                                 <div class="col1">
                                     <div><span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).OilTypeName %></span></div>
                                     <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).OilTypeCode %>' />
@@ -324,6 +324,8 @@
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- ボタン押下 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <!-- 在庫表で表示する油種保持用 -->
+            <asp:ListBox ID="lstDispStockOilType" runat="server" SelectionMode="Multiple"></asp:ListBox>
             <!-- 権限 -->
         </div>
  

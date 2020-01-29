@@ -202,13 +202,16 @@
 #weightListContainer > div > div.weightListValue {
     text-align:right;
 }
+div.weightListOilType {
+    height:24px;
+}
 /* *********************** */
 /* 在庫表 設定             */
 /* *********************** */
 #pnlStockList {
-    margin-top:-20px;
-    margin-bottom:10px;
-    margin-right:10px;
+    margin-top: -20px;
+    margin-bottom: 10px;
+    margin-right: 10px;
 }
 #divStockList {
     display: flex;
@@ -374,8 +377,34 @@
 #divStockList div.colStockInfoTopRow {
     border-right: 1px solid darkgray;
 }
+/* ************************ */
+/* 油種表示非表示枠         */
+/* ************************ */
+#divEmptyBox {
+    display:flex;
+    flex-wrap:wrap;
+}
+#divEmptyBox > div {
+    font-size: 0.8em;
+    border: 1px solid darkgray;
+    background-color: #2B8E56;
+    color: #FFFFFF;
+    padding:2px;
+    padding-left:5px;
+    padding-right:5px;
+    border-radius :10px;
+    margin-right:2px;
+    height:calc(50% - 2px);
+    cursor:pointer;
+}
+#divEmptyBox > div:hover {
+    background-color: #8e2b63;
+}
+div.oilTypeData div.col1 span[data-tiptext] {
+    cursor: pointer;
+}
 /* ************** */
-/* 色の色         */
+/* 表の色         */
 /* ************** */
 /* 大見出し色 */
 #divStockList div.col1 div,
@@ -386,10 +415,9 @@
 #divSuggestList div.leftColumn div,
 #divSuggestList div.suggestDate,
 #divSuggestList div.values div:nth-child(1),
-#pnlWeightList div.weightListOilType
-{
-    background-color:#2B8E56;
-    color:#FFFFFF;
+#pnlWeightList div.weightListOilType {
+    background-color: #2B8E56;
+    color: #FFFFFF;
 }
 /* 見出し色 */
 #divStockList div.col2 div,
@@ -486,4 +514,8 @@
 [data-tiptext]:hover::after {
     top: 20px; /*HOVER位置*/
     opacity: 1;
+}
+/* 完全に消す予定だが一旦非表示 */
+#pnlWeightList {
+    display:none;
 }

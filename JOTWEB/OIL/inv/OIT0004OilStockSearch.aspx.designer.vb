@@ -50,6 +50,24 @@ Partial Public Class OIT0004OilStockSearch
     Protected WithEvents WF_ORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''TxtSalesOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtSalesOffice As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblSalesOfficeName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblSalesOfficeName As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_CONSIGNEE_CODE コントロール。
     '''</summary>
     '''<remarks>

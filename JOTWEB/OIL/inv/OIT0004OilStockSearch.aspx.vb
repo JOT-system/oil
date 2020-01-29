@@ -3,7 +3,7 @@
 ' 作成日 2019/11/08
 ' 更新日 2019/11/08
 ' 作成者 JOT遠藤
-' 更新車 JOT遠藤
+' 更新者 JOT遠藤
 '
 ' 修正履歴:
 '         :
@@ -98,12 +98,15 @@ Public Class OIT0004OilStockSearch
             '初期変数設定処理
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
             Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)       '組織コード
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text) '営業所
             Master.GetFirstValue(work.WF_SEL_CONSIGNEE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text)       '油槽所
             Master.GetFirstValue(work.WF_SEL_STYMD.Text, "STYMD", WF_STYMD_CODE.Text)       '年月日
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004C Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
             WF_ORG.Text = work.WF_SEL_ORG.Text            '組織コード
+
+            TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODEMAP.Text '営業所
             WF_CONSIGNEE_CODE.Text = work.WF_SEL_CONSIGNEE.Text            '油槽所
             WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text            '年月日
         End If
@@ -123,6 +126,8 @@ Public Class OIT0004OilStockSearch
         '○ 名称設定処理
         'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
         'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
+        '営業所
+        CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_DUMMY)
         CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_DUMMY)         '油槽所
 
     End Sub
@@ -147,6 +152,11 @@ Public Class OIT0004OilStockSearch
         '○ 条件選択画面の入力値退避
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
         work.WF_SEL_ORG.Text = WF_ORG.Text                  '組織コード
+        '営業所
+        work.WF_SEL_SALESOFFICECODEMAP.Text = TxtSalesOffice.Text
+        work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
+        work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
+
         work.WF_SEL_CONSIGNEE.Text = WF_CONSIGNEE_CODE.Text '油槽所
         work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text         '年月日
 
@@ -183,7 +193,25 @@ Public Class OIT0004OilStockSearch
         Dim WW_LINE_ERR As String = ""
 
         '○ 単項目チェック
-        '油槽所
+        '営業所
+        Master.CheckField(WF_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所 : " & TxtSalesOffice.Text, needsPopUp:=True)
+                TxtSalesOffice.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所", needsPopUp:=True)
+            TxtSalesOffice.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '油槽所 TxtSalesOffice.Text
+        'Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             '存在チェック
@@ -195,7 +223,7 @@ Public Class OIT0004OilStockSearch
                 Exit Sub
             End If
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "油槽所", needsPopUp:=True)
             WF_CONSIGNEE_CODE.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -295,14 +323,24 @@ Public Class OIT0004OilStockSearch
                                 .WF_Calendar.Text = CDate(WF_STYMD_CODE.Text).ToString("yyyy/MM/dd")
                         End Select
                         .ActiveCalendar()
+                    Case LIST_BOX_CLASSIFICATION.LC_ORG
+                        '組織コード(営業所)
+
                     Case Else
                         '会社コード
                         Dim prmData As New Hashtable
                         prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
 
+                        '営業所
+                        If WF_FIELD.Value = "TxtSalesOffice" Then
+                            'prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
+                        End If
+
                         '油槽所
                         If WF_FIELD.Value = "WF_CONSIGNEE" Then
-                            prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
+                            'prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
+                            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN")
                         End If
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -322,6 +360,10 @@ Public Class OIT0004OilStockSearch
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
+            '営業所
+            Case "TxtSalesOffice"
+                CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+
             Case "WF_CONSIGNEE"        '油槽所
                 CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_RTN_SW)
         End Select
@@ -358,6 +400,11 @@ Public Class OIT0004OilStockSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
+            Case "TxtSalesOffice"       '営業所
+                TxtSalesOffice.Text = WW_SelectValue
+                LblSalesOfficeName.Text = WW_SelectText
+                TxtSalesOffice.Focus()
+
             Case "WF_CONSIGNEE"          '油槽所
                 WF_CONSIGNEE_CODE.Text = WW_SelectValue
                 WF_CONSIGNEE_NAME.Text = WW_SelectText
@@ -466,8 +513,12 @@ Public Class OIT0004OilStockSearch
                 Case "ORG"             '運用部署
                     prmData = work.CreateORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "OFFICECODE"       '営業所
+                    prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CONSIGNEE"        '油槽所
-                    prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
+                    'WF_CAMPCODE.Text
+                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

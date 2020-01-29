@@ -35,6 +35,7 @@ body, td, th {
     color: #2bb6c1;
     border: solid 1px #2bb6c1;
     transition: 0.3s;
+    font-size:1em;
 }
 
 .btn-sticky:hover {
@@ -1479,7 +1480,8 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     font-weight: bold;
     padding: 10px;
     height: 20px;
-    background-color: #8BACCD;
+    //background-color: #8BACCD;
+    background: linear-gradient(to bottom, #8BACCD, rgb(240,240,240));
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }

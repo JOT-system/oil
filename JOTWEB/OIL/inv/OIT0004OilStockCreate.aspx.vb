@@ -4,7 +4,7 @@
 ' 作成日 2020/01/20
 ' 更新日 2020/01/20
 ' 作成者 JOTxxxx
-' 更新車 JOTxxxx
+' 更新者 JOTxxxx
 '
 ' 修正履歴:
 '         :
@@ -632,7 +632,7 @@ Public Class OIT0004OilStockCreate
         Dim baseDate = work.WF_SEL_STYMD.Text
         'Demo用なのでこの辺もベタうちは考えて
         Dim trainList As New List(Of String) From {"5972", "5282", "8072"}
-        'trainList = New List(Of String) From {"5972", "5282"}
+        trainList = New List(Of String) From {"5972", "5282"}
         Dim oilCodes As New List(Of String)
         If {"30"}.Contains(work.WF_SEL_CONSIGNEE.Text) Then
             oilCodes.AddRange({"1001", "1101", "1301", "1302", "1401", "2101", "2201"})
@@ -864,7 +864,137 @@ Public Class OIT0004OilStockCreate
         End Try
 
     End Sub
+    ''' <summary>
+    ''' 対象列車情報取得
+    ''' </summary>
+    ''' <param name="sqlCon">SQL接続</param>
+    ''' <param name="salesOffice">営業所コード</param>
+    ''' <param name="consignee">油槽所コード</param>
+    ''' <returns>営業所、油槽所を元に取得した列車情報</returns>
+    ''' <remarks>一旦戻り値が無い場合は提案表を出さない仕組みとする</remarks>
+    Private Function GetTargetTrain(sqlCon As SqlConnection, salesOffice As String, consignee As String) As Dictionary(Of String, TrainListItem)
+        '↓本当はDBから取得！！！のたたき台↓ コメントアウトしSQLなり共通関数なりを利用し整えること
+        'Try
+        '    Dim retVal As New Dictionary(Of String, TrainListItem)
 
+        '    Dim sqlStr As New StringBuilder
+        '    sqlStr.AppendLine("SELECT XXXXX")
+        '    sqlStr.AppendLine("  FROM XXXXX")
+        '    sqlStr.AppendLine(" WHERE XXXX = @XXXXX")
+
+        '    Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+        '        With sqlCmd.Parameters
+        '            .Add("@xxxx", SqlDbType.NVarChar).Value = "xxxx"
+        '            .Add("@xxxx", SqlDbType.NVarChar).Value = "xxxx"
+        '        End With
+        '        Dim tlItem As TrainListItem
+        '        Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+        '            While sqlDr.Read
+        '                tlItem = New TrainListItem(Convert.ToString(sqlDr("車CODE")), Convert.ToString(sqlDr("車名称")))
+        '                retVal.Add(tlItem.TrainNo, tlItem)
+        '            End While
+        '        End Using
+
+        '    End Using
+        '    Return retVal
+        'Catch ex As Exception
+        '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005C")
+
+        '    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+        '    CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select Train List"
+        '    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+        '    CS0011LOGWrite.TEXT = ex.ToString()
+        '    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+        '    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+        '    Throw '呼出し元の後続処理を走らせたくないのでThrow 
+        'End Try
+        '↑本当はDBから取得！！！のたたき台↑
+        Dim retVal As New Dictionary(Of String, TrainListItem)
+        '袖ヶ浦
+        If salesOffice = "011203" AndAlso consignee = "40" Then
+            retVal.Add("5972", New TrainListItem("5972", "5972-南松本"))
+        End If
+        If salesOffice = "011203" AndAlso consignee = "30" Then
+            retVal.Add("8877", New TrainListItem("8877", "8877-倉賀野"))
+            retVal.Add("8883", New TrainListItem("8883", "8883-倉賀野"))
+        End If
+        '根岸
+        If salesOffice = "011402" AndAlso consignee = "10" Then
+            retVal.Add("5463", New TrainListItem("5463", "5463-坂城"))
+            retVal.Add("2085", New TrainListItem("2085", "2085-坂城"))
+            retVal.Add("8471", New TrainListItem("8471", "8471-坂城"))
+        End If
+        If salesOffice = "011402" AndAlso consignee = "20" Then
+            retVal.Add("81", New TrainListItem("81", "81-竜王"))
+            retVal.Add("83", New TrainListItem("83", "83-竜王"))
+        End If
+        '三重塩浜
+        If salesOffice = "012402" AndAlso consignee = "40" Then
+            retVal.Add("5282", New TrainListItem("5282", "5282-南松本"))
+            retVal.Add("8072", New TrainListItem("8072", "8072-南松本"))
+        End If
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 基準日を元に日付リストを生成
+    ''' </summary>
+    ''' <param name="baseDate">基準日</param>
+    ''' <param name="daySpan">引数BaseDateを含む設定した日付情報を取得(初期値:7)</param>
+    ''' <returns></returns>
+    Private Function GetTargetDateList(sqlCon As SqlConnection, baseDate As String, Optional daySpan As Integer = 7) As Dictionary(Of String, DaysItem)
+        Try
+            Dim retVal As New Dictionary(Of String, DaysItem)
+            '日付型に変換 検索条件よりわたってきている想定なので日付型に確実に変換できる想定
+            Dim baseDtm As Date = Date.Parse(baseDate)
+            Dim dtItm As DaysItem
+            '基準日から引数期間のデータを生成
+            For i As Integer = 0 To daySpan - 1
+                Dim currentDay As Date = baseDtm.AddDays(i)
+                dtItm = New DaysItem(currentDay)
+                retVal.Add(dtItm.KeyString, dtItm)
+            Next i
+
+            '祝祭日取得SQLの生成
+            Dim sqlStr As New StringBuilder
+            sqlStr.AppendLine("SELECT WORKINGYMD  AS WORKINGYMD")
+            sqlStr.AppendLine("       WORKINGTEXT")
+            sqlStr.AppendLine("  FROM COM.OIS0021_CALENDAR")
+            sqlStr.AppendLine(" WHERE WORKINGYMD BETWEEN @FROMDT AND @TODT")
+            sqlStr.AppendLine("   AND WORKINGKBN >= @WORKINGKBN")
+            sqlStr.AppendLine("   AND DELFLG      = @DELFLG")
+
+            'DBより取得を行い祝祭日情報付与
+            Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@FROMDT", SqlDbType.Date).Value = "xxxx"
+                    .Add("@TODT", SqlDbType.Date).Value = "xxxx"
+                    .Add("@WORKINGKBN", SqlDbType.NVarChar).Value = "2"
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                End With
+
+                Dim tlItem As TrainListItem
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    While sqlDr.Read
+                        tlItem = New TrainListItem(Convert.ToString(sqlDr("車CODE")), Convert.ToString(sqlDr("車名称")))
+                        'retVal.Add(tlItem.TrainNo, tlItem)
+                    End While
+                End Using
+
+            End Using
+            Return retVal
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005C")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select TargetDateList"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Throw '呼出し元の後続処理を走らせたくないのでThrow 
+        End Try
+
+    End Function
     ''' <summary>
     ''' 一意制約チェック
     ''' </summary>
@@ -2692,6 +2822,75 @@ Public Class OIT0004OilStockCreate
             Next repStockValItem
         Next repOilTypeItem
     End Sub
+    ''' <summary>
+    ''' 油種保持クラス
+    ''' </summary>
+    <Serializable>
+    Public Class OilItem
+        Public Property OilCode As String = ""
+        Public Property OilName As String = ""
+    End Class
+    ''' <summary>
+    ''' 列車番号クラス
+    ''' </summary>
+    <Serializable>
+    Public Class TrainListItem
+        Public Property TrainNo As String
+        Public Property TrainName As String
+        Public Sub New(trainNo As String, trainName As String)
+            Me.TrainNo = trainNo
+            Me.TrainName = trainName
+        End Sub
+    End Class
+    ''' <summary>
+    ''' 日付保持クラス
+    ''' </summary>
+    <Serializable>
+    Public Class DaysItem
+        Const DISP_DATEFORMAT As String = "M月d日(<\span>ddd</\span>)"
+        ''' <summary>
+        ''' キーとなる日付文字列(yyyy/MM/dd)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property KeyString As String
+        ''' <summary>
+        ''' 画面表示用日付
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DispDate As String
+        ''' <summary>
+        ''' 日付型での対象日付
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ItemDate As Date
+        ''' <summary>
+        ''' 祝祭日判定(True:祝祭日,False:通常日)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IsHoliday As Boolean = False
+        ''' <summary>
+        ''' 曜日番号(日:0 ～ 土：6)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property WeekNum As String
+        ''' <summary>
+        ''' 休日名称
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property HolidayName As String = ""
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="day"></param>
+        Public Sub New(day As Date)
+            Me.KeyString = day.ToString("yyyy/MM/dd")
+            Me.DispDate = day.ToString(DISP_DATEFORMAT)
+            Me.ItemDate = day
+            Me.IsHoliday = False '一旦False、別処理で設定
+            Me.WeekNum = CInt(day.DayOfWeek).ToString
+            Me.HolidayName = "" '一旦ブランク 別処理で設定
+        End Sub
+    End Class
 
 #Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"
     '   "RepeaterでPoscBack時処理で使用するため保持させる必要上RepeaterのViewState使用停止するのは難しい"

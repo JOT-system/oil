@@ -1,4 +1,5 @@
-﻿Imports JOTWEB.GRIS0005LeftBox
+﻿Option Strict On
+Imports JOTWEB.GRIS0005LeftBox
 
 Public Class OIT0004WRKINC
     Inherits UserControl
@@ -31,7 +32,19 @@ Public Class OIT0004WRKINC
         CreateORGParam = prmData
 
     End Function
-
+    ''' <summary>
+    ''' 営業所の取得
+    ''' </summary>
+    ''' <param name="I_SALESOFFICEPT"></param>
+    ''' <returns></returns>
+    ''' <remarks>全て</remarks>
+    Function CreateSALESOFFICEParam(ByVal I_COMPCODE As String, ByVal I_SALESOFFICEPT As String) As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_SALESOFFICE) = I_SALESOFFICEPT
+        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+        CreateSALESOFFICEParam = prmData
+    End Function
     '' <summary>
     '' 固定値マスタから一覧の取得
     '' </summary>

@@ -277,6 +277,77 @@ Public Module BaseDllConst
     Public Const CONST_ORDERINFO_CANCEL_53 As String = "53"
 #End Region
 
+#Region "受注進行ステータス"
+    ''' <summary>
+    ''' 100:受注受付
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_100 As String = "100"
+    ''' <summary>
+    ''' 200:手配
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_200 As String = "200"
+    ''' <summary>
+    ''' 210:手配中（入換指示手配済）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_210 As String = "210"
+    ''' <summary>
+    ''' 220:手配中（積込指示手配済）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_220 As String = "220"
+    ''' <summary>
+    ''' 230:手配中（託送指示手配済）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_230 As String = "230"
+    ''' <summary>
+    ''' 240:手配中（入換指示未手配）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_240 As String = "240"
+    ''' <summary>
+    ''' 250:手配中（積込指示未手配）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_250 As String = "250"
+    ''' <summary>
+    ''' 260;手配中（託送指示未手配）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_260 As String = "260"
+    ''' <summary>
+    ''' 270:手配完了
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_270 As String = "270"
+    ''' <summary>
+    ''' 300:受注確定
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_300 As String = "300"
+    ''' <summary>
+    ''' 400:受入確認中
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_400 As String = "400"
+    ''' <summary>
+    ''' 500:検収中
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_500 As String = "500"
+    ''' <summary>
+    ''' 550:検収済
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_550 As String = "550"
+    ''' <summary>
+    ''' 600:費用確定
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_600 As String = "600"
+    ''' <summary>
+    ''' 700:経理未計上
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_700 As String = "700"
+    ''' <summary>
+    ''' 800:経理計上
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_800 As String = "800"
+    ''' <summary>
+    ''' 900:受注キャンセル
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_900 As String = "900"
+#End Region
+
 #Region "油種"
     ''' <summary>
     ''' 油種(ハイオク)
@@ -322,7 +393,6 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ATank As String = "2101"
 #End Region
-
 
 #Region "海外向け"
     ''' <summary>

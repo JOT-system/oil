@@ -14,6 +14,15 @@ Option Explicit On
 Partial Public Class OIT0004OilStockCreate
     
     '''<summary>
+    '''spnInventoryDays コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents spnInventoryDays As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
     '''WF_INVENTORYDAYS コントロール。
     '''</summary>
     '''<remarks>
@@ -21,6 +30,24 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_INVENTORYDAYS As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ButtonAUTOSUGGESTION コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonAUTOSUGGESTION As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''WF_ButtonORDERLIST コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonORDERLIST As Global.System.Web.UI.HtmlControls.HtmlInputButton
     
     '''<summary>
     '''WF_ButtonFIRST コントロール。

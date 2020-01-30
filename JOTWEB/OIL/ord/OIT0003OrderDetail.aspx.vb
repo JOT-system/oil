@@ -3757,12 +3757,22 @@ Public Class OIT0003OrderDetail
                         PARA92.Value = "2"                                '利用可否フラグ(2:積置なし)
                     End If
 
-                    PARA23.Value = "1"                                '利用可否フラグ(1:利用可能)
-                    PARA24.Value = DateTime.Parse(TxtLoadingDate.Text)                '積込日（予定）
-                    PARA25.Value = DateTime.Parse(TxtDepDate.Text)                    '発日（予定）
-                    PARA26.Value = DateTime.Parse(TxtArrDate.Text)                    '積車着日（予定）
-                    PARA27.Value = DateTime.Parse(TxtAccDate.Text)                    '受入日（予定）
-                    PARA28.Value = DateTime.Parse(TxtEmparrDate.Text)                 '空車着日（予定）
+                    PARA23.Value = "1"                                    '利用可否フラグ(1:利用可能)
+                    PARA24.Value = TxtLoadingDate.Text                    '積込日（予定）
+                    PARA25.Value = TxtDepDate.Text                        '発日（予定）
+                    PARA26.Value = TxtArrDate.Text                        '積車着日（予定）
+                    PARA27.Value = TxtAccDate.Text                        '受入日（予定）
+                    '空車着日（予定）
+                    If TxtActualLoadingDate.Text = "" Then
+                        PARA28.Value = DBNull.Value
+                    Else
+                        PARA28.Value = TxtEmparrDate.Text
+                    End If
+                    'PARA24.Value = DateTime.Parse(TxtLoadingDate.Text)                '積込日（予定）
+                    'PARA25.Value = DateTime.Parse(TxtDepDate.Text)                    '発日（予定）
+                    'PARA26.Value = DateTime.Parse(TxtArrDate.Text)                    '積車着日（予定）
+                    'PARA27.Value = DateTime.Parse(TxtAccDate.Text)                    '受入日（予定）
+                    'PARA28.Value = DateTime.Parse(TxtEmparrDate.Text)                 '空車着日（予定）
                     '積込日（実績）
                     If TxtActualLoadingDate.Text = "" Then
                         PARA29.Value = DBNull.Value
@@ -5047,8 +5057,15 @@ Public Class OIT0003OrderDetail
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
                     '油種名を一覧に設定
-                ElseIf WF_FIELD.Value = "OILNAME" _
-                    OrElse WF_FIELD.Value = "ORDERINGOILNAME" Then
+                ElseIf WF_FIELD.Value = "OILNAME" Then
+                    updHeader.Item("OILCODE") = WW_SETVALUE
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                    '〇 タンク車割当状況チェック
+                    WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+
+                    '油種名(受発注用)を一覧に設定
+                ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
                     updHeader.Item("OILCODE") = WW_SETVALUE
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 

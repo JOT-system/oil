@@ -399,6 +399,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , @P8                                            AS CONSIGNEENAME" _
             & " , ''                                             AS OILCODE" _
             & " , ''                                             AS OILNAME" _
+            & " , ''                                             AS ORDERINGTYPE" _
+            & " , ''                                             AS ORDERINGOILNAME" _
             & " , ''                                             AS TANKNO" _
             & " , ''                                             AS LASTOILCODE" _
             & " , ''                                             AS LASTOILNAME" _
@@ -439,10 +441,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '   ')    AS CONSIGNEECODE" _
             & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '   ')    AS CONSIGNEENAME" _
             & " , ISNULL(RTRIM(OIT0003.OILCODE), '')             AS OILCODE" _
-            & " , ISNULL(RTRIM(OIM0003_NOW.OILNAME), '')         AS OILNAME" _
+            & " , ISNULL(RTRIM(OIT0003.OILNAME), '')             AS OILNAME" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')        AS ORDERINGTYPE" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')     AS ORDERINGOILNAME" _
             & " , ISNULL(RTRIM(OIT0003.TANKNO), '')              AS TANKNO" _
             & " , ISNULL(RTRIM(OIT0005.LASTOILCODE), '')         AS LASTOILCODE" _
-            & " , ISNULL(RTRIM(OIM0003_PAST.OILNAME), '')        AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(OIT0005.PREORDERINGOILNAME), '')  AS LASTOILNAME" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
@@ -489,20 +493,20 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "       OIT0003.TANKNO = OIM0005.TANKNUMBER" _
             & "       AND OIM0005.DELFLG <> @P2" _
-            & " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_NOW ON " _
-            & "       OIT0002.OFFICECODE = OIM0003_NOW.OFFICECODE" _
-            & "       AND OIT0002.SHIPPERSCODE = OIM0003_NOW.SHIPPERCODE" _
-            & "       AND OIT0002.BASECODE = OIM0003_NOW.PLANTCODE" _
-            & "       AND OIT0003.OILCODE = OIM0003_NOW.OILCODE" _
-            & "       AND OIM0003_NOW.DELFLG <> @P2" _
-            & " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
-            & "       OIT0002.OFFICECODE = OIM0003_PAST.OFFICECODE" _
-            & "       AND OIT0002.SHIPPERSCODE = OIM0003_PAST.SHIPPERCODE" _
-            & "       AND OIT0002.BASECODE = OIM0003_PAST.PLANTCODE" _
-            & "       AND OIT0005.LASTOILCODE = OIM0003_PAST.OILCODE" _
-            & "       AND OIM0003_PAST.DELFLG <> @P2" _
             & " WHERE OIT0002.ORDERNO = @P1" _
             & " AND OIT0002.DELFLG <> @P2"
+            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_NOW ON " _
+            '& "       OIT0002.OFFICECODE = OIM0003_NOW.OFFICECODE" _
+            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_NOW.SHIPPERCODE" _
+            '& "       AND OIT0002.BASECODE = OIM0003_NOW.PLANTCODE" _
+            '& "       AND OIT0003.OILCODE = OIM0003_NOW.OILCODE" _
+            '& "       AND OIM0003_NOW.DELFLG <> @P2" _
+            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
+            '& "       OIT0002.OFFICECODE = OIM0003_PAST.OFFICECODE" _
+            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_PAST.SHIPPERCODE" _
+            '& "       AND OIT0002.BASECODE = OIM0003_PAST.PLANTCODE" _
+            '& "       AND OIT0005.LASTOILCODE = OIM0003_PAST.OILCODE" _
+            '& "       AND OIM0003_PAST.DELFLG <> @P2" _
 
             SQLStr &=
                   " ORDER BY" _
@@ -510,6 +514,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 & "    , OIT0002.SHIPPERSCODE" _
                 & "    , OIT0003.DETAILNO" _
                 & "    , OIT0003.OILCODE" _
+                & "    , OIT0003.ORDERINGTYPE" _
                 & "    , OIT0003.TANKNO"
         End If
 
@@ -746,66 +751,88 @@ Public Class OIT0001EmptyTurnDairyDetail
         WW_GetValue = {"", "", "", "", "", "", "", ""}
         Dim arrTankCode(intTankCnt) As String
         Dim arrTankName(intTankCnt) As String
+        Dim arrTankType(intTankCnt) As String
+        Dim arrTankOrderName(intTankCnt) As String
         Dim z As Integer = 0
 
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_HTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtHTank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_HTank
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_RTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtRTank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_RTank
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_TTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtTTank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_TTank
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_MTTank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtMTTank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_MTTank
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_KTank1, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtKTank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_KTank1
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K3Tank1, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtK3Tank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_K3Tank1
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K5Tank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtK5Tank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_K5Tank
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K10Tank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtK10Tank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_K10Tank
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_LTank1, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtLTank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_LTank1
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", BaseDllConst.CONST_ATank, WW_GetValue)
         For i As Integer = 0 To Integer.Parse(TxtATank.Text) - 1
             arrTankCode(z) = BaseDllConst.CONST_ATank
             arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
             z += 1
         Next
 
@@ -814,6 +841,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         For Each OIT0001row As DataRow In OIT0001tbl.Rows
             OIT0001row("OILCODE") = arrTankCode(z)
             OIT0001row("OILNAME") = arrTankName(z)
+            OIT0001row("ORDERINGTYPE") = arrTankType(z)
+            OIT0001row("ORDERINGOILNAME") = arrTankOrderName(z)
             z += 1
         Next
 
@@ -894,7 +923,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
 
                     '油種
-                    If WF_FIELD.Value = "OILNAME" Then
+                    If WF_FIELD.Value = "OILNAME" _
+                        OrElse WF_FIELD.Value = "ORDERINGOILNAME" Then
                         'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
                         prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                     End If
@@ -1208,7 +1238,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtAccDate.Focus()
 
                 '(一覧)荷主, (一覧)油種, (一覧)タンク車№, (一覧)返送日列車
-            Case "SHIPPERSNAME", "OILNAME", "TANKNO", "RETURNDATETRAIN"
+            Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO", "RETURNDATETRAIN"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -1236,6 +1266,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                     updHeader.Item("OILCODE") = WW_SETVALUE
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
+                    '油種名(受発注用)を一覧に設定
+                ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
+                    updHeader.Item("OILCODE") = WW_SETVALUE
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                    updHeader.Item("OILNAME") = WW_GetValue(2)
+                    updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
+
                     'タンク車№を一覧に設定
                 ElseIf WF_FIELD.Value = "TANKNO" Then
                     'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
@@ -1249,8 +1288,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
                     updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                    CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                    updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+                    'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                    'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+
+                    WW_GetValue = {"", "", "", "", "", "", "", ""}
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", updHeader.Item("LASTOILCODE"), WW_GetValue)
+                    updHeader.Item("LASTOILNAME") = WW_GetValue(0)
 
                     '交検日
                     Dim WW_JRINSPECTIONCNT As String
@@ -1601,6 +1644,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , @P07                                           AS CONSIGNEENAME" _
             & " , ''                                             AS OILCODE" _
             & " , ''                                             AS OILNAME" _
+            & " , ''                                             AS ORDERINGTYPE" _
+            & " , ''                                             AS ORDERINGOILNAME" _
             & " , ''                                             AS TANKNO" _
             & " , ''                                             AS LASTOILCODE" _
             & " , ''                                             AS LASTOILNAME" _
@@ -2173,6 +2218,21 @@ Public Class OIT0001EmptyTurnDairyDetail
                     updHeader.Item(WF_FIELD.Value) = ""
                 End If
 
+            Case "ORDERINGOILNAME"   '(一覧)油種(受発注用)
+                If WW_ListValue <> "" Then
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG_N", WW_ListValue, WW_GetValue)
+                    updHeader.Item("OILCODE") = WW_GetValue(0)
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                    updHeader.Item("OILNAME") = WW_GetValue(2)
+                    updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
+
+                Else
+                    updHeader.Item("OILCODE") = ""
+                    updHeader.Item(WF_FIELD.Value) = ""
+                    updHeader.Item("OILNAME") = ""
+                    updHeader.Item("ORDERINGTYPE") = ""
+                End If
+
             Case "TANKNO"            '(一覧)タンク車№
 
                 '入力が空の場合は、対象項目を空文字で設定する。
@@ -2202,12 +2262,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '前回油種
                 Dim WW_LASTOILNAME As String = ""
                 updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+                'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
 
-                'Dim WW_GetValue2() As String = {"", "", "", "", "", ""}
-                'WW_FixvalueMasterSearch("", "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue2)
-                'updHeader.Item("LASTOILNAME") = WW_GetValue2(0)
+                WW_GetValue = {"", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue)
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_GetValue(1) + WW_GetValue(4), WW_GetValue)
+                updHeader.Item("LASTOILNAME") = WW_GetValue(0)
 
                 '交検日
                 Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
@@ -3415,17 +3476,21 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        TANKNO      = @P03, SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
-            & "        , OILCODE   = @P05, RETURNDATETRAIN = @P07, JOINT = @P08" _
-            & "        , UPDYMD    = @P19, UPDUSER         = @P20" _
-            & "        , UPDTERMID = @P21, RECEIVEYMD      = @P22" _
+            & "        LINEORDER         = @P33, TANKNO       = @P03, ORDERINFO    = @P34" _
+            & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
+            & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
+            & "        , RETURNDATETRAIN = @P07, JOINT        = @P08" _
+            & "        , UPDYMD          = @P19, UPDUSER      = @P20" _
+            & "        , UPDTERMID       = @P21, RECEIVEYMD   = @P22" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO            , TANKNO             , KAMOKU" _
-            & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE" _
+            & "        ( ORDERNO         , DETAILNO            , LINEORDER" _
+            & "        , TANKNO          , KAMOKU              , ORDERINFO" _
+            & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
+            & "        , ORDERINGTYPE    , ORDERINGOILNAME" _
             & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINT" _
             & "        , CHANGETRAINNO   , SECONDCONSIGNEECODE , SECONDCONSIGNEENAME" _
             & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CANGERETSTATION    , CHANGEARRSTATIONNAME" _
@@ -3434,8 +3499,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02, @P03, @P04" _
-            & "        , @P23, @P24, @P05" _
+            & "        ( @P01, @P02, @P33" _
+            & "        , @P03, @P04, @P34" _
+            & "        , @P23, @P24, @P05, @P35" _
+            & "        , @P36, @P37" _
             & "        , @P06, @P25, @P07, @P08" _
             & "        , @P26, @P27, @P28" _
             & "        , @P29, @P30, @P31, @P32" _
@@ -3456,11 +3523,16 @@ Public Class OIT0001EmptyTurnDairyDetail
             " SELECT" _
             & "    ORDERNO" _
             & "    , DETAILNO" _
+            & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
+            & "    , ORDERINFO" _
             & "    , SHIPPERSCODE" _
             & "    , SHIPPERSNAME" _
             & "    , OILCODE" _
+            & "    , OILNAME" _
+            & "    , ORDERINGTYPE" _
+            & "    , ORDERINGOILNAME" _
             & "    , CARSNUMBER" _
             & "    , CARSAMOUNT" _
             & "    , RETURNDATETRAIN" _
@@ -3499,11 +3571,16 @@ Public Class OIT0001EmptyTurnDairyDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '入線順
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 4)   '油種コード
+                Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 40)  '油種名
+                Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 2)   '油種区分(受発注用)
+                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 40)  '油種名(受発注用)
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
@@ -3543,13 +3620,18 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     'DB更新
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
-                    'PARA01.Value = OIT0001row("ORDERNO")              '受注№
+                    'PARA01.Value = OIT0001row("ORDERNO")             '受注№
                     PARA02.Value = OIT0001row("DETAILNO")             '受注明細№
+                    PARA33.Value = ""                                 '入線順
                     PARA03.Value = OIT0001row("TANKNO")               'タンク車№
                     PARA04.Value = OIT0001row("KAMOKU")               '費用科目
+                    PARA34.Value = ""                                 '受注情報
                     PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
                     PARA24.Value = OIT0001row("SHIPPERSNAME")         '荷主名
                     PARA05.Value = OIT0001row("OILCODE")              '油種コード
+                    PARA35.Value = OIT0001row("OILNAME")              '油種名
+                    PARA36.Value = OIT0001row("ORDERINGTYPE")         '油種区分(受発注用)
+                    PARA37.Value = OIT0001row("ORDERINGOILNAME")      '油種名(受発注用)
                     PARA06.Value = "1"                                '車数
                     PARA25.Value = "0"                                '数量
                     If OIT0001row("RETURNDATETRAIN") <> "" Then
@@ -3669,8 +3751,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , CAST(SUM(1) OVER(PARTITION BY OIM0003.OILCODE ORDER BY OIM0003.OILCODE) AS int) AS CNT" _
             & " FROM OIL.OIT0003_DETAIL OIT0003 " _
             & "  INNER JOIN OIL.OIM0003_PRODUCT OIM0003 ON" _
-            & "        OIM0003.OFFICECODE = @P02 " _
-            & "    AND OIM0003.OILCODE    = OIT0003.OILCODE" _
+            & "        OIM0003.OFFICECODE     = @P02 " _
+            & "    AND OIM0003.OILCODE        = OIT0003.OILCODE" _
+            & "    AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE" _
             & " WHERE OIT0003.ORDERNO = @P01" _
             & "   AND OIT0003.DELFLG <> @P03"
 

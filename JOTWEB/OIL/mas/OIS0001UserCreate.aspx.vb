@@ -388,7 +388,7 @@ Public Class OIS0001UserCreate
             & " WHERE" _
             & "     USERID   = @P1" _
             & " AND STYMD    = @P2" _
-            & " AND DELFLG   = @P3"
+            & " AND DELFLG   <> @P3"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -483,7 +483,7 @@ Public Class OIS0001UserCreate
                 Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
             ElseIf WW_ERR_SW = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR Then
-                Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "ユーザIDコードかつ開始日年月日", needsPopUp:=True)
+                Master.Output(WW_ERR_SW, C_MESSAGE_TYPE.ERR, "ユーザIDかつ開始日年月日", needsPopUp:=True)
 
             Else
                 Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)

@@ -12,6 +12,15 @@
 .listTitle {
     margin-top:10px;
 }
+/* 上部テキストボックス */
+#WF_INVENTORYDAYS {
+    height: 24px;
+    margin: 0;
+    padding-top: 1px;
+    padding-bottom: 0px;
+    width:80px;
+    text-align :right;
+}
 /* ********** */
 /* 提案表定義 */
 /* ********** */
@@ -85,6 +94,20 @@
     max-width: calc(60px * 2);
     display:flex;
     flex-wrap:wrap;
+}
+/* 提案表列車Noが1個来た場合の設定 */
+/* 60pxだと狭すぎて日付がつぶれるので調整する */
+#divSuggestList > div.dataColumn.has1Col > div.values > div {
+    width:110px;
+    min-width:110px;
+    max-width:110px;
+}
+#divSuggestList > div.dataColumn.dataColumn.has1Col {
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
+    display: flex;
+    flex-wrap: wrap;
 }
 /* 提案表日付データ幅 一杯に伸ばす */
 #divSuggestList .suggestDate{
@@ -179,13 +202,16 @@
 #weightListContainer > div > div.weightListValue {
     text-align:right;
 }
+div.weightListOilType {
+    height:24px;
+}
 /* *********************** */
 /* 在庫表 設定             */
 /* *********************** */
 #pnlStockList {
-    margin-top:-20px;
-    margin-bottom:10px;
-    margin-right:10px;
+    margin-top: -20px;
+    margin-bottom: 10px;
+    margin-right: 10px;
 }
 #divStockList {
     display: flex;
@@ -351,8 +377,34 @@
 #divStockList div.colStockInfoTopRow {
     border-right: 1px solid darkgray;
 }
+/* ************************ */
+/* 油種表示非表示枠         */
+/* ************************ */
+#divEmptyBox {
+    display:flex;
+    flex-wrap:wrap;
+}
+#divEmptyBox > div {
+    font-size: 0.8em;
+    border: 1px solid darkgray;
+    background-color: #2B8E56;
+    color: #FFFFFF;
+    padding:2px;
+    padding-left:5px;
+    padding-right:5px;
+    border-radius :10px;
+    margin-right:2px;
+    height:calc(50% - 2px);
+    cursor:pointer;
+}
+#divEmptyBox > div:hover {
+    background-color: #8e2b63;
+}
+div.oilTypeData div.col1 span[data-tiptext] {
+    cursor: pointer;
+}
 /* ************** */
-/* 色の色         */
+/* 表の色         */
 /* ************** */
 /* 大見出し色 */
 #divStockList div.col1 div,
@@ -363,10 +415,9 @@
 #divSuggestList div.leftColumn div,
 #divSuggestList div.suggestDate,
 #divSuggestList div.values div:nth-child(1),
-#pnlWeightList div.weightListOilType
-{
-    background-color:#2B8E56;
-    color:#FFFFFF;
+#pnlWeightList div.weightListOilType {
+    background-color: #2B8E56;
+    color: #FFFFFF;
 }
 /* 見出し色 */
 #divStockList div.col2 div,
@@ -390,17 +441,19 @@
 /* ****************** */
 /* 日付部分の土日編集 */
 /* ****************** */
+/* 上のみ塗りつぶしパターン */
 /* 土曜 */
-#divSuggestList div.suggestDate.week6,
+/*#divSuggestList div.suggestDate.week6,
 #divStockList div.dateItem div.week6 {
     background-color:blue;
-}
+}*/
 /* 日曜 */
-#divSuggestList div.suggestDate.week0,
+/*#divSuggestList div.suggestDate.week0,
 #divStockList div.dateItem div.week0 {
     background-color: red;
-}
+}*/
 
+/* 曜日文言のみ塗りつぶしパターン */
 /* 土曜 */
 /*#divSuggestList div.suggestDate.week6 > span > span,
 #divStockList div.dateItem div.week6 > span > span {
@@ -411,3 +464,60 @@
 #divStockList div.dateItem div.week0 > span > span {
     color: red;
 }*/
+
+/* 列塗りつぶしパターン */
+/* 土曜 */
+#divSuggestList div.dataColumn.week6 > div.suggestDate,
+#divSuggestList div.dataColumn.week6 > div.values > div,
+#divStockList div.dateItem div.week6,
+#divStockList div.oilTypeData div.week6,
+#divStockList div.oilTypeData div.week6 > div{
+    color: #14171A;
+    background-color: rgb(189,215,238) !important;
+}
+/* 日曜祝日 */
+#divSuggestList div.dataColumn.week0 > div.suggestDate,
+#divSuggestList div.dataColumn.week0 > div.values > div,
+#divSuggestList div.dataColumn.holiday1 > div.suggestDate,
+#divSuggestList div.dataColumn.holiday1 > div.values > div,
+#divStockList div.dateItem div.week0,
+#divStockList div.oilTypeData div.week0,
+#divStockList div.oilTypeData div.week0 > div,
+#divStockList div.dateItem div.holiday1,
+#divStockList div.oilTypeData div.holiday1,
+#divStockList div.oilTypeData div.holiday1 > div {
+    color: #14171A;
+    background-color: rgb(248,203,173) !important;
+}
+/* TIP表示 */
+[data-tiptext] {
+    position: relative;
+    display: inline-block;
+}
+
+[data-tiptext]::after {
+    position: absolute;
+    transition: all 0.3s ease 0s;
+    opacity: 0;
+    top: 0px;/*HOVERのスタート位置*/
+    left: 0px;
+    display: block;
+    padding: 0.2em 0.5em;
+    content: attr(data-tiptext);
+    white-space: nowrap;
+    color: #ffffff;
+    border-radius: 6px;
+    //background: #1b2538;
+    background-color: RGBA(27, 37, 56, 0.8);
+    font-size:0.8em;
+    z-index:2;
+    pointer-events:none;
+}
+[data-tiptext]:hover::after {
+    top: 24px; /*HOVER位置*/
+    opacity: 1;
+}
+/* 完全に消す予定だが一旦非表示 */
+#pnlWeightList {
+    display:none;
+}

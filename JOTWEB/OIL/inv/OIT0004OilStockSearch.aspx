@@ -27,26 +27,35 @@
         <!-- ○ 変動項目 ○ -->
         <div class="inputBox">
             <!-- 会社コード -->
-            <div class="inputItem">
-                <a id="WF_CAMPCODE_LABEL" style="display:none">会社コード</a>
-                <a class="ef" id="WF_CAMPCODE_CODE" style="display:none" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
+            <div class="inputItem" style="display:none;">
+                <a id="WF_CAMPCODE_LABEL">会社コード</a>
+                <a class="ef" id="WF_CAMPCODE_CODE" ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
                     <asp:TextBox ID="WF_CAMPCODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox>
                 </a>
-                <a id="WF_CAMPCODE_NAME" style="display:none">
+                <a id="WF_CAMPCODE_NAME" >
                     <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
             <!-- 組織コード -->
-            <div class="inputItem">
-                <a id="WF_ORG_LABEL" style="display:none">組織コード</a>
-                <a class="ef" id="WF_ORG_CODE" style="display:none" ondblclick="Field_DBclick('WF_ORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORG');">
+            <div class="inputItem" style="display:none;">
+                <a id="WF_ORG_LABEL">組織コード</a>
+                <a class="ef" id="WF_ORG_CODE" ondblclick="Field_DBclick('WF_ORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORG');">
                     <asp:TextBox ID="WF_ORG" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="6"></asp:TextBox>
                 </a>
-                <a id="WF_ORG_NAME" style="display:none">
+                <a id="WF_ORG_NAME" >
                     <asp:Label ID="WF_ORG_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
-
+            <!-- 営業所 -->
+            <div class="inputItem">
+                <a id="WF_OFFICECODE_LABEL"  class="requiredMark">営業所</a>
+                <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
+                    <asp:TextBox ID="TxtSalesOffice" runat="server"  CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
+                </a>
+                <a id="WF_OFFICECODE_TEXT" >
+                    <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
             <!-- 油槽所 -->
             <div class="inputItem">
                 <a id="WF_CONSIGNEE_LABEL" class="requiredMark">油槽所</a>

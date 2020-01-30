@@ -22,15 +22,15 @@
         <div class="headerboxOnly" id="headerbox">
             <div class="actionButtonBox">
                 <div class="leftSide">
-
-                    <a >在庫維持日数</a>
-                    <a class="ef">
-                        <asp:TextBox ID="WF_INVENTORYDAYS" runat="server" onblur="MsgClear();"></asp:TextBox>
-                    </a>
-
+                    <span id="spnInventoryDays" runat="server">
+                        <a >在庫維持日数</a>
+                        <a class="ef">
+                            <asp:TextBox ID="WF_INVENTORYDAYS" runat="server" onblur="MsgClear();"></asp:TextBox>
+                        </a>
+                    </span>
                     <!-- ボタン -->
-                    <input type="button" id="WF_ButtonAUTOSUGGESTION" class="btn-sticky" value="自動提案"     onclick="ButtonClick('WF_ButtonAUTOSUGGESTION');" />
-                    <input type="button" id="WF_ButtonORDERLIST"      class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
+                    <input type="button" id="WF_ButtonAUTOSUGGESTION" runat="server" class="btn-sticky" value="自動提案"     onclick="ButtonClick('WF_ButtonAUTOSUGGESTION');" />
+                    <input type="button" id="WF_ButtonORDERLIST"      runat="server" class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
                     <input type="button" id="WF_ButtonINPUTCLEAR"     class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
                 </div>
 
@@ -75,28 +75,30 @@
                         <div><span>油種</span></div>
                         <asp:Repeater runat="server" ID="repOilTypeNameList" DataSource='<%# Eval("SuggestOilNameList") %>' >
                             <ItemTemplate >
-                                <div><span><%# Eval("Value") %></span></div>
+                                <div><span><%#DirectCast(Eval("Value"), OilItem).OilName %></span></div>
                             </ItemTemplate>
                         </asp:Repeater>
                     </div>
                     <%-- 三列目以降 --%>
                     <asp:Repeater ID="repSuggestItem" runat="server"  DataSource='<%# Eval("SuggestList") %>' >
                         <ItemTemplate>
-                            <div class='dataColumn has<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).SuggestOrderItem.Count %>Col'  >
+                            <div class='dataColumn has<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).SuggestOrderItem.Count %>Col week<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.WeekNum %> holiday<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.IsHoliday, "1", "0") %>'  >
                             <%-- 日付部分 --%>
-                            <div class='suggestDate week<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).WeekName %>'>
+                            <div class='suggestDate week<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.WeekNum %>'>
                                 <!-- -->
-                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).DispDate %></span>
+                                <span <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.IsHoliday, "data-tiptext='" & DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.HolidayName & "'", "") %>>
+                                    <%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).DayInfo.DispDate %>
+                                </span>
                                 <asp:HiddenField ID="hdnSuggestListKey" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                             </div>
                             <%--列車・チェック・値のリピーター--%> 
                             <asp:Repeater ID="repSuggestTrainItem" runat="server"  
-                                DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem).SuggestOrderItem %>' >
+                                DataSource='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem).SuggestOrderItem %>' >
                                 <ItemTemplate>
                                     <div class="values">
                                     <%--  列車 --%>
                                     <div>
-                                        <span><%# Eval("Key") %>
+                                        <span data-tiptext='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.TrainName %>'><%# Eval("Key") %>
                                             <asp:HiddenField ID="hdnTrainId" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                                         </span>
                                     </div>
@@ -104,19 +106,19 @@
                                     <div>
                                         <span>
                                             <asp:CheckBox ID="chkSuggest" runat="server" 
-                                            Checked='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValues).CheckValue %>' />
+                                            Checked='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).CheckValue %>' />
                                         </span>
                                     </div>
                                     <%--  各種値 --%>
                                     <asp:Repeater ID="repSuggestValueItem" runat="server"  
-                                        DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValues).SuggestValuesItem %>' >
+                                        DataSource='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem %>' >
                                         <ItemTemplate>
                                             <%--  油種に紐づいた値 --%>
-                                            <div class="num" data-oilcode='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode %>'>
-                                                <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode %>'  />
+                                            <div class="num" data-oilcode='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode %>'>
+                                                <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode %>'  />
                                                 <asp:TextBox ID="txtSuggestValue" runat="server" 
-                                                    Text='<%# DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
-                                                    Enabled='<%# If(DirectCast(Eval("Value"), DemoDispDataClass.SuggestItem.SuggestValue).OilCode = DemoDispDataClass.SUMMARY_CODE, "False", "True") %>'></asp:TextBox>
+                                                    Text='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
+                                                    Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE, "False", "True") %>'></asp:TextBox>
                                             </div>
                                         </ItemTemplate>
                                     </asp:Repeater>
@@ -143,10 +145,10 @@
                     <ItemTemplate>
                         <div class="weightListItem">
                             <div class="weightListOilType">
-                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.WeightListItem).OilTypeName %></span>
+                                <span><%# DirectCast(Eval("Value"), OilItem).OilName %></span>
                             </div>
                             <div class="weightListValue">
-                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.WeightListItem).Weight %></span>
+                                <span><%# DirectCast(Eval("Value"), OilItem).Weight %></span>
                             </div>
                         </div>
                     </ItemTemplate>
@@ -162,7 +164,7 @@
                 <div id="divStockList">
                     <!-- 1・2行目のヘッダー -->
                     <div class="header"> 
-                        <div class="emptyBox"></div>
+                        <div id="divEmptyBox" class="emptyBox"></div>
                         <!-- 動的日付部の生成 -->
                         <asp:Repeater ID="repStockDate" runat="server">
                             <HeaderTemplate>
@@ -171,8 +173,8 @@
                                     <div class="dateItem">
                             </HeaderTemplate>
                             <ItemTemplate>
-                                <div class='colStockInfo date week<%# CInt(DirectCast(Eval("Value"), Date).DayOfWeek) %>'>
-                                    <span><%# Eval("Key") %></span>
+                                <div class='colStockInfo date week<%# DirectCast(Eval("Value"), DaysItem).WeekNum %>  holiday<%# If(DirectCast(Eval("Value"), DaysItem).IsHoliday, "1", "0") %>'>
+                                    <span <%# If(DirectCast(Eval("Value"), DaysItem).IsHoliday, "data-tiptext='" & DirectCast(Eval("Value"), DaysItem).HolidayName & "'", "") %>> <%# DirectCast(Eval("Value"), DaysItem).DispDate %></span>
                                 </div>
                             </ItemTemplate>
                             <FooterTemplate>
@@ -185,10 +187,10 @@
                     <!-- 油種ごとのデータ生成部 -->
                     <asp:Repeater ID="repStockOilTypeItem" runat="server" ClientIDMode="Predictable">
                         <ItemTemplate>
-                            <div class="oilTypeData">
+                            <div class="oilTypeData" data-oilcode='<%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).OilTypeCode %>'>
                                 <div class="col1">
-                                    <div><span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %></span></div>
-                                    <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).OilTypeName %>' />
+                                    <div><span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).OilTypeName %></span></div>
+                                    <asp:HiddenField ID="hdnOilTypeCode" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).OilTypeCode %>' />
                                 </div>
                                 <div class="col2">
                                     <div><span>タンク容量</span></div>
@@ -198,13 +200,13 @@
 
                                 <div class="col3">
                                     <div> <%--タンク容量値 --%>
-                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TankCapacity %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TankCapacity %></span>
                                     </div>
                                     <div> <%--目標在庫値 --%>
-                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TargetStock %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStock %></span>
                                     </div>
                                     <div> <%--目標在庫率値 --%>
-                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).TargetStockRate %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStockRate %></span>
                                     </div>
                                 </div>
                                 <div class="col4">
@@ -215,13 +217,13 @@
 
                                 <div class="col5">
                                     <div> <%--80%在庫 --%>
-                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).Stock80 %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).Stock80 %></span>
                                     </div>
                                     <div> <%-- D/S --%>
-                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).DS %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).DS %></span>
                                     </div>
                                     <div> <%--前週出荷平均 --%>
-                                        <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).LastShipmentAve %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).LastShipmentAve %></span>
                                     </div>
                                 </div>
                                 <div class="col6">
@@ -237,37 +239,38 @@
                                 </div>
 
                                 <%-- 日付毎の各値 --%>
-                                <asp:Repeater ID="repStockValues" runat="server" DataSource='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListCollection).StockItemList %>'>
+                                <asp:Repeater ID="repStockValues" runat="server" DataSource='<%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).StockItemList %>'>
                                     <ItemTemplate>
-                                        <div class="colStockValue">
+                                        <div class='colStockValue week<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.WeekNum %> holiday<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsHoliday, "1", "0") %>' >
+                                            <asp:HiddenField ID="hdnDateKey" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.KeyString %>' />
                                             <div><%--前日夕在庫--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).LastEveningStock.ToString("#,###") %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).LastEveningStock.ToString("#,###") %></span>
                                             </div>
                                             <div><%--保持日数--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).Retentiondays %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Retentiondays %></span>
                                             </div>
                                             <div><%--朝在庫--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).MorningStock %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %></span>
                                             </div>
                                             <div><%--受入--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).Receive %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive %></span>
                                             </div>
                                             <div><%--払出--%>
                                                 <span>
-                                                    <asp:TextBox ID="txtSend" runat="server" Text='<%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).Send %>'></asp:TextBox>
+                                                    <asp:TextBox ID="txtSend" runat="server" Text='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Send %>'></asp:TextBox>
                                                 </span>
                                             </div>
                                             <div><%--夕在庫--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).EveningStock %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStock %></span>
                                             </div>
                                             <div><%--夕在庫D/S除--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).EveningStockWithoutDS %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStockWithoutDS %></span>
                                             </div>
                                             <div><%--空容量--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).FreeSpace %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).FreeSpace %></span>
                                             </div>
                                             <div><%--在庫率--%>
-                                                <span><%# DirectCast(Eval("Value"), DemoDispDataClass.StockListItem).StockRate %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).StockRate %></span>
                                             </div>
                                         </div>
 
@@ -321,6 +324,8 @@
             <input id="WF_ButtonClick" runat="server" value="" type="text" />
             <!-- ボタン押下 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+            <!-- 在庫表で表示する油種保持用 -->
+            <asp:ListBox ID="lstDispStockOilType" runat="server" SelectionMode="Multiple"></asp:ListBox>
             <!-- 権限 -->
         </div>
  

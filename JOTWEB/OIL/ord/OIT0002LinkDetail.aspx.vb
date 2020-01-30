@@ -629,6 +629,12 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End If
 
+        '〇日付妥当性チェック
+        WW_CheckValidityDate(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+
         '○ 名称設定処理
         '会社コード
         CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
@@ -2164,6 +2170,51 @@ Public Class OIT0002LinkDetail
 
     End Sub
 
+    ''' <summary>
+    ''' 年月日妥当性チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckValidityDate(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim iresult As Integer
+
+        '○ 過去日付チェック
+        '例) iresult = dt1.Date.CompareTo(dt2.Date)
+        '    iresultの意味
+        '     0 : dt1とdt2は同じ日
+        '    -1 : dt1はdt2より前の日
+        '     1 : dt1はdt2より後の日
+        '(予定)空車着日 と　利用可能日を比較
+        iresult = Date.Parse(TxtEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
+        If iresult = -1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
+            TxtEmpDate.Focus()
+            WW_CheckMES1 = "利用可能日より過去の日付のためエラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '(実績)空車着日 と　利用可能日を比較
+        iresult = Date.Parse(TxtActEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
+        If iresult = -1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+            TxtActEmpDate.Focus()
+            WW_CheckMES1 = "利用可能日より過去の日付のためエラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+    End Sub
 
     ''' <summary>
     ''' 年月日チェック

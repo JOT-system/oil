@@ -4,7 +4,7 @@
 ' 作成日 2020/01/20
 ' 更新日 2020/01/20
 ' 作成者 JOTxxxx
-' 更新車 JOTxxxx
+' 更新者 JOTxxxx
 '
 ' 修正履歴:
 '         :
@@ -58,14 +58,20 @@ Public Class OIT0004OilStockCreate
 
         Try
             If IsPostBack Then
-                Dim dispDataObj As DemoDispDataClass
-                dispDataObj = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+                'Dim dispDataObj As DemoDispDataClass
+                'dispDataObj = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     'Master.RecoverTable(OIM0005tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonAUTOSUGGESTION" '自動提案ボタン押下
+                            WF_ButtonAUTOSUGGESTION_Click()
+                        Case "WF_ButtonORDERLIST" '受注作成ボタン押下
+                            WF_ButtonORDERLIST_Click()
+                        Case "WF_ButtonINPUTCLEAR" '入力値クリアボタン押下
+                            WF_ButtonINPUTCLEAR_Click()
 
                         'Case "WF_UPDATE"                '表更新ボタン押下
                         '    WF_UPDATE_Click()
@@ -124,435 +130,7 @@ Public Class OIT0004OilStockCreate
         End Try
 
     End Sub
-#Region "Demo用"
-    ''' <summary>
-    ''' 在庫管理表検索データクラス
-    ''' </summary>
-    ''' <remarks>デモ用ですが画面オブジェクト及び外部の変数へは直接アクセスしなこと
-    ''' （コンストラクタや引数で受け渡しさせる、別ファイルに外だしした時もワークするように考慮する）
-    ''' 当クラス及びサブクラス内でDB操作をする際はきっちりデストラクタ(Finalize)を仕込む
-    ''' 場合によってはUsingをサポートするように記述する</remarks>
-    <Serializable>
-    Public Class DemoDispDataClass
-        Public Const SUMMARY_CODE As String = "Summary"
-        Public Property testVal As String = "test"
-        ''' <summary>
-        ''' 受注提案タンク車数リストプロパティ
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>Key=日付 Value=列車、油種、チェックボックス、受入数を加味したリスト</remarks>
-        Public Property SuggestList As New Dictionary(Of String, SuggestItem)
-        ''' <summary>
-        ''' 油種名のディクショナリ
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property SuggestOilNameList As New Dictionary(Of String, String)
-        ''' <summary>
-        ''' 比重リストアイテム
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property WeightList As New Dictionary(Of String, WeightListItem)
-        ''' <summary>
-        ''' 比重一覧日付部分
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property StockDate As Dictionary(Of String, Date)
-        ''' <summary>
-        ''' 在庫一覧データ
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property StockList As Dictionary(Of String, StockListCollection)
-        ''' <summary>
-        ''' コンストラクタ
-        ''' </summary>
-        ''' <param name="baseDay">基準日</param>
-        ''' <param name="trainList">列車IDリスト</param>
-        ''' <param name="oilCodes">対象油種リスト</param>
-        Public Sub New(baseDay As String, trainList As List(Of String), oilCodes As List(Of String))
-            '******************************
-            'コンストラクタ引数チェック
-            '(一旦呼出し元にスローします)
-            '******************************
-            Dim baseDtm As Date
-            '引数が日付に変換できない場合エラー
-            If Date.TryParse(baseDay, baseDtm) = False Then
-                Throw New Exception("baseDay dose not convert to date.")
-            End If
-            If trainList Is Nothing OrElse trainList.Count = 0 Then
-                Throw New Exception("trainList is empty.")
-            End If
-            If oilCodes Is Nothing OrElse oilCodes.Count = 0 Then
-                Throw New Exception("oilCodes is empty.")
-            End If
-            '******************************
-            ' 提案リスト縦軸の油種名を生成
-            '******************************
-            Me.SuggestOilNameList = CreateSuggestOilNameList(oilCodes)
-            '******************************
-            ' 基準日～基準日＋7 
-            ' 提案リスト
-            ' 日付ごとのSuggestItemを生成
-            '******************************
-            Me.SuggestList = New Dictionary(Of String, SuggestItem)
-            For i = 0 To 6
-                Dim targetDate As Date = baseDtm.AddDays(i)
-                Dim keyDate As String = targetDate.ToString("yyyy/MM/dd")
-                '列車Noのループ
-                Dim suggestItem = New SuggestItem(targetDate)
-                For Each trainId In trainList
-                    suggestItem.Add(trainId, oilCodes)
-                Next trainId
-                Me.SuggestList.Add(keyDate, suggestItem)
-            Next i
-            '******************************
-            ' 比重リスト生成
-            '******************************
-            'Demo用仮作成DB等より比重を取ること
-            Me.WeightList = New Dictionary(Of String, WeightListItem)
-            For Each oilNameItem In Me.SuggestOilNameList
-                If oilNameItem.Key = SUMMARY_CODE Then
-                    Continue For
-                End If
-                Dim item As New WeightListItem
-                item.OilTypeCode = oilNameItem.Key
-                item.OilTypeName = oilNameItem.Value
-                item.Weight = 0.75D '本来DBなどから取得
-                Me.WeightList.Add(item.OilTypeCode, item)
-            Next
-            '******************************
-            ' 在庫リスト生成
-            '******************************
-            '表示用ヘッダー日付生成
-            Me.StockDate = New Dictionary(Of String, Date)
-            For i = 0 To 6 'Demo用一旦6指定で7日間ここを29にすれば30日間になる
-                Dim targetDate As Date = baseDtm.AddDays(i)
-                Me.StockDate.Add(targetDate.ToString("M月d日(<\span>ddd</\span>)"), targetDate)
-            Next
-            Me.StockList = New Dictionary(Of String, StockListCollection)
-            For Each oilNameItem In Me.SuggestOilNameList
-                If oilNameItem.Key = SUMMARY_CODE Then
-                    Continue For
-                End If
-                Dim item As New StockListCollection(oilNameItem, Me.StockDate)
-                Me.StockList.Add(oilNameItem.Key, item)
-            Next 'oilNameItem
-        End Sub
-        ''' <summary>
-        ''' 油種名、油種コードリストを生成
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>この辺は検討現状、Demoの為コードでベタ打ち。
-        ''' 「あらかじめコードと名称でそろった状態で渡す」や
-        ''' 「ここで名称を取得する（都度都度抽出になる）」
-        ''' は検討という意味</remarks>
-        Private Function CreateSuggestOilNameList(oilCodes As List(Of String)) As Dictionary(Of String, String)
-            Dim retVal As New Dictionary(Of String, String)
-            Dim dicFullOilList As New Dictionary(Of String, String) _
-                From {{"1001", "ハイオク"}, {"1101", "レギュラー"},
-                      {"1301", "灯油"}, {"1302", "未添加灯油"}, {"1401", "軽油"},
-                      {"1404", "３号軽油"}, {"2201", "ＬＳＡ"},
-                      {"2101", "Ａ重油"}}
-            For Each oilCode In oilCodes
-                Dim valName As String = ""
-                If dicFullOilList.ContainsKey(oilCode) Then
-                    valName = dicFullOilList(oilCode)
-                Else
-                    valName = String.Format("未定義({0})", oilCode)
-                End If
-                retVal.Add(oilCode, valName)
-            Next oilCode
 
-            '合計行の付与
-            retVal.Add(SUMMARY_CODE, "合計")
-            Return retVal
-        End Function
-
-        ''' <summary>
-        ''' 列車Noをキーに持つ受注提案アイテム
-        ''' </summary>
-        <Serializable>
-        Public Class SuggestItem
-            ''' <summary>
-            ''' 対象日付
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property ThisDate As String
-            ''' <summary>
-            ''' 画面表示用日付（対象日付のフォーマット違い）
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property DispDate As String
-            Public Property WeekName As String
-            ''' <summary>
-            ''' 受入数情報格納用ディクショナリ
-            ''' </summary>
-            ''' <returns></returns>
-            ''' <remarks>Key=列車No,Value=一覧の値クラス</remarks>
-            Public Property SuggestOrderItem As Dictionary(Of String, SuggestValues)
-            ''' <summary>
-            ''' 積置き情報格納用ディクショナリ
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property SuggestLoadingItem As Dictionary(Of String, SuggestValues)
-
-
-            ''' <summary>
-            ''' コンストラクタ
-            ''' </summary>
-            ''' <param name="targetDate">対象日付</param>
-            Public Sub New(targetDate As Date)
-                '受入数一覧
-                Me.SuggestOrderItem = New Dictionary(Of String, SuggestValues)
-                '積置き一覧
-                Me.SuggestLoadingItem = New Dictionary(Of String, SuggestValues)
-
-                Me.ThisDate = targetDate.ToString("yyyy/MM/dd") '内部用の日付
-                Me.DispDate = targetDate.ToString("M月d日(<\span>ddd</\span>)") '画面表示用の日付
-                Me.WeekName = CInt(targetDate.DayOfWeek).ToString
-            End Sub
-            Public Sub Add(trainNo As String, oilCodes As List(Of String))
-                Dim orderValues = New SuggestValues
-                Dim loadingValues = New SuggestValues
-                For Each oilCode As String In oilCodes
-                    orderValues.Add(oilCode, "0")
-                    loadingValues.Add(oilCode, "0")
-                Next
-                orderValues.Add(SUMMARY_CODE, "0")
-                loadingValues.Add(SUMMARY_CODE, "0")
-                Me.SuggestOrderItem.Add(trainNo, orderValues)
-                Me.SuggestLoadingItem.Add(trainNo, loadingValues)
-            End Sub
-
-            ''' <summary>
-            ''' 受注提案タンク車数用数値情報格納クラス
-            ''' </summary>
-            <Serializable>
-            Public Class SuggestValues
-                ''' <summary>
-                ''' 受注提案タンク車数用数値情報ディクショナリ
-                ''' </summary>
-                ''' <returns></returns>
-                Public Property SuggestValuesItem As Dictionary(Of String, SuggestValue)
-                Public Property CheckValue As Boolean = False
-                ''' <summary>
-                ''' デフォルトプロパティ
-                ''' </summary>
-                ''' <param name="oilCode"></param>
-                ''' <returns></returns>
-                Default Public Property _item(oilCode As String) As SuggestValue
-                    Get
-                        Return Me.SuggestValuesItem(oilCode)
-                    End Get
-                    Set(value As SuggestValue)
-                        Me.SuggestValuesItem(oilCode) = value
-                    End Set
-                End Property
-                ''' <summary>
-                ''' コンストラクタ
-                ''' </summary>
-                Public Sub New()
-                    Me.SuggestValuesItem = New Dictionary(Of String, SuggestValue)
-                End Sub
-                Public Sub Add(oilCode As String, val As String)
-                    Me.SuggestValuesItem.Add(oilCode, New SuggestValue _
-                        With {.ItemValue = val, .OilCode = oilCode})
-                End Sub
-            End Class
-            ''' <summary>
-            ''' 提案値クラス
-            ''' </summary>
-            <Serializable>
-            Public Class SuggestValue
-                ''' <summary>
-                ''' 油種コード
-                ''' </summary>
-                ''' <returns></returns>
-                Public Property OilCode As String = ""
-                ''' <summary>
-                ''' 数
-                ''' </summary>
-                ''' <returns></returns>
-                ''' <remarks>画面入力項目の為String</remarks>
-                Public Property ItemValue As String = "0"
-            End Class
-        End Class
-        ''' <summary>
-        ''' 比重リストアイテムクラス
-        ''' </summary>
-        <Serializable>
-        Public Class WeightListItem
-            ''' <summary>
-            ''' 油種コード
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property OilTypeCode As String = ""
-            ''' <summary>
-            ''' 油種名
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property OilTypeName As String = ""
-            ''' <summary>
-            ''' 比重
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property Weight As Decimal = 0
-        End Class
-        ''' <summary>
-        ''' 在庫クラス
-        ''' </summary>
-        <Serializable>
-        Public Class StockListCollection
-            ''' <summary>
-            ''' コンストラクタ
-            ''' </summary>
-            Public Sub New(oilTypeItem As KeyValuePair(Of String, String),
-                           dateItem As Dictionary(Of String, Date))
-                Me.OilTypeCode = oilTypeItem.Key
-                Me.OilTypeName = oilTypeItem.Value
-                '２列目から４列目のタンク容量～前週出荷平均については
-                '一旦0
-                Me.TankCapacity = 12345.6D
-                Me.TargetStock = 0
-                Me.TargetStockRate = 0
-                Me.Stock80 = 0
-                Me.DS = 0
-                Me.LastShipmentAve = 0
-                Me.StockItemList = New Dictionary(Of String, StockListItem)
-                For Each dateVal In dateItem
-                    Dim item = New StockListItem(dateVal.Key, dateVal.Value)
-                    Me.StockItemList.Add(dateVal.Key, item)
-                Next
-            End Sub
-
-            ''' <summary>
-            ''' 油種コード
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property OilTypeCode As String = ""
-            ''' <summary>
-            ''' 油種名
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property OilTypeName As String = ""
-            ''' <summary>
-            ''' タンク容量
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property TankCapacity As Decimal
-            ''' <summary>
-            ''' 目標在庫
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property TargetStock As Decimal
-            ''' <summary>
-            ''' 目標在庫率
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property TargetStockRate As Decimal
-            ''' <summary>
-            ''' 80%在庫
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property Stock80 As Decimal
-            ''' <summary>
-            ''' D/S
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property DS As Decimal
-            ''' <summary>
-            ''' 前週出荷平均
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property LastShipmentAve As Decimal
-            ''' <summary>
-            ''' 日付別の在庫データ
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property StockItemList As Dictionary(Of String, StockListItem)
-        End Class
-        <Serializable>
-        Public Class StockListItem
-            ''' <summary>
-            ''' コンストラクタ
-            ''' </summary>
-            Public Sub New(dispDate As String, innerDate As Date)
-                Me.DispDate = dispDate
-                Me.WeekName = CInt(innerDate.DayOfWeek).ToString
-                'Demo用、実際イメージ沸いてから値のコンストラクタ引数追加など仕込み方は考える
-                Me.LastEveningStock = 12345
-                Me.Retentiondays = 0
-                Me.MorningStock = 0
-                Me.Receive = 0
-                Me.Send = "0" '画面入力項目の為文字
-                Me.EveningStock = 0
-                Me.EveningStockWithoutDS = 0
-                Me.FreeSpace = 0
-                Me.StockRate = 0
-            End Sub
-
-            ''' <summary>
-            ''' 日付
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property DispDate As String = ""
-            ''' <summary>
-            ''' 曜日名
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property WeekName As String = ""
-            ''' <summary>
-            ''' 前日夕在庫
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property LastEveningStock As Decimal
-            ''' <summary>
-            ''' 保有日数
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property Retentiondays As Decimal
-            ''' <summary>
-            ''' 朝在庫
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property MorningStock As Decimal
-            ''' <summary>
-            ''' 受入
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property Receive As Decimal
-            ''' <summary>
-            ''' 払出(画面入力エリアの為文字列)
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property Send As String
-            ''' <summary>
-            ''' 夕在庫
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property EveningStock As Decimal
-            ''' <summary>
-            ''' 夕在庫D/S除
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property EveningStockWithoutDS As Decimal
-            ''' <summary>
-            ''' 空容量
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property FreeSpace As Decimal
-            ''' <summary>
-            ''' 在庫率
-            ''' </summary>
-            ''' <returns></returns>
-            Public Property StockRate As Decimal
-        End Class
-    End Class
-
-    'Private Function DemoDispSuggestList(baseDay As String, trainList As List(Of String), oilCodes As List(Of String))
-
-    'End Function
-
-#End Region
     ''' <summary>
     ''' 初期化処理
     ''' </summary>
@@ -598,37 +176,89 @@ Public Class OIT0004OilStockCreate
             'Grid情報保存先のファイル名
             Master.CreateXMLSaveFile()
         End If
-
         '**********************************************
-        '↓●Demo用
+        '画面情報を元に各対象リストを生成
         '**********************************************
         Dim baseDate = work.WF_SEL_STYMD.Text
-        'Demo用なのでこの辺もベタうちは考えて
-        Dim trainList As New List(Of String) From {"5972", "5282", "8072"}
-        Dim oilCodes As New List(Of String)
-        If {"30"}.Contains(work.WF_SEL_CONSIGNEE.Text) Then
-            oilCodes.AddRange({"1001", "1101", "1301", "1302", "1401", "2101", "2201"})
-        Else
-            oilCodes.AddRange({"1001", "1101", "1301", "1401", "2101", "2201"})
-        End If
-        '画面データクラス
-        Dim dispDataObj = New DemoDispDataClass(baseDate, trainList, oilCodes)
+        Dim salesOffice = work.WF_SEL_SALESOFFICECODE.Text
+        Dim consignee = work.WF_SEL_CONSIGNEE.Text
+        Dim daysList As Dictionary(Of String, DaysItem)
+        Dim oilTypeList As Dictionary(Of String, OilItem)
+        Dim trainList As Dictionary(Of String, TrainListItem)
+        Using sqlCon = CS0050SESSION.getConnection
+            sqlCon.Open()
+            daysList = GetTargetDateList(sqlCon, baseDate)
+            oilTypeList = GetTargetOilType(sqlCon, salesOffice)
+            trainList = GetTargetTrain(sqlCon, salesOffice, consignee)
+        End Using
+        Dim dispDataObj = New DispDataClass(daysList, trainList, oilTypeList)
         'コンストラクタで生成したデータを画面に貼り付け
         '1.提案リスト
-        frvSuggest.DataSource = New Object() {dispDataObj}
-        frvSuggest.DataBind()
+        If dispDataObj.ShowSuggestList = False Then
+            pnlSuggestList.Visible = False
+            Me.spnInventoryDays.Visible = False
+            Me.WF_ButtonAUTOSUGGESTION.Visible = False
+            Me.WF_ButtonORDERLIST.Visible = False
+        Else
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispDataObj}
+            frvSuggest.DataBind()
+        End If
+
         '2.比重リスト
-        repWeightList.DataSource = dispDataObj.WeightList
+        repWeightList.DataSource = dispDataObj.OilTypeList
         repWeightList.DataBind()
         '3.在庫表
         repStockDate.DataSource = dispDataObj.StockDate
         repStockDate.DataBind()
         repStockOilTypeItem.DataSource = dispDataObj.StockList
         repStockOilTypeItem.DataBind()
-        '**********************************************
-        '↑●Demo用
-        '**********************************************
         SaveThisScreenValue(dispDataObj)
+        '4.在庫表表示マーク
+        lstDispStockOilType.DataSource = oilTypeList.Values
+        lstDispStockOilType.DataTextField = "OilName"
+        lstDispStockOilType.DataValueField = "OilCode"
+        lstDispStockOilType.DataBind()
+        For Each lstItem As ListItem In lstDispStockOilType.Items
+            lstItem.Selected = True
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' 自動提案ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonAUTOSUGGESTION_Click()
+
+    End Sub
+    ''' <summary>
+    ''' 受注作成ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonORDERLIST_Click()
+
+    End Sub
+    ''' <summary>
+    ''' 入力値クリアボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonINPUTCLEAR_Click()
+        Dim dispValues = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+        dispValues.InputValueToZero()
+        'コンストラクタで生成したデータを画面に貼り付け
+        '1.提案リスト
+        If dispValues.ShowSuggestList = False Then
+            pnlSuggestList.Visible = False
+        Else
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispValues}
+            frvSuggest.DataBind()
+        End If
+        '2.比重リスト
+        repWeightList.DataSource = dispValues.OilTypeList
+        repWeightList.DataBind()
+        '3.在庫表
+        repStockDate.DataSource = dispValues.StockDate
+        repStockDate.DataBind()
+        repStockOilTypeItem.DataSource = dispValues.StockList
+        repStockOilTypeItem.DataBind()
     End Sub
     ''' <summary>
     ''' 戻るボタン押下時処理
@@ -805,7 +435,181 @@ Public Class OIT0004OilStockCreate
         End Try
 
     End Sub
+    ''' <summary>
+    ''' 対象列車情報取得
+    ''' </summary>
+    ''' <param name="sqlCon">SQL接続</param>
+    ''' <param name="salesOffice">営業所コード</param>
+    ''' <param name="consignee">油槽所コード</param>
+    ''' <returns>キー：列車No,値：列車アイテムクラス
+    ''' 営業所、油槽所を元に取得した列車情報</returns>
+    ''' <remarks>一旦戻り値が無い場合は提案表を出さない仕組みとする</remarks>
+    Private Function GetTargetTrain(sqlCon As SqlConnection, salesOffice As String, consignee As String) As Dictionary(Of String, TrainListItem)
+        '↓本当はDBから取得！！！のたたき台↓ コメントアウトしSQLなり共通関数なりを利用し整えること
+        'Try
+        '    Dim retVal As New Dictionary(Of String, TrainListItem)
 
+        '    Dim sqlStr As New StringBuilder
+        '    sqlStr.AppendLine("SELECT XXXXX")
+        '    sqlStr.AppendLine("  FROM XXXXX")
+        '    sqlStr.AppendLine(" WHERE XXXX = @XXXXX")
+
+        '    Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+        '        With sqlCmd.Parameters
+        '            .Add("@xxxx", SqlDbType.NVarChar).Value = "xxxx"
+        '            .Add("@xxxx", SqlDbType.NVarChar).Value = "xxxx"
+        '        End With
+        '        Dim tlItem As TrainListItem
+        '        Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+        '            While sqlDr.Read
+        '                tlItem = New TrainListItem(Convert.ToString(sqlDr("車CODE")), Convert.ToString(sqlDr("車名称")))
+        '                retVal.Add(tlItem.TrainNo, tlItem)
+        '            End While
+        '        End Using
+
+        '    End Using
+        '    Return retVal
+        'Catch ex As Exception
+        '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005C")
+
+        '    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+        '    CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select Train List"
+        '    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+        '    CS0011LOGWrite.TEXT = ex.ToString()
+        '    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+        '    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+        '    Throw '呼出し元の後続処理を走らせたくないのでThrow 
+        'End Try
+        '↑本当はDBから取得！！！のたたき台↑
+        Dim retVal As New Dictionary(Of String, TrainListItem)
+        '袖ヶ浦
+        If salesOffice = "011203" AndAlso consignee = "40" Then
+            retVal.Add("5972", New TrainListItem("5972", "5972-南松本"))
+        End If
+        If salesOffice = "011203" AndAlso consignee = "30" Then
+            retVal.Add("8877", New TrainListItem("8877", "8877-倉賀野"))
+            retVal.Add("8883", New TrainListItem("8883", "8883-倉賀野"))
+        End If
+        '根岸
+        If salesOffice = "011402" AndAlso consignee = "10" Then
+            retVal.Add("5463", New TrainListItem("5463", "5463-坂城"))
+            retVal.Add("2085", New TrainListItem("2085", "2085-坂城"))
+            retVal.Add("8471", New TrainListItem("8471", "8471-坂城"))
+        End If
+        If salesOffice = "011402" AndAlso consignee = "20" Then
+            retVal.Add("81", New TrainListItem("81", "81-竜王"))
+            retVal.Add("83", New TrainListItem("83", "83-竜王"))
+        End If
+        '三重塩浜
+        If salesOffice = "012402" AndAlso consignee = "40" Then
+            retVal.Add("5282", New TrainListItem("5282", "5282-南松本"))
+            retVal.Add("8072", New TrainListItem("8072", "8072-南松本"))
+        End If
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 基準日を元に日付リストを生成
+    ''' </summary>
+    ''' <param name="baseDate">基準日</param>
+    ''' <param name="daySpan">引数BaseDateを含む設定した日付情報を取得(初期値:7)</param>
+    ''' <returns>キー：日付、値：日付アイテムクラス</returns>
+    Private Function GetTargetDateList(sqlCon As SqlConnection, baseDate As String, Optional daySpan As Integer = 7) As Dictionary(Of String, DaysItem)
+        Try
+            Dim retVal As New Dictionary(Of String, DaysItem)
+            '日付型に変換 検索条件よりわたってきている想定なので日付型に確実に変換できる想定
+            Dim baseDtm As Date = Date.Parse(baseDate)
+            Dim dtItm As DaysItem
+            '基準日から引数期間のデータを生成
+            For i As Integer = 0 To daySpan - 1
+                Dim currentDay As Date = baseDtm.AddDays(i)
+                dtItm = New DaysItem(currentDay)
+                retVal.Add(dtItm.KeyString, dtItm)
+            Next i
+
+            '祝祭日取得SQLの生成
+            Dim sqlStr As New StringBuilder
+            sqlStr.AppendLine("SELECT FORMAT(WORKINGYMD,'yyyy/MM/dd')  AS WORKINGYMD")
+            sqlStr.AppendLine("      ,WORKINGTEXT")
+            sqlStr.AppendLine("  FROM COM.OIS0021_CALENDAR")
+            sqlStr.AppendLine(" WHERE WORKINGYMD BETWEEN @FROMDT AND @TODT")
+            sqlStr.AppendLine("   AND WORKINGKBN >= @WORKINGKBN")
+            sqlStr.AppendLine("   AND DELFLG      = @DELFLG")
+            'DBより取得を行い祝祭日情報付与
+            Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@FROMDT", SqlDbType.Date).Value = retVal.Keys.First
+                    .Add("@TODT", SqlDbType.Date).Value = retVal.Keys.Last
+                    .Add("@WORKINGKBN", SqlDbType.NVarChar).Value = "2"
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                End With
+
+                Dim keyDate As String
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    While sqlDr.Read
+                        keyDate = Convert.ToString(sqlDr("WORKINGYMD"))
+                        If retVal.ContainsKey(keyDate) Then
+                            With retVal(keyDate)
+                                .IsHoliday = True '抽出結果は休日扱いなのでTrueを格納
+                                .HolidayName = Convert.ToString(sqlDr("WORKINGTEXT"))
+                            End With
+                        End If
+                    End While
+                End Using 'sqlDr
+
+            End Using 'sqlCmd
+            Return retVal
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005C")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select TargetDateList"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Throw '呼出し元の後続処理を走らせたくないのでThrow 
+        End Try
+
+    End Function
+    ''' <summary>
+    ''' 対象油種ディクショナリ作成
+    ''' </summary>
+    ''' <param name="sqlCon">SQL接続オブジェクト</param>
+    ''' <param name="salesOffice">営業所</param>
+    ''' <returns>キー:油種コード、値：油種アイテムクラス</returns>
+    Private Function GetTargetOilType(sqlCon As SqlConnection, salesOffice As String) As Dictionary(Of String, OilItem)
+        Dim retVal As New Dictionary(Of String, OilItem)
+        Dim sqlStr As New StringBuilder
+        sqlStr.AppendLine("SELECT KEYCODE  AS OILCODE")
+        sqlStr.AppendLine("      ,VALUE1   AS OILNAME")
+        sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE")
+        sqlStr.AppendLine(" WHERE CAMPCODE = @CAMPCODE")
+        sqlStr.AppendLine("   AND CLASS    = @CLASS")
+        sqlStr.AppendLine("   AND DELFLG   = @DELFLG")
+        sqlStr.AppendLine(" ORDER BY KEYCODE")
+        'DBより取得を行い祝祭日情報付与
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@CAMPCODE", SqlDbType.NVarChar).Value = salesOffice
+                .Add("@CLASS", SqlDbType.NVarChar).Value = "PRODUCTPATTERN"
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+            End With
+
+            Dim oilCode As String
+            Dim oilName As String
+            Dim oilItm As OilItem
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                While sqlDr.Read
+                    oilCode = Convert.ToString(sqlDr("OILCODE"))
+                    oilName = Convert.ToString(sqlDr("OILNAME"))
+                    oilItm = New OilItem(oilCode, oilName)
+                    retVal.Add(oilItm.OilCode, oilItm)
+                End While
+            End Using 'sqlDr
+        End Using 'sqlCmd
+        Return retVal
+
+    End Function
     ''' <summary>
     ''' 一意制約チェック
     ''' </summary>
@@ -2528,7 +2332,7 @@ Public Class OIT0004OilStockCreate
     ''' <remarks>一旦ViewStateに保存
     ''' （重ければシリアライズ→Base64化→1レコード1フィールドのDataTableにBase64文字を格納に格納、
     ''' 　共通関数で退避もやる余地はあり）</remarks>
-    Private Sub SaveThisScreenValue(dispDataClass As DemoDispDataClass)
+    Private Sub SaveThisScreenValue(dispDataClass As DispDataClass)
         ViewState("THISSCREENVALUES") = dispDataClass
     End Sub
     ''' <summary>
@@ -2536,16 +2340,18 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>一旦ViewStateに保存</remarks>
-    Private Function GetThisScreenData(frvSuggestObj As FormView, repStockObj As Repeater) As DemoDispDataClass
+    Private Function GetThisScreenData(frvSuggestObj As FormView, repStockObj As Repeater) As DispDataClass
         If ViewState("THISSCREENVALUES") Is Nothing Then
             Return Nothing
         End If
         '画面情報クラスの復元
-        Dim retVal As DemoDispDataClass = DirectCast(ViewState("THISSCREENVALUES"), DemoDispDataClass)
+        Dim retVal As DispDataClass = DirectCast(ViewState("THISSCREENVALUES"), DispDataClass)
         '提案表 日付リピーター
         Dim repValArea As Repeater = DirectCast(frvSuggestObj.FindControl("repSuggestItem"), Repeater)
         '提案表画面データの入力項目を画面情報保持クラスに反映
-        SetDispSuggestItemValue(retVal, repValArea)
+        If retVal.ShowSuggestList = True Then
+            SetDispSuggestItemValue(retVal, repValArea)
+        End If
         '在庫表画面データの入力項目を画面情報保持クラスに反映
         SetDispStockItemValue(retVal, repStockObj)
         Return retVal
@@ -2555,7 +2361,7 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     ''' <param name="dispDataClass">IN/OUT 画面情報クラス</param>
     ''' <param name="repSuggestItem">提案数リピーターオブジェクト</param>
-    Private Sub SetDispSuggestItemValue(ByRef dispDataClass As DemoDispDataClass, repSuggestItem As Repeater)
+    Private Sub SetDispSuggestItemValue(ByRef dispDataClass As DispDataClass, repSuggestItem As Repeater)
         Dim hdnSuggestListKeyObj As HiddenField = Nothing
         Dim suggestListKey As String = ""
 
@@ -2570,9 +2376,9 @@ Public Class OIT0004OilStockCreate
         Dim suggestValObj As TextBox = Nothing
         Dim suggestVal As String = ""
 
-        Dim dateValueClassItem As DemoDispDataClass.SuggestItem = Nothing
-        Dim trainValueClassItem As DemoDispDataClass.SuggestItem.SuggestValues = Nothing
-        Dim oilTypeValueClassItem As DemoDispDataClass.SuggestItem.SuggestValue = Nothing
+        Dim dateValueClassItem As DispDataClass.SuggestItem = Nothing
+        Dim trainValueClassItem As DispDataClass.SuggestItem.SuggestValues = Nothing
+        Dim oilTypeValueClassItem As DispDataClass.SuggestItem.SuggestValue = Nothing
         '一段階目 日付別のリピーター
         For Each repSuggestListItem As RepeaterItem In repSuggestItem.Items
             '提案リストの日付キーを取得
@@ -2604,24 +2410,576 @@ Public Class OIT0004OilStockCreate
             Next repSuggestTrainItem '二段階目リピーター
         Next repSuggestListItem '一段階目リピーター
     End Sub
-    Private Sub SetDispStockItemValue(ByRef dispDataClass As DemoDispDataClass, repStockItemObj As Repeater)
+    Private Sub SetDispStockItemValue(ByRef dispDataClass As DispDataClass, repStockItemObj As Repeater)
         Dim oilTypeCodeObj As HiddenField = Nothing
         Dim oilTypeCode As String = ""
 
         Dim repStockVal As Repeater = Nothing
+        Dim dateKeyObj As HiddenField = Nothing
+        Dim dateKeyStr As String = ""
         Dim sendObj As TextBox = Nothing '画面払出テキストボックス
         Dim sendVal As String = ""
+
+        Dim stockListClass = dispDataClass.StockList
+        Dim stockListCol As DispDataClass.StockListCollection = Nothing
+        Dim stockListItm As DispDataClass.StockListItem = Nothing
         For Each repOilTypeItem As RepeaterItem In repStockItemObj.Items
             oilTypeCodeObj = DirectCast(repOilTypeItem.FindControl("hdnOilTypeCode"), HiddenField)
             oilTypeCode = oilTypeCodeObj.Value
             repStockVal = DirectCast(repOilTypeItem.FindControl("repStockValues"), Repeater)
+            stockListCol = stockListClass(oilTypeCode)
+            For Each repStockValItem As RepeaterItem In repStockVal.Items
+                dateKeyObj = DirectCast(repStockValItem.FindControl("hdnDateKey"), HiddenField)
+                dateKeyStr = dateKeyObj.Value
+                sendObj = DirectCast(repStockValItem.FindControl("txtSend"), TextBox)
+                sendVal = sendObj.Text
 
-            For Each repStockValItem In repStockVal.Items
-                'sendObj = DirectCast()
+                stockListItm = stockListCol.StockItemList(dateKeyStr)
+                stockListItm.Send = sendVal
             Next repStockValItem
         Next repOilTypeItem
     End Sub
+    ''' <summary>
+    ''' 油種保持クラス
+    ''' </summary>
+    <Serializable>
+    Public Class OilItem
+        ''' <summary>
+        ''' 油種コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OilCode As String = ""
+        ''' <summary>
+        ''' 油種名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OilName As String = ""
+        ''' <summary>
+        ''' 比重
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Weight As Decimal = 0
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New(oilCode As String, oilName As String)
+            Me.OilCode = oilCode
+            Me.OilName = oilName
+            'Weight格納は一旦ベタ打ち
+            Select Case oilCode
+                Case "1001" 'ハイオク
+                    Me.Weight = 0.75D
+                Case "1101" 'レギュラー
+                    Me.Weight = 0.75D
+                Case "1301" '灯油
+                    Me.Weight = 0.79D
+                Case "1401" '軽油
+                    Me.Weight = 0.75D
+                Case "2101" 'Ａ重油
+                    Me.Weight = 0.87D
+                Case "2201" 'ＬＳＡ
+                    Me.Weight = 0.87D
+                Case "1302" '未添加灯油
+                    Me.Weight = 0.75D
+                Case "1404" '３号軽油
+                    Me.Weight = 0.82D
+                Case Else
+                    Me.Weight = 0.75D
+            End Select
+        End Sub
+    End Class
+    ''' <summary>
+    ''' 列車番号クラス
+    ''' </summary>
+    <Serializable>
+    Public Class TrainListItem
+        ''' <summary>
+        ''' 列車番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TrainNo As String
+        ''' <summary>
+        ''' 列車名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TrainName As String
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="trainNo">列車番号</param>
+        ''' <param name="trainName">列車名</param>
+        Public Sub New(trainNo As String, trainName As String)
+            Me.TrainNo = trainNo
+            Me.TrainName = trainName
+        End Sub
+    End Class
+    ''' <summary>
+    ''' 日付保持クラス
+    ''' </summary>
+    <Serializable>
+    Public Class DaysItem
+        ''' <summary>
+        ''' 画面表示用日付書式
+        ''' </summary>
+        Const DISP_DATEFORMAT As String = "M月d日(<\span>ddd</\span>)"
+        ''' <summary>
+        ''' キーとなる日付文字列(yyyy/MM/dd)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property KeyString As String
+        ''' <summary>
+        ''' 画面表示用日付
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DispDate As String
+        ''' <summary>
+        ''' 日付型での対象日付
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ItemDate As Date
+        ''' <summary>
+        ''' 祝祭日判定(True:祝祭日,False:通常日)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IsHoliday As Boolean = False
+        ''' <summary>
+        ''' 曜日番号(日:0 ～ 土：6)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property WeekNum As String
+        ''' <summary>
+        ''' 休日名称
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property HolidayName As String = ""
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="day">格納する日付</param>
+        Public Sub New(day As Date)
+            Me.KeyString = day.ToString("yyyy/MM/dd")
+            Me.DispDate = day.ToString(DISP_DATEFORMAT)
+            Me.ItemDate = day
+            Me.IsHoliday = False '一旦False、別処理で設定
+            Me.WeekNum = CInt(day.DayOfWeek).ToString
+            Me.HolidayName = "" '一旦ブランク 別処理で設定
+        End Sub
+    End Class
+    ''' <summary>
+    ''' 在庫管理表検索データクラス
+    ''' </summary>
+    ''' <remarks>デモ用ですが画面オブジェクト及び外部の変数へは直接アクセスしなこと
+    ''' （コンストラクタや引数で受け渡しさせる、別ファイルに外だしした時もワークするように考慮する）
+    ''' 当クラス及びサブクラス内でDB操作をする際はきっちりデストラクタ(Finalize)を仕込む
+    ''' 場合によってはUsingをサポートするように記述する</remarks>
+    <Serializable>
+    Public Class DispDataClass
+        Public Const SUMMARY_CODE As String = "Summary"
+        ''' <summary>
+        ''' 受注提案タンク車数リストプロパティ
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Key=日付 Value=列車、油種、チェックボックス、受入数を加味したリスト</remarks>
+        Public Property SuggestList As New Dictionary(Of String, SuggestItem)
+        ''' <summary>
+        ''' 油種名のディクショナリ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property SuggestOilNameList As New Dictionary(Of String, OilItem)
+        ''' <summary>
+        ''' 比重リストアイテム
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OilTypeList As Dictionary(Of String, OilItem)
+        ''' <summary>
+        ''' 在庫一覧日付部分
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property StockDate As Dictionary(Of String, DaysItem)
+        ''' <summary>
+        ''' 在庫一覧データ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property StockList As Dictionary(Of String, StockListCollection)
+        ''' <summary>
+        ''' 提案書表示可否(True:表示,False:非表示)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ShowSuggestList As Boolean = True
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="daysList">対象日リスト</param>
+        ''' <param name="trainList">列車IDリスト</param>
+        ''' <param name="oilTypeList">対象油種リスト</param>
+        Public Sub New(daysList As Dictionary(Of String, DaysItem), trainList As Dictionary(Of String, TrainListItem), oilTypeList As Dictionary(Of String, OilItem))
+            '******************************
+            'コンストラクタ引数チェック
+            '(一旦呼出し元にスローします)
+            '******************************
+            '引数が日付に変換できない場合エラー
+            If daysList Is Nothing OrElse daysList.Count = 0 Then
+                Throw New Exception("baseDay dose not convert to date.")
+            End If
 
+            If oilTypeList Is Nothing OrElse oilTypeList.Count = 0 Then
+                Throw New Exception("oilCodes is empty.")
+            End If
+            '提案リストデータ作成有無判定
+            If trainList Is Nothing OrElse trainList.Count = 0 Then
+                Me.ShowSuggestList = False
+            End If
+            '引数情報をプロパティに保持
+            Me.OilTypeList = oilTypeList
+            '******************************
+            '提案リストデータ作成処理
+            '******************************
+            If Me.ShowSuggestList = True Then
+                '******************************
+                ' 提案リスト縦軸の油種名を生成
+                '******************************
+                Me.SuggestOilNameList = CreateSuggestOilNameList(oilTypeList)
+                '******************************
+                ' 基準日～基準日＋7 
+                ' 提案リスト
+                ' 日付ごとのSuggestItemを生成
+                '******************************
+                Me.SuggestList = New Dictionary(Of String, SuggestItem)
+                For Each dayItm In daysList.Values  'i = 0 To 6
+                    '列車Noのループ
+                    Dim suggestItem = New SuggestItem(dayItm)
+                    For Each trainInfo In trainList.Values
+                        suggestItem.Add(trainInfo, Me.SuggestOilNameList)
+                    Next trainInfo
+                    Me.SuggestList.Add(dayItm.KeyString, suggestItem)
+                Next 'dayItm
+            End If
+            '******************************
+            ' 比重リスト生成
+            '******************************
+            'oilTypeListをそのまま使用
+            '******************************
+            ' 在庫リスト生成
+            '******************************
+            '表示用ヘッダー日付生成
+            Me.StockDate = daysList
+            Me.StockList = New Dictionary(Of String, StockListCollection)
+            For Each oilNameItem In Me.OilTypeList
+                If oilNameItem.Key = SUMMARY_CODE Then
+                    Continue For
+                End If
+                Dim item As New StockListCollection(oilNameItem.Value, Me.StockDate)
+                Me.StockList.Add(oilNameItem.Key, item)
+            Next 'oilNameItem
+        End Sub
+        ''' <summary>
+        ''' 入力項目を0クリア・チェックボックスを未チェックにするメソッド
+        ''' </summary>
+        Public Sub InputValueToZero()
+            '提案表クリア
+            For Each suggestItm In SuggestList.Values
+                For Each odrItem In suggestItm.SuggestOrderItem.Values
+                    odrItem.CheckValue = False 'チェックボックスを未チェック
+                    For Each itm In odrItem.SuggestValuesItem.Values
+                        itm.ItemValue = "0" 'テキストをすべて0
+                    Next
+                Next
+            Next
+            '在庫表クリア
+            For Each odrItem In Me.StockList.Values
+                For Each trainIdItem In odrItem.StockItemList.Values
+                    trainIdItem.Send = "0" '払い出し0クリア
+                Next
+            Next
+        End Sub
+
+        ''' <summary>
+        ''' 油種名、油種コードリストを生成
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>合計行の付与</remarks>
+        Private Function CreateSuggestOilNameList(oilCodes As Dictionary(Of String, OilItem)) As Dictionary(Of String, OilItem)
+            Dim retVal As New Dictionary(Of String, OilItem)
+            Dim copiedItem As OilItem
+            For Each itm In oilCodes
+                copiedItem = New OilItem(itm.Key, itm.Value.OilName)
+                copiedItem.Weight = itm.Value.Weight
+                retVal.Add(itm.Key, copiedItem)
+            Next
+            '合計行の付与
+            retVal.Add(SUMMARY_CODE, New OilItem(SUMMARY_CODE, "合計"))
+            Return retVal
+        End Function
+
+        ''' <summary>
+        ''' 列車Noをキーに持つ受注提案アイテム
+        ''' </summary>
+        <Serializable>
+        Public Class SuggestItem
+            ''' <summary>
+            ''' 日付情報クラス
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property DayInfo As DaysItem
+            ''' <summary>
+            ''' 受入数情報格納用ディクショナリ
+            ''' </summary>
+            ''' <returns></returns>
+            ''' <remarks>Key=列車No,Value=一覧の値クラス</remarks>
+            Public Property SuggestOrderItem As Dictionary(Of String, SuggestValues)
+            ''' <summary>
+            ''' 【未使用】積置き情報格納用ディクショナリ
+            ''' </summary>
+            ''' <returns></returns>
+            ''' <remarks>未使用 一旦残すがしばらくしたら消す</remarks>
+            Public Property SuggestLoadingItem As Dictionary(Of String, SuggestValues)
+            ''' <summary>
+            ''' 列車情報クラス
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TrainInfo As TrainListItem
+            ''' <summary>
+            ''' コンストラクタ
+            ''' </summary>
+            ''' <param name="targetDate">日付情報クラス</param>
+            Public Sub New(targetDate As DaysItem)
+                Me.DayInfo = targetDate
+                Me.SuggestOrderItem = New Dictionary(Of String, SuggestValues)
+            End Sub
+            ''' <summary>
+            ''' 提案データ追加メソッド
+            ''' </summary>
+            ''' <param name="trainInfo">列車情報クラス</param>
+            ''' <param name="oilCodes">油種情報コレクション</param>
+            Public Sub Add(trainInfo As TrainListItem, oilCodes As Dictionary(Of String, OilItem))
+                Dim orderValues = New SuggestValues
+                orderValues.TrainInfo = trainInfo
+                For Each oilCodeItem In oilCodes.Values
+                    orderValues.Add(oilCodeItem, "0", Me.DayInfo)
+                Next
+                'orderValues.Add(New OilItem(SUMMARY_CODE, "合計"), "0", Me.DayInfo)
+                Me.SuggestOrderItem.Add(trainInfo.TrainNo, orderValues)
+                Me.TrainInfo = trainInfo
+
+            End Sub
+
+            ''' <summary>
+            ''' 受注提案タンク車数用数値情報格納クラス
+            ''' </summary>
+            <Serializable>
+            Public Class SuggestValues
+                ''' <summary>
+                ''' 受注提案タンク車数用数値情報ディクショナリ
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property SuggestValuesItem As Dictionary(Of String, SuggestValue)
+                ''' <summary>
+                ''' 提案表チェックボックスチェック状態
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property CheckValue As Boolean = False
+                ''' <summary>
+                ''' 列車情報クラス
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property TrainInfo As TrainListItem
+                ''' <summary>
+                ''' デフォルトプロパティ
+                ''' </summary>
+                ''' <param name="oilCode"></param>
+                ''' <returns></returns>
+                Default Public Property _item(oilCode As String) As SuggestValue
+                    Get
+                        Return Me.SuggestValuesItem(oilCode)
+                    End Get
+                    Set(value As SuggestValue)
+                        Me.SuggestValuesItem(oilCode) = value
+                    End Set
+                End Property
+                ''' <summary>
+                ''' コンストラクタ
+                ''' </summary>
+                Public Sub New()
+                    Me.SuggestValuesItem = New Dictionary(Of String, SuggestValue)
+                End Sub
+                ''' <summary>
+                ''' アイテム追加メソッド
+                ''' </summary>
+                ''' <param name="oilInfo">油種情報クラス</param>
+                ''' <param name="val">計算値</param>
+                ''' <param name="dayItm">日付情報</param>
+                Public Sub Add(oilInfo As OilItem, val As String, dayItm As DaysItem)
+                    Me.SuggestValuesItem.Add(oilInfo.OilCode, New SuggestValue _
+                        With {.ItemValue = val, .OilInfo = oilInfo, .DayInfo = dayItm})
+                End Sub
+            End Class
+            ''' <summary>
+            ''' 提案値クラス
+            ''' </summary>
+            <Serializable>
+            Public Class SuggestValue
+                ''' <summary>
+                ''' 油種コード
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property OilCode As String = ""
+                Public Property OilInfo As OilItem = Nothing
+                ''' <summary>
+                ''' 数
+                ''' </summary>
+                ''' <returns></returns>
+                ''' <remarks>画面入力項目の為String</remarks>
+                Public Property ItemValue As String = "0"
+                ''' <summary>
+                ''' 日付情報
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property DayInfo As DaysItem = Nothing
+            End Class
+        End Class
+        ''' <summary>
+        ''' 在庫クラス
+        ''' </summary>
+        <Serializable>
+        Public Class StockListCollection
+            ''' <summary>
+            ''' コンストラクタ
+            ''' </summary>
+            Public Sub New(oilTypeItem As OilItem,
+                           dateItem As Dictionary(Of String, DaysItem))
+                Me.OilTypeCode = oilTypeItem.OilCode
+                Me.OilTypeName = oilTypeItem.OilName
+                '２列目から４列目のタンク容量～前週出荷平均については
+                '一旦0
+                Me.TankCapacity = 12345.6D
+                Me.TargetStock = 0
+                Me.TargetStockRate = 0
+                Me.Stock80 = 0
+                Me.DS = 0
+                Me.LastShipmentAve = 0
+                Me.StockItemList = New Dictionary(Of String, StockListItem)
+                For Each dateVal In dateItem
+                    Dim item = New StockListItem(dateVal.Key, dateVal.Value)
+                    Me.StockItemList.Add(dateVal.Key, item)
+                Next
+            End Sub
+
+            ''' <summary>
+            ''' 油種コード
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property OilTypeCode As String = ""
+            ''' <summary>
+            ''' 油種名
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property OilTypeName As String = ""
+            ''' <summary>
+            ''' タンク容量
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TankCapacity As Decimal
+            ''' <summary>
+            ''' 目標在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TargetStock As Decimal
+            ''' <summary>
+            ''' 目標在庫率
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TargetStockRate As Decimal
+            ''' <summary>
+            ''' 80%在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Stock80 As Decimal
+            ''' <summary>
+            ''' D/S
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property DS As Decimal
+            ''' <summary>
+            ''' 前週出荷平均
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property LastShipmentAve As Decimal
+            ''' <summary>
+            ''' 日付別の在庫データ
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property StockItemList As Dictionary(Of String, StockListItem)
+        End Class
+        <Serializable>
+        Public Class StockListItem
+            ''' <summary>
+            ''' コンストラクタ
+            ''' </summary>
+            Public Sub New(dispDate As String, dayItm As DaysItem)
+                Me.DaysItem = dayItm
+                'Demo用、実際イメージ沸いてから値のコンストラクタ引数追加など仕込み方は考える
+                Me.LastEveningStock = 12345
+                Me.Retentiondays = 0
+                Me.MorningStock = 0
+                Me.Receive = 0
+                Me.Send = "0" '画面入力項目の為文字
+                Me.EveningStock = 0
+                Me.EveningStockWithoutDS = 0
+                Me.FreeSpace = 0
+                Me.StockRate = 0
+            End Sub
+            ''' <summary>
+            ''' 日付情報クラス
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property DaysItem As DaysItem
+            ''' <summary>
+            ''' 前日夕在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property LastEveningStock As Decimal
+            ''' <summary>
+            ''' 保有日数
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Retentiondays As Decimal
+            ''' <summary>
+            ''' 朝在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property MorningStock As Decimal
+            ''' <summary>
+            ''' 受入
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Receive As Decimal
+            ''' <summary>
+            ''' 払出(画面入力エリアの為文字列)
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Send As String
+            ''' <summary>
+            ''' 夕在庫
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property EveningStock As Decimal
+            ''' <summary>
+            ''' 夕在庫D/S除
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property EveningStockWithoutDS As Decimal
+            ''' <summary>
+            ''' 空容量
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property FreeSpace As Decimal
+            ''' <summary>
+            ''' 在庫率
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property StockRate As Decimal
+        End Class
+    End Class
 #Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"
     '   "RepeaterでPoscBack時処理で使用するため保持させる必要上RepeaterのViewState使用停止するのは難しい"
 

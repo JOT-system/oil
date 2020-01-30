@@ -51,6 +51,8 @@
     <asp:TextBox ID="WF_SEL_ORDERNUMBER" runat="server"></asp:TextBox>
     <!-- 列車 -->
     <asp:TextBox ID="WF_SEL_TRAIN" runat="server"></asp:TextBox>
+    <!-- 列車名 -->
+    <asp:TextBox ID="WF_SEL_TRAINNAME" runat="server"></asp:TextBox>
     <!-- パターンコード -->
     <asp:TextBox ID="WF_SEL_PATTERNCODE" runat="server"></asp:TextBox>
     <!-- パターン名 -->
@@ -177,6 +179,8 @@
     <asp:TextBox ID="WF_SEL_LINK_PREORDERNO" runat="server"></asp:TextBox>
     <!-- 列車 -->
     <asp:TextBox ID="WF_SEL_LINK_TRAIN" runat="server"></asp:TextBox>
+    <!-- 列車名 -->
+    <asp:TextBox ID="WF_SEL_LINK_TRAINNAME" runat="server"></asp:TextBox>
     <!-- 担当営業所 -->
     <asp:TextBox ID="WF_SEL_LINK_ORDERSALESOFFICE" runat="server"></asp:TextBox>
     <!-- 空車発駅(名) -->

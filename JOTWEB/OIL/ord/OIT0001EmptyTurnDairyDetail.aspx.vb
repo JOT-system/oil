@@ -39,16 +39,8 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
     Private WW_ORDERINFOFLG_10 As Boolean = False                        '受注情報セット可否(情報(10:積置))
-    'Private WW_ORDERINFO_10 As String = "10"                             '受注情報(10:積置)用格納
-    'Private WW_ORDERINFONAME_10 As String = "積置"
-
     Private WW_ORDERINFOALERMFLG_80 As Boolean = False                   '受注情報セット可否(警告(80:タンク車数オーバー))
-    Private WW_ORDERINFOALERM_80 As String = "80"                        '受注情報(80:タンク車数オーバー)用格納
-    Private WW_ORDERINFOALERMNAME_80 As String = "タンク車数オーバー"
-
     Private WW_ORDERINFOALERMFLG_82 As Boolean = False                   '受注情報セット可否(警告(82:検査間近あり))
-    Private WW_ORDERINFOALERM_82 As String = "82"                        '受注情報(82:検査間近あり)用格納
-    Private WW_ORDERINFOALERMNAME_82 As String = "検査間近あり"
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -1277,10 +1269,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Select Case WW_JRINSPECTIONFLG
                             Case "1"
                                 updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                             Case "2"
                                 updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                             Case "3"
                                 updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                         End Select
                     Else
                         updHeader.Item("JRINSPECTIONALERT") = ""
@@ -1303,10 +1298,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Select Case WW_JRALLINSPECTIONFLG
                             Case "1"
                                 updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                             Case "2"
                                 updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                             Case "3"
                                 updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                         End Select
                     Else
                         updHeader.Item("JRALLINSPECTIONALERT") = ""
@@ -3247,11 +3245,11 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '〇 交付アラート、または全検アラートが1件でも警告以上の場合
                     If WW_ORDERINFOALERMFLG_82 = True Then
-                        PARA22.Value = WW_ORDERINFOALERM_82
+                        PARA22.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
 
                         '    '〇 積込日 < 発日 の場合 
                         'ElseIf WW_ORDERINFOFLG_10 = True AndAlso WW_ORDERINFOALERMFLG_82 = False Then
-                        '    PARA22.Value = WW_ORDERINFO_10
+                        '    PARA22.Value = BaseDllConst.CONST_ORDERINFO_10
 
                         '〇 上記以外
                     ElseIf WW_ORDERINFOALERMFLG_82 = False Then
@@ -3880,12 +3878,12 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '受付情報が「検査間近有」の場合は優先して設定
                     If WW_ORDERINFOALERMFLG_82 = True Then
-                        PARAUP36.Value = WW_ORDERINFOALERM_82
+                        PARAUP36.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
 
                         'タンク車数が「最大牽引タンク車数」より大きい場合
                     ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
                         '80(タンク車数オーバー)を設定
-                        PARAUP36.Value = WW_ORDERINFOALERM_80
+                        PARAUP36.Value = BaseDllConst.CONST_ORDERINFO_ALERT_80
 
                     ElseIf Integer.Parse(TxtTotalTank.Text) <= Integer.Parse(WW_GetValue(3)) Then
                         PARAUP36.Value = ""

@@ -275,6 +275,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''lstDispStockOilType コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lstDispStockOilType As Global.System.Web.UI.WebControls.ListBox
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

@@ -214,6 +214,15 @@ Public Class OIT0004OilStockCreate
         repStockOilTypeItem.DataSource = dispDataObj.StockList
         repStockOilTypeItem.DataBind()
         SaveThisScreenValue(dispDataObj)
+        '4.在庫表表示マーク
+        lstDispStockOilType.DataSource = oilTypeList.Values
+        lstDispStockOilType.DataTextField = "OilName"
+        lstDispStockOilType.DataValueField = "OilCode"
+        lstDispStockOilType.DataBind()
+        For Each lstItem As ListItem In lstDispStockOilType.Items
+            lstItem.Selected = True
+        Next
+
     End Sub
     ''' <summary>
     ''' 自動提案ボタン押下時処理
@@ -2725,6 +2734,11 @@ Public Class OIT0004OilStockCreate
             ''' <remarks>未使用 一旦残すがしばらくしたら消す</remarks>
             Public Property SuggestLoadingItem As Dictionary(Of String, SuggestValues)
             ''' <summary>
+            ''' 列車情報クラス
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property TrainInfo As TrainListItem
+            ''' <summary>
             ''' コンストラクタ
             ''' </summary>
             ''' <param name="targetDate">日付情報クラス</param>
@@ -2739,11 +2753,14 @@ Public Class OIT0004OilStockCreate
             ''' <param name="oilCodes">油種情報コレクション</param>
             Public Sub Add(trainInfo As TrainListItem, oilCodes As Dictionary(Of String, OilItem))
                 Dim orderValues = New SuggestValues
+                orderValues.TrainInfo = trainInfo
                 For Each oilCodeItem In oilCodes.Values
                     orderValues.Add(oilCodeItem, "0", Me.DayInfo)
                 Next
                 'orderValues.Add(New OilItem(SUMMARY_CODE, "合計"), "0", Me.DayInfo)
                 Me.SuggestOrderItem.Add(trainInfo.TrainNo, orderValues)
+                Me.TrainInfo = trainInfo
+
             End Sub
 
             ''' <summary>
@@ -2756,7 +2773,16 @@ Public Class OIT0004OilStockCreate
                 ''' </summary>
                 ''' <returns></returns>
                 Public Property SuggestValuesItem As Dictionary(Of String, SuggestValue)
+                ''' <summary>
+                ''' 提案表チェックボックスチェック状態
+                ''' </summary>
+                ''' <returns></returns>
                 Public Property CheckValue As Boolean = False
+                ''' <summary>
+                ''' 列車情報クラス
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property TrainInfo As TrainListItem
                 ''' <summary>
                 ''' デフォルトプロパティ
                 ''' </summary>

@@ -791,7 +791,8 @@ Public Class OIT0002LinkDetail
             '本線列車
             Case "TxtHeadOfficeTrain"
                 Dim WW_GetValue() As String = {"", "", "", "", ""}
-                FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
+                'FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
                 '空車発駅（着駅）
                 TxtDepstation.Text = WW_GetValue(2)

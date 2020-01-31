@@ -440,6 +440,10 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_DATE_AVAILABLEDATE_ERROR As String = "20015"
 
+        ''' <summary>
+        ''' 列車牽引車数オーバー
+        ''' </summary>
+        Public Const OIL_TRAINCARS_ERROR As String = "20016"
 
 #End Region
 

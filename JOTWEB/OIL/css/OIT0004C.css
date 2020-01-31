@@ -232,6 +232,10 @@ div.weightListOilType {
 #divStockList div.lastMargin {
     margin-left:auto;
 }
+/* マイナス金額の場合強調表示 */
+span.minus {
+    color:red;
+}
 /* ヘッダー行 日付（文言）、日付関連 */
 /* データ行の１～６列目の幅を足す
    ※余白要素があるので手動でバランスとる */
@@ -371,7 +375,10 @@ div.weightListOilType {
 {
     border-right: 1px solid darkgray;
 }
-#divStockList div.oilTypeData:nth-last-child(1) > div {
+#divStockList div.oilTypeData:nth-last-child(1) > div{
+    border-bottom: 1px solid darkgray;
+}
+#divStockList div.oilTypeData.lastRow > div {
     border-bottom: 1px solid darkgray;
 }
 #divStockList div.colStockInfoTopRow {
@@ -394,6 +401,7 @@ div.weightListOilType {
     padding-right:5px;
     border-radius :10px;
     margin-right:2px;
+    height:0;
     height:calc(50% - 2px);
     cursor:pointer;
 }

@@ -404,6 +404,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS TANKNO" _
             & " , ''                                             AS LASTOILCODE" _
             & " , ''                                             AS LASTOILNAME" _
+            & " , ''                                             AS PREORDERINGTYPE" _
+            & " , ''                                             AS PREORDERINGOILNAME" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
@@ -446,7 +448,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')     AS ORDERINGOILNAME" _
             & " , ISNULL(RTRIM(OIT0003.TANKNO), '')              AS TANKNO" _
             & " , ISNULL(RTRIM(OIT0005.LASTOILCODE), '')         AS LASTOILCODE" _
-            & " , ISNULL(RTRIM(OIT0005.PREORDERINGOILNAME), '')  AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(OIT0005.LASTOILNAME), '')         AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(OIT0005.PREORDERINGTYPE), '')     AS PREORDERINGTYPE" _
+            & " , ISNULL(RTRIM(OIT0005.PREORDERINGOILNAME), '')  AS PREORDERINGOILNAME" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
@@ -1268,7 +1272,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '油種名(受発注用)を一覧に設定
                 ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
-                    updHeader.Item("OILCODE") = WW_SETVALUE
+                    updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
@@ -1288,12 +1292,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
                     updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                    'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                    'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+                    updHeader.Item("LASTOILNAME") = WW_GetValue(4)
+                    updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
+                    updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
 
-                    WW_GetValue = {"", "", "", "", "", "", "", ""}
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", updHeader.Item("LASTOILCODE"), WW_GetValue)
-                    updHeader.Item("LASTOILNAME") = WW_GetValue(0)
+                    ''CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                    ''updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+
+                    'WW_GetValue = {"", "", "", "", "", "", "", ""}
+                    'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", updHeader.Item("LASTOILCODE"), WW_GetValue)
+                    'updHeader.Item("LASTOILNAME") = WW_GetValue(0)
 
                     '交検日
                     Dim WW_JRINSPECTIONCNT As String
@@ -1649,6 +1657,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS TANKNO" _
             & " , ''                                             AS LASTOILCODE" _
             & " , ''                                             AS LASTOILNAME" _
+            & " , ''                                             AS PREORDERINGTYPE" _
+            & " , ''                                             AS PREORDERINGOILNAME" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
@@ -2030,6 +2040,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0001INProw("TANKNO"), WW_GetValue)
                 OIT0001INProw("LASTOILCODE") = WW_GetValue(1)
 
+                '前回油種名(前回油種コードから油種名を取得し設定)
+                'WW_GetValue = {"", "", "", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", OIT0001INProw("LASTOILCODE"), WW_GetValue)
+                'OIT0001INProw("LASTOILNAME") = WW_GetValue(0)
+                OIT0001INProw("LASTOILNAME") = WW_GetValue(4)
+                OIT0001INProw("PREORDERINGTYPE") = WW_GetValue(5)
+                OIT0001INProw("PREORDERINGOILNAME") = WW_GetValue(6)
+
                 '交検日
                 OIT0001INProw("JRINSPECTIONDATE") = WW_GetValue(2)
 
@@ -2081,11 +2099,6 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Else
                     OIT0001INProw("JRALLINSPECTIONALERT") = ""
                 End If
-
-                '前回油種名(前回油種コードから油種名を取得し設定)
-                WW_GetValue = {"", "", "", "", "", "", "", ""}
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", OIT0001INProw("LASTOILCODE"), WW_GetValue)
-                OIT0001INProw("LASTOILNAME") = WW_GetValue(0)
 
             End If
 
@@ -2242,6 +2255,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '前回油種
                     updHeader.Item("LASTOILCODE") = ""
                     updHeader.Item("LASTOILNAME") = ""
+                    updHeader.Item("PREORDERINGTYPE") = ""
+                    updHeader.Item("PREORDERINGOILNAME") = ""
                     '交検日
                     updHeader.Item("JRINSPECTIONDATE") = ""
                     updHeader.Item("JRINSPECTIONALERT") = ""
@@ -2262,13 +2277,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '前回油種
                 Dim WW_LASTOILNAME As String = ""
                 updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+                updHeader.Item("LASTOILNAME") = WW_GetValue(4)
+                updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
+                updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
+                ''CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                ''updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
 
-                WW_GetValue = {"", "", "", "", "", "", "", ""}
-                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue)
-                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_GetValue(1) + WW_GetValue(4), WW_GetValue)
-                updHeader.Item("LASTOILNAME") = WW_GetValue(0)
+                'WW_GetValue = {"", "", "", "", "", "", "", ""}
+                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue)
+                ''WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_GetValue(1) + WW_GetValue(4), WW_GetValue)
+                'updHeader.Item("LASTOILNAME") = WW_GetValue(0)
 
                 '交検日
                 Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
@@ -2727,7 +2745,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         '前回油種と油種の整合性チェック
         For Each OIT0001row As DataRow In OIT0001tbl.Rows
-            WW_FixvalueMasterSearch(OIT0001row("LASTOILCODE"), "LASTOILCONSISTENCY", OIT0001row("OILCODE"), WW_GetValue)
+            WW_FixvalueMasterSearch(OIT0001row("LASTOILCODE") + OIT0001row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0001row("OILCODE") + OIT0001row("ORDERINGTYPE"), WW_GetValue)
 
             If WW_GetValue(2) = "1" Then
                 Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)

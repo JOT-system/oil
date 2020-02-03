@@ -445,6 +445,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_TRAINCARS_ERROR As String = "20016"
 
+        ''' <summary>
+        ''' 高速列車非対応タンク車エラー
+        ''' </summary>
+        Public Const OIL_SPEEDTRAINTANK_ERROR As String = "20017"
+
 #End Region
 
 

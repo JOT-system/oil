@@ -630,6 +630,7 @@ Public Class OILMasterPage
         O_VALUE = CS0010CHARstr.CHAROUT
         Return O_VALUE
     End Function
+
     ''' <summary>
     ''' 単項目チェック処理
     ''' </summary>
@@ -640,12 +641,28 @@ Public Class OILMasterPage
     ''' <param name="I_LEN_SAME_FLG">固定桁数チェックフラグ</param>
     ''' <remarks></remarks>
     Public Sub CheckField(ByVal I_COMPCODE As String, ByVal I_FIELD As String, ByRef IO_VALUE As String, ByRef O_MESSAGENO As String, ByRef O_CHECKREPORT As String, Optional ByVal I_LEN_SAME_FLG As Boolean = False)
+
+        Static chkKey As ChkItm
+        If chkKey Is Nothing OrElse
+           chkKey.CompCode <> I_COMPCODE OrElse
+           chkKey.MapId <> Me.MAPID Then
+            chkKey = New ChkItm
+            chkKey.CompCode = I_COMPCODE
+            chkKey.MapId = Me.MAPID
+            chkKey.Tbl = New DataTable
+        End If
+
         CS0036FCHECK.CAMPCODE = I_COMPCODE                              '会社コード
         CS0036FCHECK.MAPID = Me.MAPID                                   '画面ID
         CS0036FCHECK.FIELD = I_FIELD                                    '項目名
         CS0036FCHECK.VALUE = IO_VALUE                                   '値
         CS0036FCHECK.SAMEFLG = I_LEN_SAME_FLG                           '固定桁数チェックフラグ
+        CS0036FCHECK.TBL = chkKey.Tbl
         CS0036FCHECK.check()
+
+        If chkKey IsNot Nothing Then
+            chkKey.Tbl = CS0036FCHECK.TBL
+        End If
 
         O_MESSAGENO = CS0036FCHECK.ERR
         O_CHECKREPORT = CS0036FCHECK.CHECKREPORT
@@ -655,6 +672,27 @@ Public Class OILMasterPage
         End If
 
     End Sub
+    ''' <summary>
+    ''' 入力チェックキー情報保持用クラス
+    ''' </summary>
+    Private Class ChkItm
+        ''' <summary>
+        ''' 会社コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CompCode As String
+        ''' <summary>
+        ''' マップID
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MapId As String
+        ''' <summary>
+        ''' DataFieldマスタ取得結果保持用
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Tbl As DataTable
+    End Class
+
     '''' <summary>
     '''' 単項目チェック処理チェック存在確認
     '''' </summary>

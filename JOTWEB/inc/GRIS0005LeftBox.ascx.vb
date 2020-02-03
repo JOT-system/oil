@@ -197,6 +197,7 @@ Public Class GRIS0005LeftBox
         LP_STATION
         LP_ORDERTYPE
         LP_PRODUCTSEGLIST
+        LP_ADDITINALCONDITION
     End Enum
 
     ''' <summary>
@@ -363,7 +364,7 @@ Public Class GRIS0005LeftBox
     Public Function GetActiveValue() As String()
         Select Case WF_LEFTMView.ActiveViewIndex
             Case 2
-                Return WF_TBL_SELECT.Text.Split(C_TABLE_SPLIT)
+                Return WF_TBL_SELECT.Text.Split(C_TABLE_SPLIT.ToCharArray)
             Case 1
                 Dim Value As String() = {"", ""}
                 Value(0) = WF_Calendar.Text
@@ -404,7 +405,7 @@ Public Class GRIS0005LeftBox
     ''' </param>
     ''' <returns>作成した一覧情報</returns>
     ''' <remarks></remarks>
-    Protected Function CreateListData(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
+    Protected Function CreateListData(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing) As ListBox
         If IsNothing(Params) Then
             Params = New Hashtable
         End If
@@ -662,7 +663,7 @@ Public Class GRIS0005LeftBox
                 LbMap.Add(key, lsbx)
             End Using
         End If
-        Return LbMap.Item(key)
+        Return DirectCast(LbMap.Item(key), ListBox)
     End Function
 
     '''' <summary>
@@ -774,7 +775,7 @@ Public Class GRIS0005LeftBox
                 LbMap.Add(Key, lsbx)
             End Using
         End If
-        Return LbMap.Item(Key)
+        Return DirectCast(LbMap.Item(Key), ListBox)
     End Function
 
     '''' <summary>
@@ -1084,12 +1085,12 @@ Public Class GRIS0005LeftBox
     Protected Function CreateBaseList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
         Dim I_COMP = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
 
-        Dim key As String = I_COMP
+        Dim key As String = Convert.ToString(I_COMP)
         If Not LbMap.ContainsKey(key) Then
             Dim lsbx As New ListBox
 
             Using GL0014PLANTList As New GL0014PLANTList With {
-                   .CAMPCODE = I_COMP _
+                   .CAMPCODE = key _
                  , .LIST = lsbx
                 }
                 GL0014PLANTList.getList()
@@ -1100,7 +1101,7 @@ Public Class GRIS0005LeftBox
             End Using
         End If
 
-        Return LbMap.Item(key)
+        Return DirectCast(LbMap.Item(key), ListBox)
     End Function
 
     ''' <summary>
@@ -1111,9 +1112,12 @@ Public Class GRIS0005LeftBox
     ''' <returns>作成した一覧情報</returns>
     ''' <remarks></remarks>
     Protected Function CreateStationList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        Dim I_COMP = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
-        Dim I_CLASS = Params.Item(C_PARAMETERS.LP_FIX_CLASS)
-        Dim I_DEPARRFLG = Params.Item(C_PARAMETERS.LP_STATION)
+        Dim I_COMP As String = C_DEFAULT_DATAKEY
+        If Params.Item(C_PARAMETERS.LP_COMPANY) IsNot Nothing Then
+            I_COMP = Convert.ToString(Params.Item(C_PARAMETERS.LP_COMPANY))
+        End If
+        Dim I_CLASS As String = Convert.ToString(Params.Item(C_PARAMETERS.LP_FIX_CLASS))
+        Dim I_DEPARRFLG As String = Convert.ToString(Params.Item(C_PARAMETERS.LP_STATION))
         Dim key As String = I_COMP & If(I_CLASS = String.Empty, "ALLVALUE", I_CLASS)
         If Not LbMap.ContainsKey(key) Then
             Dim lsbx As New ListBox
@@ -1131,7 +1135,7 @@ Public Class GRIS0005LeftBox
             End Using
         End If
 
-        Return LbMap.Item(key)
+        Return DirectCast(LbMap.Item(key), ListBox)
     End Function
 
     ''' <summary>
@@ -1142,8 +1146,11 @@ Public Class GRIS0005LeftBox
     ''' <returns>作成した一覧情報</returns>
     ''' <remarks>固定値一覧情報からリストボックスに表示する固定値を取得する</remarks>
     Protected Function CreateFixValueList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        Dim I_COMP = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
-        Dim I_CLASS = Params.Item(C_PARAMETERS.LP_FIX_CLASS)
+        Dim I_COMP As String = C_DEFAULT_DATAKEY
+        If Params.Item(C_PARAMETERS.LP_COMPANY) IsNot Nothing Then
+            I_COMP = Convert.ToString(Params.Item(C_PARAMETERS.LP_COMPANY))
+        End If
+        Dim I_CLASS As String = Convert.ToString(Params.Item(C_PARAMETERS.LP_FIX_CLASS))
         Dim key As String = I_COMP & If(I_CLASS = String.Empty, "ALLVALUE", I_CLASS)
         If Not LbMap.ContainsKey(key) Then
             Dim lsbx As New ListBox
@@ -1153,6 +1160,11 @@ Public Class GRIS0005LeftBox
                  , .CLAS = I_CLASS _
                  , .LISTBOX1 = lsbx
                 }
+                'FixValue抽出用の追加条件付与
+                If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALCONDITION) AndAlso
+                   Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION)) <> "" Then
+                    GS0007FIXVALUElst.ADDITIONAL_CONDITION = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION))
+                End If
                 GS0007FIXVALUElst.GS0007FIXVALUElst()
                 O_RTN = GS0007FIXVALUElst.ERR
                 lsbx = GS0007FIXVALUElst.LISTBOX1
@@ -1160,7 +1172,7 @@ Public Class GRIS0005LeftBox
             End Using
         End If
 
-        Return LbMap.Item(key)
+        Return DirectCast(LbMap.Item(key), ListBox)
     End Function
     ''' <summary>
     ''' コードからサブコードを取得する
@@ -1171,8 +1183,11 @@ Public Class GRIS0005LeftBox
     ''' <returns>作成した一覧情報</returns>
     ''' <remarks></remarks>
     Protected Function CreateSubCodeList(ByVal Params As Hashtable, ByRef O_RTN As String, ByVal I_SUBCODE As Integer) As ListBox
-        Dim I_CLASS As String = Params.Item(C_PARAMETERS.LP_FIX_CLASS)
-        Dim I_COMP As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
+        Dim I_CLASS As String = Convert.ToString(Params.Item(C_PARAMETERS.LP_FIX_CLASS))
+        Dim I_COMP As String = C_DEFAULT_DATAKEY
+        If Params.Item(C_PARAMETERS.LP_COMPANY) IsNot Nothing Then
+            I_COMP = Convert.ToString(Params.Item(C_PARAMETERS.LP_COMPANY))
+        End If
         Dim I_KEY As String = I_CLASS & I_SUBCODE
         If Not LbMap.ContainsKey(I_KEY) Then
             Using GS0007FIXVALUElst As New GS0007FIXVALUElst
@@ -1205,7 +1220,7 @@ Public Class GRIS0005LeftBox
             End Using
         End If
 
-        Return LbMap.Item(I_KEY)
+        Return DirectCast(LbMap.Item(I_KEY), ListBox)
     End Function
     ''' <summary>
     ''' リスト検索
@@ -1257,7 +1272,7 @@ Public Class GRIS0005LeftBox
     Protected Sub Backup(ByVal SELECT_VALUE As LIST_BOX_CLASSIFICATION, ByVal PARAMS As Hashtable)
         '〇EXTRA＿LISTはTABLE化する
         If Not IsNothing(PARAMS(C_PARAMETERS.LP_LIST)) Then
-            Dim list As ListBox = PARAMS(C_PARAMETERS.LP_LIST)
+            Dim list As ListBox = DirectCast(PARAMS(C_PARAMETERS.LP_LIST), ListBox)
             Dim htbl As New Hashtable
             For Each item As ListItem In list.Items
                 htbl.Add(item.Value, item.Text)
@@ -1277,19 +1292,19 @@ Public Class GRIS0005LeftBox
 
         If Not IsNothing(ViewState("LF_LIST_SELECT")) Then
             If WF_LEFTMView.ActiveViewIndex = 2 Then
-                SetTableList(ViewState("LF_LIST_SELECT"), O_RTN, ViewState("LF_PARAMS"))
+                SetTableList(ViewState("LF_LIST_SELECT"), O_RTN, DirectCast(ViewState("LF_PARAMS"), Hashtable))
             ElseIf WF_LEFTMView.ActiveViewIndex = 0 Then
-                Dim params As Hashtable = ViewState("LF_PARAMS")
+                Dim params As Hashtable = DirectCast(ViewState("LF_PARAMS"), Hashtable)
                 '〇EXTRA＿LISTはLISTBOX化する
                 If Not IsNothing(params(C_PARAMETERS.LP_LIST)) Then
                     Dim list As New ListBox
-                    Dim htbl As Hashtable = params(C_PARAMETERS.LP_LIST)
+                    Dim htbl As Hashtable = DirectCast(params(C_PARAMETERS.LP_LIST), Hashtable)
                     For Each key As String In htbl.Keys
-                        list.Items.Add(New ListItem(htbl.Item(key), key))
+                        list.Items.Add(New ListItem(Convert.ToString(htbl.Item(key)), key))
                     Next
                     params(C_PARAMETERS.LP_LIST) = list
                 End If
-                SetListBox(ViewState("LF_LIST_SELECT"), O_RTN, ViewState("LF_PARAMS"))
+                SetListBox(ViewState("LF_LIST_SELECT"), O_RTN, DirectCast(ViewState("LF_PARAMS"), Hashtable))
             End If
         End If
     End Sub

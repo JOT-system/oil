@@ -414,29 +414,53 @@ Public Class OIT0004OilStockCreate
     Private Function GetTargetOilType(sqlCon As SqlConnection, salesOffice As String) As Dictionary(Of String, OilItem)
         Dim retVal As New Dictionary(Of String, OilItem)
         Dim sqlStr As New StringBuilder
-        sqlStr.AppendLine("SELECT KEYCODE  AS OILCODE")
-        sqlStr.AppendLine("      ,VALUE1   AS OILNAME")
-        sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE")
-        sqlStr.AppendLine(" WHERE CAMPCODE = @CAMPCODE")
-        sqlStr.AppendLine("   AND CLASS    = @CLASS")
-        sqlStr.AppendLine("   AND DELFLG   = @DELFLG")
+        sqlStr.AppendLine("SELECT FV.KEYCODE  AS OILCODE")
+        sqlStr.AppendLine("      ,FV.VALUE1   AS OILNAME")
+        sqlStr.AppendLine("      ,FV.VALUE8   AS BIGOILCODE")
+        sqlStr.AppendLine("      ,FV.VALUE10  AS MIDDLEOILCODE")
+        sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FV")
+        sqlStr.AppendLine(" WHERE FV.CAMPCODE  = @CAMPCODE")
+        sqlStr.AppendLine("   AND FV.CLASS     = @CLASS")
+        sqlStr.AppendLine("   AND FV.DELFLG    = @DELFLG")
+        sqlStr.AppendLine("   AND FV.VALUE12  != @STOCKFLG")
         sqlStr.AppendLine(" ORDER BY KEYCODE")
+        'FixValueに中分類大分類を追加したらJOIN不要で↑のSQLを元に改修
+        'sqlStr.AppendLine("SELECT FV.KEYCODE  AS OILCODE")
+        'sqlStr.AppendLine("      ,FV.VALUE1   AS OILNAME")
+        'sqlStr.AppendLine("      ,PD.BIGOILCODE      AS BIGOILCODE")
+        'sqlStr.AppendLine("      ,PD.MIDDLEOILCODE   AS MIDDLEOILCODE")
+        'sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FV")
+        'sqlStr.AppendLine(" INNER JOIN OIL.OIM0003_PRODUCT PD")
+        'sqlStr.AppendLine("    ON FV.CAMPCODE = PD.OFFICECODE")
+        'sqlStr.AppendLine("   AND FV.KEYCODE  = PD.OILCODE")
+        'sqlStr.AppendLine("   AND FV.VALUE2   = PD.SEGMENTOILCODE")
+        'sqlStr.AppendLine("   AND PD.DELFLG = @DELFLG")
+        'sqlStr.AppendLine(" WHERE FV.CAMPCODE = @CAMPCODE")
+        'sqlStr.AppendLine("   AND FV.CLASS    = @CLASS")
+        'sqlStr.AppendLine("   AND FV.DELFLG   = @DELFLG")
+        'sqlStr.AppendLine(" ORDER BY KEYCODE")
+
         'DBより取得を行い祝祭日情報付与
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@CAMPCODE", SqlDbType.NVarChar).Value = salesOffice
                 .Add("@CLASS", SqlDbType.NVarChar).Value = "PRODUCTPATTERN"
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                .Add("@STOCKFLG", SqlDbType.NVarChar).Value = "9" '不等号条件
             End With
 
             Dim oilCode As String
             Dim oilName As String
+            Dim bigOilCode As String
+            Dim midOilCode As String
             Dim oilItm As OilItem
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 While sqlDr.Read
                     oilCode = Convert.ToString(sqlDr("OILCODE"))
                     oilName = Convert.ToString(sqlDr("OILNAME"))
-                    oilItm = New OilItem(oilCode, oilName)
+                    bigOilCode = Convert.ToString(sqlDr("BIGOILCODE"))
+                    midOilCode = Convert.ToString(sqlDr("MIDDLEOILCODE"))
+                    oilItm = New OilItem(oilCode, oilName, bigOilCode, midOilCode)
                     retVal.Add(oilItm.OilCode, oilItm)
                 End While
             End Using 'sqlDr
@@ -892,11 +916,29 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property Weight As Decimal = 0
         ''' <summary>
+        ''' 大分類コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property BigOilCode As String = ""
+        ''' <summary>
+        ''' 中分類コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MiddleOilCode As String = ""
+
+
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
-        Public Sub New(oilCode As String, oilName As String)
+        ''' <param name="oilCode"></param>
+        ''' <param name="oilName"></param>
+        ''' <param name="bigOilCode"></param>
+        ''' <param name="middleOilCode"></param>
+        Public Sub New(oilCode As String, oilName As String, bigOilCode As String, middleOilCode As String)
             Me.OilCode = oilCode
             Me.OilName = oilName
+            Me.BigOilCode = bigOilCode
+            Me.MiddleOilCode = middleOilCode
             'Weight格納は一旦ベタ打ち
             Select Case oilCode
                 Case "1001" 'ハイオク
@@ -918,6 +960,14 @@ Public Class OIT0004OilStockCreate
                 Case Else
                     Me.Weight = 0.75D
             End Select
+
+        End Sub
+
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New(oilCode As String, oilName As String)
+            Me.New(oilCode, oilName, "", "")
         End Sub
     End Class
     ''' <summary>
@@ -1134,7 +1184,7 @@ Public Class OIT0004OilStockCreate
             Dim retVal As New Dictionary(Of String, OilItem)
             Dim copiedItem As OilItem
             For Each itm In oilCodes
-                copiedItem = New OilItem(itm.Key, itm.Value.OilName)
+                copiedItem = New OilItem(itm.Key, itm.Value.OilName, itm.Value.BigOilCode, itm.Value.MiddleOilCode)
                 copiedItem.Weight = itm.Value.Weight
                 retVal.Add(itm.Key, copiedItem)
             Next
@@ -1374,6 +1424,7 @@ Public Class OIT0004OilStockCreate
                            dateItem As Dictionary(Of String, DaysItem))
                 Me.OilTypeCode = oilTypeItem.OilCode
                 Me.OilTypeName = oilTypeItem.OilName
+                Me.OilInfo = oilTypeItem
                 '２列目から４列目のタンク容量～前週出荷平均については
                 '一旦0
                 Me.TankCapacity = 12345.6D
@@ -1388,6 +1439,11 @@ Public Class OIT0004OilStockCreate
                     Me.StockItemList.Add(dateVal.Key, item)
                 Next
             End Sub
+            ''' <summary>
+            ''' 油種情報クラス
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property OilInfo As OilItem = Nothing
 
             ''' <summary>
             ''' 油種コード

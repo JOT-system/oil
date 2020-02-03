@@ -693,6 +693,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS LINKDETAILNO" _
             & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS TANKNO" _
+            & " , ''                                             AS MODEL" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
@@ -760,6 +761,7 @@ Public Class OIT0003OrderDetail
                 & " , ''                                                 AS LINKDETAILNO" _
                 & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
+                & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
@@ -990,6 +992,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
             & " , ISNULL(RTRIM(TMP0001.TANKNO), '')                             AS TANKNO" _
+            & " , ISNULL(RTRIM(TMP0001.MODEL), '')                              AS MODEL" _
             & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERT), '')                  AS JRINSPECTIONALERT" _
             & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERTSTR), '')               AS JRINSPECTIONALERTSTR" _
             & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONDATE), '')                   AS JRINSPECTIONDATE" _
@@ -1054,6 +1057,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')                         AS TANKNO" _
+            & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
@@ -2561,6 +2565,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS LINKDETAILNO" _
             & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS TANKNO" _
+            & " , ''                                             AS MODEL" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
             & " , ''                                             AS JRINSPECTIONDATE" _
@@ -2746,6 +2751,12 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        '〇高速列車対応タンク車チェック
+        WW_CheckSpeedTrainTank(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
             '受注DB追加・更新
@@ -2920,7 +2931,7 @@ Public Class OIT0003OrderDetail
                     updHeader.Item(WF_FIELD.Value) = ""
                 End If
 
-            Case "OILNAME", "ORDERINGOILNAME" '(一覧)油種
+            Case "OILNAME"           '(一覧)油種
                 '〇油種が設定されている場合
                 If WW_ListValue <> "" Then
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_N", WW_ListValue, WW_GetValue)
@@ -2950,6 +2961,24 @@ Public Class OIT0003OrderDetail
                 '        updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI
                 '    End If
                 'End If
+
+            Case "ORDERINGOILNAME"    '(一覧)油種(受発注用)
+                '〇油種が設定されている場合
+                If WW_ListValue <> "" Then
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG_N", WW_ListValue, WW_GetValue)
+                    updHeader.Item("OILCODE") = WW_GetValue(0).Substring(0, 4)
+                    updHeader.Item("OILNAME") = WW_GetValue(2)
+                    updHeader.Item("ORDERINGTYPE") = WW_GetValue(3)
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                Else
+                    updHeader.Item("OILCODE") = ""
+                    updHeader.Item("OILNAME") = ""
+                    updHeader.Item("ORDERINGTYPE") = ""
+                    updHeader.Item(WF_FIELD.Value) = ""
+                End If
+
+                '〇 タンク車割当状況チェック
+                WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
 
             Case "TANKNO"            '(一覧)タンク車№
 
@@ -6450,6 +6479,54 @@ Public Class OIT0003OrderDetail
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 高速列車対応タンク車チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckSpeedTrainTank(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_OfficeCode As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '〇 検索(営業所).テキストボックスが未設定
+        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+            '〇 画面(受注営業所).テキストボックスが未設定
+            If work.WF_SEL_ORDERSALESOFFICECODE.Text = "" Then
+                WW_OfficeCode = Master.USER_ORG
+            Else
+                WW_OfficeCode = work.WF_SEL_ORDERSALESOFFICECODE.Text
+            End If
+        Else
+            WW_OfficeCode = work.WF_SEL_SALESOFFICECODE.Text
+        End If
+        WW_FixvalueMasterSearch(WW_OfficeCode, "TRAINNUMBER_FIND", TxtTrainName.Text, WW_GetValue)
+
+        '高速列車対応タンク車チェック
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+            '高速列車区分＝"1"(高速列車)、かつ型式<>"タキ1000"の場合はエラー
+            If WW_GetValue(5) = "1" And OIT0003row("MODEL") <> "タキ1000" Then
+                Master.Output(C_MESSAGE_NO.OIL_SPEEDTRAINTANK_ERROR,
+                              C_MESSAGE_TYPE.ERR,
+                              OIT0003row("TANKNO") + "(" + OIT0003row("MODEL") + ")",
+                              needsPopUp:=True)
+
+                WW_CheckMES1 = "高速列車非対応タンク車エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_SPEEDTRAINTANK_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
                 Exit Sub

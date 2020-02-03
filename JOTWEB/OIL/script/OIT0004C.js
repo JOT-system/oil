@@ -17,8 +17,15 @@ function InitDisplay() {
     //当画面のテキストボックスは全て数字の為共通関数を通す(共通関数は小数点拒否の為、要確認)
     //let txtObjList = document.forms[0].querySelectorAll("#headerboxOnly input[type=text]");
     let suggestCol = document.forms[0].querySelectorAll("div.dataColumn > div.values");
+    document.forms[0].style.display = 'none'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     bindSuggestSummary(suggestCol);
     bindDipsOiltypeStockList();
+    document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
+    // 数字入力のみ可能にする共通関数KeyDown共通関数を仕込む
+    let numInputBoxList = document.forms[0].querySelectorAll("#WF_INVENTORYDAYS, #pnlSuggestList input[type=text],#pnlStockList input[type=text]");
+    bindNumericKeyPressOnly(numInputBoxList);
+    //フォーカスを合わせる
+    forcusObj();
 }
 
 // 〇提案数の合計計算イベントバインド(暫定関数)
@@ -130,5 +137,73 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
         stockRow.style.display = "";
         targetOpt.selected = true;
     }
-   
+    let stockRows = stockListObj.querySelectorAll('div.oilTypeData');
+    let lastStockRow = null;
+    for (let i = 0; i < stockRows.length; i++) {
+        stockRows[i].classList.remove('lastRow');
+        if (stockRows[i].style.display !== 'none') {
+            lastStockRow = stockRows[i];
+        }
+    }
+
+    if (lastStockRow !== null) {
+        lastStockRow.classList.add('lastRow');
+    }
+
+}
+//〇フォーカス合わせ処理
+function forcusObj() {
+    let forcusIdObj = document.getElementById('hdnForcusObjId');
+    // フォーカス処理不要の場合
+    if (forcusIdObj === null) {
+        return;
+    }
+    let targetId = forcusIdObj.value;
+    forcusIdObj.name = "";
+    // フォーカスを充てるオブジェクトが存在していない場合はそのまま終了
+    let targetObj = document.getElementById(targetId);
+    if (targetObj === null) {
+        return;
+    }
+    // フォーカス処理必要な場合
+    let msgBoxObj = document.getElementById('pnlCommonMessageWrapper');
+    if (msgBoxObj === null) {
+        setTimeout(function () {
+            targetObj.focus({ preventScroll: false });
+            targetObj.select();
+        }, 10);
+        return;
+    }
+    // ダイアログクローズ後のフォーカス
+    let closeBtnObj = document.getElementById('btnCommonMessageOk');
+    if (closeBtnObj === null) {
+        return;
+    }
+    // ダイアログを閉じるタイミングでフォーカスを合わせる
+    closeBtnObj.addEventListener('click', (function (targetId) {
+        return function () {
+            // 画像クリック時にテキストボックスのダブルクリックイベント発火
+            document.getElementById(targetId).focus();
+            document.getElementById(targetId).select();
+        };
+    })(targetId), false);
+}
+/* 数値のみのKeypressのみを許可するイベントバインド */
+function bindNumericKeyPressOnly(targetTextBoxList) {
+    for (let i = 0; i < targetTextBoxList.length; i++) {
+        let textObj = targetTextBoxList[i];
+        /* keypressはIeでは動かない */
+        textObj.addEventListener('keypress', CheckNum);
+        textObj.style.imeMode = 'disabled';
+        /* 桁数 */
+        if (textObj.id === 'WF_INVENTORYDAYS') {
+            textObj.maxLength = 1;
+        }
+        if (textObj.id.indexOf('txtSuggestValue') !== -1) {
+            textObj.maxLength = 3;
+        }
+        if (textObj.id.indexOf('txtSend') !== -1) {
+            textObj.maxLength = 5;
+        }
+    }
 }

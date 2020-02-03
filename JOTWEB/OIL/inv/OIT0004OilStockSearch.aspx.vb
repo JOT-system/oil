@@ -273,11 +273,11 @@ Public Class OIT0004OilStockSearch
             Dim getDay As String = getMMDD.Remove(0, getMMDD.IndexOf("/") + 1)
 
             '閏年の場合はその旨のメッセージを出力
-            If Not DateTime.IsLeapYear(chkLeapYear) _
+            If Not DateTime.IsLeapYear(CInt(chkLeapYear)) _
             AndAlso (getMonth = "2" OrElse getMonth = "02") AndAlso getDay = "29" Then
                 Master.Output(C_MESSAGE_NO.OIL_LEAPYEAR_NOTFOUND, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
                 '月と日の範囲チェック
-            ElseIf getMonth >= 13 OrElse getDay >= 32 Then
+            ElseIf CInt(getMonth) >= 13 OrElse CInt(getDay) >= 32 Then
                 Master.Output(C_MESSAGE_NO.OIL_MONTH_DAY_OVER_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
             Else
                 'Master.Output(I_VALUE, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
@@ -315,7 +315,7 @@ Public Class OIT0004OilStockSearch
             End Try
 
             With leftview
-                Select Case WF_LeftMViewChange.Value
+                Select Case CInt(WF_LeftMViewChange.Value)
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
@@ -376,8 +376,6 @@ Public Class OIT0004OilStockSearch
         End If
 
     End Sub
-
-
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***
     ' ******************************************************************************
@@ -393,9 +391,9 @@ Public Class OIT0004OilStockSearch
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex.ToString
+            WW_SelectValue = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Text
         End If
 
         '○ 選択内容を画面項目へセット
@@ -414,7 +412,7 @@ Public Class OIT0004OilStockSearch
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
-                    If WW_DATE < C_DEFAULT_YMD Then
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
                         WF_STYMD_CODE.Text = ""
                     Else
                         WF_STYMD_CODE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")

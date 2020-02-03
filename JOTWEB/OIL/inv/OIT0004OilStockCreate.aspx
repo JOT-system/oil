@@ -35,6 +35,7 @@
                 </div>
 
                 <div class="rightSide">
+                    <input type="button" id="WF_ButtonRECULC"        class="btn-sticky" value="在庫表再計算"     onclick="ButtonClick('WF_ButtonRECULC');" />
                     <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="更新"     onclick="ButtonClick('WF_ButtonUPDATE');" />
                     <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
                     <input type="button" id="WF_ButtonINSERT"        class="btn-sticky" value="新規登録" onclick="ButtonClick('WF_ButtonINSERT');" />
@@ -244,7 +245,7 @@
                                         <div class='colStockValue week<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.WeekNum %> holiday<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsHoliday, "1", "0") %>' >
                                             <asp:HiddenField ID="hdnDateKey" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.KeyString %>' />
                                             <div><%--前日夕在庫--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).LastEveningStock.ToString("#,###") %></span>
+                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).LastEveningStock.ToString("#,##0") %></span>
                                             </div>
                                             <div><%--保持日数--%>
                                                 <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Retentiondays %></span>
@@ -267,7 +268,9 @@
                                                 <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStockWithoutDS %></span>
                                             </div>
                                             <div><%--空容量--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).FreeSpace %></span>
+                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).FreeSpace < 0, "minus", "") %>'>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).FreeSpace %>
+                                                </span>
                                             </div>
                                             <div><%--在庫率--%>
                                                 <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).StockRate %></span>

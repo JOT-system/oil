@@ -1410,6 +1410,7 @@ function commonHideWait() {
 // 〇数値のみ入力可能
 function CheckNum() {
     if (event.keyCode < 48 || event.keyCode > 57) {
-        window.event.returnValue = false;
+        window.event.returnValue = false; // IEだと効かないので↓追加
+        event.preventDefault(); // IEはこれで効く
     }
 }

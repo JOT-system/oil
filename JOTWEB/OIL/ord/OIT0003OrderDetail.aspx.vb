@@ -66,6 +66,8 @@ Public Class OIT0003OrderDetail
                     '○ 画面表示データ復元
                     Master.RecoverTable(OIT0003tbl)
                     Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+                    'Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+                    'Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"                '油種数登録ボタン押下
@@ -240,29 +242,31 @@ Public Class OIT0003OrderDetail
         WW_CreateXMLSaveFile()
 
         '受注営業所
-        'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
+        '作成(貨車連結用)フラグ(２：更新)　かつ、作成モード(１：新規)
         If work.WF_SEL_CREATELINKFLG.Text = "2" _
-            AndAlso work.WF_SEL_CREATEFLG.Text = "1" Then   '作成(貨車連結用)フラグ(２：更新)　かつ、作成モード(１：新規)
+            AndAlso work.WF_SEL_CREATEFLG.Text = "1" Then
             TxtOrderOfficeCode.Text = work.WF_SEL_LINK_ORDERSALESOFFICE.Text
             CODENAME_get("SALESOFFICE", TxtOrderOfficeCode.Text, TxtOrderOffice.Text, WW_RTN_SW)
 
             work.WF_SEL_ORDERSALESOFFICE.Text = TxtOrderOffice.Text
             work.WF_SEL_ORDERSALESOFFICECODE.Text = TxtOrderOfficeCode.Text
 
-        ElseIf work.WF_SEL_CREATEFLG.Text = "2" Then        '作成モード(２：更新)
+            '作成モード(２：更新)
+        ElseIf work.WF_SEL_CREATEFLG.Text = "2" Then
             TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
             TxtOrderOfficeCode.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
-            'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
-        Else                                            '作成モード(１：新規登録)
+
+            '作成モード(１：新規登録)
+        Else
             TxtOrderOffice.Text = work.WF_SEL_SALESOFFICE.Text
             TxtOrderOfficeCode.Text = work.WF_SEL_SALESOFFICECODE.Text
-            'TxtOrderOffice.Text = work.WF_SEL_SALESOFFICECODE.Text
+
         End If
 
         'ステータス
         If work.WF_SEL_ORDERSTATUSNM.Text = "" Then
-            work.WF_SEL_ORDERSTATUS.Text = "100"
-            work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
+            work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
+            CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_100, work.WF_SEL_ORDERSTATUSNM.Text, WW_DUMMY)
         End If
         TxtOrderStatus.Text = work.WF_SEL_ORDERSTATUSNM.Text
 
@@ -278,11 +282,11 @@ Public Class OIT0003OrderDetail
             chkOrderInfo.Checked = False
         End If
 
-        '###################################################
+
         '受注パターン
         CODENAME_get("ORDERTYPE", work.WF_SEL_PATTERNCODE.Text, work.WF_SEL_PATTERNNAME.Text, WW_DUMMY)
         TxtOrderType.Text = work.WF_SEL_PATTERNNAME.Text
-        '###################################################
+
         'オーダー№
         If work.WF_SEL_ORDERNUMBER.Text = "" Then
             Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
@@ -993,7 +997,7 @@ Public Class OIT0003OrderDetail
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
+            & " , ISNULL(RTRIM(TMP0001.LINEORDER), '')                          AS LINEORDER" _
             & " , ISNULL(RTRIM(TMP0001.TANKNO), '')                             AS TANKNO" _
             & " , ISNULL(RTRIM(TMP0001.MODEL), '')                              AS MODEL" _
             & " , ISNULL(RTRIM(TMP0001.JRINSPECTIONALERT), '')                  AS JRINSPECTIONALERT" _
@@ -5875,35 +5879,35 @@ Public Class OIT0003OrderDetail
             pnlSummaryArea.Visible = False
         End If
 
-        ''〇 タブの使用可否制御
-        'If work.WF_SEL_ORDERSTATUS.Text = "100" Then
-        '    WF_Dtab01.Enabled = True
-        '    WF_Dtab02.Enabled = False
-        '    WF_Dtab03.Enabled = False
-        '    WF_Dtab04.Enabled = False
-        '    pnlSummaryArea.Visible = False
+        '〇 タブの使用可否制御
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            WF_Dtab01.Enabled = True
+            WF_Dtab02.Enabled = False
+            WF_Dtab03.Enabled = False
+            WF_Dtab04.Enabled = False
+            pnlSummaryArea.Visible = False
 
-        'ElseIf work.WF_SEL_ORDERSTATUS.Text = "200" _
-        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "210" _
-        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "220" _
-        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "230" _
-        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "240" _
-        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "250" _
-        '    OrElse work.WF_SEL_ORDERSTATUS.Text = "260" Then
-        '    WF_Dtab01.Enabled = True
-        '    WF_Dtab02.Enabled = True
-        '    WF_Dtab03.Enabled = False
-        '    WF_Dtab04.Enabled = False
-        '    pnlSummaryArea.Visible = False
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+            WF_Dtab01.Enabled = True
+            WF_Dtab02.Enabled = True
+            WF_Dtab03.Enabled = False
+            WF_Dtab04.Enabled = False
+            pnlSummaryArea.Visible = False
 
-        'Else
-        '    WF_Dtab01.Enabled = False
-        '    WF_Dtab02.Enabled = False
-        '    WF_Dtab03.Enabled = True
-        '    WF_Dtab04.Enabled = False
-        '    pnlSummaryArea.Visible = True
+        Else
+            WF_Dtab01.Enabled = False
+            WF_Dtab02.Enabled = False
+            WF_Dtab03.Enabled = True
+            WF_Dtab04.Enabled = False
+            pnlSummaryArea.Visible = True
 
-        'End If
+        End If
 
         '〇 受注内容の制御
         '100:受注受付以外の場合は、受注内容(ヘッダーの内容)の変更を不可とする。

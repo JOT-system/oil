@@ -262,7 +262,16 @@
                                                 <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Retentiondays %></span>
                                             </div>
                                             <div><%--朝在庫--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %></span>
+                                                <span class='morningStockIdx<%# Container.ItemIndex %>'>
+                                                    <%-- 初日のみテキストボックス表示 --%>
+                                                    <asp:TextBox ID="txtMorningStock" runat="server" 
+                                                        Text='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %>'
+                                                        Visible='<%# If(Container.ItemIndex = 0, True, False) %>'
+                                                        data-textfield="MorningStock"></asp:TextBox>
+                                                    <asp:Label ID="lblMorningStock" runat="server" 
+                                                        Text='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %>'
+                                                        Visible='<%# If(Container.ItemIndex = 0, False, True) %>'></asp:Label>
+                                                </span>
                                             </div>
                                             <div><%--受入--%>
                                                 <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive %></span>

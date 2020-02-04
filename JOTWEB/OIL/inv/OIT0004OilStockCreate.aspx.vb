@@ -520,7 +520,6 @@ Public Class OIT0004OilStockCreate
                                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                                 Return False
                             End If 'isNormal(WW_CS0024FCHECKERR) 
-
                         Next svalItm
 
                     Next valueItm
@@ -539,6 +538,16 @@ Public Class OIT0004OilStockCreate
                         Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="払出", needsPopUp:=True)
                         AppendForcusObject(itm.SendTextClientId)
                         WW_CheckMES1 = String.Format("払出入力エラー。日付:{0},油種:{1}", itm.DaysItem.DispDate, oilName)
+                        WW_CheckMES2 = C_MESSAGE_NO.NUMERIC_VALUE_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                        Return False
+                    End If 'isNormal(WW_CS0024FCHECKERR) 
+
+                    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MORNINGSTOCK", itm.MorningStock, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                    If Not isNormal(WW_CS0024FCHECKERR) Then
+                        Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="朝在庫", needsPopUp:=True)
+                        AppendForcusObject(itm.MorningStockClientId)
+                        WW_CheckMES1 = String.Format("朝在庫入力エラー。日付:{0},油種:{1}", itm.DaysItem.DispDate, oilName)
                         WW_CheckMES2 = C_MESSAGE_NO.NUMERIC_VALUE_ERROR
                         WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                         Return False
@@ -874,7 +883,8 @@ Public Class OIT0004OilStockCreate
         Dim dateKeyStr As String = ""
         Dim sendObj As TextBox = Nothing '画面払出テキストボックス
         Dim sendVal As String = ""
-
+        Dim morningStockObj As TextBox = Nothing
+        Dim morningStockVal As String = ""
         Dim stockListClass = dispDataClass.StockList
         Dim stockListCol As DispDataClass.StockListCollection = Nothing
         Dim stockListItm As DispDataClass.StockListItem = Nothing
@@ -888,10 +898,14 @@ Public Class OIT0004OilStockCreate
                 dateKeyStr = dateKeyObj.Value
                 sendObj = DirectCast(repStockValItem.FindControl("txtSend"), TextBox)
                 sendVal = sendObj.Text
+                morningStockObj = DirectCast(repStockValItem.FindControl("txtMorningStock"), TextBox)
+                morningStockVal = morningStockObj.Text
 
                 stockListItm = stockListCol.StockItemList(dateKeyStr)
                 stockListItm.Send = sendVal
                 stockListItm.SendTextClientId = sendObj.ClientID
+                stockListItm.MorningStock = morningStockVal
+                stockListItm.MorningStockClientId = morningStockObj.ClientID
             Next repStockValItem
         Next repOilTypeItem
     End Sub
@@ -1227,6 +1241,8 @@ Public Class OIT0004OilStockCreate
                 For Each itm In stockListItm.StockItemList.Values
                     Dim itmDate As String = itm.DaysItem.KeyString
                     Dim oilCode As String = stockListItm.OilTypeCode
+                    Dim decSendVal As Decimal = Decimal.Parse(itm.Send)
+                    Dim decMorningStockVal As Decimal = Decimal.Parse(itm.MorningStock)
                     '前日日付データ取得
                     Dim prevDayKey As String = itm.DaysItem.ItemDate.AddDays(-1).ToString("yyyy/MM/dd")
                     '前日データを元に実行する処理(前日データあり=一覧初日以外)
@@ -1236,7 +1252,7 @@ Public Class OIT0004OilStockCreate
                         '◆1行目 前日夕在庫(前日データの夕在庫フィールドを格納)
                         itm.LastEveningStock = prevItm.EveningStock
                         '◆3行目 朝在庫 ※計算順序に営業するため2行目処理より前に持ってくること
-                        itm.MorningStock = prevItm.MorningStock + prevItm.Receive - Decimal.Parse(prevItm.Send)
+                        itm.MorningStock = (Decimal.Parse(prevItm.MorningStock) + prevItm.Receive - Decimal.Parse(prevItm.Send)).ToString
 
                     End If
                     '◆2行目 保有日数(朝在庫 / 前週出荷平均)
@@ -1255,11 +1271,11 @@ Public Class OIT0004OilStockCreate
                     '◆5行目払出
                     '入力項目なので無視
                     '◆6行目 夕在庫 (朝在庫 + 受入- 払出)
-                    itm.EveningStock = itm.MorningStock + itm.Receive - Decimal.Parse(itm.Send)
+                    itm.EveningStock = decMorningStockVal + itm.Receive - decSendVal
                     '◆7行名 夕在庫D/S (夕在庫 - D/S)
                     itm.EveningStockWithoutDS = itm.EveningStock - stockListItm.DS
                     '◆8行目 空き容量 (夕在庫 -  D/S)
-                    itm.FreeSpace = stockListItm.TargetStock - ((itm.MorningStock + itm.Receive) - Decimal.Parse(itm.Send))
+                    itm.FreeSpace = stockListItm.TargetStock - ((decMorningStockVal + itm.Receive) - decSendVal)
                     '◆9行目 在庫率
                     If stockListItm.TargetStockRate = 0 Then
                         itm.StockRate = 0
@@ -1501,7 +1517,7 @@ Public Class OIT0004OilStockCreate
                 'Demo用、実際イメージ沸いてから値のコンストラクタ引数追加など仕込み方は考える
                 Me.LastEveningStock = 12345
                 Me.Retentiondays = 0
-                Me.MorningStock = 0
+                Me.MorningStock = "0"
                 Me.Receive = 0
                 Me.Send = "0" '画面入力項目の為文字
                 Me.EveningStock = 0
@@ -1528,7 +1544,13 @@ Public Class OIT0004OilStockCreate
             ''' 朝在庫
             ''' </summary>
             ''' <returns></returns>
-            Public Property MorningStock As Decimal
+            Public Property MorningStock As String
+            ''' <summary>
+            ''' 朝在庫(画面入力エリアのテキストボックスID)
+            ''' </summary>
+            ''' <returns></returns>
+            ''' <remarks>画面情報収集後に設定（初期は未設定なので使用注意）</remarks>
+            Public Property MorningStockClientId As String
             ''' <summary>
             ''' 受入
             ''' </summary>

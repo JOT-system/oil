@@ -358,6 +358,16 @@ span.minus {
     width: 100%;
     padding-top: 0px;
     padding-bottom: 0px;
+    line-height: 1em;
+    height: 18px;
+}
+span.morningStockIdx0 {
+    margin-top:0px !important; 
+}
+#divStockList input[type=text][data-textfield="MorningStock"] {
+    // height: 18px;
+    //line-height:0.8em;
+    width:calc(100% + 5.5px);
 }
 /* ************** */
 /* 在庫表罫線制御 */

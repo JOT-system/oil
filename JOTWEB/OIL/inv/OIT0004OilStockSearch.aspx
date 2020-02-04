@@ -75,7 +75,7 @@
                 </a>
             </div>
         </div>
-
+    </div>
     <!-- rightbox レイアウト -->
     <MSINC:rightview id="rightview" runat="server" />
 

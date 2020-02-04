@@ -14,9 +14,9 @@
         <!-- 全体レイアウト　Menuheaderbox -->
         <div  class="Menuheaderbox" id="Menuheaderbox">
 
-          <!-- 在庫管理メニュー表示 --------------------------------------------------------->
+          <!-- 在庫管理メニュー表示 ****************************************************** -->
           <a  class="Menu_L" id="Menu_L"  >
-            <asp:Repeater ID="Repeater_Menu_L" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_L" runat="server" ClientIDMode="Predictable" >
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -37,9 +37,9 @@
             </asp:Repeater>
           </a>
 
-          <!-- 受注管理メニュー表示 --------------------------------------------------------->
+          <!-- 受注管理メニュー表示 ****************************************************** -->
           <a  class="Menu_L2" id="Menu_L2"  >
-            <asp:Repeater ID="Repeater_Menu_L2" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_L2" runat="server" ClientIDMode="Predictable">
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -61,9 +61,9 @@
             </asp:Repeater>
           </a>
 
-          <!-- 回送管理メニュー表示 --------------------------------------------------------->
+          <!-- 回送管理メニュー表示 ****************************************************** -->
           <a class="Menu_R" id="Menu_R" >
-            <asp:Repeater ID="Repeater_Menu_R" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_R" runat="server" ClientIDMode="Predictable" >
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -84,9 +84,9 @@
             </asp:Repeater>
           </a>
 
-          <!-- マスタ管理メニュー表示 --------------------------------------------------------->
+          <!-- マスタ管理メニュー表示 ****************************************************** -->
           <a class="Menu_R2" id="Menu_R2" >
-            <asp:Repeater ID="Repeater_Menu_R2" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_R2" runat="server" ClientIDMode="Predictable" >
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -107,9 +107,9 @@
             </asp:Repeater>
           </a>
 
-          <!-- 請求支払管理メニュー表示 --------------------------------------------------------->
+          <!-- 請求支払管理メニュー表示 ****************************************************** -->
           <a  class="Menu_L3" id="Menu_L3"  >
-            <asp:Repeater ID="Repeater_Menu_L3" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_L3" runat="server" ClientIDMode="Predictable" >
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -131,9 +131,9 @@
             </asp:Repeater>
           </a>
 
-          <!-- タンク車所在管理メニュー表示 --------------------------------------------------------->
+          <!-- タンク車所在管理メニュー表示 ****************************************************** -->
           <a  class="Menu_L4" id="Menu_L4"  >
-            <asp:Repeater ID="Repeater_Menu_L4" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_L4" runat="server" ClientIDMode="Predictable" >
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -155,9 +155,9 @@
             </asp:Repeater>
           </a>
 
-          <!-- 実績・統計メニュー表示 --------------------------------------------------------->
+          <!-- 実績・統計メニュー表示 ****************************************************** -->
           <a class="Menu_R3" id="Menu_R3" >
-            <asp:Repeater ID="Repeater_Menu_R3" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_R3" runat="server" ClientIDMode="Predictable" >
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -178,9 +178,9 @@
             </asp:Repeater>
           </a>
 
-          <!-- データ連携メニュー表示 --------------------------------------------------------->
+          <!-- データ連携メニュー表示 ****************************************************** -->
           <a class="Menu_R4" id="Menu_R4" >
-            <asp:Repeater ID="Repeater_Menu_R4" runat="server" >
+            <asp:Repeater ID="Repeater_Menu_R4" runat="server" ClientIDMode="Predictable" >
                 <HeaderTemplate>
                     <table>
                 </HeaderTemplate>
@@ -201,7 +201,7 @@
             </asp:Repeater>
           </a>
 
-         <!------- ボタン押下 ------->
+         <!-- ***** ボタン押下 ***** -->
          <a hidden="hidden">
                 <input id="WF_ButtonClick" runat="server" value=""  type="text" />        
           </a>

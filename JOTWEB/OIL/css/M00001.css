@@ -52,7 +52,7 @@ a[id^="Menu_"] table td {
     max-width:100%;
 }
 /* メニュー枠内タイトルの共通設定(色や画像は後述スタイルで個別設定)(spanタグIDが"WF_MenuLabe_"で始まるもの) */
-span[id^=WF_MenuLabe_] {
+span[id*=WF_MenuLabe_] {
     display: inline-block;
     overflow: hidden;
     width: 100%;

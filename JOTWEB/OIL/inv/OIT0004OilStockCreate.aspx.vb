@@ -148,14 +148,17 @@ Public Class OIT0004OilStockCreate
         Dim daysList As Dictionary(Of String, DaysItem)
         Dim oilTypeList As Dictionary(Of String, OilItem)
         Dim trainList As Dictionary(Of String, TrainListItem)
+        Dim isShowSuggestList As Boolean = False
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             daysList = GetTargetDateList(sqlCon, baseDate)
             oilTypeList = GetTargetOilType(sqlCon, salesOffice)
             trainList = GetTargetTrain(sqlCon, salesOffice, consignee)
+            isShowSuggestList = Me.IsShowSuggestList(sqlCon, consignee)
         End Using
         Dim dispDataObj = New DispDataClass(daysList, trainList, oilTypeList)
         'コンストラクタで生成したデータを画面に貼り付け
+        dispDataObj.ShowSuggestList = isShowSuggestList
         '1.提案リスト
         If dispDataObj.ShowSuggestList = False Then
             pnlSuggestList.Visible = False
@@ -424,21 +427,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND FV.DELFLG    = @DELFLG")
         sqlStr.AppendLine("   AND FV.VALUE12  != @STOCKFLG")
         sqlStr.AppendLine(" ORDER BY KEYCODE")
-        'FixValueに中分類大分類を追加したらJOIN不要で↑のSQLを元に改修
-        'sqlStr.AppendLine("SELECT FV.KEYCODE  AS OILCODE")
-        'sqlStr.AppendLine("      ,FV.VALUE1   AS OILNAME")
-        'sqlStr.AppendLine("      ,PD.BIGOILCODE      AS BIGOILCODE")
-        'sqlStr.AppendLine("      ,PD.MIDDLEOILCODE   AS MIDDLEOILCODE")
-        'sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FV")
-        'sqlStr.AppendLine(" INNER JOIN OIL.OIM0003_PRODUCT PD")
-        'sqlStr.AppendLine("    ON FV.CAMPCODE = PD.OFFICECODE")
-        'sqlStr.AppendLine("   AND FV.KEYCODE  = PD.OILCODE")
-        'sqlStr.AppendLine("   AND FV.VALUE2   = PD.SEGMENTOILCODE")
-        'sqlStr.AppendLine("   AND PD.DELFLG = @DELFLG")
-        'sqlStr.AppendLine(" WHERE FV.CAMPCODE = @CAMPCODE")
-        'sqlStr.AppendLine("   AND FV.CLASS    = @CLASS")
-        'sqlStr.AppendLine("   AND FV.DELFLG   = @DELFLG")
-        'sqlStr.AppendLine(" ORDER BY KEYCODE")
+        '↑FixValueのみでの取得
 
         'DBより取得を行い祝祭日情報付与
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
@@ -467,6 +456,34 @@ Public Class OIT0004OilStockCreate
         End Using 'sqlCmd
         Return retVal
 
+    End Function
+    ''' <summary>
+    ''' 荷受人マスタより提案表の表示可否を取得
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="consignee"></param>
+    ''' <returns></returns>
+    Private Function IsShowSuggestList(sqlCon As SqlConnection, consignee As String) As Boolean
+        Dim sqlStr As New StringBuilder
+        sqlStr.AppendLine("SELECT NIUKE.CONSIGNEECODE  AS CONSIGNEECODE")
+        sqlStr.AppendLine("  FROM OIL.OIM0012_NIUKE NIUKE")
+        sqlStr.AppendLine(" WHERE NIUKE.CONSIGNEECODE  = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND NIUKE.STOCKFLG       = @STOCKFLG")
+        sqlStr.AppendLine("   AND NIUKE.DELFLG         = @DELFLG")
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = consignee
+                .Add("@STOCKFLG", SqlDbType.NVarChar).Value = "1" '不等号条件
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows Then
+                    Return True
+                End If
+            End Using 'sqlDr
+        End Using
+        Return False
     End Function
     ''' <summary>
     ''' 入力チェック処理
@@ -939,8 +956,28 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property MiddleOilCode As String = ""
+        ''' <summary>
+        ''' タンク容量
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>これを元に80%及び目標を在庫を計算</remarks>
+        Public Property MaxTankCap As Decimal
+        ''' <summary>
+        ''' 目標在庫率
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TankCapRate As Decimal
+        ''' <summary>
+        ''' D/S
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DS As Decimal
+        ''' <summary>
+        ''' 前週出荷平均
+        ''' </summary>
+        ''' <returns></returns>
 
-
+        Public Property LastSendAverage As Decimal
         ''' <summary>
         ''' コンストラクタ
         ''' </summary>
@@ -953,10 +990,14 @@ Public Class OIT0004OilStockCreate
             Me.OilName = oilName
             Me.BigOilCode = bigOilCode
             Me.MiddleOilCode = middleOilCode
-            'Weight格納は一旦ベタ打ち
+            '一旦各種値はベタ打ち
             Select Case oilCode
                 Case "1001" 'ハイオク
                     Me.Weight = 0.75D
+                    Me.MaxTankCap = 956
+                    Me.DS = 44
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 280
                 Case "1101" 'レギュラー
                     Me.Weight = 0.75D
                 Case "1301" '灯油
@@ -983,6 +1024,15 @@ Public Class OIT0004OilStockCreate
         Public Sub New(oilCode As String, oilName As String)
             Me.New(oilCode, oilName, "", "")
         End Sub
+        ''' <summary>
+        ''' 自身のコピーを別インスタンスで生成する
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Copy() As OilItem
+            Dim retVal As New OilItem(Me.OilCode, Me.OilName, Me.BigOilCode, Me.MiddleOilCode)
+            retVal.Weight = Me.Weight
+            Return retVal
+        End Function
     End Class
     ''' <summary>
     ''' 列車番号クラス
@@ -1198,8 +1248,7 @@ Public Class OIT0004OilStockCreate
             Dim retVal As New Dictionary(Of String, OilItem)
             Dim copiedItem As OilItem
             For Each itm In oilCodes
-                copiedItem = New OilItem(itm.Key, itm.Value.OilName, itm.Value.BigOilCode, itm.Value.MiddleOilCode)
-                copiedItem.Weight = itm.Value.Weight
+                copiedItem = itm.Value.Copy
                 retVal.Add(itm.Key, copiedItem)
             Next
             '合計行の付与

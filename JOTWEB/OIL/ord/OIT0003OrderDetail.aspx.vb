@@ -65,6 +65,7 @@ Public Class OIT0003OrderDetail
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     Master.RecoverTable(OIT0003tbl)
+                    Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"                '油種数登録ボタン押下
@@ -1233,6 +1234,8 @@ Public Class OIT0003OrderDetail
             & " , 0                                                  AS TIMSTP" _
             & " , 1                                                  AS 'SELECT'" _
             & " , 0                                                  AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERNO), '')                 AS ORDERNO" _
+            & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')                AS DETAILNO" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINFO), '')               AS ORDERINFO" _
             & " , ''                                                 AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
@@ -2727,6 +2730,8 @@ Public Class OIT0003OrderDetail
         '〇前回油種と油種の整合性チェック
         WW_CheckLastOilConsistency(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
             Exit Sub
         End If
 
@@ -2850,7 +2855,17 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_ButtonUPDATE_TAB2()
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
 
+        Dim WW_RESULT As String = ""
+
+        '受注明細DB更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_UpdateOrderDetail_TAB2(SQLcon)
+        End Using
     End Sub
 
     ''' <summary>
@@ -2906,12 +2921,78 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+
     ''' <summary>
     ''' リスト変更時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ListChange()
 
+        Select Case WF_DetailMView.ActiveViewIndex
+                'タンク車割当
+            Case 0
+                WW_ListChange_TAB1()
+
+                '入換・積込指示
+            Case 1
+                WW_ListChange_TAB2()
+
+                'タンク車明細
+            Case 2
+
+                '費用入力
+            Case 3
+
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' リスト変更時処理(タブ「入換・積込指示」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListChange_TAB2()
+        '○ LINECNT取得
+        Dim WW_LINECNT As Integer = 0
+        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0003tbl_tab2.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        '○ 設定項目取得
+        '対象フォーム項目取得
+        Dim WW_ListValue = Request.Form("txt" & pnlListArea2.ID & WF_FIELD.Value & WF_GridDBclick.Text)
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        Select Case WF_FIELD.Value
+            Case "LOADINGIRILINEORDER",     '(一覧)積込入線順
+                 "LINE",                    '(一覧)回線
+                 "FILLINGPOINT",            '(一覧)充填ポイント
+                 "LOADINGOUTLETORDER"       '(一覧)積込出線順
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+            Case "LOADINGIRILINETRAINNO"    '(一覧)積込入線列車番号
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                updHeader.Item("LOADINGIRILINETRAINNAME") = ""
+
+            Case "LOADINGOUTLETTRAINNO"     '(一覧)積込出線列車番号
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                updHeader.Item("LOADINGOUTLETTRAINNAME") = ""
+
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
+    End Sub
+
+    ''' <summary>
+    ''' リスト変更時処理(タブ「タンク車割当」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListChange_TAB1()
         '○ LINECNT取得
         Dim WW_LINECNT As Integer = 0
         If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -2992,6 +3073,8 @@ Public Class OIT0003OrderDetail
                 If WW_ListValue = "" Then
                     'タンク車№
                     updHeader.Item("TANKNO") = ""
+                    '型式
+                    updHeader.Item("MODEL") = ""
                     '前回油種
                     updHeader.Item("LASTOILCODE") = ""
                     updHeader.Item("LASTOILNAME") = ""
@@ -3027,7 +3110,8 @@ Public Class OIT0003OrderDetail
 
                 'タンク車№
                 updHeader.Item("TANKNO") = WW_ListValue
-
+                '型式
+                updHeader.Item("MODEL") = WW_GetValue(7)
                 '####################################################
                 '前回油種
                 'Dim WW_LASTOILNAME As String = ""
@@ -3299,204 +3383,8 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
-    ''' <summary>
-    ''' 油種別タンク車数、積込数量データ取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <remarks></remarks>
-    Protected Sub WW_OILTANKCntGet(ByVal SQLcon As SqlConnection)
+#Region "タブ「タンク車割当」各テーブル追加・更新"
 
-        If IsNothing(OIT0003WKtbl) Then
-            OIT0003WKtbl = New DataTable
-        End If
-
-        If OIT0003WKtbl.Columns.Count <> 0 Then
-            OIT0003WKtbl.Columns.Clear()
-        End If
-
-        OIT0003WKtbl.Clear()
-
-        '○ 検索SQL
-        '　検索説明
-        '     条件指定に従い該当データを受注テーブルから取得する
-        Dim SQLStr As String =
-              " SELECT DISTINCT " _
-            & "   0                                                  AS LINECNT" _
-            & " , ''                                                 AS OPERATION" _
-            & " , ''                                                 AS TIMSTP" _
-            & " , 1                                                  AS 'SELECT'" _
-            & " , 0                                                  AS HIDDEN" _
-            & " , ISNULL(RTRIM(OIT0003.ORDERNO), '')                 AS ORDERNO" _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P10 THEN 1 ELSE 0 END) " _
-            & "    OVER(Partition BY OIT0003.ORDERNO)                AS HTANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P11 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS RTANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P12 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TTANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P13 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS MTTANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P14 OR OIT0003.OILCODE = @P15 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS KTANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P16 OR OIT0003.OILCODE = @P17 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K3TANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P18 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K5TANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P19 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K10TANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P20 OR OIT0003.OILCODE = @P21 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS LTANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P22 THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS ATANK " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE <> '' THEN 1 ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TOTAL " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P10 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS HTANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P11 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS RTANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P12 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TTANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P13 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS MTTANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P14 OR OIT0003.OILCODE = @P15 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS KTANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P16 OR OIT0003.OILCODE = @P17 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K3TANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P18 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K5TANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P19 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K10TANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P20 OR OIT0003.OILCODE = @P21 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS LTANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE = @P22 THEN ISNULL(OIT0003.CARSAMOUNT,0)ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS ATANKCNT " _
-            & " , SUM(CASE WHEN OIT0003.OILCODE <> '' THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
-            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TOTALCNT " _
-            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
-            & "  LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
-            & "  OIT0003.TANKNO = OIM0005.TANKNUMBER " _
-            & " WHERE OIT0003.ORDERNO = @P01" _
-            & "   AND OIT0003.DELFLG <> @P02"
-
-        'SQLStr &=
-        '      " ORDER BY" _
-        '    & "    OIT0003.ORDERNO"
-
-        Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
-                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
-                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
-                PARA02.Value = C_DELETE_FLG.DELETE
-
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 4) '油種(ハイオク)
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 4) '油種(レギュラー)
-                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 4) '油種(灯油)
-                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 4) '油種(未添加灯油)
-                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 4) '油種(軽油)
-                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 4) '油種(軽油)
-                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 4) '油種(３号軽油)
-                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 4) '油種(３号軽油)
-                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 4) '油種(５号軽油)
-                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 4) '油種(１０号軽油)
-                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
-                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
-                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 4) '油種(Ａ重油)
-                PARA10.Value = BaseDllConst.CONST_HTank
-                PARA11.Value = BaseDllConst.CONST_RTank
-                PARA12.Value = BaseDllConst.CONST_TTank
-                PARA13.Value = BaseDllConst.CONST_MTTank
-                PARA14.Value = BaseDllConst.CONST_KTank1
-                PARA15.Value = BaseDllConst.CONST_KTank2
-                PARA16.Value = BaseDllConst.CONST_K3Tank1
-                PARA17.Value = BaseDllConst.CONST_K3Tank2
-                PARA18.Value = BaseDllConst.CONST_K5Tank
-                PARA19.Value = BaseDllConst.CONST_K10Tank
-                PARA20.Value = BaseDllConst.CONST_LTank1
-                PARA21.Value = BaseDllConst.CONST_LTank2
-                PARA22.Value = BaseDllConst.CONST_ATank
-
-                '■　初期化
-                '〇 油種別タンク車数(車)
-                TxtHTank_c.Text = "0"
-                TxtRTank_c.Text = "0"
-                TxtTTank_c.Text = "0"
-                TxtMTTank_c.Text = "0"
-                TxtKTank_c.Text = "0"
-                TxtK3Tank_c.Text = "0"
-                TxtK5Tank_c.Text = "0"
-                TxtK10Tank_c.Text = "0"
-                TxtLTank_c.Text = "0"
-                TxtATank_c.Text = "0"
-                TxtTotal_c.Text = "0"
-                '〇 積込数量(kl)
-                TxtHTank_c2.Text = "0"
-                TxtRTank_c2.Text = "0"
-                TxtTTank_c2.Text = "0"
-                TxtMTTank_c2.Text = "0"
-                TxtKTank_c2.Text = "0"
-                TxtK3Tank_c2.Text = "0"
-                TxtK5Tank_c2.Text = "0"
-                TxtK10Tank_c2.Text = "0"
-                TxtLTank_c2.Text = "0"
-                TxtATank_c2.Text = "0"
-                TxtTotalCnt_c2.Text = "0"
-
-                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-
-                    '○ テーブル検索結果をテーブル格納
-                    OIT0003WKtbl.Load(SQLdr)
-                End Using
-
-                Dim i As Integer = 0
-                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                    i += 1
-                    OIT0003WKrow("LINECNT") = i        'LINECNT
-
-                    '[ヘッダー]
-                    '〇 油種別タンク車数(車)
-                    TxtHTank_c.Text = OIT0003WKrow("HTANK")
-                    TxtRTank_c.Text = OIT0003WKrow("RTANK")
-                    TxtTTank_c.Text = OIT0003WKrow("TTANK")
-                    TxtMTTank_c.Text = OIT0003WKrow("MTTANK")
-                    TxtKTank_c.Text = OIT0003WKrow("KTANK")
-                    TxtK3Tank_c.Text = OIT0003WKrow("K3TANK")
-                    TxtK5Tank_c.Text = OIT0003WKrow("K5TANK")
-                    TxtK10Tank_c.Text = OIT0003WKrow("K10TANK")
-                    TxtLTank_c.Text = OIT0003WKrow("LTANK")
-                    TxtATank_c.Text = OIT0003WKrow("ATANK")
-                    TxtTotal_c.Text = OIT0003WKrow("TOTAL")
-                    '〇 積込数量(kl)
-                    TxtHTank_c2.Text = OIT0003WKrow("HTANKCNT")
-                    TxtRTank_c2.Text = OIT0003WKrow("RTANKCNT")
-                    TxtTTank_c2.Text = OIT0003WKrow("TTANKCNT")
-                    TxtMTTank_c2.Text = OIT0003WKrow("MTTANKCNT")
-                    TxtKTank_c2.Text = OIT0003WKrow("KTANKCNT")
-                    TxtK3Tank_c2.Text = OIT0003WKrow("K3TANKCNT")
-                    TxtK5Tank_c2.Text = OIT0003WKrow("K5TANKCNT")
-                    TxtK10Tank_c2.Text = OIT0003WKrow("K10TANKCNT")
-                    TxtLTank_c2.Text = OIT0003WKrow("LTANKCNT")
-                    TxtATank_c2.Text = OIT0003WKrow("ATANKCNT")
-                    TxtTotalCnt_c2.Text = OIT0003WKrow("TOTALCNT")
-
-                Next
-            End Using
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D SELECT")
-
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D Select"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
-        End Try
-
-    End Sub
 
     ''' <summary>
     ''' 受注TBL登録更新
@@ -4772,6 +4660,99 @@ Public Class OIT0003OrderDetail
         End Try
 
     End Sub
+#End Region
+
+#Region "タブ「入換・積込指示」各テーブル更新"
+    ''' <summary>
+    ''' 受注明細TBL更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrderDetail_TAB2(ByVal SQLcon As SqlConnection)
+
+        Try
+            '更新SQL文･･･受注明細TBLの各項目をを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0003_DETAIL " _
+                    & "    SET LINE                    = @P04, " _
+                    & "        FILLINGPOINT            = @P05, " _
+                    & "        LOADINGIRILINETRAINNO   = @P06, " _
+                    & "        LOADINGIRILINETRAINNAME = @P07, " _
+                    & "        LOADINGIRILINEORDER     = @P08, " _
+                    & "        LOADINGOUTLETTRAINNO    = @P09, " _
+                    & "        LOADINGOUTLETTRAINNAME  = @P10, " _
+                    & "        LOADINGOUTLETORDER      = @P11, " _
+                    & "        UPDYMD                  = @P12, " _
+                    & "        UPDUSER                 = @P13, " _
+                    & "        UPDTERMID               = @P14, " _
+                    & "        RECEIVEYMD              = @P15  " _
+                    & "  WHERE ORDERNO                 = @P01  " _
+                    & "    AND DETAILNO                = @P02  " _
+                    & "    AND DELFLG                 <> @P03; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  '受注№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '受注明細No
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '削除フラグ
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '回線
+            Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '充填ポイント
+            Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '積込入線列車番号
+            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.NVarChar)  '積込入線列車番号名
+            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.NVarChar)  '積込入線順
+            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '積込出線列車番号
+            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '積込出線列車番号名
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.NVarChar)  '積込出線順
+
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.DateTime)  '更新年月日
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.NVarChar)  '更新端末
+            Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", System.Data.SqlDbType.DateTime)  '集信日時
+
+            For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
+                PARA01.Value = OIT0003tab2row("ORDERNO")
+                PARA02.Value = OIT0003tab2row("DETAILNO")
+                PARA03.Value = C_DELETE_FLG.DELETE
+                PARA04.Value = OIT0003tab2row("LINE")
+                PARA05.Value = OIT0003tab2row("FILLINGPOINT")
+                PARA06.Value = OIT0003tab2row("LOADINGIRILINETRAINNO")
+                PARA07.Value = OIT0003tab2row("LOADINGIRILINETRAINNAME")
+                PARA08.Value = OIT0003tab2row("LOADINGIRILINEORDER")
+                PARA09.Value = OIT0003tab2row("LOADINGOUTLETTRAINNO")
+                PARA10.Value = OIT0003tab2row("LOADINGOUTLETTRAINNAME")
+                PARA11.Value = OIT0003tab2row("LOADINGOUTLETORDER")
+
+                PARA12.Value = Date.Now
+                PARA13.Value = Master.USERID
+                PARA14.Value = Master.USERTERMID
+                PARA15.Value = C_DEFAULT_YMD
+
+                SQLcmd.ExecuteNonQuery()
+            Next
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDERDETAIL_TAB2 UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDERDETAIL_TAB2 UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+#End Region
 
     ''' <summary>
     ''' 受注(一覧)表示用
@@ -4980,6 +4961,205 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+    End Sub
+
+    ''' <summary>
+    ''' 油種別タンク車数、積込数量データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_OILTANKCntGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT DISTINCT " _
+            & "   0                                                  AS LINECNT" _
+            & " , ''                                                 AS OPERATION" _
+            & " , ''                                                 AS TIMSTP" _
+            & " , 1                                                  AS 'SELECT'" _
+            & " , 0                                                  AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERNO), '')                 AS ORDERNO" _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P10 THEN 1 ELSE 0 END) " _
+            & "    OVER(Partition BY OIT0003.ORDERNO)                AS HTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P11 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS RTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P12 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P13 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS MTTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P14 OR OIT0003.OILCODE = @P15 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS KTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P16 OR OIT0003.OILCODE = @P17 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K3TANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P18 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K5TANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P19 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K10TANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P20 OR OIT0003.OILCODE = @P21 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS LTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P22 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS ATANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE <> '' THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TOTAL " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P10 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS HTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P11 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS RTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P12 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P13 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS MTTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P14 OR OIT0003.OILCODE = @P15 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS KTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P16 OR OIT0003.OILCODE = @P17 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K3TANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P18 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K5TANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P19 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K10TANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P20 OR OIT0003.OILCODE = @P21 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS LTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P22 THEN ISNULL(OIT0003.CARSAMOUNT,0)ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS ATANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE <> '' THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TOTALCNT " _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & "  LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+            & "  OIT0003.TANKNO = OIM0005.TANKNUMBER " _
+            & " WHERE OIT0003.ORDERNO = @P01" _
+            & "   AND OIT0003.DELFLG <> @P02"
+
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0003.ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 4) '油種(ハイオク)
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 4) '油種(レギュラー)
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 4) '油種(灯油)
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 4) '油種(未添加灯油)
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 4) '油種(軽油)
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 4) '油種(軽油)
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 4) '油種(３号軽油)
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 4) '油種(３号軽油)
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 4) '油種(５号軽油)
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 4) '油種(１０号軽油)
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 4) '油種(Ａ重油)
+                PARA10.Value = BaseDllConst.CONST_HTank
+                PARA11.Value = BaseDllConst.CONST_RTank
+                PARA12.Value = BaseDllConst.CONST_TTank
+                PARA13.Value = BaseDllConst.CONST_MTTank
+                PARA14.Value = BaseDllConst.CONST_KTank1
+                PARA15.Value = BaseDllConst.CONST_KTank2
+                PARA16.Value = BaseDllConst.CONST_K3Tank1
+                PARA17.Value = BaseDllConst.CONST_K3Tank2
+                PARA18.Value = BaseDllConst.CONST_K5Tank
+                PARA19.Value = BaseDllConst.CONST_K10Tank
+                PARA20.Value = BaseDllConst.CONST_LTank1
+                PARA21.Value = BaseDllConst.CONST_LTank2
+                PARA22.Value = BaseDllConst.CONST_ATank
+
+                '■　初期化
+                '〇 油種別タンク車数(車)
+                TxtHTank_c.Text = "0"
+                TxtRTank_c.Text = "0"
+                TxtTTank_c.Text = "0"
+                TxtMTTank_c.Text = "0"
+                TxtKTank_c.Text = "0"
+                TxtK3Tank_c.Text = "0"
+                TxtK5Tank_c.Text = "0"
+                TxtK10Tank_c.Text = "0"
+                TxtLTank_c.Text = "0"
+                TxtATank_c.Text = "0"
+                TxtTotal_c.Text = "0"
+                '〇 積込数量(kl)
+                TxtHTank_c2.Text = "0"
+                TxtRTank_c2.Text = "0"
+                TxtTTank_c2.Text = "0"
+                TxtMTTank_c2.Text = "0"
+                TxtKTank_c2.Text = "0"
+                TxtK3Tank_c2.Text = "0"
+                TxtK5Tank_c2.Text = "0"
+                TxtK10Tank_c2.Text = "0"
+                TxtLTank_c2.Text = "0"
+                TxtATank_c2.Text = "0"
+                TxtTotalCnt_c2.Text = "0"
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                    i += 1
+                    OIT0003WKrow("LINECNT") = i        'LINECNT
+
+                    '[ヘッダー]
+                    '〇 油種別タンク車数(車)
+                    TxtHTank_c.Text = OIT0003WKrow("HTANK")
+                    TxtRTank_c.Text = OIT0003WKrow("RTANK")
+                    TxtTTank_c.Text = OIT0003WKrow("TTANK")
+                    TxtMTTank_c.Text = OIT0003WKrow("MTTANK")
+                    TxtKTank_c.Text = OIT0003WKrow("KTANK")
+                    TxtK3Tank_c.Text = OIT0003WKrow("K3TANK")
+                    TxtK5Tank_c.Text = OIT0003WKrow("K5TANK")
+                    TxtK10Tank_c.Text = OIT0003WKrow("K10TANK")
+                    TxtLTank_c.Text = OIT0003WKrow("LTANK")
+                    TxtATank_c.Text = OIT0003WKrow("ATANK")
+                    TxtTotal_c.Text = OIT0003WKrow("TOTAL")
+                    '〇 積込数量(kl)
+                    TxtHTank_c2.Text = OIT0003WKrow("HTANKCNT")
+                    TxtRTank_c2.Text = OIT0003WKrow("RTANKCNT")
+                    TxtTTank_c2.Text = OIT0003WKrow("TTANKCNT")
+                    TxtMTTank_c2.Text = OIT0003WKrow("MTTANKCNT")
+                    TxtKTank_c2.Text = OIT0003WKrow("KTANKCNT")
+                    TxtK3Tank_c2.Text = OIT0003WKrow("K3TANKCNT")
+                    TxtK5Tank_c2.Text = OIT0003WKrow("K5TANKCNT")
+                    TxtK10Tank_c2.Text = OIT0003WKrow("K10TANKCNT")
+                    TxtLTank_c2.Text = OIT0003WKrow("LTANKCNT")
+                    TxtATank_c2.Text = OIT0003WKrow("ATANKCNT")
+                    TxtTotalCnt_c2.Text = OIT0003WKrow("TOTALCNT")
+
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -5417,6 +5597,9 @@ Public Class OIT0003OrderDetail
                     Else
                         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
                     End If
+
+                    '型式
+                    updHeader.Item("MODEL") = WW_GetValue(7)
 
                     '####################################################
                     '前回油種
@@ -6309,13 +6492,19 @@ Public Class OIT0003OrderDetail
             End If
         End If
 
-        '(一覧)重複チェック(準備)
+        '(一覧)チェック(準備)
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            OIT0003row("ORDERINFO") = ""
+            OIT0003row("ORDERINFONAME") = ""
+        Next
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+        'タンク車Noでソートし、重複がないかチェックする。
         Dim OIT0003tbl_DUMMY As DataTable = OIT0003tbl.Copy
         Dim OIT0003tbl_dv As DataView = New DataView(OIT0003tbl_DUMMY)
         Dim chkTankNo As String = ""
         Dim chkLineOrder As String = ""
-
-        'タンク車Noでソートし、重複がないかチェックする。
         OIT0003tbl_dv.Sort = "TANKNO"
         For Each drv As DataRowView In OIT0003tbl_dv
             If drv("HIDDEN") <> "1" AndAlso drv("TANKNO") <> "" AndAlso chkTankNo = drv("TANKNO") Then
@@ -6324,6 +6513,15 @@ Public Class OIT0003OrderDetail
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
                 O_RTN = "ERR"
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = OIT0003tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = drv("LINECNT"))
+                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
+                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl)
                 Exit Sub
             End If
 
@@ -6580,19 +6778,23 @@ Public Class OIT0003OrderDetail
                 OIT0003row("ORDERINFO") = "83"
                 OIT0003row("ORDERINFONAME") = "前回油種確認"
 
-                Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
-                Exit Sub
+
+                'Exit Sub
             Else
                 OIT0003row("ORDERINFO") = ""
                 OIT0003row("ORDERINFONAME") = ""
 
             End If
         Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -6641,6 +6843,9 @@ Public Class OIT0003OrderDetail
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_SPEEDTRAINTANK_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl)
                 Exit Sub
             Else
                 OIT0003row("ORDERINFO") = ""
@@ -6781,7 +6986,6 @@ Public Class OIT0003OrderDetail
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
-
 
     ''' <summary>
     ''' 本線列車に紐づく情報を取得
@@ -6958,6 +7162,7 @@ Public Class OIT0003OrderDetail
                 Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
                 Dim tblObj = DirectCast(divObj.Controls(0), Table)
 
+                '受注進行ステータスが"受注受付"の場合
                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
@@ -6967,6 +7172,7 @@ Public Class OIT0003OrderDetail
                             End If
                         Next
                     Next
+                    '受注進行ステータスが"受注受付"以外の場合
                 Else
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
@@ -7009,8 +7215,8 @@ Public Class OIT0003OrderDetail
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTAB4TBL.txt"
 
     End Sub
+
 #Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"
-    '   "RepeaterでPoscBack時処理で使用するため保持させる必要上RepeaterのViewState使用停止するのは難しい"
 
     Protected Overrides Sub SavePageStateToPersistenceMedium(ByVal viewState As Object)
         Dim lofF As New LosFormatter
@@ -7057,4 +7263,5 @@ Public Class OIT0003OrderDetail
 
     End Function
 #End Region
+
 End Class

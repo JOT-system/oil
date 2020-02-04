@@ -59,14 +59,14 @@
                         <div>
                             <span>内訳</span>
                         </div>
-                        <div>
+                        <div id="suggestLeftRecvTitle" style='height:calc(<%# Eval("SuggestOilNameList").Count %> * 24px)'>
                             <span>受入数</span>
                         </div>
-                        <asp:Repeater runat="server" ID="repOilTypeNameListEmpty" DataSource='<%# Eval("SuggestOilNameList") %>' >
+<%--                        <asp:Repeater runat="server" ID="repOilTypeNameListEmpty" DataSource='<%# Eval("SuggestOilNameList") %>' >
                             <ItemTemplate >
                                 <div></div>
                             </ItemTemplate>
-                        </asp:Repeater>
+                        </asp:Repeater>--%>
                         <%--  積置きの画面表示なし？ --%>
                     </div>
                     <%--  二列目 --%>
@@ -76,7 +76,8 @@
                         <div><span>油種</span></div>
                         <asp:Repeater runat="server" ID="repOilTypeNameList" DataSource='<%# Eval("SuggestOilNameList") %>' >
                             <ItemTemplate >
-                                <div data-oilcode='<%# DirectCast(Eval("Value"), OilItem).OilCode %>'
+                                <div data-title="suggestValue"
+                                     data-oilcode='<%# DirectCast(Eval("Value"), OilItem).OilCode %>'
                                      data-bigoilcode='<%# DirectCast(Eval("Value"), OilItem).BigOilCode %>'
                                      data-midoilcode='<%# DirectCast(Eval("Value"), OilItem).MiddleOilCode %>'>
                                     <span>

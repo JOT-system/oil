@@ -141,7 +141,7 @@ Public Class OIT0004OilStockCreate
         End If
         '**********************************************
         '画面情報を元に各対象リストを生成
-        '*********************************************
+        '**********************************************
         Dim baseDate = work.WF_SEL_STYMD.Text
         Dim salesOffice = work.WF_SEL_SALESOFFICECODE.Text
         Dim consignee = work.WF_SEL_CONSIGNEE.Text

@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 Imports System.Web.UI.WebControls
 
 ''' <summary>
@@ -62,36 +63,40 @@ Public Class GS0007FIXVALUElst
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property LISTBOX1() As Object
+    Public Property LISTBOX1() As ListBox
     ''' <summary>
     ''' 固定値1LISTBOX
     ''' </summary>
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property LISTBOX2() As Object
+    Public Property LISTBOX2() As ListBox
     ''' <summary>
     ''' 固定値1LISTBOX
     ''' </summary>
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property LISTBOX3() As Object
+    Public Property LISTBOX3() As ListBox
     ''' <summary>
     ''' 固定値1LISTBOX
     ''' </summary>
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property LISTBOX4() As Object
+    Public Property LISTBOX4() As ListBox
     ''' <summary>
     ''' 固定値1LISTBOX
     ''' </summary>
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property LISTBOX5() As Object
-
+    Public Property LISTBOX5() As ListBox
+    ''' <summary>
+    ''' SQL検索条件に含めるテキスト(このまま加える為、SQLインジェクションに注意)
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ADDITIONAL_CONDITION As String = ""
     Protected METHOD_NAME As String = "GS0007FIXVALUElst"
 
     Public Sub GS0007FIXVALUElst()
@@ -108,31 +113,31 @@ Public Class GS0007FIXVALUElst
             If IsNothing(LISTBOX1) Then
                 LISTBOX1 = New ListBox
             Else
-                CType(LISTBOX1, ListBox).Items.Clear()
+                LISTBOX1.Items.Clear()
             End If
 
             If IsNothing(LISTBOX2) Then
                 LISTBOX2 = New ListBox
             Else
-                CType(LISTBOX2, ListBox).Items.Clear()
+                LISTBOX2.Items.Clear()
             End If
 
             If IsNothing(LISTBOX3) Then
                 LISTBOX3 = New ListBox
             Else
-                CType(LISTBOX3, ListBox).Items.Clear()
+                LISTBOX3.Items.Clear()
             End If
 
             If IsNothing(LISTBOX4) Then
                 LISTBOX4 = New ListBox
             Else
-                CType(LISTBOX4, ListBox).Items.Clear()
+                LISTBOX4.Items.Clear()
             End If
 
             If IsNothing(LISTBOX5) Then
                 LISTBOX5 = New ListBox
             Else
-                CType(LISTBOX5, ListBox).Items.Clear()
+                LISTBOX5.Items.Clear()
             End If
 
         Catch ex As Exception
@@ -140,7 +145,7 @@ Public Class GS0007FIXVALUElst
 
         '●In PARAMチェック
         'PARAM01: CLAS
-        If checkParam(METHOD_NAME, CLAS) Then
+        If checkParam(METHOD_NAME, CLAS) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
 
@@ -154,9 +159,6 @@ Public Class GS0007FIXVALUElst
 
         Dim SQLStr As String = String.Empty
         Try
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
 
             'OIS0015_FIXVALUE検索SQL文
             If String.IsNullOrEmpty(CLAS) Then
@@ -172,8 +174,11 @@ Public Class GS0007FIXVALUElst
                     & " Where CAMPCODE  = @P1 " _
                     & "   and STYMD    <= @P3 " _
                     & "   and ENDYMD   >= @P4 " _
-                    & "   and DELFLG   <> @P5 " _
-                    & " ORDER BY KEYCODE "
+                    & "   and DELFLG   <> @P5 "
+                If ADDITIONAL_CONDITION <> "" Then
+                    SQLStr = SQLStr & " " & ADDITIONAL_CONDITION & " "
+                End If
+                SQLStr = SQLStr & " ORDER BY KEYCODE "
             Else
                 SQLStr =
                       " SELECT                           " _
@@ -188,8 +193,11 @@ Public Class GS0007FIXVALUElst
                     & "   and CLASS     = @P2 " _
                     & "   and STYMD    <= @P3 " _
                     & "   and ENDYMD   >= @P4 " _
-                    & "   and DELFLG   <> @P5 " _
-                    & " ORDER BY KEYCODE "
+                    & "   and DELFLG   <> @P5 "
+                If ADDITIONAL_CONDITION <> "" Then
+                    SQLStr = SQLStr & " " & ADDITIONAL_CONDITION & " "
+                End If
+                SQLStr = SQLStr & " ORDER BY KEYCODE "
             End If
 
             'If String.IsNullOrEmpty(CLAS) Then
@@ -224,49 +232,43 @@ Public Class GS0007FIXVALUElst
             '        & "   and DELFLG   <> @P5 " _
             '        & " ORDER BY KEYCODE "
             'End If
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
 
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
-            PARA1.Value = CAMPCODE
-            PARA2.Value = CLAS
-            PARA3.Value = Date.Now
-            PARA4.Value = Date.Now
-            PARA5.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                    .Add("@P2", SqlDbType.NVarChar, 20).Value = CLAS
+                    .Add("@P3", SqlDbType.Date).Value = Date.Now
+                    .Add("@P4", SqlDbType.Date).Value = Date.Now
+                    .Add("@P5", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    Dim val(5) As String
+                    Dim keyCode As String = ""
+                    While SQLdr.Read
+                        keyCode = Convert.ToString(SQLdr("KEYCODE"))
+                        If keyCode <> "" Then
+                            For i As Integer = 1 To 5
+                                val(i) = Convert.ToString(SQLdr(String.Format("VALUE{0}", i)))
+                            Next
+                            VALUE1.Items.Add(New ListItem(val(1), keyCode))
+                            VALUE2.Items.Add(New ListItem(val(2), keyCode))
+                            VALUE3.Items.Add(New ListItem(val(3), keyCode))
+                            VALUE4.Items.Add(New ListItem(val(4), keyCode))
+                            VALUE5.Items.Add(New ListItem(val(5), keyCode))
 
-            While SQLdr.Read
-                If SQLdr("KEYCODE") <> "" Then
-                    VALUE1.Items.Add(New ListItem(SQLdr("VALUE1"), SQLdr("KEYCODE")))
-                    VALUE2.Items.Add(New ListItem(SQLdr("VALUE2"), SQLdr("KEYCODE")))
-                    VALUE3.Items.Add(New ListItem(SQLdr("VALUE3"), SQLdr("KEYCODE")))
-                    VALUE4.Items.Add(New ListItem(SQLdr("VALUE4"), SQLdr("KEYCODE")))
-                    VALUE5.Items.Add(New ListItem(SQLdr("VALUE5"), SQLdr("KEYCODE")))
-
-                    LISTBOX1.Items.Add(New ListItem(SQLdr("VALUE1"), SQLdr("KEYCODE")))
-                    LISTBOX2.Items.Add(New ListItem(SQLdr("VALUE2"), SQLdr("KEYCODE")))
-                    LISTBOX3.Items.Add(New ListItem(SQLdr("VALUE3"), SQLdr("KEYCODE")))
-                    LISTBOX4.Items.Add(New ListItem(SQLdr("VALUE4"), SQLdr("KEYCODE")))
-                    LISTBOX5.Items.Add(New ListItem(SQLdr("VALUE5"), SQLdr("KEYCODE")))
-                End If
-            End While
-
-            ERR = C_MESSAGE_NO.NORMAL
-
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
-
+                            LISTBOX1.Items.Add(New ListItem(val(1), keyCode))
+                            LISTBOX2.Items.Add(New ListItem(val(2), keyCode))
+                            LISTBOX3.Items.Add(New ListItem(val(3), keyCode))
+                            LISTBOX4.Items.Add(New ListItem(val(4), keyCode))
+                            LISTBOX5.Items.Add(New ListItem(val(5), keyCode))
+                        End If
+                    End While
+                End Using 'SQLdr
+                ERR = C_MESSAGE_NO.NORMAL
+            End Using 'SQLcon,SQLcmd
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
@@ -286,51 +288,44 @@ Public Class GS0007FIXVALUElst
         If VALUE1.Items.Count = 0 Then
             Try
                 'DataBase接続文字
-                Dim SQLcon = sm.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
+                Using SQLcon = sm.getConnection,
+                      SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                    SQLcon.Open() 'DataBase接続(Open)
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 20).Value = C_DEFAULT_DATAKEY
+                        .Add("@P2", SqlDbType.NVarChar, 20).Value = CLAS
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.Date).Value = Date.Now
+                        .Add("@P5", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        Dim val(5) As String
+                        Dim keyCode As String = ""
 
-                Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
-                PARA1.Value = C_DEFAULT_DATAKEY
-                PARA2.Value = CLAS
-                PARA3.Value = Date.Now
-                PARA4.Value = Date.Now
-                PARA5.Value = C_DELETE_FLG.DELETE
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        While SQLdr.Read
+                            keyCode = Convert.ToString(SQLdr("KEYCODE"))
+                            If keyCode <> "" Then
 
-                While SQLdr.Read
-                    If SQLdr("KEYCODE") <> "" Then
-                        VALUE1.Items.Add(New ListItem(SQLdr("VALUE1"), SQLdr("KEYCODE")))
-                        VALUE2.Items.Add(New ListItem(SQLdr("VALUE2"), SQLdr("KEYCODE")))
-                        VALUE3.Items.Add(New ListItem(SQLdr("VALUE3"), SQLdr("KEYCODE")))
-                        VALUE4.Items.Add(New ListItem(SQLdr("VALUE4"), SQLdr("KEYCODE")))
-                        VALUE5.Items.Add(New ListItem(SQLdr("VALUE5"), SQLdr("KEYCODE")))
+                                For i As Integer = 1 To 5
+                                    val(i) = Convert.ToString(SQLdr(String.Format("VALUE{0}", i)))
+                                Next
+                                VALUE1.Items.Add(New ListItem(val(1), keyCode))
+                                VALUE2.Items.Add(New ListItem(val(2), keyCode))
+                                VALUE3.Items.Add(New ListItem(val(3), keyCode))
+                                VALUE4.Items.Add(New ListItem(val(4), keyCode))
+                                VALUE5.Items.Add(New ListItem(val(5), keyCode))
 
-                        LISTBOX1.Items.Add(New ListItem(SQLdr("VALUE1"), SQLdr("KEYCODE")))
-                        LISTBOX2.Items.Add(New ListItem(SQLdr("VALUE2"), SQLdr("KEYCODE")))
-                        LISTBOX3.Items.Add(New ListItem(SQLdr("VALUE3"), SQLdr("KEYCODE")))
-                        LISTBOX4.Items.Add(New ListItem(SQLdr("VALUE4"), SQLdr("KEYCODE")))
-                        LISTBOX5.Items.Add(New ListItem(SQLdr("VALUE5"), SQLdr("KEYCODE")))
-                    End If
-                End While
+                                LISTBOX1.Items.Add(New ListItem(val(1), keyCode))
+                                LISTBOX2.Items.Add(New ListItem(val(2), keyCode))
+                                LISTBOX3.Items.Add(New ListItem(val(3), keyCode))
+                                LISTBOX4.Items.Add(New ListItem(val(4), keyCode))
+                                LISTBOX5.Items.Add(New ListItem(val(5), keyCode))
+                            End If
+                        End While
+                    End Using
 
-                ERR = C_MESSAGE_NO.NORMAL
-
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-
-                SQLcmd.Dispose()
-                SQLcmd = Nothing
-
-                SQLcon.Close() 'DataBase接続(Close)
-                SQLcon.Dispose()
-                SQLcon = Nothing
-
+                    ERR = C_MESSAGE_NO.NORMAL
+                End Using 'SQLcon, SQLcmd
             Catch ex As Exception
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 

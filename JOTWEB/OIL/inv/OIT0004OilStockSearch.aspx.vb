@@ -1,4 +1,5 @@
-﻿''************************************************************
+﻿Option Strict On
+''************************************************************
 ' 在庫管理表検索画面
 ' 作成日 2019/11/08
 ' 更新日 2019/11/08
@@ -309,7 +310,7 @@ Public Class OIT0004OilStockSearch
 
         If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
             Try
-                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+                WF_LeftMViewChange.Value = Integer.Parse(WF_LeftMViewChange.Value).ToString
             Catch ex As Exception
                 Exit Sub
             End Try
@@ -340,10 +341,11 @@ Public Class OIT0004OilStockSearch
                         '油槽所
                         If WF_FIELD.Value = "WF_CONSIGNEE" Then
                             'prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
-                            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN")
+                            Dim additionalCond As String = " and VALUE2 != '9' "
+                            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN", I_ADDITIONALCONDITION:=additionalCond)
                         End If
-
-                        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                        Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                        .SetListBox(enumVal, WW_DUMMY, prmData)
                         .ActiveListBox()
                 End Select
             End With
@@ -516,7 +518,8 @@ Public Class OIT0004OilStockSearch
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CONSIGNEE"        '油槽所
                     'WF_CAMPCODE.Text
-                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN")
+                    Dim additionalCond As String = " and VALUE2 != '9' "
+                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN", I_ADDITIONALCONDITION:=additionalCond)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception

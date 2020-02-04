@@ -7009,4 +7009,52 @@ Public Class OIT0003OrderDetail
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTAB4TBL.txt"
 
     End Sub
+#Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"
+    '   "RepeaterでPoscBack時処理で使用するため保持させる必要上RepeaterのViewState使用停止するのは難しい"
+
+    Protected Overrides Sub SavePageStateToPersistenceMedium(ByVal viewState As Object)
+        Dim lofF As New LosFormatter
+        Using sw As New IO.StringWriter
+            lofF.Serialize(sw, viewState)
+            Dim viewStateString = sw.ToString()
+            Dim bytes = Convert.FromBase64String(viewStateString)
+            bytes = CompressByte(bytes)
+            ClientScript.RegisterHiddenField("__VSTATE", Convert.ToBase64String(bytes))
+        End Using
+    End Sub
+    Protected Overrides Function LoadPageStateFromPersistenceMedium() As Object
+        Dim viewState As String = Request.Form("__VSTATE")
+        Dim bytes = Convert.FromBase64String(viewState)
+        bytes = DeCompressByte(bytes)
+        Dim lofF = New LosFormatter()
+        Return lofF.Deserialize(Convert.ToBase64String(bytes))
+    End Function
+    ''' <summary>
+    ''' ByteDetaを圧縮
+    ''' </summary>
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function CompressByte(data As Byte()) As Byte()
+        Using ms As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(ms, IO.Compression.CompressionMode.Compress)
+            ds.Write(data, 0, data.Length)
+            ds.Close()
+            Return ms.ToArray
+        End Using
+    End Function
+    ''' <summary>
+    ''' Byteデータを解凍
+    ''' </summary>
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function DeCompressByte(data As Byte()) As Byte()
+        Using inpMs As New IO.MemoryStream(data),
+              outMs As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(inpMs, IO.Compression.CompressionMode.Decompress)
+            ds.CopyTo(outMs)
+            Return outMs.ToArray
+        End Using
+
+    End Function
+#End Region
 End Class

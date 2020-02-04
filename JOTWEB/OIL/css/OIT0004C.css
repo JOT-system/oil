@@ -332,7 +332,7 @@ span.minus {
 #divStockList div.col6 > div,
 #divStockList div.colStockValue > div{
     height:calc(100% / 9);
-    max-height:24px;
+    max-height:23.5px;
 }
 #divStockList div.colStockInfoTopRow {
     max-height:24px;
@@ -384,12 +384,25 @@ span.minus {
 #divStockList div.colStockInfoTopRow {
     border-right: 1px solid darkgray;
 }
+/* 在庫表の油種ごとの隙間あけて見やすくする場合↓2つ有効化 */
+div.oilTypeData {
+    margin-bottom: 2px;
+}
+#divStockList div.oilTypeData > div {
+    border-bottom: 1px solid darkgray;
+}
+
+@media all and (-ms-high-contrast: none) {
+    #divStockList div.header + div.oilTypeData > div.colStockValue > div:last-child {
+        //border-bottom: 1px solid darkgray;
+    }
+}
 /* ************************ */
 /* 油種表示非表示枠         */
 /* ************************ */
 #divEmptyBox {
-    display:flex;
-    flex-wrap:wrap;
+    display: flex;
+    flex-wrap: wrap;
 }
 #divEmptyBox > div {
     font-size: 0.8em;
@@ -424,7 +437,8 @@ div.oilTypeData div.col1 span[data-tiptext] {
 #divSuggestList div.suggestDate,
 #divSuggestList div.values div:nth-child(1),
 #pnlWeightList div.weightListOilType {
-    background-color: #2B8E56;
+    /* background-color: #2B8E56; */
+    background-color: #51986D;
     color: #FFFFFF;
 }
 /* 見出し色 */

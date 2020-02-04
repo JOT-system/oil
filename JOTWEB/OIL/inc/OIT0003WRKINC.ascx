@@ -145,6 +145,8 @@
     <asp:TextBox ID="WF_SEL_ACTUALACCDATE" runat="server"></asp:TextBox>
     <!-- 空車着日(実績) -->
     <asp:TextBox ID="WF_SEL_ACTUALEMPARRDATE" runat="server"></asp:TextBox>
+    <!-- 貨車連結順序表№ -->
+    <asp:TextBox ID="WF_SEL_LINKNO" runat="server"></asp:TextBox>
 
     <!-- 計上年月日 -->
     <asp:TextBox ID="WF_SEL_KEIJYOYMD" runat="server"></asp:TextBox>

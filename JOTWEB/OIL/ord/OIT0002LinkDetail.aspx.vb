@@ -994,7 +994,8 @@ Public Class OIT0002LinkDetail
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                     updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
 
-                    FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                    'FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
 
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
@@ -1641,7 +1642,8 @@ Public Class OIT0002LinkDetail
                 OIT0002INProw("TANKNUMBER") = XLSTBLrow("TANKNUMBER")
 
                 '●タンク車№から対象データを自動で設定
-                FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0002INProw("TANKNUMBER"), WW_GetValue)
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TANKNUMBER", OIT0002INProw("TANKNUMBER"), WW_GetValue)
+                'FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", OIT0002INProw("TANKNUMBER"), WW_GetValue)
                 OIT0002INProw("PREOILCODE") = WW_GetValue(1)
 
                 '交検日
@@ -1817,7 +1819,8 @@ Public Class OIT0002LinkDetail
 
             Case "TANKNUMBER"           '(一覧)タンク車№
                 If WW_ListValue <> "" Then
-                    FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                    FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                    'FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
 
                     'タンク車№
                     updHeader.Item("TANKNUMBER") = WW_ListValue

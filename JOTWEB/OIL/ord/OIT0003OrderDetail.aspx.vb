@@ -6309,10 +6309,11 @@ Public Class OIT0003OrderDetail
             End If
         End If
 
-        '(一覧)タンク車No(重複チェック)
+        '(一覧)重複チェック(準備)
         Dim OIT0003tbl_DUMMY As DataTable = OIT0003tbl.Copy
         Dim OIT0003tbl_dv As DataView = New DataView(OIT0003tbl_DUMMY)
         Dim chkTankNo As String = ""
+        Dim chkLineOrder As String = ""
 
         'タンク車Noでソートし、重複がないかチェックする。
         OIT0003tbl_dv.Sort = "TANKNO"
@@ -6332,8 +6333,50 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
-        '(一覧)タンク車割当状況(未割当チェック)
+        '貨物駅入線順でソートし、重複がないかチェックする。
+        OIT0003tbl_dv.Sort = "LINEORDER"
+        For Each drv As DataRowView In OIT0003tbl_dv
+            If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") <> "" AndAlso chkLineOrder = drv("LINEORDER") Then
+                Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "貨物駅入線順重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
+            '行削除したデータの場合は退避しない。
+            If drv("HIDDEN") <> "1" Then
+                chkLineOrder = drv("LINEORDER")
+            End If
+        Next
+
+        '(一覧)チェック
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+            '(一覧)受注油種(空白チェック)
+            If OIT0003row("ORDERINGOILNAME") = "" And OIT0003row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)受注油種", needsPopUp:=True)
+
+                WW_CheckMES1 = "受注油種未設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
+            '(一覧)貨物駅入線順(空白チェック)
+            If OIT0003row("LINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)貨物駅入線順", needsPopUp:=True)
+
+                WW_CheckMES1 = "貨物駅入線順未設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
+            '(一覧)タンク車割当状況(未割当チェック)
             If OIT0003row("TANKQUOTA") = CONST_TANKNO_STATUS_MIWARI And OIT0003row("DELFLG") = "0" Then
                 Master.Output(C_MESSAGE_NO.OIL_TANKNO_MIWARIATE_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 

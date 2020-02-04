@@ -210,10 +210,10 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 /* ************** */
 #detailbox {
     font-size: 13.5px;
-    //height: calc(100% - 1.4em); /* コンテンツ全体のフッターメッセージのサイズを引く */
-     position:relative;
-     bottom:0px;
-     min-height:230px;
+    /*height: calc(100% - 1.4em);*/ /* コンテンツ全体のフッターメッセージのサイズを引く */
+    position:relative;
+    bottom:0px;
+    min-height:230px;
 }
 /* ************** */
 /* タブレイアウト */

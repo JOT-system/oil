@@ -1,4 +1,9 @@
-﻿/* テキストボックス補正 */
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
 input[type=text] {
     height: 1.6em;
     font-size: 13.5px;

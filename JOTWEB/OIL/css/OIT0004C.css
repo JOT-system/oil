@@ -54,6 +54,19 @@
     min-width: 80px;
     max-width: 80px;
 }
+#divSuggestList > .leftColumn {
+    flex-flow:column wrap; 
+    width: 100%; 
+    height: 100%; 
+    display: flex; 
+    align-items: stretch; 
+    align-content: stretch;
+}
+#divSuggestList > .leftColumn > div:nth-child(2) {
+    height: calc(24px * 9); 
+    border-bottom: 1px solid darkgray !important; 
+    display:block !important;
+}
 /* 提案表2列目の油種などの文言幅 */
 #divSuggestList > div.oilTypeColumn {
     width: 90px;
@@ -345,6 +358,16 @@ span.minus {
     width: 100%;
     padding-top: 0px;
     padding-bottom: 0px;
+    line-height: 1em;
+    height: 18px;
+}
+span.morningStockIdx0 {
+    margin-top:0px !important; 
+}
+#divStockList input[type=text][data-textfield="MorningStock"] {
+    // height: 18px;
+    //line-height:0.8em;
+    width:calc(100% + 5.5px);
 }
 /* ************** */
 /* 在庫表罫線制御 */
@@ -421,6 +444,7 @@ div.oilTypeData {
 #divEmptyBox > div:hover {
     background-color: #8e2b63;
 }
+div[data-oilcode][data-title='suggestValue'] span[data-tiptext],
 div.oilTypeData div.col1 span[data-tiptext] {
     cursor: pointer;
 }

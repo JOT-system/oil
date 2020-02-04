@@ -282,7 +282,6 @@ Public Class OIT0003OrderDetail
             chkOrderInfo.Checked = False
         End If
 
-
         '受注パターン
         CODENAME_get("ORDERTYPE", work.WF_SEL_PATTERNCODE.Text, work.WF_SEL_PATTERNNAME.Text, WW_DUMMY)
         TxtOrderType.Text = work.WF_SEL_PATTERNNAME.Text

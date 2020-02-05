@@ -41,6 +41,13 @@ window.addEventListener('DOMContentLoaded', function () {
     if (typeof InitDisplay === 'function') {
         InitDisplay();
     }
+    //フッターメッセージ除去
+    let msgBoxObj = document.getElementById('pnlCommonMessageWrapper');
+    if (msgBoxObj !== null) {
+        if (msgBoxObj.style.display !== 'none') {
+            document.getElementById("WF_MESSAGE").innerText = "";
+        }
+    }
     // マウスポインタ戻す
     AutoCursor();
     //フォーカス合わせ

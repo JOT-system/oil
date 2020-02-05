@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 構造取得（帳票用）
@@ -94,10 +95,6 @@ Public Structure CS0028STRUCT
         '●構造（帳票）取得
         '○ 帳票IDよりDB(M0006_STRUCT)検索
         Try
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             '検索SQL文
             Dim SQLStr As String =
                  "SELECT SEQ , rtrim(CODE) as CODE " _
@@ -111,37 +108,32 @@ Public Structure CS0028STRUCT
                & "   and DELFLG     <> '1' " _
                & " ORDER BY SEQ "
 
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-            PARA1.Value = USERID
-            PARA2.Value = CAMPCODE
-            PARA3.Value = STRUCT
-            PARA4.Value = Date.Now
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
 
-            CODE = New List(Of String)
-            ERR = C_MESSAGE_NO.DLL_IF_ERROR
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
+                    .Add("@P2", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                    .Add("@P3", SqlDbType.NVarChar, 20).Value = STRUCT
+                    .Add("@P4", SqlDbType.Date).Value = Date.Now
+                End With
 
-            While SQLdr.Read
-                CODE.Add(SQLdr("CODE"))
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    CODE = New List(Of String)
+                    ERR = C_MESSAGE_NO.DLL_IF_ERROR
 
-                ERR = C_MESSAGE_NO.NORMAL
+                    While SQLdr.Read
+                        CODE.Add(Convert.ToString(SQLdr("CODE")))
+                        ERR = C_MESSAGE_NO.NORMAL
+                    End While
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
 
-            End While
-
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
+                SQLcon.Close() 'DataBase接続(Close)
+            End Using
 
         Catch ex As Exception
             ERR = C_MESSAGE_NO.DB_ERROR

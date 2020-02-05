@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' 更新ジャーナル出力
 ''' </summary>
 ''' <remarks></remarks>
@@ -83,35 +84,33 @@ Public Structure CS0020JOURNAL
                 TABLENM & "(" & _
                 ACTION & ")_" & _
                 sm.TERMID & ".txt"
-            Dim JNL As New System.IO.StreamWriter(W_JNLDIR, True, System.Text.Encoding.UTF8)
+            Using JNL As New System.IO.StreamWriter(W_JNLDIR, True, System.Text.Encoding.UTF8)
+                'ROWデータのCSV(tab)変換
+                Dim CSVstr As New StringBuilder
+                For Each value As Object In ROW.ItemArray
+                    If CSVstr.Length > 0 Then
+                        CSVstr.Append(ControlChars.Tab)
+                    End If
+                    CSVstr.Append(Convert.ToString(value))
+                Next
+                '改行
+                CSVstr.Append(ControlChars.NewLine)
+                'ＥＲＲＬｏｇ出力
+                Dim ERRTEXT As String
+                ERRTEXT = "DATETIME = " & DateTime.Now.ToString("yyyyMMddHHmmss") & " , "
+                ERRTEXT = ERRTEXT & "Camp = " & sm.TERM_COMPANY & " , "
+                ERRTEXT = ERRTEXT & "Userid = " & sm.USERID & " , "
+                ERRTEXT = ERRTEXT & "Namespace = " & sm.NAMESPACE_VALUE & " , "
+                ERRTEXT = ERRTEXT & "Class = " & sm.CLASS_NAME & " , "
+                ERRTEXT = ERRTEXT & "Tablenm = " & TABLENM & " , "
+                ERRTEXT = ERRTEXT & "Action = " & ACTION & " , "
+                ERRTEXT = ERRTEXT & "Term = " & sm.TERMID & " , "
+                ERRTEXT = ERRTEXT & "TEXT = " & CSVstr.ToString
+                JNL.Write(ERRTEXT)
 
-            'ROWデータのCSV(tab)変換
-            Dim CSVstr As String = ""
-            For Each value As Object In ROW.ItemArray
-                If CSVstr <> "" Then
-                    CSVstr = CSVstr & ControlChars.Tab
-                End If
-                CSVstr = CSVstr & value
-            Next
-            '改行
-            CSVstr = CSVstr & ControlChars.NewLine
-
-            'ＥＲＲＬｏｇ出力
-            Dim ERRTEXT As String
-            ERRTEXT = "DATETIME = " & DateTime.Now.ToString("yyyyMMddHHmmss") & " , "
-            ERRTEXT = ERRTEXT & "Camp = " & sm.TERM_COMPANY & " , "
-            ERRTEXT = ERRTEXT & "Userid = " & sm.USERID & " , "
-            ERRTEXT = ERRTEXT & "Namespace = " & sm.NAMESPACE_VALUE & " , "
-            ERRTEXT = ERRTEXT & "Class = " & sm.CLASS_NAME & " , "
-            ERRTEXT = ERRTEXT & "Tablenm = " & TABLENM & " , "
-            ERRTEXT = ERRTEXT & "Action = " & ACTION & " , "
-            ERRTEXT = ERRTEXT & "Term = " & sm.TERMID & " , "
-            ERRTEXT = ERRTEXT & "TEXT = " & CSVstr
-            JNL.Write(ERRTEXT)
-
-            '閉じる
-            JNL.Close()
-            JNL.Dispose()
+                '閉じる
+                JNL.Close()
+            End Using
 
             ERR = C_MESSAGE_NO.NORMAL
 

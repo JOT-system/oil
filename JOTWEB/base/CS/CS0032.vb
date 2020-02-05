@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Option Strict On
+Imports System.IO
 
 ''' <summary>
 ''' TableData(Grid)復元　…　性能対策
@@ -20,35 +21,35 @@ Public Structure CS0032TABLERecover
     ''' <value>ディレクトリ</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property FILEDIR() As String
+    Public Property FILEDIR As String
     ''' <summary>
     ''' 格納対象テーブルデータ
     ''' </summary>
     ''' <value>テーブルデータ</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property TBLDATA() As System.Data.DataTable
+    Public Property TBLDATA As System.Data.DataTable
     ''' <summary>
     ''' 復元モード
     ''' </summary>
     ''' <value>復元モード</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property RECOVERMODE() As RECOVERY_MODE
+    Public Property RECOVERMODE As RECOVERY_MODE
     ''' <summary>
     ''' 格納後のテーブルデータ
     ''' </summary>
     ''' <value>テーブルデータ</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property OUTTBL() As System.Data.DataTable
+    Public Property OUTTBL As System.Data.DataTable
     ''' <summary>
     ''' エラーコード
     ''' </summary>
     ''' <value>エラーコード</value>
     ''' <returns>0;正常、それ以外：エラー</returns>
     ''' <remarks>OK:0,ERR:5001(Customize),ERR:5002(Customize/Program)</remarks>
-    Public Property ERR() As String
+    Public Property ERR As String
     ''' <summary>
     ''' 構造体/関数名
     ''' </summary>
@@ -109,20 +110,21 @@ Public Structure CS0032TABLERecover
         OUTTBL.Clear()
         If (RECOVERMODE = RECOVERY_MODE.HEAD_ONLY Or RECOVERMODE = RECOVERY_MODE.WITH_HEADER) Then
             Dim FILEHEADER As String = FILEDIR.Substring(0, FILEDIR.LastIndexOf(".")) & "_head.txt"
-            Dim hfs As New System.IO.StreamReader(FILEHEADER, System.Text.Encoding.UTF8)
-            Dim linedata As String = hfs.ReadLine
-            Do Until linedata = Nothing
+            Using hfs As New FileStream(FILEHEADER, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                  hstr As New System.IO.StreamReader(hfs, System.Text.Encoding.UTF8)
+                Dim linedata As String = hstr.ReadLine
+                Do Until linedata = Nothing
 
-                Dim WW_item() As String = linedata.Split(ControlChars.Tab)
+                    Dim WW_item() As String = linedata.Split(ControlChars.Tab)
 
-                'データ格納行データ準備
-                OUTTBL.Columns.Add(WW_item(0), Type.GetType(WW_item(1)))
-                linedata = hfs.ReadLine
-            Loop
+                    'データ格納行データ準備
+                    OUTTBL.Columns.Add(WW_item(0), Type.GetType(WW_item(1)))
+                    linedata = hstr.ReadLine
+                Loop
 
-            hfs.Close()
-            hfs.Dispose()
-            hfs = Nothing
+                hstr.Close()
+                hstr.Dispose()
+            End Using
         Else
             For Each Column As DataColumn In TBLDATA.Columns
                 OUTTBL.Columns.Add(Column.ColumnName, Column.DataType)
@@ -139,8 +141,9 @@ Public Structure CS0032TABLERecover
         Try
             Dim WW_LineData As String
             Dim WW_Row As DataRow
-            Using fs As New System.IO.StreamReader(FILEDIR, System.Text.Encoding.UTF8)
-                Dim sr = New StringReader(fs.ReadToEnd())
+            Using fs As New FileStream(FILEDIR, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                  str As New System.IO.StreamReader(fs, System.Text.Encoding.UTF8),
+                  sr = New StringReader(str.ReadToEnd())
                 Do
                     WW_LineData = sr.ReadLine()
                     If WW_LineData = Nothing Then
@@ -157,11 +160,9 @@ Public Structure CS0032TABLERecover
                     Next
 
                     OUTTBL.Rows.Add(WW_Row)
-
                 Loop
-
-                fs.Close()
-            End Using
+                str.Close()
+            End Using 'fs,str,sr
 
         Catch ex As Exception
             ERR = C_MESSAGE_NO.SYSTEM_ADM_ERROR

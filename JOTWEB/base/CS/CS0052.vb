@@ -1,5 +1,5 @@
-﻿Option Explicit On
-Imports System.Web.UI.WebControls
+﻿Option Strict On
+Option Explicit On
 Imports System.Drawing
 
 ''' <summary>

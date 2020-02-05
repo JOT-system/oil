@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' 共通で利用する定数定義
 ''' </summary>
 Public Module BaseDllConst

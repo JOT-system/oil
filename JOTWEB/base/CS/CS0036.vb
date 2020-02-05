@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' FIELDDATAによる項目のチェック処理
@@ -267,10 +268,11 @@ Public Class CS0036FCHECK
             Dim WW_TIME As DateTime
             Dim WW_VALUE_SAVE As String = VALUE
             Dim i As Integer = 0
-
+            Dim rowItm As DataRow
             If WW_row.Count > 0 Then
+                rowItm = WW_row(i)
                 '○必須チェック
-                If WW_row(i)("MUST") = CONST_FLAG_YES Then
+                If Convert.ToString(rowItm("MUST")) = CONST_FLAG_YES Then
                     If String.IsNullOrEmpty(VALUE) Then
                         CHECKREPORT = C_MESSAGE_TEXT.PREREQUISITE_ERROR_TEXT & "(" & VALUE & ")"
                         ERR = C_MESSAGE_NO.PREREQUISITE_ERROR
@@ -279,7 +281,7 @@ Public Class CS0036FCHECK
                 End If
 
                 '○項目属性別チェック
-                Select Case WW_row(i)("FIELDTYPE")
+                Select Case Convert.ToString(rowItm("FIELDTYPE"))
                     Case "NUM"
                         If String.IsNullOrEmpty(VALUE) Then
                             '空欄は、0を設定
@@ -319,9 +321,9 @@ Public Class CS0036FCHECK
                         End Try
 
                         '　整数部チェック
-                        If WW_row(i)("INTLENG") <> 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定
+                        If CInt(rowItm("INTLENG")) <> 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定
                             Try
-                                If WW_INT_SIDE.Length > WW_row(i)("INTLENG") Then
+                                If WW_INT_SIDE.Length > CInt(rowItm("INTLENG")) Then
                                     CHECKREPORT = C_MESSAGE_TEXT.INTEGER_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
                                     ERR = C_MESSAGE_NO.INTEGER_LENGTH_OVER_ERROR
                                     VALUEOUT = "0"
@@ -336,7 +338,7 @@ Public Class CS0036FCHECK
                         End If
 
                         '　小数部チェック
-                        If WW_row(i)("DECLENG") = 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定　
+                        If CInt(rowItm("DECLENG")) = 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定　
                             If WW_DEC_SIDE.Length > 0 Then
                                 CHECKREPORT = C_MESSAGE_TEXT.DECIMAL_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
                                 ERR = C_MESSAGE_NO.DECIMAL_LENGTH_OVER_ERROR
@@ -345,7 +347,7 @@ Public Class CS0036FCHECK
                             End If
                         Else
                             Try
-                                If WW_DEC_SIDE.Length > WW_row(i)("DECLENG") Then
+                                If WW_DEC_SIDE.Length > CInt(rowItm("DECLENG")) Then
                                     CHECKREPORT = C_MESSAGE_TEXT.DECIMAL_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
                                     ERR = C_MESSAGE_NO.DECIMAL_LENGTH_OVER_ERROR
                                     VALUEOUT = "0"
@@ -360,8 +362,8 @@ Public Class CS0036FCHECK
                         End If
 
                         '有効桁数編集
-                        If WW_row(i)("INTLENG") <> 0 And WW_row(i)("DECLENG") = 0 Then
-                            VALUEOUT = Right("0000000000" & WW_I_VALUE.ToString, WW_row(i)("INTLENG"))
+                        If CInt(rowItm("INTLENG")) <> 0 AndAlso CInt(rowItm("DECLENG")) = 0 Then
+                            VALUEOUT = Right("0000000000" & WW_I_VALUE.ToString, CInt(rowItm("INTLENG")))
                         Else
                             VALUEOUT = WW_I_VALUE
                         End If
@@ -378,14 +380,14 @@ Public Class CS0036FCHECK
                                 Exit Sub
                             End Try
 
-                            If WW_DATE < C_DEFAULT_YMD Then
+                            If WW_DATE < CDate(C_DEFAULT_YMD) Then
                                 CHECKREPORT = C_MESSAGE_TEXT.DATE_FORMAT_ERROR_TEXT & "(" & VALUE & ")"
                                 ERR = C_MESSAGE_NO.DATE_FORMAT_ERROR
                                 Exit Sub
                             End If
 
                             '2018/04/24 追加
-                            If WW_DATE > C_MAX_YMD Then
+                            If WW_DATE > CDate(C_MAX_YMD) Then
                                 CHECKREPORT = C_MESSAGE_TEXT.DATE_MAX_OVER_ERROR_TEXT & "(" & VALUE & ")"
                                 ERR = C_MESSAGE_NO.DATE_FORMAT_ERROR
                                 Exit Sub
@@ -401,10 +403,10 @@ Public Class CS0036FCHECK
                         If VALUE <> "" Then
                             VALUE = StrConv(VALUE, VbStrConv.Narrow)
                             Try
-                            If VALUE.Contains(":") Then
-                                    WW_TIME = VALUE
+                                If VALUE.Contains(":") Then
+                                    WW_TIME = CDate(VALUE)
                                 Else
-                                    WW_TIME = VALUE.PadLeft(4, "0").Insert(2, ":")
+                                    WW_TIME = CDate(VALUE.PadLeft(4, "0"c).Insert(2, ":"))
                                 End If
 
                                 VALUEOUT = WW_TIME.ToString("H:mm")
@@ -415,12 +417,12 @@ Public Class CS0036FCHECK
                             End Try
 
                             '　整数部チェック
-                            If WW_row(i)("INTLENG") <> 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定
+                            If CInt(rowItm("INTLENG")) <> 0 Then            'データフィールドマスタ(OIS0016_DATAFIELD)　桁数未設定
                                 Dim WW_MINUTE As Integer = WW_TIME.Hour * 60 + WW_TIME.Minute
 
                                 Try
-                                    If WW_MINUTE Mod WW_row(i)("INTLENG") <> 0 Then
-                                        CHECKREPORT = WW_row(i)("INTLENG") & C_MESSAGE_TEXT.TIME_FORMAT_SPLIT_ERROR_TEXT & "(" & VALUE & ")"
+                                    If WW_MINUTE Mod CInt(rowItm("INTLENG")) <> 0 Then
+                                        CHECKREPORT = Convert.ToString(rowItm("INTLENG")) & C_MESSAGE_TEXT.TIME_FORMAT_SPLIT_ERROR_TEXT & "(" & VALUE & ")"
                                         ERR = C_MESSAGE_NO.DATE_FORMAT_ERROR
                                         Exit Sub
                                     End If
@@ -437,9 +439,9 @@ Public Class CS0036FCHECK
 
                     Case "STR"
                         ' 有効桁数チェック
-                        If WW_row(i)("INTLENG") <> 0 Then
+                        If CInt(rowItm("INTLENG")) <> 0 Then
                             '桁数判断
-                            If VALUE.Length > WW_row(i)("INTLENG") Then
+                            If VALUE.Length > CInt(rowItm("INTLENG")) Then
                                 CHECKREPORT = C_MESSAGE_TEXT.STRING_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
                                 ERR = C_MESSAGE_NO.STRING_LENGTH_OVER_ERROR
                                 Exit Sub
@@ -451,7 +453,7 @@ Public Class CS0036FCHECK
                 End Select
 
                 '固定値マスタ存在チェック
-                If WW_row(i)("FVCHECK") = CONST_FLAG_YES Then
+                If Convert.ToString(rowItm("FVCHECK")) = CONST_FLAG_YES Then
                     Dim WW_FINDrow() As DataRow = TBL.Select("FIELD='" & FIELD & "' and KEYCODE='" & WW_VALUE_SAVE & "'")
                     If WW_FINDrow.Count = 0 Then
                         CHECKREPORT = C_MESSAGE_TEXT.SELECT_INVALID_VALUE_ERROR & "(" & VALUE & ")"
@@ -462,7 +464,7 @@ Public Class CS0036FCHECK
 
                 '固定桁数かチェック
                 If SAMEFLG Then
-                    If WW_row(i)("INTLENG") <> VALUEOUT.Length Then
+                    If CInt(rowItm("INTLENG")) <> VALUEOUT.Length Then
                         CHECKREPORT = C_MESSAGE_TEXT.INTEGER_LENGTH_OVER_ERROR_TEXT & "(" & VALUE & ")"
                         ERR = C_MESSAGE_NO.INTEGER_LENGTH_OVER_ERROR
                         'Exit Sub
@@ -526,13 +528,8 @@ Public Class CS0036FCHECK
                 TBL.DefaultView.Sort = "FIELD,KEYCODE"
 
                 'テンポラリDB項目作成
-                '○指定ﾊﾟﾗﾒｰﾀで検索
-                'DataBase接続文字
-                Using SQLcon = sm.getConnection
-                    SQLcon.Open() 'DataBase接続(Open)
-
-                    'CAMPCODE検索SQL文
-                    Dim SQL_Str As String =
+                'CAMPCODE検索SQL文
+                Dim SQL_Str As String =
                                  " SELECT " _
                                & "          FIELD                                     , " _
                                & "          FIELDTYPE                                 , " _
@@ -576,23 +573,24 @@ Public Class CS0036FCHECK
                                & "  ) MAIN                                              " _
                                & " WHERE                                                " _
                                & "           RNK = 1                                    "
-                    If I_SINGLE Then
-                        SQL_Str = SQL_Str & String.Format(" and FIELD = '{0}' ", Me.FIELD)
-                    End If
+                If I_SINGLE Then
+                    SQL_Str = SQL_Str & String.Format(" and FIELD = '{0}' ", Me.FIELD)
+                End If
+                '○指定ﾊﾟﾗﾒｰﾀで検索
+                'DataBase接続文字
+                Using SQLcon = sm.getConnection,
+                      SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                    SQLcon.Open() 'DataBase接続(Open)
 
-                    Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-                        Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                        Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-                        Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                        Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                        Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
-                        PARA1.Value = CAMPCODE
-                        PARA2.Value = MAPID
-                        PARA3.Value = Date.Now
-                        PARA4.Value = Date.Now
-                        PARA5.Value = C_DELETE_FLG.DELETE
-                        Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                        .Add("@P2", SqlDbType.NVarChar, 50).Value = MAPID
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.Date).Value = Date.Now
+                        .Add("@P5", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
 
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                         While SQLdr.Read
                             S0013row = TBL.NewRow
                             S0013row("FIELD") = SQLdr("FIELD")
@@ -606,8 +604,8 @@ Public Class CS0036FCHECK
                         End While
                         'Close
                         SQLdr.Close() 'Reader(Close)
-                        SQLdr = Nothing
                     End Using
+
                 End Using
             End If
         Catch ex As Exception

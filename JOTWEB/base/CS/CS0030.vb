@@ -1,4 +1,5 @@
-﻿Imports System.Web
+﻿Option Strict On
+Imports System.Web
 Imports System.IO
 Imports Microsoft.Office.Interop
 Imports System.Runtime.InteropServices
@@ -758,7 +759,7 @@ Public Structure CS0030REPORT
 
             Try
                 'メモリー不足対策として3000件づつ処理する(Range操作レスポンスは悪いので１件づつ処理できない)
-                For wLoopCNT As Integer = 0 To (Math.Ceiling(WW_View.Count / 3000) - 1)
+                For wLoopCNT As Integer = 0 To CInt((Math.Ceiling(WW_View.Count / 3000) - 1))
 
                     If wLoopCNT = (Math.Ceiling(WW_View.Count / 3000) - 1) Then
                         '〇出力編集
@@ -893,7 +894,7 @@ Public Structure CS0030REPORT
                     Next
 
                     '繰返データセット
-                    If WW_View(i)("CELLNO") > (WW_CELL_KEY.Count - 1) Then
+                    If CInt(WW_View(i)("CELLNO")) > (WW_CELL_KEY.Count - 1) Then
                         '列位置決め用KeyにHitしない場合、メッセージをセット
                         'WW_HENSYUrange(WW_LineCNT * CS0021UPROFXLS.POSI_I_Y_MAX, CS0021UPROFXLS.POSI_I_X_MAX + WW_CELL_KEY.Count * CS0021UPROFXLS.POSI_R_X_MAX) = "★表示出来ないデータ有(該当列無)"
                         WW_HENSYUrange(WW_LineCNT * Math.Max(CS0021PROFXLS.POSI_I_Y_MAX, CS0021PROFXLS.POSI_R_Y_MAX), CS0021PROFXLS.POSI_I_X_MAX + WW_CELL_KEY.Count * CS0021PROFXLS.POSI_R_X_MAX) = "★表示出来ないデータ有(該当列無)"
@@ -903,7 +904,7 @@ Public Structure CS0030REPORT
                             If (WW_R_TITLEKBN(CNT) = "I_Data") And WW_R_POSIY(CNT) > 0 And WW_R_POSIX(CNT) > 0 Then
                                 Try
                                     'WW_HENSYUrange(WW_LineCNT * CS0021UPROFXLS.POSI_I_Y_MAX + WW_R_POSIY(CNT) - 1, CS0021UPROFXLS.POSI_I_X_MAX + WW_View(i)("CELLNO") * CS0021UPROFXLS.POSI_R_X_MAX + WW_R_POSIX(CNT) - 1) = WW_View(i)(WW_R_FIELD(CNT)).ToString
-                                    WW_HENSYUrange(WW_LineCNT * Math.Max(CS0021PROFXLS.POSI_I_Y_MAX, CS0021PROFXLS.POSI_R_Y_MAX) + WW_R_POSIY(CNT) - 1, CS0021PROFXLS.POSI_I_X_MAX + WW_View(i)("CELLNO") * CS0021PROFXLS.POSI_R_X_MAX + WW_R_POSIX(CNT) - 1) = WW_View(i)(WW_R_FIELD(CNT)).ToString
+                                    WW_HENSYUrange(WW_LineCNT * Math.Max(CS0021PROFXLS.POSI_I_Y_MAX, CS0021PROFXLS.POSI_R_Y_MAX) + WW_R_POSIY(CNT) - 1, CS0021PROFXLS.POSI_I_X_MAX + CInt(WW_View(i)("CELLNO")) * CS0021PROFXLS.POSI_R_X_MAX + WW_R_POSIX(CNT) - 1) = WW_View(i)(WW_R_FIELD(CNT)).ToString
                                 Catch ex As Exception
                                     '項目名が無い場合、無視
                                 End Try

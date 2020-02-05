@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' 文字編集
 ''' </summary>
 ''' <remarks>不要文字を除去する</remarks>

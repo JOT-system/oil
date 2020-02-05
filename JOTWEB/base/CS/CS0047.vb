@@ -1,4 +1,5 @@
-﻿Imports System.Web
+﻿Option Strict On
+Imports System.Web
 Imports System.IO
 Imports Microsoft.Office.Interop
 Imports System.Runtime.InteropServices

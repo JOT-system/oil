@@ -1,4 +1,4 @@
-﻿Imports System.Drawing
+﻿Option Strict On
 Imports System.Data.SqlClient
 
 Public Class GRIS0001Title
@@ -59,13 +59,8 @@ Public Class GRIS0001Title
             End If
             Dim WW_FIND As Boolean = False
             Try
-
-                'DataBase接続文字
-                Using SQLcon As IDbConnection = CS0050Session.getConnection
-                    SQLcon.Open() 'DataBase接続(Open)
-
-                    '検索SQL文
-                    Dim SQLStr As String =
+                '検索SQL文
+                Dim SQLStr As String =
                          "SELECT rtrim(A.MAPNAMES) as NAMES " _
                        & " FROM  COM.OIS0008_PROFMMAP A " _
                        & " Where  " _
@@ -75,31 +70,34 @@ Public Class GRIS0001Title
                        & "   and A.STYMD   <= @P3 " _
                        & "   and A.ENDYMD  >= @P4 " _
                        & "   and A.DELFLG  <> @P5 "
-                    Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                        Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.VarChar, 50)
-                        Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.VarChar, 50)
-                        Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                        Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                        Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.VarChar, 1)
-                        PARA1.Value = I_MAPID
-                        PARA2.Value = I_MAPVARI
-                        PARA3.Value = Date.Now
-                        PARA4.Value = Date.Now
-                        PARA5.Value = C_DELETE_FLG.DELETE
-                        Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-                            If SQLdr.HasRows = True Then
-                                While SQLdr.Read
-                                    WF_TITLETEXT.Text = SQLdr("NAMES")
-                                    WW_FIND = True
-                                End While
-                            Else
-                                WF_TITLETEXT.Text = "業務メニュー"
-                                WW_FIND = False
-                            End If
+                'DataBase接続文字
+                Using SQLcon As SqlConnection = CS0050Session.getConnection,
+                      SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                    SQLcon.Open() 'DataBase接続(Open)
 
-                        End Using
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.VarChar, 50).Value = I_MAPID
+                        .Add("@P2", SqlDbType.VarChar, 50).Value = I_MAPVARI
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.Date).Value = Date.Now
+                        .Add("@P5", SqlDbType.VarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+
+                        If SQLdr.HasRows = True Then
+                            While SQLdr.Read
+                                WF_TITLETEXT.Text = Convert.ToString(SQLdr("NAMES"))
+                                WW_FIND = True
+                            End While
+                        Else
+                            WF_TITLETEXT.Text = "業務メニュー"
+                            WW_FIND = False
+                        End If
+
                     End Using
+
                 End Using
             Catch ex As Exception
                 O_RTN = C_MESSAGE_NO.DB_ERROR

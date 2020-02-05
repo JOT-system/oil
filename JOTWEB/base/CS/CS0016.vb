@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' プロファイル変数取得
@@ -154,11 +155,6 @@ Public Class CS0016ProfMValue
         '●変数情報取得
         '○ DB(S0007_UPROFVARI)検索
         Try
-            '○指定ﾊﾟﾗﾒｰﾀで検索
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             'I_CAMPCODE検索SQL文
             Dim SQL_Str As String = ""
             If CAMPCODE = "" Then
@@ -224,94 +220,93 @@ Public Class CS0016ProfMValue
                         & "         ,CASE CAMPCODE WHEN '" & C_DEFAULT_DATAKEY & "' THEN 2 ELSE 1 END"
             End If
 
-            Dim SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 50)
-            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 50)
-            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.Date)
-            Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.Date)
-            Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
-            PARA1.Value = PROFID
-            PARA2.Value = MAPID
-            PARA3.Value = CAMPCODE
-            PARA4.Value = VARI
-            PARA5.Value = FIELD
-            PARA6.Value = TARGETDATE
-            PARA7.Value = TARGETDATE
-            PARA8.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            '○指定ﾊﾟﾗﾒｰﾀで検索
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
 
-            VALUE = ""
-            ERR = C_MESSAGE_NO.DLL_IF_ERROR
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = PROFID
+                    .Add("@P2", SqlDbType.NVarChar, 50).Value = MAPID
+                    .Add("@P3", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                    .Add("@P4", SqlDbType.NVarChar, 50).Value = VARI
+                    .Add("@P5", SqlDbType.NVarChar, 50).Value = FIELD
+                    .Add("@P6", SqlDbType.Date).Value = TARGETDATE
+                    .Add("@P7", SqlDbType.Date).Value = TARGETDATE
+                    .Add("@P8", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
 
-            Dim WW_DATE As Date = Date.Now
-            If SQLdr.Read Then
-                Select Case SQLdr("VALUETYPE")
-                    Case C_VALUE_TYPE.DATE_BEGINING_MONTH
-                        WW_DATE = New DateTime(Date.Now.Year, Date.Now.Month, 1)
-                        If SQLdr("VALUEADDYY") <> 0 Then
-                            WW_DATE = WW_DATE.AddYears(SQLdr("VALUEADDYY"))
-                        End If
-                        If SQLdr("VALUEADDMM") <> 0 Then
-                            WW_DATE = WW_DATE.AddMonths(SQLdr("VALUEADDMM"))
-                        End If
-                        If SQLdr("VALUEADDDD") <> 0 Then
-                            WW_DATE = WW_DATE.AddDays(SQLdr("VALUEADDDD"))
-                        End If
-                        VALUE = WW_DATE.ToString("yyyy/MM/dd")
-                        ERR = C_MESSAGE_NO.NORMAL
-                    Case C_VALUE_TYPE.DATE_NOW
-                        WW_DATE = Date.Now
-                        If SQLdr("VALUEADDYY") <> 0 Then
-                            WW_DATE = WW_DATE.AddYears(SQLdr("VALUEADDYY"))
-                        End If
-                        If SQLdr("VALUEADDMM") <> 0 Then
-                            WW_DATE = WW_DATE.AddMonths(SQLdr("VALUEADDMM"))
-                        End If
-                        If SQLdr("VALUEADDDD") <> 0 Then
-                            WW_DATE = WW_DATE.AddDays(SQLdr("VALUEADDDD"))
-                        End If
-                        VALUE = WW_DATE.ToString("yyyy/MM/dd")
-                        ERR = C_MESSAGE_NO.NORMAL
-                    Case C_VALUE_TYPE.DATE_FIX_VALUE
-                        Try
-                            Date.TryParse(SQLdr("VALUE"), WW_DATE)
-                        Catch ex As Exception
-                            Exit Sub
-                        End Try
-                        If SQLdr("VALUEADDYY") <> 0 Then
-                            WW_DATE = WW_DATE.AddYears(SQLdr("VALUEADDYY"))
-                        End If
-                        If SQLdr("VALUEADDMM") <> 0 Then
-                            WW_DATE = WW_DATE.AddMonths(SQLdr("VALUEADDMM"))
-                        End If
-                        If SQLdr("VALUEADDDD") <> 0 Then
-                            WW_DATE = WW_DATE.AddDays(SQLdr("VALUEADDDD"))
-                        End If
-                        VALUE = WW_DATE.ToString("yyyy/MM/dd")
-                        ERR = C_MESSAGE_NO.NORMAL
-                    Case C_VALUE_TYPE.VALUE_FIX
-                        VALUE = SQLdr("VALUE")
-                        ERR = C_MESSAGE_NO.NORMAL
-                    Case Else
-                        VALUE = ""
-                        ERR = C_MESSAGE_NO.NORMAL
-                End Select
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    VALUE = ""
+                    ERR = C_MESSAGE_NO.DLL_IF_ERROR
 
-            End If
+                    Dim WW_DATE As Date = Date.Now
+                    If SQLdr.Read Then
+                        Dim valueAddYY As Integer = CInt(SQLdr("VALUEADDYY"))
+                        Dim valueAddMM As Integer = CInt(SQLdr("VALUEADDMM"))
+                        Dim valueAddDD As Integer = CInt(SQLdr("VALUEADDDD"))
+                        Select Case Convert.ToString(SQLdr("VALUETYPE"))
+                            Case C_VALUE_TYPE.DATE_BEGINING_MONTH
+                                WW_DATE = New DateTime(Date.Now.Year, Date.Now.Month, 1)
+                                If valueAddYY <> 0 Then
+                                    WW_DATE = WW_DATE.AddYears(valueAddYY)
+                                End If
+                                If valueAddMM <> 0 Then
+                                    WW_DATE = WW_DATE.AddMonths(valueAddMM)
+                                End If
+                                If valueAddDD <> 0 Then
+                                    WW_DATE = WW_DATE.AddDays(valueAddDD)
+                                End If
+                                VALUE = WW_DATE.ToString("yyyy/MM/dd")
+                                ERR = C_MESSAGE_NO.NORMAL
+                            Case C_VALUE_TYPE.DATE_NOW
+                                WW_DATE = Date.Now
+                                If valueAddYY <> 0 Then
+                                    WW_DATE = WW_DATE.AddYears(valueAddYY)
+                                End If
+                                If valueAddMM <> 0 Then
+                                    WW_DATE = WW_DATE.AddMonths(valueAddMM)
+                                End If
+                                If valueAddDD <> 0 Then
+                                    WW_DATE = WW_DATE.AddDays(valueAddDD)
+                                End If
+                                VALUE = WW_DATE.ToString("yyyy/MM/dd")
+                                ERR = C_MESSAGE_NO.NORMAL
+                            Case C_VALUE_TYPE.DATE_FIX_VALUE
+                                Try
+                                    Date.TryParse(Convert.ToString(SQLdr("VALUE")), WW_DATE)
+                                Catch ex As Exception
+                                    Exit Sub
+                                End Try
+                                If valueAddYY <> 0 Then
+                                    WW_DATE = WW_DATE.AddYears(valueAddYY)
+                                End If
+                                If valueAddMM <> 0 Then
+                                    WW_DATE = WW_DATE.AddMonths(valueAddMM)
+                                End If
+                                If valueAddDD <> 0 Then
+                                    WW_DATE = WW_DATE.AddDays(valueAddDD)
+                                End If
+                                VALUE = WW_DATE.ToString("yyyy/MM/dd")
+                                ERR = C_MESSAGE_NO.NORMAL
+                            Case C_VALUE_TYPE.VALUE_FIX
+                                VALUE = Convert.ToString(SQLdr("VALUE"))
+                                ERR = C_MESSAGE_NO.NORMAL
+                            Case Else
+                                VALUE = ""
+                                ERR = C_MESSAGE_NO.NORMAL
+                        End Select
 
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
+                    End If
 
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
 
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
+                End Using
+                SQLcon.Close() 'DataBase接続(Close)
+            End Using
+
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 

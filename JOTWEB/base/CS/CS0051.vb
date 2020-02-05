@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' ユーザ情報を取得する
@@ -139,12 +140,12 @@ Public Class CS0051UserInfo : Implements IDisposable
         Dim sm As New CS0050SESSION
 
         'EXTRA PARAM01:STYMD
-        If STYMD < C_DEFAULT_YMD Then
+        If STYMD < CDate(C_DEFAULT_YMD) Then
             STYMD = Date.Now
         End If
 
         'EXTRA PARAM01:ENDYMD
-        If ENDYMD < C_DEFAULT_YMD Then
+        If ENDYMD < CDate(C_DEFAULT_YMD) Then
             ENDYMD = Date.Now
         End If
 
@@ -153,13 +154,8 @@ Public Class CS0051UserInfo : Implements IDisposable
             '****************
             '*** 共通宣言 ***
             '****************
-            'DataBase接続文字
-            Using SQLcon = sm.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
-
-
-                'Message検索SQL文
-                Dim SQLStr As String =
+            'Message検索SQL文
+            Dim SQLStr As String =
                      "SELECT " _
                    & "   rtrim(CAMPCODE) as CAMPCODE " _
                    & " , rtrim(ORG) as ORG " _
@@ -178,53 +174,55 @@ Public Class CS0051UserInfo : Implements IDisposable
                    & "   and ENDYMD >= @P2 " _
                    & "   and DELFLG <> @P4 "
 
-                '  "SELECT " _
-                '& "   rtrim(CAMPCODE) as CAMPCODE " _
-                '& " , rtrim(ORG) as ORG " _
-                '& " , rtrim(STAFFCODE) as STAFFCODE " _
-                '& " , rtrim(STAFFNAMES) as STAFFNAMES " _
-                '& " , rtrim(STAFFNAMEL) as STAFFNAMEL " _
-                '& " , rtrim(MAPID) as MAPID " _
-                '& " , rtrim(VARIANT) as VARIANT " _
-                '& " , rtrim(CAMPROLE) as CAMPROLE " _
-                '& " , rtrim(MAPROLE) as MAPROLE " _
-                '& " , rtrim(ORGROLE) as ORGROLE " _
-                '& " , rtrim(VIEWPROFID) as VIEWPROFID " _
-                '& " , rtrim(RPRTPROFID) as RPRTPROFID " _
-                '& " FROM  COM.OIS0004_USER " _
-                '& " Where USERID = @P1 " _
-                '& "   and STYMD <= @P3 " _
-                '& "   and ENDYMD >= @P2 " _
-                '& "   and DELFLG <> @P4 "
-                Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-                    PARA1.Value = USERID
-                    PARA2.Value = STYMD
-                    PARA3.Value = ENDYMD
-                    PARA4.Value = C_DELETE_FLG.DELETE
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            '  "SELECT " _
+            '& "   rtrim(CAMPCODE) as CAMPCODE " _
+            '& " , rtrim(ORG) as ORG " _
+            '& " , rtrim(STAFFCODE) as STAFFCODE " _
+            '& " , rtrim(STAFFNAMES) as STAFFNAMES " _
+            '& " , rtrim(STAFFNAMEL) as STAFFNAMEL " _
+            '& " , rtrim(MAPID) as MAPID " _
+            '& " , rtrim(VARIANT) as VARIANT " _
+            '& " , rtrim(CAMPROLE) as CAMPROLE " _
+            '& " , rtrim(MAPROLE) as MAPROLE " _
+            '& " , rtrim(ORGROLE) as ORGROLE " _
+            '& " , rtrim(VIEWPROFID) as VIEWPROFID " _
+            '& " , rtrim(RPRTPROFID) as RPRTPROFID " _
+            '& " FROM  COM.OIS0004_USER " _
+            '& " Where USERID = @P1 " _
+            '& "   and STYMD <= @P3 " _
+            '& "   and ENDYMD >= @P2 " _
+            '& "   and DELFLG <> @P4 "
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
 
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
+                    .Add("@P2", SqlDbType.Date).Value = STYMD
+                    .Add("@P3", SqlDbType.Date).Value = ENDYMD
+                    .Add("@P4", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     If SQLdr.Read Then
-                        CAMPCODE = SQLdr("CAMPCODE")
-                        ORG = SQLdr("ORG")
+                        CAMPCODE = Convert.ToString(SQLdr("CAMPCODE"))
+                        ORG = Convert.ToString(SQLdr("ORG"))
                         '                        STAFFCODE = SQLdr("STAFFCODE")
                         '                        ORGROLE = SQLdr("ORGROLE")
-                        STAFFNAMES = SQLdr("STAFFNAMES")
-                        STAFFNAMEL = SQLdr("STAFFNAMEL")
-                        MAPID = SQLdr("MAPID")
-                        MAPVARI = SQLdr("VARIANT")
+                        STAFFNAMES = Convert.ToString(SQLdr("STAFFNAMES"))
+                        STAFFNAMEL = Convert.ToString(SQLdr("STAFFNAMEL"))
+                        MAPID = Convert.ToString(SQLdr("MAPID"))
+                        MAPVARI = Convert.ToString(SQLdr("VARIANT"))
                         '20191101-追加-START
-                        MENUROLE = SQLdr("MENUROLE")
-                        VIEWPROFROLE = SQLdr("VIEWPROFID")
-                        RPRTPROFROLE = SQLdr("RPRTPROFID")
-                        APPROVALIDROLE = SQLdr("APPROVALID")
+                        MENUROLE = Convert.ToString(SQLdr("MENUROLE"))
+                        VIEWPROFROLE = Convert.ToString(SQLdr("VIEWPROFID"))
+                        RPRTPROFROLE = Convert.ToString(SQLdr("RPRTPROFID"))
+                        APPROVALIDROLE = Convert.ToString(SQLdr("APPROVALID"))
                         '20191101-追加-END
-                        MAPROLE = SQLdr("MAPROLE")
-                        VIEWPROFID = SQLdr("VIEWPROFID")
-                        RPRTPROFID = SQLdr("RPRTPROFID")
+                        MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
+                        VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
+                        RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
                         ERR = C_MESSAGE_NO.NORMAL
                     Else
                         ERR = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
@@ -232,14 +230,10 @@ Public Class CS0051UserInfo : Implements IDisposable
 
                     'Close
                     SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
                 End Using
-
                 SQLcon.Close() 'DataBase接続(Close)
             End Using
-
         Catch ex As Exception
-
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                    'SUBクラス名
@@ -295,12 +289,12 @@ Public Class CS0051UserInfo : Implements IDisposable
         Dim sm As New CS0050SESSION
 
         'EXTRA PARAM01:STYMD
-        If STYMD < C_DEFAULT_YMD Then
+        If STYMD < CDate(C_DEFAULT_YMD) Then
             STYMD = Date.Now
         End If
 
         'EXTRA PARAM01:ENDYMD
-        If ENDYMD < C_DEFAULT_YMD Then
+        If ENDYMD < CDate(C_DEFAULT_YMD) Then
             ENDYMD = Date.Now
         End If
 
@@ -309,13 +303,8 @@ Public Class CS0051UserInfo : Implements IDisposable
             '****************
             '*** 共通宣言 ***
             '****************
-            'DataBase接続文字
-            Using SQLcon = sm.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
-
-
-                'Message検索SQL文
-                Dim SQLStr As String =
+            'Message検索SQL文
+            Dim SQLStr As String =
                      "SELECT " _
                    & "   rtrim(TERMID) as TERMID " _
                    & " , rtrim(IPADDR) as IPADDR " _
@@ -328,36 +317,32 @@ Public Class CS0051UserInfo : Implements IDisposable
                    & "   and ENDYMD    >= @P2 " _
                    & "   and DELFLG    <> @P4 " _
                    & " ORDER BY TERMCLASS ASC "
-                Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-                    Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
-                    Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 20)
-                    PARA1.Value = ORG
-                    PARA2.Value = STYMD
-                    PARA3.Value = ENDYMD
-                    PARA4.Value = C_DELETE_FLG.DELETE
-                    PARA5.Value = C_TERMCLASS.BASE
-                    PARA6.Value = CAMPCODE
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 30).Value = ORG
+                    .Add("@P2", SqlDbType.Date).Value = STYMD
+                    .Add("@P3", SqlDbType.Date).Value = ENDYMD
+                    .Add("@P4", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    .Add("@P5", SqlDbType.NVarChar, 1).Value = C_TERMCLASS.BASE
+                    .Add("@P6", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                End With
 
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     If SQLdr.Read Then
-                        SERVERID = SQLdr("TERMID")
-                        SERVERIP = SQLdr("IPADDR")
-                        SERVERNAMES = SQLdr("TERMNAMES")
+                        SERVERID = Convert.ToString(SQLdr("TERMID"))
+                        SERVERIP = Convert.ToString(SQLdr("IPADDR"))
+                        SERVERNAMES = Convert.ToString(SQLdr("TERMNAMES"))
                         ERR = C_MESSAGE_NO.NORMAL
                     Else
                         ERR = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
                     End If
-
                     'Close
                     SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
                 End Using
-
                 SQLcon.Close() 'DataBase接続(Close)
             End Using
 

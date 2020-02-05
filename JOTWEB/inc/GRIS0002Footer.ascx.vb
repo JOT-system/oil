@@ -1,4 +1,5 @@
-﻿Imports System.Drawing
+﻿Option Strict On
+Imports System.Drawing
 
 Public Class GRIS0002Footer
     Inherits UserControl

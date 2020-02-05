@@ -843,8 +843,10 @@ Public Class OILMasterPage
         '〇会社コード取得
         Dim COMPCODE As String = String.Empty
         Dim mySearch = Page.Master.FindControl("contents1")
-        Dim myWork = Page.Master.FindControl("contents1").FindControl("work")
-
+        Dim myWork As Control = Nothing
+        If Not IsNothing(mySearch) Then
+            myWork = mySearch.FindControl("work")
+        End If
         '検索条件枠から取得
         If Not IsNothing(mySearch) Then
             For Each ctl In mySearch.Controls

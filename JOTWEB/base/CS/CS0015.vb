@@ -1,6 +1,5 @@
-﻿Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
-
+﻿Option Strict On
+Imports System.Data.SqlClient
 ''' <summary>
 ''' タイトル会社取得
 ''' </summary>
@@ -13,7 +12,7 @@ Public Class CS0015TITLEcamp
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property List() As Object
+    Public Property List() As ListBox
 
     ''' <summary>
     ''' ユーザID
@@ -131,34 +130,28 @@ Public Class CS0015TITLEcamp
                 '& "GROUP BY A.CAMPCODE , A.NAMES " _
                 '& "ORDER BY A.CAMPCODE "
 
-                Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                '                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
-                PARA1.Value = USERID
-                '                PARA2.Value = C_ROLE_VARIANT.USER_COMP
-                PARA3.Value = Date.Now
-                PARA4.Value = Date.Now
-                PARA5.Value = C_DELETE_FLG.DELETE
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
+                        '.Add("@P2", SqlDbType.NVarChar, 20).Value = C_ROLE_VARIANT.USER_COMP
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.Date).Value = Date.Now
+                        .Add("@P5", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
 
-                Dim i As Integer = 0
-                While SQLdr.Read
-                    i = i + 1
-                    W_OBJ_USER_CAMPCODE.Add(SQLdr("CAMPCODE"))
-                    W_OBJ_USER_NAMES.Add(SQLdr("NAME"))
-                    W_OBJ_USER_PERMIT.Add(SQLdr("PERMITCODE"))
-                End While
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        Dim i As Integer = 0
+                        While SQLdr.Read
+                            i = i + 1
+                            W_OBJ_USER_CAMPCODE.Add(Convert.ToString(SQLdr("CAMPCODE")))
+                            W_OBJ_USER_NAMES.Add(Convert.ToString(SQLdr("NAME")))
+                            W_OBJ_USER_PERMIT.Add(Convert.ToString(SQLdr("PERMITCODE")))
+                        End While
 
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-
-                SQLcmd.Dispose()
-                SQLcmd = Nothing
-
+                        'Close
+                        SQLdr.Close() 'Reader(Close)
+                    End Using
+                End Using
             Catch ex As Exception
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
                 CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名

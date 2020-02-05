@@ -1,5 +1,7 @@
-﻿Imports System.Drawing
-
+﻿Option Strict On
+''' <summary>
+''' 左ボックス共通ユーザーコントロールクラス
+''' </summary>
 Public Class GRIS0005LeftBox
     Inherits UserControl
     ''' <summary>
@@ -231,9 +233,9 @@ Public Class GRIS0005LeftBox
                 Case Else
                     Restore(O_RTN)
                     '〇取得
-                    LF_FILTER_CODE = If(ViewState("LF_FILTER_CODE"), "0")
-                    LF_SORTING_CODE = If(ViewState("LF_SORTING_CODE"), "0")
-                    LF_PARAM_DATA = If(ViewState("LF_PARAM_DATA"), "0")
+                    LF_FILTER_CODE = If(ViewState("LF_FILTER_CODE") Is Nothing, "0", Convert.ToString(ViewState("LF_FILTER_CODE")))
+                    LF_SORTING_CODE = If(ViewState("LF_SORTING_CODE") Is Nothing, "0", Convert.ToString(ViewState("LF_SORTING_CODE")))
+                    LF_PARAM_DATA = If(ViewState("LF_PARAM_DATA") Is Nothing, "0", Convert.ToString(ViewState("LF_PARAM_DATA")))
             End Select
 
         End If
@@ -643,19 +645,49 @@ Public Class GRIS0005LeftBox
     ''' <returns>作成した一覧情報</returns>
     ''' <remarks></remarks>
     Protected Function CreateCompList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
-        Dim key As String = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0001CompList.LC_COMPANY_TYPE.ROLE) _
-                          & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0001CompList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                          & LIST_BOX_CLASSIFICATION.LC_COMPANY
+        Dim typeMode As String = ""
+        If Params.Item(C_PARAMETERS.LP_TYPEMODE) Is Nothing Then
+            typeMode = Convert.ToString(GL0001CompList.LC_COMPANY_TYPE.ROLE)
+        Else
+            typeMode = CInt(Params.Item(C_PARAMETERS.LP_TYPEMODE)).ToString
+        End If
+        Dim dispFormat As String = ""
+        If Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT) Is Nothing Then
+            dispFormat = CInt(GL0001CompList.C_VIEW_FORMAT_PATTERN.NAMES).ToString
+        Else
+            dispFormat = Convert.ToString(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT))
+        End If
+        Dim viewFormat = DirectCast([Enum].ToObject(GetType(GL0000.C_VIEW_FORMAT_PATTERN), CInt(dispFormat)), GL0000.C_VIEW_FORMAT_PATTERN)
+        Dim listClassComp As String = CInt(LIST_BOX_CLASSIFICATION.LC_COMPANY).ToString
+
+        Dim key As String = ""
+        key = typeMode & dispFormat & listClassComp
 
         If Not LbMap.ContainsKey(key) Then
+            Dim paramStYmd As Date = Date.Now
+            If Params.Item(C_PARAMETERS.LP_STYMD) IsNot Nothing Then
+                paramStYmd = CDate(Params.Item(C_PARAMETERS.LP_STYMD))
+            End If
+            Dim paramEndYmd As Date = Date.Now
+            If Params.Item(C_PARAMETERS.LP_ENDYMD) IsNot Nothing Then
+                paramEndYmd = CDate(Params.Item(C_PARAMETERS.LP_ENDYMD))
+            End If
+            Dim roleCode As String = DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP
+            If Params.Item(C_PARAMETERS.LP_ROLE) IsNot Nothing Then
+                roleCode = Convert.ToString(Params.Item(C_PARAMETERS.LP_ROLE))
+            End If
+            Dim defaultSort As String = String.Empty
+            If Params.Item(C_PARAMETERS.LP_DEFAULT_SORT) IsNot Nothing Then
+                defaultSort = Convert.ToString(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT))
+            End If
             '○会社コードListBox設定
             Using CL0001CompList As New GL0001CompList With {
-                   .TYPEMODE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0001CompList.LC_COMPANY_TYPE.ROLE) _
-                 , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-                 , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                 , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
-                 , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-                 , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0001CompList.C_VIEW_FORMAT_PATTERN.NAMES)
+                   .TYPEMODE = typeMode _
+                 , .STYMD = paramStYmd _
+                 , .ENDYMD = paramEndYmd _
+                 , .ROLECODE = roleCode _
+                 , .DEFAULT_SORT = defaultSort _
+                 , .VIEW_FORMAT = viewFormat
             }
                 CL0001CompList.getList()
                 Dim lsbx As ListBox = CL0001CompList.LIST
@@ -749,25 +781,67 @@ Public Class GRIS0005LeftBox
     Protected Function CreateOrg(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
         '○部署ListBox設定
         Dim Categorys As String() = TryCast(Params.Item(C_PARAMETERS.LP_ORG_CATEGORYS), String())
-        Dim Key As String = If(Params.Item(C_PARAMETERS.LP_COMPANY), "-")
+        Dim Key As String = "-"
+        If Params.Item(C_PARAMETERS.LP_COMPANY) IsNot Nothing Then
+            Key = Convert.ToString(Params.Item(C_PARAMETERS.LP_COMPANY))
+        End If
         For Each category As String In Categorys
             Key = Key & category
         Next
-        Key = Key & If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                  & LIST_BOX_CLASSIFICATION.LC_ORG
+        Dim dispFormat As String = ""
+        If Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT) Is Nothing Then
+            dispFormat = CInt(GL0001CompList.C_VIEW_FORMAT_PATTERN.NAMES).ToString
+        Else
+            dispFormat = Convert.ToString(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT))
+        End If
+        Key = Key & dispFormat & CInt(LIST_BOX_CLASSIFICATION.LC_ORG).ToString
 
         If Not LbMap.ContainsKey(Key) Then
+            Dim defaultSort As String = String.Empty
+            If Params.Item(C_PARAMETERS.LP_DEFAULT_SORT) IsNot Nothing Then
+                defaultSort = Convert.ToString(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT))
+            End If
+            Dim paramStYmd As Date = Date.Now
+            If Params.Item(C_PARAMETERS.LP_STYMD) IsNot Nothing Then
+                paramStYmd = CDate(Params.Item(C_PARAMETERS.LP_STYMD))
+            End If
+            Dim paramEndYmd As Date = Date.Now
+            If Params.Item(C_PARAMETERS.LP_ENDYMD) IsNot Nothing Then
+                paramEndYmd = CDate(Params.Item(C_PARAMETERS.LP_ENDYMD))
+            End If
+            Dim viewFormat = DirectCast([Enum].ToObject(GetType(GL0000.C_VIEW_FORMAT_PATTERN), CInt(dispFormat)), GL0000.C_VIEW_FORMAT_PATTERN)
+            Dim campCode As String = ""
+            If Params.Item(C_PARAMETERS.LP_COMPANY) IsNot Nothing Then
+                campCode = Convert.ToString(Params.Item(C_PARAMETERS.LP_COMPANY))
+            End If
+            Dim authWith = GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY
+            If Params.Item(C_PARAMETERS.LP_TYPEMODE) IsNot Nothing Then
+                Dim authWithNum As Integer = CInt(Params.Item(C_PARAMETERS.LP_TYPEMODE))
+                authWith = DirectCast([Enum].ToObject(GetType(GL0002OrgList.LS_AUTHORITY_WITH), CInt(authWithNum)), GL0002OrgList.LS_AUTHORITY_WITH)
+            End If
+            Dim roleCode As String = DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP
+            If Params.Item(C_PARAMETERS.LP_ROLE) IsNot Nothing Then
+                roleCode = Convert.ToString(Params.Item(C_PARAMETERS.LP_ROLE))
+            End If
+            Dim permission As String = C_PERMISSION.REFERLANCE
+            If Params.Item(C_PARAMETERS.LP_PERMISSION) IsNot Nothing Then
+                permission = Convert.ToString(Params.Item(C_PARAMETERS.LP_PERMISSION))
+            End If
+            Dim orgCode As String = DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG
+            If Params.Item(C_PARAMETERS.LP_ORG) IsNot Nothing Then
+                orgCode = Convert.ToString(Params.Item(C_PARAMETERS.LP_ORG))
+            End If
             Using CL0002OrgList As New GL0002OrgList With {
-                  .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-                , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-                , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-                , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0002OrgList.C_VIEW_FORMAT_PATTERN.NAMES) _
-                , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-                , .AUTHWITH = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY) _
+                  .DEFAULT_SORT = defaultSort _
+                , .STYMD = paramStYmd _
+                , .ENDYMD = paramEndYmd _
+                , .VIEW_FORMAT = viewFormat _
+                , .CAMPCODE = campCode _
+                , .AUTHWITH = authWith _
                 , .Categorys = Categorys _
-                , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_MAP) _
-                , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-                , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), DirectCast(Parent.Page.Master, OILMasterPage).USER_ORG)
+                , .ROLECODE = roleCode _
+                , .PERMISSION = permission _
+                , .ORGCODE = orgCode
              }
                 CL0002OrgList.getList()
                 O_RTN = CL0002OrgList.ERR
@@ -971,11 +1045,19 @@ Public Class GRIS0005LeftBox
     ''' <remarks></remarks>
     Protected Function CreateRoleList(ByVal Params As Hashtable, ByRef O_RTN As String) As ListBox
         '---20191120追加---_OIS0001USERに利用するため修正
-        Dim I_COMP = If(Params.Item(C_PARAMETERS.LP_COMPANY), C_DEFAULT_DATAKEY)
-        Dim I_CLASS = Params.Item(C_PARAMETERS.LP_CLASSCODE)
-        Dim I_STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now)
-        Dim I_ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now)
-
+        Dim I_COMP As String = C_DEFAULT_DATAKEY
+        If Params.Item(C_PARAMETERS.LP_COMPANY) IsNot Nothing Then
+            I_COMP = Convert.ToString(Params.Item(C_PARAMETERS.LP_COMPANY))
+        End If
+        Dim I_CLASS As String = Convert.ToString(Params.Item(C_PARAMETERS.LP_CLASSCODE))
+        Dim I_STYMD As Date = Date.Now
+        If Params.Item(C_PARAMETERS.LP_STYMD) IsNot Nothing Then
+            I_STYMD = CDate(Params.Item(C_PARAMETERS.LP_STYMD))
+        End If
+        Dim I_ENDYMD As Date = Date.Now
+        If Params.Item(C_PARAMETERS.LP_ENDYMD) IsNot Nothing Then
+            I_ENDYMD = CDate(Params.Item(C_PARAMETERS.LP_ENDYMD))
+        End If
         Dim key As String = I_COMP & If(I_CLASS = String.Empty, "ALLVALUE", I_CLASS)
         If Not LbMap.ContainsKey(key) Then
             Dim lsbx As New ListBox
@@ -995,7 +1077,7 @@ Public Class GRIS0005LeftBox
             End Using
         End If
 
-        Return LbMap.Item(key)
+        Return DirectCast(LbMap.Item(key), ListBox)
     End Function
     '---20191120追加---
 
@@ -1281,7 +1363,7 @@ Public Class GRIS0005LeftBox
         End If
 
         ViewState.Add("LF_PARAMS", PARAMS)
-        ViewState.Add("LF_LIST_SELECT", SELECT_VALUE)
+        ViewState.Add("LF_LIST_SELECT", CInt(SELECT_VALUE).ToString)
     End Sub
     ''' <summary>
     ''' 保持した情報の反映
@@ -1291,8 +1373,9 @@ Public Class GRIS0005LeftBox
     Protected Sub Restore(ByRef O_RTN As String)
 
         If Not IsNothing(ViewState("LF_LIST_SELECT")) Then
+            Dim listClass = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(ViewState("LF_LIST_SELECT"))), LIST_BOX_CLASSIFICATION)
             If WF_LEFTMView.ActiveViewIndex = 2 Then
-                SetTableList(ViewState("LF_LIST_SELECT"), O_RTN, DirectCast(ViewState("LF_PARAMS"), Hashtable))
+                SetTableList(listClass, O_RTN, DirectCast(ViewState("LF_PARAMS"), Hashtable))
             ElseIf WF_LEFTMView.ActiveViewIndex = 0 Then
                 Dim params As Hashtable = DirectCast(ViewState("LF_PARAMS"), Hashtable)
                 '〇EXTRA＿LISTはLISTBOX化する
@@ -1304,7 +1387,7 @@ Public Class GRIS0005LeftBox
                     Next
                     params(C_PARAMETERS.LP_LIST) = list
                 End If
-                SetListBox(ViewState("LF_LIST_SELECT"), O_RTN, DirectCast(ViewState("LF_PARAMS"), Hashtable))
+                SetListBox(listClass, O_RTN, DirectCast(ViewState("LF_PARAMS"), Hashtable))
             End If
         End If
     End Sub

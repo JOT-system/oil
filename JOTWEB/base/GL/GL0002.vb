@@ -1,6 +1,5 @@
-﻿Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
-
+﻿Option Strict On
+Imports System.Data.SqlClient
 ''' <summary>
 ''' 部署情報取得
 ''' </summary>
@@ -133,15 +132,15 @@ Public Class GL0002OrgList
         '●初期処理
 
         'PARAM 01: Categorys
-        If checkParam(METHOD_NAME, Categorys) Then
+        If checkParam(METHOD_NAME, Categorys) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM EXTRA01: STYMD
-        If STYMD < C_DEFAULT_YMD Then
+        If STYMD < CDate(C_DEFAULT_YMD) Then
             STYMD = Date.Now
         End If
         'PARAM EXTRA02: ENDYMD
-        If ENDYMD < C_DEFAULT_YMD Then
+        If ENDYMD < CDate(C_DEFAULT_YMD) Then
             ENDYMD = Date.Now
         End If
 
@@ -167,9 +166,9 @@ Public Class GL0002OrgList
             'Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ORG
             '    getOrgRelationList(SQLcon)
             Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ALL
-                getOrgAllList(SQLcon, 1)
+                getOrgAllList(SQLcon, "1")
             Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG
-                getOrgAllList(SQLcon, 2)
+                getOrgAllList(SQLcon, "2")
             Case Else
                 getOrgList(SQLcon)
         End Select
@@ -258,28 +257,20 @@ Public Class GL0002OrgList
                 'PARA4.Value = STYMD
                 'PARA5.Value = ENDYMD
                 'PARA8.Value = C_DELETE_FLG.DELETE
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                    .Add("@P2", SqlDbType.NVarChar, 6).Value = ORGCODE
+                    .Add("@P3", SqlDbType.Date).Value = STYMD
+                    .Add("@P4", SqlDbType.Date).Value = ENDYMD
+                    .Add("@P5", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
 
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 6)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
-
-                PARA1.Value = CAMPCODE
-                PARA2.Value = ORGCODE
-                PARA3.Value = STYMD
-                PARA4.Value = ENDYMD
-                PARA5.Value = C_DELETE_FLG.DELETE
-
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-
-                '○出力編集
-                addListData(SQLdr)
-
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○出力編集
+                    addListData(SQLdr)
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
             End Using
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
@@ -333,25 +324,19 @@ Public Class GL0002OrgList
             End Select
 
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.Date)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 1)
+                With SQLcmd.Parameters
+                    .Add("@P0", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                    .Add("@P1", SqlDbType.Date).Value = STYMD
+                    .Add("@P2", SqlDbType.Date).Value = ENDYMD
+                    .Add("@P3", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
 
-                PARA0.Value = CAMPCODE
-                PARA1.Value = STYMD
-                PARA2.Value = ENDYMD
-                PARA3.Value = C_DELETE_FLG.DELETE
-
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-
-                '○出力編集
-                addListData(SQLdr)
-
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○出力編集
+                    addListData(SQLdr)
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
             End Using
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
@@ -786,8 +771,8 @@ Public Class GL0002OrgList
     ''' <param name="I_SQLDR"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Protected Overrides Function extracheck(ByVal I_SQLDR As SqlDataReader)
-        Return (IsNothing(Me.Categorys) OrElse Categorys.Contains(I_SQLDR("CATEGORY")))
+    Protected Overrides Function extracheck(ByVal I_SQLDR As SqlDataReader) As Boolean
+        Return (IsNothing(Me.Categorys) OrElse Categorys.Contains(Convert.ToString(I_SQLDR("CATEGORY"))))
 
     End Function
 End Class

@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' メッセージ関連の定数定義
 ''' </summary>
 Public Module Messages

@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 会社情報取得
@@ -135,15 +136,15 @@ Public Class GS0001CAMPget
 
         '●In PARAMチェック
         'PARAM01: CAMPCODE
-        If checkParam(METHOD_NAME, CAMPCODE) Then
+        If checkParam(METHOD_NAME, CAMPCODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
 
         'PARAM02: STYMD
 
-        If checkParam(METHOD_NAME, STYMD) Then
+        If checkParam(METHOD_NAME, STYMD) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
-        ElseIf STYMD < C_DEFAULT_YMD Then
+        ElseIf STYMD < CDate(C_DEFAULT_YMD) Then
             ERR = C_MESSAGE_NO.DLL_IF_ERROR
 
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
@@ -157,9 +158,9 @@ Public Class GS0001CAMPget
         End If
 
         'PARAM03: ENDYMD
-        If checkParam(METHOD_NAME, ENDYMD) Then
+        If checkParam(METHOD_NAME, ENDYMD) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
-        ElseIf ENDYMD < C_DEFAULT_YMD Then
+        ElseIf ENDYMD < CDate(C_DEFAULT_YMD) Then
             ERR = C_MESSAGE_NO.DLL_IF_ERROR
 
             Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
@@ -176,10 +177,6 @@ Public Class GS0001CAMPget
         '●会社情報取得
         '○ DB(OIM0001_CAMP)検索
         Try
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             'OIM0001_CAMP検索SQL文
             Dim SQL_Str As String =
                     "SELECT rtrim(NAMES) as NAMES , rtrim(NAMEL) as NAMEL , rtrim(NAMESK) as NAMESK , rtrim(NAMELK) as NAMELK , rtrim(POSTNUM1) as POSTNUM1 , rtrim(POSTNUM2) as POSTNUM2 , rtrim(ADDR1) as ADDR1 , rtrim(ADDR2) as ADDR2 , rtrim(ADDR3) as ADDR3 , rtrim(ADDR4) as ADDR4 , rtrim(TEL) as TEL , rtrim(FAX) as FAX , rtrim(MAIL) as MAIL " _
@@ -188,60 +185,54 @@ Public Class GS0001CAMPget
                 & "   and STYMD   <= @P2 " _
                 & "   and ENDYMD  >= @P3 " _
                 & "   and DELFLG  <> @P4 "
-            Dim SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-            PARA1.Value = CAMPCODE
-            PARA2.Value = ENDYMD
-            PARA3.Value = STYMD
-            PARA4.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                    .Add("@P2", SqlDbType.Date).Value = ENDYMD
+                    .Add("@P3", SqlDbType.Date).Value = STYMD
+                    .Add("@P4", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    NAMES = ""
+                    NAMEL = ""
+                    NAMESK = ""
+                    NAMELK = ""
+                    POSTNUM1 = ""
+                    POSTNUM2 = ""
+                    ADDR1 = ""
+                    ADDR2 = ""
+                    ADDR3 = ""
+                    ADDR4 = ""
+                    TEL = ""
+                    FAX = ""
+                    MAIL = ""
+                    ERR = C_MESSAGE_NO.DLL_IF_ERROR
 
-            NAMES = ""
-            NAMEL = ""
-            NAMESK = ""
-            NAMELK = ""
-            POSTNUM1 = ""
-            POSTNUM2 = ""
-            ADDR1 = ""
-            ADDR2 = ""
-            ADDR3 = ""
-            ADDR4 = ""
-            TEL = ""
-            FAX = ""
-            MAIL = ""
-            ERR = C_MESSAGE_NO.DLL_IF_ERROR
+                    If SQLdr.Read Then
+                        NAMES = Convert.ToString(SQLdr("NAMES"))
+                        NAMEL = Convert.ToString(SQLdr("NAMEL"))
+                        NAMESK = Convert.ToString(SQLdr("NAMESK"))
+                        NAMELK = Convert.ToString(SQLdr("NAMELK"))
+                        POSTNUM1 = Convert.ToString(SQLdr("POSTNUM1"))
+                        POSTNUM2 = Convert.ToString(SQLdr("POSTNUM2"))
+                        ADDR1 = Convert.ToString(SQLdr("ADDR1"))
+                        ADDR2 = Convert.ToString(SQLdr("ADDR2"))
+                        ADDR3 = Convert.ToString(SQLdr("ADDR3"))
+                        ADDR4 = Convert.ToString(SQLdr("ADDR4"))
+                        TEL = Convert.ToString(SQLdr("TEL"))
+                        FAX = Convert.ToString(SQLdr("FAX"))
+                        MAIL = Convert.ToString(SQLdr("MAIL"))
+                        ERR = C_MESSAGE_NO.NORMAL
+                    End If
 
-            If SQLdr.Read Then
-                NAMES = SQLdr("NAMES")
-                NAMEL = SQLdr("NAMEL")
-                NAMESK = SQLdr("NAMESK")
-                NAMELK = SQLdr("NAMELK")
-                POSTNUM1 = SQLdr("POSTNUM1")
-                POSTNUM2 = SQLdr("POSTNUM2")
-                ADDR1 = SQLdr("ADDR1")
-                ADDR2 = SQLdr("ADDR2")
-                ADDR3 = SQLdr("ADDR3")
-                ADDR4 = SQLdr("ADDR4")
-                TEL = SQLdr("TEL")
-                FAX = SQLdr("FAX")
-                MAIL = SQLdr("MAIL")
-                ERR = C_MESSAGE_NO.NORMAL
-            End If
-
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
-
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
+                SQLcon.Close() 'DataBase接続(Close)
+            End Using
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 

@@ -26,14 +26,7 @@ function InitDisplay() {
     bindNumericKeyPressOnly(numInputBoxList);
     //フォーカスを合わせる
     forcusObj();
-    //フッターメッセージ除去
-    let msgBoxObj = document.getElementById('pnlCommonMessageWrapper');
-    if (msgBoxObj !== null) {
-        if (msgBoxObj.style.display !== 'none') {
-            document.getElementById("WF_MESSAGE").innerText = "";
-        }
-    }
-    
+
 }
 
 // 〇提案数の合計計算イベントバインド(暫定関数)

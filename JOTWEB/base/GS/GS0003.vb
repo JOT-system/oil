@@ -1,6 +1,5 @@
-﻿Imports System.Data.SqlClient
-
-
+﻿Option Strict On
+Imports System.Data.SqlClient
 ''' <summary>
 ''' 画面メモ情報取得
 ''' </summary>
@@ -37,7 +36,7 @@ Public Class GS0003MEMOget
 
         '●In PARAMチェック
         'PARAM01: MAPID
-        If checkParam(METHOD_NAME, MAPID) Then
+        If checkParam(METHOD_NAME, MAPID) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
 
@@ -52,10 +51,6 @@ Public Class GS0003MEMOget
         '●画面メモ情報取得
         '○ DB(OIS0000_MEMO)検索
         Try
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             'OIS0000_MEMO検索SQL文
             Dim SQL_Str As String =
                     "SELECT rtrim(MEMO) as MEMO " _
@@ -63,32 +58,29 @@ Public Class GS0003MEMOget
                 & " Where USERID   = @P1 " _
                 & "   and MAPID    = @P2 " _
                 & "   and DELFLG  <> @P3 "
-            Dim SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 1)
-            PARA1.Value = USERID
-            PARA2.Value = MAPID
-            PARA3.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-            ERR = C_MESSAGE_NO.DLL_IF_ERROR
-            '存在したら一行取得
-            If SQLdr.Read Then
-                MEMO = SQLdr("MEMO")
-                ERR = C_MESSAGE_NO.NORMAL
-            End If
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
 
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
+                    .Add("@P2", SqlDbType.NVarChar, 50).Value = MAPID
+                    .Add("@P3", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
 
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    ERR = C_MESSAGE_NO.DLL_IF_ERROR
+                    '存在したら一行取得
+                    If SQLdr.Read Then
+                        MEMO = Convert.ToString(SQLdr("MEMO"))
+                        ERR = C_MESSAGE_NO.NORMAL
+                    End If
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using 'SQLdr
+            End Using 'SQLcon, SQLcmd
 
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
@@ -108,10 +100,6 @@ Public Class GS0003MEMOget
         '○ メモ情報なしの場合、空データ追加
         If ERR = C_MESSAGE_NO.DLL_IF_ERROR Then
             Try
-                'DataBase接続文字
-                Dim SQLcon = sm.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
-
                 'OIS0000_MEMO追加SQL文
                 Dim SQL_Str As String =
                         "INSERT " _
@@ -131,31 +119,29 @@ Public Class GS0003MEMOget
                     & "       @P5 , " _
                     & "       @P6 , " _
                     & "       @P7 ) "
-                Dim SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 50)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 500)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.Date)
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.NVarChar, 20)
-                PARA1.Value = USERID
-                PARA2.Value = MAPID
-                PARA3.Value = ""
-                PARA4.Value = C_DELETE_FLG.ALIVE
-                PARA5.Value = Date.Now
-                PARA6.Value = Date.Now
-                PARA7.Value = USERID
-                SQLcmd.ExecuteNonQuery()
-                SQLcmd.Dispose()
 
-                SQLcon.Close() 'DataBase接続(Close)
-                SQLcon.Dispose()
-                SQLcon = Nothing
+                'DataBase接続文字
+                Using SQLcon = sm.getConnection,
+                      SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                    SQLcon.Open() 'DataBase接続(Open)
 
-                MEMO = ""
-                ERR = C_MESSAGE_NO.NORMAL
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
+                        .Add("@P2", SqlDbType.NVarChar, 50).Value = MAPID
+                        .Add("@P3", SqlDbType.NVarChar, 500).Value = ""
+                        .Add("@P4", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.ALIVE
+                        .Add("@P5", SqlDbType.Date).Value = Date.Now
+                        .Add("@P6", SqlDbType.Date).Value = Date.Now
+                        .Add("@P7", SqlDbType.NVarChar, 20).Value = USERID
+                    End With
 
+                    SQLcmd.ExecuteNonQuery()
+
+                    SQLcon.Close() 'DataBase接続(Close)
+
+                    MEMO = ""
+                    ERR = C_MESSAGE_NO.NORMAL
+                End Using
             Catch ex As Exception
                 Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
@@ -169,9 +155,6 @@ Public Class GS0003MEMOget
                 ERR = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
-
         End If
-
     End Sub
-
 End Class

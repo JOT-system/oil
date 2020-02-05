@@ -4,9 +4,20 @@ Imports System.Net
 Public Class M00000LOGON
     Inherits System.Web.UI.Page
 
-    Private CS0050Session As New CS0050SESSION                  'セッション情報
+    'セッション情報
+    Private CS0050Session As New CS0050SESSION
 
-    Private Const MAPID As String = "M00000"                    '画面ID
+    '画面ID
+    Private Const MAPID As String = "M00000"
+
+    'パスワード誤り回数を超えた時のメッセージ
+    Private Const CONST_MSG_10056 As String = "10056"
+
+    'パスワード入力間違いの時のメッセージ 
+    Private Const CONST_MSG_10057 As String = "10057"
+
+    'ＩＤ、パスワード入力間違いの時のメッセージ 
+    Private Const CONST_MSG_10058 As String = "10058"
 
     Private Const C_MAX_MISS_PASSWORD_COUNT As Integer = 6      'パスワード入力失敗の最大回数
     ''' <summary>
@@ -150,7 +161,7 @@ Public Class M00000LOGON
 
 
         '■■■　初期メッセージ表示　■■■
-        Master.Output(C_MESSAGE_NO.INPUT_ID_PASSWD, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.INPUT_ID_PASSWD, C_MESSAGE_TYPE.INF)
 
         'C:\APPL\APPLFILES\XML_TMPディレクトリの不要データを掃除
         Dim WW_File As String
@@ -232,6 +243,8 @@ Public Class M00000LOGON
         Dim WW_LOGONYMD As String = Date.Now.ToString("yyyy/MM/dd")
         Dim WW_URL As String = String.Empty
         Dim WW_MENUURL As String = String.Empty
+        Dim WW_chk As String = String.Empty
+
         'DataBase接続文字
         Using SQLcon As SqlConnection = CS0050Session.getConnection
             SQLcon.Open() 'DataBase接続(Open)
@@ -343,30 +356,33 @@ Public Class M00000LOGON
             End Try
 
             'ユーザID誤り
-            If Not isNormal(WW_err) OrElse
-                UserID.Text = C_DEFAULT_DATAKEY OrElse
-                UserID.Text = "INIT" Then
-                Master.Output(C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR, C_MESSAGE_TYPE.ERR)
-                CS0011LOGWRITE.INFSUBCLASS = "Main"
-                CS0011LOGWRITE.INFPOSI = "パスワードERR USERID ERR"
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
-                CS0011LOGWRITE.TEXT = "(USERID=" & UserID.Text & "、PASS=" & PassWord.Text & ")"
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR 'ユーザID、パスワードに誤りがあります(1)。
-                CS0011LOGWRITE.CS0011LOGWrite()
+            'If Not isNormal(WW_err) OrElse
+            '    UserID.Text = C_DEFAULT_DATAKEY OrElse
+            '    UserID.Text = "INIT" Then
+
+            If Not isNormal(WW_err) Then
+                Master.Output(CONST_MSG_10058, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
                 UserID.Focus()
                 Exit Sub
             End If
 
             '○ パスワードチェック
             'ユーザあり　かつ　(パスワード誤り　または　パスワード6回以上誤り)
-            If (PassWord.Text <> WW_PASSWORD OrElse WW_MISSCNT >= C_MAX_MISS_PASSWORD_COUNT) Then
-                Master.Output(C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR, C_MESSAGE_TYPE.ERR)
-                CS0011LOGWRITE.INFSUBCLASS = "Main"
-                CS0011LOGWRITE.INFPOSI = "パスワードERR、MAX回数"
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ERR
-                CS0011LOGWRITE.TEXT = "(USERID=" & UserID.Text & "、PASS=" & PassWord.Text & ")"
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR 'ユーザID、パスワードに誤りがあります(2)。
-                CS0011LOGWRITE.CS0011LOGWrite()
+            If (PassWord.Text <> WW_PASSWORD) Then
+
+                Master.Output(CONST_MSG_10057, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+                UserID.Focus()
+                WW_chk = "err"
+
+            ElseIf (WW_MISSCNT >= C_MAX_MISS_PASSWORD_COUNT) Then
+
+                Master.Output(CONST_MSG_10056, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+                UserID.Focus()
+                WW_chk = "err"
+
+            End If
+
+            If WW_chk = "err" Then
                 'パスワードエラー回数のカウントUP
                 Try
                     'S0014_USER更新SQL文
@@ -399,7 +415,6 @@ Public Class M00000LOGON
                 End Try
                 UserID.Focus()
                 Exit Sub
-
             End If
 
             '○ パスワードチェックＯＫ時処理

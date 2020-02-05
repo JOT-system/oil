@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 Imports System.Net
 
 Public Class M00000LOGON
@@ -128,13 +129,13 @@ Public Class M00000LOGON
 
         '○パソコン名存在チェック
         ' ホスト名を取得する
-        Dim WW_ipAddress As Object
-        Dim WW_hostName As Object
+        Dim WW_ipAddress As String
+        Dim WW_hostName As String
 
         Try
-            WW_ipAddress = Request.ServerVariables("REMOTE_HOST")
+            WW_ipAddress = Convert.ToString(Request.ServerVariables("REMOTE_HOST"))
             WW_hostName = System.Net.Dns.GetHostEntry(WW_ipAddress).HostName()
-            If InStr(WW_hostName.ToString, ".") = 0 Then
+            If InStr(WW_hostName, ".") = 0 Then
                 CS0006TERMchk.TERMID = WW_hostName.ToString
             Else
                 CS0006TERMchk.TERMID = Mid(WW_hostName.ToString, 1, InStr(WW_hostName.ToString, ".") - 1)
@@ -311,29 +312,29 @@ Public Class M00000LOGON
 
                     WW_err = C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR
                     If SQLdr.Read Then
-                        WW_USERID = SQLdr("USERID")
-                        WW_PASSWORD = SQLdr("PASSWORD")
-                        WW_USERCAMP = SQLdr("CAMPCODE")
-                        WW_ORG = SQLdr("ORG")
-                        WW_STYMD = SQLdr("STYMD")
-                        WW_ENDYMD = SQLdr("ENDYMD")
-                        WW_MISSCNT = SQLdr("MISSCNT")
+                        WW_USERID = Convert.ToString(SQLdr("USERID"))
+                        WW_PASSWORD = Convert.ToString(SQLdr("PASSWORD"))
+                        WW_USERCAMP = Convert.ToString(SQLdr("CAMPCODE"))
+                        WW_ORG = Convert.ToString(SQLdr("ORG"))
+                        WW_STYMD = CDate(SQLdr("STYMD"))
+                        WW_ENDYMD = CDate(SQLdr("ENDYMD"))
+                        WW_MISSCNT = CInt(SQLdr("MISSCNT"))
                         If SQLdr("UPDYMD") Is DBNull.Value Then
                             WW_UPDYMD = System.DateTime.UtcNow
                         Else
-                            WW_UPDYMD = SQLdr("UPDYMD")
+                            WW_UPDYMD = CDate(SQLdr("UPDYMD"))
                         End If
-                        WW_UPDTIMSTP = SQLdr("UPDTIMSTP")
+                        WW_UPDTIMSTP = CType(SQLdr("UPDTIMSTP"), Byte())
                         '20191101-追加-START
-                        WW_MENUROLE = SQLdr("MENUROLE")
-                        WW_MAPROLE = SQLdr("MAPROLE")
-                        WW_VIEWPROFID = SQLdr("VIEWPROFID")
-                        WW_RPRTPROFID = SQLdr("RPRTPROFID")
-                        WW_APPROVALID = SQLdr("APPROVALID")
+                        WW_MENUROLE = Convert.ToString(SQLdr("MENUROLE"))
+                        WW_MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
+                        WW_VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
+                        WW_RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
+                        WW_APPROVALID = Convert.ToString(SQLdr("APPROVALID"))
                         '20191101-追加-END
-                        WW_MAPID = SQLdr("MAPID")
-                        WW_VARIANT = SQLdr("VARIANT")
-                        WW_PASSENDYMD = SQLdr("PASSENDYMD")
+                        WW_MAPID = Convert.ToString(SQLdr("MAPID"))
+                        WW_VARIANT = Convert.ToString(SQLdr("VARIANT"))
+                        WW_PASSENDYMD = Convert.ToString(SQLdr("PASSENDYMD"))
                         WW_err = C_MESSAGE_NO.NORMAL
                     End If
 
@@ -499,10 +500,10 @@ Public Class M00000LOGON
                     If SQLdr.Read Then
                         Try
                             Dim WW_DATE As Date
-                            Date.TryParse(SQLdr("LOGONYMD"), WW_DATE)
+                            Date.TryParse(Convert.ToString(SQLdr("LOGONYMD")), WW_DATE)
                             WW_LOGONYMD = WW_DATE.ToString("yyyy/MM/dd")
                         Catch ex As Exception
-                            WW_LOGONYMD = Date.Now
+                            WW_LOGONYMD = Date.Now.ToString("yyyy/MM/dd")
                         End Try
                     End If
 
@@ -591,7 +592,7 @@ Public Class M00000LOGON
                 Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
                 If SQLdr.Read Then
-                    O_URL = SQLdr("URL")
+                    O_URL = Convert.ToString(SQLdr("URL"))
                 End If
 
                 'Close

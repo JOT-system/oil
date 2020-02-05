@@ -1515,20 +1515,35 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     height: 32px;
     content: "";
     display: table-cell;
-    background-image: url('../oil/img/iconWarn.png');
+    background-image: url('../oil/img/w_cat.png');
     background-repeat: no-repeat;
     background-size: contain;
     float: left;
     margin-right: 10px;
 }
 
-#pnlCommonMessageText #lblCommonMessageText[data-naeiw="E"]:before,
+#pnlCommonMessageText #lblCommonMessageText[data-naeiw="E"]:before {
+    width: 60px;
+    height: 60px;
+    content: "";
+    display: table-cell;
+    background-image: url('../oil/img/e_cat.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    float: left;
+    margin-right: 10px;
+}
+
+
+
+
+
 #pnlCommonMessageText #lblCommonMessageText[data-naeiw="A"]:before {
     width: 60px;
     height: 60px;
     content: "";
     display: table-cell;
-    background-image: url('../oil/img/404cat.png');
+    background-image: url('../oil/img/a_cat.png');
     background-repeat: no-repeat;
     background-size: contain;
     float: left;

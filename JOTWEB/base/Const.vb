@@ -271,6 +271,10 @@ Public Module BaseDllConst
     ''' タンク車重複
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_85 As String = "85"
+    ''' <summary>
+    ''' 充填ポイント重複 
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_86 As String = "86"
 
     ''' <summary>
     ''' 失注（荷主都合）

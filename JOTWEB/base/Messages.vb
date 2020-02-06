@@ -451,6 +451,31 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_SPEEDTRAINTANK_ERROR As String = "20017"
 
+        ''' <summary>
+        ''' 積場スペックエラー
+        ''' </summary>
+        Public Const OIL_LOADINGSPECS_ERROR As String = "20018"
+
+        ''' <summary>
+        ''' 充填ポイント重複エラー
+        ''' </summary>
+        Public Const OIL_FILLINGPOINT_REPEAT_ERROR As String = "20019"
+
+        ''' <summary>
+        ''' 積込可能油種(油種毎)件数オーバー
+        ''' </summary>
+        Public Const OIL_LOADING_OIL_RECORD_OVER As String = "20020"
+
+        ''' <summary>
+        ''' 積込可能油種(油種大分類毎)件数オーバー
+        ''' </summary>
+        Public Const OIL_LOADING_BIGOIL_RECORD_OVER As String = "20021"
+
+        ''' <summary>
+        ''' 積込可能油種(油種合計)件数オーバー
+        ''' </summary>
+        Public Const OIL_LOADING_OILTOTAL_RECORD_OVER As String = "20022"
+
 #End Region
 
 

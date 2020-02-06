@@ -218,7 +218,7 @@
                                         <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStock %></span>
                                     </div>
                                     <div> <%--目標在庫率値 --%>
-                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStockRate %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStockRate %>%</span>
                                     </div>
                                 </div>
                                 <div class="col4">
@@ -256,13 +256,17 @@
                                         <div class='colStockValue week<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.WeekNum %> holiday<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsHoliday, "1", "0") %>' >
                                             <asp:HiddenField ID="hdnDateKey" runat="server" Visible="false" Value='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.KeyString %>' />
                                             <div><%--前日夕在庫--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).LastEveningStock.ToString("#,##0") %></span>
+                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).LastEveningStock < 0, "minus", "") %>'>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).LastEveningStock.ToString("#,##0") %>
+                                                </span>
                                             </div>
                                             <div><%--保持日数--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Retentiondays %></span>
+                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).Retentiondays < 0, "minus", "") %>'>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Retentiondays %>
+                                                </span>
                                             </div>
                                             <div><%--朝在庫--%>
-                                                <span class='morningStockIdx<%# Container.ItemIndex %>'>
+                                                <span class='morningStockIdx<%# Container.ItemIndex %> <%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock.Contains("-"), "minus", "") %>'>
                                                     <%-- 初日のみテキストボックス表示 --%>
                                                     <asp:TextBox ID="txtMorningStock" runat="server" 
                                                         Text='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %>'
@@ -274,7 +278,9 @@
                                                 </span>
                                             </div>
                                             <div><%--受入--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive %></span>
+                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive < 0, "minus", "") %>'>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive %>
+                                                </span>
                                             </div>
                                             <div><%--払出--%>
                                                 <span>
@@ -282,10 +288,14 @@
                                                 </span>
                                             </div>
                                             <div><%--夕在庫--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStock %></span>
+                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStock < 0, "minus", "") %>'>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStock %>
+                                                </span>
                                             </div>
                                             <div><%--夕在庫D/S除--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStockWithoutDS %></span>
+                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStockWithoutDS < 0, "minus", "") %>'>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).EveningStockWithoutDS %>
+                                                </span>
                                             </div>
                                             <div><%--空容量--%>
                                                 <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).FreeSpace < 0, "minus", "") %>'>
@@ -293,7 +303,9 @@
                                                 </span>
                                             </div>
                                             <div><%--在庫率--%>
-                                                <span><%# DirectCast(Eval("Value"), DispDataClass.StockListItem).StockRate %></span>
+                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).StockRate < 0, "minus", "") %>'>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).StockRate.ToString("P1") %>
+                                                </span>
                                             </div>
                                         </div>
 

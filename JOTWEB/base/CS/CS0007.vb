@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 更新権限チェック（画面 APSRVチェック有）
@@ -174,7 +175,7 @@ Public Class CS0007CheckAuthority
         If isNormal(ERR) Then
             ''一番小さい権限を採用する
             'MAPPERMITCODE = Math.Min(WW_SRV_PERMIT, Math.Min(WW_USER_MAP_PERMIT, WW_USER_COMP_PERMIT))
-            MAPPERMITCODE = WW_USER_MAP_PERMIT
+            MAPPERMITCODE = WW_USER_MAP_PERMIT.ToString
         End If
 
     End Sub
@@ -188,7 +189,7 @@ Public Class CS0007CheckAuthority
     ''' <returns></returns>
     ''' <remarks></remarks>
     Protected Function checkUserPermission(ByVal SQLcon As SqlConnection, ByVal ROLECODE As String, ByVal OBJCODE As String, ByVal CODE As String) As Integer
-        Dim WW_PERMIT As Integer = C_PERMISSION.INVALID
+        Dim WW_PERMIT As Integer = CInt(C_PERMISSION.INVALID)
         '検索SQL文
         Try
             Dim SQLStr As String =
@@ -205,18 +206,14 @@ Public Class CS0007CheckAuthority
                & " ORDER BY A.SEQ                                      "
 
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 1)
-                PARA1.Value = ROLECODE
-                PARA2.Value = OBJCODE
-                PARA3.Value = CODE
-                PARA4.Value = Date.Now
-                PARA5.Value = Date.Now
-                PARA6.Value = C_DELETE_FLG.DELETE
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = ROLECODE
+                    .Add("@P2", SqlDbType.NVarChar, 20).Value = OBJCODE
+                    .Add("@P3", SqlDbType.NVarChar, 20).Value = CODE
+                    .Add("@P4", SqlDbType.Date).Value = Date.Now
+                    .Add("@P5", SqlDbType.Date).Value = Date.Now
+                    .Add("@P6", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
                 Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
                 '権限コード初期値(権限なし)設定
@@ -224,7 +221,7 @@ Public Class CS0007CheckAuthority
                 ERR = C_MESSAGE_NO.AUTHORIZATION_ERROR
 
                 If SQLdr.Read Then
-                    WW_PERMIT = SQLdr("PERMITCODE")
+                    WW_PERMIT = CInt(SQLdr("PERMITCODE"))
                     ERR = C_MESSAGE_NO.NORMAL
                 End If
 

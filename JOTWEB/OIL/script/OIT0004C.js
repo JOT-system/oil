@@ -26,6 +26,7 @@ function InitDisplay() {
     bindNumericKeyPressOnly(numInputBoxList);
     //フォーカスを合わせる
     forcusObj();
+
 }
 
 // 〇提案数の合計計算イベントバインド(暫定関数)
@@ -83,21 +84,32 @@ function bindDipsOiltypeStockList() {
         return;
     }
     let stockListObj = document.getElementById('divStockList');
+    let suggestListObj = document.getElementById('divSuggestList');
     let opts = listDispObj.options;
     for (let i = 0; i < opts.length; i++) {
         let optItm = opts[i];
         let oilcode = optItm.value;
         let oilName = optItm.text;
         let optIdx = i;
-        let stockRowTitle = stockListObj.querySelectorAll('div.oilTypeData[data-oilcode="' + oilcode + '"] > div.col1 > div > span')[0];
-        if (stockRowTitle !== null) {
-            stockRowTitle.dataset.tiptext = 'クリックして隠す';
-            stockRowTitle.addEventListener('click', (function (oilcode, oilName, optIdx) {
-                return function () {
-                    DipsOiltypeStockList(oilcode, oilName, optIdx);
-                };
-            })(oilcode, oilName, optIdx), false);
+        let oilTypeRowColumnQuery = 'div.oilTypeData[data-oilcode="' + oilcode + '"] > div.col1 > div > span';
+        let stockRowTitles = [ stockListObj.querySelectorAll(oilTypeRowColumnQuery)[0] ];
+        if (suggestListObj !== null) {
+            oilTypeRowColumnQuery = 'div[data-oilcode="' + oilcode + '"][data-title="suggestValue"] > span';
+            stockRowTitles.push(suggestListObj.querySelectorAll(oilTypeRowColumnQuery)[0]);
         }
+
+        for (let j = 0; j < stockRowTitles.length; j++) {
+            let stockRowTitle = stockRowTitles[j];
+            if (stockRowTitle !== null) {
+                stockRowTitle.dataset.tiptext = 'クリックして隠す';
+                stockRowTitle.addEventListener('click', (function (oilcode, oilName, optIdx) {
+                    return function () {
+                        DipsOiltypeStockList(oilcode, oilName, optIdx);
+                    };
+                })(oilcode, oilName, optIdx), false);
+            }
+        }
+
         if (optItm.selected === false) {
             optItm.selected = true;
             DipsOiltypeStockList(oilcode, oilName, optIdx);
@@ -115,8 +127,18 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
     let targetOpt = listDispObj.options[optIdx];
     let stockListObj = document.getElementById('divStockList');
     let stockRow = stockListObj.querySelectorAll('div.oilTypeData[data-oilcode="' + oilcode + '"]')[0];
+
+    let suggestListObj = document.getElementById('divSuggestList');
+    let suggestListLeftTitle;
+    let suggestListLeftOilTypeName;
+    let suggestListValueArea;
+    if (suggestListObj !== null) {
+        suggestListLeftTitle = document.getElementById('suggestLeftRecvTitle');
+        suggestListLeftOilTypeName = suggestListObj.querySelectorAll('div[data-title="suggestValue"][data-oilcode="' + oilcode + '"]')[0];
+        suggestListValueArea = suggestListObj.querySelectorAll('div.values div.num[data-oilcode="' + oilcode + '"]');
+    }
+    let styleDispValue = 'none';
     if (targetOpt.selected) {
-        stockRow.style.display = "none";
         targetOpt.selected = false;
         let divObj = document.createElement("div");
         let divObjid = 'stockDispShowButton' + oilcode;
@@ -134,9 +156,28 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
         showBox.appendChild(divObj);
 
     } else {
-        stockRow.style.display = "";
+        styleDispValue = "";
         targetOpt.selected = true;
     }
+
+    stockRow.style.display = styleDispValue;
+    if (suggestListObj !== null) {
+        let selectedCnt = listDispObj.querySelectorAll('option:checked').length;
+        suggestListLeftOilTypeName.style.display = styleDispValue;
+        for (let i = 0; i < suggestListValueArea.length; i++) {
+            suggestListValueArea[i].style.display = styleDispValue;
+        }
+        let wholeHeight = (selectedCnt + 1 + 3) * 24;
+        let titleHeight = (selectedCnt + 1) * 24;
+        suggestListObj.style.height = wholeHeight.toString() + 'px';
+        suggestListLeftTitle.style.height = titleHeight.toString() + 'px';
+        //suggestListObj.style.height = "calc(100px - 1px)";
+        //suggestListLeftTitle.style.height = "";
+
+    }
+    listDispObj = document.getElementById('lstDispStockOilType');
+    
+
     let stockRows = stockListObj.querySelectorAll('div.oilTypeData');
     let lastStockRow = null;
     for (let i = 0; i < stockRows.length; i++) {

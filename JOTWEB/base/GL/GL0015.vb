@@ -1,5 +1,5 @@
-﻿Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 貨物駅一覧取得
@@ -56,15 +56,15 @@ Public Class GL0015StationList
         'O_ERR = OK:00000,ERR:00002(環境エラー),ERR:00003(DBerr)
         '●初期処理
         'PARAM 01: CAMPCODE
-        If checkParam(METHOD_NAME, CAMPCODE) Then
+        If checkParam(METHOD_NAME, CAMPCODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM EXTRA01: STYMD
-        If STYMD < C_DEFAULT_YMD Then
+        If STYMD < CDate(C_DEFAULT_YMD) Then
             STYMD = Date.Now
         End If
         'PARAM EXTRA02: ENDYMD
-        If ENDYMD < C_DEFAULT_YMD Then
+        If ENDYMD < CDate(C_DEFAULT_YMD) Then
             ENDYMD = Date.Now
         End If
 
@@ -118,36 +118,30 @@ Public Class GL0015StationList
                         "   ORDER BY STATIONCODE  "
             End If
 
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA0 As SqlParameter = SQLcmd.Parameters.Add("@P0", System.Data.SqlDbType.VarChar, 1)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.VarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.VarChar, 20)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.VarChar, 1)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim depStFlg As String = CAMPCODE
+                If DEPARRSTATIONFLG <> "" Then
+                    depStFlg = DEPARRSTATIONFLG
+                End If
+                With SQLcmd.Parameters
+                    With SQLcmd.Parameters
+                        .Add("@P0", SqlDbType.VarChar, 1).Value = "7"
+                        .Add("@P1", SqlDbType.VarChar, 20).Value = depStFlg
+                        .Add("@P2", SqlDbType.VarChar, 20).Value = CLAS
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.Date).Value = Date.Now
+                        .Add("@P5", SqlDbType.VarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
 
-            PARA0.Value = "7"
-            If DEPARRSTATIONFLG <> "" Then
-                PARA1.Value = DEPARRSTATIONFLG
-            Else
-                PARA1.Value = CAMPCODE
-            End If
-            PARA2.Value = CLAS
-            PARA3.Value = Date.Now
-            PARA4.Value = Date.Now
-            PARA5.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-
-            While SQLdr.Read
-                LIST.Items.Add(New ListItem(SQLdr("STATIONNAME"), SQLdr("STATIONCODE")))
-            End While
-
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
+                End With
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    While SQLdr.Read
+                        LIST.Items.Add(New ListItem(Convert.ToString(SQLdr("STATIONNAME")), Convert.ToString(SQLdr("STATIONCODE"))))
+                    End While
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
+            End Using
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0015"                'SUBクラス名

@@ -54,6 +54,19 @@
     min-width: 80px;
     max-width: 80px;
 }
+#divSuggestList > .leftColumn {
+    flex-flow:column wrap; 
+    width: 100%; 
+    height: 100%; 
+    display: flex; 
+    align-items: stretch; 
+    align-content: stretch;
+}
+#divSuggestList > .leftColumn > div:nth-child(2) {
+    height: calc(24px * 9); 
+    border-bottom: 1px solid darkgray !important; 
+    display:block !important;
+}
 /* 提案表2列目の油種などの文言幅 */
 #divSuggestList > div.oilTypeColumn {
     width: 90px;
@@ -332,7 +345,7 @@ span.minus {
 #divStockList div.col6 > div,
 #divStockList div.colStockValue > div{
     height:calc(100% / 9);
-    max-height:24px;
+    max-height:23.5px;
 }
 #divStockList div.colStockInfoTopRow {
     max-height:24px;
@@ -345,6 +358,16 @@ span.minus {
     width: 100%;
     padding-top: 0px;
     padding-bottom: 0px;
+    line-height: 1em;
+    height: 18px;
+}
+span.morningStockIdx0 {
+    margin-top:0px !important; 
+}
+#divStockList input[type=text][data-textfield="MorningStock"] {
+    // height: 18px;
+    //line-height:0.8em;
+    width:calc(100% + 5.5px);
 }
 /* ************** */
 /* 在庫表罫線制御 */
@@ -384,12 +407,25 @@ span.minus {
 #divStockList div.colStockInfoTopRow {
     border-right: 1px solid darkgray;
 }
+/* 在庫表の油種ごとの隙間あけて見やすくする場合↓2つ有効化 */
+div.oilTypeData {
+    margin-bottom: 2px;
+}
+#divStockList div.oilTypeData > div {
+    border-bottom: 1px solid darkgray;
+}
+
+@media all and (-ms-high-contrast: none) {
+    #divStockList div.header + div.oilTypeData > div.colStockValue > div:last-child {
+        //border-bottom: 1px solid darkgray;
+    }
+}
 /* ************************ */
 /* 油種表示非表示枠         */
 /* ************************ */
 #divEmptyBox {
-    display:flex;
-    flex-wrap:wrap;
+    display: flex;
+    flex-wrap: wrap;
 }
 #divEmptyBox > div {
     font-size: 0.8em;
@@ -408,6 +444,7 @@ span.minus {
 #divEmptyBox > div:hover {
     background-color: #8e2b63;
 }
+div[data-oilcode][data-title='suggestValue'] span[data-tiptext],
 div.oilTypeData div.col1 span[data-tiptext] {
     cursor: pointer;
 }
@@ -424,7 +461,8 @@ div.oilTypeData div.col1 span[data-tiptext] {
 #divSuggestList div.suggestDate,
 #divSuggestList div.values div:nth-child(1),
 #pnlWeightList div.weightListOilType {
-    background-color: #2B8E56;
+    /* background-color: #2B8E56; */
+    background-color: #51986D;
     color: #FFFFFF;
 }
 /* 見出し色 */

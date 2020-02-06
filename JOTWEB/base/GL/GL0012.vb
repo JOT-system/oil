@@ -1,5 +1,5 @@
-﻿Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' ロール情報取得
@@ -57,19 +57,19 @@ Public Class GL0012RoleList
         'O_ERR = OK:00000,ERR:00002(環境エラー),ERR:00003(DBerr)
         '●初期処理
         'PARAM 01: OBJCODE
-        If checkParam(METHOD_NAME, OBJCODE) Then
+        If checkParam(METHOD_NAME, OBJCODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM 02: CAMPCODE
-        If checkParam(METHOD_NAME, CAMPCODE) Then
+        If checkParam(METHOD_NAME, CAMPCODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM EXTRA01: STYMD
-        If STYMD < C_DEFAULT_YMD Then
+        If STYMD < CDate(C_DEFAULT_YMD) Then
             STYMD = Date.Now
         End If
         'PARAM EXTRA02: ENDYMD
-        If ENDYMD < C_DEFAULT_YMD Then
+        If ENDYMD < CDate(C_DEFAULT_YMD) Then
             ENDYMD = Date.Now
         End If
 
@@ -121,30 +121,22 @@ Public Class GL0012RoleList
             '    Case Else
             'End Select
 
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.VarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.VarChar, 20)
-            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.VarChar, 20)
-
-            PARA1.Value = CAMPCODE
-            PARA2.Value = Date.Now
-            PARA3.Value = Date.Now
-            PARA4.Value = OBJCODE
-            PARA5.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-
-            While SQLdr.Read
-                LIST.Items.Add(New ListItem(SQLdr("ROLENAME"), SQLdr("ROLE")))
-            End While
-
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.VarChar, 20).Value = CAMPCODE
+                    .Add("@P2", SqlDbType.Date).Value = Date.Now
+                    .Add("@P3", SqlDbType.Date).Value = Date.Now
+                    .Add("@P4", SqlDbType.VarChar, 20).Value = OBJCODE
+                    .Add("@P5", SqlDbType.VarChar, 20).Value = C_DELETE_FLG.DELETE
+                End With
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    While SQLdr.Read
+                        LIST.Items.Add(New ListItem(Convert.ToString(SQLdr("ROLENAME")), Convert.ToString(SQLdr("ROLE"))))
+                    End While
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
+            End Using
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0012"                'SUBクラス名

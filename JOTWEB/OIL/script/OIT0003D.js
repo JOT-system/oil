@@ -33,15 +33,15 @@ function InitDisplay() {
                 //document.getElementById("WF_ButtonCSV").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
             }
-            //〇タブ２
-            else if (objDtabNo === "1") {
-            }
-            //〇タブ３
-            else if (objDtabNo === "2") {
-            }
-            //〇タブ４
-            else if (objDtabNo === "3") {
-            }
+            ////〇タブ２
+            //else if (objDtabNo === "1") {
+            //}
+            ////〇タブ３
+            //else if (objDtabNo === "2") {
+            //}
+            ////〇タブ４
+            //else if (objDtabNo === "3") {
+            //}
 
 
         } else if (document.getElementById('WF_CREATEFLG').value === "2" 
@@ -58,15 +58,15 @@ function InitDisplay() {
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
             }
-            //〇タブ２
-            else if (objDtabNo === "1") {
-            }
-            //〇タブ３
-            else if (objDtabNo === "2") {
-            }
-            //〇タブ４
-            else if (objDtabNo === "3") {
-            }
+            ////〇タブ２
+            //else if (objDtabNo === "1") {
+            //}
+            ////〇タブ３
+            //else if (objDtabNo === "2") {
+            //}
+            ////〇タブ４
+            //else if (objDtabNo === "3") {
+            //}
         }
 
     } else {
@@ -80,15 +80,15 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
         }
-        //〇タブ２
-        else if (objDtabNo === "1") {
-        }
-        //〇タブ３
-        else if (objDtabNo === "2") {
-        }
-        //〇タブ４
-        else if (objDtabNo === "3") {
-        }
+        ////〇タブ２
+        //else if (objDtabNo === "1") {
+        //}
+        ////〇タブ３
+        //else if (objDtabNo === "2") {
+        //}
+        ////〇タブ４
+        //else if (objDtabNo === "3") {
+        //}
     }
 
     // 上部 表示/非表示イベントバインド
@@ -130,8 +130,6 @@ function InitDisplay() {
         // チェックボックス変更
         ChangeCheckBox(arrListId[i]);
     }
-
-
 }
 
 

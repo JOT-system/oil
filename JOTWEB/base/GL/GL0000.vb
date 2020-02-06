@@ -1,6 +1,5 @@
-﻿Imports System.Web
+﻿Option Strict On
 Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
 ''' <summary>
 ''' GS系根底クラス
 ''' </summary>
@@ -178,13 +177,13 @@ Public MustInherit Class GL0000 : Implements IDisposable
             '○出力編集
             Select Case VIEW_FORMAT
                 Case C_VIEW_FORMAT_PATTERN.NAMES
-                    LIST.Items.Add(New ListItem(I_SQLDR(NAMES_NAME), I_SQLDR(CODE_NAME)))
+                    LIST.Items.Add(New ListItem(Convert.ToString(I_SQLDR(NAMES_NAME)), Convert.ToString(I_SQLDR(CODE_NAME))))
 
                 Case C_VIEW_FORMAT_PATTERN.CODE
-                    LIST.Items.Add(New ListItem(I_SQLDR(CODE_NAME), I_SQLDR(CODE_NAME)))
+                    LIST.Items.Add(New ListItem(Convert.ToString(I_SQLDR(CODE_NAME)), Convert.ToString(I_SQLDR(CODE_NAME))))
 
                 Case C_VIEW_FORMAT_PATTERN.BOTH
-                    LIST.Items.Add(New ListItem(I_SQLDR(NAMES_NAME) & "(" & I_SQLDR(CODE_NAME) & ")", I_SQLDR(CODE_NAME)))
+                    LIST.Items.Add(New ListItem(String.Format("{0}({1})", I_SQLDR(NAMES_NAME), I_SQLDR(CODE_NAME)), Convert.ToString(I_SQLDR(CODE_NAME))))
 
                 Case Else
                     addExtraListData(I_SQLDR, CODE_NAME, NAMES_NAME)
@@ -196,7 +195,7 @@ Public MustInherit Class GL0000 : Implements IDisposable
     ''' </summary>
     ''' <param name="I_SQLDR"></param>
     ''' <remarks></remarks>
-    Protected Overridable Function extracheck(ByVal I_SQLDR As SqlDataReader)
+    Protected Overridable Function extracheck(ByVal I_SQLDR As SqlDataReader) As Boolean
         Return True
     End Function
     ''' <summary>
@@ -207,7 +206,7 @@ Public MustInherit Class GL0000 : Implements IDisposable
     ''' <param name="NAMES_NAME"></param>
     ''' <remarks></remarks>
     Public Overridable Sub addExtraListData(ByVal I_SQLDR As SqlDataReader, ByVal CODE_NAME As String, ByVal NAMES_NAME As String)
-        LIST.Items.Add(New ListItem(I_SQLDR(NAMES_NAME), I_SQLDR(CODE_NAME)))
+        LIST.Items.Add(New ListItem(Convert.ToString(I_SQLDR(NAMES_NAME)), Convert.ToString(I_SQLDR(CODE_NAME))))
     End Sub
 
     ''' <summary>
@@ -215,7 +214,7 @@ Public MustInherit Class GL0000 : Implements IDisposable
     ''' </summary>
     ''' <param name="profTbl">PROFVIEWデータ</param>
     ''' <param name="outArea">出力先(Panel)コントロール</param>
-    Protected Sub MakeTableObject(ByVal profTbl As String(,), ByVal srcTbl As DataTable, outArea As Object)
+    Protected Sub MakeTableObject(ByVal profTbl As String(,), ByVal srcTbl As DataTable, outArea As Panel)
 
         '●項目定義取得
         Dim outTHCell = New TableHeaderCell With {.ViewStateMode = UI.ViewStateMode.Disabled}
@@ -271,33 +270,34 @@ Public MustInherit Class GL0000 : Implements IDisposable
         outPanel.ID = Trim(outArea.ID) & "_D"
         outTable = New Table()
         Dim outTData = New TableRow
+        Dim scrDr As DataRow = Nothing
         For i As Integer = 0 To srcTbl.Rows.Count - 1
-
+            scrDr = srcTbl(i)
             outTData = New TableRow
 
             '〇転送用パラメタの作成
             Dim prmData As String = String.Empty
             For index As Integer = 0 To profTbl.GetLength(0) - 1
                 Dim fieldName As String = Convert.ToString(profTbl(index, 0))
-                prmData = If(String.IsNullOrEmpty(prmData), "", prmData & C_VALUE_SPLIT_DELIMITER) & _
-                            fieldName & "=" & srcTbl(i)(fieldName)
+                prmData = If(String.IsNullOrEmpty(prmData), "", prmData & C_VALUE_SPLIT_DELIMITER) &
+                            fieldName & "=" & Convert.ToString(scrDr(fieldName))
             Next
 
             For j As Integer = 0 To profTbl.GetLength(0) - 1
                 Dim outCell = New TableCell
                 Dim fieldName As String = Convert.ToString(profTbl(j, 0))
 
-                outCell.Text = srcTbl(i)(fieldName)
+                outCell.Text = Convert.ToString(scrDr(fieldName))
 
                 'テーブルセルのサイズ
                 If CInt(profTbl(j, 2)) * 16 = 0 Then
                     outCell.Style.Add("display", "none")
                 Else
-                    Dim cellWidth As String = ((CInt(profTbl(j, 2)) * 16))
+                    Dim cellWidth As String = ((CInt(profTbl(j, 2)) * 16)).ToString
                     outCell.Style.Add("width", cellWidth & "px")
                 End If
                 outCell.Attributes.Add("id", "LTD" & j & "_" & i)
-                outCell.Attributes.Add(fieldName, srcTbl(i)(fieldName))
+                outCell.Attributes.Add(fieldName, Convert.ToString(scrDr(fieldName)))
                 'イベント追加
                 outCell.Attributes.Add("ondblclick", "WF_TableF_DbClick('" & prmData & "');")
                 '生成したセルの追加先

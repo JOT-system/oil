@@ -1,9 +1,7 @@
-﻿Option Explicit On
+﻿Option Strict On
+Option Explicit On
 
 Imports System.Data.SqlClient
-Imports System.Web
-Imports System.Web.UI.WebControls
-Imports System.Web.UI.HtmlControls
 
 ''' <summary>
 ''' Tableオブジェクト展開
@@ -161,8 +159,8 @@ Public Class CS0013ProfView
         TITLEOPT = False
         HIDENOOPT = False
         HIDEOPERATIONOPT = False
-        NOCOLUMNWIDTHOPT = False
-        OPERATIONCOLUMNWIDTHOPT = False
+        NOCOLUMNWIDTHOPT = 0
+        OPERATIONCOLUMNWIDTHOPT = 0
         USERSORTOPT = 0
         WITHTAGNAMES = False
         TARGETDATE = String.Empty
@@ -318,7 +316,7 @@ Public Class CS0013ProfView
     ''' </summary>
     ''' <param name="profTbl">PROFVIEWデータ</param>
     ''' <param name="outArea">出力先(Panel)コントロール</param>
-    Private Sub MakeTableObject(ByRef profTbl As DataTable, ByRef outArea As Object)
+    Private Sub MakeTableObject(ByRef profTbl As DataTable, ByRef outArea As Panel)
 
         '●項目定義取得
         Dim outTHCell = New TableHeaderCell With {.ViewStateMode = UI.ViewStateMode.Disabled}
@@ -401,7 +399,7 @@ Public Class CS0013ProfView
         End If
 
         'ヘッダー部可変域作成
-        For Each profRow In profTbl.Rows
+        For Each profRow As DataRow In profTbl.Rows
 
             If profRow("EFFECT").ToString = "N" Then
                 Continue For
@@ -487,7 +485,7 @@ Public Class CS0013ProfView
         outTableR = New Table() With {.ViewStateMode = UI.ViewStateMode.Disabled}
         Dim outTDataR = New TableRow With {.ViewStateMode = UI.ViewStateMode.Disabled}
         Dim lineCnt As Integer = 0
-        For Each dataRow In Me.SRCDATA.Rows
+        For Each dataRow As DataRow In Me.SRCDATA.Rows
             lineCnt += 1
 
             outTDataL = New TableHeaderRow With {.ViewStateMode = UI.ViewStateMode.Disabled}
@@ -551,7 +549,7 @@ Public Class CS0013ProfView
                 outTDataR.Style.Add("color", Trim(Convert.ToString(dataRow("FONTCOLOR"))))
             End If
 
-            For Each profRow In profTbl.Rows
+            For Each profRow As DataRow In profTbl.Rows
 
                 If profRow("EFFECT").ToString = "N" Then
                     Continue For
@@ -860,7 +858,7 @@ Public Class CS0013ProfView
         End If
 
         If lmp.ContainsKey(classKey & formatvalue) Then
-            Dim lst As ListBox = lmp.Item(classKey & formatvalue)
+            Dim lst As ListBox = DirectCast(lmp.Item(classKey & formatvalue), ListBox)
 
             For Each item As ListItem In lst.Items
                 wkList.Items.Add(New ListItem(item.Text, item.Value))
@@ -868,7 +866,7 @@ Public Class CS0013ProfView
             itemList = wkList
             Return True
         Else
-            Dim formats As String() = formatvalue.Split(",")
+            Dim formats As String() = formatvalue.Split(","c)
             Dim where As String = ""
             Dim keyvalue As String = ""
             For Each value As String In formats
@@ -879,9 +877,6 @@ Public Class CS0013ProfView
                 End If
             Next
             Try
-                'DataBase接続文字
-                Dim SQLcon = sm.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
 
                 Dim SQLStr As String = String.Empty
                 SQLStr =
@@ -901,35 +896,31 @@ Public Class CS0013ProfView
                     & where _
                     & " ORDER BY KEYCODE "
 
-                Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 1)
-                PARA1.Value = CAMPCODE
-                PARA2.Value = classKey
-                PARA3.Value = Date.Now
-                PARA4.Value = Date.Now
-                PARA5.Value = C_DELETE_FLG.DELETE
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                'DataBase接続文字
+                Using SQLcon = sm.getConnection,
+                      SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                    SQLcon.Open() 'DataBase接続(Open)
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                        .Add("@P2", SqlDbType.NVarChar, 20).Value = classKey
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.Date).Value = Date.Now
+                        .Add("@P5", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        Dim keyCode As String = ""
+                        While SQLdr.Read
+                            keyCode = Convert.ToString(SQLdr("KEYCODE"))
+                            If keyCode <> "" Then
+                                wkList.Items.Add(New ListItem(Convert.ToString(SQLdr(keyvalue)), keyCode))
+                            End If
+                        End While
+                        'Close
+                        SQLdr.Close() 'Reader(Close)
+                    End Using
 
-                While SQLdr.Read
-                    If SQLdr("KEYCODE") <> "" Then
-                        wkList.Items.Add(New ListItem(SQLdr(keyvalue), SQLdr("KEYCODE")))
-                    End If
-                End While
-
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-
-                SQLcmd.Dispose()
-                SQLcmd = Nothing
-
-                SQLcon.Close() 'DataBase接続(Close)
-                SQLcon.Dispose()
-                SQLcon = Nothing
+                    SQLcon.Close() 'DataBase接続(Close)
+                End Using
 
                 lmp.Add(classKey & formatvalue, wkList)
 

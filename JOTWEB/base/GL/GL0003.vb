@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 Imports System.Web.UI.WebControls
 
 ''' <summary>
@@ -106,11 +107,11 @@ Public Class GL0003CustomerList
 
 
         'PARAM 01: TYPE
-        If checkParam(METHOD_NAME, TYPE) Then
+        If checkParam(METHOD_NAME, TYPE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM 01: CAMPCODE
-        If checkParam(METHOD_NAME, CAMPCODE) Then
+        If checkParam(METHOD_NAME, CAMPCODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM EXTRA01: ORGCODE
@@ -118,11 +119,11 @@ Public Class GL0003CustomerList
             ORGCODE = String.Empty
         End If
         'PARAM EXTRA02: STYMD
-        If STYMD < C_DEFAULT_YMD Then
+        If STYMD < CDate(C_DEFAULT_YMD) Then
             STYMD = Date.Now
         End If
         'PARAM EXTRA03: ENDYMD
-        If ENDYMD < C_DEFAULT_YMD Then
+        If ENDYMD < CDate(C_DEFAULT_YMD) Then
             ENDYMD = Date.Now
         End If
 

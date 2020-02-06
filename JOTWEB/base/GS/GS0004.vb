@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 画面メモ情報更新
@@ -51,11 +52,11 @@ Public Class GS0004MEMOset
 
         '●In PARAMチェック
         'PARAM01: MAPID
-        If checkParam(METHOD_NAME, MAPID) Then
+        If checkParam(METHOD_NAME, MAPID) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM02: MEMO
-        If checkParam(METHOD_NAME, _MEMO) Then
+        If checkParam(METHOD_NAME, _MEMO) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'セッション制御宣言
@@ -73,10 +74,6 @@ Public Class GS0004MEMOset
         '●画面メモ情報更新
         '○ DB(OIS0000_MEMO)更新
         Try
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             'OIS0000_MEMO更新SQL文
             Dim SQLStr As String =
                     " DECLARE @hensuu as bigint ;                                                                    " _
@@ -107,25 +104,23 @@ Public Class GS0004MEMOset
                          & "        @P4,@P4,@P5,@P6,@P7) ;                                                                  " _
                          & " CLOSE hensuu ;                                                                                 " _
                          & " DEALLOCATE hensuu ; "
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 500)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 50)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.DateTime)
-            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 30)
-            Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.DateTime)
-            Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", System.Data.SqlDbType.NVarChar, 1)
-            PARA1.Value = MEMO
-            PARA2.Value = USERID
-            PARA3.Value = MAPID
-            PARA4.Value = Date.Now
-            PARA5.Value = USERID
-            PARA6.Value = TERMID
-            PARA7.Value = C_DEFAULT_YMD
-            PARA8.Value = C_DELETE_FLG.ALIVE
-            SQLcmd.ExecuteNonQuery()
-            SQLcmd.Dispose()
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
+
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 500).Value = MEMO
+                    .Add("@P2", SqlDbType.NVarChar, 20).Value = USERID
+                    .Add("@P3", SqlDbType.NVarChar, 50).Value = MAPID
+                    .Add("@P4", SqlDbType.DateTime).Value = Date.Now
+                    .Add("@P5", SqlDbType.NVarChar, 20).Value = USERID
+                    .Add("@P6", SqlDbType.NVarChar, 30).Value = TERMID
+                    .Add("@P7", SqlDbType.DateTime).Value = C_DEFAULT_YMD
+                    .Add("@P8", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.ALIVE
+                End With
+                SQLcmd.ExecuteNonQuery()
+            End Using
 
             ERR = C_MESSAGE_NO.NORMAL
 

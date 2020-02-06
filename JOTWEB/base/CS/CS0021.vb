@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' プロファイル(帳票)取得
@@ -265,15 +266,11 @@ Public Structure CS0021PROFXLS
 
         '●プロファイル(帳票)取得
         Dim CS0050SESSION As New CS0050SESSION
-        Dim SQLcon = CS0050SESSION.getConnection
-        SQLcon.Open()       'DataBase接続(Open)
-        Try
+        Using SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open()
             GetProfM(SQLcon)
-        Finally
-            SQLcon.Close()      'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
-        End Try
+            SQLcon.Close()
+        End Using
 
     End Sub
 
@@ -312,8 +309,6 @@ Public Structure CS0021PROFXLS
             & " ORDER BY" _
             & "    SORTORDER"
 
-        Dim SQLcmd As New SqlCommand()
-
         TITLEKBN = New List(Of String)
         FIELD = New List(Of String)
         FIELDNAME = New List(Of String)
@@ -335,147 +330,160 @@ Public Structure CS0021PROFXLS
         SORTstr = ""
         HEADWRITE = ""
 
+
+
+
         Try
-            SQLcmd = New SqlCommand(SQLstr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLstr, SQLcon)
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
+                    .Add("@P3", SqlDbType.NVarChar, 50).Value = MAPID
+                    .Add("@P4", SqlDbType.NVarChar, 50).Value = REPORTID
+                    .Add("@P5", SqlDbType.Date).Value = TARGETDATE
+                    .Add("@P6", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
+                '動的パラメータ
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)
 
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 50)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 50)
-            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.Date)
-            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)
+                Dim WW_READ As Boolean = False
+                Dim titleKbnVal As String = ""
+                Dim fieldVal As String = ""
+                Dim excelFileVal As String = ""
+                Dim effectVal As String = ""
+                Dim fieldnamesVal As String = ""
+                Dim structVal As String = ""
+                Dim posicolVal As Integer = 0
+                Dim posirowVal As Integer = 0
+                Dim widthVal As Integer = 0
+                Dim sortVal As Integer = 0
+                For Each key As String In {PROFID, C_DEFAULT_DATAKEY}
+                    PARA2.Value = key
 
-            PARA1.Value = CAMPCODE
-            PARA3.Value = MAPID
-            PARA4.Value = REPORTID
-            PARA5.Value = TARGETDATE
-            PARA6.Value = C_DELETE_FLG.DELETE
-
-            Dim WW_READ As Boolean = False
-            For Each key As String In {PROFID, C_DEFAULT_DATAKEY}
-                PARA2.Value = key
-
-                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    While SQLdr.Read
-                        Select Case SQLdr("TITLEKBN")
-                            Case "H"                'ヘッダー領域
-                                If Not IsDBNull(SQLdr("EXCELFILE")) Then
-                                    EXCELFILE = SQLdr("EXCELFILE")
-                                End If
-                                POSISTART = SQLdr("POSISTART")
-                                PROFID = SQLdr("PROFID")
-                                REPORTID = SQLdr("REPORTID")
-                                HEADWRITE = SQLdr("EFFECT")
-
-                            Case "T"                'タイトル領域
-                                WW_READ = True
-                                TITLEKBN.Add(SQLdr("TITLEKBN"))
-                                FIELD.Add(SQLdr("FIELD"))
-                                FIELDNAME.Add(SQLdr("FIELDNAMES"))
-                                If IsDBNull(SQLdr("STRUCT")) Then
-                                    STRUCT.Add(Space(20))
-                                Else
-                                    STRUCT.Add(SQLdr("STRUCT"))
-                                End If
-                                POSIX.Add(SQLdr("POSICOL"))
-                                POSIY.Add(SQLdr("POSIROW"))
-                                WIDTH.Add(SQLdr("WIDTH"))
-                                EFFECT.Add(SQLdr("EFFECT"))
-                                SORT.Add(SQLdr("SORTORDER"))
-
-                                If SQLdr("POSICOL") > POSI_T_X_MAX Then
-                                    POSI_T_X_MAX = SQLdr("POSICOL")
-                                End If
-
-                                If SQLdr("POSIROW") > POSI_T_Y_MAX Then
-                                    POSI_T_Y_MAX = SQLdr("POSIROW")
-                                End If
-
-                            Case "I"                '明細領域
-                                WW_READ = True
-                                TITLEKBN.Add(SQLdr("TITLEKBN"))
-                                FIELD.Add(SQLdr("FIELD"))
-                                FIELDNAME.Add(SQLdr("FIELDNAMES"))
-                                If IsDBNull(SQLdr("STRUCT")) Then
-                                    STRUCT.Add(Space(20))
-                                Else
-                                    STRUCT.Add(SQLdr("STRUCT"))
-                                End If
-                                POSIX.Add(SQLdr("POSICOL"))
-                                POSIY.Add(SQLdr("POSIROW"))
-                                WIDTH.Add(SQLdr("WIDTH"))
-                                EFFECT.Add(SQLdr("EFFECT"))
-                                SORT.Add(SQLdr("SORTORDER"))
-
-                                If SQLdr("POSICOL") > POSI_I_X_MAX Then
-                                    POSI_I_X_MAX = SQLdr("POSICOL")
-                                End If
-
-                                If SQLdr("POSIROW") > POSI_I_Y_MAX Then
-                                    POSI_I_Y_MAX = SQLdr("POSIROW")
-                                End If
-
-                            Case "I_Data"           '繰返アイテムデータ
-                                WW_READ = True
-                                TITLEKBN.Add(SQLdr("TITLEKBN"))
-                                FIELD.Add(SQLdr("FIELD"))
-                                FIELDNAME.Add(SQLdr("FIELDNAMES"))
-                                If IsDBNull(SQLdr("STRUCT")) Then
-                                    STRUCT.Add(Space(20))
-                                Else
-                                    STRUCT.Add(SQLdr("STRUCT"))
-                                End If
-                                POSIX.Add(SQLdr("POSICOL"))
-                                POSIY.Add(SQLdr("POSIROW"))
-                                WIDTH.Add(SQLdr("WIDTH"))
-                                EFFECT.Add(SQLdr("EFFECT"))
-                                SORT.Add(SQLdr("SORTORDER"))
-
-                                If SQLdr("POSICOL") > POSI_R_X_MAX Then
-                                    POSI_R_X_MAX = SQLdr("POSICOL")
-                                End If
-
-                                If SQLdr("POSIROW") > POSI_R_Y_MAX Then
-                                    POSI_R_Y_MAX = SQLdr("POSIROW")
-                                End If
-
-                            Case "I_DataKey"        '繰返アイテムキー
-                                WW_READ = True
-                                TITLEKBN.Add(SQLdr("TITLEKBN"))
-                                FIELD.Add(SQLdr("FIELD"))
-                                FIELDNAME.Add(SQLdr("FIELDNAMES"))
-                                If IsDBNull(SQLdr("STRUCT")) Then
-                                    STRUCT.Add(Space(20))
-                                Else
-                                    STRUCT.Add(SQLdr("STRUCT"))
-                                End If
-                                POSIX.Add(SQLdr("POSICOL"))
-                                POSIY.Add(SQLdr("POSIROW"))
-                                WIDTH.Add(SQLdr("WIDTH"))
-                                EFFECT.Add(SQLdr("EFFECT"))
-                                SORT.Add(SQLdr("SORTORDER"))
-                        End Select
-
-                        'ソート文字列取得
-                        If Not (SQLdr("TITLEKBN") = "H" Or SQLdr("TITLEKBN") = "T") Then
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        While SQLdr.Read
+                            titleKbnVal = Convert.ToString(SQLdr("TITLEKBN"))
+                            fieldVal = Convert.ToString(SQLdr("FIELD"))
+                            effectVal = Convert.ToString(SQLdr("EFFECT"))
+                            fieldnamesVal = Convert.ToString(SQLdr("FIELDNAMES"))
+                            If IsDBNull(SQLdr("STRUCT")) Then
+                                structVal = Space(20)
+                            Else
+                                structVal = Convert.ToString(SQLdr("STRUCT"))
+                            End If
+                            posicolVal = CInt(SQLdr("POSICOL"))
+                            posirowVal = CInt(SQLdr("POSIROW"))
+                            widthVal = CInt(SQLdr("WIDTH"))
+                            sortVal = 0
                             If Not IsDBNull(SQLdr("SORTORDER")) Then
-                                If Not SQLdr("SORTORDER") = 0 Then
+                                sortVal = CInt(SQLdr("SORTORDER"))
+                            End If
+                            Select Case titleKbnVal
+                                Case "H"                'ヘッダー領域
+                                    If Not IsDBNull(SQLdr("EXCELFILE")) Then
+                                        EXCELFILE = Convert.ToString(SQLdr("EXCELFILE"))
+                                    End If
+                                    POSISTART = CInt(SQLdr("POSISTART"))
+                                    PROFID = Convert.ToString(SQLdr("PROFID"))
+                                    REPORTID = Convert.ToString(SQLdr("REPORTID"))
+                                    HEADWRITE = effectVal
+
+                                Case "T"                'タイトル領域
+                                    WW_READ = True
+                                    TITLEKBN.Add(titleKbnVal)
+                                    FIELD.Add(fieldVal)
+                                    FIELDNAME.Add(fieldnamesVal)
+                                    STRUCT.Add(structVal)
+
+                                    POSIX.Add(posicolVal)
+                                    POSIY.Add(posirowVal)
+                                    WIDTH.Add(widthVal)
+                                    EFFECT.Add(effectVal)
+                                    SORT.Add(sortVal)
+
+                                    If posicolVal > POSI_T_X_MAX Then
+                                        POSI_T_X_MAX = posicolVal
+                                    End If
+
+                                    If posirowVal > POSI_T_Y_MAX Then
+                                        POSI_T_Y_MAX = posirowVal
+                                    End If
+
+                                Case "I"                '明細領域
+                                    WW_READ = True
+                                    TITLEKBN.Add(titleKbnVal)
+                                    FIELD.Add(fieldVal)
+                                    FIELDNAME.Add(fieldnamesVal)
+                                    STRUCT.Add(structVal)
+
+                                    POSIX.Add(posicolVal)
+                                    POSIY.Add(posirowVal)
+                                    WIDTH.Add(widthVal)
+                                    EFFECT.Add(effectVal)
+                                    SORT.Add(sortVal)
+
+                                    If posicolVal > POSI_I_X_MAX Then
+                                        POSI_I_X_MAX = posicolVal
+                                    End If
+
+                                    If posirowVal > POSI_I_Y_MAX Then
+                                        POSI_I_Y_MAX = posirowVal
+                                    End If
+
+                                Case "I_Data"           '繰返アイテムデータ
+                                    WW_READ = True
+                                    TITLEKBN.Add(titleKbnVal)
+                                    FIELD.Add(fieldVal)
+                                    FIELDNAME.Add(fieldnamesVal)
+                                    STRUCT.Add(structVal)
+
+                                    POSIX.Add(posicolVal)
+                                    POSIY.Add(posirowVal)
+                                    WIDTH.Add(widthVal)
+                                    EFFECT.Add(effectVal)
+                                    SORT.Add(sortVal)
+
+                                    If posicolVal > POSI_R_X_MAX Then
+                                        POSI_R_X_MAX = posicolVal
+                                    End If
+
+                                    If posirowVal > POSI_R_Y_MAX Then
+                                        POSI_R_Y_MAX = posirowVal
+                                    End If
+
+                                Case "I_DataKey"        '繰返アイテムキー
+                                    WW_READ = True
+                                    TITLEKBN.Add(titleKbnVal)
+                                    FIELD.Add(fieldVal)
+                                    FIELDNAME.Add(fieldnamesVal)
+                                    STRUCT.Add(structVal)
+
+                                    POSIX.Add(posicolVal)
+                                    POSIY.Add(posirowVal)
+                                    WIDTH.Add(widthVal)
+                                    EFFECT.Add(effectVal)
+                                    SORT.Add(sortVal)
+                            End Select
+
+                            'ソート文字列取得
+                            If Not (titleKbnVal = "H" OrElse titleKbnVal = "T") Then
+                                If Not sortVal = 0 Then
                                     If SORTstr = "" Then
-                                        SORTstr &= SQLdr("FIELD")
+                                        SORTstr &= fieldVal
                                     Else
-                                        SORTstr &= " , " & SQLdr("FIELD")
+                                        SORTstr &= " , " & fieldVal
                                     End If
                                 End If
                             End If
-                        End If
-                    End While
-                End Using
+                        End While
+                    End Using
 
-                If WW_READ Then
-                    ERR = C_MESSAGE_NO.NORMAL
-                    Exit For
-                End If
-            Next
+                    If WW_READ Then
+                        ERR = C_MESSAGE_NO.NORMAL
+                        Exit For
+                    End If
+                Next
+            End Using
+
         Catch ex As Exception
             ERR = C_MESSAGE_NO.DB_ERROR
 
@@ -487,9 +495,6 @@ Public Structure CS0021PROFXLS
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR            'DBエラー
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
-        Finally
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
         End Try
 
     End Sub

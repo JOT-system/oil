@@ -1,4 +1,5 @@
-﻿Public Class GRM00001WRKINC
+﻿Option Strict On
+Public Class GRM00001WRKINC
     Inherits System.Web.UI.UserControl
 
     Public Const MAPID As String = "M00001"                          'MAPID

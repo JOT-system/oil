@@ -1,6 +1,5 @@
-﻿Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
-
+﻿'Option Strict On
+Imports System.Data.SqlClient
 ''' <summary>
 ''' 会社情報取得
 ''' </summary>
@@ -54,15 +53,15 @@ Public Class GL0001CompList
 
 
         'PARAM EXTRA01: ROLECODE
-        If checkParam(METHOD_NAME, ROLECODE) Then
+        If checkParam(METHOD_NAME, ROLECODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM EXTRA02: STYMD
-        If STYMD < C_DEFAULT_YMD Then
+        If STYMD < CDate(C_DEFAULT_YMD) Then
             STYMD = Date.Now
         End If
         'PARAM EXTRA03: ENDYMD
-        If ENDYMD < C_DEFAULT_YMD Then
+        If ENDYMD < CDate(C_DEFAULT_YMD) Then
             ENDYMD = Date.Now
         End If
 
@@ -79,9 +78,9 @@ Public Class GL0001CompList
         Dim SQLcon = sm.getConnection
         SQLcon.Open() 'DataBase接続(Open)
         Select Case TYPEMODE
-            Case LC_COMPANY_TYPE.ROLE
+            Case CInt(LC_COMPANY_TYPE.ROLE).ToString
                 getCompList(SQLcon)
-            Case LC_COMPANY_TYPE.ALL
+            Case CInt(LC_COMPANY_TYPE.ALL).ToString
                 getCompAllList(SQLcon)
         End Select
 

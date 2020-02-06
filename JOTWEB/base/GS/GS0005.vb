@@ -1,5 +1,5 @@
-﻿Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 画面RightBOX用帳票ID取得
@@ -57,15 +57,15 @@ Public Class GS0005ReportList
 
         '●In PARAMチェック
         'PARAM01: COMPCODE
-        If checkParam(METHOD_NAME, COMPCODE) Then
+        If checkParam(METHOD_NAME, COMPCODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM02: MAPID
-        If checkParam(METHOD_NAME, MAPID) Then
+        If checkParam(METHOD_NAME, MAPID) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
         'PARAM03: PROFID
-        If checkParam(METHOD_NAME, PROFID) Then
+        If checkParam(METHOD_NAME, PROFID) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
 
@@ -84,10 +84,6 @@ Public Class GS0005ReportList
         '●RightBOX用帳票List取得
         '○ DB(OIS0014_PROFMXLS)検索　…　入力パラメータによる検索
         Try
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             'S0011_UPROFXLS検索SQL文
             Dim SQL_Str As String =
                   " SELECT " _
@@ -108,40 +104,34 @@ Public Class GS0005ReportList
                 & "   and DELFLG     <> @P7 " _
                 & " GROUP BY REPORTID , FIELDNAMES , EXCELFILE " _
                 & " ORDER BY REPORTID "
-            Dim SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 50)
-            Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-            Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-            Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.Date)
-            Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", System.Data.SqlDbType.NVarChar, 1)
-            PARA1.Value = COMPCODE
-            PARA2.Value = PROFID
-            PARA3.Value = MAPID
-            PARA4.Value = C_TITLEKBN.HEADER
-            PARA5.Value = TARGETDATE
-            PARA6.Value = TARGETDATE
-            PARA7.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-            While SQLdr.Read
-                WW_ListBOX.Items.Add(New ListItem(SQLdr("FIELDNAME") & "(書式:" & SQLdr("EXCELFILE") & ")", SQLdr("REPORTID")))
-            End While
-            ERR = C_MESSAGE_NO.NORMAL
-            REPORTOBJ = WW_ListBOX
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = COMPCODE
+                    .Add("@P2", SqlDbType.NVarChar, 20).Value = PROFID
+                    .Add("@P3", SqlDbType.NVarChar, 50).Value = MAPID
+                    .Add("@P4", SqlDbType.NVarChar, 1).Value = C_TITLEKBN.HEADER
+                    .Add("@P5", SqlDbType.Date).Value = TARGETDATE
+                    .Add("@P6", SqlDbType.Date).Value = TARGETDATE
+                    .Add("@P7", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
 
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    While SQLdr.Read
+                        WW_ListBOX.Items.Add(New ListItem(String.Format("{0}(書式:{1})", SQLdr("FIELDNAME"), SQLdr("EXCELFILE")), Convert.ToString(SQLdr("REPORTID"))))
+                    End While
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
 
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
+                ERR = C_MESSAGE_NO.NORMAL
+                REPORTOBJ = WW_ListBOX
 
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
-
+                SQLcon.Close() 'DataBase接続(Close)
+            End Using
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 

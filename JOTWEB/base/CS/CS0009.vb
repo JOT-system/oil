@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' メッセージ取得
@@ -109,7 +110,7 @@ Public Structure CS0009MESSAGEout
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property MESSAGEBOX() As Object
+    Public Property MESSAGEBOX() As Label
 
     ''' <summary>
     ''' エラーコード
@@ -225,65 +226,55 @@ Public Structure CS0009MESSAGEout
             '****************
             '*** 共通宣言 ***
             '****************
-            'DataBase接続文字
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             'Message検索SQL文
             Dim SQLStr As String =
                  "SELECT rtrim(TEXT) as TEXT " _
                & " FROM  COM.OIS0003_MESSAGE " _
                & " Where ID= @P1 "
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 10)
-            PARA1.Value = MESSAGENO
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
+                SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 10).Value = MESSAGENO
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    While SQLdr.Read
+                        W_Message = "  " & Convert.ToString(SQLdr("TEXT"))
+                        W_Message = W_Message.Replace("?01", PARA01)
+                        W_Message = W_Message.Replace("?02", PARA02)
+                        W_Message = W_Message.Replace("?03", PARA03)
+                        W_Message = W_Message.Replace("?04", PARA04)
+                        W_Message = W_Message.Replace("?05", PARA05)
+                        W_Message = W_Message.Replace("?06", PARA06)
+                        W_Message = W_Message.Replace("?07", PARA07)
+                        W_Message = W_Message.Replace("?08", PARA08)
+                        W_Message = W_Message.Replace("?09", PARA09)
+                        W_Message = W_Message.Replace("?10", PARA10)
 
-            While SQLdr.Read
-                W_Message = "  " & SQLdr("TEXT")
-                W_Message = W_Message.Replace("?01", PARA01)
-                W_Message = W_Message.Replace("?02", PARA02)
-                W_Message = W_Message.Replace("?03", PARA03)
-                W_Message = W_Message.Replace("?04", PARA04)
-                W_Message = W_Message.Replace("?05", PARA05)
-                W_Message = W_Message.Replace("?06", PARA06)
-                W_Message = W_Message.Replace("?07", PARA07)
-                W_Message = W_Message.Replace("?08", PARA08)
-                W_Message = W_Message.Replace("?09", PARA09)
-                W_Message = W_Message.Replace("?10", PARA10)
+                        MESSAGEBOX.Text = W_Message
 
-                MESSAGEBOX.TEXT = W_Message
+                        Select Case NAEIW.ToUpper
+                            Case C_MESSAGE_TYPE.NOR
+                                MESSAGEBOX.ForeColor = Drawing.Color.Black 'black
+                                MESSAGEBOX.Font.Bold = False
+                            Case C_MESSAGE_TYPE.INF
+                                MESSAGEBOX.ForeColor = Drawing.Color.DarkBlue 'darkblue
+                                MESSAGEBOX.Font.Bold = True
+                            Case C_MESSAGE_TYPE.WAR
+                                MESSAGEBOX.ForeColor = Drawing.Color.DarkBlue 'darkblue
+                                MESSAGEBOX.Font.Bold = True
+                            Case C_MESSAGE_TYPE.ERR, C_MESSAGE_TYPE.ABORT
+                                MESSAGEBOX.ForeColor = Drawing.Color.Red 'red
+                                MESSAGEBOX.Font.Bold = True
+                        End Select
 
-                Select Case NAEIW.ToUpper
-                    Case C_MESSAGE_TYPE.NOR
-                        MESSAGEBOX.ForeColor = MESSAGEBOX.foreColor.black 'black
-                        MESSAGEBOX.Font.Bold = "False"
-                    Case C_MESSAGE_TYPE.INF
-                        MESSAGEBOX.ForeColor = MESSAGEBOX.foreColor.darkblue 'darkblue
-                        MESSAGEBOX.Font.Bold = "True"
-                    Case C_MESSAGE_TYPE.WAR
-                        MESSAGEBOX.ForeColor = MESSAGEBOX.foreColor.darkblue 'darkblue
-                        MESSAGEBOX.Font.Bold = "True"
-                    Case C_MESSAGE_TYPE.ERR, C_MESSAGE_TYPE.ABORT
-                        MESSAGEBOX.ForeColor = MESSAGEBOX.foreColor.red 'red
-                        MESSAGEBOX.Font.Bold = "True"
-                End Select
-
-            End While
-
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-            SQLcon.Close() 'DataBase接続(Close)
-            SQLcon.Dispose()
-            SQLcon = Nothing
+                    End While
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
+                SQLcon.Close() 'DataBase接続(Close)
+            End Using
 
             ERR = C_MESSAGE_NO.NORMAL
-
         Catch ex As Exception
 
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
@@ -296,9 +287,9 @@ Public Structure CS0009MESSAGEout
             CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
             MESSAGEBOX.TEXT = "システム管理者へ連絡して下さい(DB OIS0003_MESSAGE Select ERR)"
-            MESSAGEBOX.ForeColor = MESSAGEBOX.ForeColor.red 'red
-            MESSAGEBOX.BackColor = MESSAGEBOX.BackColor.darksalmon 'darksalmon
-            MESSAGEBOX.Font.Bold = "True"
+            MESSAGEBOX.ForeColor = Drawing.Color.Red 'red
+            MESSAGEBOX.BackColor = Drawing.Color.DarkSalmon 'darksalmon
+            MESSAGEBOX.Font.Bold = True
             ERR = C_MESSAGE_NO.DB_ERROR
             Exit Sub
         End Try

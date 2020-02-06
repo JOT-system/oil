@@ -1,4 +1,4 @@
-﻿Imports System.Drawing
+﻿Option Strict On
 
 Public Class GRIS0004RightBox
     Inherits UserControl
@@ -88,7 +88,7 @@ Public Class GRIS0004RightBox
         GS0005ReportList.getList()
         If isNormal(GS0005ReportList.ERR) Then
             Try
-                Dim REPORTOBJ As ListBox = CType(GS0005ReportList.REPORTOBJ, System.Web.UI.WebControls.ListBox)
+                Dim REPORTOBJ As ListBox = DirectCast(GS0005ReportList.REPORTOBJ, System.Web.UI.WebControls.ListBox)
                 For Each item As ListItem In REPORTOBJ.Items
                     WW_REPORTID.Items.Add(New ListItem(item.Text, item.Value))
                 Next
@@ -169,7 +169,7 @@ Public Class GRIS0004RightBox
         GS0005ReportList.getList()
         If isNormal(GS0005ReportList.ERR) Then
             Try
-                Dim REPORTOBJ As ListBox = CType(GS0005ReportList.REPORTOBJ, System.Web.UI.WebControls.ListBox)
+                Dim REPORTOBJ As ListBox = DirectCast(GS0005ReportList.REPORTOBJ, System.Web.UI.WebControls.ListBox)
                 For Each item As ListItem In REPORTOBJ.Items
                     WW_REPORTID.Items.Add(New ListItem(item.Text, item.Value))
                 Next

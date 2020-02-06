@@ -311,6 +311,10 @@ Public Class OIT0003OrderLinkQuota
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAIN.Text) Then
             SQLStr &= String.Format("    AND OIT0004.TRAINNO = '{0}'", work.WF_SEL_TRAIN.Text)
         End If
+        '貨車連結順序表№(一度設定した貨車連結順序表№があれば紐づけを実施)
+        If Not String.IsNullOrEmpty(work.WF_SEL_LINKNO.Text) Then
+            SQLStr &= String.Format("    AND OIT0004.LINKNO = '{0}'", work.WF_SEL_LINKNO.Text)
+        End If
 
         SQLStr &=
               "    AND OIT0004.DELFLG <> @P4" _

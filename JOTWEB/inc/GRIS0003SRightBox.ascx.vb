@@ -1,4 +1,4 @@
-﻿Imports System.Drawing
+﻿Option Strict On
 
 Public Class GRIS0003SRightBox
     Inherits UserControl

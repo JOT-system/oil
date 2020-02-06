@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Option Strict On
+Imports System.IO
 
 ''' <summary>
 ''' EXCEL帳票アップロード時処理

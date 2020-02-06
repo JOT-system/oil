@@ -1,4 +1,5 @@
-﻿Imports System.Web
+﻿Option Strict On
+Imports System.Web
 Imports System.Data.SqlClient
 Imports System.Web.SessionState
 Imports System.Configuration
@@ -24,7 +25,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property NAMESPACE_VALUE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.NAMESPACE_VALUE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.NAMESPACE_VALUE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -40,7 +41,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property CLASS_NAME As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.CLASS_NAME)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.CLASS_NAME))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -60,7 +61,7 @@ Public Class CS0050SESSION : Implements IDisposable
 
             If GetStr = Nothing Then
                 SESSION = If(SESSION, HttpContext.Current.Session)
-                Return SESSION(C_SESSION_KEY.DB_CONNECT)
+                Return Convert.ToString(SESSION(C_SESSION_KEY.DB_CONNECT))
             Else
                 Return GetStr
             End If
@@ -79,7 +80,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property USERID As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.USER_ID)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.USER_ID))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -95,7 +96,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property TERMID As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.USER_TERM_ID)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.USER_TERM_ID))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -111,7 +112,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property TERM_COMPANY As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.TERM_COMPANY)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.TERM_COMPANY))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -127,7 +128,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property TERM_ORG As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.TERM_ORGANIZATION)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.TERM_ORGANIZATION))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -143,7 +144,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property TERM_M_ORG As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.TERM_MANAGMENT_ORGANIZATION)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.TERM_MANAGMENT_ORGANIZATION))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -159,7 +160,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property SELECTED_COMPANY As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.SELECTED_ANOTHER_COMPANY)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.SELECTED_ANOTHER_COMPANY))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -175,7 +176,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property DRIVERS As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.TERM_DRIVERS)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.TERM_DRIVERS))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -191,7 +192,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property LOG_PATH As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.LOGGING_PATH)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.LOGGING_PATH))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -207,7 +208,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property PDF_PATH As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.PDF_PRINT_PATH)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.PDF_PRINT_PATH))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -223,7 +224,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property UPLOAD_PATH As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.UPLOADED_PATH)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.UPLOADED_PATH))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -239,7 +240,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property JORNAL_PATH As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.UPDATE_JORNALING_PATH)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.UPDATE_JORNALING_PATH))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -255,7 +256,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property SYSTEM_PATH As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.SYSTEM_PATH)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.SYSTEM_PATH))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -271,7 +272,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property APSV_ID As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.APSV_TERM_ID)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.APSV_TERM_ID))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -287,7 +288,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property APSV_COMPANY As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.APSV_FOUNDIION_COMPAY)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.APSV_FOUNDIION_COMPAY))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -303,7 +304,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property APSV_ORG As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.APSV_FOUNDIION_ORGANIZATION)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.APSV_FOUNDIION_ORGANIZATION))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -319,7 +320,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property APSV_M_ORG As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.APSV_MANAGMENT_ORGANIZATION)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.APSV_MANAGMENT_ORGANIZATION))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -335,7 +336,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_MAPID As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_DISPLAY_MAP_ID)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_DISPLAY_MAP_ID))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -351,7 +352,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_MENU_MODE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_USER_MENU_MODE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_USER_MENU_MODE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -367,7 +368,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_MAP_MODE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_USER_MAP_MODE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_USER_MAP_MODE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -383,7 +384,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_VIEWPROF_MODE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_USER_VIEWPROF_MODE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_USER_VIEWPROF_MODE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -399,7 +400,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_RPRTPROF_MODE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_USER_RPRTPROF_MODE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_USER_RPRTPROF_MODE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -415,7 +416,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_APPROVALID As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_USER_APPROVALID)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_USER_APPROVALID))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -431,7 +432,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_MAP_VARIANT As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_USER_MAP_VARIANT)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_USER_MAP_VARIANT))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -447,7 +448,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property VIEW_PERMIT As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_PERMISSION_MODE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_PERMISSION_MODE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -463,7 +464,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property MAP_ETC As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_ETC_VALUE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_ETC_VALUE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -479,7 +480,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property HELP_ID As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_HELP_MAP_ID)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_HELP_MAP_ID))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -495,7 +496,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property HELP_COMP As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.MAPPING_HELP_COMP_CD)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.MAPPING_HELP_COMP_CD))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -511,7 +512,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property LOGONDATE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.LOGON_LOGIN_DATE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.LOGON_LOGIN_DATE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -527,7 +528,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property SELECTED_START_DATE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.SELECTED_START_DATE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.SELECTED_START_DATE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)
@@ -543,7 +544,7 @@ Public Class CS0050SESSION : Implements IDisposable
     Public Property SELECTED_END_DATE As String
         Get
             SESSION = If(SESSION, HttpContext.Current.Session)
-            Return SESSION(C_SESSION_KEY.SELECTED_END_DATE)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.SELECTED_END_DATE))
         End Get
         Set(ByVal value As String)
             SESSION = If(SESSION, HttpContext.Current.Session)

@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 権限チェック（マスタチェック）
@@ -123,12 +124,8 @@ Public Structure CS0025AUTHORget
         '●権限チェック（マスタチェック）　…　ユーザ操作権限取得
 
         Try
-            'DataBase接続文字
-            Using SQLcon = sm.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
-
-                '検索SQL文
-                Dim SQLStr As String =
+            '検索SQL文
+            Dim SQLStr As String =
                      "SELECT rtrim(B.PERMITCODE) as PERMITCODE        " _
                    & " FROM       COM.OIS0004_USER        A                 " _
                    & " INNER JOIN COM.OIS0009_ROLE        B              ON " _
@@ -148,41 +145,40 @@ Public Structure CS0025AUTHORget
                    & "   and A.ENDYMD  >= @P5                         " _
                    & "   and A.DELFLG  <> '1'                         " _
                    & "ORDER BY B.SEQ                                  "
-                '  "SELECT rtrim(B.PERMITCODE) as PERMITCODE        " _
-                '& " FROM       COM.OIS0004_USER        A                 " _
-                '& " INNER JOIN COM.OIS0009_ROLE        B              ON " _
-                '& "       B.OBJECT   = @P2                         " _
-                '& "   and B.ROLE     = CASE B.OBJECT               " _
-                '& "                    WHEN 'ORG'  THEN A.ORGROLE  " _
-                '& "                    WHEN 'CAMP' THEN A.CAMPROLE " _
-                '& "                    WHEN 'MAP'  THEN A.MAPROLE  " _
-                '& "                    END                         " _
-                '& "   and B.CAMPCODE = A.CAMPCODE                  " _
-                '& "   and B.CODE     = @P3                         " _
-                '& "   and B.STYMD   <= @P4                         " _
-                '& "   and B.ENDYMD  >= @P5                         " _
-                '& "   and B.DELFLG  <> '1'                         " _
-                '& " Where A.USERID   = @P1                         " _
-                '& "   and A.STYMD   <= @P4                         " _
-                '& "   and A.ENDYMD  >= @P5                         " _
-                '& "   and A.DELFLG  <> '1'                         " _
-                '& "ORDER BY B.SEQ                                  "
+            '  "SELECT rtrim(B.PERMITCODE) as PERMITCODE        " _
+            '& " FROM       COM.OIS0004_USER        A                 " _
+            '& " INNER JOIN COM.OIS0009_ROLE        B              ON " _
+            '& "       B.OBJECT   = @P2                         " _
+            '& "   and B.ROLE     = CASE B.OBJECT               " _
+            '& "                    WHEN 'ORG'  THEN A.ORGROLE  " _
+            '& "                    WHEN 'CAMP' THEN A.CAMPROLE " _
+            '& "                    WHEN 'MAP'  THEN A.MAPROLE  " _
+            '& "                    END                         " _
+            '& "   and B.CAMPCODE = A.CAMPCODE                  " _
+            '& "   and B.CODE     = @P3                         " _
+            '& "   and B.STYMD   <= @P4                         " _
+            '& "   and B.ENDYMD  >= @P5                         " _
+            '& "   and B.DELFLG  <> '1'                         " _
+            '& " Where A.USERID   = @P1                         " _
+            '& "   and A.STYMD   <= @P4                         " _
+            '& "   and A.ENDYMD  >= @P5                         " _
+            '& "   and A.DELFLG  <> '1'                         " _
+            '& "ORDER BY B.SEQ                                  "
 
-                Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 20)
-                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 20)
-                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Date)
-                    Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", System.Data.SqlDbType.Date)
-                    Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", System.Data.SqlDbType.NVarChar, 1)
-                    PARA1.Value = USERID
-                    PARA2.Value = OBJCODE
-                    PARA3.Value = CODE
-                    PARA4.Value = ENDYMD
-                    PARA5.Value = STYMD
-                    PARA6.Value = C_DELETE_FLG.DELETE
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            'DataBase接続文字
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
 
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
+                    .Add("@P2", SqlDbType.NVarChar, 20).Value = OBJCODE
+                    .Add("@P3", SqlDbType.NVarChar, 20).Value = CODE
+                    .Add("@P4", SqlDbType.Date).Value = ENDYMD
+                    .Add("@P5", SqlDbType.Date).Value = STYMD
+                    .Add("@P6", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '権限コード初期値(権限なし)設定
                     PERMITCODE = ""
                     ERR = C_MESSAGE_NO.AUTHORIZATION_ERROR
@@ -194,8 +190,6 @@ Public Structure CS0025AUTHORget
 
                     'Close
                     SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
-
                 End Using
 
                 SQLcon.Close() 'DataBase接続(Close)

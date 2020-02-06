@@ -1,6 +1,5 @@
-﻿Imports System.IO
-Imports System.Text
-
+﻿Option Strict On
+Imports System.IO
 ''' <summary>
 ''' iniファイル情報取得
 ''' </summary>

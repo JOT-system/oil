@@ -52,10 +52,13 @@ Public Class OIT0004WRKINC
     '' <param name="FIXCODE"></param>
     '' <returns></returns>
     '' <remarks></remarks>
-    Function CreateFIXParam(ByVal I_COMPCODE As String, Optional ByVal I_FIXCODE As String = "") As Hashtable
+    Function CreateFIXParam(ByVal I_COMPCODE As String, Optional ByVal I_FIXCODE As String = "", Optional ByVal I_ADDITIONALCONDITION As String = "") As Hashtable
         Dim prmData As New Hashtable
         prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
         prmData.Item(C_PARAMETERS.LP_FIX_CLASS) = I_FIXCODE
+        If I_ADDITIONALCONDITION <> "" Then
+            prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) = I_ADDITIONALCONDITION
+        End If
         CreateFIXParam = prmData
     End Function
 

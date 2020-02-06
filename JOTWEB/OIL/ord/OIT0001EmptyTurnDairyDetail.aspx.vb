@@ -2745,7 +2745,13 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         '前回油種と油種の整合性チェック
         For Each OIT0001row As DataRow In OIT0001tbl.Rows
-            WW_FixvalueMasterSearch(OIT0001row("LASTOILCODE") + OIT0001row("PREORDERINGTYPE"), "LASTOILCONSISTENCY" + OIT0001row("ORDERINGTYPE"), OIT0001row("OILCODE"), WW_GetValue)
+
+            'タンク車№が未設定の場合はチェックはしない。
+            If OIT0001row("TANKNO") = "" Then
+                Continue For
+            End If
+
+            WW_FixvalueMasterSearch(OIT0001row("LASTOILCODE") + OIT0001row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0001row("OILCODE") + OIT0001row("ORDERINGTYPE"), WW_GetValue)
 
             If WW_GetValue(2) = "1" Then
                 Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)

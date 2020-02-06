@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' 共通で利用する定数定義
 ''' </summary>
 Public Module BaseDllConst
@@ -258,6 +259,18 @@ Public Module BaseDllConst
     ''' 検査間近有
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_82 As String = "82"
+    ''' <summary>
+    ''' 前回油種確認
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_83 As String = "83"
+    ''' <summary>
+    ''' 高速列車非対応
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_84 As String = "84"
+    ''' <summary>
+    ''' タンク車重複
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_85 As String = "85"
 
     ''' <summary>
     ''' 失注（荷主都合）

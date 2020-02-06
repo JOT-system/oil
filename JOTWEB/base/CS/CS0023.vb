@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Option Strict On
+Imports System.IO
 Imports Microsoft.OFFICE.Interop
 Imports System.Runtime.InteropServices
 
@@ -215,11 +216,13 @@ Public Structure CS0023XLSUPLOAD
             WW_EXCELrange = W_ExcelSheet.Range(WW_STARTpoint, WW_ENDpoint)      'データの入力セル範囲
 
             '　1行目データからレポートIDとプロファイルID("ID:")を探す
-            WW_EXCELdat = WW_EXCELrange.Value          'EXCELデータ取得
+            WW_EXCELdat = CType(WW_EXCELrange.Value, Object(,))          'EXCELデータ取得
+            Dim excelRowValue As String = ""
             For i As Integer = 1 To 50
                 For j As Integer = 1 To 100
-                    If InStr(WW_EXCELdat(i, j), "ID:") > 0 Then
-                        REPORTID = Trim(WW_EXCELdat(i, j).Replace("ID:", ""))
+                    excelRowValue = Convert.ToString(WW_EXCELdat(i, j))
+                    If InStr(excelRowValue, "ID:") > 0 Then
+                        REPORTID = Trim(excelRowValue.Replace("ID:", ""))
                         If InStr(REPORTID, ";") > 0 Then
                             SCOLON = InStr(REPORTID, ";")
                             PROFID = Mid(REPORTID, SCOLON + 1, Len(REPORTID))
@@ -535,14 +538,14 @@ Public Structure CS0023XLSUPLOAD
                     WW_ENDpoint = DirectCast(WW_Cells.Item(CS0021PROFXLS.POSISTART + (WW_DATcnt + 1) * CS0021PROFXLS.POSI_I_Y_MAX - 1, CS0021PROFXLS.POSI_I_X_MAX), Excel.Range)
                     WW_EXCELrange = W_ExcelSheet.Range(WW_STARTpoint, WW_ENDpoint)           'Excelデータの入力セル範囲
 
-                    WW_HENSYUrange = WW_EXCELrange.Value
+                    WW_HENSYUrange = CType(WW_EXCELrange.Value, Object(,))
 
                     '○明細データ取得
                     WW_TBLDATArow = WW_TBLDATA.NewRow()
 
                     For i As Integer = 0 To WW_I_TITOLKBN.Count - 1
 
-                        If WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)) = Nothing Then
+                        If WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)) Is Nothing Then
                             If IsNothing(WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i))) Then
                                 'WW_TBLDATArow(WW_I_FIELD(i)) = ""
                             Else
@@ -592,7 +595,7 @@ Public Structure CS0023XLSUPLOAD
                                     WW_TBLDATArow(WW_I_FIELD(i)) = WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)).ToString
                                     WW_LoopEND = 1
                                 Case "System.Date"
-                                    WW_TBLDATArow(WW_I_FIELD(i)) = WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)).ToString("yyyy/MM/dd")
+                                    WW_TBLDATArow(WW_I_FIELD(i)) = CDate(WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i))).ToString("yyyy/MM/dd")
                                     WW_LoopEND = 1
                                 Case "Nothing"
                                 Case Else
@@ -669,7 +672,7 @@ Public Structure CS0023XLSUPLOAD
                     'Excelデータの入力セル範囲
                     WW_EXCELrange = W_ExcelSheet.Range(WW_STARTpoint, WW_ENDpoint)
 
-                    WW_HENSYUrange = WW_EXCELrange.Value
+                    WW_HENSYUrange = CType(WW_EXCELrange.Value, Object(,))
 
                     Dim WW_RecWrite As Integer = 0
 
@@ -682,7 +685,7 @@ Public Structure CS0023XLSUPLOAD
 
                         '明細アイテム(I)
                         For i As Integer = 0 To WW_I_TITOLKBN.Count - 1
-                            If WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)) = Nothing Then
+                            If WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)) Is Nothing Then
                             Else
                                 WW_LoopEND = 1
                                 Select Case WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)).GetType.ToString
@@ -701,7 +704,7 @@ Public Structure CS0023XLSUPLOAD
                                     Case "System.Double"
                                         WW_TBLDATArow(WW_I_FIELD(i)) = WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)).ToString
                                     Case "System.Date"
-                                        WW_TBLDATArow(WW_I_FIELD(i)) = WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)).ToString("yyyy/MM/dd")
+                                        WW_TBLDATArow(WW_I_FIELD(i)) = CDate(WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i))).ToString("yyyy/MM/dd")
                                     Case "Nothing"
                                     Case Else
                                         WW_TBLDATArow(WW_I_FIELD(i)) = WW_HENSYUrange(WW_I_POSIY(i), WW_I_POSIX(i)).ToString
@@ -713,7 +716,7 @@ Public Structure CS0023XLSUPLOAD
                         For i As Integer = 0 To WW_R_TITOLKBN.Count - 1
                             If WW_R_TITOLKBN(i) = "I_Data" Then
 
-                                If WW_HENSYUrange(WW_R_POSIY(i), CS0021PROFXLS.POSI_I_X_MAX + CS0021PROFXLS.POSI_R_X_MAX * CNT + WW_R_POSIX(i)) = Nothing Then
+                                If WW_HENSYUrange(WW_R_POSIY(i), CS0021PROFXLS.POSI_I_X_MAX + CS0021PROFXLS.POSI_R_X_MAX * CNT + WW_R_POSIX(i)) Is Nothing Then
                                     'WW_TBLDATArow(WW_R_FIELD(i)) = WW_HENSYUrange(WW_R_POSIY(i), CS0021UPROFXLS.POSI_I_X_MAX + CS0021UPROFXLS.POSI_R_X_MAX * CNT + WW_R_POSIX(i))
                                 Else
                                     WW_RecWrite = 1
@@ -734,7 +737,7 @@ Public Structure CS0023XLSUPLOAD
                                         Case "System.Double"
                                             WW_TBLDATArow(WW_R_FIELD(i)) = WW_HENSYUrange(WW_R_POSIY(i), CS0021PROFXLS.POSI_I_X_MAX + CS0021PROFXLS.POSI_R_X_MAX * CNT + WW_R_POSIX(i)).ToString
                                         Case "System.Date"
-                                            WW_TBLDATArow(WW_R_FIELD(i)) = WW_HENSYUrange(WW_R_POSIY(i), CS0021PROFXLS.POSI_I_X_MAX + CS0021PROFXLS.POSI_R_X_MAX * CNT + WW_R_POSIX(i)).ToString("yyyy/MM/dd")
+                                            WW_TBLDATArow(WW_R_FIELD(i)) = CDate(WW_HENSYUrange(WW_R_POSIY(i), CS0021PROFXLS.POSI_I_X_MAX + CS0021PROFXLS.POSI_R_X_MAX * CNT + WW_R_POSIX(i))).ToString("yyyy/MM/dd")
                                         Case "Nothing"
                                         Case Else
                                             WW_TBLDATArow(WW_R_FIELD(i)) = WW_HENSYUrange(WW_R_POSIY(i), CS0021PROFXLS.POSI_I_X_MAX + CS0021PROFXLS.POSI_R_X_MAX * CNT + WW_R_POSIX(i)).ToString
@@ -807,12 +810,12 @@ Public Structure CS0023XLSUPLOAD
             WW_ENDpoint = DirectCast(WW_Cells.Item(CS0021PROFXLS.POSI_T_Y_MAX, CS0021PROFXLS.POSI_T_X_MAX), Excel.Range)
             WW_EXCELrange = W_ExcelSheet.Range(WW_STARTpoint, WW_ENDpoint)           'Excelデータの入力セル範囲
 
-            WW_HENSYUrange = WW_EXCELrange.Value
+            WW_HENSYUrange = CType(WW_EXCELrange.Value, Object(,))
 
             '○タイトルデータ取得
             For i As Integer = 0 To CS0021PROFXLS.TITLEKBN.Count - 1
-                If CS0021PROFXLS.TITLEKBN(i) = "T" And CS0021PROFXLS.EFFECT(i) = "Y" And CS0021PROFXLS.POSIY(i) > 0 And CS0021PROFXLS.POSIX(i) > 0 Then
-                    If WW_HENSYUrange(CS0021PROFXLS.POSIY(i), CS0021PROFXLS.POSIX(i)) = Nothing Then
+                If CS0021PROFXLS.TITLEKBN(i) = "T" AndAlso CS0021PROFXLS.EFFECT(i) = "Y" AndAlso CS0021PROFXLS.POSIY(i) > 0 And CS0021PROFXLS.POSIX(i) > 0 Then
+                    If WW_HENSYUrange(CS0021PROFXLS.POSIY(i), CS0021PROFXLS.POSIX(i)) Is Nothing Then
                     Else
                         Select Case WW_HENSYUrange(CS0021PROFXLS.POSIY(i), CS0021PROFXLS.POSIX(i)).GetType.ToString
                             Case "System.String"
@@ -845,7 +848,7 @@ Public Structure CS0023XLSUPLOAD
                                 Next
                             Case "System.Date"
                                 For j As Integer = 0 To WW_TBLDATA.Rows.Count - 1
-                                    WW_TBLDATA.Rows(j)(CS0021PROFXLS.FIELD(i)) = WW_HENSYUrange(CS0021PROFXLS.POSIY(i), CS0021PROFXLS.POSIX(i)).ToString("yyyy/MM/dd")
+                                    WW_TBLDATA.Rows(j)(CS0021PROFXLS.FIELD(i)) = CDate(WW_HENSYUrange(CS0021PROFXLS.POSIY(i), CS0021PROFXLS.POSIX(i))).ToString("yyyy/MM/dd")
                                 Next
                             Case "Nothing"
                             Case Else

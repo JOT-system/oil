@@ -1,6 +1,5 @@
+Option Strict On
 Imports System.Data.SqlClient
-
-
 ''' <summary>
 ''' コンピュータ名存在チェック
 ''' </summary>
@@ -99,20 +98,18 @@ Public Structure CS0006TERMchk
                    & "   and ENDYMD >= @P3 " _
                    & "   and DELFLG <> @P4 "
                 Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-                    PARA1.Value = TERMID
-                    PARA2.Value = Date.Now
-                    PARA3.Value = Date.Now
-                    PARA4.Value = C_DELETE_FLG.DELETE
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 30).Value = TERMID
+                        .Add("@P2", SqlDbType.Date).Value = Date.Now
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
                     Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
                     If SQLdr.Read Then
-                        TERMCAMP = SQLdr("TERMCAMP")
-                        TERMORG = SQLdr("TERMORG")
-                        MORG = SQLdr("MORG")
+                        TERMCAMP = Convert.ToString(SQLdr("TERMCAMP"))
+                        TERMORG = Convert.ToString(SQLdr("TERMORG"))
+                        MORG = Convert.ToString(SQLdr("MORG"))
                         WW_CNT = 1
                     End If
 

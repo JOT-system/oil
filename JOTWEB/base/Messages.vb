@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' メッセージ関連の定数定義
 ''' </summary>
 Public Module Messages
@@ -444,6 +445,11 @@ Public Module Messages
         ''' 列車牽引車数オーバー
         ''' </summary>
         Public Const OIL_TRAINCARS_ERROR As String = "20016"
+
+        ''' <summary>
+        ''' 高速列車非対応タンク車エラー
+        ''' </summary>
+        Public Const OIL_SPEEDTRAINTANK_ERROR As String = "20017"
 
 #End Region
 

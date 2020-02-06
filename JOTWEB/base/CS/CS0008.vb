@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' オンライン状態取得
@@ -64,11 +65,8 @@ Public Class CS0008ONLINEstat : Implements IDisposable
         Try
             'DataBase接続文字
             'Dim SQLcon As New SqlConnection(HttpContext.Current.Session("DBcon"))
-            Using SQLcon = sm.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
-
-                'S0015_ONLINESTAT検索SQL文
-                Dim SQL_Str As String =
+            'S0015_ONLINESTAT検索SQL文
+            Dim SQL_Str As String =
                      "SELECT " _
                    & "  isnull(ONLINESW,0) as ONLINESW  " _
                    & ", rtrim(TEXT)        as TEXT      " _
@@ -77,30 +75,34 @@ Public Class CS0008ONLINEstat : Implements IDisposable
                    & " Where TERMID  = @P1              " _
                    & "   and DELFLG <> @P2              "
 
-                If (String.IsNullOrEmpty(Me.COMPCODE) = False) Then SQL_Str &= String.Format(" and CAMPCODE = '{0}' ", Me.COMPCODE)
-                Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.NVarChar, 1)
-                    PARA1.Value = TERMID
-                    PARA2.Value = C_DELETE_FLG.DELETE
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            If (String.IsNullOrEmpty(Me.COMPCODE) = False) Then
+                SQL_Str &= String.Format(" and CAMPCODE = '{0}' ", Me.COMPCODE)
+            End If
 
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
+
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.NVarChar, 30).Value = TERMID
+                    .Add("@P2", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     ONLINESW = 0
                     ERR = C_MESSAGE_NO.DB_ERROR
                     Dim swcnt As Integer = 0
                     While SQLdr.Read
-                        ONLINESW += SQLdr("ONLINESW")
-                        TEXT &= SQLdr("TEXT")
+                        ONLINESW += CInt(SQLdr("ONLINESW"))
+                        TEXT &= Convert.ToString(SQLdr("TEXT"))
                         swcnt += 1
                         ERR = C_MESSAGE_NO.NORMAL
                     End While
-                    ONLINESW = ONLINESW / swcnt
+                    ONLINESW = CInt(ONLINESW / swcnt)
                     'Close
                     SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
-                End Using
-
-            End Using
+                End Using 'SQLdr
+            End Using 'SQLcon, SQLcmd
 
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get

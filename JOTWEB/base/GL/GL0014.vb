@@ -1,5 +1,5 @@
-﻿Imports System.Data.SqlClient
-Imports System.Web.UI.WebControls
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' 基地情報取得
@@ -31,7 +31,7 @@ Public Class GL0014PLANTList
         'O_ERR = OK:00000,ERR:00002(環境エラー),ERR:00003(DBerr)
         '●初期処理
         'PARAM 01: CAMPCODE
-        If checkParam(METHOD_NAME, CAMPCODE) Then
+        If checkParam(METHOD_NAME, CAMPCODE) <> C_MESSAGE_NO.NORMAL Then
             Exit Sub
         End If
 
@@ -69,22 +69,20 @@ Public Class GL0014PLANTList
                     " WHERE   DELFLG       <> @P1       " &
                     "   ORDER BY PLANTCODE  "
 
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.VarChar, 1)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
 
-            PARA1.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                SQLcmd.Parameters.Add("@P1", SqlDbType.VarChar, 1).Value = C_DELETE_FLG.DELETE
 
-            While SQLdr.Read
-                LIST.Items.Add(New ListItem(SQLdr("ROLENAME"), SQLdr("PLANTCODE")))
-            End While
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    While SQLdr.Read
+                        LIST.Items.Add(New ListItem(Convert.ToString(SQLdr("ROLENAME")), Convert.ToString(SQLdr("PLANTCODE"))))
+                    End While
 
-            'Close
-            SQLdr.Close() 'Reader(Close)
-            SQLdr = Nothing
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                End Using
 
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
+            End Using
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0014"                'SUBクラス名

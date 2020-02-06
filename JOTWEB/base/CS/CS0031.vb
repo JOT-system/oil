@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' TableData(Grid)退避　…　性能対策
 ''' </summary>
 ''' <remarks></remarks>
@@ -100,39 +101,42 @@ Public Structure CS0031TABLEsave
         '○退避処理
         If SAVEMODE = SAVING_MODE.WITH_HEADER Then
             '書込ファイル（追加書き込み）を開く
-            Dim SaveHF As New System.IO.StreamWriter(FILEHEADER, True, System.Text.Encoding.UTF8)
-            Dim SAVEHstr As New System.Text.StringBuilder()
-            'ヘッダー部分を保存する
-            For Each Column As DataColumn In TBLDATA.Columns
-
-                SAVEHstr.Append(Column.ColumnName)
-                SAVEHstr.Append(ControlChars.Tab)
-                SAVEHstr.Append(Column.DataType)
-                SAVEHstr.Append(ControlChars.NewLine)
-            Next
-            'ファイル書き込み()
-            Try
-                SaveHF.Write(SAVEHstr)
-            Catch ex As System.SystemException
-                ERR = C_MESSAGE_NO.FILE_IO_ERROR
-                CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "Text File Write"                  '
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
-                CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT & "(" & ex.ToString & ")"
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.FILE_IO_ERROR
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            End Try
-            '閉じる
-            SaveHF.Close()
-            SaveHF.Dispose()
-            SAVEHstr.Clear()
-            SAVEHstr = Nothing
+            Using saveHFs As New IO.FileStream(FILEHEADER, IO.FileMode.Create, IO.FileAccess.Write),
+                  SaveHF As New System.IO.StreamWriter(saveHFs, System.Text.Encoding.UTF8)
+                Dim SAVEHstr As New System.Text.StringBuilder()
+                'ヘッダー部分を保存する
+                For Each Column As DataColumn In TBLDATA.Columns
+                    SAVEHstr.Append(Column.ColumnName)
+                    SAVEHstr.Append(ControlChars.Tab)
+                    SAVEHstr.Append(Column.DataType)
+                    SAVEHstr.Append(ControlChars.NewLine)
+                Next
+                'ファイル書き込み()
+                Try
+                    SaveHF.Write(SAVEHstr)
+                Catch ex As System.SystemException
+                    ERR = C_MESSAGE_NO.FILE_IO_ERROR
+                    CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME              'SUBクラス名
+                    CS0011LOGWRITE.INFPOSI = "Text File Write"                  '
+                    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
+                    CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT & "(" & ex.ToString & ")"
+                    CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.FILE_IO_ERROR
+                    CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+                End Try
+                '閉じる
+                SaveHF.Close()
+                SaveHF.Dispose()
+                SAVEHstr.Clear()
+                SAVEHstr = Nothing
+                saveHFs.Close()
+            End Using
         End If
 
         '書込ファイル（追加書き込み）を開く
-        Using SaveF As New System.IO.StreamWriter(FILEDIR, True, System.Text.Encoding.UTF8)
+        Using saveFs As New IO.FileStream(FILEDIR, IO.FileMode.Create, IO.FileAccess.Write),
+              SaveF As New System.IO.StreamWriter(saveFs, System.Text.Encoding.UTF8)
 
-            Dim SAVEstr As New System.Text.StringBuilder()
+            Dim SAVEstr As New System.Text.StringBuilder
             Dim wITEMarray() As Object
             SaveF.AutoFlush = False
             '行ループ
@@ -171,6 +175,7 @@ Public Structure CS0031TABLEsave
 
             '閉じる
             SaveF.Close()
+            saveFs.Close()
         End Using
 
         ERR = C_MESSAGE_NO.NORMAL

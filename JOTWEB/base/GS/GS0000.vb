@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Option Strict On
+''' <summary>
 ''' GS系根底クラス
 ''' </summary>
 ''' <remarks></remarks>

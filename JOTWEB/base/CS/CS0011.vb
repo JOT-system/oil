@@ -1,4 +1,5 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
 
 ''' <summary>
 ''' ログ出力
@@ -12,7 +13,7 @@ Public Structure CS0011LOGWrite
     ''' <value>SUBCLASS</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property INFSUBCLASS() As String
+    Public Property INFSUBCLASS As String
 
     ''' <summary>
     ''' Position(問題発生場所)
@@ -20,7 +21,7 @@ Public Structure CS0011LOGWrite
     ''' <value>Position</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property INFPOSI() As String
+    Public Property INFPOSI As String
 
     ''' <summary>
     ''' メッセージタイプ
@@ -28,7 +29,7 @@ Public Structure CS0011LOGWrite
     ''' <value>メッセージタイプ</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property NIWEA() As String
+    Public Property NIWEA As String
 
     ''' <summary>
     ''' MessageTEXT
@@ -36,7 +37,7 @@ Public Structure CS0011LOGWrite
     ''' <value>メッセージ文字列</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property TEXT() As String
+    Public Property TEXT As String
 
     ''' <summary>
     ''' MESSAGENO
@@ -44,7 +45,7 @@ Public Structure CS0011LOGWrite
     ''' <value>MESSAGENO</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Property MESSAGENO() As String
+    Public Property MESSAGENO As String
 
     ''' <summary>
     ''' エラーコード
@@ -52,7 +53,7 @@ Public Structure CS0011LOGWrite
     ''' <value>エラーコード</value>
     ''' <returns>0;正常、それ以外：エラー</returns>
     ''' <remarks>OK:00000,ERR:00002(パラメータERR),ERR:00003(DB err),ERR:00004(File io err)</remarks>
-    Public Property ERR() As String
+    Public Property ERR As String
 
     ''' <summary>
     ''' 構造体/関数名
@@ -112,52 +113,42 @@ Public Structure CS0011LOGWrite
         Dim sm As New CS0050SESSION
 
         Try
-
-            'DataBase接続
-            '*共通関数
-            'OIS0002_LOGCNTL検索SQL文
-            Dim SQLcon = sm.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
             Dim SQLstr_LOGCNTL As String = "SELECT A , E , W , I , N " _
                                           & " FROM  COM.OIS0002_LOGCNTL " _
                                           & " Where stymd  <= @P1 " _
                                           & "   and endymd >= @P2 " _
                                           & "   and DELFLG <> @P3 "
-            Dim SQLcmd As New SqlCommand(SQLstr_LOGCNTL, SQLcon)
-            Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.Date)
-            Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-            Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.NVarChar, 1)
-            PARA1.Value = Date.Now
-            PARA2.Value = Date.Now
-            PARA3.Value = C_DELETE_FLG.DELETE
-            Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            'DataBase接続
+            '*共通関数
+            'OIS0002_LOGCNTL検索SQL文
+            Using SQLcon = sm.getConnection,
+                  SQLcmd As New SqlCommand(SQLstr_LOGCNTL, SQLcon)
+                SQLcon.Open() 'DataBase接続(Open)
+                With SQLcmd.Parameters
+                    .Add("@P1", SqlDbType.Date).Value = Date.Now
+                    .Add("@P2", SqlDbType.Date).Value = Date.Now
+                    .Add("@P3", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
 
-            While SQLdr.Read
-                Select Case NIWEA.ToUpper
-                    Case C_MESSAGE_TYPE.ABORT  '異常(DataBase以外のERRLog出力)
-                        W_OUTPUTSW = SQLdr(C_MESSAGE_TYPE.ABORT)
-                    Case C_MESSAGE_TYPE.ERR  'エラー(ファイル出力等)
-                        W_OUTPUTSW = SQLdr(C_MESSAGE_TYPE.ERR)
-                    Case C_MESSAGE_TYPE.WAR   '警告()
-                        W_OUTPUTSW = SQLdr(C_MESSAGE_TYPE.WAR)
-                    Case C_MESSAGE_TYPE.INF  'インフォメーション(トランザクション処理の開始・終了)
-                        W_OUTPUTSW = SQLdr(C_MESSAGE_TYPE.INF)
-                    Case C_MESSAGE_TYPE.NOR  '正常終了(DataBase更新)
-                        W_OUTPUTSW = SQLdr(C_MESSAGE_TYPE.NOR)
-                End Select
-            End While
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    While SQLdr.Read
+                        Select Case NIWEA.ToUpper
+                            Case C_MESSAGE_TYPE.ABORT  '異常(DataBase以外のERRLog出力)
+                                W_OUTPUTSW = Convert.ToString(SQLdr(C_MESSAGE_TYPE.ABORT))
+                            Case C_MESSAGE_TYPE.ERR  'エラー(ファイル出力等)
+                                W_OUTPUTSW = Convert.ToString(SQLdr(C_MESSAGE_TYPE.ERR))
+                            Case C_MESSAGE_TYPE.WAR   '警告()
+                                W_OUTPUTSW = Convert.ToString(SQLdr(C_MESSAGE_TYPE.WAR))
+                            Case C_MESSAGE_TYPE.INF  'インフォメーション(トランザクション処理の開始・終了)
+                                W_OUTPUTSW = Convert.ToString(SQLdr(C_MESSAGE_TYPE.INF))
+                            Case C_MESSAGE_TYPE.NOR  '正常終了(DataBase更新)
+                                W_OUTPUTSW = Convert.ToString(SQLdr(C_MESSAGE_TYPE.NOR))
+                        End Select
+                    End While
+                    SQLdr.Close()
+                End Using
 
-            SQLdr.Close()
-            SQLdr.Dispose()
-            SQLdr = Nothing
-
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-            SQLcon.Close()
-            SQLcon.Dispose()
-            SQLcon = Nothing
+            End Using 'SQLcon, SQLcmd
 
         Catch ex As Exception
             'エラーログのエラーは処理できない
@@ -176,27 +167,21 @@ Public Structure CS0011LOGWrite
                 W_LOGDIR = W_LOGDIR & DateTime.Now.ToString("yyyyMMddHHmmss")
                 W_LOGDIR = W_LOGDIR & DateTime.Now.Millisecond & "-"
                 W_LOGDIR = W_LOGDIR & NIWEA & MESSAGENO & ".txt"
-                Dim ERRLog As New System.IO.StreamWriter(W_LOGDIR, True, System.Text.Encoding.UTF8)
-
-                'ＥＲＲＬｏｇ出力
-                Dim W_ERRTEXT As String
-                W_ERRTEXT = "DATETIME = " & DateTime.Now.ToString & " , "
-                W_ERRTEXT = W_ERRTEXT & "Term = " & sm.TERMID & " , "
-                W_ERRTEXT = W_ERRTEXT & "Camp = " & sm.TERM_COMPANY & " , "
-                W_ERRTEXT = W_ERRTEXT & "Userid = " & sm.USERID & " , "
-                W_ERRTEXT = W_ERRTEXT & "SubClass = " & INFSUBCLASS & " , "
-                W_ERRTEXT = W_ERRTEXT & "Position = " & INFPOSI & " , "
-                W_ERRTEXT = W_ERRTEXT & "MESSAGENO = " & MESSAGENO & " , "
-                W_ERRTEXT = W_ERRTEXT & "TEXT = " & TEXT
-                'スタックトレース追加
-                W_ERRTEXT = W_ERRTEXT & Environment.NewLine & Environment.NewLine & Environment.StackTrace
-                ERRLog.Write(W_ERRTEXT)
-
-                '閉じる
-                ERRLog.Close()
-                ERRLog.Dispose()
-                ERRLog = Nothing
-
+                Using ERRLog As New System.IO.StreamWriter(W_LOGDIR, True, System.Text.Encoding.UTF8)
+                    'ＥＲＲＬｏｇ出力
+                    Dim W_ERRTEXT As String
+                    W_ERRTEXT = "DATETIME = " & DateTime.Now.ToString & " , "
+                    W_ERRTEXT = W_ERRTEXT & "Term = " & sm.TERMID & " , "
+                    W_ERRTEXT = W_ERRTEXT & "Camp = " & sm.TERM_COMPANY & " , "
+                    W_ERRTEXT = W_ERRTEXT & "Userid = " & sm.USERID & " , "
+                    W_ERRTEXT = W_ERRTEXT & "SubClass = " & INFSUBCLASS & " , "
+                    W_ERRTEXT = W_ERRTEXT & "Position = " & INFPOSI & " , "
+                    W_ERRTEXT = W_ERRTEXT & "MESSAGENO = " & MESSAGENO & " , "
+                    W_ERRTEXT = W_ERRTEXT & "TEXT = " & TEXT
+                    'スタックトレース追加
+                    W_ERRTEXT = W_ERRTEXT & Environment.NewLine & Environment.NewLine & Environment.StackTrace
+                    ERRLog.Write(W_ERRTEXT)
+                End Using
                 '全体
             Catch ex As System.SystemException
                 ERR = C_MESSAGE_NO.FILE_IO_ERROR 'IO ERR
@@ -207,5 +192,4 @@ Public Structure CS0011LOGWrite
         End If
 
     End Sub
-
 End Structure

@@ -7021,10 +7021,12 @@ Public Class OIT0003OrderDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '(一覧)チェック(準備)
-        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+        For Each OIT0003row As DataRow In OIT0003tbl_tab2.Rows
             OIT0003row("ORDERINFO") = ""
             OIT0003row("ORDERINFONAME") = ""
         Next
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
 
         '〇 充填ポイントでソートし、重複がないかチェックする。
         Dim OIT0003tbl_DUMMY As DataTable = OIT0003tbl_tab2.Copy
@@ -7084,14 +7086,229 @@ Public Class OIT0003OrderDetail
                 '○ 画面表示データ保存
                 Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
                 'Exit Sub
+            Else
+                WW_LoadingTotalCars = WW_GetValue(0)
+
             End If
-            WW_LoadingTotalCars = WW_GetValue(0)
         Next
         If O_RTN = "ERR2" Then Exit Sub
 
+        '〇 積込可能件数チェック
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
 
+            WW_CheckLoadingCnt(WW_ERRCODE, SQLcon)
+            If WW_ERRCODE = "ERR3" Then
+                Exit Sub
+            End If
+        End Using
 
     End Sub
+
+    ''' <summary>
+    ''' 積込可能件数チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckLoadingCnt(ByRef O_RTN As String, ByVal SQLcon As SqlConnection)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
+        '○ チェックSQL
+        '　説明
+        '     受注TBL, 受注明細TBLと油種マスタから積込可能件数の値を取得しチェックする
+
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   ISNULL(RTRIM(MERGE_TBL.PLANTCODE), '')    AS PLANTCODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.PLANTNAME), '')    AS PLANTNAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.BIGOILCODE), '')   AS BIGOILCODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.CHECKOILCODE), '') AS CHECKOILCODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.CHECKOILNAME), '') AS CHECKOILNAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.TANKCOUNT), '')    AS TANKCOUNT" _
+            & " , ISNULL(RTRIM(OIM0014.BIGOILCODE), '')     AS CHK_BIGOILCODE" _
+            & " , ISNULL(RTRIM(OIM0014.CHECKOILCODE), '')   AS CHK_CHECKOILCODE" _
+            & " , ISNULL(RTRIM(OIM0014.TANKCOUNT), '')      AS CHK_TANKCOUNT" _
+            & " , CASE WHEN MERGE_TBL.TANKCOUNT <= OIM0014.TANKCOUNT THEN 0 " _
+            & "   ELSE 1 " _
+            & "   END                                       AS JUDGE " _
+            & " FROM ( "
+
+        '基地コード毎の油種件数一覧
+        SQLStr &=
+              " SELECT " _
+            & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
+            & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
+            & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
+            & " , ISNULL(RTRIM(OIM0003.CHECKOILCODE), '') AS CHECKOILCODE" _
+            & " , ISNULL(RTRIM(OIM0003.CHECKOILNAME), '') AS CHECKOILNAME" _
+            & " , COUNT(1)                                AS TANKCOUNT" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON" _
+            & "        OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "    AND OIT0003.DELFLG <> @P02" _
+            & " INNER JOIN OIL.OIM0003_PRODUCT OIM0003 ON" _
+            & "        OIM0003.OFFICECODE     = OIT0002.OFFICECODE " _
+            & "    AND OIM0003.SHIPPERCODE    = OIT0002.SHIPPERSCODE" _
+            & "    AND OIM0003.PLANTCODE      = OIT0002.BASECODE" _
+            & "    AND OIM0003.OILCODE        = OIT0003.OILCODE" _
+            & "    AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE" _
+            & "    AND OIM0003.DELFLG        <> @P02" _
+            & " INNER JOIN OIL.OIM0009_PLANT OIM0009 ON" _
+            & "        OIM0009.PLANTCODE      = OIM0003.PLANTCODE " _
+            & "    AND OIM0009.DELFLG        <> @P02" _
+            & " WHERE OIT0002.ORDERNO = @P01" _
+            & "    AND OIT0002.DELFLG <> @P02" _
+            & " GROUP BY " _
+            & "   OIM0003.PLANTCODE" _
+            & " , OIM0009.PLANTNAME" _
+            & " , OIM0003.BIGOILCODE" _
+            & " , OIM0003.CHECKOILCODE" _
+            & " , OIM0003.CHECKOILNAME"
+
+        '基地コード毎の油種大分類件数一覧
+        SQLStr &=
+              " UNION ALL " _
+            & " SELECT " _
+            & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
+            & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
+            & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
+            & " , 'ZZZZ'                                  AS CHECKOILCODE" _
+            & " , ISNULL(RTRIM(OIM0003.BIGOILNAME), '')   AS CHECKOILNAME" _
+            & " , COUNT(1)                                AS TANKCOUNT" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON" _
+            & "        OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "    AND OIT0003.DELFLG <> @P02" _
+            & " INNER JOIN OIL.OIM0003_PRODUCT OIM0003 ON" _
+            & "        OIM0003.OFFICECODE     = OIT0002.OFFICECODE " _
+            & "    AND OIM0003.SHIPPERCODE    = OIT0002.SHIPPERSCODE" _
+            & "    AND OIM0003.PLANTCODE      = OIT0002.BASECODE" _
+            & "    AND OIM0003.OILCODE        = OIT0003.OILCODE" _
+            & "    AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE" _
+            & "    AND OIM0003.DELFLG        <> @P02" _
+            & " INNER JOIN OIL.OIM0009_PLANT OIM0009 ON" _
+            & "        OIM0009.PLANTCODE      = OIM0003.PLANTCODE " _
+            & "    AND OIM0009.DELFLG        <> @P02" _
+            & " WHERE OIT0002.ORDERNO = @P01" _
+            & "    AND OIT0002.DELFLG <> @P02" _
+            & " GROUP BY " _
+            & "   OIM0003.PLANTCODE" _
+            & " , OIM0009.PLANTNAME" _
+            & " , OIM0003.BIGOILCODE" _
+            & " , OIM0003.BIGOILNAME"
+
+        '基地コード毎の油種合計件数一覧
+        SQLStr &=
+              " UNION ALL " _
+            & " SELECT " _
+            & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
+            & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
+            & " , ''                                      AS BIGOILCODE" _
+            & " , ''                                      AS CHECKOILCODE" _
+            & " , '合計'                                  AS CHECKOILNAME" _
+            & " , COUNT(1)                                AS TANKCOUNT" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON" _
+            & "        OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "    AND OIT0003.DELFLG <> @P02" _
+            & " INNER JOIN OIL.OIM0003_PRODUCT OIM0003 ON" _
+            & "        OIM0003.OFFICECODE     = OIT0002.OFFICECODE " _
+            & "    AND OIM0003.SHIPPERCODE    = OIT0002.SHIPPERSCODE" _
+            & "    AND OIM0003.PLANTCODE      = OIT0002.BASECODE" _
+            & "    AND OIM0003.OILCODE        = OIT0003.OILCODE" _
+            & "    AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE" _
+            & "    AND OIM0003.DELFLG        <> @P02" _
+            & " INNER JOIN OIL.OIM0009_PLANT OIM0009 ON" _
+            & "        OIM0009.PLANTCODE      = OIM0003.PLANTCODE " _
+            & "    AND OIM0009.DELFLG        <> @P02" _
+            & " WHERE OIT0002.ORDERNO  = @P01" _
+            & "    AND OIT0002.DELFLG <> @P02" _
+            & " GROUP BY " _
+            & "   OIM0003.PLANTCODE" _
+            & " , OIM0009.PLANTNAME"
+
+        SQLStr &=
+              " ) MERGE_TBL " _
+            & " LEFT JOIN ( " _
+            & "      SELECT " _
+            & "        OIM0014.PLANTCODE " _
+            & "      , OIM0014.BIGOILCODE " _
+            & "      , OIM0014.CHECKOILCODE " _
+            & "      , OIM0014.TANKCOUNT " _
+            & "      FROM OIL.OIM0014_LOADCALC OIM0014 " _
+            & "      UNION ALL " _
+            & "      SELECT " _
+            & "        OIM0014_TOTAL.PLANTCODE " _
+            & "      , '' AS BIGOILCODE " _
+            & "      , '' AS CHECKOILCODE " _
+            & "      , SUM(OIM0014_TOTAL.TANKCOUNT) AS TANKCOUNT " _
+            & "      FROM OIL.OIM0014_LOADCALC OIM0014_TOTAL " _
+            & "      WHERE OIM0014_TOTAL.CHECKOILCODE = 'ZZZZ' " _
+            & "      GROUP BY " _
+            & "        OIM0014_TOTAL.PLANTCODE " _
+            & " ) OIM0014 ON" _
+            & "     OIM0014.PLANTCODE = MERGE_TBL.PLANTCODE " _
+            & " AND OIM0014.BIGOILCODE = MERGE_TBL.BIGOILCODE " _
+            & " AND OIM0014.CHECKOILCODE = MERGE_TBL.CHECKOILCODE "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA2.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLdr)
+                End Using
+
+                For Each OIT0003UPDrow As DataRow In OIT0003WKtbl.Rows
+                    If OIT0003UPDrow("JUDGE") = "1" Then
+                        Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+                        WW_CheckMES1 = "積込可能車数オーバー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
+                        WW_CheckTRAINCARSERR(WW_CheckMES1, WW_CheckMES2, OIT0003UPDrow)
+                        O_RTN = "ERR3"
+                        Exit Sub
+                    End If
+                Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D CHECK_LOADINGCNT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D CHECK_LOADINGCNT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
 
     ''' <summary>
     ''' 本線列車に紐づく情報を取得

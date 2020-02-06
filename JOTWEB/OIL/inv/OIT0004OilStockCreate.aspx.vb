@@ -157,6 +157,8 @@ Public Class OIT0004OilStockCreate
             isShowSuggestList = Me.IsShowSuggestList(sqlCon, consignee)
         End Using
         Dim dispDataObj = New DispDataClass(daysList, trainList, oilTypeList)
+        '取得値を元に再計算
+        dispDataObj.RecalcStockList()
         'コンストラクタで生成したデータを画面に貼り付け
         dispDataObj.ShowSuggestList = isShowSuggestList
         '1.提案リスト
@@ -979,6 +981,11 @@ Public Class OIT0004OilStockCreate
 
         Public Property LastSendAverage As Decimal
         ''' <summary>
+        ''' 画面表示期間より１日前の夕在庫
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OffScreenLastEveningStock As Decimal
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
         ''' <param name="oilCode"></param>
@@ -998,22 +1005,63 @@ Public Class OIT0004OilStockCreate
                     Me.DS = 44
                     Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 280
+                    Me.OffScreenLastEveningStock = 520
                 Case "1101" 'レギュラー
                     Me.Weight = 0.75D
+                    Me.MaxTankCap = 2780
+                    Me.DS = 112
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 800
+                    Me.OffScreenLastEveningStock = 2222
                 Case "1301" '灯油
                     Me.Weight = 0.79D
+                    Me.MaxTankCap = 1709
+                    Me.DS = 101
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 250
+                    Me.OffScreenLastEveningStock = 1360
                 Case "1401" '軽油
                     Me.Weight = 0.75D
+                    Me.MaxTankCap = 13714
+                    Me.DS = 594
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 5800
+                    Me.OffScreenLastEveningStock = 11000
                 Case "2101" 'Ａ重油
                     Me.Weight = 0.87D
+                    Me.MaxTankCap = 1299
+                    Me.DS = 98
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 150
+                    Me.OffScreenLastEveningStock = 500
                 Case "2201" 'ＬＳＡ
                     Me.Weight = 0.87D
+                    Me.MaxTankCap = 584
+                    Me.DS = 41
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 75
+                    Me.OffScreenLastEveningStock = 400
                 Case "1302" '未添加灯油
                     Me.Weight = 0.75D
+                    Me.MaxTankCap = 2780
+                    Me.DS = 112
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 800
+                    Me.OffScreenLastEveningStock = 1360
                 Case "1404" '３号軽油
                     Me.Weight = 0.82D
+                    Me.MaxTankCap = 13714
+                    Me.DS = 594
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 0
+                    Me.OffScreenLastEveningStock = 10800
                 Case Else
                     Me.Weight = 0.75D
+                    Me.MaxTankCap = 956
+                    Me.DS = 44
+                    Me.TankCapRate = 0.8D
+                    Me.LastSendAverage = 280
+                    Me.OffScreenLastEveningStock = 1360
             End Select
 
         End Sub
@@ -1031,6 +1079,10 @@ Public Class OIT0004OilStockCreate
         Public Function Copy() As OilItem
             Dim retVal As New OilItem(Me.OilCode, Me.OilName, Me.BigOilCode, Me.MiddleOilCode)
             retVal.Weight = Me.Weight
+            retVal.MaxTankCap = Me.MaxTankCap
+            retVal.TankCapRate = Me.TankCapRate
+            retVal.DS = Me.DS
+            retVal.LastSendAverage = Me.LastSendAverage
             Return retVal
         End Function
     End Class
@@ -1273,7 +1325,13 @@ Public Class OIT0004OilStockCreate
                 'チェックをしている値のみ合計する
                 If tgtItm.CheckValue Then
                     If tgtItm.SuggestValuesItem.ContainsKey(oilCode) Then
-                        retVal = retVal + Decimal.Parse(tgtItm.SuggestValuesItem(oilCode).ItemValue)
+                        '入力値 * 45 / Weight
+                        Dim suggestItm = tgtItm.SuggestValuesItem(oilCode)
+                        Dim calcVal As Decimal = 0
+                        If suggestItm.OilInfo.Weight <> 0 Then
+                            calcVal = Math.Floor(Decimal.Parse(suggestItm.ItemValue) * 45 / suggestItm.OilInfo.Weight)
+                        End If
+                        retVal = retVal + calcVal
                     End If
                 End If
             Next
@@ -1301,14 +1359,19 @@ Public Class OIT0004OilStockCreate
                         '◆1行目 前日夕在庫(前日データの夕在庫フィールドを格納)
                         itm.LastEveningStock = prevItm.EveningStock
                         '◆3行目 朝在庫 ※計算順序に営業するため2行目処理より前に持ってくること
-                        itm.MorningStock = (Decimal.Parse(prevItm.MorningStock) + prevItm.Receive - Decimal.Parse(prevItm.Send)).ToString
-
+                        decMorningStockVal = Decimal.Parse(prevItm.MorningStock) + prevItm.Receive - Decimal.Parse(prevItm.Send)
+                        itm.MorningStock = decMorningStockVal.ToString
+                    Else
+                        '画面期間外の前日夕在庫が朝在庫となる
+                        'decMorningStockVal = stockListItm.OilInfo.OffScreenLastEveningStock
+                        'itm.LastEveningStock = decMorningStockVal
+                        'itm.MorningStock = decMorningStockVal.ToString
                     End If
                     '◆2行目 保有日数(朝在庫 / 前週出荷平均)
                     If stockListItm.LastShipmentAve = 0 Then
                         itm.Retentiondays = 0
                     Else
-                        itm.Retentiondays = stockListItm.LastShipmentAve
+                        itm.Retentiondays = Math.Round(decMorningStockVal / stockListItm.LastShipmentAve, 1)
                     End If
                     '◆4行目 受入数 (提案リストの値)
                     If Me.ShowSuggestList = True Then
@@ -1326,10 +1389,11 @@ Public Class OIT0004OilStockCreate
                     '◆8行目 空き容量 (夕在庫 -  D/S)
                     itm.FreeSpace = stockListItm.TargetStock - ((decMorningStockVal + itm.Receive) - decSendVal)
                     '◆9行目 在庫率
-                    If stockListItm.TargetStockRate = 0 Then
+                    If stockListItm.TargetStock = 0 Then
                         itm.StockRate = 0
                     Else
-                        itm.StockRate = itm.FreeSpace / stockListItm.TargetStockRate
+                        '夕在庫 / 目標在庫
+                        itm.StockRate = Math.Round(itm.EveningStock / stockListItm.TargetStock, 3)
                     End If
                 Next itm '当日の油種ごとのオブジェクトループ
 
@@ -1492,16 +1556,21 @@ Public Class OIT0004OilStockCreate
                 Me.OilInfo = oilTypeItem
                 '２列目から４列目のタンク容量～前週出荷平均については
                 '一旦0
-                Me.TankCapacity = 12345.6D
-                Me.TargetStock = 0
-                Me.TargetStockRate = 0
-                Me.Stock80 = 0
-                Me.DS = 0
-                Me.LastShipmentAve = 0
+                Me.TankCapacity = oilTypeItem.MaxTankCap
+                Me.TargetStock = Math.Round(oilTypeItem.MaxTankCap * oilTypeItem.TankCapRate, 1)
+                Me.TargetStockRate = Math.Round(oilTypeItem.TankCapRate * 100, 1)
+                Me.Stock80 = Math.Round(oilTypeItem.MaxTankCap * oilTypeItem.TankCapRate, 1)
+                Me.DS = oilTypeItem.DS
+                Me.LastShipmentAve = oilTypeItem.LastSendAverage
                 Me.StockItemList = New Dictionary(Of String, StockListItem)
                 For Each dateVal In dateItem
                     Dim item = New StockListItem(dateVal.Key, dateVal.Value)
+                    If dateItem.Keys(0) = dateVal.Key Then
+                        item.LastEveningStock = oilTypeItem.OffScreenLastEveningStock
+                        item.MorningStock = oilTypeItem.OffScreenLastEveningStock.ToString
+                    End If
                     Me.StockItemList.Add(dateVal.Key, item)
+
                 Next
             End Sub
             ''' <summary>

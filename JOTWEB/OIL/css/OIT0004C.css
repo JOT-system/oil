@@ -567,3 +567,43 @@ div.oilTypeData div.col1 span[data-tiptext] {
 #pnlWeightList {
     display:none;
 }
+/* ************************ */
+/* ↓表見出し固定ここから↓ */
+/* ************************ */
+/* IEはposition sticky未対応なのでそのまま */
+#divStockList > .header {
+    position: sticky;
+    top: -10px;
+    z-index: 3;
+}
+
+_:-ms-lang(x)::backdrop,
+#divStockList > .header {
+    top: 0px;
+}
+
+#divStockList > .header > .emptyBox {
+    background-color:rgb(249,249,249);
+}
+#divSuggestList > .leftColumn {
+    position:sticky;
+    left:-10px;
+    z-index:3;
+}
+#divSuggestList > .oilTypeColumn {
+    position: sticky;
+    left: 70px;
+    z-index: 3;
+}
+_:-ms-lang(x)::backdrop,
+#divSuggestList > .leftColumn {
+    left: 0;
+}
+_:-ms-lang(x)::backdrop,
+#divSuggestList > .oilTypeColumn {
+    left: 80px;
+}
+
+/* ************************ */
+/* ↑表見出し固定ここまで↑ */
+/* ************************ */

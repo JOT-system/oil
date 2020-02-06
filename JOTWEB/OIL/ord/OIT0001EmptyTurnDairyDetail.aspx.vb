@@ -2751,6 +2751,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Continue For
             End If
 
+            WW_GetValue = {"", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch(OIT0001row("LASTOILCODE") + OIT0001row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0001row("OILCODE") + OIT0001row("ORDERINGTYPE"), WW_GetValue)
 
             If WW_GetValue(2) = "1" Then

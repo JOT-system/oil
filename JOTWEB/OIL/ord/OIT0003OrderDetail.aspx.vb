@@ -1248,7 +1248,9 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0003.LINE), '')                    AS LINE" _
             & " , ISNULL(RTRIM(OIT0003.FILLINGPOINT), '')            AS FILLINGPOINT" _
             & " , ISNULL(RTRIM(OIT0003.OILCODE), '')                 AS OILCODE" _
-            & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS OILNAME" _
+            & " , ISNULL(RTRIM(OIT0003.OILNAME), '')                 AS OILNAME" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')            AS ORDERINGTYPE" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS ORDERINGOILNAME" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
             & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
             & " , ISNULL(RTRIM(OIT0003.LOADINGOUTLETTRAINNO), '')    AS LOADINGOUTLETTRAINNO" _
@@ -2862,6 +2864,16 @@ Public Class OIT0003OrderDetail
         rightview.SetErrorReport("")
 
         Dim WW_RESULT As String = ""
+
+        '〇 積場スペックチェック
+        WW_CheckLoadingSpecs(WW_ERRCODE)
+        If WW_ERRCODE = "ERR1" Then
+            Master.Output(C_MESSAGE_NO.OIL_FILLINGPOINT_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        ElseIf WW_ERRCODE = "ERR2" Then
+            Master.Output(C_MESSAGE_NO.OIL_LOADINGSPECS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
 
         '受注明細DB更新
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -5322,6 +5334,11 @@ Public Class OIT0003OrderDetail
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                         SQLcon.Open()       'DataBase接続
 
+                        '######################################################
+                        '受注営業所を変更した時点で、新規登録と同様の扱いとする。
+                        work.WF_SEL_CREATEFLG.Text = "1"
+                        work.WF_SEL_CREATELINKFLG.Text = "1"
+                        '######################################################
                         MAPDataGet(SQLcon, 0)
                     End Using
 
@@ -6775,6 +6792,7 @@ Public Class OIT0003OrderDetail
 
         '前回油種と油種の整合性チェック
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            WW_GetValue = {"", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch(OIT0003row("LASTOILCODE") + OIT0003row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0003row("OILCODE") + OIT0003row("ORDERINGTYPE"), WW_GetValue)
 
             If WW_GetValue(2) = "1" Then
@@ -6834,8 +6852,8 @@ Public Class OIT0003OrderDetail
 
             '高速列車区分＝"1"(高速列車)、かつ型式<>"タキ1000"の場合はエラー
             If WW_GetValue(5) = "1" And OIT0003row("MODEL") <> "タキ1000" Then
-                OIT0003row("ORDERINFO") = "84"
-                OIT0003row("ORDERINFONAME") = "高速列車非対応"
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_84
+                CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 
                 Master.Output(C_MESSAGE_NO.OIL_SPEEDTRAINTANK_ERROR,
                               C_MESSAGE_TYPE.ERR,
@@ -6991,6 +7009,91 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 積場スペックチェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckLoadingSpecs(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_LoadingTotalCars As Integer = 0
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '(一覧)チェック(準備)
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            OIT0003row("ORDERINFO") = ""
+            OIT0003row("ORDERINFONAME") = ""
+        Next
+
+        '〇 充填ポイントでソートし、重複がないかチェックする。
+        Dim OIT0003tbl_DUMMY As DataTable = OIT0003tbl_tab2.Copy
+        Dim OIT0003tbl_dv As DataView = New DataView(OIT0003tbl_DUMMY)
+        Dim chkFillingPoint As String = ""
+        OIT0003tbl_dv.Sort = "FILLINGPOINT"
+        For Each drv As DataRowView In OIT0003tbl_dv
+            If drv("HIDDEN") <> "1" AndAlso drv("FILLINGPOINT") <> "" AndAlso chkFillingPoint = drv("FILLINGPOINT") Then
+                'Master.Output(C_MESSAGE_NO.OIL_FILLINGPOINT_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "充填ポイント重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_FILLINGPOINT_REPEAT_ERROR
+                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR1"
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = OIT0003tbl_tab2.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = drv("LINECNT"))
+                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_86
+                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+                'Exit Sub
+            End If
+
+            '行削除したデータの場合は退避しない。
+            If drv("HIDDEN") <> "1" Then
+                chkFillingPoint = drv("FILLINGPOINT")
+            End If
+        Next
+        If O_RTN = "ERR1" Then Exit Sub
+
+        '〇 積場スペックチェック
+        For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
+            WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            WW_FixvalueMasterSearch(work.WF_SEL_BASECODE.Text,
+                                "LOADINGSPECS",
+                                OIT0003tab2row("OILCODE") _
+                                + OIT0003tab2row("ORDERINGTYPE") _
+                                + OIT0003tab2row("FILLINGPOINT"),
+                                WW_GetValue)
+
+            If WW_GetValue(0) = "" Then
+                'Master.Output(C_MESSAGE_NO.OIL_LOADINGSPECS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+                WW_CheckMES1 = "積場スペックエラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADINGSPECS_ERROR
+                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003tab2row)
+                O_RTN = "ERR2"
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = OIT0003tbl_tab2.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = OIT0003tab2row("LINECNT"))
+                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_81
+                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+                'Exit Sub
+            End If
+            WW_LoadingTotalCars = WW_GetValue(0)
+        Next
+        If O_RTN = "ERR2" Then Exit Sub
+
+
+
+    End Sub
+
+    ''' <summary>
     ''' 本線列車に紐づく情報を取得
     ''' </summary>
     ''' <param name="I_Value"></param>
@@ -7101,7 +7204,7 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
-    ''' エラーレポート編集(一覧用)
+    ''' エラーレポート編集(一覧用(タブ「タンク車割当」))
     ''' </summary>
     ''' <param name="MESSAGE1"></param>
     ''' <param name="MESSAGE2"></param>
@@ -7125,6 +7228,34 @@ Public Class OIT0003OrderDetail
         rightview.AddErrorReport(WW_ERR_MES)
 
     End Sub
+
+    ''' <summary>
+    ''' エラーレポート編集(一覧用(タブ「入換・積込指示」))
+    ''' </summary>
+    ''' <param name="MESSAGE1"></param>
+    ''' <param name="MESSAGE2"></param>
+    ''' <param name="OIM0003row"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckListTab2ERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIM0003row As DataRow = Nothing)
+
+        Dim WW_ERR_MES As String = ""
+        WW_ERR_MES = MESSAGE1
+        If MESSAGE2 <> "" Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+        End If
+
+        If Not IsNothing(OIM0003row) Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 項番               =" & OIM0003row("LINECNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 回線               =" & OIM0003row("LINE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 充填ポイント       =" & OIM0003row("FILLINGPOINT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注油種           =" & OIM0003row("ORDERINGOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車№         =" & OIM0003row("TANKNO")
+        End If
+
+        rightview.AddErrorReport(WW_ERR_MES)
+
+    End Sub
+
 
     ''' <summary>
     ''' エラーレポート編集(列車牽引車数オーバー)

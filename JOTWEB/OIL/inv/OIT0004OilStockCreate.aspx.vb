@@ -1363,9 +1363,9 @@ Public Class OIT0004OilStockCreate
                         itm.MorningStock = decMorningStockVal.ToString
                     Else
                         '画面期間外の前日夕在庫が朝在庫となる
-                        decMorningStockVal = stockListItm.OilInfo.OffScreenLastEveningStock
-                        itm.LastEveningStock = decMorningStockVal
-                        itm.MorningStock = decMorningStockVal.ToString
+                        'decMorningStockVal = stockListItm.OilInfo.OffScreenLastEveningStock
+                        'itm.LastEveningStock = decMorningStockVal
+                        'itm.MorningStock = decMorningStockVal.ToString
                     End If
                     '◆2行目 保有日数(朝在庫 / 前週出荷平均)
                     If stockListItm.LastShipmentAve = 0 Then
@@ -1565,7 +1565,12 @@ Public Class OIT0004OilStockCreate
                 Me.StockItemList = New Dictionary(Of String, StockListItem)
                 For Each dateVal In dateItem
                     Dim item = New StockListItem(dateVal.Key, dateVal.Value)
+                    If dateItem.Keys(0) = dateVal.Key Then
+                        item.LastEveningStock = oilTypeItem.OffScreenLastEveningStock
+                        item.MorningStock = oilTypeItem.OffScreenLastEveningStock.ToString
+                    End If
                     Me.StockItemList.Add(dateVal.Key, item)
+
                 Next
             End Sub
             ''' <summary>

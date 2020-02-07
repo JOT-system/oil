@@ -275,6 +275,18 @@ Public Module BaseDllConst
     ''' 充填ポイント重複 
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_86 As String = "86"
+    ''' <summary>
+    ''' 積込可能(油種毎)件数オーバー 
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_87 As String = "87"
+    ''' <summary>
+    ''' 積込可能(油種大分類毎)件数オーバー 
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_88 As String = "88"
+    ''' <summary>
+    ''' 積込可能(油種合計)件数オーバー 
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_89 As String = "89"
 
     ''' <summary>
     ''' 失注（荷主都合）

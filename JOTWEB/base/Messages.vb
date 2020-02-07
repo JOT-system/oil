@@ -462,19 +462,9 @@ Public Module Messages
         Public Const OIL_FILLINGPOINT_REPEAT_ERROR As String = "20019"
 
         ''' <summary>
-        ''' 積込可能油種(油種毎)件数オーバー
+        ''' 積込可能油種件数オーバー
         ''' </summary>
         Public Const OIL_LOADING_OIL_RECORD_OVER As String = "20020"
-
-        ''' <summary>
-        ''' 積込可能油種(油種大分類毎)件数オーバー
-        ''' </summary>
-        Public Const OIL_LOADING_BIGOIL_RECORD_OVER As String = "20021"
-
-        ''' <summary>
-        ''' 積込可能油種(油種合計)件数オーバー
-        ''' </summary>
-        Public Const OIL_LOADING_OILTOTAL_RECORD_OVER As String = "20022"
 
 #End Region
 

@@ -7099,6 +7099,7 @@ Public Class OIT0003OrderDetail
 
             WW_CheckLoadingCnt(WW_ERRCODE, SQLcon)
             If WW_ERRCODE = "ERR3" Then
+                Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 Exit Sub
             End If
         End Using
@@ -7125,10 +7126,17 @@ Public Class OIT0003OrderDetail
 
         OIT0003WKtbl.Clear()
 
+        '(一覧)チェック(準備)
+        For Each OIT0003row As DataRow In OIT0003tbl_tab2.Rows
+            OIT0003row("ORDERINFO") = ""
+            OIT0003row("ORDERINFONAME") = ""
+        Next
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
         '○ チェックSQL
         '　説明
         '     受注TBL, 受注明細TBLと油種マスタから積込可能件数の値を取得しチェックする
-
         Dim SQLStr As String =
               " SELECT " _
             & "   ISNULL(RTRIM(MERGE_TBL.PLANTCODE), '')    AS PLANTCODE" _
@@ -7281,11 +7289,48 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 For Each OIT0003UPDrow As DataRow In OIT0003WKtbl.Rows
+                    '"1"(車数オーバー)
                     If OIT0003UPDrow("JUDGE") = "1" Then
-                        Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                        WW_CheckMES1 = "積込可能車数オーバー。"
-                        WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0003tbl_tab2.AsEnumerable.
+                                          FirstOrDefault(Function(x) x.Item("LINECNT") = OIT0003UPDrow("LINECNT"))
+
+                        Select Case OIT0003UPDrow("CHECKOILCODE")
+                            '油種(白油・黒油)合計チェック
+                            Case "ZZZZ"
+                                WW_CheckMES1 = "積込可能(油種大分類毎)件数オーバー。"
+                                WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
+
+                                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_88
+                                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                                '○ 画面表示データ保存
+                                Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
+                            '油種合計チェック
+                            Case ""
+                                WW_CheckMES1 = "積込可能(油種合計)件数オーバー。"
+                                WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
+
+                                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_89
+                                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                                '○ 画面表示データ保存
+                                Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
+                                '油種(各種)合計チェック
+                            Case Else
+                                WW_CheckMES1 = "積込可能(油種毎)件数オーバー。"
+                                WW_CheckMES2 = C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER
+
+                                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_87
+                                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                                '○ 画面表示データ保存
+                                Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+                        End Select
+
                         WW_CheckTRAINCARSERR(WW_CheckMES1, WW_CheckMES2, OIT0003UPDrow)
                         O_RTN = "ERR3"
                         Exit Sub

@@ -70,7 +70,7 @@
             <span>
                 <a id="WF_HEADOFFICETRAIN_LABEL" class="requiredMark">本線列車</a>
                 <a class="ef" id="WF_HEADOFFICETRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
-                    <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>
+                    <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" CssClass="boxIcon iconOnly" readonly="true" MaxLength="4"></asp:TextBox>
                     <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                 </a>
             </span>
@@ -79,7 +79,7 @@
             <span>
                 <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
                 <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
-                    <asp:TextBox ID="TxtDepstation" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="7"></asp:TextBox>
+                    <asp:TextBox ID="TxtDepstation" runat="server" onblur="MsgClear();" CssClass="boxIcon iconOnly" readonly="true" MaxLength="7"></asp:TextBox>
                 </a>
 
             </span>
@@ -92,7 +92,7 @@
             <span>
                 <a id="WF_ARRSTATION_LABEL" class="requiredMark">着駅</a>
                 <a class="ef" id="WF_ARRSTATION" ondblclick="Field_DBclick('TxtArrstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstation');">
-                    <asp:TextBox ID="TxtArrstation" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="7"></asp:TextBox>
+                    <asp:TextBox ID="TxtArrstation" runat="server" onblur="MsgClear();" CssClass="boxIcon iconOnly" readonly="true" MaxLength="7"></asp:TextBox>
                 </a>
 
             </span>

@@ -152,7 +152,7 @@ Public Class OIT0004OilStockCreate
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             daysList = GetTargetDateList(sqlCon, baseDate)
-            oilTypeList = GetTargetOilType(sqlCon, salesOffice)
+            oilTypeList = GetTargetOilType(sqlCon, salesOffice, consignee)
             trainList = GetTargetTrain(sqlCon, salesOffice, consignee)
             isShowSuggestList = Me.IsShowSuggestList(sqlCon, consignee)
         End Using
@@ -198,11 +198,23 @@ Public Class OIT0004OilStockCreate
     Protected Sub WF_ButtonAUTOSUGGESTION_Click()
         '○ エラーレポート準備
         rightview.SetErrorReport("")
-
+        '******************************
+        '画面入力情報を取得
+        '******************************
         Dim dispClass = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+        '******************************
+        '入力チェック処理実行
+        '******************************
         If WW_Check(dispClass, WF_ButtonClick.Value) = False Then
             Return
         End If
+        '******************************
+        '自動提案処理実行
+        '******************************
+        Dim inventoryDays As Integer = 0
+        inventoryDays = CInt(Me.WF_INVENTORYDAYS.Text)
+        dispClass.AutoSuggest(inventoryDays)
+
     End Sub
     ''' <summary>
     ''' 受注作成ボタン押下時処理
@@ -323,26 +335,26 @@ Public Class OIT0004OilStockCreate
         Dim retVal As New Dictionary(Of String, TrainListItem)
         '袖ヶ浦
         If salesOffice = "011203" AndAlso consignee = "40" Then
-            retVal.Add("5972", New TrainListItem("5972", "5972-南松本"))
+            retVal.Add("5972", New TrainListItem("5972", "5972-南松本", 20))
         End If
         If salesOffice = "011203" AndAlso consignee = "30" Then
-            retVal.Add("8877", New TrainListItem("8877", "8877-倉賀野"))
-            retVal.Add("8883", New TrainListItem("8883", "8883-倉賀野"))
+            retVal.Add("8877", New TrainListItem("8877", "8877-倉賀野", 20))
+            retVal.Add("8883", New TrainListItem("8883", "8883-倉賀野", 22))
         End If
         '根岸
         If salesOffice = "011402" AndAlso consignee = "10" Then
-            retVal.Add("5463", New TrainListItem("5463", "5463-坂城"))
-            retVal.Add("2085", New TrainListItem("2085", "2085-坂城"))
-            retVal.Add("8471", New TrainListItem("8471", "8471-坂城"))
+            retVal.Add("5463", New TrainListItem("5463", "5463-坂城", 17))
+            retVal.Add("2085", New TrainListItem("2085", "2085-坂城", 17))
+            retVal.Add("8471", New TrainListItem("8471", "8471-坂城", 17))
         End If
         If salesOffice = "011402" AndAlso consignee = "20" Then
-            retVal.Add("81", New TrainListItem("81", "81-竜王"))
-            retVal.Add("83", New TrainListItem("83", "83-竜王"))
+            retVal.Add("81", New TrainListItem("81", "81-竜王", 17))
+            retVal.Add("83", New TrainListItem("83", "83-竜王", 13))
         End If
         '三重塩浜
         If salesOffice = "012402" AndAlso consignee = "40" Then
-            retVal.Add("5282", New TrainListItem("5282", "5282-南松本"))
-            retVal.Add("8072", New TrainListItem("8072", "8072-南松本"))
+            retVal.Add("5282", New TrainListItem("5282", "5282-南松本", 18))
+            retVal.Add("8072", New TrainListItem("8072", "8072-南松本", 18))
         End If
         Return retVal
     End Function
@@ -415,9 +427,11 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     ''' <param name="sqlCon">SQL接続オブジェクト</param>
     ''' <param name="salesOffice">営業所</param>
+    ''' <param name="consignee">油槽所（荷受人）コード</param>
     ''' <returns>キー:油種コード、値：油種アイテムクラス</returns>
-    Private Function GetTargetOilType(sqlCon As SqlConnection, salesOffice As String) As Dictionary(Of String, OilItem)
+    Private Function GetTargetOilType(sqlCon As SqlConnection, salesOffice As String, consignee As String) As Dictionary(Of String, OilItem)
         Dim retVal As New Dictionary(Of String, OilItem)
+        '営業所に対応する油種コード取得
         Dim sqlStr As New StringBuilder
         sqlStr.AppendLine("SELECT FV.KEYCODE  AS OILCODE")
         sqlStr.AppendLine("      ,FV.VALUE1   AS OILNAME")
@@ -429,16 +443,33 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND FV.DELFLG    = @DELFLG")
         sqlStr.AppendLine("   AND FV.VALUE12  != @STOCKFLG")
         sqlStr.AppendLine(" ORDER BY KEYCODE")
-        '↑FixValueのみでの取得
+
+        'タンク容量、目標在庫率、D/S、開始年月、終了年月取得用
+        Dim sqlConsigneeOilType As New StringBuilder
+        sqlConsigneeOilType.AppendLine("SELECT FV.VALUE1 AS OILCODE")
+        sqlConsigneeOilType.AppendLine("      ,FV.VALUE2 AS FROMMD")
+        sqlConsigneeOilType.AppendLine("      ,FV.VALUE3 AS TOMD")
+        sqlConsigneeOilType.AppendLine("      ,FV.VALUE4 AS TANKCAP")
+        sqlConsigneeOilType.AppendLine("      ,FV.VALUE5 AS TARGETCAPRATE")
+        sqlConsigneeOilType.AppendLine("      ,FV.VALUE6 AS DS")
+        sqlConsigneeOilType.AppendLine(" FROM OIL.VIW0001_FIXVALUE FV")
+        sqlConsigneeOilType.AppendLine("WHERE FV.CAMPCODE = @CAMPCODE")
+        sqlConsigneeOilType.AppendLine("  AND FV.CLASS    = @CLASS")
+        sqlConsigneeOilType.AppendLine("  AND FV.KEYCODE  = @CONSIGNEE")
+        sqlConsigneeOilType.AppendLine("  AND FV.DELFLG   = @DELFLG")
 
         'DBより取得を行い祝祭日情報付与
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            Dim paramCampCode = sqlCmd.Parameters.Add("@CAMPCODE", SqlDbType.NVarChar)
+            Dim paramClass = sqlCmd.Parameters.Add("@CLASS", SqlDbType.NVarChar)
+            '2つのSQLで変わらない（or不要なパラメータ)
             With sqlCmd.Parameters
-                .Add("@CAMPCODE", SqlDbType.NVarChar).Value = salesOffice
-                .Add("@CLASS", SqlDbType.NVarChar).Value = "PRODUCTPATTERN"
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
                 .Add("@STOCKFLG", SqlDbType.NVarChar).Value = "9" '不等号条件
+                .Add("@CONSIGNEE", SqlDbType.NVarChar).Value = consignee
             End With
+            paramCampCode.Value = salesOffice
+            paramClass.Value = "PRODUCTPATTERN"
 
             Dim oilCode As String
             Dim oilName As String
@@ -455,6 +486,38 @@ Public Class OIT0004OilStockCreate
                     retVal.Add(oilItm.OilCode, oilItm)
                 End While
             End Using 'sqlDr
+
+            '油種毎の付帯情報を格納（大本テーブルは油槽所諸元マスタ[OIM0015_SYOGEN]）
+            sqlCmd.CommandText = sqlConsigneeOilType.ToString
+            paramCampCode.Value = C_DEFAULT_DATAKEY 'Default
+            paramClass.Value = "SYOGEN"
+            Dim syoGenOilTypeList As New List(Of String)
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                Dim syoGenOilCode As String = ""
+                While sqlDr.Read
+                    syoGenOilCode = Convert.ToString(sqlDr("OILCODE"))
+                    syoGenOilTypeList.Add(syoGenOilCode)
+                    If retVal.ContainsKey(syoGenOilCode) Then
+                        With retVal(syoGenOilCode)
+                            .MaxTankCap = Decimal.Parse(Convert.ToString(sqlDr("TANKCAP")))
+                            .TankCapRate = Decimal.Parse(Convert.ToString(sqlDr("TARGETCAPRATE")))
+                            .DS = Decimal.Parse(Convert.ToString(sqlDr("DS")))
+                            .FromMd = Convert.ToString(sqlDr("FROMMD"))
+                            .FromMd = CInt(Split(.FromMd, "/")(0)).ToString("00") & "/" & CInt(Split(.FromMd, "/")(1)).ToString("00")
+                            .ToMd = Convert.ToString(sqlDr("TOMD"))
+                            .ToMd = CInt(Split(.ToMd, "/")(0)).ToString("00") & "/" & CInt(Split(.ToMd, "/")(1)).ToString("00")
+                            If .FromMd.Equals("01/01") AndAlso .ToMd.Equals("12/31") Then
+                                .IsOilTypeSwitch = True
+                            End If
+                        End With
+                    End If
+                End While
+            End Using
+            '油槽所諸元マスタにかからない油種を表示対象から除外
+            Dim removeKeys = (From itm In retVal Where Not syoGenOilTypeList.Contains(itm.Key) Select itm.Key).ToList
+            For Each key In removeKeys
+                retVal.Remove(key)
+            Next
         End Using 'sqlCmd
         Return retVal
 
@@ -986,6 +1049,24 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property OffScreenLastEveningStock As Decimal
         ''' <summary>
+        ''' 油種変更有無(True:あり,False:なし)
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>油槽所諸元マスタの開始月日が1/1、終了年月が12/1以外の場合True,それいがいFalse</remarks>
+        Public Property IsOilTypeSwitch As Boolean
+        ''' <summary>
+        ''' 開始月日(MM/dd形式)
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>年月0パディング済で格納想定</remarks>
+        Public Property FromMd As String
+        ''' <summary>
+        ''' 終了月日(MM/dd形式)
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>年月0パディング済で格納想定</remarks>
+        Public Property ToMd As String
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
         ''' <param name="oilCode"></param>
@@ -997,69 +1078,42 @@ Public Class OIT0004OilStockCreate
             Me.OilName = oilName
             Me.BigOilCode = bigOilCode
             Me.MiddleOilCode = middleOilCode
-            '一旦各種値はベタ打ち
+            'DOTO 一旦各種値はベタ打ちの為DBより取得が必要
             Select Case oilCode
                 Case "1001" 'ハイオク
                     Me.Weight = 0.75D
-                    Me.MaxTankCap = 956
-                    Me.DS = 44
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 280
                     Me.OffScreenLastEveningStock = 520
                 Case "1101" 'レギュラー
                     Me.Weight = 0.75D
-                    Me.MaxTankCap = 2780
-                    Me.DS = 112
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 800
                     Me.OffScreenLastEveningStock = 2222
                 Case "1301" '灯油
                     Me.Weight = 0.79D
-                    Me.MaxTankCap = 1709
-                    Me.DS = 101
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 250
                     Me.OffScreenLastEveningStock = 1360
                 Case "1401" '軽油
                     Me.Weight = 0.75D
-                    Me.MaxTankCap = 13714
-                    Me.DS = 594
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 5800
                     Me.OffScreenLastEveningStock = 11000
                 Case "2101" 'Ａ重油
                     Me.Weight = 0.87D
-                    Me.MaxTankCap = 1299
-                    Me.DS = 98
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 150
                     Me.OffScreenLastEveningStock = 500
                 Case "2201" 'ＬＳＡ
                     Me.Weight = 0.87D
-                    Me.MaxTankCap = 584
-                    Me.DS = 41
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 75
                     Me.OffScreenLastEveningStock = 400
                 Case "1302" '未添加灯油
                     Me.Weight = 0.75D
-                    Me.MaxTankCap = 2780
-                    Me.DS = 112
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 800
                     Me.OffScreenLastEveningStock = 1360
                 Case "1404" '３号軽油
                     Me.Weight = 0.82D
-                    Me.MaxTankCap = 13714
-                    Me.DS = 594
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 0
                     Me.OffScreenLastEveningStock = 10800
                 Case Else
                     Me.Weight = 0.75D
-                    Me.MaxTankCap = 956
-                    Me.DS = 44
-                    Me.TankCapRate = 0.8D
                     Me.LastSendAverage = 280
                     Me.OffScreenLastEveningStock = 1360
             End Select
@@ -1083,6 +1137,9 @@ Public Class OIT0004OilStockCreate
             retVal.TankCapRate = Me.TankCapRate
             retVal.DS = Me.DS
             retVal.LastSendAverage = Me.LastSendAverage
+            retVal.IsOilTypeSwitch = Me.IsOilTypeSwitch
+            retVal.FromMd = Me.FromMd
+            retVal.ToMd = Me.ToMd
             Return retVal
         End Function
     End Class
@@ -1102,13 +1159,21 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property TrainName As String
         ''' <summary>
+        ''' 列車最大受入数
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remark>自動提案の最大数を格納</remark>
+        Public Property MaxVolume As Decimal
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
         ''' <param name="trainNo">列車番号</param>
         ''' <param name="trainName">列車名</param>
-        Public Sub New(trainNo As String, trainName As String)
+        ''' <param name="maxVolume">列車最大受入数</param>
+        Public Sub New(trainNo As String, trainName As String, maxVolume As Decimal)
             Me.TrainNo = trainNo
             Me.TrainName = trainName
+            Me.MaxVolume = maxVolume
         End Sub
     End Class
     ''' <summary>
@@ -1273,7 +1338,23 @@ Public Class OIT0004OilStockCreate
         ''' <summary>
         ''' 入力項目を0クリア・チェックボックスを未チェックにするメソッド
         ''' </summary>
+        ''' <remarks>初日朝在庫は保持</remarks>
         Public Sub InputValueToZero()
+            '提案表クリア
+            SuggestBalueInputValueToZero()
+
+            '在庫表クリア
+            For Each odrItem In Me.StockList.Values
+                For Each trainIdItem In odrItem.StockItemList.Values
+                    trainIdItem.Send = "0" '払い出し0クリア
+                Next
+            Next
+        End Sub
+        ''' <summary>
+        ''' 提案表部分の0クリア
+        ''' </summary>
+        ''' <remarks>自動提案でも使用するため外だし</remarks>
+        Private Sub SuggestBalueInputValueToZero()
             '提案表クリア
             For Each suggestItm In SuggestList.Values
                 For Each odrItem In suggestItm.SuggestOrderItem.Values
@@ -1281,12 +1362,6 @@ Public Class OIT0004OilStockCreate
                     For Each itm In odrItem.SuggestValuesItem.Values
                         itm.ItemValue = "0" 'テキストをすべて0
                     Next
-                Next
-            Next
-            '在庫表クリア
-            For Each odrItem In Me.StockList.Values
-                For Each trainIdItem In odrItem.StockItemList.Values
-                    trainIdItem.Send = "0" '払い出し0クリア
                 Next
             Next
         End Sub
@@ -1367,28 +1442,30 @@ Public Class OIT0004OilStockCreate
                         'itm.LastEveningStock = decMorningStockVal
                         'itm.MorningStock = decMorningStockVal.ToString
                     End If
-                    '◆2行目 保有日数(朝在庫 / 前週出荷平均)
+                    '◆保有日数(朝在庫 / 前週出荷平均)
                     If stockListItm.LastShipmentAve = 0 Then
                         itm.Retentiondays = 0
                     Else
                         itm.Retentiondays = Math.Round(decMorningStockVal / stockListItm.LastShipmentAve, 1)
                     End If
-                    '◆4行目 受入数 (提案リストの値)
+                    '◆朝在庫 除DS
+                    itm.MorningStockWithoutDS = decMorningStockVal - stockListItm.DS
+                    '◆受入数 (提案リストの値)
                     If Me.ShowSuggestList = True Then
                         '提案リスト表示時
                         itm.Receive = GetSummarySuggestValue(itmDate, oilCode)
                     Else
                         itm.Receive = 0 '？？？？？ここはどうする
                     End If
-                    '◆5行目払出
+                    '◆払出
                     '入力項目なので無視
-                    '◆6行目 夕在庫 (朝在庫 + 受入- 払出)
+                    '◆夕在庫 (朝在庫 + 受入- 払出)
                     itm.EveningStock = decMorningStockVal + itm.Receive - decSendVal
-                    '◆7行名 夕在庫D/S (夕在庫 - D/S)
+                    '◆夕在庫D/S (夕在庫 - D/S)
                     itm.EveningStockWithoutDS = itm.EveningStock - stockListItm.DS
-                    '◆8行目 空き容量 (夕在庫 -  D/S)
+                    '◆空き容量 (夕在庫 -  D/S)
                     itm.FreeSpace = stockListItm.TargetStock - ((decMorningStockVal + itm.Receive) - decSendVal)
-                    '◆9行目 在庫率
+                    '◆在庫率
                     If stockListItm.TargetStock = 0 Then
                         itm.StockRate = 0
                     Else
@@ -1403,10 +1480,11 @@ Public Class OIT0004OilStockCreate
         ''' <summary>
         ''' 自動提案計算処理
         ''' </summary>
+        ''' <param name="inventoryDays">在庫維持日数</param>
         ''' <remarks>外部呼出用メソッド</remarks>
-
-        Public Sub AutoSuggest()
-
+        Public Sub AutoSuggest(inventoryDays As Integer)
+            '提案表部分の値を0クリア
+            SuggestBalueInputValueToZero()
         End Sub
 
         ''' <summary>
@@ -1453,7 +1531,7 @@ Public Class OIT0004OilStockCreate
                 Dim orderValues = New SuggestValues
                 orderValues.TrainInfo = trainInfo
                 For Each oilCodeItem In oilCodes.Values
-                    orderValues.Add(oilCodeItem, "0", Me.DayInfo)
+                    orderValues.Add(oilCodeItem, "0", Me.DayInfo, trainInfo)
                 Next
                 'orderValues.Add(New OilItem(SUMMARY_CODE, "合計"), "0", Me.DayInfo)
                 Me.SuggestOrderItem.Add(trainInfo.TrainNo, orderValues)
@@ -1506,9 +1584,9 @@ Public Class OIT0004OilStockCreate
                 ''' <param name="oilInfo">油種情報クラス</param>
                 ''' <param name="val">計算値</param>
                 ''' <param name="dayItm">日付情報</param>
-                Public Sub Add(oilInfo As OilItem, val As String, dayItm As DaysItem)
+                Public Sub Add(oilInfo As OilItem, val As String, dayItm As DaysItem, trainInfo As TrainListItem)
                     Me.SuggestValuesItem.Add(oilInfo.OilCode, New SuggestValue _
-                        With {.ItemValue = val, .OilInfo = oilInfo, .DayInfo = dayItm})
+                        With {.ItemValue = val, .OilInfo = oilInfo, .DayInfo = dayItm, .TrainInfo = trainInfo})
                 End Sub
             End Class
             ''' <summary>
@@ -1539,6 +1617,11 @@ Public Class OIT0004OilStockCreate
                 ''' </summary>
                 ''' <returns></returns>
                 Public Property DayInfo As DaysItem = Nothing
+                ''' <summary>
+                ''' 列車情報
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property TrainInfo As TrainListItem
             End Class
         End Class
         ''' <summary>
@@ -1559,7 +1642,7 @@ Public Class OIT0004OilStockCreate
                 Me.TankCapacity = oilTypeItem.MaxTankCap
                 Me.TargetStock = Math.Round(oilTypeItem.MaxTankCap * oilTypeItem.TankCapRate, 1)
                 Me.TargetStockRate = Math.Round(oilTypeItem.TankCapRate * 100, 1)
-                Me.Stock80 = Math.Round(oilTypeItem.MaxTankCap * oilTypeItem.TankCapRate, 1)
+                Me.Stock80 = Math.Round(oilTypeItem.MaxTankCap * 0.8D, 1)
                 Me.DS = oilTypeItem.DS
                 Me.LastShipmentAve = oilTypeItem.LastSendAverage
                 Me.StockItemList = New Dictionary(Of String, StockListItem)
@@ -1669,6 +1752,11 @@ Public Class OIT0004OilStockCreate
             ''' <returns></returns>
             ''' <remarks>画面情報収集後に設定（初期は未設定なので使用注意）</remarks>
             Public Property MorningStockClientId As String
+            ''' <summary>
+            ''' 朝在庫D/S除
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property MorningStockWithoutDS As Decimal
             ''' <summary>
             ''' 受入
             ''' </summary>

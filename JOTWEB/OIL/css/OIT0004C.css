@@ -308,7 +308,8 @@ span.minus {
 #divStockList div.colStockValue > div {
     text-align:right;
 }
-#divStockList div.colStockValue > div:not(:nth-child(5)) {
+    /* #divStockList div.colStockValue > div:not(:nth-child(5)) */
+#divStockList div.colStockValue > div {
     padding-right:8px !important;
 }
 #divStockList div.col2 > div,
@@ -344,7 +345,7 @@ span.minus {
 }
 #divStockList div.col6 > div,
 #divStockList div.colStockValue > div{
-    height:calc(100% / 9);
+    height:calc(100% / 6);
     max-height:23.5px;
 }
 #divStockList div.colStockInfoTopRow {
@@ -369,6 +370,14 @@ span.morningStockIdx0 {
     //line-height:0.8em;
     width:calc(100% + 5.5px);
 }
+#divStockList input[type=text][name$="txtSend"] {
+    width: calc(100% + 5.5px);
+}
+/* :not(.col1) > div:last-child > span */
+#divStockList div.oilTypeData div[class^="col"]:not(.col1):not(.col2):not(.col3):not(.col4):not(.col5) > div:last-child > span {
+    margin-top: 0;
+}
+
 /* ************** */
 /* 在庫表罫線制御 */
 /* ************** */

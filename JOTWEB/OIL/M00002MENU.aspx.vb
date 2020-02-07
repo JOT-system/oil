@@ -223,10 +223,7 @@ Public Class M00002MENU
         If (e.Item.ItemType = ListItemType.Header) Then
         End If
 
-        Dim dicSuffixList As New Dictionary(Of String, String) From {{"Repeater_Menu_L", "L"}, {"Repeater_Menu_L2", "L2"},
-                                                                     {"Repeater_Menu_R", "R"}, {"Repeater_Menu_R2", "R2"},
-                                                                     {"Repeater_Menu_L3", "L3"}, {"Repeater_Menu_L4", "L4"},
-                                                                     {"Repeater_Menu_R3", "R3"}, {"Repeater_Menu_R4", "R4"}}
+        Dim dicSuffixList As New Dictionary(Of String, String) From {{"Repeater_Menu_L", "L"}, {"Repeater_Menu_R", "R"}}
         Dim callRep As Repeater = DirectCast(sender, Repeater)
         Dim repFieldSuffix As String = dicSuffixList(callRep.ID)
 

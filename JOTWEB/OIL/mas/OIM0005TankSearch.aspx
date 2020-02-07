@@ -50,7 +50,7 @@
             <div class="inputItem">
                 <a id="WF_TANKNUMBER_LABEL">JOT車番</a>
                 <a class="ef" id="WF_TANKNUMBER" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_TANKNUMBER%>);" onchange="TextBox_change('WF_TANKNUMBER');">
-                    <asp:TextBox  ID="WF_TANKNUMBER_CODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="8"></asp:TextBox>
+                    <asp:TextBox  ID="WF_TANKNUMBER_CODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="8"  placeholder="未入力は全件表示"></asp:TextBox>
                 </a>
                 <a id="WF_TANKNUMBER_TEXT">
                     <asp:Label ID="WF_TANKNUMBER_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>

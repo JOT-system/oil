@@ -209,49 +209,67 @@ Public Class M00002MENU
         End Using
 
     End Sub
-    ' ******************************************************************************
-    ' ***  Repeater_Menu_L バインド　在庫管理　                                  ***
-    ' ******************************************************************************
-    Protected Sub RptInfo_ItemDataBound_L(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.RepeaterItemEventArgs) Handles Repeater_Menu_L.ItemDataBound
+
+    ''' <summary>
+    ''' Repeater_Menu_x バインドイベント(Handlesに含めたオブジェクトが対象)
+    ''' </summary>
+    ''' <param name="sender">イベント発生オブジェクト</param>
+    ''' <param name="e"></param>
+    Protected Sub RptInfo_ItemDataBound_L(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.RepeaterItemEventArgs) _
+        Handles Repeater_Menu_L.ItemDataBound, Repeater_Menu_R.ItemDataBound
 
         '★★★ Repeater_Menu_Lバインド時 編集（左） ★★★
         '○ヘッダー編集 処理なし
         If (e.Item.ItemType = ListItemType.Header) Then
         End If
 
+        Dim dicSuffixList As New Dictionary(Of String, String) From {{"Repeater_Menu_L", "L"}, {"Repeater_Menu_L2", "L2"},
+                                                                     {"Repeater_Menu_R", "R"}, {"Repeater_Menu_R2", "R2"},
+                                                                     {"Repeater_Menu_L3", "L3"}, {"Repeater_Menu_L4", "L4"},
+                                                                     {"Repeater_Menu_R3", "R3"}, {"Repeater_Menu_R4", "R4"}}
+        Dim callRep As Repeater = DirectCast(sender, Repeater)
+        Dim repFieldSuffix As String = dicSuffixList(callRep.ID)
+
         '○アイテム編集
         If ((e.Item.ItemType = ListItemType.Item) Or (e.Item.ItemType = ListItemType.AlternatingItem)) Then
-            CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Text = DataBinder.Eval(e.Item.DataItem, "TITLE")
-            CType(e.Item.FindControl("WF_MenuVARI_L"), Label).Text = DataBinder.Eval(e.Item.DataItem, "VARIANT")
-            If IsDBNull(DataBinder.Eval(e.Item.DataItem, "URL")) Then
-                CType(e.Item.FindControl("WF_MenuURL_L"), Label).Text = String.Empty
-            Else
-                CType(e.Item.FindControl("WF_MenuURL_L"), Label).Text = DataBinder.Eval(e.Item.DataItem, "URL")
-            End If
-            CType(e.Item.FindControl("WF_MenuMAP_L"), Label).Text = DataBinder.Eval(e.Item.DataItem, "MAPID")
-            CType(e.Item.FindControl("WF_MenuButton_L"), Button).Text = "  " & DataBinder.Eval(e.Item.DataItem, "NAMES")
+            Dim repItem As Common.DbDataRecord = DirectCast(e.Item.DataItem, System.Data.Common.DbDataRecord)
+            Dim menuLabel As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuLabe_{0}", repFieldSuffix)), Label)
+            Dim menuVari As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuVARI_{0}", repFieldSuffix)), Label)
+            Dim menuUrl As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuURL_{0}", repFieldSuffix)), Label)
+            Dim menuMap As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuMAP_{0}", repFieldSuffix)), Label)
+            Dim menuButton As Button = DirectCast(e.Item.FindControl(String.Format("WF_MenuButton_{0}", repFieldSuffix)), Button)
 
-            If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
-                If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
-                    CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuVARI_L"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuButton_L"), Button).Visible = False
-                    CType(e.Item.FindControl("WF_MenuURL_L"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuMAP_L"), Label).Visible = False
+            menuLabel.Text = Convert.ToString(repItem("TITLE"))
+            menuVari.Text = Convert.ToString(repItem("VARIANT"))
+            If Convert.ToString(repItem("URL")) = "" Then
+                menuUrl.Text = String.Empty
+            Else
+                menuUrl.Text = Convert.ToString(repItem("URL"))
+            End If
+            menuMap.Text = Convert.ToString(repItem("MAPID"))
+            menuButton.Text = "  " & Convert.ToString(repItem("NAMES"))
+
+            If Convert.ToString(repItem("TITLE")) = "" Then
+                If Convert.ToString(repItem("NAMES")) = "" Then
+                    menuLabel.Text = "　　"
+                    menuLabel.Visible = False
+                    menuVari.Visible = False
+                    menuButton.Visible = False
+                    menuUrl.Visible = False
+                    menuMap.Visible = False
                 Else
-                    CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuVARI_L"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuButton_L"), Button).Visible = True
-                    CType(e.Item.FindControl("WF_MenuURL_L"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuMAP_L"), Label).Visible = False
+                    menuLabel.Visible = False
+                    menuVari.Visible = False
+                    menuButton.Visible = True
+                    menuUrl.Visible = False
+                    menuMap.Visible = False
                 End If
             Else
-                CType(e.Item.FindControl("WF_MenuLabe_L"), Label).Visible = True
-                CType(e.Item.FindControl("WF_MenuVARI_L"), Label).Visible = False
-                CType(e.Item.FindControl("WF_MenuButton_L"), Button).Visible = False
-                CType(e.Item.FindControl("WF_MenuURL_L"), Label).Visible = False
-                CType(e.Item.FindControl("WF_MenuMAP_L"), Label).Visible = False
+                menuLabel.Visible = True
+                menuVari.Visible = False
+                menuButton.Visible = False
+                menuUrl.Visible = False
+                menuMap.Visible = False
             End If
 
         End If
@@ -261,65 +279,17 @@ Public Class M00002MENU
         End If
 
     End Sub
+    ''' <summary>
+    ''' Repeater_Menu_X ボタン押下時処理
+    ''' </summary>
+    ''' <param name="source"></param>
+    ''' <param name="e"></param>
+    Protected Sub Repeater_Menu_ItemCommand_L(source As Object, e As RepeaterCommandEventArgs) _
+        Handles Repeater_Menu_L.ItemCommand, Repeater_Menu_R.ItemCommand
 
-    ' ******************************************************************************
-    ' ***  Repeater_Menu_R バインド  回送管理　　                                 ***
-    ' ******************************************************************************
-    Protected Sub RptInfo_ItemDataBound_R(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.RepeaterItemEventArgs) Handles Repeater_Menu_R.ItemDataBound
-
-        '★★★ Repeater_Menu_Rバインド時 編集（右） ★★★
-        '○ヘッダー編集　 処理なし
-        If (e.Item.ItemType = ListItemType.Header) Then
-        End If
-
-        '○アイテム編集
-        If ((e.Item.ItemType = ListItemType.Item) Or (e.Item.ItemType = ListItemType.AlternatingItem)) Then
-            CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Text = DataBinder.Eval(e.Item.DataItem, "TITLE")
-            CType(e.Item.FindControl("WF_MenuVARI_R"), Label).Text = DataBinder.Eval(e.Item.DataItem, "VARIANT")
-            If IsDBNull(DataBinder.Eval(e.Item.DataItem, "URL")) Then
-                CType(e.Item.FindControl("WF_MenuURL_R"), Label).Text = ""
-            Else
-                CType(e.Item.FindControl("WF_MenuURL_R"), Label).Text = DataBinder.Eval(e.Item.DataItem, "URL")
-            End If
-            CType(e.Item.FindControl("WF_MenuMAP_R"), Label).Text = DataBinder.Eval(e.Item.DataItem, "MAPID")
-            CType(e.Item.FindControl("WF_MenuButton_R"), Button).Text = "  " & DataBinder.Eval(e.Item.DataItem, "NAMES")
-
-            If DataBinder.Eval(e.Item.DataItem, "TITLE") = "" Then
-                If DataBinder.Eval(e.Item.DataItem, "NAMES") = "" Then
-                    CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Text = "　　"
-                    CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuVARI_R"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuButton_R"), Button).Visible = False
-                    CType(e.Item.FindControl("WF_MenuURL_R"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuMAP_R"), Label).Visible = False
-                Else
-                    CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuVARI_R"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuButton_R"), Button).Visible = True
-                    CType(e.Item.FindControl("WF_MenuURL_R"), Label).Visible = False
-                    CType(e.Item.FindControl("WF_MenuMAP_R"), Label).Visible = False
-                End If
-            Else
-                CType(e.Item.FindControl("WF_MenuLabe_R"), Label).Visible = True
-                CType(e.Item.FindControl("WF_MenuVARI_R"), Label).Visible = False
-                CType(e.Item.FindControl("WF_MenuButton_R"), Button).Visible = False
-                CType(e.Item.FindControl("WF_MenuURL_R"), Label).Visible = False
-                CType(e.Item.FindControl("WF_MenuMAP_R"), Label).Visible = False
-            End If
-        End If
-
-        '○フッター編集　 処理なし
-        If e.Item.ItemType = ListItemType.Footer Then
-        End If
-
-    End Sub
-
-
-
-    ' ******************************************************************************
-    ' ***  Repeater_Menu_L 在庫管理メニューボタン押下処理                        ***
-    ' ******************************************************************************
-    Protected Sub Repeater_Menu_ItemCommand_L(source As Object, e As RepeaterCommandEventArgs) Handles Repeater_Menu_L.ItemCommand
+        Dim dicSuffixList As New Dictionary(Of String, String) From {{"Repeater_Menu_L", "L"}, {"Repeater_Menu_R", "R"}}
+        Dim callRep As Repeater = DirectCast(source, Repeater)
+        Dim repFieldSuffix As String = dicSuffixList(callRep.ID)
 
         '共通宣言
         '*共通関数宣言(BASEDLL)
@@ -329,10 +299,11 @@ Public Class M00002MENU
 
         '★★★ ボタン押下時、画面遷移（左） ★★★
         '○ボタン押下時、画面遷移情報取得
-        Dim WW_COUNT As Integer = e.Item.ItemIndex.ToString()
-        Dim WW_URL As Label = Repeater_Menu_L.Items(WW_COUNT).FindControl("WF_MenuURL_L")
-        Dim WW_VARI As Label = Repeater_Menu_L.Items(WW_COUNT).FindControl("WF_MenuVARI_L")
-        Dim WW_MAPID As Label = Repeater_Menu_L.Items(WW_COUNT).FindControl("WF_MenuMAP_L")
+        Dim WW_COUNT As Integer = e.Item.ItemIndex
+        Dim repItem As RepeaterItem = callRep.Items(WW_COUNT)
+        Dim WW_URL As Label = DirectCast(repItem.FindControl(String.Format("WF_MenuURL_{0}", repFieldSuffix)), Label)
+        Dim WW_VARI As Label = DirectCast(repItem.FindControl(String.Format("WF_MenuVARI_{0}", repFieldSuffix)), Label)
+        Dim WW_MAPID As Label = DirectCast(repItem.FindControl(String.Format("WF_MenuMAP_{0}", repFieldSuffix)), Label)
 
         '○画面遷移権限チェック（左）
         CS0007CheckAuthority.MAPID = WW_MAPID.Text
@@ -394,94 +365,6 @@ Public Class M00002MENU
         'ボタン押下時、画面遷移
         Server.Transfer(WW_URL.Text)
 
-    End Sub
-
-    ' ******************************************************************************
-    ' ***  Repeater_Menu_R 回送管理メニューボタン押下処理                        ***
-    ' ******************************************************************************
-    Protected Sub Repeater_Menu_ItemCommand_R(source As Object, e As RepeaterCommandEventArgs) Handles Repeater_Menu_R.ItemCommand
-
-        '共通宣言
-        '*共通関数宣言(BASEDLL)
-        Dim CS0007CheckAuthority As New CS0007CheckAuthority          'AUTHORmap
-
-        '★★★ ボタン押下時、画面遷移（右） ★★★
-        'ボタン押下時、画面遷移
-        Dim WW_COUNT As Integer = e.Item.ItemIndex.ToString()
-        Dim WW_URL As Label = Repeater_Menu_R.Items(WW_COUNT).FindControl("WF_MenuURL_R")
-        Dim WW_VARI As Label = Repeater_Menu_R.Items(WW_COUNT).FindControl("WF_MenuVARI_R")
-        Dim WW_MAPID As Label = Repeater_Menu_R.Items(WW_COUNT).FindControl("WF_MenuMAP_R")
-
-        '○画面遷移権限チェック（右）
-        CS0007CheckAuthority.MAPID = WW_MAPID.Text
-        CS0007CheckAuthority.ROLECODE_MAP = Master.ROLE_MAP
-        '20191101-追加-START
-        CS0007CheckAuthority.ROLECODE_MENU = Master.ROLE_MENU
-        CS0007CheckAuthority.ROLECODE_VIEWPROF = Master.ROLE_VIEWPROF
-        CS0007CheckAuthority.ROLECODE_RPRTPROF = Master.ROLE_RPRTPROF
-        '20191101-追加-END
-        CS0007CheckAuthority.check()
-        If isNormal(CS0007CheckAuthority.ERR) Then
-            If CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.REFERLANCE OrElse
-               CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.UPDATE Then
-                CS0050Session.VIEW_PERMIT = CS0007CheckAuthority.MAPPERMITCODE
-                CS0050Session.VIEW_MAPID = WW_MAPID.Text
-                CS0050Session.VIEW_MAP_VARIANT = WW_VARI.Text
-                CS0050Session.MAP_ETC = ""
-                '20191101-追加-START
-                CS0050Session.VIEW_MENU_MODE = CS0007CheckAuthority.ROLECODE_MENU
-                CS0050Session.VIEW_MAP_MODE = CS0007CheckAuthority.ROLECODE_MAP
-                CS0050Session.VIEW_VIEWPROF_MODE = CS0007CheckAuthority.ROLECODE_VIEWPROF
-                CS0050Session.VIEW_RPRTPROF_MODE = CS0007CheckAuthority.ROLECODE_RPRTPROF
-                '20191101-追加-END
-
-                Master.MAPvariant = WW_VARI.Text
-                Master.MAPID = WW_MAPID.Text
-                Master.MAPpermitcode = CS0007CheckAuthority.MAPPERMITCODE
-                Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
-                Master.ShowMessage()
-            Else
-                Master.Output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-                Master.ShowMessage()
-
-                Exit Sub
-            End If
-        Else
-            Master.Output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-            Master.ShowMessage()
-
-            Exit Sub
-        End If
-
-        'セッション変数クリア
-        HttpContext.Current.Session("Selected_STYMD") = ""
-        HttpContext.Current.Session("Selected_ENDYMD") = ""
-
-        HttpContext.Current.Session("Selected_USERIDFrom") = ""
-        HttpContext.Current.Session("Selected_USERIDTo") = ""
-        HttpContext.Current.Session("Selected_USERIDG1") = ""
-        HttpContext.Current.Session("Selected_USERIDG2") = ""
-        HttpContext.Current.Session("Selected_USERIDG3") = ""
-        HttpContext.Current.Session("Selected_USERIDG4") = ""
-        HttpContext.Current.Session("Selected_USERIDG5") = ""
-
-        HttpContext.Current.Session("Selected_MAPIDPFrom") = ""
-        HttpContext.Current.Session("Selected_MAPIDPTo") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG1") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG2") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG3") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG4") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG5") = ""
-
-        HttpContext.Current.Session("Selected_MAPIDFrom") = ""
-        HttpContext.Current.Session("Selected_MAPIDTo") = ""
-        HttpContext.Current.Session("Selected_MAPIDG1") = ""
-        HttpContext.Current.Session("Selected_MAPIDG2") = ""
-        HttpContext.Current.Session("Selected_MAPIDG3") = ""
-        HttpContext.Current.Session("Selected_MAPIDG4") = ""
-        HttpContext.Current.Session("Selected_MAPIDG5") = ""
-
-        Server.Transfer(WW_URL.Text)
 
     End Sub
 

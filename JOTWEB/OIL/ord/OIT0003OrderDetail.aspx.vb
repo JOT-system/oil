@@ -7281,6 +7281,7 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 For Each OIT0003UPDrow As DataRow In OIT0003WKtbl.Rows
+                    '"1"(車数オーバー)
                     If OIT0003UPDrow("JUDGE") = "1" Then
                         Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 

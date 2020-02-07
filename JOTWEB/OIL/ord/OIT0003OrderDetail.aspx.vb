@@ -2967,71 +2967,6 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
-    ''' リスト変更時処理(タブ「入換・積込指示」)
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WW_ListChange_TAB2()
-        '○ LINECNT取得
-        Dim WW_LINECNT As Integer = 0
-        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
-
-        '○ 対象ヘッダー取得
-        Dim updHeader = OIT0003tbl_tab2.AsEnumerable.
-                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
-        If IsNothing(updHeader) Then Exit Sub
-
-        '○ 設定項目取得
-        '対象フォーム項目取得
-        Dim WW_ListValue = Request.Form("txt" & pnlListArea2.ID & WF_FIELD.Value & WF_GridDBclick.Text)
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-
-        Select Case WF_FIELD.Value
-            'Case "LOADINGIRILINEORDER",     '(一覧)積込入線順
-            '     "LINE",                    '(一覧)回線
-            '     "FILLINGPOINT",            '(一覧)充填ポイント
-            '     "LOADINGOUTLETORDER"       '(一覧)積込出線順
-            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
-
-            'Case "LOADINGIRILINETRAINNO"    '(一覧)積込入線列車番号
-            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
-            '    updHeader.Item("LOADINGIRILINETRAINNAME") = ""
-
-            'Case "LOADINGOUTLETTRAINNO"     '(一覧)積込出線列車番号
-            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
-            '    updHeader.Item("LOADINGOUTLETTRAINNAME") = ""
-
-            Case "LINE"                     '(一覧)回線を一覧に設定
-                updHeader.Item(WF_FIELD.Value) = WW_ListValue
-
-                '〇営業所配下情報を取得・設定
-                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    '〇 画面(受注営業所).テキストボックスが未設定
-                    If TxtOrderOffice.Text = "" Then
-                        WW_FixvalueMasterSearch(Master.USER_ORG, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
-                    Else
-                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
-                    End If
-                Else
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
-                End If
-
-                '入線列車番号
-                updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(1)
-                '入線列車名
-                updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(9)
-                '出線列車番号
-                updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(6)
-                '出線列車名
-                updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(7)
-
-        End Select
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
-
-    End Sub
-
-    ''' <summary>
     ''' リスト変更時処理(タブ「タンク車割当」)
     ''' </summary>
     ''' <remarks></remarks>
@@ -3251,6 +3186,71 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' リスト変更時処理(タブ「入換・積込指示」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListChange_TAB2()
+        '○ LINECNT取得
+        Dim WW_LINECNT As Integer = 0
+        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0003tbl_tab2.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        '○ 設定項目取得
+        '対象フォーム項目取得
+        Dim WW_ListValue = Request.Form("txt" & pnlListArea2.ID & WF_FIELD.Value & WF_GridDBclick.Text)
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        Select Case WF_FIELD.Value
+            'Case "LOADINGIRILINEORDER",     '(一覧)積込入線順
+            '     "LINE",                    '(一覧)回線
+            '     "FILLINGPOINT",            '(一覧)充填ポイント
+            '     "LOADINGOUTLETORDER"       '(一覧)積込出線順
+            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+            'Case "LOADINGIRILINETRAINNO"    '(一覧)積込入線列車番号
+            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+            '    updHeader.Item("LOADINGIRILINETRAINNAME") = ""
+
+            'Case "LOADINGOUTLETTRAINNO"     '(一覧)積込出線列車番号
+            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+            '    updHeader.Item("LOADINGOUTLETTRAINNAME") = ""
+
+            Case "LINE"                     '(一覧)回線を一覧に設定
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+                '〇営業所配下情報を取得・設定
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
+                    End If
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
+                End If
+
+                '入線列車番号
+                updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(1)
+                '入線列車名
+                updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(9)
+                '出線列車番号
+                updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(6)
+                '出線列車名
+                updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(7)
+
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
 
     End Sub
 
@@ -7774,14 +7774,34 @@ Public Class OIT0003OrderDetail
                 Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
                 Dim tblObj = DirectCast(divObj.Controls(0), Table)
 
-                For Each rowitem As TableRow In tblObj.Rows
-                    For Each cellObj As TableCell In rowitem.Controls
-                        If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                '五井営業所、甲子営業所、袖ヶ浦営業所の場合
+                '積込列車番号の入力を可能とする。
+                If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011203" Then
+
+                    For Each rowitem As TableRow In tblObj.Rows
+                        For Each cellObj As TableCell In rowitem.Controls
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") Then
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                        End If
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            End If
+                        Next
                     Next
-                Next
+
+                Else
+                    For Each rowitem As TableRow In tblObj.Rows
+                        For Each cellObj As TableCell In rowitem.Controls
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
+                        Next
+                    Next
+
+                End If
 
             'タンク車明細
             Case 2

@@ -1879,13 +1879,15 @@ Public Class OIT0003OrderDetail
                         End If
                     End If
 
-                    '(一覧)荷主名, (一覧)油種, (一覧)タンク車№, (一覧)入線列車番号, (一覧)出線列車番号
+                    '(一覧)荷主名, (一覧)油種, (一覧)タンク車№, 
+                    '(一覧)入線列車番号, (一覧)出線列車番号, (一覧)回線
                     If WF_FIELD.Value = "SHIPPERSNAME" _
                         OrElse WF_FIELD.Value = "OILNAME" _
                         OrElse WF_FIELD.Value = "ORDERINGOILNAME" _
                         OrElse WF_FIELD.Value = "TANKNO" _
                         OrElse WF_FIELD.Value = "LOADINGIRILINETRAINNO" _
-                        OrElse WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
+                        OrElse WF_FIELD.Value = "LOADINGOUTLETTRAINNO" _
+                        OrElse WF_FIELD.Value = "LINE" Then
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
@@ -2984,19 +2986,43 @@ Public Class OIT0003OrderDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
-            Case "LOADINGIRILINEORDER",     '(一覧)積込入線順
-                 "LINE",                    '(一覧)回線
-                 "FILLINGPOINT",            '(一覧)充填ポイント
-                 "LOADINGOUTLETORDER"       '(一覧)積込出線順
+            'Case "LOADINGIRILINEORDER",     '(一覧)積込入線順
+            '     "LINE",                    '(一覧)回線
+            '     "FILLINGPOINT",            '(一覧)充填ポイント
+            '     "LOADINGOUTLETORDER"       '(一覧)積込出線順
+            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+            'Case "LOADINGIRILINETRAINNO"    '(一覧)積込入線列車番号
+            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+            '    updHeader.Item("LOADINGIRILINETRAINNAME") = ""
+
+            'Case "LOADINGOUTLETTRAINNO"     '(一覧)積込出線列車番号
+            '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+            '    updHeader.Item("LOADINGOUTLETTRAINNAME") = ""
+
+            Case "LINE"                     '(一覧)回線を一覧に設定
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
-            Case "LOADINGIRILINETRAINNO"    '(一覧)積込入線列車番号
-                updHeader.Item(WF_FIELD.Value) = WW_ListValue
-                updHeader.Item("LOADINGIRILINETRAINNAME") = ""
+                '〇営業所配下情報を取得・設定
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    '〇 画面(受注営業所).テキストボックスが未設定
+                    If TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
+                    End If
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_ListValue, WW_GetValue)
+                End If
 
-            Case "LOADINGOUTLETTRAINNO"     '(一覧)積込出線列車番号
-                updHeader.Item(WF_FIELD.Value) = WW_ListValue
-                updHeader.Item("LOADINGOUTLETTRAINNAME") = ""
+                '入線列車番号
+                updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(1)
+                '入線列車名
+                updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(9)
+                '出線列車番号
+                updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(6)
+                '出線列車名
+                updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(7)
 
         End Select
 
@@ -5547,10 +5573,10 @@ Public Class OIT0003OrderDetail
                 End Try
                 TxtActualEmparrDate.Focus()
 
-            '(一覧)荷主, (一覧)油種, (一覧)タンク車№
-            '(一覧)積込入線列車番号, (一覧)積込出線列車番号
+            'タブ「タンク車割当」　　⇒　(一覧)荷主, (一覧)油種, (一覧)タンク車№
+            'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO",
-                 "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO"
+                 "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -5760,11 +5786,11 @@ Public Class OIT0003OrderDetail
                             End If
 
                             '回線
-                            updHeader.Item("LINE") = WW_GetValue(4)
+                            updHeader.Item("LINE") = WW_GetValue(5)
                             '出線列車番号
-                            updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(5)
+                            updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(6)
                             '出線列車名
-                            updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(6)
+                            updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(7)
 
                             '積込出線列車番号を一覧に設定
                         ElseIf WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
@@ -5794,11 +5820,36 @@ Public Class OIT0003OrderDetail
                             End If
 
                             '回線
-                            updHeader.Item("LINE") = WW_GetValue(4)
+                            updHeader.Item("LINE") = WW_GetValue(5)
                             '入線列車番号
-                            updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(5)
+                            updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(6)
                             '入線列車名
-                            updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(6)
+                            updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(7)
+
+                            '回線を一覧に設定
+                        ElseIf WF_FIELD.Value = "LINE" Then
+                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+
+                            '〇営業所配下情報を取得・設定
+                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                                '〇 画面(受注営業所).テキストボックスが未設定
+                                If TxtOrderOffice.Text = "" Then
+                                    WW_FixvalueMasterSearch(Master.USER_ORG, "RINKAITRAIN_LINE", WW_SETVALUE, WW_GetValue)
+                                Else
+                                    WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_SETVALUE, WW_GetValue)
+                                End If
+                            Else
+                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "RINKAITRAIN_LINE", WW_SETVALUE, WW_GetValue)
+                            End If
+
+                            '入線列車番号
+                            updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(1)
+                            '入線列車名
+                            updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(9)
+                            '出線列車番号
+                            updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(6)
+                            '出線列車名
+                            updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(7)
 
                         End If
 

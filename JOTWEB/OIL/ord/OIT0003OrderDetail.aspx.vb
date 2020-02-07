@@ -1879,11 +1879,13 @@ Public Class OIT0003OrderDetail
                         End If
                     End If
 
-                    '(一覧)荷主名, (一覧)油種, (一覧)タンク車№
+                    '(一覧)荷主名, (一覧)油種, (一覧)タンク車№, (一覧)入線列車番号, (一覧)出線列車番号
                     If WF_FIELD.Value = "SHIPPERSNAME" _
                         OrElse WF_FIELD.Value = "OILNAME" _
                         OrElse WF_FIELD.Value = "ORDERINGOILNAME" _
-                        OrElse WF_FIELD.Value = "TANKNO" Then
+                        OrElse WF_FIELD.Value = "TANKNO" _
+                        OrElse WF_FIELD.Value = "LOADINGIRILINETRAINNO" _
+                        OrElse WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
@@ -5352,6 +5354,7 @@ Public Class OIT0003OrderDetail
             Case "TxtTrainNo"
                 '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
 
+                '〇 KeyCodeが重複し、名称(Value1)が異なる場合の取得術
                 If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
                     Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
                     Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
@@ -5545,7 +5548,9 @@ Public Class OIT0003OrderDetail
                 TxtActualEmparrDate.Focus()
 
             '(一覧)荷主, (一覧)油種, (一覧)タンク車№
-            Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO"
+            '(一覧)積込入線列車番号, (一覧)積込出線列車番号
+            Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO",
+                 "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -5554,152 +5559,283 @@ Public Class OIT0003OrderDetail
                 Dim WW_SETTEXT As String = WW_SelectText
                 Dim WW_SETVALUE As String = WW_SelectValue
 
-                '○ 画面表示データ復元
-                If Not Master.RecoverTable(OIT0003tbl) Then Exit Sub
+                '各タブにより設定を制御
+                Select Case WF_DetailMView.ActiveViewIndex
+                'タンク車割当
+                    Case 0
+                        '○ 画面表示データ復元
+                        If Not Master.RecoverTable(OIT0003tbl) Then Exit Sub
 
-                '○ 対象ヘッダー取得
-                Dim updHeader = OIT0003tbl.AsEnumerable.
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0003tbl.AsEnumerable.
                             FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
-                If IsNothing(updHeader) Then Exit Sub
+                        If IsNothing(updHeader) Then Exit Sub
 
-                '〇 一覧項目へ設定
-                '荷主名を一覧に設定
-                If WF_FIELD.Value = "SHIPPERSNAME" Then
-                    updHeader.Item("SHIPPERSCODE") = WW_SETVALUE
-                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                        '〇 一覧項目へ設定
+                        '荷主名を一覧に設定
+                        If WF_FIELD.Value = "SHIPPERSNAME" Then
+                            updHeader.Item("SHIPPERSCODE") = WW_SETVALUE
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                    '油種名を一覧に設定
-                ElseIf WF_FIELD.Value = "OILNAME" Then
-                    updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
-                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                            '油種名を一覧に設定
+                        ElseIf WF_FIELD.Value = "OILNAME" Then
+                            updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                    '〇 タンク車割当状況チェック
-                    WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+                            '〇 タンク車割当状況チェック
+                            WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
 
-                    '油種名(受発注用)を一覧に設定
-                ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
-                    updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
-                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                            '油種名(受発注用)を一覧に設定
+                        ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
+                            updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                    '〇営業所配下情報を取得・設定
-                    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                        '〇 画面(受注営業所).テキストボックスが未設定
-                        If TxtOrderOffice.Text = "" Then
-                            WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
-                        Else
-                            WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                            '〇営業所配下情報を取得・設定
+                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                                '〇 画面(受注営業所).テキストボックスが未設定
+                                If TxtOrderOffice.Text = "" Then
+                                    WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                                Else
+                                    WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                                End If
+                            Else
+                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                            End If
+                            updHeader.Item("OILNAME") = WW_GetValue(2)
+                            updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
+
+                            '〇 タンク車割当状況チェック
+                            WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+
+                            'タンク車№を一覧に設定
+                        ElseIf WF_FIELD.Value = "TANKNO" Then
+                            'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
+                            Dim WW_TANKNUMBER As String = WW_SETVALUE
+                            Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
+                            updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
+
+                            'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                            '〇 検索(営業所).テキストボックスが未設定
+                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                                '〇 画面(受注営業所).テキストボックスが未設定
+                                If TxtOrderOffice.Text = "" Then
+                                    WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                                Else
+                                    WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                                End If
+                            Else
+                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                            End If
+
+                            '型式
+                            updHeader.Item("MODEL") = WW_GetValue(7)
+
+                            '####################################################
+                            '前回油種
+                            'Dim WW_LASTOILNAME As String = ""
+                            'updHeader.Item("LASTOILCODE") = WW_GetValue(1)
+                            'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                            'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+
+                            updHeader.Item("LASTOILCODE") = WW_GetValue(1)
+                            updHeader.Item("LASTOILNAME") = WW_GetValue(4)
+                            updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
+                            updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
+                            '####################################################
+
+                            '交検日
+                            Dim WW_JRINSPECTIONCNT As String
+                            updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
+                            If WW_GetValue(2) <> "" Then
+                                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+
+                                Dim WW_JRINSPECTIONFLG As String
+                                If WW_JRINSPECTIONCNT <= 3 Then
+                                    WW_JRINSPECTIONFLG = "1"
+                                ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                                    WW_JRINSPECTIONFLG = "2"
+                                Else
+                                    WW_JRINSPECTIONFLG = "3"
+                                End If
+                                Select Case WW_JRINSPECTIONFLG
+                                    Case "1"
+                                        updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                                    Case "2"
+                                        updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                                    Case "3"
+                                        updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                                End Select
+                            Else
+                                updHeader.Item("JRINSPECTIONALERT") = ""
+                            End If
+
+                            '全検日
+                            Dim WW_JRALLINSPECTIONCNT As String
+                            updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
+                            If WW_GetValue(3) <> "" Then
+                                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+
+                                Dim WW_JRALLINSPECTIONFLG As String
+                                If WW_JRALLINSPECTIONCNT <= 3 Then
+                                    WW_JRALLINSPECTIONFLG = "1"
+                                ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                                    WW_JRALLINSPECTIONFLG = "2"
+                                Else
+                                    WW_JRALLINSPECTIONFLG = "3"
+                                End If
+                                Select Case WW_JRALLINSPECTIONFLG
+                                    Case "1"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                                    Case "2"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                                    Case "3"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                                End Select
+                            Else
+                                updHeader.Item("JRALLINSPECTIONALERT") = ""
+                            End If
+
+                            '〇 タンク車割当状況チェック
+                            WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+
+                            '積込入線列車番号を一覧に設定
+                        ElseIf WF_FIELD.Value = "LOADINGIRILINETRAINNO" Then
+                            updHeader.Item("LOADINGIRILINETRAINNAME") = WW_SETTEXT
+                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+
+                            '積込出線列車番号を一覧に設定
+                        ElseIf WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
+                            updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_SETTEXT
+                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+
                         End If
-                    Else
-                        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
-                    End If
-                    updHeader.Item("OILNAME") = WW_GetValue(2)
-                    updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
+                        'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
 
-                    '〇 タンク車割当状況チェック
-                    WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+                        '○ 画面表示データ保存
+                        If Not Master.SaveTable(OIT0003tbl) Then Exit Sub
 
-                    'タンク車№を一覧に設定
-                ElseIf WF_FIELD.Value = "TANKNO" Then
-                    'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
-                    Dim WW_TANKNUMBER As String = WW_SETVALUE
-                    Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
-                    updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
+                '入換・積込指示
+                    Case 1
+                        '○ 画面表示データ復元
+                        If Not Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text) Then Exit Sub
 
-                    'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                    '〇 検索(営業所).テキストボックスが未設定
-                    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                        '〇 画面(受注営業所).テキストボックスが未設定
-                        If TxtOrderOffice.Text = "" Then
-                            WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                        Else
-                            WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0003tbl_tab2.AsEnumerable.
+                            FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+                        If IsNothing(updHeader) Then Exit Sub
+
+                        '〇 一覧項目へ設定
+                        '積込入線列車番号を一覧に設定
+                        If WF_FIELD.Value = "LOADINGIRILINETRAINNO" Then
+
+                            '〇 KeyCodeが重複し、名称(Value1)が異なる場合の取得術
+                            If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+                                Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
+                                Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
+                                WW_SelectValue = selectedItem.Value
+                                WW_SelectText = selectedItem.Text
+                            End If
+
+                            '積込入線列車番号
+                            updHeader.Item(WF_FIELD.Value) = WW_SelectValue
+                            '積込入線列車名
+                            updHeader.Item("LOADINGIRILINETRAINNAME") = WW_SelectText
+
+                            '〇営業所配下情報を取得・設定
+                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                                '〇 画面(受注営業所).テキストボックスが未設定
+                                If TxtOrderOffice.Text = "" Then
+                                    WW_FixvalueMasterSearch(Master.USER_ORG, "RINKAITRAIN_FIND_I", WW_SelectText, WW_GetValue)
+                                Else
+                                    WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "RINKAITRAIN_FIND_I", WW_SelectText, WW_GetValue)
+                                End If
+                            Else
+                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "RINKAITRAIN_FIND_I", WW_SelectText, WW_GetValue)
+                            End If
+
+                            '回線
+                            updHeader.Item("LINE") = WW_GetValue(4)
+                            '出線列車番号
+                            updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(5)
+                            '出線列車名
+                            updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(6)
+
+                            '積込出線列車番号を一覧に設定
+                        ElseIf WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
+                            '〇 KeyCodeが重複し、名称(Value1)が異なる場合の取得術
+                            If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+                                Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
+                                Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
+                                WW_SelectValue = selectedItem.Value
+                                WW_SelectText = selectedItem.Text
+                            End If
+
+                            '出線列車番号
+                            updHeader.Item(WF_FIELD.Value) = WW_SelectValue
+                            '出線列車名
+                            updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_SelectText
+
+                            '〇営業所配下情報を取得・設定
+                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                                '〇 画面(受注営業所).テキストボックスが未設定
+                                If TxtOrderOffice.Text = "" Then
+                                    WW_FixvalueMasterSearch(Master.USER_ORG, "RINKAITRAIN_FIND_O", WW_SelectText, WW_GetValue)
+                                Else
+                                    WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "RINKAITRAIN_FIND_O", WW_SelectText, WW_GetValue)
+                                End If
+                            Else
+                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "RINKAITRAIN_FIND_O", WW_SelectText, WW_GetValue)
+                            End If
+
+                            '回線
+                            updHeader.Item("LINE") = WW_GetValue(4)
+                            '入線列車番号
+                            updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(5)
+                            '入線列車名
+                            updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(6)
+
                         End If
-                    Else
-                        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                    End If
 
-                    '型式
-                    updHeader.Item("MODEL") = WW_GetValue(7)
+                        '○ 画面表示データ保存
+                        If Not Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text) Then Exit Sub
 
-                    '####################################################
-                    '前回油種
-                    'Dim WW_LASTOILNAME As String = ""
-                    'updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                    'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                    'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
+                'タンク車明細
+                    Case 2
+                        '○ 画面表示データ復元
+                        If Not Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text) Then Exit Sub
 
-                    updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                    updHeader.Item("LASTOILNAME") = WW_GetValue(4)
-                    updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
-                    updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
-                    '####################################################
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0003tbl_tab3.AsEnumerable.
+                            FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+                        If IsNothing(updHeader) Then Exit Sub
 
-                    '交検日
-                    Dim WW_JRINSPECTIONCNT As String
-                    updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                    If WW_GetValue(2) <> "" Then
-                        WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+                        '### ここに書く #######
 
-                        Dim WW_JRINSPECTIONFLG As String
-                        If WW_JRINSPECTIONCNT <= 3 Then
-                            WW_JRINSPECTIONFLG = "1"
-                        ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
-                            WW_JRINSPECTIONFLG = "2"
-                        Else
-                            WW_JRINSPECTIONFLG = "3"
-                        End If
-                        Select Case WW_JRINSPECTIONFLG
-                            Case "1"
-                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
-                                updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                            Case "2"
-                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
-                                updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                            Case "3"
-                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
-                                updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                        End Select
-                    Else
-                        updHeader.Item("JRINSPECTIONALERT") = ""
-                    End If
+                        '○ 画面表示データ保存
+                        If Not Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text) Then Exit Sub
 
-                    '全検日
-                    Dim WW_JRALLINSPECTIONCNT As String
-                    updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                    If WW_GetValue(3) <> "" Then
-                        WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+                '費用入力
+                    Case 3
+                        '○ 画面表示データ復元
+                        If Not Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text) Then Exit Sub
 
-                        Dim WW_JRALLINSPECTIONFLG As String
-                        If WW_JRALLINSPECTIONCNT <= 3 Then
-                            WW_JRALLINSPECTIONFLG = "1"
-                        ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
-                            WW_JRALLINSPECTIONFLG = "2"
-                        Else
-                            WW_JRALLINSPECTIONFLG = "3"
-                        End If
-                        Select Case WW_JRALLINSPECTIONFLG
-                            Case "1"
-                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
-                                updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                            Case "2"
-                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
-                                updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                            Case "3"
-                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
-                                updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                        End Select
-                    Else
-                        updHeader.Item("JRALLINSPECTIONALERT") = ""
-                    End If
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0003tbl_tab4.AsEnumerable.
+                            FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+                        If IsNothing(updHeader) Then Exit Sub
 
-                    '〇 タンク車割当状況チェック
-                    WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+                        '### ここに書く #######
 
-                End If
-                'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                        '○ 画面表示データ保存
+                        If Not Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text) Then Exit Sub
 
-                '○ 画面表示データ保存
-                If Not Master.SaveTable(OIT0003tbl) Then Exit Sub
+                End Select
 
         End Select
 
@@ -6796,8 +6932,8 @@ Public Class OIT0003OrderDetail
             WW_FixvalueMasterSearch(OIT0003row("LASTOILCODE") + OIT0003row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0003row("OILCODE") + OIT0003row("ORDERINGTYPE"), WW_GetValue)
 
             If WW_GetValue(2) = "1" Then
-                OIT0003row("ORDERINFO") = "83"
-                OIT0003row("ORDERINFONAME") = "前回油種確認"
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_83
+                CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 
                 'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
@@ -7331,7 +7467,7 @@ Public Class OIT0003OrderDetail
                                 Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
                         End Select
 
-                        WW_CheckTRAINCARSERR(WW_CheckMES1, WW_CheckMES2, OIT0003UPDrow)
+                        WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003UPDrow)
                         O_RTN = "ERR3"
                         Exit Sub
                     End If
@@ -7353,7 +7489,6 @@ Public Class OIT0003OrderDetail
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
-
 
     ''' <summary>
     ''' 本線列車に紐づく情報を取得
@@ -7584,6 +7719,18 @@ Public Class OIT0003OrderDetail
 
             '入換・積込指示
             Case 1
+                '〇 (一覧)テキストボックスの制御(読取専用)
+                Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
+                Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+                For Each rowitem As TableRow In tblObj.Rows
+                    For Each cellObj As TableCell In rowitem.Controls
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        End If
+                    Next
+                Next
 
             'タンク車明細
             Case 2

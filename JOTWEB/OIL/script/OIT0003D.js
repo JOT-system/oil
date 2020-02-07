@@ -192,6 +192,12 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "RETURNDATETRAIN") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
+        else if (fieldNM === "LOADINGIRILINETRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 47;
+        }
+        else if (fieldNM === "LOADINGOUTLETTRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 48;
+        }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";

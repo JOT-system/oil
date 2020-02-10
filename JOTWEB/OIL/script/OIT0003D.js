@@ -201,6 +201,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "LINE") {
             document.getElementById('WF_LeftMViewChange').value = 49;
         }
+        else if (fieldNM === "ACTUALLODDATE") {
+            document.getElementById('WF_LeftMViewChange').value = 17;
+        }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";

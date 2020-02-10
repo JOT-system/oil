@@ -36,7 +36,7 @@ Public Class GRIS0001Title
         If I_MAPID = LOGONID Then
             'ID、表題設定
             WF_TITLEID.Text = "ID: Logon"
-            WF_TITLETEXT.Text = "Welcome to FrontEnd Support System"
+            WF_TITLETEXT.Text = "新石油システム（仮称）（今後変わるよ）"
             WF_TITLECAMP.Text = ""
             '現在日付設定
             WF_TITLEDATE.Text = DateTime.Now.ToString("yyyy年MM月dd日 HH時mm分")

@@ -2196,11 +2196,11 @@ Public Class OIT0002LinkDetail
         '     1 : dt1はdt2より後の日
         '(予定)空車着日 と　利用可能日を比較
         iresult = Date.Parse(TxtEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
-        If iresult = -1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
+        If iresult = 1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
             TxtEmpDate.Focus()
-            WW_CheckMES1 = "利用可能日より過去の日付のためエラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR
+            WW_CheckMES1 = "(予定)空車着日"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -2208,11 +2208,11 @@ Public Class OIT0002LinkDetail
 
         '(実績)空車着日 と　利用可能日を比較
         iresult = Date.Parse(TxtActEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
-        If iresult = -1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+        If iresult = 1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
             TxtActEmpDate.Focus()
-            WW_CheckMES1 = "利用可能日より過去の日付のためエラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR
+            WW_CheckMES1 = "(実績)空車着日"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub

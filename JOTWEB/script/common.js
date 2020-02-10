@@ -48,6 +48,13 @@ window.addEventListener('DOMContentLoaded', function () {
             document.getElementById("WF_MESSAGE").innerText = "";
         }
     }
+    /* テキストボックスフォーカスがあった時点で選択 */
+    var texboxObjList = document.querySelectorAll("input[type='text'],input[type='password']");
+    for (let i = 0; i < texboxObjList.length; i++) {
+        texboxObjList[i].addEventListener('focus', function () {
+            this.select();
+        });
+    }
     // マウスポインタ戻す
     AutoCursor();
     //フォーカス合わせ

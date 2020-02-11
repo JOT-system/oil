@@ -34,9 +34,45 @@ Public Class GRIS0001Title
         'ID、表題設定
         WF_TITLEID.Text = "ID: " & I_MAPID
         If I_MAPID = LOGONID Then
+
+            ' システム名称タイトル取得
+            Try
+                '検索SQL文
+                Dim SQLStr As String =
+                         "SELECT rtrim(A.VALUE1) as NAMES " _
+                       & " FROM  COM.OIS0015_FIXVALUE A " _
+                       & " Where  " _
+                       & "       A.CAMPCODE   = '01' " _
+                       & "   and A.CLASS = 'SYSTEMNAME' " _
+                       & "   and A.KEYCODE = 'NAME' " _
+                       & "   and A.DELFLG  <> '1' "
+
+                'DataBase接続文字
+                Using SQLcon As SqlConnection = CS0050Session.getConnection,
+                      SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                    SQLcon.Open() 'DataBase接続(Open)
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+
+                        If SQLdr.HasRows = True Then
+                            While SQLdr.Read
+                                WF_TITLETEXT.Text = Convert.ToString(SQLdr("NAMES"))
+                            End While
+                        Else
+                            WF_TITLETEXT.Text = "業務メニュー"
+                        End If
+
+                    End Using
+
+                End Using
+            Catch ex As Exception
+                O_RTN = C_MESSAGE_NO.DB_ERROR
+                Exit Sub
+            End Try
+
             'ID、表題設定
             WF_TITLEID.Text = "ID: Logon"
-            WF_TITLETEXT.Text = "新石油システム（仮称）（今後変わるよ）"
+            ' WF_TITLETEXT.Text = "新石油システム（仮称）（今後変わるよ）"
             WF_TITLECAMP.Text = ""
             '現在日付設定
             WF_TITLEDATE.Text = DateTime.Now.ToString("yyyy年MM月dd日 HH時mm分")

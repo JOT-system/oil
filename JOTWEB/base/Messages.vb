@@ -437,9 +437,9 @@ Public Module Messages
         Public Const OIL_TANKNO_MIWARIATE_ERROR As String = "20014"
 
         ''' <summary>
-        ''' 年月日妥当性エラー(利用可能日より過去日付)
+        ''' 日付関連エラー(利用可能日より（予定）空車着日)
         ''' </summary>
-        Public Const OIL_DATE_AVAILABLEDATE_ERROR As String = "20015"
+        Public Const OIL_DATE_AVAILABLEDATE_ERROR_Y As String = "20015"
 
         ''' <summary>
         ''' 列車牽引車数オーバー
@@ -465,6 +465,13 @@ Public Module Messages
         ''' 積込可能油種件数オーバー
         ''' </summary>
         Public Const OIL_LOADING_OIL_RECORD_OVER As String = "20020"
+
+        ''' <summary>
+        ''' 日付関連エラー(利用可能日より（実績）空車着日)
+        ''' </summary>
+        Public Const OIL_DATE_AVAILABLEDATE_ERROR_J As String = "20021"
+
+
 
 #End Region
 

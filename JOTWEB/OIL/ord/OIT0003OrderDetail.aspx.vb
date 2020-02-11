@@ -56,6 +56,10 @@ Public Class OIT0003OrderDetail
 
     Private WW_RINKAIFLG As Boolean = False                         '臨海鉄道対象可否(TRUE：対象, FALSE:未対象)
 
+    Private WW_SwapInput As String = "0"                            '入換指示入力(0:未 1:完了)
+    Private WW_LoadingInput As String = "0"                         '積込指示入力(0:未 1:完了)
+    Private WW_DeliveryInput As String = "0"                        '託送指示入力(0:未 1:完了)
+
     Private WW_ORDERINFOFLG_10 As Boolean = False                   '受注情報セット可否(情報(10:積置))
     Private WW_ORDERINFOALERMFLG_80 As Boolean = False              '受注情報セット可否(警告(80:タンク車数オーバー))
     Private WW_ORDERINFOALERMFLG_82 As Boolean = False              '受注情報セット可否(警告(82:検査間近あり))
@@ -68,7 +72,7 @@ Public Class OIT0003OrderDetail
                     '○ 画面表示データ復元
                     Master.RecoverTable(OIT0003tbl)
                     Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
-                    'Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+                    Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
                     'Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
                     Select Case WF_ButtonClick.Value
@@ -1733,6 +1737,32 @@ Public Class OIT0003OrderDetail
                 WW_DataCNT += 1
                 '行(LINECNT)を再設定する。既存項目(SELECT)を利用
                 OIT0003tab3row("SELECT") = WW_DataCNT
+
+                '(実績)積込日(テキストボックス)を、(一覧)の(実績)積込日に反映
+                If OIT0003tab3row("ACTUALLODDATE") = "" Then
+                    OIT0003tab3row("ACTUALLODDATE") = TxtActualLoadingDate.Text
+                End If
+
+                '(実績)発日(テキストボックス)を、(一覧)の(実績)発日に反映
+                If OIT0003tab3row("ACTUALDEPDATE") = "" Then
+                    OIT0003tab3row("ACTUALDEPDATE") = TxtActualDepDate.Text
+                End If
+
+                '(実績)積込着日(テキストボックス)を、(一覧)の(実績)積込着日に反映
+                If OIT0003tab3row("ACTUALARRDATE") = "" Then
+                    OIT0003tab3row("ACTUALARRDATE") = TxtActualArrDate.Text
+                End If
+
+                '(実績)受入日(テキストボックス)を、(一覧)の(実績)受入日に反映
+                If OIT0003tab3row("ACTUALACCDATE") = "" Then
+                    OIT0003tab3row("ACTUALACCDATE") = TxtActualAccDate.Text
+                End If
+
+                '(実績)空車着日(テキストボックス)を、(一覧)の(実績)空車着日に反映
+                If OIT0003tab3row("ACTUALEMPARRDATE") = "" Then
+                    OIT0003tab3row("ACTUALEMPARRDATE") = TxtActualEmparrDate.Text
+                End If
+
             End If
         Next
 
@@ -3062,11 +3092,27 @@ Public Class OIT0003OrderDetail
         rightview.SetErrorReport("")
 
         Dim WW_RESULT As String = ""
+        Dim WW_Message As String = ""
+        'WW_DeliveryInput = "0"                        '託送指示入力(0:未 1:完了)
+
+        '五井営業所、甲子営業所、袖ヶ浦営業所、三重塩浜営業所の場合
+        '積込列車番号の入力を可能とする。
+        If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
+            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
+            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011203" Then
+
+            '臨海鉄道対象のため有効にする。
+            WW_RINKAIFLG = True
+
+        End If
 
         '○関連チェック
-        WW_CheckTab2(WW_ERRCODE)
+        WW_CheckTab2(WW_ERRCODE, WW_Message)
         If WW_ERRCODE = "ERR" Then
-            Exit Sub
+            '入換指示入力(0:未 1:完了)
+            WW_SwapInput = "0"
+            WW_RESULT = WW_ERRCODE
+            'Exit Sub
         End If
 
         '受注明細DB更新
@@ -3077,32 +3123,117 @@ Public Class OIT0003OrderDetail
         End Using
 
         '〇 積場スペックチェック
-        WW_CheckLoadingSpecs(WW_ERRCODE)
-        If WW_ERRCODE = "ERR1" Then
-            Master.Output(C_MESSAGE_NO.OIL_FILLINGPOINT_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+        WW_CheckLoadingSpecs(WW_ERRCODE, WW_Message)
+        If WW_ERRCODE = "ERR" Then
+            '積込指示入力(0:未 1:完了)
+            WW_LoadingInput = "0"
+        ElseIf WW_ERRCODE = "ERR1" Then
+            '積込指示入力(0:未 1:完了)
+            WW_LoadingInput = "0"
+            'Master.Output(C_MESSAGE_NO.OIL_FILLINGPOINT_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            'Exit Sub
         ElseIf WW_ERRCODE = "ERR2" Then
-            Master.Output(C_MESSAGE_NO.OIL_LOADINGSPECS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+            '積込指示入力(0:未 1:完了)
+            WW_LoadingInput = "0"
+            'Master.Output(C_MESSAGE_NO.OIL_LOADINGSPECS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            'Exit Sub
         ElseIf WW_ERRCODE = "ERR3" Then
-            Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
+            '積込指示入力(0:未 1:完了)
+            WW_LoadingInput = "0"
+            'Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            'Exit Sub
         End If
 
+        '###############################################################################################
         '受注進行ステータス退避用
         Dim strOrderStatus As String = ""
-        '〇受注ステータスが"手配中"の場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
 
-            '臨海鉄道未対象の場合
-            If WW_RINKAIFLG = False Then
-                '手配完了
-                strOrderStatus = CONST_ORDERSTATUS_270
-            Else
-                '手配中(託送指示未手配)
-                strOrderStatus = CONST_ORDERSTATUS_260
-            End If
+        '臨海鉄道未対象の場合
+        If WW_RINKAIFLG = False Then
+            '〇 受注進行ステータスの状態
+            Select Case work.WF_SEL_ORDERSTATUS.Text
+                '受注進行ステータス＝"200:手配中"
+                Case BaseDllConst.CONST_ORDERSTATUS_200
+                    '積込指示入力＝"1:完了"の場合
+                    If WW_LoadingInput = "1" Then
+                        '手配完了
+                        strOrderStatus = CONST_ORDERSTATUS_270
+                    End If
+            End Select
 
+        Else
+            '〇 受注進行ステータスの状態
+            Select Case work.WF_SEL_ORDERSTATUS.Text
+                '受注進行ステータス＝"200:手配中"
+                '受注進行ステータス＝"210:手配中(入換指示手配済)"
+                '受注進行ステータス＝"220:手配中(積込指示手配済)"
+                '受注進行ステータス＝"230:手配中(託送指示手配済)"
+                '受注進行ステータス＝"240:手配中(入換指示未手配)"
+                '受注進行ステータス＝"250:手配中(積込指示未手配)"
+                '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                Case BaseDllConst.CONST_ORDERSTATUS_200,
+                     BaseDllConst.CONST_ORDERSTATUS_210,
+                     BaseDllConst.CONST_ORDERSTATUS_220,
+                     BaseDllConst.CONST_ORDERSTATUS_230,
+                     BaseDllConst.CONST_ORDERSTATUS_240,
+                     BaseDllConst.CONST_ORDERSTATUS_250,
+                     BaseDllConst.CONST_ORDERSTATUS_260
+
+                    '入換指示入力＝"1:完了"
+                    'かつ、積込指示入力＝"1:完了"
+                    'かつ、託送指示入力＝"1:完了"の場合
+                    If WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "1" Then
+                        '手配完了
+                        strOrderStatus = CONST_ORDERSTATUS_270
+
+                        '入換指示入力＝"1:完了"
+                        'かつ、積込指示入力＝"0:未完了"
+                        'かつ、託送指示入力＝"0:未完了"の場合
+                    ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso WW_DeliveryInput = "0" Then
+                        '手配中(入換指示手配済)
+                        strOrderStatus = CONST_ORDERSTATUS_210
+
+                        '入換指示入力＝"0:未完了"
+                        'かつ、積込指示入力＝"1:完了"
+                        'かつ、託送指示入力＝"0:未完了"の場合
+                    ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "0" Then
+                        '手配中(積込指示手配済)
+                        strOrderStatus = CONST_ORDERSTATUS_220
+
+                        '入換指示入力＝"0:未完了"
+                        'かつ、積込指示入力＝"0:未完了"
+                        'かつ、託送指示入力＝"1:完了"の場合
+                    ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "0" AndAlso WW_DeliveryInput = "1" Then
+                        '手配中(託送指示手配済)
+                        strOrderStatus = CONST_ORDERSTATUS_230
+
+                        '入換指示入力＝"0:未完了"
+                        'かつ、積込指示入力＝"1:完了"
+                        'かつ、託送指示入力＝"1:完了"の場合
+                    ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "1" Then
+                        '手配中(入換指示未手配)
+                        strOrderStatus = CONST_ORDERSTATUS_240
+
+                        '入換指示入力＝"1:完了"
+                        'かつ、積込指示入力＝"0:未完了"
+                        'かつ、託送指示入力＝"1:完了"の場合
+                    ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso WW_DeliveryInput = "1" Then
+                        '手配中(積込指示未手配)
+                        strOrderStatus = CONST_ORDERSTATUS_250
+
+                        '入換指示入力＝"1:完了"
+                        'かつ、積込指示入力＝"1:完了"
+                        'かつ、託送指示入力＝"0:未完了"の場合
+                    ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "0" Then
+                        '手配中(託送指示未手配)
+                        strOrderStatus = CONST_ORDERSTATUS_260
+
+                    End If
+            End Select
+        End If
+
+        '受注進行ステータスに変更があった場合
+        If strOrderStatus <> "" Then
             '〇(受注TBL)受注進行ステータス更新
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
@@ -3113,6 +3244,52 @@ Public Class OIT0003OrderDetail
                 work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
             End Using
         End If
+
+
+        If WW_RESULT = "ERR" Then
+            WW_ERRCODE = WW_RESULT
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, WW_Message, needsPopUp:=True)
+            Exit Sub
+        ElseIf WW_ERRCODE = "ERR" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, WW_Message, needsPopUp:=True)
+            Exit Sub
+        ElseIf WW_ERRCODE = "ERR1" Then
+            Master.Output(C_MESSAGE_NO.OIL_FILLINGPOINT_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        ElseIf WW_ERRCODE = "ERR2" Then
+            Master.Output(C_MESSAGE_NO.OIL_LOADINGSPECS_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        ElseIf WW_ERRCODE = "ERR3" Then
+            Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '###############################################################################################
+        ''受注進行ステータス退避用
+        'Dim strOrderStatus As String = ""
+
+        ''〇受注ステータスが"手配中"の場合
+        'If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
+
+        '    '臨海鉄道未対象の場合
+        '    If WW_RINKAIFLG = False Then
+        '        '手配完了
+        '        strOrderStatus = CONST_ORDERSTATUS_270
+        '    Else
+        '        '手配中(託送指示未手配)
+        '        strOrderStatus = CONST_ORDERSTATUS_260
+        '    End If
+
+        '    '〇(受注TBL)受注進行ステータス更新
+        '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+        '        SQLcon.Open()       'DataBase接続
+
+        '        WW_UpdateOrderStatus(strOrderStatus)
+        '        CODENAME_get("ORDERSTATUS", strOrderStatus, TxtOrderStatus.Text, WW_DUMMY)
+        '        work.WF_SEL_ORDERSTATUS.Text = strOrderStatus
+        '        work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
+        '    End Using
+        'End If
 
     End Sub
 
@@ -3187,6 +3364,7 @@ Public Class OIT0003OrderDetail
 
                 'タンク車明細
             Case 2
+                WW_ListChange_TAB3()
 
                 '費用入力
             Case 3
@@ -3483,6 +3661,43 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' リスト変更時処理(タブ「タンク車明細」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListChange_TAB3()
+        '○ LINECNT取得
+        Dim WW_LINECNT As Integer = 0
+        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0003tbl_tab3.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        '○ 設定項目取得
+        '対象フォーム項目取得
+        Dim WW_ListValue = Request.Form("txt" & pnlListArea3.ID & WF_FIELD.Value & WF_GridDBclick.Text)
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        Select Case WF_FIELD.Value
+            Case "CARSAMOUNT",           '(一覧)数量
+                 "JOINT"                 '(一覧)ジョイント先
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+            Case "CHANGETRAINNO",        '(一覧)本線列車番号変更
+                 "SECONDARRSTATIONNAME", '(一覧)第2着駅
+                 "SECONDCONSIGNEENAME",  '(一覧)第2荷受人
+                 "CHANGEARRSTATIONNAME"  '(一覧)空車着駅(変更)
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+    End Sub
+
+    ''' <summary>
     ''' タブ切替
     ''' </summary>
     ''' <remarks></remarks>
@@ -3517,15 +3732,15 @@ Public Class OIT0003OrderDetail
                 '入換・積込指示
                 WF_Dtab02.CssClass = "selected"
 
-                ''○ 画面表示データ取得
-                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                '    SQLcon.Open()       'DataBase接続
+                '○ 画面表示データ取得
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
 
-                '    MAPDataGetTab2(SQLcon)
-                'End Using
+                    MAPDataGetTab2(SQLcon)
+                End Using
 
-                ''○ 画面表示データ保存
-                'Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
 
             Case 2
                 'タンク車明細
@@ -5803,8 +6018,10 @@ Public Class OIT0003OrderDetail
 
             'タブ「タンク車割当」　　⇒　(一覧)荷主, (一覧)油種, (一覧)タンク車№
             'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線
+            'タブ「タンク車明細」　　⇒　(一覧)(実績)積込日, (実績)発日, (実績)積車着日, (実績)受入日, (実績)空車着日
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO",
-                 "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE"
+                 "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE",
+                 "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -5815,7 +6032,7 @@ Public Class OIT0003OrderDetail
 
                 '各タブにより設定を制御
                 Select Case WF_DetailMView.ActiveViewIndex
-                'タンク車割当
+                '◆タンク車割当
                     Case 0
                         '○ 画面表示データ復元
                         If Not Master.RecoverTable(OIT0003tbl) Then Exit Sub
@@ -5974,7 +6191,7 @@ Public Class OIT0003OrderDetail
                         '○ 画面表示データ保存
                         If Not Master.SaveTable(OIT0003tbl) Then Exit Sub
 
-                '入換・積込指示
+                '◆入換・積込指示
                     Case 1
                         '○ 画面表示データ復元
                         If Not Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text) Then Exit Sub
@@ -6084,7 +6301,7 @@ Public Class OIT0003OrderDetail
                         '○ 画面表示データ保存
                         If Not Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text) Then Exit Sub
 
-                'タンク車明細
+                '◆タンク車明細
                     Case 2
                         '○ 画面表示データ復元
                         If Not Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text) Then Exit Sub
@@ -6094,12 +6311,31 @@ Public Class OIT0003OrderDetail
                             FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
                         If IsNothing(updHeader) Then Exit Sub
 
-                        '### ここに書く #######
+                        '〇 一覧項目へ設定
+                        '(実績)積込日, (実績)発日, (実績)積車積込日, (実績)受入日, (実績)空車着日を一覧に設定
+                        If WF_FIELD.Value = "ACTUALLODDATE" _
+                            OrElse WF_FIELD.Value = "ACTUALDEPDATE" _
+                            OrElse WF_FIELD.Value = "ACTUALARRDATE" _
+                            OrElse WF_FIELD.Value = "ACTUALACCDATE" _
+                            OrElse WF_FIELD.Value = "ACTUALEMPARRDATE" Then
+
+                            Dim WW_DATE As Date
+                            Try
+                                Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                                If WW_DATE < C_DEFAULT_YMD Then
+                                    updHeader.Item(WF_FIELD.Value) = ""
+                                Else
+                                    updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
+                                End If
+                            Catch ex As Exception
+                            End Try
+
+                        End If
 
                         '○ 画面表示データ保存
                         If Not Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text) Then Exit Sub
 
-                '費用入力
+                '◆費用入力
                     Case 3
                         '○ 画面表示データ復元
                         If Not Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text) Then Exit Sub
@@ -7049,7 +7285,7 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckTab2(ByRef O_RTN As String)
+    Protected Sub WW_CheckTab2(ByRef O_RTN As String, ByRef O_Msg As String)
         O_RTN = C_MESSAGE_NO.NORMAL
         Dim WW_TEXT As String = ""
         Dim WW_CheckMES1 As String = ""
@@ -7064,12 +7300,13 @@ Public Class OIT0003OrderDetail
             '※臨海鉄道対象の場合
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGIRILINETRAINNO") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線列車番号", needsPopUp:=True)
+                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線列車番号", needsPopUp:=True)
 
                 WW_CheckMES1 = "積込入線列車番号未設定エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
+                O_Msg = "(一覧)積込入線列車番号"
                 Exit Sub
             End If
 
@@ -7077,47 +7314,49 @@ Public Class OIT0003OrderDetail
             '※臨海鉄道対象の場合
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGIRILINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線順", needsPopUp:=True)
+                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)積込入線順", needsPopUp:=True)
 
                 WW_CheckMES1 = "積込入線順未設定エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
+                O_Msg = "(一覧)積込入線順"
                 Exit Sub
             End If
 
-            '(一覧)回線(空白チェック)
-            If OIT0003row("LINE") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)回線", needsPopUp:=True)
+            ''(一覧)回線(空白チェック)
+            'If OIT0003row("LINE") = "" And OIT0003row("DELFLG") = "0" Then
+            '    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)回線", needsPopUp:=True)
 
-                WW_CheckMES1 = "回線未設定エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            '    WW_CheckMES1 = "回線未設定エラー。"
+            '    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
 
-            '(一覧)充填ポイント(空白チェック)
-            If OIT0003row("FILLINGPOINT") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)充填ポイント", needsPopUp:=True)
+            ''(一覧)充填ポイント(空白チェック)
+            'If OIT0003row("FILLINGPOINT") = "" And OIT0003row("DELFLG") = "0" Then
+            '    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)充填ポイント", needsPopUp:=True)
 
-                WW_CheckMES1 = "充填ポイント未設定エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            '    WW_CheckMES1 = "充填ポイント未設定エラー。"
+            '    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            '    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
 
             '(一覧)出線列車番号(空白チェック)
             '※臨海鉄道対象の場合
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGOUTLETTRAINNO") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線列車番号", needsPopUp:=True)
+                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線列車番号", needsPopUp:=True)
 
                 WW_CheckMES1 = "出線列車番号未設定エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
+                O_Msg = "(一覧)出線列車番号"
                 Exit Sub
             End If
 
@@ -7125,18 +7364,22 @@ Public Class OIT0003OrderDetail
             '※臨海鉄道対象の場合
             If WW_RINKAIFLG = True _
                 And OIT0003row("LOADINGOUTLETORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線順", needsPopUp:=True)
+                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)出線順", needsPopUp:=True)
 
                 WW_CheckMES1 = "出線順未設定エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
+                O_Msg = "(一覧)出線順"
                 Exit Sub
             End If
         Next
 
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+
+        '入換指示⇒完了
+        WW_SwapInput = "1"
 
     End Sub
 
@@ -7528,7 +7771,7 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckLoadingSpecs(ByRef O_RTN As String)
+    Protected Sub WW_CheckLoadingSpecs(ByRef O_RTN As String, ByRef O_MSG As String)
         O_RTN = C_MESSAGE_NO.NORMAL
         Dim WW_LoadingTotalCars As Integer = 0
         Dim WW_CheckMES1 As String = ""
@@ -7542,6 +7785,32 @@ Public Class OIT0003OrderDetail
         Next
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
+        For Each OIT0003row As DataRow In OIT0003tbl_tab2.Rows
+            '(一覧)回線(空白チェック)
+            If OIT0003row("LINE") = "" And OIT0003row("DELFLG") = "0" Then
+                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)回線", needsPopUp:=True)
+
+                WW_CheckMES1 = "回線未設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+                O_MSG = "(一覧)回線"
+                Exit Sub
+            End If
+
+            '(一覧)充填ポイント(空白チェック)
+            If OIT0003row("FILLINGPOINT") = "" And OIT0003row("DELFLG") = "0" Then
+                'Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)充填ポイント", needsPopUp:=True)
+
+                WW_CheckMES1 = "充填ポイント未設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+                O_MSG = "(一覧)充填ポイント"
+                Exit Sub
+            End If
+        Next
 
         '〇 回線・充填ポイントでソートし、重複がないかチェックする。
         Dim OIT0003tbl_DUMMY As DataTable = OIT0003tbl_tab2.Copy
@@ -7618,6 +7887,9 @@ Public Class OIT0003OrderDetail
             If WW_ERRCODE = "ERR3" Then Exit Sub
         End Using
 
+        '積込指示⇒完了
+        WW_LoadingInput = "1"
+
     End Sub
 
     ''' <summary>
@@ -7673,7 +7945,7 @@ Public Class OIT0003OrderDetail
               " SELECT " _
             & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
-            & "   ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
+            & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.CHECKOILCODE), '') AS CHECKOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.CHECKOILNAME), '') AS CHECKOILNAME" _
@@ -7708,7 +7980,7 @@ Public Class OIT0003OrderDetail
             & " SELECT " _
             & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
-            & "   ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
+            & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILCODE), '')   AS BIGOILCODE" _
             & " , 'ZZZZ'                                  AS CHECKOILCODE" _
             & " , ISNULL(RTRIM(OIM0003.BIGOILNAME), '')   AS CHECKOILNAME" _
@@ -7742,7 +8014,7 @@ Public Class OIT0003OrderDetail
             & " SELECT " _
             & "   ISNULL(RTRIM(OIM0003.PLANTCODE), '')    AS PLANTCODE" _
             & " , ISNULL(RTRIM(OIM0009.PLANTNAME), '')    AS PLANTNAME" _
-            & "   ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
+            & " , ISNULL(RTRIM(OIT0003.LINE), '')         AS LINE" _
             & " , ''                                      AS BIGOILCODE" _
             & " , ''                                      AS CHECKOILCODE" _
             & " , '合計'                                  AS CHECKOILNAME" _
@@ -8095,7 +8367,11 @@ Public Class OIT0003OrderDetail
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") Then
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGETRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGEARRSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
@@ -8113,9 +8389,6 @@ Public Class OIT0003OrderDetail
                 If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
                     OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
                     OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011203" Then
-
-                    '臨海鉄道対象のため有効にする。
-                    WW_RINKAIFLG = True
 
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
@@ -8144,8 +8417,23 @@ Public Class OIT0003OrderDetail
 
             'タンク車明細
             Case 2
+                '〇 (一覧)テキストボックスの制御(読取専用)
+                Dim divObj = DirectCast(pnlListArea3.FindControl(pnlListArea3.ID & "_DR"), Panel)
+                Dim tblObj = DirectCast(divObj.Controls(0), Table)
 
-            '費用入力
+                For Each rowitem As TableRow In tblObj.Rows
+                    For Each cellObj As TableCell In rowitem.Controls
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        End If
+                    Next
+                Next
+
+                '費用入力
             Case 3
 
 

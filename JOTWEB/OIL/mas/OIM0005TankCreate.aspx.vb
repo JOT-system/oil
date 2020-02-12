@@ -345,6 +345,10 @@ Public Class OIM0005TankCreate
         '予備
         WF_RESERVE3.Text = work.WF_SEL_RESERVE3.Text
 
+        '利用フラグ
+        WF_USEDFLG.Text = work.WF_SEL_USEDFLG2.Text
+        CODENAME_get("USEDFLG", WF_USEDFLG.Text, WF_USEDFLG_TEXT.Text, WW_RTN_SW)
+
         '削除
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
         CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
@@ -460,18 +464,36 @@ Public Class OIM0005TankCreate
             & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
-            & " FROM OIL.OIM0005_TANK OIM0005 "
+            & " , ISNULL(RTRIM(OIM0005.USEDFLG), '')         AS USEDFLG " _
+            & " FROM OIL.OIM0005_TANK OIM0005 " _
+            & " WHERE OIM0005.DELFLG <> @P3 "
 
-        If work.WF_SEL_TANKNUMBER.Text = "" And
-            work.WF_SEL_MODEL.Text = "" Then
-            SQLStr &=
-              " WHERE OIM0005.DELFLG      <> @P3"
-        Else
-            SQLStr &=
-              " WHERE (OIM0005.TANKNUMBER = @P1" _
-            & "   OR OIM0005.MODEL = @P2)" _
-            & "   AND OIM0005.DELFLG      <> @P3"
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        'タンク車№
+        If Not String.IsNullOrEmpty(work.WF_SEL_TANKNUMBER.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.TANKNUMBER = '{0}'", work.WF_SEL_TANKNUMBER.Text)
         End If
+
+        '型式
+        If Not String.IsNullOrEmpty(work.WF_SEL_MODEL.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.MODEL = '{0}'", work.WF_SEL_MODEL.Text)
+        End If
+
+        '利用フラグ
+        If Not String.IsNullOrEmpty(work.WF_SEL_USEDFLG.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
+        End If
+
+        'If work.WF_SEL_TANKNUMBER.Text = "" And
+        '    work.WF_SEL_MODEL.Text = "" Then
+        '    SQLStr &=
+        '      " WHERE OIM0005.DELFLG      <> @P3"
+        'Else
+        '    SQLStr &=
+        '      " WHERE (OIM0005.TANKNUMBER = @P1" _
+        '    & "   OR OIM0005.MODEL = @P2)" _
+        '    & "   AND OIM0005.DELFLG      <> @P3"
+        'End If
 
         SQLStr &=
               " ORDER BY" _
@@ -479,12 +501,12 @@ Public Class OIM0005TankCreate
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 8)        'JOT車番
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)       '型式
+                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 8)        'JOT車番
+                'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)       '型式
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
 
-                PARA1.Value = work.WF_SEL_TANKNUMBER.Text
-                PARA2.Value = work.WF_SEL_MODEL.Text
+                'PARA1.Value = work.WF_SEL_TANKNUMBER.Text
+                'PARA2.Value = work.WF_SEL_MODEL.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -997,18 +1019,20 @@ Public Class OIM0005TankCreate
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            'Case "WF_TANKNUMBER"        'JOT車番
+            'Case "WF_TANKNUMBER"               'JOT車番
             '    CODENAME_get("TANKNUMBER", WF_TANKNUMBER.Text, WF_TANKNUMBER_TEXT.Text, WW_RTN_SW)
-            Case "WF_MODEL"             '型式
+            Case "WF_MODEL"                     '型式
                 CODENAME_get("TANKMODEL", WF_MODEL.Text, WF_MODEL_TEXT.Text, WW_RTN_SW)
-            Case "WF_DELFLG"             '削除フラグ
+            Case "WF_DELFLG"                    '削除フラグ
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
-            Case "WF_CURRENTSTATIONCODE"     '原常備駅C
+            Case "WF_CURRENTSTATIONCODE"        '原常備駅C
                 CODENAME_get("STATIONPATTERN", WF_CURRENTSTATIONCODE.Text, WF_CURRENTSTATIONCODE_TEXT.Text, WW_RTN_SW)
-            Case "WF_EXTRADINARYSTATIONCODE"      '臨時常備駅C
+            Case "WF_EXTRADINARYSTATIONCODE"    '臨時常備駅C
                 CODENAME_get("STATIONPATTERN", WF_EXTRADINARYSTATIONCODE.Text, WF_EXTRADINARYSTATIONCODE_TEXT.Text, WW_RTN_SW)
-            Case "WF_OPERATIONBASECODE"      '運用基地
+            Case "WF_OPERATIONBASECODE"         '運用基地
                 CODENAME_get("BASE", WF_OPERATIONBASECODE.Text, WF_OPERATIONBASECODE_TEXT.Text, WW_RTN_SW)
+            Case "USEDFLG"                      '利用フラグ
+                CODENAME_get("USEDFLG", WF_USEDFLG.Text, WF_USEDFLG_TEXT.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -1230,6 +1254,13 @@ Public Class OIM0005TankCreate
                     Catch ex As Exception
                     End Try
                     WF_JRSPECIFIEDDATE.Focus()
+
+                '利用フラグ
+                Case "WF_USEDFLG"
+                    WF_USEDFLG.Text = WW_SelectValue
+                    WF_USEDFLG_TEXT.Text = WW_SelectText
+                    WF_USEDFLG.Focus()
+
             End Select
         Else
         End If
@@ -1251,59 +1282,63 @@ Public Class OIM0005TankCreate
         '○ フォーカスセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                Case "WF_DELFLG"                '削除フラグ
+                Case "WF_DELFLG"                    '削除フラグ
                     WF_DELFLG.Focus()
 
-                Case "WF_TANKNUMBER"               'JOT車番
+                Case "WF_TANKNUMBER"                'JOT車番
                     WF_TANKNUMBER.Focus()
 
-                Case "WF_LEASESTYMD"             'リース開始年月日
+                Case "WF_LEASESTYMD"                'リース開始年月日
                     WF_LEASESTYMD.Focus()
 
-                Case "WF_LEASEENDYMD"             'リース満了年月日
+                Case "WF_LEASEENDYMD"               'リース満了年月日
                     WF_LEASEENDYMD.Focus()
 
-                Case "WF_CURRENTSTATIONCODE"               '原常備駅C
+                Case "WF_CURRENTSTATIONCODE"        '原常備駅C
                     WF_CURRENTSTATIONCODE.Focus()
 
-                Case "WF_EXTRADINARYSTATIONCODE"               '臨時常備駅C
+                Case "WF_EXTRADINARYSTATIONCODE"    '臨時常備駅C
                     WF_EXTRADINARYSTATIONCODE.Focus()
 
-                Case "WF_USERLIMIT"            '第三者使用期限
+                Case "WF_USERLIMIT"                 '第三者使用期限
                     WF_USERLIMIT.Focus()
 
-                Case "WF_LIMITTEXTRADIARYSTATION"             '臨時常備駅期限
+                Case "WF_LIMITTEXTRADIARYSTATION"   '臨時常備駅期限
                     WF_LIMITTEXTRADIARYSTATION.Focus()
 
-                Case "WF_EXTRADINARYLIMIT"            '臨時専用期限
+                Case "WF_EXTRADINARYLIMIT"          '臨時専用期限
                     WF_EXTRADINARYLIMIT.Focus()
 
-                Case "WF_OPERATIONBASECODE"               '運用基地
+                Case "WF_OPERATIONBASECODE"         '運用基地
                     WF_OPERATIONBASECODE.Focus()
 
-                Case "WF_ALLINSPECTIONDATE"             '取得年月日
+                Case "WF_ALLINSPECTIONDATE"         '取得年月日
                     WF_ALLINSPECTIONDATE.Focus()
 
-                Case "WF_TRANSFERDATE"            '車籍編入年月日
+                Case "WF_TRANSFERDATE"              '車籍編入年月日
                     WF_TRANSFERDATE.Focus()
 
-                Case "WF_MODEL"               '型式
+                Case "WF_MODEL"                     '型式
                     WF_MODEL.Focus()
 
                 Case "WF_SPECIFIEDDATE"             '次回指定年月日
                     WF_SPECIFIEDDATE.Focus()
 
-                Case "WF_JRALLINSPECTIONDATE"            '次回全検年月日(JR)
+                Case "WF_JRALLINSPECTIONDATE"       '次回全検年月日(JR)
                     WF_JRALLINSPECTIONDATE.Focus()
 
-                Case "WF_JRINSPECTIONDATE"             '次回交検年月日(JR）
+                Case "WF_JRINSPECTIONDATE"          '次回交検年月日(JR）
                     WF_JRINSPECTIONDATE.Focus()
 
                 Case "WF_INSPECTIONDATE"            '次回交検年月日
                     WF_INSPECTIONDATE.Focus()
 
-                Case "WF_JRSPECIFIEDDATE"            '次回指定年月日(JR)
+                Case "WF_JRSPECIFIEDDATE"           '次回指定年月日(JR)
                     WF_JRSPECIFIEDDATE.Focus()
+
+                Case "USEDFLG"                      '利用フラグ
+                    WF_USEDFLG.Focus()
+
             End Select
         Else
         End If
@@ -2791,6 +2826,7 @@ Public Class OIM0005TankCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> 富士石油車番 =" & OIM0005row("FUJITANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シ車番 =" & OIM0005row("SHELLTANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 予備 =" & OIM0005row("RESERVE3") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 利用フラグ =" & OIM0005row("USEDFLG") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIM0005row("DELFLG")
         End If
 
@@ -3024,21 +3060,24 @@ Public Class OIM0005TankCreate
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"             '運用部署
+                Case "ORG"              '運用部署
                     prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TANKNUMBER"        'JOT車番
+                Case "TANKNUMBER"       'JOT車番
                     prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "MODEL"        '型式
+                Case "MODEL"            '型式
                     prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "STATIONPATTERN"　 '原常備駅C、臨時常備駅C
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "BASE"      '運用基地
+                Case "BASE"             '運用基地
                     prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "USEDFLG"          '利用フラグ
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
             End Select

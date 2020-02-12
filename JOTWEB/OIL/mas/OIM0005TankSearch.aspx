@@ -66,6 +66,16 @@
                     <asp:Label ID="WF_MODEL_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
+            <!-- 利用フラグ -->
+            <div class="inputItem">
+                <a id="WF_USEDFLG_LABEL">利用フラグ</a>
+                <a class="ef"  id="WF_USEDFLG"  ondblclick="Field_DBclick('WF_USEDFLG', <%=LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY%>);" onchange="TextBox_change('WF_USEDFLG');">
+                    <asp:TextBox  ID="WF_USEDFLG_CODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
+                </a>
+                <a id="WF_USEDFLG_TEXT">
+                    <asp:Label ID="WF_USEDFLG_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
         </div> <!-- End inputBox -->
     </div> <!-- End searchbox -->
 

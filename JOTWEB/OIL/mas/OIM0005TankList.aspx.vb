@@ -256,111 +256,129 @@ Public Class OIM0005TankList
         '     条件指定に従い該当データをタンク車マスタから取得する
         Dim SQLStr As String =
               " SELECT " _
-            & "   0                                     AS LINECNT " _
-            & " , ''                                    AS OPERATION " _
-            & " , CAST(OIM0005.UPDTIMSTP AS bigint)       AS UPDTIMSTP " _
-            & " , 1                                     AS 'SELECT' " _
-            & " , 0                                     AS HIDDEN " _
-            & " , ISNULL(RTRIM(OIM0005.DELFLG), '')         AS DELFLG " _
-            & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')         AS TANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.MODEL), '')         AS MODEL " _
-            & " , ISNULL(RTRIM(OIM0005.MODELKANA), '')         AS MODELKANA " _
-            & " , ISNULL(RTRIM(OIM0005.LOAD), '')         AS LOAD " _
-            & " , ISNULL(RTRIM(OIM0005.LOADUNIT), '')         AS LOADUNIT " _
-            & " , ISNULL(RTRIM(OIM0005.VOLUME), '')         AS VOLUME " _
-            & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')         AS VOLUMEUNIT " _
-            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')         AS ORIGINOWNERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')         AS ORIGINOWNERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')         AS OWNERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.OWNERNAME), '')         AS OWNERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECODE), '')         AS LEASECODE " _
-            & " , ISNULL(RTRIM(OIM0005.LEASENAME), '')         AS LEASENAME " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')         AS LEASECLASS " _
-            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')         AS LEASECLASSNEMAE " _
-            & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')         AS AUTOEXTENTION " _
-            & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN ''                   " _
-            & "   ELSE FORMAT(OIM0005.LEASESTYMD,'yyyy/MM/dd')              " _
-            & "   END                                     as LEASESTYMD   " _
-            & " , CASE WHEN OIM0005.LEASEENDYMD IS NULL THEN ''                   " _
-            & "   ELSE FORMAT(OIM0005.LEASEENDYMD,'yyyy/MM/dd')              " _
-            & "   END                                     as LEASEENDYMD   " _
-            & " , ISNULL(RTRIM(OIM0005.USERCODE), '')         AS USERCODE " _
-            & " , ISNULL(RTRIM(OIM0005.USERNAME), '')         AS USERNAME " _
-            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONCODE), '')         AS CURRENTSTATIONCODE " _
-            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONNAME), '')         AS CURRENTSTATIONNAME " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONCODE), '')         AS EXTRADINARYSTATIONCODE " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONNAME), '')         AS EXTRADINARYSTATIONNAME " _
-            & " , CASE WHEN OIM0005.USERLIMIT IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.USERLIMIT,'yyyy/MM/dd')              " _
-            & "   END                                     as USERLIMIT   " _
-            & " , CASE WHEN OIM0005.LIMITTEXTRADIARYSTATION IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.LIMITTEXTRADIARYSTATION,'yyyy/MM/dd')              " _
-            & "   END                                     as LIMITTEXTRADIARYSTATION   " _
-            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPECODE), '')         AS DEDICATETYPECODE " _
-            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPENAME), '')         AS DEDICATETYPENAME " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPECODE), '')         AS EXTRADINARYTYPECODE " _
-            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPENAME), '')         AS EXTRADINARYTYPENAME " _
-            & " , CASE WHEN OIM0005.EXTRADINARYLIMIT IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.EXTRADINARYLIMIT,'yyyy/MM/dd')              " _
-            & "   END                                     as EXTRADINARYLIMIT   " _
-            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')         AS OPERATIONBASECODE " _
-            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')         AS OPERATIONBASENAME " _
-            & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')         AS COLORCODE " _
-            & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')         AS COLORNAME " _
-            & " , ISNULL(RTRIM(OIM0005.ENEOS), '')         AS ENEOS " _
-            & " , ISNULL(RTRIM(OIM0005.ECO), '')         AS ECO " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE1), '')         AS RESERVE1 " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE2), '')         AS RESERVE2 " _
-            & " , CASE WHEN OIM0005.JRINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.INSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.INSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as INSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.JRSPECIFIEDDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRSPECIFIEDDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRSPECIFIEDDATE   " _
-            & " , CASE WHEN OIM0005.SPECIFIEDDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.SPECIFIEDDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as SPECIFIEDDATE   " _
-            & " , CASE WHEN OIM0005.JRALLINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.JRALLINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as JRALLINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.ALLINSPECTIONDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.ALLINSPECTIONDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as ALLINSPECTIONDATE   " _
-            & " , CASE WHEN OIM0005.TRANSFERDATE IS NULL THEN ''                   " _
-            & "              ELSE FORMAT(OIM0005.TRANSFERDATE,'yyyy/MM/dd')              " _
-            & "   END                                     as TRANSFERDATE   " _
-            & " , ISNULL(RTRIM(OIM0005.OBTAINEDCODE), '')         AS OBTAINEDCODE " _
-            & " , CAST(ISNULL(RTRIM(OIM0005.PROGRESSYEAR), '') AS VarChar)         AS PROGRESSYEAR " _
-            & " , CAST(ISNULL(RTRIM(OIM0005.NEXTPROGRESSYEAR), '') AS VarChar)         AS NEXTPROGRESSYEAR " _
-            & " , ISNULL(RTRIM(OIM0005.JRTANKNUMBER), '')         AS JRTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.OLDTANKNUMBER), '')         AS OLDTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.OTTANKNUMBER), '')         AS OTTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER), '')         AS JXTGTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.COSMOTANKNUMBER), '')         AS COSMOTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
-            & " FROM OIL.OIM0005_TANK OIM0005 "
+            & "   0                                                            AS LINECNT " _
+            & " , ''                                                           AS OPERATION " _
+            & " , CAST(OIM0005.UPDTIMSTP AS bigint)                            AS UPDTIMSTP " _
+            & " , 1                                                            AS 'SELECT' " _
+            & " , 0                                                            AS HIDDEN " _
+            & " , ISNULL(RTRIM(OIM0005.DELFLG), '')                            AS DELFLG " _
+            & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                        AS TANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.MODEL), '')                             AS MODEL " _
+            & " , ISNULL(RTRIM(OIM0005.MODELKANA), '')                         AS MODELKANA " _
+            & " , ISNULL(RTRIM(OIM0005.LOAD), '')                              AS LOAD " _
+            & " , ISNULL(RTRIM(OIM0005.LOADUNIT), '')                          AS LOADUNIT " _
+            & " , ISNULL(RTRIM(OIM0005.VOLUME), '')                            AS VOLUME " _
+            & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')                        AS VOLUMEUNIT " _
+            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')                   AS ORIGINOWNERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')                   AS ORIGINOWNERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')                         AS OWNERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.OWNERNAME), '')                         AS OWNERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECODE), '')                         AS LEASECODE " _
+            & " , ISNULL(RTRIM(OIM0005.LEASENAME), '')                         AS LEASENAME " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')                        AS LEASECLASS " _
+            & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')                   AS LEASECLASSNEMAE " _
+            & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')                     AS AUTOEXTENTION " _
+            & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN '' " _
+            & "   ELSE FORMAT(OIM0005.LEASESTYMD,'yyyy/MM/dd')" _
+            & "   END                                                          AS LEASESTYMD " _
+            & " , CASE WHEN OIM0005.LEASEENDYMD IS NULL THEN '' " _
+            & "   ELSE FORMAT(OIM0005.LEASEENDYMD,'yyyy/MM/dd') " _
+            & "   END                                                          AS LEASEENDYMD " _
+            & " , ISNULL(RTRIM(OIM0005.USERCODE), '')                          AS USERCODE " _
+            & " , ISNULL(RTRIM(OIM0005.USERNAME), '')                          AS USERNAME " _
+            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONCODE), '')                AS CURRENTSTATIONCODE " _
+            & " , ISNULL(RTRIM(OIM0005.CURRENTSTATIONNAME), '')                AS CURRENTSTATIONNAME " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONCODE), '')            AS EXTRADINARYSTATIONCODE " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYSTATIONNAME), '')            AS EXTRADINARYSTATIONNAME " _
+            & " , CASE WHEN OIM0005.USERLIMIT IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.USERLIMIT,'yyyy/MM/dd') " _
+            & "   END                                                          AS USERLIMIT " _
+            & " , CASE WHEN OIM0005.LIMITTEXTRADIARYSTATION IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.LIMITTEXTRADIARYSTATION,'yyyy/MM/dd') " _
+            & "   END                                                          AS LIMITTEXTRADIARYSTATION " _
+            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPECODE), '')                  AS DEDICATETYPECODE " _
+            & " , ISNULL(RTRIM(OIM0005.DEDICATETYPENAME), '')                  AS DEDICATETYPENAME " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPECODE), '')               AS EXTRADINARYTYPECODE " _
+            & " , ISNULL(RTRIM(OIM0005.EXTRADINARYTYPENAME), '')               AS EXTRADINARYTYPENAME " _
+            & " , CASE WHEN OIM0005.EXTRADINARYLIMIT IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.EXTRADINARYLIMIT,'yyyy/MM/dd') " _
+            & "   END                                                          AS EXTRADINARYLIMIT " _
+            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')                 AS OPERATIONBASECODE " _
+            & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')                 AS OPERATIONBASENAME " _
+            & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')                         AS COLORCODE " _
+            & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')                         AS COLORNAME " _
+            & " , ISNULL(RTRIM(OIM0005.ENEOS), '')                             AS ENEOS " _
+            & " , ISNULL(RTRIM(OIM0005.ECO), '')                               AS ECO " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE1), '')                          AS RESERVE1 " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE2), '')                          AS RESERVE2 " _
+            & " , CASE WHEN OIM0005.JRINSPECTIONDATE IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.JRINSPECTIONDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS JRINSPECTIONDATE " _
+            & " , CASE WHEN OIM0005.INSPECTIONDATE IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.INSPECTIONDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS INSPECTIONDATE " _
+            & " , CASE WHEN OIM0005.JRSPECIFIEDDATE IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.JRSPECIFIEDDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS JRSPECIFIEDDATE " _
+            & " , CASE WHEN OIM0005.SPECIFIEDDATE IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.SPECIFIEDDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS SPECIFIEDDATE " _
+            & " , CASE WHEN OIM0005.JRALLINSPECTIONDATE IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.JRALLINSPECTIONDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS JRALLINSPECTIONDATE " _
+            & " , CASE WHEN OIM0005.ALLINSPECTIONDATE IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.ALLINSPECTIONDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS ALLINSPECTIONDATE " _
+            & " , CASE WHEN OIM0005.TRANSFERDATE IS NULL THEN '' " _
+            & "              ELSE FORMAT(OIM0005.TRANSFERDATE,'yyyy/MM/dd') " _
+            & "   END                                                          AS TRANSFERDATE " _
+            & " , ISNULL(RTRIM(OIM0005.OBTAINEDCODE), '')                      AS OBTAINEDCODE " _
+            & " , CAST(ISNULL(RTRIM(OIM0005.PROGRESSYEAR), '') AS VarChar)     AS PROGRESSYEAR " _
+            & " , CAST(ISNULL(RTRIM(OIM0005.NEXTPROGRESSYEAR), '') AS VarChar) AS NEXTPROGRESSYEAR " _
+            & " , ISNULL(RTRIM(OIM0005.JRTANKNUMBER), '')                      AS JRTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.OLDTANKNUMBER), '')                     AS OLDTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.OTTANKNUMBER), '')                      AS OTTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER), '')                    AS JXTGTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.COSMOTANKNUMBER), '')                   AS COSMOTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')                    AS FUJITANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')                   AS SHELLTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')                          AS RESERVE3 " _
+            & " , ISNULL(RTRIM(OIM0005.USEDFLG), '')                           AS USEDFLG " _
+            & " FROM OIL.OIM0005_TANK OIM0005 " _
+            & " WHERE OIM0005.DELFLG <> @P3 "
 
-        If work.WF_SEL_TANKNUMBER.Text = "" And
-            work.WF_SEL_MODEL.Text = "" Then
-            SQLStr &=
-              " WHERE OIM0005.DELFLG      <> @P3"
-        ElseIf work.WF_SEL_TANKNUMBER.Text <> "" And
-            work.WF_SEL_MODEL.Text <> "" Then
-            SQLStr &=
-              " WHERE OIM0005.TANKNUMBER = @P1" _
-            & "   AND OIM0005.MODEL = @P2" _
-            & "   AND OIM0005.DELFLG      <> @P3"
-        Else
-            SQLStr &=
-              " WHERE (OIM0005.TANKNUMBER = @P1" _
-            & "   OR OIM0005.MODEL = @P2)" _
-            & "   AND OIM0005.DELFLG      <> @P3"
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        'タンク車№
+        If Not String.IsNullOrEmpty(work.WF_SEL_TANKNUMBER.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.TANKNUMBER = '{0}'", work.WF_SEL_TANKNUMBER.Text)
         End If
+
+        '型式
+        If Not String.IsNullOrEmpty(work.WF_SEL_MODEL.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.MODEL = '{0}'", work.WF_SEL_MODEL.Text)
+        End If
+
+        '利用フラグ
+        If Not String.IsNullOrEmpty(work.WF_SEL_USEDFLG.Text) Then
+            SQLStr &= String.Format("    AND OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
+        End If
+
+        'If work.WF_SEL_TANKNUMBER.Text = "" And
+        '    work.WF_SEL_MODEL.Text = "" Then
+        '    SQLStr &=
+        '      " WHERE OIM0005.DELFLG      <> @P3"
+        'ElseIf work.WF_SEL_TANKNUMBER.Text <> "" And
+        '    work.WF_SEL_MODEL.Text <> "" Then
+        '    SQLStr &=
+        '      " WHERE OIM0005.TANKNUMBER = @P1" _
+        '    & "   AND OIM0005.MODEL = @P2" _
+        '    & "   AND OIM0005.DELFLG      <> @P3"
+        'Else
+        '    SQLStr &=
+        '      " WHERE (OIM0005.TANKNUMBER = @P1" _
+        '    & "   OR OIM0005.MODEL = @P2)" _
+        '    & "   AND OIM0005.DELFLG      <> @P3"
+        'End If
 
         SQLStr &=
               " ORDER BY" _
@@ -368,12 +386,12 @@ Public Class OIM0005TankList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 8)        'JOT車番
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)       '型式
+                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 8)        'JOT車番
+                'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)       '型式
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
 
-                PARA1.Value = work.WF_SEL_TANKNUMBER.Text
-                PARA2.Value = work.WF_SEL_MODEL.Text
+                'PARA1.Value = work.WF_SEL_TANKNUMBER.Text
+                'PARA2.Value = work.WF_SEL_MODEL.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -494,7 +512,7 @@ Public Class OIM0005TankList
         '選択行
         work.WF_SEL_LINECNT.Text = ""
 
-        'JOT車番
+        'JOT車番(登録(新規追加用))
         work.WF_SEL_TANKNUMBER2.Text = ""
 
         '原籍所有者C
@@ -563,7 +581,7 @@ Public Class OIM0005TankList
         '取得先C
         work.WF_SEL_OBTAINEDCODE.Text = ""
 
-        '形式
+        '形式(登録(新規追加用))
         work.WF_SEL_MODEL2.Text = ""
 
         '形式カナ
@@ -664,6 +682,9 @@ Public Class OIM0005TankList
 
         '予備
         work.WF_SEL_RESERVE3.Text = ""
+
+        '利用フラグ(登録(新規追加用))
+        work.WF_SEL_USEDFLG2.Text = "1"
 
         '削除
         work.WF_SEL_DELFLG.Text = "0"
@@ -835,6 +856,7 @@ Public Class OIM0005TankList
             & "        , FUJITANKNUMBER = @P55" _
             & "        , SHELLTANKNUMBER = @P56" _
             & "        , RESERVE3 = @P57" _
+            & "        , USEDFLG = @P65" _
             & "        , UPDYMD = @P61" _
             & "        , UPDUSER = @P62" _
             & "        , UPDTERMID = @P63" _
@@ -901,6 +923,7 @@ Public Class OIM0005TankList
             & "        , FUJITANKNUMBER" _
             & "        , SHELLTANKNUMBER" _
             & "        , RESERVE3" _
+            & "        , USEDFLG" _
             & "        , INITYMD" _
             & "        , INITUSER" _
             & "        , INITTERMID" _
@@ -967,6 +990,7 @@ Public Class OIM0005TankList
             & "        , @P55" _
             & "        , @P56" _
             & "        , @P57" _
+            & "        , @P65" _
             & "        , @P58" _
             & "        , @P59" _
             & "        , @P60" _
@@ -1038,6 +1062,7 @@ Public Class OIM0005TankList
             & "    , FUJITANKNUMBER" _
             & "    , SHELLTANKNUMBER" _
             & "    , RESERVE3" _
+            & "    , USEDFLG" _
             & "    , INITYMD" _
             & "    , INITUSER" _
             & "    , INITTERMID" _
@@ -1053,102 +1078,103 @@ Public Class OIM0005TankList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
-                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)            '削除フラグ
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 8)            'JOT車番
-                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)            '原籍所有者C
-                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)            '名義所有者C
-                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)            'リース先C
-                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)            'リース区分C
-                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 20)            '自動延長
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.Date)            'リース開始年月日
-                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.Date)            'リース満了年月日
-                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)            '第三者使用者C
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)            '原常備駅C
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)            '臨時常備駅C
-                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.Date)            '第三者使用期限
-                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Date)            '臨時常備駅期限
-                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 20)            '原専用種別C
-                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 20)            '臨時専用種別C
-                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.Date)            '臨時専用期限
-                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 20)            '運用基地C
-                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 20)            '塗色C
-                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 20)            'エネオス
-                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 20)            'エコレール
-                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.Date)            '取得年月日
-                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.Date)            '車籍編入年月日
-                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 20)            '取得先C
-                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 20)            '形式
-                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.NVarChar, 10)            '形式カナ
-                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Float, 4, 1)            '荷重
-                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 2)            '荷重単位
-                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.Float, 4, 1)            '容積
-                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 2)            '容積単位
-                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)            '原籍所有者
-                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 20)            '名義所有者
-                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)            'リース先
-                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)            'リース区分
-                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 20)            '第三者使用者
-                Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 20)            '原常備駅
-                Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 20)            '臨時常備駅
-                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 20)            '原専用種別
-                Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar, 20)            '臨時専用種別
-                Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar, 20)            '運用場所
-                Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 20)            '塗色
-                Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.NVarChar, 20)            '予備1
-                Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar, 20)            '予備2
-                Dim PARA43 As SqlParameter = SQLcmd.Parameters.Add("@P43", SqlDbType.Date)            '次回指定年月日
-                Dim PARA44 As SqlParameter = SQLcmd.Parameters.Add("@P44", SqlDbType.Date)            '次回全検年月日(JR) 
-                Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.Int)            '現在経年
-                Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.Int)            '次回全検時経年
-                Dim PARA47 As SqlParameter = SQLcmd.Parameters.Add("@P47", SqlDbType.Date)            '次回交検年月日(JR）
-                Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.Date)            '次回交検年月日
-                Dim PARA49 As SqlParameter = SQLcmd.Parameters.Add("@P49", SqlDbType.Date)            '次回指定年月日(JR)
-                Dim PARA50 As SqlParameter = SQLcmd.Parameters.Add("@P50", SqlDbType.NVarChar, 20)            'JR車番
-                Dim PARA51 As SqlParameter = SQLcmd.Parameters.Add("@P51", SqlDbType.NVarChar, 20)            '旧JOT車番
-                Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar, 20)            'OT車番
-                Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar, 20)            'JXTG車番
-                Dim PARA54 As SqlParameter = SQLcmd.Parameters.Add("@P54", SqlDbType.NVarChar, 20)            'コスモ車番
-                Dim PARA55 As SqlParameter = SQLcmd.Parameters.Add("@P55", SqlDbType.NVarChar, 20)            '富士石油車番
-                Dim PARA56 As SqlParameter = SQLcmd.Parameters.Add("@P56", SqlDbType.NVarChar, 20)            '出光昭シ車番
-                Dim PARA57 As SqlParameter = SQLcmd.Parameters.Add("@P57", SqlDbType.NVarChar, 20)            '予備
-                Dim PARA58 As SqlParameter = SQLcmd.Parameters.Add("@P58", SqlDbType.DateTime)            '登録年月日
-                Dim PARA59 As SqlParameter = SQLcmd.Parameters.Add("@P59", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
-                Dim PARA60 As SqlParameter = SQLcmd.Parameters.Add("@P60", SqlDbType.NVarChar, 20)            '登録端末
-                Dim PARA61 As SqlParameter = SQLcmd.Parameters.Add("@P61", SqlDbType.DateTime)            '更新年月日
-                Dim PARA62 As SqlParameter = SQLcmd.Parameters.Add("@P62", SqlDbType.NVarChar, 20)            '更新ユーザーＩＤ
-                Dim PARA63 As SqlParameter = SQLcmd.Parameters.Add("@P63", SqlDbType.NVarChar, 20)            '更新端末
-                Dim PARA64 As SqlParameter = SQLcmd.Parameters.Add("@P64", SqlDbType.DateTime)            '集信日時
+                Dim PARA00 As SqlParameter = SQLcmd.Parameters.Add("@P00", SqlDbType.NVarChar, 1)           '削除フラグ
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 8)           'JOT車番
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20)          '原籍所有者C
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 20)          '名義所有者C
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20)          'リース先C
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20)          'リース区分C
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 20)          '自動延長
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.Date)                  'リース開始年月日
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.Date)                  'リース満了年月日
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)          '第三者使用者C
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)          '原常備駅C
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)          '臨時常備駅C
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.Date)                  '第三者使用期限
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Date)                  '臨時常備駅期限
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 20)          '原専用種別C
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 20)          '臨時専用種別C
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.Date)                  '臨時専用期限
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 20)          '運用基地C
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 20)          '塗色C
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 20)          'エネオス
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 20)          'エコレール
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.Date)                  '取得年月日
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.Date)                  '車籍編入年月日
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 20)          '取得先C
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 20)          '形式
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.NVarChar, 10)          '形式カナ
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Float, 4, 1)           '荷重
+                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 2)           '荷重単位
+                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.Float, 4, 1)           '容積
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 2)           '容積単位
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 20)          '原籍所有者
+                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 20)          '名義所有者
+                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)          'リース先
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)          'リース区分
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 20)          '第三者使用者
+                Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 20)          '原常備駅
+                Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 20)          '臨時常備駅
+                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 20)          '原専用種別
+                Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar, 20)          '臨時専用種別
+                Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar, 20)          '運用場所
+                Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 20)          '塗色
+                Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.NVarChar, 20)          '予備1
+                Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar, 20)          '予備2
+                Dim PARA43 As SqlParameter = SQLcmd.Parameters.Add("@P43", SqlDbType.Date)                  '次回指定年月日
+                Dim PARA44 As SqlParameter = SQLcmd.Parameters.Add("@P44", SqlDbType.Date)                  '次回全検年月日(JR) 
+                Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.Int)                   '現在経年
+                Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.Int)                   '次回全検時経年
+                Dim PARA47 As SqlParameter = SQLcmd.Parameters.Add("@P47", SqlDbType.Date)                  '次回交検年月日(JR）
+                Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.Date)                  '次回交検年月日
+                Dim PARA49 As SqlParameter = SQLcmd.Parameters.Add("@P49", SqlDbType.Date)                  '次回指定年月日(JR)
+                Dim PARA50 As SqlParameter = SQLcmd.Parameters.Add("@P50", SqlDbType.NVarChar, 20)          'JR車番
+                Dim PARA51 As SqlParameter = SQLcmd.Parameters.Add("@P51", SqlDbType.NVarChar, 20)          '旧JOT車番
+                Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar, 20)          'OT車番
+                Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar, 20)          'JXTG車番
+                Dim PARA54 As SqlParameter = SQLcmd.Parameters.Add("@P54", SqlDbType.NVarChar, 20)          'コスモ車番
+                Dim PARA55 As SqlParameter = SQLcmd.Parameters.Add("@P55", SqlDbType.NVarChar, 20)          '富士石油車番
+                Dim PARA56 As SqlParameter = SQLcmd.Parameters.Add("@P56", SqlDbType.NVarChar, 20)          '出光昭シ車番
+                Dim PARA57 As SqlParameter = SQLcmd.Parameters.Add("@P57", SqlDbType.NVarChar, 20)          '予備
+                Dim PARA65 As SqlParameter = SQLcmd.Parameters.Add("@P65", SqlDbType.NVarChar, 1)           '利用フラグ
+                Dim PARA58 As SqlParameter = SQLcmd.Parameters.Add("@P58", SqlDbType.DateTime)              '登録年月日
+                Dim PARA59 As SqlParameter = SQLcmd.Parameters.Add("@P59", SqlDbType.NVarChar, 20)          '登録ユーザーＩＤ
+                Dim PARA60 As SqlParameter = SQLcmd.Parameters.Add("@P60", SqlDbType.NVarChar, 20)          '登録端末
+                Dim PARA61 As SqlParameter = SQLcmd.Parameters.Add("@P61", SqlDbType.DateTime)              '更新年月日
+                Dim PARA62 As SqlParameter = SQLcmd.Parameters.Add("@P62", SqlDbType.NVarChar, 20)          '更新ユーザーＩＤ
+                Dim PARA63 As SqlParameter = SQLcmd.Parameters.Add("@P63", SqlDbType.NVarChar, 20)          '更新端末
+                Dim PARA64 As SqlParameter = SQLcmd.Parameters.Add("@P64", SqlDbType.DateTime)              '集信日時
 
-                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)            '削除フラグ
-                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)            'JOT車番
-                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 20)            '原籍所有者C
-                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 20)            '名義所有者C
-                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 20)            'リース先C
-                Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 20)            'リース区分C
-                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 20)            '自動延長
-                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.Date)            'リース開始年月日
-                Dim JPARA08 As SqlParameter = SQLcmdJnl.Parameters.Add("@P08", SqlDbType.Date)            'リース満了年月日
-                Dim JPARA09 As SqlParameter = SQLcmdJnl.Parameters.Add("@P09", SqlDbType.NVarChar, 20)            '第三者使用者C
-                Dim JPARA10 As SqlParameter = SQLcmdJnl.Parameters.Add("@P10", SqlDbType.NVarChar, 20)            '原常備駅C
-                Dim JPARA11 As SqlParameter = SQLcmdJnl.Parameters.Add("@P11", SqlDbType.NVarChar, 20)            '臨時常備駅C
-                Dim JPARA12 As SqlParameter = SQLcmdJnl.Parameters.Add("@P12", SqlDbType.Date)            '第三者使用期限
-                Dim JPARA13 As SqlParameter = SQLcmdJnl.Parameters.Add("@P13", SqlDbType.Date)            '臨時常備駅期限
-                Dim JPARA14 As SqlParameter = SQLcmdJnl.Parameters.Add("@P14", SqlDbType.NVarChar, 20)            '原専用種別C
-                Dim JPARA15 As SqlParameter = SQLcmdJnl.Parameters.Add("@P15", SqlDbType.NVarChar, 20)            '臨時専用種別C
-                Dim JPARA16 As SqlParameter = SQLcmdJnl.Parameters.Add("@P16", SqlDbType.Date)            '臨時専用期限
-                Dim JPARA17 As SqlParameter = SQLcmdJnl.Parameters.Add("@P17", SqlDbType.NVarChar, 20)            '運用基地C
-                Dim JPARA18 As SqlParameter = SQLcmdJnl.Parameters.Add("@P18", SqlDbType.NVarChar, 20)            '塗色C
-                Dim JPARA19 As SqlParameter = SQLcmdJnl.Parameters.Add("@P19", SqlDbType.NVarChar, 20)            'エネオス
-                Dim JPARA20 As SqlParameter = SQLcmdJnl.Parameters.Add("@P20", SqlDbType.NVarChar, 20)            'エコレール
-                Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P21", SqlDbType.Date)            '取得年月日
-                Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P22", SqlDbType.Date)            '車籍編入年月日
-                Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P23", SqlDbType.NVarChar, 20)            '取得先C
-                'Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P24", SqlDbType.NVarChar, 20)            '形式
-                'Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P25", SqlDbType.NVarChar, 10)            '形式カナ
-                'Dim JPARA26 As SqlParameter = SQLcmdJnl.Parameters.Add("@P26", SqlDbType.Float, 4, 1)            '荷重
-                'Dim JPARA27 As SqlParameter = SQLcmdJnl.Parameters.Add("@P27", SqlDbType.NVarChar, 2)            '荷重単位
-                'Dim JPARA28 As SqlParameter = SQLcmdJnl.Parameters.Add("@P28", SqlDbType.Float, 4, 1)            '容積
-                'Dim JPARA29 As SqlParameter = SQLcmdJnl.Parameters.Add("@P29", SqlDbType.NVarChar, 2)            '容積単位
+                Dim JPARA00 As SqlParameter = SQLcmdJnl.Parameters.Add("@P00", SqlDbType.NVarChar, 1)       '削除フラグ
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 8)       'JOT車番
+                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 20)      '原籍所有者C
+                Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 20)      '名義所有者C
+                Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 20)      'リース先C
+                Dim JPARA05 As SqlParameter = SQLcmdJnl.Parameters.Add("@P05", SqlDbType.NVarChar, 20)      'リース区分C
+                Dim JPARA06 As SqlParameter = SQLcmdJnl.Parameters.Add("@P06", SqlDbType.NVarChar, 20)      '自動延長
+                Dim JPARA07 As SqlParameter = SQLcmdJnl.Parameters.Add("@P07", SqlDbType.Date)              'リース開始年月日
+                Dim JPARA08 As SqlParameter = SQLcmdJnl.Parameters.Add("@P08", SqlDbType.Date)              'リース満了年月日
+                Dim JPARA09 As SqlParameter = SQLcmdJnl.Parameters.Add("@P09", SqlDbType.NVarChar, 20)      '第三者使用者C
+                Dim JPARA10 As SqlParameter = SQLcmdJnl.Parameters.Add("@P10", SqlDbType.NVarChar, 20)      '原常備駅C
+                Dim JPARA11 As SqlParameter = SQLcmdJnl.Parameters.Add("@P11", SqlDbType.NVarChar, 20)      '臨時常備駅C
+                Dim JPARA12 As SqlParameter = SQLcmdJnl.Parameters.Add("@P12", SqlDbType.Date)              '第三者使用期限
+                Dim JPARA13 As SqlParameter = SQLcmdJnl.Parameters.Add("@P13", SqlDbType.Date)              '臨時常備駅期限
+                Dim JPARA14 As SqlParameter = SQLcmdJnl.Parameters.Add("@P14", SqlDbType.NVarChar, 20)      '原専用種別C
+                Dim JPARA15 As SqlParameter = SQLcmdJnl.Parameters.Add("@P15", SqlDbType.NVarChar, 20)      '臨時専用種別C
+                Dim JPARA16 As SqlParameter = SQLcmdJnl.Parameters.Add("@P16", SqlDbType.Date)              '臨時専用期限
+                Dim JPARA17 As SqlParameter = SQLcmdJnl.Parameters.Add("@P17", SqlDbType.NVarChar, 20)      '運用基地C
+                Dim JPARA18 As SqlParameter = SQLcmdJnl.Parameters.Add("@P18", SqlDbType.NVarChar, 20)      '塗色C
+                Dim JPARA19 As SqlParameter = SQLcmdJnl.Parameters.Add("@P19", SqlDbType.NVarChar, 20)      'エネオス
+                Dim JPARA20 As SqlParameter = SQLcmdJnl.Parameters.Add("@P20", SqlDbType.NVarChar, 20)      'エコレール
+                Dim JPARA21 As SqlParameter = SQLcmdJnl.Parameters.Add("@P21", SqlDbType.Date)              '取得年月日
+                Dim JPARA22 As SqlParameter = SQLcmdJnl.Parameters.Add("@P22", SqlDbType.Date)              '車籍編入年月日
+                Dim JPARA23 As SqlParameter = SQLcmdJnl.Parameters.Add("@P23", SqlDbType.NVarChar, 20)      '取得先C
+                'Dim JPARA24 As SqlParameter = SQLcmdJnl.Parameters.Add("@P24", SqlDbType.NVarChar, 20)     '形式
+                'Dim JPARA25 As SqlParameter = SQLcmdJnl.Parameters.Add("@P25", SqlDbType.NVarChar, 10)     '形式カナ
+                'Dim JPARA26 As SqlParameter = SQLcmdJnl.Parameters.Add("@P26", SqlDbType.Float, 4, 1)      '荷重
+                'Dim JPARA27 As SqlParameter = SQLcmdJnl.Parameters.Add("@P27", SqlDbType.NVarChar, 2)      '荷重単位
+                'Dim JPARA28 As SqlParameter = SQLcmdJnl.Parameters.Add("@P28", SqlDbType.Float, 4, 1)      '容積
+                'Dim JPARA29 As SqlParameter = SQLcmdJnl.Parameters.Add("@P29", SqlDbType.NVarChar, 2)      '容積単位
                 'Dim JPARA30 As SqlParameter = SQLcmdJnl.Parameters.Add("@P30", SqlDbType.NVarChar, 20)            '原籍所有者
                 'Dim JPARA31 As SqlParameter = SQLcmdJnl.Parameters.Add("@P31", SqlDbType.NVarChar, 20)            '名義所有者
                 'Dim JPARA32 As SqlParameter = SQLcmdJnl.Parameters.Add("@P32", SqlDbType.NVarChar, 20)            'リース先
@@ -1177,6 +1203,7 @@ Public Class OIM0005TankList
                 'Dim JPARA55 As SqlParameter = SQLcmdJnl.Parameters.Add("@P55", SqlDbType.NVarChar, 20)            '富士石油車番
                 'Dim JPARA56 As SqlParameter = SQLcmdJnl.Parameters.Add("@P56", SqlDbType.NVarChar, 20)            '出光昭シ車番
                 'Dim JPARA57 As SqlParameter = SQLcmdJnl.Parameters.Add("@P57", SqlDbType.NVarChar, 20)            '予備
+                'Dim JPARA65 As SqlParameter = SQLcmdJnl.Parameters.Add("@P65", SqlDbType.NVarChar, 1)            '利用フラグ
                 'Dim JPARA58 As SqlParameter = SQLcmdJnl.Parameters.Add("@P58", SqlDbType.DateTime)            '登録年月日
                 'Dim JPARA59 As SqlParameter = SQLcmdJnl.Parameters.Add("@P59", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
                 'Dim JPARA60 As SqlParameter = SQLcmdJnl.Parameters.Add("@P60", SqlDbType.NVarChar, 20)            '登録端末
@@ -1286,6 +1313,7 @@ Public Class OIM0005TankList
                         PARA55.Value = OIM0005row("FUJITANKNUMBER")
                         PARA56.Value = OIM0005row("SHELLTANKNUMBER")
                         PARA57.Value = OIM0005row("RESERVE3")
+                        PARA65.Value = OIM0005row("USEDFLG")
                         PARA58.Value = WW_DATENOW
                         PARA59.Value = Master.USERID
                         PARA60.Value = Master.USERTERMID
@@ -1385,6 +1413,7 @@ Public Class OIM0005TankList
                         'JPARA55.Value = OIM0005row("FUJITANKNUMBER")
                         'JPARA56.Value = OIM0005row("SHELLTANKNUMBER")
                         'JPARA57.Value = OIM0005row("RESERVE3")
+                        'JPARA65.Value = OIM0005row("USEDFLG")
                         'JPARA58.Value = WW_DATENOW
                         'JPARA59.Value = Master.USERID
                         'JPARA60.Value = Master.USERTERMID
@@ -1743,6 +1772,9 @@ Public Class OIM0005TankList
 
         '予備
         work.WF_SEL_RESERVE3.Text = OIM0005tbl.Rows(WW_LINECNT)("RESERVE3")
+
+        '利用フラグ(登録(新規追加用))
+        work.WF_SEL_USEDFLG2.Text = OIM0005tbl.Rows(WW_LINECNT)("USEDFLG")
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIM0005tbl.Rows(WW_LINECNT)("DELFLG")

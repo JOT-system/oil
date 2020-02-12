@@ -221,6 +221,33 @@ Partial Public Class OIM0004StationCreate
     Protected WithEvents LblTypeNameKanaText As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''LblDepArrStation コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblDepArrStation As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtDepArrStation コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtDepArrStation As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblDepArrStationName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblDepArrStationName As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

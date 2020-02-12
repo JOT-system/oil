@@ -96,16 +96,18 @@ Public Class OIM0005TankSearch
             work.Initialize()
 
             '初期変数設定処理
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
-            Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)       '組織コード
-            Master.GetFirstValue(work.WF_SEL_TANKNUMBER.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text)       'JOT車番
-            Master.GetFirstValue(work.WF_SEL_MODEL.Text, "MODEL", WF_MODEL_CODE.Text)       '型式
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)               '会社コード
+            Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)                              '組織コード
+            Master.GetFirstValue(work.WF_SEL_TANKNUMBER.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text)    'JOT車番
+            Master.GetFirstValue(work.WF_SEL_MODEL.Text, "MODEL", WF_MODEL_CODE.Text)                   '型式
+            Master.GetFirstValue(work.WF_SEL_USEDFLG.Text, "USEPROPRIETY", WF_USEDFLG_CODE.Text)        '利用フラグ
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
-            WF_ORG.Text = work.WF_SEL_ORG.Text            '組織コード
-            WF_TANKNUMBER_CODE.Text = work.WF_SEL_TANKNUMBER.Text            'JOT車番
-            WF_MODEL_CODE.Text = work.WF_SEL_MODEL.Text            '型式
+            WF_ORG.Text = work.WF_SEL_ORG.Text                      '組織コード
+            WF_TANKNUMBER_CODE.Text = work.WF_SEL_TANKNUMBER.Text   'JOT車番
+            WF_MODEL_CODE.Text = work.WF_SEL_MODEL.Text             '型式
+            WF_USEDFLG_CODE.Text = work.WF_SEL_USEDFLG.Text         '利用フラグ
         End If
 
         '○ RightBox情報設定
@@ -125,10 +127,11 @@ Public Class OIM0005TankSearch
         rightview.Initialize("画面レイアウト設定", WW_DUMMY)
 
         '○ 名称設定処理
-        'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
-        'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
-        CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_DUMMY)         'JOT車番
-        'CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_DUMMY)         '型式
+        'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)             '会社コード
+        'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)                            '組織コード
+        CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_DUMMY)  'JOT車番
+        'CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_DUMMY)                 '型式
+        CODENAME_get("USEDFLG", WF_USEDFLG_CODE.Text, WF_USEDFLG_NAME.Text, WW_DUMMY)           '利用フラグ
 
     End Sub
 
@@ -142,6 +145,7 @@ Public Class OIM0005TankSearch
         '○ 入力文字置き換え(使用禁止文字排除)
         Master.EraseCharToIgnore(WF_TANKNUMBER_CODE.Text)     'JOT車番
         Master.EraseCharToIgnore(WF_MODEL_CODE.Text)          '型式
+        Master.EraseCharToIgnore(WF_USEDFLG_CODE.Text)        '利用フラグ
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -154,7 +158,7 @@ Public Class OIM0005TankSearch
         work.WF_SEL_ORG.Text = WF_ORG.Text                    '組織コード
         work.WF_SEL_TANKNUMBER.Text = WF_TANKNUMBER_CODE.Text 'JOT車番
         work.WF_SEL_MODEL.Text = WF_MODEL_CODE.Text           '型式
-
+        work.WF_SEL_USEDFLG.Text = WF_USEDFLG_CODE.Text       '利用フラグ  
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -227,6 +231,26 @@ Public Class OIM0005TankSearch
             Exit Sub
         End If
 
+        '利用フラグ
+        Master.CheckField(WF_CAMPCODE.Text, "USEDFLG", WF_USEDFLG_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            If WF_USEDFLG_CODE.Text <> "" Then
+                '存在チェック
+                CODENAME_get("USEDFLG", WF_USEDFLG_CODE.Text, WF_USEDFLG_NAME.Text, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "利用フラグ : " & WF_USEDFLG_CODE.Text, needsPopUp:=True)
+                    WF_USEDFLG_CODE.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "利用フラグ", needsPopUp:=True)
+            WF_USEDFLG_CODE.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -287,10 +311,12 @@ Public Class OIM0005TankSearch
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "WF_TANKNUMBER"        'JOT車番
+            Case "WF_TANKNUMBER"    'JOT車番
                 CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
                 'Case "WF_MODEL"             '型式
                 '    CODENAME_get("TANKMODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_RTN_SW)
+            Case "WF_USEDFLG"       '利用フラグ
+                CODENAME_get("USEDFLG", WF_USEDFLG_CODE.Text, WF_USEDFLG_NAME.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -334,6 +360,11 @@ Public Class OIM0005TankSearch
                 WF_MODEL_CODE.Text = WW_SelectValue
                 'WF_MODEL_NAME.Text = WW_SelectText
                 WF_MODEL_CODE.Focus()
+
+            Case "WF_USEDFLG"          '利用フラグ
+                WF_USEDFLG_CODE.Text = WW_SelectValue
+                WF_USEDFLG_NAME.Text = WW_SelectText
+                WF_USEDFLG_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -351,10 +382,12 @@ Public Class OIM0005TankSearch
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "WF_TANKNUMBER"          'JOT車番
+            Case "WF_TANKNUMBER"        'JOT車番
                 WF_TANKNUMBER_CODE.Focus()
-            Case "WF_MODEL"          '型式
+            Case "WF_MODEL"             '型式
                 WF_MODEL_CODE.Focus()
+            Case "WF_USEDFLG"           '利用フラグ
+                WF_USEDFLG_CODE.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -422,15 +455,18 @@ Public Class OIM0005TankSearch
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "ORG"             '運用部署
+                Case "ORG"              '運用部署
                     prmData = work.CreateORGParam(WF_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TANKNUMBER"        'JOT車番
+                Case "TANKNUMBER"       'JOT車番
                     prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "MODEL"        '型式
+                Case "MODEL"            '型式
                     prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "USEDFLG"          '利用フラグ
+                    prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

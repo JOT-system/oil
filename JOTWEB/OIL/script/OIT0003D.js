@@ -201,7 +201,11 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "LINE") {
             document.getElementById('WF_LeftMViewChange').value = 49;
         }
-        else if (fieldNM === "ACTUALLODDATE") {
+        else if (fieldNM === "ACTUALLODDATE"
+            || fieldNM === "ACTUALDEPDATE" 
+            || fieldNM === "ACTUALARRDATE" 
+            || fieldNM === "ACTUALACCDATE" 
+            || fieldNM === "ACTUALEMPARRDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

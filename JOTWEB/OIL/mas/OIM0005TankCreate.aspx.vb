@@ -841,6 +841,8 @@ Public Class OIM0005TankCreate
 
         OIM0005INProw("RESERVE3") = WF_RESERVE3.Text              '予備
 
+        OIM0005INProw("USEDFLG") = WF_USEDFLG.Text                '利用フラグ
+
         '○ チェック用テーブルに登録する
         OIM0005INPtbl.Rows.Add(OIM0005INProw)
 
@@ -928,6 +930,7 @@ Public Class OIM0005TankCreate
         WF_ALLINSPECTIONDATE.Text = ""            '取得年月日
         WF_TRANSFERDATE.Text = ""            '車籍編入年月日
         WF_OBTAINEDCODE.Text = ""            '取得先C
+        WF_USEDFLG.Text = ""                '利用フラグ
         WF_DELFLG.Text = ""                 '削除フラグ
         WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
 
@@ -993,14 +996,50 @@ Public Class OIM0005TankCreate
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
-                            Case "WF_TANKNUMBER"       'タンク車番号
-                                prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER")
-                            Case "WF_MODEL"       'タンク車型式
-                                prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKMODEL")
-                            Case "WF_CURRENTSTATIONCODE", "WF_EXTRADINARYSTATIONCODE"      '原常備駅C、臨時常備駅C
-                                prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN")
-                            Case "WF_OPERATIONBASECODE"      '運用基地
+                            Case "WF_TANKNUMBER"       'JOT車番(タンク車番号)
+                                prmData = work.CreateTankParam(Master.USER_ORG, "TANKNUMBER")
+                                'prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER")
+
+                            '原籍所有者C
+                            Case "WF_ORIGINOWNERCODE"
+
+                            '名義所有者C
+                            Case "WF_OWNERCODE"
+
+                            'リース先C
+                            Case "WF_LEASECODE"
+
+                            'リース区分C
+                            Case "WF_LEASECLASS"
+
+                            '第三者使用者C
+                            Case "WF_USERCODE"
+
+                            '原常備駅C, 臨時常備駅C
+                            Case "WF_CURRENTSTATIONCODE", "WF_EXTRADINARYSTATIONCODE"
+                                prmData = work.CreateFIXParam(Master.USER_ORG, "STATIONPATTERN")
+                                'prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN")
+
+                            '原専用種別C
+                            Case "WF_DEDICATETYPECODE"
+
+                            '臨時専用種別C
+                            Case "WF_EXTRADINARYTYPECODE"
+
+                            '運用基地C
+                            Case "WF_OPERATIONBASECODE"
                                 prmData = work.CreateBaseParam(work.WF_SEL_CAMPCODE.Text, "BASE")
+
+                            '塗色C
+                            Case "WF_COLORCODE"
+
+                            '取得先C
+                            Case "WF_OBTAINEDCODE"
+
+                            '型式(タンク車)
+                            Case "WF_MODEL"
+                                prmData = work.CreateTankParam(work.WF_SEL_CAMPCODE.Text, "TANKMODEL")
+
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -2674,6 +2713,28 @@ Public Class OIM0005TankCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            '利用フラグ(バリデーションチェック）
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "USEDFLG", OIM0005INProw("USEDFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("USEDFLG", OIM0005INProw("USEDFLG"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(利用フラグエラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+
+
 
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
@@ -2928,6 +2989,7 @@ Public Class OIM0005TankCreate
                         OIM0005row("FUJITANKNUMBER") = OIM0005INProw("FUJITANKNUMBER") AndAlso
                         OIM0005row("SHELLTANKNUMBER") = OIM0005INProw("SHELLTANKNUMBER") AndAlso
                         OIM0005row("RESERVE3") = OIM0005INProw("RESERVE3") AndAlso
+                        OIM0005row("USEDFLG") = OIM0005INProw("USEDFLG") AndAlso
                         OIM0005INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する

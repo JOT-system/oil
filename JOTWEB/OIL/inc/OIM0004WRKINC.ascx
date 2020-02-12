@@ -22,6 +22,9 @@
     <asp:TextBox ID="WF_SEL_TYPENAME" runat="server"></asp:TextBox>
     <!-- 貨物駅種別名称カナ -->
     <asp:TextBox ID="WF_SEL_TYPENAMEKANA" runat="server"></asp:TextBox>
+    <!-- 発着駅フラグ -->
+    <asp:TextBox ID="WF_SEL_DEPARRSTATIONFLG" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_DEPARRSTATIONFLG2" runat="server"></asp:TextBox>
     <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>
     <!-- 更新データ(退避用) -->

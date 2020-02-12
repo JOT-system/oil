@@ -264,18 +264,20 @@ Public Class OIM0004StationList
 
         Dim SQLStr As String =
               " SELECT" _
-            & "   0                                          AS LINECNT" _
-            & " , ''                                         AS OPERATION" _
-            & " , CAST(OIM0004.UPDTIMSTP AS bigint)          AS TIMSTP" _
-            & " , 1                                          AS 'SELECT'" _
-            & " , 0                                          AS HIDDEN" _
-            & " , ISNULL(RTRIM(OIM0004.STATIONCODE), '')     AS STATIONCODE" _
-            & " , ISNULL(RTRIM(OIM0004.BRANCH), '   ')       AS BRANCH" _
-            & " , ISNULL(RTRIM(OIM0004.STATONNAME), '')      AS STATONNAME" _
-            & " , ISNULL(RTRIM(OIM0004.STATIONNAMEKANA), '') AS STATIONNAMEKANA" _
-            & " , ISNULL(RTRIM(OIM0004.TYPENAME), '')        AS TYPENAME" _
-            & " , ISNULL(RTRIM(OIM0004.TYPENAMEKANA), '')    AS TYPENAMEKANA" _
-            & " , ISNULL(RTRIM(OIM0004.DELFLG), '')          AS DELFLG" _
+            & "   0                                           AS LINECNT" _
+            & " , ''                                          AS OPERATION" _
+            & " , CAST(OIM0004.UPDTIMSTP AS bigint)           AS TIMSTP" _
+            & " , 1                                           AS 'SELECT'" _
+            & " , 0                                           AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIM0004.STATIONCODE), '')      AS STATIONCODE" _
+            & " , ISNULL(RTRIM(OIM0004.BRANCH), '   ')        AS BRANCH" _
+            & " , ISNULL(RTRIM(OIM0004.STATONNAME), '')       AS STATONNAME" _
+            & " , ISNULL(RTRIM(OIM0004.STATIONNAMEKANA), '')  AS STATIONNAMEKANA" _
+            & " , ISNULL(RTRIM(OIM0004.TYPENAME), '')         AS TYPENAME" _
+            & " , ISNULL(RTRIM(OIM0004.TYPENAMEKANA), '')     AS TYPENAMEKANA" _
+            & " , ISNULL(RTRIM(OIM0004.DEPARRSTATIONFLG), '') AS DEPARRSTATIONFLG" _
+            & " , ''                                          AS DEPARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIM0004.DELFLG), '')           AS DELFLG" _
             & " FROM OIL.OIM0004_STATION OIM0004 " _
             & " WHERE OIM0004.STATIONCODE like @P1" _
             & "   AND OIM0004.DELFLG      <> @P3"
@@ -287,6 +289,10 @@ Public Class OIM0004StationList
         If Not String.IsNullOrEmpty(work.WF_SEL_BRANCH.Text) Then
             'SQLStr &= String.Format("    AND OIM0004.BRANCH = '{0}'", work.WF_SEL_BRANCH.Text)
             SQLStr &= String.Format("    AND OIM0004.BRANCH like '%{0}%'", work.WF_SEL_BRANCH.Text)
+        End If
+        '発着駅フラグ
+        If Not String.IsNullOrEmpty(work.WF_SEL_DEPARRSTATIONFLG.Text) Then
+            SQLStr &= String.Format("    AND OIM0004.DEPARRSTATIONFLG like '%{0}%'", work.WF_SEL_DEPARRSTATIONFLG.Text)
         End If
 
         SQLStr &=
@@ -320,6 +326,8 @@ Public Class OIM0004StationList
                     i += 1
                     OIM0004row("LINECNT") = i        'LINECNT
 
+                    '発着駅フラグ
+                    CODENAME_get("DEPARRSTATIONFLG", OIM0004row("DEPARRSTATIONFLG"), OIM0004row("DEPARRSTATIONNAME"), WW_DUMMY)
                     ''貨物駅コード
                     'CODENAME_get("STATIONCODE", OIM0004row("STATIONCODE"), OIM0004row("STATONNAME"), WW_DUMMY)
 
@@ -451,6 +459,9 @@ Public Class OIM0004StationList
         '貨物駅種別名称
         'TxtTypeNameKana.Text = ""
         work.WF_SEL_TYPENAMEKANA.Text = ""
+
+        '発着駅フラグ
+        work.WF_SEL_DEPARRSTATIONFLG2.Text = ""
 
         '削除
         'WF_DELFLG.Text = "0"
@@ -603,25 +614,23 @@ Public Class OIM0004StationList
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIM0004_STATION" _
             & "    SET" _
-            & "        STATONNAME   = @P3        , STATIONNAMEKANA = @P4" _
-            & "        , TYPENAME   = @P5        , TYPENAMEKANA    = @P6" _
-            & "        , DELFLG     = @P7" _
-            & "        , UPDYMD     = @P11       , UPDUSER         = @P12 , UPDTERMID = @P13" _
-            & "        , RECEIVEYMD = @P14" _
+            & "        STATONNAME         = @P3  , STATIONNAMEKANA = @P4" _
+            & "        , TYPENAME         = @P5  , TYPENAMEKANA    = @P6" _
+            & "        , DEPARRSTATIONFLG = @P15 , DELFLG          = @P7" _
+            & "        , UPDYMD           = @P11 , UPDUSER         = @P12 , UPDTERMID = @P13" _
+            & "        , RECEIVEYMD       = @P14" _
             & "    WHERE" _
             & "        STATIONCODE       = @P1" _
             & "        AND BRANCH       = @P2 ;" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIM0004_STATION" _
-            & "        ( STATIONCODE , BRANCH" _
-            & "        , STATONNAME , STATIONNAMEKANA" _
-            & "        , TYPENAME   , TYPENAMEKANA  , DEPARRSTATIONFLG, DELFLG" _
-            & "        , INITYMD    , INITUSER      , INITTERMID" _
-            & "        , UPDYMD     , UPDUSER       , UPDTERMID" _
+            & "        ( STATIONCODE, BRANCH       , STATONNAME       , STATIONNAMEKANA" _
+            & "        , TYPENAME   , TYPENAMEKANA , DEPARRSTATIONFLG , DELFLG" _
+            & "        , INITYMD    , INITUSER     , INITTERMID" _
+            & "        , UPDYMD     , UPDUSER      , UPDTERMID" _
             & "        , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P1  , @P2" _
-            & "        , @P3  , @P4" _
+            & "        ( @P1  , @P2 , @P3  , @P4" _
             & "        , @P5  , @P6 , @P15 , @P7" _
             & "        , @P8  , @P9 , @P10" _
             & "        , @P11 , @P12, @P13" _
@@ -689,7 +698,7 @@ Public Class OIM0004StationList
                         PARA4.Value = OIM0004row("STATIONNAMEKANA")
                         PARA5.Value = OIM0004row("TYPENAME")
                         PARA6.Value = OIM0004row("TYPENAMEKANA")
-                        PARA15.Value = ""
+                        PARA15.Value = OIM0004row("DEPARRSTATIONFLG")
                         PARA7.Value = OIM0004row("DELFLG")
                         PARA8.Value = WW_DATENOW
                         PARA9.Value = Master.USERID
@@ -912,6 +921,9 @@ Public Class OIM0004StationList
         '貨物駅種別名称カナ
         'TxtTypeNameKana.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAMEKANA")
         work.WF_SEL_TYPENAMEKANA.Text = OIM0004tbl.Rows(WW_LINECNT)("TYPENAMEKANA")
+
+        '発着駅フラグ
+        work.WF_SEL_DEPARRSTATIONFLG2.Text = OIM0004tbl.Rows(WW_LINECNT)("DEPARRSTATIONFLG")
 
         '削除フラグ
         'WF_DELFLG.Text = OIM0004tbl.Rows(WW_LINECNT)("DELFLG")
@@ -1857,6 +1869,8 @@ Public Class OIM0004StationList
                 Case "UORG"             '運用部署
                     prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "DEPARRSTATIONFLG" '発着駅フラグ
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPARRSTATIONFLG"))
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

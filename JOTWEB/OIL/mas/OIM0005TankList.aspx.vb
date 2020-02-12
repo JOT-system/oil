@@ -684,7 +684,7 @@ Public Class OIM0005TankList
         work.WF_SEL_RESERVE3.Text = ""
 
         '利用フラグ(登録(新規追加用))
-        work.WF_SEL_USEDFLG2.Text = ""
+        work.WF_SEL_USEDFLG2.Text = "1"
 
         '削除
         work.WF_SEL_DELFLG.Text = "0"
@@ -1203,7 +1203,7 @@ Public Class OIM0005TankList
                 'Dim JPARA55 As SqlParameter = SQLcmdJnl.Parameters.Add("@P55", SqlDbType.NVarChar, 20)            '富士石油車番
                 'Dim JPARA56 As SqlParameter = SQLcmdJnl.Parameters.Add("@P56", SqlDbType.NVarChar, 20)            '出光昭シ車番
                 'Dim JPARA57 As SqlParameter = SQLcmdJnl.Parameters.Add("@P57", SqlDbType.NVarChar, 20)            '予備
-                'Dim JPARA65 As SqlParameter = SQLcmdJnl.Parameters.Add("@P65", SqlDbType.NVarChar, 1)            '予備
+                'Dim JPARA65 As SqlParameter = SQLcmdJnl.Parameters.Add("@P65", SqlDbType.NVarChar, 1)            '利用フラグ
                 'Dim JPARA58 As SqlParameter = SQLcmdJnl.Parameters.Add("@P58", SqlDbType.DateTime)            '登録年月日
                 'Dim JPARA59 As SqlParameter = SQLcmdJnl.Parameters.Add("@P59", SqlDbType.NVarChar, 20)            '登録ユーザーＩＤ
                 'Dim JPARA60 As SqlParameter = SQLcmdJnl.Parameters.Add("@P60", SqlDbType.NVarChar, 20)            '登録端末

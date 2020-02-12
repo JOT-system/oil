@@ -336,7 +336,8 @@ Public Class OIM0004StationSearch
 
                 '貨物車コード 
                 If WF_FIELD.Value = "TxtStationCode" Then
-                    prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
+                    prmData = work.CreateSTATIONPTParam(Master.USER_ORG, TxtStationCode.Text & TxtBranch.Text)
+                    'prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
                 End If
 
                 .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -423,9 +424,15 @@ Public Class OIM0004StationSearch
                 WF_UORG.Focus()
 
             Case "TxtStationCode"       '貨物車コード
-                TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
-                LblStationCode.Text = WW_SelectText
-                TxtBranch.Text = WW_SelectValue.Substring(4)
+                If WW_SelectValue = "" Then
+                    TxtStationCode.Text = ""
+                    LblStationCode.Text = ""
+                    TxtBranch.Text = ""
+                Else
+                    TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
+                    LblStationCode.Text = WW_SelectText
+                    TxtBranch.Text = WW_SelectValue.Substring(4)
+                End If
                 TxtStationCode.Focus()
 
             Case "TxtDepArrStation"     '発着駅フラグ

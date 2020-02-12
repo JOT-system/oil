@@ -588,6 +588,41 @@ Public Class OIT0004OilStockCreate
         Return retVal
     End Function
     ''' <summary>
+    ''' 在庫テーブルより既登録データを取得
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="dispData"></param>
+    ''' <returns></returns>
+    Private Function GetMoveInsideData(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        Dim retVal As DispDataClass = Nothing
+        Dim sqlStr As New StringBuilder
+        '1レコード想定
+        sqlStr.AppendLine("SELECT FX.VALUE2  AS MT_SALESOFFICE")
+        sqlStr.AppendLine("       FX.VALUE3  AS MT_CONSIGNEECODE")
+        sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
+        sqlStr.AppendLine(" WHERE FX.CAMPCODE = @CAMPCODE")
+        sqlStr.AppendLine("   AND FX.CLASS    = @CLASS")
+        sqlStr.AppendLine("   AND FX.KEYCODE  = @OFFICECODE")
+        sqlStr.AppendLine("   AND FX.VALUE1   = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                ' .Add("@CAMPCODE", SqlDbType.NVarChar).Value = consignee
+                .Add("@CLASS", SqlDbType.NVarChar).Value = "1" '不等号条件
+                ' .Add("@OFFICECODE", SqlDbType.NVarChar).Value = consignee
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows Then
+
+                End If
+            End Using 'sqlDr
+        End Using
+        Return retVal
+    End Function
+
+    ''' <summary>
     ''' 荷受人マスタより提案表の表示可否を取得
     ''' </summary>
     ''' <param name="sqlCon"></param>
@@ -1958,7 +1993,7 @@ Public Class OIT0004OilStockCreate
                 '一旦0
                 Me.TankCapacity = oilTypeItem.MaxTankCap
                 Me.TargetStock = Math.Round(oilTypeItem.MaxTankCap * oilTypeItem.TankCapRate, 1)
-                Me.TargetStockRate = Math.Round(oilTypeItem.TankCapRate * 100, 1)
+                Me.TargetStockRate = oilTypeItem.TankCapRate
                 Me.Stock80 = Math.Round(oilTypeItem.MaxTankCap * 0.8D, 1)
                 Me.DS = oilTypeItem.DS
                 Me.LastShipmentAve = oilTypeItem.LastSendAverage

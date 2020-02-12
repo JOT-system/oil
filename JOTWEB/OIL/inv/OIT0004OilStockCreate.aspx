@@ -214,13 +214,13 @@
 
                                 <div class="col3">
                                     <div> <%--タンク容量値 --%>
-                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TankCapacity %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TankCapacity.ToString("#,##0") %></span>
                                     </div>
                                     <div> <%--目標在庫値 --%>
-                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStock.ToString("0") %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStock.ToString("#,##0") %></span>
                                     </div>
                                     <div> <%--目標在庫率値 --%>
-                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStockRate %>%</span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStockRate.ToString("P1") %></span>
                                     </div>
                                 </div>
                                 <div class="col4">
@@ -231,13 +231,13 @@
 
                                 <div class="col5">
                                     <div> <%--80%在庫 --%>
-                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).Stock80.ToString("0") %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).Stock80.ToString("#,##0") %></span>
                                     </div>
                                     <div> <%-- D/S --%>
-                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).DS %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).DS.ToString("#,##0") %></span>
                                     </div>
                                     <div> <%--前週出荷平均 --%>
-                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).LastShipmentAve %></span>
+                                        <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).LastShipmentAve.ToString("#,##0") %></span>
                                     </div>
                                 </div>
                                 <div class="col6">
@@ -258,17 +258,19 @@
                                                 <span class='morningStockIdx<%# Container.ItemIndex %> <%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock.Contains("-"), "minus", "") %>'>
                                                     <%-- 初日のみテキストボックス表示 --%>
                                                     <asp:TextBox ID="txtMorningStock" runat="server" 
-                                                        Text='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %>'
+                                                        Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock),
+                                                                                 Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock).ToString("#,##0"),
+                                                                                 DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock) %>'
                                                         Visible='<%# If(Container.ItemIndex = 0, True, False) %>'
                                                         data-textfield="MorningStock"></asp:TextBox>
                                                     <asp:Label ID="lblMorningStock" runat="server" 
-                                                        Text='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock %>'
+                                                        Text='<%# Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStock).ToString("#,##0") %>'
                                                         Visible='<%# If(Container.ItemIndex = 0, False, True) %>'></asp:Label>
                                                 </span>
                                             </div>
                                             <div><%--朝在庫D/S除--%>
                                                 <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStockWithoutDS < 0, "minus", "") %>'>
-                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStockWithoutDS.ToString("0") %>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).MorningStockWithoutDS.ToString("#,##0") %>
                                                 </span>
                                             </div>
                                             <div><%--保持日数--%>
@@ -283,12 +285,14 @@
                                             </div>
                                             <div><%--受入--%>
                                                 <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive < 0, "minus", "") %>'>
-                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive %>
+                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive.ToString("#,##0") %>
                                                 </span>
                                             </div>
                                             <div><%--払出--%>
                                                 <span>
-                                                    <asp:TextBox ID="txtSend" runat="server" Text='<%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Send %>'></asp:TextBox>
+                                                    <asp:TextBox ID="txtSend" runat="server" Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).Send),
+                                                                                             Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Send).ToString("#,##0"),
+                                                                                             DirectCast(Eval("Value"), DispDataClass.StockListItem).Send) %>'></asp:TextBox>
                                                 </span>
                                             </div>
                                         </div>

@@ -52,6 +52,13 @@ window.addEventListener('DOMContentLoaded', function () {
     var texboxObjList = document.querySelectorAll("input[type='text'],input[type='password']");
     for (let i = 0; i < texboxObjList.length; i++) {
         texboxObjList[i].addEventListener('focus', function () {
+            // Edgeの場合はディレイをかけてテキストボックス全選択
+            if (navigator.userAgent.match(/Edge\/(13|14|15|16|17|18)/)) {
+                let tergetItemId = this.id;
+                return setTimeout(function () {
+                    document.getElementById(tergetItemId).select();
+                }, 10);
+            }
             this.select();
         });
     }

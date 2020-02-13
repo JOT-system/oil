@@ -471,7 +471,10 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_DATE_AVAILABLEDATE_ERROR_J As String = "20021"
 
-
+        ''' <summary>
+        ''' 荷受人(油槽所)受入油種NG
+        ''' </summary>
+        Public Const OIL_CONSIGNEE_OILCODE_NG As String = "20022"
 
 #End Region
 

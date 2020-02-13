@@ -62,7 +62,7 @@
     align-items: stretch; 
     align-content: stretch;
 }
-#divSuggestList > .leftColumn > div:nth-child(2) {
+#divSuggestList > .leftColumn > div:last-child {
     height: calc(24px * 9); 
     border-bottom: 1px solid darkgray !important; 
     display:block !important;
@@ -89,6 +89,34 @@
     width:60px;
     min-width:60px;
     max-width:60px;
+}
+/* 提案表列車Noが7個に増えた場合は下の規則性にそって増幅させてください */
+/* 提案表列車Noが6個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has6Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ６倍 */
+    width : calc(60px * 6);
+    min-width: calc(60px * 6);
+    max-width: calc(60px * 6);
+    display:flex;
+    flex-wrap:wrap;
+}
+/* 提案表列車Noが5個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has5Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ５倍 */
+    width : calc(60px * 5);
+    min-width: calc(60px * 5);
+    max-width: calc(60px * 5);
+    display:flex;
+    flex-wrap:wrap;
+}
+/* 提案表列車Noが4個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has4Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ４倍 */
+    width : calc(60px * 4);
+    min-width: calc(60px * 4);
+    max-width: calc(60px * 4);
+    display:flex;
+    flex-wrap:wrap;
 }
 /* 提案表列車Noが3個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has3Col{
@@ -154,7 +182,7 @@
     border-right:0px;
 }
 #divSuggestList div.leftColumn div:last-child {
-    display:none;
+  /*  display:none; */
 }
 #divSuggestList div.leftColumn div:not(:nth-child(1)),
 #divSuggestList div.oilTypeColumn div:not(:nth-child(1)){
@@ -308,7 +336,8 @@ span.minus {
 #divStockList div.colStockValue > div {
     text-align:right;
 }
-#divStockList div.colStockValue > div:not(:nth-child(5)) {
+    /* #divStockList div.colStockValue > div:not(:nth-child(5)) */
+#divStockList div.colStockValue > div {
     padding-right:8px !important;
 }
 #divStockList div.col2 > div,
@@ -342,9 +371,10 @@ span.minus {
         margin-top: 0px;
     }
 }
+/* 在庫表の表示項目が増えた場合（夕在庫、朝在庫等の行）が増えた場合１油種での行数を height:calc(100% / [ここ]);に設定 */
 #divStockList div.col6 > div,
 #divStockList div.colStockValue > div{
-    height:calc(100% / 9);
+    height:calc(100% / 8);
     max-height:23.5px;
 }
 #divStockList div.colStockInfoTopRow {
@@ -369,6 +399,19 @@ span.morningStockIdx0 {
     //line-height:0.8em;
     width:calc(100% + 5.5px);
 }
+#divStockList input[type=text][name$="txtSend"],
+#divStockList input[type=text][name$="txtReceiveFromLorry"] {
+    width: calc(100% + 5.5px);
+}
+/* :not(.col1) > div:last-child > span */
+#divStockList div.oilTypeData div[class^="col"] > div > span.stockinputtext,
+#divStockList div.oilTypeData div[class^="col"] > div > span[class^="morningStockIdx"] {
+    margin-top: 0;
+}
+/*#divStockList div.oilTypeData div[class^="col"]:not(.col1):not(.col2):not(.col3):not(.col4):not(.col5) > div:last-child > span {
+    margin-top: 0;
+}*/
+
 /* ************** */
 /* 在庫表罫線制御 */
 /* ************** */
@@ -484,6 +527,52 @@ div.oilTypeData div.col1 span[data-tiptext] {
 #divStockList div.oilTypeData:nth-child(even) div.colStockValue div:nth-child(odd){
     background-color: #DEF4E9;
 }
+/* **************************** */
+/* 表の色(油種個別設定)         */
+/* **************************** */
+/* ハイオク */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1001"],
+#divStockList div.oilTypeData[data-oilcode="1001"] div.col1 > div {
+    color: #14171A;
+    background-color: rgb(255,255,0);
+}
+/* レギュラー */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1101"],
+#divStockList div.oilTypeData[data-oilcode="1101"] div.col1 > div {
+    background-color: rgb(255,192,0);
+}
+/* 灯油 */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1301"],
+#divStockList div.oilTypeData[data-oilcode="1301"] div.col1 > div {
+    color: #14171A;
+    background-color: rgb(255,255,255);
+}
+/* 未添加灯油 */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1302"],
+#divStockList div.oilTypeData[data-oilcode="1302"] div.col1 > div {
+    color: #14171A;
+    background-color: rgb(221,245,253);
+}
+/* 軽油 */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1401"],
+#divStockList div.oilTypeData[data-oilcode="1401"] div.col1 > div {
+    background-color: rgb(0,176,80);
+}
+/* 3号軽油 */
+#divSuggestList div[data-title=suggestValue][data-oilcode="1404"],
+#divStockList div.oilTypeData[data-oilcode="1404"] div.col1 > div {
+    background-color: rgb(146,208,80);
+}
+/* A重油 */
+#divSuggestList div[data-title=suggestValue][data-oilcode="2101"],
+#divStockList div.oilTypeData[data-oilcode="2101"] div.col1 > div {
+    background-color: rgb(0,112,192);
+}
+/* LSA */
+#divSuggestList div[data-title=suggestValue][data-oilcode="2201"],
+#divStockList div.oilTypeData[data-oilcode="2201"] div.col1 > div {
+    background-color: rgb(0,176,240);
+}
 /* ****************** */
 /* 日付部分の土日編集 */
 /* ****************** */
@@ -550,14 +639,15 @@ div.oilTypeData div.col1 span[data-tiptext] {
     display: block;
     padding: 0.2em 0.5em;
     content: attr(data-tiptext);
-    white-space: nowrap;
+    //white-space: nowrap;
     color: #ffffff;
     border-radius: 6px;
     //background: #1b2538;
     background-color: RGBA(27, 37, 56, 0.8);
     font-size:0.8em;
-    z-index:2;
+    z-index:5;
     pointer-events:none;
+    white-space:pre;
 }
 [data-tiptext]:hover::after {
     top: 24px; /*HOVER位置*/
@@ -567,3 +657,43 @@ div.oilTypeData div.col1 span[data-tiptext] {
 #pnlWeightList {
     display:none;
 }
+/* ************************ */
+/* ↓表見出し固定ここから↓ */
+/* ************************ */
+/* IEはposition sticky未対応なので固定されません */
+#divStockList > .header {
+    position: sticky;
+    top: -10px;
+    z-index: 3;
+}
+
+_:-ms-lang(x)::backdrop,
+#divStockList > .header {
+    top: 0px;
+}
+
+#divStockList > .header > .emptyBox {
+    background-color:rgb(249,249,249);
+}
+#divSuggestList > .leftColumn {
+    position:sticky;
+    left:-10px;
+    z-index:4;
+}
+#divSuggestList > .oilTypeColumn {
+    position: sticky;
+    left: 70px;
+    z-index: 3;
+}
+_:-ms-lang(x)::backdrop,
+#divSuggestList > .leftColumn {
+    left: 0;
+}
+_:-ms-lang(x)::backdrop,
+#divSuggestList > .oilTypeColumn {
+    left: 80px;
+}
+
+/* ************************ */
+/* ↑表見出し固定ここまで↑ */
+/* ************************ */

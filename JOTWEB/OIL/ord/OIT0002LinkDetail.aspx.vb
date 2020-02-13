@@ -365,6 +365,8 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS TANKNUMBER " _
             & " , ''                                             AS PREOILCODE " _
             & " , ''                                             AS PREOILNAME " _
+            & " , ''                                             AS PREORDERINGTYPE " _
+            & " , ''                                             AS PREORDERINGOILNAME " _
             & " , ''                                             AS DEPSTATION " _
             & " , @P3                                            AS DEPSTATIONNAME " _
             & " , ''                                             AS RETSTATION " _
@@ -397,8 +399,10 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0004.LINETRAINNO), '   ')     AS LINETRAINNO " _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), '   ')       AS LINEORDER " _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')         AS TANKNUMBER " _
-            & " , ISNULL(RTRIM(OIT0005.LASTOILCODE), '')        AS PREOILCODE " _
-            & " , ISNULL(RTRIM(OIM0003.OILNAME), '')            AS PREOILNAME " _
+            & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')         AS PREOILCODE " _
+            & " , ISNULL(RTRIM(OIT0004.PREOILNAME), '')         AS PREOILNAME " _
+            & " , ISNULL(RTRIM(OIT0004.PREORDERINGTYPE), '')    AS PREORDERINGTYPE " _
+            & " , ISNULL(RTRIM(OIT0004.PREORDERINGOILNAME), '') AS PREORDERINGOILNAME " _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATION), '')         AS DEPSTATION " _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')     AS DEPSTATIONNAME " _
             & " , ISNULL(RTRIM(OIT0004.RETSTATION), '')         AS RETSTATION " _
@@ -438,18 +442,19 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')             AS LINKNO " _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')            AS LINKDETAILNO " _
             & " FROM OIL.OIT0004_LINK OIT0004 " _
-            & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
-            & "       OIT0004.TANKNUMBER = OIT0005.TANKNUMBER " _
-            & "       AND OIT0005.DELFLG <> @P2 " _
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "       OIT0004.TANKNUMBER = OIM0005.TANKNUMBER " _
             & "       AND OIM0005.DELFLG <> @P2 " _
-            & " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003 ON " _
-            & "       OIT0005.LASTOILCODE = OIM0003.OILCODE " _
-            & "       AND OIT0004.OFFICECODE = OIM0003.OFFICECODE " _
-            & "       AND OIM0003.DELFLG <> @P2 " _
             & " WHERE OIT0004.LINKNO = @P1 " _
             & " AND OIT0004.DELFLG <> @P2 "
+
+            '& " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+            '& "       OIT0004.TANKNUMBER = OIT0005.TANKNUMBER " _
+            '& "       AND OIT0005.DELFLG <> @P2 " _
+            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003 ON " _
+            '& "       OIT0005.LASTOILCODE = OIM0003.OILCODE " _
+            '& "       AND OIT0004.OFFICECODE = OIM0003.OFFICECODE " _
+            '& "       AND OIM0003.DELFLG <> @P2 " _
 
             SQLStr &=
                   " ORDER BY " _
@@ -838,7 +843,7 @@ Public Class OIT0002LinkDetail
     Protected Sub WF_ButtonSel_Click()
         Dim WW_SelectValue As String = ""
         Dim WW_SelectText As String = ""
-        Dim WW_GetValue() As String = {"", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
@@ -1000,8 +1005,11 @@ Public Class OIT0002LinkDetail
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
                     updHeader.Item("PREOILCODE") = WW_GetValue(1)
-                    CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                    updHeader.Item("PREOILNAME") = WW_LASTOILNAME
+                    'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                    'updHeader.Item("PREOILNAME") = WW_LASTOILNAME
+                    updHeader.Item("PREOILNAME") = WW_GetValue(4)
+                    updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
+                    updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
 
                     '交検日
                     Dim WW_JRINSPECTIONCNT As String
@@ -1294,6 +1302,8 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS TANKNUMBER " _
             & " , ''                                             AS PREOILCODE " _
             & " , ''                                             AS PREOILNAME " _
+            & " , ''                                             AS PREORDERINGTYPE " _
+            & " , ''                                             AS PREORDERINGOILNAME " _
             & " , ''                                             AS DEPSTATION " _
             & " , @P02                                           AS DEPSTATIONNAME " _
             & " , ''                                             AS RETSTATION " _
@@ -1705,7 +1715,7 @@ Public Class OIT0002LinkDetail
                 End If
 
                 '前回油種名(前回油種コードから油種名を取得し設定)
-                WW_GetValue = {"", "", "", "", ""}
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN", OIT0002INProw("PREOILCODE"), WW_GetValue)
                 OIT0002INProw("PREOILNAME") = WW_GetValue(0)
             End If
@@ -1808,7 +1818,7 @@ Public Class OIT0002LinkDetail
         '○ 設定項目取得
         '対象フォーム項目取得
         Dim WW_ListValue = Request.Form("txt" & pnlListArea.ID & WF_FIELD.Value & WF_GridDBclick.Text)
-        Dim WW_GetValue() As String = {"", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
             Case "LINETRAINNO"          '入線番号
@@ -1828,8 +1838,11 @@ Public Class OIT0002LinkDetail
                     '前回油種
                     Dim WW_LASTOILNAME As String = ""
                     updHeader.Item("PREOILCODE") = WW_GetValue(1)
-                    CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                    updHeader.Item("PREOILNAME") = WW_LASTOILNAME
+                    'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
+                    'updHeader.Item("PREOILNAME") = WW_LASTOILNAME
+                    updHeader.Item("PREOILNAME") = WW_GetValue(4)
+                    updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
+                    updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
 
                     '交検日
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
@@ -2196,11 +2209,11 @@ Public Class OIT0002LinkDetail
         '     1 : dt1はdt2より後の日
         '(予定)空車着日 と　利用可能日を比較
         iresult = Date.Parse(TxtEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
-        If iresult = -1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
+        If iresult = 1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
             TxtEmpDate.Focus()
-            WW_CheckMES1 = "利用可能日より過去の日付のためエラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR
+            WW_CheckMES1 = "(予定)空車着日"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -2208,11 +2221,11 @@ Public Class OIT0002LinkDetail
 
         '(実績)空車着日 と　利用可能日を比較
         iresult = Date.Parse(TxtActEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
-        If iresult = -1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+        If iresult = 1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
             TxtActEmpDate.Focus()
-            WW_CheckMES1 = "利用可能日より過去の日付のためエラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR
+            WW_CheckMES1 = "(実績)空車着日"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
@@ -2340,17 +2353,27 @@ Public Class OIT0002LinkDetail
             '検索SQL文
             Dim SQLStr As String =
                " SELECT" _
-                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '   ') AS CAMPCODE" _
-                & " , ISNULL(RTRIM(VIW0001.CLASS), '   ')    AS CLASS" _
-                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '   ')  AS KEYCODE" _
-                & " , ISNULL(RTRIM(VIW0001.STYMD), '   ')    AS STYMD" _
-                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '   ')   AS ENDYMD" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE1), '   ')   AS VALUE1" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE2), '   ')   AS VALUE2" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE3), '   ')   AS VALUE3" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE4), '   ')   AS VALUE4" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE5), '   ')   AS VALUE5" _
-                & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
+                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '') AS CAMPCODE" _
+                & " , ISNULL(RTRIM(VIW0001.CLASS), '')    AS CLASS" _
+                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')  AS KEYCODE" _
+                & " , ISNULL(RTRIM(VIW0001.STYMD), '')    AS STYMD" _
+                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')   AS ENDYMD" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE1), '')   AS VALUE1" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE2), '')   AS VALUE2" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE3), '')   AS VALUE3" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE4), '')   AS VALUE4" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE5), '')   AS VALUE5" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE6), '')   AS VALUE6" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE7), '')   AS VALUE7" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE8), '')   AS VALUE8" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE9), '')   AS VALUE9" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE10), '')  AS VALUE10" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE11), '')  AS VALUE11" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE12), '')  AS VALUE12" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE13), '')  AS VALUE13" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE14), '')  AS VALUE14" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE15), '')  AS VALUE15" _
+                & " , ISNULL(RTRIM(VIW0001.DELFLG), '')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
                 & " AND VIW0001.DELFLG <> @P02"
@@ -2457,32 +2480,34 @@ Public Class OIT0002LinkDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0004_LINK" _
             & "    SET" _
-            & "          AVAILABLEYMD  = @P03    , STATUS           = @P04" _
-            & "        , INFO          = @P05    , PREORDERNO       = @P06" _
-            & "        , TRAINNO       = @P07    , TRAINNAME        = @P19, OFFICECODE       = @P08" _
-            & "        , DEPSTATION    = @P09    , DEPSTATIONNAME   = @P10" _
-            & "        , RETSTATION    = @P11    , RETSTATIONNAME   = @P12" _
-            & "        , EMPARRDATE    = @P13    , ACTUALEMPARRDATE = @P14" _
-            & "        , LINETRAINNO   = @P15    , LINEORDER        = @P16" _
-            & "        , TANKNUMBER    = @P17    , PREOILCODE       = @P18" _
-            & "        , UPDYMD        = @P87    , UPDUSER          = @P88" _
-            & "        , UPDTERMID     = @P89    , RECEIVEYMD       = @P90" _
+            & "          AVAILABLEYMD    = @P03 , STATUS             = @P04" _
+            & "        , INFO            = @P05 , PREORDERNO         = @P06" _
+            & "        , TRAINNO         = @P07 , TRAINNAME          = @P19, OFFICECODE       = @P08" _
+            & "        , DEPSTATION      = @P09 , DEPSTATIONNAME     = @P10" _
+            & "        , RETSTATION      = @P11 , RETSTATIONNAME     = @P12" _
+            & "        , EMPARRDATE      = @P13 , ACTUALEMPARRDATE   = @P14" _
+            & "        , LINETRAINNO     = @P15 , LINEORDER          = @P16" _
+            & "        , TANKNUMBER      = @P17" _
+            & "        , PREOILCODE      = @P18 , PREOILNAME         = @P20" _
+            & "        , PREORDERINGTYPE = @P21 , PREORDERINGOILNAME = @P22" _
+            & "        , UPDYMD          = @P87 , UPDUSER            = @P88" _
+            & "        , UPDTERMID       = @P89 , RECEIVEYMD         = @P90" _
             & "    WHERE" _
             & "        LINKNO            = @P01 " _
             & "        AND  LINKDETAILNO = @P02 " _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0004_LINK" _
-            & "        ( LINKNO       , LINKDETAILNO    , AVAILABLEYMD   , STATUS            , INFO           " _
-            & "        , PREORDERNO   , TRAINNO         , TRAINNAME      , OFFICECODE        , DEPSTATION , DEPSTATIONNAME " _
-            & "        , RETSTATION   , RETSTATIONNAME  , EMPARRDATE     , ACTUALEMPARRDATE  , LINETRAINNO    " _
-            & "        , LINEORDER    , TANKNUMBER      , PREOILCODE " _
-            & "        , DELFLG       , INITYMD         , INITUSER       , INITTERMID " _
-            & "        , UPDYMD       , UPDUSER         , UPDTERMID      , RECEIVEYMD)" _
+            & "        ( LINKNO    , LINKDETAILNO  , AVAILABLEYMD, STATUS          , INFO " _
+            & "        , PREORDERNO, TRAINNO       , TRAINNAME   , OFFICECODE      , DEPSTATION     , DEPSTATIONNAME " _
+            & "        , RETSTATION, RETSTATIONNAME, EMPARRDATE  , ACTUALEMPARRDATE, LINETRAINNO " _
+            & "        , LINEORDER , TANKNUMBER    , PREOILCODE  , PREOILNAME      , PREORDERINGTYPE, PREORDERINGOILNAME " _
+            & "        , DELFLG    , INITYMD       , INITUSER    , INITTERMID " _
+            & "        , UPDYMD    , UPDUSER       , UPDTERMID   , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P03, @P04, @P05" _
             & "        , @P06, @P07, @P19, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15" _
-            & "        , @P16, @P17, @P18" _
+            & "        , @P16, @P17, @P18, @P20, @P21, @P22" _
             & "        , @P83, @P84, @P85, @P86" _
             & "        , @P87, @P88, @P89, @P90) ;" _
             & " CLOSE hensuu ;" _
@@ -2510,6 +2535,9 @@ Public Class OIT0002LinkDetail
             & "    , LINEORDER" _
             & "    , TANKNUMBER" _
             & "    , PREOILCODE" _
+            & "    , PREOILNAME" _
+            & "    , PREORDERINGTYPE" _
+            & "    , PREORDERINGOILNAME" _
             & "    , DELFLG" _
             & "    , INITYMD" _
             & "    , INITUSER" _
@@ -2545,6 +2573,9 @@ Public Class OIT0002LinkDetail
                 Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 2)  '入線順
                 Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 8)  'タンク車№
                 Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 4)  '前回油種
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40) '前回油種名
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 2)  '前回油種区分(受発注用)
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 40) '前回油種名(受発注用)
                 Dim PARA83 As SqlParameter = SQLcmd.Parameters.Add("@P83", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA84 As SqlParameter = SQLcmd.Parameters.Add("@P84", SqlDbType.DateTime)     '登録年月日
                 Dim PARA85 As SqlParameter = SQLcmd.Parameters.Add("@P85", SqlDbType.NVarChar, 20) '登録ユーザーID
@@ -2655,8 +2686,11 @@ Public Class OIT0002LinkDetail
                             End If
                             PARA15.Value = OIT0002row("LINETRAINNO")          '入線列車番号
                             PARA16.Value = OIT0002row("LINEORDER")            '入線順
-                            PARA17.Value = OIT0002row("TANKNUMBER")         'タンク車№
+                            PARA17.Value = OIT0002row("TANKNUMBER")           'タンク車№
                             PARA18.Value = OIT0002row("PREOILCODE")           '前回油種　
+                            PARA20.Value = OIT0002row("PREOILNAME")           '前回油種名　
+                            PARA21.Value = OIT0002row("PREORDERINGTYPE")      '前回油種区分(受発注用)　
+                            PARA22.Value = OIT0002row("PREORDERINGOILNAME")   '前回油種名(受発注用)
                             Select Case PARA18.Value
                                 Case BaseDllConst.CONST_HTank                 '油種(ハイオク)
                                     LNG_TxtHTank += 1

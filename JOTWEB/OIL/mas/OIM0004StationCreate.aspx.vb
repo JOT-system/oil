@@ -179,9 +179,10 @@ Public Class OIM0004StationCreate
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
         'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署
 
-        '貨物駅コード・貨物コード枝番・削除フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
+        '貨物駅コード・貨物コード枝番・発着駅フラグ・削除フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtStationCode.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtBranch.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtDepArrStation.Attributes("onkeyPress") = "CheckNum()"
         Me.WF_DELFLG.Attributes("onkeyPress") = "CheckNum()"
 
         '選択行
@@ -204,6 +205,10 @@ Public Class OIM0004StationCreate
 
         '貨物駅種別名称カナ
         TxtTypeNameKana.Text = work.WF_SEL_TYPENAMEKANA.Text
+
+        '発着駅フラグ
+        TxtDepArrStation.Text = work.WF_SEL_DEPARRSTATIONFLG2.Text
+        CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStationName.Text, WW_DUMMY)
 
         '削除
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
@@ -421,13 +426,11 @@ Public Class OIM0004StationCreate
         OIM0004INProw("STATIONNAMEKANA") = TxtStationNameKana.Text   '貨物駅名称カナ
         OIM0004INProw("TypeName") = TxtTypeName.Text                 '貨物駅種別名称
         OIM0004INProw("TYPENAMEKANA") = TxtTypeNameKana.Text         '貨物駅種別名称カナ
+        OIM0004INProw("DEPARRSTATIONFLG") = TxtDepArrStation.Text    '発着駅フラグ
 
         '○ 名称取得
-        'CODENAME_get("TORICODES", OIM0004INProw("TORICODES"), OIM0004INProw("TORINAMES"), WW_DUMMY)           '取引先名称(出荷先)
-        'CODENAME_get("SHUKABASHO", OIM0004INProw("SHUKABASHO"), OIM0004INProw("SHUKABASHONAMES"), WW_DUMMY)   '出荷場所名称
-
-        'CODENAME_get("TORICODET", OIM0004INProw("TORICODET"), OIM0004INProw("TORINAMET"), WW_DUMMY)           '取引先名称(届先)
-        'CODENAME_get("TODOKECODE", OIM0004INProw("TODOKECODE"), OIM0004INProw("TODOKENAME"), WW_DUMMY)        '届先名称
+        '発着駅フラグ名
+        CODENAME_get("DEPARRSTATIONFLG", OIM0004INProw("DEPARRSTATIONFLG"), OIM0004INProw("DEPARRSTATIONNAME"), WW_DUMMY)
 
         '○ チェック用テーブルに登録する
         OIM0004INPtbl.Rows.Add(OIM0004INProw)
@@ -500,6 +503,7 @@ Public Class OIM0004StationCreate
         TxtStationNameKana.Text = ""        '貨物駅名称カナ
         TxtTypeName.Text = ""               '貨物駅種別名称
         TxtTypeNameKana.Text = ""           '貨物駅種別名称カナ
+        TxtDepArrStation.Text = ""          '発着駅フラグ
         WF_DELFLG.Text = ""                 '削除
         WF_DELFLG_TEXT.Text = ""            '削除名称
 
@@ -535,6 +539,9 @@ Public Class OIM0004StationCreate
                     ''貨物車コード 
                     'Case "STATIONCODE"
                     '    prmData = work.CreateSTATIONPTParam(work.WF_SEL_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
+                    '発着駅フラグ 
+                    Case "TxtDepArrStation"
+                        prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, TxtDepArrStation.Text)
 
                     '削除フラグ   
                     Case "WF_DELFLG"
@@ -562,6 +569,9 @@ Public Class OIM0004StationCreate
             ''運用部署
             'Case "WF_UORG"
             '    CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+            '発着駅フラグ
+            Case "TxtDepArrStation"
+                CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStationName.Text, WW_RTN_SW)
             '削除フラグ
             Case "WF_DELFLG"
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
@@ -609,43 +619,48 @@ Public Class OIM0004StationCreate
                     WF_DELFLG_TEXT.Text = WW_SelectText
                     WF_DELFLG.Focus()
 
-                    '貨物駅コード
-                Case "STATIONCODE"
-                    TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
-                    LblStationCodeText.Text = WW_SelectText
-                    TxtBranch.Text = WW_SelectValue.Substring(4)
-                    TxtStationCode.Focus()
+                '    '貨物駅コード
+                'Case "STATIONCODE"
+                '    TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
+                '    LblStationCodeText.Text = WW_SelectText
+                '    TxtBranch.Text = WW_SelectValue.Substring(4)
+                '    TxtStationCode.Focus()
 
-                    '貨物コード枝番
-                Case "BRANCH"
-                    TxtBranch.Text = WW_SelectValue
-                    LblBranchText.Text = WW_SelectText
-                    TxtBranch.Focus()
+                '    '貨物コード枝番
+                'Case "BRANCH"
+                '    TxtBranch.Text = WW_SelectValue
+                '    LblBranchText.Text = WW_SelectText
+                '    TxtBranch.Focus()
 
-                    '貨物駅名称
-                Case "STATONNAME"
-                    TxtStationName.Text = WW_SelectValue
-                    LblStationNameText.Text = WW_SelectText
-                    TxtStationName.Focus()
+                '    '貨物駅名称
+                'Case "STATONNAME"
+                '    TxtStationName.Text = WW_SelectValue
+                '    LblStationNameText.Text = WW_SelectText
+                '    TxtStationName.Focus()
 
-                    '貨物駅名称カナ
-                Case "STATIONNAMEKANA"
-                    TxtStationNameKana.Text = WW_SelectValue
-                    LblStationNameKanaText.Text = WW_SelectText
-                    TxtStationNameKana.Focus()
+                '    '貨物駅名称カナ
+                'Case "STATIONNAMEKANA"
+                '    TxtStationNameKana.Text = WW_SelectValue
+                '    LblStationNameKanaText.Text = WW_SelectText
+                '    TxtStationNameKana.Focus()
 
-                    '貨物駅種別名称
-                Case "TYPENAME"
-                    TxtTypeName.Text = WW_SelectValue
-                    LblTypeNameText.Text = WW_SelectText
-                    TxtTypeName.Focus()
+                '    '貨物駅種別名称
+                'Case "TYPENAME"
+                '    TxtTypeName.Text = WW_SelectValue
+                '    LblTypeNameText.Text = WW_SelectText
+                '    TxtTypeName.Focus()
 
-                    '貨物駅種別名称カナ
-                Case "TYPENAMEKANA"
-                    TxtTypeNameKana.Text = WW_SelectValue
-                    LblTypeNameKanaText.Text = WW_SelectText
-                    TxtTypeNameKana.Focus()
+                '    '貨物駅種別名称カナ
+                'Case "TYPENAMEKANA"
+                '    TxtTypeNameKana.Text = WW_SelectValue
+                '    LblTypeNameKanaText.Text = WW_SelectText
+                '    TxtTypeNameKana.Focus()
 
+                    '発着駅フラグ
+                Case "TxtDepArrStation"
+                    TxtDepArrStation.Text = WW_SelectValue
+                    LblDepArrStationName.Text = WW_SelectText
+                    TxtDepArrStation.Focus()
             End Select
         Else
         End If
@@ -671,29 +686,33 @@ Public Class OIM0004StationCreate
                 Case "WF_DELFLG"
                     WF_DELFLG.Focus()
 
-                    '貨物駅コード
-                Case "STATIONCODE"
-                    TxtStationCode.Focus()
+                '    '貨物駅コード
+                'Case "STATIONCODE"
+                '    TxtStationCode.Focus()
 
-                    '貨物コード枝番
-                Case "BRANCH"
-                    TxtBranch.Focus()
+                '    '貨物コード枝番
+                'Case "BRANCH"
+                '    TxtBranch.Focus()
 
-                    '貨物駅名称
-                Case "STATONNAME"
-                    TxtStationName.Focus()
+                '    '貨物駅名称
+                'Case "STATONNAME"
+                '    TxtStationName.Focus()
 
-                    '貨物駅名称カナ
-                Case "STATIONNAMEKANA"
-                    TxtStationNameKana.Focus()
+                '    '貨物駅名称カナ
+                'Case "STATIONNAMEKANA"
+                '    TxtStationNameKana.Focus()
 
-                    '貨物駅種別名称
-                Case "TYPENAME"
-                    TxtTypeName.Focus()
+                '    '貨物駅種別名称
+                'Case "TYPENAME"
+                '    TxtTypeName.Focus()
 
-                    '貨物駅種別名称カナ
-                Case "TYPENAMEKANA"
-                    TxtTypeNameKana.Focus()
+                '    '貨物駅種別名称カナ
+                'Case "TYPENAMEKANA"
+                '    TxtTypeNameKana.Focus()
+
+                    '発着駅フラグ
+                Case "TxtDepArrStation"
+                    TxtDepArrStation.Focus()
 
             End Select
         Else
@@ -823,6 +842,26 @@ Public Class OIM0004StationCreate
                     WW_LINE_ERR = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
+            End If
+
+            '発着駅フラグ(バリデーションチェック）
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEPARRSTATIONFLG", OIM0004INProw("DEPARRSTATIONFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("DEPARRSTATIONFLG", OIM0004INProw("DEPARRSTATIONFLG"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(発着駅フラグエラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(発着駅フラグエラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             '一意制約チェック
@@ -1074,6 +1113,9 @@ Public Class OIM0004StationCreate
                 Case "UORG"             '運用部署
                     prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "DEPARRSTATIONFLG" '発着駅フラグ
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPARRSTATIONFLG"))
 
                 Case "DELFLG"           '削除
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))

@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIM0004WRKINC
-
+    
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_UORG コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_UORG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LINECNT コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STATIONCODE コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STATIONCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STATIONCODE2 コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STATIONCODE2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BRANCH コントロール。
     '''</summary>
@@ -66,7 +66,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BRANCH As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BRANCH2 コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BRANCH2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STATONNAME コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STATONNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STATIONNAMEKANA コントロール。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STATIONNAMEKANA As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TYPENAME コントロール。
     '''</summary>
@@ -102,7 +102,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TYPENAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TYPENAMEKANA コントロール。
     '''</summary>
@@ -113,6 +113,24 @@ Partial Public Class OIM0004WRKINC
     Public WithEvents WF_SEL_TYPENAMEKANA As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
+    '''WF_SEL_DEPARRSTATIONFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DEPARRSTATIONFLG As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_DEPARRSTATIONFLG2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DEPARRSTATIONFLG2 As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
     '''WF_SEL_DELFLG コントロール。
     '''</summary>
     '''<remarks>
@@ -120,7 +138,7 @@ Partial Public Class OIM0004WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INPTBL コントロール。
     '''</summary>

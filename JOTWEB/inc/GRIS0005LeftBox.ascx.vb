@@ -128,6 +128,10 @@ Public Class GRIS0005LeftBox
         LC_STATION
         LC_ORDERTYPE
         LC_PRODUCTSEGLIST
+        LC_RINKAITRAIN_INLIST
+        LC_RINKAITRAIN_OUTLIST
+        LC_RINKAITRAIN_LINELIST
+        LC_DEPARRSTATIONLIST
     End Enum
 
     ''' <summary>
@@ -200,6 +204,10 @@ Public Class GRIS0005LeftBox
         LP_ORDERTYPE
         LP_PRODUCTSEGLIST
         LP_ADDITINALCONDITION
+        LP_RINKAITRAIN_INLIST
+        LP_RINKAITRAIN_OUTLIST
+        LP_RINKAITRAIN_LINELIST
+        LP_DEPARRSTATIONLIST
     End Enum
 
     ''' <summary>
@@ -575,6 +583,22 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_PRODUCTSEGLIST
                 '品種パターン(受発注用)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN_SEG"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST
+                '臨海鉄道列車番号(入線)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "RINKAITRAIN_I"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_OUTLIST
+                '臨海鉄道列車番号(出線)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "RINKAITRAIN_O"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_LINELIST
+                '臨海鉄道(回線)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "RINKAITRAIN_LINE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST
+                '発着駅フラグ
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "DEPARRSTATIONFLG"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_STATION
                 '貨物駅

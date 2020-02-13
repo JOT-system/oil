@@ -254,7 +254,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         '〇営業所配下情報を取得・設定
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
         work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
         work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -324,7 +324,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         For Each rowitem As TableRow In tblObj.Rows
             For Each cellObj As TableCell In rowitem.Controls
                 If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") Then
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") Then
                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                 End If
             Next
@@ -678,7 +679,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         For Each rowitem As TableRow In tblObj.Rows
             For Each cellObj As TableCell In rowitem.Controls
                 If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") Then
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") Then
                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                 End If
             Next
@@ -713,7 +715,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End If
 
         '〇営業所配下情報を取得・設定
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
         work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
         work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -752,7 +754,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         End Using
 
         '〇画面で設定された油種コードを取得
-        WW_GetValue = {"", "", "", "", "", "", "", ""}
+        WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         Dim arrTankCode(intTankCnt) As String
         Dim arrTankName(intTankCnt) As String
         Dim arrTankType(intTankCnt) As String
@@ -1007,7 +1009,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
             '本線列車
             Case "TxtHeadOfficeTrain"
-                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 'WW_FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
@@ -1024,6 +1026,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '着駅
                 TxtArrstation.Text = WW_GetValue(2)
                 CODENAME_get("ARRSTATION", TxtArrstation.Text, LblArrstationName.Text, WW_DUMMY)
+
+                '〇 (予定)の日付を設定
+                TxtLoadingDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtDepDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
+                TxtArrDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                TxtAccDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+
                 TxtHeadOfficeTrain.Focus()
             '発駅
             Case "TxtDepstation"
@@ -1061,7 +1070,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Protected Sub WF_ButtonSel_Click()
         Dim WW_SelectValue As String = ""
         Dim WW_SelectText As String = ""
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '○ 選択内容を取得
         If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
@@ -1159,8 +1168,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                 CODENAME_get("ARRSTATION", TxtArrstation.Text, LblArrstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
 
+                '〇 (予定)の日付を設定
+                TxtLoadingDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                TxtDepDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
+                TxtArrDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                TxtAccDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+
                 '〇営業所配下情報を取得・設定
-                WW_GetValue = {"", "", "", "", "", "", "", ""}
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
                 work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
                 work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -2005,7 +2020,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Next
             End If
 
-            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
             '○ 項目セット
             ''会社コード
@@ -2206,7 +2221,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         '○ 設定項目取得
         '対象フォーム項目取得
         Dim WW_ListValue = Request.Form("txt" & pnlListArea.ID & WF_FIELD.Value & WF_GridDBclick.Text)
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
             Case "TxtOrderOffice"    '受注営業所
@@ -2283,7 +2298,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 ''CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
                 ''updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
 
-                'WW_GetValue = {"", "", "", "", "", "", "", ""}
+                'WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue)
                 ''WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_GetValue(1) + WW_GetValue(4), WW_GetValue)
                 'updHeader.Item("LASTOILNAME") = WW_GetValue(0)
@@ -2741,7 +2756,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim WW_CheckMES2 As String = ""
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
-        Dim WW_GetValue = {"", "", "", "", "", "", "", ""}
+        Dim WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '前回油種と油種の整合性チェック
         For Each OIT0001row As DataRow In OIT0001tbl.Rows
@@ -2751,6 +2766,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Continue For
             End If
 
+            WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch(OIT0001row("LASTOILCODE") + OIT0001row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0001row("OILCODE") + OIT0001row("ORDERINGTYPE"), WW_GetValue)
 
             If WW_GetValue(2) = "1" Then
@@ -2847,20 +2863,27 @@ Public Class OIT0001EmptyTurnDairyDetail
             '検索SQL文
             Dim SQLStr As String =
                " SELECT" _
-                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '   ') AS CAMPCODE" _
-                & " , ISNULL(RTRIM(VIW0001.CLASS), '   ')    AS CLASS" _
-                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '   ')  AS KEYCODE" _
-                & " , ISNULL(RTRIM(VIW0001.STYMD), '   ')    AS STYMD" _
-                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '   ')   AS ENDYMD" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE1), '   ')   AS VALUE1" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE2), '   ')   AS VALUE2" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE3), '   ')   AS VALUE3" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE4), '   ')   AS VALUE4" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE5), '   ')   AS VALUE5" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE6), '   ')   AS VALUE6" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE7), '   ')   AS VALUE7" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE8), '   ')   AS VALUE8" _
-                & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
+                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '') AS CAMPCODE" _
+                & " , ISNULL(RTRIM(VIW0001.CLASS), '')    AS CLASS" _
+                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')  AS KEYCODE" _
+                & " , ISNULL(RTRIM(VIW0001.STYMD), '')    AS STYMD" _
+                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')   AS ENDYMD" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE1), '')   AS VALUE1" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE2), '')   AS VALUE2" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE3), '')   AS VALUE3" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE4), '')   AS VALUE4" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE5), '')   AS VALUE5" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE6), '')   AS VALUE6" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE7), '')   AS VALUE7" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE8), '')   AS VALUE8" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE9), '')   AS VALUE9" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE10), '')  AS VALUE10" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE11), '')  AS VALUE11" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE12), '')  AS VALUE12" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE13), '')  AS VALUE13" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE14), '')  AS VALUE14" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE15), '')  AS VALUE15" _
+                & " , ISNULL(RTRIM(VIW0001.DELFLG), '')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
                 & " AND VIW0001.DELFLG <> @P03"
@@ -2939,7 +2962,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Protected Sub WW_ScreenEnabledSet()
 
         '〇各営業者で管理している油種を取得
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", ""}
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue)
 
         '〇初期化
@@ -3937,7 +3960,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Using
 
                 Dim i As Integer = 0
-                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
                 For Each OIT0001UPDrow As DataRow In OIT0001WKtbl.Rows

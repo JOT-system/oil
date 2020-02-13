@@ -96,6 +96,8 @@ Public Class OIM0004StationSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "STATIONCODE", TxtStationCode.Text)
             '貨物コード枝番
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "BRANCH", TxtBranch.Text)
+            '発着駅フラグ
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "DEPARRSTATIONFLG", TxtDepArrStation.Text)
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0004L Then   '実行画面からの遷移
             '〇画面項目設定処理
             '会社コード
@@ -106,7 +108,8 @@ Public Class OIM0004StationSearch
             TxtStationCode.Text = work.WF_SEL_STATIONCODE.Text
             '貨物コード枝番
             TxtBranch.Text = work.WF_SEL_BRANCH.Text
-
+            '発着駅フラグ
+            TxtDepArrStation.Text = work.WF_SEL_DEPARRSTATIONFLG.Text
         End If
 
         '貨物駅コード・貨物コード枝番を入力するテキストボックスは数値(0～9)のみ可能とする。
@@ -138,6 +141,8 @@ Public Class OIM0004StationSearch
         CODENAME_get("STATIONCODE", TxtStationCode.Text & TxtBranch.Text, LblStationCode.Text, WW_DUMMY)
         ''貨物コード枝番
         'CODENAME_get("BRANCH", TxtBranch.Text, LblBranch.Text, WW_DUMMY)
+        '発着駅フラグ
+        CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStation.Text, WW_DUMMY)
 
     End Sub
 
@@ -157,6 +162,8 @@ Public Class OIM0004StationSearch
         Master.EraseCharToIgnore(TxtStationCode.Text)
         '貨物コード枝番
         Master.EraseCharToIgnore(TxtBranch.Text)
+        '発着駅フラグ
+        Master.EraseCharToIgnore(TxtDepArrStation.Text)
 
         '○ チェック処理
         WW_Check(WW_ERR_SW)
@@ -173,6 +180,8 @@ Public Class OIM0004StationSearch
         work.WF_SEL_STATIONCODE.Text = TxtStationCode.Text
         '貨物コード枝番
         work.WF_SEL_BRANCH.Text = TxtBranch.Text
+        '発着駅フラグ
+        work.WF_SEL_DEPARRSTATIONFLG.Text = TxtDepArrStation.Text
 
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
@@ -264,6 +273,26 @@ Public Class OIM0004StationSearch
             Exit Sub
         End If
 
+        '発着駅フラグ
+        Master.CheckField(WF_CAMPCODE.Text, "DEPARRSTATIONFLG", TxtDepArrStation.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStation.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+                              "発着駅フラグ : " & TxtDepArrStation.Text)
+                TxtDepArrStation.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            'ポップアップを表示(needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "発着駅フラグ", needsPopUp:=True)
+            TxtDepArrStation.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -307,6 +336,7 @@ Public Class OIM0004StationSearch
 
                 '貨物車コード 
                 If WF_FIELD.Value = "TxtStationCode" Then
+                    'prmData = work.CreateSTATIONPTParam(Master.USER_ORG, TxtStationCode.Text & TxtBranch.Text)
                     prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
                 End If
 
@@ -339,6 +369,9 @@ Public Class OIM0004StationSearch
                 '貨物コード枝番
                 'Case "TxtGoodsStationCodeBranch"
                 '    CODENAME_get("BRANCH", TxtBranch.Text, LblBranch.Text, WW_RTN_SW)
+            '発着駅フラグ
+            Case "TxtDepArrStation"
+                CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStation.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -391,10 +424,21 @@ Public Class OIM0004StationSearch
                 WF_UORG.Focus()
 
             Case "TxtStationCode"       '貨物車コード
-                TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
-                LblStationCode.Text = WW_SelectText
-                TxtBranch.Text = WW_SelectValue.Substring(4)
+                If WW_SelectValue = "" Then
+                    TxtStationCode.Text = ""
+                    LblStationCode.Text = ""
+                    TxtBranch.Text = ""
+                Else
+                    TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
+                    LblStationCode.Text = WW_SelectText
+                    TxtBranch.Text = WW_SelectValue.Substring(4)
+                End If
                 TxtStationCode.Focus()
+
+            Case "TxtDepArrStation"     '発着駅フラグ
+                TxtDepArrStation.Text = WW_SelectValue
+                LblDepArrStation.Text = WW_SelectText
+                TxtDepArrStation.Focus()
 
         End Select
 
@@ -419,6 +463,8 @@ Public Class OIM0004StationSearch
                 WF_UORG.Focus()
             Case "TxtStationCode"       '貨物車コード
                 TxtStationCode.Focus()
+            Case "TxtDepArrStation"     '発着駅フラグ
+                TxtDepArrStation.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -495,6 +541,9 @@ Public Class OIM0004StationSearch
                 Case "STATIONCODE"      '貨物駅コード
                     prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "DEPARRSTATIONFLG" '発着駅フラグ
+                    prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST, I_VALUE, O_TEXT, O_RTN, prmData)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

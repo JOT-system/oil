@@ -1589,6 +1589,33 @@ Partial Public Class OIM0005TankCreate
     Protected WithEvents WF_RESERVE3_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_USEDFLG_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_USEDFLG_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_USEDFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_USEDFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_USEDFLG_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_USEDFLG_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

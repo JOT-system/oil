@@ -43,7 +43,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
-                            <asp:TextBox ID="WF_DELFLG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
+                            <asp:TextBox ID="WF_DELFLG" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -99,6 +99,17 @@
                         <asp:TextBox ID="TxtTypeNameKana" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="LblTypeNameKanaText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+                </p>
+                <p id="KEY_LINE_6">
+                    <!-- 発着駅フラグ -->
+                    <span class="ef" id="WF_DEPARRSTATION">
+                        <asp:Label ID="LblDepArrStation" runat="server" Text="発着駅フラグ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <span ondblclick="Field_DBclick('TxtDepArrStation', <%=LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST%>)" onchange="TextBox_change('TxtDepArrStation');">
+                            <asp:TextBox ID="TxtDepArrStation" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="LblDepArrStationName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    <span></span>
                 </p>
             </div>
         </div>

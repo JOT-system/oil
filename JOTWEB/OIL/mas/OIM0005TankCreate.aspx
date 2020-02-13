@@ -44,7 +44,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除フラグ" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
-                            <asp:TextBox ID="WF_DELFLG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
+                            <asp:TextBox ID="WF_DELFLG" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -140,7 +140,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_CURRENTSTATIONCODE_L" runat="server" Text="原常備駅C"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_CURRENTSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_CURRENTSTATIONCODE');">
-                            <asp:TextBox ID="WF_CURRENTSTATIONCODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
+                            <asp:TextBox ID="WF_CURRENTSTATIONCODE" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_CURRENTSTATIONCODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -149,7 +149,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_EXTRADINARYSTATIONCODE_L" runat="server" Text="臨時常備駅C" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_EXTRADINARYSTATIONCODE', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('WF_EXTRADINARYSTATIONCODE');">
-                            <asp:TextBox ID="WF_EXTRADINARYSTATIONCODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
+                            <asp:TextBox ID="WF_EXTRADINARYSTATIONCODE" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_EXTRADINARYSTATIONCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -553,6 +553,18 @@
                         <asp:TextBox ID="WF_RESERVE3" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_RESERVE3_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
+                </p>
+
+                <p id="KEY_LINE_31">
+                    <!-- 利用フラグ -->
+                    <span class="ef">
+                        <asp:Label ID="WF_USEDFLG_L" runat="server" Text="利用フラグ" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_USEDFLG', <%=LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY%>);" onchange="TextBox_change('WF_USEDFLG');">
+                            <asp:TextBox ID="WF_USEDFLG" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_USEDFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                    <span></span>
                 </p>
             </div>
         </div>

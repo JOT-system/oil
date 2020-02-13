@@ -70,6 +70,17 @@
                 </a>
             </div>
 
+            <!-- 発着駅フラグ -->
+            <div class="inputItem">
+                <a id="WF_DEPARRSTATION_LABEL">発着駅フラグ</a>
+                <a class="ef" id="WF_DEPARRSTATION" ondblclick="Field_DBclick('TxtDepArrStation', <%=LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST%>);" onchange="TextBox_change('TxtDepArrStation');">
+                    <asp:TextBox ID="TxtDepArrStation" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
+                </a>
+                <a id="WF_DEPARRSTATION_TEXT">
+                    <asp:Label ID="LblDepArrStation" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
+
         </div> <!-- End inputBox -->
 
         <!-- 会社コード -->

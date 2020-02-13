@@ -351,3 +351,15 @@ div[data-generated="1"] div[id$="_DR"] {
     padding-right:5px;
     text-align:right;
 }
+/* 一覧のReadOnlyの制御 */
+div[id^=pnlListArea] input[type=text][readonly]:not(.iconOnly) {
+    color: #737373;
+    background-color:rgb(240,240,240);
+}
+div[id^=pnlListArea] input[type=text][readonly]:not(.iconOnly):hover {
+    color: #737373;
+    background-color:rgb(240,240,240);
+    border-color:skyblue;
+    background-image:none;
+    box-shadow :none;
+}

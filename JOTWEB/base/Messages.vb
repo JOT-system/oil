@@ -437,9 +437,9 @@ Public Module Messages
         Public Const OIL_TANKNO_MIWARIATE_ERROR As String = "20014"
 
         ''' <summary>
-        ''' 年月日妥当性エラー(利用可能日より過去日付)
+        ''' 日付関連エラー(利用可能日より（予定）空車着日)
         ''' </summary>
-        Public Const OIL_DATE_AVAILABLEDATE_ERROR As String = "20015"
+        Public Const OIL_DATE_AVAILABLEDATE_ERROR_Y As String = "20015"
 
         ''' <summary>
         ''' 列車牽引車数オーバー
@@ -450,6 +450,31 @@ Public Module Messages
         ''' 高速列車非対応タンク車エラー
         ''' </summary>
         Public Const OIL_SPEEDTRAINTANK_ERROR As String = "20017"
+
+        ''' <summary>
+        ''' 積場スペックエラー
+        ''' </summary>
+        Public Const OIL_LOADINGSPECS_ERROR As String = "20018"
+
+        ''' <summary>
+        ''' 充填ポイント重複エラー
+        ''' </summary>
+        Public Const OIL_FILLINGPOINT_REPEAT_ERROR As String = "20019"
+
+        ''' <summary>
+        ''' 積込可能油種件数オーバー
+        ''' </summary>
+        Public Const OIL_LOADING_OIL_RECORD_OVER As String = "20020"
+
+        ''' <summary>
+        ''' 日付関連エラー(利用可能日より（実績）空車着日)
+        ''' </summary>
+        Public Const OIL_DATE_AVAILABLEDATE_ERROR_J As String = "20021"
+
+        ''' <summary>
+        ''' 荷受人(油槽所)受入油種NG
+        ''' </summary>
+        Public Const OIL_CONSIGNEE_OILCODE_NG As String = "20022"
 
 #End Region
 

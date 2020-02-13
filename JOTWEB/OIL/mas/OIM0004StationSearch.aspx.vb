@@ -336,8 +336,8 @@ Public Class OIM0004StationSearch
 
                 '貨物車コード 
                 If WF_FIELD.Value = "TxtStationCode" Then
-                    prmData = work.CreateSTATIONPTParam(Master.USER_ORG, TxtStationCode.Text & TxtBranch.Text)
-                    'prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
+                    'prmData = work.CreateSTATIONPTParam(Master.USER_ORG, TxtStationCode.Text & TxtBranch.Text)
+                    prmData = work.CreateSTATIONPTParam(WF_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
                 End If
 
                 .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)

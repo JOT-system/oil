@@ -3034,6 +3034,17 @@ Public Class OIT0003OrderDetail
         Master.SaveTable(OIT0003tbl)
         Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTAB1TBL.Text)
 
+        '〇 荷受人油種チェック
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_CheckConsigneeOil(WW_ERRCODE, SQLcon)
+            If WW_ERRCODE = "ERR" Then
+                Master.Output(C_MESSAGE_NO.OIL_CONSIGNEE_OILCODE_NG, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+        End Using
+
         '〇列車マスタ牽引車数チェック
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
@@ -3905,6 +3916,7 @@ Public Class OIT0003OrderDetail
             & "        , ORDERINFO     = @P22    , STACKINGFLG    = @P92" _
             & "        , LODDATE       = @P24    , DEPDATE        = @P25" _
             & "        , ARRDATE       = @P26    , ACCDATE        = @P27" _
+            & "        , EMPARRDATE    = @P28" _
             & "        , UPDYMD        = @P87    , UPDUSER        = @P88" _
             & "        , UPDTERMID     = @P89    , RECEIVEYMD     = @P90" _
             & "    WHERE" _
@@ -7755,6 +7767,95 @@ Public Class OIT0003OrderDetail
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0003D CHECK_TRAINCARS"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 荷受人油種チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckConsigneeOil(ByRef O_RTN As String, ByVal SQLcon As SqlConnection)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
+        '○ チェックSQL
+        '　説明
+        '     タンク車割当で設定した油種について、下記油槽所が受入可能かチェックする。
+        '     (JXTG北信油槽所, JXTG甲府油槽所, OT八王子)
+
+        '荷受人油種チェック用
+        Dim SQLStr As String =
+              " SELECT " _
+            & " ISNULL(RTRIM(VIW0007.CONSIGNEECODE), '')   AS CONSIGNEECODE " _
+            & " , ISNULL(RTRIM(VIW0007.CONSIGNEENAME), '') AS CONSIGNEENAME " _
+            & " , ISNULL(RTRIM(VIW0007.NG_OILCODE), '')    AS NG_OILCODE " _
+            & " , ISNULL(RTRIM(VIW0007.NG_OILNAME), '')    AS NG_OILNAME " _
+            & " FROM  OIL.VIW0007_CONSIGNEE_OILCHECK VIW0007 " _
+            & " WHERE VIW0007.CONSIGNEECODE = @P01 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '荷受人コード
+                PARA1.Value = work.WF_SEL_CONSIGNEECODE.Text
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLdr)
+                End Using
+
+                For Each OIT0003ChkDrow As DataRow In OIT0003WKtbl.Rows
+                    For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                        If OIT0003ChkDrow("NG_OILCODE") = OIT0003row("OILCODE") + OIT0003row("ORDERINGTYPE") Then
+                            'Master.Output(C_MESSAGE_NO.OIL_CONSIGNEE_OILCODE_NG, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_90
+                            CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+
+                            WW_CheckMES1 = "荷受人(油槽所)受入油種NG。"
+                            WW_CheckMES2 = C_MESSAGE_NO.OIL_CONSIGNEE_OILCODE_NG
+                            WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                            O_RTN = "ERR"
+                            'Exit Sub
+                        Else
+                            OIT0003row("ORDERINFO") = ""
+                            OIT0003row("ORDERINFONAME") = ""
+                        End If
+                    Next
+                Next
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl)
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D CHECK_CONSIGNEEOIL")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D CHECK_CONSIGNEEOIL"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

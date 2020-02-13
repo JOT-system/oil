@@ -287,6 +287,10 @@ Public Module BaseDllConst
     ''' 積込可能(油種合計)件数オーバー 
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_89 As String = "89"
+    ''' <summary>
+    ''' 荷受人(油槽所)受入油種NG
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_90 As String = "90"
 
     ''' <summary>
     ''' 失注（荷主都合）

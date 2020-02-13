@@ -62,7 +62,7 @@
     align-items: stretch; 
     align-content: stretch;
 }
-#divSuggestList > .leftColumn > div:nth-child(2) {
+#divSuggestList > .leftColumn > div:last-child {
     height: calc(24px * 9); 
     border-bottom: 1px solid darkgray !important; 
     display:block !important;
@@ -89,6 +89,34 @@
     width:60px;
     min-width:60px;
     max-width:60px;
+}
+/* 提案表列車Noが7個に増えた場合は下の規則性にそって増幅させてください */
+/* 提案表列車Noが6個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has6Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ６倍 */
+    width : calc(60px * 6);
+    min-width: calc(60px * 6);
+    max-width: calc(60px * 6);
+    display:flex;
+    flex-wrap:wrap;
+}
+/* 提案表列車Noが5個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has5Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ５倍 */
+    width : calc(60px * 5);
+    min-width: calc(60px * 5);
+    max-width: calc(60px * 5);
+    display:flex;
+    flex-wrap:wrap;
+}
+/* 提案表列車Noが4個来た場合の設定 */
+#divSuggestList > div.dataColumn.dataColumn.has4Col{
+    /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ４倍 */
+    width : calc(60px * 4);
+    min-width: calc(60px * 4);
+    max-width: calc(60px * 4);
+    display:flex;
+    flex-wrap:wrap;
 }
 /* 提案表列車Noが3個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has3Col{
@@ -343,6 +371,7 @@ span.minus {
         margin-top: 0px;
     }
 }
+/* 在庫表の表示項目が増えた場合（夕在庫、朝在庫等の行）が増えた場合１油種での行数を height:calc(100% / [ここ]);に設定 */
 #divStockList div.col6 > div,
 #divStockList div.colStockValue > div{
     height:calc(100% / 8);
@@ -631,7 +660,7 @@ div.oilTypeData div.col1 span[data-tiptext] {
 /* ************************ */
 /* ↓表見出し固定ここから↓ */
 /* ************************ */
-/* IEはposition sticky未対応なのでそのまま */
+/* IEはposition sticky未対応なので固定されません */
 #divStockList > .header {
     position: sticky;
     top: -10px;

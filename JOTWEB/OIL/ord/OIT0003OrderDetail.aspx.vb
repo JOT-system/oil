@@ -1032,18 +1032,20 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.ORDERINGTYPE), '')                       AS ORDERINGTYPE" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINGOILNAME), '')                    AS ORDERINGOILNAME" _
             & " , CASE" _
-            & "   WHEN OIT0004.TANKNUMBER IS NULL AND TMP0001.OILNAME IS NULL THEN @P04" _
-            & "   WHEN OIT0004.TANKNUMBER <> '' " _
+            & "   WHEN (OIT0004.TANKNUMBER IS NULL OR TMP0001.TANKNO IS NULL) " _
+            & "    AND TMP0001.OILNAME IS NULL THEN @P04" _
+            & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P05" _
-            & "   WHEN OIT0004.TANKNUMBER <> '' " _
+            & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P05" _
-            & "   WHEN OIT0004.TANKNUMBER IS NOT NULL AND TMP0001.OILCODE IS NULL THEN @P04" _
-            & "   WHEN OIT0004.TANKNUMBER IS NOT NULL THEN @P06" _
+            & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
+            & "    AND TMP0001.OILCODE IS NULL THEN @P04" _
+            & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) THEN @P06" _
             & "   ELSE @P07" _
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
@@ -1076,10 +1078,10 @@ Public Class OIT0003OrderDetail
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P10" _
             & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
-            & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')                         AS LASTOILCODE" _
-            & " , ISNULL(RTRIM(OIT0004.PREOILNAME), '')                         AS LASTOILNAME" _
-            & " , ISNULL(RTRIM(OIT0004.PREORDERINGTYPE), '')                    AS PREORDERINGTYPE" _
-            & " , ISNULL(RTRIM(OIT0004.PREORDERINGOILNAME), '')                 AS PREORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(OIT0004.PREOILCODE), OIT0005.LASTOILCODE)                AS LASTOILCODE" _
+            & " , ISNULL(RTRIM(OIT0004.PREOILNAME), OIT0005.LASTOILNAME)                AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(OIT0004.PREORDERINGTYPE), OIT0005.PREORDERINGTYPE)       AS PREORDERINGTYPE" _
+            & " , ISNULL(RTRIM(OIT0004.PREORDERINGOILNAME), OIT0005.PREORDERINGOILNAME) AS PREORDERINGOILNAME" _
             & " , ISNULL(RTRIM(TMP0001.CHANGETRAINNO), '')                      AS CHANGETRAINNO" _
             & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEECODE), '')                AS SECONDCONSIGNEECODE" _
             & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
@@ -1116,16 +1118,11 @@ Public Class OIT0003OrderDetail
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "       (OIT0004.TANKNUMBER = OIM0005.TANKNUMBER " _
             & "        OR TMP0001.TANKNO  = OIM0005.TANKNUMBER) " _
-            & "       AND OIM0005.DELFLG <> @P03"
-        '& " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
-        '& " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-        '& " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
-        '& "       OIT0004.TANKNUMBER = TMP0001.TANKNO " _
-        '& "       AND OIT0004.LINKNO = @P01" _
-        '& "       AND OIT0004.TRAINNO = @P02" _
-        '& "       AND OIT0004.DELFLG <> @P03" _
-        '& "       AND OIT0004.STATUS  = '1'" _
-        '& " WHERE OIT0004.TANKNUMBER IS NULL"
+            & "       AND OIM0005.DELFLG <> @P03" _
+            & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+            & "       (OIT0004.TANKNUMBER = OIT0005.TANKNUMBER " _
+            & "        OR TMP0001.TANKNO  = OIT0005.TANKNUMBER) " _
+            & "       AND OIT0005.DELFLG <> @P03"
 
         SQLStr &=
               " " _
@@ -1151,18 +1148,20 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.ORDERINGTYPE), '')                       AS ORDERINGTYPE" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINGOILNAME), '')                    AS ORDERINGOILNAME" _
             & " , CASE" _
-            & "   WHEN OIT0004.TANKNUMBER IS NULL AND TMP0001.OILNAME IS NULL THEN @P04" _
-            & "   WHEN OIT0004.TANKNUMBER <> '' " _
+            & "   WHEN (OIT0004.TANKNUMBER IS NULL OR TMP0001.TANKNO IS NULL) " _
+            & "    AND TMP0001.OILNAME IS NULL THEN @P04" _
+            & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P05" _
-            & "   WHEN OIT0004.TANKNUMBER <> '' " _
+            & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P05" _
-            & "   WHEN OIT0004.TANKNUMBER IS NOT NULL AND TMP0001.OILCODE IS NULL THEN @P04" _
-            & "   WHEN OIT0004.TANKNUMBER IS NOT NULL THEN @P06" _
+            & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
+            & "    AND TMP0001.OILCODE IS NULL THEN @P04" _
+            & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) THEN @P06" _
             & "   ELSE @P07" _
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')                          AS LINEORDER" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
@@ -1195,10 +1194,10 @@ Public Class OIT0003OrderDetail
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P10" _
             & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
-            & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')                         AS LASTOILCODE" _
-            & " , ISNULL(RTRIM(OIT0004.PREOILNAME), '')                         AS LASTOILNAME" _
-            & " , ISNULL(RTRIM(OIT0004.PREORDERINGTYPE), '')                    AS PREORDERINGTYPE" _
-            & " , ISNULL(RTRIM(OIT0004.PREORDERINGOILNAME), '')                 AS PREORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(OIT0004.PREOILCODE), OIT0005.LASTOILCODE)                AS LASTOILCODE" _
+            & " , ISNULL(RTRIM(OIT0004.PREOILNAME), OIT0005.LASTOILNAME)                AS LASTOILNAME" _
+            & " , ISNULL(RTRIM(OIT0004.PREORDERINGTYPE), OIT0005.PREORDERINGTYPE)       AS PREORDERINGTYPE" _
+            & " , ISNULL(RTRIM(OIT0004.PREORDERINGOILNAME), OIT0005.PREORDERINGOILNAME) AS PREORDERINGOILNAME" _
             & " , ISNULL(RTRIM(TMP0001.CHANGETRAINNO), '')                      AS CHANGETRAINNO" _
             & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEECODE), '')                AS SECONDCONSIGNEECODE" _
             & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
@@ -1236,30 +1235,11 @@ Public Class OIT0003OrderDetail
             & "       (OIT0004.TANKNUMBER = OIM0005.TANKNUMBER " _
             & "        OR TMP0001.TANKNO  = OIM0005.TANKNUMBER) " _
             & "       AND OIM0005.DELFLG <> @P03 " _
+            & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+            & "       (OIT0004.TANKNUMBER = OIT0005.TANKNUMBER " _
+            & "        OR TMP0001.TANKNO  = OIT0005.TANKNUMBER) " _
+            & "       AND OIT0005.DELFLG <> @P03" _
             & " WHERE TMP0001.ORDERNO IS NULL "
-
-        '###### 2020/02/13 コメント #################################################################################
-        '& " FROM OIL.OIT0004_LINK OIT0004 " _
-        '& " LEFT JOIN OIL.TMP0001ORDER TMP0001 ON " _
-        '& "       OIT0004.TANKNUMBER = TMP0001.TANKNO " _
-        '& "       AND TMP0001.DELFLG <> @P03" _
-        '& " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
-        '& "       OIT0004.TANKNUMBER = OIM0005.TANKNUMBER" _
-        '& "       AND OIM0005.DELFLG <> @P03" _
-        '& " WHERE OIT0004.LINKNO = @P01" _
-        '& " AND OIT0004.TRAINNO = @P02" _
-        '& " AND OIT0004.DELFLG <> @P03" _
-        '& " AND OIT0004.STATUS  = '1'"
-
-        '###### 2020/02/01 コメント #################################################################################
-        '& "   WHEN OIT0004.TANKNUMBER IS NOT NULL AND TMP0001.OILCODE <> OIT0004.PREOILCODE THEN '前回油種確認'" _
-        '& "   WHEN OIT0004.TANKNUMBER IS NOT NULL AND TMP0001.OILCODE = OIT0004.PREOILCODE THEN @P06" _
-        '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
-        '& "       OIM0003_PAST.OFFICECODE = @P11" _
-        '& "       AND OIM0003_PAST.SHIPPERCODE = @P12" _
-        '& "       AND OIM0003_PAST.PLANTCODE  = @P13" _
-        '& "       AND OIT0004.PREOILCODE = OIM0003_PAST.OILCODE" _
-        '& "       AND OIM0003_PAST.DELFLG <> @P03" _
 
         'SQLStr &=
         '      " ORDER BY" _
@@ -3174,16 +3154,16 @@ Public Class OIT0003OrderDetail
                 work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200
                 work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
 
-                ''○ 画面表示データ復元
-                'Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-                'For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                '    If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                '        OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
-                '        OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
-                '    End If
-                'Next
-                ''○ 画面表示データ保存
-                'Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                '○ 画面表示データ復元
+                Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                    If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                        OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                        OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                    End If
+                Next
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
             End Using
 
@@ -3478,6 +3458,9 @@ Public Class OIT0003OrderDetail
             Case 3
 
         End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
 
     End Sub
 
@@ -5458,6 +5441,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.OTHER9OTANKCH), '')           AS OTHER9OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANKCH), '')          AS OTHER10OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
+            & " , ISNULL(RTRIM(OIT0002.TANKRINKNO), '')              AS TANKRINKNO" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _

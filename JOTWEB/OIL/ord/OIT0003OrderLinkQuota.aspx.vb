@@ -249,6 +249,7 @@ Public Class OIT0003OrderLinkQuota
             & " , ISNULL(RTRIM(OIT0004.TRAINNO), '')                          AS TRAINNO" _
             & " , ISNULL(RTRIM(OIT0004.TRAINNAME), '')                        AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                       AS OFFICECODE" _
+            & " , ''                                                          AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATION), '')                       AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                   AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0004.RETSTATION), '')                       AS RETSTATION" _
@@ -383,6 +384,8 @@ Public Class OIT0003OrderLinkQuota
                     CODENAME_get("ORDERSTATUS", OIT0003row("STATUS"), OIT0003row("STATUS"), WW_DUMMY)
                     '受注情報
                     CODENAME_get("ORDERINFO", OIT0003row("INFO"), OIT0003row("INFO"), WW_DUMMY)
+                    '担当営業所
+                    CODENAME_get("SALESOFFICE", OIT0003row("OFFICECODE"), OIT0003row("OFFICENAME"), WW_DUMMY)
                 Next
             End Using
         Catch ex As Exception
@@ -765,6 +768,8 @@ Public Class OIT0003OrderLinkQuota
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERSTATUS"))
                 Case "ORDERINFO"        '受注情報
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
+                Case "SALESOFFICE"      '営業所
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
 
             End Select
         Catch ex As Exception

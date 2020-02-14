@@ -3029,8 +3029,8 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
-        '〇 日付妥当性チェック
-        WW_CheckValidityDate(WW_ERRCODE)
+        '〇 日付妥当性チェック((予定)日付)
+        WW_CheckPlanValidityDate(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
             Exit Sub
         End If
@@ -3386,6 +3386,18 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_ButtonUPDATE_TAB3()
+
+        '○ 関連チェック
+        WW_CheckTab3(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+
+        '〇 日付妥当性チェック(実績(日付))
+        WW_CheckActualValidityDate(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
 
     End Sub
 
@@ -7144,122 +7156,6 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
-        '〇 (実績)の日付は入力されていた場合チェックする。
-        '(実績)積込日
-        If TxtActualLoadingDate.Text <> "" Then
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALLODDATE", TxtActualLoadingDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                Try
-                    Date.TryParse(TxtActualLoadingDate.Text, WW_STYMD)
-                Catch ex As Exception
-                    WW_STYMD = C_DEFAULT_YMD
-                End Try
-            Else
-
-                '年月日チェック
-                WW_CheckDate(TxtActualLoadingDate.Text, "(実績)積込日", WW_CS0024FCHECKERR)
-                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
-                TxtActualLoadingDate.Focus()
-                WW_CheckMES1 = "積込日入力エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
-
-        '(実績)発日
-        If TxtActualDepDate.Text <> "" Then
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALDEPDATE", TxtActualDepDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                Try
-                    Date.TryParse(TxtActualDepDate.Text, WW_STYMD)
-                Catch ex As Exception
-                    WW_STYMD = C_DEFAULT_YMD
-                End Try
-            Else
-
-                '年月日チェック
-                WW_CheckDate(TxtActualDepDate.Text, "(実績)発日", WW_CS0024FCHECKERR)
-                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
-                TxtActualDepDate.Focus()
-                WW_CheckMES1 = "発日入力エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
-
-        '(実績)積車着日
-        If TxtActualArrDate.Text <> "" Then
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALARRDATE", TxtActualArrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                Try
-                    Date.TryParse(TxtActualArrDate.Text, WW_STYMD)
-                Catch ex As Exception
-                    WW_STYMD = C_DEFAULT_YMD
-                End Try
-            Else
-
-                '年月日チェック
-                WW_CheckDate(TxtActualArrDate.Text, "(実績)積車着日", WW_CS0024FCHECKERR)
-                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)積車着日", needsPopUp:=True)
-                TxtActualArrDate.Focus()
-                WW_CheckMES1 = "積車着日入力エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
-
-        '(実績)受入日
-        If TxtActualAccDate.Text <> "" Then
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALACCDATE", TxtActualAccDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                Try
-                    Date.TryParse(TxtActualAccDate.Text, WW_STYMD)
-                Catch ex As Exception
-                    WW_STYMD = C_DEFAULT_YMD
-                End Try
-            Else
-
-                '年月日チェック
-                WW_CheckDate(TxtActualAccDate.Text, "(実績)受入日", WW_CS0024FCHECKERR)
-                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)受入日", needsPopUp:=True)
-                TxtActualAccDate.Focus()
-                WW_CheckMES1 = "受入日入力エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
-
-        '(実績)空車着日
-        If TxtActualEmparrDate.Text <> "" Then
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALEMPARRDATE", TxtActualEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                Try
-                    Date.TryParse(TxtActualEmparrDate.Text, WW_STYMD)
-                Catch ex As Exception
-                    WW_STYMD = C_DEFAULT_YMD
-                End Try
-            Else
-
-                '年月日チェック
-                WW_CheckDate(TxtActualEmparrDate.Text, "(実績)空車着日", WW_CS0024FCHECKERR)
-                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
-                TxtActualEmparrDate.Focus()
-                WW_CheckMES1 = "空車着日入力エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
-
         '(一覧)チェック(準備)
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
             OIT0003row("ORDERINFO") = ""
@@ -7477,6 +7373,138 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' チェック処理(タブ「タンク車明細」)
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckTab3(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_STYMD As Date
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+
+        '〇 (実績)の日付は入力されていた場合チェックする。
+        '(実績)積込日
+        If TxtActualLoadingDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALLODDATE", TxtActualLoadingDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualLoadingDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualLoadingDate.Text, "(実績)積込日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
+                TxtActualLoadingDate.Focus()
+                WW_CheckMES1 = "積込日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)発日
+        If TxtActualDepDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALDEPDATE", TxtActualDepDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualDepDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualDepDate.Text, "(実績)発日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
+                TxtActualDepDate.Focus()
+                WW_CheckMES1 = "発日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)積車着日
+        If TxtActualArrDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALARRDATE", TxtActualArrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualArrDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualArrDate.Text, "(実績)積車着日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)積車着日", needsPopUp:=True)
+                TxtActualArrDate.Focus()
+                WW_CheckMES1 = "積車着日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)受入日
+        If TxtActualAccDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALACCDATE", TxtActualAccDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualAccDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualAccDate.Text, "(実績)受入日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)受入日", needsPopUp:=True)
+                TxtActualAccDate.Focus()
+                WW_CheckMES1 = "受入日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)空車着日
+        If TxtActualEmparrDate.Text <> "" Then
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALEMPARRDATE", TxtActualEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(TxtActualEmparrDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+
+                '年月日チェック
+                WW_CheckDate(TxtActualEmparrDate.Text, "(実績)空車着日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+                TxtActualEmparrDate.Focus()
+                WW_CheckMES1 = "空車着日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+    End Sub
+
+    ''' <summary>
     ''' 年月日チェック
     ''' </summary>
     ''' <param name="I_DATE"></param>
@@ -7511,11 +7539,11 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
-    ''' 年月日妥当性チェック
+    ''' 年月日妥当性チェック((予定)日付)
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckValidityDate(ByRef O_RTN As String)
+    Protected Sub WW_CheckPlanValidityDate(ByRef O_RTN As String)
 
         O_RTN = C_MESSAGE_NO.NORMAL
         WW_ORDERINFOFLG_10 = False
@@ -7646,6 +7674,161 @@ Public Class OIT0003OrderDetail
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 年月日妥当性チェック((実績)日付)
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckActualValidityDate(ByRef O_RTN As String)
+
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim iresult As Integer
+
+        '○ 過去日付チェック
+        '例) iresult = dt1.Date.CompareTo(dt2.Date)
+        '    iresultの意味
+        '     0 : dt1とdt2は同じ日
+        '    -1 : dt1はdt2より前の日
+        '     1 : dt1はdt2より後の日
+        '(実績)積込日 と　現在日付を比較
+        If TxtActualLoadingDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualLoadingDate.Text).CompareTo(DateTime.Today)
+            If iresult = -1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
+                TxtActualLoadingDate.Focus()
+                WW_CheckMES1 = "(実績日)過去日付エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)発日 と　現在日付を比較
+        If TxtActualDepDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualDepDate.Text).CompareTo(DateTime.Today)
+            If iresult = -1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
+                TxtActualDepDate.Focus()
+                WW_CheckMES1 = "(実績日)過去日付エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)積車着日 と　現在日付を比較
+        If TxtActualArrDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualArrDate.Text).CompareTo(DateTime.Today)
+            If iresult = -1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積車着日", needsPopUp:=True)
+                TxtActualArrDate.Focus()
+                WW_CheckMES1 = "(実績日)過去日付エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)受入日 と　現在日付を比較
+        If TxtActualAccDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualAccDate.Text).CompareTo(DateTime.Today)
+            If iresult = -1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)受入日", needsPopUp:=True)
+                TxtActualAccDate.Focus()
+                WW_CheckMES1 = "(実績日)過去日付エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)空車着日 と　現在日付を比較
+        If TxtActualEmparrDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualEmparrDate.Text).CompareTo(DateTime.Today)
+            If iresult = -1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+                TxtActualEmparrDate.Focus()
+                WW_CheckMES1 = "(実績日)過去日付エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '○ 日付妥当性チェック
+        '例) iresult = dt1.Date.CompareTo(dt2.Date)
+        '    iresultの意味
+        '     0 : dt1とdt2は同じ日
+        '    -1 : dt1はdt2より前の日
+        '     1 : dt1はdt2より後の日
+        '(実績)積込日 と　(実績)発日を比較
+        If TxtActualLoadingDate.Text <> "" AndAlso TxtActualDepDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualLoadingDate.Text).CompareTo(Date.Parse(TxtActualDepDate.Text))
+            If iresult = 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日 > (実績)発日", needsPopUp:=True)
+                TxtActualDepDate.Focus()
+                WW_CheckMES1 = "(実績日)入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)発日 と　(実績)積車着日を比較
+        If TxtActualDepDate.Text <> "" AndAlso TxtActualArrDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualDepDate.Text).CompareTo(Date.Parse(TxtActualArrDate.Text))
+            If iresult = 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発日 > (実績)積車着日", needsPopUp:=True)
+                TxtActualArrDate.Focus()
+                WW_CheckMES1 = "(実績日)入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)積車着日 と　(実績)受入日を比較
+        If TxtActualArrDate.Text <> "" AndAlso TxtActualAccDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualArrDate.Text).CompareTo(Date.Parse(TxtActualAccDate.Text))
+            If iresult = 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積車着日 > (実績)受入日", needsPopUp:=True)
+                TxtActualAccDate.Focus()
+                WW_CheckMES1 = "(実績日)入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
+
+        '(実績)受入日 と　(実績)空車着日を比較
+        If TxtActualAccDate.Text <> "" AndAlso TxtActualEmparrDate.Text <> "" Then
+            iresult = Date.Parse(TxtActualAccDate.Text).CompareTo(Date.Parse(TxtActualEmparrDate.Text))
+            If iresult = 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)受入日 > (実績)空車着日", needsPopUp:=True)
+                TxtActualEmparrDate.Focus()
+                WW_CheckMES1 = "(実績日)入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
 
     End Sub

@@ -59,7 +59,6 @@ Public Class OIT0003OrderDetail
 
     Private WW_SwapInput As String = "0"                            '入換指示入力(0:未 1:完了)
     Private WW_LoadingInput As String = "0"                         '積込指示入力(0:未 1:完了)
-    Private WW_DeliveryInput As String = "0"                        '託送指示入力(0:未 1:完了)
 
     Private WW_ORDERINFOFLG_10 As Boolean = False                   '受注情報セット可否(情報(10:積置))
     Private WW_ORDERINFOALERMFLG_80 As Boolean = False              '受注情報セット可否(警告(80:タンク車数オーバー))
@@ -163,6 +162,16 @@ Public Class OIT0003OrderDetail
                 WF_CREATELINKFLG.Value = "1"
             Else
                 WF_CREATELINKFLG.Value = "2"
+            End If
+
+            '○ 託送指示フラグ(0：未手配, 1：手配)設定
+            '　・100:受注受付の状態では、非活性とする。
+            If work.WF_SEL_DELIVERYFLG.Text = "1" _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+                WF_DELIVERYFLG.Value = "1"
+            Else
+                WF_DELIVERYFLG.Value = "0"
             End If
         Finally
             '○ 格納Table Close
@@ -1597,7 +1606,6 @@ Public Class OIT0003OrderDetail
         If WF_DetailMView.ActiveViewIndex = "0" Then
             '○ 画面表示データ復元
             'Master.RecoverTable(OIT0003tbl_tab1, work.WF_SEL_INPTAB1TBL.Text)
-
             DisplayGrid_TAB1()
 
             'タブ「入換・積込指示」
@@ -1994,8 +2002,43 @@ Public Class OIT0003OrderDetail
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDELIVERY_Click()
 
-        '託送指示フラグを"1"(完了)にする。
-        WW_DeliveryInput = "1"
+        Dim strOrderStatus As String = ""
+
+        '託送指示フラグを"1"(手配)にする。
+        work.WF_SEL_DELIVERYFLG.Text = "1"
+
+        '受注TBL更新
+        WW_UpdateDeliveryFlg("1")
+
+        '〇 受注進行ステータスの状態
+        WW_ScreenOrderStatusSet(strOrderStatus)
+
+        '受注進行ステータスに変更があった場合
+        If strOrderStatus <> "" Then
+            '〇(受注TBL)受注進行ステータス更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateOrderStatus(strOrderStatus)
+                CODENAME_get("ORDERSTATUS", strOrderStatus, TxtOrderStatus.Text, WW_DUMMY)
+                work.WF_SEL_ORDERSTATUS.Text = strOrderStatus
+                work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
+            End Using
+        End If
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+        For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+            If OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                OIT0003row("ORDERSTATUS") = strOrderStatus
+                OIT0003row("ORDERSTATUSNAME") = TxtOrderStatus.Text
+                OIT0003row("DELIVERYFLG") = "1"
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
     End Sub
 
@@ -3180,6 +3223,12 @@ Public Class OIT0003OrderDetail
 
             End Using
 
+            '〇 受注ステータスが"手配"へ変更された場合
+            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
+                WF_DTAB_CHANGE_NO.Value = "1"
+                WF_Detail_TABChange()
+            End If
+
         End If
 
     End Sub
@@ -3259,78 +3308,14 @@ Public Class OIT0003OrderDetail
                     If WW_LoadingInput = "1" Then
                         '手配完了
                         strOrderStatus = CONST_ORDERSTATUS_270
+                        CODENAME_get("ORDERSTATUS", strOrderStatus, TxtOrderStatus.Text, WW_DUMMY)
                     End If
             End Select
 
         Else
             '〇 受注進行ステータスの状態
-            Select Case work.WF_SEL_ORDERSTATUS.Text
-                '受注進行ステータス＝"200:手配中"
-                '受注進行ステータス＝"210:手配中(入換指示手配済)"
-                '受注進行ステータス＝"220:手配中(積込指示手配済)"
-                '受注進行ステータス＝"230:手配中(託送指示手配済)"
-                '受注進行ステータス＝"240:手配中(入換指示未手配)"
-                '受注進行ステータス＝"250:手配中(積込指示未手配)"
-                '受注進行ステータス＝"260:手配中(託送指示未手配)"
-                Case BaseDllConst.CONST_ORDERSTATUS_200,
-                     BaseDllConst.CONST_ORDERSTATUS_210,
-                     BaseDllConst.CONST_ORDERSTATUS_220,
-                     BaseDllConst.CONST_ORDERSTATUS_230,
-                     BaseDllConst.CONST_ORDERSTATUS_240,
-                     BaseDllConst.CONST_ORDERSTATUS_250,
-                     BaseDllConst.CONST_ORDERSTATUS_260
+            WW_ScreenOrderStatusSet(strOrderStatus)
 
-                    '入換指示入力＝"1:完了"
-                    'かつ、積込指示入力＝"1:完了"
-                    'かつ、託送指示入力＝"1:完了"の場合
-                    If WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "1" Then
-                        '手配完了
-                        strOrderStatus = CONST_ORDERSTATUS_270
-
-                        '入換指示入力＝"1:完了"
-                        'かつ、積込指示入力＝"0:未完了"
-                        'かつ、託送指示入力＝"0:未完了"の場合
-                    ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso WW_DeliveryInput = "0" Then
-                        '手配中(入換指示手配済)
-                        strOrderStatus = CONST_ORDERSTATUS_210
-
-                        '入換指示入力＝"0:未完了"
-                        'かつ、積込指示入力＝"1:完了"
-                        'かつ、託送指示入力＝"0:未完了"の場合
-                    ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "0" Then
-                        '手配中(積込指示手配済)
-                        strOrderStatus = CONST_ORDERSTATUS_220
-
-                        '入換指示入力＝"0:未完了"
-                        'かつ、積込指示入力＝"0:未完了"
-                        'かつ、託送指示入力＝"1:完了"の場合
-                    ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "0" AndAlso WW_DeliveryInput = "1" Then
-                        '手配中(託送指示手配済)
-                        strOrderStatus = CONST_ORDERSTATUS_230
-
-                        '入換指示入力＝"0:未完了"
-                        'かつ、積込指示入力＝"1:完了"
-                        'かつ、託送指示入力＝"1:完了"の場合
-                    ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "1" Then
-                        '手配中(入換指示未手配)
-                        strOrderStatus = CONST_ORDERSTATUS_240
-
-                        '入換指示入力＝"1:完了"
-                        'かつ、積込指示入力＝"0:未完了"
-                        'かつ、託送指示入力＝"1:完了"の場合
-                    ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso WW_DeliveryInput = "1" Then
-                        '手配中(積込指示未手配)
-                        strOrderStatus = CONST_ORDERSTATUS_250
-
-                        '入換指示入力＝"1:完了"
-                        'かつ、積込指示入力＝"1:完了"
-                        'かつ、託送指示入力＝"0:未完了"の場合
-                    ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso WW_DeliveryInput = "0" Then
-                        '手配中(託送指示未手配)
-                        strOrderStatus = CONST_ORDERSTATUS_260
-
-                    End If
-            End Select
         End If
 
         '受注進行ステータスに変更があった場合
@@ -3343,9 +3328,22 @@ Public Class OIT0003OrderDetail
                 CODENAME_get("ORDERSTATUS", strOrderStatus, TxtOrderStatus.Text, WW_DUMMY)
                 work.WF_SEL_ORDERSTATUS.Text = strOrderStatus
                 work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
+
             End Using
         End If
 
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+        For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+            If OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                OIT0003row("ORDERSTATUS") = strOrderStatus
+                OIT0003row("ORDERSTATUSNAME") = TxtOrderStatus.Text
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
         If WW_RESULT = "ERR" Then
             WW_ERRCODE = WW_RESULT
@@ -4339,7 +4337,7 @@ Public Class OIT0003OrderDetail
                     End If
 
                     PARA23.Value = "1"                                    '利用可否フラグ(1:利用可能)
-                    PARA94.Value = "1"                                    '託送指示フラグ(1:未手配)
+                    PARA94.Value = work.WF_SEL_DELIVERYFLG.Text           '託送指示フラグ(0:未手配, 1:手配)
                     PARA24.Value = TxtLoadingDate.Text                    '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                        '発日（予定）
                     PARA26.Value = TxtArrDate.Text                        '積車着日（予定）
@@ -5405,6 +5403,7 @@ Public Class OIT0003OrderDetail
             & "   END                                                AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
             & " , ISNULL(RTRIM(OIT0002.USEPROPRIETYFLG), '')   　    AS USEPROPRIETYFLG" _
+            & " , ISNULL(RTRIM(OIT0002.DELIVERYFLG), '')   　        AS DELIVERYFLG" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
             & "   WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
@@ -5827,6 +5826,72 @@ Public Class OIT0003OrderDetail
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDERSTATUS UPDATE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDERSTATUS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' (受注TBL)託送指示フラグ更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateDeliveryFlg(ByVal I_Value As String)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLの託送指示フラグを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0002_ORDER " _
+                    & "    SET DELIVERYFLG = @P03, " _
+                    & "        UPDYMD      = @P11, " _
+                    & "        UPDUSER     = @P12, " _
+                    & "        UPDTERMID   = @P13, " _
+                    & "        RECEIVEYMD  = @P14  " _
+                    & "  WHERE ORDERNO     = @P01  " _
+                    & "    AND DELFLG     <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+            PARA02.Value = C_DELETE_FLG.DELETE
+            PARA03.Value = I_Value
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_DELIVERYFLG UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_DELIVERYFLG UPDATE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -6656,12 +6721,87 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 画面表示設定処理(受注進行ステータス)
+    ''' </summary>
+    Protected Sub WW_ScreenOrderStatusSet(ByRef O_VALUE As String)
+        Select Case work.WF_SEL_ORDERSTATUS.Text
+                '受注進行ステータス＝"200:手配中"
+                '受注進行ステータス＝"210:手配中(入換指示手配済)"
+                '受注進行ステータス＝"220:手配中(積込指示手配済)"
+                '受注進行ステータス＝"230:手配中(託送指示手配済)"
+                '受注進行ステータス＝"240:手配中(入換指示未手配)"
+                '受注進行ステータス＝"250:手配中(積込指示未手配)"
+                '受注進行ステータス＝"260:手配中(託送指示未手配)"
+            Case BaseDllConst.CONST_ORDERSTATUS_200,
+                 BaseDllConst.CONST_ORDERSTATUS_210,
+                 BaseDllConst.CONST_ORDERSTATUS_220,
+                 BaseDllConst.CONST_ORDERSTATUS_230,
+                 BaseDllConst.CONST_ORDERSTATUS_240,
+                 BaseDllConst.CONST_ORDERSTATUS_250,
+                 BaseDllConst.CONST_ORDERSTATUS_260
+
+                '入換指示入力＝"1:完了"
+                'かつ、積込指示入力＝"1:完了"
+                'かつ、託送指示入力＝"1:完了"の場合
+                If WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                    '手配完了
+                    O_VALUE = CONST_ORDERSTATUS_270
+
+                    '入換指示入力＝"1:完了"
+                    'かつ、積込指示入力＝"0:未完了"
+                    'かつ、託送指示入力＝"0:未完了"の場合
+                ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
+                    '手配中(入換指示手配済)
+                    O_VALUE = CONST_ORDERSTATUS_210
+
+                    '入換指示入力＝"0:未完了"
+                    'かつ、積込指示入力＝"1:完了"
+                    'かつ、託送指示入力＝"0:未完了"の場合
+                ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
+                    '手配中(積込指示手配済)
+                    O_VALUE = CONST_ORDERSTATUS_220
+
+                    '入換指示入力＝"0:未完了"
+                    'かつ、積込指示入力＝"0:未完了"
+                    'かつ、託送指示入力＝"1:完了"の場合
+                ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                    '手配中(託送指示手配済)
+                    O_VALUE = CONST_ORDERSTATUS_230
+
+                    '入換指示入力＝"0:未完了"
+                    'かつ、積込指示入力＝"1:完了"
+                    'かつ、託送指示入力＝"1:完了"の場合
+                ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                    '手配中(入換指示未手配)
+                    O_VALUE = CONST_ORDERSTATUS_240
+
+                    '入換指示入力＝"1:完了"
+                    'かつ、積込指示入力＝"0:未完了"
+                    'かつ、託送指示入力＝"1:完了"の場合
+                ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                    '手配中(積込指示未手配)
+                    O_VALUE = CONST_ORDERSTATUS_250
+
+                    '入換指示入力＝"1:完了"
+                    'かつ、積込指示入力＝"1:完了"
+                    'かつ、託送指示入力＝"0:未完了"の場合
+                ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
+                    '手配中(託送指示未手配)
+                    O_VALUE = CONST_ORDERSTATUS_260
+
+                End If
+        End Select
+    End Sub
+
+
+
+    ''' <summary>
     ''' 画面表示設定処理
     ''' </summary>
     Protected Sub WW_ScreenEnabledSet()
 
         '〇 託送指示ボタン制御
-        If WW_DeliveryInput = "1" Then
+        If work.WF_SEL_DELIVERYFLG.Text = "1" Then
 
         End If
 
@@ -6689,8 +6829,7 @@ Public Class OIT0003OrderDetail
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
             WF_Dtab01.Enabled = False
             WF_Dtab02.Enabled = True
             WF_Dtab03.Enabled = False
@@ -8793,36 +8932,69 @@ Public Class OIT0003OrderDetail
                 Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
                 Dim tblObj = DirectCast(divObj.Controls(0), Table)
 
-                '五井営業所、甲子営業所、袖ヶ浦営業所、三重塩浜営業所の場合
-                '積込列車番号の入力を可能とする。
-                If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011203" Then
+                '〇 受注進行ステータスの状態
+                Select Case work.WF_SEL_ORDERSTATUS.Text
+                '受注進行ステータス＝"200:手配中"
+                '受注進行ステータス＝"210:手配中(入換指示手配済)"
+                '受注進行ステータス＝"220:手配中(積込指示手配済)"
+                '受注進行ステータス＝"230:手配中(託送指示手配済)"
+                '受注進行ステータス＝"240:手配中(入換指示未手配)"
+                '受注進行ステータス＝"250:手配中(積込指示未手配)"
+                '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                    Case BaseDllConst.CONST_ORDERSTATUS_200,
+                         BaseDllConst.CONST_ORDERSTATUS_210,
+                         BaseDllConst.CONST_ORDERSTATUS_220,
+                         BaseDllConst.CONST_ORDERSTATUS_230,
+                         BaseDllConst.CONST_ORDERSTATUS_240,
+                         BaseDllConst.CONST_ORDERSTATUS_250,
+                         BaseDllConst.CONST_ORDERSTATUS_260
+                        '五井営業所、甲子営業所、袖ヶ浦営業所、三重塩浜営業所の場合
+                        '積込列車番号の入力を可能とする。
+                        If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
+                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
+                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011203" Then
 
-                    For Each rowitem As TableRow In tblObj.Rows
-                        For Each cellObj As TableCell In rowitem.Controls
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                            End If
+                            WW_RINKAIFLG = True
+
+                            For Each rowitem As TableRow In tblObj.Rows
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                Next
+                            Next
+
+                            '上記以外(仙台営業所、根岸営業所、四日市営業所)の場合
+                            '積込列車番号の入力を不可とする。
+                        Else
+                            For Each rowitem As TableRow In tblObj.Rows
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    End If
+                                Next
+                            Next
+
+                        End If
+
+                    Case Else
+                        For Each rowitem As TableRow In tblObj.Rows
+                            For Each cellObj As TableCell In rowitem.Controls
+                                If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LINE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
+                            Next
                         Next
-                    Next
-
-                    '上記以外(仙台営業所、根岸営業所、四日市営業所)の場合
-                    '積込列車番号の入力を不可とする。
-                Else
-                    For Each rowitem As TableRow In tblObj.Rows
-                        For Each cellObj As TableCell In rowitem.Controls
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            End If
-                        Next
-                    Next
-
-                End If
+                End Select
 
             'タンク車明細
             Case 2

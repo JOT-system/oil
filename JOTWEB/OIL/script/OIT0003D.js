@@ -15,7 +15,17 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
-    //更新ボタン活性／非活性
+    //〇 託送指示ボタン活性／非活性
+    if (document.getElementById('WF_DELIVERYFLG').value === "0") {
+        //活性 
+        document.getElementById("WF_ButtonDELIVERY").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonDELIVERY").disabled = "disabled";
+    }
+
+    //〇 更新ボタン活性／非活性
     let objDtabNo = document.getElementById("WF_DTAB_CHANGE_NO").value;
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //更新ボタン活性／非活性(新規登録、更新で切り分け)
@@ -24,7 +34,6 @@ function InitDisplay() {
             //活性
             document.getElementById("WF_ButtonINSERT").disabled = "";
             //非活性 
-            document.getElementById("WF_ButtonDELIVERY").disabled = "disabled";
             //〇タブ１
             if (objDtabNo === "0") {
                 document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
@@ -44,13 +53,11 @@ function InitDisplay() {
             //else if (objDtabNo === "3") {
             //}
 
-
         } else if (document.getElementById('WF_CREATEFLG').value === "2" 
                    || document.getElementById('WF_SEL_CREATELINKFLG').value === "2") {
             //非活性
             document.getElementById("WF_ButtonINSERT").disabled = "disabled";
             //活性 
-            document.getElementById("WF_ButtonDELIVERY").disabled = "";
             //〇タブ１
             if (objDtabNo === "0") {
                 document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";

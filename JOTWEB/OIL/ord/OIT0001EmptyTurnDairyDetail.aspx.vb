@@ -3376,7 +3376,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
 
                     PARA23.Value = "1"                                '利用可否フラグ(1:利用可能)
-                    PARA94.Value = "1"                                '託送指示フラグ(1:未手配)
+                    PARA94.Value = "0"                                '託送指示フラグ(0:未手配)
                     PARA24.Value = TxtLoadingDate.Text                '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                    '発日（予定）
                     PARA26.Value = TxtArrDate.Text                    '積車着日（予定）

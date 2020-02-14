@@ -657,6 +657,8 @@
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         <!-- 貨車連結切替用フラグ -->
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
+        <!-- 託送指示フラグ -->
+        <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
         <!-- DetailBox Mview切替 -->
         <input id="WF_DTAB_CHANGE_NO" runat="server" value="" type="text"/>
         <!-- ヘッダーを表示するか保持、"1"(表示:初期値),"0"(非表示)  -->

@@ -29,6 +29,7 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
+                <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
                 <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>

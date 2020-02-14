@@ -24,6 +24,7 @@ function InitDisplay() {
             //活性
             document.getElementById("WF_ButtonINSERT").disabled = "";
             //非活性 
+            document.getElementById("WF_ButtonDELIVERY").disabled = "disabled";
             //〇タブ１
             if (objDtabNo === "0") {
                 document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
@@ -49,6 +50,7 @@ function InitDisplay() {
             //非活性
             document.getElementById("WF_ButtonINSERT").disabled = "disabled";
             //活性 
+            document.getElementById("WF_ButtonDELIVERY").disabled = "";
             //〇タブ１
             if (objDtabNo === "0") {
                 document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";
@@ -71,6 +73,7 @@ function InitDisplay() {
 
     } else {
         //非活性 
+        document.getElementById("WF_ButtonDELIVERY").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
         //〇タブ１
         if (objDtabNo === "0") {
@@ -80,12 +83,19 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
         }
-        ////〇タブ２
-        //else if (objDtabNo === "1") {
-        //}
-        ////〇タブ３
-        //else if (objDtabNo === "2") {
-        //}
+        //〇タブ２
+        else if (objDtabNo === "1") {
+            document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "disabled";
+            document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "disabled";
+        }
+        //〇タブ３
+        else if (objDtabNo === "2") {
+            document.getElementById("WF_ButtonALLSELECT_TAB3").disabled = "disabled";
+            document.getElementById("WF_ButtonSELECT_LIFTED_TAB3").disabled = "disabled";
+            document.getElementById("WF_ButtonLINE_LIFTED_TAB3").disabled = "disabled";
+            document.getElementById("WF_ButtonLINE_ADD_TAB3").disabled = "disabled";
+            document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
+        }
         ////〇タブ４
         //else if (objDtabNo === "3") {
         //}

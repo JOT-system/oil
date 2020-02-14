@@ -77,6 +77,8 @@ Public Class OIT0003OrderDetail
                     'Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonDELIVERY"              '託送指示ボタン押下
+                            WF_ButtonDELIVERY_Click()
                         Case "WF_ButtonINSERT"                '油種数登録ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"                   '戻るボタン押下
@@ -1984,6 +1986,17 @@ Public Class OIT0003OrderDetail
 
         TBLview.Dispose()
         TBLview = Nothing
+    End Sub
+
+    ''' <summary>
+    ''' 託送指示ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonDELIVERY_Click()
+
+        '託送指示フラグを"1"(完了)にする。
+        WW_DeliveryInput = "1"
+
     End Sub
 
     ''' <summary>
@@ -3998,19 +4011,20 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0002_ORDER" _
             & "    SET" _
-            & "        OFFICECODE      = @P04    , OFFICENAME     = @P05" _
-            & "        , TRAINNO       = @P02    , TRAINNAME      = @P93, ORDERTYPE      = @P06" _
-            & "        , SHIPPERSCODE  = @P07    , SHIPPERSNAME   = @P08" _
-            & "        , BASECODE      = @P09    , BASENAME       = @P10" _
-            & "        , CONSIGNEECODE = @P11    , CONSIGNEENAME  = @P12" _
-            & "        , DEPSTATION    = @P13    , DEPSTATIONNAME = @P14" _
-            & "        , ARRSTATION    = @P15    , ARRSTATIONNAME = @P16" _
-            & "        , ORDERINFO     = @P22    , STACKINGFLG    = @P92" _
-            & "        , LODDATE       = @P24    , DEPDATE        = @P25" _
-            & "        , ARRDATE       = @P26    , ACCDATE        = @P27" _
-            & "        , EMPARRDATE    = @P28" _
-            & "        , UPDYMD        = @P87    , UPDUSER        = @P88" _
-            & "        , UPDTERMID     = @P89    , RECEIVEYMD     = @P90" _
+            & "        OFFICECODE        = @P04  , OFFICENAME     = @P05" _
+            & "        , TRAINNO         = @P02  , TRAINNAME      = @P93, ORDERTYPE      = @P06" _
+            & "        , SHIPPERSCODE    = @P07  , SHIPPERSNAME   = @P08" _
+            & "        , BASECODE        = @P09  , BASENAME       = @P10" _
+            & "        , CONSIGNEECODE   = @P11  , CONSIGNEENAME  = @P12" _
+            & "        , DEPSTATION      = @P13  , DEPSTATIONNAME = @P14" _
+            & "        , ARRSTATION      = @P15  , ARRSTATIONNAME = @P16" _
+            & "        , ORDERINFO       = @P22  , STACKINGFLG    = @P92" _
+            & "        , USEPROPRIETYFLG = @P23  , DELIVERYFLG    = @P94" _
+            & "        , LODDATE         = @P24  , DEPDATE        = @P25" _
+            & "        , ARRDATE         = @P26  , ACCDATE        = @P27" _
+            & "        , EMPARRDATE      = @P28" _
+            & "        , UPDYMD          = @P87  , UPDUSER        = @P88" _
+            & "        , UPDTERMID       = @P89  , RECEIVEYMD     = @P90" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & " IF (@@FETCH_STATUS <> 0)" _
@@ -4018,8 +4032,8 @@ Public Class OIT0003OrderDetail
             & "        ( ORDERNO      , TRAINNO         , TRAINNAME      , ORDERYMD            , OFFICECODE , OFFICENAME" _
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME   , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION     , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
-            & "        , RETSTATION   , RETSTATIONNAME  , CANGERETSTATION, CHANGEARRSTATIONNAME, ORDERSTATUS" _
-            & "        , ORDERINFO    , STACKINGFLG     , USEPROPRIETYFLG, LODDATE             , DEPDATE    , ARRDATE" _
+            & "        , RETSTATION   , RETSTATIONNAME  , CANGERETSTATION, CHANGEARRSTATIONNAME, ORDERSTATUS, ORDERINFO " _
+            & "        , STACKINGFLG  , USEPROPRIETYFLG , DELIVERYFLG    , LODDATE             , DEPDATE    , ARRDATE" _
             & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE  , ACTUALDEPDATE       , ACTUALARRDATE" _
             & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK          , HTANK               , TTANK" _
             & "        , MTTANK       , KTANK           , K3TANK         , K5TANK              , K10TANK" _
@@ -4039,8 +4053,8 @@ Public Class OIT0003OrderDetail
             & "        ( @P01, @P02, @P93, @P03, @P04, @P05" _
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
-            & "        , @P17, @P18, @P19, @P20, @P21" _
-            & "        , @P22, @P92, @P23, @P24, @P25, @P26" _
+            & "        , @P17, @P18, @P19, @P20, @P21, @P22" _
+            & "        , @P92, @P23, @P94, @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30, @P31" _
             & "        , @P32, @P33, @P34, @P35, @P36" _
             & "        , @P37, @P38, @P39, @P40, @P41" _
@@ -4087,6 +4101,7 @@ Public Class OIT0003OrderDetail
             & "    , ORDERINFO" _
             & "    , STACKINGFLG" _
             & "    , USEPROPRIETYFLG" _
+            & "    , DELIVERYFLG" _
             & "    , LODDATE" _
             & "    , DEPDATE" _
             & "    , ARRDATE" _
@@ -4188,6 +4203,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 2)  '受注情報
                 Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
+                Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.NVarChar, 1)  '託送指示フラグ
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)         '積込日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)         '発日（予定）
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Date)         '積車着日（予定）
@@ -4323,6 +4339,7 @@ Public Class OIT0003OrderDetail
                     End If
 
                     PARA23.Value = "1"                                    '利用可否フラグ(1:利用可能)
+                    PARA94.Value = "1"                                    '託送指示フラグ(1:未手配)
                     PARA24.Value = TxtLoadingDate.Text                    '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                        '発日（予定）
                     PARA26.Value = TxtArrDate.Text                        '積車着日（予定）
@@ -6642,6 +6659,11 @@ Public Class OIT0003OrderDetail
     ''' 画面表示設定処理
     ''' </summary>
     Protected Sub WW_ScreenEnabledSet()
+
+        '〇 託送指示ボタン制御
+        If WW_DeliveryInput = "1" Then
+
+        End If
 
         '○ 油種別タンク車数(車)、積込数量(kl)、計上月、売上金額、支払金額の表示・非表示制御
         '権限コードが更新の場合は表示設定

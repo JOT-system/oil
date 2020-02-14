@@ -76,6 +76,7 @@ a[id^="Menu_"] input[type=submit] {
     border-left-style: solid;
     border-color: rgba(56,56,56,0.4);
     font-size: 20px;
+    height: 30px;
     font-weight: 600;
     text-align: left;
     margin-left: 2em;

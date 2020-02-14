@@ -279,12 +279,19 @@ Public Class OIM0004StationList
             & " , ''                                          AS DEPARRSTATIONNAME" _
             & " , ISNULL(RTRIM(OIM0004.DELFLG), '')           AS DELFLG" _
             & " FROM OIL.OIM0004_STATION OIM0004 " _
-            & " WHERE OIM0004.STATIONCODE like @P1" _
-            & "   AND OIM0004.DELFLG      <> @P3"
+            & " WHERE OIM0004.DELFLG <> @P3"
+
+        '& " WHERE OIM0004.STATIONCODE like @P1" _
+        '& "   AND OIM0004.DELFLG      <> @P3"
+
         '            & " WHERE OIM0004.STATIONCODE = @P1" _
         '            & "   AND OIM0004.BRANCH      = @P2" _
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '貨物駅コード
+        If Not String.IsNullOrEmpty(work.WF_SEL_STATIONCODE.Text) Then
+            SQLStr &= String.Format("    AND OIM0004.STATIONCODE like '{0}%'", work.WF_SEL_STATIONCODE.Text)
+        End If
         '貨物コード枝番
         If Not String.IsNullOrEmpty(work.WF_SEL_BRANCH.Text) Then
             'SQLStr &= String.Format("    AND OIM0004.BRANCH = '{0}'", work.WF_SEL_BRANCH.Text)
@@ -292,7 +299,7 @@ Public Class OIM0004StationList
         End If
         '発着駅フラグ
         If Not String.IsNullOrEmpty(work.WF_SEL_DEPARRSTATIONFLG.Text) Then
-            SQLStr &= String.Format("    AND OIM0004.DEPARRSTATIONFLG like '%{0}%'", work.WF_SEL_DEPARRSTATIONFLG.Text)
+            SQLStr &= String.Format("    AND OIM0004.DEPARRSTATIONFLG like '{0}'", work.WF_SEL_DEPARRSTATIONFLG.Text)
         End If
 
         SQLStr &=
@@ -302,13 +309,13 @@ Public Class OIM0004StationList
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 4)        '貨物駅コード
-                '                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 3)        '貨物コード枝番
+                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 4)        '貨物駅コード
+                'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 3)        '貨物コード枝番
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
 
-                PARA1.Value = work.WF_SEL_STATIONCODE.Text + "%"
-                '                PARA1.Value = work.WF_SEL_STATIONCODE.Text
-                '                PARA2.Value = work.WF_SEL_BRANCH.Text
+                'PARA1.Value = work.WF_SEL_STATIONCODE.Text + "%"
+                'PARA1.Value = work.WF_SEL_STATIONCODE.Text
+                'PARA2.Value = work.WF_SEL_BRANCH.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()

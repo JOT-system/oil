@@ -240,7 +240,33 @@ Public Class OIT0003OrderDetail
         GridViewInitialize()
 
         '○ 詳細-画面初期設定
-        WF_DTAB_CHANGE_NO.Value = "0"
+        '〇 受注進行ステータスが"受注受付"の場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            WF_DTAB_CHANGE_NO.Value = "0"
+
+            '〇 受注進行ステータスが下記内容へ変更された場合
+            '   受注進行ステータス＝"200:手配中"
+            '   受注進行ステータス＝"210:手配中(入換指示手配済)"
+            '   受注進行ステータス＝"220:手配中(積込指示手配済)"
+            '   受注進行ステータス＝"230:手配中(託送指示手配済)"
+            '   受注進行ステータス＝"240:手配中(入換指示未手配)"
+            '   受注進行ステータス＝"250:手配中(積込指示未手配)"
+            '   受注進行ステータス＝"260:手配中(託送指示未手配)"
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+            WF_DTAB_CHANGE_NO.Value = "1"
+
+            '〇 受注進行ステータスが"手配完了"へ変更された場合
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            WF_DTAB_CHANGE_NO.Value = "2"
+        Else
+            WF_DTAB_CHANGE_NO.Value = "0"
+        End If
 
         '〇 タブ切替
         WF_Detail_TABChange()
@@ -3363,32 +3389,11 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
-        '###############################################################################################
-        ''受注進行ステータス退避用
-        'Dim strOrderStatus As String = ""
-
-        ''〇受注ステータスが"手配中"の場合
-        'If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
-
-        '    '臨海鉄道未対象の場合
-        '    If WW_RINKAIFLG = False Then
-        '        '手配完了
-        '        strOrderStatus = CONST_ORDERSTATUS_270
-        '    Else
-        '        '手配中(託送指示未手配)
-        '        strOrderStatus = CONST_ORDERSTATUS_260
-        '    End If
-
-        '    '〇(受注TBL)受注進行ステータス更新
-        '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '        SQLcon.Open()       'DataBase接続
-
-        '        WW_UpdateOrderStatus(strOrderStatus)
-        '        CODENAME_get("ORDERSTATUS", strOrderStatus, TxtOrderStatus.Text, WW_DUMMY)
-        '        work.WF_SEL_ORDERSTATUS.Text = strOrderStatus
-        '        work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
-        '    End Using
-        'End If
+        '〇 受注ステータスが"手配完了"へ変更された場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            WF_DTAB_CHANGE_NO.Value = "2"
+            WF_Detail_TABChange()
+        End If
 
     End Sub
 

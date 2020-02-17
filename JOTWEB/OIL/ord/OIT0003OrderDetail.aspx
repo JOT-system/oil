@@ -29,6 +29,7 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
+                <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
                 <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
@@ -656,6 +657,8 @@
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         <!-- 貨車連結切替用フラグ -->
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
+        <!-- 託送指示フラグ -->
+        <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
         <!-- DetailBox Mview切替 -->
         <input id="WF_DTAB_CHANGE_NO" runat="server" value="" type="text"/>
         <!-- ヘッダーを表示するか保持、"1"(表示:初期値),"0"(非表示)  -->

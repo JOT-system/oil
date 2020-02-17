@@ -50,7 +50,7 @@
 
             <!-- 貨物駅コード -->
             <div class="inputItem">
-                <a id="WF_STATIONCODE_LABEL" class="requiredMark">貨物駅コード</a>
+                <a id="WF_STATIONCODE_LABEL">貨物駅コード</a>
                 <a class="ef" id="WF_STATIONCODE" ondblclick="Field_DBclick('TxtStationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtStationCode');">
                     <asp:TextBox ID="TxtStationCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="4" placeholder="前方一致で検索"></asp:TextBox>
                 </a>

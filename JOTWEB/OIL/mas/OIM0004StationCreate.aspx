@@ -103,9 +103,9 @@
                 <p id="KEY_LINE_6">
                     <!-- 発着駅フラグ -->
                     <span class="ef" id="WF_DEPARRSTATION">
-                        <asp:Label ID="LblDepArrStation" runat="server" Text="発着駅フラグ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <asp:Label ID="LblDepArrStation" runat="server" Text="発着駅フラグ" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <span ondblclick="Field_DBclick('TxtDepArrStation', <%=LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST%>)" onchange="TextBox_change('TxtDepArrStation');">
-                            <asp:TextBox ID="TxtDepArrStation" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox>
+                            <asp:TextBox ID="TxtDepArrStation" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="LblDepArrStationName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>

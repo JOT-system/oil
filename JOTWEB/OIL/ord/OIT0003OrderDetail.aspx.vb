@@ -2286,39 +2286,18 @@ Public Class OIT0003OrderDetail
                         Else
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                         End If
+
+                        '### LeftBoxマルチ対応(20200217) START #####################################################
+                        If WF_FIELD.Value = "TANKNO" Then
+                            '↓暫定一覧対応 2020/02/13 グループ会社版を復活させ石油システムに合わない部分は直す
+                            Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                            .SetTableList(enumVal, WW_DUMMY, prmData)
+                            .ActiveTable()
+                            Return
+                            '↑暫定一覧対応 2020/02/13
+                        End If
+                        '### LeftBoxマルチ対応(20200217) END   #####################################################
                     End If
-
-                    ''(一覧)油種
-                    'If WF_FIELD.Value = "OILNAME" Then
-                    '    '〇 検索(営業所).テキストボックスが未設定
-                    '    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    '        '〇 画面(受注営業所).テキストボックスが未設定
-                    '        If TxtOrderOffice.Text = "" Then
-                    '            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
-                    '        Else
-                    '            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "")
-                    '        End If
-                    '    Else
-                    '        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
-                    '        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                    '    End If
-                    'End If
-
-                    ''(一覧)タンク車№
-                    'If WF_FIELD.Value = "TANKNO" Then
-                    '    '〇 検索(営業所).テキストボックスが未設定
-                    '    If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    '        '〇 画面(受注営業所).テキストボックスが未設定
-                    '        If TxtOrderOffice.Text = "" Then
-                    '            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
-                    '        Else
-                    '            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, "")
-                    '        End If
-                    '    Else
-                    '        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_CAMPCODE.Text, "")
-                    '        prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
-                    '    End If
-                    'End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .ActiveListBox()
@@ -6286,6 +6265,14 @@ Public Class OIT0003OrderDetail
             WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
             WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
             WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+
+            '### LeftBoxマルチ対応(20200217) START #####################################################
+        ElseIf leftview.ActiveViewIdx = 2 Then
+            '一覧表表示時
+            Dim selectedLeftTableVal = leftview.GetLeftTableValue()
+            WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
+            WW_SelectText = selectedLeftTableVal("VALUE1")
+            '### LeftBoxマルチ対応(20200217) END   #####################################################
         End If
 
         '○ 選択内容を画面項目へセット

@@ -755,6 +755,14 @@ Public Class OIT0002LinkDetail
                             'タンク車№
                             Case "TANKNUMBER"
                                 prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, "")
+                                '### LeftBoxマルチ対応(20200217) START #####################################################
+                                '↓暫定一覧対応 2020/02/13 グループ会社版を復活させ石油システムに合わない部分は直す
+                                Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                                .SetTableList(enumVal, WW_DUMMY, prmData)
+                                .ActiveTable()
+                                Return
+                                '↑暫定一覧対応 2020/02/13
+                                '### LeftBoxマルチ対応(20200217) END   #####################################################
                         End Select
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -857,6 +865,14 @@ Public Class OIT0002LinkDetail
             WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
             WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
             WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+
+            '### LeftBoxマルチ対応(20200217) START #####################################################
+        ElseIf leftview.ActiveViewIdx = 2 Then
+            '一覧表表示時
+            Dim selectedLeftTableVal = leftview.GetLeftTableValue()
+            WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
+            WW_SelectText = selectedLeftTableVal("VALUE1")
+            '### LeftBoxマルチ対応(20200217) END   #####################################################
         End If
 
         '○ 選択内容を画面項目へセット

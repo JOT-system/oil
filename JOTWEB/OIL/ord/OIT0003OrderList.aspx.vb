@@ -279,6 +279,7 @@ Public Class OIT0003OrderList
             & "   END                                                AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
             & " , ISNULL(RTRIM(OIT0002.USEPROPRIETYFLG), '')   　    AS USEPROPRIETYFLG" _
+            & " , ISNULL(RTRIM(OIT0002.DELIVERYFLG), '')   　        AS DELIVERYFLG" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
             & "   WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
@@ -707,11 +708,12 @@ Public Class OIT0003OrderList
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = "0"
-        '作成フラグ(新規登録：1, 更新：2)
+        '作成フラグ(1：新規登録, 2：更新)
         work.WF_SEL_CREATEFLG.Text = "1"
-        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        '作成フラグ(1：貨車連結未使用, 2：貨車連結使用)
         work.WF_SEL_CREATELINKFLG.Text = "1"
-
+        '託送指示フラグ(0：未手配, 1:手配)
+        work.WF_SEL_DELIVERYFLG.Text = "0"
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
 
@@ -841,10 +843,12 @@ Public Class OIT0003OrderList
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = "0"
-        '作成フラグ(新規登録：1, 更新：2)
+        '作成フラグ(1：新規登録, 2：更新)
         work.WF_SEL_CREATEFLG.Text = "1"
-        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        '作成フラグ(1：貨車連結未使用, 2：貨車連結使用)
         work.WF_SEL_CREATELINKFLG.Text = "2"
+        '託送指示フラグ(0：未手配, 1:手配)
+        work.WF_SEL_DELIVERYFLG.Text = "0"
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
@@ -1041,10 +1045,12 @@ Public Class OIT0003OrderList
 
         '削除フラグ
         work.WF_SEL_DELFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELFLG")
-        '作成フラグ(新規登録：1, 更新：2)
+        '作成フラグ(1：新規登録, 2：更新)
         work.WF_SEL_CREATEFLG.Text = "2"
-        '作成フラグ(貨車連結未使用：1, 貨車連結使用：2)
+        '作成フラグ(1：貨車連結未使用, 2：貨車連結使用)
         work.WF_SEL_CREATELINKFLG.Text = "1"
+        '託送指示フラグ(0：未手配, 1:手配)
+        work.WF_SEL_DELIVERYFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELIVERYFLG")
 
         '○ 状態をクリア
         For Each OIT0003row As DataRow In OIT0003tbl.Rows

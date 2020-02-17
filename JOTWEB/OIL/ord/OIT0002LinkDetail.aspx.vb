@@ -665,6 +665,13 @@ Public Class OIT0002LinkDetail
             MAPDataGet(SQLcon, 0)
         End Using
 
+        Dim i As Integer = 0
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            i += 1
+            OIT0002row("LINEORDER") = i        '貨物駅入線順
+
+        Next
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0002tbl)
 

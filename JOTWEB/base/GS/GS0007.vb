@@ -341,5 +341,97 @@ Public Class GS0007FIXVALUElst
         End If
 
     End Sub
+    ''' <summary>
+    ''' FixValueより取得したテーブルを返却
+    ''' </summary>
+    ''' <returns>DataTable </returns>
+    Public Function GS0007FIXVALUETbl() As DataTable
+        Dim retDt As DataTable = Nothing
+        '●In PARAMチェック
+        'PARAM01: CLAS
+        If checkParam(METHOD_NAME, CLAS) <> C_MESSAGE_NO.NORMAL Then
+            Throw New Exception(String.Format("CLAS Name Undefine CLAS={0}", CLAS))
+        End If
+        'セッション制御宣言
+        Dim sm As New CS0050SESSION
+        '初期値設定
+        ERR = C_MESSAGE_NO.DLL_IF_ERROR
+        Dim sqlStat As New StringBuilder
+        'SQL文字の生成
+        If String.IsNullOrEmpty(CLAS) Then
+            '使うか不明で、Datatableを返却するためリストボックスと違い同じ規則性不要
+            sqlStat.AppendLine("SELECT DISTINCT")
+            sqlStat.AppendLine("      ,rtrim(CLASS)  AS CLASS")
+            sqlStat.AppendLine("      ,rtrim(NAMES)  AS NAMES")
+            sqlStat.AppendLine("  FROM  OIL.VIW0001_FIXVALUE")
+            sqlStat.AppendLine(" WHERE  CAMPCODE   = @CAMPCODE")
+            sqlStat.AppendLine("   AND  STYMD     <= @STYMD")
+            sqlStat.AppendLine("   AND  ENDYMD    >= @ENDYMD")
+            sqlStat.AppendLine("   AND  DELFLG    <> @DELFLG")
+            If ADDITIONAL_CONDITION <> "" Then
+                sqlStat.AppendLine(ADDITIONAL_CONDITION)
+            End If
+            sqlStat.AppendLine(" ORDER BY KEYCODE ")
+        Else
+            sqlStat.AppendLine("SELECT ")
+            sqlStat.AppendLine("       rtrim(isnull(KEYCODE,''))  AS KEYCODE")
+            For Each fieldName In {"VALUE1", "VALUE2", "VALUE3", "VALUE4", "VALUE5",
+                                       "VALUE6", "VALUE7", "VALUE8", "VALUE9", "VALUE10",
+                                       "VALUE11", "VALUE12", "VALUE13", "VALUE14", "VALUE15"}
+                sqlStat.AppendFormat("      ,rtrim(isnull({0},''))   AS {0}", fieldName).AppendLine()
+            Next fieldName
+            sqlStat.AppendLine("      ,rtrim(isnull(NAMES,''))  AS NAMES")
+            sqlStat.AppendLine("      ,rtrim(isnull(NAMEL,''))  AS NAMEL")
+            sqlStat.AppendLine("      ,SYSTEMKEYFLG  AS SYSTEMKEYFLG")
+            sqlStat.AppendLine("  FROM  OIL.VIW0001_FIXVALUE")
+            sqlStat.AppendLine(" WHERE  CAMPCODE   = @CAMPCODE")
+            sqlStat.AppendLine("   AND  CLASS      = @CLASS")
+            sqlStat.AppendLine("   AND  STYMD     <= @STYMD")
+            sqlStat.AppendLine("   AND  ENDYMD    >= @ENDYMD")
+            sqlStat.AppendLine("   AND  DELFLG    <> @DELFLG")
+            If ADDITIONAL_CONDITION <> "" Then
+                sqlStat.AppendLine(ADDITIONAL_CONDITION)
+            End If
+            sqlStat.AppendLine(" ORDER BY KEYCODE ")
+        End If
 
+        Try
+            'DataBase接続文字
+            Using sqlCon = sm.getConnection,
+                  sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@CLASS", SqlDbType.NVarChar, 20).Value = CLAS
+                    .Add("@STYMD", SqlDbType.Date).Value = Date.Now
+                    .Add("@ENDYMD", SqlDbType.Date).Value = Date.Now
+                    .Add("@DELFLG", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+
+                End With
+                Dim paramCampCode = sqlCmd.Parameters.Add("@CAMPCODE", SqlDbType.NVarChar, 20)
+                'パラメータのCOMPCODE、なければCOMPCODE"Default"で検索
+                For Each campVal As String In {CAMPCODE, C_DEFAULT_DATAKEY}
+                    paramCampCode.Value = campVal
+                    Using sqlDa As New SqlDataAdapter(sqlCmd)
+                        retDt = New DataTable
+                        sqlDa.Fill(retDt)
+                    End Using
+                    'レコードがある場合はCOMPCODE="Default"で検索しない
+                    If retDt IsNot Nothing AndAlso retDt.Rows.Count > 0 Then
+                        Exit For
+                    End If
+                Next campVal
+            End Using
+        Catch ex As Exception
+            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+
+            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME           'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "DB:S0011_UPROFXLS Select DEFAULT"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+
+            ERR = C_MESSAGE_NO.DB_ERROR
+        End Try
+        Return retDt
+    End Function
 End Class

@@ -209,14 +209,18 @@ Public Class GRIS0005LeftBox
         LP_RINKAITRAIN_LINELIST
         LP_DEPARRSTATIONLIST
     End Enum
-
+    Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
     ''' 作成一覧情報の保持
     ''' </summary>
     Protected LbMap As New Hashtable
 
     Protected C_TABLE_SPLIT As String = "|"
-
+    Public ReadOnly Property ActiveViewIdx As Integer
+        Get
+            Return Me.WF_LEFTMView.ActiveViewIndex
+        End Get
+    End Property
     ''' <summary>
     ''' サーバ処理の遷移先
     ''' </summary>
@@ -274,6 +278,7 @@ Public Class GRIS0005LeftBox
     ''' <para>ソート・フィルタの設定は一覧作成後に行う</para>
     ''' </remarks>
     Public Sub SetListBox(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
+        LF_LEFTBOX.Style.Clear()
         LF_SORTING_CODE = C_SORTING_CODE.BOTH
         LF_FILTER_CODE = C_FILTER_CODE.ENABLE
         ListToView(CreateListData(ListCode, O_RTN, Params))
@@ -293,6 +298,11 @@ Public Class GRIS0005LeftBox
     ''' <para>ソート・フィルタの設定は一覧作成後に行う</para>
     ''' </remarks>
     Public Sub SetTableList(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
+        LF_LEFTBOX.Style.Add(HtmlTextWriterStyle.PaddingBottom, "0")
+        LF_LEFTBOX.Style.Add(HtmlTextWriterStyle.PaddingRight, "0")
+        LF_LEFTBOX.Style.Add(HtmlTextWriterStyle.Width, "50%")
+        LF_LEFTBOX.Style.Add("min-width", "400px")
+        LF_LEFTBOX.Style.Add("overflow-y", "hidden")
         LF_SORTING_CODE = C_SORTING_CODE.HIDE
         LF_FILTER_CODE = C_FILTER_CODE.DISABLE
         CreateTableList(ListCode, O_RTN, Params)
@@ -363,6 +373,32 @@ Public Class GRIS0005LeftBox
         WF_LeftListBox.Focus()
     End Sub
     ''' <summary>
+    ''' 左ボックスで選択した情報を取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetLeftTableValue() As Dictionary(Of String, String)
+        If WF_LEFTMView.ActiveViewIndex <> 2 Then
+            Return Nothing
+        End If
+        Dim retVal As New Dictionary(Of String, String)
+        retVal.Add(LEFT_TABLE_SELECTED_KEY, Me.hdnLeftTableSelectedKey.Value)
+        Dim retArr As New List(Of String)
+        retArr.AddRange(WF_TBL_SELECT.Text.Split(C_TABLE_SPLIT.ToCharArray))
+        For Each itm In retArr
+            Dim fieldValuePair = itm.Split("=".ToCharArray, 2)
+            Dim fieldName As String = fieldValuePair(0)
+            Dim value As String
+            If fieldValuePair.Count > 2 Then
+                value = fieldValuePair(1)
+            Else
+                value = ""
+            End If
+            retVal.Add(fieldName, value)
+        Next
+        Return retVal
+    End Function
+
+    ''' <summary>
     ''' 左ボックスで指定した値を取得する
     ''' </summary>
     ''' <returns>
@@ -374,7 +410,10 @@ Public Class GRIS0005LeftBox
     Public Function GetActiveValue() As String()
         Select Case WF_LEFTMView.ActiveViewIndex
             Case 2
-                Return WF_TBL_SELECT.Text.Split(C_TABLE_SPLIT.ToCharArray)
+                Dim retArr As New List(Of String)
+                retArr.Add(Me.hdnLeftTableSelectedKey.Value)
+                retArr.AddRange(WF_TBL_SELECT.Text.Split(C_TABLE_SPLIT.ToCharArray))
+                Return retArr.ToArray
             Case 1
                 Dim Value As String() = {"", ""}
                 Value(0) = WF_Calendar.Text
@@ -621,45 +660,34 @@ Public Class GRIS0005LeftBox
     ''' <para>統一車番：TYPEMODE, COMPANYCODE, ORGCODE</para>
     ''' </param>
     ''' <remarks></remarks>
-    Protected Sub CreateTableList(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
+    Private Sub CreateTableList(ByVal ListCode As LIST_BOX_CLASSIFICATION, ByRef O_RTN As String, Optional ByVal Params As Hashtable = Nothing)
+        Dim dispDt As DataTable
+        Dim dispFieldsDef As List(Of LeftTableDefItem) = Nothing
         Select Case ListCode
-            'Case LIST_BOX_CLASSIFICATION.LC_STAFFCODE
-            '    '社員
-            '    Using GL0005StaffList As New GL0005StaffList With {
-            '       .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0005StaffList.LC_STAFF_TYPE.ALL) _
-            '     , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-            '     , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-            '     , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-            '     , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-            '     , .STAFFKBN = If(Params.Item(C_PARAMETERS.LP_STAFF_KBN_LIST), Nothing) _
-            '     , .ROLECODE = If(Params.Item(C_PARAMETERS.LP_ROLE), DirectCast(Parent.Page.Master, OILMasterPage).ROLE_ORG) _
-            '     , .PERMISSION = If(Params.Item(C_PARAMETERS.LP_PERMISSION), C_PERMISSION.REFERLANCE) _
-            '     , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), GL0005StaffList.C_DEFAULT_SORT.SEQ) _
-            '     , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0005StaffList.C_VIEW_FORMAT_PATTERN.NAMES) _
-            '     , .STAFFCODE = If(Params.Item(C_PARAMETERS.LP_SELECTED_CODE), String.Empty) _
-            '     , .AREA = pnlLeftList
-            '    }
-            '        GL0005StaffList.getTable()
-            '        O_RTN = GL0005StaffList.ERR
-            '    End Using
-            'Case LIST_BOX_CLASSIFICATION.LC_CARCODE
-            '    '車両
-            '    Using GL0007CarList As New GL0007CarList With {
-            '       .TYPE = If(Params.Item(C_PARAMETERS.LP_TYPEMODE), GL0007CarList.LC_LORRY_TYPE.ALL) _
-            '     , .CAMPCODE = If(Params.Item(C_PARAMETERS.LP_COMPANY), "") _
-            '     , .STYMD = If(Params.Item(C_PARAMETERS.LP_STYMD), Date.Now) _
-            '     , .ENDYMD = If(Params.Item(C_PARAMETERS.LP_ENDYMD), Date.Now) _
-            '     , .ORGCODE = If(Params.Item(C_PARAMETERS.LP_ORG), "") _
-            '     , .DEFAULT_SORT = If(Params.Item(C_PARAMETERS.LP_DEFAULT_SORT), String.Empty) _
-            '     , .VIEW_FORMAT = If(Params.Item(C_PARAMETERS.LP_DISPLAY_FORMAT), GL0007CarList.C_VIEW_FORMAT_PATTERN.NAMES) _
-            '     , .AREA = pnlLeftList
-            '    }
-            '        GL0007CarList.getTable()
-            '        O_RTN = GL0007CarList.ERR
-            '    End Using
+            Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER
+                'タンク車番号
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER"
+                dispDt = CreateFixValueTable(Params, O_RTN)
+                '上記データテーブルの表示対象項目を定義(フィールド、表示名）
+                dispFieldsDef = New List(Of LeftTableDefItem) From
+                    {New LeftTableDefItem("VALUE13", "情報"),
+                     New LeftTableDefItem("VALUE12", "状態"),
+                     New LeftTableDefItem("VALUE15", "所在地"),
+                     New LeftTableDefItem("VALUE5", "油種"),
+                     New LeftTableDefItem("VALUE14", "積車"),
+                     New LeftTableDefItem("KEYCODE", "車番", True),
+                     New LeftTableDefItem("VALUE1", "型式", 10),
+                     New LeftTableDefItem("VALUE3", "交換日")}
+
             Case Else
                 Exit Sub
         End Select
+        '上記Select Caseで取得したデータテーブル、表示フィールド定義を元に
+        '左ボックスのパネルコントロールにレンダリング
+        If dispDt IsNot Nothing AndAlso dispFieldsDef IsNot Nothing Then
+            MakeTableObject(dispFieldsDef, dispDt, pnlLeftList)
+        End If
+
     End Sub
     ''' <summary>
     ''' 会社コード一覧を作成する
@@ -1281,6 +1309,41 @@ Public Class GRIS0005LeftBox
         Return DirectCast(LbMap.Item(key), ListBox)
     End Function
     ''' <summary>
+    ''' Datatable設定共通サブ
+    ''' </summary>
+    ''' <param name="Params">取得用パラメータ</param>
+    ''' <param name="O_RTN">成功可否</param>
+    ''' <returns>作成した一覧情報</returns>
+    ''' <remarks>固定値一覧情報からリストボックスに表示する固定値を取得する</remarks>
+    Protected Function CreateFixValueTable(ByVal Params As Hashtable, ByRef O_RTN As String) As DataTable
+        Dim I_COMP As String = C_DEFAULT_DATAKEY
+        Dim retDt As DataTable = Nothing
+        If Params.Item(C_PARAMETERS.LP_COMPANY) IsNot Nothing Then
+            I_COMP = Convert.ToString(Params.Item(C_PARAMETERS.LP_COMPANY))
+        End If
+        Dim I_CLASS As String = Convert.ToString(Params.Item(C_PARAMETERS.LP_FIX_CLASS))
+        Dim key As String = I_COMP & If(I_CLASS = String.Empty, "ALLVALUE", I_CLASS)
+        If Not LbMap.ContainsKey(key) Then
+            Dim lsbx As New ListBox
+
+            Using GS0007FIXVALUElst As New GS0007FIXVALUElst With {
+                   .CAMPCODE = I_COMP _
+                 , .CLAS = I_CLASS _
+                 , .LISTBOX1 = lsbx
+                }
+                'FixValue抽出用の追加条件付与
+                If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALCONDITION) AndAlso
+                   Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION)) <> "" Then
+                    GS0007FIXVALUElst.ADDITIONAL_CONDITION = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION))
+                End If
+                retDt = GS0007FIXVALUElst.GS0007FIXVALUETbl()
+                O_RTN = GS0007FIXVALUElst.ERR
+            End Using
+        End If
+
+        Return retDt
+    End Function
+    ''' <summary>
     ''' コードからサブコードを取得する
     ''' </summary>
     ''' <param name="Params">取得用パラメータ</param>
@@ -1415,4 +1478,268 @@ Public Class GRIS0005LeftBox
             End If
         End If
     End Sub
+#Region "左ボックスのテーブル表処理関連"
+    ''' <summary>
+    ''' テーブルオブジェクト展開
+    ''' </summary>
+    ''' <param name="leftTableDefs">カラム定義</param>
+    ''' <param name="outArea">出力先(Panel)コントロール</param>
+    Private Sub MakeTableObject(ByVal leftTableDefs As List(Of LeftTableDefItem), ByVal srcTbl As DataTable, outArea As Panel)
+
+        '●項目定義取得
+        Dim outTHCell = New TableHeaderCell With {.ViewStateMode = UI.ViewStateMode.Disabled}
+        Dim lenghtFix As Integer = 0
+        Dim leftFixAll As Integer = 32
+        Dim rightLengthFixAll As Integer = 0
+
+        'ソートキー領域作成
+        Dim sortItemId As String = "hdnListSortValue" & outArea.Page.Form.ClientID & outArea.ID
+        Dim sortValue As String = ""
+        Dim sortItems As New HiddenField With {.ID = sortItemId, .ViewStateMode = UI.ViewStateMode.Disabled}
+        If outArea.Page.Request.Form.GetValues(sortItemId) IsNot Nothing Then
+            sortValue = outArea.Page.Request.Form.GetValues(sortItemId)(0)
+        End If
+        sortItems.Value = sortValue
+        outArea.Controls.Add(sortItems)
+        'テーブル全体のタグ
+        Dim tableObj As New HtmlGenericControl("div") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+        tableObj.Attributes.Add("class", "leftTable")
+        ' ヘッダー作成
+        Dim wholeHeaderWrapper As New HtmlGenericControl("div") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+        wholeHeaderWrapper.Attributes.Add("class", "leftTableHeaderWrapper")
+        Dim wholeHeader As New HtmlGenericControl("div") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+        Dim keyFieldName As String = ""
+        wholeHeader.Attributes.Add("class", "leftTableHeader")
+        For Each leftTableDef In leftTableDefs
+            'データテーブルに対象カラムが含まれていない場合はスキップ
+            If srcTbl IsNot Nothing AndAlso srcTbl.Columns.Contains(leftTableDef.FieldName) = False Then
+                leftTableDef.HasDtColumn = False
+                Continue For
+            End If
+
+            If keyFieldName = "" AndAlso leftTableDef.KeyField Then
+                keyFieldName = leftTableDef.FieldName
+            End If
+
+            Dim headerCell As New HtmlGenericControl("div") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+            Dim headerCellValue As New HtmlGenericControl("span") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+            headerCellValue.Attributes.Add("data-fieldname", leftTableDef.FieldName)
+            headerCellValue.InnerHtml = leftTableDef.DispFieldName
+            lenghtFix = leftTableDef.Length * 16
+
+            If lenghtFix = 0 Then
+                headerCell.Style.Add("display", "none")
+            Else
+                headerCell.Style.Add("width", lenghtFix.ToString & "px")
+                headerCell.Style.Add("min-width", lenghtFix.ToString & "px")
+            End If
+            headerCell.Controls.Add(headerCellValue)
+            wholeHeader.Controls.Add(headerCell)
+        Next leftTableDef
+        'キーフィールド設定が無い場合は最左のフィールドをキーとする
+        If keyFieldName = "" Then
+            keyFieldName = (From val In leftTableDefs Where val.HasDtColumn).FirstOrDefault.FieldName
+        End If
+
+        wholeHeaderWrapper.Controls.Add(wholeHeader)
+        tableObj.Controls.Add(wholeHeaderWrapper)
+        ' データ
+        Dim scrDr As DataRow = Nothing
+        Dim wholeDataRowWrapper As New HtmlGenericControl("div") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+        wholeDataRowWrapper.Attributes.Add("class", "leftTableDataWrapper")
+        Dim wholeDataRow As HtmlGenericControl
+        Dim dataCell As HtmlGenericControl
+        Dim dataCellValue As HtmlGenericControl
+        Dim keyValue As String = ""
+        'Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+        Dim dicFieldValues As Dictionary(Of String, String)
+        'Dim base64Str As String = ""
+        'Dim noConpressionByte As Byte()
+
+        For i As Integer = 0 To srcTbl.Rows.Count - 1
+            scrDr = srcTbl(i)
+            dicFieldValues = New Dictionary(Of String, String)
+            wholeDataRow = New HtmlGenericControl("div") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+
+            For Each leftTableDef In leftTableDefs
+                If leftTableDef.HasDtColumn = False Then
+                    Continue For
+                End If
+                dataCell = New HtmlGenericControl("div") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+                dataCellValue = New HtmlGenericControl("span") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+
+                Dim fieldName As String = leftTableDef.FieldName
+                Dim fieldValue As String = Convert.ToString(scrDr(fieldName))
+                dataCellValue.InnerHtml = fieldValue
+                dicFieldValues.Add(fieldName, fieldValue)
+                'テーブルセルのサイズ
+                If leftTableDef.Length * 16 = 0 Then
+                    dataCell.Style.Add("display", "none")
+                Else
+                    Dim cellWidth As String = (leftTableDef.Length * 16).ToString
+                    dataCell.Style.Add("width", cellWidth & "px")
+                    dataCell.Style.Add("min-width", cellWidth & "px")
+                    If leftTableDef.Align <> "" Then
+                        dataCell.Style.Add(HtmlTextWriterStyle.TextAlign, leftTableDef.Align)
+                    End If
+                End If
+                dataCell.Attributes.Add("data-fieldname", leftTableDef.FieldName)
+                dataCell.Controls.Add(dataCellValue)
+                wholeDataRow.Controls.Add(dataCell)
+            Next leftTableDef
+
+            keyValue = Convert.ToString(scrDr(keyFieldName))
+            ''クラスをシリアライズ
+            'Using ms As New IO.MemoryStream()
+            '    formatter.Serialize(ms, dicFieldValues)
+            '    noConpressionByte = ms.ToArray
+            'End Using
+            ''圧縮シリアライズしたByteデータを圧縮し圧縮したByteデータをBase64に変換
+            'Using ms As New IO.MemoryStream(),
+            '  ds As New IO.Compression.DeflateStream(ms, IO.Compression.CompressionMode.Compress, True)
+            '    ds.Write(noConpressionByte, 0, noConpressionByte.Length)
+            '    ds.Close()
+            '    Dim byteDat = ms.ToArray
+            '    base64Str = Convert.ToBase64String(byteDat, 0, byteDat.Length, Base64FormattingOptions.None)
+            'End Using
+            Dim fieldValuesStr = String.Join(C_TABLE_SPLIT, (From x In dicFieldValues Select String.Format("{0}={1}", x.Key, x.Value)))
+            wholeDataRow.Style.Add("order", (i + 1).ToString)
+            wholeDataRow.Attributes.Add("data-initorder", (i + 1).ToString)
+            wholeDataRow.Attributes.Add("data-key", keyValue)
+            wholeDataRow.Attributes.Add("data-values", fieldValuesStr)
+            wholeDataRow.Attributes.Add("onclick", "WF_TableF_DbClick(this);")
+            If srcTbl.Rows.Count - 1 = i Then
+                wholeDataRow.Attributes.Add("class", "leftTableDataRow lastRow")
+            Else
+                wholeDataRow.Attributes.Add("class", "leftTableDataRow")
+            End If
+            wholeDataRowWrapper.Controls.Add(wholeDataRow)
+        Next i
+
+        tableObj.Controls.Add(wholeDataRowWrapper)
+        outArea.Controls.Add(tableObj)
+        Dim style As New HtmlGenericControl("style") With {.ViewStateMode = UI.ViewStateMode.Disabled}
+        'Edgeで背面のdivContensbox横スクロールBox効くので抑止(leftBox表示中は)
+        style.InnerHtml = "#divContensbox {overflow:hidden;}"
+        outArea.Controls.Add(style)
+    End Sub
+    ''' <summary>
+    ''' 左ボックス用テーブルの出力フィールド定義(1カラム分)
+    ''' </summary>
+    Public Class LeftTableDefItem
+        ''' <summary>
+        ''' フィールド名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property FieldName As String
+        ''' <summary>
+        ''' 画面表示フィールド名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DispFieldName As String
+        ''' <summary>
+        ''' 表示幅
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Length As Integer
+        ''' <summary>
+        ''' 参照テーブルに対象のフィールド名を保持しているか
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>描画処理で使用するので設定の使う側は設定の意識不要</remarks>
+        Public Property HasDtColumn As Boolean = True
+        Public Property TextAlign As StyleCollection
+        ''' <summary>
+        ''' キーフィールド設定、選択したキーとなるフィールド（True：キー、False：非キー）
+        ''' 未設定の場合、表示上最左（先頭列がキーとなる）複数ある場合は１つのみ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property KeyField As Boolean = False
+        ''' <summary>
+        ''' テキストの表示位置設定（"left","right","center"等を設定）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Align As String = ""
+        ''' <summary>
+        ''' 数字フィールド（True:数字フィールド,False:通常フィールド）
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>一旦未使用</remarks>
+        Public Property IsNumericField As Boolean = False
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="fieldName">フィールド名</param>
+        ''' <param name="dispFieldName">画面表示フィールド名</param>
+        ''' <param name="length">幅</param>
+        ''' <param name="align">テキスト表示位置</param>
+        ''' <param name="keyField">キーフィールド</param>
+        Public Sub New(fieldName As String, dispFieldName As String, length As Integer, align As String, keyField As Boolean)
+            Me.FieldName = fieldName
+            Me.DispFieldName = dispFieldName
+            Me.Length = length
+            Me.Align = align
+            Me.KeyField = keyField
+        End Sub
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="fieldName">フィールド名</param>
+        ''' <param name="dispFieldName">画面表示フィールド名</param>
+        ''' <param name="length">幅</param>
+        ''' <param name="align">テキスト表示位置</param>
+        Public Sub New(fieldName As String, dispFieldName As String, length As Integer, align As String)
+            Me.New(fieldName, dispFieldName, length, align, False)
+        End Sub
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="fieldName">フィールド名</param>
+        ''' <param name="DispFieldName">画面表示カラム</param>
+        ''' <param name="Length">サイズ</param>
+        ''' <param name = "keyField" > キーフィールド</param>
+        Public Sub New(fieldName As String, dispFieldName As String, length As Integer, keyField As Boolean)
+            Me.New(fieldName, dispFieldName, length, "")
+        End Sub
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="fieldName">フィールド名</param>
+        ''' <param name="DispFieldName">画面表示カラム</param>
+        ''' <param name="Length">サイズ</param>
+        Public Sub New(fieldName As String, dispFieldName As String, length As Integer)
+            Me.New(fieldName, dispFieldName, length, "")
+        End Sub
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="fieldName">フィールド名</param>
+        ''' <param name="dispFieldName">画面表示カラム</param>
+        ''' <param name="keyField">キーフィールド</param>
+        Public Sub New(fieldName As String, dispFieldName As String, keyField As Boolean)
+            Me.New(fieldName, dispFieldName, 6, "", keyField)
+        End Sub
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="fieldName">フィールド名</param>
+        ''' <param name="dispFieldName">画面表示カラム</param>
+        Public Sub New(fieldName As String, dispFieldName As String)
+            Me.New(fieldName, dispFieldName, 6)
+        End Sub
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="param"></param>
+        Public Sub New(ParamArray param() As String)
+            Me.FieldName = param(0)
+            Me.DispFieldName = param(1)
+            If param.Length = 3 Then
+                Me.Length = CInt(param(3))
+            End If
+        End Sub
+    End Class
+
+#End Region
+
 End Class

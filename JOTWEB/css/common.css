@@ -813,8 +813,106 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     background: rgba(153, 102, 0, 0.3);
     border-radius: 5px;
 }
+#pnlLeftList {
+    margin-top: 10px;
+    width: 100%;
+    max-width: calc(100% - 2px);
+    height: 100%;
+    max-height: calc(100% - 75px);
+    position: relative;
+    overflow: auto;
+    //overflow-y:hidden;
+    display: flex;
+    flex-direction: column;
+}
+#pnlLeftList div.leftTable {
+    position:absolute;
+}
+#pnlLeftList div.leftTableDataWrapper {
+ //flex: 1 1 auto;
+ //overflow-y: auto;
+ min-height: 0px;
+ margin-bottom:5px;
+}
+#pnlLeftList div {
+    box-sizing:border-box;
+}
+#pnlLeftList .leftTableHeaderWrapper {
+    position :sticky ;
+    top:0;
+    background-color:rgb(242,242,242);
+}
+#pnlLeftList .leftTableHeaderWrapper > div {
+    background-color:rgb(242,242,242);
+}
+#pnlLeftList .leftTable > div > div {
+    display:flex;
+    flex-wrap:nowrap;
+}
+/* 各セルの設定 */
+#pnlLeftList .leftTable > div > div > div {
+    flex-grow: 0;
+    flex-shrink: 0;
+    border:1px solid #a8b7c5;
+    border-bottom:0px; /* ボーダーの重なり抑止 */
+    border-right:0px;
+    word-break:break-all;
+    padding:2px;
+    min-height:25px;
+}
+#pnlLeftList .leftTableDataRow > div {
+   /* height:30px; */
+    display :flex;
+    align-items:stretch;
+}
+#pnlLeftList .leftTableDataRow > div > span {
+    display:flex;
+    align-items:center;
+    height:100%;
+}
+/* ボーダーの重なりで端のボーダーは表示 */
+#pnlLeftList .leftTable > div > div > div:last-child {
+    border-right: 1px solid #a8b7c5;
+    margin-right: 10px;
+}
+/* ボーダーの重なりで端のボーダーは表示 */
+#pnlLeftList .leftTable > div:last-child > div.lastRow > div {
+    border-bottom:1px solid #a8b7c5;
+}
+/* 表ヘッダーセルの設定 */
+#pnlLeftList .leftTable > div > div.leftTableHeader > div {
+    text-align:center;
+    align-items: center;
+    border-color:#3c6690;
+    background: linear-gradient(#829ebc,#225588);
+    box-shadow: 0px 1px 1px rgba(255,255,255,0.3) inset;
+    color:white;
+}
+/* 各丸 */
+#pnlLeftList .leftTable > div > div.leftTableHeader > div:first-child{
+    border-top-left-radius:5px;
+}
+#pnlLeftList .leftTable > div > div.leftTableHeader > div:last-child{
+    border-top-right-radius:5px;
+}
+#pnlLeftList .leftTable > div:last-child > div.lastRow > div:first-child {
+    border-bottom-left-radius:5px;
+}
+#pnlLeftList .leftTable > div:last-child > div.lastRow > div:last-child {
+    border-bottom-right-radius: 5px;
+}
+/* データ行セルの設定 */
+#pnlLeftList .leftTableDataRow:hover > div {
+    
+}
+#pnlLeftList .leftTableDataRow:hover > div {
+    background-color:#9E82BC;
+    //background: linear-gradient(#9E82BC,#F1EEF6);
+    cursor:pointer;
+    color:white;
+} 
 /* 左テーブル */
-#pnlLeftList_H {
+/*#pnlLeftList_H {
     position: fixed;
     top: 5.5em;
     left: 2em;
@@ -826,8 +924,7 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     height: 500px;
     overflow-y: scroll;
     font-size: 1.4rem;
-}
-
+}*/
 /* 左ボックス拡張機能 */
 #WF_LeftBoxSortType {
     width: 300px;
@@ -839,11 +936,18 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     //height: 2.1em;
 }
 
-#WF_buttonFilter {
+#WF_buttonFilter,
+#btnSearchLeftTable {
     width: 60px;
     min-height: 22px;
 }
-
+div.leftTableSearch {
+    margin-top:5px;
+    width:100%;
+}
+#txtSearchLeftTable {
+    width: calc(100% - 100px);
+}
 #divPnlListArea_HLShowHideDetailBox {
     color: crimson;
 }

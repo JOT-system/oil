@@ -111,7 +111,16 @@ window.addEventListener('DOMContentLoaded', function () {
         commonAppendInputBoxIcon(targetTextBoxList);
         document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     }
-
+    /* ******************************** */
+    /* 左ボックステーブル表示時の補正   */
+    /* ******************************** */
+    let userAgent = window.navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf('msie') !== -1 ||
+        userAgent.indexOf('trident') !== -1) {
+        //IE(display:stickyが効かない為IEはこれでカバー)
+        commonLeftTableHeaderFixed();
+    }
+    
 });
 
 // 処理後カーソルを戻す
@@ -578,11 +587,14 @@ function ListboxDBclick() {
     }
 }
 // ○左BOX用処理（DBクリック選択+値反映）
-function WF_TableF_DbClick(index) {
+function WF_TableF_DbClick(callerObj) {
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let keyValue = callerObj.dataset.key;
+        let itemValues = callerObj.dataset.values;
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_LeftboxOpen').value = "";
-        document.getElementById('WF_TBL_SELECT').value = index;
+        document.getElementById('hdnLeftTableSelectedKey').value = keyValue;
+        document.getElementById('WF_TBL_SELECT').value = itemValues;
         document.getElementById("WF_ButtonClick").value = "WF_ListboxDBclick";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
@@ -1197,6 +1209,156 @@ function ListDbClick(obj, lineCnt) {
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }
+}
+/**
+ * 左ボックステーブル表示の検索ボタン押下時イベント
+ * のタグを追加する
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonLeftTableFilter() {
+    // 念の為表示エリアのオブジェクト有無確認（なければ終了）
+    let leftTableArea = document.getElementById('pnlLeftList');
+    if (leftTableArea === null) {
+        return;
+    }
+    let findTextObj = document.getElementById('txtSearchLeftTable');
+    if (findTextObj === null) {
+        return;
+    }
+    let findText = findTextObj.value;
+    let hiddenList = leftTableArea.querySelectorAll('.leftTableDataRow[style*="display: none"],.leftTableDataRow[style*="display : none"]');
+    for (let i = 0; i < hiddenList.length; i++) {
+        hiddenList[i].style.display = '';
+    }
+    let userAgent = window.navigator.userAgent.toLowerCase();
+    // 検索文字が無い場合は全部表示させ終了
+    if (findText === '') {
+        commonLeftTableMarkLastRow(leftTableArea);
+        if (userAgent.indexOf('msie') !== -1 ||
+            userAgent.indexOf('trident') !== -1) {
+            //IE(display:stickyが効かない為IEはこれでカバー)
+            commonLeftTableScroll(leftTableArea);
+        }
+        return;
+    }
+    // 検索文字に一致しない行は非表示
+    let searchList = leftTableArea.querySelectorAll('.leftTableDataRow');
+    for (let i = 0; i < searchList.length; i++) {
+        let rowObj = searchList[i];
+        let foundCell = rowObj.querySelectorAll('span');
+        let isFound = false;
+        if (foundCell === null) {
+            continue;
+        }
+        for (let j = 0; j < foundCell.length; j++) {
+            if (foundCell[j].textContent.indexOf(findText) >= 0) {
+                isFound = true;
+                continue;
+            }
+        }
+        // ここまで来た場合は全セル一致なしの為、非表示
+        if (isFound === false) {
+            rowObj.style.display = 'none';
+        }
+    }
+    commonLeftTableMarkLastRow(leftTableArea);
+    
+    if (userAgent.indexOf('msie') !== -1 ||
+        userAgent.indexOf('trident') !== -1) {
+        //IE(display:stickyが効かない為IEはこれでカバー)
+        commonLeftTableScroll(leftTableArea);
+    }
+    
+}
+/* 左ボックステーブルの最終行に印をつける */
+/**
+ * 左ボックステーブルの最終行に印をつける
+ * @param {Element} leftTableArea 左ボックステーブルエリア
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonLeftTableMarkLastRow(leftTableArea) {
+    let curLastRow = leftTableArea.querySelector('.leftTableDataRow.lastRow');
+    if (curLastRow !== null) {
+        curLastRow.classList.remove('lastRow');
+    }
+
+    let displayRowList = leftTableArea.querySelectorAll('.leftTableDataRow:not([style*="display:none"]):not([style*="display: none"])');
+    let currentOrder = 0;
+    let curIndex = 0;
+    for (let i = 0; i < displayRowList.length; i++) {
+        let rowObj = displayRowList[i];
+        let styleOrder = Number(rowObj.style.order);
+        if (currentOrder < styleOrder) {
+            currentOrder = styleOrder;
+            curIndex = i;
+        }
+    }
+    if (currentOrder !== 0) {
+        let rowObj = displayRowList[curIndex];
+        rowObj.classList.add('lastRow');
+    }
+}
+/**
+ * 左ボックスのテーブル補正
+ * @return {undefined} なし
+ * @description 詳細エリアのタブ変更時イベント
+ */
+function commonLeftTableHeaderFixed() {
+    let leftTableObj = document.getElementById('pnlLeftList');
+    if (leftTableObj === null) {
+        return;
+    }
+    let headerArea = leftTableObj.querySelector('.leftTableHeaderWrapper');
+    let headerRowArea = leftTableObj.querySelector('.leftTableHeader');
+    let dataArea = leftTableObj.querySelector('.leftTableDataWrapper');
+    if (headerArea === null) {
+        return;
+    }
+    if (headerRowArea === null) {
+        return;
+    }
+    if (dataArea === null) {
+        return;
+    }
+    headerArea.style.position = "absolute";
+    headerRowArea.style.position = "fixed";
+    headerRowArea.style.overflow = "hidden";
+    headerRowArea.style.zIndex = "2";
+    headerRowArea.style.width = leftTableObj.clientWidth + 'px';
+    dataArea.style.position = "relative";
+    dataArea.style.top = headerRowArea.clientHeight + 'px';
+
+    leftTableObj.addEventListener('scroll', (function (leftTableObj) {
+        return function () {
+            commonLeftTableScroll(leftTableObj);
+        };
+    })(leftTableObj), false);
+    
+    window.addEventListener('resize', (function (leftTableObj) {
+        return function () {
+            commonLeftTableScroll(leftTableObj);
+        };
+    })(leftTableObj), false);
+    
+}
+function commonLeftTableScroll(leftTableObj) {
+    let headerArea = leftTableObj.querySelector('.leftTableHeaderWrapper');
+    let headerRowArea = leftTableObj.querySelector('.leftTableHeader');
+    let dataArea = leftTableObj.querySelector('.leftTableDataWrapper');
+    if (headerArea === null) {
+        return;
+    }
+    if (headerRowArea === null) {
+        return;
+    }
+    if (dataArea === null) {
+        return;
+    }
+    headerRowArea.style.width = leftTableObj.clientWidth + 'px';
+    headerRowArea.scrollLeft = leftTableObj.scrollLeft;
+    leftTableObj.scrollLeft = headerRowArea.scrollLeft;
 }
 /**
  * Inputタグで虫眼鏡を表示するオブジェクトに対して虫眼鏡、カレンダーアイコン

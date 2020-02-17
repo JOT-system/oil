@@ -12,7 +12,7 @@
             , ['<%= pnlLeftList.ClientID%>', '<%= LF_SORTING_CODE%>', '<%= LF_FILTER_CODE%>','<%=LF_PARAM_DATA%>']
         ];
        </script>
-        <div class="LF_LEFTBOX" id="LF_LEFTBOX">
+        <div class="LF_LEFTBOX" id="LF_LEFTBOX" runat="server">
             <div class="button" id="button">
                 <input type="hidden" id="WF_ButtonSel" class="btn-sticky" value="　選　択　"  onclick="ButtonClick('WF_ButtonSel');" />
                 <input type="button" id="WF_ButtonCan" class="btn-sticky" value="閉 じ る"  onclick="ButtonClick('WF_ButtonCan');" />
@@ -66,8 +66,13 @@
                 </asp:View>
                 <!-- 　テーブル　 -->
                 <asp:View id="tabT" runat="server" >
+                    <div class="leftTableSearch">
+                        <asp:TextBox ID="txtSearchLeftTable" runat="server" EnableViewState ="false" placeholder="全項目部分検索"></asp:TextBox>
+                        <input id="btnSearchLeftTable" type="button"  class="btn-sticky" value="検索" onclick="commonLeftTableFilter(); return false;" />
+                    </div>
                     <asp:panel id="pnlLeftList" runat="server" ></asp:panel>
                     <asp:textbox ID="WF_TBL_SELECT" runat="server" type="hidden"/>
+                    <asp:HiddenField ID="hdnLeftTableSelectedKey" runat="server" />
                 </asp:View>
             </asp:MultiView>
     </div>

@@ -5004,7 +5004,16 @@ Public Class OIT0003OrderDetail
                     PARA01.Value = work.WF_SEL_LINKNO_ORDER.Text     '貨車連結順序表№
                     PARA02.Value = OIT0003row("DETAILNO")            '貨車連結順序表明細№
                     PARA03.Value = WW_DATENOW.AddDays(1)             '利用可能日
-                    PARA04.Value = "1"                               'ステータス(1:利用可, 2:利用不可)
+
+                    '(実績)発日が入力されている場合
+                    If Me.TxtActualDepDate.Text <> "" Then
+                        'ステータス(1:利用可, 2:利用不可)
+                        PARA04.Value = "1"
+                    Else
+                        'ステータス(1:利用可, 2:利用不可)
+                        PARA04.Value = "2"
+                    End If
+
                     PARA05.Value = ""                                '情報
                     PARA06.Value = work.WF_SEL_ORDERNUMBER.Text      '前回オーダー№
                     PARA07.Value = Me.TxtTrainNo.Text                '本線列車

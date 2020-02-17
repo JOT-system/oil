@@ -346,6 +346,7 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANKCH), '')          AS OTHER10OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TANKRINKNO), '')              AS TANKRINKNO" _
+            & " , ISNULL(RTRIM(OIT0002.TANKRINKNOMADE), '')          AS TANKRINKNOMADE" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
@@ -1027,6 +1028,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
         '貨車連結順序表№
         work.WF_SEL_LINKNO.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKRINKNO")
+        '作成用_貨車連結順序表№
+        work.WF_SEL_LINKNO_ORDER.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKRINKNOMADE")
 
         '計上年月日
         work.WF_SEL_KEIJYOYMD.Text = OIT0003tbl.Rows(WW_LINECNT)("KEIJYOYMD")

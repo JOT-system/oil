@@ -291,6 +291,26 @@ Public Module BaseDllConst
     ''' 荷受人(油槽所)受入油種NG
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_90 As String = "90"
+    ''' <summary>
+    ''' 日付(積込日)エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_91 As String = "91"
+    ''' <summary>
+    ''' 日付(発日)エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_92 As String = "92"
+    ''' <summary>
+    ''' 日付(積車着日)エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_93 As String = "93"
+    ''' <summary>
+    ''' 日付(受入日)エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_94 As String = "94"
+    ''' <summary>
+    ''' 日付(空車着日)エラー
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_95 As String = "95"
 
     ''' <summary>
     ''' 失注（荷主都合）

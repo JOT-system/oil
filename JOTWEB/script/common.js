@@ -120,7 +120,10 @@ window.addEventListener('DOMContentLoaded', function () {
         //IE(display:stickyが効かない為IEはこれでカバー)
         commonLeftTableHeaderFixed();
     }
-    
+    /* ******************************** */
+    /* 左ボックステーブルソート機能     */
+    /* ******************************** */
+    commonLeftTableSortEventBind();
 });
 
 // 処理後カーソルを戻す
@@ -1360,6 +1363,171 @@ function commonLeftTableScroll(leftTableObj) {
     headerRowArea.scrollLeft = leftTableObj.scrollLeft;
     leftTableObj.scrollLeft = headerRowArea.scrollLeft;
 }
+function commonLeftTableSortEventBind() {
+    let leftTableObj = document.getElementById('pnlLeftList');
+    if (leftTableObj === null) {
+        return;
+    }
+    let sortItemObj = document.createElement('input');
+    sortItemObj.id = 'commonLeftListSortItem';
+    sortItemObj.type = 'hidden';
+    sortItemObj.value = '';
+    leftTableObj.appendChild(sortItemObj);
+    let headerArea = leftTableObj.querySelector('.leftTableHeaderWrapper');
+    if (headerArea === null) {
+        return;
+    }
+    let headerTextAreaList = headerArea.querySelectorAll('span[data-fieldname]');
+    if (headerTextAreaList === null) {
+        return;
+    }
+
+    for (let i = 0; i < headerTextAreaList.length; i++) {
+        headerTextObj = headerTextAreaList[i];
+        headerTextObj.addEventListener('click', (function (headerTextObj) {
+            return function () {
+                commonLeftTableSort(headerTextObj);
+            };
+        })(headerTextObj), false);
+    }
+}
+/**
+ * Inputタグで虫眼鏡を表示するオブジェクトに対して虫眼鏡、カレンダーアイコン
+ * のタグを追加する
+ * @param {Element} headerTextObj ヘッダーSpanタグ
+ * @return {undefined} なし
+ * @description 詳細エリアのタブ変更時イベント
+ */
+function commonLeftTableSort(headerTextObj) {
+    /* ********************************
+     * クリックされたフィールドを元にソート情報を生成
+    ******************************** */
+    let sortValue = document.getElementById('commonLeftListSortItem');
+    if (sortValue === null) {
+        return;
+    }
+    let sortObj = [];
+    /* Textエンコードした配列を復元 */
+    if (sortValue.value !== '') {
+        sortObj = JSON.parse(sortValue.value);
+    }
+
+    if (headerTextObj !== null) {
+        addCssClassName = '';
+        if (headerTextObj.classList.contains('sortAsc')) {
+            addCssClassName = 'sortDesc';
+            headerTextObj.classList.remove('sortAsc');
+        } else if (headerTextObj.classList.contains('sortDesc')) {
+            headerTextObj.classList.remove('sortDesc');
+            addCssClassName = '';
+        } else {
+            addCssClassName = 'sortAsc';
+        }
+        if (addCssClassName !== '') {
+            headerTextObj.classList.add(addCssClassName);
+        }
+        let targetField = headerTextObj.dataset.fieldname;
+        if (addCssClassName === '') {
+            // 配列より削除
+            let removedSordObj = sortObj.filter(function (itm) { return itm.FieldName !== targetField; });
+            sortObj = removedSordObj;
+        } else {
+            // 配列を追加 or 変更
+            let sortItem;
+            for (let i = sortObj.length - 1; i >= 0; i--) {
+                if (sortObj[i].FieldName === targetField) {
+                    sortItem = sortObj[i];
+                    sortObj[i].SortClass = addCssClassName;
+                    break;
+                }
+
+            } // ソート条件更新
+
+            if (sortItem === undefined) {
+                sortItem = {
+                    FieldName: targetField,
+                    SortClass: addCssClassName
+                };
+                sortObj.push(sortItem); 
+            } // ソート条件末尾に追加
+
+        } //ソート情報配列最新化
+        // ソート条件を隠しフィールドに保存
+        encodedValue = '';
+        if (sortObj.length > 0) {
+            encodedValue = JSON.stringify(sortObj);
+        }
+        sortValue.value = encodedValue;
+    } // HeaderObject isnot null
+    /* ********************************
+     * ソート情報を元に一覧表をソート
+    ******************************** */
+    let dataLists = document.querySelectorAll('#pnlLeftList .leftTableDataRow');
+    /* データ行が無い場合ソートできないので終了 */
+    if (dataLists === null) {
+        return;
+    }
+    if (dataLists.length === 0) {
+        return;
+    }
+    document.forms[0].style.display = 'none';
+    document.body.style.cursor = "wait";
+    if (sortObj.length === 0) {
+        //アイテムが存在しない場合は初期表示に戻す
+        for (let i = 0; i < dataLists.length; i++) {
+            let dataItm = dataLists[i];
+            dataItm.style.order = dataItm.dataset.initorder;
+        }
+    } else {
+        dataArr = [].slice.call(dataLists);
+        dataArr.sort(sortLeftList(sortObj));
+        
+        for (let i = 0; i < dataArr.length; i++) {
+            let dataItm = dataArr[i];
+            dataItm.style.order = (i + 1).toString();
+        }
+
+    }
+    let leftTableArea = document.getElementById('pnlLeftList');
+    commonLeftTableMarkLastRow(leftTableArea);
+    document.forms[0].style.display = 'block';
+    document.body.style.cursor = "auto";
+    // 並び替え処理
+    function sortLeftList(sortObj) {
+        return function (a, b) {
+            for (let i = 0; i < sortObj.length; i++) {
+                let fieldName = sortObj[i].FieldName;
+                let sortClass = sortObj[i].SortClass;
+                let aObj = a.querySelector('[data-fieldname="' + fieldName + '"] > span');
+                let bObj = b.querySelector('[data-fieldname="' + fieldName + '"] > span');
+                if (aObj === null || bObj === null) {
+                    return 0;
+                }
+                const varA = (typeof aObj.textContent === 'string') ?
+                    aObj.textContent.toUpperCase() : aObj.textContent;
+                const varB = (typeof bObj.textContent === 'string') ?
+                    bObj.textContent.toUpperCase() : bObj.textContent;
+
+                if (varA > varB) {
+                    comparison = 1;
+                    if (sortClass === 'sortDesc') {
+                        return comparison * -1;
+                    } else {
+                        return comparison;
+                    }
+                } else if (varA < varB) {
+                    comparison = -1;
+                    if (sortClass === 'sortDesc') {
+                        return comparison * -1;
+                    } else {
+                        return comparison;
+                    }
+                }
+            }
+            return 0;
+        };
+    } // end  sortLeftList
+} // commonLeftTableSort
 /**
  * Inputタグで虫眼鏡を表示するオブジェクトに対して虫眼鏡、カレンダーアイコン
  * のタグを追加する

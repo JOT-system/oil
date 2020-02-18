@@ -1071,15 +1071,16 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '○ 選択内容を取得
-        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex.ToString
-            WW_SelectValue = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Value
-            WW_SelectText = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Text
-        ElseIf leftview.ActiveViewIdx = 2 Then
+        If leftview.ActiveViewIdx = 2 Then
             '一覧表表示時
             Dim selectedLeftTableVal = leftview.GetLeftTableValue()
             WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
             WW_SelectText = selectedLeftTableVal("VALUE1") '他のフィールド名でも取ること可能一旦VALUE1で
+        ElseIf leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex.ToString
+            WW_SelectValue = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Text
+
         End If
 
         '○ 選択内容を画面項目へセット

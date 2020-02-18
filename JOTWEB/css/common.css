@@ -831,9 +831,13 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
 #pnlLeftList div.leftTableDataWrapper {
  //flex: 1 1 auto;
  //overflow-y: auto;
- min-height: 0px;
- margin-bottom:5px;
+    min-height: 0px;
+    margin-bottom:5px;
+    display:flex;
+    flex-wrap:nowrap;
+    flex-direction: column;
 }
+
 #pnlLeftList div {
     box-sizing:border-box;
 }
@@ -910,7 +914,40 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     //background: linear-gradient(#9E82BC,#F1EEF6);
     cursor:pointer;
     color:white;
-} 
+}
+/* 左テーブルのソート設定 */
+#pnlLeftList .leftTableHeader > div > span {
+    display: block;
+    text-decoration:none;
+}
+#pnlLeftList .leftTableHeader > div > span:hover {
+    text-decoration:underline;
+    color:palevioletred;
+    cursor:pointer;
+}
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after,
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after{
+    display:inline-block;
+    text-decoration:none !important;
+    color:white;
+    text-decoration-color:rgba(0,0,0,0);
+    white-space: pre-wrap;
+    overflow-y: hidden;
+    height: 13.5px;
+}
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after {
+    content:"▼";
+}
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after {
+    content:"▲";
+}
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after,
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after,
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after:hover,
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after:hover {
+    text-decoration:none !important;
+}
+
 /* 左テーブル */
 /*#pnlLeftList_H {
     position: fixed;

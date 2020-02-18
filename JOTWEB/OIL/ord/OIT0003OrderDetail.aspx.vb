@@ -7109,6 +7109,17 @@ Public Class OIT0003OrderDetail
     ''' 画面表示設定処理(受注進行ステータス)
     ''' </summary>
     Protected Sub WW_ScreenOrderStatusSet(ByRef O_VALUE As String)
+
+        '◆一度に設定をしない場合の対応
+        '　受注進行ステータス＝"260:手配中(託送指示未手配)"
+        '　託送指示フラグが"1"(手配)の場合
+        If work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_260 _
+            AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
+            '手配完了
+            O_VALUE = CONST_ORDERSTATUS_270
+            Exit Sub
+        End If
+
         Select Case work.WF_SEL_ORDERSTATUS.Text
                 '受注進行ステータス＝"200:手配中"
                 '受注進行ステータス＝"210:手配中(入換指示手配済)"

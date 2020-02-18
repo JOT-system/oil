@@ -6261,18 +6261,17 @@ Public Class OIT0003OrderDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '○ 選択内容を取得
-        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
-
-            '### LeftBoxマルチ対応(20200217) START #####################################################
-        ElseIf leftview.ActiveViewIdx = 2 Then
+        '### LeftBoxマルチ対応(20200217) START #####################################################
+        If leftview.ActiveViewIdx = 2 Then
             '一覧表表示時
             Dim selectedLeftTableVal = leftview.GetLeftTableValue()
             WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
             WW_SelectText = selectedLeftTableVal("VALUE1")
             '### LeftBoxマルチ対応(20200217) END   #####################################################
+        ElseIf leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
         End If
 
         '○ 選択内容を画面項目へセット
@@ -7110,6 +7109,17 @@ Public Class OIT0003OrderDetail
     ''' 画面表示設定処理(受注進行ステータス)
     ''' </summary>
     Protected Sub WW_ScreenOrderStatusSet(ByRef O_VALUE As String)
+
+        '◆一度に設定をしない場合の対応
+        '　受注進行ステータス＝"260:手配中(託送指示未手配)"
+        '　託送指示フラグが"1"(手配)の場合
+        If work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_260 _
+            AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
+            '手配完了
+            O_VALUE = CONST_ORDERSTATUS_270
+            Exit Sub
+        End If
+
         Select Case work.WF_SEL_ORDERSTATUS.Text
                 '受注進行ステータス＝"200:手配中"
                 '受注進行ステータス＝"210:手配中(入換指示手配済)"

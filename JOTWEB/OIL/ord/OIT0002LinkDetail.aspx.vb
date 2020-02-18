@@ -861,18 +861,17 @@ Public Class OIT0002LinkDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '○ 選択内容を取得
-        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
-
-            '### LeftBoxマルチ対応(20200217) START #####################################################
-        ElseIf leftview.ActiveViewIdx = 2 Then
+        '### LeftBoxマルチ対応(20200217) START #####################################################
+        If leftview.ActiveViewIdx = 2 Then
             '一覧表表示時
             Dim selectedLeftTableVal = leftview.GetLeftTableValue()
             WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
             WW_SelectText = selectedLeftTableVal("VALUE1")
             '### LeftBoxマルチ対応(20200217) END   #####################################################
+        ElseIf leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
         End If
 
         '○ 選択内容を画面項目へセット

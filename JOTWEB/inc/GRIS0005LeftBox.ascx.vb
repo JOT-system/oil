@@ -301,7 +301,7 @@ Public Class GRIS0005LeftBox
         LF_LEFTBOX.Style.Add(HtmlTextWriterStyle.PaddingBottom, "0")
         LF_LEFTBOX.Style.Add(HtmlTextWriterStyle.PaddingRight, "0")
         LF_LEFTBOX.Style.Add(HtmlTextWriterStyle.Width, "50%")
-        LF_LEFTBOX.Style.Add("min-width", "400px")
+        LF_LEFTBOX.Style.Add("min-width", "200px")
         LF_LEFTBOX.Style.Add("overflow-y", "hidden")
         'リサイズ用のCSS(Chromeのみワーク、2020年4月のEdgeでもChromiumなので対応できる想定)
         LF_LEFTBOX.Style.Add("overflow-x", "auto")
@@ -676,11 +676,11 @@ Public Class GRIS0005LeftBox
                 dispFieldsDef = New List(Of LeftTableDefItem) From
                     {New LeftTableDefItem("VALUE13", "情報"),
                      New LeftTableDefItem("VALUE10", "状態"),
-                     New LeftTableDefItem("VALUE9", "所在地"),
+                     New LeftTableDefItem("VALUE9", "所在地", 9),
                      New LeftTableDefItem("VALUE5", "油種"),
-                     New LeftTableDefItem("VALUE11", "積車"),
-                     New LeftTableDefItem("KEYCODE", "車番", True),
-                     New LeftTableDefItem("VALUE1", "型式", 10),
+                     New LeftTableDefItem("VALUE11", "積車", 4),
+                     New LeftTableDefItem("KEYCODE", "車番", 5, True) With {.IsNumericField = True},
+                     New LeftTableDefItem("VALUE1", "型式", 7),
                      New LeftTableDefItem("VALUE3", "交換日")}
 
             Case Else
@@ -1716,7 +1716,7 @@ Public Class GRIS0005LeftBox
         ''' <param name="Length">サイズ</param>
         ''' <param name = "keyField" > キーフィールド</param>
         Public Sub New(fieldName As String, dispFieldName As String, length As Integer, keyField As Boolean)
-            Me.New(fieldName, dispFieldName, length, "")
+            Me.New(fieldName, dispFieldName, length, "", keyField)
         End Sub
         ''' <summary>
         ''' コンストラクタ

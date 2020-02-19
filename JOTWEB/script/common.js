@@ -1392,9 +1392,8 @@ function commonLeftTableSortEventBind() {
     }
 }
 /**
- * Inputタグで虫眼鏡を表示するオブジェクトに対して虫眼鏡、カレンダーアイコン
- * のタグを追加する
- * @param {Element} headerTextObj ヘッダーSpanタグ
+ * 左表のソート処理
+ * @param {Element} headerTextObj ヘッダー
  * @return {undefined} なし
  * @description 詳細エリアのタブ変更時イベント
  */
@@ -1621,10 +1620,10 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
         })(inputObjId), true);
         // アイコン配置後のテキストボックスのサイズを補正(アイコンが無い状態に合わせる)
         inputObj = document.getElementById(inputObj.id);
-        iconElm = document.getElementById(objId);
-        let currentWidth = inputObj.scrollWidth;
-        let cstyle = window.getComputedStyle(iconElm);
-        currentWidth = currentWidth - 14;
+        //iconElm = document.getElementById(objId);
+        //let currentWidth = inputObj.scrollWidth;
+        //let cstyle = window.getComputedStyle(iconElm);
+        //currentWidth = currentWidth - 14;
         //currentWidth = iconElm.getComputedStyle()
         inputObj.style.width = "calc(100% + 1px)";
     }

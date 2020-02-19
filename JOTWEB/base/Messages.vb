@@ -476,6 +476,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_CONSIGNEE_OILCODE_NG As String = "20022"
 
+        ''' <summary>
+        ''' 受注登録内容の重複エラー
+        ''' </summary>
+        Public Const OIL_ORDER_REPEAT_ERROR As String = "20023"
+
 #End Region
 
 

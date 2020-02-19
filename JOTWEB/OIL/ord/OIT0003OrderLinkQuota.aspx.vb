@@ -292,7 +292,8 @@ Public Class OIT0003OrderLinkQuota
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
             & "        VIW0003.ORGCODE    = @P1" _
             & "    AND VIW0003.OFFICECODE = OIT0004.OFFICECODE " _
-            & "  WHERE OIT0004.AVAILABLEYMD < @P2"
+            & "  WHERE OIT0004.AVAILABLEYMD < @P2" _
+            & "    AND OIT0004.STATUS       = '1'"
 
         '& "  WHERE OIT0004.OFFICECODE = @P1" _
         '& "    AND OIT0004.AVAILABLEYMD < @P2"

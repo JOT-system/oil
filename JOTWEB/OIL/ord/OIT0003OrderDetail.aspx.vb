@@ -243,6 +243,7 @@ Public Class OIT0003OrderDetail
         '〇 受注進行ステータスが"受注受付"の場合
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
             WF_DTAB_CHANGE_NO.Value = "0"
+            WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
             '〇 受注進行ステータスが下記内容へ変更された場合
             '   受注進行ステータス＝"200:手配中"
@@ -260,13 +261,23 @@ Public Class OIT0003OrderDetail
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
             WF_DTAB_CHANGE_NO.Value = "1"
+            WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
+
+            '〇 (一覧)テキストボックスの制御(読取専用)
+            WW_ListTextBoxReadControl()
 
             '〇 受注進行ステータスが"手配完了"へ変更された場合
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
             WF_DTAB_CHANGE_NO.Value = "2"
+            WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
+
+            '〇 (一覧)テキストボックスの制御(読取専用)
+            WW_ListTextBoxReadControl()
 
         Else
             WF_DTAB_CHANGE_NO.Value = "0"
+            WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
+
         End If
 
         '〇 タブ切替
@@ -1854,31 +1865,6 @@ Public Class OIT0003OrderDetail
                 WW_DataCNT += 1
                 '行(LINECNT)を再設定する。既存項目(SELECT)を利用
                 OIT0003tab3row("SELECT") = WW_DataCNT
-
-                ''(実績)積込日(テキストボックス)を、(一覧)の(実績)積込日に反映
-                'If OIT0003tab3row("ACTUALLODDATE") = "" Then
-                '    OIT0003tab3row("ACTUALLODDATE") = TxtActualLoadingDate.Text
-                'End If
-
-                ''(実績)発日(テキストボックス)を、(一覧)の(実績)発日に反映
-                'If OIT0003tab3row("ACTUALDEPDATE") = "" Then
-                '    OIT0003tab3row("ACTUALDEPDATE") = TxtActualDepDate.Text
-                'End If
-
-                ''(実績)積込着日(テキストボックス)を、(一覧)の(実績)積込着日に反映
-                'If OIT0003tab3row("ACTUALARRDATE") = "" Then
-                '    OIT0003tab3row("ACTUALARRDATE") = TxtActualArrDate.Text
-                'End If
-
-                ''(実績)受入日(テキストボックス)を、(一覧)の(実績)受入日に反映
-                'If OIT0003tab3row("ACTUALACCDATE") = "" Then
-                '    OIT0003tab3row("ACTUALACCDATE") = TxtActualAccDate.Text
-                'End If
-
-                ''(実績)空車着日(テキストボックス)を、(一覧)の(実績)空車着日に反映
-                'If OIT0003tab3row("ACTUALEMPARRDATE") = "" Then
-                '    OIT0003tab3row("ACTUALEMPARRDATE") = TxtActualEmparrDate.Text
-                'End If
 
             End If
         Next

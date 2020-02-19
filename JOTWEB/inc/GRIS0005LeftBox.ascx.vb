@@ -671,12 +671,12 @@ Public Class GRIS0005LeftBox
                 '上記データテーブルの表示対象項目を定義(フィールド、表示名）
                 dispFieldsDef = New List(Of LeftTableDefItem) From
                     {New LeftTableDefItem("VALUE13", "情報"),
-                     New LeftTableDefItem("VALUE12", "状態"),
-                     New LeftTableDefItem("VALUE15", "所在地"),
+                     New LeftTableDefItem("VALUE10", "状態"),
+                     New LeftTableDefItem("VALUE9", "所在地"),
                      New LeftTableDefItem("VALUE5", "油種"),
-                     New LeftTableDefItem("VALUE14", "積車"),
+                     New LeftTableDefItem("VALUE11", "積車"),
                      New LeftTableDefItem("KEYCODE", "車番", True),
-                     New LeftTableDefItem("VALUE8", "型式", 10),
+                     New LeftTableDefItem("VALUE1", "型式", 10),
                      New LeftTableDefItem("VALUE3", "交換日")}
 
             Case Else

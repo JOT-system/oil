@@ -98,6 +98,7 @@ button[disabled=""]:hover {
 /* 基本設定 テキスト、パスワード、マルチラインテキスト  */
 input[type=text],
 input[type=password],
+input[type=number],
 textarea {
     font-size: 16px;
     font-family: sans-serif;
@@ -121,6 +122,7 @@ textarea {
 }
 input[type=text]:hover,
 input[type=password]:hover,
+input[type=number]:hover,
 textarea:hover {
     background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
     border-color: #2c628b;
@@ -128,6 +130,7 @@ textarea:hover {
 /* テキスト、パスワード、マルチラインテキスト フォーカス時 */
 input[type=text]:focus,
 input[type=password]:focus,
+input[type=number]:focus,
 textarea:focus {
     border-color: rgba(1,60,65, .5);
     background-image:none;
@@ -135,6 +138,7 @@ textarea:focus {
 }
 input[type=text][disabled]:hover,
 input[type=password][disabled]:hover,
+input[type=text][disabled]:hover,
 textarea[disabled]:hover {
     background-image: none;
     border-color: skyblue;
@@ -157,7 +161,16 @@ input::-ms-input-placeholder {
     color: #BBBBBB;
     font-style: italic;
 }
-
+/* chromeのNumberでのスピンボタン非表示 */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* firefoxでのスピンボタン非表示 */
+input[type=number] {
+    -moz-appearance: textfield;
+}
 /* 必須マーク表示 */
 .requiredMark:after {
     /*color: rgb(255,0,0);*/
@@ -180,6 +193,7 @@ input::-ms-input-placeholder {
 }
 /* 一覧表内のテキストボックス補正 */
 div[data-generated='1'] input[type=text],
+div[data-generated='1'] input[type=number],
 div[data-generated='1'] input[type=password] {
     width: calc(100% - 4px) !important;
     height: calc(100% - 4px) !important;
@@ -344,13 +358,19 @@ _:-ms-lang(x)::backdrop, div[data-generated='1'] .boxIconArea div {
 input[type=text].boxIcon,
 input[type=text].calendarIcon,
 input[type=text].boxIcon,
-input[type=text].calendarIcon {
+input[type=text].calendarIcon,
+input[type=number].boxIcon,
+input[type=number].calendarIcon {
     padding-left: 25px;
 }
 input[type=text][disabled].boxIcon,
 input[type=text][disabled].calendarIcon,
+input[type=number][disabled].boxIcon,
+input[type=number][disabled].calendarIcon,
 input[type=text][readonly].boxIcon:not(.iconOnly),
-input[type=text][readonly].calendarIcon:not(.iconOnly) {
+input[type=text][readonly].calendarIcon:not(.iconOnly),
+input[type=number][readonly].boxIcon:not(.iconOnly),
+input[type=number][readonly].calendarIcon:not(.iconOnly) {
     padding-left: 0.3em;
 }
 /* ------------------------------
@@ -570,7 +590,8 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     text-align:left;
     width:180px;
 }
-.searchbox .inputItem a:nth-child(2) input[type=text] {
+.searchbox .inputItem a:nth-child(2) input[type=text],
+.searchbox .inputItem a:nth-child(2) input[type=number]{
     width:calc(100%) !important;
 }
 /* 文言要素 */
@@ -745,10 +766,12 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
 }
 
 #detailkeybox input[type='text'],
-#detailkeybox input[type='password']{
+#detailkeybox input[type='number'],
+#detailkeybox input[type='password'] {
     border-radius: 3px;
 }
 #detailkeybox input[type='text']:focus,
+#detailkeybox input[type='number']:focus,
 #detailkeybox input[type='password']:focus{
     border: 1px solid rgba(1,60,65, .5);
     outline: none;
@@ -1008,8 +1031,9 @@ div.leftTableSearch {
 /* ******************* */
 /* 上部入力エリア共通  */
 /* ******************* */
-.commonHeaderInput input[type=text] {
-    font-size:13.5px;
+.commonHeaderInput input[type=text],
+.commonHeaderInput input[type=number] {
+    font-size: 13.5px;
 }
 .commonHeaderInput {
     display: flex;
@@ -1257,7 +1281,8 @@ div[data-generated='1'] tr td > div[style] {
     max-height:24px;
     margin-top:-3px;
 }
-div[data-generated='1'] input[type=text] {
+div[data-generated='1'] input[type=text],
+div[data-generated='1'] input[type=number]{
     height: 1.6em;
     font-size: 13.5px;
     box-sizing: border-box;
@@ -1399,7 +1424,8 @@ span[class^="WF_DViewRep"][class$="_Area"] {
 
 /* 詳細一覧表内のテキストボックス */
 
-span[class^="WF_DViewRep"] table input[type=text] {
+span[class^="WF_DViewRep"] table input[type=text],
+span[class^="WF_DViewRep"] table input[type=number] {
     width: 15rem;
     height: 1.6rem;
     visibility: hidden;

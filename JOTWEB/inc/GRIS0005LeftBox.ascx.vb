@@ -303,6 +303,10 @@ Public Class GRIS0005LeftBox
         LF_LEFTBOX.Style.Add(HtmlTextWriterStyle.Width, "50%")
         LF_LEFTBOX.Style.Add("min-width", "400px")
         LF_LEFTBOX.Style.Add("overflow-y", "hidden")
+        'リサイズ用のCSS(Chromeのみワーク、2020年4月のEdgeでもChromiumなので対応できる想定)
+        LF_LEFTBOX.Style.Add("overflow-x", "auto")
+        LF_LEFTBOX.Style.Add("resize", "horizontal")
+        LF_LEFTBOX.Style.Add("max-width", "calc(100vw - 20px)")
         LF_SORTING_CODE = C_SORTING_CODE.HIDE
         LF_FILTER_CODE = C_FILTER_CODE.DISABLE
         CreateTableList(ListCode, O_RTN, Params)
@@ -675,7 +679,7 @@ Public Class GRIS0005LeftBox
                      New LeftTableDefItem("VALUE15", "所在地"),
                      New LeftTableDefItem("VALUE5", "油種"),
                      New LeftTableDefItem("VALUE14", "積車"),
-                     New LeftTableDefItem("KEYCODE", "車番", True),
+                     New LeftTableDefItem("KEYCODE", "車番", True) With {.IsNumericField = True},
                      New LeftTableDefItem("VALUE8", "型式", 10),
                      New LeftTableDefItem("VALUE3", "交換日")}
 
@@ -1526,6 +1530,9 @@ Public Class GRIS0005LeftBox
             headerCellValue.Attributes.Add("data-fieldname", leftTableDef.FieldName)
             headerCellValue.InnerHtml = leftTableDef.DispFieldName
             lenghtFix = leftTableDef.Length * 16
+            If leftTableDef.IsNumericField Then
+                headerCellValue.Attributes.Add("data-isnumfield", "1")
+            End If
 
             If lenghtFix = 0 Then
                 headerCell.Style.Add("display", "none")
@@ -1533,6 +1540,7 @@ Public Class GRIS0005LeftBox
                 headerCell.Style.Add("width", lenghtFix.ToString & "px")
                 headerCell.Style.Add("min-width", lenghtFix.ToString & "px")
             End If
+
             headerCell.Controls.Add(headerCellValue)
             wholeHeader.Controls.Add(headerCell)
         Next leftTableDef
@@ -1580,7 +1588,16 @@ Public Class GRIS0005LeftBox
                     dataCell.Style.Add("width", cellWidth & "px")
                     dataCell.Style.Add("min-width", cellWidth & "px")
                     If leftTableDef.Align <> "" Then
-                        dataCell.Style.Add(HtmlTextWriterStyle.TextAlign, leftTableDef.Align)
+                        Dim alignSetting = ""
+                        If leftTableDef.Align.ToUpper = "RIGHT" Then
+                            alignSetting = "flex-end"
+                        End If
+                        If leftTableDef.Align.ToUpper = "CENTER" Then
+                            alignSetting = "center"
+                        End If
+                        If alignSetting <> "" Then
+                            dataCell.Style.Add("justify-content", alignSetting)
+                        End If
                     End If
                 End If
                 dataCell.Attributes.Add("data-fieldname", leftTableDef.FieldName)

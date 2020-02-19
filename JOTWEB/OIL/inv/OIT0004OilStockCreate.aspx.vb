@@ -163,6 +163,8 @@ Public Class OIT0004OilStockCreate
             trainList = GetTargetTrain(sqlCon, salesOffice, consignee)
             '抽出結果を画面データクラスに展開
             dispDataObj = New DispDataClass(daysList, trainList, oilTypeList, salesOffice, consignee)
+            '前週出荷平均の取得
+            dispDataObj = GetLastShipAverage(sqlCon, dispDataObj)
             '提案一覧表示可否取得
             dispDataObj.ShowSuggestList = Me.IsShowSuggestList(sqlCon, consignee)
             '構内取り有無取得
@@ -175,6 +177,8 @@ Public Class OIT0004OilStockCreate
                 dispDataObj.SuggestOilNameList(DispDataClass.SUMMARY_CODE).OilName = "中計"
                 '表構えの為親と構内取り元と同じ列車
                 mitrainList = GetTargetTrain(sqlCon, salesOffice, consignee)
+                '前週出荷平均の取得
+                dispDataObj.MiDispData = GetLastShipAverage(sqlCon, dispDataObj.MiDispData)
                 '油種は持っている元に合わせる（最終的に元と一致する油種じゃないと認めない？）
                 miOilTypeList = GetTargetOilType(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiConsignee)
                 '構内取り用の画面表示クラス生成
@@ -572,6 +576,17 @@ Public Class OIT0004OilStockCreate
 
     End Function
     ''' <summary>
+    ''' オーダー実績データを取得
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="dispData"></param>
+    ''' <returns></returns>
+    Private Function GetOrderData(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        Dim sqlStr As New StringBuilder
+        Dim retVal = dispData
+        Return retVal
+    End Function
+    ''' <summary>
     ''' 前週出荷平均取得
     ''' </summary>
     ''' <param name="sqlCon"></param>
@@ -581,27 +596,48 @@ Public Class OIT0004OilStockCreate
     Private Function GetLastShipAverage(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
         Dim sqlStr As New StringBuilder
         Dim retVal = dispData
+        '検索値の設定
+        Dim dateFrom As String = dispData.StockDate.First.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
+        Dim dateTo As String = dispData.StockDate.Last.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
 
         sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0)) AS CARSAMOUNT")
+        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))                    AS CARSAMOUNT")
+        sqlStr.AppendLine("     , DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO)  AS DAYSPAN")
+        sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO),0)  AS SHIPAVERAGE")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
-        sqlStr.AppendLine("    ON ODR.ORDERNO = DTL.ORDERNO")
-        sqlStr.AppendLine("   AND DTL.DELFLG  = @DELFLG")
+        sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
+        sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
+        sqlStr.AppendLine("   AND DTL.OILCODE is not null")
         sqlStr.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @ACTUALDATE_FROM AND @ACTUALDATE_TO")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
-                '.Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = consignee
-                .Add("@STOCKFLG", SqlDbType.NVarChar).Value = "1" '不等号条件
-                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                .Add("@ACTUALDATE_FROM", SqlDbType.Date).Value = dateFrom
+                .Add("@ACTUALDATE_TO", SqlDbType.Date).Value = dateTo
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 If sqlDr.HasRows Then
-                    Return retVal
+                    Dim oilCode As String
+                    Dim avaVal As Decimal = 0D
+                    While sqlDr.Read
+                        oilCode = Convert.ToString(sqlDr("OILCODE"))
+                        '油種未設定または対象油種を持っていないレコードはスキップ
+                        If oilCode = "" OrElse retVal.StockList.ContainsKey(oilCode) Then
+                            Continue While
+                        End If
+
+                        avaVal = Decimal.Parse(Convert.ToString(sqlDr("SHIPAVERAGE")))
+                        retVal.StockList(oilCode).LastShipmentAve = avaVal
+
+                    End While
                 End If
             End Using 'sqlDr
         End Using
@@ -645,7 +681,7 @@ Public Class OIT0004OilStockCreate
             With sqlCmd.Parameters
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
-                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
             End With
             '可変パラメータ
             Dim paramFromDate = sqlCmd.Parameters.Add("@FROMDATE", SqlDbType.Date)
@@ -718,7 +754,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@CLASS", SqlDbType.NVarChar).Value = "MOVEINSIDE"
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
-                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -765,7 +801,7 @@ Public Class OIT0004OilStockCreate
             With sqlCmd.Parameters
                 .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = consignee
                 .Add("@STOCKFLG", SqlDbType.NVarChar).Value = "1" '不等号条件
-                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -921,7 +957,7 @@ Public Class OIT0004OilStockCreate
             With sqlCmd.Parameters
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispDataClass.SalesOffice
                 .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispDataClass.Consignee
-                .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
                 .Add("@INITYMD", SqlDbType.DateTime).Value = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
                 .Add("@INITUSER", SqlDbType.NVarChar).Value = Master.USERID
                 .Add("@INITTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID

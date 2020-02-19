@@ -1427,6 +1427,11 @@ function commonLeftTableSort(headerTextObj) {
             headerTextObj.classList.add(addCssClassName);
         }
         let targetField = headerTextObj.dataset.fieldname;
+        let isnumericField = '';
+        if (headerTextObj.dataset.isnumfield) {
+            isnumericField = headerTextObj.dataset.isnumfield;
+        }
+
         if (addCssClassName === '') {
             // 配列より削除
             let removedSordObj = sortObj.filter(function (itm) { return itm.FieldName !== targetField; });
@@ -1444,9 +1449,11 @@ function commonLeftTableSort(headerTextObj) {
             } // ソート条件更新
 
             if (sortItem === undefined) {
+
                 sortItem = {
                     FieldName: targetField,
-                    SortClass: addCssClassName
+                    SortClass: addCssClassName,
+                    IsNumericField: isnumericField
                 };
                 sortObj.push(sortItem); 
             } // ソート条件末尾に追加
@@ -1498,15 +1505,26 @@ function commonLeftTableSort(headerTextObj) {
             for (let i = 0; i < sortObj.length; i++) {
                 let fieldName = sortObj[i].FieldName;
                 let sortClass = sortObj[i].SortClass;
+                let isNumericField = sortObj[i].IsNumericField;
                 let aObj = a.querySelector('[data-fieldname="' + fieldName + '"] > span');
                 let bObj = b.querySelector('[data-fieldname="' + fieldName + '"] > span');
                 if (aObj === null || bObj === null) {
                     return 0;
                 }
-                const varA = (typeof aObj.textContent === 'string') ?
+                let varA = (typeof aObj.textContent === 'string') ?
                     aObj.textContent.toUpperCase() : aObj.textContent;
-                const varB = (typeof bObj.textContent === 'string') ?
+                let varB = (typeof bObj.textContent === 'string') ?
                     bObj.textContent.toUpperCase() : bObj.textContent;
+                if (isNumericField === '1') {
+                    varA = varA.replace(/,/g, ''); // 念の為カンマ除去
+                    if (isNaN(Number(varA)) === false) {
+                        varA = Number(varA);
+                    }
+                    varB = varB.replace(/,/g, '');　// 念の為カンマ除去
+                    if (isNaN(Number(varB)) === false) {
+                        varB = Number(varB);
+                    }
+                }
 
                 if (varA > varB) {
                     comparison = 1;

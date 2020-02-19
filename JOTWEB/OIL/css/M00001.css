@@ -67,7 +67,7 @@ a[id^="Menu_"] input[type=submit] {
     width: calc(100% - 2em); /* 全体幅から当マージン分を引く */
     max-width: calc(100% - 2em); /* 全体幅から当マージン分を引く */
     color: white;
-    background-color: rgba(255, 255, 255,0.1); /* transparent → 白の透明度90% 0.1を増加させれば白が増します */
+    /* background-color: rgba(255, 255, 255,0.1); */  /* transparent → 白の透明度90% 0.1を増加させれば白が増します */
     border-left-width: 4px;
     border-right-width: 2px;
     border-top-style: none;
@@ -84,73 +84,87 @@ a[id^="Menu_"] input[type=submit] {
     white-space: nowrap;
     padding-left: 3px;
     box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.33);
-    /* 後ろの白アイコンと重なると白飛びするので薄めに縁取り rgba(56, 56, 56, 0.15) → 文字の縁取り 0.15を増加させれば濃くなります */
-    text-shadow: rgba(56, 56, 56, 0.15) 1px 1px 0, rgba(56, 56, 56, 0.15) -1px -1px 0, /*右下、左上*/
-    rgba(56, 56, 56, 0.15) -1px 1px 0, rgba(56, 56, 56, 0.15) 1px -1px 0, /*右上、左下*/
-    rgba(56, 56, 56, 0.15) 0px 1px 0, rgba(56, 56, 56, 0.15) 0-1px 0, /*右、左*/
-    rgba(56, 56, 56, 0.15) -1px 0 0, rgba(56, 56, 56, 0.15) 1px 0 0; /*上、下*/
 }
 /*在庫管理メニュー表示*/
 #Menu_L {
-    background-color: #8DCF3F;
     background-image: url(../img/oiltank.png);
+}
+#Menu_L, #Menu_L input[type=submit] {
+    background-color: #8DCF3F;
 }
 #Menu_L input[type=submit]:hover {
     background-color: #58BE89;
 }
 /*受注管理メニュー表示*/
 #Menu_L2 {
-    background-color: #44DEDE;
     background-image: url(../img/order.png);
+}
+#Menu_L2, #Menu_L2 input[type=submit] {
+    background-color: #44DEDE;
 }
 #Menu_L2 input[type=submit]:hover {
     background-color: #40AAEF;
 }
 /*請求支払管理メニュー表示*/
 #Menu_L3 {
-    background-color: #FDC44F;
     background-image: url(../img/pay.png);
+}
+#Menu_L3, #Menu_L3 input[type=submit] {
+    background-color: #FDC44F;
 }
 #Menu_L3 input[type=submit]:hover {
     background-color: #FBA848;
 }
 /*タンク車所在管理メニュー表示*/
 #Menu_L4 {
-    background-color: #CC6699;
     background-image: url(../img/tank.png);
+}
+#Menu_L4, #Menu_L4 input[type=submit] {
+    background-color: #CC6699;
 }
 #Menu_L4 input[type=submit]:hover {
     background-color: #990066;
 }
 /*回送管理メニュー表示*/
 #Menu_R {
-    background-color: #F58E7E;
     background-image: url(../img/foward.png);
+}
+#Menu_R, #Menu_R input[type=submit] {
+    background-color: #F58E7E;
 }
 #Menu_R input[type=submit]:hover {
     background-color: #F27398;
 }
 /*マスタ管理メニュー表示*/
 #Menu_R2 {
-    background-color: #93B8CA;
     background-image: url(../img/master.png);
+}
+#Menu_R2, #Menu_R2 input[type=submit] {
+    background-color: #93B8CA;
 }
 #Menu_R2 input[type=submit]:hover {
     background-color: #0E7AC4;
 }
 /*実績・統計メニュー表示*/
 #Menu_R3 {
-    background-color: #CCCCCC;
     background-image: url(../img/statistics.png);
+}
+#Menu_R3, #Menu_R3 input[type=submit] {
+    background-color: #CCCCCC;
 }
 #Menu_R3 input[type=submit]:hover {
     background-color: #737373;
 }
 /*データ連携メニュー表示*/
 #Menu_R4 {
-    background-color: #55efc4;
     background-image: url(../img/datalink.png);
+}
+#Menu_R4, #Menu_R4 input[type=submit] {
+    background-color: #55efc4;
 }
 #Menu_R4 input[type=submit]:hover {
     background-color: #00b894;
+}
+a[id^="Menu_"] input[type=submit] {
+    background-image: linear-gradient(0deg, RGBA(0,0,0,0.1),RGBA(0,0,0,0.1));
 }

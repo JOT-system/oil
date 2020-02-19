@@ -49,7 +49,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     }
     /* テキストボックスフォーカスがあった時点で選択 */
-    var texboxObjList = document.querySelectorAll("input[type='text'],input[type='password']");
+    var texboxObjList = document.querySelectorAll("input[type='text'],input[type='number'],input[type='password']");
     for (let i = 0; i < texboxObjList.length; i++) {
         texboxObjList[i].addEventListener('focus', function () {
             // Edgeの場合はディレイをかけてテキストボックス全選択
@@ -105,6 +105,7 @@ window.addEventListener('DOMContentLoaded', function () {
     let queryString = "input.boxIcon,input.calendarIcon";
     // 暫定（日付をやるならvb側をいじる）グリッド内のテキストボックス(グリッド内のtdにダブルクリックイベントがあるテキストボックス)
     queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=text]";
+    queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=number]";
     var targetTextBoxList = document.querySelectorAll(queryString);
     if (targetTextBoxList !== null) {
         document.forms[0].style.display = 'none'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
@@ -124,6 +125,21 @@ window.addEventListener('DOMContentLoaded', function () {
     /* 左ボックステーブルソート機能     */
     /* ******************************** */
     commonLeftTableSortEventBind();
+    /* ************************************ */
+    /* 数字入力のみの関数を仕込んでいる場合 */
+    /* 全角→半角変換を行う                 */
+    /* ************************************ */
+    let numericTextObjList = document.querySelectorAll('input[type="text"][onkeypress*="CheckNum()"]');
+    if (numericTextObjList !== null) {
+        for (let i = 0; i < numericTextObjList.length; i++) {
+            let numericObj = numericTextObjList[i];
+            numericObj.addEventListener('change', (function (numericObj) {
+                return function () {
+                    ConvartWideCharToNormal(numericObj);
+                };
+            })(numericObj), true);
+        }
+    }
 });
 
 // 処理後カーソルを戻す
@@ -1782,3 +1798,22 @@ function CheckNum() {
         event.preventDefault(); // IEはこれで効く
     }
 }
+// 〇全角⇔半角変換
+function ConvartWideCharToNormal(obj) {
+    if (obj === null) {
+        return;
+    }
+    if (obj.value === '') {
+        return;
+    }
+    let repVal = '';
+    repVal = obj.value.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function (s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    });
+    repVal = repVal.replace(/[．]/g, '.');
+    repVal = repVal.replace(/[ー]/g, '-');
+    repVal = repVal.replace(/[－]/g, '-');
+    //repVal = repVal.replace(/[^0-9]/g, '');
+    repVal = repVal.match(/-?\d+\.?\d*/);
+    obj.value = repVal;
+}  

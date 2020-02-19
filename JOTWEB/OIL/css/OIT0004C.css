@@ -35,7 +35,8 @@
     box-sizing: border-box;
 }
 /* 提案表の全てのテキストボックス */
-#divSuggestList input[type=text] {
+#divSuggestList input[type=text],
+#divSuggestList input[type=number]{
     text-align:right;
     box-sizing: border-box;
     height:calc(100% - 2px);
@@ -352,7 +353,8 @@ span.minus {
     max-height:24px;
 }
 /* 在庫表の全てのテキストボックス */
-#divStockList input[type=text] {
+#divStockList input[type=text],
+#divStockList input[type=number] {
     text-align: right;
     box-sizing: border-box;
     height: calc(100% - 1px);
@@ -365,13 +367,16 @@ span.minus {
 span.morningStockIdx0 {
     margin-top:0px !important; 
 }
-#divStockList input[type=text][data-textfield="MorningStock"] {
+#divStockList input[type=text][data-textfield="MorningStock"],
+#divStockList input[type=number][data-textfield="MorningStock"] {
     // height: 18px;
     //line-height:0.8em;
-    width:calc(100% + 5.5px);
+    width: calc(100% + 5.5px);
 }
 #divStockList input[type=text][name$="txtSend"],
-#divStockList input[type=text][name$="txtReceiveFromLorry"] {
+#divStockList input[type=number][name$="txtSend"],
+#divStockList input[type=text][name$="txtReceiveFromLorry"],
+#divStockList input[type=number][name$="txtReceiveFromLorry"] {
     width: calc(100% + 5.5px);
 }
 /* :not(.col1) > div:last-child > span */

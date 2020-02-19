@@ -11,7 +11,7 @@
 
     <script type="text/javascript" src="<%=ResolveUrl("~/script/M00000.js")%>"></script>
 
-
+    <!--  ここにGAのスクリプト記載予定 -->
 
 </asp:Content> 
 

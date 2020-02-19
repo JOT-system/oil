@@ -38,21 +38,19 @@ function bindSuggestSummary(suggestColumnDivList) {
         /* 加算対象のテキストボックス */
         let suggestColTextList = suggestColDiv.querySelectorAll("div.num:not([data-oilcode=Summary]) input[type=text]");
         /* 合計値格納テキストボックス */
-        let summaryColText = suggestColDiv.querySelectorAll("div.num[data-oilcode=Summary]:not(.mi) input[type=text]")[0];
-        /* 構内取り合計値格納テキストボックス */
-        let miSummaryColText = suggestColDiv.querySelectorAll("div.num.mi[data-oilcode=Summary] input[type=text]")[0];
+        let summaryColText = suggestColDiv.querySelectorAll("div.num[data-oilcode=Summary] input[type=text]")[0];
 
         for (let j = 0; j < suggestColTextList.length; j++) {
             let targetText = suggestColTextList[j];
             /* テキストボックス変更イベントをバインド */
-            targetText.addEventListener('change', (function (suggestColTextList, summaryColText, miSummaryColText) {
+            targetText.addEventListener('change', (function (suggestColTextList, summaryColText) {
                 return function () {
-                    summarySuggestValues(suggestColTextList, summaryColText, miSummaryColText);
+                    summarySuggestValues(suggestColTextList, summaryColText);
                 };
-            })(suggestColTextList, summaryColText, miSummaryColText), false);
+            })(suggestColTextList, summaryColText), false);
             /* バインド時一度実行する */
             if (j === 0) {
-                summarySuggestValues(suggestColTextList, summaryColText, miSummaryColText);
+                summarySuggestValues(suggestColTextList, summaryColText);
             }
         }
 
@@ -61,35 +59,23 @@ function bindSuggestSummary(suggestColumnDivList) {
 // 〇提案数の合計計算イベント
 //   引数:suggestColTextList ・・・ 加算対象テキストボックス
 //        summaryColText     ・・・ 合計テキストボックス
-//        miSummaryColText   ・・・ 構内取り欄合計テキストボックス
-function summarySuggestValues(suggestColTextList, summaryColText, miSummaryColText) {
+function summarySuggestValues(suggestColTextList, summaryColText) {
     let suggestColSummary = 0;
-    let suggestColSummaryWithOutMi = 0;
     for (let i = 0; i < suggestColTextList.length; i++) {
         let suggestColTextId = suggestColTextList[i].id;
         let suggestColText = document.getElementById(suggestColTextId);
-        
         if (suggestColText !== null) {
             let itemVal = suggestColText.value.replace(/,/g, '');
             if (!isNaN(itemVal)) {
                 suggestColSummary = suggestColSummary + Number(itemVal);
-                if (suggestColText.dataset.mi === undefined) {
-                    suggestColSummaryWithOutMi = suggestColSummaryWithOutMi + Number(itemVal);
-                }
-
             }
         }
     }
     let summaryColTextObj = document.getElementById(summaryColText.id);
     if (summaryColTextObj !== null) {
-        summaryColTextObj.value = suggestColSummaryWithOutMi; //suggestColSummary;
+        summaryColTextObj.value = suggestColSummary;
     }
-    if (miSummaryColText !== undefined) {
-        let miSummaryColTextObj = document.getElementById(miSummaryColText.id);
-        if (miSummaryColTextObj !== null) {
-            miSummaryColTextObj.value = suggestColSummary;
-        }
-    }
+
 }
 /* 油種行の表示非表示切替イベントバインド */
 function bindDipsOiltypeStockList() {
@@ -109,11 +95,7 @@ function bindDipsOiltypeStockList() {
         let stockRowTitles = [ stockListObj.querySelectorAll(oilTypeRowColumnQuery)[0] ];
         if (suggestListObj !== null) {
             oilTypeRowColumnQuery = 'div[data-oilcode="' + oilcode + '"][data-title="suggestValue"] > span';
-            suggestListInsideTexts = suggestListObj.querySelectorAll(oilTypeRowColumnQuery);
-            for (let k = 0; k < suggestListInsideTexts.length; k++) {
-                stockRowTitles.push(suggestListInsideTexts[k]);
-            }
-           
+            stockRowTitles.push(suggestListObj.querySelectorAll(oilTypeRowColumnQuery)[0]);
         }
 
         for (let j = 0; j < stockRowTitles.length; j++) {
@@ -148,13 +130,11 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
 
     let suggestListObj = document.getElementById('divSuggestList');
     let suggestListLeftTitle;
-    let misuggestListLeftTitle;
-    let suggestListLeftOilTypeNames;
+    let suggestListLeftOilTypeName;
     let suggestListValueArea;
     if (suggestListObj !== null) {
         suggestListLeftTitle = document.getElementById('suggestLeftRecvTitle');
-        misuggestListLeftTitle = document.getElementById('miSuggestLeftRecvTitle');
-        suggestListLeftOilTypeNames = suggestListObj.querySelectorAll('div[data-title="suggestValue"][data-oilcode="' + oilcode + '"]');
+        suggestListLeftOilTypeName = suggestListObj.querySelectorAll('div[data-title="suggestValue"][data-oilcode="' + oilcode + '"]')[0];
         suggestListValueArea = suggestListObj.querySelectorAll('div.values div.num[data-oilcode="' + oilcode + '"]');
     }
     let styleDispValue = 'none';
@@ -182,22 +162,15 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
 
     stockRow.style.display = styleDispValue;
     if (suggestListObj !== null) {
-        for (let i = 0; i < suggestListLeftOilTypeNames.length; i++) {
-            suggestListLeftOilTypeNames[i].style.display = styleDispValue;
-        }
+        let selectedCnt = listDispObj.querySelectorAll('option:checked').length;
+        suggestListLeftOilTypeName.style.display = styleDispValue;
         for (let i = 0; i < suggestListValueArea.length; i++) {
             suggestListValueArea[i].style.display = styleDispValue;
         }
-        let suggestSecondColInsideDiv = suggestListObj.querySelectorAll('div.oilTypeColumn > div:not([style*="display:none"]):not([style*="display: none"])');
-        let suggestSecondColInsideDivWithOutMi = suggestListObj.querySelectorAll('div.oilTypeColumn > div:not([style*="display:none"]):not([style*="display: none"]):not([data-mi])').length;
-        let wholeHeight = suggestSecondColInsideDiv.length * 24;
-        let titleHeight = (suggestSecondColInsideDivWithOutMi - 3) * 24;
-        let mititleHeight = (suggestSecondColInsideDiv.length - suggestSecondColInsideDivWithOutMi) * 24;
+        let wholeHeight = (selectedCnt + 1 + 3) * 24;
+        let titleHeight = (selectedCnt + 1) * 24;
         suggestListObj.style.height = wholeHeight.toString() + 'px';
         suggestListLeftTitle.style.height = titleHeight.toString() + 'px';
-        if (misuggestListLeftTitle !== null) {
-            misuggestListLeftTitle.style.height = mititleHeight.toString() + 'px';
-        }
         //suggestListObj.style.height = "calc(100px - 1px)";
         //suggestListLeftTitle.style.height = "";
 

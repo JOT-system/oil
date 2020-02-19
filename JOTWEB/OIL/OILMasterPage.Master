@@ -11,6 +11,9 @@
     <title></title>
     <%--全画面共通のスタイルシート --%>
     <link href="~/css/common.css" rel="stylesheet" type="text/css"/>
+
+    <link rel="shortcut icon" type="image/x-icon" href="~/img/oil.ico" />
+
     <%--個別のスタイルは以下に記載 OR 外部ファイルに逃す --%>
     <%--共通利用するJavaScript --%>
     <script src='<%= ResolveUrl("~/script/common.js")%>' type="text/javascript" charset="utf-8"></script>
@@ -19,6 +22,7 @@
     <script src='<%= ResolveUrl("~/script/calendar.js")%>' type="text/javascript" charset="utf-8"></script>
     <%-- コンテンツ領域 --%>
     <asp:ContentPlaceHolder ID="head" runat="server" />
+
 </head>
 
 <body spellcheck="false">

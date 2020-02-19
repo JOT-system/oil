@@ -18,12 +18,13 @@ function InitDisplay() {
     //let txtObjList = document.forms[0].querySelectorAll("#headerboxOnly input[type=text]");
     let suggestCol = document.forms[0].querySelectorAll("div.dataColumn > div.values");
     document.forms[0].style.display = 'none'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
+    // 数字入力のみ可能にする共通関数KeyDown共通関数を仕込む
+    let numInputBoxList = document.forms[0].querySelectorAll("#WF_INVENTORYDAYS, #pnlSuggestList input[type=text],#pnlStockList input[type=text], #pnlSuggestList input[type=number],#pnlStockList input[type=number]");
+    bindNumericKeyPressOnly(numInputBoxList);
+    //提案表の合計イベントバインド
     bindSuggestSummary(suggestCol);
     bindDipsOiltypeStockList();
     document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
-    // 数字入力のみ可能にする共通関数KeyDown共通関数を仕込む
-    let numInputBoxList = document.forms[0].querySelectorAll("#WF_INVENTORYDAYS, #pnlSuggestList input[type=text],#pnlStockList input[type=text]");
-    bindNumericKeyPressOnly(numInputBoxList);
     //フォーカスを合わせる
     forcusObj();
 
@@ -36,21 +37,23 @@ function bindSuggestSummary(suggestColumnDivList) {
     for (let i = 0; i < suggestColumnDivList.length; i++) {
         let suggestColDiv = suggestColumnDivList[i];
         /* 加算対象のテキストボックス */
-        let suggestColTextList = suggestColDiv.querySelectorAll("div.num:not([data-oilcode=Summary]) input[type=text]");
+        let suggestColTextList = suggestColDiv.querySelectorAll("div.num:not([data-oilcode=Summary]) input[type=text],div.num:not([data-oilcode=Summary]) input[type=number]");
         /* 合計値格納テキストボックス */
-        let summaryColText = suggestColDiv.querySelectorAll("div.num[data-oilcode=Summary] input[type=text]")[0];
+        let summaryColText = suggestColDiv.querySelectorAll("div.num[data-oilcode=Summary]:not(.mi) input[type=text],div.num[data-oilcode=Summary]:not(.mi) input[type=number]")[0];
+        /* 構内取り合計値格納テキストボックス */
+        let miSummaryColText = suggestColDiv.querySelectorAll("div.num.mi[data-oilcode=Summary] input[type=text],div.num.mi[data-oilcode=Summary] input[type=number]")[0];
 
         for (let j = 0; j < suggestColTextList.length; j++) {
             let targetText = suggestColTextList[j];
             /* テキストボックス変更イベントをバインド */
-            targetText.addEventListener('change', (function (suggestColTextList, summaryColText) {
+            targetText.addEventListener('change', (function (suggestColTextList, summaryColText, miSummaryColText) {
                 return function () {
-                    summarySuggestValues(suggestColTextList, summaryColText);
+                    summarySuggestValues(suggestColTextList, summaryColText, miSummaryColText);
                 };
-            })(suggestColTextList, summaryColText), false);
+            })(suggestColTextList, summaryColText, miSummaryColText), false);
             /* バインド時一度実行する */
             if (j === 0) {
-                summarySuggestValues(suggestColTextList, summaryColText);
+                summarySuggestValues(suggestColTextList, summaryColText, miSummaryColText);
             }
         }
 
@@ -59,23 +62,35 @@ function bindSuggestSummary(suggestColumnDivList) {
 // 〇提案数の合計計算イベント
 //   引数:suggestColTextList ・・・ 加算対象テキストボックス
 //        summaryColText     ・・・ 合計テキストボックス
-function summarySuggestValues(suggestColTextList, summaryColText) {
+//        miSummaryColText   ・・・ 構内取り欄合計テキストボックス
+function summarySuggestValues(suggestColTextList, summaryColText, miSummaryColText) {
     let suggestColSummary = 0;
+    let suggestColSummaryWithOutMi = 0;
     for (let i = 0; i < suggestColTextList.length; i++) {
         let suggestColTextId = suggestColTextList[i].id;
         let suggestColText = document.getElementById(suggestColTextId);
+        
         if (suggestColText !== null) {
             let itemVal = suggestColText.value.replace(/,/g, '');
             if (!isNaN(itemVal)) {
                 suggestColSummary = suggestColSummary + Number(itemVal);
+                if (suggestColText.dataset.mi === undefined) {
+                    suggestColSummaryWithOutMi = suggestColSummaryWithOutMi + Number(itemVal);
+                }
+
             }
         }
     }
     let summaryColTextObj = document.getElementById(summaryColText.id);
     if (summaryColTextObj !== null) {
-        summaryColTextObj.value = suggestColSummary;
+        summaryColTextObj.value = suggestColSummaryWithOutMi; //suggestColSummary;
     }
-
+    if (miSummaryColText !== undefined) {
+        let miSummaryColTextObj = document.getElementById(miSummaryColText.id);
+        if (miSummaryColTextObj !== null) {
+            miSummaryColTextObj.value = suggestColSummary;
+        }
+    }
 }
 /* 油種行の表示非表示切替イベントバインド */
 function bindDipsOiltypeStockList() {
@@ -95,7 +110,11 @@ function bindDipsOiltypeStockList() {
         let stockRowTitles = [ stockListObj.querySelectorAll(oilTypeRowColumnQuery)[0] ];
         if (suggestListObj !== null) {
             oilTypeRowColumnQuery = 'div[data-oilcode="' + oilcode + '"][data-title="suggestValue"] > span';
-            stockRowTitles.push(suggestListObj.querySelectorAll(oilTypeRowColumnQuery)[0]);
+            suggestListInsideTexts = suggestListObj.querySelectorAll(oilTypeRowColumnQuery);
+            for (let k = 0; k < suggestListInsideTexts.length; k++) {
+                stockRowTitles.push(suggestListInsideTexts[k]);
+            }
+           
         }
 
         for (let j = 0; j < stockRowTitles.length; j++) {
@@ -130,11 +149,13 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
 
     let suggestListObj = document.getElementById('divSuggestList');
     let suggestListLeftTitle;
-    let suggestListLeftOilTypeName;
+    let misuggestListLeftTitle;
+    let suggestListLeftOilTypeNames;
     let suggestListValueArea;
     if (suggestListObj !== null) {
         suggestListLeftTitle = document.getElementById('suggestLeftRecvTitle');
-        suggestListLeftOilTypeName = suggestListObj.querySelectorAll('div[data-title="suggestValue"][data-oilcode="' + oilcode + '"]')[0];
+        misuggestListLeftTitle = document.getElementById('miSuggestLeftRecvTitle');
+        suggestListLeftOilTypeNames = suggestListObj.querySelectorAll('div[data-title="suggestValue"][data-oilcode="' + oilcode + '"]');
         suggestListValueArea = suggestListObj.querySelectorAll('div.values div.num[data-oilcode="' + oilcode + '"]');
     }
     let styleDispValue = 'none';
@@ -162,15 +183,22 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
 
     stockRow.style.display = styleDispValue;
     if (suggestListObj !== null) {
-        let selectedCnt = listDispObj.querySelectorAll('option:checked').length;
-        suggestListLeftOilTypeName.style.display = styleDispValue;
+        for (let i = 0; i < suggestListLeftOilTypeNames.length; i++) {
+            suggestListLeftOilTypeNames[i].style.display = styleDispValue;
+        }
         for (let i = 0; i < suggestListValueArea.length; i++) {
             suggestListValueArea[i].style.display = styleDispValue;
         }
-        let wholeHeight = (selectedCnt + 1 + 3) * 24;
-        let titleHeight = (selectedCnt + 1) * 24;
+        let suggestSecondColInsideDiv = suggestListObj.querySelectorAll('div.oilTypeColumn > div:not([style*="display:none"]):not([style*="display: none"])');
+        let suggestSecondColInsideDivWithOutMi = suggestListObj.querySelectorAll('div.oilTypeColumn > div:not([style*="display:none"]):not([style*="display: none"]):not([data-mi])').length;
+        let wholeHeight = suggestSecondColInsideDiv.length * 24;
+        let titleHeight = (suggestSecondColInsideDivWithOutMi - 3) * 24;
+        let mititleHeight = (suggestSecondColInsideDiv.length - suggestSecondColInsideDivWithOutMi) * 24;
         suggestListObj.style.height = wholeHeight.toString() + 'px';
         suggestListLeftTitle.style.height = titleHeight.toString() + 'px';
+        if (misuggestListLeftTitle !== null) {
+            misuggestListLeftTitle.style.height = mititleHeight.toString() + 'px';
+        }
         //suggestListObj.style.height = "calc(100px - 1px)";
         //suggestListLeftTitle.style.height = "";
 
@@ -235,7 +263,15 @@ function bindNumericKeyPressOnly(targetTextBoxList) {
         let textObj = targetTextBoxList[i];
         /* keypressはIeでは動かない */
         textObj.addEventListener('keypress', CheckNum);
+
         textObj.style.imeMode = 'disabled';
+
+        textObj.addEventListener('change', (function (textObj) {
+            return function () {
+                ConvartWideCharToNormal(textObj);
+            };
+        })(textObj), true);
+
         /* 桁数 */
         if (textObj.id === 'WF_INVENTORYDAYS') {
             textObj.maxLength = 1;

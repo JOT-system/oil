@@ -255,7 +255,26 @@ Public Class OIT0004OilStockCreate
         Dim inventoryDays As Integer = 0
         inventoryDays = CInt(Me.WF_INVENTORYDAYS.Text)
         dispClass.AutoSuggest(inventoryDays)
-
+        '******************************
+        '画面情報再設定
+        '******************************
+        'コンストラクタで生成したデータを画面に貼り付け
+        '1.提案リスト
+        If dispClass.ShowSuggestList = False Then
+            pnlSuggestList.Visible = False
+        Else
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispClass}
+            frvSuggest.DataBind()
+        End If
+        '2.比重リスト
+        repWeightList.DataSource = dispClass.OilTypeList
+        repWeightList.DataBind()
+        '3.在庫表
+        repStockDate.DataSource = dispClass.StockDate
+        repStockDate.DataBind()
+        repStockOilTypeItem.DataSource = dispClass.StockList
+        repStockOilTypeItem.DataBind()
     End Sub
     ''' <summary>
     ''' 受注作成ボタン押下時処理
@@ -2186,13 +2205,13 @@ Public Class OIT0004OilStockCreate
         ''' <param name="inventoryDays">在庫維持日数</param>
         ''' <remarks>外部呼出用メソッド</remarks>
         Public Sub AutoSuggest(inventoryDays As Integer)
-            Return
+            'Return
             'TODO inventoryDaysの意味合い0ありにして0は先頭日か？
             '一旦0あり先頭
             '提案表部分の値を0クリア
             SuggestValueInputValueToZero()
             Dim fromDay As String = Me.StockDate.First.Value.KeyString
-            Dim toDay As String = Me.StockDate.First.Value.ItemDate.AddDays(inventoryDays).ToString("yyyy/MM/dd")
+            Dim toDay As String = Me.StockDate.First.Value.ItemDate.AddDays(inventoryDays - 1).ToString("yyyy/MM/dd")
             '過去日を除く開始日＋inventryDaysが処理条件
             Dim targetDays = From itm In Me.StockDate
                              Where itm.Key >= fromDay AndAlso
@@ -2212,6 +2231,7 @@ Public Class OIT0004OilStockCreate
             Dim suggestTrainItem As SuggestItem.SuggestValues
             Dim suggestTrainOilValue As SuggestItem.SuggestValue
             Dim finishIncremental As Boolean = False
+            Dim freeSpaceLists As Dictionary(Of String, Boolean)
             '処理日付のループ
             For Each targetDay In targetDays
                 If Me.SuggestList.ContainsKey(targetDay) = False Then
@@ -2219,32 +2239,56 @@ Public Class OIT0004OilStockCreate
                 End If
                 '対象日の列車・油種別の提案リスト取得
                 suggestItem = Me.SuggestList(targetDay)
+                'フリースペースが満たされた油種、情報を取得（列車別で無駄ループを無くすため）
+                '日付単位で初期化
+                freeSpaceLists = OilTypeList.ToDictionary(Function(x) x.Key, Function(x) False)
+
                 '列車別ループ
                 For Each trainInfo In Me.TrainList.Values
+                    '全油種のフリースペースが無い場合は列車別でループする意味がないので次の日付へ
+                    '(全油種の数 = フリースペースが無い油種のカウント)
+                    If OilTypeList.Count = (From fslItm In freeSpaceLists Where fslItm.Value = True).Count Then
+                        Exit For
+                    End If
                     If suggestItem.SuggestOrderItem.ContainsKey(trainInfo.TrainNo) = False Then
                         Continue For
                     End If
                     suggestTrainItem = suggestItem.SuggestOrderItem(trainInfo.TrainNo)
+                    '計算対象チェックをOn
+                    suggestTrainItem.CheckValue = True
                     finishIncremental = False
                     '油種別ループ
-                    For Each oilItem In Me.OilTypeList.Values
-                        '列車最大牽引数を超えたら次の列車へ
-                        If suggestTrainItem.CanIncremental = False Then
-                            finishIncremental = True
-                            Exit For
-                        End If
-                        suggestTrainOilValue = suggestTrainItem(oilItem.OilCode)
-                        Dim currentVal As Decimal = Decimal.Parse(suggestTrainOilValue.ItemValue)
-                        suggestTrainOilValue.ItemValue = (currentVal + 1).ToString
-                        Me.RecalcStockList(procOilCode:=oilItem.OilCode, procDay:=targetDay)
-                        With Me.StockList(oilItem.OilCode).StockItemList(targetDay)
-                            '計算の結果空き容量が0の場合はインクリメント前に戻し次の油種へ
-                            If .FreeSpace < 0 Then
-                                suggestTrainOilValue.ItemValue = (currentVal).ToString
-                                Me.RecalcStockList(procOilCode:=oilItem.OilCode, procDay:=targetDay)
+                    While Not finishIncremental
+                        For Each oilItem In Me.OilTypeList.Values
+                            '列車最大牽引数を超えたら次の列車へ
+                            If suggestTrainItem.CanIncremental = False Then
+                                finishIncremental = True
+                                Exit For
                             End If
-                        End With
-                    Next oilItem 'end 油種別ループ
+                            '全油種のフリースペースが無い場合インクリメント終了
+                            '(全油種の数 = フリースペースが無い油種のカウント)
+                            If OilTypeList.Count = (From fslItm In freeSpaceLists Where fslItm.Value = True).Count Then
+                                finishIncremental = True
+                                Exit For
+                            End If
+                            '対象油種のフリースペースが無い場合はインクリメント＋再計算せず次の油種
+                            If freeSpaceLists(oilItem.OilCode) = True Then
+                                Continue For
+                            End If
+                            suggestTrainOilValue = suggestTrainItem(oilItem.OilCode)
+                            Dim currentVal As Decimal = Decimal.Parse(suggestTrainOilValue.ItemValue)
+                            suggestTrainOilValue.ItemValue = (currentVal + 1).ToString
+                            Me.RecalcStockList(procOilCode:=oilItem.OilCode, procDay:=targetDay)
+                            With Me.StockList(oilItem.OilCode).StockItemList(targetDay)
+                                '計算の結果空き容量が0の場合はインクリメント前に戻し次の油種へ
+                                If .FreeSpace < 0 Then
+                                    freeSpaceLists(oilItem.OilCode) = True
+                                    suggestTrainOilValue.ItemValue = (currentVal).ToString
+                                    Me.RecalcStockList(procOilCode:=oilItem.OilCode, procDay:=targetDay)
+                                End If
+                            End With
+                        Next oilItem 'end 油種別ループ
+                    End While
                 Next trainInfo 'end 列車別ループ
             Next targetDay 'end 日付別ループ
         End Sub

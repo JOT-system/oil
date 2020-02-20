@@ -2693,6 +2693,8 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     Protected Sub WW_ButtonLINE_LIFTED_TAB1()
 
+        Dim SelectChk As Boolean = False
+
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
 
@@ -2742,17 +2744,22 @@ Public Class OIT0003OrderDetail
             '選択されている行は削除対象
             Dim i As Integer = 0
             Dim j As Integer = 9000
-            For Each OIT0001UPDrow In OIT0003tbl.Rows
-                If OIT0001UPDrow("OPERATION") = "on" Then
-                    j += 1
-                    OIT0001UPDrow("LINECNT") = j        'LINECNT
-                    OIT0001UPDrow("DELFLG") = C_DELETE_FLG.DELETE
-                    OIT0001UPDrow("HIDDEN") = 1
+            For Each OIT0003UPDrow In OIT0003tbl.Rows
+                If OIT0003UPDrow("OPERATION") = "on" Then
 
-                    PARA01.Value = OIT0001UPDrow("ORDERNO")
-                    PARA02.Value = OIT0001UPDrow("DETAILNO")
-                    PARA03.Value = OIT0001UPDrow("LINKNO")
-                    PARA04.Value = OIT0001UPDrow("LINKDETAILNO")
+                    If OIT0003UPDrow("LINECNT") < 9000 Then
+                        SelectChk = True
+                    End If
+
+                    j += 1
+                    OIT0003UPDrow("LINECNT") = j        'LINECNT
+                    OIT0003UPDrow("DELFLG") = C_DELETE_FLG.DELETE
+                    OIT0003UPDrow("HIDDEN") = 1
+
+                    PARA01.Value = OIT0003UPDrow("ORDERNO")
+                    PARA02.Value = OIT0003UPDrow("DETAILNO")
+                    PARA03.Value = OIT0003UPDrow("LINKNO")
+                    PARA04.Value = OIT0003UPDrow("LINKDETAILNO")
 
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
@@ -2762,9 +2769,17 @@ Public Class OIT0003OrderDetail
                     SQLcmd.ExecuteNonQuery()
                 Else
                     i += 1
-                    OIT0001UPDrow("LINECNT") = i        'LINECNT
+                    OIT0003UPDrow("LINECNT") = i        'LINECNT
                 End If
             Next
+
+            '行削除が1件でも実施された場合
+            If SelectChk = True Then
+                '貨物駅入線順に入力している値をクリアする。
+                For Each OIT0003UPDrow In OIT0003tbl.Rows
+                    OIT0003UPDrow("LINEORDER") = ""
+                Next
+            End If
 
             'CLOSE
             SQLcmd.Dispose()
@@ -2786,7 +2801,11 @@ Public Class OIT0003OrderDetail
         Master.SaveTable(OIT0003tbl)
 
         '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If SelectChk = False Then
+            Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        Else
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 

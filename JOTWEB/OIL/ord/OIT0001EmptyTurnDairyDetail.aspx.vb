@@ -1525,6 +1525,8 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' </summary>
     Protected Sub WF_ButtonLINE_LIFTED_Click()
 
+        Dim SelectChk As Boolean = False
+
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0001tbl)
 
@@ -1578,6 +1580,11 @@ Public Class OIT0001EmptyTurnDairyDetail
             Dim j As Integer = 9000
             For Each OIT0001UPDrow As DataRow In OIT0001tbl.Rows
                 If Convert.ToString(OIT0001UPDrow("OPERATION")) = "on" Then
+
+                    If OIT0001UPDrow("LINECNT") < 9000 Then
+                        SelectChk = True
+                    End If
+
                     j += 1
                     OIT0001UPDrow("LINECNT") = j        'LINECNT
                     OIT0001UPDrow("DELFLG") = C_DELETE_FLG.DELETE
@@ -1620,7 +1627,11 @@ Public Class OIT0001EmptyTurnDairyDetail
         Master.SaveTable(OIT0001tbl)
 
         '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If SelectChk = False Then
+            Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        Else
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 

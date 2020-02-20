@@ -3410,6 +3410,106 @@ Public Class OIT0003OrderDetail
             WW_OILTANKCntGet(SQLcon)
         End Using
 
+        '受注進行ステータス退避用
+        Dim strOrderStatus As String = ""
+
+        '### 受注進行ステータスチェック START ##############################################
+        '受注進行ステータスの状態
+        Select Case work.WF_SEL_ORDERSTATUS.Text
+            '"270:手配完了"
+            Case BaseDllConst.CONST_ORDERSTATUS_270
+                '(一覧)数量の入力チェック
+                '0(デフォルト値)以外が入力されていれば、入力していると判断
+                Dim chkCarsAmount As Boolean = True
+                Dim decCarsAmount As Decimal = 0
+                For Each OIT0003Chktab3row As DataRow In OIT0003tbl_tab3.Rows
+                    Try
+                        decCarsAmount = Decimal.Parse(OIT0003Chktab3row("CARSAMOUNT"))
+                    Catch ex As Exception
+                        decCarsAmount = 0
+                        OIT0003Chktab3row("CARSAMOUNT") = "0"
+                    End Try
+                    '(一覧)数値に0が1件でも存在したら、"False"(未入力)とする。
+                    If decCarsAmount = 0 Then
+                        chkCarsAmount = False
+                    End If
+                Next
+
+                '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
+                If TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_300
+                End If
+
+                '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
+                'かつ、(実績)積車着日の入力が完了
+                If TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True _
+                    AndAlso TxtActualArrDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_400
+                End If
+
+                '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
+                'かつ、(実績)積車着日の入力が完了
+                'かつ、(実績)空車着日の入力が完了
+                If TxtActualLoadingDate.Text <> "" _
+                    AndAlso TxtActualArrDate.Text <> "" _
+                    AndAlso TxtActualEmparrDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
+                End If
+
+            '"300:受注確定"
+            Case BaseDllConst.CONST_ORDERSTATUS_300
+                '(実績)積車着日の入力が完了
+                If TxtActualArrDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_400
+                End If
+
+                '(実績)積車着日の入力が完了
+                'かつ、(実績)空車着日の入力が完了
+                If TxtActualArrDate.Text <> "" _
+                    AndAlso TxtActualEmparrDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
+                End If
+
+            '"400:受入確認中"
+            Case BaseDllConst.CONST_ORDERSTATUS_400
+
+                '(実績)空車着日の入力が完了
+                If TxtActualEmparrDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
+                End If
+
+            '"500:検収中"
+            Case BaseDllConst.CONST_ORDERSTATUS_500
+
+        End Select
+
+        '受注進行ステータスに変更があった場合
+        If strOrderStatus <> "" Then
+            '〇(受注TBL)受注進行ステータス更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateOrderStatus(strOrderStatus)
+                CODENAME_get("ORDERSTATUS", strOrderStatus, TxtOrderStatus.Text, WW_DUMMY)
+                work.WF_SEL_ORDERSTATUS.Text = strOrderStatus
+                work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
+
+            End Using
+
+            '○ 画面表示データ復元
+            Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+                If OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                    OIT0003row("ORDERSTATUS") = strOrderStatus
+                    OIT0003row("ORDERSTATUSNAME") = TxtOrderStatus.Text
+                End If
+            Next
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+        End If
+        '### 受注進行ステータスチェック END   ##############################################
 
         '◎ 画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -5628,7 +5728,11 @@ Public Class OIT0003OrderDetail
                 PARA01.Value = OIT0003tab3row("ORDERNO")
                 PARA02.Value = OIT0003tab3row("DETAILNO")
                 PARA03.Value = C_DELETE_FLG.DELETE
-                PARA04.Value = Decimal.Parse(OIT0003tab3row("CARSAMOUNT"))
+                Try
+                    PARA04.Value = Decimal.Parse(OIT0003tab3row("CARSAMOUNT"))
+                Catch ex As Exception
+                    PARA04.Value = "0"
+                End Try
                 PARA05.Value = OIT0003tab3row("JOINT")
 
                 If OIT0003tab3row("ACTUALLODDATE") = "" Then
@@ -7329,7 +7433,7 @@ Public Class OIT0003OrderDetail
         '受注情報が以下の場合は、(実績)の日付の入力を制限
         '100:受注受付, 200:手配, 210:手配中（入換指示手配済）, 220:手配中（積込指示手配済）
         '230:手配中（託送指示手配済）, 240:手配中（入換指示未手配）, 250:手配中（積込指示未手配）
-        '260;手配中（託送指示未手配）
+        '260:手配中（託送指示未手配）
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
@@ -7349,6 +7453,74 @@ Public Class OIT0003OrderDetail
             TxtActualAccDate.Enabled = False
             '(実績)空車着日
             TxtActualEmparrDate.Enabled = False
+
+            '受注情報が「270:手配完了」の場合は、(実績)すべての日付の入力を制限
+            '270:手配完了
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            '(実績)積込日
+            TxtActualLoadingDate.Enabled = True
+            '(実績)発日
+            TxtActualDepDate.Enabled = True
+            '(実績)積車着日
+            TxtActualArrDate.Enabled = True
+            '(実績)受入日
+            TxtActualAccDate.Enabled = True
+            '(実績)空車着日
+            TxtActualEmparrDate.Enabled = True
+
+            '受注情報が「300:受注確定」の場合は、(実績)積込日の入力を制限
+            '300:受注確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            '(実績)積込日
+            TxtActualLoadingDate.Enabled = False
+            '(実績)発日
+            TxtActualDepDate.Enabled = True
+            '(実績)積車着日
+            TxtActualArrDate.Enabled = True
+            '(実績)受入日
+            TxtActualAccDate.Enabled = True
+            '(実績)空車着日
+            TxtActualEmparrDate.Enabled = True
+
+            '受注情報が「400:受入確認中」の場合は、(実績)積車着日の入力を制限
+            '400:受入確認中
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 Then
+            '(実績)積込日
+            TxtActualLoadingDate.Enabled = False
+            '(実績)発日
+            TxtActualDepDate.Enabled = False
+            '(実績)積車着日
+            TxtActualArrDate.Enabled = False
+            '(実績)受入日
+            TxtActualAccDate.Enabled = True
+            '(実績)空車着日
+            TxtActualEmparrDate.Enabled = True
+
+            '受注情報が「500:検収中」の場合は、(実績)空車着日の入力を制限
+            '500:検収中
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
+            '(実績)積込日
+            TxtActualLoadingDate.Enabled = False
+            '(実績)発日
+            TxtActualDepDate.Enabled = False
+            '(実績)積車着日
+            TxtActualArrDate.Enabled = False
+            '(実績)受入日
+            TxtActualAccDate.Enabled = False
+            '(実績)空車着日
+            TxtActualEmparrDate.Enabled = False
+
+            '550:検収済
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 Then
+            '600:費用確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 Then
+            '700:経理未計上
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 Then
+            '800:経理計上
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 Then
+            '900:受注キャンセル
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
         Else
             '(実績)積込日
             TxtActualLoadingDate.Enabled = True

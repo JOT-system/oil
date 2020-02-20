@@ -8854,18 +8854,21 @@ Public Class OIT0003OrderDetail
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.TRAINNO         = @P02 " _
             & "   AND OIT0002.DEPDATE         = @P03 " _
-            & "   AND OIT0002.DELFLG         <> @P04 "
+            & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
+            & "   AND OIT0002.DELFLG         <> @P05 "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA2.Value = Me.TxtTrainNo.Text
                 PARA3.Value = Me.TxtDepDate.Text
-                PARA4.Value = C_DELETE_FLG.DELETE
+                PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARA5.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

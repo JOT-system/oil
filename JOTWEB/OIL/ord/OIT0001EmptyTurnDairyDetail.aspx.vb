@@ -2955,18 +2955,21 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.TRAINNO         = @P02 " _
             & "   AND OIT0002.DEPDATE         = @P03 " _
-            & "   AND OIT0002.DELFLG         <> @P04 "
+            & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
+            & "   AND OIT0002.DELFLG         <> @P05 "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA2.Value = TxtHeadOfficeTrain.Text
                 PARA3.Value = TxtDepDate.Text
-                PARA4.Value = C_DELETE_FLG.DELETE
+                PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARA5.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3273,7 +3276,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    UPDATE OIL.OIT0002_ORDER" _
             & "    SET" _
             & "        OFFICECODE      = @P04    , OFFICENAME     = @P05" _
-            & "        , TRAINNO       = @P02    , TRAINNAME      = @P93, ORDERTYPE      = @P06" _
+            & "        , TRAINNO       = @P02    , TRAINNAME      = @P93, ORDERTYPE  = @P06" _
             & "        , SHIPPERSCODE  = @P07    , SHIPPERSNAME   = @P08" _
             & "        , BASECODE      = @P09    , BASENAME       = @P10" _
             & "        , CONSIGNEECODE = @P11    , CONSIGNEENAME  = @P12" _
@@ -3282,7 +3285,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , ORDERINFO     = @P22    , STACKINGFLG    = @P92" _
             & "        , USEPROPRIETYFLG = @P23  , DELIVERYFLG    = @P94" _
             & "        , LODDATE       = @P24    , DEPDATE        = @P25" _
-            & "        , ARRDATE       = @P26    , ACCDATE        = @P27" _
+            & "        , ARRDATE       = @P26    , ACCDATE        = @P27, EMPARRDATE = @P28" _
             & "        , UPDYMD        = @P87    , UPDUSER        = @P88" _
             & "        , UPDTERMID     = @P89    , RECEIVEYMD     = @P90" _
             & "    WHERE" _
@@ -3606,7 +3609,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA25.Value = TxtDepDate.Text                    '発日（予定）
                     PARA26.Value = TxtArrDate.Text                    '積車着日（予定）
                     PARA27.Value = TxtAccDate.Text                    '受入日（予定）
-                    PARA28.Value = DBNull.Value                       '空車着日（予定）
+                    PARA28.Value = TxtEmparrDate.Text                 '空車着日（予定）
                     PARA29.Value = DBNull.Value                       '積込日（実績）
                     PARA30.Value = DBNull.Value                       '発日（実績）
                     PARA31.Value = DBNull.Value                       '積車着日（実績）

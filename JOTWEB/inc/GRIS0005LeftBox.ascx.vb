@@ -550,9 +550,11 @@ Public Class GRIS0005LeftBox
                 Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "CAMPCODE, " &
                                                                   "VALUE3," &
                                                                   "VALUE13," &
-                                                                  "KEYCODE," &
-                                                                  "CONVERT(decimal(16,2),case when isnumeric(KEYCODE)=1 " &
-                                                                                             "then KEYCODE else null end)"
+                    "CONVERT(decimal(16,2),case when isnumeric(VALUE1)=1 " &
+                                               "then VALUE1 else null end)"
+                '    "KEYCODE," &
+                '    "CONVERT(decimal(16,2),case when isnumeric(KEYCODE)=1 " &
+                '                               "then KEYCODE else null end)"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST
                 '品種パターン

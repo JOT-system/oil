@@ -171,6 +171,8 @@ Public Class OIT0004OilStockCreate
             dispDataObj = GetMoveInsideData(sqlCon, dispDataObj)
             '既登録データ取得
             dispDataObj = GetTargetStockData(sqlCon, dispDataObj)
+            '過去日以外の日付について受入数取得
+            dispDataObj = GetReciveFromOrder(sqlCon, dispDataObj)
             '構内取り設定がある場合、構内取りデータ取得
             If dispDataObj.HasMoveInsideItem Then
                 '構内取りではない油種「合計」文言を中計と変更
@@ -576,37 +578,46 @@ Public Class OIT0004OilStockCreate
 
     End Function
     ''' <summary>
-    ''' オーダー実績データを取得
+    ''' 受入データをオーダーより取得
     ''' </summary>
     ''' <param name="sqlCon"></param>
     ''' <param name="dispData"></param>
     ''' <returns></returns>
-    Private Function GetOrderData(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+    ''' <remarks>受入予定数を設定（過去は在庫テーブルからとる？）</remarks>
+    Private Function GetReciveFromOrder(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
         Dim sqlStr As New StringBuilder
         Dim retVal = dispData
-        '検索値の設定
-        Dim dateFrom As String = dispData.StockDate.First.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
-        Dim dateTo As String = dispData.StockDate.Last.Value.ItemDate.AddDays(-7).ToString("yyyy/MM/dd")
+        '検索値の設定(過去日じゃない日付リストを取得）
+        Dim qdataVal = From itm In dispData.StockDate
+                       Where itm.Value.IsPastDay = False
+                       Order By itm.Value.KeyString
+                       Select itm.Value.KeyString
+        '全て過去日の場合は在庫テーブルから取得するためオーダーから取得しない
+        If qdataVal.Any = False Then
+            Return retVal
+        End If
 
+        Dim dateFrom As String = qdataVal.First '過去日ではない内最初
+        Dim dateTo As String = qdataVal.Last    '過去日ではない内最後
+        'ACCDATE[受入日（予定）]を元に取得（変更の場合は条件と抽出両方の項目忘れずに）
         sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))                    AS CARSAMOUNT")
-        sqlStr.AppendLine("     , DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO)  AS DAYSPAN")
-        sqlStr.AppendLine("     , ROUND(SUM(isnull(DTL.CARSAMOUNT,0)) / DATEDIFF(day ,@ACTUALDATE_FROM ,@ACTUALDATE_TO),0)  AS SHIPAVERAGE")
+        sqlStr.AppendLine("  　 , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))    AS CARSAMOUNT")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
         sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStr.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @ACTUALDATE_FROM AND @ACTUALDATE_TO")
+        sqlStr.AppendLine(" WHERE ODR.ACCDATE  　BETWEEN @DATE_FROM AND @DATE_TO")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
-        sqlStr.AppendLine(" GROUP BY DTL.OILCODE")
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-                .Add("@ACTUALDATE_FROM", SqlDbType.Date).Value = dateFrom
-                .Add("@ACTUALDATE_TO", SqlDbType.Date).Value = dateTo
+                .Add("@DATE_FROM", SqlDbType.Date).Value = dateFrom
+                .Add("@DATE_TO", SqlDbType.Date).Value = dateTo
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
             End With
@@ -614,16 +625,23 @@ Public Class OIT0004OilStockCreate
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 If sqlDr.HasRows Then
                     Dim oilCode As String
-                    Dim avaVal As Decimal = 0D
+                    Dim recvVal As Decimal = 0D
+                    Dim targetDate As String = ""
                     While sqlDr.Read
                         oilCode = Convert.ToString(sqlDr("OILCODE"))
                         '油種未設定または対象油種を持っていないレコードはスキップ
                         If oilCode = "" OrElse retVal.StockList.ContainsKey(oilCode) Then
                             Continue While
                         End If
-
-                        avaVal = Decimal.Parse(Convert.ToString(sqlDr("SHIPAVERAGE")))
-                        retVal.StockList(oilCode).LastShipmentAve = avaVal
+                        targetDate = Convert.ToString(sqlDr("TARGETDATE"))
+                        With retVal.StockList(oilCode)
+                            If .StockItemList.ContainsKey(targetDate) Then
+                                recvVal = Decimal.Parse(Convert.ToString(sqlDr("CARSAMOUNT")))
+                                With .StockItemList(targetDate)
+                                    .Receive = recvVal
+                                End With
+                            End If
+                        End With
 
                     End While
                 End If
@@ -639,6 +657,8 @@ Public Class OIT0004OilStockCreate
     ''' <returns></returns>
     ''' <remarks>TODO 一旦FromとToは表示日付From Toから7日引いたものとする</remarks>
     Private Function GetLastShipAverage(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        'これもしかすると在庫テーブルから先週の払出量かと
+        'オーダーは受入数な気がする(Consigneeしかないので)
         Dim sqlStr As New StringBuilder
         Dim retVal = dispData
         '検索値の設定
@@ -1871,6 +1891,11 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property OilTypeList As Dictionary(Of String, OilItem)
         ''' <summary>
+        ''' 列車リストアイテム
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TrainList As Dictionary(Of String, TrainListItem)
+        ''' <summary>
         ''' 在庫一覧日付部分
         ''' </summary>
         ''' <returns></returns>
@@ -1942,6 +1967,7 @@ Public Class OIT0004OilStockCreate
                        officeCode As String, consigneeCode As String)
             Me.SalesOffice = officeCode
             Me.Consignee = consigneeCode
+            Me.TrainList = trainList
             '******************************
             'コンストラクタ引数チェック
             '(一旦呼出し元にスローします)
@@ -2081,12 +2107,23 @@ Public Class OIT0004OilStockCreate
         ''' <summary>
         ''' 在庫表再計算処理
         ''' </summary>
+        ''' <param name="needsSumSuggestValue">提案数を再計算にい含めるか(True(デフォルト):含める,False:含めない)</param>
+        ''' <param name="procOilCode">再計算対象油種、未指定時は全油種処理、指定時はその油種のみ</param>
+        ''' <param name="procDay">再計算対象日、未指定時は全日付対象</param>
         ''' <remarks>外部用呼出メソッド</remarks>
-        Public Sub RecalcStockList(Optional needsSumSuggestValue As Boolean = True)
+        Public Sub RecalcStockList(Optional needsSumSuggestValue As Boolean = True, Optional procOilCode As String = "", Optional procDay As String = "")
             '日付毎のループ
             For Each stockListItm In Me.StockList.Values
+                '再計算対象油種を指定した場合、一致するまでスキップ
+                If procOilCode <> "" AndAlso procOilCode <> stockListItm.OilInfo.OilCode Then
+                    Continue For
+                End If
                 '当日の油種ごとのオブジェクトループ
                 For Each itm In stockListItm.StockItemList.Values
+                    '再計算対象日を指定した場合、一致するまでスキップ
+                    If procDay <> "" AndAlso itm.DaysItem.KeyString <> procDay Then
+                        Continue For
+                    End If
                     Dim itmDate As String = itm.DaysItem.KeyString
                     Dim oilCode As String = stockListItm.OilTypeCode
                     Dim decSendVal As Decimal = Decimal.Parse(itm.Send)
@@ -2149,8 +2186,48 @@ Public Class OIT0004OilStockCreate
         ''' <param name="inventoryDays">在庫維持日数</param>
         ''' <remarks>外部呼出用メソッド</remarks>
         Public Sub AutoSuggest(inventoryDays As Integer)
+            Return
+            'TODO inventoryDaysの意味合い0ありにして0は先頭日か？
+            '一旦0あり先頭
             '提案表部分の値を0クリア
             SuggestValueInputValueToZero()
+            Dim fromDay As String = Me.StockDate.First.Value.KeyString
+            Dim toDay As String = Me.StockDate.First.Value.ItemDate.AddDays(inventoryDays).ToString("yyyy/MM/dd")
+            '過去日を除く開始日＋inventryDaysが処理条件
+            Dim targetDays = From itm In Me.StockDate
+                             Where itm.Key >= fromDay AndAlso
+                                   itm.Key <= toDay AndAlso
+                                   itm.Value.IsPastDay = False
+                             Order By itm.Key
+                             Select itm.Key
+            '処理日付が無ければそのまま終了
+            If targetDays.Any = False Then
+                Return
+            End If
+            '一旦提案数を0クリア
+            Me.SuggestValueInputValueToZero()
+            '一旦0で提案数0で再計算(全体)
+            Me.RecalcStockList()
+            Dim suggestItem As SuggestItem
+            'Dim suggestTrainItem As aaa
+            '処理日付のループ
+            For Each targetDay In targetDays
+                If Me.SuggestList.ContainsKey(targetDay) = False Then
+                    Continue For
+                End If
+                '対象日の列車・油種別の提案リスト取得
+                suggestItem = Me.SuggestList(targetDay)
+                '列車別ループ
+                For Each trainInfo In Me.TrainList.Values
+                    'Dim suggestTrainItem = suggestItem.SuggestOrderItem(trainInfo.TrainNo)
+                    '油種別ループ
+                    For Each oilItem In Me.OilTypeList
+
+
+
+                    Next oilItem
+                Next trainInfo
+            Next targetDay
         End Sub
 
         ''' <summary>

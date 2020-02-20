@@ -205,6 +205,7 @@ Public Class GRIS0005LeftBox
         LP_ORDERTYPE
         LP_PRODUCTSEGLIST
         LP_ADDITINALCONDITION
+        LP_ADDITINALSORTORDER
         LP_RINKAITRAIN_INLIST
         LP_RINKAITRAIN_OUTLIST
         LP_RINKAITRAIN_LINELIST
@@ -545,6 +546,15 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER
                 '本線列車番号
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TRAINNUMBER"
+                'デフォルトソート順設定 組織コード、着駅、積置フラグ、列車No（数値化）
+                Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "CAMPCODE, " &
+                                                                  "VALUE3," &
+                                                                  "VALUE13," &
+                    "CONVERT(decimal(16,2),case when isnumeric(VALUE1)=1 " &
+                                               "then VALUE1 else null end)"
+                '    "KEYCODE," &
+                '    "CONVERT(decimal(16,2),case when isnumeric(KEYCODE)=1 " &
+                '                               "then KEYCODE else null end)"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST
                 '品種パターン
@@ -1309,6 +1319,11 @@ Public Class GRIS0005LeftBox
                    Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION)) <> "" Then
                     GS0007FIXVALUElst.ADDITIONAL_CONDITION = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION))
                 End If
+                'FixValue抽出用のソート条件付与
+                If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALSORTORDER) AndAlso
+                   Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER)) <> "" Then
+                    GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER))
+                End If
                 GS0007FIXVALUElst.GS0007FIXVALUElst()
                 O_RTN = GS0007FIXVALUElst.ERR
                 lsbx = GS0007FIXVALUElst.LISTBOX1
@@ -1345,6 +1360,11 @@ Public Class GRIS0005LeftBox
                 If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALCONDITION) AndAlso
                    Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION)) <> "" Then
                     GS0007FIXVALUElst.ADDITIONAL_CONDITION = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALCONDITION))
+                End If
+                'FixValue抽出用のソート条件付与
+                If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALSORTORDER) AndAlso
+                   Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER)) <> "" Then
+                    GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER))
                 End If
                 retDt = GS0007FIXVALUElst.GS0007FIXVALUETbl()
                 O_RTN = GS0007FIXVALUElst.ERR

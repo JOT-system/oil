@@ -292,7 +292,7 @@ Public Class OIT0003OrderLinkQuota
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
             & "        VIW0003.ORGCODE    = @P1" _
             & "    AND VIW0003.OFFICECODE = OIT0004.OFFICECODE " _
-            & "  WHERE OIT0004.AVAILABLEYMD < @P2" _
+            & "  WHERE OIT0004.AVAILABLEYMD <= @P2" _
             & "    AND OIT0004.STATUS       = '1'"
 
         '& "  WHERE OIT0004.OFFICECODE = @P1" _
@@ -310,9 +310,9 @@ Public Class OIT0003OrderLinkQuota
             SQLStr &= String.Format("    AND OIT0004.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODE.Text)
         End If
         '列車番号
-        If Not String.IsNullOrEmpty(work.WF_SEL_TRAIN.Text) Then
-            SQLStr &= String.Format("    AND OIT0004.TRAINNO = '{0}'", work.WF_SEL_TRAIN.Text)
-        End If
+        'If Not String.IsNullOrEmpty(work.WF_SEL_TRAIN.Text) Then
+        '    SQLStr &= String.Format("    AND OIT0004.TRAINNO = '{0}'", work.WF_SEL_TRAIN.Text)
+        'End If
         '貨車連結順序表№(一度設定した貨車連結順序表№があれば紐づけを実施)
         If Not String.IsNullOrEmpty(work.WF_SEL_LINKNO.Text) Then
             SQLStr &= String.Format("    AND OIT0004.LINKNO = '{0}'", work.WF_SEL_LINKNO.Text)

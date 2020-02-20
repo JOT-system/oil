@@ -562,10 +562,7 @@
                     </div>
                 </div>
                 <!-- 一覧レイアウト -->
-                
-                    <asp:panel id="pnlListArea1" runat="server" ></asp:panel>
-                
-
+                <asp:panel id="pnlListArea1" runat="server" ></asp:panel>
             </asp:View>
 
             <!-- ■ Tab No2　入換・積込指示　■ -->
@@ -587,10 +584,12 @@
                 <!-- ボタン -->
                 <div class="actionButtonBox">
                     <div class="leftSide">
+<%-- 20200219_タンク車明細での明細の追加・削除などは想定しないため削除
                         <input type="button" id="WF_ButtonALLSELECT_TAB3" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT_TAB3');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED_TAB3" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB3');" />
                         <input type="button" id="WF_ButtonLINE_LIFTED_TAB3" class="btn-sticky" value="行削除" onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB3');" />
                         <input type="button" id="WF_ButtonLINE_ADD_TAB3" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB3');" />
+--%>
                     </div>
                     <div class="rightSide">
                         <input type="button" id="WF_ButtonUPDATE_TAB3" class="btn-sticky" value="明細更新"  onclick="ButtonClick('WF_ButtonUPDATE_TAB3');" />

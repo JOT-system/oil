@@ -680,7 +680,7 @@ Public Class GRIS0005LeftBox
                      New LeftTableDefItem("VALUE5", "油種"),
                      New LeftTableDefItem("VALUE11", "積車", 4),
                      New LeftTableDefItem("KEYCODE", "車番", 5, True) With {.IsNumericField = True},
-                     New LeftTableDefItem("VALUE1", "型式", 7),
+                     New LeftTableDefItem("VALUE1", "型式", 6),
                      New LeftTableDefItem("VALUE3", "交換日")}
 
             Case Else

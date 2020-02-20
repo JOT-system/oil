@@ -218,6 +218,12 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "LINE") {
             document.getElementById('WF_LeftMViewChange').value = 49;
         }
+        else if (fieldNM === "SECONDCONSIGNEENAME") {
+            document.getElementById('WF_LeftMViewChange').value = 43;
+        }
+        else if (fieldNM === "SECONDARRSTATIONNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 51;
+        }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 
             || fieldNM === "ACTUALARRDATE" 

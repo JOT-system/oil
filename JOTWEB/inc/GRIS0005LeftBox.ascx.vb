@@ -132,6 +132,7 @@ Public Class GRIS0005LeftBox
         LC_RINKAITRAIN_OUTLIST
         LC_RINKAITRAIN_LINELIST
         LC_DEPARRSTATIONLIST
+        LC_STATIONCODE_FOCUSON
     End Enum
 
     ''' <summary>
@@ -208,6 +209,7 @@ Public Class GRIS0005LeftBox
         LP_RINKAITRAIN_OUTLIST
         LP_RINKAITRAIN_LINELIST
         LP_DEPARRSTATIONLIST
+        LP_STATIONCODE_FOCUSON
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -521,8 +523,12 @@ Public Class GRIS0005LeftBox
             '    Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "MODELPATTERN"
             '    lbox = createFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_STATIONCODE
-                '貨物駅パターン
+                '貨物駅パターン(全貨物駅)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STATIONPATTERN"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON
+                '貨物駅パターン(使用駅のみ)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STATIONFOCUSON"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER
                 'タンク車番号

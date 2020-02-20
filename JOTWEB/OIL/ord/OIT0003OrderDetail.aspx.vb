@@ -6586,10 +6586,12 @@ Public Class OIT0003OrderDetail
 
             'タブ「タンク車割当」　　⇒　(一覧)荷主, (一覧)油種, (一覧)タンク車№
             'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線
-            'タブ「タンク車明細」　　⇒　(一覧)(実績)積込日, (実績)発日, (実績)積車着日, (実績)受入日, (実績)空車着日
+            'タブ「タンク車明細」　　⇒　(一覧)(実績)積込日, (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)空車着日
+            '                            (一覧)第2着駅, (一覧)第2荷受人
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO",
                  "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE",
-                 "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE"
+                 "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE",
+                 "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -6618,30 +6620,42 @@ Public Class OIT0003OrderDetail
 
                             '油種名を一覧に設定
                         ElseIf WF_FIELD.Value = "OILNAME" Then
-                            updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
-                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                            If WW_SETVALUE = "" Then
+                                updHeader.Item("OILCODE") = ""
+                                updHeader.Item(WF_FIELD.Value) = ""
+                            Else
+                                updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
+                                updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                            End If
 
                             '〇 タンク車割当状況チェック
                             WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
 
                             '油種名(受発注用)を一覧に設定
                         ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
-                            updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
-                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
-
-                            '〇営業所配下情報を取得・設定
-                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                                '〇 画面(受注営業所).テキストボックスが未設定
-                                If TxtOrderOffice.Text = "" Then
-                                    WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
-                                Else
-                                    WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
-                                End If
+                            If WW_SETVALUE = "" Then
+                                updHeader.Item("OILCODE") = ""
+                                updHeader.Item(WF_FIELD.Value) = ""
+                                updHeader.Item("OILNAME") = ""
+                                updHeader.Item("ORDERINGTYPE") = ""
                             Else
-                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                                updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
+                                updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                                '〇営業所配下情報を取得・設定
+                                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                                    '〇 画面(受注営業所).テキストボックスが未設定
+                                    If TxtOrderOffice.Text = "" Then
+                                        WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                                    Else
+                                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                                    End If
+                                Else
+                                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                                End If
+                                updHeader.Item("OILNAME") = WW_GetValue(2)
+                                updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
                             End If
-                            updHeader.Item("OILNAME") = WW_GetValue(2)
-                            updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
 
                             '〇 タンク車割当状況チェック
                             WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
@@ -6743,15 +6757,26 @@ Public Class OIT0003OrderDetail
                             '〇 タンク車割当状況チェック
                             WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
 
-                            '積込入線列車番号を一覧に設定
-                        ElseIf WF_FIELD.Value = "LOADINGIRILINETRAINNO" Then
-                            updHeader.Item("LOADINGIRILINETRAINNAME") = WW_SETTEXT
-                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
 
-                            '積込出線列車番号を一覧に設定
-                        ElseIf WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
-                            updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_SETTEXT
-                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+                            '(一覧)第2着駅
+                        ElseIf WF_FIELD.Value = "SECONDARRSTATIONNAME" Then
+                            updHeader.Item("SECONDARRSTATION") = WW_SETVALUE
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                            '(一覧)第2荷受人
+                        ElseIf WF_FIELD.Value = "SECONDCONSIGNEENAME" Then
+                            updHeader.Item("SECONDCONSIGNEECODE") = WW_SETVALUE
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                            '    '積込入線列車番号を一覧に設定
+                            'ElseIf WF_FIELD.Value = "LOADINGIRILINETRAINNO" Then
+                            '    updHeader.Item("LOADINGIRILINETRAINNAME") = WW_SETTEXT
+                            '    updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+
+                            '    '積込出線列車番号を一覧に設定
+                            'ElseIf WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
+                            '    updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_SETTEXT
+                            '    updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
 
                         End If
                         'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -6880,7 +6905,8 @@ Public Class OIT0003OrderDetail
                         If IsNothing(updHeader) Then Exit Sub
 
                         '〇 一覧項目へ設定
-                        '(実績)積込日, (実績)発日, (実績)積車積込日, (実績)受入日, (実績)空車着日を一覧に設定
+                        '(一覧)(実績)積込日, (一覧)(実績)発日, (一覧)(実績)積車積込日, 
+                        '(一覧)(実績)受入日, (一覧)(実績)空車着日を一覧に設定
                         If WF_FIELD.Value = "ACTUALLODDATE" _
                             OrElse WF_FIELD.Value = "ACTUALDEPDATE" _
                             OrElse WF_FIELD.Value = "ACTUALARRDATE" _
@@ -6897,6 +6923,16 @@ Public Class OIT0003OrderDetail
                                 End If
                             Catch ex As Exception
                             End Try
+
+                            '(一覧)第2着駅
+                        ElseIf WF_FIELD.Value = "SECONDARRSTATIONNAME" Then
+                            updHeader.Item("SECONDARRSTATION") = WW_SETVALUE
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                            '(一覧)第2荷受人
+                        ElseIf WF_FIELD.Value = "SECONDCONSIGNEENAME" Then
+                            updHeader.Item("SECONDCONSIGNEECODE") = WW_SETVALUE
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
                         End If
 
@@ -7222,7 +7258,7 @@ Public Class OIT0003OrderDetail
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
-            WF_Dtab01.Enabled = False
+            WF_Dtab01.Enabled = True
             WF_Dtab02.Enabled = True
             WF_Dtab03.Enabled = False
             WF_Dtab04.Enabled = False
@@ -9507,11 +9543,39 @@ Public Class OIT0003OrderDetail
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") Then
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                             End If
                         Next
                     Next
+
+                    '受注進行ステータス＝"200:手配中"
+                    '受注進行ステータス＝"210:手配中(入換指示手配済)"
+                    '受注進行ステータス＝"220:手配中(積込指示手配済)"
+                    '受注進行ステータス＝"230:手配中(託送指示手配済)"
+                    '受注進行ステータス＝"240:手配中(入換指示未手配)"
+                    '受注進行ステータス＝"250:手配中(積込指示未手配)"
+                    '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+                    For Each rowitem As TableRow In tblObj.Rows
+                        For Each cellObj As TableCell In rowitem.Controls
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            End If
+                        Next
+                    Next
+
                     '受注進行ステータスが"受注受付"以外の場合
                 Else
                     For Each rowitem As TableRow In tblObj.Rows
@@ -9612,7 +9676,9 @@ Public Class OIT0003OrderDetail
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                         End If
                     Next

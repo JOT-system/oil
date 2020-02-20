@@ -1295,12 +1295,19 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '油種名(受発注用)を一覧に設定
                 ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
-                    updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
-                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+                    If WW_SETVALUE = "" Then
+                        updHeader.Item("OILCODE") = ""
+                        updHeader.Item(WF_FIELD.Value) = ""
+                        updHeader.Item("OILNAME") = ""
+                        updHeader.Item("ORDERINGTYPE") = ""
+                    Else
+                        updHeader.Item("OILCODE") = WW_SETVALUE.Substring(0, 4)
+                        updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
-                    updHeader.Item("OILNAME") = WW_GetValue(2)
-                    updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
+                        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                        updHeader.Item("OILNAME") = WW_GetValue(2)
+                        updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
+                    End If
 
                     'タンク車№を一覧に設定
                 ElseIf WF_FIELD.Value = "TANKNO" Then

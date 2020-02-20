@@ -97,6 +97,11 @@ Public Class GS0007FIXVALUElst
     ''' </summary>
     ''' <returns></returns>
     Public Property ADDITIONAL_CONDITION As String = ""
+    ''' <summary>
+    ''' SQLのORDER BYの後にしてい未指定時はKEYCODEとなる
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ADDITIONAL_SORT_ORDER As String = ""
     Protected METHOD_NAME As String = "GS0007FIXVALUElst"
 
     Public Sub GS0007FIXVALUElst()
@@ -178,7 +183,12 @@ Public Class GS0007FIXVALUElst
                 If ADDITIONAL_CONDITION <> "" Then
                     SQLStr = SQLStr & " " & ADDITIONAL_CONDITION & " "
                 End If
-                SQLStr = SQLStr & " ORDER BY KEYCODE "
+                If Me.ADDITIONAL_SORT_ORDER <> "" Then
+                    SQLStr = SQLStr & " ORDER BY " & Me.ADDITIONAL_SORT_ORDER & " "
+                Else
+                    SQLStr = SQLStr & " ORDER BY KEYCODE "
+                End If
+
             Else
                 SQLStr =
                       " SELECT                           " _
@@ -197,7 +207,11 @@ Public Class GS0007FIXVALUElst
                 If ADDITIONAL_CONDITION <> "" Then
                     SQLStr = SQLStr & " " & ADDITIONAL_CONDITION & " "
                 End If
-                SQLStr = SQLStr & " ORDER BY KEYCODE "
+                If Me.ADDITIONAL_SORT_ORDER <> "" Then
+                    SQLStr = SQLStr & " ORDER BY " & Me.ADDITIONAL_SORT_ORDER & " "
+                Else
+                    SQLStr = SQLStr & " ORDER BY KEYCODE "
+                End If
             End If
 
             'If String.IsNullOrEmpty(CLAS) Then
@@ -371,7 +385,11 @@ Public Class GS0007FIXVALUElst
             If ADDITIONAL_CONDITION <> "" Then
                 sqlStat.AppendLine(ADDITIONAL_CONDITION)
             End If
-            sqlStat.AppendLine(" ORDER BY KEYCODE ")
+            If Me.ADDITIONAL_SORT_ORDER <> "" Then
+                sqlStat.AppendLine(" ORDER BY " & Me.ADDITIONAL_SORT_ORDER)
+            Else
+                sqlStat.AppendLine(" ORDER BY KEYCODE")
+            End If
         Else
             sqlStat.AppendLine("SELECT ")
             sqlStat.AppendLine("       rtrim(isnull(KEYCODE,''))  AS KEYCODE")
@@ -392,7 +410,11 @@ Public Class GS0007FIXVALUElst
             If ADDITIONAL_CONDITION <> "" Then
                 sqlStat.AppendLine(ADDITIONAL_CONDITION)
             End If
-            sqlStat.AppendLine(" ORDER BY KEYCODE ")
+            If Me.ADDITIONAL_SORT_ORDER <> "" Then
+                sqlStat.AppendLine(" ORDER BY " & Me.ADDITIONAL_SORT_ORDER)
+            Else
+                sqlStat.AppendLine(" ORDER BY KEYCODE")
+            End If
         End If
 
         Try

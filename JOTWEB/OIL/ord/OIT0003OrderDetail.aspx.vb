@@ -3161,7 +3161,8 @@ Public Class OIT0003OrderDetail
 
         End If
 
-        '○ GridView初期設定
+        '### START ######################################################
+        '★ GridView初期設定
         '○ 画面表示データ再取得(受注(明細)画面表示データ取得)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
@@ -3184,6 +3185,18 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
         Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTAB1TBL.Text)
+
+        '○ 画面表示データ再取得(タブ「入換・積込」表示データ取得)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGetTab2(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
+        '### END   ######################################################
 
         '〇 荷受人油種チェック
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -3854,16 +3867,25 @@ Public Class OIT0003OrderDetail
                     FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
         If IsNothing(updHeader) Then Exit Sub
 
+        '〇 一覧の件数取得
+        Dim intListCnt As Integer = OIT0003tbl_tab2.Rows.Count
+
         '○ 設定項目取得
         '対象フォーム項目取得
         Dim WW_ListValue = Request.Form("txt" & pnlListArea2.ID & WF_FIELD.Value & WF_GridDBclick.Text)
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
-            Case "LOADINGIRILINEORDER",     '(一覧)積込入線順
-                 "FILLINGPOINT",            '(一覧)充填ポイント
-                 "LOADINGOUTLETORDER"       '(一覧)積込出線順
+            Case "LOADINGIRILINEORDER"      '(一覧)積込入線順
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                updHeader.Item("LOADINGOUTLETORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)
+
+            Case "FILLINGPOINT"             '(一覧)充填ポイント
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+            Case "LOADINGOUTLETORDER"       '(一覧)積込出線順
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                updHeader.Item("LOADINGIRILINEORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)
 
             'Case "LOADINGIRILINETRAINNO"    '(一覧)積込入線列車番号
             '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
@@ -3976,15 +3998,15 @@ Public Class OIT0003OrderDetail
                 '入換・積込指示
                 WF_Dtab02.CssClass = "selected"
 
-                '○ 画面表示データ取得
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                ''○ 画面表示データ取得
+                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '    SQLcon.Open()       'DataBase接続
 
-                    MAPDataGetTab2(SQLcon)
-                End Using
+                '    MAPDataGetTab2(SQLcon)
+                'End Using
 
-                '○ 画面表示データ保存
-                Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+                ''○ 画面表示データ保存
+                'Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
 
             Case 2
                 'タンク車明細

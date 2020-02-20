@@ -267,7 +267,10 @@ Public Class OIT0003OrderDetail
             WW_ListTextBoxReadControl()
 
             '〇 受注進行ステータスが"手配完了"へ変更された場合
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
@@ -573,6 +576,8 @@ Public Class OIT0003OrderDetail
         '〇タブ「タンク車明細」表示用
         GridViewInitializeTab3()
 
+        '〇タンク車所在の更新
+        WW_TankShozaiSet()
 
     End Sub
 
@@ -1675,6 +1680,9 @@ Public Class OIT0003OrderDetail
         '〇 画面表示設定処理
         WW_ScreenEnabledSet()
 
+        '〇タンク車所在の更新
+        WW_TankShozaiSet()
+
     End Sub
 
     ''' <summary>
@@ -2767,6 +2775,13 @@ Public Class OIT0003OrderDetail
                     PARA14.Value = C_DEFAULT_YMD
 
                     SQLcmd.ExecuteNonQuery()
+
+                    '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                    '引数１：所在地コード　⇒　変更なし(空白)
+                    '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                    '引数３：積車区分　　　⇒　変更なし(空白)
+                    WW_UpdateTankShozai("", "3", "", OIT0003UPDrow("TANKNO"))
+
                 Else
                     i += 1
                     OIT0003UPDrow("LINECNT") = i        'LINECNT
@@ -3259,6 +3274,12 @@ Public Class OIT0003OrderDetail
             If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
                 WF_DTAB_CHANGE_NO.Value = "1"
                 WF_Detail_TABChange()
+
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("1"(発送))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                WW_UpdateTankShozai("", "1", "")
             End If
 
         End If
@@ -3877,15 +3898,29 @@ Public Class OIT0003OrderDetail
 
         Select Case WF_FIELD.Value
             Case "LOADINGIRILINEORDER"      '(一覧)積込入線順
-                updHeader.Item(WF_FIELD.Value) = WW_ListValue
-                updHeader.Item("LOADINGOUTLETORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)
+                '入力された値が0、または一覧の件数より大きい場合
+                If Integer.Parse(WW_ListValue) = 0 _
+                    OrElse Integer.Parse(WW_ListValue) > intListCnt Then
+                    updHeader.Item(WF_FIELD.Value) = ""
+                    updHeader.Item("LOADINGOUTLETORDER") = ""
+                Else
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                    updHeader.Item("LOADINGOUTLETORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)
+                End If
 
             Case "FILLINGPOINT"             '(一覧)充填ポイント
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
             Case "LOADINGOUTLETORDER"       '(一覧)積込出線順
-                updHeader.Item(WF_FIELD.Value) = WW_ListValue
-                updHeader.Item("LOADINGIRILINEORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)
+                '入力された値が0、または一覧の件数より大きい場合
+                If Integer.Parse(WW_ListValue) = 0 _
+                    OrElse Integer.Parse(WW_ListValue) > intListCnt Then
+                    updHeader.Item(WF_FIELD.Value) = ""
+                    updHeader.Item("LOADINGIRILINEORDER") = ""
+                Else
+                    updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                    updHeader.Item("LOADINGIRILINEORDER") = (intListCnt - Integer.Parse(WW_ListValue) + 1)
+                End If
 
             'Case "LOADINGIRILINETRAINNO"    '(一覧)積込入線列車番号
             '    updHeader.Item(WF_FIELD.Value) = WW_ListValue
@@ -6324,6 +6359,99 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' (タンク車所在TBL)所在地の内容を更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
+                                      ByVal I_STATUS As String,
+                                      ByVal I_KBN As String,
+                                      Optional ByVal I_TANKNO As String = Nothing)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLの託送指示フラグを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0005_SHOZAI " _
+                    & "    SET "
+
+            '○ 更新内容が指定されていれば追加する
+            '所在地コード
+            If Not String.IsNullOrEmpty(I_LOCATION) Then
+                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+            End If
+            'タンク車状態コード
+            If Not String.IsNullOrEmpty(I_STATUS) Then
+                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+            End If
+            '積車区分
+            If Not String.IsNullOrEmpty(I_KBN) Then
+                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+
+            SQLStr &=
+                      "        UPDYMD       = @P11, " _
+                    & "        UPDUSER      = @P12, " _
+                    & "        UPDTERMID    = @P13, " _
+                    & "        RECEIVEYMD   = @P14  " _
+                    & "  WHERE TANKNUMBER   = @P01  " _
+                    & "    AND DELFLG      <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA02.Value = C_DELETE_FLG.DELETE
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            If I_TANKNO = "" Then
+                '(一覧)で設定しているタンク車をKEYに更新
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    PARA01.Value = OIT0003row("TANKNO")
+                    SQLcmd.ExecuteNonQuery()
+                Next
+            Else
+                '指定されたタンク車№をKEYに更新
+                PARA01.Value = I_TANKNO
+                SQLcmd.ExecuteNonQuery()
+
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TANKSHOZAI UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TANKSHOZAI UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
     ''' (受注TBL)託送指示フラグ更新
     ''' </summary>
     ''' <remarks></remarks>
@@ -7366,8 +7494,6 @@ Public Class OIT0003OrderDetail
         End Select
     End Sub
 
-
-
     ''' <summary>
     ''' 画面表示設定処理
     ''' </summary>
@@ -7551,6 +7677,7 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             TxtActualEmparrDate.Enabled = False
 
+
             '550:検収済
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 Then
             '600:費用確定
@@ -7573,6 +7700,101 @@ Public Class OIT0003OrderDetail
             TxtActualAccDate.Enabled = True
             '(実績)空車着日
             TxtActualEmparrDate.Enabled = True
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' タンク車所在設定処理
+    ''' </summary>
+    Protected Sub WW_TankShozaiSet()
+
+        '〇タンク車所在の更新
+        '受注進行ステータスが以下の場合
+        '100:受注受付, 200:手配, 210:手配中（入換指示手配済）, 220:手配中（積込指示手配済）
+        '230:手配中（託送指示手配済）, 240:手配中（入換指示未手配）, 250:手配中（積込指示未手配）
+        '260:手配中（託送指示未手配）
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+
+            '### 特になし ###############################################################
+
+            '受注進行ステータスが「270:手配完了」の場合
+            '270:手配完了
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+
+            '### 特になし ###############################################################
+
+            '受注進行ステータスが「300:受注確定」の場合
+            '300:受注確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            '引数１：所在地コード　⇒　変更なし(空白)
+            '引数２：タンク車状態　⇒　変更なし(空白)
+            '引数３：積車区分　　　⇒　変更あり("F"(積車))
+            WW_UpdateTankShozai("", "", "F")
+
+            '(実績)発日の入力が完了
+            If Me.TxtActualDepDate.Text <> "" Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                WW_UpdateTankShozai(TxtArrstationCode.Text, "2", "")
+            End If
+
+            '受注進行ステータスが「400:受入確認中」の場合
+            '400:受入確認中
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 Then
+            '★タンク車所在の更新
+            '引数１：所在地コード　⇒　変更あり(着駅)
+            '引数２：タンク車状態　⇒　変更あり("3"(到着))
+            '引数３：積車区分　　　⇒　変更なし(空白)
+            WW_UpdateTankShozai(TxtArrstationCode.Text, "3", "")
+
+            '(実績)受入日の入力が完了
+            If Me.TxtActualAccDate.Text <> "" Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更なし(空白)
+                '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                WW_UpdateTankShozai("", "", "E")
+            End If
+
+            '受注進行ステータスが「500:検収中」の場合
+            '500:検収中
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
+            '★タンク車所在の更新
+            '引数１：所在地コード　⇒　変更あり(発駅)
+            '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+            '引数３：積車区分　　　⇒　変更あり("E"(空車))
+            WW_UpdateTankShozai(TxtDepstationCode.Text, "3", "E")
+
+            '550:検収済
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 Then
+            '### 特になし ###############################################################
+
+            '600:費用確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 Then
+            '### 特になし ###############################################################
+
+            '700:経理未計上
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 Then
+            '### 特になし ###############################################################
+
+            '800:経理計上
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 Then
+            '### 特になし ###############################################################
+
+            '900:受注キャンセル
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+            '### 特になし ###############################################################
+
         End If
 
     End Sub

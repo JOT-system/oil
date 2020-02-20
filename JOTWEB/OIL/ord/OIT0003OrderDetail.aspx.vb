@@ -2693,6 +2693,8 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     Protected Sub WW_ButtonLINE_LIFTED_TAB1()
 
+        Dim SelectChk As Boolean = False
+
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
 
@@ -2742,17 +2744,22 @@ Public Class OIT0003OrderDetail
             '選択されている行は削除対象
             Dim i As Integer = 0
             Dim j As Integer = 9000
-            For Each OIT0001UPDrow In OIT0003tbl.Rows
-                If OIT0001UPDrow("OPERATION") = "on" Then
-                    j += 1
-                    OIT0001UPDrow("LINECNT") = j        'LINECNT
-                    OIT0001UPDrow("DELFLG") = C_DELETE_FLG.DELETE
-                    OIT0001UPDrow("HIDDEN") = 1
+            For Each OIT0003UPDrow In OIT0003tbl.Rows
+                If OIT0003UPDrow("OPERATION") = "on" Then
 
-                    PARA01.Value = OIT0001UPDrow("ORDERNO")
-                    PARA02.Value = OIT0001UPDrow("DETAILNO")
-                    PARA03.Value = OIT0001UPDrow("LINKNO")
-                    PARA04.Value = OIT0001UPDrow("LINKDETAILNO")
+                    If OIT0003UPDrow("LINECNT") < 9000 Then
+                        SelectChk = True
+                    End If
+
+                    j += 1
+                    OIT0003UPDrow("LINECNT") = j        'LINECNT
+                    OIT0003UPDrow("DELFLG") = C_DELETE_FLG.DELETE
+                    OIT0003UPDrow("HIDDEN") = 1
+
+                    PARA01.Value = OIT0003UPDrow("ORDERNO")
+                    PARA02.Value = OIT0003UPDrow("DETAILNO")
+                    PARA03.Value = OIT0003UPDrow("LINKNO")
+                    PARA04.Value = OIT0003UPDrow("LINKDETAILNO")
 
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
@@ -2762,9 +2769,17 @@ Public Class OIT0003OrderDetail
                     SQLcmd.ExecuteNonQuery()
                 Else
                     i += 1
-                    OIT0001UPDrow("LINECNT") = i        'LINECNT
+                    OIT0003UPDrow("LINECNT") = i        'LINECNT
                 End If
             Next
+
+            '行削除が1件でも実施された場合
+            If SelectChk = True Then
+                '貨物駅入線順に入力している値をクリアする。
+                For Each OIT0003UPDrow In OIT0003tbl.Rows
+                    OIT0003UPDrow("LINEORDER") = ""
+                Next
+            End If
 
             'CLOSE
             SQLcmd.Dispose()
@@ -2786,7 +2801,11 @@ Public Class OIT0003OrderDetail
         Master.SaveTable(OIT0003tbl)
 
         '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If SelectChk = False Then
+            Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        Else
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 
@@ -8854,18 +8873,21 @@ Public Class OIT0003OrderDetail
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.TRAINNO         = @P02 " _
             & "   AND OIT0002.DEPDATE         = @P03 " _
-            & "   AND OIT0002.DELFLG         <> @P04 "
+            & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
+            & "   AND OIT0002.DELFLG         <> @P05 "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA2.Value = Me.TxtTrainNo.Text
                 PARA3.Value = Me.TxtDepDate.Text
-                PARA4.Value = C_DELETE_FLG.DELETE
+                PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARA5.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

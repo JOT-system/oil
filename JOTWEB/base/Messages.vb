@@ -481,6 +481,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_ORDER_REPEAT_ERROR As String = "20023"
 
+        ''' <summary>
+        ''' 油種数登録ボタン未使用(新規登録時において)
+        ''' </summary>
+        Public Const OIL_OILREGISTER_NOTUSE As String = "20024"
+
 #End Region
 
 

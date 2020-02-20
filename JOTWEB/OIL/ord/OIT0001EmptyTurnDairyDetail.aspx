@@ -129,6 +129,13 @@
                     <asp:TextBox ID="TxtAccDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
+            <!-- ■　(予定)空車着日　■ -->
+            <span>
+                <a id="WF_EMPARRDATE_LABEL" class="requiredMark">空車着日</a>
+                <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                    <asp:TextBox ID="TxtEmparrDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                </a>
+            </span>
             
         </div> <!-- End commonHeaderInput -->
         <div class="summaryAreaWrapper">
@@ -297,6 +304,8 @@
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
             <!-- 新規・更新切替用フラグ -->
             <input id="WF_CREATEFLG" runat="server" value="" type="text" />
+            <!-- 油種数登録ボタン押下フラグ(True:有効, False：無効) -->
+            <input id="WF_ButtonInsertFLG" runat="server" value="" type="text" />
         </div>
 </asp:Content>
 

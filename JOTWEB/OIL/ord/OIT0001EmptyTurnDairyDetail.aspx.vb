@@ -38,9 +38,9 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
 
-    Private WW_ORDERINFOFLG_10 As Boolean = False                        '受注情報セット可否(情報(10:積置))
-    Private WW_ORDERINFOALERMFLG_80 As Boolean = False                   '受注情報セット可否(警告(80:タンク車数オーバー))
-    Private WW_ORDERINFOALERMFLG_82 As Boolean = False                   '受注情報セット可否(警告(82:検査間近あり))
+    Private WW_ORDERINFOFLG_10 As Boolean = False                   '受注情報セット可否(情報(10:積置))
+    Private WW_ORDERINFOALERMFLG_80 As Boolean = False              '受注情報セット可否(警告(80:タンク車数オーバー))
+    Private WW_ORDERINFOALERMFLG_82 As Boolean = False              '受注情報セット可否(警告(82:検査間近あり))
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -156,6 +156,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""
         WF_RightboxOpen.Value = ""
+        WF_ButtonInsertFLG.Value = "FALSE"
         rightview.ResetIndex()
         leftview.ActiveListBox()
 
@@ -199,6 +200,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         TxtArrDate.Text = work.WF_SEL_LOADINGCAR_ARRIVALDATE.Text
         '(予定)受入日
         TxtAccDate.Text = work.WF_SEL_RECEIPTDATE.Text
+        '(予定)空車着日
+        TxtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
 
         '合計車数
         TxtTotalTank.Text = work.WF_SEL_TANKCARTOTAL.Text
@@ -737,6 +740,14 @@ Public Class OIT0001EmptyTurnDairyDetail
         If TxtTotalTank.Text = "0" Then
             Master.Output(C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             TxtHTank.Focus()
+
+            '〇 油種数登録ボタンのチェックを無効(False)
+            WF_ButtonInsertFLG.Value = "FALSE"
+
+        Else
+            '〇 油種数登録ボタンのチェックを有効(True)
+            WF_ButtonInsertFLG.Value = "TRUE"
+
         End If
 
         '○ 画面表示データ取得
@@ -956,6 +967,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                         '(予定)受入日
                         Case "TxtAccDate"
                             .WF_Calendar.Text = TxtAccDate.Text
+                        '(予定)空車着日
+                        Case "TxtEmparrDate"
+                            .WF_Calendar.Text = TxtEmparrDate.Text
                             ''返送日列車
                             'Case "RETURNDATETRAIN"
                             '    .WF_Calendar.Text = Date.Now.ToString("yyyy/MM/dd")
@@ -1030,6 +1044,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtDepDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
                 TxtArrDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
                 TxtAccDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                TxtEmparrDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
 
                 TxtHeadOfficeTrain.Focus()
             '発駅
@@ -1181,6 +1196,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtDepDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
                 TxtArrDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
                 TxtAccDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                TxtEmparrDate.Text = Now.AddDays(1 + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
 
                 '〇営業所配下情報を取得・設定
                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
@@ -1263,6 +1279,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtAccDate.Focus()
+
+            Case "TxtEmparrDate"           '(予定)空車着日
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                        TxtEmparrDate.Text = ""
+                    Else
+                        TxtEmparrDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                TxtEmparrDate.Focus()
 
                 '(一覧)荷主, (一覧)油種, (一覧)タンク車№, (一覧)返送日列車
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO", "RETURNDATETRAIN"
@@ -1442,6 +1471,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtArrDate.Focus()
             Case "TxtAccDate"           '(予定)受入日
                 TxtAccDate.Focus()
+            Case "TxtEmparrDate"        '(予定)空車着日
+                TxtEmparrDate.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -1849,6 +1880,14 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         Dim WW_RESULT As String = ""
 
+        '〇新規登録時で油種数登録ボタンを押下しているかチェック
+        If work.WF_SEL_CREATEFLG.Text = "1" _
+            AndAlso WF_ButtonInsertFLG.Value = "FALSE" Then
+
+            Master.Output(C_MESSAGE_NO.OIL_OILREGISTER_NOTUSE, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+
         '○関連チェック
         WW_Check(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
@@ -1928,8 +1967,6 @@ Public Class OIT0001EmptyTurnDairyDetail
         If Not isNormal(WW_ERRCODE) Then
             Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
         End If
-
-
 
     End Sub
 
@@ -2578,6 +2615,52 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
+        '(予定)空車着日
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EMPARRDATE", TxtEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            Try
+                Date.TryParse(TxtEmparrDate.Text, WW_STYMD)
+            Catch ex As Exception
+                WW_STYMD = CDate(C_DEFAULT_YMD)
+            End Try
+        Else
+            '年月日チェック
+            WW_CheckDate(TxtEmparrDate.Text, "(予定)空車着日", WW_CS0024FCHECKERR)
+            'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
+            TxtEmparrDate.Focus()
+            WW_CheckMES1 = "空車着日入力エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+
+        ''タンク車数の件数カウント用
+        'Dim intTankCnt As Integer = 0
+        'intTankCnt += Integer.Parse(TxtHTank.Text)
+        'intTankCnt += Integer.Parse(TxtRTank.Text)
+        'intTankCnt += Integer.Parse(TxtTTank.Text)
+        'intTankCnt += Integer.Parse(TxtMTTank.Text)
+        'intTankCnt += Integer.Parse(TxtKTank.Text)
+        'intTankCnt += Integer.Parse(TxtK3Tank.Text)
+        'intTankCnt += Integer.Parse(TxtK5Tank.Text)
+        'intTankCnt += Integer.Parse(TxtK10Tank.Text)
+        'intTankCnt += Integer.Parse(TxtLTank.Text)
+        'intTankCnt += Integer.Parse(TxtATank.Text)
+        'TxtTotalTank.Text = intTankCnt.ToString()
+
+        ''油種数が１つも入力されていない場合
+        'If TxtTotalTank.Text = "0" Then
+        '    Master.Output(C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '    TxtHTank.Focus()
+        '    WW_CheckMES1 = "油種数未入力エラー。"
+        '    WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR
+        '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+        '    O_RTN = "ERR"
+        '    Exit Sub
+        'End If
+
         '(一覧)タンク車No(重複チェック)
         Dim OIT0001tbl_DUMMY As DataTable = OIT0001tbl.Copy
         Dim OIT0001tbl_dv As DataView = New DataView(OIT0001tbl_DUMMY)
@@ -2598,6 +2681,21 @@ Public Class OIT0001EmptyTurnDairyDetail
             '行削除したデータの場合は退避しない。
             If Convert.ToString(drv("HIDDEN")) <> "1" Then
                 chkTankNo = Convert.ToString(drv("TANKNO"))
+            End If
+        Next
+
+        '(一覧)チェック
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+
+            '(一覧)受注油種(空白チェック)
+            If OIT0001row("ORDERINGOILNAME") = "" And OIT0001row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)受注油種", needsPopUp:=True)
+
+                WW_CheckMES1 = "受注油種未設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
+                O_RTN = "ERR"
+                Exit Sub
             End If
         Next
 
@@ -2723,6 +2821,17 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
+        '(予定)空車着日 と　現在日付を比較
+        iresult = Date.Parse(TxtEmparrDate.Text).CompareTo(DateTime.Today)
+        If iresult = -1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
+            TxtEmparrDate.Focus()
+            WW_CheckMES1 = "(予定日)過去日付エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
 
         '○ 日付妥当性チェック
         '例) iresult = dt1.Date.CompareTo(dt2.Date)
@@ -2761,6 +2870,18 @@ Public Class OIT0001EmptyTurnDairyDetail
         If iresult = 1 Then
             Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)積車着日 > (予定)受入日", needsPopUp:=True)
             TxtLoadingDate.Focus()
+            WW_CheckMES1 = "(予定日)入力エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '(予定)受入日 と　(予定)空車着日を比較
+        iresult = Date.Parse(TxtAccDate.Text).CompareTo(Date.Parse(TxtEmparrDate.Text))
+        If iresult = 1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日 > (予定)空車着日", needsPopUp:=True)
+            TxtEmparrDate.Focus()
             WW_CheckMES1 = "(予定日)入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
@@ -2932,7 +3053,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)積込日       =" & TxtLoadingDate.Text & " , "
         WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)発日         =" & TxtDepDate.Text & " , "
         WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)積車着日     =" & TxtArrDate.Text & " , "
-        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)受入日       =" & TxtAccDate.Text
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)受入日       =" & TxtAccDate.Text & " , "
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)空車着日     =" & TxtEmparrDate.Text
 
         rightview.SetErrorReport(WW_ERR_MES)
 

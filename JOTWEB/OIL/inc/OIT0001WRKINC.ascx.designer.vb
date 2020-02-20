@@ -192,7 +192,16 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_RECEIPTDATE As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_EMPARRDATE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_EMPARRDATE As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_REGULAR_TANKCAR コントロール。
     '''</summary>
@@ -372,7 +381,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CONSIGNEENAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_PATTERNCODE コントロール。
     '''</summary>
@@ -381,7 +390,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_PATTERNCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_PATTERNNAME コントロール。
     '''</summary>

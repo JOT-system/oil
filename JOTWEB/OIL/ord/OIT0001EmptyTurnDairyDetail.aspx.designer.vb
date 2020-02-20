@@ -158,6 +158,15 @@ Partial Public Class OIT0001EmptyTurnDairyDetail
     Protected WithEvents TxtAccDate As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtEmparrDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtEmparrDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtTotalTank コントロール。
     '''</summary>
     '''<remarks>
@@ -426,6 +435,15 @@ Partial Public Class OIT0001EmptyTurnDairyDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CREATEFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_ButtonInsertFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonInsertFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

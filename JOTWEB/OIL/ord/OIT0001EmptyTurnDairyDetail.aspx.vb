@@ -2635,32 +2635,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
-
-        ''タンク車数の件数カウント用
-        'Dim intTankCnt As Integer = 0
-        'intTankCnt += Integer.Parse(TxtHTank.Text)
-        'intTankCnt += Integer.Parse(TxtRTank.Text)
-        'intTankCnt += Integer.Parse(TxtTTank.Text)
-        'intTankCnt += Integer.Parse(TxtMTTank.Text)
-        'intTankCnt += Integer.Parse(TxtKTank.Text)
-        'intTankCnt += Integer.Parse(TxtK3Tank.Text)
-        'intTankCnt += Integer.Parse(TxtK5Tank.Text)
-        'intTankCnt += Integer.Parse(TxtK10Tank.Text)
-        'intTankCnt += Integer.Parse(TxtLTank.Text)
-        'intTankCnt += Integer.Parse(TxtATank.Text)
-        'TxtTotalTank.Text = intTankCnt.ToString()
-
-        ''油種数が１つも入力されていない場合
-        'If TxtTotalTank.Text = "0" Then
-        '    Master.Output(C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-        '    TxtHTank.Focus()
-        '    WW_CheckMES1 = "油種数未入力エラー。"
-        '    WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR
-        '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-
         '(一覧)タンク車No(重複チェック)
         Dim OIT0001tbl_DUMMY As DataTable = OIT0001tbl.Copy
         Dim OIT0001tbl_dv As DataView = New DataView(OIT0001tbl_DUMMY)

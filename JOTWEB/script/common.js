@@ -1813,7 +1813,10 @@ function ConvartWideCharToNormal(obj) {
     repVal = repVal.replace(/[．]/g, '.');
     repVal = repVal.replace(/[ー]/g, '-');
     repVal = repVal.replace(/[－]/g, '-');
+    repVal = repVal.replace(/，/g, '');
+    repVal = repVal.replace(/,/g, '');
     //repVal = repVal.replace(/[^0-9]/g, '');
-    repVal = repVal.match(/-?\d+\.?\d*/);
+    repVal = repVal.replace(/[^-^0-9^\.]/g, "");
+    //repVal = repVal.match(/-?\d+\.?\d*/);
     obj.value = repVal;
 }  

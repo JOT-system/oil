@@ -19,20 +19,20 @@ body:before {
   //  margin-top: 5px;
 }
 /* 4項目構えの最左を除く項目名フィールドを少し縮める */
-.commonHeaderInput > span:not(:nth-child(4n+1)) > a:nth-child(1) {
+.commonHeaderInput > span:not(:nth-child(5n+1)) > a:nth-child(1) {
     width:90px; /* 共通設定は115px */
 }
-.commonHeaderInput > span:not(:nth-child(4n+1)) {
+.commonHeaderInput > span:not(:nth-child(5n+1)) {
     /* 一項目の共通設定幅280px - (共通設定115px - 上記width) */
     width:255px;
 }
 .commonHeaderInput {
-    width:1080px;
+    width:1340px;
 }
 
 /* コンテンツの最小横幅 */
 .headerbox, .detailbox {
-    min-width: 1080px;
+    min-width: 1340px;
 }
 /* 下段の最小の高さ */
 .detailbox {
@@ -119,6 +119,7 @@ body:before {
 }
 /* 上部の入力欄の項目名の右寄せ */
 #WF_DEPDATE_LABEL, #WF_ARRSTATION_LABEL,
-#WF_ARRDATE_LABEL, #WF_ACCDATE_LABEL {
-    text-align:right;
+#WF_ARRDATE_LABEL, #WF_ACCDATE_LABEL,
+#WF_EMPARRDATE_LABEL {
+    text-align: right;
 }

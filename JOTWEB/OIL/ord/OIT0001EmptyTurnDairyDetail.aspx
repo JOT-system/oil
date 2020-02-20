@@ -65,7 +65,7 @@
                     <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="20"></asp:TextBox>
                 </a>
             </span>
-            <span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
             <!-- ■　本線列車　■ -->
             <span>
                 <a id="WF_HEADOFFICETRAIN_LABEL" class="requiredMark">本線列車</a>
@@ -74,7 +74,7 @@
                     <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                 </a>
             </span>
-            <span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
             <!-- ■　発駅　■ -->
             <span>
                 <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
@@ -101,6 +101,7 @@
                     <asp:Label ID="LblArrstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </span>
+            <span></span>
             <!-- ■　(予定)積込日　■ -->
             <span>
                 <a id="WF_LOADINGDATE_LABEL" class="requiredMark">(予定)積込日</a>

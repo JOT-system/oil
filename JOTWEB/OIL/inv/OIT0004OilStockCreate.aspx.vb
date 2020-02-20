@@ -2209,7 +2209,9 @@ Public Class OIT0004OilStockCreate
             '一旦0で提案数0で再計算(全体)
             Me.RecalcStockList()
             Dim suggestItem As SuggestItem
-            'Dim suggestTrainItem As aaa
+            Dim suggestTrainItem As SuggestItem.SuggestValues
+            Dim suggestTrainOilValue As SuggestItem.SuggestValue
+            Dim finishIncremental As Boolean = False
             '処理日付のループ
             For Each targetDay In targetDays
                 If Me.SuggestList.ContainsKey(targetDay) = False Then
@@ -2219,15 +2221,32 @@ Public Class OIT0004OilStockCreate
                 suggestItem = Me.SuggestList(targetDay)
                 '列車別ループ
                 For Each trainInfo In Me.TrainList.Values
-                    'Dim suggestTrainItem = suggestItem.SuggestOrderItem(trainInfo.TrainNo)
+                    If suggestItem.SuggestOrderItem.ContainsKey(trainInfo.TrainNo) = False Then
+                        Continue For
+                    End If
+                    suggestTrainItem = suggestItem.SuggestOrderItem(trainInfo.TrainNo)
+                    finishIncremental = False
                     '油種別ループ
-                    For Each oilItem In Me.OilTypeList
-
-
-
-                    Next oilItem
-                Next trainInfo
-            Next targetDay
+                    For Each oilItem In Me.OilTypeList.Values
+                        '列車最大牽引数を超えたら次の列車へ
+                        If suggestTrainItem.CanIncremental = False Then
+                            finishIncremental = True
+                            Exit For
+                        End If
+                        suggestTrainOilValue = suggestTrainItem(oilItem.OilCode)
+                        Dim currentVal As Decimal = Decimal.Parse(suggestTrainOilValue.ItemValue)
+                        suggestTrainOilValue.ItemValue = (currentVal + 1).ToString
+                        Me.RecalcStockList(procOilCode:=oilItem.OilCode, procDay:=targetDay)
+                        With Me.StockList(oilItem.OilCode).StockItemList(targetDay)
+                            '計算の結果空き容量が0の場合はインクリメント前に戻し次の油種へ
+                            If .FreeSpace < 0 Then
+                                suggestTrainOilValue.ItemValue = (currentVal).ToString
+                                Me.RecalcStockList(procOilCode:=oilItem.OilCode, procDay:=targetDay)
+                            End If
+                        End With
+                    Next oilItem 'end 油種別ループ
+                Next trainInfo 'end 列車別ループ
+            Next targetDay 'end 日付別ループ
         End Sub
 
         ''' <summary>
@@ -2288,13 +2307,16 @@ Public Class OIT0004OilStockCreate
                 Me.TrainInfo = trainInfo
 
             End Sub
-
+            ''' <summary>
+            ''' 構内取りデータの紐づけ
+            ''' </summary>
             Public Sub RelateMoveInside()
                 For Each suggestOrder In Me.SuggestOrderItem
                     Dim itm = Me.SuggestMiOrderItem(suggestOrder.Key)
                     suggestOrder.Value.MiSuggestValuesItem = itm.SuggestValuesItem
                 Next
             End Sub
+
             ''' <summary>
             ''' 受注提案タンク車数用数値情報格納クラス
             ''' </summary>
@@ -2349,7 +2371,21 @@ Public Class OIT0004OilStockCreate
                     Me.SuggestValuesItem.Add(oilInfo.OilCode, New SuggestValue _
                         With {.ItemValue = val, .OilInfo = oilInfo, .DayInfo = dayItm, .TrainInfo = trainInfo})
                 End Sub
-
+                ''' <summary>
+                ''' 列車最大牽引車数をオーバーせず追加できるか(True:追加可能,False：追加不可)
+                ''' </summary>
+                ''' <returns></returns>
+                Public Function CanIncremental() As Boolean
+                    Dim summaryNum As Decimal = (From itm In Me.SuggestValuesItem
+                                                 Where itm.Key <> SUMMARY_CODE
+                                                 Select If(IsNumeric(itm.Value.ItemValue), Decimal.Parse(itm.Value.ItemValue), 0D)
+                                                 ).Sum
+                    If Me.TrainInfo.MaxVolume <= summaryNum Then
+                        Return False
+                    Else
+                        Return True
+                    End If
+                End Function
             End Class
             ''' <summary>
             ''' 提案値クラス

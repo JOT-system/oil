@@ -3275,11 +3275,14 @@ Public Class OIT0003OrderDetail
                 WF_DTAB_CHANGE_NO.Value = "1"
                 WF_Detail_TABChange()
 
-                '★タンク車所在の更新
-                '引数１：所在地コード　⇒　変更なし(空白)
-                '引数２：タンク車状態　⇒　変更あり("1"(発送))
-                '引数３：積車区分　　　⇒　変更なし(空白)
-                WW_UpdateTankShozai("", "1", "")
+                '〇タンク車所在の更新
+                WW_TankShozaiSet()
+
+                ''★タンク車所在の更新
+                ''引数１：所在地コード　⇒　変更なし(空白)
+                ''引数２：タンク車状態　⇒　変更あり("1"(発送))
+                ''引数３：積車区分　　　⇒　変更なし(空白)
+                'WW_UpdateTankShozai("", "1", "")
             End If
 
         End If
@@ -7711,12 +7714,26 @@ Public Class OIT0003OrderDetail
 
         '〇タンク車所在の更新
         '受注進行ステータスが以下の場合
-        '100:受注受付, 200:手配, 210:手配中（入換指示手配済）, 220:手配中（積込指示手配済）
-        '230:手配中（託送指示手配済）, 240:手配中（入換指示未手配）, 250:手配中（積込指示未手配）
-        '260:手配中（託送指示未手配）
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
+        '100:受注受付
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+
+            '### 特になし ###############################################################
+
+            '受注進行ステータスが以下の場合
+            '200:手配
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
+
+            '★タンク車所在の更新
+            '引数１：所在地コード　⇒　変更なし(空白)
+            '引数２：タンク車状態　⇒　変更あり("1"(発送))
+            '引数３：積車区分　　　⇒　変更なし(空白)
+            WW_UpdateTankShozai("", "1", "")
+
+            '受注進行ステータスが以下の場合
+            '210:手配中（入換指示手配済）, 220:手配中（積込指示手配済）
+            '230:手配中（託送指示手配済）, 240:手配中（入換指示未手配）, 250:手配中（積込指示未手配）
+            '260:手配中（託送指示未手配）
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
@@ -7773,7 +7790,7 @@ Public Class OIT0003OrderDetail
             '引数１：所在地コード　⇒　変更あり(発駅)
             '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
             '引数３：積車区分　　　⇒　変更あり("E"(空車))
-            WW_UpdateTankShozai(TxtDepstationCode.Text, "3", "E")
+            WW_UpdateTankShozai(TxtDepstationCode.Text, "2", "E")
 
             '550:検収済
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 Then

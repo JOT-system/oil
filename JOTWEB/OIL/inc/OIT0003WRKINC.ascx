@@ -15,6 +15,8 @@
     <asp:TextBox ID="WF_SEL_SALESOFFICE" runat="server"></asp:TextBox>
     <!-- 年月日 -->
     <asp:TextBox ID="WF_SEL_DATE" runat="server"></asp:TextBox>
+    <!-- 発日 -->
+    <asp:TextBox ID="WF_SEL_SEARCH_DEPDATE" runat="server"></asp:TextBox>
     <!-- 列車番号 -->
     <asp:TextBox ID="WF_SEL_TRAINNUMBER" runat="server"></asp:TextBox>
     <!-- 荷卸地コード -->

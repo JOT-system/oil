@@ -77,6 +77,15 @@ Partial Public Class OIT0003OrderSearch
     Protected WithEvents TxtDateStart As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtDepDateStart コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtDepDateStart As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtTrainNumber コントロール。
     '''</summary>
     '''<remarks>
@@ -138,7 +147,7 @@ Partial Public Class OIT0003OrderSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -147,7 +156,7 @@ Partial Public Class OIT0003OrderSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.OIT0003WRKINC
-
+    
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>

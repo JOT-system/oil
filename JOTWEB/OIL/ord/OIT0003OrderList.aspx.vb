@@ -364,8 +364,11 @@ Public Class OIT0003OrderList
             & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
             & "        OIS0015_2.CLASS   = 'ORDERINFO' " _
             & "    AND OIS0015_2.KEYCODE = OIT0002.ORDERINFO " _
-            & " WHERE OIT0002.ORDERYMD   >= @P2" _
+            & " WHERE OIT0002.LODDATE    >= @P2" _
             & "   AND OIT0002.DELFLG     <> @P3"
+
+        '20200225(条件変更：登録年月日⇒(予定)積込日に変更)
+        '& " WHERE OIT0002.ORDERYMD   >= @P2" _
 
         '& " , ISNULL(RTRIM(OIS0015_2.VALUE1), '')                AS ORDERINFONAME" _
         '& " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
@@ -376,6 +379,10 @@ Public Class OIT0003OrderList
         '営業所
         If Not String.IsNullOrEmpty(work.WF_SEL_SALESOFFICECODE.Text) Then
             SQLStr &= String.Format("    AND OIT0002.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODE.Text)
+        End If
+        '発日('20200225(条件追加：(予定)発日))
+        If Not String.IsNullOrEmpty(work.WF_SEL_SEARCH_DEPDATE.Text) Then
+            SQLStr &= String.Format("    AND OIT0002.DEPDATE = '{0}'", work.WF_SEL_SEARCH_DEPDATE.Text)
         End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then

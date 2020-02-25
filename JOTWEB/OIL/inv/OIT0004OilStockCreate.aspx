@@ -127,7 +127,11 @@
                                 <ItemTemplate>
                                     <div class="values">
                                     <%--  列車 --%>
-                                    <div>
+                                    <div class="trainNo">
+                                        <div class="lockImgArea <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>">
+                                            <asp:HiddenField ID="hdnTrainLock" runat="server" 
+                                                Value='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>'  />
+                                        </div>
                                         <span data-tiptext='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.TrainName %>'><%# Eval("Key") %>
                                             <asp:HiddenField ID="hdnTrainId" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
                                         </span>
@@ -224,10 +228,12 @@
             <!-- 在庫表 -->
             <asp:Panel ID="pnlStockList" runat="server" >
                 <div class="listTitle">在庫表</div>
-                <div id="divStockList">
+                <div id="divStockList" class="full">
                     <!-- 1・2行目のヘッダー -->
                     <div class="header"> 
-                        <div id="divEmptyBox" class="emptyBox"></div>
+                        <div id="divEmptyBox" class="emptyBox">
+                            <div id="dispLorry"><span></span></div>
+                        </div>
                         <!-- 動的日付部の生成 -->
                         <asp:Repeater ID="repStockDate" runat="server">
                             <HeaderTemplate>
@@ -261,6 +267,9 @@
                                     <div><span>タンク容量</span></div>
                                     <div><span>目標在庫</span></div>
                                     <div><span>目標在庫率</span></div>
+                                    <div><span>80%在庫</span></div>
+                                    <div><span>D/S</span></div>
+                                    <div><span>前週出荷平均</span></div>
                                 </div>
 
                                 <div class="col3">
@@ -273,14 +282,6 @@
                                     <div> <%--目標在庫率値 --%>
                                         <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).TargetStockRate.ToString("P1") %></span>
                                     </div>
-                                </div>
-                                <div class="col4">
-                                    <div><span>80%在庫</span></div>
-                                    <div><span>D/S</span></div>
-                                    <div><span>前週出荷 平均</span></div>
-                                </div>
-
-                                <div class="col5">
                                     <div> <%--80%在庫 --%>
                                         <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).Stock80.ToString("#,##0") %></span>
                                     </div>
@@ -291,14 +292,15 @@
                                         <span><%# DirectCast(Eval("Value"), DispDataClass.StockListCollection).LastShipmentAve.ToString("#,##0") %></span>
                                     </div>
                                 </div>
+
                                 <div class="col6">
                                     <div>朝在庫</div>
                                     <div>朝在庫D/S除</div>
                                     <div>保持日数</div>
                                     <div>在庫率</div>
                                     <div>受入</div>
-                                    <div>ﾛｰﾘｰ受入</div>
-                                    <div>受入計</div>
+                                    <div class="receiveFromLorry">ﾛｰﾘｰ受入</div>
+                                    <div class="receiveSummary">受入計</div>
                                     <div>払出</div>
                                 </div>
 
@@ -345,7 +347,7 @@
                                                     <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive.ToString("#,##0") %>
                                                 </span>
                                             </div>
-                                            <div><%-- ﾛｰﾘｰ受入 --%>
+                                            <div class="receiveFromLorry"><%-- ﾛｰﾘｰ受入 --%>
                                                 <span class="stockinputtext">
                                                     <asp:TextBox ID="txtReceiveFromLorry" runat="server" Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).ReceiveFromLorry),
                                                                                                                                  Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).ReceiveFromLorry).ToString("#,##0"),
@@ -356,7 +358,7 @@
                                                     </asp:TextBox>
                                                 </span>
                                             </div>
-                                            <div><%--受入計--%>
+                                            <div class="receiveSummary"><%--受入計--%>
                                                 <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).SummaryReceive < 0, "minus", "") %>'>
                                                     <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).SummaryReceive.ToString("#,##0") %>
                                                 </span>
@@ -425,6 +427,8 @@
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
             <!-- 在庫表で表示する油種保持用 -->
             <asp:ListBox ID="lstDispStockOilType" runat="server" SelectionMode="Multiple"></asp:ListBox>
+            <!-- ローリー表示・非表示状態保持用 full or hideLorry -->
+            <asp:HiddenField ID="hdnDispLorry" runat="server" Value="full" />
             <!-- 権限 -->
         </div>
  

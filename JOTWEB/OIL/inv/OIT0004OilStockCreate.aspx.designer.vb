@@ -284,6 +284,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents lstDispStockOilType As Global.System.Web.UI.WebControls.ListBox
     
     '''<summary>
+    '''hdnDispLorry コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDispLorry As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

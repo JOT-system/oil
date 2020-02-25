@@ -56,6 +56,16 @@
                     <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
+            <!-- 荷主 -->
+            <div class="inputItem">
+                <a id="WF_SHIPPER_LABEL"  class="requiredMark">荷主</a>
+                <a class="ef" id="WF_SHIPPERCODE" ondblclick="Field_DBclick('TxtShipper', <%=LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST%>);" onchange="TextBox_change('TxtShipper');">
+                    <asp:TextBox ID="TxtShipper" runat="server"  CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
+                </a>
+                <a id="WF_SHIPPERCODE_TEXT" >
+                    <asp:Label ID="LblShipperName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </div>
             <!-- 油槽所 -->
             <div class="inputItem">
                 <a id="WF_CONSIGNEE_LABEL" class="requiredMark">油槽所</a>

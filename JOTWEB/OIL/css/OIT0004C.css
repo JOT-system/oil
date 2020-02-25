@@ -179,12 +179,46 @@
 {
     border-right: 1px solid darkgray;
 }
+#divSuggestList .lockImgArea {
+    width: 15px;
+    height: 15px;
+    margin:0;
+    padding:0;
+    display: inline-block;
+    background-color:transparent !important;
+    border:none !important;
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+    //float: right;
+    pointer-events: auto !important; 
+    cursor:pointer !important;
+}
+#divSuggestList .lockImgArea:hover {
+
+    cursor:pointer !important;
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+#divSuggestList .lockImgArea.Locked {
+        background-image:  url('../img/lockKey.png');
+}
+#divSuggestList .lockImgArea.Locked:hover {
+        background-image:  url('../img/lockKeyHover.png');
+}
+#divSuggestList .lockImgArea.Unlocked {
+        background-image:  url('../img/unlockKey.png');
+}
+#divSuggestList .lockImgArea.Unlocked:hover {
+    background-image:  url('../img/unlockKeyHover.png');
+}
 /* *********************** */
 /* 比重表 設定             */
 /* *********************** */
 #weightListContainer {
-    display:flex;
-    flex-wrap:nowrap;
+    display: flex;
+    flex-wrap: nowrap;
 }
 /* 一列の幅定義 */
 #weightListContainer > div {
@@ -255,8 +289,8 @@ span.minus {
    ※余白要素があるので手動でバランスとる */
 #divStockList div.emptyBox {
     //width:411px;
-    width:calc(90px + 85px + 70px + 85px + 70px + 95px);
-    min-width:calc(90px + 85px + 70px + 85px + 70px + 95px);
+    width: calc(90px + 110px + 70px + 95px);
+    min-width: calc(90px + 110px + 70px + 95px);
 }
 #divStockList > div.header > div.headerDate {
     display:flex;
@@ -280,8 +314,8 @@ span.minus {
 #divStockList div.col3,
 #divStockList div.col4,
 #divStockList div.col5{
-    width:85px;
-    min-width:85px;
+    width:110px;
+    min-width:110px;
     //text-align:center;
     display:flex;
     flex-wrap: nowrap;
@@ -317,7 +351,7 @@ span.minus {
 #divStockList div.col3 > div,
 #divStockList div.col4 > div,
 #divStockList div.col5 > div{
-    height:calc(100% / 3);
+    height:calc(100% / 6);
 }
 #divStockList div.col2 > div > span,
 #divStockList div.col3 > div > span,
@@ -344,13 +378,50 @@ span.minus {
         margin-top: 0px;
     }
 }
-#divStockList div.col6 > div,
-#divStockList div.colStockValue > div{
-    height:calc(100% / 8);
-    max-height:23.5px;
+#divStockList.full div.col6 > div,
+#divStockList.full div.colStockValue > div {
+    height: calc(100% / 8);
+    max-height: 23.5px;
+}
+#divStockList.hideLorry div.col6 > div.receiveFromLorry,
+#divStockList.hideLorry div.colStockValue > div.receiveFromLorry,
+#divStockList.hideLorry div.col6 > div.receiveSummary,
+#divStockList.hideLorry div.colStockValue > div.receiveSummary {
+    display: none;
+}
+#divStockList.hideLorry div.col6 > div,
+#divStockList.hideLorry div.colStockValue > div {
+    height: calc(100% / 6);
+    max-height: 23.5px;
+}
+#dispLorry {
+    margin-top: auto;
+    margin-left: auto;
+    border: none !important;
+    background-color: transparent !important;
+    font-weight: bold;
+    color: #2bb6c1 !important;
+    font-size:1em;
+    order:9999;
+}
+#dispLorry:hover {
+    text-decoration:underline;
+    color: #2bb6c1 !important;
+}
+#divStockList.full #dispLorry > span:after {
+    content: "ﾛｰﾘｰ非表示";
+}
+#divStockList.full #dispLorry > span:before {
+    content: "◆";
+}
+#divStockList.hideLorry #dispLorry > span:after {
+    content: "ﾛｰﾘｰ表示"
+}
+#divStockList.full #dispLorry > span:before {
+    content: "◇";
 }
 #divStockList div.colStockInfoTopRow {
-    max-height:24px;
+    max-height: 24px;
 }
 /* 在庫表の全てのテキストボックス */
 #divStockList input[type=text],

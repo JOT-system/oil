@@ -300,7 +300,7 @@
                                 <div class="col6">
                                     <div>朝在庫</div>
                                     <div>朝在庫D/S除</div>
-                                    <div>保持日数</div>
+                                    <div>保有日数</div>
                                     <div>在庫率</div>
                                     <div>受入</div>
                                     <div class="receiveFromLorry">ﾛｰﾘｰ受入</div>

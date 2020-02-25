@@ -36,10 +36,10 @@ function InitDisplay() {
             //非活性 
             //〇タブ１
             if (objDtabNo === "0") {
-                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
-                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
-                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
-                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";
+                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "";
+                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
+                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
             }

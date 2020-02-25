@@ -2088,7 +2088,7 @@ Public Class OIT0003OrderDetail
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            MAPDataGet(SQLcon, "5")
+            MAPDataGet(SQLcon, "18")
         End Using
 
         Dim i As Integer = 0

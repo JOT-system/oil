@@ -2268,7 +2268,8 @@ Public Class OIT0003OrderDetail
                         OrElse WF_FIELD.Value = "TANKNO" _
                         OrElse WF_FIELD.Value = "LOADINGIRILINETRAINNO" _
                         OrElse WF_FIELD.Value = "LOADINGOUTLETTRAINNO" _
-                        OrElse WF_FIELD.Value = "LINE" Then
+                        OrElse WF_FIELD.Value = "LINE" _
+                        OrElse WF_FIELD.Value = "FILLINGPOINT" Then
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
@@ -2281,8 +2282,15 @@ Public Class OIT0003OrderDetail
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                         End If
 
+
+                        If WF_FIELD.Value = "FILLINGPOINT" Then
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_BASECODE.Text, "")
+                        End If
+
                         '### LeftBoxマルチ対応(20200217) START #####################################################
-                        If WF_FIELD.Value = "TANKNO" Then
+                        If WF_FIELD.Value = "TANKNO" _
+                            OrElse WF_FIELD.Value = "FILLINGPOINT" Then
+
                             '↓暫定一覧対応 2020/02/13 グループ会社版を復活させ石油システムに合わない部分は直す
                             Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
                             .SetTableList(enumVal, WW_DUMMY, prmData)
@@ -6861,11 +6869,11 @@ Public Class OIT0003OrderDetail
                 If Not Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text) Then Exit Sub
 
             'タブ「タンク車割当」　　⇒　(一覧)荷主, (一覧)油種, (一覧)タンク車№
-            'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線
+            'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線, (一覧)充填ポイント
             'タブ「タンク車明細」　　⇒　(一覧)(実績)積込日, (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)空車着日
             '                            (一覧)第2着駅, (一覧)第2荷受人
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO",
-                 "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE",
+                 "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE", "FILLINGPOINT",
                  "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE",
                  "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME"
                 '○ LINECNT取得
@@ -7164,6 +7172,10 @@ Public Class OIT0003OrderDetail
                             updHeader.Item("LOADINGOUTLETTRAINNO") = WW_GetValue(6)
                             '出線列車名
                             updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(7)
+
+                            '充填ポイントを一覧に設定
+                        ElseIf WF_FIELD.Value = "FILLINGPOINT" Then
+                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
 
                         End If
 

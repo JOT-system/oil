@@ -68,6 +68,24 @@ Partial Public Class OIT0004OilStockSearch
     Protected WithEvents LblSalesOfficeName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''TxtShipper コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtShipper As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblShipperName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblShipperName As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_CONSIGNEE_CODE コントロール。
     '''</summary>
     '''<remarks>

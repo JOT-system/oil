@@ -100,14 +100,15 @@ Public Class OIT0004OilStockSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
             Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)       '組織コード
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text) '営業所
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "SHIPPER", TxtShipper.Text) '荷主
             Master.GetFirstValue(work.WF_SEL_CONSIGNEE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text)       '油槽所
             Master.GetFirstValue(work.WF_SEL_STYMD.Text, "STYMD", WF_STYMD_CODE.Text)       '年月日
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004C Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
             WF_ORG.Text = work.WF_SEL_ORG.Text            '組織コード
-
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODEMAP.Text '営業所
+            TxtShipper.Text = work.WF_SEL_SHIPPERCODE.Text
             WF_CONSIGNEE_CODE.Text = work.WF_SEL_CONSIGNEE.Text            '油槽所
             WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text            '年月日
         End If
@@ -129,6 +130,7 @@ Public Class OIT0004OilStockSearch
         'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
         '営業所
         CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_DUMMY)
+        CODENAME_get("SHIPPERCODE", TxtShipper.Text, LblShipperName.Text, WW_DUMMY)
         CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_DUMMY)         '油槽所
 
     End Sub
@@ -404,6 +406,10 @@ Public Class OIT0004OilStockSearch
                 TxtSalesOffice.Text = WW_SelectValue
                 LblSalesOfficeName.Text = WW_SelectText
                 TxtSalesOffice.Focus()
+            Case "TxtShipper"          '荷主
+                TxtShipper.Text = WW_SelectValue
+                LblShipperName.Text = WW_SelectText
+                TxtShipper.Focus()
 
             Case "WF_CONSIGNEE"          '油槽所
                 WF_CONSIGNEE_CODE.Text = WW_SelectValue
@@ -516,6 +522,9 @@ Public Class OIT0004OilStockSearch
                 Case "OFFICECODE"       '営業所
                     prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "SHIPPER"        '荷主
+                    prmData = work.CreateFIXParam(TxtShipper.Text, "SHIPPERSMASTER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CONSIGNEE"        '油槽所
                     'WF_CAMPCODE.Text
                     Dim additionalCond As String = " and VALUE2 != '9' "

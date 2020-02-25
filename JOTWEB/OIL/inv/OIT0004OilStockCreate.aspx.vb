@@ -2382,6 +2382,11 @@ Public Class OIT0004OilStockCreate
                 ''' <returns></returns>
                 Public Property CheckValue As Boolean = False
                 ''' <summary>
+                ''' 列車使用ロック(True:使用不可,False:使用可
+                ''' </summary>
+                ''' <returns></returns>
+                Public Property TrainLock As Boolean = False
+                ''' <summary>
                 ''' 列車情報クラス
                 ''' </summary>
                 ''' <returns></returns>

@@ -35,7 +35,7 @@ body, td, th {
     color: #2bb6c1;
     border: solid 1px #2bb6c1;
     transition: 0.3s;
-    font-size:1em;
+    font-size: 1.2em;
 }
 
 .btn-sticky:hover {

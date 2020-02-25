@@ -209,11 +209,11 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 /* 詳細部         */
 /* ************** */
 #detailbox {
-    font-size: 13.5px;
+    /* font-size: 13.5px; */
     /*height: calc(100% - 1.4em);*/ /* コンテンツ全体のフッターメッセージのサイズを引く */
-    position:relative;
-    bottom:0px;
-    min-height:230px;
+    position: relative;
+    bottom: 0px;
+    min-height: 230px;
 }
 /* ************** */
 /* タブレイアウト */

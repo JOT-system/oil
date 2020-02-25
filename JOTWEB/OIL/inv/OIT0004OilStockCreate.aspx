@@ -127,10 +127,14 @@
                                 <ItemTemplate>
                                     <div class="values">
                                     <%--  列車 --%>
-                                    <div class="trainNo">
+                                    <div class="trainNo"
+                                         data-ispastday='<%# if(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsPastDay = True,
+                                                                                                                "False",
+                                                                                                                "True") %>'>
                                         <div class="lockImgArea <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>">
                                             <asp:HiddenField ID="hdnTrainLock" runat="server" 
-                                                Value='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>'  />
+                                                Value='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>'
+                                                 />
                                         </div>
                                         <span data-tiptext='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainInfo.TrainName %>'><%# Eval("Key") %>
                                             <asp:HiddenField ID="hdnTrainId" runat="server" Value='<%# Eval("Key") %>' Visible="false" />
@@ -232,7 +236,7 @@
                     <!-- 1・2行目のヘッダー -->
                     <div class="header"> 
                         <div id="divEmptyBox" class="emptyBox">
-                            <div id="dispLorry"><span></span></div>
+                            <div id="dispLorry"><span id="spnDispLorry"></span></div>
                         </div>
                         <!-- 動的日付部の生成 -->
                         <asp:Repeater ID="repStockDate" runat="server">

@@ -143,7 +143,6 @@
     <Content Include="OIL\img\iconInfo.png" />
     <Content Include="OIL\img\iconWarn.png" />
     <Content Include="OIL\img\lockKey.png" />
-    <Content Include="OIL\img\lockKeyHover.png" />
     <Content Include="OIL\img\noicon.png" />
     <Content Include="OIL\img\foward.png" />
     <Content Include="OIL\img\leftbox.png" />
@@ -154,7 +153,6 @@
     <Content Include="OIL\img\statistics.png" />
     <Content Include="OIL\img\tank.png" />
     <Content Include="OIL\img\unlockKey.png" />
-    <Content Include="OIL\img\unlockKeyHover.png" />
     <Content Include="OIL\img\w_cat.png" />
     <Content Include="OIL\inc\GRM00002WRKINC.ascx" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />

@@ -22,6 +22,7 @@ Public Class OIT0003OrderDetail
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部タブID
+    Private Const CONST_DETAIL_NEWLIST As String = "5"              '明細一覧(新規作成)
 
     'Private Const CONST_DSPROWCOUNT As Integer = 45                '１画面表示対象
     'Private Const CONST_SCROLLROWCOUNT As Integer = 10              'マウススクロール時の増分
@@ -2088,7 +2089,7 @@ Public Class OIT0003OrderDetail
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            MAPDataGet(SQLcon, "18")
+            MAPDataGet(SQLcon, CONST_DETAIL_NEWLIST)
         End Using
 
         Dim i As Integer = 0
@@ -3309,7 +3310,7 @@ Public Class OIT0003OrderDetail
         Dim WW_Message As String = ""
         'WW_DeliveryInput = "0"                        '託送指示入力(0:未 1:完了)
 
-        '五井営業所、甲子営業所、袖ヶ浦営業所、三重塩浜営業所の場合
+        '五井営業所、甲子営業所、袖ヶ浦営業所の場合
         '積込列車番号の入力を可能とする。
         If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
             OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
@@ -10083,7 +10084,7 @@ Public Class OIT0003OrderDetail
                          BaseDllConst.CONST_ORDERSTATUS_240,
                          BaseDllConst.CONST_ORDERSTATUS_250,
                          BaseDllConst.CONST_ORDERSTATUS_260
-                        '五井営業所、甲子営業所、袖ヶ浦営業所、三重塩浜営業所の場合
+                        '五井営業所、甲子営業所、袖ヶ浦営業所の場合
                         '積込列車番号の入力を可能とする。
                         If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
                             OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
@@ -10100,13 +10101,16 @@ Public Class OIT0003OrderDetail
                                 Next
                             Next
 
-                            '上記以外(仙台営業所、根岸営業所、四日市営業所)の場合
+                            '上記以外(仙台営業所、根岸営業所、四日市営業所、三重塩浜営業所)の場合
                             '積込列車番号の入力を不可とする。
+                            '充填ポイントの入力を不可とする。(20200221石油部打合せ内容反映)
                         Else
                             For Each rowitem As TableRow In tblObj.Rows
                                 For Each cellObj As TableCell In rowitem.Controls
                                     If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
                                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LINE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") _
                                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
                                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")

@@ -133,6 +133,7 @@ Public Class GRIS0005LeftBox
         LC_RINKAITRAIN_LINELIST
         LC_DEPARRSTATIONLIST
         LC_STATIONCODE_FOCUSON
+        LC_FILLINGPOINT
     End Enum
 
     ''' <summary>
@@ -211,6 +212,7 @@ Public Class GRIS0005LeftBox
         LP_RINKAITRAIN_LINELIST
         LP_DEPARRSTATIONLIST
         LP_STATIONCODE_FOCUSON
+        LP_FILLINGPOINT
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -659,6 +661,10 @@ Public Class GRIS0005LeftBox
                 '発着駅フラグ
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "DEPARRSTATIONFLG"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_FILLINGPOINT
+                '充填ポイント
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "FILLINGPOINT"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_STATION
                 '貨物駅
                 lbox = CreateStationList(Params, O_RTN)
@@ -698,6 +704,25 @@ Public Class GRIS0005LeftBox
                      New LeftTableDefItem("KEYCODE", "車番", 5, True) With {.IsNumericField = True},
                      New LeftTableDefItem("VALUE1", "型式", 6),
                      New LeftTableDefItem("VALUE3", "交換日")}
+
+            Case LIST_BOX_CLASSIFICATION.LC_FILLINGPOINT
+                '充填ポイント
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "FILLINGPOINT"
+                dispDt = CreateFixValueTable(Params, O_RTN)
+                '上記データテーブルの表示対象項目を定義(フィールド、表示名）
+                dispFieldsDef = New List(Of LeftTableDefItem) From
+                    {New LeftTableDefItem("KEYCODE", "充填ポイント", 0, True),
+                     New LeftTableDefItem("VALUE1", "充填ポイント", 7),
+                     New LeftTableDefItem("VALUE2", "ハイオク", 5),
+                     New LeftTableDefItem("VALUE3", "レギュラー"),
+                     New LeftTableDefItem("VALUE4", "灯油", 4),
+                     New LeftTableDefItem("VALUE5", "未添加灯油"),
+                     New LeftTableDefItem("VALUE6", "軽油", 4),
+                     New LeftTableDefItem("VALUE7", "３号軽油", 5),
+                     New LeftTableDefItem("VALUE8", "５号軽油", 5),
+                     New LeftTableDefItem("VALUE9", "１０号軽油"),
+                     New LeftTableDefItem("VALUE10", "重油", 4),
+                     New LeftTableDefItem("VALUE11", "ＬＳＡ", 4)}
 
             Case Else
                 Exit Sub

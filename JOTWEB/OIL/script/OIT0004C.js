@@ -25,6 +25,9 @@ function InitDisplay() {
     bindSuggestSummary(suggestCol);
     bindDipsOiltypeStockList();
     document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
+    // 提案表、車両ロックのイベントバインド
+    // ローリ非表示のイベントバインド
+    bindDispLorry();
     //フォーカスを合わせる
     forcusObj();
 
@@ -219,6 +222,76 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
         lastStockRow.classList.add('lastRow');
     }
 
+}
+//〇ローリー表示非表示イベントバインド
+function bindDispLorry() {
+    let dispButton = document.getElementById('spnDispLorry');
+    let divStockListObj = document.getElementById('divStockList');
+    let hdnDispLorryObj = document.getElementById('hdnDispLorry');
+    if (dispButton === null) {
+        return;
+    }
+    if (divStockListObj === null) {
+        return;
+    }
+    if (hdnDispLorryObj === null) {
+        return;
+    }
+    // ダイアログを閉じるタイミングでフォーカスを合わせる
+    dispButton.addEventListener('click', (function () {
+        return function () {
+            dispLorry();
+        };
+    })(), false);
+    
+    // 初回ロード時は表示非表示を反転させdispLorryを実行
+    let className = 'hideLorry';
+    if (hdnDispLorryObj.value !== "full") {
+        className = 'full';
+    } 
+    hdnDispLorryObj.value = className;
+    dispLorry();
+}
+//〇ローリー表示非表示イベント
+function dispLorry() {
+    let dispButton = document.getElementById('spnDispLorry');
+    let divStockListObj = document.getElementById('divStockList');
+    let hdnDispLorryObj = document.getElementById('hdnDispLorry');
+    
+    if (dispButton === null) {
+        return;
+    }
+    if (divStockListObj === null) {
+        return;
+    }
+    if (hdnDispLorryObj === null) {
+        return;
+    }
+    let lorryValuesObj = divStockListObj.querySelectorAll('span.stockinputtext > input[type="text"]');
+    let hasAnyValues = false;
+    for (let i = 0; i < lorryValuesObj.length; i++) {
+        if (lorryValuesObj[i].value !== "0" && lorryValuesObj[i].value !== "") {
+            hasAnyValues = true;
+            break;
+        }
+    }
+    divStockListObj.classList.remove('hideLorry');
+    divStockListObj.classList.remove('full');
+    divStockListObj.classList.remove('hasLorryValue');
+    // 初回ロード時は表示非表示を反転させdispLorryを実行
+    let className = 'hideLorry';
+    if (hdnDispLorryObj.value !== "full") {
+        className = 'full';
+    } 
+    hdnDispLorryObj.value = className;
+    divStockListObj.classList.add(className);
+    dispButton.parentNode.removeAttribute("data-tiptext");
+    if (hasAnyValues) {
+        divStockListObj.classList.add('hasLorryValue');
+        if (className === 'hideLorry') {
+            dispButton.parentNode.dataset.tiptext = 'ローリー受入数入力あり';
+        }
+    }
 }
 //〇フォーカス合わせ処理
 function forcusObj() {

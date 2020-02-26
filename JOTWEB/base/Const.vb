@@ -311,6 +311,10 @@ Public Module BaseDllConst
     ''' 日付(空車着日)エラー
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_95 As String = "95"
+    ''' <summary>
+    ''' タンク数量未設定
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_96 As String = "96"
 
     ''' <summary>
     ''' 失注（荷主都合）

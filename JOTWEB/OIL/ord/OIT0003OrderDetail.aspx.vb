@@ -3435,6 +3435,9 @@ Public Class OIT0003OrderDetail
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
+
+            '○メッセージ表示
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
 
     End Sub
@@ -3510,11 +3513,21 @@ Public Class OIT0003OrderDetail
                     If decCarsAmount = 0 Then
                         chkCarsAmount = False
 
+                        OIT0003Chktab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_96
+                        CODENAME_get("ORDERINFO", OIT0003Chktab3row("ORDERINFO"), OIT0003Chktab3row("ORDERINFONAME"), WW_DUMMY)
+
                         WW_CheckMES1 = "タンク車の油種数量が0(kl)エラー。"
                         WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                         WW_CheckListTab3ERR(WW_CheckMES1, WW_CheckMES2, OIT0003Chktab3row)
+                    Else
+                        OIT0003Chktab3row("ORDERINFO") = ""
+                        OIT0003Chktab3row("ORDERINFONAME") = ""
+
                     End If
                 Next
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
                 If TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True Then
@@ -4015,8 +4028,33 @@ Public Class OIT0003OrderDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
-            Case "CARSAMOUNT",           '(一覧)数量
-                 "JOINT"                 '(一覧)ジョイント先
+            Case "CARSAMOUNT"            '(一覧)数量
+                'updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+                Dim regChkAmount As New Regex("^(?<seisu>(\d*))\.*(?<syosu>(\d*))$", RegexOptions.Singleline)
+                Dim strSeisu As String  '整数部取得
+                Dim strSyosu As String  '小数部取得
+
+                Try
+                    strSeisu = regChkAmount.Match(WW_ListValue).Result("${seisu}")
+                    strSyosu = regChkAmount.Match(WW_ListValue).Result("${syosu}")
+                    If strSyosu.Length > 0 _
+                    OrElse strSeisu.Length <> 5 Then
+                        'updHeader.Item(WF_FIELD.Value) = strSeisu.Substring(0, strSeisu.Length) & "." & "000"
+                        updHeader.Item(WF_FIELD.Value) = "0.000"
+                        Exit Select
+
+                    End If
+
+                    updHeader.Item(WF_FIELD.Value) = strSeisu.Substring(0, 2) & "." & strSeisu.Substring(2, 3)
+
+                Catch ex As Exception
+                    updHeader.Item(WF_FIELD.Value) = "0.000"
+                    Exit Select
+
+                End Try
+
+            Case "JOINT"                 '(一覧)ジョイント先
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
             Case "CHANGETRAINNO",        '(一覧)本線列車番号変更
@@ -6549,7 +6587,7 @@ Public Class OIT0003OrderDetail
         End Try
 
         '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

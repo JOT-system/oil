@@ -113,6 +113,8 @@ Public Class OILMasterPage
                     Select Case btnText.Value
                         Case "HELP"
                             ShowHelp()
+                        Case "WF_ButtonBackToMenu"
+                            WF_ButtonBackToMenu_Click()
                     End Select
 
                 End If
@@ -135,6 +137,55 @@ Public Class OILMasterPage
             'サーバー処理終了
             MF_SUBMIT.Value = "FALSE"
         End Try
+
+    End Sub
+    ''' <summary>
+    ''' Htmlレンダリング処理
+    ''' </summary>
+    ''' <param name="writer"></param>
+    ''' <remarks>前ページに反映させた「メニューへ」ボタンが不要な場合はこの処理を関数ごとごっそり消せば済みます</remarks>
+    Protected Overrides Sub Render(writer As HtmlTextWriter)
+        '検索ページ(FormIdがSで終わるまたはメニュー・ログイン「M0000」で始まるページは通常描画
+        If (Me.contents1.Page.Title.EndsWith("S") OrElse Me.contents1.Page.Title.StartsWith("M0000")) Then
+            MyBase.Render(writer)
+            Return
+        End If
+        '何もしない場合の生成するHtmlを抜き出す
+        Dim tw As IO.TextWriter = New IO.StringWriter
+        Dim htw = New HtmlTextWriter(tw)
+        MyBase.Render(htw)
+        Dim pageSource = tw.ToString
+        '抜き出したHtmlを検索し加工
+        '検索対象ID（戻るボタンID）
+        Dim findId As String = "=""WF_ButtonEND"""
+        Dim editedPageSource = pageSource
+        Dim idPos = editedPageSource.IndexOf(findId)
+        '対象のIDが見つからない場合はそのままレンダリング
+        If idPos = -1 Then
+            writer.Write(pageSource)
+        End If
+        '見つかった場合は終了タグまでループ
+        Dim findTagEnd As Boolean = False
+        Dim incVal As Integer = 0
+        While findTagEnd = False
+            incVal = incVal + 1
+            '無限ループ抑止（ありえないが終了タグが見つからない場合）
+            If editedPageSource.Length <= idPos + incVal Then
+                Exit While
+            End If
+            '対象のIDが含まれる終了タグを検索
+            If editedPageSource.Substring(idPos + incVal, 1) = ">" Then
+                findTagEnd = True
+                Dim startHtml = editedPageSource.Substring(0, idPos + incVal + 1)
+                Dim endHtml = editedPageSource.Substring(idPos + incVal + 1)
+                '対象の戻るボタンの後ろにメニューへボタン追加
+                Dim backToMenuElm As String = " " & ControlChars.CrLf & "<input type=""button"" id=""WF_ButtonBackToMenu"" class=""btn-sticky"" value=""メニューへ"" onclick=""ButtonClick('WF_ButtonBackToMenu');"" />" & ControlChars.CrLf & " "
+                editedPageSource = startHtml & backToMenuElm & endHtml
+                Exit While
+            End If
+        End While
+        '書き換えたHTMLを描画
+        writer.Write(editedPageSource)
 
     End Sub
 
@@ -352,7 +403,15 @@ Public Class OILMasterPage
         Dim HELPCAMP As String = GetTargetComp()
         footer.ShowHelp(MF_MAPID.Value, HELPCAMP, USERID)
     End Sub
-
+    ''' <summary>
+    ''' メニューへ戻るボタン押下時処理
+    ''' </summary>
+    Public Sub WF_ButtonBackToMenu_Click()
+        '本当はURLマスタですが一旦固定
+        Server.Transfer("~/OIL/M00001MENU.aspx")
+        CS0050SESSION.VIEW_MAPID = "M00001"
+        Me.MAPID = "M00001"
+    End Sub
     ''' <summary>
     ''' メッセージの設定処理
     ''' </summary>

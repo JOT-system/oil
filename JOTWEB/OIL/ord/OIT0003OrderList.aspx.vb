@@ -382,7 +382,7 @@ Public Class OIT0003OrderList
         End If
         '発日('20200225(条件追加：(予定)発日))
         If Not String.IsNullOrEmpty(work.WF_SEL_SEARCH_DEPDATE.Text) Then
-            SQLStr &= String.Format("    AND OIT0002.DEPDATE = '{0}'", work.WF_SEL_SEARCH_DEPDATE.Text)
+            SQLStr &= String.Format("    AND OIT0002.DEPDATE >= '{0}'", work.WF_SEL_SEARCH_DEPDATE.Text)
         End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then

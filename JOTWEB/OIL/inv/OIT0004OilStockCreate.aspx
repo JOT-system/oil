@@ -128,9 +128,9 @@
                                     <div class="values">
                                     <%--  列車 --%>
                                     <div class="trainNo"
-                                         data-ispastday='<%# if(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsPastDay = True,
-                                                                                                                "False",
-                                                                                                                "True") %>'>
+                                         data-ispastday='<%#If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).SuggestValuesItem.First.Value.DayInfo.IsPastDay = True,
+                                                                                                                            "True",
+                                                                                                                            "False") %>'>
                                         <div class="lockImgArea <%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>">
                                             <asp:HiddenField ID="hdnTrainLock" runat="server" 
                                                 Value='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValues).TrainLock, "Locked", "Unlocked") %>'

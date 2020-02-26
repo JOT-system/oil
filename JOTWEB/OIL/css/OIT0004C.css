@@ -217,12 +217,13 @@
     background-repeat: no-repeat;
     background-size: contain;
     //float: right;
-    pointer-events: auto !important; 
+    pointer-events: auto; 
     cursor:pointer !important;
 }
+#divSuggestList div.trainNo[data-ispastday=True] .lockImgArea {
+    pointer-events: none; 
+}
 #divSuggestList .lockImgArea:hover {
-
-    cursor:pointer !important;
     opacity: 1;
     filter: alpha(opacity=100);
 }
@@ -428,7 +429,7 @@ span.minus {
     background-color: transparent !important;
     font-weight: bold;
     color: #2bb6c1 !important;
-    font-size:1em;
+    font-size:15px !important;
     order:9999;
 }
 #dispLorry:hover > span:after {

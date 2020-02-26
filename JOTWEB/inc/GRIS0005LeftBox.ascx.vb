@@ -713,16 +713,16 @@ Public Class GRIS0005LeftBox
                 dispFieldsDef = New List(Of LeftTableDefItem) From
                     {New LeftTableDefItem("KEYCODE", "充填ポイント", 0, True),
                      New LeftTableDefItem("VALUE1", "充填ポイント", 7),
-                     New LeftTableDefItem("VALUE2", "ハイオク", 5),
-                     New LeftTableDefItem("VALUE3", "レギュラー"),
-                     New LeftTableDefItem("VALUE4", "灯油", 4),
-                     New LeftTableDefItem("VALUE5", "未添加灯油"),
-                     New LeftTableDefItem("VALUE6", "軽油", 4),
-                     New LeftTableDefItem("VALUE7", "３号軽油", 5),
-                     New LeftTableDefItem("VALUE8", "５号軽油", 5),
-                     New LeftTableDefItem("VALUE9", "１０号軽油"),
-                     New LeftTableDefItem("VALUE10", "重油", 4),
-                     New LeftTableDefItem("VALUE11", "ＬＳＡ", 4)}
+                     New LeftTableDefItem("VALUE2", "ハイオク", 5) With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE3", "レギュラー") With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE4", "灯油", 4) With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE5", "未添加灯油") With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE6", "軽油", 4) With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE7", "３号軽油", 5) With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE8", "５号軽油", 5) With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE9", "１０号軽油") With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE10", "重油", 4) With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"},
+                     New LeftTableDefItem("VALUE11", "ＬＳＡ", 4) With {.FontSize = "30px", .MarginTop = "-2px", .Align = "center"}}
 
             Case Else
                 Exit Sub
@@ -1629,6 +1629,14 @@ Public Class GRIS0005LeftBox
 
                 Dim fieldName As String = leftTableDef.FieldName
                 Dim fieldValue As String = Convert.ToString(scrDr(fieldName))
+                If leftTableDef.FontSize <> "" Then
+                    dataCellValue.Style.Add(HtmlTextWriterStyle.FontSize, leftTableDef.FontSize)
+                    dataCellValue.Style.Add(HtmlTextWriterStyle.Height, "20px")
+                    dataCellValue.Style.Add(HtmlTextWriterStyle.OverflowY, "hidden")
+                    If leftTableDef.MarginTop <> "" Then
+                        dataCellValue.Style.Add(HtmlTextWriterStyle.MarginTop, leftTableDef.MarginTop)
+                    End If
+                End If
                 dataCellValue.InnerHtml = fieldValue
                 dicFieldValues.Add(fieldName, fieldValue)
                 'テーブルセルのサイズ
@@ -1651,6 +1659,7 @@ Public Class GRIS0005LeftBox
                         End If
                     End If
                 End If
+
                 dataCell.Attributes.Add("data-fieldname", leftTableDef.FieldName)
                 dataCell.Controls.Add(dataCellValue)
                 wholeDataRow.Controls.Add(dataCell)
@@ -1734,6 +1743,17 @@ Public Class GRIS0005LeftBox
         ''' <returns></returns>
         ''' <remarks>一旦未使用</remarks>
         Public Property IsNumericField As Boolean = False
+        ''' <summary>
+        ''' 個別フォントサイズ（未指定時は設定しない）
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>これを指定した場合、縦枠は広がらない</remarks>
+        Public Property FontSize As String = ""
+        ''' <summary>
+        ''' 個別フォントサイズを指定時に上位置微調整の為使用(マイナスしていすると上にずれます)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MarginTop As String = ""
         ''' <summary>
         ''' コンストラクタ
         ''' </summary>

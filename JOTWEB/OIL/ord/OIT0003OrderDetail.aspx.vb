@@ -3386,20 +3386,20 @@ Public Class OIT0003OrderDetail
                 work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
 
             End Using
+
+            '○ 画面表示データ復元
+            Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+                If OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                    OIT0003row("ORDERSTATUS") = strOrderStatus
+                    OIT0003row("ORDERSTATUSNAME") = TxtOrderStatus.Text
+                End If
+            Next
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
         End If
-
-        '○ 画面表示データ復元
-        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-
-        For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
-            If OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                OIT0003row("ORDERSTATUS") = strOrderStatus
-                OIT0003row("ORDERSTATUSNAME") = TxtOrderStatus.Text
-            End If
-        Next
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
         '### END ###############################################################################
 
@@ -3419,6 +3419,8 @@ Public Class OIT0003OrderDetail
         ElseIf WW_ERRCODE = "ERR3" Then
             Master.Output(C_MESSAGE_NO.OIL_LOADING_OIL_RECORD_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
+        Else
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
 
         '〇 受注ステータスが"手配完了"へ変更された場合
@@ -5657,8 +5659,8 @@ Public Class OIT0003OrderDetail
 
         End Try
 
-        '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -6377,8 +6379,8 @@ Public Class OIT0003OrderDetail
 
         End Try
 
-        '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -6470,8 +6472,10 @@ Public Class OIT0003OrderDetail
 
         End Try
 
-        '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
+            '○メッセージ表示
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 

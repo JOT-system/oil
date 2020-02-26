@@ -219,6 +219,8 @@
     //float: right;
     pointer-events: auto; 
     cursor:pointer !important;
+    position:relative;
+    z-index:2;
 }
 #divSuggestList div.trainNo[data-ispastday=True] .lockImgArea {
     pointer-events: none; 

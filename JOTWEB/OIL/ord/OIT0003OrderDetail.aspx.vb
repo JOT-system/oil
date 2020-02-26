@@ -3513,11 +3513,21 @@ Public Class OIT0003OrderDetail
                     If decCarsAmount = 0 Then
                         chkCarsAmount = False
 
+                        OIT0003Chktab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_96
+                        CODENAME_get("ORDERINFO", OIT0003Chktab3row("ORDERINFO"), OIT0003Chktab3row("ORDERINFONAME"), WW_DUMMY)
+
                         WW_CheckMES1 = "タンク車の油種数量が0(kl)エラー。"
                         WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                         WW_CheckListTab3ERR(WW_CheckMES1, WW_CheckMES2, OIT0003Chktab3row)
+                    Else
+                        OIT0003Chktab3row("ORDERINFO") = ""
+                        OIT0003Chktab3row("ORDERINFONAME") = ""
+
                     End If
                 Next
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
                 If TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True Then

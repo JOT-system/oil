@@ -134,6 +134,7 @@ Public Class GRIS0005LeftBox
         LC_DEPARRSTATIONLIST
         LC_STATIONCODE_FOCUSON
         LC_FILLINGPOINT
+        LC_JOINTLIST
     End Enum
 
     ''' <summary>
@@ -213,6 +214,7 @@ Public Class GRIS0005LeftBox
         LP_DEPARRSTATIONLIST
         LP_STATIONCODE_FOCUSON
         LP_FILLINGPOINT
+        LP_JOINTLIST
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -633,6 +635,10 @@ Public Class GRIS0005LeftBox
                 '荷主
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SHIPPERSMASTER"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_JOINTLIST
+                'ジョイント
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "JOINTMASTER"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST
                 '荷受人
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "CONSIGNEEPATTERN"
@@ -779,10 +785,10 @@ Public Class GRIS0005LeftBox
             End If
             '○会社コードListBox設定
             Using CL0001CompList As New GL0001CompList With {
-                   .typeMode = typeMode _
+                   .TYPEMODE = typeMode _
                  , .STYMD = paramStYmd _
                  , .ENDYMD = paramEndYmd _
-                 , .roleCode = roleCode _
+                 , .ROLECODE = roleCode _
                  , .DEFAULT_SORT = defaultSort _
                  , .VIEW_FORMAT = viewFormat
             }
@@ -933,12 +939,12 @@ Public Class GRIS0005LeftBox
                 , .STYMD = paramStYmd _
                 , .ENDYMD = paramEndYmd _
                 , .VIEW_FORMAT = viewFormat _
-                , .campCode = campCode _
-                , .authWith = authWith _
+                , .CAMPCODE = campCode _
+                , .AUTHWITH = authWith _
                 , .Categorys = Categorys _
-                , .roleCode = roleCode _
-                , .permission = permission _
-                , .orgCode = orgCode
+                , .ROLECODE = roleCode _
+                , .PERMISSION = permission _
+                , .ORGCODE = orgCode
              }
                 CL0002OrgList.getList()
                 O_RTN = CL0002OrgList.ERR

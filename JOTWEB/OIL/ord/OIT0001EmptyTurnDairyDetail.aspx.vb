@@ -328,7 +328,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             For Each cellObj As TableCell In rowitem.Controls
                 If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") Then
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                 End If
             Next
@@ -417,6 +418,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS RETURNDATETRAIN" _
+            & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
             & " , ''                                             AS REMARK" _
             & " , '0'                                            AS DELFLG" _
@@ -487,6 +489,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "   END                                                                      AS JRALLINSPECTIONALERTSTR" _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE" _
             & " , ISNULL(RTRIM(OIT0003.RETURNDATETRAIN), '')                               AS RETURNDATETRAIN" _
+            & " , ISNULL(RTRIM(OIT0003.JOINTCODE), '')           AS JOINTCODE" _
             & " , ISNULL(RTRIM(OIT0003.JOINT), '')               AS JOINT" _
             & " , ISNULL(RTRIM(OIT0003.REMARK), '')              AS REMARK" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')              AS DELFLG" _
@@ -678,7 +681,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             For Each cellObj As TableCell In rowitem.Controls
                 If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") Then
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                 End If
             Next
@@ -950,6 +954,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                         .ActiveTable()
                         Return
                         '↑暫定一覧対応 2020/02/13
+                    End If
+                    'ジョイント
+                    If WF_FIELD.Value = "JOINT" Then
+                        '全表示のため設定をコメントにする。
+                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                     End If
 
                     .SetListBox(enumVal, WW_DUMMY, prmData)
@@ -1295,8 +1304,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Try
                 TxtEmparrDate.Focus()
 
-                '(一覧)荷主, (一覧)油種, (一覧)タンク車№, (一覧)返送日列車
-            Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO", "RETURNDATETRAIN"
+                '(一覧)荷主, (一覧)油種, (一覧)タンク車№, (一覧)ジョイント, (一覧)返送日列車
+            Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO", "JOINT", "RETURNDATETRAIN"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -1421,6 +1430,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Else
                         updHeader.Item("JRALLINSPECTIONALERT") = ""
                     End If
+
+                    'ジョイントを一覧に設定
+                ElseIf WF_FIELD.Value = "JOINT" Then
+                    updHeader.Item("JOINTCODE") = WW_SETVALUE
+                    updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
                     '返送日列車を一覧に設定
                 ElseIf WF_FIELD.Value = "RETURNDATETRAIN" Then
@@ -1740,6 +1754,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS RETURNDATETRAIN" _
+            & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
             & " , ''                                             AS REMARK" _
             & " , '0'                                            AS DELFLG" _
@@ -3779,7 +3794,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        LINEORDER         = @P33, TANKNO       = @P03, ORDERINFO    = @P34" _
             & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
-            & "        , RETURNDATETRAIN = @P07, JOINT        = @P08, REMARK       = @P38" _
+            & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK       = @P38" _
             & "        , UPDYMD          = @P19, UPDUSER      = @P20" _
             & "        , UPDTERMID       = @P21, RECEIVEYMD   = @P22" _
             & "    WHERE" _
@@ -3790,8 +3805,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        ( ORDERNO         , DETAILNO            , LINEORDER" _
             & "        , TANKNO          , KAMOKU              , ORDERINFO" _
             & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
-            & "        , ORDERINGTYPE    , ORDERINGOILNAME" _
-            & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINT" _
+            & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
+            & "        , RETURNDATETRAIN , JOINTCODE           , JOINT" _
             & "        , REMARK          , CHANGETRAINNO       , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
             & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CANGERETSTATION    , CHANGEARRSTATIONNAME" _
             & "        , SALSE           , SALSETAX" _
@@ -3802,8 +3817,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        ( @P01, @P02, @P33" _
             & "        , @P03, @P04, @P34" _
             & "        , @P23, @P24, @P05, @P35" _
-            & "        , @P36, @P37" _
-            & "        , @P06, @P25, @P07, @P08" _
+            & "        , @P36, @P37, @P06, @P25" _
+            & "        , @P07, @P39, @P08" _
             & "        , @P38, @P26, @P27, @P28" _
             & "        , @P29, @P30, @P31, @P32" _
             & "        , @P09, @P10" _
@@ -3836,6 +3851,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , CARSNUMBER" _
             & "    , CARSAMOUNT" _
             & "    , RETURNDATETRAIN" _
+            & "    , JOINTCODE" _
             & "    , JOINT" _
             & "    , REMARK" _
             & "    , CHANGETRAINNO" _
@@ -3885,6 +3901,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
+                Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar, 40)  'ジョイントコード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
                 Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar)      '記事欄
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 4)   '本線列車（変更後）
@@ -3941,6 +3958,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Else
                         PARA07.Value = DBNull.Value
                     End If
+                    PARA39.Value = OIT0001row("JOINTCODE")            'ジョイントコード
                     PARA08.Value = OIT0001row("JOINT")                'ジョイント
                     PARA38.Value = OIT0001row("REMARK")               '記事欄
                     PARA26.Value = ""                                 '本線列車（変更後）

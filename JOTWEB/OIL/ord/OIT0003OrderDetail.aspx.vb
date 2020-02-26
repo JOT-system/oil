@@ -4018,8 +4018,33 @@ Public Class OIT0003OrderDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
-            Case "CARSAMOUNT",           '(一覧)数量
-                 "JOINT"                 '(一覧)ジョイント先
+            Case "CARSAMOUNT"            '(一覧)数量
+                'updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
+                Dim regChkAmount As New Regex("^(?<seisu>(\d*))\.*(?<syosu>(\d*))$", RegexOptions.Singleline)
+                Dim strSeisu As String  '整数部取得
+                Dim strSyosu As String  '小数部取得
+
+                Try
+                    strSeisu = regChkAmount.Match(WW_ListValue).Result("${seisu}")
+                    strSyosu = regChkAmount.Match(WW_ListValue).Result("${syosu}")
+                    If strSyosu.Length > 0 _
+                    OrElse strSeisu.Length <> 5 Then
+                        'updHeader.Item(WF_FIELD.Value) = strSeisu.Substring(0, strSeisu.Length) & "." & "000"
+                        updHeader.Item(WF_FIELD.Value) = "0.000"
+                        Exit Select
+
+                    End If
+
+                    updHeader.Item(WF_FIELD.Value) = strSeisu.Substring(0, 2) & "." & strSeisu.Substring(2, 3)
+
+                Catch ex As Exception
+                    updHeader.Item(WF_FIELD.Value) = "0.000"
+                    Exit Select
+
+                End Try
+
+            Case "JOINT"                 '(一覧)ジョイント先
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
             Case "CHANGETRAINNO",        '(一覧)本線列車番号変更

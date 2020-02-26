@@ -31,7 +31,8 @@
                     <!-- ボタン -->
                     <input type="button" id="WF_ButtonAUTOSUGGESTION" runat="server" class="btn-sticky" value="自動提案"     onclick="ButtonClick('WF_ButtonAUTOSUGGESTION');" />
                     <input type="button" id="WF_ButtonORDERLIST"      runat="server" class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
-                    <input type="button" id="WF_ButtonINPUTCLEAR"     class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
+                    <input type="button" id="WF_ButtonINPUTCLEAR"     runat="server" class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
+                    <input type="button" id="WF_ButtonGETEMPTURN"     runat="server" class="btn-sticky" value="受入数 空回日報取込" onclick="ButtonClick('WF_ButtonGETEMPTURN');" />
                 </div>
 
                 <div class="rightSide">

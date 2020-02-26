@@ -63,6 +63,8 @@ Public Class OIT0004OilStockCreate
                             WF_ButtonORDERLIST_Click()
                         Case "WF_ButtonINPUTCLEAR" '入力値クリアボタン押下
                             WF_ButtonINPUTCLEAR_Click()
+                        Case "WF_ButtonGETEMPTURN" '空回日報取込ボタン押下
+
                         Case "WF_ButtonRECULC"
                             WF_ButtonRECULC_Click()
                         Case "WF_ButtonUPDATE" '更新ボタン押下
@@ -208,6 +210,8 @@ Public Class OIT0004OilStockCreate
             Me.spnInventoryDays.Visible = False
             Me.WF_ButtonAUTOSUGGESTION.Visible = False
             Me.WF_ButtonORDERLIST.Visible = False
+            Me.WF_ButtonINPUTCLEAR.Visible = False
+            Me.WF_ButtonGETEMPTURN.Visible = False
         Else
             pnlSuggestList.Visible = True
             frvSuggest.DataSource = New Object() {dispDataObj}

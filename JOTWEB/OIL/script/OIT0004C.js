@@ -26,6 +26,7 @@ function InitDisplay() {
     bindDipsOiltypeStockList();
     document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     // 提案表、車両ロックのイベントバインド
+    bindTrainLock();
     // ローリ非表示のイベントバインド
     bindDispLorry();
     //フォーカスを合わせる
@@ -291,6 +292,87 @@ function dispLorry() {
         if (className === 'hideLorry') {
             dispButton.parentNode.dataset.tiptext = 'ローリー受入数入力あり';
         }
+    }
+}
+//〇列車ロック時イベント
+function bindTrainLock() {
+    let suggestObj = document.getElementById('pnlSuggestList');
+    if (suggestObj === null) {
+        return;
+    }
+    /* 過去日ではないロックアイコンを取得 */
+    let trainLockObjList = suggestObj.querySelectorAll('div.trainNo[data-ispastday="False"] div.lockImgArea');
+    if (trainLockObjList === null) {
+        return;
+    }
+    /* ロックアイコンにクリックイベントを配置 */
+    for (let i = 0; i < trainLockObjList.length; i++) {
+        let trainLockObj = trainLockObjList[i];
+        trainLockObj.addEventListener('click', (function (trainLockObj) {
+            return function () {
+                trainLockEvent(trainLockObj,false);
+            };
+        })(trainLockObj), false);
+        /* 初回実行を行う */
+        trainLockEvent(trainLockObj, true);
+    }
+    
+}
+/* 列車ロック時イベント */
+function trainLockEvent(callerObj,initCall) {
+    let valuesArea = callerObj.parentNode.parentNode;
+    let hdnStatus = callerObj.querySelector("input");
+
+    if (valuesArea === null) {
+        return;
+    }
+    if (hdnStatus === null) {
+        return;
+    }
+    /* 入力要素の取得 */
+    let changeVal = hdnStatus.value;
+    if (initCall === false) {
+        callerObj.classList.remove('Locked');
+        callerObj.classList.remove('Unlocked');
+        /* 初期設定を除き Locked ⇔ Unlockedを反転 */ 
+        if (changeVal === 'Unlocked') {
+            changeVal = 'Locked';
+        } else {
+            changeVal = 'Unlocked';
+        }
+        callerObj.classList.add(changeVal);
+        hdnStatus.value = changeVal;
+    }
+    let inputObjList = valuesArea.querySelectorAll('div:not([data-oilcode=\'Summary\']) > input:not([type=hidden]),input[type=checkbox]');
+    if (inputObjList === null) {
+        return;
+    }
+    let inputCloneObj = valuesArea.querySelectorAll('input[id$=\'_clone\']');
+    if (inputCloneObj !== null) {
+        for (let i = 0; i < inputCloneObj.length; i++) {
+            inputCloneObj[i].parentNode.removeChild(inputCloneObj[i]);
+        }
+    }
+    let disabled = false;
+    if (changeVal === 'Locked') {
+        disabled = true;
+    } 
+    for (let i = 0; i < inputObjList.length; i++) {
+        let obj = inputObjList[i];
+        let displayVal = 'inline-block';
+        if (disabled === true) {
+            /* ただ単にDisabledにするとPostBackでサーバー側では受け取れなくなるため */
+            /* 使用不可のクローンを作成しクローン元を非表示にする */
+            let cloneItem = obj.cloneNode();
+            cloneItem.id = cloneItem.id + '_clone';
+            cloneItem.name = '';
+            cloneItem.disabled = true;
+            cloneItem.classList.add('aspNetDisabled');
+            obj.parentNode.appendChild(cloneItem);
+
+            displayVal = 'none';
+        }
+        obj.style.display = displayVal;
     }
 }
 //〇フォーカス合わせ処理

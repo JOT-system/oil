@@ -157,12 +157,23 @@ Public Class OILMasterPage
         Dim pageSource = tw.ToString
         '抜き出したHtmlを検索し加工
         '検索対象ID（戻るボタンID）
-        Dim findId As String = "=""WF_ButtonEND"""
+        Dim findIdList As New List(Of String) From {"=""WF_ButtonEND""",
+                                                    "=""WF_CLEAR"""}
+
         Dim editedPageSource = pageSource
-        Dim idPos = editedPageSource.IndexOf(findId)
+        Dim idPos = 0 ' editedPageSource.IndexOf(findId)
+        Dim isIdFound As Boolean = False
+        For Each findId In findIdList
+            idPos = editedPageSource.IndexOf(findId)
+            If idPos <> -1 Then
+                isIdFound = True
+                Exit For
+            End If
+        Next
         '対象のIDが見つからない場合はそのままレンダリング
-        If idPos = -1 Then
+        If isIdFound = False Then
             writer.Write(pageSource)
+            Return
         End If
         '見つかった場合は終了タグまでループ
         Dim findTagEnd As Boolean = False

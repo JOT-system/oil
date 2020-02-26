@@ -68,6 +68,15 @@ button[disabled=""]:hover {
 #divHidden {
     display: none;
 }
+/* メニューへボタン */
+#WF_ButtonBackToMenu {
+    color: #F58E7E;
+    border: solid 1px #F58E7E;
+}
+#WF_ButtonBackToMenu:hover {
+    background: #F58E7E;
+    color: #fff;
+}
 /* 一覧先頭ページ、最終ページボタン */
 .firstPage, .lastPage {
     width: 24px;

@@ -339,7 +339,10 @@ Public Class OIT0004OilStockSearch
                             'prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
                             prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
                         End If
-
+                        '荷主
+                        If WF_FIELD.Value = "TxtShipper" Then
+                            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
+                        End If
                         '油槽所
                         If WF_FIELD.Value = "WF_CONSIGNEE" Then
                             'prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
@@ -367,7 +370,8 @@ Public Class OIT0004OilStockSearch
             '営業所
             Case "TxtSalesOffice"
                 CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
-
+            Case "TxtShipper"
+                CODENAME_get("SHIPPER", TxtShipper.Text, LblShipperName.Text, WW_RTN_SW)
             Case "WF_CONSIGNEE"        '油槽所
                 CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_RTN_SW)
         End Select
@@ -447,6 +451,8 @@ Public Class OIT0004OilStockSearch
         Select Case WF_FIELD.Value
             Case "WF_CONSIGNEE"          '油槽所
                 WF_CONSIGNEE_CODE.Focus()
+            Case "WF_"
+                TxtShipper.Focus()
             Case "WF_STYMD"          '年月日
                 WF_STYMD_CODE.Focus()
         End Select
@@ -523,8 +529,8 @@ Public Class OIT0004OilStockSearch
                     prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "SHIPPER"        '荷主
-                    prmData = work.CreateFIXParam(TxtShipper.Text, "SHIPPERSMASTER")
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST, I_VALUE, O_TEXT, O_RTN, prmData)
+                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CONSIGNEE"        '油槽所
                     'WF_CAMPCODE.Text
                     Dim additionalCond As String = " and VALUE2 != '9' "

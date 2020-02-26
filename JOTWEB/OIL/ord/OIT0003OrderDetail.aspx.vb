@@ -3338,22 +3338,30 @@ Public Class OIT0003OrderDetail
         End Using
 
         '● 積場スペックチェック
-        WW_CheckLoadingSpecs(WW_ERRCODE, WW_Message)
-        If WW_ERRCODE = "ERR" _
+        '★臨海鉄道未対象の場合
+        '　入換・積込指示の入力は行わないためチェック対象外
+        If WW_RINKAIFLG = False Then
+            '積込指示入力(0:未 1:完了)
+            WW_LoadingInput = "1"
+
+            '★臨海鉄道対象の場合
+        Else
+            WW_CheckLoadingSpecs(WW_ERRCODE, WW_Message)
+            If WW_ERRCODE = "ERR" _
             OrElse WW_ERRCODE = "ERR1" _
             OrElse WW_ERRCODE = "ERR2" _
             OrElse WW_ERRCODE = "ERR3" Then
+                '積込指示入力(0:未 1:完了)
+                WW_LoadingInput = "0"
 
-            '積込指示入力(0:未 1:完了)
-            WW_LoadingInput = "0"
-
+            End If
         End If
 
         '受注進行ステータス退避用
         Dim strOrderStatus As String = ""
 
         '### START ###############################################################################
-        '臨海鉄道未対象の場合
+        '★臨海鉄道未対象の場合
         If WW_RINKAIFLG = False Then
             '〇 受注進行ステータスの状態
             Select Case work.WF_SEL_ORDERSTATUS.Text
@@ -3367,7 +3375,7 @@ Public Class OIT0003OrderDetail
                     End If
             End Select
 
-            '臨海鉄道対象の場合
+            '★臨海鉄道対象の場合
         Else
             '〇 受注進行ステータスの状態
             WW_ScreenOrderStatusSet(strOrderStatus)

@@ -268,8 +268,8 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '')  AS ARRDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACCDATE, 'yyyy/MM/dd'), '')  AS ACCDATE" _
             & " , ISNULL(FORMAT(OIT0002.EMPARRDATE, 'yyyy/MM/dd'), '')  AS EMPARRDATE" _
-            & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.HTANK), '')                   AS HTANK" _
+            & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.TTANK), '')                   AS TTANK" _
             & " , ISNULL(RTRIM(OIT0002.MTTANK), '')                  AS MTTANK" _
             & " , ISNULL(RTRIM(OIT0002.KTANK), '')                   AS KTANK" _

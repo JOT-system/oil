@@ -418,6 +418,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINT" _
+            & " , ''                                             AS REMARK" _
             & " , '0'                                            AS DELFLG" _
             & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
@@ -487,6 +488,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE" _
             & " , ISNULL(RTRIM(OIT0003.RETURNDATETRAIN), '')                               AS RETURNDATETRAIN" _
             & " , ISNULL(RTRIM(OIT0003.JOINT), '')               AS JOINT" _
+            & " , ISNULL(RTRIM(OIT0003.REMARK), '')              AS REMARK" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')              AS DELFLG" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')             AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')            AS DETAILNO" _
@@ -1739,6 +1741,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS JRALLINSPECTIONDATE" _
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINT" _
+            & " , ''                                             AS REMARK" _
             & " , '0'                                            AS DELFLG" _
             & " , @P01                                           AS ORDERNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
@@ -2069,6 +2072,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("RETURNDATETRAIN") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("JOINT") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("REMARK") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("DELFLG") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("ORDERNO") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("DETAILNO") >= 0 Then
@@ -2084,6 +2088,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         XLSTBLrow("JRALLINSPECTIONDATE").Equals(OIT0001row("JRALLINSPECTIONDATE")) AndAlso
                         XLSTBLrow("RETURNDATETRAIN").Equals(OIT0001row("RETURNDATETRAIN")) AndAlso
                         XLSTBLrow("JOINT").Equals(OIT0001row("JOINT")) AndAlso
+                        XLSTBLrow("REMARK").Equals(OIT0001row("REMARK")) AndAlso
                         XLSTBLrow("DELFLG").Equals(OIT0001row("DELFLG")) AndAlso
                         XLSTBLrow("ORDERNO").Equals(OIT0001row("ORDERNO")) AndAlso
                         XLSTBLrow("DETAILNO").Equals(OIT0001row("DETAILNO")) Then
@@ -2199,6 +2204,11 @@ Public Class OIT0001EmptyTurnDairyDetail
             'ジョイント
             If WW_COLUMNS.IndexOf("JOINT") >= 0 Then
                 OIT0001INProw("JOINT") = XLSTBLrow("JOINT")
+            End If
+
+            '記事欄
+            If WW_COLUMNS.IndexOf("REMARK") >= 0 Then
+                OIT0001INProw("REMARK") = XLSTBLrow("REMARK")
             End If
 
             '削除フラグ
@@ -3769,7 +3779,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        LINEORDER         = @P33, TANKNO       = @P03, ORDERINFO    = @P34" _
             & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
-            & "        , RETURNDATETRAIN = @P07, JOINT        = @P08" _
+            & "        , RETURNDATETRAIN = @P07, JOINT        = @P08, REMARK       = @P38" _
             & "        , UPDYMD          = @P19, UPDUSER      = @P20" _
             & "        , UPDTERMID       = @P21, RECEIVEYMD   = @P22" _
             & "    WHERE" _
@@ -3782,7 +3792,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
             & "        , ORDERINGTYPE    , ORDERINGOILNAME" _
             & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINT" _
-            & "        , CHANGETRAINNO   , SECONDCONSIGNEECODE , SECONDCONSIGNEENAME" _
+            & "        , REMARK          , CHANGETRAINNO       , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
             & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CANGERETSTATION    , CHANGEARRSTATIONNAME" _
             & "        , SALSE           , SALSETAX" _
             & "        , TOTALSALSE      , PAYMENT             , PAYMENTTAX         , TOTALPAYMENT" _
@@ -3794,7 +3804,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P23, @P24, @P05, @P35" _
             & "        , @P36, @P37" _
             & "        , @P06, @P25, @P07, @P08" _
-            & "        , @P26, @P27, @P28" _
+            & "        , @P38, @P26, @P27, @P28" _
             & "        , @P29, @P30, @P31, @P32" _
             & "        , @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14" _
@@ -3827,6 +3837,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , CARSAMOUNT" _
             & "    , RETURNDATETRAIN" _
             & "    , JOINT" _
+            & "    , REMARK" _
             & "    , CHANGETRAINNO" _
             & "    , SECONDCONSIGNEECODE" _
             & "    , SECONDCONSIGNEENAME" _
@@ -3875,6 +3886,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
+                Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar)      '記事欄
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 4)   '本線列車（変更後）
                 Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 10)  '第2荷受人コード
                 Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.NVarChar, 40)  '第2荷受人名
@@ -3930,6 +3942,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         PARA07.Value = DBNull.Value
                     End If
                     PARA08.Value = OIT0001row("JOINT")                'ジョイント
+                    PARA38.Value = OIT0001row("REMARK")               '記事欄
                     PARA26.Value = ""                                 '本線列車（変更後）
                     PARA27.Value = ""                                 '第2荷受人コード
                     PARA28.Value = ""                                 '第2荷受人名

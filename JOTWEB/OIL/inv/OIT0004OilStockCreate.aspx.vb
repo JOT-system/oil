@@ -1519,6 +1519,7 @@ Public Class OIT0004OilStockCreate
         Dim trainRepeater As Repeater = Nothing
         Dim trainIdObj As HiddenField = Nothing
         Dim trainId As String = ""
+        Dim hdnTrainLock As HiddenField = Nothing
         Dim chkObj As CheckBox = Nothing
 
         Dim oilTypeItemValue As Repeater = Nothing
@@ -1548,10 +1549,19 @@ Public Class OIT0004OilStockCreate
                 trainId = trainIdObj.Value
                 'チェックボックス取得
                 chkObj = DirectCast(repSuggestTrainItem.FindControl("chkSuggest"), CheckBox)
+                '列車ロック情報取得
+                hdnTrainLock = DirectCast(repSuggestTrainItem.FindControl("hdnTrainLock"), HiddenField)
                 '列車番号別のクラスを取得
                 trainValueClassItem = dateValueClassItem.SuggestOrderItem(trainId)
                 '画面情報クラスに設定しているチェックOn/Offの情報を格納
                 trainValueClassItem.CheckValue = chkObj.Checked
+                '画面情報クラスに列車ロック情報格納
+                If hdnTrainLock.Value = "Locked" Then
+                    trainValueClassItem.TrainLock = True
+                Else
+                    trainValueClassItem.TrainLock = False
+                End If
+
                 '三段階目の油種別の提案数リピーターを取得
                 oilTypeItemValue = DirectCast(repSuggestTrainItem.FindControl("repSuggestValueItem"), Repeater)
                 For Each repOilTypeValItem As RepeaterItem In oilTypeItemValue.Items
@@ -2258,6 +2268,10 @@ Public Class OIT0004OilStockCreate
                         Continue For
                     End If
                     suggestTrainItem = suggestItem.SuggestOrderItem(trainInfo.TrainNo)
+                    '列車ロックがかかっている場合計算しない
+                    If suggestTrainItem.TrainLock = True Then
+                        Continue For
+                    End If
                     '計算対象チェックをOn
                     suggestTrainItem.CheckValue = True
                     finishIncremental = False

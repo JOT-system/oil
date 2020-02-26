@@ -268,7 +268,7 @@ function dispLorry() {
     if (hdnDispLorryObj === null) {
         return;
     }
-    let lorryValuesObj = divStockListObj.querySelectorAll('span.stockinputtext > input[type="text"]');
+    let lorryValuesObj = divStockListObj.querySelectorAll('div.receiveFromLorry > span.stockinputtext > input[type="text"]');
     let hasAnyValues = false;
     for (let i = 0; i < lorryValuesObj.length; i++) {
         if (lorryValuesObj[i].value !== "0" && lorryValuesObj[i].value !== "") {

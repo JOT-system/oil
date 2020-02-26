@@ -3487,6 +3487,8 @@ Public Class OIT0003OrderDetail
                 '0(デフォルト値)以外が入力されていれば、入力していると判断
                 Dim chkCarsAmount As Boolean = True
                 Dim decCarsAmount As Decimal = 0
+                Dim WW_CheckMES1 As String = ""
+                Dim WW_CheckMES2 As String = ""
                 For Each OIT0003Chktab3row As DataRow In OIT0003tbl_tab3.Rows
                     Try
                         decCarsAmount = Decimal.Parse(OIT0003Chktab3row("CARSAMOUNT"))
@@ -3497,12 +3499,22 @@ Public Class OIT0003OrderDetail
                     '(一覧)数値に0が1件でも存在したら、"False"(未入力)とする。
                     If decCarsAmount = 0 Then
                         chkCarsAmount = False
+
+                        WW_CheckMES1 = "タンク車の油種数量が0(kl)エラー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                        WW_CheckListTab3ERR(WW_CheckMES1, WW_CheckMES2, OIT0003Chktab3row)
                     End If
                 Next
 
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
                 If TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True Then
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_300
+
+                    '### 油種数量(数値)が0(kl)の場合はエラー表示 ##################
+                ElseIf chkCarsAmount = False Then
+                    Master.Output(C_MESSAGE_NO.OIL_TANKNO_NUMBER_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Exit Sub
+                    '##############################################################
                 End If
 
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
@@ -3515,7 +3527,7 @@ Public Class OIT0003OrderDetail
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
                 'かつ、(実績)積車着日の入力が完了
                 'かつ、(実績)空車着日の入力が完了
-                If TxtActualLoadingDate.Text <> "" _
+                If TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True _
                     AndAlso TxtActualArrDate.Text <> "" _
                     AndAlso TxtActualEmparrDate.Text <> "" Then
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
@@ -9966,6 +9978,32 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+    ''' <summary>
+    ''' エラーレポート編集(一覧用(タブ「タンク車明細」))
+    ''' </summary>
+    ''' <param name="MESSAGE1"></param>
+    ''' <param name="MESSAGE2"></param>
+    ''' <param name="OIM0003row"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckListTab3ERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIM0003row As DataRow = Nothing)
+
+        Dim WW_ERR_MES As String = ""
+        WW_ERR_MES = MESSAGE1
+        If MESSAGE2 <> "" Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+        End If
+
+        If Not IsNothing(OIM0003row) Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 項番               =" & OIM0003row("LINECNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注№             =" & OIM0003row("ORDERNO") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 受注油種           =" & OIM0003row("ORDERINGOILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車№         =" & OIM0003row("TANKNO") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 数量(kl)           =" & OIM0003row("CARSAMOUNT")
+        End If
+
+        rightview.AddErrorReport(WW_ERR_MES)
+
+    End Sub
 
     ''' <summary>
     ''' エラーレポート編集(列車牽引車数オーバー)

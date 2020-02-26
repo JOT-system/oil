@@ -486,6 +486,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_OILREGISTER_NOTUSE As String = "20024"
 
+        ''' <summary>
+        ''' タンク車数量エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_NUMBER_ERROR As String = "20025"
+
 #End Region
 
 

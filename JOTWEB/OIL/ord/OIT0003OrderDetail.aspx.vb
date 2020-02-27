@@ -5269,8 +5269,8 @@ Public Class OIT0003OrderDetail
                     PARA15.Value = DBNull.Value                      '空車着日（実績）
                     PARA16.Value = ""         '入線列車番号
                     'PARA16.Value = OIT0003row("LINETRAINNO")         '入線列車番号
-                    PARA17.Value = iNewLineOrder                      '入線順
-                    'PARA17.Value = OIT0003row("LINEORDER")           '入線順
+                    'PARA17.Value = iNewLineOrder                      '入線順
+                    PARA17.Value = OIT0003row("LINEORDER")           '入線順
 
                     PARA18.Value = OIT0003row("TANKNO")              'タンク車№
                     PARA19.Value = OIT0003row("OILCODE")             '油種コード

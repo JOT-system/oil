@@ -99,15 +99,50 @@ Public Class OIT0004OilStockSearch
             '初期変数設定処理
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", WF_CAMPCODE.Text)       '会社コード
             Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)       '組織コード
-            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text) '営業所
-            Master.GetFirstValue(work.WF_SEL_CONSIGNEE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text)       '油槽所
+            'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text) '営業所
+            'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "SHIPPER", TxtShipper.Text) '荷主
+            'Master.GetFirstValue(work.WF_SEL_CONSIGNEE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text)       '油槽所
+            If work.WF_SEL_CAMPCODE.Text <> "01" Then
+
+            Else
+
+            End If
+            Dim prmData As New Hashtable
+            prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
+            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
+            leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, WW_DUMMY, prmData)
+            If leftview.WF_LeftListBox.Items IsNot Nothing Then
+                '一旦根岸(011402)'本当はログインユーザーのORG
+                Dim foundItem = leftview.WF_LeftListBox.Items.FindByValue("011402")
+                'Dim foundItem = leftview.WF_LeftListBox.Items.FindByValue(Master.USER_ORG)
+                If foundItem IsNot Nothing Then
+                    TxtSalesOffice.Text = foundItem.Value
+                Else
+                    TxtSalesOffice.Text = leftview.WF_LeftListBox.Items(0).Value
+                End If
+
+
+            End If
+
+            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
+            leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, WW_DUMMY, prmData)
+            If leftview.WF_LeftListBox.Items IsNot Nothing Then
+                TxtShipper.Text = leftview.WF_LeftListBox.Items(0).Value
+            End If
+
+            Dim additionalCond As String = " and VALUE2 != '9' "
+            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN", I_ADDITIONALCONDITION:=additionalCond)
+            leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, WW_DUMMY, prmData)
+            If leftview.WF_LeftListBox.Items IsNot Nothing Then
+                Me.WF_CONSIGNEE_CODE.Text = leftview.WF_LeftListBox.Items(0).Value
+            End If
             Master.GetFirstValue(work.WF_SEL_STYMD.Text, "STYMD", WF_STYMD_CODE.Text)       '年月日
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0004C Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
             WF_ORG.Text = work.WF_SEL_ORG.Text            '組織コード
-
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODEMAP.Text '営業所
+            TxtShipper.Text = work.WF_SEL_SHIPPERCODE.Text
             WF_CONSIGNEE_CODE.Text = work.WF_SEL_CONSIGNEE.Text            '油槽所
             WF_STYMD_CODE.Text = work.WF_SEL_STYMD.Text            '年月日
         End If
@@ -129,6 +164,7 @@ Public Class OIT0004OilStockSearch
         'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
         '営業所
         CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_DUMMY)
+        CODENAME_get("SHIPPER", TxtShipper.Text, LblShipperName.Text, WW_DUMMY)
         CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_DUMMY)         '油槽所
 
     End Sub
@@ -158,6 +194,7 @@ Public Class OIT0004OilStockSearch
         work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
         work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
 
+        work.WF_SEL_SHIPPERCODE.Text = TxtShipper.Text      '荷主
         work.WF_SEL_CONSIGNEE.Text = WF_CONSIGNEE_CODE.Text '油槽所
         work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text         '年月日
 
@@ -210,7 +247,24 @@ Public Class OIT0004OilStockSearch
             O_RTN = "ERR"
             Exit Sub
         End If
-
+        '荷主 Shipper
+        'Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(WF_CAMPCODE.Text, "SHIPPER", TxtShipper.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            '存在チェック
+            CODENAME_get("SHIPPER", TxtShipper.Text, LblShipperName.Text, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "荷主 : " & TxtShipper.Text, needsPopUp:=True)
+                TxtShipper.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "荷主", needsPopUp:=True)
+            TxtShipper.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
         '油槽所 TxtSalesOffice.Text
         'Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         Master.CheckField(WF_CAMPCODE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -337,7 +391,10 @@ Public Class OIT0004OilStockSearch
                             'prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
                             prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
                         End If
-
+                        '荷主
+                        If WF_FIELD.Value = "TxtShipper" Then
+                            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
+                        End If
                         '油槽所
                         If WF_FIELD.Value = "WF_CONSIGNEE" Then
                             'prmData = work.CreateFIXParam(WF_CAMPCODE.Text, "CONSIGNEEPATTERN")
@@ -359,22 +416,26 @@ Public Class OIT0004OilStockSearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
-
+        Dim fieldName As String = ""
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
             '営業所
             Case "TxtSalesOffice"
                 CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
-
+                fieldName = "営業所"
+            Case "TxtShipper"
+                CODENAME_get("SHIPPER", TxtShipper.Text, LblShipperName.Text, WW_RTN_SW)
+                fieldName = "荷主"
             Case "WF_CONSIGNEE"        '油槽所
                 CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_RTN_SW)
+                fieldName = "油槽所"
         End Select
 
         '○ メッセージ表示
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, fieldName)
         End If
 
     End Sub
@@ -404,6 +465,10 @@ Public Class OIT0004OilStockSearch
                 TxtSalesOffice.Text = WW_SelectValue
                 LblSalesOfficeName.Text = WW_SelectText
                 TxtSalesOffice.Focus()
+            Case "TxtShipper"          '荷主
+                TxtShipper.Text = WW_SelectValue
+                LblShipperName.Text = WW_SelectText
+                TxtShipper.Focus()
 
             Case "WF_CONSIGNEE"          '油槽所
                 WF_CONSIGNEE_CODE.Text = WW_SelectValue
@@ -441,6 +506,8 @@ Public Class OIT0004OilStockSearch
         Select Case WF_FIELD.Value
             Case "WF_CONSIGNEE"          '油槽所
                 WF_CONSIGNEE_CODE.Focus()
+            Case "WF_"
+                TxtShipper.Focus()
             Case "WF_STYMD"          '年月日
                 WF_STYMD_CODE.Focus()
         End Select
@@ -516,6 +583,9 @@ Public Class OIT0004OilStockSearch
                 Case "OFFICECODE"       '営業所
                     prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "SHIPPER"        '荷主
+                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CONSIGNEE"        '油槽所
                     'WF_CAMPCODE.Text
                     Dim additionalCond As String = " and VALUE2 != '9' "

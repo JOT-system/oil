@@ -35,7 +35,8 @@
     box-sizing: border-box;
 }
 /* 提案表の全てのテキストボックス */
-#divSuggestList input[type=text] {
+#divSuggestList input[type=text],
+#divSuggestList input[type=number]{
     text-align:right;
     box-sizing: border-box;
     height:calc(100% - 2px);
@@ -62,7 +63,7 @@
     align-items: stretch; 
     align-content: stretch;
 }
-#divSuggestList > .leftColumn > div:last-child {
+#divSuggestList > .leftColumn > div:nth-child(2) {
     height: calc(24px * 9); 
     border-bottom: 1px solid darkgray !important; 
     display:block !important;
@@ -86,53 +87,52 @@
 }
 /* 提案表列車No、油種チェックボックス、油種ごとのテキストボックスセルの幅 */
 #divSuggestList > div.dataColumn > div.values > div {
-    width:60px;
-    min-width:60px;
-    max-width:60px;
+    width:65px;
+    min-width:65px;
+    max-width:65px;
 }
-/* 提案表列車Noが7個に増えた場合は下の規則性にそって増幅させてください */
 /* 提案表列車Noが6個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has6Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ６倍 */
-    width : calc(60px * 6);
-    min-width: calc(60px * 6);
-    max-width: calc(60px * 6);
+    width : calc(65px * 6);
+    min-width: calc(65px * 6);
+    max-width: calc(65px * 6);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが5個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has5Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ５倍 */
-    width : calc(60px * 5);
-    min-width: calc(60px * 5);
-    max-width: calc(60px * 5);
+    width : calc(65px * 5);
+    min-width: calc(65px * 5);
+    max-width: calc(65px * 5);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが4個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has4Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ４倍 */
-    width : calc(60px * 4);
-    min-width: calc(60px * 4);
-    max-width: calc(60px * 4);
+    width : calc(65px * 4);
+    min-width: calc(65px * 4);
+    max-width: calc(65px * 4);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが3個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has3Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ３倍 */
-    width : calc(60px * 3);
-    min-width: calc(60px * 3);
-    max-width: calc(60px * 3);
+    width : calc(65px * 3);
+    min-width: calc(65px * 3);
+    max-width: calc(65px * 3);
     display:flex;
     flex-wrap:wrap;
 }
 /* 提案表列車Noが2個来た場合の設定 */
 #divSuggestList > div.dataColumn.dataColumn.has2Col{
     /* #divSuggestList > div.dataColumn > div.values > div のWidthと合わせ２倍 */
-    width : calc(60px * 2);
-    min-width: calc(60px * 2);
-    max-width: calc(60px * 2);
+    width : calc(65px * 2);
+    min-width: calc(65px * 2);
+    max-width: calc(65px * 2);
     display:flex;
     flex-wrap:wrap;
 }
@@ -206,12 +206,49 @@
 {
     border-right: 1px solid darkgray;
 }
+#divSuggestList .lockImgArea {
+    width: 15px;
+    height: 15px;
+    margin:0;
+    padding:0;
+    display: inline-block;
+    background-color:transparent !important;
+    border:none !important;
+    background-repeat: no-repeat;
+    background-size: contain;
+    //float: right;
+    pointer-events: auto; 
+    cursor:pointer !important;
+    position:relative;
+    z-index:2;
+}
+#divSuggestList div.trainNo[data-ispastday=True] .lockImgArea {
+    pointer-events: none; 
+}
+#divSuggestList .lockImgArea:hover {
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+#divSuggestList .lockImgArea.Locked {
+    background-image:  url('../img/lockKey.png');
+}
+#divSuggestList .lockImgArea.Locked:hover {
+    background-image:  url('../img/unlockKey.png');
+}
+#divSuggestList .lockImgArea.Unlocked {
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    background-image:  url('../img/unlockKey.png');
+}
+#divSuggestList .lockImgArea.Unlocked:hover {
+    background-image:  url('../img/lockKey.png');
+}
 /* *********************** */
 /* 比重表 設定             */
 /* *********************** */
 #weightListContainer {
-    display:flex;
-    flex-wrap:nowrap;
+    display: flex;
+    flex-wrap: nowrap;
 }
 /* 一列の幅定義 */
 #weightListContainer > div {
@@ -282,8 +319,8 @@ span.minus {
    ※余白要素があるので手動でバランスとる */
 #divStockList div.emptyBox {
     //width:411px;
-    width:calc(90px + 85px + 70px + 85px + 70px + 95px);
-    min-width:calc(90px + 85px + 70px + 85px + 70px + 95px);
+    width: calc(90px + 110px + 70px + 95px);
+    min-width: calc(90px + 110px + 70px + 95px);
 }
 #divStockList > div.header > div.headerDate {
     display:flex;
@@ -307,8 +344,8 @@ span.minus {
 #divStockList div.col3,
 #divStockList div.col4,
 #divStockList div.col5{
-    width:85px;
-    min-width:85px;
+    width:110px;
+    min-width:110px;
     //text-align:center;
     display:flex;
     flex-wrap: nowrap;
@@ -344,7 +381,7 @@ span.minus {
 #divStockList div.col3 > div,
 #divStockList div.col4 > div,
 #divStockList div.col5 > div{
-    height:calc(100% / 3);
+    height:calc(100% / 6);
 }
 #divStockList div.col2 > div > span,
 #divStockList div.col3 > div > span,
@@ -371,17 +408,64 @@ span.minus {
         margin-top: 0px;
     }
 }
-/* 在庫表の表示項目が増えた場合（夕在庫、朝在庫等の行）が増えた場合１油種での行数を height:calc(100% / [ここ]);に設定 */
-#divStockList div.col6 > div,
-#divStockList div.colStockValue > div{
-    height:calc(100% / 8);
-    max-height:23.5px;
+#divStockList.full div.col6 > div,
+#divStockList.full div.colStockValue > div {
+    height: calc(100% / 8);
+    max-height: 23.5px;
+}
+#divStockList.hideLorry div.col6 > div.receiveFromLorry,
+#divStockList.hideLorry div.colStockValue > div.receiveFromLorry,
+#divStockList.hideLorry div.col6 > div.receiveSummary,
+#divStockList.hideLorry div.colStockValue > div.receiveSummary {
+    display: none;
+}
+#divStockList.hideLorry div.col6 > div,
+#divStockList.hideLorry div.colStockValue > div {
+    height: calc(100% / 6);
+    max-height: 23.5px;
+}
+#dispLorry {
+    margin-top: auto;
+    margin-left: auto;
+    border: none !important;
+    background-color: transparent !important;
+    font-weight: bold;
+    color: #2bb6c1 !important;
+    font-size:15px !important;
+    order:9999;
+}
+#dispLorry:hover > span:after {
+    text-decoration:underline;
+    color: #2bb6c1 !important;
+}
+#divStockList.full #dispLorry > span:after {
+    content: "ﾛｰﾘｰ非表示";
+}
+#divStockList.full #dispLorry > span:before {
+    content: "◆";
+}
+#divStockList.hideLorry #dispLorry > span:after {
+    content: "ﾛｰﾘｰ表示"
+}
+#divStockList.hideLorry #dispLorry > span:before {
+    content: "◇";
+}
+#divStockList.hideLorry.hasLorryValue #dispLorry > span:before {
+    content: "◆";
+    color: red !important;
 }
 #divStockList div.colStockInfoTopRow {
-    max-height:24px;
+    max-height: 24px;
+}
+#divStockList.hideLorry div.col2 > div,
+#divStockList.hideLorry div.col3 > div,
+#divStockList.hideLorry div.col4 > div,
+#divStockList.hideLorry div.col5 > div {
+    height: 23.5px;
 }
 /* 在庫表の全てのテキストボックス */
-#divStockList input[type=text] {
+#divStockList input[type=text],
+#divStockList input[type=number] {
     text-align: right;
     box-sizing: border-box;
     height: calc(100% - 1px);
@@ -394,13 +478,16 @@ span.minus {
 span.morningStockIdx0 {
     margin-top:0px !important; 
 }
-#divStockList input[type=text][data-textfield="MorningStock"] {
+#divStockList input[type=text][data-textfield="MorningStock"],
+#divStockList input[type=number][data-textfield="MorningStock"] {
     // height: 18px;
     //line-height:0.8em;
-    width:calc(100% + 5.5px);
+    width: calc(100% + 5.5px);
 }
 #divStockList input[type=text][name$="txtSend"],
-#divStockList input[type=text][name$="txtReceiveFromLorry"] {
+#divStockList input[type=number][name$="txtSend"],
+#divStockList input[type=text][name$="txtReceiveFromLorry"],
+#divStockList input[type=number][name$="txtReceiveFromLorry"] {
     width: calc(100% + 5.5px);
 }
 /* :not(.col1) > div:last-child > span */
@@ -660,7 +747,7 @@ div.oilTypeData div.col1 span[data-tiptext] {
 /* ************************ */
 /* ↓表見出し固定ここから↓ */
 /* ************************ */
-/* IEはposition sticky未対応なので固定されません */
+/* IEはposition sticky未対応なのでそのまま */
 #divStockList > .header {
     position: sticky;
     top: -10px;

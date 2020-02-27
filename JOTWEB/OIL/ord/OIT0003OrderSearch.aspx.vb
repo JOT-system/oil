@@ -82,8 +82,10 @@ Public Class OIT0003OrderSearch
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "UORG", WF_UORG.Text)
             '営業所
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text)
-            '年月日(開始)
+            '年月日(積込日(検索用))
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "DATESTART", TxtDateStart.Text)
+            '発日(検索用)
+            Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "DEPDATESTART", TxtDepDateStart.Text)
             '列車番号
             Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TRAINNO", TxtTrainNumber.Text)
             '荷卸地
@@ -98,8 +100,10 @@ Public Class OIT0003OrderSearch
             WF_UORG.Text = work.WF_SEL_UORG.Text
             '営業所
             TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODEMAP.Text
-            '年月日(開始)
+            '年月日(積込日(検索用))
             TxtDateStart.Text = work.WF_SEL_DATE.Text
+            '発日(検索用)
+            TxtDepDateStart.Text = work.WF_SEL_SEARCH_DEPDATE.Text
             '列車番号
             TxtTrainNumber.Text = work.WF_SEL_TRAINNUMBER.Text
             '荷卸地
@@ -150,8 +154,10 @@ Public Class OIT0003OrderSearch
         Master.EraseCharToIgnore(WF_UORG.Text)
         '営業所
         Master.EraseCharToIgnore(TxtSalesOffice.Text)
-        '年月日(開始)
+        '年月日(積込日(検索用))
         Master.EraseCharToIgnore(TxtDateStart.Text)
+        '発日(検索用)
+        Master.EraseCharToIgnore(TxtDepDateStart.Text)
         '列車番号
         Master.EraseCharToIgnore(TxtTrainNumber.Text)
         '荷卸地
@@ -174,8 +180,10 @@ Public Class OIT0003OrderSearch
         work.WF_SEL_SALESOFFICECODEMAP.Text = TxtSalesOffice.Text
         work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
         work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
-        '年月日
+        '年月日(積込日(検索用))
         work.WF_SEL_DATE.Text = TxtDateStart.Text
+        '発日(検索用)
+        work.WF_SEL_SEARCH_DEPDATE.Text = TxtDepDateStart.Text
         '列車番号
         work.WF_SEL_TRAINNUMBER.Text = TxtTrainNumber.Text
         '荷卸地
@@ -264,7 +272,7 @@ Public Class OIT0003OrderSearch
             End If
         End If
 
-        '年月日(開始)
+        '年月日(積込日(検索用))
         Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STYMD", TxtDateStart.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             Try
@@ -273,8 +281,23 @@ Public Class OIT0003OrderSearch
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "年月日", needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "積込日", needsPopUp:=True)
             TxtDateStart.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+
+        '発日(検索用)
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STDEPYMD", TxtDepDateStart.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If isNormal(WW_CS0024FCHECKERR) Then
+            Try
+                Date.TryParse(TxtDepDateStart.Text, WW_STYMD)
+            Catch ex As Exception
+                WW_STYMD = C_DEFAULT_YMD
+            End Try
+        Else
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "発日", needsPopUp:=True)
+            TxtDepDateStart.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
@@ -375,6 +398,8 @@ Public Class OIT0003OrderSearch
                     Select Case WF_FIELD.Value
                         Case "TxtDateStart"
                             .WF_Calendar.Text = TxtDateStart.Text
+                        Case "TxtDepDateStart"
+                            .WF_Calendar.Text = TxtDepDateStart.Text
                             'Case "TxtDateEnd"
                             '    .WF_Calendar.Text = TxtDateEnd.Text
                     End Select
@@ -453,7 +478,7 @@ Public Class OIT0003OrderSearch
                 LblSalesOfficeName.Text = WW_SelectText
                 TxtSalesOffice.Focus()
 
-            Case "TxtDateStart"         '年月日(開始)
+            Case "TxtDateStart"         '年月日(積込日(検索用))
                 Dim WW_DATE As Date
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
@@ -465,6 +490,18 @@ Public Class OIT0003OrderSearch
                 Catch ex As Exception
                 End Try
                 TxtDateStart.Focus()
+            Case "TxtDepDateStart"      '発日(検索用)
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        TxtDepDateStart.Text = ""
+                    Else
+                        TxtDepDateStart.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                TxtDepDateStart.Focus()
             Case "TxtUnloading"       '荷卸地
                 TxtUnloading.Text = WW_SelectValue
                 LblUnloadingName.Text = WW_SelectText
@@ -495,8 +532,10 @@ Public Class OIT0003OrderSearch
                 WF_UORG.Focus()
             Case "TxtSalesOffice"       '営業所
                 TxtSalesOffice.Focus()
-            Case "TxtDateStart"         '年月日(開始)
+            Case "TxtDateStart"         '年月日(積込日(検索用))
                 TxtDateStart.Focus()
+            Case "TxtDepDateStart"      '発日(検索用)
+                TxtDepDateStart.Focus()
             Case "TxtUnloading"         '荷卸地
                 TxtUnloading.Focus()
             Case "TxtStatus"            '状態

@@ -50,6 +50,24 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents WF_ButtonORDERLIST As Global.System.Web.UI.HtmlControls.HtmlInputButton
     
     '''<summary>
+    '''WF_ButtonINPUTCLEAR コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonINPUTCLEAR As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''WF_ButtonGETEMPTURN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonGETEMPTURN As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
     '''<remarks>
@@ -282,6 +300,15 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents lstDispStockOilType As Global.System.Web.UI.WebControls.ListBox
+    
+    '''<summary>
+    '''hdnDispLorry コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDispLorry As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''Master プロパティ。

@@ -36,10 +36,10 @@ function InitDisplay() {
             //非活性 
             //〇タブ１
             if (objDtabNo === "0") {
-                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
-                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
-                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
-                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";
+                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "";
+                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
+                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
             }
@@ -217,6 +217,15 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         }
         else if (fieldNM === "LINE") {
             document.getElementById('WF_LeftMViewChange').value = 49;
+        }
+        else if (fieldNM === "SECONDCONSIGNEENAME") {
+            document.getElementById('WF_LeftMViewChange').value = 43;
+        }
+        else if (fieldNM === "SECONDARRSTATIONNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 51;
+        }
+        else if (fieldNM === "FILLINGPOINT") {
+            document.getElementById('WF_LeftMViewChange').value = 52;
         }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 

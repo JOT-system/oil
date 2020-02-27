@@ -43,6 +43,9 @@
     <asp:TextBox ID="WF_SEL_LOADINGCAR_ARRIVALDATE" runat="server"></asp:TextBox>
     <!-- 受入日 -->
     <asp:TextBox ID="WF_SEL_RECEIPTDATE" runat="server"></asp:TextBox>
+    <!-- 空車着日 -->
+    <asp:TextBox ID="WF_SEL_EMPARRDATE" runat="server"></asp:TextBox>
+
     <!-- レギュラー(タンク車数) -->
     <asp:TextBox ID="WF_SEL_REGULAR_TANKCAR" runat="server"></asp:TextBox>
     <!-- ハイオク(タンク車数) -->

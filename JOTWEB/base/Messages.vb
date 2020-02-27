@@ -476,6 +476,21 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_CONSIGNEE_OILCODE_NG As String = "20022"
 
+        ''' <summary>
+        ''' 受注登録内容の重複エラー
+        ''' </summary>
+        Public Const OIL_ORDER_REPEAT_ERROR As String = "20023"
+
+        ''' <summary>
+        ''' 油種数登録ボタン未使用(新規登録時において)
+        ''' </summary>
+        Public Const OIL_OILREGISTER_NOTUSE As String = "20024"
+
+        ''' <summary>
+        ''' タンク車数量エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_NUMBER_ERROR As String = "20025"
+
 #End Region
 
 

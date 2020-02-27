@@ -21,8 +21,8 @@ if (window.addEventListener) {
     if (window.event === void 0)
         addEvent = function (element, type, listener, useCapture) {
             var process;
-            if (typeof useCapture != 'boolean') useCapture = false;
-            if (typeof listener == 'function')
+            if (typeof useCapture !== 'boolean') useCapture = false;
+            if (typeof listener === 'function')
                 process = function (evt) {
                     if (listener.call(element, evt) === false) return preventDefault(evt);
                 };
@@ -37,8 +37,8 @@ if (window.addEventListener) {
     else
         addEvent = function (element, type, listener, useCapture) {
             var process;
-            if (typeof useCapture != 'boolean') useCapture = false;
-            if (typeof listener == 'function')
+            if (typeof useCapture !== 'boolean') useCapture = false;
+            if (typeof listener === 'function')
                 process = function () {
                     if (listener.call(element, event) === false) return preventDefault(event);
                 };
@@ -55,7 +55,7 @@ else if (window.attachEvent) {
     if (window.event === void 0)
         addEvent = function (element, type, listener) {
             var process;
-            if (typeof listener == 'function')
+            if (typeof listener === 'function')
                 process = function (evt) {
                     if (listener.call(element, evt) === false) return preventDefault(evt);
                 };
@@ -70,7 +70,7 @@ else if (window.attachEvent) {
     else
         addEvent = function (element, type, listener) {
             var process;
-            if (typeof listener == 'function')
+            if (typeof listener === 'function')
                 process = function () {
                     if (listener.call(element, event) === false) return preventDefault(event);
                 };
@@ -87,7 +87,7 @@ else {
     if (window.event === void 0)
         addEvent = function (element, type, listener) {
             var process;
-            if (typeof listener == 'function')
+            if (typeof listener === 'function')
                 process = function (evt) {
                     if (listener.call(element, evt) === false) return preventDefault(evt);
                 };
@@ -102,7 +102,7 @@ else {
     else
         addEvent = function (element, type, listener) {
             var process;
-            if (typeof listener == 'function')
+            if (typeof listener === 'function')
                 process = function () {
                     if (listener.call(element, event) === false) return preventDefault(event);
                 };
@@ -117,7 +117,7 @@ else {
 }
 addEvent(document, 'keydown', function (evt) {
     var key = getKeyCode(evt);
-    if (key == 116 || evt.ctrlKey && key == 82) {
+    if (key === 116 || evt.ctrlKey && key === 82) {
         return false;
     }
 });

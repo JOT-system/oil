@@ -25,8 +25,6 @@ Public Class OIT0003OrderList
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
     Private Const CONST_UPDATE As String = "Update"                 'データ更新
     Private Const CONST_PATTERNERR As String = "PATTEN ERR"         '関連チェックエラー
-    Private Const CONST_ORDERSTS_CAN As String = "900"              '受注キャンセル
-    Private Const CONST_ORDERSTS_CANNM As String = "受注キャンセル" '受注キャンセル
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
@@ -45,7 +43,6 @@ Public Class OIT0003OrderList
     Private WW_ORDERSTATUS As String = ""                           '受注進行ステータス
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-
 
         Try
             If IsPostBack Then
@@ -211,14 +208,6 @@ Public Class OIT0003OrderList
         CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
-        ''〇 受注キャンセルの場合はダブルクリックは無効
-        'If (WW_ORDERSTATUS = CONST_ORDERSTS_CAN) Then
-        '    CS0013ProfView.LEVENT = ""
-        '    CS0013ProfView.LFUNC = ""
-        'Else
-
-        'End If
-
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
@@ -346,6 +335,7 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANKCH), '')          AS OTHER10OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TANKRINKNO), '')              AS TANKRINKNO" _
+            & " , ISNULL(RTRIM(OIT0002.TANKRINKNOMADE), '')          AS TANKRINKNOMADE" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
@@ -374,8 +364,11 @@ Public Class OIT0003OrderList
             & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
             & "        OIS0015_2.CLASS   = 'ORDERINFO' " _
             & "    AND OIS0015_2.KEYCODE = OIT0002.ORDERINFO " _
-            & " WHERE OIT0002.ORDERYMD   >= @P2" _
+            & " WHERE OIT0002.LODDATE    >= @P2" _
             & "   AND OIT0002.DELFLG     <> @P3"
+
+        '20200225(条件変更：登録年月日⇒(予定)積込日に変更)
+        '& " WHERE OIT0002.ORDERYMD   >= @P2" _
 
         '& " , ISNULL(RTRIM(OIS0015_2.VALUE1), '')                AS ORDERINFONAME" _
         '& " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
@@ -386,6 +379,10 @@ Public Class OIT0003OrderList
         '営業所
         If Not String.IsNullOrEmpty(work.WF_SEL_SALESOFFICECODE.Text) Then
             SQLStr &= String.Format("    AND OIT0002.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODE.Text)
+        End If
+        '発日('20200225(条件追加：(予定)発日))
+        If Not String.IsNullOrEmpty(work.WF_SEL_SEARCH_DEPDATE.Text) Then
+            SQLStr &= String.Format("    AND OIT0002.DEPDATE >= '{0}'", work.WF_SEL_SEARCH_DEPDATE.Text)
         End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then
@@ -555,10 +552,10 @@ Public Class OIT0003OrderList
                     PARA12.Value = Master.USERID
                     PARA13.Value = Master.USERTERMID
                     PARA14.Value = C_DEFAULT_YMD
-                    PARA15.Value = CONST_ORDERSTS_CAN
+                    PARA15.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
-                    OIT0003UPDrow("ORDERSTATUS") = CONST_ORDERSTS_CAN
-                    OIT0003UPDrow("ORDERSTATUSNAME") = CONST_ORDERSTS_CANNM
+                    OIT0003UPDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_900
+                    CODENAME_get("ORDERSTATUS", OIT0003UPDrow("ORDERSTATUS"), OIT0003UPDrow("ORDERSTATUSNAME"), WW_DUMMY)
 
                     SQLcmd.ExecuteNonQuery()
                 End If
@@ -897,7 +894,7 @@ Public Class OIT0003OrderList
 
         '〇 受注進行ステータスが"900(受注キャンセル)"の場合は何もしない
         WW_ORDERSTATUS = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUS")
-        If WW_ORDERSTATUS = CONST_ORDERSTS_CAN Then
+        If WW_ORDERSTATUS = BaseDllConst.CONST_ORDERSTATUS_900 Then
             Exit Sub
         End If
 
@@ -1027,6 +1024,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
         '貨車連結順序表№
         work.WF_SEL_LINKNO.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKRINKNO")
+        '作成用_貨車連結順序表№
+        work.WF_SEL_LINKNO_ORDER.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKRINKNOMADE")
 
         '計上年月日
         work.WF_SEL_KEIJYOYMD.Text = OIT0003tbl.Rows(WW_LINECNT)("KEIJYOYMD")
@@ -1097,8 +1096,15 @@ Public Class OIT0003OrderList
         '画面表示データ保存(遷移先(登録画面)向け)
         Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
 
-        '登録画面ページへ遷移
-        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
+        '受注進行ステータス(コード)
+        '〇受注進行ステータスが"100:受注受付"の場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            '受注貨車連結割当画面ページへ遷移
+            Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
+        Else
+            '受注明細画面ページへ遷移
+            Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
+        End If
 
     End Sub
 
@@ -1219,6 +1225,51 @@ Public Class OIT0003OrderList
 
     End Sub
 
+
+    ''' <summary>
+    ''' 名称取得
+    ''' </summary>
+    ''' <param name="I_FIELD"></param>
+    ''' <param name="I_VALUE"></param>
+    ''' <param name="O_TEXT"></param>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
+
+        O_TEXT = ""
+        O_RTN = ""
+
+        If I_VALUE = "" Then
+            O_RTN = C_MESSAGE_NO.NORMAL
+            Exit Sub
+        End If
+        Dim prmData As New Hashtable
+
+        Try
+            Select Case I_FIELD
+                Case "CAMPCODE"         '会社コード
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "UORG"             '運用部署
+                    prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "DELFLG"           '削除
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+
+                Case "ORDERSTATUS"      '受注進行ステータス
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERSTATUS"))
+
+                Case "ORDERINFO"        '受注情報
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
+
+            End Select
+        Catch ex As Exception
+            O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+            Exit Sub
+        End Try
+
+    End Sub
 
     ''' <summary>
     ''' 遷移先(登録画面)退避データ保存先の作成

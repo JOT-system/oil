@@ -49,7 +49,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     }
     /* テキストボックスフォーカスがあった時点で選択 */
-    var texboxObjList = document.querySelectorAll("input[type='text'],input[type='password']");
+    var texboxObjList = document.querySelectorAll("input[type='text'],input[type='number'],input[type='password']");
     for (let i = 0; i < texboxObjList.length; i++) {
         texboxObjList[i].addEventListener('focus', function () {
             // Edgeの場合はディレイをかけてテキストボックス全選択
@@ -105,13 +105,41 @@ window.addEventListener('DOMContentLoaded', function () {
     let queryString = "input.boxIcon,input.calendarIcon";
     // 暫定（日付をやるならvb側をいじる）グリッド内のテキストボックス(グリッド内のtdにダブルクリックイベントがあるテキストボックス)
     queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=text]";
+    queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=number]";
     var targetTextBoxList = document.querySelectorAll(queryString);
     if (targetTextBoxList !== null) {
         document.forms[0].style.display = 'none'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
         commonAppendInputBoxIcon(targetTextBoxList);
         document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     }
-
+    /* ******************************** */
+    /* 左ボックステーブル表示時の補正   */
+    /* ******************************** */
+    let userAgent = window.navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf('msie') !== -1 ||
+        userAgent.indexOf('trident') !== -1) {
+        //IE(display:stickyが効かない為IEはこれでカバー)
+        commonLeftTableHeaderFixed();
+    }
+    /* ******************************** */
+    /* 左ボックステーブルソート機能     */
+    /* ******************************** */
+    commonLeftTableSortEventBind();
+    /* ************************************ */
+    /* 数字入力のみの関数を仕込んでいる場合 */
+    /* 全角→半角変換を行う                 */
+    /* ************************************ */
+    let numericTextObjList = document.querySelectorAll('input[type="text"][onkeypress*="CheckNum()"]');
+    if (numericTextObjList !== null) {
+        for (let i = 0; i < numericTextObjList.length; i++) {
+            let numericObj = numericTextObjList[i];
+            numericObj.addEventListener('change', (function (numericObj) {
+                return function () {
+                    ConvartWideCharToNormal(numericObj);
+                };
+            })(numericObj), true);
+        }
+    }
 });
 
 // 処理後カーソルを戻す
@@ -578,11 +606,14 @@ function ListboxDBclick() {
     }
 }
 // ○左BOX用処理（DBクリック選択+値反映）
-function WF_TableF_DbClick(index) {
+function WF_TableF_DbClick(callerObj) {
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let keyValue = callerObj.dataset.key;
+        let itemValues = callerObj.dataset.values;
         document.getElementById("MF_SUBMIT").value = "TRUE";
         document.getElementById('WF_LeftboxOpen').value = "";
-        document.getElementById('WF_TBL_SELECT').value = index;
+        document.getElementById('hdnLeftTableSelectedKey').value = keyValue;
+        document.getElementById('WF_TBL_SELECT').value = itemValues;
         document.getElementById("WF_ButtonClick").value = "WF_ListboxDBclick";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
@@ -1199,6 +1230,338 @@ function ListDbClick(obj, lineCnt) {
     }
 }
 /**
+ * 左ボックステーブル表示の検索ボタン押下時イベント
+ * のタグを追加する
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonLeftTableFilter() {
+    // 念の為表示エリアのオブジェクト有無確認（なければ終了）
+    let leftTableArea = document.getElementById('pnlLeftList');
+    if (leftTableArea === null) {
+        return;
+    }
+    let findTextObj = document.getElementById('txtSearchLeftTable');
+    if (findTextObj === null) {
+        return;
+    }
+    let findText = findTextObj.value;
+    let hiddenList = leftTableArea.querySelectorAll('.leftTableDataRow[style*="display: none"],.leftTableDataRow[style*="display : none"]');
+    for (let i = 0; i < hiddenList.length; i++) {
+        hiddenList[i].style.display = '';
+    }
+    let userAgent = window.navigator.userAgent.toLowerCase();
+    // 検索文字が無い場合は全部表示させ終了
+    if (findText === '') {
+        commonLeftTableMarkLastRow(leftTableArea);
+        if (userAgent.indexOf('msie') !== -1 ||
+            userAgent.indexOf('trident') !== -1) {
+            //IE(display:stickyが効かない為IEはこれでカバー)
+            commonLeftTableScroll(leftTableArea);
+        }
+        return;
+    }
+    // 検索文字に一致しない行は非表示
+    let searchList = leftTableArea.querySelectorAll('.leftTableDataRow');
+    for (let i = 0; i < searchList.length; i++) {
+        let rowObj = searchList[i];
+        let foundCell = rowObj.querySelectorAll('span');
+        let isFound = false;
+        if (foundCell === null) {
+            continue;
+        }
+        for (let j = 0; j < foundCell.length; j++) {
+            if (foundCell[j].textContent.indexOf(findText) >= 0) {
+                isFound = true;
+                continue;
+            }
+        }
+        // ここまで来た場合は全セル一致なしの為、非表示
+        if (isFound === false) {
+            rowObj.style.display = 'none';
+        }
+    }
+    commonLeftTableMarkLastRow(leftTableArea);
+    
+    if (userAgent.indexOf('msie') !== -1 ||
+        userAgent.indexOf('trident') !== -1) {
+        //IE(display:stickyが効かない為IEはこれでカバー)
+        commonLeftTableScroll(leftTableArea);
+    }
+    
+}
+/* 左ボックステーブルの最終行に印をつける */
+/**
+ * 左ボックステーブルの最終行に印をつける
+ * @param {Element} leftTableArea 左ボックステーブルエリア
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonLeftTableMarkLastRow(leftTableArea) {
+    let curLastRow = leftTableArea.querySelector('.leftTableDataRow.lastRow');
+    if (curLastRow !== null) {
+        curLastRow.classList.remove('lastRow');
+    }
+
+    let displayRowList = leftTableArea.querySelectorAll('.leftTableDataRow:not([style*="display:none"]):not([style*="display: none"])');
+    let currentOrder = 0;
+    let curIndex = 0;
+    for (let i = 0; i < displayRowList.length; i++) {
+        let rowObj = displayRowList[i];
+        let styleOrder = Number(rowObj.style.order);
+        if (currentOrder < styleOrder) {
+            currentOrder = styleOrder;
+            curIndex = i;
+        }
+    }
+    if (currentOrder !== 0) {
+        let rowObj = displayRowList[curIndex];
+        rowObj.classList.add('lastRow');
+    }
+}
+/**
+ * 左ボックスのテーブル補正
+ * @return {undefined} なし
+ * @description 詳細エリアのタブ変更時イベント
+ */
+function commonLeftTableHeaderFixed() {
+    let leftTableObj = document.getElementById('pnlLeftList');
+    if (leftTableObj === null) {
+        return;
+    }
+    let headerArea = leftTableObj.querySelector('.leftTableHeaderWrapper');
+    let headerRowArea = leftTableObj.querySelector('.leftTableHeader');
+    let dataArea = leftTableObj.querySelector('.leftTableDataWrapper');
+    if (headerArea === null) {
+        return;
+    }
+    if (headerRowArea === null) {
+        return;
+    }
+    if (dataArea === null) {
+        return;
+    }
+    headerArea.style.position = "absolute";
+    headerRowArea.style.position = "fixed";
+    headerRowArea.style.overflow = "hidden";
+    headerRowArea.style.zIndex = "2";
+    headerRowArea.style.width = leftTableObj.clientWidth + 'px';
+    dataArea.style.position = "relative";
+    dataArea.style.top = headerRowArea.clientHeight + 'px';
+
+    leftTableObj.addEventListener('scroll', (function (leftTableObj) {
+        return function () {
+            commonLeftTableScroll(leftTableObj);
+        };
+    })(leftTableObj), false);
+    
+    window.addEventListener('resize', (function (leftTableObj) {
+        return function () {
+            commonLeftTableScroll(leftTableObj);
+        };
+    })(leftTableObj), false);
+    
+}
+function commonLeftTableScroll(leftTableObj) {
+    let headerArea = leftTableObj.querySelector('.leftTableHeaderWrapper');
+    let headerRowArea = leftTableObj.querySelector('.leftTableHeader');
+    let dataArea = leftTableObj.querySelector('.leftTableDataWrapper');
+    if (headerArea === null) {
+        return;
+    }
+    if (headerRowArea === null) {
+        return;
+    }
+    if (dataArea === null) {
+        return;
+    }
+    headerRowArea.style.width = leftTableObj.clientWidth + 'px';
+    headerRowArea.scrollLeft = leftTableObj.scrollLeft;
+    leftTableObj.scrollLeft = headerRowArea.scrollLeft;
+}
+function commonLeftTableSortEventBind() {
+    let leftTableObj = document.getElementById('pnlLeftList');
+    if (leftTableObj === null) {
+        return;
+    }
+    let sortItemObj = document.createElement('input');
+    sortItemObj.id = 'commonLeftListSortItem';
+    sortItemObj.type = 'hidden';
+    sortItemObj.value = '';
+    leftTableObj.appendChild(sortItemObj);
+    let headerArea = leftTableObj.querySelector('.leftTableHeaderWrapper');
+    if (headerArea === null) {
+        return;
+    }
+    let headerTextAreaList = headerArea.querySelectorAll('span[data-fieldname]');
+    if (headerTextAreaList === null) {
+        return;
+    }
+
+    for (let i = 0; i < headerTextAreaList.length; i++) {
+        headerTextObj = headerTextAreaList[i];
+        headerTextObj.addEventListener('click', (function (headerTextObj) {
+            return function () {
+                commonLeftTableSort(headerTextObj);
+            };
+        })(headerTextObj), false);
+    }
+}
+/**
+ * 左表のソート処理
+ * @param {Element} headerTextObj ヘッダー
+ * @return {undefined} なし
+ * @description 詳細エリアのタブ変更時イベント
+ */
+function commonLeftTableSort(headerTextObj) {
+    /* ********************************
+     * クリックされたフィールドを元にソート情報を生成
+    ******************************** */
+    let sortValue = document.getElementById('commonLeftListSortItem');
+    if (sortValue === null) {
+        return;
+    }
+    let sortObj = [];
+    /* Textエンコードした配列を復元 */
+    if (sortValue.value !== '') {
+        sortObj = JSON.parse(sortValue.value);
+    }
+
+    if (headerTextObj !== null) {
+        addCssClassName = '';
+        if (headerTextObj.classList.contains('sortAsc')) {
+            addCssClassName = 'sortDesc';
+            headerTextObj.classList.remove('sortAsc');
+        } else if (headerTextObj.classList.contains('sortDesc')) {
+            headerTextObj.classList.remove('sortDesc');
+            addCssClassName = '';
+        } else {
+            addCssClassName = 'sortAsc';
+        }
+        if (addCssClassName !== '') {
+            headerTextObj.classList.add(addCssClassName);
+        }
+        let targetField = headerTextObj.dataset.fieldname;
+        let isnumericField = '';
+        if (headerTextObj.dataset.isnumfield) {
+            isnumericField = headerTextObj.dataset.isnumfield;
+        }
+
+        if (addCssClassName === '') {
+            // 配列より削除
+            let removedSordObj = sortObj.filter(function (itm) { return itm.FieldName !== targetField; });
+            sortObj = removedSordObj;
+        } else {
+            // 配列を追加 or 変更
+            let sortItem;
+            for (let i = sortObj.length - 1; i >= 0; i--) {
+                if (sortObj[i].FieldName === targetField) {
+                    sortItem = sortObj[i];
+                    sortObj[i].SortClass = addCssClassName;
+                    break;
+                }
+
+            } // ソート条件更新
+
+            if (sortItem === undefined) {
+
+                sortItem = {
+                    FieldName: targetField,
+                    SortClass: addCssClassName,
+                    IsNumericField: isnumericField
+                };
+                sortObj.push(sortItem); 
+            } // ソート条件末尾に追加
+
+        } //ソート情報配列最新化
+        // ソート条件を隠しフィールドに保存
+        encodedValue = '';
+        if (sortObj.length > 0) {
+            encodedValue = JSON.stringify(sortObj);
+        }
+        sortValue.value = encodedValue;
+    } // HeaderObject isnot null
+    /* ********************************
+     * ソート情報を元に一覧表をソート
+    ******************************** */
+    let dataLists = document.querySelectorAll('#pnlLeftList .leftTableDataRow');
+    /* データ行が無い場合ソートできないので終了 */
+    if (dataLists === null) {
+        return;
+    }
+    if (dataLists.length === 0) {
+        return;
+    }
+    document.forms[0].style.display = 'none';
+    document.body.style.cursor = "wait";
+    if (sortObj.length === 0) {
+        //アイテムが存在しない場合は初期表示に戻す
+        for (let i = 0; i < dataLists.length; i++) {
+            let dataItm = dataLists[i];
+            dataItm.style.order = dataItm.dataset.initorder;
+        }
+    } else {
+        dataArr = [].slice.call(dataLists);
+        dataArr.sort(sortLeftList(sortObj));
+        
+        for (let i = 0; i < dataArr.length; i++) {
+            let dataItm = dataArr[i];
+            dataItm.style.order = (i + 1).toString();
+        }
+
+    }
+    let leftTableArea = document.getElementById('pnlLeftList');
+    commonLeftTableMarkLastRow(leftTableArea);
+    document.forms[0].style.display = 'block';
+    document.body.style.cursor = "auto";
+    // 並び替え処理
+    function sortLeftList(sortObj) {
+        return function (a, b) {
+            for (let i = 0; i < sortObj.length; i++) {
+                let fieldName = sortObj[i].FieldName;
+                let sortClass = sortObj[i].SortClass;
+                let isNumericField = sortObj[i].IsNumericField;
+                let aObj = a.querySelector('[data-fieldname="' + fieldName + '"] > span');
+                let bObj = b.querySelector('[data-fieldname="' + fieldName + '"] > span');
+                if (aObj === null || bObj === null) {
+                    return 0;
+                }
+                let varA = (typeof aObj.textContent === 'string') ?
+                    aObj.textContent.toUpperCase() : aObj.textContent;
+                let varB = (typeof bObj.textContent === 'string') ?
+                    bObj.textContent.toUpperCase() : bObj.textContent;
+                if (isNumericField === '1') {
+                    varA = varA.replace(/,/g, ''); // 念の為カンマ除去
+                    if (isNaN(Number(varA)) === false) {
+                        varA = Number(varA);
+                    }
+                    varB = varB.replace(/,/g, '');　// 念の為カンマ除去
+                    if (isNaN(Number(varB)) === false) {
+                        varB = Number(varB);
+                    }
+                }
+
+                if (varA > varB) {
+                    comparison = 1;
+                    if (sortClass === 'sortDesc') {
+                        return comparison * -1;
+                    } else {
+                        return comparison;
+                    }
+                } else if (varA < varB) {
+                    comparison = -1;
+                    if (sortClass === 'sortDesc') {
+                        return comparison * -1;
+                    } else {
+                        return comparison;
+                    }
+                }
+            }
+            return 0;
+        };
+    } // end  sortLeftList
+} // commonLeftTableSort
+/**
  * Inputタグで虫眼鏡を表示するオブジェクトに対して虫眼鏡、カレンダーアイコン
  * のタグを追加する
  * @param {object} targetTextBoxList Inputタグオブジェクト
@@ -1273,10 +1636,10 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
         })(inputObjId), true);
         // アイコン配置後のテキストボックスのサイズを補正(アイコンが無い状態に合わせる)
         inputObj = document.getElementById(inputObj.id);
-        iconElm = document.getElementById(objId);
-        let currentWidth = inputObj.scrollWidth;
-        let cstyle = window.getComputedStyle(iconElm);
-        currentWidth = currentWidth - 14;
+        //iconElm = document.getElementById(objId);
+        //let currentWidth = inputObj.scrollWidth;
+        //let cstyle = window.getComputedStyle(iconElm);
+        //currentWidth = currentWidth - 14;
         //currentWidth = iconElm.getComputedStyle()
         inputObj.style.width = "calc(100% + 1px)";
     }
@@ -1435,3 +1798,25 @@ function CheckNum() {
         event.preventDefault(); // IEはこれで効く
     }
 }
+// 〇全角⇔半角変換
+function ConvartWideCharToNormal(obj) {
+    if (obj === null) {
+        return;
+    }
+    if (obj.value === '') {
+        return;
+    }
+    let repVal = '';
+    repVal = obj.value.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function (s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    });
+    repVal = repVal.replace(/[．]/g, '.');
+    repVal = repVal.replace(/[ー]/g, '-');
+    repVal = repVal.replace(/[－]/g, '-');
+    repVal = repVal.replace(/，/g, '');
+    repVal = repVal.replace(/,/g, '');
+    //repVal = repVal.replace(/[^0-9]/g, '');
+    repVal = repVal.replace(/[^-^0-9^\.]/g, "");
+    //repVal = repVal.match(/-?\d+\.?\d*/);
+    obj.value = repVal;
+}  

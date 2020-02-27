@@ -15,6 +15,8 @@
     <asp:TextBox ID="WF_SEL_SALESOFFICE" runat="server"></asp:TextBox>
     <!-- 年月日 -->
     <asp:TextBox ID="WF_SEL_DATE" runat="server"></asp:TextBox>
+    <!-- 発日 -->
+    <asp:TextBox ID="WF_SEL_SEARCH_DEPDATE" runat="server"></asp:TextBox>
     <!-- 列車番号 -->
     <asp:TextBox ID="WF_SEL_TRAINNUMBER" runat="server"></asp:TextBox>
     <!-- 荷卸地コード -->
@@ -147,6 +149,8 @@
     <asp:TextBox ID="WF_SEL_ACTUALEMPARRDATE" runat="server"></asp:TextBox>
     <!-- 貨車連結順序表№ -->
     <asp:TextBox ID="WF_SEL_LINKNO" runat="server"></asp:TextBox>
+    <!-- 貨車連結順序表№(受注　→　貨車連結順序表(作成用)) -->
+    <asp:TextBox ID="WF_SEL_LINKNO_ORDER" runat="server"></asp:TextBox>
 
     <!-- 計上年月日 -->
     <asp:TextBox ID="WF_SEL_KEIJYOYMD" runat="server"></asp:TextBox>

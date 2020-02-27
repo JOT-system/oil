@@ -38,18 +38,18 @@ function carenda(num,calId) {
     var dValue = document.getElementById("dValue");
     document.getElementById("WF_ButtonSel").disabled = true;
 
-    if (calId == undefined) { calId = 'WF_Calendar'; }
+    if (calId === undefined) { calId = 'WF_Calendar'; }
     // memo１日＝６０秒×６０分×２４時間＝８６４００秒、８６４００秒＝８６４０００００ミリ秒 
     switch (parseInt(num)) {
         case 0:
             //初期表示
-            if (document.getElementById(calId).value == "") {
+            if (document.getElementById(calId).value === "") {
                 year = now.getFullYear();
                 month = now.getMonth() + 1;
                 date = now.getDate();
             } else {
                 var ymd = new Date(document.getElementById(calId).value);
-                if (ymd != "Invalid Date") {
+                if (ymd !== "Invalid Date") {
                     year = ymd.getFullYear();
                     month = ymd.getMonth() + 1;
                     date = ymd.getDate();
@@ -63,7 +63,7 @@ function carenda(num,calId) {
         case 1:
             //前月表示
             var backMDate = new Date(parseInt(dValue.innerHTML) - 24 * 60 * 60 * 1000 * 1);
-            if (backMDate.getMonth() == now.getMonth() && backMDate.getFullYear() == now.getFullYear()) {
+            if (backMDate.getMonth() === now.getMonth() && backMDate.getFullYear() === now.getFullYear()) {
                 year = now.getFullYear();
                 month = now.getMonth() + 1;
                 date = now.getDate();
@@ -76,7 +76,7 @@ function carenda(num,calId) {
         case 2:
             //翌月表示
             var nextMDate = new Date(parseInt(dValue.innerHTML) + 24 * 60 * 60 * 1000 * 31);
-            if (nextMDate.getMonth() == now.getMonth() && nextMDate.getFullYear() == now.getFullYear()) {
+            if (nextMDate.getMonth() === now.getMonth() && nextMDate.getFullYear() === now.getFullYear()) {
                 year = now.getFullYear();
                 month = now.getMonth() + 1;
                 date = now.getDate();
@@ -92,10 +92,9 @@ function carenda(num,calId) {
 
     var last_date = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
     var editMsg;
-    if (month == 2) {
-        if (year % 4 == 0) {
-            if ((year % 100 == 0) && (year % 400 != 0)) {
-            } else {
+    if (month === 2) {
+        if (year % 4 === 0) {
+            if (!(year % 100 === 0 && year % 400 !== 0)) {
                 last_date[1] = 29;
             }
         }
@@ -103,29 +102,29 @@ function carenda(num,calId) {
 
     // 月を英語表記にする
     var usmonth;
-    if (month == 1) {
+    if (month === 1) {
         usmonth = "January"
-    } else if (month == 2) {
+    } else if (month === 2) {
         usmonth = "February"
-    } else if (month == 3) {
+    } else if (month === 3) {
         usmonth = "March"
-    } else if (month == 4) {
+    } else if (month === 4) {
         usmonth = "April"
-    } else if (month == 5) {
+    } else if (month === 5) {
         usmonth = "May"
-    } else if (month == 6) {
+    } else if (month === 6) {
         usmonth = "June"
-    } else if (month == 7) {
+    } else if (month === 7) {
         usmonth = "July"
-    } else if (month == 8) {
+    } else if (month === 8) {
         usmonth = "August"
-    } else if (month == 9) {
+    } else if (month === 9) {
         usmonth = "September"
-    } else if (month == 10) {
+    } else if (month === 10) {
         usmonth = "October"
-    } else if (month == 11) {
+    } else if (month === 11) {
         usmonth = "November"
-    } else if (month == 12) {
+    } else if (month === 12) {
         usmonth = "Decembar"
     }
 
@@ -164,18 +163,18 @@ function carenda(num,calId) {
     gyouji_tbl[14 * 4 + 2] = shubun(year);
 
     //当日と行事が重なる場合の初期設定
-    if (date != -1) {
+    if (date !== -1) {
         firstAltMsg = "&nbsp";
         firstAltYMD = year + "/" + month + "/" + date;
-        for (var j = 0; j < kokuminLastCnt; j++) {
-            if (gyouji_tbl[j * 4 + 1] == month && gyouji_tbl[j * 4 + 2] == date) {
+        for (let j = 0; j < kokuminLastCnt; j++) {
+            if (gyouji_tbl[j * 4 + 1] === month && gyouji_tbl[j * 4 + 2] === date) {
                 firstAltMsg += gyouji_tbl[j * 4 + 3] + "&nbsp";
             }
         }
     }
 
     for (i = 1; i <= last_date[month - 1]; i++) {
-        if (i != 1 && dayIndex == 0) {
+        if (i !== 1 && dayIndex === 0) {
             editMsg += "<tr>";
         }
 
@@ -202,10 +201,10 @@ function carenda(num,calId) {
         }
 
         //行事の時
-        for (var j = 0; j < kokuminLastCnt; j++) {
-            if (gyouji_tbl[j * 4 + 1] == month && gyouji_tbl[j * 4 + 2] == i) {
+        for (let j = 0; j < kokuminLastCnt; j++) {
+            if (gyouji_tbl[j * 4 + 1] === month && gyouji_tbl[j * 4 + 2] === i) {
                 //祝日
-                if (gyouji_tbl[j * 4] == 1) {
+                if (gyouji_tbl[j * 4] === 1) {
                     fontColor = "#F27398";
                 } else {
                     kabeColor = "lightgreen";
@@ -216,12 +215,12 @@ function carenda(num,calId) {
 
         //選択された日（オレンジに）
         var ymd2 = new Date(document.getElementById(calId).value);
-        if (i == ymd2.getDate() && year == ymd2.getFullYear() && month == ymd2.getMonth() + 1) {
+        if (i === ymd2.getDate() && year === ymd2.getFullYear() && month === ymd2.getMonth() + 1) {
             fontColor = "darkorange";
         } else {
             //当日（指定なしの場合、当日をオレンジに）
-            if (document.getElementById(calId).value == "") {
-                if (i == now.getDate() && year == now.getFullYear() && month == now.getMonth() + 1) {
+            if (document.getElementById(calId).value === "") {
+                if (i === now.getDate() && year === now.getFullYear() && month === now.getMonth() + 1) {
                     fontColor = "darkorange";
                 }
             }
@@ -229,12 +228,12 @@ function carenda(num,calId) {
 
         editMsg += defTD2(i, fontColor, kabeColor, altYMD, altMsg);
 
-        if (dayIndex == 6) {
+        if (dayIndex === 6) {
             editMsg += "</tr>\n";
         }
         dayIndex++; dayIndex %= 7;
     }
-    if (dayIndex != 7) {
+    if (dayIndex !== 7) {
         editMsg += "</tr>\n";
     }
     editMsg += "</table>\n";
@@ -271,7 +270,7 @@ function setDate(altYMD) {
 function setColor(altYMD, event) {
     var Element = document.getElementById(altYMD);
 
-    if (event == 1) {
+    if (event === 1) {
         saveBgColor = Element.style.background;
         saveFgColor = Element.style.color;
 
@@ -287,10 +286,10 @@ function getSyukujituDate(year, month, syuu) {
     var syuuCnt = 0;
     for (var i = 1; i <= 31; i++) {
         var date = (new Date(year, month - 1, i)).getDay();
-        if ((new Date(year, month - 1, i)).getDay() == 1) {
+        if ((new Date(year, month - 1, i)).getDay() === 1) {
             syuuCnt++;
         }
-        if (syuuCnt == syuu) {
+        if (syuuCnt === syuu) {
             return i;
         }
     }

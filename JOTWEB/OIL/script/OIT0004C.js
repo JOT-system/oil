@@ -18,12 +18,17 @@ function InitDisplay() {
     //let txtObjList = document.forms[0].querySelectorAll("#headerboxOnly input[type=text]");
     let suggestCol = document.forms[0].querySelectorAll("div.dataColumn > div.values");
     document.forms[0].style.display = 'none'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
+    // 数字入力のみ可能にする共通関数KeyDown共通関数を仕込む
+    let numInputBoxList = document.forms[0].querySelectorAll("#WF_INVENTORYDAYS, #pnlSuggestList input[type=text],#pnlStockList input[type=text], #pnlSuggestList input[type=number],#pnlStockList input[type=number]");
+    bindNumericKeyPressOnly(numInputBoxList);
+    //提案表の合計イベントバインド
     bindSuggestSummary(suggestCol);
     bindDipsOiltypeStockList();
     document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
-    // 数字入力のみ可能にする共通関数KeyDown共通関数を仕込む
-    let numInputBoxList = document.forms[0].querySelectorAll("#WF_INVENTORYDAYS, #pnlSuggestList input[type=text],#pnlStockList input[type=text]");
-    bindNumericKeyPressOnly(numInputBoxList);
+    // 提案表、車両ロックのイベントバインド
+    bindTrainLock();
+    // ローリ非表示のイベントバインド
+    bindDispLorry();
     //フォーカスを合わせる
     forcusObj();
 
@@ -36,11 +41,11 @@ function bindSuggestSummary(suggestColumnDivList) {
     for (let i = 0; i < suggestColumnDivList.length; i++) {
         let suggestColDiv = suggestColumnDivList[i];
         /* 加算対象のテキストボックス */
-        let suggestColTextList = suggestColDiv.querySelectorAll("div.num:not([data-oilcode=Summary]) input[type=text]");
+        let suggestColTextList = suggestColDiv.querySelectorAll("div.num:not([data-oilcode=Summary]) input[type=text],div.num:not([data-oilcode=Summary]) input[type=number]");
         /* 合計値格納テキストボックス */
-        let summaryColText = suggestColDiv.querySelectorAll("div.num[data-oilcode=Summary]:not(.mi) input[type=text]")[0];
+        let summaryColText = suggestColDiv.querySelectorAll("div.num[data-oilcode=Summary]:not(.mi) input[type=text],div.num[data-oilcode=Summary]:not(.mi) input[type=number]")[0];
         /* 構内取り合計値格納テキストボックス */
-        let miSummaryColText = suggestColDiv.querySelectorAll("div.num.mi[data-oilcode=Summary] input[type=text]")[0];
+        let miSummaryColText = suggestColDiv.querySelectorAll("div.num.mi[data-oilcode=Summary] input[type=text],div.num.mi[data-oilcode=Summary] input[type=number]")[0];
 
         for (let j = 0; j < suggestColTextList.length; j++) {
             let targetText = suggestColTextList[j];
@@ -219,6 +224,157 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
     }
 
 }
+//〇ローリー表示非表示イベントバインド
+function bindDispLorry() {
+    let dispButton = document.getElementById('spnDispLorry');
+    let divStockListObj = document.getElementById('divStockList');
+    let hdnDispLorryObj = document.getElementById('hdnDispLorry');
+    if (dispButton === null) {
+        return;
+    }
+    if (divStockListObj === null) {
+        return;
+    }
+    if (hdnDispLorryObj === null) {
+        return;
+    }
+    // ダイアログを閉じるタイミングでフォーカスを合わせる
+    dispButton.addEventListener('click', (function () {
+        return function () {
+            dispLorry();
+        };
+    })(), false);
+    
+    // 初回ロード時は表示非表示を反転させdispLorryを実行
+    let className = 'hideLorry';
+    if (hdnDispLorryObj.value !== "full") {
+        className = 'full';
+    } 
+    hdnDispLorryObj.value = className;
+    dispLorry();
+}
+//〇ローリー表示非表示イベント
+function dispLorry() {
+    let dispButton = document.getElementById('spnDispLorry');
+    let divStockListObj = document.getElementById('divStockList');
+    let hdnDispLorryObj = document.getElementById('hdnDispLorry');
+    
+    if (dispButton === null) {
+        return;
+    }
+    if (divStockListObj === null) {
+        return;
+    }
+    if (hdnDispLorryObj === null) {
+        return;
+    }
+    let lorryValuesObj = divStockListObj.querySelectorAll('div.receiveFromLorry > span.stockinputtext > input[type="text"]');
+    let hasAnyValues = false;
+    for (let i = 0; i < lorryValuesObj.length; i++) {
+        if (lorryValuesObj[i].value !== "0" && lorryValuesObj[i].value !== "") {
+            hasAnyValues = true;
+            break;
+        }
+    }
+    divStockListObj.classList.remove('hideLorry');
+    divStockListObj.classList.remove('full');
+    divStockListObj.classList.remove('hasLorryValue');
+    // 初回ロード時は表示非表示を反転させdispLorryを実行
+    let className = 'hideLorry';
+    if (hdnDispLorryObj.value !== "full") {
+        className = 'full';
+    } 
+    hdnDispLorryObj.value = className;
+    divStockListObj.classList.add(className);
+    dispButton.parentNode.removeAttribute("data-tiptext");
+    if (hasAnyValues) {
+        divStockListObj.classList.add('hasLorryValue');
+        if (className === 'hideLorry') {
+            dispButton.parentNode.dataset.tiptext = 'ローリー受入数入力あり';
+        }
+    }
+}
+//〇列車ロック時イベント
+function bindTrainLock() {
+    let suggestObj = document.getElementById('pnlSuggestList');
+    if (suggestObj === null) {
+        return;
+    }
+    /* 過去日ではないロックアイコンを取得 */
+    let trainLockObjList = suggestObj.querySelectorAll('div.trainNo[data-ispastday="False"] div.lockImgArea');
+    if (trainLockObjList === null) {
+        return;
+    }
+    /* ロックアイコンにクリックイベントを配置 */
+    for (let i = 0; i < trainLockObjList.length; i++) {
+        let trainLockObj = trainLockObjList[i];
+        trainLockObj.addEventListener('click', (function (trainLockObj) {
+            return function () {
+                trainLockEvent(trainLockObj,false);
+            };
+        })(trainLockObj), false);
+        /* 初回実行を行う */
+        trainLockEvent(trainLockObj, true);
+    }
+    
+}
+/* 列車ロック時イベント */
+function trainLockEvent(callerObj,initCall) {
+    let valuesArea = callerObj.parentNode.parentNode;
+    let hdnStatus = callerObj.querySelector("input");
+
+    if (valuesArea === null) {
+        return;
+    }
+    if (hdnStatus === null) {
+        return;
+    }
+    /* 入力要素の取得 */
+    let changeVal = hdnStatus.value;
+    if (initCall === false) {
+        callerObj.classList.remove('Locked');
+        callerObj.classList.remove('Unlocked');
+        /* 初期設定を除き Locked ⇔ Unlockedを反転 */ 
+        if (changeVal === 'Unlocked') {
+            changeVal = 'Locked';
+        } else {
+            changeVal = 'Unlocked';
+        }
+        callerObj.classList.add(changeVal);
+        hdnStatus.value = changeVal;
+    }
+    let inputObjList = valuesArea.querySelectorAll('div:not([data-oilcode=\'Summary\']) > input:not([type=hidden]),input[type=checkbox]');
+    if (inputObjList === null) {
+        return;
+    }
+    let inputCloneObj = valuesArea.querySelectorAll('input[id$=\'_clone\']');
+    if (inputCloneObj !== null) {
+        for (let i = 0; i < inputCloneObj.length; i++) {
+            inputCloneObj[i].parentNode.removeChild(inputCloneObj[i]);
+        }
+    }
+    let disabled = false;
+    if (changeVal === 'Locked') {
+        disabled = true;
+    } 
+    for (let i = 0; i < inputObjList.length; i++) {
+        let obj = inputObjList[i];
+        let displayVal = 'inline-block';
+        if (disabled === true) {
+            /* ただ単にDisabledにするとPostBackでサーバー側では受け取れなくなるため */
+            /* 使用不可のクローンを作成しクローン元を非表示にする */
+            let cloneItem = obj.cloneNode();
+            cloneItem.id = cloneItem.id + '_clone';
+            cloneItem.name = '';
+            cloneItem.disabled = true;
+            cloneItem.classList.add('aspNetDisabled');
+            obj.parentNode.appendChild(cloneItem);
+
+            displayVal = 'none';
+        }
+        obj.style.display = displayVal;
+    }
+}
 //〇フォーカス合わせ処理
 function forcusObj() {
     let forcusIdObj = document.getElementById('hdnForcusObjId');
@@ -262,7 +418,15 @@ function bindNumericKeyPressOnly(targetTextBoxList) {
         let textObj = targetTextBoxList[i];
         /* keypressはIeでは動かない */
         textObj.addEventListener('keypress', CheckNum);
+
         textObj.style.imeMode = 'disabled';
+
+        textObj.addEventListener('change', (function (textObj) {
+            return function () {
+                ConvartWideCharToNormal(textObj);
+            };
+        })(textObj), true);
+
         /* 桁数 */
         if (textObj.id === 'WF_INVENTORYDAYS') {
             textObj.maxLength = 1;

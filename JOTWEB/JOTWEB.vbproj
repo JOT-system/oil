@@ -98,6 +98,7 @@
   <ItemGroup>
     <Content Include="bin\JOTWEB.dll" />
     <Content Include="bin\JOTWEB.pdb" />
+    <Content Include="img\oil.ico" />
     <Content Include="img\right.png" />
     <Content Include="img\tank2.png" />
     <Content Include="OIL\css\OIT0004C.css" />
@@ -141,6 +142,7 @@
     <Content Include="OIL\img\iconError.png" />
     <Content Include="OIL\img\iconInfo.png" />
     <Content Include="OIL\img\iconWarn.png" />
+    <Content Include="OIL\img\lockKey.png" />
     <Content Include="OIL\img\noicon.png" />
     <Content Include="OIL\img\foward.png" />
     <Content Include="OIL\img\leftbox.png" />
@@ -150,6 +152,7 @@
     <Content Include="OIL\img\pay.png" />
     <Content Include="OIL\img\statistics.png" />
     <Content Include="OIL\img\tank.png" />
+    <Content Include="OIL\img\unlockKey.png" />
     <Content Include="OIL\img\w_cat.png" />
     <Content Include="OIL\inc\GRM00002WRKINC.ascx" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />

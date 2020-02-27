@@ -35,7 +35,7 @@ body, td, th {
     color: #2bb6c1;
     border: solid 1px #2bb6c1;
     transition: 0.3s;
-    font-size:1em;
+    font-size: 1.2em;
 }
 
 .btn-sticky:hover {
@@ -68,6 +68,15 @@ button[disabled=""]:hover {
 #divHidden {
     display: none;
 }
+/* メニューへボタン */
+#WF_ButtonBackToMenu {
+    color: #F58E7E;
+    border: solid 1px #F58E7E;
+}
+#WF_ButtonBackToMenu:hover {
+    background: #F58E7E;
+    color: #fff;
+}
 /* 一覧先頭ページ、最終ページボタン */
 .firstPage, .lastPage {
     width: 24px;
@@ -98,6 +107,7 @@ button[disabled=""]:hover {
 /* 基本設定 テキスト、パスワード、マルチラインテキスト  */
 input[type=text],
 input[type=password],
+input[type=number],
 textarea {
     font-size: 16px;
     font-family: sans-serif;
@@ -121,6 +131,7 @@ textarea {
 }
 input[type=text]:hover,
 input[type=password]:hover,
+input[type=number]:hover,
 textarea:hover {
     background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
     border-color: #2c628b;
@@ -128,6 +139,7 @@ textarea:hover {
 /* テキスト、パスワード、マルチラインテキスト フォーカス時 */
 input[type=text]:focus,
 input[type=password]:focus,
+input[type=number]:focus,
 textarea:focus {
     border-color: rgba(1,60,65, .5);
     background-image:none;
@@ -135,6 +147,7 @@ textarea:focus {
 }
 input[type=text][disabled]:hover,
 input[type=password][disabled]:hover,
+input[type=text][disabled]:hover,
 textarea[disabled]:hover {
     background-image: none;
     border-color: skyblue;
@@ -157,7 +170,16 @@ input::-ms-input-placeholder {
     color: #BBBBBB;
     font-style: italic;
 }
-
+/* chromeのNumberでのスピンボタン非表示 */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* firefoxでのスピンボタン非表示 */
+input[type=number] {
+    -moz-appearance: textfield;
+}
 /* 必須マーク表示 */
 .requiredMark:after {
     /*color: rgb(255,0,0);*/
@@ -180,6 +202,7 @@ input::-ms-input-placeholder {
 }
 /* 一覧表内のテキストボックス補正 */
 div[data-generated='1'] input[type=text],
+div[data-generated='1'] input[type=number],
 div[data-generated='1'] input[type=password] {
     width: calc(100% - 4px) !important;
     height: calc(100% - 4px) !important;
@@ -344,13 +367,19 @@ _:-ms-lang(x)::backdrop, div[data-generated='1'] .boxIconArea div {
 input[type=text].boxIcon,
 input[type=text].calendarIcon,
 input[type=text].boxIcon,
-input[type=text].calendarIcon {
+input[type=text].calendarIcon,
+input[type=number].boxIcon,
+input[type=number].calendarIcon {
     padding-left: 25px;
 }
 input[type=text][disabled].boxIcon,
 input[type=text][disabled].calendarIcon,
+input[type=number][disabled].boxIcon,
+input[type=number][disabled].calendarIcon,
 input[type=text][readonly].boxIcon:not(.iconOnly),
-input[type=text][readonly].calendarIcon:not(.iconOnly) {
+input[type=text][readonly].calendarIcon:not(.iconOnly),
+input[type=number][readonly].boxIcon:not(.iconOnly),
+input[type=number][readonly].calendarIcon:not(.iconOnly) {
     padding-left: 0.3em;
 }
 /* ------------------------------
@@ -570,7 +599,8 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     text-align:left;
     width:180px;
 }
-.searchbox .inputItem a:nth-child(2) input[type=text] {
+.searchbox .inputItem a:nth-child(2) input[type=text],
+.searchbox .inputItem a:nth-child(2) input[type=number]{
     width:calc(100%) !important;
 }
 /* 文言要素 */
@@ -745,10 +775,12 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
 }
 
 #detailkeybox input[type='text'],
-#detailkeybox input[type='password']{
+#detailkeybox input[type='number'],
+#detailkeybox input[type='password'] {
     border-radius: 3px;
 }
 #detailkeybox input[type='text']:focus,
+#detailkeybox input[type='number']:focus,
 #detailkeybox input[type='password']:focus{
     border: 1px solid rgba(1,60,65, .5);
     outline: none;
@@ -813,8 +845,143 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     background: rgba(153, 102, 0, 0.3);
     border-radius: 5px;
 }
+#pnlLeftList {
+    margin-top: 10px;
+    width: 100%;
+    max-width: calc(100% - 2px);
+    height: 100%;
+    max-height: calc(100% - 75px);
+    position: relative;
+    overflow: auto;
+    //overflow-y:hidden;
+    display: flex;
+    flex-direction: column;
+}
+#pnlLeftList div.leftTable {
+    position:absolute;
+}
+#pnlLeftList div.leftTableDataWrapper {
+ //flex: 1 1 auto;
+ //overflow-y: auto;
+    min-height: 0px;
+    margin-bottom:5px;
+    display:flex;
+    flex-wrap:nowrap;
+    flex-direction: column;
+}
+
+#pnlLeftList div {
+    box-sizing:border-box;
+}
+#pnlLeftList .leftTableHeaderWrapper {
+    position :sticky ;
+    top:0;
+    background-color:rgb(242,242,242);
+}
+#pnlLeftList .leftTableHeaderWrapper > div {
+    background-color:rgb(242,242,242);
+}
+#pnlLeftList .leftTable > div > div {
+    display:flex;
+    flex-wrap:nowrap;
+}
+/* 各セルの設定 */
+#pnlLeftList .leftTable > div > div > div {
+    flex-grow: 0;
+    flex-shrink: 0;
+    border:1px solid #a8b7c5;
+    border-bottom:0px; /* ボーダーの重なり抑止 */
+    border-right:0px;
+    word-break:break-all;
+    padding:2px;
+    min-height:25px;
+}
+#pnlLeftList .leftTableDataRow > div {
+   /* height:30px; */
+    display :flex;
+    align-items:stretch;
+}
+#pnlLeftList .leftTableDataRow > div > span {
+    display:flex;
+    align-items:center;
+    height:100%;
+}
+/* ボーダーの重なりで端のボーダーは表示 */
+#pnlLeftList .leftTable > div > div > div:last-child {
+    border-right: 1px solid #a8b7c5;
+    margin-right: 10px;
+}
+/* ボーダーの重なりで端のボーダーは表示 */
+#pnlLeftList .leftTable > div:last-child > div.lastRow > div {
+    border-bottom:1px solid #a8b7c5;
+}
+/* 表ヘッダーセルの設定 */
+#pnlLeftList .leftTable > div > div.leftTableHeader > div {
+    text-align:center;
+    align-items: center;
+    border-color:#3c6690;
+    background: linear-gradient(#829ebc,#225588);
+    box-shadow: 0px 1px 1px rgba(255,255,255,0.3) inset;
+    color:white;
+}
+/* 各丸 */
+#pnlLeftList .leftTable > div > div.leftTableHeader > div:first-child{
+    border-top-left-radius:5px;
+}
+#pnlLeftList .leftTable > div > div.leftTableHeader > div:last-child{
+    border-top-right-radius:5px;
+}
+#pnlLeftList .leftTable > div:last-child > div.lastRow > div:first-child {
+    border-bottom-left-radius:5px;
+}
+#pnlLeftList .leftTable > div:last-child > div.lastRow > div:last-child {
+    border-bottom-right-radius: 5px;
+}
+/* データ行セルの設定 */
+#pnlLeftList .leftTableDataRow:hover > div {
+    
+}
+#pnlLeftList .leftTableDataRow:hover > div {
+    background-color:#9E82BC;
+    //background: linear-gradient(#9E82BC,#F1EEF6);
+    cursor:pointer;
+    color:white;
+}
+/* 左テーブルのソート設定 */
+#pnlLeftList .leftTableHeader > div > span {
+    display: block;
+    text-decoration:none;
+}
+#pnlLeftList .leftTableHeader > div > span:hover {
+    text-decoration:underline;
+    color:palevioletred;
+    cursor:pointer;
+}
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after,
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after{
+    display:inline-block;
+    text-decoration:none !important;
+    color:white;
+    text-decoration-color:rgba(0,0,0,0);
+    white-space: pre-wrap;
+    overflow-y: hidden;
+    height: 13.5px;
+}
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after {
+    content:"▼";
+}
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after {
+    content:"▲";
+}
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after,
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after,
+#pnlLeftList .leftTableHeader > div > span.sortDesc:after:hover,
+#pnlLeftList .leftTableHeader > div > span.sortAsc:after:hover {
+    text-decoration:none !important;
+}
+
 /* 左テーブル */
-#pnlLeftList_H {
+/*#pnlLeftList_H {
     position: fixed;
     top: 5.5em;
     left: 2em;
@@ -826,8 +993,7 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     height: 500px;
     overflow-y: scroll;
     font-size: 1.4rem;
-}
-
+}*/
 /* 左ボックス拡張機能 */
 #WF_LeftBoxSortType {
     width: 300px;
@@ -839,11 +1005,18 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
     //height: 2.1em;
 }
 
-#WF_buttonFilter {
+#WF_buttonFilter,
+#btnSearchLeftTable {
     width: 60px;
     min-height: 22px;
 }
-
+div.leftTableSearch {
+    margin-top:5px;
+    width:100%;
+}
+#txtSearchLeftTable {
+    width: calc(100% - 100px);
+}
 #divPnlListArea_HLShowHideDetailBox {
     color: crimson;
 }
@@ -867,8 +1040,9 @@ input[type=text][readonly].calendarIcon:not(.iconOnly) {
 /* ******************* */
 /* 上部入力エリア共通  */
 /* ******************* */
-.commonHeaderInput input[type=text] {
-    font-size:13.5px;
+.commonHeaderInput input[type=text],
+.commonHeaderInput input[type=number] {
+    font-size: 13.5px;
 }
 .commonHeaderInput {
     display: flex;
@@ -1116,7 +1290,8 @@ div[data-generated='1'] tr td > div[style] {
     max-height:24px;
     margin-top:-3px;
 }
-div[data-generated='1'] input[type=text] {
+div[data-generated='1'] input[type=text],
+div[data-generated='1'] input[type=number]{
     height: 1.6em;
     font-size: 13.5px;
     box-sizing: border-box;
@@ -1258,7 +1433,8 @@ span[class^="WF_DViewRep"][class$="_Area"] {
 
 /* 詳細一覧表内のテキストボックス */
 
-span[class^="WF_DViewRep"] table input[type=text] {
+span[class^="WF_DViewRep"] table input[type=text],
+span[class^="WF_DViewRep"] table input[type=number] {
     width: 15rem;
     height: 1.6rem;
     visibility: hidden;

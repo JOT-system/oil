@@ -65,7 +65,7 @@
                     <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="20"></asp:TextBox>
                 </a>
             </span>
-            <span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
             <!-- ■　本線列車　■ -->
             <span>
                 <a id="WF_HEADOFFICETRAIN_LABEL" class="requiredMark">本線列車</a>
@@ -74,7 +74,7 @@
                     <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                 </a>
             </span>
-            <span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
             <!-- ■　発駅　■ -->
             <span>
                 <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
@@ -101,6 +101,7 @@
                     <asp:Label ID="LblArrstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </span>
+            <span></span>
             <!-- ■　(予定)積込日　■ -->
             <span>
                 <a id="WF_LOADINGDATE_LABEL" class="requiredMark">(予定)積込日</a>
@@ -127,6 +128,13 @@
                 <a id="WF_ACCDATE_LABEL" class="requiredMark">受入日</a>
                 <a class="ef" id="WF_ACCDATE" ondblclick="Field_DBclick('TxtAccDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox ID="TxtAccDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                </a>
+            </span>
+            <!-- ■　(予定)空車着日　■ -->
+            <span>
+                <a id="WF_EMPARRDATE_LABEL" class="requiredMark">空車着日</a>
+                <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                    <asp:TextBox ID="TxtEmparrDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
             
@@ -243,7 +251,8 @@
                 <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"  onclick="ButtonClick('WF_ButtonCSV');" />
             </div>
             <div class="rightSide">
-                <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="空回日報確定" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                <%--<input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="空回日報確定" onclick="ButtonClick('WF_ButtonUPDATE');" />--%>
+                <input type="button" id="WF_ButtonUPDATE" class="btn-sticky" value="受注登録に進む" onclick="ButtonClick('WF_ButtonUPDATE');" />
             </div>
         </div>
         <div id="listWrapper" class="listWrapper">
@@ -297,6 +306,8 @@
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
             <!-- 新規・更新切替用フラグ -->
             <input id="WF_CREATEFLG" runat="server" value="" type="text" />
+            <!-- 油種数登録ボタン押下フラグ(True:有効, False：無効) -->
+            <input id="WF_ButtonInsertFLG" runat="server" value="" type="text" />
         </div>
 </asp:Content>
 

@@ -146,10 +146,12 @@ Public Class OIT0004OilStockCreate
         '**********************************************
         Dim baseDate = work.WF_SEL_STYMD.Text
         Dim salesOffice = work.WF_SEL_SALESOFFICECODE.Text
+        Dim shipper As String = work.WF_SEL_SHIPPERCODE.Text
         Dim consignee = work.WF_SEL_CONSIGNEE.Text
+
         Dim daysList As Dictionary(Of String, DaysItem)
         Dim oilTypeList As Dictionary(Of String, OilItem)
-        Dim trainList As Dictionary(Of String, TrainListItem)
+        Dim trainList As New Dictionary(Of String, TrainListItem)
         Dim dispDataObj As DispDataClass = Nothing
 
         Dim mitrainList As Dictionary(Of String, TrainListItem) = Nothing
@@ -161,30 +163,41 @@ Public Class OIT0004OilStockCreate
             daysList = GetTargetDateList(sqlCon, baseDate)
             '対象油種取得
             oilTypeList = GetTargetOilType(sqlCon, salesOffice, consignee)
+            '提案一覧表示可否取得
+            Dim canShowSuggestList As Boolean = Me.IsShowSuggestList(sqlCon, consignee)
+
             '対象列車取得（ここはまだベタ打ち）
-            trainList = GetTargetTrain(sqlCon, salesOffice, consignee)
+            If canShowSuggestList Then
+                trainList = GetTargetTrain(sqlCon, salesOffice, shipper, consignee)
+            End If
             '抽出結果を画面データクラスに展開
-            dispDataObj = New DispDataClass(daysList, trainList, oilTypeList, salesOffice, consignee)
+            dispDataObj = New DispDataClass(daysList, trainList, oilTypeList, salesOffice, shipper, consignee)
+            '提案一覧表示可否設定
+            dispDataObj.ShowSuggestList = canShowSuggestList
             '前週出荷平均の取得
             dispDataObj = GetLastShipAverage(sqlCon, dispDataObj)
-            '提案一覧表示可否取得
-            dispDataObj.ShowSuggestList = Me.IsShowSuggestList(sqlCon, consignee)
+            'ローリー初期表示判定
+            Me.hdnDispLorry.Value = IsShowLorryValue(sqlCon, consignee)
             '構内取り有無取得
             dispDataObj = GetMoveInsideData(sqlCon, dispDataObj)
             '既登録データ取得
             dispDataObj = GetTargetStockData(sqlCon, dispDataObj)
             '過去日以外の日付について受入数取得
             dispDataObj = GetReciveFromOrder(sqlCon, dispDataObj)
+            '列車運行情報の取得
+            dispDataObj = GetTrainOperation(sqlCon, dispDataObj)
             '構内取り設定がある場合、構内取りデータ取得
             If dispDataObj.HasMoveInsideItem Then
                 '構内取りではない油種「合計」文言を中計と変更
                 dispDataObj.SuggestOilNameList(DispDataClass.SUMMARY_CODE).OilName = "中計"
                 '表構えの為親と構内取り元と同じ列車
-                mitrainList = GetTargetTrain(sqlCon, salesOffice, consignee)
+                If canShowSuggestList Then
+                    mitrainList = GetTargetTrain(sqlCon, salesOffice, shipper, consignee)
+                End If
                 '油種は持っている元に合わせる（最終的に元と一致する油種じゃないと認めない？）
                 miOilTypeList = GetTargetOilType(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiConsignee)
                 '構内取り用の画面表示クラス生成
-                dispDataObj.MiDispData = New DispDataClass(daysList, mitrainList, miOilTypeList, dispDataObj.MiSalesOffice, dispDataObj.MiConsignee)
+                dispDataObj.MiDispData = New DispDataClass(daysList, mitrainList, miOilTypeList, dispDataObj.MiSalesOffice, shipper, dispDataObj.MiConsignee)
                 '前週出荷平均の取得
                 dispDataObj.MiDispData = GetLastShipAverage(sqlCon, dispDataObj.MiDispData)
                 dispDataObj.MiDispData.RecalcStockList(False)
@@ -373,68 +386,87 @@ Public Class OIT0004OilStockCreate
     ''' <returns>キー：列車No,値：列車アイテムクラス
     ''' 営業所、油槽所を元に取得した列車情報</returns>
     ''' <remarks>一旦戻り値が無い場合は提案表を出さない仕組みとする</remarks>
-    Private Function GetTargetTrain(sqlCon As SqlConnection, salesOffice As String, consignee As String) As Dictionary(Of String, TrainListItem)
-        '↓本当はDBから取得！！！のたたき台↓ コメントアウトしSQLなり共通関数なりを利用し整えること
-        'Try
-        '    Dim retVal As New Dictionary(Of String, TrainListItem)
+    Private Function GetTargetTrain(sqlCon As SqlConnection, salesOffice As String, shipper As String, consignee As String) As Dictionary(Of String, TrainListItem)
+        Try
+            Dim retVal As New Dictionary(Of String, TrainListItem)
 
-        '    Dim sqlStr As New StringBuilder
-        '    sqlStr.AppendLine("SELECT XXXXX")
-        '    sqlStr.AppendLine("  FROM XXXXX")
-        '    sqlStr.AppendLine(" WHERE XXXX = @XXXXX")
+            Dim sqlStr As New StringBuilder
+            sqlStr.AppendLine("SELECT TR.TRAINNO")     '列車No
+            sqlStr.AppendLine("      ,isnull(TR.TRAINNAME,'') AS TRAINNAME")
+            sqlStr.AppendLine("      ,isnull(TR.MAXTANK1,0)   AS MAXTANK")   '最大牽引数
+            sqlStr.AppendLine("      ,TR.TSUMI")      '積置フラグ
+            sqlStr.AppendLine("      ,TR.DEPSTATION") '発駅
+            sqlStr.AppendLine("      ,TR.ARRSTATION") '着駅
+            sqlStr.AppendLine("      ,isnull(TR.DEPDAYS,0)    AS DEPDAYS")    '発日日数
+            sqlStr.AppendLine("      ,isnull(TR.MARGEDAYS,0)  AS MARGEDAYS")  '特継日数
+            sqlStr.AppendLine("      ,isnull(TR.ARRDAYS,0)    AS ARRDAYS")    '積車着日数
+            sqlStr.AppendLine("      ,isnull(TR.ACCDAYS,0)    AS ACCDAYS")    '受入日数
+            sqlStr.AppendLine("      ,isnull(TR.EMPARRDAYS,0) AS EMPARRDAYS") '空車着日数
+            sqlStr.AppendLine("      ,isnull(TR.USEDAYS,0)    AS USEDAYS")    '当日利用日数
+            sqlStr.AppendLine("      ,FX.VALUE7               AS PATCODE")    'パターンコード
+            sqlStr.AppendLine("      ,FX.VALUE8               AS PATNAME")    'パターン名
+            sqlStr.AppendLine("  FROM      OIL.VIW0001_FIXVALUE FX")
+            sqlStr.AppendLine(" INNER JOIN OIL.OIM0007_TRAIN    TR")
+            sqlStr.AppendLine("         ON FX.CAMPCODE = TR.OFFICECODE")
+            sqlStr.AppendLine("        AND FX.CLASS    = @CLASS")
+            sqlStr.AppendLine("        AND FX.VALUE1   = @SHIPPERCODE")
+            sqlStr.AppendLine("        AND FX.KEYCODE  = TR.ARRSTATION")
+            sqlStr.AppendLine(" WHERE FX.CAMPCODE   = @SALESOFFICE")
+            sqlStr.AppendLine("   AND FX.VALUE5     = @CONSIGNEECODE")
+            sqlStr.AppendLine("   AND FX.DELFLG     = @DELFLG")
+            sqlStr.AppendLine("   AND TR.OFFICECODE = @SALESOFFICE")
+            sqlStr.AppendLine("   AND TR.DELFLG     = @DELFLG")
+            sqlStr.AppendLine(" ORDER BY TR.TRAINNO,TR.TSUMI")
 
-        '    Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
-        '        With sqlCmd.Parameters
-        '            .Add("@xxxx", SqlDbType.NVarChar).Value = "xxxx"
-        '            .Add("@xxxx", SqlDbType.NVarChar).Value = "xxxx"
-        '        End With
-        '        Dim tlItem As TrainListItem
-        '        Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
-        '            While sqlDr.Read
-        '                tlItem = New TrainListItem(Convert.ToString(sqlDr("車CODE")), Convert.ToString(sqlDr("車名称")))
-        '                retVal.Add(tlItem.TrainNo, tlItem)
-        '            End While
-        '        End Using
 
-        '    End Using
-        '    Return retVal
-        'Catch ex As Exception
-        '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005C")
+            Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@CLASS", SqlDbType.NVarChar).Value = "PATTERNMASTER"
+                    .Add("@SALESOFFICE", SqlDbType.NVarChar).Value = salesOffice
+                    .Add("@SHIPPERCODE", SqlDbType.NVarChar).Value = shipper
+                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = consignee
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Dim tlItem As TrainListItem
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    Dim trainCode As String = ""
+                    Dim trainName As String = ""
+                    Dim decMaxVol As Decimal = 0D
 
-        '    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-        '    CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select Train List"
-        '    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-        '    CS0011LOGWrite.TEXT = ex.ToString()
-        '    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-        '    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-        '    Throw '呼出し元の後続処理を走らせたくないのでThrow 
-        'End Try
-        '↑本当はDBから取得！！！のたたき台↑
-        Dim retVal As New Dictionary(Of String, TrainListItem)
-        '袖ヶ浦
-        If salesOffice = "011203" AndAlso consignee = "40" Then
-            retVal.Add("5972", New TrainListItem("5972", "5972-南松本", 20))
-        End If
-        If salesOffice = "011203" AndAlso consignee = "30" Then
-            retVal.Add("8877", New TrainListItem("8877", "8877-倉賀野", 20))
-            retVal.Add("8883", New TrainListItem("8883", "8883-倉賀野", 22))
-        End If
-        '根岸
-        If salesOffice = "011402" AndAlso consignee = "10" Then
-            retVal.Add("5463", New TrainListItem("5463", "5463-坂城", 17))
-            retVal.Add("2085", New TrainListItem("2085", "2085-坂城", 17))
-            retVal.Add("8471", New TrainListItem("8471", "8471-坂城", 17))
-        End If
-        If salesOffice = "011402" AndAlso consignee = "20" Then
-            retVal.Add("81", New TrainListItem("81", "81-竜王", 17))
-            retVal.Add("83", New TrainListItem("83", "83-竜王", 13))
-        End If
-        '三重塩浜
-        If salesOffice = "012402" AndAlso consignee = "40" Then
-            retVal.Add("5282", New TrainListItem("5282", "5282-南松本", 18))
-            retVal.Add("8072", New TrainListItem("8072", "8072-南松本", 18))
-        End If
-        Return retVal
+                    While sqlDr.Read
+                        trainCode = Convert.ToString(sqlDr("TRAINNO"))
+                        trainName = Convert.ToString(sqlDr("TRAINNAME"))
+                        decMaxVol = Convert.ToDecimal(sqlDr("MAXTANK"))
+                        tlItem = New TrainListItem(trainCode, trainName, decMaxVol) With {
+                            .Tsumi = Convert.ToString(sqlDr("TSUMI")),
+                            .DepStation = Convert.ToString(sqlDr("DEPSTATION")),
+                            .ArrStation = Convert.ToString(sqlDr("ARRSTATION")),
+                            .DepDays = Convert.ToDecimal(sqlDr("DEPDAYS")),
+                            .MargeDays = Convert.ToDecimal(sqlDr("MARGEDAYS")),
+                            .ArrDays = Convert.ToDecimal(sqlDr("ARRDAYS")),
+                            .AccDays = Convert.ToDecimal(sqlDr("ACCDAYS")),
+                            .EmpArrDays = Convert.ToDecimal(sqlDr("EMPARRDAYS")),
+                            .UseDays = Convert.ToDecimal(sqlDr("USEDAYS")),
+                            .PatCode = Convert.ToString(sqlDr("PATCODE")),
+                            .PatName = Convert.ToString(sqlDr("PATNAME"))
+                            }
+                        retVal.Add(tlItem.TrainNo, tlItem)
+                    End While
+                End Using
+
+            End Using
+            Return retVal
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, Me.Title)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select Train List"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Throw '呼出し元の後続処理を走らせたくないのでThrow 
+        End Try
     End Function
     ''' <summary>
     ''' 基準日を元に日付リストを生成
@@ -488,7 +520,7 @@ Public Class OIT0004OilStockCreate
             End Using 'sqlCmd
             Return retVal
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0005C")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, Me.Title)
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select TargetDateList"
@@ -816,6 +848,103 @@ Public Class OIT0004OilStockCreate
         Return retVal
     End Function
     ''' <summary>
+    ''' 列車運行情報マスタより情報取得
+    ''' </summary>
+    ''' <param name="sqlCon">SQL接続</param>
+    ''' <param name="dispData">画面表示クラス</param>
+    ''' <returns></returns>
+    Private Function GetTrainOperation(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        If dispData.ShowSuggestList = False Then
+            Return dispData
+        End If
+        Dim trOpeList As New List(Of TrainOperationItem)
+        Dim retVal = dispData
+        Dim fromDateObj = dispData.StockDate.Values.FirstOrDefault
+        Dim toDateObj = dispData.StockDate.Values.LastOrDefault
+
+        Dim sqlStat As New StringBuilder
+
+        sqlStat.AppendLine("SELECT TRO.OFFICECODE                       AS OFFICECODE")
+        sqlStat.AppendLine("      ,TRO.TRAINNO                          AS TRAINNO")
+        sqlStat.AppendLine("      ,format(TRO.WORKINGDATE,'yyyy/MM/dd') AS WORKINGDATE")
+        sqlStat.AppendLine("      ,TRO.TSUMI                            AS TSUMI")
+        sqlStat.AppendLine("      ,TRO.DEPSTATION                       AS DEPSTATION")
+        sqlStat.AppendLine("      ,TRO.ARRSTATION                       AS ARRSTATION")
+        sqlStat.AppendLine("      ,isnull(TRO.RUN,'0')                  AS RUN")
+        sqlStat.AppendLine("  FROM OIL.OIM0017_TRAINOPERATION TRO")
+        sqlStat.AppendLine(" WHERE TRO.WORKINGDATE BETWEEN @FROMDATE AND @TODATE")
+        sqlStat.AppendLine("   AND TRO.DELFLG      = @DELFLG")
+        '列車条件をORで積み上げ ここから
+        sqlStat.AppendLine("   AND (")
+        Dim trainCondTemplate As String = ""
+        trainCondTemplate = trainCondTemplate & " (     TRO.TRAINNO    = '{0}' " & ControlChars.CrLf
+        trainCondTemplate = trainCondTemplate & "   AND TRO.TSUMI      = '{1}' " & ControlChars.CrLf
+        trainCondTemplate = trainCondTemplate & "   AND TRO.DEPSTATION = '{2}' " & ControlChars.CrLf
+        trainCondTemplate = trainCondTemplate & "   AND TRO.ARRSTATION = '{3}' " & ControlChars.CrLf
+        trainCondTemplate = trainCondTemplate & " ) " & ControlChars.CrLf
+        Dim isFirstTime As Boolean = True
+        For Each trainItm In dispData.TrainList.Values
+            sqlStat.AppendFormat(trainCondTemplate, trainItm.TrainNo,
+                                 trainItm.Tsumi, trainItm.DepStation, trainItm.ArrStation).AppendLine()
+            If isFirstTime Then
+                isFirstTime = False
+                trainCondTemplate = " OR " & trainCondTemplate
+            End If
+        Next trainItm
+        sqlStat.AppendLine("       )")
+        '列車条件をORで積み上げ ここまで
+        sqlStat.AppendLine(" ORDER BY TRO.TRAINNO,TRO.WORKINGDATE")
+        '抽出結果なし且つ範囲が未来日部分に関して１年前の過去実績の払出を設定
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+            '固定パラメータの設定
+            With sqlCmd.Parameters
+                .Add("@FROMDATE", SqlDbType.Date).Value = fromDateObj.ItemDate
+                .Add("@TODATE", SqlDbType.Date).Value = toDateObj.ItemDate
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+
+            End With
+
+            '指定年月の情報取得
+            Using sqlDr = sqlCmd.ExecuteReader
+                Dim trainOpeItem As TrainOperationItem
+                While sqlDr.Read
+                    trainOpeItem = New TrainOperationItem
+                    trainOpeItem.OfficeCode = Convert.ToString(sqlDr("OFFICECODE"))
+                    trainOpeItem.TrainNo = Convert.ToString(sqlDr("TRAINNO"))
+                    trainOpeItem.WorkingDate = Convert.ToString(sqlDr("WORKINGDATE"))
+                    trainOpeItem.Tsumi = Convert.ToString(sqlDr("TSUMI"))
+                    trainOpeItem.DepStation = Convert.ToString(sqlDr("DEPSTATION"))
+                    trainOpeItem.ArrStation = Convert.ToString(sqlDr("ARRSTATION"))
+                    trainOpeItem.Run = Convert.ToString(sqlDr("RUN"))
+                    trOpeList.Add(trainOpeItem)
+                End While 'sqlDr.Read
+            End Using 'sqlDr
+        End Using 'sqlCmd
+        retVal.TrainOperationList = trOpeList '2020/02/27 現状保持しとく必要はないが念のため
+        Dim targetDate As String = ""
+        Dim targetTrainNo As String = ""
+        Dim run As String = ""
+        For Each sgItm In retVal.SuggestList.Values
+            targetDate = sgItm.DayInfo.KeyString
+
+            For Each odrItm In sgItm.SuggestOrderItem.Values
+                targetTrainNo = odrItm.TrainInfo.TrainNo
+                run = "1"
+                run = (From opeItm In trOpeList
+                       Where opeItm.TrainNo = targetTrainNo AndAlso
+                             opeItm.WorkingDate = targetDate
+                       Select Convert.ToString(opeItm.Run)).DefaultIfEmpty("1").First
+                If run = "0" Then
+                    odrItm.TrainLock = True
+                Else
+                    odrItm.TrainLock = False
+                End If
+            Next odrItm
+
+        Next sgItm
+        Return retVal
+    End Function
+    ''' <summary>
     ''' 在庫テーブルより既登録データを取得
     ''' </summary>
     ''' <param name="sqlCon"></param>
@@ -899,6 +1028,34 @@ Public Class OIT0004OilStockCreate
             End Using 'sqlDr
         End Using
         Return False
+    End Function
+    ''' <summary>
+    ''' ローリー初期表示判定
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="consignee"></param>
+    ''' <returns></returns>
+    Private Function IsShowLorryValue(sqlCon As SqlConnection, consignee As String) As String
+        Dim sqlStr As New StringBuilder
+        sqlStr.AppendLine("SELECT FX.KEYCODE  AS CONSIGNEECODE")
+        sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
+        sqlStr.AppendLine(" WHERE FX.CLASS    = @CLASS")
+        sqlStr.AppendLine("   AND FX.KEYCODE  = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@CLASS", SqlDbType.NVarChar).Value = "STOCKLORRYINITSHOW"
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = consignee
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows Then
+                    Return "full"
+                End If
+            End Using 'sqlDr
+        End Using
+        Return "hideLorry"
     End Function
     ''' <summary>
     ''' 在庫テーブル登録処理
@@ -1519,6 +1676,7 @@ Public Class OIT0004OilStockCreate
         Dim trainRepeater As Repeater = Nothing
         Dim trainIdObj As HiddenField = Nothing
         Dim trainId As String = ""
+        Dim hdnTrainLock As HiddenField = Nothing
         Dim chkObj As CheckBox = Nothing
 
         Dim oilTypeItemValue As Repeater = Nothing
@@ -1548,10 +1706,19 @@ Public Class OIT0004OilStockCreate
                 trainId = trainIdObj.Value
                 'チェックボックス取得
                 chkObj = DirectCast(repSuggestTrainItem.FindControl("chkSuggest"), CheckBox)
+                '列車ロック情報取得
+                hdnTrainLock = DirectCast(repSuggestTrainItem.FindControl("hdnTrainLock"), HiddenField)
                 '列車番号別のクラスを取得
                 trainValueClassItem = dateValueClassItem.SuggestOrderItem(trainId)
                 '画面情報クラスに設定しているチェックOn/Offの情報を格納
                 trainValueClassItem.CheckValue = chkObj.Checked
+                '画面情報クラスに列車ロック情報格納
+                If hdnTrainLock.Value = "Locked" Then
+                    trainValueClassItem.TrainLock = True
+                Else
+                    trainValueClassItem.TrainLock = False
+                End If
+
                 '三段階目の油種別の提案数リピーターを取得
                 oilTypeItemValue = DirectCast(repSuggestTrainItem.FindControl("repSuggestValueItem"), Repeater)
                 For Each repOilTypeValItem As RepeaterItem In oilTypeItemValue.Items
@@ -1804,6 +1971,62 @@ Public Class OIT0004OilStockCreate
         ''' <remark>自動提案の最大数を格納</remark>
         Public Property MaxVolume As Decimal
         ''' <summary>
+        ''' 積置フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Tsumi As String
+        ''' <summary>
+        ''' 発駅コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DepStation As String
+        ''' <summary>
+        ''' 着駅コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ArrStation As String
+        ''' <summary>
+        ''' 発日日数
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DepDays As Decimal
+        ''' <summary>
+        ''' 特継日数
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MargeDays As Decimal
+        ''' <summary>
+        ''' 積車着日数
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ArrDays As Decimal
+        ''' <summary>
+        ''' 受入日数
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property AccDays As Decimal
+        ''' <summary>
+        ''' 空車着日数
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property EmpArrDays As Decimal
+        ''' <summary>
+        ''' 当日利用日数
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property UseDays As Decimal
+        ''' <summary>
+        ''' パターンコード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PatCode As String
+        ''' <summary>
+        ''' パターン名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PatName As String
+
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
         ''' <param name="trainNo">列車番号</param>
@@ -1893,6 +2116,11 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property SalesOffice As String = ""
         ''' <summary>
+        ''' 荷主
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Shipper As String = ""
+        ''' <summary>
         ''' 荷受人（油槽所）
         ''' </summary>
         ''' <returns></returns>
@@ -1918,6 +2146,11 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property TrainList As Dictionary(Of String, TrainListItem)
+        ''' <summary>
+        ''' 列車運行情報リスト
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TrainOperationList As List(Of TrainOperationItem)
         ''' <summary>
         ''' 在庫一覧日付部分
         ''' </summary>
@@ -1987,8 +2220,9 @@ Public Class OIT0004OilStockCreate
         ''' <param name="trainList">列車IDリスト</param>
         ''' <param name="oilTypeList">対象油種リスト</param>
         Public Sub New(daysList As Dictionary(Of String, DaysItem), trainList As Dictionary(Of String, TrainListItem), oilTypeList As Dictionary(Of String, OilItem),
-                       officeCode As String, consigneeCode As String)
+                       officeCode As String, shipper As String, consigneeCode As String)
             Me.SalesOffice = officeCode
+            Me.Shipper = shipper
             Me.Consignee = consigneeCode
             Me.TrainList = trainList
             '******************************
@@ -2258,6 +2492,10 @@ Public Class OIT0004OilStockCreate
                         Continue For
                     End If
                     suggestTrainItem = suggestItem.SuggestOrderItem(trainInfo.TrainNo)
+                    '列車ロックがかかっている場合計算しない
+                    If suggestTrainItem.TrainLock = True Then
+                        Continue For
+                    End If
                     '計算対象チェックをOn
                     suggestTrainItem.CheckValue = True
                     finishIncremental = False
@@ -2674,6 +2912,48 @@ Public Class OIT0004OilStockCreate
             ''' <returns></returns>
             Public Property StockRate As Decimal
         End Class
+    End Class
+    ''' <summary>
+    ''' 列車運行情報アイテムクラス
+    ''' </summary>
+    <Serializable>
+    Public Class TrainOperationItem
+        ''' <summary>
+        ''' 営業所コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OfficeCode As String
+        ''' <summary>
+        ''' JOT列車番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property TrainNo As String
+        ''' <summary>
+        ''' 運行日(yyyy/MM/dd形式)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property WorkingDate As String
+        ''' <summary>
+        ''' 積込フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Tsumi As String
+        ''' <summary>
+        ''' 発駅コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DepStation As String
+        ''' <summary>
+        ''' 着駅コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ArrStation As String
+        ''' <summary>
+        ''' 稼働フラグ(0:非稼働  1:稼働)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property [Run] As String
+
     End Class
 #Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"
     '   "RepeaterでPoscBack時処理で使用するため保持させる必要上RepeaterのViewState使用停止するのは難しい"

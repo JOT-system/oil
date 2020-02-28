@@ -64,7 +64,7 @@ Public Class OIT0004OilStockCreate
                         Case "WF_ButtonINPUTCLEAR" '入力値クリアボタン押下
                             WF_ButtonINPUTCLEAR_Click()
                         Case "WF_ButtonGETEMPTURN" '空回日報取込ボタン押下
-
+                            WF_ButtonGETEMPTURN_Click()
                         Case "WF_ButtonRECULC"
                             WF_ButtonRECULC_Click()
                         Case "WF_ButtonUPDATE" '更新ボタン押下
@@ -298,6 +298,35 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     Protected Sub WF_ButtonORDERLIST_Click()
 
+    End Sub
+    ''' <summary>
+    ''' 空回日報取り込みボタン押下時
+    ''' </summary>
+    Protected Sub WF_ButtonGETEMPTURN_Click()
+        '画面入力値を取得し画面データクラスへ反映
+        Dim dispValues = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+        '自動提案の値を一旦すべて0に変更
+        dispValues.SuggestValueInputValueToZero()
+        Using sqlCon = CS0050SESSION.getConnection
+            sqlCon.Open()
+            dispValues = GetEmptyTurnInfo(sqlCon, dispValues)
+        End Using
+        '1.提案リスト
+        If dispValues.ShowSuggestList = False Then
+            pnlSuggestList.Visible = False
+        Else
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispValues}
+            frvSuggest.DataBind()
+        End If
+        '2.比重リスト
+        repWeightList.DataSource = dispValues.OilTypeList
+        repWeightList.DataBind()
+        '3.在庫表
+        repStockDate.DataSource = dispValues.StockDate
+        repStockDate.DataBind()
+        repStockOilTypeItem.DataSource = dispValues.StockList
+        repStockOilTypeItem.DataBind()
     End Sub
     ''' <summary>
     ''' 入力値クリアボタン押下時処理
@@ -998,6 +1027,73 @@ Public Class OIT0004OilStockCreate
                 End If
             End Using 'sqlDr
         End Using 'sqlCmd
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 空回日報情報を取得、提案表の値を更新
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="dispData"></param>
+    ''' <returns></returns>
+    Private Function GetEmptyTurnInfo(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        'これもしかすると在庫テーブルから先週の払出量かと
+        'オーダーは受入数な気がする(Consigneeしかないので)
+        Dim sqlStr As New StringBuilder
+        Dim retVal = dispData
+        '検索値の設定
+        Dim dateFrom As String = dispData.StockDate.First.Value.KeyString
+        Dim dateTo As String = dispData.StockDate.Last.Value.KeyString
+
+        sqlStr.AppendLine("SELECT DTL.OILCODE")
+        sqlStr.AppendLine("     , ODR.TRAINNO")
+        sqlStr.AppendLine("     , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))    AS CARSAMOUNT")
+        sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+        sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
+        sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
+        sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
+        sqlStr.AppendLine("   AND DTL.OILCODE is not null")
+        sqlStr.AppendLine(" WHERE ODR.ACCDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
+        sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+        sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
+        sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.TRAINNO,ODR.ACCDATE")
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                .Add("@DATE_FROM", SqlDbType.Date).Value = dateFrom
+                .Add("@ADATE_TO", SqlDbType.Date).Value = dateTo
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows Then
+                    Dim oilCode As String = ""
+                    Dim trainNo As String = ""
+                    Dim targetDate As String = ""
+                    Dim suggestVal As Decimal = 0D
+                    While sqlDr.Read
+                        oilCode = Convert.ToString(sqlDr("OILCODE"))
+                        trainNo = Convert.ToString(sqlDr("TRAINNO"))
+                        targetDate = Convert.ToString(sqlDr("TARGETDATE"))
+                        '油種未設定または対象油種を持っていないレコードはスキップ
+                        If oilCode = "" OrElse retVal.SuggestOilNameList.ContainsKey(oilCode) = False OrElse
+                           targetDate = "" OrElse retVal.SuggestList.ContainsKey(targetDate) = False OrElse
+                           trainNo = "" OrElse retVal.SuggestList(targetDate).SuggestOrderItem.ContainsKey(trainNo) = False Then
+                            Continue While
+                        End If
+                        With retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem(oilCode)
+                            suggestVal = Convert.ToDecimal(sqlDr("CARSAMOUNT"))
+                            .ItemValue = suggestVal.ToString("#,##0")
+                        End With
+
+                    End While
+                End If
+            End Using 'sqlDr
+        End Using
         Return retVal
     End Function
 
@@ -2303,7 +2399,7 @@ Public Class OIT0004OilStockCreate
         ''' 提案表部分の0クリア
         ''' </summary>
         ''' <remarks>自動提案でも使用するため外だし</remarks>
-        Private Sub SuggestValueInputValueToZero()
+        Public Sub SuggestValueInputValueToZero()
             '提案表クリア
             For Each suggestItm In SuggestList.Values
                 For Each odrItem In suggestItm.SuggestOrderItem.Values

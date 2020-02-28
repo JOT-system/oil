@@ -1790,7 +1790,30 @@ function commonHideWait() {
         document.body.removeChild(hasElm);
     }
 }
-
+// 〇数値のみ入力可能 一旦callerObj以外の引数無視
+function commonAutoDecPoint(callerObj, decPint, totalLength) {
+    // 呼出し元オブジェクト
+    if (callerObj === null) {
+        return;
+    }
+    let targetObj = callerObj;
+    if (callerObj.tagName.toLowerCase() !== "input") {
+        targetObj = callerObj.querySelector("input");
+    }
+    // デフォルト値
+    let defVal = '00.000';
+    let inpValue = targetObj.value;
+    // 一旦小数点は除去
+    inpValue = inpValue.replace(/[.]/g, '');
+    // 除去した結果の長さが5以外ならデフォルト
+    if (inpValue.length !== 5) {
+        inpValue = defVal;
+    } else {
+        // 2文字目まで + "." + 3文字目以降を設定
+        inpValue = inpValue.substring(0, 2) + "." + inpValue.substring(2)
+    }
+    targetObj.value = inpValue;
+}
 // 〇数値のみ入力可能
 function CheckNum() {
     if (event.keyCode < 48 || event.keyCode > 57) {

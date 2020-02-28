@@ -1568,6 +1568,7 @@ Public Class OIT0003OrderDetail
                 & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
                 & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
                 & " , ISNULL(RTRIM(OIT0003.CARSAMOUNT), '')                         AS CARSAMOUNT" _
+                & " , ISNULL(RTRIM(OIT0003.JOINTCODE), '')                          AS JOINTCODE" _
                 & " , ISNULL(RTRIM(OIT0003.JOINT), '')                              AS JOINT" _
                 & " , ISNULL(FORMAT(OIT0003.ACTUALLODDATE, 'yyyy/MM/dd'), NULL)     AS ACTUALLODDATE" _
                 & " , ISNULL(FORMAT(OIT0003.ACTUALDEPDATE, 'yyyy/MM/dd'), NULL)     AS ACTUALDEPDATE" _
@@ -2262,7 +2263,7 @@ Public Class OIT0003OrderDetail
                     End If
 
                     '(一覧)荷主名, (一覧)油種, (一覧)タンク車№, 
-                    '(一覧)入線列車番号, (一覧)出線列車番号, (一覧)回線
+                    '(一覧)入線列車番号, (一覧)出線列車番号, (一覧)回線, (一覧)充填ポイント
                     If WF_FIELD.Value = "SHIPPERSNAME" _
                         OrElse WF_FIELD.Value = "OILNAME" _
                         OrElse WF_FIELD.Value = "ORDERINGOILNAME" _
@@ -2283,7 +2284,7 @@ Public Class OIT0003OrderDetail
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                         End If
 
-
+                        '(一覧)充填ポイント
                         If WF_FIELD.Value = "FILLINGPOINT" Then
                             prmData = work.CreateSALESOFFICEParam(work.WF_SEL_BASECODE.Text, "")
                         End If
@@ -2300,6 +2301,12 @@ Public Class OIT0003OrderDetail
                             '↑暫定一覧対応 2020/02/13
                         End If
                         '### LeftBoxマルチ対応(20200217) END   #####################################################
+
+                        '(一覧)ジョイント先
+                    ElseIf WF_FIELD.Value = "JOINT" Then
+                        '全表示のため設定をコメントにする。
+                        'prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+
                     End If
 
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -4825,9 +4832,9 @@ Public Class OIT0003OrderDetail
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
             & "        LINEORDER             = @P33, TANKNO               = @P03" _
-            & "        , ORDERINFO           = @P37, SHIPPERSCODE         = @P23, SHIPPERSNAME        = @P24" _
-            & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE        = @P35" _
-            & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINT               = @P08" _
+            & "        , ORDERINFO           = @P37, SHIPPERSCODE         = @P23, SHIPPERSNAME = @P24" _
+            & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE = @P35" _
+            & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE    = @P39, JOINT        = @P08" _
             & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
             & "        , SECONDCONSIGNEECODE = @P27, SECONDCONSIGNEENAME  = @P28" _
             & "        , SECONDARRSTATION    = @P29, SECONDARRSTATIONNAME = @P30" _
@@ -4841,10 +4848,10 @@ Public Class OIT0003OrderDetail
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO            , LINEORDER          , TANKNO             " _
+            & "        ( ORDERNO         , DETAILNO            , LINEORDER          , TANKNO" _
             & "        , KAMOKU          , ORDERINFO           , SHIPPERSCODE       , SHIPPERSNAME" _
             & "        , OILCODE         , OILNAME             , ORDERINGTYPE       , ORDERINGOILNAME" _
-            & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINT" _
+            & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINTCODE          , JOINT" _
             & "        , CHANGETRAINNO   , CHANGETRAINNAME     , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
             & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CANGERETSTATION    , CHANGEARRSTATIONNAME" _
             & "        , SALSE           , SALSETAX            , TOTALSALSE" _
@@ -4855,7 +4862,7 @@ Public Class OIT0003OrderDetail
             & "        ( @P01, @P02, @P33, @P03" _
             & "        , @P04, @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
-            & "        , @P06, @P25, @P07, @P08" _
+            & "        , @P06, @P25, @P07, @P39, @P08" _
             & "        , @P26, @P38, @P27, @P28" _
             & "        , @P29, @P30, @P31, @P32" _
             & "        , @P09, @P10, @P11" _
@@ -4883,6 +4890,7 @@ Public Class OIT0003OrderDetail
             & "    , CARSNUMBER" _
             & "    , CARSAMOUNT" _
             & "    , RETURNDATETRAIN" _
+            & "    , JOINTCODE" _
             & "    , JOINT" _
             & "    , CHANGETRAINNO" _
             & "    , CHANGETRAINNAME" _
@@ -4930,6 +4938,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
                 Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
+                Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar)      'ジョイントコード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 4)   '本線列車（変更後）
                 Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar, 4)   '本線列車名（変更後）
@@ -4991,6 +5000,7 @@ Public Class OIT0003OrderDetail
                     PARA06.Value = "1"                                '車数
                     PARA25.Value = "0"                                '数量
                     PARA07.Value = DBNull.Value                       '返送日列車
+                    PARA39.Value = DBNull.Value                       'ジョイントコード
                     PARA08.Value = DBNull.Value                       'ジョイント
                     PARA26.Value = OIT0003row("CHANGETRAINNO")        '本線列車（変更後）
                     PARA38.Value = OIT0003row("CHANGETRAINNAME")      '本線列車名（変更後）
@@ -5823,6 +5833,7 @@ Public Class OIT0003OrderDetail
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0003_DETAIL " _
                     & "    SET CARSAMOUNT           = @P04, " _
+                    & "        JOINTCODE            = @P23, " _
                     & "        JOINT                = @P05, " _
                     & "        ACTUALLODDATE        = @P06, " _
                     & "        ACTUALDEPDATE        = @P07, " _
@@ -5852,6 +5863,7 @@ Public Class OIT0003OrderDetail
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '受注明細No
             Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '削除フラグ
             Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Decimal)   '数量
+            Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", System.Data.SqlDbType.NVarChar)  'ジョイントコード
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  'ジョイント
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.Date)      '積込日（実績）
             Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '発日（実績）
@@ -5881,6 +5893,7 @@ Public Class OIT0003OrderDetail
                 Catch ex As Exception
                     PARA04.Value = "0"
                 End Try
+                PARA23.Value = OIT0003tab3row("JOINTCODE")
                 PARA05.Value = OIT0003tab3row("JOINT")
 
                 If OIT0003tab3row("ACTUALLODDATE") = "" Then
@@ -6934,11 +6947,11 @@ Public Class OIT0003OrderDetail
             'タブ「タンク車割当」　　⇒　(一覧)荷主, (一覧)油種, (一覧)タンク車№
             'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線, (一覧)充填ポイント
             'タブ「タンク車明細」　　⇒　(一覧)(実績)積込日, (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)空車着日
-            '                            (一覧)第2着駅, (一覧)第2荷受人
+            '                            (一覧)ジョイント先, (一覧)第2着駅, (一覧)第2荷受人
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO",
                  "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE", "FILLINGPOINT",
                  "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE",
-                 "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME"
+                 "JOINT", "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -7274,6 +7287,11 @@ Public Class OIT0003OrderDetail
                                 End If
                             Catch ex As Exception
                             End Try
+
+                            '(一覧)ジョイントを一覧に設定
+                        ElseIf WF_FIELD.Value = "JOINT" Then
+                            updHeader.Item("JOINTCODE") = WW_SETVALUE
+                            updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
                             '(一覧)第2着駅
                         ElseIf WF_FIELD.Value = "SECONDARRSTATIONNAME" Then
@@ -10231,7 +10249,8 @@ Public Class OIT0003OrderDetail
 
                 For Each rowitem As TableRow In tblObj.Rows
                     For Each cellObj As TableCell In rowitem.Controls
-                        If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
                         OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _

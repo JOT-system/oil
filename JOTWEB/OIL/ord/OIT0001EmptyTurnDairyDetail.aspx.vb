@@ -1323,17 +1323,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                 If IsNothing(updHeader) Then Exit Sub
 
                 '〇 一覧項目へ設定
-                '荷主名を一覧に設定
+                '(一覧)荷主名を一覧に設定
                 If WF_FIELD.Value = "SHIPPERSNAME" Then
                     updHeader.Item("SHIPPERSCODE") = WW_SETVALUE
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                    '油種名を一覧に設定
+                    '(一覧)油種名を一覧に設定
                 ElseIf WF_FIELD.Value = "OILNAME" Then
                     updHeader.Item("OILCODE") = WW_SETVALUE
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                    '油種名(受発注用)を一覧に設定
+                    '(一覧)油種名(受発注用)を一覧に設定
                 ElseIf WF_FIELD.Value = "ORDERINGOILNAME" Then
                     If WW_SETVALUE = "" Then
                         updHeader.Item("OILCODE") = ""
@@ -1349,7 +1349,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
                     End If
 
-                    'タンク車№を一覧に設定
+                    '(一覧)タンク車№を一覧に設定
                 ElseIf WF_FIELD.Value = "TANKNO" Then
                     'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
                     Dim WW_TANKNUMBER As String = WW_SETVALUE
@@ -1359,7 +1359,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
 
-                    '前回油種
+                    '(一覧)前回油種
                     Dim WW_LASTOILNAME As String = ""
                     updHeader.Item("LASTOILCODE") = WW_GetValue(1)
                     updHeader.Item("LASTOILNAME") = WW_GetValue(4)
@@ -1373,7 +1373,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", updHeader.Item("LASTOILCODE"), WW_GetValue)
                     'updHeader.Item("LASTOILNAME") = WW_GetValue(0)
 
-                    '交検日
+                    '(一覧)交検日
                     Dim WW_JRINSPECTIONCNT As String
                     updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
                     If WW_GetValue(2) <> "" Then
@@ -1402,7 +1402,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         updHeader.Item("JRINSPECTIONALERT") = ""
                     End If
 
-                    '全検日
+                    '(一覧)全検日
                     Dim WW_JRALLINSPECTIONCNT As String
                     updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
                     If WW_GetValue(3) <> "" Then
@@ -1431,12 +1431,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                         updHeader.Item("JRALLINSPECTIONALERT") = ""
                     End If
 
-                    'ジョイントを一覧に設定
+                    '(一覧)ジョイントを一覧に設定
                 ElseIf WF_FIELD.Value = "JOINT" Then
                     updHeader.Item("JOINTCODE") = WW_SETVALUE
                     updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
 
-                    '返送日列車を一覧に設定
+                    '(一覧)返送日列車を一覧に設定
                 ElseIf WF_FIELD.Value = "RETURNDATETRAIN" Then
                     'Dim WW_DATE As Date
                     'Try

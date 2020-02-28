@@ -227,6 +227,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "FILLINGPOINT") {
             document.getElementById('WF_LeftMViewChange').value = 52;
         }
+        else if (fieldNM === "JOINT") {
+            document.getElementById('WF_LeftMViewChange').value = 53;
+        }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 
             || fieldNM === "ACTUALARRDATE" 

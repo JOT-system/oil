@@ -140,6 +140,11 @@ window.addEventListener('DOMContentLoaded', function () {
             })(numericObj), true);
         }
     }
+    /* ************************************ */
+    /* 一覧表変更情報を保持するための       */
+    /* イベントバインド                     */
+    /* ************************************ */
+    bindcommonListChangedInput();
 });
 
 // 処理後カーソルを戻す
@@ -1041,6 +1046,94 @@ function commonListScroll(listObj) {
     setCommonListScrollXpos(listObj.id, rightDataTableObj.scrollLeft);
     rightHeaderTableObj.scrollLeft = rightDataTableObj.scrollLeft; // 左右連動させる
     leftDataTableObj.scrollTop = rightDataTableObj.scrollTop; // 上下連動させる
+}
+/**
+ * リストボックスの変更をキャッチするイベントを追加
+ * @return {undefined} なし
+ * @example 個別ページからの使用想定はなし,data-generatedのinputタグの変更を保持する
+ */
+function bindcommonListChangedInput() {
+    let pnlObjects = document.querySelectorAll("div[data-generated='1']");
+    if (pnlObjects === null) {
+        return;
+    }
+    /* パネルループ複数パネルを考慮 */
+    for (let i = 0; i < pnlObjects.length; i++) {
+        let pnlObj = pnlObjects[i];
+        let inputTextObjects = pnlObj.querySelectorAll("input[type='text']");
+        /* 一覧にテキストボックスが存在しなければ次のパネルへスキップ */
+        if (inputTextObjects === null) {
+            continue;
+        }
+        if (inputTextObjects.length === 0) {
+            continue;
+        }
+        /* パネルのIDを取得 */
+        let pnlId = pnlObj.id;
+        /* 変更フィールド保持用のhiddenタグをパネル内に生成 */
+        let hiddenModInfoItem = document.createElement('input');
+        hiddenModInfoItem.type = 'hidden';
+        let hiddenModInfoItemId = pnlId + 'modval';
+        hiddenModInfoItem.id = hiddenModInfoItemId;
+        hiddenModInfoItem.name = hiddenModInfoItemId;
+        pnlObj.appendChild(hiddenModInfoItem);
+        
+        /* パネル内のテキストボックスオブジェクトループ */
+        for (let j = 0; j < inputTextObjects.length; j++) {
+            /* テキストボックスのIDよりフィールド名取得
+             * txt[panelId]フィールド名lineCntでフィールド名以外を除去する */
+            let inputTextObj = inputTextObjects[j];
+            let lineCnt = inputTextObj.attributes.getNamedItem("rownum").value;
+            let fieldName = inputTextObj.id.substring(("txt" + pnlId).length);
+            fieldName = fieldName.substring(0, fieldName.length - lineCnt.length);
+            /* 変更イベントをバインド */
+            inputTextObj.parentNode.addEventListener('change', (function (inputTextObj, lineCnt, fieldName, hiddenModInfoItemId) {
+                return function () {
+                    commonListChangedInput(inputTextObj, lineCnt, fieldName,  hiddenModInfoItemId);
+                };
+            })(inputTextObj, lineCnt, fieldName, hiddenModInfoItemId), false);
+        }
+    }
+
+}
+/**
+ * リストボックスの変更をキャッチするイベントを追加
+ * @param {Element} inputTextObj テキストボックス
+ * @param {string} lineCnt 行番号
+ * @param {string} fieldName フィールド名
+ * @param {string} hiddenModInfoItemId 変更フィールド保持hiddenID
+ * @return {undefined} なし
+ * @example 個別ページからの使用想定はなし,data-generatedのinputタグの変更を保持する
+ */
+function commonListChangedInput(inputTextObj, lineCnt, fieldName, hiddenModInfoItemId) {  
+    let hdnObj = document.getElementById(hiddenModInfoItemId);
+    if (hdnObj === null) {
+        return;
+    }
+    /* 変更フィールド情報の文字列をJson配列に変換 */
+    let modValuesString = hdnObj.value;
+    let jsonVal = [];
+    if (modValuesString !== '') {
+        jsonVal = JSON.parse(modValuesString);
+    }
+    /* 一旦対象LineCnt,フィールド名を削除 */
+    // 配列より削除
+    let removedjsonValObj = jsonVal.filter(function (itm) { return !(itm.FieldName === fieldName && itm.LineCnt === lineCnt);  });
+    jsonVal = removedjsonValObj;
+
+    let modVal = inputTextObj.value;
+    let modItem;
+    modItem = {
+        FieldName: fieldName,
+        LineCnt: lineCnt,
+        ModValue: modVal
+    };
+    jsonVal.push(modItem);
+    encodedValue = '';
+    if (jsonVal.length > 0) {
+        encodedValue = JSON.stringify(jsonVal);
+    }
+    hdnObj.value = encodedValue;
 }
 /**
  * リストの高さを調節する

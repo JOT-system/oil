@@ -808,7 +808,8 @@ Public Class OIT0004OilStockCreate
         '期間外の前日夕在庫取得判定用
         Dim prevDate As String = fromDateObj.ItemDate.AddDays(-1).ToString("yyyy/MM/dd")
         '一年前の過去日取得用
-        Dim pastDateList As New List(Of String) '取得必要過去日リスト
+        Dim foundRecList As New List(Of String) '取得必要過去日リスト
+
         Dim sqlStat As New StringBuilder
 
         sqlStat.AppendLine("SELECT format(OS.STOCKYMD,'yyyy/MM/dd') AS STOCKYMD")
@@ -824,7 +825,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("   AND OS.SHIPPERSCODE  = @SHIPPERSCODE")
         sqlStat.AppendLine("   AND OS.DELFLG        = @DELFLG")
         sqlStat.AppendLine(" ORDER BY OS.STOCKYMD,OS.OILCODE")
-        '抽出結果なし且つ範囲が未来日部分に関して１年前の過去実績の払出を設定
+        '保存済みの在庫情報を取得
         Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
             '固定パラメータの設定
             With sqlCmd.Parameters
@@ -838,8 +839,9 @@ Public Class OIT0004OilStockCreate
 
             paramFromDate.Value = fromDateObj.KeyString
             paramToDate.Value = toDateObj.KeyString
-
+            '**************************
             '指定年月の情報取得
+            '**************************
             Using sqlDr = sqlCmd.ExecuteReader
                 Dim curDate As String = ""
                 Dim oilCode As String = ""
@@ -865,6 +867,7 @@ Public Class OIT0004OilStockCreate
                     If stockListCol.StockItemList.ContainsKey(curDate) = False Then
                         Continue While '次のループへ
                     End If
+                    foundRecList.Add(oilCode & "," & curDate)
                     dateValue = stockListCol.StockItemList(curDate)
                     dateValue.MorningStock = Convert.ToString(sqlDr("MORSTOCK")) '朝在庫
                     dateValue.Send = Convert.ToString(sqlDr("SHIPPINGVOL")) '払出
@@ -872,6 +875,31 @@ Public Class OIT0004OilStockCreate
                     dateValue.ReceiveFromLorry = Convert.ToString(sqlDr("ARRLORRYVOL")) '払出
                 End While 'sqlDr.Read
             End Using 'sqlDr
+            ''上記抽出結果なし且つ範囲が未来日部分に関して１年前の過去実績の払出を設定
+            'paramFromDate.Value = fromDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
+            'paramToDate.Value = toDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
+            'Using sqlDr = sqlCmd.ExecuteReader
+            '    Dim curDate As String = ""
+            '    Dim oilCode As String = ""
+            '    Dim stockListCol As DispDataClass.StockListCollection = Nothing
+            '    Dim dateValue As DispDataClass.StockListItem = Nothing
+            '    While sqlDr.Read
+            '        curDate = Convert.ToString(sqlDr("STOCKYMD"))
+            '        oilCode = Convert.ToString(sqlDr("OILCODE"))
+            '        curDate = CDate(curDate).AddYears(1).ToString("yyyy/MM/dd")
+
+            '        '対象油種を保持していない場合
+            '        If dispData.StockList.ContainsKey(oilCode) = False Then
+            '            Continue While '次のループへ
+            '        End If
+            '        '既に在庫データを保持していた場合は過去データで塗り替えない為スキップ
+            '        If (foundRecList.Contains(oilCode & "," & curDate)) Then
+            '            Continue While '次のループへ
+            '        End If
+
+            '        stockListCol = dispData.StockList(oilCode)
+            '    End While
+            'End Using
         End Using 'sqlCmd
 
         Return retVal

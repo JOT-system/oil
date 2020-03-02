@@ -939,6 +939,11 @@ function bindListCommonEvents(listObjId, isPostBack, adjustHeight, keepHScrollWh
                                 return false;
                             }
                         }
+                        // スクロール前に変更FocusOutしイベントを発火させる
+                        let actvElm = document.activeElement;
+                        if (actvElm !== null) {
+                            actvElm.blur();
+                        } 
                         objSubmit.value = 'TRUE';
                         //objMouseWheel.value = '-';
                         objEventHandler.value = "WF_MouseWheelDown";
@@ -950,6 +955,11 @@ function bindListCommonEvents(listObjId, isPostBack, adjustHeight, keepHScrollWh
                 // ↓キー押下時
                 if (window.event.keyCode === 40) {
                     if (objSubmit.value === 'FALSE') {
+                        // スクロール前に変更FocusOutしイベントを発火させる
+                        let actvElm = document.activeElement;
+                        if (actvElm !== null) {
+                            actvElm.blur();
+                        } 
                         objSubmit.value = 'TRUE';
                         //objMouseWheel.value = '+';
                         objEventHandler.value = "WF_MouseWheelUp";
@@ -1222,6 +1232,11 @@ function commonListMouseWheel(event) {
             objEventHandler.value = "WF_MouseWheelDown";
 
         }
+        // スクロール前に変更FocusOutしイベントを発火させる
+        let actvElm = document.activeElement;
+        if (actvElm !== null) {
+            actvElm.blur();
+        } 
         objSubmit.value = "TRUE";
         document.body.style.cursor = "wait";
         document.forms[0].submit();                            //aspx起動

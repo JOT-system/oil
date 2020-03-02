@@ -1918,7 +1918,7 @@ function commonAutoDecPoint(callerObj, decPint, totalLength) {
         inpValue = defVal;
     } else {
         // 2文字目まで + "." + 3文字目以降を設定
-        inpValue = inpValue.substring(0, 2) + "." + inpValue.substring(2)
+        inpValue = Number(inpValue.substring(0, 2)) + "." + inpValue.substring(2)
     }
     targetObj.value = inpValue;
 }

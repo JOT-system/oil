@@ -76,6 +76,20 @@ Public Class OIT0003OrderDetail
                     Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
                     'Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
+                    '○ 画面編集データ取得＆保存(サーバー側で設定した内容を取得し保存する。)
+                    If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl, pnlListArea1) Then
+                        Master.SaveTable(OIT0003tbl)
+                    End If
+                    If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl_tab2, pnlListArea2) Then
+                        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+                    End If
+                    If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl_tab3, pnlListArea3) Then
+                        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+                    End If
+                    'If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl_tab4, pnlListArea4) Then
+                    '    Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+                    'End If
+
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDELIVERY"              '託送指示ボタン押下
                             WF_ButtonDELIVERY_Click()

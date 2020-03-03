@@ -875,31 +875,38 @@ Public Class OIT0004OilStockCreate
                     dateValue.ReceiveFromLorry = Convert.ToString(sqlDr("ARRLORRYVOL")) '払出
                 End While 'sqlDr.Read
             End Using 'sqlDr
-            ''上記抽出結果なし且つ範囲が未来日部分に関して１年前の過去実績の払出を設定
-            'paramFromDate.Value = fromDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
-            'paramToDate.Value = toDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
-            'Using sqlDr = sqlCmd.ExecuteReader
-            '    Dim curDate As String = ""
-            '    Dim oilCode As String = ""
-            '    Dim stockListCol As DispDataClass.StockListCollection = Nothing
-            '    Dim dateValue As DispDataClass.StockListItem = Nothing
-            '    While sqlDr.Read
-            '        curDate = Convert.ToString(sqlDr("STOCKYMD"))
-            '        oilCode = Convert.ToString(sqlDr("OILCODE"))
-            '        curDate = CDate(curDate).AddYears(1).ToString("yyyy/MM/dd")
+            '上記抽出結果なし且つ範囲が未来日部分に関して１年前の過去実績の払出を設定
+            paramFromDate.Value = fromDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
+            paramToDate.Value = toDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
+            Using sqlDr = sqlCmd.ExecuteReader
+                Dim curDate As String = ""
+                Dim oilCode As String = ""
+                Dim stockListCol As DispDataClass.StockListCollection = Nothing
+                Dim dateValue As DispDataClass.StockListItem = Nothing
+                While sqlDr.Read
+                    curDate = Convert.ToString(sqlDr("STOCKYMD"))
+                    oilCode = Convert.ToString(sqlDr("OILCODE"))
+                    curDate = CDate(curDate).AddYears(1).ToString("yyyy/MM/dd")
 
-            '        '対象油種を保持していない場合
-            '        If dispData.StockList.ContainsKey(oilCode) = False Then
-            '            Continue While '次のループへ
-            '        End If
-            '        '既に在庫データを保持していた場合は過去データで塗り替えない為スキップ
-            '        If (foundRecList.Contains(oilCode & "," & curDate)) Then
-            '            Continue While '次のループへ
-            '        End If
+                    '対象油種を保持していない場合
+                    If dispData.StockList.ContainsKey(oilCode) = False Then
+                        Continue While '次のループへ
+                    End If
+                    '対象日付が無いまたは過去日の場合はスキップ
+                    If dispData.StockDate.ContainsKey(curDate) = False OrElse
+                       dispData.StockDate(curDate).IsPastDay Then
+                        Continue While '次のループへ
+                    End If
+                    '既に在庫データを保持していた場合は過去データで塗り替えない為スキップ
+                    If (foundRecList.Contains(oilCode & "," & curDate)) Then
+                        Continue While '次のループへ
+                    End If
 
-            '        stockListCol = dispData.StockList(oilCode)
-            '    End While
-            'End Using
+                    stockListCol = dispData.StockList(oilCode)
+                    dateValue = stockListCol.StockItemList(curDate)
+                    dateValue.Send = Convert.ToString(sqlDr("SHIPPINGVOL")) '払出
+                End While
+            End Using 'sqlDr 一年前抽出
         End Using 'sqlCmd
 
         Return retVal
@@ -1075,7 +1082,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("SELECT DTL.OILCODE")
         sqlStr.AppendLine("     , ODR.TRAINNO")
         sqlStr.AppendLine("     , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
-        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))    AS CARSAMOUNT")
+        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSNUMBER,0))    AS CARSNUMBER")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
@@ -1113,8 +1120,12 @@ Public Class OIT0004OilStockCreate
                            trainNo = "" OrElse retVal.SuggestList(targetDate).SuggestOrderItem.ContainsKey(trainNo) = False Then
                             Continue While
                         End If
+                        '過去日の場合も設定しない
+                        If retVal.SuggestList(targetDate).DayInfo.IsPastDay Then
+                            Continue While
+                        End If
                         With retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem(oilCode)
-                            suggestVal = Convert.ToDecimal(sqlDr("CARSAMOUNT"))
+                            suggestVal = Convert.ToDecimal(sqlDr("CARSNUMBER"))
                             .ItemValue = suggestVal.ToString("#,##0")
                         End With
 

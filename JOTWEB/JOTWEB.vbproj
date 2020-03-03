@@ -151,6 +151,7 @@
     <Content Include="OIL\img\oiltank.png" />
     <Content Include="OIL\img\order.png" />
     <Content Include="OIL\img\pay.png" />
+    <Content Include="OIL\img\richText.png" />
     <Content Include="OIL\img\statistics.png" />
     <Content Include="OIL\img\tank.png" />
     <Content Include="OIL\img\unlockKey.png" />

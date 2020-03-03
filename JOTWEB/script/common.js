@@ -1722,6 +1722,8 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
             if (inputObj.id.indexOf('REMARK') > -1) {
                 additionalClass = 'richTextIconArea';
                 inputObj.classList.add('richTextIcon');
+                inputObj.classList.add('iconOnly');
+                inputObj.readOnly = 'readonly';
             } else if (inputObj.id.indexOf('DATE') > -1) {
                 additionalClass = 'calendarIconArea';
                 inputObj.classList.add('calendarIcon');

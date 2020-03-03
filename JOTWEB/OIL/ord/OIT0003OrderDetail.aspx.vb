@@ -5248,16 +5248,36 @@ Public Class OIT0003OrderDetail
                     work.WF_SEL_LINKNO_ORDER.Text = WW_GetValue(0)
                 End If
 
+                '(予定)空車着日(前日)を取得
+                Dim dtEDbefore As Date = Date.Parse(Me.TxtEmparrDate.Text).AddDays(-1)
+
                 For Each OIT0003row As DataRow In OIT0003tbl_tab3.Select(Nothing, "LINEORDER DESC")
 
                     PARA01.Value = work.WF_SEL_LINKNO_ORDER.Text     '貨車連結順序表№
                     PARA02.Value = OIT0003row("DETAILNO")            '貨車連結順序表明細№
-                    PARA03.Value = WW_DATENOW.AddDays(1)             '利用可能日
 
+                    '利用可能日
                     '(実績)発日が入力されている場合
                     If Me.TxtActualDepDate.Text <> "" Then
-                        'ステータス(1:利用可, 2:利用不可)
-                        PARA04.Value = "1"
+                        '(予定)空車着日(前日)の日付を設定する。
+                        PARA03.Value = dtEDbefore
+                    Else
+                        PARA03.Value = WW_DATENOW.AddDays(1)
+                    End If
+
+                    'ステータス
+                    '(実績)発日が入力されている場合
+                    If Me.TxtActualDepDate.Text <> "" Then
+                        '◯ (予定)空車着日(前日) = (実績)発日
+                        '　 または、(予定)空車着日(当日) = (実績)発日
+                        If dtEDbefore = Date.Parse(Me.TxtActualDepDate.Text) _
+                            OrElse Date.Parse(Me.TxtEmparrDate.Text) = Date.Parse(Me.TxtActualDepDate.Text) Then
+                            'ステータス(1:利用可, 2:利用不可)
+                            PARA04.Value = "1"
+                        Else
+                            'ステータス(1:利用可, 2:利用不可)
+                            PARA04.Value = "2"
+                        End If
                     Else
                         'ステータス(1:利用可, 2:利用不可)
                         PARA04.Value = "2"

@@ -1022,6 +1022,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_DELIVERYFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_MAPButtonControl コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MAPButtonControl As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''WF_DTAB_CHANGE_NO コントロール。
     '''</summary>
     '''<remarks>

@@ -180,14 +180,40 @@ Public Class OIT0003OrderDetail
             End If
 
             '○ 託送指示フラグ(0：未手配, 1：手配)設定
-            '　・100:受注受付の状態では、非活性とする。
+            '　 受注進行ステータスが100:受注受付, または270:手配完了以降のステータスに変更された場合
             If work.WF_SEL_DELIVERYFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+                '託送指示ボタンを非活性
                 WF_DELIVERYFLG.Value = "1"
             Else
+                '託送指示ボタンを活性
                 WF_DELIVERYFLG.Value = "0"
             End If
+
+            '◯受注進行ステータスが270:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
+                'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
+                WF_MAPButtonControl.Value = "1"
+            End If
+
         Finally
             '○ 格納Table Close
             If Not IsNothing(OIT0003tbl) Then
@@ -2082,6 +2108,15 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
+        '〇 受注ステータスが"手配完了"へ変更された場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            WF_DTAB_CHANGE_NO.Value = "2"
+            WF_Detail_TABChange()
+
+            '○メッセージ表示
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
+
     End Sub
 
     ''' <summary>
@@ -3241,6 +3276,16 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
 
+        '○ 画面表示データ再取得(タブ「タンク車明細」表示データ取得)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGetTab3(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
         '### END   ######################################################
 
         '〇 荷受人油種チェック
@@ -3308,11 +3353,43 @@ Public Class OIT0003OrderDetail
                 '〇タンク車所在の更新
                 WW_TankShozaiSet()
 
-                ''★タンク車所在の更新
-                ''引数１：所在地コード　⇒　変更なし(空白)
-                ''引数２：タンク車状態　⇒　変更あり("1"(発送))
-                ''引数３：積車区分　　　⇒　変更なし(空白)
-                'WW_UpdateTankShozai("", "1", "")
+                '### 臨海鉄道対応 ####################################################################################
+                '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
+                '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
+                'タブ「タンク車明細」へ業務を移行する。
+                '※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
+                If WW_RINKAIFLG = False _
+                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
+                    '〇(受注TBL)受注進行ステータス更新
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_270)
+                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_270, TxtOrderStatus.Text, WW_DUMMY)
+                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270
+                        work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
+
+                        '○ 画面表示データ復元
+                        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                            End If
+                        Next
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+                    End Using
+
+                    WF_DTAB_CHANGE_NO.Value = "2"
+                    WF_Detail_TABChange()
+
+                    '〇タンク車所在の更新
+                    WW_TankShozaiSet()
+                End If
+                '#####################################################################################################
+
             End If
 
         End If
@@ -3333,9 +3410,9 @@ Public Class OIT0003OrderDetail
 
         '五井営業所、甲子営業所、袖ヶ浦営業所の場合
         '積込列車番号の入力を可能とする。
-        If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
-            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
-            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011203" Then
+        If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
 
             '臨海鉄道対象のため有効にする。
             WW_RINKAIFLG = True
@@ -7555,6 +7632,17 @@ Public Class OIT0003OrderDetail
             '手配完了
             O_VALUE = CONST_ORDERSTATUS_270
             Exit Sub
+
+            '　営業所＝"三重塩浜営業所"
+            '　受注進行ステータス＝"200:手配"
+            '　託送指示フラグが"1"(手配)の場合
+        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_200 _
+            AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
+            '手配完了
+            O_VALUE = CONST_ORDERSTATUS_270
+            Exit Sub
+
         End If
 
         Select Case work.WF_SEL_ORDERSTATUS.Text
@@ -7669,14 +7757,13 @@ Public Class OIT0003OrderDetail
 
             '上記以外は、タブ「タンク車明細」の許可
         Else
-            WF_Dtab01.Enabled = False
-            WF_Dtab02.Enabled = False
+            WF_Dtab01.Enabled = True
+            WF_Dtab02.Enabled = True
             WF_Dtab03.Enabled = True
             WF_Dtab04.Enabled = False
             pnlSummaryArea.Visible = True
 
         End If
-        'WF_Dtab03.Enabled = True
 
         '〇 受注内容の制御
         '100:受注受付以外の場合は、受注内容(ヘッダーの内容)の変更を不可とする。
@@ -10228,9 +10315,9 @@ Public Class OIT0003OrderDetail
                          BaseDllConst.CONST_ORDERSTATUS_260
                         '五井営業所、甲子営業所、袖ヶ浦営業所の場合
                         '積込列車番号の入力を可能とする。
-                        If work.WF_SEL_ORDERSALESOFFICECODE.Text = "011201" _
-                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011202" _
-                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = "011203" Then
+                        If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
 
                             WW_RINKAIFLG = True
 

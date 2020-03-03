@@ -289,8 +289,8 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.CANGERETSTATION), '')         AS CHANGERETSTATION" _
             & " , ISNULL(RTRIM(OIT0002.CHANGEARRSTATIONNAME), '')    AS CHANGEARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.HTANK), '')                   AS HTANK" _
+            & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.TTANK), '')                   AS TTANK" _
             & " , ISNULL(RTRIM(OIT0002.MTTANK), '')                  AS MTTANK" _
             & " , ISNULL(RTRIM(OIT0002.KTANK), '')                   AS KTANK" _

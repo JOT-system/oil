@@ -3923,6 +3923,7 @@ Public Class OIT0003OrderDetail
             Case "LINEORDER"              '(一覧)貨物駅入線順
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
+                '(★サーバー側で設定しているため必要ないが念のため残す(20200302))
             Case "CHANGETRAINNO"          '(一覧)本線列車番号変更
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
@@ -3932,6 +3933,7 @@ Public Class OIT0003OrderDetail
             Case "SECONDCONSIGNEENAME"    '(一覧)第2荷受人
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
+                '(★サーバー側で設定しているため必要ないが念のため残す(20200302))
             Case "CHANGEARRSTATIONNAME"   '(一覧)空車着駅(変更)
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 

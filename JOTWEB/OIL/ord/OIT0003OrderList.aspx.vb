@@ -287,8 +287,8 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(OIT0002.CANGERETSTATION), '')         AS CHANGERETSTATION" _
-            & " , ISNULL(RTRIM(OIT0002.CHANGEARRSTATIONNAME), '')    AS CHANGEARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.CHANGERETSTATION), '')        AS CHANGERETSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.CHANGERETSTATIONNAME), '')    AS CHANGERETSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.HTANK), '')                   AS HTANK" _
             & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.TTANK), '')                   AS TTANK" _
@@ -334,8 +334,8 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.OTHER9OTANKCH), '')           AS OTHER9OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANKCH), '')          AS OTHER10OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
-            & " , ISNULL(RTRIM(OIT0002.TANKRINKNO), '')              AS TANKRINKNO" _
-            & " , ISNULL(RTRIM(OIT0002.TANKRINKNOMADE), '')          AS TANKRINKNOMADE" _
+            & " , ISNULL(RTRIM(OIT0002.TANKLINKNO), '')              AS TANKLINKNO" _
+            & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
@@ -638,9 +638,9 @@ Public Class OIT0003OrderList
         '着駅(コード)
         work.WF_SEL_ARRIVALSTATION.Text = ""
         '戻着駅(名)
-        work.WF_SEL_CANGERETSTATIONNM.Text = ""
+        work.WF_SEL_CHANGERETSTATIONNM.Text = ""
         '戻着駅(コード)
-        work.WF_SEL_CANGERETSTATION.Text = ""
+        work.WF_SEL_CHANGERETSTATION.Text = ""
 
         '車数（レギュラー）
         work.WF_SEL_REGULAR_TANKCAR.Text = "0"
@@ -773,9 +773,9 @@ Public Class OIT0003OrderList
         '着駅(コード)
         work.WF_SEL_ARRIVALSTATION.Text = ""
         '戻着駅(名)
-        work.WF_SEL_CANGERETSTATIONNM.Text = ""
+        work.WF_SEL_CHANGERETSTATIONNM.Text = ""
         '戻着駅(コード)
-        work.WF_SEL_CANGERETSTATION.Text = ""
+        work.WF_SEL_CHANGERETSTATION.Text = ""
 
         '車数（レギュラー）
         work.WF_SEL_REGULAR_TANKCAR.Text = "0"
@@ -951,9 +951,9 @@ Public Class OIT0003OrderList
         '着駅(コード)
         work.WF_SEL_ARRIVALSTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ARRSTATION")
         '戻着駅(名)
-        work.WF_SEL_CANGERETSTATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("CHANGEARRSTATIONNAME")
+        work.WF_SEL_CHANGERETSTATIONNM.Text = OIT0003tbl.Rows(WW_LINECNT)("CHANGERETSTATIONNAME")
         '戻着駅(コード)
-        work.WF_SEL_CANGERETSTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("CHANGERETSTATION")
+        work.WF_SEL_CHANGERETSTATION.Text = OIT0003tbl.Rows(WW_LINECNT)("CHANGERETSTATION")
 
         '車数（レギュラー）
         work.WF_SEL_REGULAR_TANKCAR.Text = OIT0003tbl.Rows(WW_LINECNT)("RTANK")
@@ -1023,9 +1023,9 @@ Public Class OIT0003OrderList
         '空車着日(実績)
         work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0003tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
         '貨車連結順序表№
-        work.WF_SEL_LINKNO.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKRINKNO")
+        work.WF_SEL_LINKNO.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKLINKNO")
         '作成用_貨車連結順序表№
-        work.WF_SEL_LINKNO_ORDER.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKRINKNOMADE")
+        work.WF_SEL_LINKNO_ORDER.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKLINKNOMADE")
 
         '計上年月日
         work.WF_SEL_KEIJYOYMD.Text = OIT0003tbl.Rows(WW_LINECNT)("KEIJYOYMD")

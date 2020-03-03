@@ -852,8 +852,8 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS SECONDCONSIGNEENAME" _
             & " , ''                                             AS SECONDARRSTATION" _
             & " , ''                                             AS SECONDARRSTATIONNAME" _
-            & " , ''                                             AS CANGERETSTATION" _
-            & " , ''                                             AS CHANGEARRSTATIONNAME" _
+            & " , ''                                             AS CHANGERETSTATION" _
+            & " , ''                                             AS CHANGERETSTATIONNAME" _
             & " , '0'                                            AS DELFLG" _
             & " FROM sys.all_objects "
 
@@ -945,8 +945,8 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
                 & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
                 & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
-                & " , ISNULL(RTRIM(OIT0003.CANGERETSTATION), '')                    AS CANGERETSTATION" _
-                & " , ISNULL(RTRIM(OIT0003.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
+                & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATION), '')                   AS CHANGERETSTATION" _
+                & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATIONNAME), '')               AS CHANGERETSTATIONNAME" _
                 & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                             AS DELFLG" _
                 & " FROM OIL.OIT0002_ORDER OIT0002 " _
                 & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
@@ -1185,8 +1185,8 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
             & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
             & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(TMP0001.CANGERETSTATION), '')                    AS CANGERETSTATION" _
-            & " , ISNULL(RTRIM(TMP0001.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGERETSTATION), '')                   AS CHANGERETSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGERETSTATIONNAME), '')               AS CHANGERETSTATIONNAME" _
             & " , ISNULL(RTRIM(TMP0001.DELFLG), '0')                            AS DELFLG" _
             & " FROM ( " _
             & "       SELECT  " _
@@ -1302,8 +1302,8 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
             & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
             & " , ISNULL(RTRIM(TMP0001.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(TMP0001.CANGERETSTATION), '')                    AS CANGERETSTATION" _
-            & " , ISNULL(RTRIM(TMP0001.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGERETSTATION), '')                   AS CHANGERETSTATION" _
+            & " , ISNULL(RTRIM(TMP0001.CHANGERETSTATIONNAME), '')               AS CHANGERETSTATIONNAME" _
             & " , ISNULL(RTRIM(TMP0001.DELFLG), '0')                            AS DELFLG" _
             & " FROM ( " _
             & "       SELECT " _
@@ -1575,7 +1575,7 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS ORDERINGOILNAME" _
                 & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
-                & " , ISNULL(RTRIM(OIT0002.TANKRINKNO), '')              AS LINKNO" _
+                & " , ISNULL(RTRIM(OIT0002.TANKLINKNO), '')              AS LINKNO" _
                 & " , ''                                                 AS LINKDETAILNO" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -1621,8 +1621,8 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '')                AS SECONDCONSIGNEENAME" _
                 & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATION), '')                   AS SECONDARRSTATION" _
                 & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
-                & " , ISNULL(RTRIM(OIT0003.CANGERETSTATION), '')                    AS CANGERETSTATION" _
-                & " , ISNULL(RTRIM(OIT0003.CHANGEARRSTATIONNAME), '')               AS CHANGEARRSTATIONNAME" _
+                & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATION), '')                   AS CHANGERETSTATION" _
+                & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATIONNAME), '')               AS CHANGERETSTATIONNAME" _
                 & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                             AS DELFLG" _
                 & " FROM OIL.OIT0002_ORDER OIT0002 " _
                 & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
@@ -3354,6 +3354,16 @@ Public Class OIT0003OrderDetail
                 WW_TankShozaiSet()
 
                 '### 臨海鉄道対応 ####################################################################################
+                '五井営業所、甲子営業所、袖ヶ浦営業所の場合
+                '積込列車番号の入力を可能とする。
+                If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+                    '臨海鉄道対象のため有効にする。
+                    WW_RINKAIFLG = True
+
+                End If
                 '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
                 '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
                 'タブ「タンク車明細」へ業務を移行する。
@@ -4011,7 +4021,7 @@ Public Class OIT0003OrderDetail
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
                 '(★サーバー側で設定しているため必要ないが念のため残す(20200302))
-            Case "CHANGEARRSTATIONNAME"   '(一覧)空車着駅(変更)
+            Case "CHANGERETSTATIONNAME"   '(一覧)空車着駅(変更)
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
         End Select
@@ -4160,7 +4170,7 @@ Public Class OIT0003OrderDetail
             Case "CHANGETRAINNO",        '(一覧)本線列車番号変更
                  "SECONDARRSTATIONNAME", '(一覧)第2着駅
                  "SECONDCONSIGNEENAME",  '(一覧)第2荷受人
-                 "CHANGEARRSTATIONNAME"  '(一覧)空車着駅(変更)
+                 "CHANGERETSTATIONNAME"  '(一覧)空車着駅(変更)
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
         End Select
@@ -4385,26 +4395,26 @@ Public Class OIT0003OrderDetail
             & "        ORDERNO          = @P01" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0002_ORDER" _
-            & "        ( ORDERNO      , TRAINNO         , TRAINNAME      , ORDERYMD            , OFFICECODE , OFFICENAME" _
-            & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME   , BASECODE            , BASENAME" _
-            & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION     , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
-            & "        , RETSTATION   , RETSTATIONNAME  , CANGERETSTATION, CHANGEARRSTATIONNAME, ORDERSTATUS, ORDERINFO " _
-            & "        , STACKINGFLG  , USEPROPRIETYFLG , DELIVERYFLG    , LODDATE             , DEPDATE    , ARRDATE" _
-            & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE  , ACTUALDEPDATE       , ACTUALARRDATE" _
-            & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK          , HTANK               , TTANK" _
-            & "        , MTTANK       , KTANK           , K3TANK         , K5TANK              , K10TANK" _
-            & "        , LTANK        , ATANK           , OTHER1OTANK    , OTHER2OTANK         , OTHER3OTANK" _
-            & "        , OTHER4OTANK  , OTHER5OTANK     , OTHER6OTANK    , OTHER7OTANK         , OTHER8OTANK" _
+            & "        ( ORDERNO      , TRAINNO         , TRAINNAME       , ORDERYMD            , OFFICECODE , OFFICENAME" _
+            & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME    , BASECODE            , BASENAME" _
+            & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION      , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
+            & "        , RETSTATION   , RETSTATIONNAME  , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS, ORDERINFO " _
+            & "        , STACKINGFLG  , USEPROPRIETYFLG , DELIVERYFLG     , LODDATE             , DEPDATE    , ARRDATE" _
+            & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE" _
+            & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK           , HTANK               , TTANK" _
+            & "        , MTTANK       , KTANK           , K3TANK          , K5TANK              , K10TANK" _
+            & "        , LTANK        , ATANK           , OTHER1OTANK     , OTHER2OTANK         , OTHER3OTANK" _
+            & "        , OTHER4OTANK  , OTHER5OTANK     , OTHER6OTANK     , OTHER7OTANK         , OTHER8OTANK" _
             & "        , OTHER9OTANK  , OTHER10OTANK    , TOTALTANK" _
-            & "        , RTANKCH      , HTANKCH         , TTANKCH        , MTTANKCH            , KTANKCH" _
-            & "        , K3TANKCH     , K5TANKCH        , K10TANKCH      , LTANKCH             , ATANKCH" _
-            & "        , OTHER1OTANKCH, OTHER2OTANKCH   , OTHER3OTANKCH  , OTHER4OTANKCH       , OTHER5OTANKCH" _
-            & "        , OTHER6OTANKCH, OTHER7OTANKCH   , OTHER8OTANKCH  , OTHER9OTANKCH       , OTHER10OTANKCH" _
+            & "        , RTANKCH      , HTANKCH         , TTANKCH         , MTTANKCH            , KTANKCH" _
+            & "        , K3TANKCH     , K5TANKCH        , K10TANKCH       , LTANKCH             , ATANKCH" _
+            & "        , OTHER1OTANKCH, OTHER2OTANKCH   , OTHER3OTANKCH   , OTHER4OTANKCH       , OTHER5OTANKCH" _
+            & "        , OTHER6OTANKCH, OTHER7OTANKCH   , OTHER8OTANKCH   , OTHER9OTANKCH       , OTHER10OTANKCH" _
             & "        , TOTALTANKCH" _
-            & "        , TANKRINKNO   , KEIJYOYMD       , SALSE          , SALSETAX            , TOTALSALSE" _
-            & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT   , DELFLG" _
+            & "        , TANKLINKNO   , KEIJYOYMD       , SALSE           , SALSETAX            , TOTALSALSE" _
+            & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT    , DELFLG" _
             & "        , INITYMD      , INITUSER        , INITTERMID" _
-            & "        , UPDYMD       , UPDUSER         , UPDTERMID      , RECEIVEYMD)" _
+            & "        , UPDYMD       , UPDUSER         , UPDTERMID       , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P93, @P03, @P04, @P05" _
             & "        , @P06, @P07, @P08, @P09, @P10" _
@@ -4451,8 +4461,8 @@ Public Class OIT0003OrderDetail
             & "    , ARRSTATIONNAME" _
             & "    , RETSTATION" _
             & "    , RETSTATIONNAME" _
-            & "    , CANGERETSTATION" _
-            & "    , CHANGEARRSTATIONNAME" _
+            & "    , CHANGERETSTATION" _
+            & "    , CHANGERETSTATIONNAME" _
             & "    , ORDERSTATUS" _
             & "    , ORDERINFO" _
             & "    , STACKINGFLG" _
@@ -4510,7 +4520,7 @@ Public Class OIT0003OrderDetail
             & "    , OTHER9OTANKCH" _
             & "    , OTHER10OTANKCH" _
             & "    , TOTALTANKCH" _
-            & "    , TANKRINKNO" _
+            & "    , TANKLINKNO" _
             & "    , KEIJYOYMD" _
             & "    , SALSE" _
             & "    , SALSETAX" _
@@ -4659,8 +4669,8 @@ Public Class OIT0003OrderDetail
                     PARA18.Value = ""                                 '空車着駅名
                     PARA19.Value = ""                                 '空車着駅コード(変更後)
                     PARA20.Value = ""                                 '空車着駅名(変更後)
-                    'PARA19.Value = OIT0003row("CANGERETSTATION")      '空車着駅コード(変更後)
-                    'PARA20.Value = OIT0003row("CHANGEARRSTATIONNAME") '空車着駅名(変更後)
+                    'PARA19.Value = OIT0003row("CHANGERETSTATION")     '空車着駅コード(変更後)
+                    'PARA20.Value = OIT0003row("CHANGERETSTATIONNAME") '空車着駅名(変更後)
                     PARA21.Value = work.WF_SEL_ORDERSTATUS.Text       '受注進行ステータス
 
                     ''# 受注情報
@@ -4931,7 +4941,7 @@ Public Class OIT0003OrderDetail
             & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
             & "        , SECONDCONSIGNEECODE = @P27, SECONDCONSIGNEENAME  = @P28" _
             & "        , SECONDARRSTATION    = @P29, SECONDARRSTATIONNAME = @P30" _
-            & "        , CANGERETSTATION     = @P31, CHANGEARRSTATIONNAME = @P32" _
+            & "        , CHANGERETSTATION    = @P31, CHANGERETSTATIONNAME = @P32" _
             & "        , SALSE               = @P09, SALSETAX             = @P10, TOTALSALSE   = @P11" _
             & "        , PAYMENT             = @P12, PAYMENTTAX           = @P13, TOTALPAYMENT = @P14" _
             & "        , UPDYMD              = @P19, UPDUSER              = @P20" _
@@ -4946,7 +4956,7 @@ Public Class OIT0003OrderDetail
             & "        , OILCODE         , OILNAME             , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINTCODE          , JOINT" _
             & "        , CHANGETRAINNO   , CHANGETRAINNAME     , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
-            & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CANGERETSTATION    , CHANGEARRSTATIONNAME" _
+            & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CHANGERETSTATION   , CHANGERETSTATIONNAME" _
             & "        , SALSE           , SALSETAX            , TOTALSALSE" _
             & "        , PAYMENT         , PAYMENTTAX          , TOTALPAYMENT" _
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
@@ -4991,8 +5001,8 @@ Public Class OIT0003OrderDetail
             & "    , SECONDCONSIGNEENAME" _
             & "    , SECONDARRSTATION" _
             & "    , SECONDARRSTATIONNAME" _
-            & "    , CANGERETSTATION" _
-            & "    , CHANGEARRSTATIONNAME" _
+            & "    , CHANGERETSTATION" _
+            & "    , CHANGERETSTATIONNAME" _
             & "    , SALSE" _
             & "    , SALSETAX" _
             & "    , TOTALSALSE" _
@@ -5101,8 +5111,8 @@ Public Class OIT0003OrderDetail
                     PARA28.Value = OIT0003row("SECONDCONSIGNEENAME")  '第2荷受人名
                     PARA29.Value = OIT0003row("SECONDARRSTATION")     '第2着駅コード
                     PARA30.Value = OIT0003row("SECONDARRSTATIONNAME") '第2着駅名
-                    PARA31.Value = OIT0003row("CANGERETSTATION")      '空車着駅コード（変更後）
-                    PARA32.Value = OIT0003row("CHANGEARRSTATIONNAME") '空車着駅名（変更後）
+                    PARA31.Value = OIT0003row("CHANGERETSTATION")     '空車着駅コード（変更後）
+                    PARA32.Value = OIT0003row("CHANGERETSTATIONNAME") '空車着駅名（変更後）
                     PARA09.Value = "0"                                '売上金額
                     PARA10.Value = "0"                                '売上消費税額
                     PARA11.Value = "0"                                '売上合計金額
@@ -5852,7 +5862,7 @@ Public Class OIT0003OrderDetail
                     & "        ACTUALARRDATE    = @P05, " _
                     & "        ACTUALACCDATE    = @P06, " _
                     & "        ACTUALEMPARRDATE = @P07, " _
-                    & "        TANKRINKNOMADE   = @P12, " _
+                    & "        TANKLINKNOMADE   = @P12, " _
                     & "        UPDYMD           = @P08, " _
                     & "        UPDUSER          = @P09, " _
                     & "        UPDTERMID        = @P10, " _
@@ -5959,8 +5969,8 @@ Public Class OIT0003OrderDetail
                     & "        SECONDCONSIGNEENAME  = @P13, " _
                     & "        SECONDARRSTATION     = @P14, " _
                     & "        SECONDARRSTATIONNAME = @P15, " _
-                    & "        CANGERETSTATION      = @P16, " _
-                    & "        CHANGEARRSTATIONNAME = @P17, " _
+                    & "        CHANGERETSTATION     = @P16, " _
+                    & "        CHANGERETSTATIONNAME = @P17, " _
                     & "        UPDYMD               = @P18, " _
                     & "        UPDUSER              = @P19, " _
                     & "        UPDTERMID            = @P20, " _
@@ -6041,8 +6051,8 @@ Public Class OIT0003OrderDetail
                 PARA13.Value = OIT0003tab3row("SECONDCONSIGNEENAME")
                 PARA14.Value = OIT0003tab3row("SECONDARRSTATION")
                 PARA15.Value = OIT0003tab3row("SECONDARRSTATIONNAME")
-                PARA16.Value = OIT0003tab3row("CANGERETSTATION")
-                PARA17.Value = OIT0003tab3row("CHANGEARRSTATIONNAME")
+                PARA16.Value = OIT0003tab3row("CHANGERETSTATION")
+                PARA17.Value = OIT0003tab3row("CHANGERETSTATIONNAME")
 
                 PARA18.Value = Date.Now
                 PARA19.Value = Master.USERID
@@ -6138,8 +6148,8 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
-            & " , ISNULL(RTRIM(OIT0002.CANGERETSTATION), '')         AS CHANGERETSTATION" _
-            & " , ISNULL(RTRIM(OIT0002.CHANGEARRSTATIONNAME), '')    AS CHANGEARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.CHANGERETSTATION), '')        AS CHANGERETSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.CHANGERETSTATIONNAME), '')    AS CHANGERETSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.RTANK), '')                   AS RTANK" _
             & " , ISNULL(RTRIM(OIT0002.HTANK), '')                   AS HTANK" _
             & " , ISNULL(RTRIM(OIT0002.TTANK), '')                   AS TTANK" _
@@ -6185,8 +6195,8 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.OTHER9OTANKCH), '')           AS OTHER9OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANKCH), '')          AS OTHER10OTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
-            & " , ISNULL(RTRIM(OIT0002.TANKRINKNO), '')              AS TANKRINKNO" _
-            & " , ISNULL(RTRIM(OIT0002.TANKRINKNOMADE), '')          AS TANKRINKNOMADE" _
+            & " , ISNULL(RTRIM(OIT0002.TANKLINKNO), '')              AS TANKLINKNO" _
+            & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
@@ -6502,7 +6512,7 @@ Public Class OIT0003OrderDetail
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0002_ORDER " _
                     & "    SET ORDERSTATUS = @P03, " _
-                    & "        TANKRINKNO  = @P04, " _
+                    & "        TANKLINKNO  = @P04, " _
                     & "        UPDYMD      = @P11, " _
                     & "        UPDUSER     = @P12, " _
                     & "        UPDTERMID   = @P13, " _
@@ -10284,7 +10294,7 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGEARRSTATIONNAME") Then
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGERETSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next

@@ -76,9 +76,9 @@
     <!-- 着駅(名) -->
     <asp:TextBox ID="WF_SEL_ARRIVALSTATIONNM" runat="server"></asp:TextBox>
     <!-- 戻着駅(コード) -->
-    <asp:TextBox ID="WF_SEL_CANGERETSTATION" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_CHANGERETSTATION" runat="server"></asp:TextBox>
     <!-- 戻着駅(名) -->
-    <asp:TextBox ID="WF_SEL_CANGERETSTATIONNM" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_CHANGERETSTATIONNM" runat="server"></asp:TextBox>
 
     <!-- レギュラー(タンク車数) -->
     <asp:TextBox ID="WF_SEL_REGULAR_TANKCAR" runat="server"></asp:TextBox>

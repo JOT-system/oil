@@ -621,6 +621,10 @@ Public Class CS0013ProfView
                                 textValue = Convert.ToString(dataRow(fieldName))
                         End Select
                         Dim textTagBase = "<input id=""{0}"" name=""{0}"" style=""width:{1};font-size:{2};height:{3};text-align:{4};"" type=""text"" rownum=""{5}"" value=""{6}"">"
+                        If fieldName.Equals("REMARK") AndAlso
+                           textValue.Contains(ControlChars.CrLf) OrElse textValue.Contains(ControlChars.Lf) Then
+                            textTagBase = "<input id=""{0}"" name=""{0}"" style=""width:{1};font-size:{2};height:{3};text-align:{4};"" type=""text"" rownum=""{5}"" value=""{6}"" data-withenterval=""{6}"">"
+                        End If
 
                         Dim textTagString = String.Format(textTagBase,
                                                           "txt" & Me.TBLOBJ.ID & Convert.ToString(fieldName) & (Integer.Parse(outTDataL.Cells(0).Text)).ToString,

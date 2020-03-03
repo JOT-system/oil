@@ -147,10 +147,10 @@ Public Structure CS0031TABLEsave
                 For j As Integer = 0 To wITEMarray.Length - 1
                     'データ追加
                     If j = 0 Then
-                        SAVEstr.Append(wITEMarray(j).ToString)
+                        SAVEstr.Append(ControlChars.Quote & wITEMarray(j).ToString.Replace(ControlChars.Quote, ControlChars.Quote & ControlChars.Quote) & ControlChars.Quote)
                     Else
                         SAVEstr.Append(ControlChars.Tab)
-                        SAVEstr.Append(wITEMarray(j).ToString)
+                        SAVEstr.Append(ControlChars.Quote & wITEMarray(j).ToString.Replace(ControlChars.Quote, ControlChars.Quote & ControlChars.Quote) & ControlChars.Quote)
                     End If
 
                 Next j

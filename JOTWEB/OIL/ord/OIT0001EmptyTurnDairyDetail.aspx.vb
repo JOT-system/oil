@@ -49,6 +49,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     Master.RecoverTable(OIT0001tbl)
+                    If CS0013ProfView.SetDispListTextBoxValues(OIT0001tbl, pnlListArea) Then
+                        Master.SaveTable(OIT0001tbl)
+                    End If
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"          '油種数登録ボタン押下

@@ -2466,6 +2466,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     updHeader.Item("JRALLINSPECTIONALERTSTR") = ""
                 End If
 
+                '(★サーバー側で設定しているため必要ないが念のため残す(20200302))
             Case "RETURNDATETRAIN"   '(一覧)返送日列車
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
@@ -3903,7 +3904,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 40)  '油種名(受発注用)
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 4)   '返送日列車
                 Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar, 40)  'ジョイントコード
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
                 Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar)      '記事欄

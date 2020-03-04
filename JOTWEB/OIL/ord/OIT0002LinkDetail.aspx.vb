@@ -402,8 +402,8 @@ Public Class OIT0002LinkDetail
             & " , CAST(OIT0004.UPDTIMSTP AS bigint)             AS UPDTIMSTP " _
             & " , 1                                             AS 'SELECT' " _
             & " , 0                                             AS HIDDEN " _
-            & " , ISNULL(RTRIM(OIT0004.LINETRAINNO), '   ')     AS LINETRAINNO " _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '   ')       AS LINEORDER " _
+            & " , ISNULL(RTRIM(OIT0004.LINETRAINNO), '')        AS LINETRAINNO " _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')          AS LINEORDER " _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')         AS TANKNUMBER " _
             & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')         AS PREOILCODE " _
             & " , ISNULL(RTRIM(OIT0004.PREOILNAME), '')         AS PREOILNAME " _

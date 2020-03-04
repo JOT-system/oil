@@ -7534,28 +7534,28 @@ Public Class OIT0003OrderDetail
             '検索SQL文
             Dim SQLStr As String =
                " SELECT" _
-                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '   ') AS CAMPCODE" _
-                & " , ISNULL(RTRIM(VIW0001.CLASS), '   ')    AS CLASS" _
-                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '   ')  AS KEYCODE" _
-                & " , ISNULL(RTRIM(VIW0001.STYMD), '   ')    AS STYMD" _
-                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '   ')   AS ENDYMD" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE1), '   ')   AS VALUE1" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE2), '   ')   AS VALUE2" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE3), '   ')   AS VALUE3" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE4), '   ')   AS VALUE4" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE5), '   ')   AS VALUE5" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE6), '   ')   AS VALUE6" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE7), '   ')   AS VALUE7" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE8), '   ')   AS VALUE8" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE9), '   ')   AS VALUE9" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE10), '   ')   AS VALUE10" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE11), '   ')   AS VALUE11" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE12), '   ')   AS VALUE12" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE13), '   ')   AS VALUE13" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE14), '   ')   AS VALUE14" _
-                & " , ISNULL(RTRIM(VIW0001.VALUE15), '   ')   AS VALUE15" _
-                & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '   ')   AS SYSTEMKEYFLG" _
-                & " , ISNULL(RTRIM(VIW0001.DELFLG), '   ')   AS DELFLG" _
+                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '')    AS CAMPCODE" _
+                & " , ISNULL(RTRIM(VIW0001.CLASS), '')       AS CLASS" _
+                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')     AS KEYCODE" _
+                & " , ISNULL(RTRIM(VIW0001.STYMD), '')       AS STYMD" _
+                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')      AS ENDYMD" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE1), '')      AS VALUE1" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE2), '')      AS VALUE2" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE3), '')      AS VALUE3" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE4), '')      AS VALUE4" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE5), '')      AS VALUE5" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE6), '')      AS VALUE6" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE7), '')      AS VALUE7" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE8), '')      AS VALUE8" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE9), '')      AS VALUE9" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE10), '')     AS VALUE10" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE11), '')     AS VALUE11" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE12), '')     AS VALUE12" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE13), '')     AS VALUE13" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE14), '')     AS VALUE14" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE15), '')     AS VALUE15" _
+                & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '')   AS SYSTEMKEYFLG" _
+                & " , ISNULL(RTRIM(VIW0001.DELFLG), '')      AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _
                 & " AND VIW0001.DELFLG <> @P03"

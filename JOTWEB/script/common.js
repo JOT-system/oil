@@ -136,6 +136,7 @@ window.addEventListener('DOMContentLoaded', function () {
     if (numericTextObjList !== null) {
         for (let i = 0; i < numericTextObjList.length; i++) {
             let numericObj = numericTextObjList[i];
+            numericObj.setAttribute('inputmode', 'numeric');
             numericObj.addEventListener('change', (function (numericObj) {
                 return function () {
                     ConvartWideCharToNormal(numericObj);

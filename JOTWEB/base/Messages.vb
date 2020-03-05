@@ -490,6 +490,14 @@ Public Module Messages
         ''' タンク車数量エラー
         ''' </summary>
         Public Const OIL_TANKNO_NUMBER_ERROR As String = "20025"
+        ''' <summary>
+        ''' 受注作成する列車が選ばれていません。
+        ''' </summary>
+        Public Const OIL_ORDER_NO_CHECKED_ERROR As String = "20026"
+        ''' <summary>
+        ''' 同一受入予定日の複数受注データが存在するため更新をスキップしました。
+        ''' </summary>
+        Public Const OIL_ORDER_DUPULICATE_ACCDATE_ERROR As String = "20027"
 
 #End Region
 

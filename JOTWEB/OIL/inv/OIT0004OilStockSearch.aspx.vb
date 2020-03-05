@@ -17,11 +17,14 @@ Imports JOTWEB.GRIS0005LeftBox
 ''' <remarks></remarks>
 Public Class OIT0004OilStockSearch
     Inherits Page
-
+    '○ 共通関数宣言(BASEDLL)
+    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+    Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     '○ 共通処理結果
     Private WW_ERR_SW As String
     Private WW_RTN_SW As String
     Private WW_DUMMY As String
+
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -108,6 +111,8 @@ Public Class OIT0004OilStockSearch
 
             End If
             Dim prmData As New Hashtable
+            Dim shipperCode As String = ""
+            Dim consigneeCode As String = ""
             prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
             prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
             leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, WW_DUMMY, prmData)
@@ -121,19 +126,26 @@ Public Class OIT0004OilStockSearch
                     TxtSalesOffice.Text = leftview.WF_LeftListBox.Items(0).Value
                 End If
 
+                If TxtSalesOffice.Text <> "" Then
+                    GetDefRelateValues(TxtSalesOffice.Text, shipperCode, consigneeCode)
+                End If
 
             End If
 
             prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
             leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, WW_DUMMY, prmData)
-            If leftview.WF_LeftListBox.Items IsNot Nothing Then
+            If shipperCode <> "" Then
+                TxtShipper.Text = shipperCode
+            ElseIf leftview.WF_LeftListBox.Items IsNot Nothing Then
                 TxtShipper.Text = leftview.WF_LeftListBox.Items(0).Value
             End If
 
             Dim additionalCond As String = " and VALUE2 != '9' "
             prmData = work.CreateFIXParam(TxtSalesOffice.Text, "CONSIGNEEPATTERN", I_ADDITIONALCONDITION:=additionalCond)
             leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST, WW_DUMMY, prmData)
-            If leftview.WF_LeftListBox.Items IsNot Nothing Then
+            If consigneeCode <> "" Then
+                Me.WF_CONSIGNEE_CODE.Text = consigneeCode
+            ElseIf leftview.WF_LeftListBox.Items IsNot Nothing Then
                 Me.WF_CONSIGNEE_CODE.Text = leftview.WF_LeftListBox.Items(0).Value
             End If
             Master.GetFirstValue(work.WF_SEL_STYMD.Text, "STYMD", WF_STYMD_CODE.Text)       '年月日
@@ -423,6 +435,15 @@ Public Class OIT0004OilStockSearch
             Case "TxtSalesOffice"
                 CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
                 fieldName = "営業所"
+                If TxtSalesOffice.Text <> "" AndAlso LblSalesOfficeName.Text <> "" Then
+                    Dim shippersCode As String = ""
+                    Dim consigneeCode As String = ""
+                    GetDefRelateValues(TxtSalesOffice.Text, shippersCode, consigneeCode)
+                    TxtShipper.Text = shippersCode
+                    WF_CONSIGNEE_CODE.Text = consigneeCode
+                    CODENAME_get("SHIPPER", TxtShipper.Text, LblShipperName.Text, WW_RTN_SW)
+                    CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_RTN_SW)
+                End If
             Case "TxtShipper"
                 CODENAME_get("SHIPPER", TxtShipper.Text, LblShipperName.Text, WW_RTN_SW)
                 fieldName = "荷主"
@@ -464,6 +485,15 @@ Public Class OIT0004OilStockSearch
             Case "TxtSalesOffice"       '営業所
                 TxtSalesOffice.Text = WW_SelectValue
                 LblSalesOfficeName.Text = WW_SelectText
+                If TxtSalesOffice.Text <> "" AndAlso LblSalesOfficeName.Text <> "" Then
+                    Dim shippersCode As String = ""
+                    Dim consigneeCode As String = ""
+                    GetDefRelateValues(TxtSalesOffice.Text, shippersCode, consigneeCode)
+                    TxtShipper.Text = shippersCode
+                    WF_CONSIGNEE_CODE.Text = consigneeCode
+                    CODENAME_get("SHIPPER", TxtShipper.Text, LblShipperName.Text, WW_RTN_SW)
+                    CODENAME_get("CONSIGNEE", WF_CONSIGNEE_CODE.Text, WF_CONSIGNEE_NAME.Text, WW_RTN_SW)
+                End If
                 TxtSalesOffice.Focus()
             Case "TxtShipper"          '荷主
                 TxtShipper.Text = WW_SelectValue
@@ -598,5 +628,55 @@ Public Class OIT0004OilStockSearch
         End Try
 
     End Sub
+    ''' <summary>
+    ''' 営業所に紐づく初期の荷主、荷受人コードを取得
+    ''' </summary>
+    ''' <param name="officeCode">営業所コード</param>
+    ''' <param name="shippersCode">[OUT]荷主コード</param>
+    ''' <param name="consigneeCode">[OUT]荷受人コード</param>
+    Protected Sub GetDefRelateValues(ByVal officeCode As String, ByRef shippersCode As String, ByRef consigneeCode As String)
+        Try
+            '営業所コードが未設定なら何もしない
+            If officeCode = "" Then
+                Return
+            End If
 
+            Dim sqlStat As New StringBuilder
+            sqlStat.AppendLine("SELECT FX.VALUE1 AS SHIPPERSCODE")
+            sqlStat.AppendLine("      ,FX.VALUE2 AS CONSIGNEECODE")
+            sqlStat.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
+            sqlStat.AppendLine(" WHERE FX.CAMPCODE = @CAMPCODE")
+            sqlStat.AppendLine("   AND FX.CLASS    = @CLASS")
+            sqlStat.AppendLine("   AND FX.KEYCODE  = @OFFICE")
+            sqlStat.AppendLine("   AND FX.DELFLG   = @DELFLG")
+            'DataBase接続文字
+            Using sqlCon = CS0050SESSION.getConnection,
+                  sqlCmd = New SqlClient.SqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open() 'DataBase接続(Open)
+                With sqlCmd.Parameters
+                    .Add("@CAMPCODE", SqlDbType.NVarChar).Value = "01"
+                    .Add("@CLASS", SqlDbType.NVarChar).Value = "STOCKSELECTDEFOFFICE"
+                    .Add("@OFFICE", SqlDbType.NVarChar).Value = officeCode
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Using sqlDr As SqlClient.SqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows Then
+                        sqlDr.Read()
+                        shippersCode = Convert.ToString(sqlDr("SHIPPERSCODE"))
+                        consigneeCode = Convert.ToString(sqlDr("CONSIGNEECODE"))
+                    End If
+                End Using 'sqlDr
+            End Using 'sqlCon, sqlCmd
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D MASTER_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D MASTER_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+    End Sub
 End Class

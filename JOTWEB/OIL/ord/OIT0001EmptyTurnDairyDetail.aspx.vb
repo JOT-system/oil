@@ -444,14 +444,14 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '')            AS ORDERYMD" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '   ')        AS ORDERTYPE" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')           AS ORDERTYPE" _
             & " , ''                                             AS ORDERTYPENAME" _
-            & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '   ')     AS SHIPPERSCODE" _
-            & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '   ')     AS SHIPPERSNAME" _
-            & " , ISNULL(RTRIM(OIT0002.BASECODE), '   ')         AS BASECODE" _
-            & " , ISNULL(RTRIM(OIT0002.BASENAME), '   ')         AS BASENAME" _
-            & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '   ')    AS CONSIGNEECODE" _
-            & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '   ')    AS CONSIGNEENAME" _
+            & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')        AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')        AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(OIT0002.BASECODE), '')            AS BASECODE" _
+            & " , ISNULL(RTRIM(OIT0002.BASENAME), '')            AS BASENAME" _
+            & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')       AS CONSIGNEECODE" _
+            & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')       AS CONSIGNEENAME" _
             & " , ISNULL(RTRIM(OIT0003.OILCODE), '')             AS OILCODE" _
             & " , ISNULL(RTRIM(OIT0003.OILNAME), '')             AS OILNAME" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')        AS ORDERINGTYPE" _
@@ -4345,7 +4345,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 0                                                  AS HIDDEN" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '   ')          AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _

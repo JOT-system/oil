@@ -1833,4 +1833,6 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     height: 100%;
     border-radius: 5px;
     resize: both;
+    max-height: calc(100vh - 100px);
+    max-width: calc(100vw - 60px);
 }

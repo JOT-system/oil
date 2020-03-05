@@ -65,10 +65,11 @@
                         <%-- 構内取り用の見出し --%>
                         <asp:PlaceHolder ID="phmiSuggestLeftRectTitle" runat="server" Visible='<%# Eval("HasMoveInsideItem") %>'>
                             <div id="miSuggestLeftRecvTitle" style='height:calc(<%#  If(Eval("HasMoveInsideItem"), DirectCast(Eval("MiDispData"), DispDataClass).SuggestOilNameList.Count, "0") %> * 24px)'>
-                                <span data-tiptext='<%# String.Format("構内取り {4}営業所:{0}({1}) {4}油槽所:{2}({3})",
-                                                                                   Eval("MiSalesOfficeName"), Eval("MiSalesOffice"),
-                                                                                   Eval("MiConsigneeName"), Eval("MiConsignee"),
-                                                                                   ControlChars.CrLf) %>'
+                                <span data-tiptext='<%# String.Format("構内取り {6}営業所:{0}({1}) {6}荷主:{2}({3}) {6}油槽所:{4}({5}) ",
+                                                                                                                       Eval("MiSalesOfficeName"), Eval("MiSalesOffice"),
+                                                                                                                       Eval("MiShippersName"), Eval("MiShippersCode"),
+                                                                                                                       Eval("MiConsigneeName"), Eval("MiConsignee"),
+                                                                                                                       ControlChars.CrLf) %>'
                                     >構内取り</span>
                             </div>
                         </asp:PlaceHolder>

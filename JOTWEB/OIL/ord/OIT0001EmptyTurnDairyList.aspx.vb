@@ -170,7 +170,7 @@ Public Class OIT0001EmptyTurnDairyList
             Master.RecoverTable(OIT0001tbl, work.WF_SEL_INPTBL.Text)
         End If
 
-        '''○ 名称設定処理
+        ''○ 名称設定処理
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
         'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署
 

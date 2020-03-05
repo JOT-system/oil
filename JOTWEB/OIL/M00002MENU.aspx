@@ -9,7 +9,7 @@
 
 </asp:Content> 
 <asp:Content ID="MC0002" ContentPlaceHolderID="contents1" runat="server">
-       <!-- AWSサーバーとGITの接続確認 -->
+       
         <!-- 全体レイアウト　Menuheaderbox -->
         <div  class="Menuheaderbox" id="Menuheaderbox">
 

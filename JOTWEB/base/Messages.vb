@@ -498,6 +498,11 @@ Public Module Messages
         ''' 同一受入予定日の複数受注データが存在するため更新をスキップしました。
         ''' </summary>
         Public Const OIL_ORDER_DUPULICATE_ACCDATE_ERROR As String = "20027"
+        ''' <summary>
+        ''' 削除データ未存在
+        ''' </summary>
+        Public Const OIL_DELDATA_NOTFOUND As String = "20028"
+
 
 #End Region
 

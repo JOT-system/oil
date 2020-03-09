@@ -250,7 +250,7 @@ Public Class OIT0004OilStockSearch
         If isNormal(WW_CS0024FCHECKERR) Then
             CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
-                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所 : " & TxtSalesOffice.Text, needsPopUp:=True)
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "営業所 : " & TxtSalesOffice.Text, needsPopUp:=True)
                 TxtSalesOffice.Focus()
                 O_RTN = "ERR"
                 Exit Sub

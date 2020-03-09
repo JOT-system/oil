@@ -548,32 +548,35 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End Using
 
                 With SQLcmd.Parameters
-                    .Add("@P0", SqlDbType.Int).Value = O_INSCNT             '明細数(新規作成)
+                    .Add("@P0", SqlDbType.Int).Value = O_INSCNT                                  '明細数(新規作成)
                     .Add("@P3", SqlDbType.NVarChar, 10).Value = work.WF_SEL_SHIPPERSCODE.Text    '荷主コード
                     .Add("@P4", SqlDbType.NVarChar, 40).Value = work.WF_SEL_SHIPPERSNAME.Text    '荷主名
-                    .Add("@P5", SqlDbType.NVarChar, 9).Value = work.WF_SEL_BASECODE.Text     '基地コード
-                    .Add("@P6", SqlDbType.NVarChar, 40).Value = work.WF_SEL_BASENAME.Text    '基地名
-                    .Add("@P7", SqlDbType.NVarChar, 10).Value = work.WF_SEL_CONSIGNEECODE.Text    '荷受人コード
-                    .Add("@P8", SqlDbType.NVarChar, 40).Value = work.WF_SEL_CONSIGNEENAME.Text    '荷受人名
-                    .Add("@P9", SqlDbType.NVarChar, 20).Value = C_INSPECTIONALERT.ALERT_RED    '赤丸
+                    .Add("@P5", SqlDbType.NVarChar, 9).Value = work.WF_SEL_BASECODE.Text         '基地コード
+                    .Add("@P6", SqlDbType.NVarChar, 40).Value = work.WF_SEL_BASENAME.Text        '基地名
+                    .Add("@P7", SqlDbType.NVarChar, 10).Value = work.WF_SEL_CONSIGNEECODE.Text   '荷受人コード
+                    .Add("@P8", SqlDbType.NVarChar, 40).Value = work.WF_SEL_CONSIGNEENAME.Text   '荷受人名
+                    .Add("@P9", SqlDbType.NVarChar, 20).Value = C_INSPECTIONALERT.ALERT_RED      '赤丸
                     .Add("@P10", SqlDbType.NVarChar, 20).Value = C_INSPECTIONALERT.ALERT_YELLOW  '黄丸
-                    .Add("@P11", SqlDbType.NVarChar, 20).Value = C_INSPECTIONALERT.ALERT_GREEN  '緑丸
-                    .Add("@P12", SqlDbType.NVarChar, 9).Value = work.WF_SEL_PATTERNCODE.Text   '受注パターン
-                    .Add("@P13", SqlDbType.NVarChar, 100).Value = work.WF_SEL_PATTERNNAME.Text '受注パターン名
+                    .Add("@P11", SqlDbType.NVarChar, 20).Value = C_INSPECTIONALERT.ALERT_GREEN   '緑丸
+                    .Add("@P12", SqlDbType.NVarChar, 9).Value = work.WF_SEL_PATTERNCODE.Text     '受注パターン
+                    .Add("@P13", SqlDbType.NVarChar, 100).Value = work.WF_SEL_PATTERNNAME.Text   '受注パターン名
                 End With
 
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 11)    '受注№
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)     '削除フラグ
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
 
+                '新規登録の場合
                 If work.WF_SEL_CREATEFLG.Text = "1" Then
-
                     For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
                         PARA1.Value = OIT0001WKrow("ORDERNO_NUM")
                         PARA2.Value = C_DELETE_FLG.ALIVE
                     Next
+
+                    '既存更新の場合
                 ElseIf work.WF_SEL_CREATEFLG.Text = "2" Then
                     PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                     PARA2.Value = C_DELETE_FLG.DELETE
+
                 End If
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()

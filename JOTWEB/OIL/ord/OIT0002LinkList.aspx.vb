@@ -594,6 +594,7 @@ Public Class OIT0002LinkList
     Protected Sub WF_ButtonLINE_LIFTED_Click()
 
         Dim SelectChk As Boolean = False
+        Dim intTblCnt As Integer = 0
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0002tbl)
@@ -630,6 +631,7 @@ Public Class OIT0002LinkList
             '選択されている行は削除対象
             Dim i As Integer = 0
             Dim j As Integer = 9000
+            intTblCnt = OIT0002tbl.Rows.Count
             For Each OIT0002UPDrow In OIT0002tbl.Rows
                 If OIT0002UPDrow("OPERATION") = "on" Then
                     If OIT0002UPDrow("LINECNT") < 9000 Then
@@ -675,8 +677,14 @@ Public Class OIT0002LinkList
         Master.SaveTable(OIT0002tbl)
 
         '○メッセージ表示
-        If SelectChk = False Then
+        '一覧件数が０件の時の行削除の場合
+        If intTblCnt = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_DELDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+            '一覧件数が１件以上で未選択による行削除の場合
+        ElseIf SelectChk = False Then
             Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
         Else
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If

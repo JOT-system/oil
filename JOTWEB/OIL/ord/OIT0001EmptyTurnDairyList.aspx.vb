@@ -505,6 +505,7 @@ Public Class OIT0001EmptyTurnDairyList
     Protected Sub WF_ButtonLINE_LIFTED_Click()
 
         Dim SelectChk As Boolean = False
+        Dim intTblCnt As Integer = 0
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0001tbl)
@@ -548,6 +549,7 @@ Public Class OIT0001EmptyTurnDairyList
             '選択されている行は削除対象
             Dim i As Integer = 0
             Dim j As Integer = 9000
+            intTblCnt = OIT0001tbl.Rows.Count
             For Each OIT0001UPDrow In OIT0001tbl.Rows
                 If OIT0001UPDrow("OPERATION") = "on" Then
 
@@ -592,8 +594,14 @@ Public Class OIT0001EmptyTurnDairyList
         Master.SaveTable(OIT0001tbl)
 
         '○メッセージ表示
-        If SelectChk = False Then
+        '一覧件数が０件の時の行削除の場合
+        If intTblCnt = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_DELDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+            '一覧件数が１件以上で未選択による行削除の場合
+        ElseIf SelectChk = False Then
             Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
         Else
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If

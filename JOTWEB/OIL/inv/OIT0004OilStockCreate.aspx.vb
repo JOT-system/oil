@@ -73,6 +73,8 @@ Public Class OIT0004OilStockCreate
 
                         Case "WF_ButtonEND"                 '戻るボタン押下
                             WF_ButtonEND_Click()
+                        Case "WF_RadioButonClick"
+                            WF_RadioButton_Click()
                     End Select
                 End If
             Else
@@ -146,9 +148,9 @@ Public Class OIT0004OilStockCreate
         Dim salesOffice As String = work.WF_SEL_SALESOFFICECODE.Text
         Dim salesOfficeName As String = work.WF_SEL_SALESOFFICE.Text
         Dim shipper As String = work.WF_SEL_SHIPPERCODE.Text
-        Dim shipperName As String = "" 'work.WF_SEL_SHIPPERNAME.Text
+        Dim shipperName As String = work.WF_SEL_SHIPPERNAME.Text
         Dim consignee As String = work.WF_SEL_CONSIGNEE.Text
-        Dim consigneeName As String = "" 'work.WF_SEL_CONSIGNEENAME.Text
+        Dim consigneeName As String = work.WF_SEL_CONSIGNEENAME.Text
 
         Dim daysList As Dictionary(Of String, DaysItem)
         Dim oilTypeList As Dictionary(Of String, OilItem)
@@ -173,7 +175,7 @@ Public Class OIT0004OilStockCreate
             End If
             '抽出結果を画面データクラスに展開
             dispDataObj = New DispDataClass(daysList, trainList, oilTypeList, salesOffice, shipper, consignee)
-            dispDataObj.SelesOfficeName = salesOfficeName
+            dispDataObj.SalesOfficeName = salesOfficeName
             dispDataObj.ShipperName = shipperName
             dispDataObj.ConsigneeName = consigneeName
             '提案一覧表示可否設定
@@ -204,7 +206,7 @@ Public Class OIT0004OilStockCreate
                 miOilTypeList = GetTargetOilType(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiConsignee)
                 '構内取り用の画面表示クラス生成
                 dispDataObj.MiDispData = New DispDataClass(daysList, mitrainList, miOilTypeList, dispDataObj.MiSalesOffice, dispDataObj.MiShippersCode, dispDataObj.MiConsignee)
-                dispDataObj.MiDispData.SelesOfficeName = dispDataObj.MiSalesOfficeName
+                dispDataObj.MiDispData.SalesOfficeName = dispDataObj.MiSalesOfficeName
                 dispDataObj.MiDispData.ShipperName = dispDataObj.MiShippersName
                 dispDataObj.MiDispData.ConsigneeName = dispDataObj.MiConsigneeName
                 dispDataObj.MiDispData.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, dispDataObj.MiDispData)
@@ -320,6 +322,7 @@ Public Class OIT0004OilStockCreate
         End If
         'SQL接続
         Dim orderInfoList As Dictionary(Of String, OrderItem)
+        Dim retMsg As List(Of EntryOrderResultItm)
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             '既登録の受注情報取得
@@ -329,9 +332,46 @@ Public Class OIT0004OilStockCreate
             '******************************
             '更新処理実行
             '******************************
-            Dim retMes = EntryOrderInfo(sqlCon, dispClass, orderInfoList)
-        End Using
+            retMsg = EntryOrderInfo(sqlCon, dispClass, orderInfoList)
+            '構内取りありの場合(構内取り分のデータを登録
+            If dispClass.HasMoveInsideItem Then
+                '構内取り分既登録受注情報取得
+                orderInfoList = GetEmptyTurnOrder(sqlCon, dispClass.MiDispData)
+                orderInfoList = GetEmptyTurnDetail(sqlCon, dispClass.MiDispData, orderInfoList)
+                orderInfoList = GetEmptyTurnMaxDetailNo(sqlCon, dispClass.MiDispData, orderInfoList)
+                '構内取り分の受注情報登録
+                Dim retMiMes = EntryOrderInfo(sqlCon, dispClass.MiDispData, orderInfoList)
 
+                retMsg.AddRange(retMiMes) '構内取り以外の処理結果メッセージをマージ
+            End If
+        End Using
+        If retMsg Is Nothing OrElse retMsg.Count = 0 Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        Else
+            Dim dummyLabel As New Label
+            Dim CS0009MESSAGEout As New CS0009MESSAGEout
+            CS0009MESSAGEout.MESSAGEBOX = dummyLabel
+            CS0009MESSAGEout.NAEIW = "E"
+            Dim argStrSetting As String = "{8}{9}日付:{0}{8}{9}列車:{1}{8}{9}油種:{2}{8}{9}受注№:{3}{8}{9}明細№:{4}{8}{9}営業所:{5}{8}{9}荷主:{6}{8}{9}荷受人:{7}{8}"
+            Dim nextBorder As String = "＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊" & ControlChars.CrLf
+            For Each msgItm In retMsg
+                If dummyLabel.Text <> "" Then
+                    rightview.AddErrorReport(nextBorder)
+                End If
+                dummyLabel.Text = ""
+                Dim argString = String.Format(argStrSetting, msgItm.AccDate, msgItm.TrainNo,
+                                              msgItm.OilCode, msgItm.OrderNo, msgItm.DetailNo,
+                                              msgItm.OfficeCode, msgItm.ShipperCode,
+                                              msgItm.ConsigneeCode, ControlChars.CrLf, ControlChars.Tab)
+                CS0009MESSAGEout.MESSAGENO = msgItm.MessageId
+                CS0009MESSAGEout.PARA01 = argString
+
+                CS0009MESSAGEout.CS0009MESSAGEout()
+
+                rightview.AddErrorReport("■" & Trim(dummyLabel.Text))
+            Next
+            Master.Output(C_MESSAGE_NO.BOX_ERROR_EXIST, C_MESSAGE_TYPE.INF, needsPopUp:=True)
+        End If
 
     End Sub
     ''' <summary>
@@ -345,6 +385,9 @@ Public Class OIT0004OilStockCreate
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             dispValues = EditEmptyTurnCarsNum(sqlCon, dispValues)
+            If dispValues.HasMoveInsideItem Then
+                dispValues.MiDispData = EditEmptyTurnCarsNum(sqlCon, dispValues.MiDispData)
+            End If
         End Using
         '1.提案リスト
         If dispValues.ShowSuggestList = False Then
@@ -372,6 +415,9 @@ Public Class OIT0004OilStockCreate
 
         Dim dispValues = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
         dispValues.InputValueToZero()
+        If dispValues.HasMoveInsideItem Then
+            dispValues.MiDispData.InputValueToZero()
+        End If
         'コンストラクタで生成したデータを画面に貼り付け
         '1.提案リスト
         If dispValues.ShowSuggestList = False Then
@@ -402,6 +448,9 @@ Public Class OIT0004OilStockCreate
             Return
         End If
         dispValues.RecalcStockList()
+        If dispValues.HasMoveInsideItem Then
+            dispValues.MiDispData.RecalcStockList()
+        End If
         SaveThisScreenValue(dispValues)
         '在庫表再表示
         repStockDate.DataSource = dispValues.StockDate
@@ -425,6 +474,11 @@ Public Class OIT0004OilStockCreate
             Dim errNum As String = ""
             If EntryStockData(sqlCon, dispValues, errNum, Date.Now) = False Then
                 Return
+            End If
+            If dispValues.HasMoveInsideItem Then
+                If EntryStockData(sqlCon, dispValues.MiDispData, errNum, Date.Now) = False Then
+                    Return
+                End If
             End If
         End Using
 
@@ -1168,13 +1222,13 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
         sqlStr.AppendLine(" WHERE FX.CAMPCODE = @CAMPCODE")
         sqlStr.AppendLine("   AND FX.CLASS    = @CLASS")
-        sqlStr.AppendLine("   AND FX.KEYCODE  = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND FX.KEYCODE  = @SHIPPERSCODE")
         sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@CAMPCODE", SqlDbType.NVarChar).Value = "01"
                 .Add("@CLASS", SqlDbType.NVarChar).Value = "ASYNCDELETESHIPPER"
-                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
             End With
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -1402,6 +1456,10 @@ Public Class OIT0004OilStockCreate
     Private Function GetEmptyTurnDetail(sqlCon As SqlConnection, dispData As DispDataClass, orderList As Dictionary(Of String, OrderItem)) As Dictionary(Of String, OrderItem)
         Dim sqlStat As New StringBuilder
         Dim retVal = orderList
+        '受注基本データがなければ取得する必要がないのでスキップ
+        If orderList Is Nothing OrElse orderList.Count = 0 Then
+            Return retVal
+        End If
         '画面で選択された（選択されていないものは除去）日付、列車、油種情報を取得
         Dim targetTrainInfo = dispData.GetSuggestCheckedItem
         '前処理の入力チェックがあり、ここにきてありえないが選択されたデータが無い場合そのまま終了
@@ -1494,6 +1552,10 @@ Public Class OIT0004OilStockCreate
     Private Function GetEmptyTurnMaxDetailNo(sqlCon As SqlConnection, dispData As DispDataClass, orderList As Dictionary(Of String, OrderItem)) As Dictionary(Of String, OrderItem)
         Dim sqlStat As New StringBuilder
         Dim retVal = orderList
+        '既登録データがない場合はそもそも取得する必要がないのでスキップ
+        If orderList Is Nothing OrElse orderList.Count = 0 Then
+            Return retVal
+        End If
         '画面で選択された（選択されていないものは除去）日付、列車、油種情報を取得
         Dim targetTrainInfo = dispData.GetSuggestCheckedItem
         '前処理の入力チェックがあり、ここにきてありえないが選択されたデータが無い場合そのまま終了
@@ -1822,17 +1884,34 @@ Public Class OIT0004OilStockCreate
                 '戻り値エラー情報に格納
                 retMessage.Add(New EntryOrderResultItm With {
                                .AccDate = chkItm.dayInfo.KeyString,
-                               .ShipperCode = dispDataClass.Shipper,
-                               .ConsigneeCode = dispDataClass.Consignee,
+                               .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                               .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                               .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
                                .TrainNo = chkItm.trainInfo.TrainNo,
+                               .OrderNo = "(" & String.Join(",", (From itm In qOder Select itm.OrderNo)) & ")",
                                .MessageId = C_MESSAGE_NO.OIL_ORDER_DUPULICATE_ACCDATE_ERROR
                                })
                 Continue For
             End If
             '同一受入日、荷主、荷受人、列車番号の既登録データをorderItm変数にセット(1件またはNothing(0件)となる)
             orderItm = qOder.FirstOrDefault
+            '既登録オーダー（受注テーブル）なし、画面入力の車数がすべて0の場合は登録する意味がないのでスキップ
+            If orderItm Is Nothing AndAlso (From sitm In chkItm.SuggestOrderItem.Values
+                                            Where CInt(sitm.ItemValue) > 0).Any = False Then
 
-            '既登録オーダーのステータスが進んでいたら更新させない
+                '戻り値エラー情報に格納
+                retMessage.Add(New EntryOrderResultItm With {
+                               .AccDate = chkItm.dayInfo.KeyString,
+                               .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                               .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                               .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
+                               .TrainNo = chkItm.trainInfo.TrainNo,
+                               .MessageId = C_MESSAGE_NO.OIL_CANNOT_ENTRY_ORDER
+                               })
+                Continue For
+            End If
+
+            '既登録オーダー（受注テーブル）のステータスが進んでいたら更新させない
             If orderItm IsNot Nothing AndAlso
                Not {CONST_ORDERSTATUS_100,
                     CONST_ORDERSTATUS_200, CONST_ORDERSTATUS_210,
@@ -1840,38 +1919,52 @@ Public Class OIT0004OilStockCreate
                     CONST_ORDERSTATUS_240, CONST_ORDERSTATUS_250,
                     CONST_ORDERSTATUS_260, CONST_ORDERSTATUS_270}.
                     Contains(orderItm.OrderStatus) Then
-                '戻り値エラー情報に格納(TODOエラー番号：ステータスが進みすぎて更新できないエラー)
+                '戻り値エラー情報に格納
                 retMessage.Add(New EntryOrderResultItm With {
                                .AccDate = chkItm.dayInfo.KeyString,
-                               .ShipperCode = dispDataClass.Shipper,
-                               .ConsigneeCode = dispDataClass.Consignee,
+                               .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                               .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                               .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
                                .TrainNo = chkItm.trainInfo.TrainNo,
-                               .MessageId = C_MESSAGE_NO.OIL_ORDER_DUPULICATE_ACCDATE_ERROR
+                               .OrderNo = orderItm.OrderNo,
+                               .MessageId = C_MESSAGE_NO.OIL_THIS_ORDER_STATUS_ISNOT_PROC
                                })
                 Continue For
             End If '既登録オーダーステータスチェック End If
             '(コスモ時、既登録オーダーがある場合)
-            '削除時オーダー同期させず且つ1つでも油種が減った場合、すべての油種を処理させない、受入日、列車番号は処理しない
+            '削除時オーダー（受注テーブル）同期させず且つ1つでも油種が減った場合、すべての油種を処理させない、受入日、列車番号は処理しない
             If orderItm IsNot Nothing AndAlso dispDataClass.AsyncDeleteShipper = True Then
-                Dim hasDecrementTrainCnt As Boolean = False
+                Dim hasDecrementTrainCnt As Boolean
+                Dim decOilCode As String = ""
+                Dim decOilName As String = ""
+                Dim decOrderNo As String = ""
+                Dim decDetailNo As String = ""
+                hasDecrementTrainCnt = False
                 For Each chkOilVal In chkItm.SuggestOrderItem
                     Dim qOrderDetailOilCount = (From detItm In orderItm.DetailList Where detItm.OilCode = chkOilVal.Key)
                     '受注テーブルの車数と画面入力の車数を比較
                     If qOrderDetailOilCount.Count > CInt(chkOilVal.Value.ItemValue) Then
                         '車数減少を検知したためフラグを耐えてチェックを抜ける
+                        decOilCode = chkOilVal.Value.OilInfo.OilName & "(" & chkOilVal.Value.OilInfo.OilCode & ")"
+                        decOrderNo = qOrderDetailOilCount(0).OrderNo
+                        decDetailNo = qOrderDetailOilCount(0).DetailNo
                         hasDecrementTrainCnt = True
                         Exit For
                     End If
                 Next chkOilVal
                 '車数減少の場合
                 If hasDecrementTrainCnt Then
-                    '戻り値エラー情報に格納(TODOエラー番号：ステータスが進みすぎて更新できないエラー)
+                    '戻り値エラー情報に格納
                     retMessage.Add(New EntryOrderResultItm With {
                                    .AccDate = chkItm.dayInfo.KeyString,
-                                   .ShipperCode = dispDataClass.Shipper,
-                                   .ConsigneeCode = dispDataClass.Consignee,
+                                   .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                                   .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                                   .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
                                    .TrainNo = chkItm.trainInfo.TrainNo,
-                                   .MessageId = C_MESSAGE_NO.OIL_ORDER_DUPULICATE_ACCDATE_ERROR
+                                   .OilCode = decOilCode,
+                                   .OrderNo = decOrderNo,
+                                   .DetailNo = decDetailNo,
+                                   .MessageId = C_MESSAGE_NO.OIL_ASYNC_DELETE_SHIPPER
                                    })
                     Continue For '次の列車・日付キーへスキップ
                 End If　'車数減少の場合 End If
@@ -1886,14 +1979,15 @@ Public Class OIT0004OilStockCreate
                 If orderNo = "" Then
                     If entryResult Is Nothing Then
                         entryResult = New EntryOrderResultItm With {
-                        .MessageId = C_MESSAGE_NO.MASTER_NOT_FOUND_ERROR,
+                        .MessageId = C_MESSAGE_NO.OIL_CANNOT_GET_NEW_ORDERNO,
                         .Message = "NEWORDERNOGET"
                         }
                     End If
                     With entryResult
                         .AccDate = chkItm.dayInfo.KeyString
-                        .ShipperCode = dispDataClass.Shipper
-                        .ConsigneeCode = dispDataClass.Consignee
+                        .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName)
+                        .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName)
+                        .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName)
                         .TrainNo = chkItm.trainInfo.TrainNo
                     End With
                     retMessage.Add(entryResult)
@@ -1915,22 +2009,122 @@ Public Class OIT0004OilStockCreate
                 'オーダー詳細テーブル既登録の車数と画面上の車数が同値なら特に操作をしないで次の油種へ
                 If detailTrainCnt = CInt(chkOilVal.Value.ItemValue) Then
                     Continue For
-                End If
+                End If '未変更用
+
                 'オーダー詳細テーブル既登録の車数と画面上の車数につき
                 '画面上の油種が増えていた場合は追加
                 If detailTrainCnt < CInt(chkOilVal.Value.ItemValue) Then
                     Dim orderDetItem As OrderDetailItem
+                    orderItm.TRCount(chkOilVal.Key) = chkOilVal.Value.ItemValue
+                    If orderItm.EntryType = OrderItem.OrderItemEntryType.None Then
+                        orderItm.EntryType = OrderItem.OrderItemEntryType.Update
+                        orderItm.UpdUser = Master.USERID
+                        orderItm.UpdYmd = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+                        orderItm.UpdTermId = Master.USERTERMID
+                        orderItm.ReceiveYmd = CONST_DEFAULT_RECEIVEYMD
+                    End If
                     '油種増分数
                     Dim incrimentCnt = CInt(chkOilVal.Value.ItemValue) - detailTrainCnt
                     Dim curDetailInt = CInt(orderItm.MaxDetailNo)
-                    For i = 0 To incrimentCnt
+                    For i = 1 To incrimentCnt
                         curDetailInt = curDetailInt + 1
                         orderDetItem = New OrderDetailItem(orderItm, curDetailInt.ToString("000"),
                                                            dispDataClass, chkOilVal.Value, procDtm, Master.USERID, Master.USERTERMID)
+                        orderItm.DetailList.Add(orderDetItem)
                     Next i
+                    orderItm.MaxDetailNo = curDetailInt.ToString("000")
+                End If '新規追加オーダー詳細増幅
+                'オーダー詳細テーブル既登録の車数と画面上の車数につき
+                '画面上の油種が減っていた場合は削除フラグ
+                If detailTrainCnt > CInt(chkOilVal.Value.ItemValue) Then
+                    orderItm.TRCount(chkOilVal.Key) = chkOilVal.Value.ItemValue
+                    If orderItm.EntryType = OrderItem.OrderItemEntryType.None Then
+                        orderItm.EntryType = OrderItem.OrderItemEntryType.Update
+                        orderItm.UpdUser = Master.USERID
+                        orderItm.UpdYmd = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+                        orderItm.UpdTermId = Master.USERTERMID
+                        orderItm.ReceiveYmd = CONST_DEFAULT_RECEIVEYMD
+                    End If
+                    Dim delCnt As Integer = detailTrainCnt - CInt(chkOilVal.Value.ItemValue)
+                    For Each oderDetailItm In qOrderDetailOil
+                        If delCnt <= 0 Then
+                            Exit For
+                        End If
+                        '処理種別を None(何もしない)からDelete(論理削除)に変更
+                        oderDetailItm.EntryType = OrderDetailItem.DetailEntryType.Delete
+                        oderDetailItm.DelFlg = C_DELETE_FLG.DELETE
+                        oderDetailItm.UpdUser = Master.USERID
+                        oderDetailItm.UpdYmd = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+                        oderDetailItm.UpdTermId = Master.USERTERMID
+                        delCnt = delCnt - 1
+                    Next oderDetailItm
                 End If
             Next chkOilVal '画面上の日付・列車固定の油種部分をループ End
+            '***********************************************
+            'オーダー詳細情報部に更新対象があるかチェック
+            '***********************************************
+            '受注詳細でEntryType=None(何もしない)件数 = 受注明細の件数の場合、DB登録の意味がないのでスキップ
+            If orderItm.DetailList.Count = (From dtlItm In orderItm.DetailList Where dtlItm.EntryType = OrderDetailItem.DetailEntryType.None).Count Then
+                retMessage.Add(New EntryOrderResultItm With {
+                                   .AccDate = chkItm.dayInfo.KeyString,
+                                   .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                                   .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                                   .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
+                                   .TrainNo = chkItm.trainInfo.TrainNo,
+                                   .MessageId = C_MESSAGE_NO.OIL_CANNOT_ENTRY_ORDER
+                                   })
+                Continue For
+            End If
+            '***********************************************
+            '更新処理実行
+            '***********************************************
+            Dim detailNo As String = ""
+            Dim odrNo As String = ""
+            Try
+                detailNo = ""
+                odrNo = ""
+                '日付列車単位でのトランザクション
+                Using tran = sqlCon.BeginTransaction
+                    odrNo = orderItm.OrderNo
+                    'オーダー基本部
+                    If orderItm.EntryType = OrderItem.OrderItemEntryType.Insert Then
+                        InsertOrder(sqlCon, tran, orderItm)
+                    ElseIf orderItm.EntryType = OrderItem.OrderItemEntryType.Update Then
+                        UpdateOrder(sqlCon, tran, orderItm)
+                    End If
+                    'オーダー詳細部ループ
+                    For Each detailItm In orderItm.DetailList
+                        detailNo = detailItm.DetailNo
+                        If detailItm.EntryType = OrderDetailItem.DetailEntryType.Insert Then
+                            InsertOrderDetail(sqlCon, tran, detailItm)
+                        ElseIf detailItm.EntryType = OrderDetailItem.DetailEntryType.Delete Then
+                            DeleteOrderDetail(sqlCon, tran, detailItm)
+                        End If
+                    Next 'detailItm
 
+                    'トランザクションコミット
+                    tran.Commit()
+                End Using 'tran
+            Catch ex As Exception
+                retMessage.Add(New EntryOrderResultItm With {
+                   .AccDate = chkItm.dayInfo.KeyString,
+                   .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                   .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                   .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
+                   .TrainNo = chkItm.trainInfo.TrainNo,
+                   .OrderNo = odrNo,
+                   .DetailNo = detailNo,
+                   .MessageId = C_MESSAGE_NO.DB_ERROR, '一旦このコード
+                   .StackTrace = ex.ToString
+                   })
+                CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+                CS0011LOGWrite.INFPOSI = "DB:OIT0004C ORDERUPDATE"
+                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWrite.TEXT = ex.ToString()
+                CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+                Continue For
+            End Try
         Next chkItm '日付、列車毎ループ終了
         Return retMessage '処理結果メッセージを返却(0件なら完全に正常想定)
     End Function
@@ -1970,9 +2164,11 @@ Public Class OIT0004OilStockCreate
             errMes = New EntryOrderResultItm
             errMes.MessageId = C_MESSAGE_NO.DB_ERROR
             errMes.Message = "GetNewOrderNo Error"
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D MASTER_SELECT")
+            errMes.StackTrace = ex.ToString()
+
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004C MASTER_SELECT")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D MASTER_SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004C MASTER_SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1980,762 +2176,418 @@ Public Class OIT0004OilStockCreate
         End Try
         Return retVal
     End Function
-    '''' <summary>
-    '''' 受注TBL登録更新
-    '''' </summary>
-    '''' <param name="SQLcon"></param>
-    '''' <remarks></remarks>
-    'Protected Function EntryOrder(ByVal sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing) As Boolean
+    ''' <summary>
+    ''' オーダー基本情報追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <param name="orderItm"></param>
+    Private Sub InsertOrder(sqlCon As SqlConnection, sqlTran As SqlTransaction, orderItm As OrderItem)
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("INSERT INTO OIL.OIT0002_ORDER")
+        sqlStat.AppendLine("   (ORDERNO,TRAINNO,TRAINNAME,ORDERYMD,OFFICECODE,OFFICENAME,ORDERTYPE,")
+        sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,BASECODE,BASENAME,CONSIGNEECODE,CONSIGNEENAME,")
+        sqlStat.AppendLine("    DEPSTATION,DEPSTATIONNAME,ARRSTATION,ARRSTATIONNAME,RETSTATION,RETSTATIONNAME,")
+        sqlStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,ORDERSTATUS,ORDERINFO,STACKINGFLG,USEPROPRIETYFLG,DELIVERYFLG,")
+        sqlStat.AppendLine("    LODDATE,DEPDATE,ARRDATE,ACCDATE,EMPARRDATE,ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
+        sqlStat.AppendLine("    RTANK,HTANK,TTANK,MTTANK,KTANK,K3TANK,K5TANK,K10TANK,LTANK,ATANK,")
+        sqlStat.AppendLine("    OTHER1OTANK,OTHER2OTANK,OTHER3OTANK,OTHER4OTANK,OTHER5OTANK,")
+        sqlStat.AppendLine("    OTHER6OTANK,OTHER7OTANK,OTHER8OTANK,OTHER9OTANK,OTHER10OTANK,")
+        sqlStat.AppendLine("    TOTALTANK,")
+        sqlStat.AppendLine("    RTANKCH,HTANKCH,TTANKCH,MTTANKCH,KTANKCH,K3TANKCH,K5TANKCH,K10TANKCH,LTANKCH,ATANKCH,")
+        sqlStat.AppendLine("    OTHER1OTANKCH,OTHER2OTANKCH,OTHER3OTANKCH,OTHER4OTANKCH,OTHER5OTANKCH,")
+        sqlStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
+        sqlStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,KEIJYOYMD,")
+        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
+        sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
+        sqlStat.AppendLine("    VALUES")
+        sqlStat.AppendLine("   (@ORDERNO,@TRAINNO,@TRAINNAME,@ORDERYMD,@OFFICECODE,@OFFICENAME,@ORDERTYPE,")
+        sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@BASECODE,@BASENAME,@CONSIGNEECODE,@CONSIGNEENAME,")
+        sqlStat.AppendLine("    @DEPSTATION,@DEPSTATIONNAME,@ARRSTATION,@ARRSTATIONNAME,@RETSTATION,@RETSTATIONNAME,")
+        sqlStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,@ORDERSTATUS,@ORDERINFO,@STACKINGFLG,@USEPROPRIETYFLG,@DELIVERYFLG,")
+        sqlStat.AppendLine("    @LODDATE,@DEPDATE,@ARRDATE,@ACCDATE,@EMPARRDATE,@ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
+        sqlStat.AppendLine("    @RTANK,@HTANK,@TTANK,@MTTANK,@KTANK,@K3TANK,@K5TANK,@K10TANK,@LTANK,@ATANK,")
+        sqlStat.AppendLine("    @OTHER1OTANK,@OTHER2OTANK,@OTHER3OTANK,@OTHER4OTANK,@OTHER5OTANK,")
+        sqlStat.AppendLine("    @OTHER6OTANK,@OTHER7OTANK,@OTHER8OTANK,@OTHER9OTANK,@OTHER10OTANK,")
+        sqlStat.AppendLine("    @TOTALTANK,")
+        sqlStat.AppendLine("    @RTANKCH,@HTANKCH,@TTANKCH,@MTTANKCH,@KTANKCH,@K3TANKCH,@K5TANKCH,@K10TANKCH,@LTANKCH,@ATANKCH,")
+        sqlStat.AppendLine("    @OTHER1OTANKCH,@OTHER2OTANKCH,@OTHER3OTANKCH,@OTHER4OTANKCH,@OTHER5OTANKCH,")
+        sqlStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
+        sqlStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@KEIJYOYMD,")
+        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
+        sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
 
-    '    '○ ＤＢ更新
-    '    Dim SQLStr As String =
-    '          " DECLARE @hensuu AS bigint ;" _
-    '        & "    SET @hensuu = 0 ;" _
-    '        & " DECLARE hensuu CURSOR FOR" _
-    '        & "    SELECT" _
-    '        & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
-    '        & "    FROM" _
-    '        & "        OIL.OIT0002_ORDER" _
-    '        & "    WHERE" _
-    '        & "        ORDERNO          = @P01" _
-    '        & " OPEN hensuu ;" _
-    '        & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
-    '        & " IF (@@FETCH_STATUS = 0)" _
-    '        & "    UPDATE OIL.OIT0002_ORDER" _
-    '        & "    SET" _
-    '        & "        OFFICECODE      = @P04    , OFFICENAME     = @P05" _
-    '        & "        , TRAINNO       = @P02    , TRAINNAME      = @P93, ORDERTYPE  = @P06" _
-    '        & "        , SHIPPERSCODE  = @P07    , SHIPPERSNAME   = @P08" _
-    '        & "        , BASECODE      = @P09    , BASENAME       = @P10" _
-    '        & "        , CONSIGNEECODE = @P11    , CONSIGNEENAME  = @P12" _
-    '        & "        , DEPSTATION    = @P13    , DEPSTATIONNAME = @P14" _
-    '        & "        , ARRSTATION    = @P15    , ARRSTATIONNAME = @P16" _
-    '        & "        , ORDERINFO     = @P22    , STACKINGFLG    = @P92" _
-    '        & "        , USEPROPRIETYFLG = @P23  , DELIVERYFLG    = @P94" _
-    '        & "        , LODDATE       = @P24    , DEPDATE        = @P25" _
-    '        & "        , ARRDATE       = @P26    , ACCDATE        = @P27, EMPARRDATE = @P28" _
-    '        & "        , UPDYMD        = @P87    , UPDUSER        = @P88" _
-    '        & "        , UPDTERMID     = @P89    , RECEIVEYMD     = @P90" _
-    '        & "    WHERE" _
-    '        & "        ORDERNO          = @P01" _
-    '        & " IF (@@FETCH_STATUS <> 0)" _
-    '        & "    INSERT INTO OIL.OIT0002_ORDER" _
-    '        & "        ( ORDERNO      , TRAINNO         , TRAINNAME      , ORDERYMD            , OFFICECODE , OFFICENAME" _
-    '        & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME   , BASECODE            , BASENAME" _
-    '        & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION     , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
-    '        & "        , RETSTATION   , RETSTATIONNAME  , CANGERETSTATION, CHANGEARRSTATIONNAME, ORDERSTATUS, ORDERINFO    " _
-    '        & "        , STACKINGFLG  , USEPROPRIETYFLG , DELIVERYFLG    , LODDATE             , DEPDATE    , ARRDATE" _
-    '        & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE  , ACTUALDEPDATE       , ACTUALARRDATE" _
-    '        & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK          , HTANK               , TTANK" _
-    '        & "        , MTTANK       , KTANK           , K3TANK         , K5TANK              , K10TANK" _
-    '        & "        , LTANK        , ATANK           , OTHER1OTANK    , OTHER2OTANK         , OTHER3OTANK" _
-    '        & "        , OTHER4OTANK  , OTHER5OTANK     , OTHER6OTANK    , OTHER7OTANK         , OTHER8OTANK" _
-    '        & "        , OTHER9OTANK  , OTHER10OTANK    , TOTALTANK" _
-    '        & "        , RTANKCH      , HTANKCH         , TTANKCH        , MTTANKCH            , KTANKCH" _
-    '        & "        , K3TANKCH     , K5TANKCH        , K10TANKCH      , LTANKCH             , ATANKCH" _
-    '        & "        , OTHER1OTANKCH, OTHER2OTANKCH   , OTHER3OTANKCH  , OTHER4OTANKCH       , OTHER5OTANKCH" _
-    '        & "        , OTHER6OTANKCH, OTHER7OTANKCH   , OTHER8OTANKCH  , OTHER9OTANKCH       , OTHER10OTANKCH" _
-    '        & "        , TOTALTANKCH" _
-    '        & "        , TANKRINKNO   , KEIJYOYMD       , SALSE          , SALSETAX            , TOTALSALSE" _
-    '        & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT   , DELFLG" _
-    '        & "        , INITYMD      , INITUSER        , INITTERMID" _
-    '        & "        , UPDYMD       , UPDUSER         , UPDTERMID      , RECEIVEYMD)" _
-    '        & "    VALUES" _
-    '        & "        ( @P01, @P02, @P93, @P03, @P04, @P05" _
-    '        & "        , @P06, @P07, @P08, @P09, @P10" _
-    '        & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
-    '        & "        , @P17, @P18, @P19, @P20, @P21, @P22" _
-    '        & "        , @P92, @P23, @P94, @P24, @P25, @P26" _
-    '        & "        , @P27, @P28, @P29, @P30, @P31" _
-    '        & "        , @P32, @P33, @P34, @P35, @P36" _
-    '        & "        , @P37, @P38, @P39, @P40, @P41" _
-    '        & "        , @P42, @P43, @P44, @P45, @P46" _
-    '        & "        , @P47, @P48, @P49, @P50, @P51" _
-    '        & "        , @P52, @P53, @P54" _
-    '        & "        , @P55, @P56, @P57, @P58, @P59" _
-    '        & "        , @P60, @P61, @P62, @P63, @P64" _
-    '        & "        , @P65, @P66, @P67, @P68, @P69" _
-    '        & "        , @P70, @P71, @P72, @P73, @P74" _
-    '        & "        , @P75" _
-    '        & "        , @P76, @P91, @P77, @P78, @P79" _
-    '        & "        , @P80, @P81, @P82, @P83" _
-    '        & "        , @P84, @P85, @P86" _
-    '        & "        , @P87, @P88, @P89, @P90) ;" _
-    '        & " CLOSE hensuu ;" _
-    '        & " DEALLOCATE hensuu ;"
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            With sqlCmd.Parameters
+                .Add("ORDERNO", SqlDbType.NVarChar).Value = orderItm.OrderNo
+                .Add("TRAINNO", SqlDbType.NVarChar).Value = orderItm.TrainNo
+                .Add("TRAINNAME", SqlDbType.NVarChar).Value = orderItm.TrainName
+                .Add("ORDERYMD", SqlDbType.Date).Value = orderItm.OrderYmd
+                .Add("OFFICECODE", SqlDbType.NVarChar).Value = orderItm.OfficeCode
+                .Add("OFFICENAME", SqlDbType.NVarChar).Value = orderItm.OfficeName
+                .Add("ORDERTYPE", SqlDbType.NVarChar).Value = orderItm.OrderType
+                .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = orderItm.ShippersCode
+                .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = orderItm.ShippersName
+                .Add("BASECODE", SqlDbType.NVarChar).Value = orderItm.BaseCode
+                .Add("BASENAME", SqlDbType.NVarChar).Value = orderItm.BaseName
+                .Add("CONSIGNEECODE", SqlDbType.NVarChar).Value = orderItm.ConsigneeCode
+                .Add("CONSIGNEENAME", SqlDbType.NVarChar).Value = orderItm.ConsigneeName
+                .Add("DEPSTATION", SqlDbType.NVarChar).Value = orderItm.DepStation
+                .Add("DEPSTATIONNAME", SqlDbType.NVarChar).Value = orderItm.DepStationName
+                .Add("ARRSTATION", SqlDbType.NVarChar).Value = orderItm.ArrStation
+                .Add("ARRSTATIONNAME", SqlDbType.NVarChar).Value = orderItm.ArrStationName
+                .Add("RETSTATION", SqlDbType.NVarChar).Value = orderItm.RetStation
+                .Add("RETSTATIONNAME", SqlDbType.NVarChar).Value = orderItm.RetStationName
+                .Add("CHANGERETSTATION", SqlDbType.NVarChar).Value = orderItm.ChangeRetStation
+                .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = orderItm.ChangeRetStationName
+                .Add("ORDERSTATUS", SqlDbType.NVarChar).Value = orderItm.OrderStatus
+                .Add("ORDERINFO", SqlDbType.NVarChar).Value = orderItm.OrderInfo
+                .Add("STACKINGFLG", SqlDbType.NVarChar).Value = orderItm.StackingFlg
+                .Add("USEPROPRIETYFLG", SqlDbType.NVarChar).Value = orderItm.UseProprietyFlg
+                .Add("DELIVERYFLG", SqlDbType.NVarChar).Value = orderItm.DeliveryFlg
+                .Add("LODDATE", SqlDbType.Date).Value = orderItm.LodDate
+                .Add("DEPDATE", SqlDbType.Date).Value = orderItm.DepDate
+                .Add("ARRDATE", SqlDbType.Date).Value = orderItm.ArrDate
+                .Add("ACCDATE", SqlDbType.Date).Value = orderItm.AccDate
+                .Add("EMPARRDATE", SqlDbType.Date).Value = orderItm.EmpArrDate
+                .Add("ACTUALLODDATE", SqlDbType.Date).Value = If(orderItm.ActualLodDate = "", CType(DBNull.Value, Object), orderItm.ActualLodDate)
+                .Add("ACTUALDEPDATE", SqlDbType.Date).Value = If(orderItm.ActualDepDate = "", CType(DBNull.Value, Object), orderItm.ActualDepDate)
+                .Add("ACTUALARRDATE", SqlDbType.Date).Value = If(orderItm.ActualArrDate = "", CType(DBNull.Value, Object), orderItm.ActualArrDate)
+                .Add("ACTUALACCDATE", SqlDbType.Date).Value = If(orderItm.ActualAccDate = "", CType(DBNull.Value, Object), orderItm.ActualAccDate)
+                .Add("ACTUALEMPARRDATE", SqlDbType.Date).Value = If(orderItm.ActualEmpArrDate = "", CType(DBNull.Value, Object), orderItm.ActualEmpArrDate)
+                .Add("RTANK", SqlDbType.Int).Value = orderItm.RTank
+                .Add("HTANK", SqlDbType.Int).Value = orderItm.HTank
+                .Add("TTANK", SqlDbType.Int).Value = orderItm.TTank
+                .Add("MTTANK", SqlDbType.Int).Value = orderItm.MTtank
+                .Add("KTANK", SqlDbType.Int).Value = orderItm.KTank
+                .Add("K3TANK", SqlDbType.Int).Value = orderItm.K3Tank
+                .Add("K5TANK", SqlDbType.Int).Value = orderItm.K5Tank
+                .Add("K10TANK", SqlDbType.Int).Value = orderItm.K10Tank
+                .Add("LTANK", SqlDbType.Int).Value = orderItm.LTank
+                .Add("ATANK", SqlDbType.Int).Value = orderItm.ATank
+                .Add("OTHER1OTANK", SqlDbType.Int).Value = orderItm.Other1Otank
+                .Add("OTHER2OTANK", SqlDbType.Int).Value = orderItm.Other2OTank
+                .Add("OTHER3OTANK", SqlDbType.Int).Value = orderItm.Other3OTank
+                .Add("OTHER4OTANK", SqlDbType.Int).Value = orderItm.Other4OTank
+                .Add("OTHER5OTANK", SqlDbType.Int).Value = orderItm.Other5OTank
+                .Add("OTHER6OTANK", SqlDbType.Int).Value = orderItm.Other6OTank
+                .Add("OTHER7OTANK", SqlDbType.Int).Value = orderItm.Other7OTank
+                .Add("OTHER8OTANK", SqlDbType.Int).Value = orderItm.Other8OTank
+                .Add("OTHER9OTANK", SqlDbType.Int).Value = orderItm.Other9OTank
+                .Add("OTHER10OTANK", SqlDbType.Int).Value = orderItm.Other10OTank
+                .Add("TOTALTANK", SqlDbType.Int).Value = orderItm.TotalTank
+                .Add("RTANKCH", SqlDbType.Int).Value = orderItm.RTankCh
+                .Add("HTANKCH", SqlDbType.Int).Value = orderItm.HTankCh
+                .Add("TTANKCH", SqlDbType.Int).Value = orderItm.TTankCh
+                .Add("MTTANKCH", SqlDbType.Int).Value = orderItm.MtTankCh
+                .Add("KTANKCH", SqlDbType.Int).Value = orderItm.KTankCh
+                .Add("K3TANKCH", SqlDbType.Int).Value = orderItm.K3TankCh
+                .Add("K5TANKCH", SqlDbType.Int).Value = orderItm.K5TankCh
+                .Add("K10TANKCH", SqlDbType.Int).Value = orderItm.K10TankCh
+                .Add("LTANKCH", SqlDbType.Int).Value = orderItm.LTankCh
+                .Add("ATANKCH", SqlDbType.Int).Value = orderItm.ATankCh
+                .Add("OTHER1OTANKCH", SqlDbType.Int).Value = orderItm.Other1OTankCh
+                .Add("OTHER2OTANKCH", SqlDbType.Int).Value = orderItm.Other2OTankCh
+                .Add("OTHER3OTANKCH", SqlDbType.Int).Value = orderItm.Other3OTankCh
+                .Add("OTHER4OTANKCH", SqlDbType.Int).Value = orderItm.Other4OTankCh
+                .Add("OTHER5OTANKCH", SqlDbType.Int).Value = orderItm.Other5OTankCh
+                .Add("OTHER6OTANKCH", SqlDbType.Int).Value = orderItm.Other6OTankCh
+                .Add("OTHER7OTANKCH", SqlDbType.Int).Value = orderItm.Other7OTankCh
+                .Add("OTHER8OTANKCH", SqlDbType.Int).Value = orderItm.Other8OTankCh
+                .Add("OTHER9OTANKCH", SqlDbType.Int).Value = orderItm.Other9OTankCh
+                .Add("OTHER10OTANKCH", SqlDbType.Int).Value = orderItm.Other10OTankCh
+                .Add("TOTALTANKCH", SqlDbType.Int).Value = orderItm.TotalTankCh
+                .Add("TANKLINKNO", SqlDbType.NVarChar).Value = orderItm.TankLinkNo
+                .Add("TANKLINKNOMADE", SqlDbType.NVarChar).Value = orderItm.TankLinkNoMade
+                .Add("KEIJYOYMD", SqlDbType.Date).Value = If(orderItm.KeijyoYmd = "", CType(DBNull.Value, Object), orderItm.KeijyoYmd)
+                .Add("SALSE", SqlDbType.Int).Value = orderItm.Salse
+                .Add("SALSETAX", SqlDbType.Int).Value = orderItm.SalseTax
+                .Add("TOTALSALSE", SqlDbType.Int).Value = orderItm.TotalSalse
+                .Add("PAYMENT", SqlDbType.Int).Value = orderItm.Payment
+                .Add("PAYMENTTAX", SqlDbType.Int).Value = orderItm.PaymentTax
+                .Add("TOTALPAYMENT", SqlDbType.Int).Value = orderItm.TotalPayment
+                .Add("DELFLG", SqlDbType.NVarChar).Value = orderItm.DelFlg
+                .Add("INITYMD", SqlDbType.DateTime).Value = orderItm.InitYmd
+                .Add("INITUSER", SqlDbType.NVarChar).Value = orderItm.InitUser
+                .Add("INITTERMID", SqlDbType.NVarChar).Value = orderItm.InitTermId
+                .Add("UPDYMD", SqlDbType.DateTime).Value = orderItm.UpdYmd
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = orderItm.UpdUser
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = orderItm.UpdTermId
+                .Add("RECEIVEYMD", SqlDbType.DateTime).Value = orderItm.ReceiveYmd
+            End With
+            sqlCmd.CommandTimeout = 300
+            sqlCmd.ExecuteNonQuery()
+        End Using
+        CS0020JOURNAL.TABLENM = "OIT0002_ORDER"
+        CS0020JOURNAL.ACTION = "INSERT"
+        CS0020JOURNAL.ROW = orderItm.ToDataTable.Rows(0)
+        CS0020JOURNAL.CS0020JOURNAL()
+        If Not isNormal(CS0020JOURNAL.ERR) Then
+            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
 
-    '    '○ 更新ジャーナル出力
-    '    Dim SQLJnl As String =
-    '        " SELECT" _
-    '        & "    ORDERNO" _
-    '        & "    , TRAINNO" _
-    '        & "    , TRAINNAME" _
-    '        & "    , ORDERYMD" _
-    '        & "    , OFFICECODE" _
-    '        & "    , OFFICENAME" _
-    '        & "    , ORDERTYPE" _
-    '        & "    , SHIPPERSCODE" _
-    '        & "    , SHIPPERSNAME" _
-    '        & "    , BASECODE" _
-    '        & "    , BASENAME" _
-    '        & "    , CONSIGNEECODE" _
-    '        & "    , CONSIGNEENAME" _
-    '        & "    , DEPSTATION" _
-    '        & "    , DEPSTATIONNAME" _
-    '        & "    , ARRSTATION" _
-    '        & "    , ARRSTATIONNAME" _
-    '        & "    , RETSTATION" _
-    '        & "    , RETSTATIONNAME" _
-    '        & "    , CANGERETSTATION" _
-    '        & "    , CHANGEARRSTATIONNAME" _
-    '        & "    , ORDERSTATUS" _
-    '        & "    , ORDERINFO" _
-    '        & "    , STACKINGFLG" _
-    '        & "    , USEPROPRIETYFLG" _
-    '        & "    , DELIVERYFLG" _
-    '        & "    , LODDATE" _
-    '        & "    , DEPDATE" _
-    '        & "    , ARRDATE" _
-    '        & "    , ACCDATE" _
-    '        & "    , EMPARRDATE" _
-    '        & "    , ACTUALLODDATE" _
-    '        & "    , ACTUALDEPDATE" _
-    '        & "    , ACTUALARRDATE" _
-    '        & "    , ACTUALACCDATE" _
-    '        & "    , ACTUALEMPARRDATE" _
-    '        & "    , RTANK" _
-    '        & "    , HTANK" _
-    '        & "    , TTANK" _
-    '        & "    , MTTANK" _
-    '        & "    , KTANK" _
-    '        & "    , K3TANK" _
-    '        & "    , K5TANK" _
-    '        & "    , K10TANK" _
-    '        & "    , LTANK" _
-    '        & "    , ATANK" _
-    '        & "    , OTHER1OTANK" _
-    '        & "    , OTHER2OTANK" _
-    '        & "    , OTHER3OTANK" _
-    '        & "    , OTHER4OTANK" _
-    '        & "    , OTHER5OTANK" _
-    '        & "    , OTHER6OTANK" _
-    '        & "    , OTHER7OTANK" _
-    '        & "    , OTHER8OTANK" _
-    '        & "    , OTHER9OTANK" _
-    '        & "    , OTHER10OTANK" _
-    '        & "    , TOTALTANK" _
-    '        & "    , RTANKCH" _
-    '        & "    , HTANKCH" _
-    '        & "    , TTANKCH" _
-    '        & "    , MTTANKCH" _
-    '        & "    , KTANKCH" _
-    '        & "    , K3TANKCH" _
-    '        & "    , K5TANKCH" _
-    '        & "    , K10TANKCH" _
-    '        & "    , LTANKCH" _
-    '        & "    , ATANKCH" _
-    '        & "    , OTHER1OTANKCH" _
-    '        & "    , OTHER2OTANKCH" _
-    '        & "    , OTHER3OTANKCH" _
-    '        & "    , OTHER4OTANKCH" _
-    '        & "    , OTHER5OTANKCH" _
-    '        & "    , OTHER6OTANKCH" _
-    '        & "    , OTHER7OTANKCH" _
-    '        & "    , OTHER8OTANKCH" _
-    '        & "    , OTHER9OTANKCH" _
-    '        & "    , OTHER10OTANKCH" _
-    '        & "    , TOTALTANKCH" _
-    '        & "    , TANKRINKNO" _
-    '        & "    , KEIJYOYMD" _
-    '        & "    , SALSE" _
-    '        & "    , SALSETAX" _
-    '        & "    , TOTALSALSE" _
-    '        & "    , PAYMENT" _
-    '        & "    , PAYMENTTAX" _
-    '        & "    , TOTALPAYMENT" _
-    '        & "    , DELFLG" _
-    '        & "    , INITYMD" _
-    '        & "    , INITUSER" _
-    '        & "    , INITTERMID" _
-    '        & "    , UPDYMD" _
-    '        & "    , UPDUSER" _
-    '        & "    , UPDTERMID" _
-    '        & "    , RECEIVEYMD" _
-    '        & "    , UPDTIMSTP" _
-    '        & " FROM" _
-    '        & "    OIL.OIT0002_ORDER" _
-    '        & " WHERE" _
-    '        & "        ORDERNO      = @P01"
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+            Return
+        End If
+    End Sub
+    ''' <summary>
+    ''' オーダー基本情報更新処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <param name="orderItm"></param>
+    Private Sub UpdateOrder(sqlCon As SqlConnection, sqlTran As SqlTransaction, orderItm As OrderItem)
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("UPDATE OIL.OIT0002_ORDER")
+        sqlStat.AppendLine("   SET  RTANK        = @RTANK")
+        sqlStat.AppendLine("       ,HTANK        = @HTANK")
+        sqlStat.AppendLine("       ,TTANK        = @TTANK")
+        sqlStat.AppendLine("       ,MTTANK       = @MTTANK")
+        sqlStat.AppendLine("       ,KTANK        = @KTANK")
+        sqlStat.AppendLine("       ,K3TANK       = @K3TANK")
+        sqlStat.AppendLine("       ,K5TANK       = @K5TANK")
+        sqlStat.AppendLine("       ,K10TANK      = @K10TANK")
+        sqlStat.AppendLine("       ,LTANK        = @LTANK")
+        sqlStat.AppendLine("       ,ATANK        = @ATANK")
+        sqlStat.AppendLine("       ,OTHER1OTANK  = @OTHER1OTANK")
+        sqlStat.AppendLine("       ,OTHER2OTANK  = @OTHER2OTANK")
+        sqlStat.AppendLine("       ,OTHER3OTANK  = @OTHER3OTANK")
+        sqlStat.AppendLine("       ,OTHER4OTANK  = @OTHER4OTANK")
+        sqlStat.AppendLine("       ,OTHER5OTANK  = @OTHER5OTANK")
+        sqlStat.AppendLine("       ,OTHER6OTANK  = @OTHER6OTANK")
+        sqlStat.AppendLine("       ,OTHER7OTANK  = @OTHER7OTANK")
+        sqlStat.AppendLine("       ,OTHER8OTANK  = @OTHER8OTANK")
+        sqlStat.AppendLine("       ,OTHER9OTANK  = @OTHER9OTANK")
+        sqlStat.AppendLine("       ,OTHER10OTANK = @OTHER10OTANK")
+        sqlStat.AppendLine("       ,TOTALTANK    = @TOTALTANK")
+        sqlStat.AppendLine("       ,UPDYMD       = @UPDYMD")
+        sqlStat.AppendLine("       ,UPDUSER      = @UPDUSER")
+        sqlStat.AppendLine("       ,UPDTERMID    = @UPDTERMID")
+        sqlStat.AppendLine("       ,RECEIVEYMD   = @RECEIVEYMD")
+        sqlStat.AppendLine(" WHERE ORDERNO = @ORDERNO")
 
-    '    Try
-    '        Using SQLcmd As New SqlCommand(SQLStr, sqlCon), SQLcmdJnl As New SqlCommand(SQLJnl, sqlCon)
-    '            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
-    '            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
-    '            Dim PARA93 As SqlParameter = SQLcmd.Parameters.Add("@P93", SqlDbType.NVarChar, 20) '本線列車名
-    '            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '受注登録日
-    '            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  '受注営業所コード
-    '            Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 20) '受注営業所名
-    '            Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 7)  '受注パターン
-    '            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 10) '荷主コード
-    '            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 40) '荷主名
-    '            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 9)  '基地コード
-    '            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '基地名
-    '            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 10) '荷受人コード
-    '            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 40) '荷受人名
-    '            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 7)  '発駅コード
-    '            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 40) '発駅名
-    '            Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 7)  '着駅コード
-    '            Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 40) '着駅名
-    '            Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 7)  '空車着駅コード
-    '            Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 40) '空車着駅名
-    '            Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 7)  '空車着駅コード(変更後)
-    '            Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40) '空車着駅名(変更後)
-    '            Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 3)  '受注進行ステータス
-    '            Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 2)  '受注情報
-    '            Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
-    '            Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
-    '            Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.NVarChar, 1)  '託送指示フラグ
-    '            Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)         '積込日（予定）
-    '            Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)         '発日（予定）
-    '            Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Date)         '積車着日（予定）
-    '            Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.Date)         '受入日（予定）
-    '            Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.Date)         '空車着日（予定）
-    '            Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.Date)         '積込日（実績）
-    '            Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.Date)         '発日（実績）
-    '            Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.Date)         '積車着日（実績）
-    '            Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.Date)         '受入日（実績）
-    '            Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.Date)         '空車着日（実績）
-    '            Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.Int)          '車数（レギュラー）
-    '            Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.Int)          '車数（ハイオク）
-    '            Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.Int)          '車数（灯油）
-    '            Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.Int)          '車数（未添加灯油）
-    '            Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.Int)          '車数（軽油）
-    '            Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.Int)          '車数（３号軽油）
-    '            Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.Int)          '車数（５号軽油）
-    '            Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.Int)          '車数（１０号軽油）
-    '            Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.Int)          '車数（LSA）
-    '            Dim PARA43 As SqlParameter = SQLcmd.Parameters.Add("@P43", SqlDbType.Int)          '車数（A重油）
-    '            Dim PARA44 As SqlParameter = SQLcmd.Parameters.Add("@P44", SqlDbType.Int)          '車数（その他１）
-    '            Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.Int)          '車数（その他２）
-    '            Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.Int)          '車数（その他３）
-    '            Dim PARA47 As SqlParameter = SQLcmd.Parameters.Add("@P47", SqlDbType.Int)          '車数（その他４）
-    '            Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.Int)          '車数（その他５）
-    '            Dim PARA49 As SqlParameter = SQLcmd.Parameters.Add("@P49", SqlDbType.Int)          '車数（その他６）
-    '            Dim PARA50 As SqlParameter = SQLcmd.Parameters.Add("@P50", SqlDbType.Int)          '車数（その他７）
-    '            Dim PARA51 As SqlParameter = SQLcmd.Parameters.Add("@P51", SqlDbType.Int)          '車数（その他８）
-    '            Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.Int)          '車数（その他９）
-    '            Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.Int)          '車数（その他１０）
-    '            Dim PARA54 As SqlParameter = SQLcmd.Parameters.Add("@P54", SqlDbType.Int)          '合計車数
-    '            Dim PARA55 As SqlParameter = SQLcmd.Parameters.Add("@P55", SqlDbType.Int)          '変更後_車数（レギュラー）
-    '            Dim PARA56 As SqlParameter = SQLcmd.Parameters.Add("@P56", SqlDbType.Int)          '変更後_車数（ハイオク）
-    '            Dim PARA57 As SqlParameter = SQLcmd.Parameters.Add("@P57", SqlDbType.Int)          '変更後_車数（灯油）
-    '            Dim PARA58 As SqlParameter = SQLcmd.Parameters.Add("@P58", SqlDbType.Int)          '変更後_車数（未添加灯油）
-    '            Dim PARA59 As SqlParameter = SQLcmd.Parameters.Add("@P59", SqlDbType.Int)          '変更後_車数（軽油）
-    '            Dim PARA60 As SqlParameter = SQLcmd.Parameters.Add("@P60", SqlDbType.Int)          '変更後_車数（３号軽油）
-    '            Dim PARA61 As SqlParameter = SQLcmd.Parameters.Add("@P61", SqlDbType.Int)          '変更後_車数（５号軽油）
-    '            Dim PARA62 As SqlParameter = SQLcmd.Parameters.Add("@P62", SqlDbType.Int)          '変更後_車数（１０号軽油）
-    '            Dim PARA63 As SqlParameter = SQLcmd.Parameters.Add("@P63", SqlDbType.Int)          '変更後_車数（LSA）
-    '            Dim PARA64 As SqlParameter = SQLcmd.Parameters.Add("@P64", SqlDbType.Int)          '変更後_車数（A重油）
-    '            Dim PARA65 As SqlParameter = SQLcmd.Parameters.Add("@P65", SqlDbType.Int)          '変更後_車数（その他１）
-    '            Dim PARA66 As SqlParameter = SQLcmd.Parameters.Add("@P66", SqlDbType.Int)          '変更後_車数（その他２）
-    '            Dim PARA67 As SqlParameter = SQLcmd.Parameters.Add("@P67", SqlDbType.Int)          '変更後_車数（その他３）
-    '            Dim PARA68 As SqlParameter = SQLcmd.Parameters.Add("@P68", SqlDbType.Int)          '変更後_車数（その他４）
-    '            Dim PARA69 As SqlParameter = SQLcmd.Parameters.Add("@P69", SqlDbType.Int)          '変更後_車数（その他５）
-    '            Dim PARA70 As SqlParameter = SQLcmd.Parameters.Add("@P70", SqlDbType.Int)          '変更後_車数（その他６）
-    '            Dim PARA71 As SqlParameter = SQLcmd.Parameters.Add("@P71", SqlDbType.Int)          '変更後_車数（その他７）
-    '            Dim PARA72 As SqlParameter = SQLcmd.Parameters.Add("@P72", SqlDbType.Int)          '変更後_車数（その他８）
-    '            Dim PARA73 As SqlParameter = SQLcmd.Parameters.Add("@P73", SqlDbType.Int)          '変更後_車数（その他９）
-    '            Dim PARA74 As SqlParameter = SQLcmd.Parameters.Add("@P74", SqlDbType.Int)          '変更後_車数（その他１０）
-    '            Dim PARA75 As SqlParameter = SQLcmd.Parameters.Add("@P75", SqlDbType.Int)          '変更後_合計車数
-    '            Dim PARA76 As SqlParameter = SQLcmd.Parameters.Add("@P76", SqlDbType.NVarChar, 11) '貨車連結順序表№
-    '            Dim PARA91 As SqlParameter = SQLcmd.Parameters.Add("@P91", SqlDbType.Date)         '計上日
-    '            Dim PARA77 As SqlParameter = SQLcmd.Parameters.Add("@P77", SqlDbType.Int)          '売上金額
-    '            Dim PARA78 As SqlParameter = SQLcmd.Parameters.Add("@P78", SqlDbType.Int)          '売上消費税額
-    '            Dim PARA79 As SqlParameter = SQLcmd.Parameters.Add("@P79", SqlDbType.Int)          '売上合計金額
-    '            Dim PARA80 As SqlParameter = SQLcmd.Parameters.Add("@P80", SqlDbType.Int)          '支払金額
-    '            Dim PARA81 As SqlParameter = SQLcmd.Parameters.Add("@P81", SqlDbType.Int)          '支払消費税額
-    '            Dim PARA82 As SqlParameter = SQLcmd.Parameters.Add("@P82", SqlDbType.Int)          '支払合計金額
-    '            Dim PARA83 As SqlParameter = SQLcmd.Parameters.Add("@P83", SqlDbType.NVarChar, 1)  '削除フラグ
-    '            Dim PARA84 As SqlParameter = SQLcmd.Parameters.Add("@P84", SqlDbType.DateTime)     '登録年月日
-    '            Dim PARA85 As SqlParameter = SQLcmd.Parameters.Add("@P85", SqlDbType.NVarChar, 20) '登録ユーザーID
-    '            Dim PARA86 As SqlParameter = SQLcmd.Parameters.Add("@P86", SqlDbType.NVarChar, 20) '登録端末
-    '            Dim PARA87 As SqlParameter = SQLcmd.Parameters.Add("@P87", SqlDbType.DateTime)     '更新年月日
-    '            Dim PARA88 As SqlParameter = SQLcmd.Parameters.Add("@P88", SqlDbType.NVarChar, 20) '更新ユーザーID
-    '            Dim PARA89 As SqlParameter = SQLcmd.Parameters.Add("@P89", SqlDbType.NVarChar, 20) '更新端末
-    '            Dim PARA90 As SqlParameter = SQLcmd.Parameters.Add("@P90", SqlDbType.DateTime)     '集信日時
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            With sqlCmd.Parameters
+                .Add("ORDERNO", SqlDbType.NVarChar).Value = orderItm.OrderNo
+                .Add("RTANK", SqlDbType.Int).Value = orderItm.RTank
+                .Add("HTANK", SqlDbType.Int).Value = orderItm.HTank
+                .Add("TTANK", SqlDbType.Int).Value = orderItm.TTank
+                .Add("MTTANK", SqlDbType.Int).Value = orderItm.MTtank
+                .Add("KTANK", SqlDbType.Int).Value = orderItm.KTank
+                .Add("K3TANK", SqlDbType.Int).Value = orderItm.K3Tank
+                .Add("K5TANK", SqlDbType.Int).Value = orderItm.K5Tank
+                .Add("K10TANK", SqlDbType.Int).Value = orderItm.K10Tank
+                .Add("LTANK", SqlDbType.Int).Value = orderItm.LTank
+                .Add("ATANK", SqlDbType.Int).Value = orderItm.ATank
+                .Add("OTHER1OTANK", SqlDbType.Int).Value = orderItm.Other1Otank
+                .Add("OTHER2OTANK", SqlDbType.Int).Value = orderItm.Other2OTank
+                .Add("OTHER3OTANK", SqlDbType.Int).Value = orderItm.Other3OTank
+                .Add("OTHER4OTANK", SqlDbType.Int).Value = orderItm.Other4OTank
+                .Add("OTHER5OTANK", SqlDbType.Int).Value = orderItm.Other5OTank
+                .Add("OTHER6OTANK", SqlDbType.Int).Value = orderItm.Other6OTank
+                .Add("OTHER7OTANK", SqlDbType.Int).Value = orderItm.Other7OTank
+                .Add("OTHER8OTANK", SqlDbType.Int).Value = orderItm.Other8OTank
+                .Add("OTHER9OTANK", SqlDbType.Int).Value = orderItm.Other9OTank
+                .Add("OTHER10OTANK", SqlDbType.Int).Value = orderItm.Other10OTank
+                .Add("TOTALTANK", SqlDbType.Int).Value = orderItm.TotalTank
+                .Add("UPDYMD", SqlDbType.DateTime).Value = orderItm.UpdYmd
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = orderItm.UpdUser
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = orderItm.UpdTermId
+                .Add("RECEIVEYMD", SqlDbType.DateTime).Value = orderItm.ReceiveYmd
+            End With
+            sqlCmd.CommandTimeout = 300
+            sqlCmd.ExecuteNonQuery()
+        End Using
+        CS0020JOURNAL.TABLENM = "OIT0002_ORDER"
+        CS0020JOURNAL.ACTION = "UPDATE"
+        CS0020JOURNAL.ROW = orderItm.ToDataTable.Rows(0)
+        CS0020JOURNAL.CS0020JOURNAL()
+        If Not isNormal(CS0020JOURNAL.ERR) Then
+            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
 
-    '            Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+            Return
+        End If
+    End Sub
+    ''' <summary>
+    ''' 受注明細追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <param name="detailItem"></param>
+    Public Sub InsertOrderDetail(sqlCon As SqlConnection, sqlTran As SqlTransaction, detailItem As OrderDetailItem)
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("INSERT INTO OIL.OIT0003_DETAIL")
+        sqlStat.AppendLine("   (ORDERNO,DETAILNO,LINEORDER,TANKNO,KAMOKU,ORDERINFO,")
+        sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,")
+        sqlStat.AppendLine("    ORDERINGTYPE,ORDERINGOILNAME,")
+        sqlStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
+        sqlStat.AppendLine("    JOINTCODE,JOINT,REMARK,")
+        sqlStat.AppendLine("    CHANGETRAINNO,CHANGETRAINNAME,")
+        sqlStat.AppendLine("    SECONDCONSIGNEECODE,SECONDCONSIGNEENAME,")
+        sqlStat.AppendLine("    SECONDARRSTATION,SECONDARRSTATIONNAME,")
+        sqlStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,")
+        sqlStat.AppendLine("    LINE,FILLINGPOINT,")
+        sqlStat.AppendLine("    LOADINGIRILINETRAINNO,LOADINGIRILINETRAINNAME,")
+        sqlStat.AppendLine("    LOADINGIRILINEORDER,LOADINGOUTLETTRAINNO,")
+        sqlStat.AppendLine("    LOADINGOUTLETTRAINNAME,LOADINGOUTLETORDER,")
+        sqlStat.AppendLine("    ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
+        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
+        sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
+        sqlStat.AppendLine("    VALUES")
+        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@LINEORDER,@TANKNO,@KAMOKU,@ORDERINFO,")
+        sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,")
+        sqlStat.AppendLine("    @ORDERINGTYPE,@ORDERINGOILNAME,")
+        sqlStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
+        sqlStat.AppendLine("    @JOINTCODE,@JOINT,@REMARK,")
+        sqlStat.AppendLine("    @CHANGETRAINNO,@CHANGETRAINNAME,")
+        sqlStat.AppendLine("    @SECONDCONSIGNEECODE,@SECONDCONSIGNEENAME,")
+        sqlStat.AppendLine("    @SECONDARRSTATION,@SECONDARRSTATIONNAME,")
+        sqlStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,")
+        sqlStat.AppendLine("    @LINE,@FILLINGPOINT,")
+        sqlStat.AppendLine("    @LOADINGIRILINETRAINNO,@LOADINGIRILINETRAINNAME,")
+        sqlStat.AppendLine("    @LOADINGIRILINEORDER,@LOADINGOUTLETTRAINNO,")
+        sqlStat.AppendLine("    @LOADINGOUTLETTRAINNAME,@LOADINGOUTLETORDER,")
+        sqlStat.AppendLine("    @ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
+        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
+        sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD )")
 
-    '            For Each OIT0001row As DataRow In OIT0001tbl.Rows
-    '                'If Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
-    '                '    Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
-    '                '    Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
-    '                Dim WW_DATENOW As DateTime = Date.Now
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            With sqlCmd.Parameters
+                .Add("ORDERNO", SqlDbType.NVarChar).Value = detailItem.OrderNo
+                .Add("DETAILNO", SqlDbType.NVarChar).Value = detailItem.DetailNo
+                .Add("LINEORDER", SqlDbType.NVarChar).Value = detailItem.LineOrder
+                .Add("TANKNO", SqlDbType.NVarChar).Value = detailItem.TankNo
+                .Add("KAMOKU", SqlDbType.NVarChar).Value = detailItem.Kamoku
+                .Add("ORDERINFO", SqlDbType.NVarChar).Value = detailItem.OrderInfo
+                .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = detailItem.ShippersCode
+                .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = detailItem.ShippersName
+                .Add("OILCODE", SqlDbType.NVarChar).Value = detailItem.OilCode
+                .Add("OILNAME", SqlDbType.NVarChar).Value = detailItem.OilName
+                .Add("ORDERINGTYPE", SqlDbType.NVarChar).Value = detailItem.OrderingType
+                .Add("ORDERINGOILNAME", SqlDbType.NVarChar).Value = detailItem.OrderingOilName
+                .Add("CARSNUMBER", SqlDbType.NVarChar).Value = detailItem.CarsNumber
+                .Add("CARSAMOUNT", SqlDbType.NVarChar).Value = detailItem.CarsAmount
+                .Add("RETURNDATETRAIN", SqlDbType.NVarChar).Value = detailItem.ReturnDateTrain
+                .Add("JOINTCODE", SqlDbType.NVarChar).Value = detailItem.JointCode
+                .Add("JOINT", SqlDbType.NVarChar).Value = detailItem.Joint
+                .Add("REMARK", SqlDbType.NVarChar).Value = detailItem.Remark
+                .Add("CHANGETRAINNO", SqlDbType.NVarChar).Value = detailItem.ChangeTrainNo
+                .Add("CHANGETRAINNAME", SqlDbType.NVarChar).Value = detailItem.ChangeTrainName
+                .Add("SECONDCONSIGNEECODE", SqlDbType.NVarChar).Value = detailItem.SecondConsigneeCode
+                .Add("SECONDCONSIGNEENAME", SqlDbType.NVarChar).Value = detailItem.SecondConsigneeName
+                .Add("SECONDARRSTATION", SqlDbType.NVarChar).Value = detailItem.SecondArrStation
+                .Add("SECONDARRSTATIONNAME", SqlDbType.NVarChar).Value = detailItem.SecondArrStationName
+                .Add("CHANGERETSTATION", SqlDbType.NVarChar).Value = detailItem.ChangeRetStation
+                .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = detailItem.ChangeRetStationName
+                .Add("LINE", SqlDbType.NVarChar).Value = detailItem.Line
+                .Add("FILLINGPOINT", SqlDbType.NVarChar).Value = detailItem.FillingPoint
+                .Add("LOADINGIRILINETRAINNO", SqlDbType.NVarChar).Value = detailItem.LoadingIriLineTrainNo
+                .Add("LOADINGIRILINETRAINNAME", SqlDbType.NVarChar).Value = detailItem.LoadingIriLineTrainName
+                .Add("LOADINGIRILINEORDER", SqlDbType.NVarChar).Value = detailItem.LoadingIriLineOrder
+                .Add("LOADINGOUTLETTRAINNO", SqlDbType.NVarChar).Value = detailItem.LoadingOutletTrainNo
+                .Add("LOADINGOUTLETTRAINNAME", SqlDbType.NVarChar).Value = detailItem.LoadingOutletTrainName
+                .Add("LOADINGOUTLETORDER", SqlDbType.NVarChar).Value = detailItem.LoadingOutletOrder
+                .Add("ACTUALLODDATE", SqlDbType.NVarChar).Value = If(detailItem.ActualLodDate = "", CType(DBNull.Value, Object), detailItem.ActualLodDate)
+                .Add("ACTUALDEPDATE", SqlDbType.NVarChar).Value = If(detailItem.ActualDepDate = "", CType(DBNull.Value, Object), detailItem.ActualDepDate)
+                .Add("ACTUALARRDATE", SqlDbType.NVarChar).Value = If(detailItem.ActualArrDate = "", CType(DBNull.Value, Object), detailItem.ActualArrDate)
+                .Add("ACTUALACCDATE", SqlDbType.NVarChar).Value = If(detailItem.ActualAccDate = "", CType(DBNull.Value, Object), detailItem.ActualAccDate)
+                .Add("ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = If(detailItem.ActualEmpArrDate = "", CType(DBNull.Value, Object), detailItem.ActualEmpArrDate)
+                .Add("SALSE", SqlDbType.NVarChar).Value = detailItem.Salse
+                .Add("SALSETAX", SqlDbType.NVarChar).Value = detailItem.SalseTax
+                .Add("TOTALSALSE", SqlDbType.NVarChar).Value = detailItem.TotalSalse
+                .Add("PAYMENT", SqlDbType.NVarChar).Value = detailItem.Payment
+                .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = detailItem.PaymentTax
+                .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = detailItem.TotalPayment
+                .Add("DELFLG", SqlDbType.NVarChar).Value = detailItem.DelFlg
+                .Add("INITYMD", SqlDbType.NVarChar).Value = detailItem.InitYmd
+                .Add("INITUSER", SqlDbType.NVarChar).Value = detailItem.InitUser
+                .Add("INITTERMID", SqlDbType.NVarChar).Value = detailItem.InitTermId
+                .Add("UPDYMD", SqlDbType.NVarChar).Value = detailItem.UpdYmd
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = detailItem.UpdUser
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = detailItem.UpdTermId
+                .Add("RECEIVEYMD", SqlDbType.NVarChar).Value = detailItem.ReceiveYmd
+            End With
+            sqlCmd.CommandTimeout = 300
+            sqlCmd.ExecuteNonQuery()
+        End Using
+        CS0020JOURNAL.TABLENM = "OIT0003_DETAIL"
+        CS0020JOURNAL.ACTION = "INSERT"
+        CS0020JOURNAL.ROW = detailItem.ToDataTable.Rows(0)
+        CS0020JOURNAL.CS0020JOURNAL()
+        If Not isNormal(CS0020JOURNAL.ERR) Then
+            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
 
-    '                'DB更新
-    '                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
-    '                'PARA01.Value = OIT0001row("ORDERNO")              '受注№
-    '                PARA02.Value = TxtHeadOfficeTrain.Text            '本線列車
-    '                PARA93.Value = TxtHeadOfficeTrainName.Text        '本線列車名
-    '                PARA03.Value = OIT0001row("ORDERYMD")             '受注登録日
-    '                PARA04.Value = work.WF_SEL_SALESOFFICECODE.Text   '受注営業所コード
-    '                PARA05.Value = work.WF_SEL_SALESOFFICE.Text       '受注営業所名
-    '                PARA06.Value = work.WF_SEL_PATTERNCODE.Text       '受注パターン
-    '                PARA07.Value = work.WF_SEL_SHIPPERSCODE.Text      '荷主コード
-    '                PARA08.Value = work.WF_SEL_SHIPPERSNAME.Text      '荷主名
-    '                PARA09.Value = work.WF_SEL_BASECODE.Text          '基地コード
-    '                PARA10.Value = work.WF_SEL_BASENAME.Text          '基地名
-    '                PARA11.Value = work.WF_SEL_CONSIGNEECODE.Text     '荷受人コード
-    '                PARA12.Value = work.WF_SEL_CONSIGNEENAME.Text     '荷受人名
-    '                PARA13.Value = TxtDepstation.Text                 '発駅コード
-    '                PARA14.Value = LblDepstationName.Text             '発駅名
-    '                PARA15.Value = TxtArrstation.Text                 '着駅コード
-    '                PARA16.Value = LblArrstationName.Text             '着駅名
-    '                PARA17.Value = ""                                 '空車着駅コード
-    '                PARA18.Value = ""                                 '空車着駅名
-    '                PARA19.Value = ""                                 '空車着駅コード(変更後)
-    '                PARA20.Value = ""                                 '空車着駅名(変更後)
-    '                PARA21.Value = "100"                              '受注進行ステータス(100:受注受付)
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+            Return
+        End If
 
-    '                '# 受注情報
-    '                '交付アラートが「3日以内のタンク車」または「4日～6日のタンク車」の場合
-    '                If OIT0001row("JRINSPECTIONALERTSTR").Equals(C_INSPECTIONALERT.ALERT_YELLOW) _
-    '                    OrElse OIT0001row("JRINSPECTIONALERTSTR").Equals(C_INSPECTIONALERT.ALERT_RED) Then
-    '                    WW_ORDERINFOALERMFLG_82 = True
+    End Sub
+    ''' <summary>
+    ''' 受注明細(論理)削除処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <param name="detailItem"></param>
+    Public Sub DeleteOrderDetail(sqlCon As SqlConnection, sqlTran As SqlTransaction, detailItem As OrderDetailItem)
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("UPDATE OIL.OIT0003_DETAIL")
+        sqlStat.AppendLine("   SET DELFLG     = @DELFLG")
+        sqlStat.AppendLine("      ,UPDYMD     = @UPDYMD")
+        sqlStat.AppendLine("      ,UPDUSER    = @UPDUSER")
+        sqlStat.AppendLine("      ,UPDTERMID  = @UPDTERMID")
+        sqlStat.AppendLine("      ,RECEIVEYMD = @RECEIVEYMD")
+        sqlStat.AppendLine(" WHERE ORDERNO  = @ORDERNO")
+        sqlStat.AppendLine("   AND DETAILNO = @DETAILNO")
 
-    '                    '全検アラートが「3日以内のタンク車」または「4日～6日のタンク車」の場合
-    '                ElseIf OIT0001row("JRALLINSPECTIONALERTSTR").Equals(C_INSPECTIONALERT.ALERT_YELLOW) _
-    '                    OrElse OIT0001row("JRALLINSPECTIONALERTSTR").Equals(C_INSPECTIONALERT.ALERT_RED) Then
-    '                    WW_ORDERINFOALERMFLG_82 = True
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            With sqlCmd.Parameters
+                .Add("ORDERNO", SqlDbType.NVarChar).Value = detailItem.OrderNo
+                .Add("DETAILNO", SqlDbType.NVarChar).Value = detailItem.DetailNo
+                .Add("DELFLG", SqlDbType.NVarChar).Value = detailItem.DelFlg
+                .Add("UPDYMD", SqlDbType.NVarChar).Value = detailItem.UpdYmd
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = detailItem.UpdUser
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = detailItem.UpdTermId
+                .Add("RECEIVEYMD", SqlDbType.NVarChar).Value = detailItem.ReceiveYmd
+            End With
+            sqlCmd.CommandTimeout = 300
+            sqlCmd.ExecuteNonQuery()
+        End Using
+        CS0020JOURNAL.TABLENM = "OIT0003_DETAIL"
+        CS0020JOURNAL.ACTION = "DELETE"
+        CS0020JOURNAL.ROW = detailItem.ToDataTable.Rows(0)
+        CS0020JOURNAL.CS0020JOURNAL()
+        If Not isNormal(CS0020JOURNAL.ERR) Then
+            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
 
-    '                End If
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+            Return
+        End If
 
-    '                '〇 交付アラート、または全検アラートが1件でも警告以上の場合
-    '                If WW_ORDERINFOALERMFLG_82 = True Then
-    '                    PARA22.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
-
-    '                    '    '〇 積込日 < 発日 の場合 
-    '                    'ElseIf WW_ORDERINFOFLG_10 = True AndAlso WW_ORDERINFOALERMFLG_82 = False Then
-    '                    '    PARA22.Value = BaseDllConst.CONST_ORDERINFO_10
-
-    '                    '〇 上記以外
-    '                ElseIf WW_ORDERINFOALERMFLG_82 = False Then
-    '                    PARA22.Value = ""
-
-    '                End If
-
-    '                '〇 積込日 < 発日 の場合 
-    '                If WW_ORDERINFOFLG_10 = True Then
-    '                    PARA92.Value = "1"                                '利用可否フラグ(1:積置あり)
-    '                Else
-    '                    PARA92.Value = "2"                                '利用可否フラグ(2:積置なし)
-    '                End If
-
-    '                PARA23.Value = "1"                                '利用可否フラグ(1:利用可能)
-    '                PARA94.Value = "0"                                '託送指示フラグ(0:未手配)
-    '                PARA24.Value = TxtLoadingDate.Text                '積込日（予定）
-    '                PARA25.Value = TxtDepDate.Text                    '発日（予定）
-    '                PARA26.Value = TxtArrDate.Text                    '積車着日（予定）
-    '                PARA27.Value = TxtAccDate.Text                    '受入日（予定）
-    '                PARA28.Value = TxtEmparrDate.Text                 '空車着日（予定）
-    '                PARA29.Value = DBNull.Value                       '積込日（実績）
-    '                PARA30.Value = DBNull.Value                       '発日（実績）
-    '                PARA31.Value = DBNull.Value                       '積車着日（実績）
-    '                PARA32.Value = DBNull.Value                       '受入日（実績）
-    '                PARA33.Value = DBNull.Value                       '空車着日（実績）
-    '                PARA34.Value = "0"                                '車数（レギュラー）
-    '                PARA35.Value = "0"                                '車数（ハイオク）
-    '                PARA36.Value = "0"                                '車数（灯油）
-    '                PARA37.Value = "0"                                '車数（未添加灯油）
-    '                PARA38.Value = "0"                                '車数（軽油）
-    '                PARA39.Value = "0"                                '車数（３号軽油）
-    '                PARA40.Value = "0"                                '車数（５号軽油）
-    '                PARA41.Value = "0"                                '車数（１０号軽油）
-    '                PARA42.Value = "0"                                '車数（LSA）
-    '                PARA43.Value = "0"                                '車数（A重油）
-    '                PARA44.Value = "0"                                '車数（その他１）
-    '                PARA45.Value = "0"                                '車数（その他２）
-    '                PARA46.Value = "0"                                '車数（その他３）
-    '                PARA47.Value = "0"                                '車数（その他４）
-    '                PARA48.Value = "0"                                '車数（その他５）
-    '                PARA49.Value = "0"                                '車数（その他６）
-    '                PARA50.Value = "0"                                '車数（その他７）
-    '                PARA51.Value = "0"                                '車数（その他８）
-    '                PARA52.Value = "0"                                '車数（その他９）
-    '                PARA53.Value = "0"                                '車数（その他１０）
-    '                PARA54.Value = "0"                                '合計車数
-    '                PARA55.Value = "0"                                '変更後_車数（レギュラー）
-    '                PARA56.Value = "0"                                '変更後_車数（ハイオク）
-    '                PARA57.Value = "0"                                '変更後_車数（灯油）
-    '                PARA58.Value = "0"                                '変更後_車数（未添加灯油）
-    '                PARA59.Value = "0"                                '変更後_車数（軽油）
-    '                PARA60.Value = "0"                                '変更後_車数（３号軽油）
-    '                PARA61.Value = "0"                                '変更後_車数（５号軽油）
-    '                PARA62.Value = "0"                                '変更後_車数（１０号軽油）
-    '                PARA63.Value = "0"                                '変更後_車数（LSA）
-    '                PARA64.Value = "0"                                '変更後_車数（A重油）
-    '                PARA65.Value = "0"                                '変更後_車数（その他１）
-    '                PARA66.Value = "0"                                '変更後_車数（その他２）
-    '                PARA67.Value = "0"                                '変更後_車数（その他３）
-    '                PARA68.Value = "0"                                '変更後_車数（その他４）
-    '                PARA69.Value = "0"                                '変更後_車数（その他５）
-    '                PARA70.Value = "0"                                '変更後_車数（その他６）
-    '                PARA71.Value = "0"                                '変更後_車数（その他７）
-    '                PARA72.Value = "0"                                '変更後_車数（その他８）
-    '                PARA73.Value = "0"                                '変更後_車数（その他９）
-    '                PARA74.Value = "0"                                '変更後_車数（その他１０）
-    '                PARA75.Value = "0"                                '変更後_合計車数
-    '                PARA76.Value = ""                                 '貨車連結順序表№
-    '                PARA91.Value = DBNull.Value                       '計上日
-    '                PARA77.Value = "0"                                '売上金額
-    '                PARA78.Value = "0"                                '売上消費税額
-    '                PARA79.Value = "0"                                '売上合計金額
-    '                PARA80.Value = "0"                                '支払金額
-    '                PARA81.Value = "0"                                '支払消費税額
-    '                PARA82.Value = "0"                                '支払合計金額
-    '                PARA83.Value = OIT0001row("DELFLG")               '削除フラグ
-    '                PARA84.Value = WW_DATENOW                         '登録年月日
-    '                PARA85.Value = Master.USERID                      '登録ユーザーID
-    '                PARA86.Value = Master.USERTERMID                  '登録端末
-    '                PARA87.Value = WW_DATENOW                         '更新年月日
-    '                PARA88.Value = Master.USERID                      '更新ユーザーID
-    '                PARA89.Value = Master.USERTERMID                  '更新端末
-    '                PARA90.Value = C_DEFAULT_YMD
-
-    '                SQLcmd.CommandTimeout = 300
-    '                SQLcmd.ExecuteNonQuery()
-
-    '                OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-
-    '                '更新ジャーナル出力
-    '                JPARA01.Value = work.WF_SEL_ORDERNUMBER.Text
-
-    '                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
-    '                    If IsNothing(OIT0001UPDtbl) Then
-    '                        OIT0001UPDtbl = New DataTable
-
-    '                        For index As Integer = 0 To SQLdr.FieldCount - 1
-    '                            OIT0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-    '                        Next
-    '                    End If
-
-    '                    OIT0001UPDtbl.Clear()
-    '                    OIT0001UPDtbl.Load(SQLdr)
-    '                End Using
-
-    '                For Each OIT0001UPDrow As DataRow In OIT0001UPDtbl.Rows
-    '                    CS0020JOURNAL.TABLENM = "OIT0001L"
-    '                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
-    '                    CS0020JOURNAL.ROW = OIT0001UPDrow
-    '                    CS0020JOURNAL.CS0020JOURNAL()
-    '                    If Not isNormal(CS0020JOURNAL.ERR) Then
-    '                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
-
-    '                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
-    '                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
-    '                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-    '                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
-    '                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
-    '                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
-    '                        Exit Sub
-    '                    End If
-    '                Next
-    '                'End If
-    '            Next
-    '        End Using
-    '    Catch ex As Exception
-    '        Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D UPDATE_INSERT_ORDER")
-
-    '        CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-    '        CS0011LOGWrite.INFPOSI = "DB:OIT0001D UPDATE_INSERT_ORDER"
-    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-    '        CS0011LOGWrite.TEXT = ex.ToString()
-    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-    '        CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-    '        Exit Sub
-    '    End Try
-
-    '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-    'End Function
-
-    '''' <summary>
-    '''' 受注明細TBL登録更新
-    '''' </summary>
-    '''' <param name="SQLcon"></param>
-    '''' <remarks></remarks>
-    'Protected Sub EntryOrderDetail(ByVal sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing) As Boolean
-
-    '    '○ ＤＢ更新
-    '    Dim SQLStr As String =
-    '          " DECLARE @hensuu AS bigint ;" _
-    '        & "    SET @hensuu = 0 ;" _
-    '        & " DECLARE hensuu CURSOR FOR" _
-    '        & "    SELECT" _
-    '        & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
-    '        & "    FROM" _
-    '        & "        OIL.OIT0003_DETAIL" _
-    '        & "    WHERE" _
-    '        & "        ORDERNO  = @P01" _
-    '        & "   AND  DETAILNO = @P02" _
-    '        & " OPEN hensuu ;" _
-    '        & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
-    '        & " IF (@@FETCH_STATUS = 0)" _
-    '        & "    UPDATE OIL.OIT0003_DETAIL" _
-    '        & "    SET" _
-    '        & "        LINEORDER         = @P33, TANKNO       = @P03, ORDERINFO    = @P34" _
-    '        & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
-    '        & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
-    '        & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK       = @P38" _
-    '        & "        , UPDYMD          = @P19, UPDUSER      = @P20" _
-    '        & "        , UPDTERMID       = @P21, RECEIVEYMD   = @P22" _
-    '        & "    WHERE" _
-    '        & "        ORDERNO          = @P01" _
-    '        & "        AND DETAILNO     = @P02" _
-    '        & " IF (@@FETCH_STATUS <> 0)" _
-    '        & "    INSERT INTO OIL.OIT0003_DETAIL" _
-    '        & "        ( ORDERNO         , DETAILNO            , LINEORDER" _
-    '        & "        , TANKNO          , KAMOKU              , ORDERINFO" _
-    '        & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
-    '        & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
-    '        & "        , RETURNDATETRAIN , JOINTCODE           , JOINT" _
-    '        & "        , REMARK          , CHANGETRAINNO       , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
-    '        & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CANGERETSTATION    , CHANGEARRSTATIONNAME" _
-    '        & "        , SALSE           , SALSETAX" _
-    '        & "        , TOTALSALSE      , PAYMENT             , PAYMENTTAX         , TOTALPAYMENT" _
-    '        & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
-    '        & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
-    '        & "    VALUES" _
-    '        & "        ( @P01, @P02, @P33" _
-    '        & "        , @P03, @P04, @P34" _
-    '        & "        , @P23, @P24, @P05, @P35" _
-    '        & "        , @P36, @P37, @P06, @P25" _
-    '        & "        , @P07, @P39, @P08" _
-    '        & "        , @P38, @P26, @P27, @P28" _
-    '        & "        , @P29, @P30, @P31, @P32" _
-    '        & "        , @P09, @P10" _
-    '        & "        , @P11, @P12, @P13, @P14" _
-    '        & "        , @P15, @P16, @P17, @P18" _
-    '        & "        , @P19, @P20, @P21, @P22) ;" _
-    '        & " CLOSE hensuu ;" _
-    '        & " DEALLOCATE hensuu ;"
-
-    '    '& "   AND  TANKNO   = @P03" _
-    '    '& "   AND  KAMOKU   = @P04" _
-    '    '& "        AND TANKNO       = @P03" _
-    '    '& "        AND KAMOKU       = @P04" _
-
-    '    '○ 更新ジャーナル出力
-    '    Dim SQLJnl As String =
-    '        " SELECT" _
-    '        & "    ORDERNO" _
-    '        & "    , DETAILNO" _
-    '        & "    , LINEORDER" _
-    '        & "    , TANKNO" _
-    '        & "    , KAMOKU" _
-    '        & "    , ORDERINFO" _
-    '        & "    , SHIPPERSCODE" _
-    '        & "    , SHIPPERSNAME" _
-    '        & "    , OILCODE" _
-    '        & "    , OILNAME" _
-    '        & "    , ORDERINGTYPE" _
-    '        & "    , ORDERINGOILNAME" _
-    '        & "    , CARSNUMBER" _
-    '        & "    , CARSAMOUNT" _
-    '        & "    , RETURNDATETRAIN" _
-    '        & "    , JOINTCODE" _
-    '        & "    , JOINT" _
-    '        & "    , REMARK" _
-    '        & "    , CHANGETRAINNO" _
-    '        & "    , SECONDCONSIGNEECODE" _
-    '        & "    , SECONDCONSIGNEENAME" _
-    '        & "    , SECONDARRSTATION" _
-    '        & "    , SECONDARRSTATIONNAME" _
-    '        & "    , CANGERETSTATION" _
-    '        & "    , CHANGEARRSTATIONNAME" _
-    '        & "    , SALSE" _
-    '        & "    , SALSETAX" _
-    '        & "    , TOTALSALSE" _
-    '        & "    , PAYMENT" _
-    '        & "    , PAYMENTTAX" _
-    '        & "    , TOTALPAYMENT" _
-    '        & "    , DELFLG" _
-    '        & "    , INITYMD" _
-    '        & "    , INITUSER" _
-    '        & "    , INITTERMID" _
-    '        & "    , UPDYMD" _
-    '        & "    , UPDUSER" _
-    '        & "    , UPDTERMID" _
-    '        & "    , RECEIVEYMD" _
-    '        & "    , UPDTIMSTP" _
-    '        & " FROM" _
-    '        & "    OIL.OIT0003_DETAIL" _
-    '        & " WHERE" _
-    '        & "        ORDERNO  = @P01" _
-    '        & "   AND  DETAILNO = @P02"
-    '    '& "   AND  TANKNO   = @P03" _
-    '    '& "   AND  KAMOKU   = @P04"
-
-    '    Try
-    '        Using SQLcmd As New SqlCommand(SQLStr, sqlCon), SQLcmdJnl As New SqlCommand(SQLJnl, sqlCon)
-    '            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
-    '            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
-    '            Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '入線順
-    '            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
-    '            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
-    '            Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
-    '            Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
-    '            Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
-    '            Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 4)   '油種コード
-    '            Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 40)  '油種名
-    '            Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 2)   '油種区分(受発注用)
-    '            Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 40)  '油種名(受発注用)
-    '            Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.Int)           '車数
-    '            Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Int)           '数量
-    '            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.DateTime)      '返送日列車
-    '            Dim PARA39 As SqlParameter = SQLcmd.Parameters.Add("@P39", SqlDbType.NVarChar, 40)  'ジョイントコード
-    '            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 200) 'ジョイント
-    '            Dim PARA38 As SqlParameter = SQLcmd.Parameters.Add("@P38", SqlDbType.NVarChar)      '記事欄
-    '            Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 4)   '本線列車（変更後）
-    '            Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 10)  '第2荷受人コード
-    '            Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.NVarChar, 40)  '第2荷受人名
-    '            Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar, 7)   '第2着駅コード
-    '            Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 40)  '第2着駅名
-    '            Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 7)   '空車着駅コード（変更後）
-    '            Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 40)  '空車着駅名（変更後）
-    '            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Int)           '売上金額
-    '            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Int)           '売上消費税額
-    '            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Int)           '売上合計金額
-    '            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.Int)           '支払金額
-    '            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Int)           '支払消費税額
-    '            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.Int)           '支払合計金額
-    '            Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 1)   '削除フラグ
-    '            Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.DateTime)      '登録年月日
-    '            Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 20)  '登録ユーザーID
-    '            Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 20)  '登録端末
-    '            Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.DateTime)      '更新年月日
-    '            Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 20)  '更新ユーザーID
-    '            Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 20)  '更新端末
-    '            Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.DateTime)      '集信日時
-
-    '            Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 4) '受注№
-    '            Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3) '受注明細№
-    '            'Dim JPARA03 As SqlParameter = SQLcmdJnl.Parameters.Add("@P03", SqlDbType.NVarChar, 8) 'タンク車№
-    '            'Dim JPARA04 As SqlParameter = SQLcmdJnl.Parameters.Add("@P04", SqlDbType.NVarChar, 7) '費用科目
-
-    '            For Each OIT0001row As DataRow In OIT0001tbl.Rows
-    '                'If Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.UPDATING OrElse
-    '                '    Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.INSERTING OrElse
-    '                '    Trim(OIT0001row("OPERATION")) = C_LIST_OPERATION_CODE.SELECTED Then
-    '                Dim WW_DATENOW As DateTime = Date.Now
-
-    '                'DB更新
-    '                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
-    '                'PARA01.Value = OIT0001row("ORDERNO")             '受注№
-    '                PARA02.Value = OIT0001row("DETAILNO")             '受注明細№
-    '                PARA33.Value = ""                                 '入線順
-    '                PARA03.Value = OIT0001row("TANKNO")               'タンク車№
-    '                PARA04.Value = OIT0001row("KAMOKU")               '費用科目
-    '                PARA34.Value = ""                                 '受注情報
-    '                PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
-    '                PARA24.Value = OIT0001row("SHIPPERSNAME")         '荷主名
-    '                PARA05.Value = OIT0001row("OILCODE")              '油種コード
-    '                PARA35.Value = OIT0001row("OILNAME")              '油種名
-    '                PARA36.Value = OIT0001row("ORDERINGTYPE")         '油種区分(受発注用)
-    '                PARA37.Value = OIT0001row("ORDERINGOILNAME")      '油種名(受発注用)
-    '                PARA06.Value = "1"                                '車数
-    '                PARA25.Value = "0"                                '数量
-    '                If Convert.ToString(OIT0001row("RETURNDATETRAIN")) <> "" Then
-    '                    PARA07.Value = OIT0001row("RETURNDATETRAIN")  '返送日列車
-    '                Else
-    '                    PARA07.Value = DBNull.Value
-    '                End If
-    '                PARA39.Value = OIT0001row("JOINTCODE")            'ジョイントコード
-    '                PARA08.Value = OIT0001row("JOINT")                'ジョイント
-    '                PARA38.Value = OIT0001row("REMARK")               '記事欄
-    '                PARA26.Value = ""                                 '本線列車（変更後）
-    '                PARA27.Value = ""                                 '第2荷受人コード
-    '                PARA28.Value = ""                                 '第2荷受人名
-    '                PARA29.Value = ""                                 '第2着駅コード
-    '                PARA30.Value = ""                                 '第2着駅名
-    '                PARA31.Value = ""                                 '空車着駅コード（変更後）
-    '                PARA32.Value = ""                                 '空車着駅名（変更後）
-    '                PARA09.Value = "0"                                '売上金額
-    '                PARA10.Value = "0"                                '売上消費税額
-    '                PARA11.Value = "0"                                '売上合計金額
-    '                PARA12.Value = "0"                                '支払金額
-    '                PARA13.Value = "0"                                '支払消費税額
-    '                PARA14.Value = "0"                                '支払合計金額
-    '                PARA15.Value = OIT0001row("DELFLG")               '削除フラグ
-    '                PARA16.Value = WW_DATENOW                         '登録年月日
-    '                PARA17.Value = Master.USERID                      '登録ユーザーID
-    '                PARA18.Value = Master.USERTERMID                  '登録端末
-    '                PARA19.Value = WW_DATENOW                         '更新年月日
-    '                PARA20.Value = Master.USERID                      '更新ユーザーID
-    '                PARA21.Value = Master.USERTERMID                  '更新端末
-    '                PARA22.Value = C_DEFAULT_YMD
-
-    '                SQLcmd.CommandTimeout = 300
-    '                SQLcmd.ExecuteNonQuery()
-
-    '                OIT0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-
-    '                '更新ジャーナル出力
-    '                JPARA01.Value = work.WF_SEL_ORDERNUMBER.Text
-    '                JPARA01.Value = OIT0001row("ORDERNO")             '受注№
-    '                JPARA02.Value = OIT0001row("DETAILNO")            '受注明細№
-    '                'JPARA03.Value = OIT0001row("TANKNO")              'タンク車№
-    '                'JPARA04.Value = OIT0001row("KAMOKU")              '費用科目
-
-    '                Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
-    '                    If IsNothing(OIT0001UPDtbl) Then
-    '                        OIT0001UPDtbl = New DataTable
-
-    '                        For index As Integer = 0 To SQLdr.FieldCount - 1
-    '                            OIT0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-    '                        Next
-    '                    End If
-
-    '                    OIT0001UPDtbl.Clear()
-    '                    OIT0001UPDtbl.Load(SQLdr)
-    '                End Using
-
-    '                For Each OIT0001UPDrow As DataRow In OIT0001UPDtbl.Rows
-    '                    CS0020JOURNAL.TABLENM = "OIT0001L"
-    '                    CS0020JOURNAL.ACTION = "UPDATE_INSERT"
-    '                    CS0020JOURNAL.ROW = OIT0001UPDrow
-    '                    CS0020JOURNAL.CS0020JOURNAL()
-    '                    If Not isNormal(CS0020JOURNAL.ERR) Then
-    '                        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
-
-    '                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
-    '                        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
-    '                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-    '                        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
-    '                        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
-    '                        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
-    '                        Exit Sub
-    '                    End If
-    '                Next
-    '                'End If
-    '            Next
-    '        End Using
-    '    Catch ex As Exception
-    '        Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D UPDATE_INSERT_ORDERDETAIL")
-
-    '        CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-    '        CS0011LOGWrite.INFPOSI = "DB:OIT0001D UPDATE_INSERT_ORDERDETAIL"
-    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-    '        CS0011LOGWrite.TEXT = ex.ToString()
-    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-    '        CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-    '        Exit Sub
-    '    End Try
-
-    '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-
-    'End Sub
-
+    End Sub
     ''' <summary>
     ''' ジャーナル書き込み
     ''' </summary>
@@ -2743,7 +2595,7 @@ Public Class OIT0004OilStockCreate
     ''' <returns></returns>
     Private Function OutputJournal(journalDt As DataTable) As Boolean
         For Each dr As DataRow In journalDt.Rows
-            CS0020JOURNAL.TABLENM = "OIT0004"
+            CS0020JOURNAL.TABLENM = "OIT0001_OILSTOCK"
             CS0020JOURNAL.ACTION = "UPDATE_INSERT"
             CS0020JOURNAL.ROW = dr
             CS0020JOURNAL.CS0020JOURNAL()
@@ -2846,6 +2698,7 @@ Public Class OIT0004OilStockCreate
                     WW_CheckMES1 = "提案表未チェックエラー"
                     WW_CheckMES2 = C_MESSAGE_NO.OIL_ORDER_NO_CHECKED_ERROR
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    Return False
                 End If
             End If
         End If 'checkObj.ShowSuggestList = True '受注提案表が画面表示しているか
@@ -3219,6 +3072,8 @@ Public Class OIT0004OilStockCreate
                 mitrainValueClassItem = miDateValueClassItem.SuggestOrderItem(trainId)
                 miOilTypeItemValue = DirectCast(repSuggestTrainItem.FindControl("repMiSuggestValueItem"), Repeater)
 
+                mitrainValueClassItem.CheckValue = chkObj.Checked
+
                 For Each repMiOilTypeValItem As RepeaterItem In miOilTypeItemValue.Items
                     oilTypeCodeObj = DirectCast(repMiOilTypeValItem.FindControl("hdnOilTypeCode"), HiddenField)
                     oilTypeCode = oilTypeCodeObj.Value
@@ -3253,11 +3108,13 @@ Public Class OIT0004OilStockCreate
         Dim stockListClass = dispDataClass.StockList
         Dim stockListCol As DispDataClass.StockListCollection = Nothing
         Dim stockListItm As DispDataClass.StockListItem = Nothing
+        '在庫表リピーターのループ(油種)
         For Each repOilTypeItem As RepeaterItem In repStockItemObj.Items
             oilTypeCodeObj = DirectCast(repOilTypeItem.FindControl("hdnOilTypeCode"), HiddenField)
             oilTypeCode = oilTypeCodeObj.Value
             repStockVal = DirectCast(repOilTypeItem.FindControl("repStockValues"), Repeater)
             stockListCol = stockListClass(oilTypeCode)
+            '在庫表リピーターのループ(日付)
             For Each repStockValItem As RepeaterItem In repStockVal.Items
                 dateKeyObj = DirectCast(repStockValItem.FindControl("hdnDateKey"), HiddenField)
                 dateKeyStr = dateKeyObj.Value
@@ -3669,7 +3526,7 @@ Public Class OIT0004OilStockCreate
         ''' 営業所名
         ''' </summary>
         ''' <returns></returns>
-        Public Property SelesOfficeName As String = ""
+        Public Property SalesOfficeName As String = ""
         ''' <summary>
         ''' 荷主
         ''' </summary>
@@ -4622,14 +4479,14 @@ Public Class OIT0004OilStockCreate
             Me.TrainName = chkItm.trainInfo.TrainName
             Me.OrderYmd = Now.ToString("yyyy/MM/dd")
             Me.OfficeCode = dispDataClass.SalesOffice
-            Me.OfficeName = "" 'TODO設定！
+            Me.OfficeName = dispDataClass.SalesOfficeName
             Me.OrderType = chkItm.trainInfo.PatCode
             Me.ShippersCode = dispDataClass.Shipper
-            Me.ShippersName = "" 'TODO設定
+            Me.ShippersName = dispDataClass.ShipperName
             Me.BaseCode = chkItm.trainInfo.PlantCode
             Me.BaseName = chkItm.trainInfo.PlantName
             Me.ConsigneeCode = dispDataClass.Consignee
-            Me.ConsigneeName = "" 'TODO設定
+            Me.ConsigneeName = dispDataClass.ConsigneeName
             Me.DepStation = chkItm.trainInfo.DepStation
             Me.DepStationName = chkItm.trainInfo.DepStationName
             Me.ArrStation = chkItm.trainInfo.ArrStation
@@ -4831,7 +4688,7 @@ Public Class OIT0004OilStockCreate
 
             Me.DetailList = New List(Of OrderDetailItem)
             'このコンストラクタを通した場合は必ずUpdateタイプ
-            Me.EntryType = OrderItemEntryType.Update
+            Me.EntryType = OrderItemEntryType.None
         End Sub
 
         ''' <summary>
@@ -5386,9 +5243,143 @@ Public Class OIT0004OilStockCreate
                     Case Else
                         Return
                 End Select
+                '合計を再計算
+                Me.TotalTank = (CInt(Me.RTank) + CInt(Me.HTank) + CInt(Me.TTank) + CInt(Me.MTtank) + CInt(Me.KTank) +
+                                CInt(Me.K3Tank) + CInt(Me.K5Tank) + CInt(Me.K10Tank) + CInt(Me.LTank) + CInt(Me.ATank) +
+                                CInt(Me.Other1Otank) + CInt(Me.Other2OTank) + CInt(Me.Other3OTank) + CInt(Me.Other4OTank) + CInt(Me.Other5OTank) +
+                                CInt(Me.Other6OTank) + CInt(Me.Other7OTank) + CInt(Me.Other8OTank) + CInt(Me.Other9OTank) + CInt(Me.Other10OTank)
+                                ).ToString
+
             End Set
         End Property
+        ''' <summary>
+        ''' ジャーナル用データテーブル変換メソッド
+        ''' </summary>
+        ''' <returns>ジャーナル登録用にデータテーブルに変換するメソッド</returns>
+        Public Function ToDataTable() As DataTable
+            Dim retDt As New DataTable
+            With retDt.Columns
+                Dim fieldList As New List(Of String) From {
+                    "ORDERNO", "TRAINNO", "TRAINNAME", "ORDERYMD", "OFFICECODE", "OFFICENAME", "ORDERTYPE", "SHIPPERSCODE", "SHIPPERSNAME",
+                    "BASECODE", "BASENAME", "CONSIGNEECODE", "CONSIGNEENAME", "DEPSTATION", "DEPSTATIONNAME",
+                    "ARRSTATION", "ARRSTATIONNAME", "RETSTATION", "RETSTATIONNAME",
+                    "CHANGERETSTATION", "CHANGERETSTATIONNAME", "ORDERSTATUS", "ORDERINFO",
+                    "STACKINGFLG", "USEPROPRIETYFLG", "DELIVERYFLG",
+                    "LODDATE", "DEPDATE", "ARRDATE", "ACCDATE", "EMPARRDATE",
+                    "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE",
+                    "RTANK", "HTANK", "TTANK", "MTTANK", "KTANK", "K3TANK", "K5TANK", "K10TANK", "LTANK", "ATANK",
+                    "OTHER1OTANK", "OTHER2OTANK", "OTHER3OTANK", "OTHER4OTANK", "OTHER5OTANK",
+                    "OTHER6OTANK", "OTHER7OTANK", "OTHER8OTANK", "OTHER9OTANK", "OTHER10OTANK", "TOTALTANK",
+                    "RTANKCH", "HTANKCH", "TTANKCH", "MTTANKCH", "KTANKCH", "K3TANKCH", "K5TANKCH", "K10TANKCH", "LTANKCH", "ATANKCH",
+                    "OTHER1OTANKCH", "OTHER2OTANKCH", "OTHER3OTANKCH", "OTHER4OTANKCH", "OTHER5OTANKCH",
+                    "OTHER6OTANKCH", "OTHER7OTANKCH", "OTHER8OTANKCH", "OTHER9OTANKCH", "OTHER10OTANKCH",
+                    "TOTALTANKCH", "TANKLINKNO", "TANKLINKNOMADE", "KEIJYOYMD",
+                    "SALSE", "SALSETAX", "TOTALSALSE", "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT",
+                    "DELFLG", "INITYMD", "INITUSER", "INITTERMID", "UPDYMD", "UPDUSER", "UPDTERMID", "RECEIVEYMD"}
+                For Each fieldName In fieldList
+                    .Add(fieldName, GetType(String))
+                Next
+            End With
+            Dim dr = retDt.NewRow
 
+            dr("ORDERNO") = Me.OrderNo
+            dr("TRAINNO") = Me.TrainNo
+            dr("TRAINNAME") = Me.TrainName
+            dr("ORDERYMD") = Me.OrderYmd
+            dr("OFFICECODE") = Me.OfficeCode
+            dr("OFFICENAME") = Me.OfficeName
+            dr("ORDERTYPE") = Me.OrderType
+            dr("SHIPPERSCODE") = Me.ShippersCode
+            dr("SHIPPERSNAME") = Me.ShippersName
+            dr("BASECODE") = Me.BaseCode
+            dr("BASENAME") = Me.BaseName
+            dr("CONSIGNEECODE") = Me.ConsigneeCode
+            dr("CONSIGNEENAME") = Me.ConsigneeName
+            dr("DEPSTATION") = Me.DepStation
+            dr("DEPSTATIONNAME") = Me.DepStationName
+            dr("ARRSTATION") = Me.ArrStation
+            dr("ARRSTATIONNAME") = Me.ArrStationName
+            dr("RETSTATION") = Me.RetStation
+            dr("RETSTATIONNAME") = Me.RetStationName
+            dr("CHANGERETSTATION") = Me.ChangeRetStation
+            dr("CHANGERETSTATIONNAME") = Me.ChangeRetStationName
+            dr("ORDERSTATUS") = Me.OrderStatus
+            dr("ORDERINFO") = Me.OrderInfo
+            dr("STACKINGFLG") = Me.StackingFlg
+            dr("USEPROPRIETYFLG") = Me.UseProprietyFlg
+            dr("DELIVERYFLG") = Me.DeliveryFlg
+            dr("LODDATE") = Me.LodDate
+            dr("DEPDATE") = Me.DepDate
+            dr("ARRDATE") = Me.ArrDate
+            dr("ACCDATE") = Me.AccDate
+            dr("EMPARRDATE") = Me.EmpArrDate
+            dr("ACTUALLODDATE") = Me.ActualLodDate
+            dr("ACTUALDEPDATE") = Me.ActualDepDate
+            dr("ACTUALARRDATE") = Me.ActualArrDate
+            dr("ACTUALACCDATE") = Me.ActualAccDate
+            dr("ACTUALEMPARRDATE") = Me.ActualEmpArrDate
+            dr("RTANK") = Me.RTank
+            dr("HTANK") = Me.HTank
+            dr("TTANK") = Me.TTank
+            dr("MTTANK") = Me.MTtank
+            dr("KTANK") = Me.KTank
+            dr("K3TANK") = Me.K3Tank
+            dr("K5TANK") = Me.K5Tank
+            dr("K10TANK") = Me.K10Tank
+            dr("LTANK") = Me.LTank
+            dr("ATANK") = Me.ATank
+            dr("OTHER1OTANK") = Me.Other1Otank
+            dr("OTHER2OTANK") = Me.Other2OTank
+            dr("OTHER3OTANK") = Me.Other3OTank
+            dr("OTHER4OTANK") = Me.Other4OTank
+            dr("OTHER5OTANK") = Me.Other5OTank
+            dr("OTHER6OTANK") = Me.Other6OTank
+            dr("OTHER7OTANK") = Me.Other7OTank
+            dr("OTHER8OTANK") = Me.Other8OTank
+            dr("OTHER9OTANK") = Me.Other9OTank
+            dr("OTHER10OTANK") = Me.Other10OTank
+            dr("TOTALTANK") = Me.TotalTank
+            dr("RTANKCH") = Me.RTankCh
+            dr("HTANKCH") = Me.HTankCh
+            dr("TTANKCH") = Me.TTankCh
+            dr("MTTANKCH") = Me.MtTankCh
+            dr("KTANKCH") = Me.KTankCh
+            dr("K3TANKCH") = Me.K3TankCh
+            dr("K5TANKCH") = Me.K5TankCh
+            dr("K10TANKCH") = Me.K10TankCh
+            dr("LTANKCH") = Me.LTankCh
+            dr("ATANKCH") = Me.ATankCh
+            dr("OTHER1OTANKCH") = Me.Other1OTankCh
+            dr("OTHER2OTANKCH") = Me.Other2OTankCh
+            dr("OTHER3OTANKCH") = Me.Other3OTankCh
+            dr("OTHER4OTANKCH") = Me.Other4OTankCh
+            dr("OTHER5OTANKCH") = Me.Other5OTankCh
+            dr("OTHER6OTANKCH") = Me.Other6OTankCh
+            dr("OTHER7OTANKCH") = Me.Other7OTankCh
+            dr("OTHER8OTANKCH") = Me.Other8OTankCh
+            dr("OTHER9OTANKCH") = Me.Other9OTankCh
+            dr("OTHER10OTANKCH") = Me.Other10OTankCh
+            dr("TOTALTANKCH") = Me.TotalTankCh
+            dr("TANKLINKNO") = Me.TankLinkNo
+            dr("TANKLINKNOMADE") = Me.TankLinkNoMade
+            dr("KEIJYOYMD") = Me.KeijyoYmd
+            dr("SALSE") = Me.Salse
+            dr("SALSETAX") = Me.SalseTax
+            dr("TOTALSALSE") = Me.TotalSalse
+            dr("PAYMENT") = Me.Payment
+            dr("PAYMENTTAX") = Me.PaymentTax
+            dr("TOTALPAYMENT") = Me.TotalPayment
+            dr("DELFLG") = Me.DelFlg
+            dr("INITYMD") = Me.InitYmd
+            dr("INITUSER") = Me.InitUser
+            dr("INITTERMID") = Me.InitTermId
+            dr("UPDYMD") = Me.UpdYmd
+            dr("UPDUSER") = Me.UpdUser
+            dr("UPDTERMID") = Me.UpdTermId
+            dr("RECEIVEYMD") = Me.ReceiveYmd
+            retDt.Rows.Add(dr)
+            Return retDt
+        End Function
     End Class
     ''' <summary>
     ''' 受注詳細アイテムクラス
@@ -5436,7 +5427,7 @@ Public Class OIT0004OilStockCreate
             Me.Kamoku = ""
             Me.OrderInfo = ""
             Me.ShippersCode = dispDataClass.Shipper
-            Me.ShippersName = "" 'TODO:Shipper名
+            Me.ShippersName = dispDataClass.ShipperName
             Me.OilCode = chkOilVal.OilInfo.OilCode
             Me.OilName = chkOilVal.OilInfo.OilName
             Me.OrderingType = chkOilVal.OilInfo.SegmentOilCode
@@ -5827,7 +5818,102 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property ReceiveYmd As String
+        ''' <summary>
+        ''' 登録種別
+        ''' </summary>
+        ''' <returns></returns>
         Public Property EntryType As DetailEntryType
+        ''' <summary>
+        ''' ジャーナル用データテーブル変換メソッド
+        ''' </summary>
+        ''' <returns>ジャーナル登録用にデータテーブルに変換するメソッド</returns>
+        Public Function ToDataTable() As DataTable
+            Dim retDt As New DataTable
+            With retDt.Columns
+                Dim fieldList As New List(Of String) From {
+                   "ORDERNO", "DETAILNO", "LINEORDER", "TANKNO", "KAMOKU", "ORDERINFO",
+                   "SHIPPERSCODE", "SHIPPERSNAME", "OILCODE", "OILNAME", "ORDERINGTYPE",
+                   "ORDERINGOILNAME", "CARSNUMBER", "CARSAMOUNT", "RETURNDATETRAIN",
+                   "JOINTCODE", "JOINT", "REMARK", "CHANGETRAINNO", "CHANGETRAINNAME",
+                   "SECONDCONSIGNEECODE", "SECONDCONSIGNEENAME",
+                   "SECONDARRSTATION", "SECONDARRSTATIONNAME",
+                   "CHANGERETSTATION", "CHANGERETSTATIONNAME",
+                   "LINE", "FILLINGPOINT",
+                   "LOADINGIRILINETRAINNO", "LOADINGIRILINETRAINNAME",
+                   "LOADINGIRILINEORDER", "LOADINGOUTLETTRAINNO",
+                   "LOADINGOUTLETTRAINNAME", "LOADINGOUTLETORDER",
+                   "ACTUALLODDATE", "ACTUALDEPDATE",
+                   "ACTUALARRDATE", "ACTUALACCDATE",
+                   "ACTUALEMPARRDATE",
+                   "SALSE", "SALSETAX", "TOTALSALSE",
+                   "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT",
+                   "DELFLG", "INITYMD", "INITUSER", "INITTERMID",
+                   "UPDYMD", "UPDUSER", "UPDTERMID", "RECEIVEYMD"
+                 }
+                For Each fieldName In fieldList
+                    .Add(fieldName, GetType(String))
+                Next
+            End With
+            Dim dr = retDt.NewRow
+
+            dr("ORDERNO") = Me.OrderNo
+            dr("DETAILNO") = Me.DetailNo
+            dr("LINEORDER") = Me.LineOrder
+            dr("TANKNO") = Me.TankNo
+            dr("KAMOKU") = Me.Kamoku
+            dr("ORDERINFO") = Me.OrderInfo
+            dr("SHIPPERSCODE") = Me.ShippersCode
+            dr("SHIPPERSNAME") = Me.ShippersName
+            dr("OILCODE") = Me.OilCode
+            dr("OILNAME") = Me.OilName
+            dr("ORDERINGTYPE") = Me.OrderingType
+            dr("ORDERINGOILNAME") = Me.OrderingOilName
+            dr("CARSNUMBER") = Me.CarsNumber
+            dr("CARSAMOUNT") = Me.CarsAmount
+            dr("RETURNDATETRAIN") = Me.ReturnDateTrain
+            dr("JOINTCODE") = Me.JointCode
+            dr("JOINT") = Me.Joint
+            dr("REMARK") = Me.Remark
+            dr("CHANGETRAINNO") = Me.ChangeTrainNo
+            dr("CHANGETRAINNAME") = Me.ChangeTrainName
+            dr("SECONDCONSIGNEECODE") = Me.SecondConsigneeCode
+            dr("SECONDCONSIGNEENAME") = Me.SecondConsigneeName
+            dr("SECONDARRSTATION") = Me.SecondArrStation
+            dr("SECONDARRSTATIONNAME") = Me.SecondArrStationName
+            dr("CHANGERETSTATION") = Me.ChangeRetStation
+            dr("CHANGERETSTATIONNAME") = Me.ChangeRetStationName
+            dr("LINE") = Me.Line
+            dr("FILLINGPOINT") = Me.FillingPoint
+            dr("LOADINGIRILINETRAINNO") = Me.LoadingIriLineTrainNo
+            dr("LOADINGIRILINETRAINNAME") = Me.LoadingIriLineTrainName
+            dr("LOADINGIRILINEORDER") = Me.LoadingIriLineOrder
+            dr("LOADINGOUTLETTRAINNO") = Me.LoadingOutletTrainNo
+            dr("LOADINGOUTLETTRAINNAME") = Me.LoadingOutletTrainName
+            dr("LOADINGOUTLETORDER") = Me.LoadingOutletOrder
+            dr("ACTUALLODDATE") = Me.ActualLodDate
+            dr("ACTUALDEPDATE") = Me.ActualDepDate
+            dr("ACTUALARRDATE") = Me.ActualArrDate
+            dr("ACTUALACCDATE") = Me.ActualAccDate
+            dr("ACTUALEMPARRDATE") = Me.ActualEmpArrDate
+            dr("SALSE") = Me.Salse
+            dr("SALSETAX") = Me.SalseTax
+            dr("TOTALSALSE") = Me.TotalSalse
+            dr("PAYMENT") = Me.Payment
+            dr("PAYMENTTAX") = Me.PaymentTax
+            dr("TOTALPAYMENT") = Me.TotalPayment
+            dr("DELFLG") = Me.DelFlg
+            dr("INITYMD") = Me.InitYmd
+            dr("INITUSER") = Me.InitUser
+            dr("INITTERMID") = Me.InitTermId
+            dr("UPDYMD") = Me.UpdYmd
+            dr("UPDUSER") = Me.UpdUser
+            dr("UPDTERMID") = Me.UpdTermId
+            dr("RECEIVEYMD") = Me.ReceiveYmd
+
+            retDt.Rows.Add(dr)
+            Return retDt
+
+        End Function
     End Class
     ''' <summary>
     ''' 受注テーブル更新処理用のメッセージ
@@ -5836,12 +5922,77 @@ Public Class OIT0004OilStockCreate
         Public Property OfficeCode As String
         Public Property ShipperCode As String
         Public Property ConsigneeCode As String
+        Private _TrainNo As String = ""
         Public Property TrainNo As String
+            Get
+                If Me._TrainNo = "" Then
+                    Return "-"
+                Else
+                    Return Me._TrainNo
+                End If
+            End Get
+            Set(value As String)
+                Me._TrainNo = value
+            End Set
+        End Property
+        Private _AccDate As String = ""
         Public Property AccDate As String
+            Get
+                If Me._AccDate = "" Then
+                    Return "-"
+                Else
+                    Return Me._AccDate
+                End If
+            End Get
+            Set(value As String)
+                Me._AccDate = value
+            End Set
+        End Property
+        Private _OilCode As String = ""
         Public Property OilCode As String
+            Get
+                If Me._OilCode = "" Then
+                    Return "-"
+                Else
+                    Return Me._OilCode
+                End If
+            End Get
+            Set(value As String)
+                Me._OilCode = value
+            End Set
+        End Property
+        Private _OrderNo As String = ""
+        Public Property OrderNo As String
+            Get
+                If Me._OrderNo = "" Then
+                    Return "-"
+                Else
+                    Return Me._OrderNo
+                End If
+            End Get
+            Set(value As String)
+                Me._OrderNo = value
+            End Set
+        End Property
+        Private _DetailNo As String
+        Public Property DetailNo As String
+            Get
+                If Me._DetailNo = "" Then
+                    Return "-"
+                Else
+                    Return Me._DetailNo
+                End If
+            End Get
+            Set(value As String)
+                Me._DetailNo = value
+            End Set
+        End Property
+
         Public Property Message As String '保留 
         Public Property MessageId As String
-        Public Property StackTrace As String
+        Public Property StackTrace As String = "-"
+
+
     End Class
 
 #Region "ViewStateを圧縮 これをしないとViewStateが7万文字近くなり重くなる,実行すると9000文字"

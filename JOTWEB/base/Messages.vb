@@ -502,7 +502,22 @@ Public Module Messages
         ''' 削除データ未存在
         ''' </summary>
         Public Const OIL_DELDATA_NOTFOUND As String = "20028"
-
+        ''' <summary>
+        ''' 受注ステータスが手配完了以降に進んでいる為スキップしました。
+        ''' </summary>
+        Public Const OIL_THIS_ORDER_STATUS_ISNOT_PROC As String = "20029"
+        ''' <summary>
+        ''' 受注登録可能な提案車数変更がありません。
+        ''' </summary>
+        Public Const OIL_CANNOT_ENTRY_ORDER As String = "20030"
+        ''' <summary>
+        ''' 荷主がコスモの車数減少は不可の為、全油種スキップしました。
+        ''' </summary>
+        Public Const OIL_ASYNC_DELETE_SHIPPER As String = "20031"
+        ''' <summary>
+        ''' 新規受注№が取得できませんでした。
+        ''' </summary>
+        Public Const OIL_CANNOT_GET_NEW_ORDERNO As String = "20032"
 
 #End Region
 

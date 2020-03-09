@@ -207,7 +207,9 @@ Public Class OIT0004OilStockSearch
         work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
 
         work.WF_SEL_SHIPPERCODE.Text = TxtShipper.Text      '荷主
+        work.WF_SEL_SHIPPERNAME.Text = LblShipperName.Text  '荷主名
         work.WF_SEL_CONSIGNEE.Text = WF_CONSIGNEE_CODE.Text '油槽所
+        work.WF_SEL_CONSIGNEENAME.Text = WF_CONSIGNEE_NAME.Text   '油槽所名
         work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text         '年月日
 
 

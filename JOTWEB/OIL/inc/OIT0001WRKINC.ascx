@@ -27,6 +27,8 @@
     <asp:TextBox ID="WF_SEL_STATUS" runat="server"></asp:TextBox>
     <!-- 情報 -->
     <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>
+    <!-- 空回日報可否フラグ -->
+    <asp:TextBox ID="WF_SEL_EMPTYTURNFLG" runat="server"></asp:TextBox>
     <!-- 受注営業所 -->
     <asp:TextBox ID="WF_SEL_ORDERSALESOFFICE" runat="server"></asp:TextBox>
     <!-- 列車 -->

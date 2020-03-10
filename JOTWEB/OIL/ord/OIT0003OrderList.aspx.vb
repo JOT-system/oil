@@ -266,6 +266,7 @@ Public Class OIT0003OrderList
             & "   WHEN '81' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIS0015_2.VALUE1), '') + '</div>'" _
             & "   ELSE ISNULL(RTRIM(OIS0015_2.VALUE1), '')" _
             & "   END                                                AS ORDERINFONAME" _
+            & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')   　       AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
             & " , ISNULL(RTRIM(OIT0002.USEPROPRIETYFLG), '')   　    AS USEPROPRIETYFLG" _
             & " , ISNULL(RTRIM(OIT0002.DELIVERYFLG), '')   　        AS DELIVERYFLG" _
@@ -607,6 +608,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = ""
+        '空回日報可否フラグ(0：未作成, 1:作成)
+        work.WF_SEL_EMPTYTURNFLG.Text = "0"
         '積置可否フラグ(１：積置あり, ２：積置なし)
         work.WF_SEL_STACKINGFLG.Text = "2"
         '利用可否フラグ(１：利用可, ２：利用不可)
@@ -750,6 +753,12 @@ Public Class OIT0003OrderList
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = ""
+        '空回日報可否フラグ(0：未作成, 1:作成)
+        work.WF_SEL_EMPTYTURNFLG.Text = "0"
+        '積置可否フラグ(１：積置あり, ２：積置なし)
+        work.WF_SEL_STACKINGFLG.Text = "2"
+        '利用可否フラグ(１：利用可, ２：利用不可)
+        work.WF_SEL_USEPROPRIETYFLG.Text = "1"
         '受注№
         work.WF_SEL_ORDERNUMBER.Text = ""
         '本線列車
@@ -915,6 +924,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_INFORMATIONNM.Text = Regex.Replace(OIT0003tbl.Rows(WW_LINECNT)("ORDERINFONAME"), "<[^>]*?>", "")
         '受注情報(コード)
         work.WF_SEL_INFORMATION.Text = OIT0003tbl.Rows(WW_LINECNT)("ORDERINFO")
+        '空回日報可否フラグ
+        work.WF_SEL_EMPTYTURNFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("EMPTYTURNFLG")
         '積置可否フラグ
         work.WF_SEL_STACKINGFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("STACKINGFLG")
         '利用可否フラグ

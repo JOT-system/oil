@@ -258,6 +258,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
@@ -292,9 +293,10 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
-            & " WHERE OIT0002.OFFICECODE = @P1" _
-            & "   AND OIT0002.LODDATE    >= @P2" _
-            & "   AND OIT0002.DELFLG     <> @P3"
+            & " WHERE OIT0002.OFFICECODE   = @P1" _
+            & "   AND OIT0002.LODDATE      >= @P2" _
+            & "   AND OIT0002.DELFLG       <> @P3" _
+            & "   AND OIT0002.EMPTYTURNFLG <> '2'"
         '& "   AND OIT0002.TRAINNO    = @P4"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
@@ -626,6 +628,8 @@ Public Class OIT0001EmptyTurnDairyList
         work.WF_SEL_INFORMATION.Text = ""
         '受注営業所名
         work.WF_SEL_ORDERSALESOFFICE.Text = ""
+        '空回日報可否フラグ(0：未作成, 1:作成)
+        work.WF_SEL_EMPTYTURNFLG.Text = "1"
 
         '本線列車
         work.WF_SEL_TRAIN.Text = ""
@@ -759,6 +763,9 @@ Public Class OIT0001EmptyTurnDairyList
         work.WF_SEL_INFORMATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFO")
         '受注営業所名
         work.WF_SEL_ORDERSALESOFFICE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICENAME")
+        '空回日報可否フラグ(0：未作成, 1:作成)
+        work.WF_SEL_EMPTYTURNFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("EMPTYTURNFLG")
+
         '本線列車
         work.WF_SEL_TRAIN.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNO")
         '発駅

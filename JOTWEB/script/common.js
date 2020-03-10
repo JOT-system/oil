@@ -2082,3 +2082,12 @@ function commonRichTextInputOpen(inputObjId) {
     document.getElementById('txtCommonRichText').focus();
     return false;
 }
+/**
+ *  新しいタブで開く
+ * @param {string} urlText URL
+ * @return {undefined} なし
+ * @description 
+ */
+function commonOpenNewTab(urlText) {
+    window.open(urlText,'_blank');
+}

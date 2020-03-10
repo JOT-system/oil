@@ -105,11 +105,7 @@ Public Class OIT0004OilStockSearch
             'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text) '営業所
             'Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "SHIPPER", TxtShipper.Text) '荷主
             'Master.GetFirstValue(work.WF_SEL_CONSIGNEE.Text, "CONSIGNEE", WF_CONSIGNEE_CODE.Text)       '油槽所
-            If work.WF_SEL_CAMPCODE.Text <> "01" Then
 
-            Else
-
-            End If
             Dim prmData As New Hashtable
             Dim shipperCode As String = ""
             Dim consigneeCode As String = ""

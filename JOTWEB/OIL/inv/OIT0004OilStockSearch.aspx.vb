@@ -207,7 +207,9 @@ Public Class OIT0004OilStockSearch
         work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
 
         work.WF_SEL_SHIPPERCODE.Text = TxtShipper.Text      '荷主
+        work.WF_SEL_SHIPPERNAME.Text = LblShipperName.Text  '荷主名
         work.WF_SEL_CONSIGNEE.Text = WF_CONSIGNEE_CODE.Text '油槽所
+        work.WF_SEL_CONSIGNEENAME.Text = WF_CONSIGNEE_NAME.Text   '油槽所名
         work.WF_SEL_STYMD.Text = WF_STYMD_CODE.Text         '年月日
 
 
@@ -248,7 +250,7 @@ Public Class OIT0004OilStockSearch
         If isNormal(WW_CS0024FCHECKERR) Then
             CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
             If Not isNormal(WW_RTN_SW) Then
-                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "営業所 : " & TxtSalesOffice.Text, needsPopUp:=True)
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "営業所 : " & TxtSalesOffice.Text, needsPopUp:=True)
                 TxtSalesOffice.Focus()
                 O_RTN = "ERR"
                 Exit Sub

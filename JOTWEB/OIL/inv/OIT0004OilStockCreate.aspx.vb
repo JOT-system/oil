@@ -1346,6 +1346,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.ORDERSTATUS),'')      AS ORDERSTATUS")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.ORDERINFO),'')        AS ORDERINFO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.STACKINGFLG),'')      AS STACKINGFLG")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.EMPTYTURNFLG),'')     AS EMPTYTURNFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.USEPROPRIETYFLG),'')  AS USEPROPRIETYFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.DELIVERYFLG),'')      AS DELIVERYFLG")
         sqlStat.AppendLine("      ,format(ODR.LODDATE,'yyyy/MM/dd')          AS LODDATE")
@@ -2188,7 +2189,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("   (ORDERNO,TRAINNO,TRAINNAME,ORDERYMD,OFFICECODE,OFFICENAME,ORDERTYPE,")
         sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,BASECODE,BASENAME,CONSIGNEECODE,CONSIGNEENAME,")
         sqlStat.AppendLine("    DEPSTATION,DEPSTATIONNAME,ARRSTATION,ARRSTATIONNAME,RETSTATION,RETSTATIONNAME,")
-        sqlStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,ORDERSTATUS,ORDERINFO,STACKINGFLG,USEPROPRIETYFLG,DELIVERYFLG,")
+        sqlStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,ORDERSTATUS,ORDERINFO,EMPTYTURNFLG,STACKINGFLG,USEPROPRIETYFLG,DELIVERYFLG,")
         sqlStat.AppendLine("    LODDATE,DEPDATE,ARRDATE,ACCDATE,EMPARRDATE,ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
         sqlStat.AppendLine("    RTANK,HTANK,TTANK,MTTANK,KTANK,K3TANK,K5TANK,K10TANK,LTANK,ATANK,")
         sqlStat.AppendLine("    OTHER1OTANK,OTHER2OTANK,OTHER3OTANK,OTHER4OTANK,OTHER5OTANK,")
@@ -2205,7 +2206,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("   (@ORDERNO,@TRAINNO,@TRAINNAME,@ORDERYMD,@OFFICECODE,@OFFICENAME,@ORDERTYPE,")
         sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@BASECODE,@BASENAME,@CONSIGNEECODE,@CONSIGNEENAME,")
         sqlStat.AppendLine("    @DEPSTATION,@DEPSTATIONNAME,@ARRSTATION,@ARRSTATIONNAME,@RETSTATION,@RETSTATIONNAME,")
-        sqlStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,@ORDERSTATUS,@ORDERINFO,@STACKINGFLG,@USEPROPRIETYFLG,@DELIVERYFLG,")
+        sqlStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,@ORDERSTATUS,@ORDERINFO,@EMPTYTURNFLG,@STACKINGFLG,@USEPROPRIETYFLG,@DELIVERYFLG,")
         sqlStat.AppendLine("    @LODDATE,@DEPDATE,@ARRDATE,@ACCDATE,@EMPARRDATE,@ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
         sqlStat.AppendLine("    @RTANK,@HTANK,@TTANK,@MTTANK,@KTANK,@K3TANK,@K5TANK,@K10TANK,@LTANK,@ATANK,")
         sqlStat.AppendLine("    @OTHER1OTANK,@OTHER2OTANK,@OTHER3OTANK,@OTHER4OTANK,@OTHER5OTANK,")
@@ -2244,6 +2245,7 @@ Public Class OIT0004OilStockCreate
                 .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = orderItm.ChangeRetStationName
                 .Add("ORDERSTATUS", SqlDbType.NVarChar).Value = orderItm.OrderStatus
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = orderItm.OrderInfo
+                .Add("EMPTYTURNFLG", SqlDbType.NVarChar).Value = orderItm.EmptyTurnFlg
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = orderItm.StackingFlg
                 .Add("USEPROPRIETYFLG", SqlDbType.NVarChar).Value = orderItm.UseProprietyFlg
                 .Add("DELIVERYFLG", SqlDbType.NVarChar).Value = orderItm.DeliveryFlg
@@ -3431,8 +3433,6 @@ Public Class OIT0004OilStockCreate
                 End If
             End Get
         End Property
-
-
         ''' <summary>
         ''' コンストラクタ
         ''' </summary>
@@ -4498,6 +4498,7 @@ Public Class OIT0004OilStockCreate
             Me.OrderStatus = CONST_ORDERSTATUS_100 '受注進行ステータス(「100:受注受付」固定)
             Me.OrderInfo = "" '受注情報(ブランク)
             Me.StackingFlg = chkItm.trainInfo.StackingFlg
+            Me.EmptyTurnFlg = "2" '０：未作成、１：作成、2：在庫から作成
             Me.UseProprietyFlg = "1" '利用可否フラグ(「1:利用可」固定)
             Me.DeliveryFlg = "0" '託送指示フラグ(「0:未手配」固定)
             '基準日を受入予定日より逆算
@@ -4613,6 +4614,7 @@ Public Class OIT0004OilStockCreate
             Me.ChangeRetStationName = Convert.ToString(sqlDr("CHANGERETSTATIONNAME"))
             Me.OrderStatus = Convert.ToString(sqlDr("ORDERSTATUS"))
             Me.OrderInfo = Convert.ToString(sqlDr("ORDERINFO"))
+            Me.EmptyTurnFlg = Convert.ToString(sqlDr("EMPTYTURNFLG"))
             Me.StackingFlg = Convert.ToString(sqlDr("STACKINGFLG"))
             Me.UseProprietyFlg = Convert.ToString(sqlDr("USEPROPRIETYFLG"))
             Me.DeliveryFlg = Convert.ToString(sqlDr("DELIVERYFLG"))
@@ -4687,7 +4689,7 @@ Public Class OIT0004OilStockCreate
             Me.ReceiveYmd = Convert.ToString(sqlDr("RECEIVEYMD"))
 
             Me.DetailList = New List(Of OrderDetailItem)
-            'このコンストラクタを通した場合は必ずUpdateタイプ
+            'このコンストラクタを通した場合一旦何もしないフラグ
             Me.EntryType = OrderItemEntryType.None
         End Sub
 
@@ -4806,6 +4808,11 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property OrderInfo As String
+        ''' <summary>
+        ''' 空回日報可否フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property EmptyTurnFlg As String
         ''' <summary>
         ''' 積置可否フラグ
         ''' </summary>
@@ -5264,7 +5271,7 @@ Public Class OIT0004OilStockCreate
                     "BASECODE", "BASENAME", "CONSIGNEECODE", "CONSIGNEENAME", "DEPSTATION", "DEPSTATIONNAME",
                     "ARRSTATION", "ARRSTATIONNAME", "RETSTATION", "RETSTATIONNAME",
                     "CHANGERETSTATION", "CHANGERETSTATIONNAME", "ORDERSTATUS", "ORDERINFO",
-                    "STACKINGFLG", "USEPROPRIETYFLG", "DELIVERYFLG",
+                    "EMPTYTURNFLG", "STACKINGFLG", "USEPROPRIETYFLG", "DELIVERYFLG",
                     "LODDATE", "DEPDATE", "ARRDATE", "ACCDATE", "EMPARRDATE",
                     "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE",
                     "RTANK", "HTANK", "TTANK", "MTTANK", "KTANK", "K3TANK", "K5TANK", "K10TANK", "LTANK", "ATANK",
@@ -5305,6 +5312,7 @@ Public Class OIT0004OilStockCreate
             dr("CHANGERETSTATIONNAME") = Me.ChangeRetStationName
             dr("ORDERSTATUS") = Me.OrderStatus
             dr("ORDERINFO") = Me.OrderInfo
+            dr("EMPTYTURNFLG") = Me.EmptyTurnFlg
             dr("STACKINGFLG") = Me.StackingFlg
             dr("USEPROPRIETYFLG") = Me.UseProprietyFlg
             dr("DELIVERYFLG") = Me.DeliveryFlg

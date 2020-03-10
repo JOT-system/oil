@@ -565,42 +565,58 @@ Public Class M00000LOGON
     ''' <param name="O_URL"></param>
     ''' <remarks></remarks>
     Protected Sub GetURL(ByVal I_PASSENDYMD As String, ByVal I_MAPID As String, ByRef O_URL As String)
+
+        '○共通宣言
+        '*共通関数宣言(APPLDLL)
+        Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
+
         Dim WW_URL As String = ""
+        Try
+            'DataBase接続文字
+            Using SQLcon As SqlConnection = CS0050Session.getConnection
+                SQLcon.Open() 'DataBase接続(Open)
 
-        'DataBase接続文字
-        Using SQLcon As SqlConnection = CS0050Session.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
+                'OIS0007_URL検索SQL文
+                Dim SQL_Str As String =
+                     "SELECT rtrim(URL) as URL " _
+                   & " FROM  COM.OIS0007_URL " _
+                   & " Where MAPID    = @P1 " _
+                   & "   and STYMD   <= @P2 " _
+                   & "   and ENDYMD  >= @P3 " _
+                   & "   and DELFLG  <> @P4 "
+                Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.Char, 50)
+                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
+                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
+                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Char, 1)
+                    PARA1.Value = I_MAPID
 
-            'OIS0007_URL検索SQL文
-            Dim SQL_Str As String =
-                 "SELECT rtrim(URL) as URL " _
-               & " FROM  COM.OIS0007_URL " _
-               & " Where MAPID    = @P1 " _
-               & "   and STYMD   <= @P2 " _
-               & "   and ENDYMD  >= @P3 " _
-               & "   and DELFLG  <> @P4 "
-            Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.Char, 50)
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.Char, 1)
-                PARA1.Value = I_MAPID
+                    PARA2.Value = Date.Now
+                    PARA3.Value = Date.Now
+                    PARA4.Value = C_DELETE_FLG.DELETE
+                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-                PARA2.Value = Date.Now
-                PARA3.Value = Date.Now
-                PARA4.Value = C_DELETE_FLG.DELETE
-                Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    If SQLdr.Read Then
+                        O_URL = Convert.ToString(SQLdr("URL"))
+                    End If
 
-                If SQLdr.Read Then
-                    O_URL = Convert.ToString(SQLdr("URL"))
-                End If
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                    SQLdr = Nothing
 
-                'Close
-                SQLdr.Close() 'Reader(Close)
-                SQLdr = Nothing
-
+                End Using
             End Using
-        End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0007_URL SELECT")
+            CS0011LOGWRITE.INFSUBCLASS = "GetURL"                         'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "OIS0007_URL SELECT"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 End Class

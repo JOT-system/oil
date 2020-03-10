@@ -452,12 +452,13 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     border-spacing: 0;
     overflow: hidden;
 }
-#tblTitlebox tr:nth-child(1) td:nth-child(3),
-#tblTitlebox tr:nth-child(2) td:nth-child(1){
+#tblTitlebox tr:nth-child(1) td:nth-child(4),
+#tblTitlebox tr:nth-child(2) td:nth-child(2){
     height:1.2em;
 }
 /* 画面ID */
-#tblTitlebox tr:nth-child(1) td:nth-child(1) {
+#tblTitlebox tr:nth-child(1) td:nth-child(1),
+#tblTitlebox tr:nth-child(2) td:nth-child(1){
     padding-left:10px;
     vertical-align: top;
     width: 180px;
@@ -474,7 +475,7 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     text-align:left;
     width:13em;
 }
-#tblTitlebox tr:nth-child(2) td:nth-child(1) {
+#tblTitlebox tr:nth-child(2) td:nth-child(2) {
     text-align: left;
 }
 /* 右開閉アイコン */
@@ -490,8 +491,8 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     display: block;
     right: 2px;
     bottom: 2px;
-    height: 90%;
-    //width: 28px;
+    width: 32px;
+    height: 30px;
     background-image: url('../img/right.png');
     background-repeat: no-repeat;
     background-size: contain;
@@ -503,6 +504,17 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     opacity: 1;
     filter: alpha(opacity=1);
 }
+/* 新しいタブ */
+#spnOpenNewTab {
+    font-weight:bold;
+    color:darkcyan ;
+    cursor:pointer;    
+}
+#spnOpenNewTab:hover {
+    color:#ff7474;
+    text-decoration: underline;
+}
+
 /* ********************** */
 /* 共通コンテンツスタイル */
 /* ********************** */

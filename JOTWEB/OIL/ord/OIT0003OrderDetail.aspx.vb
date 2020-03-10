@@ -6567,6 +6567,91 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' (受注TBL)受注情報更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrderInfo(ByVal SQLcon As SqlConnection, ByVal I_TYPE As String, ByVal OIT0003row As DataRow)
+
+        Try
+            'DataBase接続文字
+            'Dim SQLcon = CS0050SESSION.getConnection
+            'SQLcon.Open() 'DataBase接続(Open)
+
+            Dim SQLStr As String = ""
+            '更新SQL文･･･受注TBLの受注情報を更新
+            If I_TYPE = "1" Then
+                SQLStr =
+                " UPDATE OIL.OIT0002_ORDER " _
+                & "    SET ORDERINFO   = @P04, " _
+                & "        UPDYMD      = @P11, " _
+                & "        UPDUSER     = @P12, " _
+                & "        UPDTERMID   = @P13, " _
+                & "        RECEIVEYMD  = @P14  " _
+                & "  WHERE ORDERNO     = @P01  " _
+                & "    AND DELFLG     <> @P03; "
+
+                '更新SQL文･･･受注明細TBLの受注情報を更新
+            ElseIf I_TYPE = "2" Then
+                SQLStr =
+                " UPDATE OIL.OIT0003_DETAIL " _
+                & "    SET ORDERINFO   = @P04, " _
+                & "        UPDYMD      = @P11, " _
+                & "        UPDUSER     = @P12, " _
+                & "        UPDTERMID   = @P13, " _
+                & "        RECEIVEYMD  = @P14  " _
+                & "  WHERE ORDERNO     = @P01  " _
+                & "    AND DETAILNO    = @P02  " _
+                & "    AND DELFLG     <> @P03; "
+
+            End If
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = OIT0003row("ORDERNO")
+            PARA02.Value = OIT0003row("DETAILNO")
+            PARA03.Value = C_DELETE_FLG.DELETE
+            PARA04.Value = OIT0003row("ORDERINFO")
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDERINFO UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDERINFO UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
     ''' (タンク車所在TBL)所在地の内容を更新
     ''' </summary>
     ''' <remarks></remarks>
@@ -9608,6 +9693,10 @@ Public Class OIT0003OrderDetail
                             O_RTN = "ERR"
                             O_VALUE = OIT0003ChkDrow("CONSIGNEENAME")
                             'Exit Sub
+
+                            '受注明細TBLの受注情報を更新
+                            WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+
                         Else
                             OIT0003row("ORDERINFO") = ""
                             OIT0003row("ORDERINFONAME") = ""

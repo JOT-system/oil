@@ -69,7 +69,7 @@ Public Class M00000LOGON
     Protected Sub Initialize()
         '■■■　セッション変数設定　■■■
         Dim CS001INIFILE As New CS0001INIFILEget            'INIファイル読み込み
-        Dim CS0006TERMchk As New CS0006TERMchk              'ローカルコンピュータ名存在チェック
+        '  Dim CS0006TERMchk As New CS0006TERMchk              'ローカルコンピュータ名存在チェック
         Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
         Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
         Master.dispHelp = False
@@ -91,16 +91,16 @@ Public Class M00000LOGON
         End If
 
         '○ APサーバー情報からAPサーバー設置会社(APSRVCamp)、APサーバー設置部署(APSRVOrg)取得
-        CS0006TERMchk.TERMID = CS0050Session.APSV_ID
-        CS0006TERMchk.CS0006TERMchk()
-        If isNormal(CS0006TERMchk.ERR) Then
-            CS0050Session.APSV_COMPANY = CS0006TERMchk.TERMCAMP
-            CS0050Session.APSV_ORG = CS0006TERMchk.TERMORG
-            CS0050Session.APSV_M_ORG = CS0006TERMchk.MORG
-        Else
-            Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
-            Exit Sub
-        End If
+        'CS0006TERMchk.TERMID = CS0050Session.APSV_ID
+        'CS0006TERMchk.CS0006TERMchk()
+        'If isNormal(CS0006TERMchk.ERR) Then
+        '    CS0050Session.APSV_COMPANY = CS0006TERMchk.TERMCAMP
+        '    CS0050Session.APSV_ORG = CS0006TERMchk.TERMORG
+        '    CS0050Session.APSV_M_ORG = CS0006TERMchk.MORG
+        'Else
+        '    Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
+        '    Exit Sub
+        'End If
 
 
 
@@ -129,36 +129,36 @@ Public Class M00000LOGON
 
         '○パソコン名存在チェック
         ' ホスト名を取得する
-        Dim WW_ipAddress As String
-        Dim WW_hostName As String
+        'Dim WW_ipAddress As String
+        'Dim WW_hostName As String
 
-        Try
-            WW_ipAddress = Convert.ToString(Request.ServerVariables("REMOTE_HOST"))
-            WW_hostName = System.Net.Dns.GetHostEntry(WW_ipAddress).HostName()
-            If InStr(WW_hostName, ".") = 0 Then
-                CS0006TERMchk.TERMID = WW_hostName.ToString
-            Else
-                CS0006TERMchk.TERMID = Mid(WW_hostName.ToString, 1, InStr(WW_hostName.ToString, ".") - 1)
-            End If
+        'Try
+        '    WW_ipAddress = Convert.ToString(Request.ServerVariables("REMOTE_HOST"))
+        '    WW_hostName = System.Net.Dns.GetHostEntry(WW_ipAddress).HostName()
+        '    If InStr(WW_hostName, ".") = 0 Then
+        '        CS0006TERMchk.TERMID = WW_hostName.ToString
+        '    Else
+        '        CS0006TERMchk.TERMID = Mid(WW_hostName.ToString, 1, InStr(WW_hostName.ToString, ".") - 1)
+        '    End If
 
 
-        Catch ex As Exception
-            'サーバー名
-            CS0006TERMchk.TERMID = Environment.MachineName
-        End Try
+        'Catch ex As Exception
+        '    'サーバー名
+        '    CS0006TERMchk.TERMID = Environment.MachineName
+        'End Try
 
-        CS0006TERMchk.TERMID = CS0050Session.APSV_ID
+        'CS0006TERMchk.TERMID = CS0050Session.APSV_ID
 
-        CS0006TERMchk.CS0006TERMchk()
-        If isNormal(CS0006TERMchk.ERR) Then
-            CS0050Session.TERMID = CS0006TERMchk.TERMID
-            CS0050Session.TERM_COMPANY = CS0006TERMchk.TERMCAMP
-            CS0050Session.TERM_ORG = CS0006TERMchk.TERMORG
-            CS0050Session.TERM_M_ORG = CS0006TERMchk.MORG
-        Else
-            Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
-            Exit Sub
-        End If
+        'CS0006TERMchk.CS0006TERMchk()
+        'If isNormal(CS0006TERMchk.ERR) Then
+        '    CS0050Session.TERMID = CS0006TERMchk.TERMID
+        '    CS0050Session.TERM_COMPANY = CS0006TERMchk.TERMCAMP
+        '    CS0050Session.TERM_ORG = CS0006TERMchk.TERMORG
+        '    CS0050Session.TERM_M_ORG = CS0006TERMchk.MORG
+        'Else
+        '    Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
+        '    Exit Sub
+        'End If
 
 
         '■■■　初期メッセージ表示　■■■
@@ -485,43 +485,43 @@ Public Class M00000LOGON
             ' ①下記コメントを外し、ログオン日付更新処理を有効にする（リコンパイル）
             '★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-            Try
-                'OIS0006_LOGONYMD検索SQL文
-                Dim SQL_Str As String =
-                     "SELECT isnull(LOGONYMD, '') as LOGONYMD " _
-                   & " FROM  COM.OIS0006_LOGONYMD " _
-                   & " Where TERMID   = @P1 "
-                Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
-                    PARA1.Value = CS0050Session.APSV_ID
+            'Try
+            '    'OIS0006_LOGONYMD検索SQL文
+            '    Dim SQL_Str As String =
+            '         "SELECT isnull(LOGONYMD, '') as LOGONYMD " _
+            '       & " FROM  COM.OIS0006_LOGONYMD " _
+            '       & " Where TERMID   = @P1 "
+            '    Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
+            '        Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 30)
+            '        PARA1.Value = CS0050Session.APSV_ID
 
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+            '        Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
 
-                    If SQLdr.Read Then
-                        Try
-                            Dim WW_DATE As Date
-                            Date.TryParse(Convert.ToString(SQLdr("LOGONYMD")), WW_DATE)
-                            WW_LOGONYMD = WW_DATE.ToString("yyyy/MM/dd")
-                        Catch ex As Exception
-                            WW_LOGONYMD = Date.Now.ToString("yyyy/MM/dd")
-                        End Try
-                    End If
+            '        If SQLdr.Read Then
+            '            Try
+            '                Dim WW_DATE As Date
+            '                Date.TryParse(Convert.ToString(SQLdr("LOGONYMD")), WW_DATE)
+            '                WW_LOGONYMD = WW_DATE.ToString("yyyy/MM/dd")
+            '            Catch ex As Exception
+            '                WW_LOGONYMD = Date.Now.ToString("yyyy/MM/dd")
+            '            End Try
+            '        End If
 
-                    'Close
-                    SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
-                End Using
+            '        'Close
+            '        SQLdr.Close() 'Reader(Close)
+            '        SQLdr = Nothing
+            '    End Using
 
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0006_LOGONYMD SELECT")
-                CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "OIS0006_LOGONYMD SELECT"
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWRITE.TEXT = ex.ToString()
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-                Exit Sub
-            End Try
+            'Catch ex As Exception
+            '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0006_LOGONYMD SELECT")
+            '    CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
+            '    CS0011LOGWRITE.INFPOSI = "OIS0006_LOGONYMD SELECT"
+            '    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            '    CS0011LOGWRITE.TEXT = ex.ToString()
+            '    CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
+            '    CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+            '    Exit Sub
+            'End Try
         End Using
 
         CS0050Session.VIEW_MAPID = WW_MAPID

@@ -1967,11 +1967,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_UpdateOrderDetail(SQLcon)
             End Using
 
-            '(受注TBL)タンク車数更新
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-                WW_UpdateOrderTankCnt(SQLcon)
-            End Using
+            '◯新規作成(空回日報から作成)したデータの場合
+            If work.WF_SEL_EMPTYTURNFLG.Text = "1" Then
+                '(受注TBL)タンク車数更新
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+                    WW_UpdateOrderTankCnt(SQLcon)
+                End Using
+
+            End If
 
             '空回日報(一覧)画面表示データ取得
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -3339,7 +3343,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME    , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION      , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , RETSTATION   , RETSTATIONNAME  , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS, ORDERINFO    " _
-            & "        , STACKINGFLG  , USEPROPRIETYFLG , DELIVERYFLG     , LODDATE             , DEPDATE    , ARRDATE" _
+            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , DELIVERYFLG" _
+            & "        , LODDATE      , DEPDATE         , ARRDATE" _
             & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE" _
             & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK           , HTANK               , TTANK" _
             & "        , MTTANK       , KTANK           , K3TANK          , K5TANK              , K10TANK" _
@@ -3360,7 +3365,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
             & "        , @P17, @P18, @P19, @P20, @P21, @P22" _
-            & "        , @P92, @P23, @P94, @P24, @P25, @P26" _
+            & "        , @P95, @P92, @P23, @P94" _
+            & "        , @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30, @P31" _
             & "        , @P32, @P33, @P34, @P35, @P36" _
             & "        , @P37, @P38, @P39, @P40, @P41" _
@@ -3405,6 +3411,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , CHANGERETSTATIONNAME" _
             & "    , ORDERSTATUS" _
             & "    , ORDERINFO" _
+            & "    , EMPTYTURNFLG" _
             & "    , STACKINGFLG" _
             & "    , USEPROPRIETYFLG" _
             & "    , DELIVERYFLG" _
@@ -3507,6 +3514,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 40) '空車着駅名(変更後)
                 Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 2)  '受注情報
+                Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.NVarChar, 1)  '空回日報可否フラグ
                 Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
                 Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.NVarChar, 1)  '託送指示フラグ
@@ -3610,7 +3618,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA18.Value = ""                                 '空車着駅名
                     PARA19.Value = ""                                 '空車着駅コード(変更後)
                     PARA20.Value = ""                                 '空車着駅名(変更後)
-                    PARA21.Value = "100"                              '受注進行ステータス(100:受注受付)
+
+                    '#受注進行ステータス
+                    If OIT0001row("ORDERSTATUS") = "" Then
+                        '受注進行ステータス(100:受注受付)
+                        PARA21.Value = "100"
+                    Else
+                        PARA21.Value = OIT0001row("ORDERSTATUS")
+                    End If
 
                     '# 受注情報
                     '交付アラートが「3日以内のタンク車」または「4日～6日のタンク車」の場合
@@ -3639,11 +3654,13 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     End If
 
+                    PARA95.Value = "1"                                '空回日報可否フラグ(1:作成)
+
                     '〇 積込日 < 発日 の場合 
                     If WW_ORDERINFOFLG_10 = True Then
-                        PARA92.Value = "1"                                '利用可否フラグ(1:積置あり)
+                        PARA92.Value = "1"                                '積置可否フラグ(1:積置あり)
                     Else
-                        PARA92.Value = "2"                                '利用可否フラグ(2:積置なし)
+                        PARA92.Value = "2"                                '積置可否フラグ(2:積置なし)
                     End If
 
                     PARA23.Value = "1"                                '利用可否フラグ(1:利用可能)
@@ -4351,6 +4368,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
@@ -4384,9 +4402,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')               AS TOTALTANK" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
-            & " WHERE OIT0002.OFFICECODE = @P1" _
-            & "   AND OIT0002.LODDATE    >= @P2" _
-            & "   AND OIT0002.DELFLG     <> @P3"
+            & " WHERE OIT0002.OFFICECODE   = @P1" _
+            & "   AND OIT0002.LODDATE      >= @P2" _
+            & "   AND OIT0002.DELFLG       <> @P3" _
+            & "   AND OIT0002.EMPTYTURNFLG <> '2'"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '列車番号

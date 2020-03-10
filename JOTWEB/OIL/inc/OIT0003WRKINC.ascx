@@ -45,6 +45,8 @@
     <asp:TextBox ID="WF_SEL_INFORMATION" runat="server"></asp:TextBox>
     <!-- 情報(名) -->
     <asp:TextBox ID="WF_SEL_INFORMATIONNM" runat="server"></asp:TextBox>
+    <!-- 空回日報可否フラグ -->
+    <asp:TextBox ID="WF_SEL_EMPTYTURNFLG" runat="server"></asp:TextBox>
     <!-- 積置可否フラグ -->
     <asp:TextBox ID="WF_SEL_STACKINGFLG" runat="server"></asp:TextBox>
     <!-- 利用可否フラグ -->

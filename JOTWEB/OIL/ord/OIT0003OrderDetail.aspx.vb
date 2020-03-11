@@ -181,11 +181,14 @@ Public Class OIT0003OrderDetail
 
             '○ 託送指示フラグ(0：未手配, 1：手配)設定
             '　 受注進行ステータスが100:受注受付, または270:手配完了以降のステータスに変更された場合
+            '### ステータス追加(仮) #################################
             If work.WF_SEL_DELIVERYFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
@@ -200,9 +203,12 @@ Public Class OIT0003OrderDetail
             End If
 
             '◯受注進行ステータスが270:手配完了以降のステータスに変更された場合
+            '### ステータス追加(仮) #################################
             If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
@@ -308,9 +314,12 @@ Public Class OIT0003OrderDetail
             WW_ListTextBoxReadControl()
 
             '〇 受注進行ステータスが"手配完了"へ変更された場合
+            '### ステータス追加(仮) #################################
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
@@ -3648,41 +3657,103 @@ Public Class OIT0003OrderDetail
                     '##############################################################
                 End If
 
+                '### ステータス追加(仮) #################################
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
+                'かつ、(実績)発日の入力が完了(★)
+                If Me.TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True _
+                    AndAlso Me.TxtActualDepDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_350
+                End If
+                '########################################################
+
+                '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
+                'かつ、(実績)発日の入力が完了(★)
                 'かつ、(実績)積車着日の入力が完了
                 If Me.TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True _
+                    AndAlso Me.TxtActualDepDate.Text <> "" _
                     AndAlso Me.TxtActualArrDate.Text <> "" Then
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_400
                 End If
 
-                '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
+                '### ステータス追加(仮) #################################
+                '(実績)発日の入力が完了(★)
                 'かつ、(実績)積車着日の入力が完了
+                'かつ、(実績)受入日の入力が完了(★)
+                If Me.TxtActualDepDate.Text <> "" _
+                    AndAlso Me.TxtActualArrDate.Text <> "" _
+                    AndAlso Me.TxtActualAccDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_450
+                End If
+                '########################################################
+
+                '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
+                'かつ、(実績)発日の入力が完了(★)
+                'かつ、(実績)積車着日の入力が完了
+                'かつ、(実績)受入日の入力が完了(★)
                 'かつ、(実績)空車着日の入力が完了
                 If Me.TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True _
+                    AndAlso Me.TxtActualDepDate.Text <> "" _
                     AndAlso Me.TxtActualArrDate.Text <> "" _
+                    AndAlso Me.TxtActualAccDate.Text <> "" _
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
                 End If
 
             '"300:受注確定"
-            Case BaseDllConst.CONST_ORDERSTATUS_300
-                '(実績)積車着日の入力が完了
-                If Me.TxtActualArrDate.Text <> "" Then
+            Case BaseDllConst.CONST_ORDERSTATUS_300,
+                 BaseDllConst.CONST_ORDERSTATUS_350
+
+                '### ステータス追加(仮) #################################
+                '(実績)発日の入力が完了(★)
+                If Me.TxtActualDepDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_350
+                End If
+                '########################################################
+
+                '(実績)発日の入力が完了(★)
+                'かつ、(実績)積車着日の入力が完了
+                If Me.TxtActualDepDate.Text <> "" _
+                    AndAlso Me.TxtActualArrDate.Text <> "" Then
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_400
                 End If
 
-                '(実績)積車着日の入力が完了
+                '### ステータス追加(仮) #################################
+                '(実績)発日の入力が完了(★)
+                'かつ、(実績)積車着日の入力が完了
+                'かつ、(実績)受入日の入力が完了(★)
+                If Me.TxtActualDepDate.Text <> "" _
+                    AndAlso Me.TxtActualArrDate.Text <> "" _
+                    AndAlso Me.TxtActualAccDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_450
+                End If
+                '########################################################
+
+                '(実績)発日の入力が完了(★)
+                'かつ、(実績)積車着日の入力が完了
+                'かつ、(実績)受入日の入力が完了(★)
                 'かつ、(実績)空車着日の入力が完了
-                If Me.TxtActualArrDate.Text <> "" _
+                If Me.TxtActualDepDate.Text <> "" _
+                    AndAlso Me.TxtActualArrDate.Text <> "" _
+                    AndAlso Me.TxtActualAccDate.Text <> "" _
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
                 End If
 
             '"400:受入確認中"
-            Case BaseDllConst.CONST_ORDERSTATUS_400
+            Case BaseDllConst.CONST_ORDERSTATUS_400,
+                 BaseDllConst.CONST_ORDERSTATUS_450
 
-                '(実績)空車着日の入力が完了
-                If Me.TxtActualEmparrDate.Text <> "" Then
+                '### ステータス追加(仮) #################################
+                '(実績)受入日の入力が完了(★)
+                If Me.TxtActualAccDate.Text <> "" Then
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_450
+                End If
+                '########################################################
+
+                '(実績)受入日の入力が完了(★)
+                'かつ、(実績)空車着日の入力が完了
+                If Me.TxtActualAccDate.Text <> "" _
+                    AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
                 End If
 
@@ -8116,6 +8187,22 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
 
+            '### ステータス追加(仮) #################################
+            '受注情報が「350:受注確定」の場合は、(実績)発日の入力を制限
+            '350:受注確定((実績)発日入力済み)
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 Then
+            '(実績)積込日
+            Me.TxtActualLoadingDate.Enabled = False
+            '(実績)発日
+            Me.TxtActualDepDate.Enabled = False
+            '(実績)積車着日
+            Me.TxtActualArrDate.Enabled = True
+            '(実績)受入日
+            Me.TxtActualAccDate.Enabled = True
+            '(実績)空車着日
+            Me.TxtActualEmparrDate.Enabled = True
+            '########################################################
+
             '受注情報が「400:受入確認中」の場合は、(実績)積車着日の入力を制限
             '400:受入確認中
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 Then
@@ -8129,6 +8216,22 @@ Public Class OIT0003OrderDetail
             Me.TxtActualAccDate.Enabled = True
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
+
+            '### ステータス追加(仮) #################################
+            '受注情報が「450:受入確認中」の場合は、(実績)積車着日の入力を制限
+            '450:受入確認中((実績)受入日入力済み)
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+            '(実績)積込日
+            Me.TxtActualLoadingDate.Enabled = False
+            '(実績)発日
+            Me.TxtActualDepDate.Enabled = False
+            '(実績)積車着日
+            Me.TxtActualArrDate.Enabled = False
+            '(実績)受入日
+            Me.TxtActualAccDate.Enabled = False
+            '(実績)空車着日
+            Me.TxtActualEmparrDate.Enabled = True
+            '########################################################
 
             '受注情報が「500:検収中」の場合は、(実績)空車着日の入力を制限
             '500:検収中
@@ -8229,6 +8332,16 @@ Public Class OIT0003OrderDetail
                 WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "")
             End If
 
+            '### ステータス追加(仮) #################################
+            '受注進行ステータスが「300:受注確定」の場合
+            '350:受注確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 Then
+            '引数１：所在地コード　⇒　変更あり(着駅)
+            '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+            '引数３：積車区分　　　⇒　変更あり("F"(積車))
+            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F")
+            '########################################################
+
             '受注進行ステータスが「400:受入確認中」の場合
             '400:受入確認中
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 Then
@@ -8246,6 +8359,17 @@ Public Class OIT0003OrderDetail
                 '引数３：積車区分　　　⇒　変更あり("E"(空車))
                 WW_UpdateTankShozai("", "", "E")
             End If
+
+            '### ステータス追加(仮) #################################
+            '受注進行ステータスが「450:受入確認中」の場合
+            '450:受入確認中
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+            '★タンク車所在の更新
+            '引数１：所在地コード　⇒　変更なし(空白)
+            '引数２：タンク車状態　⇒　変更あり("3"(到着))
+            '引数３：積車区分　　　⇒　変更あり("E"(空車))
+            WW_UpdateTankShozai("", "3", "E")
+            '########################################################
 
             '受注進行ステータスが「500:検収中」の場合
             '500:検収中
@@ -9205,7 +9329,9 @@ Public Class OIT0003OrderDetail
         '    -1 : dt1はdt2より前の日
         '     1 : dt1はdt2より後の日
         '(実績)積込日 と　現在日付を比較
-        If Me.TxtActualLoadingDate.Text <> "" Then
+        '受注進行ステータスが"270:手配完了"の場合
+        If Me.TxtActualLoadingDate.Text <> "" _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
             iresult = Date.Parse(Me.TxtActualLoadingDate.Text).CompareTo(DateTime.Today)
             If iresult = -1 Then
                 Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
@@ -9219,7 +9345,9 @@ Public Class OIT0003OrderDetail
         End If
 
         '(実績)発日 と　現在日付を比較
-        If Me.TxtActualDepDate.Text <> "" Then
+        '受注進行ステータスが"300:受注確定"の場合
+        If Me.TxtActualDepDate.Text <> "" _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             iresult = Date.Parse(Me.TxtActualDepDate.Text).CompareTo(DateTime.Today)
             If iresult = -1 Then
                 Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
@@ -9233,7 +9361,10 @@ Public Class OIT0003OrderDetail
         End If
 
         '(実績)積車着日 と　現在日付を比較
-        If Me.TxtActualArrDate.Text <> "" Then
+        '### ステータス追加(仮) #################################
+        '受注進行ステータスが"350:受注確定((実績)発日設定済み)"の場合
+        If Me.TxtActualArrDate.Text <> "" _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 Then
             iresult = Date.Parse(Me.TxtActualArrDate.Text).CompareTo(DateTime.Today)
             If iresult = -1 Then
                 Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積車着日", needsPopUp:=True)
@@ -9247,7 +9378,9 @@ Public Class OIT0003OrderDetail
         End If
 
         '(実績)受入日 と　現在日付を比較
-        If Me.TxtActualAccDate.Text <> "" Then
+        '受注進行ステータスが"400:受入確認中"の場合
+        If Me.TxtActualAccDate.Text <> "" _
+           AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 Then
             iresult = Date.Parse(Me.TxtActualAccDate.Text).CompareTo(DateTime.Today)
             If iresult = -1 Then
                 Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)受入日", needsPopUp:=True)
@@ -9261,7 +9394,10 @@ Public Class OIT0003OrderDetail
         End If
 
         '(実績)空車着日 と　現在日付を比較
-        If Me.TxtActualEmparrDate.Text <> "" Then
+        '### ステータス追加(仮) #################################
+        '受注進行ステータスが"450:受入確認中((実績)受入日設定済み)"の場合
+        If Me.TxtActualEmparrDate.Text <> "" _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
             iresult = Date.Parse(Me.TxtActualEmparrDate.Text).CompareTo(DateTime.Today)
             If iresult = -1 Then
                 Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)

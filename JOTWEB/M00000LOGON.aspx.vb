@@ -453,28 +453,10 @@ Public Class M00000LOGON
 
             '■■■　終了処理　■■■
 
-            '○ パスワードチェックＯＫ時、指定画面へ遷移
-            'ユーザマスタより、MAPIDおよびVARIANTを取得
+            '○ パスワードチェックＯＫ時、メニュー画面へ遷移するＵＲＬの取得
+            'ユーザマスタより、MAPIDを取得
+            GetURL(WW_PASSENDYMD, WW_MAPID, WW_URL)
 
-            Try
-                If WW_PASSENDYMD <= Date.Now.AddDays(7).ToString("yyyy/MM/dd") Then
-                    'パスワード登録画面（1週間前）の場合
-                    GetURL(WW_PASSENDYMD, "CO0014", WW_URL)
-                    GetURL(WW_PASSENDYMD, WW_MAPID, WW_MENUURL)
-                Else
-                    GetURL(WW_PASSENDYMD, WW_MAPID, WW_URL)
-                End If
-
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0007_URL SELECT")
-                CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "OIS0007_URL SELECT"
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWRITE.TEXT = ex.ToString()
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-                Exit Sub
-            End Try
 
             '★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
             'デバッグ時は、
@@ -556,7 +538,6 @@ Public Class M00000LOGON
 
     End Sub
 
-
     ''' <summary>
     ''' 遷移先URLの取得
     ''' </summary>
@@ -612,9 +593,9 @@ Public Class M00000LOGON
             CS0011LOGWRITE.INFSUBCLASS = "GetURL"                         'SUBクラス名
             CS0011LOGWRITE.INFPOSI = "OIS0007_URL SELECT"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
-            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
 

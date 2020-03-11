@@ -2089,5 +2089,9 @@ function commonRichTextInputOpen(inputObjId) {
  * @description 
  */
 function commonOpenNewTab(urlText) {
-    window.open(urlText,'_blank');
+
+    let currentForm = document.getElementsByTagName("form")[0];
+    currentForm.target = "_blank";
+    document.forms[0].submit();
+    currentForm.target = '';
 }

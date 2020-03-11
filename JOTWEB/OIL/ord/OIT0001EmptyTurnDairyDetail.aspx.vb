@@ -188,46 +188,46 @@ Public Class OIT0001EmptyTurnDairyDetail
         Master.CreateXMLSaveFile()
 
         '受注営業所
-        'TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
+        'Me.TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
         '本線列車
-        TxtHeadOfficeTrain.Text = work.WF_SEL_TRAIN.Text
+        Me.TxtHeadOfficeTrain.Text = work.WF_SEL_TRAIN.Text
         '発駅
-        TxtDepstation.Text = work.WF_SEL_DEPARTURESTATION.Text
+        Me.TxtDepstation.Text = work.WF_SEL_DEPARTURESTATION.Text
         '着駅
-        TxtArrstation.Text = work.WF_SEL_ARRIVALSTATION.Text
+        Me.TxtArrstation.Text = work.WF_SEL_ARRIVALSTATION.Text
         '(予定)積込日
-        TxtLoadingDate.Text = work.WF_SEL_LOADINGDATE.Text
+        Me.TxtLoadingDate.Text = work.WF_SEL_LOADINGDATE.Text
         '(予定)発日
-        TxtDepDate.Text = work.WF_SEL_LOADINGCAR_DEPARTUREDATE.Text
+        Me.TxtDepDate.Text = work.WF_SEL_LOADINGCAR_DEPARTUREDATE.Text
         '(予定)積車着日
-        TxtArrDate.Text = work.WF_SEL_LOADINGCAR_ARRIVALDATE.Text
+        Me.TxtArrDate.Text = work.WF_SEL_LOADINGCAR_ARRIVALDATE.Text
         '(予定)受入日
-        TxtAccDate.Text = work.WF_SEL_RECEIPTDATE.Text
+        Me.TxtAccDate.Text = work.WF_SEL_RECEIPTDATE.Text
         '(予定)空車着日
-        TxtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
+        Me.TxtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
 
         '合計車数
-        TxtTotalTank.Text = work.WF_SEL_TANKCARTOTAL.Text
+        Me.TxtTotalTank.Text = work.WF_SEL_TANKCARTOTAL.Text
         '車数（レギュラー）
-        TxtRTank.Text = work.WF_SEL_REGULAR_TANKCAR.Text
+        Me.TxtRTank.Text = work.WF_SEL_REGULAR_TANKCAR.Text
         '車数（ハイオク）
-        TxtHTank.Text = work.WF_SEL_HIGHOCTANE_TANKCAR.Text
+        Me.TxtHTank.Text = work.WF_SEL_HIGHOCTANE_TANKCAR.Text
         '車数（灯油）
-        TxtTTank.Text = work.WF_SEL_KEROSENE_TANKCAR.Text
+        Me.TxtTTank.Text = work.WF_SEL_KEROSENE_TANKCAR.Text
         '車数（未添加灯油）
-        TxtMTTank.Text = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text
+        Me.TxtMTTank.Text = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text
         '車数（軽油）
-        TxtKTank.Text = work.WF_SEL_DIESEL_TANKCAR.Text
+        Me.TxtKTank.Text = work.WF_SEL_DIESEL_TANKCAR.Text
         '車数（３号軽油）
-        TxtK3Tank.Text = work.WF_SEL_NUM3DIESEL_TANKCAR.Text
+        Me.TxtK3Tank.Text = work.WF_SEL_NUM3DIESEL_TANKCAR.Text
         '車数（５号軽油）
-        TxtK5Tank.Text = work.WF_SEL_NUM5DIESEL_TANKCAR.Text
+        Me.TxtK5Tank.Text = work.WF_SEL_NUM5DIESEL_TANKCAR.Text
         '車数（１０号軽油）
-        TxtK10Tank.Text = work.WF_SEL_NUM10DIESEL_TANKCAR.Text
+        Me.TxtK10Tank.Text = work.WF_SEL_NUM10DIESEL_TANKCAR.Text
         '車数（LSA）
-        TxtLTank.Text = work.WF_SEL_LSA_TANKCAR.Text
+        Me.TxtLTank.Text = work.WF_SEL_LSA_TANKCAR.Text
         '車数（A重油）
-        TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
+        Me.TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
 
         '本線列車・発駅・着駅を入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtHeadOfficeTrain.Attributes("onkeyPress") = "CheckNum()"
@@ -252,16 +252,16 @@ Public Class OIT0001EmptyTurnDairyDetail
             WW_ScreenEnabledSet()
 
             '新規データの作成については、受注営業所は読取専用とする。
-            TxtOrderOffice.ReadOnly = True
+            Me.TxtOrderOffice.ReadOnly = True
         Else
 
             '既存データの修正については、受注営業所は入力不可とする。
-            TxtOrderOffice.Enabled = False
+            Me.TxtOrderOffice.Enabled = False
         End If
 
         '〇営業所配下情報を取得・設定
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstation.Text, WW_GetValue)
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstation.Text, WW_GetValue)
         work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
         work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
         work.WF_SEL_BASECODE.Text = WW_GetValue(2)
@@ -273,16 +273,16 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         '○ 名称設定処理
         '会社コード
-        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
+        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, Me.WF_CAMPCODE_TEXT.Text, WW_DUMMY)
         '運用部署
-        CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_UORG_TEXT.Text, WW_DUMMY)
+        CODENAME_get("UORG", work.WF_SEL_UORG.Text, Me.WF_UORG_TEXT.Text, WW_DUMMY)
         '受注営業所
-        CODENAME_get("SALESOFFICE", work.WF_SEL_SALESOFFICECODE.Text, TxtOrderOffice.Text, WW_DUMMY)
-        work.WF_SEL_SALESOFFICE.Text = TxtOrderOffice.Text
+        CODENAME_get("SALESOFFICE", work.WF_SEL_SALESOFFICECODE.Text, Me.TxtOrderOffice.Text, WW_DUMMY)
+        work.WF_SEL_SALESOFFICE.Text = Me.TxtOrderOffice.Text
         '発駅
-        CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+        CODENAME_get("DEPSTATION", Me.TxtDepstation.Text, Me.LblDepstationName.Text, WW_DUMMY)
         '着駅
-        CODENAME_get("ARRSTATION", TxtArrstation.Text, LblArrstationName.Text, WW_DUMMY)
+        CODENAME_get("ARRSTATION", Me.TxtArrstation.Text, Me.LblArrstationName.Text, WW_DUMMY)
 
     End Sub
 
@@ -428,6 +428,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
             & " , ''                                             AS KAMOKU" _
+            & " , ''                                             AS ORDERSTATUS" _
             & " FROM sys.all_objects "
 
             SQLStr &=
@@ -499,6 +500,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')             AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')            AS DETAILNO" _
             & " , ISNULL(RTRIM(OIT0003.KAMOKU), '')              AS KAMOKU" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')         AS ORDERSTATUS" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
             & "       OIT0002.ORDERNO = OIT0003.ORDERNO" _
@@ -1767,6 +1769,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , @P01                                           AS ORDERNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
             & " , ''                                             AS KAMOKU" _
+            & " , ''                                             AS ORDERSTATUS" _
             & " FROM sys.all_objects "
         SQLStr &=
                   " ORDER BY" _
@@ -3619,13 +3622,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA19.Value = ""                                 '空車着駅コード(変更後)
                     PARA20.Value = ""                                 '空車着駅名(変更後)
 
-                    '#受注進行ステータス
-                    If OIT0001row("ORDERSTATUS") = "" Then
-                        '受注進行ステータス(100:受注受付)
-                        PARA21.Value = "100"
-                    Else
-                        PARA21.Value = OIT0001row("ORDERSTATUS")
-                    End If
+                    ''#受注進行ステータス
+                    'If OIT0001row("ORDERSTATUS") = "" Then
+                    '    '受注進行ステータス(100:受注受付)
+                    '    PARA21.Value = "100"
+                    'Else
+                    '    PARA21.Value = OIT0001row("ORDERSTATUS")
+                    'End If
+
+                    '受注進行ステータス(100:受注受付)
+                    PARA21.Value = "100"
 
                     '# 受注情報
                     '交付アラートが「3日以内のタンク車」または「4日～6日のタンク車」の場合

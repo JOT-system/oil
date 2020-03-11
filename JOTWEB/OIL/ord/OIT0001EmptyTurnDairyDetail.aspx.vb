@@ -3622,13 +3622,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA19.Value = ""                                 '空車着駅コード(変更後)
                     PARA20.Value = ""                                 '空車着駅名(変更後)
 
-                    '#受注進行ステータス
-                    If OIT0001row("ORDERSTATUS") = "" Then
-                        '受注進行ステータス(100:受注受付)
-                        PARA21.Value = "100"
-                    Else
-                        PARA21.Value = OIT0001row("ORDERSTATUS")
-                    End If
+                    ''#受注進行ステータス
+                    'If OIT0001row("ORDERSTATUS") = "" Then
+                    '    '受注進行ステータス(100:受注受付)
+                    '    PARA21.Value = "100"
+                    'Else
+                    '    PARA21.Value = OIT0001row("ORDERSTATUS")
+                    'End If
+
+                    '受注進行ステータス(100:受注受付)
+                    PARA21.Value = "100"
 
                     '# 受注情報
                     '交付アラートが「3日以内のタンク車」または「4日～6日のタンク車」の場合

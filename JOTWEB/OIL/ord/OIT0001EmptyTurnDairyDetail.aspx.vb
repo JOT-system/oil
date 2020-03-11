@@ -428,6 +428,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
             & " , ''                                             AS KAMOKU" _
+            & " , ''                                             AS ORDERSTATUS" _
             & " FROM sys.all_objects "
 
             SQLStr &=
@@ -499,6 +500,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')             AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')            AS DETAILNO" _
             & " , ISNULL(RTRIM(OIT0003.KAMOKU), '')              AS KAMOKU" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')         AS ORDERSTATUS" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
             & "       OIT0002.ORDERNO = OIT0003.ORDERNO" _
@@ -1767,6 +1769,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , @P01                                           AS ORDERNO" _
             & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
             & " , ''                                             AS KAMOKU" _
+            & " , ''                                             AS ORDERSTATUS" _
             & " FROM sys.all_objects "
         SQLStr &=
                   " ORDER BY" _

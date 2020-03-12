@@ -28,38 +28,30 @@ function InitDisplay() {
     //〇 更新ボタン活性／非活性
     let objDtabNo = document.getElementById("WF_DTAB_CHANGE_NO").value;
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
-        //更新ボタン活性／非活性(新規登録、更新で切り分け)
+        //油種数登録ボタン活性／非活性(新規登録、更新で切り分け)
         if (document.getElementById('WF_CREATEFLG').value === "1"
             && document.getElementById('WF_SEL_CREATELINKFLG').value === "1") {
             //活性
             document.getElementById("WF_ButtonINSERT").disabled = "";
-            //非活性 
-            //〇タブ１
-            if (objDtabNo === "0") {
-                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";
-                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "";
-                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
-                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
-                //document.getElementById("WF_ButtonCSV").disabled = "disabled";
-                document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
-            }
-            ////〇タブ２
-            //else if (objDtabNo === "1") {
-            //}
-            ////〇タブ３
-            //else if (objDtabNo === "2") {
-            //}
-            ////〇タブ４
-            //else if (objDtabNo === "3") {
-            //}
-
         } else if (document.getElementById('WF_CREATEFLG').value === "2" 
                    || document.getElementById('WF_SEL_CREATELINKFLG').value === "2") {
             //非活性
             document.getElementById("WF_ButtonINSERT").disabled = "disabled";
-            //活性 
-            //〇タブ１
-            if (objDtabNo === "0") {
+        }
+
+        //〇タブ１
+        if (objDtabNo === "0") {
+            if (document.getElementById('WF_MAPButtonControl').value === "1") {
+                //非活性
+                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+                //document.getElementById("WF_ButtonCSV").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+            }
+            else {
+                //活性
                 document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";
                 document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "";
                 document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "";
@@ -67,16 +59,27 @@ function InitDisplay() {
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
             }
-            ////〇タブ２
-            //else if (objDtabNo === "1") {
-            //}
-            ////〇タブ３
-            //else if (objDtabNo === "2") {
-            //}
-            ////〇タブ４
-            //else if (objDtabNo === "3") {
-            //}
         }
+        //〇タブ２
+        else if (objDtabNo === "1") {
+            if (document.getElementById('WF_MAPButtonControl').value === "1") {
+                //非活性
+                document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "disabled";
+                document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "disabled";
+            }
+            else {
+                //活性
+                document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "";
+                document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "";
+            }
+        }
+        //〇タブ３
+        else if (objDtabNo === "2") {
+            document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
+        }
+        ////〇タブ４
+        //else if (objDtabNo === "3") {
+        //}
 
     } else {
         //非活性 
@@ -97,10 +100,6 @@ function InitDisplay() {
         }
         //〇タブ３
         else if (objDtabNo === "2") {
-            document.getElementById("WF_ButtonALLSELECT_TAB3").disabled = "disabled";
-            document.getElementById("WF_ButtonSELECT_LIFTED_TAB3").disabled = "disabled";
-            document.getElementById("WF_ButtonLINE_LIFTED_TAB3").disabled = "disabled";
-            document.getElementById("WF_ButtonLINE_ADD_TAB3").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
         }
         ////〇タブ４
@@ -226,6 +225,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         }
         else if (fieldNM === "FILLINGPOINT") {
             document.getElementById('WF_LeftMViewChange').value = 52;
+        }
+        else if (fieldNM === "JOINT") {
+            document.getElementById('WF_LeftMViewChange').value = 53;
         }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 

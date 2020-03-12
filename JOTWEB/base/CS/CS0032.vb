@@ -139,30 +139,48 @@ Public Structure CS0032TABLERecover
         '○退避処理
 
         Try
-            Dim WW_LineData As String
+            'Dim WW_LineData As String
             Dim WW_Row As DataRow
+            '書込ファイル（追加書き込み）を開く
             Using fs As New FileStream(FILEDIR, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
-                  str As New System.IO.StreamReader(fs, System.Text.Encoding.UTF8),
-                  sr = New StringReader(str.ReadToEnd())
-                Do
-                    WW_LineData = sr.ReadLine()
-                    If WW_LineData = Nothing Then
-                        Exit Do
-                    End If
-
-                    Dim WW_item() As String = WW_LineData.Split(ControlChars.Tab)
-
-                    'データ格納行データ準備
+                  parser As New FileIO.TextFieldParser(fs,
+                            System.Text.Encoding.UTF8)
+                parser.TextFieldType = FileIO.FieldType.Delimited
+                parser.SetDelimiters(ControlChars.Tab)
+                parser.HasFieldsEnclosedInQuotes = True
+                parser.TrimWhiteSpace = False
+                While (parser.EndOfData = False)
+                    Dim row = parser.ReadFields()
                     WW_Row = OUTTBL.NewRow
-
                     For i As Integer = 0 To OUTTBL.Columns.Count - 1
-                        WW_Row.Item(i) = WW_item(i)
-                    Next
-
+                        WW_Row.Item(i) = row(i)
+                    Next i
                     OUTTBL.Rows.Add(WW_Row)
-                Loop
-                str.Close()
-            End Using 'fs,str,sr
+                End While
+            End Using 'saveFs, parser
+
+            'Using fs As New FileStream(FILEDIR, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+            '      str As New System.IO.StreamReader(fs, System.Text.Encoding.UTF8),
+            '      sr = New StringReader(str.ReadToEnd())
+            '    Do
+            '        WW_LineData = sr.ReadLine()
+            '        If WW_LineData = Nothing Then
+            '            Exit Do
+            '        End If
+
+            '        Dim WW_item() As String = WW_LineData.Split(ControlChars.Tab)
+
+            '        'データ格納行データ準備
+            '        WW_Row = OUTTBL.NewRow
+
+            '        For i As Integer = 0 To OUTTBL.Columns.Count - 1
+            '            WW_Row.Item(i) = WW_item(i)
+            '        Next
+
+            '        OUTTBL.Rows.Add(WW_Row)
+            '    Loop
+            '    str.Close()
+            'End Using 'fs,str,sr
 
         Catch ex As Exception
             ERR = C_MESSAGE_NO.SYSTEM_ADM_ERROR

@@ -62,7 +62,7 @@
             <!-- 積込日 -->
             <div class="inputItem">
                 <a id="WF_LOADINGDATE_LABEL" class="requiredMark">積込日</a>
-                <a class="ef" id="WF_LOADINGDATE" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('TxtLoadingDateStart');">
+                <a class="ef" id="WF_LOADINGDATE" ondblclick="Field_DBclick('TxtLoadingDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="return false;TextBox_change('TxtLoadingDateStart');">
                     <asp:TextBox ID="TxtLoadingDateStart" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
                 <a id="WF_LOADINGDATE_SYMBOL">

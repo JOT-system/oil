@@ -114,7 +114,7 @@
                 <span class="left">
                     <a id="WF_SHIPPERS_LABEL" class="requiredMark">荷主</a>
                     <a class="ef" id="WF_SHIPPERSCODE" ondblclick="Field_DBclick('TxtShippersCode', <%=LIST_BOX_CLASSIFICATION.LC_SHIPPERSLIST%>);" onchange="TextBox_change('TxtShippersCode');">
-                        <asp:TextBox ID="TxtShippersCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtShippersCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                     </a>
                 </span>
                 <span>
@@ -128,7 +128,7 @@
                 <span>
                     <a id="WF_CONSIGNEE_LABEL" class="requiredMark">荷受人</a>
                     <a class="ef" id="WF_CONSIGNEECODE" ondblclick="Field_DBclick('TxtConsigneeCode', <%=LIST_BOX_CLASSIFICATION.LC_CONSIGNEELIST%>);" onchange="TextBox_change('TxtConsigneeCode');">
-                        <asp:TextBox ID="TxtConsigneeCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtConsigneeCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                     </a>
                 </span>
                 <span class ="left">
@@ -143,7 +143,7 @@
                 <span class="left">
                     <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
                     <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstationCode');">
-                        <asp:TextBox ID="TxtDepstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtDepstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
                     </a>
                 </span>
                 <span>
@@ -157,7 +157,7 @@
                 <span>
                     <a id="WF_ARRSTATION_LABEL" class="requiredMark">着駅</a>
                     <a class="ef" id="WF_ARRSTATIONCODE" ondblclick="Field_DBclick('TxtArrstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstationCode');">
-                        <asp:TextBox ID="TxtArrstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtArrstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
                     </a>
                 </span>
                 <span class ="left">
@@ -658,6 +658,8 @@
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
         <!-- 託送指示フラグ -->
         <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
+        <!-- 画面ボタン制御 -->
+        <input id="WF_MAPButtonControl" runat="server" value="0" type="text" />
         <!-- DetailBox Mview切替 -->
         <input id="WF_DTAB_CHANGE_NO" runat="server" value="" type="text"/>
         <!-- ヘッダーを表示するか保持、"1"(表示:初期値),"0"(非表示)  -->

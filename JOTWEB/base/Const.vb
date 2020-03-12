@@ -229,6 +229,52 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const C_MAX_YMD As String = "2099/12/31"
 
+#Region "営業所"
+    ''' <summary>
+    ''' 東北支店
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010401 As String = "010401"
+    ''' <summary>
+    ''' 仙台新港営業所
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010402 As String = "010402"
+
+    ''' <summary>
+    ''' 関東支店
+    ''' </summary>
+    Public Const CONST_OFFICECODE_011401 As String = "011401"
+    ''' <summary>
+    ''' 五井営業所
+    ''' </summary>
+    Public Const CONST_OFFICECODE_011201 As String = "011201"
+    ''' <summary>
+    ''' 甲子営業所
+    ''' </summary>
+    Public Const CONST_OFFICECODE_011202 As String = "011202"
+    ''' <summary>
+    ''' 袖ヶ浦営業所
+    ''' </summary>
+    Public Const CONST_OFFICECODE_011203 As String = "011203"
+    ''' <summary>
+    ''' 根岸営業所
+    ''' </summary>
+    Public Const CONST_OFFICECODE_011402 As String = "011402"
+
+    ''' <summary>
+    ''' 中部支店
+    ''' </summary>
+    Public Const CONST_OFFICECODE_012301 As String = "012301"
+    ''' <summary>
+    ''' 四日市営業所
+    ''' </summary>
+    Public Const CONST_OFFICECODE_012401 As String = "012401"
+    ''' <summary>
+    ''' 三重塩浜営業所
+    ''' </summary>
+    Public Const CONST_OFFICECODE_012402 As String = "012402"
+
+#End Region
+
 #Region "受注情報"
     ''' <summary>
     ''' 積置
@@ -376,9 +422,17 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_300 As String = "300"
     ''' <summary>
+    ''' 350:受注確定((実績)発日設定済み)
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_350 As String = "350"
+    ''' <summary>
     ''' 400:受入確認中
     ''' </summary>
     Public Const CONST_ORDERSTATUS_400 As String = "400"
+    ''' <summary>
+    ''' 450:受入確認中((実績)受入日設定済み)
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_450 As String = "450"
     ''' <summary>
     ''' 500:検収中
     ''' </summary>

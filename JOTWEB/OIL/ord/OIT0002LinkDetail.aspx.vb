@@ -64,6 +64,12 @@ Public Class OIT0002LinkDetail
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     Master.RecoverTable(OIT0002tbl)
+
+                    '○ 画面編集データ取得＆保存(サーバー側で設定した内容を取得し保存する。)
+                    If CS0013ProfView.SetDispListTextBoxValues(OIT0002tbl, pnlListArea) Then
+                        Master.SaveTable(OIT0002tbl)
+                    End If
+
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonRegister"        '登録ボタン押下
                             WF_ButtonINSERT_Click()
@@ -396,8 +402,8 @@ Public Class OIT0002LinkDetail
             & " , CAST(OIT0004.UPDTIMSTP AS bigint)             AS UPDTIMSTP " _
             & " , 1                                             AS 'SELECT' " _
             & " , 0                                             AS HIDDEN " _
-            & " , ISNULL(RTRIM(OIT0004.LINETRAINNO), '   ')     AS LINETRAINNO " _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '   ')       AS LINEORDER " _
+            & " , ISNULL(RTRIM(OIT0004.LINETRAINNO), '')        AS LINETRAINNO " _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), '')          AS LINEORDER " _
             & " , ISNULL(RTRIM(OIT0004.TANKNUMBER), '')         AS TANKNUMBER " _
             & " , ISNULL(RTRIM(OIT0004.PREOILCODE), '')         AS PREOILCODE " _
             & " , ISNULL(RTRIM(OIT0004.PREOILNAME), '')         AS PREOILNAME " _
@@ -1843,9 +1849,11 @@ Public Class OIT0002LinkDetail
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         Select Case WF_FIELD.Value
+            '(★サーバー側で設定しているため必要ないが念のため残す(20200302))
             Case "LINETRAINNO"          '入線番号
                 updHeader.Item("LINETRAINNO") = WW_ListValue
 
+            '(★サーバー側で設定しているため必要ないが念のため残す(20200302))
             Case "LINEORDER"            '入線順序
                 updHeader.Item("LINEORDER") = WW_ListValue
 
@@ -2222,6 +2230,7 @@ Public Class OIT0002LinkDetail
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
         Dim iresult As Integer
+        Dim decChkDay As Decimal
 
         '○ 過去日付チェック
         '例) iresult = dt1.Date.CompareTo(dt2.Date)
@@ -2232,25 +2241,41 @@ Public Class OIT0002LinkDetail
         '(予定)空車着日 と　利用可能日を比較
         iresult = Date.Parse(TxtEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
         If iresult = 1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
-            TxtEmpDate.Focus()
-            WW_CheckMES1 = "(予定)空車着日"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
+            decChkDay = (Date.Parse(TxtEmpDate.Text) - Date.Parse(AvailableYMD.Text)).TotalDays
+            '(予定)空車着日 と　利用可能日の日数を取得し判断
+            '1 : (予定)空車着日が利用可能日の翌日の日付
+            '2 : (予定)空車着日が利用可能日の翌々日の日付
+            '※2以上の日数は未来日としてエラーの位置づけとする。
+            If decChkDay > 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+                TxtEmpDate.Focus()
+                WW_CheckMES1 = "(予定)空車着日"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_Y
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
 
         '(実績)空車着日 と　利用可能日を比較
-        iresult = Date.Parse(TxtActEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
-        If iresult = 1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
-            TxtActEmpDate.Focus()
-            WW_CheckMES1 = "(実績)空車着日"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
+        If TxtActEmpDate.Text <> "" Then
+            iresult = Date.Parse(TxtActEmpDate.Text).CompareTo(Date.Parse(AvailableYMD.Text))
+            If iresult = 1 Then
+                decChkDay = (Date.Parse(TxtActEmpDate.Text) - Date.Parse(AvailableYMD.Text)).TotalDays
+                '(実績)空車着日 と　利用可能日の日数を取得し判断
+                '1 : (実績)空車着日が利用可能日の翌日の日付
+                '2 : (実績)空車着日が利用可能日の翌々日の日付
+                '※2以上の日数は未来日としてエラーの位置づけとする。
+                If decChkDay > 1 Then
+                    Master.Output(C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+                    TxtActEmpDate.Focus()
+                    WW_CheckMES1 = "(実績)空車着日"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_AVAILABLEDATE_ERROR_J
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            End If
         End If
 
     End Sub

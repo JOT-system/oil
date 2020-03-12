@@ -270,7 +270,7 @@ Public Class OIM0004StationList
             & " , 1                                           AS 'SELECT'" _
             & " , 0                                           AS HIDDEN" _
             & " , ISNULL(RTRIM(OIM0004.STATIONCODE), '')      AS STATIONCODE" _
-            & " , ISNULL(RTRIM(OIM0004.BRANCH), '   ')        AS BRANCH" _
+            & " , ISNULL(RTRIM(OIM0004.BRANCH), '')           AS BRANCH" _
             & " , ISNULL(RTRIM(OIM0004.STATONNAME), '')       AS STATONNAME" _
             & " , ISNULL(RTRIM(OIM0004.STATIONNAMEKANA), '')  AS STATIONNAMEKANA" _
             & " , ISNULL(RTRIM(OIM0004.TYPENAME), '')         AS TYPENAME" _

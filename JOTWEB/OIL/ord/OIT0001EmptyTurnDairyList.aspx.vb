@@ -255,9 +255,10 @@ Public Class OIT0001EmptyTurnDairyList
             & " , 1                                                  AS 'SELECT'" _
             & " , 0                                                  AS HIDDEN" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '   ')          AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
@@ -292,9 +293,10 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
-            & " WHERE OIT0002.OFFICECODE = @P1" _
-            & "   AND OIT0002.LODDATE    >= @P2" _
-            & "   AND OIT0002.DELFLG     <> @P3"
+            & " WHERE OIT0002.OFFICECODE   = @P1" _
+            & "   AND OIT0002.LODDATE      >= @P2" _
+            & "   AND OIT0002.DELFLG       <> @P3" _
+            & "   AND OIT0002.EMPTYTURNFLG <> '2'"
         '& "   AND OIT0002.TRAINNO    = @P4"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
@@ -505,6 +507,7 @@ Public Class OIT0001EmptyTurnDairyList
     Protected Sub WF_ButtonLINE_LIFTED_Click()
 
         Dim SelectChk As Boolean = False
+        Dim intTblCnt As Integer = 0
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0001tbl)
@@ -548,6 +551,7 @@ Public Class OIT0001EmptyTurnDairyList
             '選択されている行は削除対象
             Dim i As Integer = 0
             Dim j As Integer = 9000
+            intTblCnt = OIT0001tbl.Rows.Count
             For Each OIT0001UPDrow In OIT0001tbl.Rows
                 If OIT0001UPDrow("OPERATION") = "on" Then
 
@@ -592,8 +596,14 @@ Public Class OIT0001EmptyTurnDairyList
         Master.SaveTable(OIT0001tbl)
 
         '○メッセージ表示
-        If SelectChk = False Then
+        '一覧件数が０件の時の行削除の場合
+        If intTblCnt = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_DELDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+            '一覧件数が１件以上で未選択による行削除の場合
+        ElseIf SelectChk = False Then
             Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
         Else
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
@@ -618,6 +628,8 @@ Public Class OIT0001EmptyTurnDairyList
         work.WF_SEL_INFORMATION.Text = ""
         '受注営業所名
         work.WF_SEL_ORDERSALESOFFICE.Text = ""
+        '空回日報可否フラグ(0：未作成, 1:作成)
+        work.WF_SEL_EMPTYTURNFLG.Text = "1"
 
         '本線列車
         work.WF_SEL_TRAIN.Text = ""
@@ -751,6 +763,9 @@ Public Class OIT0001EmptyTurnDairyList
         work.WF_SEL_INFORMATION.Text = OIT0001tbl.Rows(WW_LINECNT)("ORDERINFO")
         '受注営業所名
         work.WF_SEL_ORDERSALESOFFICE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICENAME")
+        '空回日報可否フラグ(0：未作成, 1:作成)
+        work.WF_SEL_EMPTYTURNFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("EMPTYTURNFLG")
+
         '本線列車
         work.WF_SEL_TRAIN.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNO")
         '発駅

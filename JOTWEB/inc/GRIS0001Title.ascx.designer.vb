@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class GRIS0001Title
-
+    
     '''<summary>
     '''titlebox コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class GRIS0001Title
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents titlebox As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-
+    
     '''<summary>
     '''WF_TITLEID コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class GRIS0001Title
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_TITLEID As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''WF_TITLETEXT コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class GRIS0001Title
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_TITLETEXT As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''WF_TITLECAMP コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class GRIS0001Title
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_TITLECAMP As Global.System.Web.UI.WebControls.Label
-
+    
     '''<summary>
     '''WF_TITLEDATE コントロール。
     '''</summary>

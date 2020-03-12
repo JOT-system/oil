@@ -361,6 +361,10 @@ function trainLockEvent(callerObj,initCall) {
         let obj = inputObjList[i];
         let displayVal = 'inline-block';
         if (disabled === true) {
+            // オーダー作成をされるとこまるので使用不可にした場合はチェックを外す
+            if (obj.type.toUpperCase() === 'CHECKBOX') {
+                obj.checked = false;
+            }
             /* ただ単にDisabledにするとPostBackでサーバー側では受け取れなくなるため */
             /* 使用不可のクローンを作成しクローン元を非表示にする */
             let cloneItem = obj.cloneNode();
@@ -420,7 +424,7 @@ function bindNumericKeyPressOnly(targetTextBoxList) {
         textObj.addEventListener('keypress', CheckNum);
 
         textObj.style.imeMode = 'disabled';
-
+        textObj.setAttribute('inputmode', 'numeric');
         textObj.addEventListener('change', (function (textObj) {
             return function () {
                 ConvartWideCharToNormal(textObj);

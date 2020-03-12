@@ -621,6 +621,10 @@ Public Class CS0013ProfView
                                 textValue = Convert.ToString(dataRow(fieldName))
                         End Select
                         Dim textTagBase = "<input id=""{0}"" name=""{0}"" style=""width:{1};font-size:{2};height:{3};text-align:{4};"" type=""text"" rownum=""{5}"" value=""{6}"">"
+                        If fieldName.Equals("REMARK") AndAlso
+                           textValue.Contains(ControlChars.CrLf) OrElse textValue.Contains(ControlChars.Lf) Then
+                            textTagBase = "<input id=""{0}"" name=""{0}"" style=""width:{1};font-size:{2};height:{3};text-align:{4};"" type=""text"" rownum=""{5}"" value=""{6}"" data-withenterval=""{6}"">"
+                        End If
 
                         Dim textTagString = String.Format(textTagBase,
                                                           "txt" & Me.TBLOBJ.ID & Convert.ToString(fieldName) & (Integer.Parse(outTDataL.Cells(0).Text)).ToString,
@@ -934,5 +938,83 @@ Public Class CS0013ProfView
         End If
 
     End Function
+    ''' <summary>
+    ''' 変更項目保持アイテムクラス
+    ''' </summary>
+    <System.Runtime.Serialization.DataContract>
+    Public Class ModListFieldItemObj
+        ''' <summary>
+        ''' 行番号
+        ''' </summary>
+        ''' <returns></returns>
+        <System.Runtime.Serialization.DataMember>
+        Public Property LineCnt As String = ""
+        ''' <summary>
+        ''' フィールド名
+        ''' </summary>
+        ''' <returns></returns>
+        <System.Runtime.Serialization.DataMember>
+        Public Property FieldName As String = ""
+        ''' <summary>
+        ''' 変更後値
+        ''' </summary>
+        ''' <returns></returns>
+        <System.Runtime.Serialization.DataMember>
+        Public Property ModValue As String = ""
+    End Class
+    ''' <summary>
+    ''' Json形式の文字データをリスト変数に変換
+    ''' </summary>
+    ''' <param name="encStr">Json形式文字列</param>
+    ''' <returns></returns>
+    Private Shared Function DecValue(encStr As String) As List(Of ModListFieldItemObj)
+        Dim retVal As List(Of ModListFieldItemObj)
+        Dim sw As New System.Runtime.Serialization.Json _
+          .DataContractJsonSerializer(GetType(List(Of ModListFieldItemObj)))
+        Using ms = New IO.MemoryStream(Encoding.UTF8.GetBytes(encStr), False)
+            retVal = DirectCast(sw.ReadObject(ms), List(Of ModListFieldItemObj))
+        End Using
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 画面上の入力した値を取得しデータテーブルにセットする
+    ''' </summary>
+    ''' <param name="dt">[I/O]データテーブル</param>
+    ''' <param name="pnlObj">[I]テーブルを設定しているパネルオブジェクト</param>
+    ''' <returns>True:変更データあり,False:変更データなし</returns>
+    ''' <remarks>戻り値でセーブするか判断可能にしています、一律保存してるなら戻り値省略でコール</remarks>
+    Public Shared Function SetDispListTextBoxValues(dt As DataTable, pnlObj As Panel) As Boolean
+        Dim retVal As Boolean = False
+        'パネルオブジェクト未存在やデータテーブルにデータが無い場合は意味がないのでそのまま終了
+        If pnlObj Is Nothing OrElse dt Is Nothing OrElse dt.Rows.Count = 0 Then
+            Return retVal
+        End If
+        'Json形式のデータが収められているFormIdを生成 (パネルID + modval）
+        Dim modJasonValuesObjName As String = pnlObj.ID & "modval"
 
+        Dim modJsonValues As String = ""
+        If pnlObj.Page.Request.Form.GetValues(modJasonValuesObjName) IsNot Nothing Then
+            modJsonValues = pnlObj.Page.Request.Form.GetValues(modJasonValuesObjName)(0)
+        End If
+
+        '変更情報が無ければ終了
+        If modJsonValues = "" Then
+            Return retVal
+        End If
+        'Json形式からリスト変数に変換
+        Dim decValList = DecValue(modJsonValues)
+        '変更一覧をループ
+        For Each decValItm In decValList
+            '渡されたデータテーブルに変更フィールド名が無ければスキップ
+            If dt.Columns.Contains(decValItm.FieldName) = False Then
+                Continue For
+            End If
+            Dim targetDr = (From itm As DataRow In dt Where Convert.ToString(itm("LINECNT")) = decValItm.LineCnt).FirstOrDefault
+            If targetDr IsNot Nothing Then
+                retVal = True '変更有判定ON
+                targetDr(decValItm.FieldName) = decValItm.ModValue '変更値をデータテーブルに格納
+            End If
+        Next decValItm
+        Return retVal
+    End Function
 End Class

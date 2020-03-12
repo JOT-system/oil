@@ -106,6 +106,9 @@ window.addEventListener('DOMContentLoaded', function () {
     // 暫定（日付をやるならvb側をいじる）グリッド内のテキストボックス(グリッド内のtdにダブルクリックイベントがあるテキストボックス)
     queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=text]";
     queryString = queryString + ",div[data-generated='1'] td[ondblclick] > input[type=number]";
+    // リッチテキスト用
+    queryString = queryString + ",div[data-generated='1'] td > input[type=text][id^='txt'][id*='REMARK']";
+
     var targetTextBoxList = document.querySelectorAll(queryString);
     if (targetTextBoxList !== null) {
         document.forms[0].style.display = 'none'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
@@ -133,6 +136,7 @@ window.addEventListener('DOMContentLoaded', function () {
     if (numericTextObjList !== null) {
         for (let i = 0; i < numericTextObjList.length; i++) {
             let numericObj = numericTextObjList[i];
+            numericObj.setAttribute('inputmode', 'numeric');
             numericObj.addEventListener('change', (function (numericObj) {
                 return function () {
                     ConvartWideCharToNormal(numericObj);
@@ -140,6 +144,11 @@ window.addEventListener('DOMContentLoaded', function () {
             })(numericObj), true);
         }
     }
+    /* ************************************ */
+    /* 一覧表変更情報を保持するための       */
+    /* イベントバインド                     */
+    /* ************************************ */
+    bindcommonListChangedInput();
 });
 
 // 処理後カーソルを戻す
@@ -156,6 +165,12 @@ function AdjustHeaderFooterContents(footerContentsId) {
     var footerClientRect = footerContentObj.getBoundingClientRect();
     /* 12はWrapperObjのPadding-Bottom*/
     let otherContntsHeight = footerContentObj.offsetTop;
+    
+    if (navigator.userAgent.match(/Edge\/(13|14|15|16|17|18)/)) {
+        let otherObj = footerContentObj.parentNode;
+        let otherHeight = otherObj.offsetHeight - otherObj.clientHeight;
+        otherContntsHeight = otherHeight + otherContntsHeight;
+    }
     footerContentObj.style.height = "calc(100% - " + otherContntsHeight + "px)";
 }
 // ポップアップ確認
@@ -934,6 +949,11 @@ function bindListCommonEvents(listObjId, isPostBack, adjustHeight, keepHScrollWh
                                 return false;
                             }
                         }
+                        // スクロール前に変更FocusOutしイベントを発火させる
+                        let actvElm = document.activeElement;
+                        if (actvElm !== null) {
+                            actvElm.blur();
+                        } 
                         objSubmit.value = 'TRUE';
                         //objMouseWheel.value = '-';
                         objEventHandler.value = "WF_MouseWheelDown";
@@ -945,6 +965,11 @@ function bindListCommonEvents(listObjId, isPostBack, adjustHeight, keepHScrollWh
                 // ↓キー押下時
                 if (window.event.keyCode === 40) {
                     if (objSubmit.value === 'FALSE') {
+                        // スクロール前に変更FocusOutしイベントを発火させる
+                        let actvElm = document.activeElement;
+                        if (actvElm !== null) {
+                            actvElm.blur();
+                        } 
                         objSubmit.value = 'TRUE';
                         //objMouseWheel.value = '+';
                         objEventHandler.value = "WF_MouseWheelUp";
@@ -1043,6 +1068,98 @@ function commonListScroll(listObj) {
     leftDataTableObj.scrollTop = rightDataTableObj.scrollTop; // 上下連動させる
 }
 /**
+ * リストボックスの変更をキャッチするイベントを追加
+ * @return {undefined} なし
+ * @example 個別ページからの使用想定はなし,data-generatedのinputタグの変更を保持する
+ */
+function bindcommonListChangedInput() {
+    let pnlObjects = document.querySelectorAll("div[data-generated='1']");
+    if (pnlObjects === null) {
+        return;
+    }
+    /* パネルループ複数パネルを考慮 */
+    for (let i = 0; i < pnlObjects.length; i++) {
+        let pnlObj = pnlObjects[i];
+        let inputTextObjects = pnlObj.querySelectorAll("input[type='text']");
+        /* 一覧にテキストボックスが存在しなければ次のパネルへスキップ */
+        if (inputTextObjects === null) {
+            continue;
+        }
+        if (inputTextObjects.length === 0) {
+            continue;
+        }
+        /* パネルのIDを取得 */
+        let pnlId = pnlObj.id;
+        /* 変更フィールド保持用のhiddenタグをパネル内に生成 */
+        let hiddenModInfoItem = document.createElement('input');
+        hiddenModInfoItem.type = 'hidden';
+        let hiddenModInfoItemId = pnlId + 'modval';
+        hiddenModInfoItem.id = hiddenModInfoItemId;
+        hiddenModInfoItem.name = hiddenModInfoItemId;
+        pnlObj.appendChild(hiddenModInfoItem);
+        
+        /* パネル内のテキストボックスオブジェクトループ */
+        for (let j = 0; j < inputTextObjects.length; j++) {
+            /* テキストボックスのIDよりフィールド名取得
+             * txt[panelId]フィールド名lineCntでフィールド名以外を除去する */
+            let inputTextObj = inputTextObjects[j];
+            let lineCnt = inputTextObj.attributes.getNamedItem("rownum").value;
+            let fieldName = inputTextObj.id.substring(("txt" + pnlId).length);
+            fieldName = fieldName.substring(0, fieldName.length - lineCnt.length);
+            /* 変更イベントをバインド */
+            inputTextObj.parentNode.addEventListener('change', (function (inputTextObj, lineCnt, fieldName, hiddenModInfoItemId) {
+                return function () {
+                    commonListChangedInput(inputTextObj, lineCnt, fieldName,  hiddenModInfoItemId);
+                };
+            })(inputTextObj, lineCnt, fieldName, hiddenModInfoItemId), false);
+        }
+    }
+
+}
+/**
+ * リストボックスの変更をキャッチするイベントを追加
+ * @param {Element} inputTextObj テキストボックス
+ * @param {string} lineCnt 行番号
+ * @param {string} fieldName フィールド名
+ * @param {string} hiddenModInfoItemId 変更フィールド保持hiddenID
+ * @return {undefined} なし
+ * @example 個別ページからの使用想定はなし,data-generatedのinputタグの変更を保持する
+ */
+function commonListChangedInput(inputTextObj, lineCnt, fieldName, hiddenModInfoItemId) {  
+    let hdnObj = document.getElementById(hiddenModInfoItemId);
+    if (hdnObj === null) {
+        return;
+    }
+    /* 変更フィールド情報の文字列をJson配列に変換 */
+    let modValuesString = hdnObj.value;
+    let jsonVal = [];
+    if (modValuesString !== '') {
+        jsonVal = JSON.parse(modValuesString);
+    }
+    /* 一旦対象LineCnt,フィールド名を削除 */
+    // 配列より削除
+    let removedjsonValObj = jsonVal.filter(function (itm) { return !(itm.FieldName === fieldName && itm.LineCnt === lineCnt);  });
+    jsonVal = removedjsonValObj;
+
+    let modVal = inputTextObj.value;
+    if (inputTextObj.hasAttribute("data-withenterval")) {
+        modVal = inputTextObj.dataset.withenterval;
+    }
+    
+    let modItem;
+    modItem = {
+        FieldName: fieldName,
+        LineCnt: lineCnt,
+        ModValue: modVal
+    };
+    jsonVal.push(modItem);
+    encodedValue = '';
+    if (jsonVal.length > 0) {
+        encodedValue = JSON.stringify(jsonVal);
+    }
+    hdnObj.value = encodedValue;
+}
+/**
  * リストの高さを調節する
  * @param {string}listId リスト全体のオブジェクトID
  * @example 個別ページからの使用想定はなし(bindListCommonEventsから設定)
@@ -1129,6 +1246,11 @@ function commonListMouseWheel(event) {
             objEventHandler.value = "WF_MouseWheelDown";
 
         }
+        // スクロール前に変更FocusOutしイベントを発火させる
+        let actvElm = document.activeElement;
+        if (actvElm !== null) {
+            actvElm.blur();
+        } 
         objSubmit.value = "TRUE";
         document.body.style.cursor = "wait";
         document.forms[0].submit();                            //aspx起動
@@ -1598,7 +1720,17 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
             additionalClass = 'calendarIconArea';
         }
         if (parentObj.tagName === 'TD') {
-            inputObj.classList.add('boxIcon');
+            if (inputObj.id.indexOf('REMARK') > -1) {
+                additionalClass = 'richTextIconArea';
+                inputObj.classList.add('richTextIcon');
+                inputObj.classList.add('iconOnly');
+                inputObj.readOnly = 'readonly';
+            } else if (inputObj.id.indexOf('DATE') > -1) {
+                additionalClass = 'calendarIconArea';
+                inputObj.classList.add('calendarIcon');
+            } else {
+                inputObj.classList.add('boxIcon');
+            }
         }
         let iconElm = document.createElement('div');
         let inputObjId = inputObj.id;
@@ -1623,7 +1755,7 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
             };
         })(inputObjId), false);
         //フォーカス保持用
-        parentObj.addEventListener('dblclick', (function (inputObjId) {
+        parentObj.addEventListener('dblclick', (function (inputObjId, additionalClass) {
             return function () {
                 var saveKey = document.title + "currentItemId";
                 sessionStorage.setItem(saveKey, inputObjId);
@@ -1632,8 +1764,12 @@ function commonAppendInputBoxIcon(targetTextBoxList) {
                     saveScrollKey = document.title + "contentsXpos";
                     sessionStorage.setItem(saveScrollKey, divContensboxObj.scrollLeft);
                 }
+                if (additionalClass === 'richTextIconArea') {
+                    commonRichTextInputOpen(inputObjId);
+                    event.stopPropagation(); // 行のダブルクリックに伝達させない
+                }
             };
-        })(inputObjId), true);
+        })(inputObjId, additionalClass), true);
         // アイコン配置後のテキストボックスのサイズを補正(アイコンが無い状態に合わせる)
         inputObj = document.getElementById(inputObj.id);
         //iconElm = document.getElementById(objId);
@@ -1790,7 +1926,30 @@ function commonHideWait() {
         document.body.removeChild(hasElm);
     }
 }
-
+// 〇数値のみ入力可能 一旦callerObj以外の引数無視
+function commonAutoDecPoint(callerObj, decPint, totalLength) {
+    // 呼出し元オブジェクト
+    if (callerObj === null) {
+        return;
+    }
+    let targetObj = callerObj;
+    if (callerObj.tagName.toLowerCase() !== "input") {
+        targetObj = callerObj.querySelector("input");
+    }
+    // デフォルト値
+    let defVal = '00.000';
+    let inpValue = targetObj.value;
+    // 一旦小数点は除去
+    inpValue = inpValue.replace(/[.]/g, '');
+    // 除去した結果の長さが5以外ならデフォルト
+    if (inpValue.length !== 5) {
+        inpValue = defVal;
+    } else {
+        // 2文字目まで + "." + 3文字目以降を設定
+        inpValue = inpValue.substring(0, 2) + "." + inpValue.substring(2)
+    }
+    targetObj.value = inpValue;
+}
 // 〇数値のみ入力可能
 function CheckNum() {
     if (event.keyCode < 48 || event.keyCode > 57) {
@@ -1819,4 +1978,120 @@ function ConvartWideCharToNormal(obj) {
     repVal = repVal.replace(/[^-^0-9^\.]/g, "");
     //repVal = repVal.match(/-?\d+\.?\d*/);
     obj.value = repVal;
-}  
+}
+/**
+ *  リッチテキスト入力画面オープン
+ * @param {string} inputObjId 入力テキストID
+ * @return {undefined} なし
+ * @description 
+ */
+function commonRichTextInputOpen(inputObjId) {
+    //let targetObjects = 
+    let textObj = document.getElementById(inputObjId);
+    let richTextWrapperId = 'pnlCommonRichTextWrapper';
+    let richTextWrapper = document.getElementById(richTextWrapperId);
+    // 既に同IDのオブジェクトが存在していた場合はクリア
+    if (document.getElementById(richTextWrapperId) !== null) {
+        richTextWrapper.parentNode.removeChild(richTextWrapper);
+    }
+    // 全体を覆うDivを生成
+    richTextWrapper = document.createElement('div');
+    richTextWrapper.id = richTextWrapperId;
+    // 中央に配置するコンテンツを生成
+    let richTextContents = document.createElement('div');
+    richTextContents.id = 'pnlCommonRichTextContents';
+    // タイトルバー設定
+    let richTextTitle = document.createElement('div');
+    richTextTitle.id = 'pnlCommonRichTextTitle';
+    // アイコン
+    let richTextTitleIcon = document.createElement('div');
+    richTextTitleIcon.id = 'pnlCommonRichTextTitleIcon';
+    // 決定、キャンセルボタン設定
+    let cancelButton = document.createElement('input');
+    cancelButton.id = 'btnCommonRichTextCancel';
+    cancelButton.type = 'button';
+    cancelButton.value = "キャンセル";
+    cancelButton.addEventListener('click', function () {
+        let richTextWrapper = document.getElementById(richTextWrapperId);
+        // 既に同IDのオブジェクトが存在していた場合はクリア
+        if (document.getElementById(richTextWrapperId) !== null) {
+            richTextWrapper.parentNode.removeChild(richTextWrapper);
+        }
+        document.forms[0].disabled = false;
+    });
+
+    let okButton = document.createElement('input');
+    okButton.id = 'btnCommonRichTextOk';
+    okButton.type = 'button';
+    okButton.value = "OK";
+    // 画面キーダウンイベントのバインド
+    okButton.addEventListener('click', (function (textObj) {
+        return function () {
+            /* ありえないが呼出し元のテキストボックス、書き込み先のテキストボックスが無ければ終了 */
+            if (textObj === null) {
+                return;
+            }
+
+            let txtRichText = document.getElementById('txtCommonRichText');
+            /* txtRichText */
+            if (txtRichText === null) {
+                return;
+            }
+            /* リッチテキスト入力値をテキストボックスに反映 */
+            let textVal = txtRichText.value.replace(/\\r\\n|\\r|\\n/g, "\r\n");
+            textObj.value = textVal;
+            textObj.dataset.withenterval = textVal;
+            /* テキストボックスの変更イベントを発火 */
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("change", false, true);
+            textObj.parentNode.dispatchEvent(evt);
+            
+            /* 後始末 */
+            let richTextWrapper = document.getElementById(richTextWrapperId);
+            // 既に同IDのオブジェクトが存在していた場合はクリア
+            if (document.getElementById(richTextWrapperId) !== null) {
+                richTextWrapper.parentNode.removeChild(richTextWrapper);
+            }
+            document.forms[0].disabled = false;
+        };
+    })(textObj), false);
+    // リッチテキスト本体エリア
+    let richRichTextArea = document.createElement('div');
+    richRichTextArea.id = 'pnlCommonRichTextArea';
+    // リッチテキストオブジェクト
+    let txtRichText = document.createElement('textarea');
+    txtRichText.id = 'txtCommonRichText';
+    txtRichText.value = textObj.value;
+    if (textObj.hasAttribute("data-withenterval")) {
+        txtRichText.value  = textObj.dataset.withenterval;
+    }
+    // 生成したオブジェクトを組み立て
+    richTextTitle.appendChild(richTextTitleIcon);
+    richTextTitle.appendChild(okButton);
+    richTextTitle.appendChild(cancelButton);
+
+    richRichTextArea.appendChild(txtRichText);
+
+    richTextContents.appendChild(richTextTitle);
+    richTextContents.appendChild(richRichTextArea);
+
+    richTextWrapper.appendChild(richTextContents);
+
+    document.forms[0].disabled = true;
+    document.body.appendChild(richTextWrapper);
+    document.getElementById('txtCommonRichText').focus();
+    return false;
+}
+/**
+ *  新しいタブで開く
+ * @param {string} urlText URL
+ * @return {undefined} なし
+ * @description 
+ */
+function commonOpenNewTab(urlText) {
+
+    let currentForm = document.getElementsByTagName("form")[0];
+    currentForm.target = "_blank";
+    document.forms[0].submit();
+    currentForm.target = '';
+}

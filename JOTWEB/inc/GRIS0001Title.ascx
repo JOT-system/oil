@@ -4,7 +4,7 @@
         <div class="titlebox" id="titlebox" runat="server">
             <table id="tblTitlebox">
                 <tr>
-                    <td rowspan="2">
+                    <td>
                         <asp:Label ID="WF_TITLEID" class="WF_TITLEID" runat="server" Text=""></asp:Label>
                     </td>
                     <td rowspan="2">
@@ -20,6 +20,9 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                       <%=If(Parent.Parent.FindControl("contents1").Page.Title = "M00001", "<span id='spnOpenNewTab' onclick='commonOpenNewTab(""" & ResolveUrl(Parent.Parent.FindControl("contents1").Page.Form.Page.AppRelativeVirtualPath) & """);return false;'>新しいタブを開く</span>", "&nbsp;") %>
+                    </td>
                     <td>
                         <asp:Label ID="WF_TITLEDATE" class="WF_TITLEDATE" runat="server" Text=""></asp:Label>
                     </td>

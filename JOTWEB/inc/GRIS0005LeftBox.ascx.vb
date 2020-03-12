@@ -699,6 +699,12 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER
                 'タンク車番号
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER"
+                '初期ソート順(油種(コード) asc,状態 desc,積車区分asc,車番(数値化)asc)
+                Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "VALUE2," &
+                                                                  "VALUE10 DESC," &
+                                                                  "VALUE11," &
+                                                                  "convert(int,KEYCODE)"
+
                 dispDt = CreateFixValueTable(Params, O_RTN)
                 '上記データテーブルの表示対象項目を定義(フィールド、表示名）
                 dispFieldsDef = New List(Of LeftTableDefItem) From

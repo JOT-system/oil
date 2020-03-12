@@ -304,7 +304,7 @@ div[data-generated='1'] input[type=password] {
 /* テキストボックスアイコン関連 */
 /* **************************** */
 /* 虫眼鏡 */
-.boxIconArea, .calendarIconArea {
+.boxIconArea, .calendarIconArea, .richTextIconArea {
     position: absolute;
     display: table-cell;
     top: 0;
@@ -338,14 +338,26 @@ div[data-generated='1'] input[type=password] {
     opacity: 0.8;
     filter: alpha(opacity=8);
 }
+.richTextIconArea div {
+    width: 16px;
+    height: 16px;
+    margin-top:calc(100% - 8px); /* 全体の高さ - (画像の高さ ÷ 2) */
+    background-image: url('../OIL/img/richText.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.8;
+    filter: alpha(opacity=8);
+}
 /* グリッド内の補正 */
-div[data-generated='1'] .boxIconArea div {
+div[data-generated='1'] .boxIconArea div,
+div[data-generated='1'] .richTextIconArea div {
     margin-top: calc(100% - 12px);
 }
 /* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     .calendarIconArea div,
-    .boxIconArea div {
+    .boxIconArea div,
+    .richTextIconArea div {
         margin-top: calc(100% - 6px);
     }
 }
@@ -357,15 +369,24 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 _:-ms-lang(x)::backdrop, div[data-generated='1'] .boxIconArea div {
     margin-top: calc(100% - 12px);
 }
-
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .richTextIconArea div {
+    margin-top: calc(100% - 8px);
+}
+/* Edgeグリッド内の補正 */
+_:-ms-lang(x)::backdrop, div[data-generated='1'] .richTextIconArea div {
+    margin-top: calc(100% - 12px);
+}
 .boxIconArea div:hover,
-.calendarIconArea div:hover{
-    cursor:pointer;
+.calendarIconArea div:hover,
+.richTextIconArea div:hover {
+    cursor: pointer;
     opacity: 1;
     filter: alpha(opacity=1);
 }
 input[type=text].boxIcon,
 input[type=text].calendarIcon,
+input[type=text].richTextIcon,
 input[type=text].boxIcon,
 input[type=text].calendarIcon,
 input[type=number].boxIcon,
@@ -374,10 +395,12 @@ input[type=number].calendarIcon {
 }
 input[type=text][disabled].boxIcon,
 input[type=text][disabled].calendarIcon,
+input[type=text][disabled].richTextIcon,
 input[type=number][disabled].boxIcon,
 input[type=number][disabled].calendarIcon,
 input[type=text][readonly].boxIcon:not(.iconOnly),
 input[type=text][readonly].calendarIcon:not(.iconOnly),
+input[type=text][readonly].richTextIcon:not(.iconOnly),
 input[type=number][readonly].boxIcon:not(.iconOnly),
 input[type=number][readonly].calendarIcon:not(.iconOnly) {
     padding-left: 0.3em;
@@ -429,12 +452,13 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     border-spacing: 0;
     overflow: hidden;
 }
-#tblTitlebox tr:nth-child(1) td:nth-child(3),
-#tblTitlebox tr:nth-child(2) td:nth-child(1){
+#tblTitlebox tr:nth-child(1) td:nth-child(4),
+#tblTitlebox tr:nth-child(2) td:nth-child(2){
     height:1.2em;
 }
 /* 画面ID */
-#tblTitlebox tr:nth-child(1) td:nth-child(1) {
+#tblTitlebox tr:nth-child(1) td:nth-child(1),
+#tblTitlebox tr:nth-child(2) td:nth-child(1){
     padding-left:10px;
     vertical-align: top;
     width: 180px;
@@ -451,7 +475,7 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     text-align:left;
     width:13em;
 }
-#tblTitlebox tr:nth-child(2) td:nth-child(1) {
+#tblTitlebox tr:nth-child(2) td:nth-child(2) {
     text-align: left;
 }
 /* 右開閉アイコン */
@@ -467,8 +491,8 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     display: block;
     right: 2px;
     bottom: 2px;
-    height: 90%;
-    //width: 28px;
+    width: 32px;
+    height: 30px;
     background-image: url('../img/right.png');
     background-repeat: no-repeat;
     background-size: contain;
@@ -480,6 +504,17 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
     opacity: 1;
     filter: alpha(opacity=1);
 }
+/* 新しいタブ */
+#spnOpenNewTab {
+    font-weight:bold;
+    color:darkcyan ;
+    cursor:pointer;    
+}
+#spnOpenNewTab:hover {
+    color:#ff7474;
+    text-decoration: underline;
+}
+
 /* ********************** */
 /* 共通コンテンツスタイル */
 /* ********************** */
@@ -1662,11 +1697,11 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     border-top-right-radius: 10px;
 }
 
-    #pnlCommonMessageTitle input[type=button] {
-        min-width: 70px;
-        margin-right: 10px;
-        padding:2px;
-    }
+#pnlCommonMessageTitle input[type=button] {
+    min-width: 70px;
+    margin-right: 10px;
+    padding:2px;
+}
 
 #pnlCommonMessageText {
     padding: 10px 10px 15px 15px;
@@ -1733,4 +1768,83 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     max-width: 800px;
     padding-top: 5px;
     vertical-align: middle;
+}
+/* ------------------------------
+共通リッチテキストボックススタイル
+(現状マルチラインテキスト)
+------------------------------ */
+#pnlCommonRichTextWrapper {
+    /* position: absolute; */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap :nowrap;
+}
+#pnlCommonRichTextContents {
+    //position: fixed;
+    //top: 100px;
+    text-align: left;
+    //min-width: 500px;
+    left: calc(50% - 250px);
+    background-color: rgb(240,240,240);
+    box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
+    border-radius: 10px;
+}
+#pnlCommonRichTextTitle {
+    width: calc(100% - 20px);
+    font-weight: bold;
+    padding: 10px;
+    height: 42px;
+    //background-color: #8BACCD;
+    background: linear-gradient(to bottom, #8BACCD, rgb(240,240,240));
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+#pnlCommonRichTextTitleIcon {
+    width: 24px;
+    height: 24px;
+    margin-right:10px;
+    background-image: url('../OIL/img/richText.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    display:inline-block;
+    vertical-align :middle;
+}
+#pnlCommonRichTextTitle input[type=button] {
+    font-size: 15px;
+    min-width: 100px;
+    margin-right: 10px;
+    padding: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: 30px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+#pnlCommonRichTextArea {
+    padding: 0 10px 15px 15px;
+    min-height: 120px;
+}
+#txtCommonRichText {
+    font-size: 19px;
+    min-width: 480px;
+    width: 100%;
+    min-height: 200px;
+    height: 100%;
+    border-radius: 5px;
+    resize: both;
+    max-height: calc(100vh - 100px);
+    max-width: calc(100vw - 60px);
 }

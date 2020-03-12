@@ -76,7 +76,7 @@
             <div class="inputItem">
                 <a id="WF_TRAINNO_LABEL">列車番号</a>
                 <a class="ef" id="WF_TRAINNO">
-                    <asp:TextBox ID="WF_TRAINNO_CODE" runat="server" onblur="MsgClear();" MaxLength="2"></asp:TextBox>
+                    <asp:TextBox ID="WF_TRAINNO_CODE" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
                 </a>
                 <a id="WF_TRAINNO_TEXT">
                     <asp:Label ID="WF_TRAINNO_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>

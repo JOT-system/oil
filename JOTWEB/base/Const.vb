@@ -422,9 +422,17 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_300 As String = "300"
     ''' <summary>
+    ''' 350:受注確定((実績)発日設定済み)
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_350 As String = "350"
+    ''' <summary>
     ''' 400:受入確認中
     ''' </summary>
     Public Const CONST_ORDERSTATUS_400 As String = "400"
+    ''' <summary>
+    ''' 450:受入確認中((実績)受入日設定済み)
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_450 As String = "450"
     ''' <summary>
     ''' 500:検収中
     ''' </summary>

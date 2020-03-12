@@ -4,6 +4,7 @@ Public Class OIT0003WRKINC
     Inherits System.Web.UI.UserControl
 
     Public Const MAPIDS As String = "OIT0003S"       'MAPID(検索)
+    Public Const MAPIDB As String = "OIT0003B"       'MAPID(検索(業務))
     Public Const MAPIDL As String = "OIT0003L"       'MAPID(一覧)
     Public Const MAPIDQ As String = "OIT0003Q"       'MAPID(貨車連結割当)
     Public Const MAPIDD As String = "OIT0003D"       'MAPID(明細)

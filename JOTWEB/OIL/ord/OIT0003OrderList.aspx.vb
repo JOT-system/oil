@@ -365,8 +365,8 @@ Public Class OIT0003OrderList
             & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
             & "        OIS0015_2.CLASS   = 'ORDERINFO' " _
             & "    AND OIS0015_2.KEYCODE = OIT0002.ORDERINFO " _
-            & " WHERE OIT0002.LODDATE    >= @P2" _
-            & "   AND OIT0002.DELFLG     <> @P3"
+            & " WHERE OIT0002.DELFLG     <> @P3" _
+            & "   AND OIT0002.LODDATE    >= @P2"
 
         '20200225(条件変更：登録年月日⇒(予定)積込日に変更)
         '& " WHERE OIT0002.ORDERYMD   >= @P2" _

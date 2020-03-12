@@ -212,13 +212,18 @@ Public Class OIT0004OilStockCreate
                 dispDataObj.MiDispData.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, dispDataObj.MiDispData)
                 '前週出荷平均の取得
                 dispDataObj.MiDispData = GetLastShipAverage(sqlCon, dispDataObj.MiDispData)
+                '既登録データ取得
+                dispDataObj.MiDispData = GetTargetStockData(sqlCon, dispDataObj.MiDispData)
+                '過去日以外の日付について受入数取得
+                dispDataObj.MiDispData = GetReciveFromOrder(sqlCon, dispDataObj.MiDispData)
                 dispDataObj.MiDispData.RecalcStockList(False)
+                'メインクラスに構内取り情報を紐づけ（参照設定）
                 For Each suggestListItem In dispDataObj.SuggestList
                     Dim key = suggestListItem.Key
                     Dim item = dispDataObj.MiDispData.SuggestList(key).SuggestOrderItem
                     suggestListItem.Value.SuggestMiOrderItem = item
                     suggestListItem.Value.RelateMoveInside()
-                Next
+                Next 'suggestListItem
             End If
             '既登録データ抽出
         End Using
@@ -831,7 +836,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
         sqlStr.AppendLine(" WHERE ODR.ACCDATE  　BETWEEN @DATE_FROM AND @DATE_TO")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
-        sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
@@ -840,7 +845,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@DATE_FROM", SqlDbType.Date).Value = dateFrom
                 .Add("@DATE_TO", SqlDbType.Date).Value = dateTo
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
-                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -897,7 +902,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND DTL.OILCODE is not null")
         sqlStr.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @ACTUALDATE_FROM AND @ACTUALDATE_TO")
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
-        sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStr.AppendLine(" GROUP BY DTL.OILCODE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
@@ -906,7 +911,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@ACTUALDATE_FROM", SqlDbType.Date).Value = dateFrom
                 .Add("@ACTUALDATE_TO", SqlDbType.Date).Value = dateTo
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
-                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -1146,7 +1151,7 @@ Public Class OIT0004OilStockCreate
         Return retVal
     End Function
     ''' <summary>
-    ''' 在庫テーブルより既登録データを取得
+    ''' 固定値マスタより構内取りデータ取得
     ''' </summary>
     ''' <param name="sqlCon"></param>
     ''' <param name="dispData"></param>
@@ -3494,8 +3499,9 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <param name="day">格納する日付</param>
         Public Sub New(day As Date)
+            Dim culture = New System.Globalization.CultureInfo("ja-JP")
             Me.KeyString = day.ToString("yyyy/MM/dd")
-            Me.DispDate = day.ToString(DISP_DATEFORMAT)
+            Me.DispDate = day.ToString(DISP_DATEFORMAT, culture)
             Me.ItemDate = day
             Me.IsHoliday = False '一旦False、別処理で設定
             Me.WeekNum = CInt(day.DayOfWeek).ToString

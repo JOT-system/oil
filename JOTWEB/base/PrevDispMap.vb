@@ -66,6 +66,18 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0004C As String = "ASP.OIL_INV_OIT0004OILSTOCKCREATE_ASPX"
         ''' <summary>
+        ''' タンク車所在管理検索
+        ''' </summary>
+        Public Const OIT0005S As String = "ASP.OIL_LOC_OIT0005TANKLOCSEARCH_ASPX"
+        ''' <summary>
+        ''' タンク車所在管理状況
+        ''' </summary>
+        Public Const OIT0005C As String = "ASP.OIL_LOC_OIT0005TANKLOCCONDITION_ASPX"
+        ''' <summary>
+        ''' タンク車所在管理一覧
+        ''' </summary>
+        Public Const OIT0005L As String = "ASP.OIL_LOC_OIT0005TANKLOCLIST_ASPX"
+        ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIS0001S As String = "ASP.OIL_MAS_OIS0001USERSEARCH_ASPX"

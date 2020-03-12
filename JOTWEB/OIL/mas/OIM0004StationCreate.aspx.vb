@@ -418,15 +418,15 @@ Public Class OIM0004StationCreate
         'OIM0004INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text        '会社コード
         'OIM0004INProw("UORG") = work.WF_SEL_UORG.Text                '運用部署
 
-        OIM0004INProw("DELFLG") = WF_DELFLG.Text                     '削除
+        OIM0004INProw("DELFLG") = Me.WF_DELFLG.Text                     '削除
 
-        OIM0004INProw("STATIONCODE") = TxtStationCode.Text           '貨物駅コード
-        OIM0004INProw("BRANCH") = TxtBranch.Text                     '貨物コード枝番
-        OIM0004INProw("STATONNAME") = TxtStationName.Text            '貨物駅名称
-        OIM0004INProw("STATIONNAMEKANA") = TxtStationNameKana.Text   '貨物駅名称カナ
-        OIM0004INProw("TypeName") = TxtTypeName.Text                 '貨物駅種別名称
-        OIM0004INProw("TYPENAMEKANA") = TxtTypeNameKana.Text         '貨物駅種別名称カナ
-        OIM0004INProw("DEPARRSTATIONFLG") = TxtDepArrStation.Text    '発着駅フラグ
+        OIM0004INProw("STATIONCODE") = Me.TxtStationCode.Text           '貨物駅コード
+        OIM0004INProw("BRANCH") = Me.TxtBranch.Text                     '貨物コード枝番
+        OIM0004INProw("STATONNAME") = Me.TxtStationName.Text            '貨物駅名称
+        OIM0004INProw("STATIONNAMEKANA") = Me.TxtStationNameKana.Text   '貨物駅名称カナ
+        OIM0004INProw("TypeName") = Me.TxtTypeName.Text                 '貨物駅種別名称
+        OIM0004INProw("TYPENAMEKANA") = Me.TxtTypeNameKana.Text         '貨物駅種別名称カナ
+        OIM0004INProw("DEPARRSTATIONFLG") = Me.TxtDepArrStation.Text    '発着駅フラグ
 
         '○ 名称取得
         '発着駅フラグ名

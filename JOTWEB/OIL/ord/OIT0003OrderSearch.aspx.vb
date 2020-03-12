@@ -113,6 +113,12 @@ Public Class OIT0003OrderSearch
 
         End If
 
+        '営業所・列車番号・荷卸地・状態を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtSalesOffice.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtTrainNumber.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtUnloading.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtStatus.Attributes("onkeyPress") = "CheckNum()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIT0003WRKINC.MAPIDS
         rightview.MAPID = OIT0003WRKINC.MAPIDL

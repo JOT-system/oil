@@ -1117,7 +1117,7 @@ Public Class OIT0003OrderDetail
         '　検索説明
         '     条件指定に従い該当データを受注テーブルから取得する
         Dim SQLStr As String =
-            " SELECT" _
+            " SELECT DISTINCT " _
             & "   0                                                             AS LINECNT" _
             & " , ''                                                            AS OPERATION" _
             & " , 0                             AS TIMSTP" _
@@ -1419,6 +1419,19 @@ Public Class OIT0003OrderDetail
                     End If
 
                 Next
+
+                'KEY重複回避処理
+                Dim strDETAILNO_BEFORE As String = "000"
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+                    '1つ前と今回の受注明細№が同じか比較
+                    If strDETAILNO_BEFORE = OIT0003row("DETAILNO") Then
+                        intDETAILNO += 1
+                        OIT0003row("DETAILNO") = intDETAILNO.ToString("000")
+                    End If
+                    strDETAILNO_BEFORE = OIT0003row("DETAILNO")
+                Next
+
             End Using
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D SELECT")

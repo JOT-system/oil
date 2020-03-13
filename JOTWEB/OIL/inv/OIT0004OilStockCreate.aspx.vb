@@ -856,7 +856,7 @@ Public Class OIT0004OilStockCreate
                     While sqlDr.Read
                         oilCode = Convert.ToString(sqlDr("OILCODE"))
                         '油種未設定または対象油種を持っていないレコードはスキップ
-                        If oilCode = "" OrElse retVal.StockList.ContainsKey(oilCode) Then
+                        If oilCode = "" OrElse retVal.StockList.ContainsKey(oilCode) = False Then
                             Continue While
                         End If
                         targetDate = Convert.ToString(sqlDr("TARGETDATE"))
@@ -921,7 +921,7 @@ Public Class OIT0004OilStockCreate
                     While sqlDr.Read
                         oilCode = Convert.ToString(sqlDr("OILCODE"))
                         '油種未設定または対象油種を持っていないレコードはスキップ
-                        If oilCode = "" OrElse retVal.StockList.ContainsKey(oilCode) Then
+                        If oilCode = "" OrElse retVal.StockList.ContainsKey(oilCode) = False Then
                             Continue While
                         End If
 
@@ -3499,9 +3499,8 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <param name="day">格納する日付</param>
         Public Sub New(day As Date)
-            Dim culture = New System.Globalization.CultureInfo("ja-JP")
             Me.KeyString = day.ToString("yyyy/MM/dd")
-            Me.DispDate = day.ToString(DISP_DATEFORMAT, culture)
+            Me.DispDate = day.ToString(DISP_DATEFORMAT)
             Me.ItemDate = day
             Me.IsHoliday = False '一旦False、別処理で設定
             Me.WeekNum = CInt(day.DayOfWeek).ToString

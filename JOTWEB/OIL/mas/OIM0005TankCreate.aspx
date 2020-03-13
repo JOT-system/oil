@@ -309,7 +309,7 @@
                     <!-- 容積 -->
                     <span class="ef">
                         <asp:Label ID="WF_VOLUME_L" runat="server" Text="容積" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_VOLUME" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_VOLUME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="3"></asp:TextBox>
                         <asp:Label ID="WF_VOLUME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 

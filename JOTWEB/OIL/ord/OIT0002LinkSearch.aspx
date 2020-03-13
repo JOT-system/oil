@@ -51,7 +51,7 @@
             <div class="inputItem">
                 <a id="WF_RETSTATION_LABEL" class="requiredMark">空車着駅</a>
                 <a class="ef" id="WF_RETSTATION" ondblclick="Field_DBclick('WF_RETSTATION', <%=LIST_BOX_CLASSIFICATION.LC_STATION%>);" onchange="TextBox_change('WF_RETSTATION');">
-                    <asp:TextBox ID="WF_RETSTATION_CODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="2"></asp:TextBox>
+                    <asp:TextBox ID="WF_RETSTATION_CODE" runat="server" CssClass="boxIcon"  onblur="MsgClear();" MaxLength="4"></asp:TextBox>
                 </a>
                 <a id="WF_RETSTATION_TEXT">
                     <asp:Label ID="WF_RETSTATION_NAME" runat="server" CssClass="WF_TEXT"></asp:Label>
@@ -62,13 +62,13 @@
             <div class="inputItem">
                 <a id="WF_STYMD_LABEL" class="requiredMark">利用可能日</a>
                 <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
             </div>
             <div class="inputItem">
                 <a id="WF_ENDYMD_LABEL" >～</a>
                 <a class="ef" id="WF_ENDYMD" ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="WF_ENDYMD_CODE" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="WF_ENDYMD_CODE" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
             </div>
 

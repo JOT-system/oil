@@ -69,7 +69,7 @@ Public Class M00000LOGON
     Protected Sub Initialize()
         '■■■　セッション変数設定　■■■
         Dim CS001INIFILE As New CS0001INIFILEget            'INIファイル読み込み
-        '  Dim CS0006TERMchk As New CS0006TERMchk              'ローカルコンピュータ名存在チェック
+        Dim CS0006TERMchk As New CS0006TERMchk              'ローカルコンピュータ名存在チェック
         Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
         Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
         Master.dispHelp = False
@@ -147,18 +147,18 @@ Public Class M00000LOGON
         '    CS0006TERMchk.TERMID = Environment.MachineName
         'End Try
 
-        'CS0006TERMchk.TERMID = CS0050Session.APSV_ID
+        CS0006TERMchk.TERMID = CS0050Session.APSV_ID
 
-        'CS0006TERMchk.CS0006TERMchk()
-        'If isNormal(CS0006TERMchk.ERR) Then
-        '    CS0050Session.TERMID = CS0006TERMchk.TERMID
-        '    CS0050Session.TERM_COMPANY = CS0006TERMchk.TERMCAMP
-        '    CS0050Session.TERM_ORG = CS0006TERMchk.TERMORG
-        '    CS0050Session.TERM_M_ORG = CS0006TERMchk.MORG
-        'Else
-        '    Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
-        '    Exit Sub
-        'End If
+        CS0006TERMchk.CS0006TERMchk()
+        If isNormal(CS0006TERMchk.ERR) Then
+            CS0050Session.TERMID = CS0006TERMchk.TERMID
+            CS0050Session.TERM_COMPANY = CS0006TERMchk.TERMCAMP
+            CS0050Session.TERM_ORG = CS0006TERMchk.TERMORG
+            CS0050Session.TERM_M_ORG = CS0006TERMchk.MORG
+        Else
+            Master.Output(CS0006TERMchk.ERR, C_MESSAGE_TYPE.ABORT, "CS0006TERMchk")
+            Exit Sub
+        End If
 
 
         '■■■　初期メッセージ表示　■■■

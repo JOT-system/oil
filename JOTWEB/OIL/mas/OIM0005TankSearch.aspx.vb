@@ -110,6 +110,10 @@ Public Class OIM0005TankSearch
             WF_USEDFLG_CODE.Text = work.WF_SEL_USEDFLG.Text         '利用フラグ
         End If
 
+        'JOT車番・利用フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.WF_TANKNUMBER_CODE.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_USEDFLG_CODE.Attributes("onkeyPress") = "CheckNum()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIM0005WRKINC.MAPIDS
         rightview.MAPID = OIM0005WRKINC.MAPIDL

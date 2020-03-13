@@ -112,9 +112,10 @@ Public Class OIM0004StationSearch
             TxtDepArrStation.Text = work.WF_SEL_DEPARRSTATIONFLG.Text
         End If
 
-        '貨物駅コード・貨物コード枝番を入力するテキストボックスは数値(0～9)のみ可能とする。
+        '貨物駅コード・貨物コード枝番・発着駅フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtStationCode.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtBranch.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtDepArrStation.Attributes("onkeyPress") = "CheckNum()"
 
         '○ RightBox情報設定
         rightview.MAPIDS = OIM0004WRKINC.MAPIDS

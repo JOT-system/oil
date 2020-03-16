@@ -1957,6 +1957,13 @@ function CheckNum() {
         event.preventDefault(); // IEはこれで効く
     }
 }
+// 〇カレンダー値のみ入力可能
+function CheckCalendar() {
+    if (event.keyCode < 47 || event.keyCode > 57) {
+        window.event.returnValue = false; // IEだと効かないので↓追加
+        event.preventDefault(); // IEはこれで効く
+    }
+}
 // 〇全角⇔半角変換
 function ConvartWideCharToNormal(obj) {
     if (obj === null) {

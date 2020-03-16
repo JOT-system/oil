@@ -123,6 +123,9 @@ Public Class OIT0001EmptyTurnDairySearch
         Me.TxtSalesOffice.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtTrainNumber.Attributes("onkeyPress") = "CheckNum()"
 
+        '積込日を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
+        Me.TxtLoadingDateStart.Attributes("onkeyPress") = "CheckCalendar()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIT0001WRKINC.MAPIDS
         rightview.MAPID = OIT0001WRKINC.MAPIDL

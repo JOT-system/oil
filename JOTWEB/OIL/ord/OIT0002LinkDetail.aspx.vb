@@ -249,6 +249,11 @@ Public Class OIT0002LinkDetail
         '車数（A重油）
         TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
 
+        '本線列車・空車発駅（着駅）・空車着駅（発駅）を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtHeadOfficeTrain.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtDepstation.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtRetstation.Attributes("onkeyPress") = "CheckNum()"
+
         '新規作成の場合
         If work.WF_SEL_CREATEFLG.Text <> "1" Then
             '既存データの修正については、登録営業所は入力不可とする。

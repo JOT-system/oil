@@ -64,13 +64,16 @@
                 <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
+                <a id="WF_ENDYMD_LABEL" >～</a>
             </div>
+<%-- 20200108(指摘票No50により、利用可能日(終了)を削除)
             <div class="inputItem">
                 <a id="WF_ENDYMD_LABEL" >～</a>
                 <a class="ef" id="WF_ENDYMD" ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox ID="WF_ENDYMD_CODE" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
             </div>
+--%>
 
             <!-- 本線列車番号 -->
             <div class="inputItem">

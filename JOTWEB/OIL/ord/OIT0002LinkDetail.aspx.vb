@@ -25,7 +25,7 @@ Public Class OIT0002LinkDetail
     Private OIT0002WKtbl As DataTable                               '作業用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    Private Const CONST_INIT_ROWS As Integer = 18                   '新規登録時初期行数
+    Private Const CONST_INIT_ROWS As Integer = 5                    '新規登録時初期行数
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
 
@@ -2729,7 +2729,7 @@ Public Class OIT0002LinkDetail
                             If TxtActEmpDate.Text <> "" Then                                    '(実績)空車着日
                                 PARA14.Value = CDate(TxtActEmpDate.Text).ToString("yyyy/MM/dd")
                             Else
-                                PARA14.Value = C_DEFAULT_YMD
+                                PARA14.Value = DBNull.Value
                             End If
                             PARA15.Value = OIT0002row("LINETRAINNO")          '入線列車番号
                             PARA16.Value = OIT0002row("LINEORDER")            '入線順
@@ -2913,82 +2913,96 @@ Public Class OIT0002LinkDetail
         '     条件指定に従い該当データを受注テーブルから取得する
 
         Dim SQLStr As String =
-                  " SELECT DISTINCT" _
-                & "    0                                                   AS LINECNT " _
-                & "    , ''                                                AS OPERATION " _
-                & "    , 1                                                 AS 'SELECT' " _
-                & "    , 0                                                 AS HIDDEN " _
-                & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
-                & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                      AS STATUS " _
-                & "    , CASE WHEN ISNULL(RTRIM(OIT0004.STATUS), '') ='1' Then '利用可' Else '利用不可' End AS STATUSNOW " _
-                & "    , ISNULL(RTRIM(OIT0004.INFO), '')                      AS INFO " _
-                & "    , CASE " _
-                & "      WHEN ISNULL(RTRIM(OIT0004.INFO), '') ='80' Then 'タンク車数オーバー' " _
-                & "      WHEN  ISNULL(RTRIM(OIT0004.INFO), '') ='82' Then '検査間近あり' " _
-                & "      Else '' End AS INFONOW " _
-                & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '99999999999')                AS PREORDERNO " _
-                & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                   AS TRAINNO " _
-                & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                AS OFFICECODE " _
-                & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')            AS DEPSTATIONNAME " _
-                & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')            AS RETSTATIONNAME " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL01 Then 1 Else 0 End) AS HTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL02 Then 1 Else 0 End) AS RTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL03 Then 1 Else 0 End) AS TTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL04 Then 1 Else 0 End) AS MTTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL05 Then 1 Else 0 End) AS KTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL06 Then 1 Else 0 End) AS K3TANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL07 Then 1 Else 0 End) AS K5TANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL08 Then 1 Else 0 End) AS K10TANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL09 Then 1 Else 0 End) AS LTANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL10 Then 1 Else 0 End) AS ATANK " _
-                & "	   , SUM(CASE WHEN OIT0004.PREOILCODE <>'' Then 1 Else 0 End) AS TOTALTANK " _
-                & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
-                & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
-                & "    , ISNULL(FORMAT(OIT0004.AVAILABLEYMD, 'yyyy/MM/dd'), '')    AS AVAILABLEYMD " _
-                & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
-                & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')            AS DEPSTATION " _
-                & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')            AS RETSTATION " _
-                & " FROM " _
-                & "    OIL.OIT0004_LINK OIT0004 "
-
-        If TxtHeadOfficeTrain.Text <> "" Then
-            If work.WF_SEL_SELECT.Text = "1" Then
-                SQLStr &=
-                  " WHERE" _
-                & "    OIT0004.RETSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
-                & "    AND OIT0004.TRAINNO       = @P4" _
-                & "    AND OIT0004.STATUS        = @P5" _
-                & "    AND OIT0004.DELFLG       <> @P6"
-            Else
-                SQLStr &=
-                  " WHERE" _
-                & "    OIT0004.RETSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
-                & "    AND OIT0004.TRAINNO       = @P4" _
-                & "    AND OIT0004.DELFLG       <> @P6"
-            End If
-        Else
-            If work.WF_SEL_SELECT.Text = "1" Then
-                SQLStr &=
-                  " WHERE" _
-                & "    OIT0004.RETSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
-                & "    AND OIT0004.STATUS        = @P5" _
-                & "    AND OIT0004.DELFLG       <> @P6"
-            Else
-                SQLStr &=
-                  " WHERE" _
-                & "    OIT0004.RETSTATION        = @P1" _
-                & "    AND OIT0004.AVAILABLEYMD >= @P2" _
-                & "    AND OIT0004.DELFLG       <> @P6"
-            End If
-        End If
+                " SELECT DISTINCT" _
+            & "    0                                                   AS LINECNT " _
+            & "    , ''                                                AS OPERATION " _
+            & "    , 1                                                 AS 'SELECT' " _
+            & "    , 0                                                 AS HIDDEN " _
+            & "    , ISNULL(RTRIM(OIT0004.LINKNO), '')                    AS LINKNO " _
+            & "    , ISNULL(RTRIM(OIT0004.STATUS), '')                      AS STATUS " _
+            & "    , ''                                                   AS STATUSNOW " _
+            & "    , ISNULL(RTRIM(OIT0004.INFO), '')                      AS INFO " _
+            & "    , CASE " _
+            & "      WHEN ISNULL(RTRIM(OIT0004.INFO), '') ='80' Then 'タンク車数オーバー' " _
+            & "      WHEN  ISNULL(RTRIM(OIT0004.INFO), '') ='82' Then '検査間近あり' " _
+            & "      Else '' End AS INFONOW " _
+            & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '99999999999')                AS PREORDERNO " _
+            & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                   AS TRAINNO " _
+            & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                AS OFFICECODE " _
+            & "    , ''                                                   AS OFFICENAME " _
+            & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')            AS DEPSTATIONNAME " _
+            & "    , ISNULL(RTRIM(OIT0004.RETSTATIONNAME), '')            AS RETSTATIONNAME " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL01 Then 1 Else 0 End) AS HTANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL02 Then 1 Else 0 End) AS RTANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL03 Then 1 Else 0 End) AS TTANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL04 Then 1 Else 0 End) AS MTTANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL05 Then 1 Else 0 End) AS KTANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL06 Then 1 Else 0 End) AS K3TANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL07 Then 1 Else 0 End) AS K5TANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL08 Then 1 Else 0 End) AS K10TANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL09 Then 1 Else 0 End) AS LTANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE =@OIL10 Then 1 Else 0 End) AS ATANK " _
+            & "	   , SUM(CASE WHEN OIT0004.PREOILCODE <>'' Then 1 Else 0 End) AS TOTALTANK " _
+            & "    , ISNULL(FORMAT(OIT0004.EMPARRDATE, 'yyyy/MM/dd'), '')      AS EMPARRDATE " _
+            & "    , ISNULL(FORMAT(OIT0004.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')      AS ACTUALEMPARRDATE " _
+            & "    , ISNULL(FORMAT(OIT0004.AVAILABLEYMD, 'yyyy/MM/dd'), '')    AS AVAILABLEYMD " _
+            & "    , ISNULL(RTRIM(OIT0004.DELFLG), '')                    AS DELFLG " _
+            & "    , ISNULL(RTRIM(OIT0004.DEPSTATION), '')            AS DEPSTATION " _
+            & "    , ISNULL(RTRIM(OIT0004.RETSTATION), '')            AS RETSTATION " _
+            & " FROM " _
+            & "    OIL.OIT0004_LINK OIT0004 " _
+            & " WHERE OIT0004.RETSTATION   = @P1" _
+            & "   AND OIT0004.AVAILABLEYMD >= @P2" _
+            & "   AND OIT0004.DELFLG       <> @P6"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '列車番号
+        If Not String.IsNullOrEmpty(Me.TxtHeadOfficeTrain.Text) Then
+            SQLStr &= String.Format("   AND OIT0004.TRAINNO = '{0}'", Me.TxtHeadOfficeTrain.Text)
+        End If
+
+        'ステータス状態
+        If work.WF_SEL_SELECT.Text = "1" Then
+            SQLStr &= String.Format("   AND OIT0004.STATUS = '{0}'", work.WF_SEL_SELECT.Text)
+        End If
+
         '有効年月日（終了）
         'If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
         '    SQLStr &= String.Format("    AND OIT0004.AVAILABLEYMD     <= '{0}'", work.WF_SEL_ENDYMD.Text)
+        'End If
+
+        'If TxtHeadOfficeTrain.Text <> "" Then
+        '    If work.WF_SEL_SELECT.Text = "1" Then
+        '        SQLStr &=
+        '          " WHERE" _
+        '        & "    OIT0004.RETSTATION        = @P1" _
+        '        & "    AND OIT0004.AVAILABLEYMD >= @P2" _
+        '        & "    AND OIT0004.TRAINNO       = @P4" _
+        '        & "    AND OIT0004.STATUS        = @P5" _
+        '        & "    AND OIT0004.DELFLG       <> @P6"
+        '    Else
+        '        SQLStr &=
+        '          " WHERE" _
+        '        & "    OIT0004.RETSTATION        = @P1" _
+        '        & "    AND OIT0004.AVAILABLEYMD >= @P2" _
+        '        & "    AND OIT0004.TRAINNO       = @P4" _
+        '        & "    AND OIT0004.DELFLG       <> @P6"
+        '    End If
+        'Else
+        '    If work.WF_SEL_SELECT.Text = "1" Then
+        '        SQLStr &=
+        '          " WHERE" _
+        '        & "    OIT0004.RETSTATION        = @P1" _
+        '        & "    AND OIT0004.AVAILABLEYMD >= @P2" _
+        '        & "    AND OIT0004.STATUS        = @P5" _
+        '        & "    AND OIT0004.DELFLG       <> @P6"
+        '    Else
+        '        SQLStr &=
+        '          " WHERE" _
+        '        & "    OIT0004.RETSTATION        = @P1" _
+        '        & "    AND OIT0004.AVAILABLEYMD >= @P2" _
+        '        & "    AND OIT0004.DELFLG       <> @P6"
+        '    End If
         'End If
 
         SQLStr &=
@@ -3013,17 +3027,17 @@ Public Class OIT0002LinkDetail
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 7)         '空車着駅（発駅）コード
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.Date)                '有効年月日(To)
-                'Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Date)                '有効年月日(From)
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)         '本線列車
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 1)         'ステータス
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.Date)                '有効年月日(From)
+                'Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.Date)                '有効年月日(To)
+                'Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)         '本線列車
+                'Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 1)         'ステータス
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 1)         '削除フラグ
 
                 PARA1.Value = TxtRetstation.Text
                 PARA2.Value = work.WF_SEL_STYMD.Text
                 'PARA3.Value = work.WF_SEL_ENDYMD.Text
-                PARA4.Value = TxtHeadOfficeTrain.Text
-                PARA5.Value = work.WF_SEL_SELECT.Text
+                'PARA4.Value = TxtHeadOfficeTrain.Text
+                'PARA5.Value = work.WF_SEL_SELECT.Text
                 PARA6.Value = C_DELETE_FLG.DELETE
 
                 Dim OILPARA01 As SqlParameter = SQLcmd.Parameters.Add("@OIL01", SqlDbType.NVarChar, 4)    '油種(ハイオク)
@@ -3040,19 +3054,19 @@ Public Class OIT0002LinkDetail
                 'Dim OILPARA12 As SqlParameter = SQLcmd.Parameters.Add("@OIL12", SqlDbType.NVarChar, 4)
                 'Dim OILPARA13 As SqlParameter = SQLcmd.Parameters.Add("@OIL13", SqlDbType.NVarChar, 4)
 
-                OILPARA01.Value = "1001"                 '油種(ハイオク)
-                OILPARA02.Value = "1101"                 '油種(レギュラー)
-                OILPARA03.Value = "1301"                 '油種(灯油)
-                OILPARA04.Value = "1302"                 '油種(未添加灯油)
-                OILPARA05.Value = "1401"                 '油種(軽油)
-                OILPARA06.Value = "1404"                 '３号軽油
-                OILPARA07.Value = "1402"                 '５号軽油
-                OILPARA08.Value = "1403"                 '１０号軽油
-                OILPARA09.Value = "2201"                 'ＬＳＡ
-                OILPARA10.Value = "2101"                 'Ａ重油
-                'OILPARA11.Value = "1405"
-                'OILPARA12.Value = "1406"
-                'OILPARA13.Value = "2202"
+                OILPARA01.Value = BaseDllConst.CONST_HTank                '油種(ハイオク)
+                OILPARA02.Value = BaseDllConst.CONST_RTank                '油種(レギュラー)
+                OILPARA03.Value = BaseDllConst.CONST_TTank                '油種(灯油)
+                OILPARA04.Value = BaseDllConst.CONST_MTTank               '油種(未添加灯油)
+                OILPARA05.Value = BaseDllConst.CONST_KTank1               '油種(軽油)
+                OILPARA06.Value = BaseDllConst.CONST_K3Tank1              '３号軽油
+                OILPARA07.Value = BaseDllConst.CONST_K5Tank               '５号軽油
+                OILPARA08.Value = BaseDllConst.CONST_K10Tank              '１０号軽油
+                OILPARA09.Value = BaseDllConst.CONST_LTank1               'ＬＳＡ
+                OILPARA10.Value = BaseDllConst.CONST_ATank                'Ａ重油
+                'OILPARA11.Value = BaseDllConst.CONST_K3Tank2
+                'OILPARA12.Value = BaseDllConst.CONST_KTank2
+                'OILPARA13.Value = BaseDllConst.CONST_LTank2
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3069,6 +3083,11 @@ Public Class OIT0002LinkDetail
                     i += 1
                     OIT0002row("LINECNT") = i        'LINECNT
 
+                    '◯名称取得
+                    '受注営業所
+                    CODENAME_get("SALESOFFICE", OIT0002row("OFFICECODE"), OIT0002row("OFFICENAME"), WW_DUMMY)                               '会社コード
+                    '利用可否フラグ
+                    CODENAME_get("USEPROPRIETY", OIT0002row("STATUS"), OIT0002row("STATUSNOW"), WW_DUMMY)                               '会社コード
                 Next
             End Using
         Catch ex As Exception
@@ -3405,6 +3424,9 @@ Public Class OIT0002LinkDetail
 
                 Case "SALESOFFICE"      '登録営業所
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
+
+                Case "USEPROPRIETY"     '利用可否フラグ
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "USEPROPRIETY"))
 
                 Case "DEPSTATION"       '空車発駅　（着駅）
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "2", "DEPSTATION"))

@@ -1,5 +1,5 @@
 ﻿''************************************************************
-' ユーザIDマスタメンテ登録画面
+' 貨車連結順序表詳細画面
 ' 作成日 2019/11/14
 ' 更新日 2019/11/14
 ' 作成者 JOT遠藤
@@ -12,7 +12,7 @@ Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
-''' ユーザIDマスタ登録（実行）
+''' 貨車連結順序表詳細
 ''' </summary>
 ''' <remarks></remarks>
 Public Class OIT0002LinkDetail

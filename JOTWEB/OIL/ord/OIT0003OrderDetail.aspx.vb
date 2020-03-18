@@ -5436,8 +5436,23 @@ Public Class OIT0003OrderDetail
                     '利用可能日
                     '(実績)発日が入力されている場合
                     If Me.TxtActualDepDate.Text <> "" Then
-                        '(予定)空車着日(前日)の日付を設定する。
-                        PARA03.Value = dtEDbefore
+                        '◯ (予定)(発日) = (実績)発日
+                        If Me.TxtDepDate.Text = Me.TxtActualDepDate.Text Then
+                            '◯ (予定)(発日) = (予定)空車着日
+                            If Me.TxtDepDate.Text = Me.TxtEmparrDate.Text Then
+                                '(予定)空車着日の日付を設定する。
+                                PARA03.Value = Me.TxtEmparrDate.Text
+
+                            Else
+                                '(予定)空車着日(前日)の日付を設定する。
+                                PARA03.Value = dtEDbefore
+
+                            End If
+                        Else
+                            '(予定)空車着日の日付を設定する。
+                            PARA03.Value = Me.TxtEmparrDate.Text
+
+                        End If
                     Else
                         PARA03.Value = WW_DATENOW.AddDays(1)
                     End If
@@ -5445,19 +5460,36 @@ Public Class OIT0003OrderDetail
                     'ステータス
                     '(実績)発日が入力されている場合
                     If Me.TxtActualDepDate.Text <> "" Then
-                        '◯ (予定)空車着日(前日) = (実績)発日
-                        '　 または、(予定)空車着日(当日) = (実績)発日
-                        If dtEDbefore = Date.Parse(Me.TxtActualDepDate.Text) _
+                        '◯ (予定)(発日) = (実績)発日
+                        If Me.TxtDepDate.Text = Me.TxtActualDepDate.Text Then
+                            '◯ (予定)空車着日(前日) = (実績)発日
+                            '　 または、(予定)空車着日(当日) = (実績)発日
+                            If dtEDbefore = Date.Parse(Me.TxtActualDepDate.Text) _
                             OrElse Date.Parse(Me.TxtEmparrDate.Text) = Date.Parse(Me.TxtActualDepDate.Text) Then
-                            'ステータス(1:利用可, 2:利用不可)
-                            PARA04.Value = "1"
+                                'ステータス(1:利用可, 2:利用不可)
+                                PARA04.Value = "1"
+
+                                '◯ (予定)空車着日(前日) = 当日
+                                '　 または、(予定)空車着日(当日) = 当日
+                            ElseIf dtEDbefore = Date.Today _
+                                OrElse Date.Parse(Me.TxtEmparrDate.Text) = Date.Today Then
+                                'ステータス(1:利用可, 2:利用不可)
+                                PARA04.Value = "1"
+
+                            Else
+                                'ステータス(1:利用可, 2:利用不可)
+                                PARA04.Value = "2"
+
+                            End If
                         Else
                             'ステータス(1:利用可, 2:利用不可)
                             PARA04.Value = "2"
+
                         End If
                     Else
                         'ステータス(1:利用可, 2:利用不可)
                         PARA04.Value = "2"
+
                     End If
 
                     PARA05.Value = ""                                '情報

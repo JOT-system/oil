@@ -248,6 +248,17 @@ Public Class OIS0001UserCreate
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
         CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
+        '削除フラグ・誤り回数・会社コード・組織コードを入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.WF_DELFLG.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_MISSCNT.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_CAMPCODE.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_ORG.Attributes("onkeyPress") = "CheckNum()"
+
+        'パスワード有効期限・開始年月日・終了年月日を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
+        Me.WF_PASSENDYMD.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.WF_STYMD.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.WF_ENDYMD.Attributes("onkeyPress") = "CheckCalendar()"
+
     End Sub
 
     ''' <summary>

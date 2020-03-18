@@ -121,6 +121,14 @@ Public Class OIS0001UserSearch
             WF_ORG_CODE.Text = work.WF_SEL_ORG.Text                  '組織コード
         End If
 
+        '会社コード・組織コードを入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.WF_CAMPCODE_CODE.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_ORG_CODE.Attributes("onkeyPress") = "CheckNum()"
+
+        '有効年月日(開始)・有効年月日(終了)を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
+        Me.WF_STYMD_CODE.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.WF_ENDYMD_CODE.Attributes("onkeyPress") = "CheckCalendar()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIS0001WRKINC.MAPIDS
         rightview.MAPID = OIS0001WRKINC.MAPIDL

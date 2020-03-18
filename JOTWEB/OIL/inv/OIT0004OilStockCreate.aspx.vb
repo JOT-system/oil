@@ -1300,7 +1300,7 @@ Public Class OIT0004OilStockCreate
                             Continue While
                         End If
                         '過去日の場合も設定しない
-                        If retVal.SuggestList(targetDate).DayInfo.IsPastDay Then
+                        If retVal.SuggestList(targetDate).DayInfo.IsBeforeToday Then
                             Continue While
                         End If
                         With retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem(oilCode)
@@ -3504,6 +3504,12 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property IsPastDay As Boolean = False
         ''' <summary>
+        ''' 当日以前フラグ(True:当日,False:当日を含まない過去日)
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>車数提案の入力可否判定に利用</remarks>
+        Public Property IsBeforeToday As Boolean = False
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
         ''' <param name="day">格納する日付</param>
@@ -3514,10 +3520,15 @@ Public Class OIT0004OilStockCreate
             Me.IsHoliday = False '一旦False、別処理で設定
             Me.WeekNum = CInt(day.DayOfWeek).ToString
             Me.HolidayName = "" '一旦ブランク 別処理で設定
-            If Me.KeyString >= Now.ToString("yyyy/MM/dd") Then
+            If Me.KeyString > Now.ToString("yyyy/MM/dd") Then
                 Me.IsPastDay = False
+                Me.IsBeforeToday = False
+            ElseIf Me.KeyString = Now.ToString("yyyy/MM/dd") Then
+                Me.IsPastDay = False
+                Me.IsBeforeToday = True
             Else
                 Me.IsPastDay = True
+                Me.IsBeforeToday = True
             End If
         End Sub
     End Class
@@ -3905,7 +3916,7 @@ Public Class OIT0004OilStockCreate
             Dim targetDays = From itm In Me.StockDate
                              Where itm.Key >= fromDay AndAlso
                                    itm.Key <= toDay AndAlso
-                                   itm.Value.IsPastDay = False
+                                   itm.Value.IsBeforeToday = False
                              Order By itm.Key
                              Select itm.Key
             '処理日付が無ければそのまま終了

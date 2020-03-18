@@ -2711,7 +2711,7 @@ Public Class OIT0004OilStockCreate
         End If 'checkObj.ShowSuggestList = True '受注提案表が画面表示しているか
 
         '在庫表 払出入力チェック
-        If {"WF_ButtonORDERLIST", "WF_ButtonRECULC"}.Contains(callerButton) Then
+        If {"WF_ButtonRECULC", "WF_ButtonUPDATE"}.Contains(callerButton) Then
             For Each stockListItem In checkObj.StockList.Values
                 Dim oilName As String = stockListItem.OilTypeName
                 For Each itm In stockListItem.StockItemList.Values

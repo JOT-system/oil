@@ -441,5 +441,11 @@ function bindNumericKeyPressOnly(targetTextBoxList) {
         if (textObj.id.indexOf('txtSend') !== -1) {
             textObj.maxLength = 5;
         }
+        if (textObj.id.indexOf('txtMorningStock_') !== -1) {
+            textObj.maxLength = 5;
+        }
+        if (textObj.id.indexOf('txtReceiveFromLorry_') !== -1) {
+            textObj.maxLength = 5;
+        }
     }
 }

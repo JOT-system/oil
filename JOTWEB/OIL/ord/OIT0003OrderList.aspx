@@ -33,7 +33,7 @@
                         <!-- 左ボタン -->
                         <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
-                        <input type="button" id="WF_ButtonORDER_CANCEL" class="btn-sticky" value="キャンセル"  onclick="if (confirm('受注キャンセルしますよろしいですか？') === false) { return false;} ButtonClick('WF_ButtonORDER_CANCEL');" />←選択した受注のキャンセル
+                        <input type="button" id="WF_ButtonORDER_CANCEL" class="btn-sticky" value="キャンセル"  onclick="ButtonClick('WF_ButtonORDER_CANCEL');" />←選択した受注のキャンセル
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->

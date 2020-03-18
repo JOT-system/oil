@@ -828,7 +828,7 @@ Public Class OIT0004OilStockCreate
         'ACCDATE[受入日（予定）]を元に取得（変更の場合は条件と抽出両方の項目忘れずに）
         sqlStr.AppendLine("SELECT DTL.OILCODE")
         sqlStr.AppendLine("  　 , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
-        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSNUMBER,0))    AS CARSNUMBER")
+        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))    AS AMOUNT")
         sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
@@ -862,7 +862,7 @@ Public Class OIT0004OilStockCreate
                         targetDate = Convert.ToString(sqlDr("TARGETDATE"))
                         With retVal.StockList(oilCode)
                             If .StockItemList.ContainsKey(targetDate) Then
-                                recvVal = Decimal.Parse(Convert.ToString(sqlDr("CARSNUMBER")))
+                                recvVal = Decimal.Parse(Convert.ToString(sqlDr("AMOUNT")))
                                 With .StockItemList(targetDate)
                                     .Receive = recvVal
                                 End With
@@ -965,6 +965,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine(" WHERE OS.STOCKYMD BETWEEN dateadd(day, -1, @FROMDATE) AND @TODATE")
         sqlStat.AppendLine("   AND OS.OFFICECODE    = @OFFICECODE")
         sqlStat.AppendLine("   AND OS.SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStat.AppendLine("   AND OS.CONSIGNEECODE = @CONSIGNEECODE")
         sqlStat.AppendLine("   AND OS.DELFLG        = @DELFLG")
         sqlStat.AppendLine(" ORDER BY OS.STOCKYMD,OS.OILCODE")
         '保存済みの在庫情報を取得
@@ -973,6 +974,7 @@ Public Class OIT0004OilStockCreate
             With sqlCmd.Parameters
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
             End With
             '可変パラメータ
@@ -1672,6 +1674,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("       AND OFFICECODE    = @OFFICECODE")
         sqlStat.AppendLine("       AND OILCODE       = @OILCODE")
         sqlStat.AppendLine("       AND SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStat.AppendLine("       AND CONSIGNEECODE = @CONSIGNEECODE")
         sqlStat.AppendLine("   OPEN hensuu ;")
         sqlStat.AppendLine("  FETCH NEXT FROM hensuu INTO @hensuu ;")
         'UPDATE
@@ -1697,6 +1700,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("            AND OFFICECODE    = @OFFICECODE")
         sqlStat.AppendLine("            AND OILCODE       = @OILCODE")
         sqlStat.AppendLine("            AND SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStat.AppendLine("            AND CONSIGNEECODE = @CONSIGNEECODE")
         'INSERT
         sqlStat.AppendLine("     IF (@@FETCH_STATUS <> 0)")
         sqlStat.AppendLine("         INSERT INTO OIL.OIT0001_OILSTOCK (")
@@ -1704,6 +1708,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("            ,OFFICECODE")
         sqlStat.AppendLine("            ,OILCODE")
         sqlStat.AppendLine("            ,SHIPPERSCODE")
+        sqlStat.AppendLine("            ,CONSIGNEECODE")
         sqlStat.AppendLine("            ,MAXTANKCAP")
         sqlStat.AppendLine("            ,TANKCAPRATE")
         sqlStat.AppendLine("            ,DS")
@@ -1728,6 +1733,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("            ,@OFFICECODE")
         sqlStat.AppendLine("            ,@OILCODE")
         sqlStat.AppendLine("            ,@SHIPPERSCODE")
+        sqlStat.AppendLine("            ,@CONSIGNEECODE")
         sqlStat.AppendLine("            ,@MAXTANKCAP")
         sqlStat.AppendLine("            ,@TANKCAPRATE")
         sqlStat.AppendLine("            ,@DS")
@@ -1758,6 +1764,7 @@ Public Class OIT0004OilStockCreate
         journalSqlStat.AppendLine("            ,OFFICECODE")
         journalSqlStat.AppendLine("            ,OILCODE")
         journalSqlStat.AppendLine("            ,SHIPPERSCODE")
+        journalSqlStat.AppendLine("            ,CONSIGNEECODE")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,MAXTANKCAP))  AS MAXTANKCAP")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,TANKCAPRATE)) AS TANKCAPRATE")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,DS))          AS DS")
@@ -1779,7 +1786,8 @@ Public Class OIT0004OilStockCreate
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,RECEIVEYMD))  AS RECEIVEYMD")
         journalSqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK")
         journalSqlStat.AppendLine(" WHERE OFFICECODE    = @OFFICECODE")
-        journalSqlStat.AppendLine("   AND SHIPPERSCODE = @SHIPPERSCODE")
+        journalSqlStat.AppendLine("   AND SHIPPERSCODE  = @SHIPPERSCODE")
+        journalSqlStat.AppendLine("   AND CONSIGNEECODE = @CONSIGNEECODE")
         journalSqlStat.AppendLine("   AND UPDYMD        = @UPDYMD")
 
         '処理日付引数が初期値なら現時刻設定
@@ -1795,6 +1803,7 @@ Public Class OIT0004OilStockCreate
             With sqlCmd.Parameters
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispDataClass.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispDataClass.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispDataClass.Consignee
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
                 .Add("@INITYMD", SqlDbType.DateTime).Value = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
                 .Add("@INITUSER", SqlDbType.NVarChar).Value = Master.USERID
@@ -3736,8 +3745,10 @@ Public Class OIT0004OilStockCreate
 
             '在庫表クリア
             For Each odrItem In Me.StockList.Values
+                '初日朝在庫及び、払出はクリアしない
+                'ローリー受け入れのみクリアする
                 For Each trainIdItem In odrItem.StockItemList.Values
-                    trainIdItem.Send = "0" '払い出し0クリア
+                    trainIdItem.ReceiveFromLorry = "0"
                 Next
             Next
         End Sub
@@ -3885,8 +3896,6 @@ Public Class OIT0004OilStockCreate
         ''' <param name="inventoryDays">在庫維持日数</param>
         ''' <remarks>外部呼出用メソッド</remarks>
         Public Sub AutoSuggest(inventoryDays As Integer)
-            'Return
-            'TODO inventoryDaysの意味合い0ありにして0は先頭日か？
             '一旦0あり先頭
             '提案表部分の値を0クリア
             SuggestValueInputValueToZero()
@@ -3975,6 +3984,14 @@ Public Class OIT0004OilStockCreate
                     End While
                 Next trainInfo 'end 列車別ループ
             Next targetDay 'end 日付別ループ
+            '残る日付もある為、全体を再度計算
+            Me.RecalcStockList()
+            '最終的にチェックをすべて外す(ユーザーに受注作成するデータを選ばせる為）
+            For Each sgItm In Me.SuggestList.Values
+                For Each trItm In sgItm.SuggestOrderItem.Values
+                    trItm.CheckValue = False
+                Next trItm
+            Next sgItm
         End Sub
         ''' <summary>
         ''' 提案一覧にチェックしているデータが存在するか確認（True:チェック項目あり,False:チェック項目なし)

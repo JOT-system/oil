@@ -43,7 +43,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
-                            <asp:TextBox ID="WF_DELFLG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
+                            <asp:TextBox ID="WF_DELFLG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_DELFLG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -60,14 +60,14 @@
                     <!-- ユーザID -->
                     <span class="ef">
                         <asp:Label ID="WF_USERID_L" runat="server" Text="ユーザID" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_USERID" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_USERID" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_USERID_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 社員名（短） -->
                     <span class="ef">
                         <asp:Label ID="WF_STAFFNAMES_L" runat="server" Text="社員名（短）" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_STAFFNAMES" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_STAFFNAMES" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_STAFFNAMES_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -76,14 +76,14 @@
                     <!-- 社員名（長） -->
                     <span class="ef">
                         <asp:Label ID="WF_STAFFNAMEL_L" runat="server" Text="社員名（長）" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_STAFFNAMEL" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_STAFFNAMEL" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                         <asp:Label ID="WF_STAFFNAMEL_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 誤り回数 -->
                     <span class="ef">
                         <asp:Label ID="WF_MISSCNT_L" runat="server" Text="誤り回数" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="WF_MISSCNT" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_MISSCNT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="3"></asp:TextBox>
                         <asp:Label ID="WF_MISSCNT_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -92,7 +92,7 @@
                     <!-- パスワード -->
                     <span class="ef">
                         <asp:Label ID="WF_PASSWORD_L" runat="server" Text="パスワード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_PASSWORD" runat="server" CssClass="WF_TEXTBOX_CSS" TextMode="Password"></asp:TextBox>
+                        <asp:TextBox ID="WF_PASSWORD" runat="server" CssClass="WF_TEXTBOX_CSS" TextMode="Password" MaxLength="200"></asp:TextBox>
                         <asp:Label ID="WF_PASSWORD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                    </span>
 
@@ -131,7 +131,7 @@
                     <span class="ef" >
                         <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_CAMPCODE', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('WF_CAMPCODE');">
-                            <asp:TextBox ID="WF_CAMPCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                            <asp:TextBox ID="WF_CAMPCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="2"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_CAMPCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
 
@@ -141,7 +141,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_ORG_L" runat="server" Text="組織コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_ORG', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORG');">
-                            <asp:TextBox ID="WF_ORG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                            <asp:TextBox ID="WF_ORG" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_ORG_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -151,7 +151,7 @@
                     <!-- メールアドレス -->
                     <span class="ef colCodeOnly">
                         <asp:Label ID="WF_EMAIL_L" runat="server" Text="メールアドレス" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_EMAIL" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_EMAIL" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="128"></asp:TextBox>
                         <!-- <asp:Label ID="WF_EMAIL_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label> -->
                     </span>
                 </p>
@@ -161,7 +161,7 @@
                     <span class="ef" >
                         <asp:Label ID="WF_MENUROLE_L" runat="server" Text="メニュー表示制御ロール" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_MENUROLE', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_MENUROLE');">
-                            <asp:TextBox ID="WF_MENUROLE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                            <asp:TextBox ID="WF_MENUROLE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_MENUROLE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -170,7 +170,7 @@
                     <span class="ef" >
                         <asp:Label ID="WF_MAPROLE_L" runat="server" Text="画面参照更新制御ロール"  CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_MAPROLE', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_MAPROLE');">
-                            <asp:TextBox ID="WF_MAPROLE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                            <asp:TextBox ID="WF_MAPROLE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_MAPROLE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -181,7 +181,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_VIEWPROFID_L" runat="server" Text="画面表示項目制御ロール" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_VIEWPROFID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_VIEWPROFID');">
-                            <asp:TextBox ID="WF_VIEWPROFID" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                            <asp:TextBox ID="WF_VIEWPROFID" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
 
                         <asp:Label ID="WF_VIEWPROFID_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -191,7 +191,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_RPRTPROFID_L" runat="server" Text="エクセル出力制御ロール" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_RPRTPROFID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_RPRTPROFID');">
-                            <asp:TextBox ID="WF_RPRTPROFID" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                            <asp:TextBox ID="WF_RPRTPROFID" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_RPRTPROFID_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
@@ -201,7 +201,7 @@
                     <!-- 画面初期値ロール -->
                     <span class="ef">
                         <asp:Label ID="WF_VARIANT_L" runat="server" Text="画面初期値ロール" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="WF_VARIANT" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                        <asp:TextBox ID="WF_VARIANT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                         <asp:Label ID="WF_VARIANT_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
@@ -209,7 +209,7 @@
                     <span class="ef">
                         <asp:Label ID="WF_APPROVALID_L" runat="server" Text="承認権限ロール" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_APPROVALID', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('WF_APPROVALID');">
-                            <asp:TextBox ID="WF_APPROVALID" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon"></asp:TextBox>
+                            <asp:TextBox ID="WF_APPROVALID" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_APPROVALID_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>

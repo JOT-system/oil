@@ -526,7 +526,14 @@ Public Module Messages
         ''' 受注キャンセルしますよろしいですか？
         ''' </summary>
         Public Const OIL_CONFIRM_CANCEL_ORDER As String = "20033"
-
+        ''' <summary>
+        ''' キャンセルデータ未存在
+        ''' </summary>
+        Public Const OIL_CANCELDATA_NOTFOUND As String = "20034"
+        ''' <summary>
+        ''' キャンセル行未存在
+        ''' </summary>
+        Public Const OIL_CANCELLINE_NOTFOUND As String = "20035"
 #End Region
 
 

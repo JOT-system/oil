@@ -2789,6 +2789,7 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_ButtonLINE_LIFTED_TAB1()
 
         Dim SelectChk As Boolean = False
+        Dim intTblCnt As Integer = 0
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
@@ -2835,6 +2836,9 @@ Public Class OIT0003OrderDetail
             Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
             Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
             Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            '件数を取得
+            intTblCnt = OIT0003tbl.Rows.Count
 
             '選択されている行は削除対象
             Dim i As Integer = 0
@@ -2903,8 +2907,14 @@ Public Class OIT0003OrderDetail
         Master.SaveTable(OIT0003tbl)
 
         '○メッセージ表示
-        If SelectChk = False Then
+        '一覧件数が０件の時の行削除の場合
+        If intTblCnt = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_DELDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+            '一覧件数が１件以上で未選択による行削除の場合
+        ElseIf SelectChk = False Then
             Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
         Else
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If

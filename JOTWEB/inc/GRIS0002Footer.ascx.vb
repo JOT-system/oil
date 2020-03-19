@@ -11,6 +11,14 @@ Public Class GRIS0002Footer
     Protected NeedsPopUp As Boolean = False '追加
     Protected MessageTitle As String = ""   '追加
     ''' <summary>
+    ''' 確認メッセージフラグ(True:表示(NeedsPopUp：Trueにしなければ無意味です),False:表示しない)
+    ''' </summary>
+    Protected IsMessageConfirm As Boolean = False
+    ''' <summary>
+    ''' 確認ボタンのId(イベントを拾う際は当設定値_Click)
+    ''' </summary>
+    Protected btnConfirmOkId As String = "btnCommonConfirmOk"
+    ''' <summary>
     ''' ページロード処理
     ''' </summary>
     ''' <param name="sender"></param>
@@ -69,7 +77,9 @@ Public Class GRIS0002Footer
                       Optional ByVal I_PARA01 As String = "",
                       Optional ByVal I_PARA02 As String = "",
                       Optional ByVal needsPopUp As Boolean = False,
-                      Optional ByVal messageTitle As String = "メッセージ")
+                      Optional ByVal messageTitle As String = "メッセージ",
+                      Optional ByVal isConfirm As Boolean = False,
+                      Optional ByVal yesButtonId As String = "btnCommonConfirmOk")
 
         Me.MEGID = msgNo
         Me.MSGTYPE = msgType
@@ -77,7 +87,8 @@ Public Class GRIS0002Footer
         Me.PARAM02 = I_PARA02
         Me.NeedsPopUp = needsPopUp
         Me.MessageTitle = messageTitle
-
+        Me.IsMessageConfirm = isConfirm
+        Me.btnConfirmOkId = yesButtonId
     End Sub
     ''' <summary>
     ''' ヘルプボタンを非表示にする
@@ -173,6 +184,8 @@ Public Class GRIS0002Footer
         Dim pnlMessageBoxTitle As New Panel With {.ID = "pnlCommonMessageTitle", .ViewStateMode = ViewStateMode.Disabled}
         Dim btnMessageBoxOkButton As New HtmlInputButton With {.ID = "btnCommonMessageOk", .ViewStateMode = ViewStateMode.Disabled,
                                                                .Value = "OK"}
+        Dim btnMessageBoxCancelButton As New HtmlInputButton With {.ID = "btnCommonMessageNo", .ViewStateMode = ViewStateMode.Disabled,
+                                                               .Value = "いいえ"}
         'ポップアップOKボタン押下時の動作
         Dim onClickScriptText As New StringBuilder
         'モーダル状態をOFFにする共通関数実行
@@ -190,7 +203,18 @@ Public Class GRIS0002Footer
         onClickScriptText.AppendLine("        document.body.appendChild(s);")
         onClickScriptText.AppendLine("    }")
         onClickScriptText.AppendLine("}")
-        btnMessageBoxOkButton.Attributes.Add("onclick", onClickScriptText.ToString)
+
+        If Me.IsMessageConfirm Then
+            btnMessageBoxOkButton.ID = Me.btnConfirmOkId
+            btnMessageBoxOkButton.Value = "はい"
+            btnMessageBoxOkButton.Attributes.Add("onclick", String.Format("ButtonClick('{0}');", Me.btnConfirmOkId))
+            btnMessageBoxCancelButton.Attributes.Add("onclick", onClickScriptText.ToString)
+            pnlMessageBoxTitle.Controls.Add(btnMessageBoxOkButton)
+            pnlMessageBoxTitle.Controls.Add(btnMessageBoxCancelButton)
+        Else
+            btnMessageBoxOkButton.Attributes.Add("onclick", onClickScriptText.ToString)
+            pnlMessageBoxTitle.Controls.Add(btnMessageBoxOkButton)
+        End If
         Dim lblMessageBoxTitleLabel As New Label With {.ID = "lblCommonMessageTitle", .ViewStateMode = ViewStateMode.Disabled,
                                                            .Text = Me.MessageTitle}
         Dim pnlMessageBoxText As New Panel With {.ID = "pnlCommonMessageText", .ViewStateMode = ViewStateMode.Disabled}
@@ -198,7 +222,7 @@ Public Class GRIS0002Footer
                                                            .Text = messageText}
         lblMessageBoxText.Attributes.Add("data-naeiw", Me.MSGTYPE)
         'メッセージボックスオブジェクトの組み立て
-        pnlMessageBoxTitle.Controls.Add(btnMessageBoxOkButton)
+
         pnlMessageBoxTitle.Controls.Add(lblMessageBoxTitleLabel)
         pnlMessageBoxText.Controls.Add(lblMessageBoxText)
 

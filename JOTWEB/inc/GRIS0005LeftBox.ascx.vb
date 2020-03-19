@@ -135,6 +135,7 @@ Public Class GRIS0005LeftBox
         LC_STATIONCODE_FOCUSON
         LC_FILLINGPOINT
         LC_JOINTLIST
+        LC_STACKING
     End Enum
 
     ''' <summary>
@@ -215,6 +216,7 @@ Public Class GRIS0005LeftBox
         LP_STATIONCODE_FOCUSON
         LP_FILLINGPOINT
         LP_JOINTLIST
+        LP_STACKING
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -575,6 +577,10 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY
                 '利用可否
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "USEPROPRIETY"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_STACKING
+                '積置可否
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "STACKING"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_BIGOILCODE
                 '油種大分類コード

@@ -16,6 +16,8 @@
     <asp:TextBox ID="WF_SEL_BASE" runat="server"></asp:TextBox>
     <!-- 列車番号 -->
     <asp:TextBox ID="WF_SEL_TRAINNUMBER" runat="server"></asp:TextBox>
+    <!-- 積置可否フラグ -->
+    <asp:TextBox ID="WF_SEL_STACKINGFLG" runat="server"></asp:TextBox>
 
     <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>

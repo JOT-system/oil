@@ -1202,6 +1202,18 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
                 'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
+                '積置可否フラグ
+                '(積置列車:T, 非積置列車：N)
+                If WW_GetValue(12) = "T" Then
+                    '"1"(積置あり)を設定
+                    work.WF_SEL_STACKINGFLG.Text = "1"
+                ElseIf WW_GetValue(12) = "N" Then
+                    '"1"(積置なし)を設定
+                    work.WF_SEL_STACKINGFLG.Text = "2"
+                Else
+                    work.WF_SEL_STACKINGFLG.Text = "2"
+                End If
+
                 '発駅
                 TxtDepstation.Text = WW_GetValue(1)
                 CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
@@ -3006,7 +3018,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "   AND OIT0002.TRAINNO         = @P02 " _
             & "   AND OIT0002.DEPDATE         = @P03 " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
-            & "   AND OIT0002.DELFLG         <> @P05 "
+            & "   AND OIT0002.STACKINGFLG     = @P05 " _
+            & "   AND OIT0002.DELFLG         <> @P06 "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -3014,12 +3027,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '積置可否フラグ
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
-                PARA2.Value = TxtHeadOfficeTrain.Text
-                PARA3.Value = TxtDepDate.Text
+                PARA2.Value = Me.TxtHeadOfficeTrain.Text
+                PARA3.Value = Me.TxtDepDate.Text
                 PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
-                PARA5.Value = C_DELETE_FLG.DELETE
+                PARA5.Value = work.WF_SEL_STACKINGFLG.Text
+                PARA6.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

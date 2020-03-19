@@ -2873,7 +2873,7 @@ Public Class OIT0003OrderDetail
                     '引数１：所在地コード　⇒　変更なし(空白)
                     '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更なし(空白)
-                    WW_UpdateTankShozai("", "3", "", OIT0003UPDrow("TANKNO"))
+                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"))
 
                 Else
                     i += 1
@@ -6830,7 +6830,9 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
                                       ByVal I_STATUS As String,
                                       ByVal I_KBN As String,
-                                      Optional ByVal I_TANKNO As String = Nothing)
+                                      Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal upEmparrDate As Boolean = False,
+                                      Optional ByVal upActualEmparrDate As Boolean = False)
 
         Try
             'DataBase接続文字
@@ -6854,6 +6856,15 @@ Public Class OIT0003OrderDetail
             '積車区分
             If Not String.IsNullOrEmpty(I_KBN) Then
                 SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            '空車着日（予定）
+            If upEmparrDate = True Then
+                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+            End If
+            '空車着日（実績）
+            If upActualEmparrDate = True Then
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", Me.TxtActualEmparrDate.Text)
             End If
 
             SQLStr &=
@@ -8381,7 +8392,8 @@ Public Class OIT0003OrderDetail
             '引数１：所在地コード　⇒　変更なし(空白)
             '引数２：タンク車状態　⇒　変更あり("1"(発送))
             '引数３：積車区分　　　⇒　変更なし(空白)
-            WW_UpdateTankShozai("", "1", "")
+            '引数４：(予定)空車着日⇒　更新対象(画面項目)
+            WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
 
             '受注進行ステータスが以下の場合
             '210:手配中（入換指示手配済）, 220:手配中（積込指示手配済）

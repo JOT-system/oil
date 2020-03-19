@@ -6393,7 +6393,7 @@ Public Class OIT0003OrderDetail
             & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
             & "        OIS0015_2.CLASS   = 'ORDERINFO' " _
             & "    AND OIS0015_2.KEYCODE = OIT0002.ORDERINFO " _
-            & " WHERE OIT0002.ORDERYMD   >= @P2" _
+            & " WHERE OIT0002.LODDATE    >= @P2" _
             & "   AND OIT0002.DELFLG     <> @P3"
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する

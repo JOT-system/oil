@@ -76,6 +76,8 @@ Public Class OIT0003OrderList
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnCommonConfirmOk"       '確認メッセージ
+                            WW_UpdateOrderStatusCancel()
                     End Select
 
                     '○ 一覧再表示処理
@@ -517,77 +519,39 @@ Public Class OIT0003OrderList
     ''' </summary>
     Protected Sub WF_ButtonORDER_CANCEL_Click()
 
-        '○ 画面表示データ復元
-        Master.RecoverTable(OIT0003tbl)
+        Dim SelectChk As Boolean = False
+        Dim intTblCnt As Integer = 0
 
-        '■■■ OIT0003tbl関連の受注TBLの「受注進行ステータス」を「900:受注キャンセル」に更新 ■■■
+        '件数を取得
+        intTblCnt = OIT0003tbl.Rows.Count
 
-        Try
-            'DataBase接続文字
-            Dim SQLcon = CS0050SESSION.getConnection
-            SQLcon.Open() 'DataBase接続(Open)
-
-            '更新SQL文･･･受注TBLを更新
-            Dim SQLStr As String =
-                    " UPDATE OIL.OIT0002_ORDER       " _
-                    & "    SET UPDYMD      = @P11,      " _
-                    & "        UPDUSER     = @P12,      " _
-                    & "        UPDTERMID   = @P13,      " _
-                    & "        RECEIVEYMD  = @P14,      " _
-                    & "        ORDERSTATUS = @P15       " _
-                    & "  WHERE ORDERNO     = @P01       " _
-                    & "    AND DELFLG     <> '1'       ;"
-
-            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
-            SQLcmd.CommandTimeout = 300
-
-            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
-
-            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
-            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
-            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
-            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
-            Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", System.Data.SqlDbType.NVarChar)
-
-            '選択されている行の受注進行ステータスを「900:受注キャンセル」に更新
-            For Each OIT0003UPDrow In OIT0003tbl.Rows
-                If OIT0003UPDrow("OPERATION") = "on" Then
-                    PARA01.Value = OIT0003UPDrow("ORDERNO")
-
-                    PARA11.Value = Date.Now
-                    PARA12.Value = Master.USERID
-                    PARA13.Value = Master.USERTERMID
-                    PARA14.Value = C_DEFAULT_YMD
-                    PARA15.Value = BaseDllConst.CONST_ORDERSTATUS_900
-
-                    OIT0003UPDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_900
-                    CODENAME_get("ORDERSTATUS", OIT0003UPDrow("ORDERSTATUS"), OIT0003UPDrow("ORDERSTATUSNAME"), WW_DUMMY)
-
-                    SQLcmd.ExecuteNonQuery()
+        '行が選択されているかチェック
+        For Each OIT0003UPDrow In OIT0003tbl.Rows
+            If OIT0003UPDrow("OPERATION") = "on" Then
+                If OIT0003UPDrow("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 Then
+                    SelectChk = True
                 End If
-            Next
-
-            'CLOSE
-            SQLcmd.Dispose()
-            SQLcmd = Nothing
-
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D DELETE")
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D DELETE"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
-
-        End Try
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl)
+            End If
+        Next
 
         '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        '一覧件数が０件の時のキャンセルの場合
+        If intTblCnt = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_CANCELDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+
+            '一覧件数が１件以上で未選択によるキャンセルの場合
+        ElseIf SelectChk = False Then
+            Master.Output(C_MESSAGE_NO.OIL_CANCELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '◯確認メッセージ(受注キャンセルの確認)
+        Master.Output(C_MESSAGE_NO.OIL_CONFIRM_CANCEL_ORDER,
+                      C_MESSAGE_TYPE.QUES,
+                      needsPopUp:=True,
+                      messageBoxTitle:="",
+                      IsConfirm:=True)
 
     End Sub
 
@@ -1241,7 +1205,6 @@ Public Class OIT0003OrderList
 
     End Sub
 
-
     ''' <summary>
     ''' 名称取得
     ''' </summary>
@@ -1287,6 +1250,86 @@ Public Class OIT0003OrderList
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
             Exit Sub
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' (受注TBL)受注進行ステータス(受注キャンセル)更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrderStatusCancel()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        '■■■ OIT0003tbl関連の受注TBLの「受注進行ステータス」を「900:受注キャンセル」に更新 ■■■
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0002_ORDER       " _
+                    & "    SET UPDYMD      = @P11,      " _
+                    & "        UPDUSER     = @P12,      " _
+                    & "        UPDTERMID   = @P13,      " _
+                    & "        RECEIVEYMD  = @P14,      " _
+                    & "        ORDERSTATUS = @P15       " _
+                    & "  WHERE ORDERNO     = @P01       " _
+                    & "    AND DELFLG     <> '1'       ;"
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+            Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", System.Data.SqlDbType.NVarChar)
+
+            '選択されている行の受注進行ステータスを「900:受注キャンセル」に更新
+            For Each OIT0003UPDrow In OIT0003tbl.Rows
+                If OIT0003UPDrow("OPERATION") = "on" Then
+                    PARA01.Value = OIT0003UPDrow("ORDERNO")
+
+                    PARA11.Value = Date.Now
+                    PARA12.Value = Master.USERID
+                    PARA13.Value = Master.USERTERMID
+                    PARA14.Value = C_DEFAULT_YMD
+                    PARA15.Value = BaseDllConst.CONST_ORDERSTATUS_900
+
+                    OIT0003UPDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_900
+                    CODENAME_get("ORDERSTATUS", OIT0003UPDrow("ORDERSTATUS"), OIT0003UPDrow("ORDERSTATUSNAME"), WW_DUMMY)
+
+                    SQLcmd.ExecuteNonQuery()
+                End If
+            Next
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

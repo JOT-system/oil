@@ -9435,15 +9435,15 @@ Public Class OIT0003OrderDetail
         If Me.TxtActualLoadingDate.Text <> "" _
             AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
             iresult = Date.Parse(Me.TxtActualLoadingDate.Text).CompareTo(DateTime.Today)
-            If iresult = -1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
-                Me.TxtActualLoadingDate.Focus()
-                WW_CheckMES1 = "(実績日)過去日付エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            'If iresult = -1 Then
+            '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
+            '    Me.TxtActualLoadingDate.Focus()
+            '    WW_CheckMES1 = "(実績日)過去日付エラー。"
+            '    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
         End If
 
         '(実績)発日 と　現在日付を比較
@@ -9451,15 +9451,15 @@ Public Class OIT0003OrderDetail
         If Me.TxtActualDepDate.Text <> "" _
             AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             iresult = Date.Parse(Me.TxtActualDepDate.Text).CompareTo(DateTime.Today)
-            If iresult = -1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
-                Me.TxtActualDepDate.Focus()
-                WW_CheckMES1 = "(実績日)過去日付エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            'If iresult = -1 Then
+            '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
+            '    Me.TxtActualDepDate.Focus()
+            '    WW_CheckMES1 = "(実績日)過去日付エラー。"
+            '    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
         End If
 
         '(実績)積車着日 と　現在日付を比較
@@ -9468,15 +9468,15 @@ Public Class OIT0003OrderDetail
         If Me.TxtActualArrDate.Text <> "" _
             AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 Then
             iresult = Date.Parse(Me.TxtActualArrDate.Text).CompareTo(DateTime.Today)
-            If iresult = -1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積車着日", needsPopUp:=True)
-                Me.TxtActualArrDate.Focus()
-                WW_CheckMES1 = "(実績日)過去日付エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            'If iresult = -1 Then
+            '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積車着日", needsPopUp:=True)
+            '    Me.TxtActualArrDate.Focus()
+            '    WW_CheckMES1 = "(実績日)過去日付エラー。"
+            '    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
         End If
 
         '(実績)受入日 と　現在日付を比較
@@ -9484,15 +9484,15 @@ Public Class OIT0003OrderDetail
         If Me.TxtActualAccDate.Text <> "" _
            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 Then
             iresult = Date.Parse(Me.TxtActualAccDate.Text).CompareTo(DateTime.Today)
-            If iresult = -1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)受入日", needsPopUp:=True)
-                Me.TxtActualAccDate.Focus()
-                WW_CheckMES1 = "(実績日)過去日付エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            'If iresult = -1 Then
+            '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)受入日", needsPopUp:=True)
+            '    Me.TxtActualAccDate.Focus()
+            '    WW_CheckMES1 = "(実績日)過去日付エラー。"
+            '    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
         End If
 
         '(実績)空車着日 と　現在日付を比較
@@ -9501,15 +9501,15 @@ Public Class OIT0003OrderDetail
         If Me.TxtActualEmparrDate.Text <> "" _
             AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
             iresult = Date.Parse(Me.TxtActualEmparrDate.Text).CompareTo(DateTime.Today)
-            If iresult = -1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
-                Me.TxtActualEmparrDate.Focus()
-                WW_CheckMES1 = "(実績日)過去日付エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+            'If iresult = -1 Then
+            '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+            '    Me.TxtActualEmparrDate.Focus()
+            '    WW_CheckMES1 = "(実績日)過去日付エラー。"
+            '    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            '    Exit Sub
+            'End If
         End If
 
         '○ 日付妥当性チェック

@@ -128,11 +128,11 @@ Public Structure CS0006TERMchk
 
                 Dim CS0011LOGWrite As New CS0011LOGWrite                    'LogOutput DirString Get
                 CS0011LOGWrite.INFSUBCLASS = METHOD_NAME                    'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"             '
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWRITE.TEXT = ex.ToString()
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+                CS0011LOGWrite.INFPOSI = "DB:OIS0001_TERM Select"             '
+                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWrite.TEXT = ex.ToString()
+                CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
 
                 ERR = C_MESSAGE_NO.DB_ERROR
 

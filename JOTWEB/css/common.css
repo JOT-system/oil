@@ -1745,16 +1745,12 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     margin-right: 10px;
 }
 
-
-
-
-
-#pnlCommonMessageText #lblCommonMessageText[data-naeiw="A"]:before {
-    width: 60px;
-    height: 60px;
+#pnlCommonMessageText #lblCommonMessageText[data-naeiw="Q"]:before {
+    width: 30px;
+    height: 30px;
     content: "";
     display: table-cell;
-    background-image: url('../oil/img/a_cat.png');
+    background-image: url('../oil/img/q_cat.png');
     background-repeat: no-repeat;
     background-size: contain;
     float: left;

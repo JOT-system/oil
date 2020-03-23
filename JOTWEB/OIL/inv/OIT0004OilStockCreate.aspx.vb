@@ -247,9 +247,9 @@ Public Class OIT0004OilStockCreate
             frvSuggest.DataBind()
         End If
 
-        '2.比重リスト
-        repWeightList.DataSource = dispDataObj.OilTypeList
-        repWeightList.DataBind()
+        ''2.比重リスト
+        'repWeightList.DataSource = dispDataObj.OilTypeList
+        'repWeightList.DataBind()
         '3.在庫表
         repStockDate.DataSource = dispDataObj.StockDate
         repStockDate.DataBind()
@@ -356,7 +356,7 @@ Public Class OIT0004OilStockCreate
             Dim dummyLabel As New Label
             Dim CS0009MESSAGEout As New CS0009MESSAGEout
             CS0009MESSAGEout.MESSAGEBOX = dummyLabel
-            CS0009MESSAGEout.NAEIW = "E"
+            CS0009MESSAGEout.NAEIW = C_NAEIW.WARNING
             Dim argStrSetting As String = "{8}{9}日付:{0}{8}{9}列車:{1}{8}{9}油種:{2}{8}{9}受注№:{3}{8}{9}明細№:{4}{8}{9}営業所:{5}{8}{9}荷主:{6}{8}{9}荷受人:{7}{8}"
             Dim nextBorder As String = "＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊" & ControlChars.CrLf
             For Each msgItm In retMsg
@@ -838,6 +838,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
         sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
@@ -846,6 +847,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@DATE_TO", SqlDbType.Date).Value = dateTo
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -904,6 +906,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
         sqlStr.AppendLine(" GROUP BY DTL.OILCODE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
@@ -912,6 +915,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@ACTUALDATE_TO", SqlDbType.Date).Value = dateTo
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -1272,6 +1276,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
         sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.TRAINNO,ODR.ACCDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
@@ -1281,6 +1286,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
                 .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
 
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -1430,6 +1436,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("   AND ODR.SHIPPERSCODE  = @SHIPPERSCODE")
         sqlStat.AppendLine("   AND ODR.CONSIGNEECODE = @CONSIGNEECODE")
         sqlStat.AppendLine("   AND ODR.DELFLG        = @DELFLG")
+        sqlStat.AppendLine("   AND ODR.ORDERSTATUS  <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
         sqlStat.AppendLine("   AND (")
         '列車No、日付が複数ある為 (列車No 日付) or (列車No 日付) ・・・でつなぐ
         Dim trainDateWhereCond As String = "         (ODR.TRAINNO = '{0}' AND ODR.ACCDATE = convert(date,'{1}'))"
@@ -1445,6 +1452,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
                 .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 While sqlDr.Read
@@ -3875,7 +3883,7 @@ Public Class OIT0004OilStockCreate
                     '◆朝在庫 除DS
                     itm.MorningStockWithoutDS = decMorningStockVal - stockListItm.DS
                     '◆受入数 (提案リストの値)
-                    If Me.ShowSuggestList = True AndAlso itm.DaysItem.IsPastDay = False AndAlso needsSumSuggestValue Then
+                    If Me.ShowSuggestList = True AndAlso itm.DaysItem.IsBeforeToday = False AndAlso needsSumSuggestValue Then
                         '提案リスト表示時
                         itm.Receive = GetSummarySuggestValue(itmDate, oilCode)
                     Else
@@ -3908,8 +3916,6 @@ Public Class OIT0004OilStockCreate
         ''' <remarks>外部呼出用メソッド</remarks>
         Public Sub AutoSuggest(inventoryDays As Integer)
             '一旦0あり先頭
-            '提案表部分の値を0クリア
-            SuggestValueInputValueToZero()
             Dim fromDay As String = Me.StockDate.First.Value.KeyString
             Dim toDay As String = Me.StockDate.First.Value.ItemDate.AddDays(inventoryDays - 1).ToString("yyyy/MM/dd")
             '過去日を除く開始日＋inventryDaysが処理条件

@@ -152,7 +152,7 @@ Public Structure CS0009MESSAGEout
             NAEIW = ""
         End If
         Select Case NAEIW.ToUpper
-            Case C_MESSAGE_TYPE.NOR, C_MESSAGE_TYPE.ABORT, C_MESSAGE_TYPE.ERR, C_MESSAGE_TYPE.WAR, C_MESSAGE_TYPE.INF
+            Case C_MESSAGE_TYPE.NOR, C_MESSAGE_TYPE.ABORT, C_MESSAGE_TYPE.ERR, C_MESSAGE_TYPE.WAR, C_MESSAGE_TYPE.INF, C_MESSAGE_TYPE.QUES
                 Exit Select
             Case Else
                 ERR = C_MESSAGE_NO.DLL_IF_ERROR

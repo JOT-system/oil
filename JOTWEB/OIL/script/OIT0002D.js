@@ -106,7 +106,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         document.getElementById('WF_FIELD').value = fieldNM;
         
         if (fieldNM === "TANKNUMBER") {
-            document.getElementById('WF_LeftMViewChange').value = 20;
+            //document.getElementById('WF_LeftMViewChange').value = 20;
+            document.getElementById('WF_LeftMViewChange').value = 55;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";

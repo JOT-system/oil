@@ -136,6 +136,7 @@ Public Class GRIS0005LeftBox
         LC_FILLINGPOINT
         LC_JOINTLIST
         LC_STACKING
+        LC_TANKNUMBERLINK
     End Enum
 
     ''' <summary>
@@ -217,6 +218,7 @@ Public Class GRIS0005LeftBox
         LP_FILLINGPOINT
         LP_JOINTLIST
         LP_STACKING
+        LP_TANKNUMBERLINK
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -541,6 +543,10 @@ Public Class GRIS0005LeftBox
                 'タンク車番号
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBERLINK
+                'タンク車番号(貨車連結順序表用)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBERLINK"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_TANKMODEL
                 'タンク車型式
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKMODEL"
@@ -702,9 +708,15 @@ Public Class GRIS0005LeftBox
         Dim dispDt As DataTable
         Dim dispFieldsDef As List(Of LeftTableDefItem) = Nothing
         Select Case ListCode
-            Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER
+            Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER,
+                 LIST_BOX_CLASSIFICATION.LC_TANKNUMBERLINK
                 'タンク車番号
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER"
+                If ListCode = LIST_BOX_CLASSIFICATION.LC_TANKNUMBER Then
+                    Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER"
+                ElseIf ListCode = LIST_BOX_CLASSIFICATION.LC_TANKNUMBERLINK Then
+                    Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBERLINK"
+                End If
+
                 '初期ソート順(油種(コード) asc,状態 desc,積車区分asc,車番(数値化)asc)
                 Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "VALUE2," &
                                                                   "VALUE10 DESC," &

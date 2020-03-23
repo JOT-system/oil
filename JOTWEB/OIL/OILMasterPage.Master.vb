@@ -432,15 +432,20 @@ Public Class OILMasterPage
     ''' <param name="I_PARA02"></param>
     ''' <param name="needsPopUp">ポップアップ表示有無(初期値：False(表示しない))</param>
     ''' <param name="messageBoxTitle">疑似メッセージボックスのタイトルバー文字(初期値：メッセージ,needsPopUpがTrueでなければ意味なし)</param>
+    ''' <param name="IsConfirm">確認メッセージ表示フラグ(True:表示(needsPopがTrueでなければ意味なし),False:表示しない</param>
+    ''' <param name="YesButtonId">確認メッセージ「はい」のボタンID初期値：btnCommonConfirmOk
+    ''' （呼び出した画面のWF_ButtonClick.ValueにこのIDを格納しポストバックされる）</param>
     ''' <remarks></remarks>
     Public Sub Output(ByVal msgNo As String,
                       ByVal msgType As String,
                       Optional ByVal I_PARA01 As String = Nothing,
                       Optional ByVal I_PARA02 As String = Nothing,
                       Optional ByVal needsPopUp As Boolean = False,
-                      Optional ByVal messageBoxTitle As String = "メッセージ")
+                      Optional ByVal messageBoxTitle As String = "メッセージ",
+                      Optional ByVal IsConfirm As Boolean = False,
+                      Optional ByVal YesButtonId As String = "btnCommonConfirmOk")
 
-        footer.Output(msgNo, msgType, I_PARA01, I_PARA02, needsPopUp, messageBoxTitle)
+        footer.Output(msgNo, msgType, I_PARA01, I_PARA02, needsPopUp, messageBoxTitle, IsConfirm, YesButtonId)
 
     End Sub
     ''' <summary>

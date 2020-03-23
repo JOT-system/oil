@@ -361,6 +361,10 @@ Public Module BaseDllConst
     ''' タンク数量未設定
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_96 As String = "96"
+    ''' <summary>
+    ''' 入線順重複
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_97 As String = "97"
 
     ''' <summary>
     ''' 失注（荷主都合）

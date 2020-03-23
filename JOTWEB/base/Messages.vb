@@ -28,6 +28,10 @@ Public Module Messages
         ''' 異常
         ''' </summary>
         Public Const ABORT As String = "A"
+        ''' <summary>
+        ''' 確認
+        ''' </summary>
+        Public Const QUES As String = "Q"
     End Class
 
     ''' <summary>
@@ -518,7 +522,18 @@ Public Module Messages
         ''' 新規受注№が取得できませんでした。
         ''' </summary>
         Public Const OIL_CANNOT_GET_NEW_ORDERNO As String = "20032"
-
+        ''' <summary>
+        ''' 受注キャンセルしますよろしいですか？
+        ''' </summary>
+        Public Const OIL_CONFIRM_CANCEL_ORDER As String = "20033"
+        ''' <summary>
+        ''' キャンセルデータ未存在
+        ''' </summary>
+        Public Const OIL_CANCELDATA_NOTFOUND As String = "20034"
+        ''' <summary>
+        ''' キャンセル行未存在
+        ''' </summary>
+        Public Const OIL_CANCELLINE_NOTFOUND As String = "20035"
 #End Region
 
 

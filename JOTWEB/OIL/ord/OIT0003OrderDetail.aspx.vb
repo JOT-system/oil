@@ -8002,10 +8002,13 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 If I_KEYCODE.Equals("") Then
-                    Dim i As Integer = 0
-                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
-                        O_VALUE(i) = OIT0003WKrow("KEYCODE")
-                        i += 1
+                    'Dim i As Integer = 0 '2020/3/23 三宅 Delete
+                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows '(全抽出結果回るので要検討
+                        'O_VALUE(i) = OIT0003WKrow("KEYCODE") 2020/3/23 三宅 全部KEYCODE(列車NO)が格納されてしまうので修正しました（問題なければこのコメント消してください)
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+                        Next
+                        'i += 1 '2020/3/23 三宅 Delete
                     Next
                 Else
                     For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows

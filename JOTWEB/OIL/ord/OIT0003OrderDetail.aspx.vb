@@ -296,12 +296,12 @@ Public Class OIT0003OrderDetail
 
             '〇 受注進行ステータスが下記内容へ変更された場合
             '   受注進行ステータス＝"200:手配中"
-            '   受注進行ステータス＝"210:手配中(入換指示手配済)"
-            '   受注進行ステータス＝"220:手配中(積込指示手配済)"
+            '   受注進行ステータス＝"210:手配中(入換指示入力済)"
+            '   受注進行ステータス＝"220:手配中(積込指示入力済)"
             '   受注進行ステータス＝"230:手配中(託送指示手配済)"
-            '   受注進行ステータス＝"240:手配中(入換指示未手配)"
-            '   受注進行ステータス＝"250:手配中(積込指示未手配)"
-            '   受注進行ステータス＝"260:手配中(託送指示未手配)"
+            '   受注進行ステータス＝"240:手配中(入換指示未入力)"
+            '   受注進行ステータス＝"250:手配中(積込指示未入力)"
+            '   受注進行ステータス＝"260:手配中(入換積込指示手配済)"
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
@@ -8047,7 +8047,7 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_ScreenOrderStatusSet(ByRef O_VALUE As String)
 
         '◆一度に設定をしない場合の対応
-        '　受注進行ステータス＝"260:手配中(託送指示未手配)"
+        '　受注進行ステータス＝"260:手配中(入換積込指示手配済)"
         '　託送指示フラグが"1"(手配)の場合
         If work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_260 _
             AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
@@ -8069,12 +8069,12 @@ Public Class OIT0003OrderDetail
 
         Select Case work.WF_SEL_ORDERSTATUS.Text
                 '受注進行ステータス＝"200:手配中"
-                '受注進行ステータス＝"210:手配中(入換指示手配済)"
-                '受注進行ステータス＝"220:手配中(積込指示手配済)"
+                '受注進行ステータス＝"210:手配中(入換指示入力済)"
+                '受注進行ステータス＝"220:手配中(積込指示入力済)"
                 '受注進行ステータス＝"230:手配中(託送指示手配済)"
-                '受注進行ステータス＝"240:手配中(入換指示未手配)"
-                '受注進行ステータス＝"250:手配中(積込指示未手配)"
-                '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                '受注進行ステータス＝"240:手配中(入換指示未入力)"
+                '受注進行ステータス＝"250:手配中(積込指示未入力)"
+                '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
             Case BaseDllConst.CONST_ORDERSTATUS_200,
                  BaseDllConst.CONST_ORDERSTATUS_210,
                  BaseDllConst.CONST_ORDERSTATUS_220,
@@ -8129,7 +8129,7 @@ Public Class OIT0003OrderDetail
                     'かつ、積込指示入力＝"1:完了"
                     'かつ、託送指示入力＝"0:未完了"の場合
                 ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
-                    '手配中(託送指示未手配)
+                    '手配中(入換積込指示手配済)
                     O_VALUE = CONST_ORDERSTATUS_260
 
                 End If
@@ -8239,9 +8239,9 @@ Public Class OIT0003OrderDetail
 
         '〇 (実績)の日付の入力可否制御
         '受注情報が以下の場合は、(実績)の日付の入力を制限
-        '100:受注受付, 200:手配, 210:手配中（入換指示手配済）, 220:手配中（積込指示手配済）
-        '230:手配中（託送指示手配済）, 240:手配中（入換指示未手配）, 250:手配中（積込指示未手配）
-        '260:手配中（託送指示未手配）
+        '100:受注受付, 200:手配, 210:手配中（入換指示入力済）, 220:手配中（積込指示入力済）
+        '230:手配中（託送指示手配済）, 240:手配中（入換指示未入力）, 250:手配中（積込指示未入力）
+        '260:手配中（入換積込指示手配済）
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
@@ -8401,9 +8401,9 @@ Public Class OIT0003OrderDetail
             WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
 
             '受注進行ステータスが以下の場合
-            '210:手配中（入換指示手配済）, 220:手配中（積込指示手配済）
-            '230:手配中（託送指示手配済）, 240:手配中（入換指示未手配）, 250:手配中（積込指示未手配）
-            '260:手配中（託送指示未手配）
+            '210:手配中（入換指示入力済）, 220:手配中（積込指示入力済）
+            '230:手配中（託送指示手配済）, 240:手配中（入換指示未入力）, 250:手配中（積込指示未入力）
+            '260:手配中（入換積込指示手配済）
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
@@ -11033,12 +11033,12 @@ Public Class OIT0003OrderDetail
                     Next
 
                     '受注進行ステータス＝"200:手配中"
-                    '受注進行ステータス＝"210:手配中(入換指示手配済)"
-                    '受注進行ステータス＝"220:手配中(積込指示手配済)"
+                    '受注進行ステータス＝"210:手配中(入換指示入力済)"
+                    '受注進行ステータス＝"220:手配中(積込指示入力済)"
                     '受注進行ステータス＝"230:手配中(託送指示手配済)"
-                    '受注進行ステータス＝"240:手配中(入換指示未手配)"
-                    '受注進行ステータス＝"250:手配中(積込指示未手配)"
-                    '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                    '受注進行ステータス＝"240:手配中(入換指示未入力)"
+                    '受注進行ステータス＝"250:手配中(積込指示未入力)"
+                    '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
                 ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
@@ -11084,12 +11084,12 @@ Public Class OIT0003OrderDetail
                 '〇 受注進行ステータスの状態
                 Select Case work.WF_SEL_ORDERSTATUS.Text
                 '受注進行ステータス＝"200:手配中"
-                '受注進行ステータス＝"210:手配中(入換指示手配済)"
-                '受注進行ステータス＝"220:手配中(積込指示手配済)"
+                '受注進行ステータス＝"210:手配中(入換指示入力済)"
+                '受注進行ステータス＝"220:手配中(積込指示入力済)"
                 '受注進行ステータス＝"230:手配中(託送指示手配済)"
-                '受注進行ステータス＝"240:手配中(入換指示未手配)"
-                '受注進行ステータス＝"250:手配中(積込指示未手配)"
-                '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                '受注進行ステータス＝"240:手配中(入換指示未入力)"
+                '受注進行ステータス＝"250:手配中(積込指示未入力)"
+                '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
                     Case BaseDllConst.CONST_ORDERSTATUS_200,
                          BaseDllConst.CONST_ORDERSTATUS_210,
                          BaseDllConst.CONST_ORDERSTATUS_220,

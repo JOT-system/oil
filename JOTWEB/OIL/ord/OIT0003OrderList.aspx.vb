@@ -461,7 +461,7 @@ Public Class OIT0003OrderList
         'チェックボックス判定
         For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
             If OIT0003tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                If OIT0003tbl.Rows(i)("OPERATION") = "" AndAlso OIT0003tbl.Rows(i)("ORDERSTATUS") <> "900" Then
+                If OIT0003tbl.Rows(i)("OPERATION") = "" AndAlso OIT0003tbl.Rows(i)("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 Then
                     OIT0003tbl.Rows(i)("OPERATION") = "on"
                 Else
                     OIT0003tbl.Rows(i)("OPERATION") = ""
@@ -484,7 +484,7 @@ Public Class OIT0003OrderList
 
         '全チェックボックスON
         For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
-            If OIT0003tbl.Rows(i)("HIDDEN") = "0" AndAlso OIT0003tbl.Rows(i)("ORDERSTATUS") <> "900" Then
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" AndAlso OIT0003tbl.Rows(i)("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 Then
                 OIT0003tbl.Rows(i)("OPERATION") = "on"
             End If
         Next

@@ -339,7 +339,7 @@ Public Class OIT0003OrderLinkQuota
                 '利用可能日の条件を登録日⇒(予定)積込日へ変更
                 'PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
                 If work.WF_SEL_LODDATE.Text.Equals("") Then
-                    PARA2.Value = DBNull.Value
+                    PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
                 Else
                     PARA2.Value = work.WF_SEL_LODDATE.Text
                 End If

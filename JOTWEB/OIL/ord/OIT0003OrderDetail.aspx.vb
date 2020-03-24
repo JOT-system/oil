@@ -182,12 +182,12 @@ Public Class OIT0003OrderDetail
             End If
 
             '○ 託送指示フラグ(0：未手配, 1：手配)設定
-            '　 受注進行ステータスが100:受注受付, または270:手配完了以降のステータスに変更された場合
+            '　 受注進行ステータスが100:受注受付, または300:手配完了以降のステータスに変更された場合
             '### ステータス追加(仮) #################################
             If work.WF_SEL_DELIVERYFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
@@ -204,10 +204,10 @@ Public Class OIT0003OrderDetail
                 WF_DELIVERYFLG.Value = "0"
             End If
 
-            '◯受注進行ステータスが270:手配完了以降のステータスに変更された場合
+            '◯受注進行ステータスが300:手配完了以降のステータスに変更された場合
             '### ステータス追加(仮) #################################
-            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
@@ -317,8 +317,8 @@ Public Class OIT0003OrderDetail
 
             '〇 受注進行ステータスが"手配完了"へ変更された場合
             '### ステータス追加(仮) #################################
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
@@ -2135,7 +2135,7 @@ Public Class OIT0003OrderDetail
         Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
         '〇 受注ステータスが"手配完了"へ変更された場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
 
@@ -3432,9 +3432,9 @@ Public Class OIT0003OrderDetail
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                         SQLcon.Open()       'DataBase接続
 
-                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_270)
-                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_270, TxtOrderStatus.Text, WW_DUMMY)
-                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270
+                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_300)
+                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_300, TxtOrderStatus.Text, WW_DUMMY)
+                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300
                         work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
 
                         '○ 画面表示データ復元
@@ -3536,7 +3536,7 @@ Public Class OIT0003OrderDetail
                     '積込指示入力＝"1:完了"の場合
                     If WW_LoadingInput = "1" Then
                         '手配完了
-                        strOrderStatus = CONST_ORDERSTATUS_270
+                        strOrderStatus = CONST_ORDERSTATUS_300
                         CODENAME_get("ORDERSTATUS", strOrderStatus, Me.TxtOrderStatus.Text, WW_DUMMY)
                     End If
             End Select
@@ -3598,7 +3598,7 @@ Public Class OIT0003OrderDetail
         End If
 
         '〇 受注ステータスが"手配完了"へ変更された場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
 
@@ -3660,8 +3660,8 @@ Public Class OIT0003OrderDetail
         '### 受注進行ステータスチェック START ##############################################
         '受注進行ステータスの状態
         Select Case work.WF_SEL_ORDERSTATUS.Text
-            '"270:手配完了"
-            Case BaseDllConst.CONST_ORDERSTATUS_270
+            '"300:手配完了"
+            Case BaseDllConst.CONST_ORDERSTATUS_300
                 '(一覧)数量の入力チェック
                 '0(デフォルト値)以外が入力されていれば、入力していると判断
                 Dim chkCarsAmount As Boolean = True
@@ -3697,7 +3697,7 @@ Public Class OIT0003OrderDetail
 
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
                 If Me.TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True Then
-                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_300
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_310
 
                     '### 油種数量(数値)が0(kl)の場合はエラー表示 ##################
                 ElseIf chkCarsAmount = False Then
@@ -3748,8 +3748,8 @@ Public Class OIT0003OrderDetail
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
                 End If
 
-            '"300:受注確定"
-            Case BaseDllConst.CONST_ORDERSTATUS_300,
+            '"310:受注確定"
+            Case BaseDllConst.CONST_ORDERSTATUS_310,
                  BaseDllConst.CONST_ORDERSTATUS_350
 
                 '### ステータス追加(仮) #################################
@@ -8052,7 +8052,7 @@ Public Class OIT0003OrderDetail
         If work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_260 _
             AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
             '手配完了
-            O_VALUE = CONST_ORDERSTATUS_270
+            O_VALUE = CONST_ORDERSTATUS_300
             Exit Sub
 
             '　営業所＝"三重塩浜営業所"
@@ -8062,7 +8062,7 @@ Public Class OIT0003OrderDetail
             AndAlso work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_200 _
             AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
             '手配完了
-            O_VALUE = CONST_ORDERSTATUS_270
+            O_VALUE = CONST_ORDERSTATUS_300
             Exit Sub
 
         End If
@@ -8088,7 +8088,7 @@ Public Class OIT0003OrderDetail
                 'かつ、託送指示入力＝"1:完了"の場合
                 If WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
                     '手配完了
-                    O_VALUE = CONST_ORDERSTATUS_270
+                    O_VALUE = CONST_ORDERSTATUS_300
 
                     '入換指示入力＝"1:完了"
                     'かつ、積込指示入力＝"0:未完了"
@@ -8262,9 +8262,9 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = False
 
-            '受注情報が「270:手配完了」の場合は、(実績)すべての日付の入力を制限
-            '270:手配完了
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            '受注情報が「300:手配完了」の場合は、(実績)すべての日付の入力を制限
+            '300:手配完了
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             '(実績)積込日
             Me.TxtActualLoadingDate.Enabled = True
             '(実績)発日
@@ -8276,9 +8276,9 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
 
-            '受注情報が「300:受注確定」の場合は、(実績)積込日の入力を制限
-            '300:受注確定
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            '受注情報が「310:受注確定」の場合は、(実績)積込日の入力を制限
+            '310:受注確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             '(実績)積込日
             Me.TxtActualLoadingDate.Enabled = False
             '(実績)発日
@@ -8413,15 +8413,15 @@ Public Class OIT0003OrderDetail
 
             '### 特になし ###############################################################
 
-            '受注進行ステータスが「270:手配完了」の場合
-            '270:手配完了
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            '受注進行ステータスが「300:手配完了」の場合
+            '300:手配完了
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
 
             '### 特になし ###############################################################
 
-            '受注進行ステータスが「300:受注確定」の場合
-            '300:受注確定
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            '受注進行ステータスが「310:受注確定」の場合
+            '310:受注確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             '引数１：所在地コード　⇒　変更なし(空白)
             '引数２：タンク車状態　⇒　変更なし(空白)
             '引数３：積車区分　　　⇒　変更あり("F"(積車))
@@ -9433,9 +9433,9 @@ Public Class OIT0003OrderDetail
         '    -1 : dt1はdt2より前の日
         '     1 : dt1はdt2より後の日
         '(実績)積込日 と　現在日付を比較
-        '受注進行ステータスが"270:手配完了"の場合
+        '受注進行ステータスが"300:手配完了"の場合
         If Me.TxtActualLoadingDate.Text <> "" _
-            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 Then
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             iresult = Date.Parse(Me.TxtActualLoadingDate.Text).CompareTo(DateTime.Today)
             'If iresult = -1 Then
             '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
@@ -9449,9 +9449,9 @@ Public Class OIT0003OrderDetail
         End If
 
         '(実績)発日 と　現在日付を比較
-        '受注進行ステータスが"300:受注確定"の場合
+        '受注進行ステータスが"310:受注確定"の場合
         If Me.TxtActualDepDate.Text <> "" _
-            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             iresult = Date.Parse(Me.TxtActualDepDate.Text).CompareTo(DateTime.Today)
             'If iresult = -1 Then
             '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)

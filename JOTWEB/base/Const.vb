@@ -418,13 +418,13 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_260 As String = "260"
     ''' <summary>
-    ''' 270:手配完了
-    ''' </summary>
-    Public Const CONST_ORDERSTATUS_270 As String = "270"
-    ''' <summary>
-    ''' 300:受注確定
+    ''' 300:手配完了
     ''' </summary>
     Public Const CONST_ORDERSTATUS_300 As String = "300"
+    ''' <summary>
+    ''' 310:受注確定
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_310 As String = "310"
     ''' <summary>
     ''' 350:受注確定((実績)発日設定済み)
     ''' </summary>

@@ -35,6 +35,7 @@
     <asp:TextBox ID="WF_SEL_ORDERSALESOFFICE" runat="server"></asp:TextBox>
     <!-- 列車 -->
     <asp:TextBox ID="WF_SEL_TRAIN" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_TRAINNAME" runat="server"></asp:TextBox>
     <!-- 発駅 -->
     <asp:TextBox ID="WF_SEL_DEPARTURESTATION" runat="server"></asp:TextBox>
     <!-- 向先 -->

@@ -191,6 +191,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         'Me.TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
         '本線列車
         Me.TxtHeadOfficeTrain.Text = work.WF_SEL_TRAIN.Text
+        Me.TxtHeadOfficeTrainName.Text = work.WF_SEL_TRAINNAME.Text
         '発駅
         Me.TxtDepstation.Text = work.WF_SEL_DEPARTURESTATION.Text
         '着駅
@@ -3616,8 +3617,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     'DB更新
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     'PARA01.Value = OIT0001row("ORDERNO")              '受注№
-                    PARA02.Value = TxtHeadOfficeTrain.Text            '本線列車
-                    PARA93.Value = TxtHeadOfficeTrainName.Text        '本線列車名
+                    PARA02.Value = Me.TxtHeadOfficeTrain.Text         '本線列車
+                    PARA93.Value = Me.TxtHeadOfficeTrainName.Text     '本線列車名
                     PARA03.Value = OIT0001row("ORDERYMD")             '受注登録日
                     PARA04.Value = work.WF_SEL_SALESOFFICECODE.Text   '受注営業所コード
                     PARA05.Value = work.WF_SEL_SALESOFFICE.Text       '受注営業所名
@@ -4840,166 +4841,168 @@ Public Class OIT0001EmptyTurnDairyDetail
 
     End Sub
 
-    '''' <summary>
-    '''' オーダー履歴情報追加処理
-    '''' </summary>
-    '''' <param name="sqlCon"></param>
-    '''' <param name="sqlTran"></param>
-    '''' <param name="drOrder"></param>
-    'Private Sub InsertOrder(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
-    '    Dim sqlStat As New StringBuilder
-    '    sqlStat.AppendLine("INSERT INTO OIL.OIT0002_ORDER")
-    '    sqlStat.AppendLine("   (ORDERNO,TRAINNO,TRAINNAME,ORDERYMD,OFFICECODE,OFFICENAME,ORDERTYPE,")
-    '    sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,BASECODE,BASENAME,CONSIGNEECODE,CONSIGNEENAME,")
-    '    sqlStat.AppendLine("    DEPSTATION,DEPSTATIONNAME,ARRSTATION,ARRSTATIONNAME,RETSTATION,RETSTATIONNAME,")
-    '    sqlStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,ORDERSTATUS,ORDERINFO,EMPTYTURNFLG,STACKINGFLG,USEPROPRIETYFLG,DELIVERYFLG,")
-    '    sqlStat.AppendLine("    LODDATE,DEPDATE,ARRDATE,ACCDATE,EMPARRDATE,ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
-    '    sqlStat.AppendLine("    RTANK,HTANK,TTANK,MTTANK,KTANK,K3TANK,K5TANK,K10TANK,LTANK,ATANK,")
-    '    sqlStat.AppendLine("    OTHER1OTANK,OTHER2OTANK,OTHER3OTANK,OTHER4OTANK,OTHER5OTANK,")
-    '    sqlStat.AppendLine("    OTHER6OTANK,OTHER7OTANK,OTHER8OTANK,OTHER9OTANK,OTHER10OTANK,")
-    '    sqlStat.AppendLine("    TOTALTANK,")
-    '    sqlStat.AppendLine("    RTANKCH,HTANKCH,TTANKCH,MTTANKCH,KTANKCH,K3TANKCH,K5TANKCH,K10TANKCH,LTANKCH,ATANKCH,")
-    '    sqlStat.AppendLine("    OTHER1OTANKCH,OTHER2OTANKCH,OTHER3OTANKCH,OTHER4OTANKCH,OTHER5OTANKCH,")
-    '    sqlStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
-    '    sqlStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,KEIJYOYMD,")
-    '    sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
-    '    sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
-    '    sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
-    '    sqlStat.AppendLine("    VALUES")
-    '    sqlStat.AppendLine("   (@ORDERNO,@TRAINNO,@TRAINNAME,@ORDERYMD,@OFFICECODE,@OFFICENAME,@ORDERTYPE,")
-    '    sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@BASECODE,@BASENAME,@CONSIGNEECODE,@CONSIGNEENAME,")
-    '    sqlStat.AppendLine("    @DEPSTATION,@DEPSTATIONNAME,@ARRSTATION,@ARRSTATIONNAME,@RETSTATION,@RETSTATIONNAME,")
-    '    sqlStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,@ORDERSTATUS,@ORDERINFO,@EMPTYTURNFLG,@STACKINGFLG,@USEPROPRIETYFLG,@DELIVERYFLG,")
-    '    sqlStat.AppendLine("    @LODDATE,@DEPDATE,@ARRDATE,@ACCDATE,@EMPARRDATE,@ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
-    '    sqlStat.AppendLine("    @RTANK,@HTANK,@TTANK,@MTTANK,@KTANK,@K3TANK,@K5TANK,@K10TANK,@LTANK,@ATANK,")
-    '    sqlStat.AppendLine("    @OTHER1OTANK,@OTHER2OTANK,@OTHER3OTANK,@OTHER4OTANK,@OTHER5OTANK,")
-    '    sqlStat.AppendLine("    @OTHER6OTANK,@OTHER7OTANK,@OTHER8OTANK,@OTHER9OTANK,@OTHER10OTANK,")
-    '    sqlStat.AppendLine("    @TOTALTANK,")
-    '    sqlStat.AppendLine("    @RTANKCH,@HTANKCH,@TTANKCH,@MTTANKCH,@KTANKCH,@K3TANKCH,@K5TANKCH,@K10TANKCH,@LTANKCH,@ATANKCH,")
-    '    sqlStat.AppendLine("    @OTHER1OTANKCH,@OTHER2OTANKCH,@OTHER3OTANKCH,@OTHER4OTANKCH,@OTHER5OTANKCH,")
-    '    sqlStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
-    '    sqlStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@KEIJYOYMD,")
-    '    sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
-    '    sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
-    '    sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
+    ''' <summary>
+    ''' オーダー履歴情報追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <param name="drOrder"></param>
+    Private Sub InsertOrder(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("INSERT INTO OIL.HIS0001_ORDER")
+        sqlStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,TRAINNO,TRAINNAME,ORDERYMD,OFFICECODE,OFFICENAME,ORDERTYPE,")
+        sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,BASECODE,BASENAME,CONSIGNEECODE,CONSIGNEENAME,")
+        sqlStat.AppendLine("    DEPSTATION,DEPSTATIONNAME,ARRSTATION,ARRSTATIONNAME,RETSTATION,RETSTATIONNAME,")
+        sqlStat.AppendLine("    CHANGERETSTATION,CHANGERETSTATIONNAME,ORDERSTATUS,ORDERINFO,EMPTYTURNFLG,STACKINGFLG,USEPROPRIETYFLG,DELIVERYFLG,")
+        sqlStat.AppendLine("    LODDATE,DEPDATE,ARRDATE,ACCDATE,EMPARRDATE,ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
+        sqlStat.AppendLine("    RTANK,HTANK,TTANK,MTTANK,KTANK,K3TANK,K5TANK,K10TANK,LTANK,ATANK,")
+        sqlStat.AppendLine("    OTHER1OTANK,OTHER2OTANK,OTHER3OTANK,OTHER4OTANK,OTHER5OTANK,")
+        sqlStat.AppendLine("    OTHER6OTANK,OTHER7OTANK,OTHER8OTANK,OTHER9OTANK,OTHER10OTANK,")
+        sqlStat.AppendLine("    TOTALTANK,")
+        sqlStat.AppendLine("    RTANKCH,HTANKCH,TTANKCH,MTTANKCH,KTANKCH,K3TANKCH,K5TANKCH,K10TANKCH,LTANKCH,ATANKCH,")
+        sqlStat.AppendLine("    OTHER1OTANKCH,OTHER2OTANKCH,OTHER3OTANKCH,OTHER4OTANKCH,OTHER5OTANKCH,")
+        sqlStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
+        sqlStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,KEIJYOYMD,")
+        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
+        sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
+        sqlStat.AppendLine("    VALUES")
+        sqlStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@TRAINNO,@TRAINNAME,@ORDERYMD,@OFFICECODE,@OFFICENAME,@ORDERTYPE,")
+        sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@BASECODE,@BASENAME,@CONSIGNEECODE,@CONSIGNEENAME,")
+        sqlStat.AppendLine("    @DEPSTATION,@DEPSTATIONNAME,@ARRSTATION,@ARRSTATIONNAME,@RETSTATION,@RETSTATIONNAME,")
+        sqlStat.AppendLine("    @CHANGERETSTATION,@CHANGERETSTATIONNAME,@ORDERSTATUS,@ORDERINFO,@EMPTYTURNFLG,@STACKINGFLG,@USEPROPRIETYFLG,@DELIVERYFLG,")
+        sqlStat.AppendLine("    @LODDATE,@DEPDATE,@ARRDATE,@ACCDATE,@EMPARRDATE,@ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
+        sqlStat.AppendLine("    @RTANK,@HTANK,@TTANK,@MTTANK,@KTANK,@K3TANK,@K5TANK,@K10TANK,@LTANK,@ATANK,")
+        sqlStat.AppendLine("    @OTHER1OTANK,@OTHER2OTANK,@OTHER3OTANK,@OTHER4OTANK,@OTHER5OTANK,")
+        sqlStat.AppendLine("    @OTHER6OTANK,@OTHER7OTANK,@OTHER8OTANK,@OTHER9OTANK,@OTHER10OTANK,")
+        sqlStat.AppendLine("    @TOTALTANK,")
+        sqlStat.AppendLine("    @RTANKCH,@HTANKCH,@TTANKCH,@MTTANKCH,@KTANKCH,@K3TANKCH,@K5TANKCH,@K10TANKCH,@LTANKCH,@ATANKCH,")
+        sqlStat.AppendLine("    @OTHER1OTANKCH,@OTHER2OTANKCH,@OTHER3OTANKCH,@OTHER4OTANKCH,@OTHER5OTANKCH,")
+        sqlStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
+        sqlStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@KEIJYOYMD,")
+        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
+        sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
 
-    '    Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
-    '        With sqlCmd.Parameters
-    '            .Add("ORDERNO", SqlDbType.NVarChar).Value = drOrder("ORDERNO")
-    '            .Add("TRAINNO", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("TRAINNAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("ORDERYMD", SqlDbType.Date).Value = drOrder("")
-    '            .Add("OFFICECODE", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("OFFICENAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("ORDERTYPE", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("BASECODE", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("BASENAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("CONSIGNEECODE", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("CONSIGNEENAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("DEPSTATION", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("DEPSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("ARRSTATION", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("ARRSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("RETSTATION", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("RETSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("CHANGERETSTATION", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("ORDERSTATUS", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("EMPTYTURNFLG", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("USEPROPRIETYFLG", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("DELIVERYFLG", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("LODDATE", SqlDbType.Date).Value = drOrder("")
-    '            .Add("DEPDATE", SqlDbType.Date).Value = drOrder("")
-    '            .Add("ARRDATE", SqlDbType.Date).Value = drOrder("")
-    '            .Add("ACCDATE", SqlDbType.Date).Value = drOrder("")
-    '            .Add("EMPARRDATE", SqlDbType.Date).Value = drOrder("")
-    '            .Add("ACTUALLODDATE", SqlDbType.Date).Value = If(drOrder("") = "", CType(DBNull.Value, Object), drOrder(""))
-    '            .Add("ACTUALDEPDATE", SqlDbType.Date).Value = If(drOrder("") = "", CType(DBNull.Value, Object), drOrder(""))
-    '            .Add("ACTUALARRDATE", SqlDbType.Date).Value = If(drOrder("") = "", CType(DBNull.Value, Object), drOrder(""))
-    '            .Add("ACTUALACCDATE", SqlDbType.Date).Value = If(drOrder("") = "", CType(DBNull.Value, Object), drOrder(""))
-    '            .Add("ACTUALEMPARRDATE", SqlDbType.Date).Value = If(drOrder("") = "", CType(DBNull.Value, Object), drOrder(""))
-    '            .Add("RTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("HTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("TTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("MTTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("KTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("K3TANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("K5TANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("K10TANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("LTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("ATANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER1OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER2OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER3OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER4OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER5OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER6OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER7OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER8OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER9OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER10OTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("TOTALTANK", SqlDbType.Int).Value = drOrder("")
-    '            .Add("RTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("HTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("TTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("MTTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("KTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("K3TANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("K5TANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("K10TANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("LTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("ATANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER1OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER2OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER3OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER4OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER5OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER6OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER7OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER8OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER9OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("OTHER10OTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("TOTALTANKCH", SqlDbType.Int).Value = drOrder("")
-    '            .Add("TANKLINKNO", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("TANKLINKNOMADE", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("KEIJYOYMD", SqlDbType.Date).Value = If(drOrder("") = "", CType(DBNull.Value, Object), drOrder(""))
-    '            .Add("SALSE", SqlDbType.Int).Value = drOrder("")
-    '            .Add("SALSETAX", SqlDbType.Int).Value = drOrder("")
-    '            .Add("TOTALSALSE", SqlDbType.Int).Value = drOrder("")
-    '            .Add("PAYMENT", SqlDbType.Int).Value = drOrder("")
-    '            .Add("PAYMENTTAX", SqlDbType.Int).Value = drOrder("")
-    '            .Add("TOTALPAYMENT", SqlDbType.Int).Value = drOrder("")
-    '            .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("")
-    '            .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("INITTERMID", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("UPDYMD", SqlDbType.DateTime).Value = drOrder("")
-    '            .Add("UPDUSER", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("UPDTERMID", SqlDbType.NVarChar).Value = drOrder("")
-    '            .Add("RECEIVEYMD", SqlDbType.DateTime).Value = drOrder("")
-    '        End With
-    '        sqlCmd.CommandTimeout = 300
-    '        sqlCmd.ExecuteNonQuery()
-    '    End Using
-    '    CS0020JOURNAL.TABLENM = "OIT0002_ORDER"
-    '    CS0020JOURNAL.ACTION = "INSERT"
-    '    CS0020JOURNAL.ROW = orderItm.ToDataTable.Rows(0)
-    '    CS0020JOURNAL.CS0020JOURNAL()
-    '    If Not isNormal(CS0020JOURNAL.ERR) Then
-    '        Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            With sqlCmd.Parameters
+                .Add("HISTORYNO", SqlDbType.NVarChar).Value = ""
+                .Add("MAPID", SqlDbType.NVarChar).Value = Me.Title
+                .Add("ORDERNO", SqlDbType.NVarChar).Value = drOrder("ORDERNO")
+                .Add("TRAINNO", SqlDbType.NVarChar).Value = drOrder("TRAINNO")
+                .Add("TRAINNAME", SqlDbType.NVarChar).Value = drOrder("TRAINNAME")
+                .Add("ORDERYMD", SqlDbType.Date).Value = drOrder("ORDERYMD")
+                .Add("OFFICECODE", SqlDbType.NVarChar).Value = drOrder("OFFICECODE")
+                .Add("OFFICENAME", SqlDbType.NVarChar).Value = drOrder("OFFICENAME")
+                .Add("ORDERTYPE", SqlDbType.NVarChar).Value = drOrder("ORDERTYPE")
+                .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
+                .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")
+                .Add("BASECODE", SqlDbType.NVarChar).Value = drOrder("BASECODE")
+                .Add("BASENAME", SqlDbType.NVarChar).Value = drOrder("BASENAME")
+                .Add("CONSIGNEECODE", SqlDbType.NVarChar).Value = drOrder("CONSIGNEECODE")
+                .Add("CONSIGNEENAME", SqlDbType.NVarChar).Value = drOrder("CONSIGNEENAME")
+                .Add("DEPSTATION", SqlDbType.NVarChar).Value = drOrder("DEPSTATION")
+                .Add("DEPSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("DEPSTATIONNAME")
+                .Add("ARRSTATION", SqlDbType.NVarChar).Value = drOrder("ARRSTATION")
+                .Add("ARRSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("ARRSTATIONNAME")
+                .Add("RETSTATION", SqlDbType.NVarChar).Value = drOrder("RETSTATION")
+                .Add("RETSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("RETSTATIONNAME")
+                .Add("CHANGERETSTATION", SqlDbType.NVarChar).Value = drOrder("CHANGERETSTATION")
+                .Add("CHANGERETSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("CHANGERETSTATIONNAME")
+                .Add("ORDERSTATUS", SqlDbType.NVarChar).Value = drOrder("ORDERSTATUS")
+                .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
+                .Add("EMPTYTURNFLG", SqlDbType.NVarChar).Value = drOrder("EMPTYTURNFLG")
+                .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
+                .Add("USEPROPRIETYFLG", SqlDbType.NVarChar).Value = drOrder("USEPROPRIETYFLG")
+                .Add("DELIVERYFLG", SqlDbType.NVarChar).Value = drOrder("DELIVERYFLG")
+                .Add("LODDATE", SqlDbType.Date).Value = drOrder("LODDATE")
+                .Add("DEPDATE", SqlDbType.Date).Value = drOrder("DEPDATE")
+                .Add("ARRDATE", SqlDbType.Date).Value = drOrder("ARRDATE")
+                .Add("ACCDATE", SqlDbType.Date).Value = drOrder("ACCDATE")
+                .Add("EMPARRDATE", SqlDbType.Date).Value = drOrder("EMPARRDATE")
+                .Add("ACTUALLODDATE", SqlDbType.Date).Value = If(drOrder("ACTUALLODDATE") = "", CType(DBNull.Value, Object), drOrder("ACTUALLODDATE"))
+                .Add("ACTUALDEPDATE", SqlDbType.Date).Value = If(drOrder("ACTUALDEPDATE") = "", CType(DBNull.Value, Object), drOrder("ACTUALDEPDATE"))
+                .Add("ACTUALARRDATE", SqlDbType.Date).Value = If(drOrder("ACTUALARRDATE") = "", CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
+                .Add("ACTUALACCDATE", SqlDbType.Date).Value = If(drOrder("ACTUALACCDATE") = "", CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
+                .Add("ACTUALEMPARRDATE", SqlDbType.Date).Value = If(drOrder("ACTUALEMPARRDATE") = "", CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
+                .Add("RTANK", SqlDbType.Int).Value = drOrder("RTANK")
+                .Add("HTANK", SqlDbType.Int).Value = drOrder("HTANK")
+                .Add("TTANK", SqlDbType.Int).Value = drOrder("TTANK")
+                .Add("MTTANK", SqlDbType.Int).Value = drOrder("MTTANK")
+                .Add("KTANK", SqlDbType.Int).Value = drOrder("KTANK")
+                .Add("K3TANK", SqlDbType.Int).Value = drOrder("K3TANK")
+                .Add("K5TANK", SqlDbType.Int).Value = drOrder("K5TANK")
+                .Add("K10TANK", SqlDbType.Int).Value = drOrder("K10TANK")
+                .Add("LTANK", SqlDbType.Int).Value = drOrder("LTANK")
+                .Add("ATANK", SqlDbType.Int).Value = drOrder("ATANK")
+                .Add("OTHER1OTANK", SqlDbType.Int).Value = drOrder("OTHER1OTANK")
+                .Add("OTHER2OTANK", SqlDbType.Int).Value = drOrder("OTHER2OTANK")
+                .Add("OTHER3OTANK", SqlDbType.Int).Value = drOrder("OTHER3OTANK")
+                .Add("OTHER4OTANK", SqlDbType.Int).Value = drOrder("OTHER4OTANK")
+                .Add("OTHER5OTANK", SqlDbType.Int).Value = drOrder("OTHER5OTANK")
+                .Add("OTHER6OTANK", SqlDbType.Int).Value = drOrder("OTHER6OTANK")
+                .Add("OTHER7OTANK", SqlDbType.Int).Value = drOrder("OTHER7OTANK")
+                .Add("OTHER8OTANK", SqlDbType.Int).Value = drOrder("OTHER8OTANK")
+                .Add("OTHER9OTANK", SqlDbType.Int).Value = drOrder("OTHER9OTANK")
+                .Add("OTHER10OTANK", SqlDbType.Int).Value = drOrder("OTHER10OTANK")
+                .Add("TOTALTANK", SqlDbType.Int).Value = drOrder("TOTALTANK")
+                .Add("RTANKCH", SqlDbType.Int).Value = drOrder("RTANKCH")
+                .Add("HTANKCH", SqlDbType.Int).Value = drOrder("HTANKCH")
+                .Add("TTANKCH", SqlDbType.Int).Value = drOrder("TTANKCH")
+                .Add("MTTANKCH", SqlDbType.Int).Value = drOrder("MTTANKCH")
+                .Add("KTANKCH", SqlDbType.Int).Value = drOrder("KTANKCH")
+                .Add("K3TANKCH", SqlDbType.Int).Value = drOrder("K3TANKCH")
+                .Add("K5TANKCH", SqlDbType.Int).Value = drOrder("K5TANKCH")
+                .Add("K10TANKCH", SqlDbType.Int).Value = drOrder("K10TANKCH")
+                .Add("LTANKCH", SqlDbType.Int).Value = drOrder("LTANKCH")
+                .Add("ATANKCH", SqlDbType.Int).Value = drOrder("ATANKCH")
+                .Add("OTHER1OTANKCH", SqlDbType.Int).Value = drOrder("OTHER1OTANKCH")
+                .Add("OTHER2OTANKCH", SqlDbType.Int).Value = drOrder("OTHER2OTANKCH")
+                .Add("OTHER3OTANKCH", SqlDbType.Int).Value = drOrder("OTHER3OTANKCH")
+                .Add("OTHER4OTANKCH", SqlDbType.Int).Value = drOrder("OTHER4OTANKCH")
+                .Add("OTHER5OTANKCH", SqlDbType.Int).Value = drOrder("OTHER5OTANKCH")
+                .Add("OTHER6OTANKCH", SqlDbType.Int).Value = drOrder("OTHER6OTANKCH")
+                .Add("OTHER7OTANKCH", SqlDbType.Int).Value = drOrder("OTHER7OTANKCH")
+                .Add("OTHER8OTANKCH", SqlDbType.Int).Value = drOrder("OTHER8OTANKCH")
+                .Add("OTHER9OTANKCH", SqlDbType.Int).Value = drOrder("OTHER9OTANKCH")
+                .Add("OTHER10OTANKCH", SqlDbType.Int).Value = drOrder("OTHER10OTANKCH")
+                .Add("TOTALTANKCH", SqlDbType.Int).Value = drOrder("TOTALTANKCH")
+                .Add("TANKLINKNO", SqlDbType.NVarChar).Value = drOrder("TANKLINKNO")
+                .Add("TANKLINKNOMADE", SqlDbType.NVarChar).Value = drOrder("TANKLINKNOMADE")
+                .Add("KEIJYOYMD", SqlDbType.Date).Value = If(drOrder("KEIJYOYMD") = "", CType(DBNull.Value, Object), drOrder("KEIJYOYMD"))
+                .Add("SALSE", SqlDbType.Int).Value = drOrder("SALSE")
+                .Add("SALSETAX", SqlDbType.Int).Value = drOrder("SALSETAX")
+                .Add("TOTALSALSE", SqlDbType.Int).Value = drOrder("TOTALSALSE")
+                .Add("PAYMENT", SqlDbType.Int).Value = drOrder("PAYMENT")
+                .Add("PAYMENTTAX", SqlDbType.Int).Value = drOrder("PAYMENTTAX")
+                .Add("TOTALPAYMENT", SqlDbType.Int).Value = drOrder("TOTALPAYMENT")
+                .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
+                .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
+                .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
+                .Add("INITTERMID", SqlDbType.NVarChar).Value = drOrder("INITTERMID")
+                .Add("UPDYMD", SqlDbType.DateTime).Value = drOrder("UPDYMD")
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = drOrder("UPDUSER")
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = drOrder("UPDTERMID")
+                .Add("RECEIVEYMD", SqlDbType.DateTime).Value = drOrder("RECEIVEYMD")
+            End With
+            sqlCmd.CommandTimeout = 300
+            sqlCmd.ExecuteNonQuery()
+        End Using
+        CS0020JOURNAL.TABLENM = "HIS0001_ORDER"
+        CS0020JOURNAL.ACTION = "INSERT"
+        CS0020JOURNAL.ROW = drOrder
+        CS0020JOURNAL.CS0020JOURNAL()
+        If Not isNormal(CS0020JOURNAL.ERR) Then
+            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
 
-    '        CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
-    '        CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
-    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-    '        CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
-    '        CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
-    '        CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
-    '        Return
-    '    End If
-    'End Sub
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+            Return
+        End If
+    End Sub
 
 End Class

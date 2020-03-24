@@ -142,7 +142,11 @@ function InitDisplay() {
             continue;
         }
         // 一覧表のイベントバインド
-        bindListCommonEvents(arrListId[i], IsPostBack,true);
+        //bindListCommonEvents(arrListId[i], IsPostBack, true);
+        //bindListCommonEvents(pnlListAreaId, IsPostBack);
+        bindListCommonEvents(arrListId[i], IsPostBack, true, true, true, false);
+        // テキストボックスEnter縦移動イベントバインド
+        commonBindEnterToVerticalTabStep();
         // チェックボックス変更
         ChangeCheckBox(arrListId[i]);
     }

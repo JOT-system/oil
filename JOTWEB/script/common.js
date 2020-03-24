@@ -1987,6 +1987,91 @@ function ConvartWideCharToNormal(obj) {
     obj.value = repVal;
 }
 /**
+ *  リストテーブルのEnterキーで下のテキストにタブを移すイベントバインド
+ * @return {undefined} なし
+ * @description 
+ */
+function commonBindEnterToVerticalTabStep() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        //生成したテーブルオブジェクトのテキストボックス確認
+        let textBoxes = generatedTable.querySelectorAll('input[type=text]');
+        //テキストボックスが無ければ次の描画されたリストテーブルへ
+        if (textBoxes === null) {
+            continue;
+        }
+        // テキストボックスのループ
+        for (let j = 0; j < textBoxes.length; j++) {
+            let textBox = textBoxes[j];
+            let lineCnt = textBox.attributes.getNamedItem("rownum").value;
+            let fieldName = textBox.id.substring(("txt" + panelId).length);
+            fieldName = fieldName.substring(0, fieldName.length - lineCnt.length);
+            let nextTextFieldName = fieldName;
+            if (textBoxes.length === j + 1) {
+                // 最後のテキストボックスは先頭のフィールド
+                nextTextFieldName = textBoxes[0].id.substring(("txt" + panelId).length);
+                nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
+            } else if (textBoxes.length > j + 1) {
+                nextTextFieldName = textBoxes[j + 1].id.substring(("txt" + panelId).length);
+                nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
+            }
+
+            textBox.dataset.fieldName = fieldName;
+            textBox.dataset.nextTextFieldName = nextTextFieldName;
+            textBox.addEventListener('keypress', (function (textBox, panelId) {
+                return function () {
+                    if (event.key === 'Enter') {
+                        commonEnterToVerticalTabStep(textBox, panelId);
+                    }
+                 };
+            })(textBox, panelId), true);
+        }
+    }
+}
+/**
+ *  リストテーブルのEnterキーで下のテキストにタブを移すイベント
+ * @param {Node} textBox テキストボックス
+ * @param {string} panelId テキストボックス
+ * @return {undefined} なし
+ * @description 
+ */
+function commonEnterToVerticalTabStep(textBox, panelId) {
+    let curLineCnt = Number(textBox.attributes.getNamedItem("rownum").value);
+    let fieldName = textBox.dataset.fieldName;
+    let nextTextFieldName = textBox.dataset.nextTextFieldName;
+    let found = false;
+    let focusNode;
+    let maxLineCnt = 999;
+    let targetObjPrefix = "txt" + panelId + fieldName;
+    while (found === false) {
+        curLineCnt = curLineCnt + 1;
+        let targetObj = targetObjPrefix + curLineCnt;
+        focusNode = document.getElementById(targetObj);
+        if (focusNode !== null) {
+            found = true;
+        } else {
+            curLineCnt = 0;
+
+            targetObjPrefix = "txt" + panelId + nextTextFieldName;
+        }
+
+        // 無限ループ抑止
+        if (maxLineCnt === curLineCnt) {
+            found = true;
+        }
+    }
+    focusNode.focus();
+    return;
+}
+/**
  *  リッチテキスト入力画面オープン
  * @param {string} inputObjId 入力テキストID
  * @return {undefined} なし

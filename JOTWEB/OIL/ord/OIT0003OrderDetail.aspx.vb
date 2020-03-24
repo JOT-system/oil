@@ -1508,7 +1508,7 @@ Public Class OIT0003OrderDetail
 
         SQLStr &=
               " ORDER BY" _
-            & "    RIGHT('00' + OIT0003.LINEORDER, 2) DESC"
+            & "    RIGHT('00' + OIT0003.LINEORDER, 2)"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -1662,6 +1662,10 @@ Public Class OIT0003OrderDetail
                 & "    AND OIS0015_2.KEYCODE = OIT0003.ORDERINFO " _
                 & " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    RIGHT('00' + OIT0003.LINEORDER, 2)"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

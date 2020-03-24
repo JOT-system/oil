@@ -394,11 +394,11 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_200 As String = "200"
     ''' <summary>
-    ''' 210:手配中（入換指示手配済）
+    ''' 210:手配中（入換指示入力済）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_210 As String = "210"
     ''' <summary>
-    ''' 220:手配中（積込指示手配済）
+    ''' 220:手配中（積込指示入力済）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_220 As String = "220"
     ''' <summary>
@@ -406,17 +406,29 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_230 As String = "230"
     ''' <summary>
-    ''' 240:手配中（入換指示未手配）
+    ''' 240:手配中（入換指示未入力）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_240 As String = "240"
     ''' <summary>
-    ''' 250:手配中（積込指示未手配）
+    ''' 250:手配中（積込指示未入力）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_250 As String = "250"
     ''' <summary>
-    ''' 260;手配中（託送指示未手配）
+    ''' 260:手配中（入換積込指示手配済）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_260 As String = "260"
+    ''' <summary>
+    ''' 270:手配中（託送指示未手配）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_270 As String = "270"
+    ''' <summary>
+    ''' 280:手配中（入換積込未連絡）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_280 As String = "280"
+    ''' <summary>
+    ''' 290:手配中（入換積込未確認）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_290 As String = "290"
     ''' <summary>
     ''' 300:手配完了
     ''' </summary>

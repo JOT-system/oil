@@ -338,7 +338,11 @@ Public Class OIT0003OrderLinkQuota
                 '### START（2020年3月24日 森川) #############
                 '利用可能日の条件を登録日⇒(予定)積込日へ変更
                 'PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
-                PARA2.Value = work.WF_SEL_LODDATE.Text
+                If work.WF_SEL_LODDATE.Text.Equals("") Then
+                    PARA2.Value = DBNull.Value
+                Else
+                    PARA2.Value = work.WF_SEL_LODDATE.Text
+                End If
                 '### END  ###################################
                 'PARA3.Value = work.WF_SEL_TRAIN.Text
                 PARA4.Value = C_DELETE_FLG.DELETE

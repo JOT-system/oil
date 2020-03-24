@@ -58,8 +58,10 @@ function InitDisplay() {
     /* フッターの高さ調整 */
     AdjustHeaderFooterContents('detailbox');
     /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack);
-
+    //bindListCommonEvents(pnlListAreaId, IsPostBack);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, false, true, true, false);
+    // テキストボックスEnter縦移動イベントバインド
+    commonBindEnterToVerticalTabStep();
     // チェックボックス
     ChangeCheckBox();
 }

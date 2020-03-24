@@ -240,7 +240,7 @@ Public Class OIT0004OilStockCreate
             Me.WF_ButtonAUTOSUGGESTION.Visible = False
             Me.WF_ButtonORDERLIST.Visible = False
             Me.WF_ButtonINPUTCLEAR.Visible = False
-            Me.WF_ButtonGETEMPTURN.Visible = False
+            'Me.WF_ButtonGETEMPTURN.Visible = False
         Else
             pnlSuggestList.Visible = True
             frvSuggest.DataSource = New Object() {dispDataObj}
@@ -389,9 +389,14 @@ Public Class OIT0004OilStockCreate
         dispValues.SuggestValueInputValueToZero()
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
-            dispValues = EditEmptyTurnCarsNum(sqlCon, dispValues)
-            If dispValues.HasMoveInsideItem Then
-                dispValues.MiDispData = EditEmptyTurnCarsNum(sqlCon, dispValues.MiDispData)
+            If dispValues.ShowSuggestList = False Then
+                dispValues = EditOtEmptyTurnCarsNum(sqlCon, dispValues)
+                dispValues.RecalcStockList()
+            Else
+                dispValues = EditEmptyTurnCarsNum(sqlCon, dispValues)
+                If dispValues.HasMoveInsideItem Then
+                    dispValues.MiDispData = EditEmptyTurnCarsNum(sqlCon, dispValues.MiDispData)
+                End If
             End If
         End Using
         '1.提案リスト
@@ -1312,6 +1317,80 @@ Public Class OIT0004OilStockCreate
                         With retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem(oilCode)
                             suggestVal = Convert.ToDecimal(sqlDr("CARSNUMBER"))
                             .ItemValue = suggestVal.ToString("#,##0")
+                        End With
+
+                    End While
+                End If
+            End Using 'sqlDr
+        End Using
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' OT用の空回日報情報を取得、提案表の車数を更新
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="dispData"></param>
+    ''' <returns></returns>
+    Private Function EditOtEmptyTurnCarsNum(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        'これもしかすると在庫テーブルから先週の払出量かと
+        'オーダーは受入数な気がする(Consigneeしかないので)
+        Dim sqlStr As New StringBuilder
+        Dim retVal = dispData
+        '検索値の設定
+        Dim dateFrom As String = dispData.StockDate.First.Value.KeyString
+        Dim dateTo As String = dispData.StockDate.Last.Value.KeyString
+
+        sqlStr.AppendLine("SELECT DTL.OILCODE")
+        sqlStr.AppendLine("     , format(ODR.ACCDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSNUMBER,0))    AS CARSNUMBER")
+        sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+        sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
+        sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
+        sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
+        sqlStr.AppendLine("   AND DTL.OILCODE is not null")
+        sqlStr.AppendLine(" WHERE ODR.ACCDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
+        sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+        sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
+        sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
+        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACCDATE")
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                .Add("@DATE_FROM", SqlDbType.Date).Value = dateFrom
+                .Add("@ADATE_TO", SqlDbType.Date).Value = dateTo
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows Then
+                    Dim oilCode As String = ""
+                    Dim trainNo As String = ""
+                    Dim targetDate As String = ""
+                    Dim stockReceiveVal As Decimal = 0D
+                    While sqlDr.Read
+                        oilCode = Convert.ToString(sqlDr("OILCODE"))
+                        targetDate = Convert.ToString(sqlDr("TARGETDATE"))
+                        '油種未設定または対象油種を持っていないレコードはスキップ
+                        If oilCode = "" OrElse retVal.StockList.ContainsKey(oilCode) = False OrElse
+                           targetDate = "" OrElse retVal.StockList(oilCode).StockItemList.ContainsKey(targetDate) = False Then
+                            Continue While
+                        End If
+                        '過去日の場合も設定しない
+                        If retVal.StockList(oilCode).StockItemList(targetDate).DaysItem.IsPastDay Then
+                            Continue While
+                        End If
+                        With retVal.StockList(oilCode).StockItemList(targetDate)
+                            Dim weight = retVal.StockList(oilCode).OilInfo.Weight
+                            stockReceiveVal = 0D
+                            If weight <> 0 Then
+                                stockReceiveVal = Math.Floor(Convert.ToDecimal(sqlDr("CARSNUMBER")) * 45 / weight)
+                            End If
+                            .Receive = stockReceiveVal
                         End With
 
                     End While

@@ -8973,23 +8973,27 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
-        '貨物駅入線順でソートし、重複がないかチェックする。
-        OIT0003tbl_dv.Sort = "LINEORDER"
-        For Each drv As DataRowView In OIT0003tbl_dv
-            If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") <> "" AndAlso chkLineOrder = drv("LINEORDER") Then
-                Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                WW_CheckMES1 = "貨物駅入線順重複エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
-                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+        '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
+        '　※上記以外の営業所については、入力しないためチェックは未実施。
+        If Me.TxtOrderOfficeCode.Text = "011203" Then
+            '貨物駅入線順でソートし、重複がないかチェックする。
+            OIT0003tbl_dv.Sort = "LINEORDER"
+            For Each drv As DataRowView In OIT0003tbl_dv
+                If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") <> "" AndAlso chkLineOrder = drv("LINEORDER") Then
+                    Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WW_CheckMES1 = "貨物駅入線順重複エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
 
-            '行削除したデータの場合は退避しない。
-            If drv("HIDDEN") <> "1" Then
-                chkLineOrder = drv("LINEORDER")
-            End If
-        Next
+                '行削除したデータの場合は退避しない。
+                If drv("HIDDEN") <> "1" Then
+                    chkLineOrder = drv("LINEORDER")
+                End If
+            Next
+        End If
 
         '(一覧)チェック
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
@@ -9005,15 +9009,19 @@ Public Class OIT0003OrderDetail
                 Exit Sub
             End If
 
-            '(一覧)貨物駅入線順(空白チェック)
-            If OIT0003row("LINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)貨物駅入線順", needsPopUp:=True)
+            '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
+            '　※上記以外の営業所については、入力しないためチェックは未実施。
+            If Me.TxtOrderOfficeCode.Text = "011203" Then
+                '(一覧)貨物駅入線順(空白チェック)
+                If OIT0003row("LINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)貨物駅入線順", needsPopUp:=True)
 
-                WW_CheckMES1 = "貨物駅入線順未設定エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
-                Exit Sub
+                    WW_CheckMES1 = "貨物駅入線順未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
             End If
 
             '(一覧)タンク車割当状況(未割当チェック)
@@ -11093,6 +11101,7 @@ Public Class OIT0003OrderDetail
                 Dim tblObj = DirectCast(divObj.Controls(0), Table)
 
                 '受注進行ステータスが"受注受付"の場合
+                '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
@@ -11101,6 +11110,9 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                                AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
                     Next
@@ -11112,6 +11124,7 @@ Public Class OIT0003OrderDetail
                     '受注進行ステータス＝"240:手配中(入換指示未入力)"
                     '受注進行ステータス＝"250:手配中(積込指示未入力)"
                     '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
+                    '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
                 ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
@@ -11126,6 +11139,9 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                                AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
                     Next

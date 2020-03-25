@@ -1325,6 +1325,35 @@ div[data-generated='1'] tr td > div[style] {
     max-height:24px;
     margin-top:-3px;
 }
+/* テーブル表内のマーク */
+div[data-generated='1'] .safe,
+div[data-generated='1'] .warning,
+div[data-generated='1'] .caution{
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+    text-align: center;
+    font-size: 22px;
+}
+div[data-generated='1'] .safe {
+    color:green
+}
+div[data-generated='1'] .warning {
+    color:yellow
+}
+div[data-generated='1'] .caution {
+    color:red
+}
+
+div[data-generated='1'] .safe:after {
+    content: "●"
+}
+div[data-generated='1'] .warning:after {
+    content: "●"
+}
+div[data-generated='1'] .caution:after {
+    content: "●"
+}
 div[data-generated='1'] input[type=text],
 div[data-generated='1'] input[type=number]{
     height: 1.6em;

@@ -433,7 +433,10 @@ Public Class OILMasterPage
     ''' <param name="needsPopUp">ポップアップ表示有無(初期値：False(表示しない))</param>
     ''' <param name="messageBoxTitle">疑似メッセージボックスのタイトルバー文字(初期値：メッセージ,needsPopUpがTrueでなければ意味なし)</param>
     ''' <param name="IsConfirm">確認メッセージ表示フラグ(True:表示(needsPopがTrueでなければ意味なし),False:表示しない</param>
-    ''' <param name="YesButtonId">確認メッセージ「はい」のボタンID初期値：btnCommonConfirmOk
+    ''' <param name="YesButtonId">確認メッセージ「はい」のボタンID初期値：btnCommonConfirmOk    
+    ''' （呼び出した画面のWF_ButtonClick.ValueにこのIDを格納しポストバックされる）</param>
+    ''' <param name="needsConfirmNgToPostBack">確認メッセージの「いいえ」ボタンもポストバック必要か(True:ポストバックあり,False：ポストバックなし)</param>
+    ''' <param name="NoButtonId">確認メッセージ「いいえ」のボタンID初期値：btnCommonConfirmNo
     ''' （呼び出した画面のWF_ButtonClick.ValueにこのIDを格納しポストバックされる）</param>
     ''' <remarks></remarks>
     Public Sub Output(ByVal msgNo As String,
@@ -443,9 +446,11 @@ Public Class OILMasterPage
                       Optional ByVal needsPopUp As Boolean = False,
                       Optional ByVal messageBoxTitle As String = "メッセージ",
                       Optional ByVal IsConfirm As Boolean = False,
-                      Optional ByVal YesButtonId As String = "btnCommonConfirmOk")
+                      Optional ByVal YesButtonId As String = "btnCommonConfirmOk",
+                      Optional ByVal needsConfirmNgToPostBack As Boolean = False,
+                      Optional ByVal NoButtonId As String = "btnCommonConfirmNo")
 
-        footer.Output(msgNo, msgType, I_PARA01, I_PARA02, needsPopUp, messageBoxTitle, IsConfirm, YesButtonId)
+        footer.Output(msgNo, msgType, I_PARA01, I_PARA02, needsPopUp, messageBoxTitle, IsConfirm, YesButtonId, needsConfirmNgToPostBack, NoButtonId)
 
     End Sub
     ''' <summary>

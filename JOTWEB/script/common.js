@@ -1,6 +1,7 @@
 ﻿/**
  * @fileoverview システム共通JavaScript処理
  */
+var commonKeyEnterProgress = false;
 /**
  * ロード時処理
  * @param {object} なし
@@ -149,6 +150,10 @@ window.addEventListener('DOMContentLoaded', function () {
     /* イベントバインド                     */
     /* ************************************ */
     bindcommonListChangedInput();
+    /* ************************************  */
+    /* 通常テキストフィールドのEntarタブ移動 */
+    /* ************************************  */
+
 });
 
 // 処理後カーソルを戻す
@@ -1208,6 +1213,7 @@ function getCommonListScrollXpos(listId) {
     }
     return retValue;
 }
+
 /**
  * リストの横スクロール位置をwebStrage(セッションストレージ)に保持する
  * @param {string}listId リスト全体のオブジェクトID
@@ -1986,6 +1992,25 @@ function ConvartWideCharToNormal(obj) {
     //repVal = repVal.match(/-?\d+\.?\d*/);
     obj.value = repVal;
 }
+function commonBindNormalEnterToVerticalTabStep() {
+    let inputObjList = document.querySelectorAll('input[type=text]:not([disabled]):not([tabindex="-1"]):not([rownum])');
+    for (let i = 0, len = inputObjList.length; i < len; ++i) {
+        let textBox = inputObjList[i];
+        textBox.addEventListener('keypress', (function (textBox, panelId) {
+            return function () {
+                if (event.key === 'Enter') {
+                    if (commonKeyEnterProgress === false) {
+                        commonKeyEnterProgress = true; //Enter連打抑止
+                        commonListEnterToVerticalTabStep(textBox, panelId);
+                        return setTimeout(function () {
+                            commonKeyEnterProgress = false;　///Enter連打抑止
+                        }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に
+                    }
+                }
+            };
+        })(textBox, panelId), true);
+    }
+}
 /**
  *  リストテーブルのEnterキーで下のテキストにタブを移すイベントバインド
  * @return {undefined} なし
@@ -1999,6 +2024,23 @@ function commonBindEnterToVerticalTabStep() {
     if (generatedTables.length === 0) {
         return;
     }
+    let focusObjKey = document.forms[0].id + "ListFocusObjId";
+    if (sessionStorage.getItem(focusObjKey) !== null) {
+        if (IsPostBack === undefined) {
+            sessionStorage.removeItem(focusObjKey);
+        }
+        if (IsPostBack === '1') {
+            focusObjId = sessionStorage.getItem(focusObjKey);
+            setTimeout(function () {
+                document.getElementById(focusObjId).focus();
+                sessionStorage.removeItem(focusObjKey);
+            }, 10);
+        } else {
+            sessionStorage.removeItem(focusObjKey);
+        }
+
+    }
+
     for (let i = 0, len = generatedTables.length; i < len; ++i) {
         let generatedTable = generatedTables[i];
         let panelId = generatedTable.id;
@@ -2029,7 +2071,13 @@ function commonBindEnterToVerticalTabStep() {
             textBox.addEventListener('keypress', (function (textBox, panelId) {
                 return function () {
                     if (event.key === 'Enter') {
-                        commonEnterToVerticalTabStep(textBox, panelId);
+                        if (commonKeyEnterProgress === false) {
+                            commonKeyEnterProgress = true; //Enter連打抑止
+                            commonListEnterToVerticalTabStep(textBox, panelId);
+                            return setTimeout(function () {
+                                commonKeyEnterProgress = false;　///Enter連打抑止
+                            }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に
+                        }
                     }
                  };
             })(textBox, panelId), true);
@@ -2043,7 +2091,7 @@ function commonBindEnterToVerticalTabStep() {
  * @return {undefined} なし
  * @description 
  */
-function commonEnterToVerticalTabStep(textBox, panelId) {
+function commonListEnterToVerticalTabStep(textBox, panelId) {
     let curLineCnt = Number(textBox.attributes.getNamedItem("rownum").value);
     let fieldName = textBox.dataset.fieldName;
     let nextTextFieldName = textBox.dataset.nextTextFieldName;
@@ -2068,6 +2116,16 @@ function commonEnterToVerticalTabStep(textBox, panelId) {
             found = true;
         }
     }
+
+    var parentNodeObj = textBox.parentNode;
+    if (parentNodeObj.hasAttribute('onchange')) {
+        var focusObjKey = document.forms[0].id + "ListFocusObjId";
+        sessionStorage.setItem(focusObjKey, focusNode.id);
+    }
+    //var retValue = sessionStorage.getItem(forcusObjKey);
+    //if (retValue === null) {
+    //    retValue = '';
+    //}
     focusNode.focus();
     return;
 }

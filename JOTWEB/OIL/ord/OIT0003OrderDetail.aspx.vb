@@ -974,6 +974,7 @@ Public Class OIT0003OrderDetail
                 & "    AND OIS0015_2.KEYCODE = OIT0003.ORDERINFO " _
                 & " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
+
             '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_NOW ON " _
             '& "       OIT0002.OFFICECODE = OIM0003_NOW.OFFICECODE" _
             '& "       AND OIT0002.SHIPPERSCODE = OIM0003_NOW.SHIPPERCODE" _
@@ -1081,6 +1082,12 @@ Public Class OIT0003OrderDetail
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
+
+                    '◯名称取得
+                    '受注情報
+                    If OIT0003row("ORDERINFONAME") = "" Then
+                        CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+                    End If
 
                 Next
             End Using
@@ -3229,10 +3236,19 @@ Public Class OIT0003OrderDetail
 
         '〇 前回油種と油種の整合性チェック
         WW_CheckLastOilConsistency(WW_ERRCODE)
-        If WW_ERRCODE = "ERR" Then
+        '前回黒油によるエラー
+        If WW_ERRCODE = "ERR1" Then
             Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
             Exit Sub
+            '前回揮発油によるエラー
+        ElseIf WW_ERRCODE = "ERR2" Then
+            'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR,
+            '  C_MESSAGE_TYPE.QUES,
+            '  needsPopUp:=True,
+            '  messageBoxTitle:="",
+            '  IsConfirm:=True,
+            '  needsConfirmNgToPostBack:=True)
         End If
 
         '〇 高速列車対応タンク車チェック
@@ -5224,7 +5240,7 @@ Public Class OIT0003OrderDetail
                         OrElse OIT0003row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
                         PARA37.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
                     Else
-                        PARA37.Value = ""
+                        PARA37.Value = OIT0003row("ORDERINFO")
                     End If
 
                     PARA23.Value = OIT0003row("SHIPPERSCODE")         '荷主コード
@@ -9710,20 +9726,42 @@ Public Class OIT0003OrderDetail
             WW_GetValue = {"", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch(OIT0003row("LASTOILCODE") + OIT0003row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0003row("OILCODE") + OIT0003row("ORDERINGTYPE"), WW_GetValue)
 
+            '前回黒油
             If WW_GetValue(2) = "1" Then
                 'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_83
+                'OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_83
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
+                O_RTN = "ERR1"
                 'Exit Sub
-            Else
-                OIT0003row("ORDERINFO") = ""
-                OIT0003row("ORDERINFONAME") = ""
 
+                '前回揮発油
+            ElseIf WW_GetValue(2) = "2" Then
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "前回油種と油種の整合性エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    '受注明細TBLの受注情報を更新
+                    WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+                End Using
+
+                If O_RTN <> "ERR1" Then O_RTN = "ERR2"
+            Else
+                If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99 _
+                    OrElse OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98 Then
+                    OIT0003row("ORDERINFO") = ""
+                    OIT0003row("ORDERINFONAME") = ""
+                End If
             End If
         Next
 
@@ -9782,9 +9820,10 @@ Public Class OIT0003OrderDetail
                 Master.SaveTable(OIT0003tbl)
                 Exit Sub
             Else
-                OIT0003row("ORDERINFO") = ""
-                OIT0003row("ORDERINFONAME") = ""
-
+                If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_84 Then
+                    OIT0003row("ORDERINFO") = ""
+                    OIT0003row("ORDERINFONAME") = ""
+                End If
             End If
         Next
 
@@ -10012,8 +10051,10 @@ Public Class OIT0003OrderDetail
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
 
                         Else
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
+                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                                OIT0003row("ORDERINFO") = ""
+                                OIT0003row("ORDERINFONAME") = ""
+                            End If
                         End If
                     Next
                 Next
@@ -10151,8 +10192,10 @@ Public Class OIT0003OrderDetail
 
                             Exit For
                         Else
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
+                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_97 Then
+                                OIT0003row("ORDERINFO") = ""
+                                OIT0003row("ORDERINFONAME") = ""
+                            End If
                         End If
                     Next
                 Next
@@ -10375,8 +10418,10 @@ Public Class OIT0003OrderDetail
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
 
                         Else
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
+                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_90 Then
+                                OIT0003row("ORDERINFO") = ""
+                                OIT0003row("ORDERINFONAME") = ""
+                            End If
                         End If
                     Next
                 Next

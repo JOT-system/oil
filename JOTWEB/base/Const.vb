@@ -365,6 +365,14 @@ Public Module BaseDllConst
     ''' 入線順重複
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_97 As String = "97"
+    ''' <summary>
+    ''' 前回揮発油
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_98 As String = "98"
+    ''' <summary>
+    ''' 前回黒油
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_99 As String = "99"
 
     ''' <summary>
     ''' 失注（荷主都合）

@@ -534,6 +534,11 @@ Public Module Messages
         ''' キャンセル行未存在
         ''' </summary>
         Public Const OIL_CANCELLINE_NOTFOUND As String = "20035"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR As String = "20036"
+
 #End Region
 
 

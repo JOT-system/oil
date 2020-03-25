@@ -150,6 +150,11 @@ Public Class OIT0003OrderDetail
                             WF_ListChange()
                         Case "WF_DTAB_Click"                  '○DetailTab切替処理
                             WF_Detail_TABChange()
+                        Case "btnChkLastOilConfirmYes"        '確認メッセージはいボタン押下(前回油種チェック)
+                            '画面表示設定処理(受注進行ステータス)
+                            WW_ScreenOrderStatusSet()
+                        Case "btnChkLastOilConfirmNo"         '確認メッセージいいえボタン押下(前回油種チェック)
+
                     End Select
 
                     '○ 一覧再表示処理
@@ -3235,20 +3240,26 @@ Public Class OIT0003OrderDetail
         End If
 
         '〇 前回油種と油種の整合性チェック
+        Dim blnOilCheck As Boolean = False
         WW_CheckLastOilConsistency(WW_ERRCODE)
         '前回黒油によるエラー
         If WW_ERRCODE = "ERR1" Then
             Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
             Exit Sub
-            '前回揮発油によるエラー
-        ElseIf WW_ERRCODE = "ERR2" Then
-            'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR,
-            '  C_MESSAGE_TYPE.QUES,
-            '  needsPopUp:=True,
-            '  messageBoxTitle:="",
-            '  IsConfirm:=True,
-            '  needsConfirmNgToPostBack:=True)
+
+            '前回揮発油,今回黒油、または灯軽油による警告
+        ElseIf WW_ERRCODE = "ERR2" _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            blnOilCheck = True
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR,
+              C_MESSAGE_TYPE.QUES,
+              needsPopUp:=True,
+              messageBoxTitle:="",
+              IsConfirm:=True,
+              YesButtonId:="btnChkLastOilConfirmYes",
+              needsConfirmNgToPostBack:=True,
+              NoButtonId:="btnChkLastOilConfirmNo")
         End If
 
         '〇 高速列車対応タンク車チェック
@@ -3399,88 +3410,9 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
-        '〇 受注ステータスが"受注手配"の場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
-            '〇(受注TBL)受注進行ステータス更新
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-
-                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_200)
-                CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_200, TxtOrderStatus.Text, WW_DUMMY)
-                work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200
-                work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
-
-                '○ 画面表示データ復元
-                Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                    If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                        OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
-                        OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
-                    End If
-                Next
-                '○ 画面表示データ保存
-                Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-
-            End Using
-
-            '〇 受注ステータスが"手配"へ変更された場合
-            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
-                WF_DTAB_CHANGE_NO.Value = "1"
-                WF_Detail_TABChange()
-
-                '〇タンク車所在の更新
-                WW_TankShozaiSet()
-
-                '### 臨海鉄道対応 ####################################################################################
-                '五井営業所、甲子営業所、袖ヶ浦営業所の場合
-                '積込列車番号の入力を可能とする。
-                If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-
-                    '臨海鉄道対象のため有効にする。
-                    WW_RINKAIFLG = True
-
-                End If
-                '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
-                '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
-                'タブ「タンク車明細」へ業務を移行する。
-                '※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
-                If WW_RINKAIFLG = False _
-                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
-                    '〇(受注TBL)受注進行ステータス更新
-                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()       'DataBase接続
-
-                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_300)
-                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_300, TxtOrderStatus.Text, WW_DUMMY)
-                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300
-                        work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
-
-                        '○ 画面表示データ復元
-                        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-                        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
-                                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
-                            End If
-                        Next
-                        '○ 画面表示データ保存
-                        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-
-                    End Using
-
-                    WF_DTAB_CHANGE_NO.Value = "2"
-                    WF_Detail_TABChange()
-
-                    '〇タンク車所在の更新
-                    WW_TankShozaiSet()
-                End If
-                '#####################################################################################################
-
-            End If
-
-        End If
+        '画面表示設定処理(受注進行ステータス)
+        '◯前回油種チェック時に警告データがない場合
+        If blnOilCheck = False Then WW_ScreenOrderStatusSet()
 
     End Sub
 
@@ -5055,7 +4987,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -5331,7 +5263,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -5658,7 +5590,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -6944,10 +6876,10 @@ Public Class OIT0003OrderDetail
 
         End Try
 
-        If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
-            '○メッセージ表示
-            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-        End If
+        'If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
+        '    '○メッセージ表示
+        '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'End If
 
     End Sub
 
@@ -8059,6 +7991,94 @@ Public Class OIT0003OrderDetail
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示設定処理(受注進行ステータス)
+    ''' </summary>
+    Protected Sub WW_ScreenOrderStatusSet()
+        '〇 受注ステータスが"受注手配"の場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            '〇(受注TBL)受注進行ステータス更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_200)
+                CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_200, Me.TxtOrderStatus.Text, WW_DUMMY)
+                work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200
+                work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+
+                '○ 画面表示データ復元
+                Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                    If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                        OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                        OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                    End If
+                Next
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+            End Using
+
+            '〇 受注ステータスが"手配"へ変更された場合
+            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
+                WF_DTAB_CHANGE_NO.Value = "1"
+                WF_Detail_TABChange()
+
+                '〇タンク車所在の更新
+                WW_TankShozaiSet()
+
+                '### 臨海鉄道対応 ####################################################################################
+                '五井営業所、甲子営業所、袖ヶ浦営業所の場合
+                '積込列車番号の入力を可能とする。
+                If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+                    '臨海鉄道対象のため有効にする。
+                    WW_RINKAIFLG = True
+
+                End If
+                '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
+                '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
+                'タブ「タンク車明細」へ業務を移行する。
+                '※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
+                If WW_RINKAIFLG = False _
+                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
+                    '〇(受注TBL)受注進行ステータス更新
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_300)
+                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_300, Me.TxtOrderStatus.Text, WW_DUMMY)
+                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300
+                        work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+
+                        '○ 画面表示データ復元
+                        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                            End If
+                        Next
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+                    End Using
+
+                    WF_DTAB_CHANGE_NO.Value = "2"
+                    WF_Detail_TABChange()
+
+                    '〇タンク車所在の更新
+                    WW_TankShozaiSet()
+                End If
+                '#####################################################################################################
+
+            End If
+
+        End If
     End Sub
 
     ''' <summary>
@@ -9740,12 +9760,11 @@ Public Class OIT0003OrderDetail
                 'Exit Sub
 
                 '前回揮発油
-            ElseIf WW_GetValue(2) = "2" Then
+            ElseIf WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3" Then
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
-
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
 
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -9934,7 +9953,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10074,7 +10093,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10215,7 +10234,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10346,7 +10365,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10442,7 +10461,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

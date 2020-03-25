@@ -229,7 +229,10 @@ Public Class OIT0004OilStockCreate
         End Using
         '取得値を元に再計算
         dispDataObj.RecalcStockList(False)
-
+        '****************************************
+        '画面共通タイトルの左下に油槽所設定
+        '****************************************
+        Master.SetTitleLeftBottomText(dispDataObj.ConsigneeName)
         '****************************************
         '生成したデータを画面に貼り付け
         '****************************************

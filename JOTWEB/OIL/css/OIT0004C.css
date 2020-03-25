@@ -750,13 +750,13 @@ div.oilTypeData div.col1 span[data-tiptext] {
 /* IEはposition sticky未対応なのでそのまま */
 #divStockList > .header {
     position: sticky;
-    top: -10px;
+    top: 26px;
     z-index: 3;
 }
 
 _:-ms-lang(x)::backdrop,
 #divStockList > .header {
-    top: 0px;
+    top: 36px;
 }
 
 #divStockList > .header > .emptyBox {
@@ -780,7 +780,30 @@ _:-ms-lang(x)::backdrop,
 #divSuggestList > .oilTypeColumn {
     left: 80px;
 }
-
+#tblTitlebox tr:nth-child(2) td:nth-child(1) {
+    padding-left:0;
+    font-weight:bold;
+}
 /* ************************ */
 /* ↑表見出し固定ここまで↑ */
+/* ************************ */
+/* ************************ */
+/* ↓ボタン固定ここから↓   */
+/* ************************ */
+#pnlSuggestList {
+    margin-top:25px;
+}
+.actionButtonBox {
+    margin: 0px;
+    margin-top: -10px;
+    margin-left: -10px;
+    padding: 5px;
+    padding-left: 10px;
+    position: fixed;
+    background-color: rgba(248, 248, 248, 1);
+    overflow-x: hidden;
+    z-index: 5;
+}
+/* ************************ */
+/* ↑ボタン固定ここまで↑   */
 /* ************************ */

@@ -222,6 +222,7 @@ Public Class OIT0002LinkDetail
         AvailableYMD.Text = work.WF_SEL_AVAILABLEYMD.Text
         '本線列車
         TxtHeadOfficeTrain.Text = work.WF_SEL_TRAINNO2.Text
+        TxtHeadOfficeTrainName.Text = work.WF_SEL_TRAINNAME2.Text
         '空車発駅（着駅）
         TxtDepstation.Text = work.WF_SEL_DEPSTATION.Text
         '空車着駅（発駅）

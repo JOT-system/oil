@@ -19,6 +19,14 @@ Public Class GRIS0002Footer
     ''' </summary>
     Protected btnConfirmOkId As String = "btnCommonConfirmOk"
     ''' <summary>
+    ''' 確認メッセージのいいえボタン押下時にポストバックする必要があるか(True:必要あり,False:必要なし(デフォルト))
+    ''' </summary>
+    Protected NeedsConfirmNgToPostBack As Boolean = False
+    ''' <summary>
+    ''' 確認メッセージ「いいえ」ボタンID
+    ''' </summary>
+    Protected btnConfirmNgId As String = "btnCommonConfirmNo"
+    ''' <summary>
     ''' ページロード処理
     ''' </summary>
     ''' <param name="sender"></param>
@@ -79,7 +87,9 @@ Public Class GRIS0002Footer
                       Optional ByVal needsPopUp As Boolean = False,
                       Optional ByVal messageTitle As String = "メッセージ",
                       Optional ByVal isConfirm As Boolean = False,
-                      Optional ByVal yesButtonId As String = "btnCommonConfirmOk")
+                      Optional ByVal yesButtonId As String = "btnCommonConfirmOk",
+                      Optional ByVal needsConfirmNgToPostBack As Boolean = False,
+                      Optional ByVal btnConfirmNgId As String = "btnCommonConfirmNo")
 
         Me.MEGID = msgNo
         Me.MSGTYPE = msgType
@@ -89,6 +99,9 @@ Public Class GRIS0002Footer
         Me.MessageTitle = messageTitle
         Me.IsMessageConfirm = isConfirm
         Me.btnConfirmOkId = yesButtonId
+        Me.NeedsConfirmNgToPostBack = needsConfirmNgToPostBack
+        Me.btnConfirmNgId = btnConfirmNgId
+
     End Sub
     ''' <summary>
     ''' ヘルプボタンを非表示にする
@@ -208,9 +221,18 @@ Public Class GRIS0002Footer
             btnMessageBoxOkButton.ID = Me.btnConfirmOkId
             btnMessageBoxOkButton.Value = "はい"
             btnMessageBoxOkButton.Attributes.Add("onclick", String.Format("ButtonClick('{0}');", Me.btnConfirmOkId))
-            btnMessageBoxCancelButton.Attributes.Add("onclick", onClickScriptText.ToString)
+
+            If NeedsConfirmNgToPostBack Then
+                btnMessageBoxCancelButton.ID = Me.btnConfirmNgId
+                btnMessageBoxCancelButton.Attributes.Add("onclick", String.Format("ButtonClick('{0}');", Me.btnConfirmNgId))
+            Else
+                btnMessageBoxCancelButton.Attributes.Add("onclick", onClickScriptText.ToString)
+            End If
+
             pnlMessageBoxTitle.Controls.Add(btnMessageBoxOkButton)
             pnlMessageBoxTitle.Controls.Add(btnMessageBoxCancelButton)
+
+
         Else
             btnMessageBoxOkButton.Attributes.Add("onclick", onClickScriptText.ToString)
             pnlMessageBoxTitle.Controls.Add(btnMessageBoxOkButton)

@@ -79,7 +79,7 @@ Public Class OILMasterPage
         Else
             'フッター初期化
             footer.Initialize()
-
+            title.SetLeftBottomMessage("")
             '画面間情報取得処理
             SetMAPValue()
         End If
@@ -122,6 +122,7 @@ Public Class OILMasterPage
             Else
                 '○ 全画面共通-タイトル設定
                 Dim WW_RTN As String = String.Empty
+
                 '                title.SetTitle(MF_MAPID.Value, MF_MAPvariant.Value, COMPANYCODE, WW_RTN, CS0050SESSION.USERID)
                 title.SetTitle(MF_MAPID.Value, MF_MENU_ROLE.Value, COMPANYCODE, WW_RTN, CS0050SESSION.USERID)
                 If Not isNormal(WW_RTN) Then
@@ -212,6 +213,7 @@ Public Class OILMasterPage
             Dim btnText As HtmlInputText = DirectCast(obj, HtmlInputText)
 
             btnText.Value = String.Empty
+
         End If
     End Sub
 #End Region
@@ -424,6 +426,14 @@ Public Class OILMasterPage
         Me.MAPID = "M00001"
     End Sub
     ''' <summary>
+    ''' 画面左下メッセージを設定
+    ''' </summary>
+    ''' <param name="text"></param>
+    ''' <remarks>ポストバック以外は初期化されます</remarks>
+    Public Sub SetTitleLeftBottomText(text As String)
+        title.SetLeftBottomMessage(text)
+    End Sub
+    ''' <summary>
     ''' メッセージの設定処理
     ''' </summary>
     ''' <param name="msgNo"></param>
@@ -433,7 +443,10 @@ Public Class OILMasterPage
     ''' <param name="needsPopUp">ポップアップ表示有無(初期値：False(表示しない))</param>
     ''' <param name="messageBoxTitle">疑似メッセージボックスのタイトルバー文字(初期値：メッセージ,needsPopUpがTrueでなければ意味なし)</param>
     ''' <param name="IsConfirm">確認メッセージ表示フラグ(True:表示(needsPopがTrueでなければ意味なし),False:表示しない</param>
-    ''' <param name="YesButtonId">確認メッセージ「はい」のボタンID初期値：btnCommonConfirmOk
+    ''' <param name="YesButtonId">確認メッセージ「はい」のボタンID初期値：btnCommonConfirmOk    
+    ''' （呼び出した画面のWF_ButtonClick.ValueにこのIDを格納しポストバックされる）</param>
+    ''' <param name="needsConfirmNgToPostBack">確認メッセージの「いいえ」ボタンもポストバック必要か(True:ポストバックあり,False：ポストバックなし)</param>
+    ''' <param name="NoButtonId">確認メッセージ「いいえ」のボタンID初期値：btnCommonConfirmNo
     ''' （呼び出した画面のWF_ButtonClick.ValueにこのIDを格納しポストバックされる）</param>
     ''' <remarks></remarks>
     Public Sub Output(ByVal msgNo As String,
@@ -443,9 +456,11 @@ Public Class OILMasterPage
                       Optional ByVal needsPopUp As Boolean = False,
                       Optional ByVal messageBoxTitle As String = "メッセージ",
                       Optional ByVal IsConfirm As Boolean = False,
-                      Optional ByVal YesButtonId As String = "btnCommonConfirmOk")
+                      Optional ByVal YesButtonId As String = "btnCommonConfirmOk",
+                      Optional ByVal needsConfirmNgToPostBack As Boolean = False,
+                      Optional ByVal NoButtonId As String = "btnCommonConfirmNo")
 
-        footer.Output(msgNo, msgType, I_PARA01, I_PARA02, needsPopUp, messageBoxTitle, IsConfirm, YesButtonId)
+        footer.Output(msgNo, msgType, I_PARA01, I_PARA02, needsPopUp, messageBoxTitle, IsConfirm, YesButtonId, needsConfirmNgToPostBack, NoButtonId)
 
     End Sub
     ''' <summary>

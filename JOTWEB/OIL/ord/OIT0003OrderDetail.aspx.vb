@@ -37,6 +37,11 @@ Public Class OIT0003OrderDetail
     Private Const CONST_TANKNO_STATUS_FUKA As String = "不可"
     Private Const CONST_TANKNO_STATUS_ZAN As String = "残車"
 
+    '◯交検・全件アラート表示用
+    Private Const CONST_ALERT_STATUS_SAFE As String = "'<div class=""safe""></div>'"
+    Private Const CONST_ALERT_STATUS_WARNING As String = "'<div class=""warning""></div>'"
+    Private Const CONST_ALERT_STATUS_CAUTION As String = "'<div class=""caution""></div>'"
+
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
     Private Const CONST_UPDATE As String = "Update"                 'データ更新
@@ -150,6 +155,11 @@ Public Class OIT0003OrderDetail
                             WF_ListChange()
                         Case "WF_DTAB_Click"                  '○DetailTab切替処理
                             WF_Detail_TABChange()
+                        Case "btnChkLastOilConfirmYes"        '確認メッセージはいボタン押下(前回油種チェック)
+                            '画面表示設定処理(受注進行ステータス)
+                            WW_ScreenOrderStatusSet()
+                        Case "btnChkLastOilConfirmNo"         '確認メッセージいいえボタン押下(前回油種チェック)
+
                     End Select
 
                     '○ 一覧再表示処理
@@ -844,8 +854,9 @@ Public Class OIT0003OrderDetail
             & " , @P05                                           AS TANKQUOTA" _
             & " , ''                                             AS LINKNO" _
             & " , ''                                             AS LINKDETAILNO" _
-            & " , ''                                             AS LINEORDER" _
+            & " , ''                                             AS SHIPORDER" _
             & " , ''                                             AS TANKNO" _
+            & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS MODEL" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
@@ -913,15 +924,16 @@ Public Class OIT0003OrderDetail
                 & "   END                                                AS TANKQUOTA" _
                 & " , ''                                                 AS LINKNO" _
                 & " , ''                                                 AS LINKDETAILNO" _
-                & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
+                & " , ISNULL(RTRIM(OIT0003.SHIPORDER), '')               AS SHIPORDER" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
+                & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
                 & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
-                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
                 & "   END                                                           AS JRINSPECTIONALERT" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -933,10 +945,10 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), NULL)    AS JRINSPECTIONDATE" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
-                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
                 & "   END                                                           AS JRALLINSPECTIONALERT" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
@@ -974,6 +986,7 @@ Public Class OIT0003OrderDetail
                 & "    AND OIS0015_2.KEYCODE = OIT0003.ORDERINFO " _
                 & " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
+
             '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_NOW ON " _
             '& "       OIT0002.OFFICECODE = OIM0003_NOW.OFFICECODE" _
             '& "       AND OIT0002.SHIPPERSCODE = OIM0003_NOW.SHIPPERCODE" _
@@ -1082,6 +1095,12 @@ Public Class OIT0003OrderDetail
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
 
+                    '◯名称取得
+                    '受注情報
+                    If OIT0003row("ORDERINFONAME") = "" Then
+                        CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+                    End If
+
                 Next
             End Using
         Catch ex As Exception
@@ -1154,15 +1173,16 @@ Public Class OIT0003OrderDetail
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPORDER, '')                           AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
             & "   END                                                           AS JRINSPECTIONALERT" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -1174,10 +1194,10 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), NULL)    AS JRINSPECTIONDATE" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
             & "   END                                                           AS JRALLINSPECTIONALERT" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
@@ -1272,15 +1292,16 @@ Public Class OIT0003OrderDetail
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPORDER, '')                           AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
             & "   END                                                           AS JRINSPECTIONALERT" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -1292,10 +1313,10 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), NULL)    AS JRINSPECTIONDATE" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
             & "   END                                                           AS JRALLINSPECTIONALERT" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
@@ -1605,10 +1626,10 @@ Public Class OIT0003OrderDetail
                 & " , ''                                                 AS LINKDETAILNO" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
-                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
                 & "   END                                                           AS JRINSPECTIONALERT" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -1620,10 +1641,10 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), NULL)  AS JRINSPECTIONDATE" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
-                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
                 & "   END                                                           AS JRALLINSPECTIONALERT" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
@@ -3228,11 +3249,26 @@ Public Class OIT0003OrderDetail
         End If
 
         '〇 前回油種と油種の整合性チェック
+        Dim blnOilCheck As Boolean = False
         WW_CheckLastOilConsistency(WW_ERRCODE)
-        If WW_ERRCODE = "ERR" Then
+        '前回黒油によるエラー
+        If WW_ERRCODE = "ERR1" Then
             Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
             Exit Sub
+
+            '前回揮発油,今回黒油、または灯軽油による警告
+        ElseIf WW_ERRCODE = "ERR2" _
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            blnOilCheck = True
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR,
+              C_MESSAGE_TYPE.QUES,
+              needsPopUp:=True,
+              messageBoxTitle:="",
+              IsConfirm:=True,
+              YesButtonId:="btnChkLastOilConfirmYes",
+              needsConfirmNgToPostBack:=True,
+              NoButtonId:="btnChkLastOilConfirmNo")
         End If
 
         '〇 高速列車対応タンク車チェック
@@ -3383,88 +3419,9 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
-        '〇 受注ステータスが"受注手配"の場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
-            '〇(受注TBL)受注進行ステータス更新
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-
-                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_200)
-                CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_200, TxtOrderStatus.Text, WW_DUMMY)
-                work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200
-                work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
-
-                '○ 画面表示データ復元
-                Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                    If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                        OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
-                        OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
-                    End If
-                Next
-                '○ 画面表示データ保存
-                Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-
-            End Using
-
-            '〇 受注ステータスが"手配"へ変更された場合
-            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
-                WF_DTAB_CHANGE_NO.Value = "1"
-                WF_Detail_TABChange()
-
-                '〇タンク車所在の更新
-                WW_TankShozaiSet()
-
-                '### 臨海鉄道対応 ####################################################################################
-                '五井営業所、甲子営業所、袖ヶ浦営業所の場合
-                '積込列車番号の入力を可能とする。
-                If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-
-                    '臨海鉄道対象のため有効にする。
-                    WW_RINKAIFLG = True
-
-                End If
-                '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
-                '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
-                'タブ「タンク車明細」へ業務を移行する。
-                '※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
-                If WW_RINKAIFLG = False _
-                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
-                    '〇(受注TBL)受注進行ステータス更新
-                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()       'DataBase接続
-
-                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_300)
-                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_300, TxtOrderStatus.Text, WW_DUMMY)
-                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300
-                        work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
-
-                        '○ 画面表示データ復元
-                        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-                        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
-                                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
-                            End If
-                        Next
-                        '○ 画面表示データ保存
-                        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-
-                    End Using
-
-                    WF_DTAB_CHANGE_NO.Value = "2"
-                    WF_Detail_TABChange()
-
-                    '〇タンク車所在の更新
-                    WW_TankShozaiSet()
-                End If
-                '#####################################################################################################
-
-            End If
-
-        End If
+        '画面表示設定処理(受注進行ステータス)
+        '◯前回油種チェック時に警告データがない場合
+        If blnOilCheck = False Then WW_ScreenOrderStatusSet()
 
     End Sub
 
@@ -4084,13 +4041,13 @@ Public Class OIT0003OrderDetail
                     End If
                     Select Case WW_JRINSPECTIONFLG
                         Case "1"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                             updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                         Case "2"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                             updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                         Case "3"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                             updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                     End Select
                 Else
@@ -4114,13 +4071,13 @@ Public Class OIT0003OrderDetail
                     End If
                     Select Case WW_JRALLINSPECTIONFLG
                         Case "1"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                             updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                         Case "2"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                             updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                         Case "3"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                             updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                     End Select
                 Else
@@ -5039,7 +4996,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -5067,7 +5024,7 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        LINEORDER             = @P33, TANKNO               = @P03" _
+            & "        SHIPORDER             = @P40, LINEORDER            = @P33, TANKNO       = @P03" _
             & "        , ORDERINFO           = @P37, SHIPPERSCODE         = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE = @P35" _
             & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE    = @P39, JOINT        = @P08" _
@@ -5084,7 +5041,7 @@ Public Class OIT0003OrderDetail
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO            , LINEORDER          , TANKNO" _
+            & "        ( ORDERNO         , DETAILNO            , SHIPORDER          , LINEORDER          , TANKNO" _
             & "        , KAMOKU          , ORDERINFO           , SHIPPERSCODE       , SHIPPERSNAME" _
             & "        , OILCODE         , OILNAME             , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINTCODE          , JOINT" _
@@ -5095,7 +5052,7 @@ Public Class OIT0003OrderDetail
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02, @P33, @P03" _
+            & "        ( @P01, @P02, @P40, @P33, @P03" _
             & "        , @P04, @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
             & "        , @P06, @P25, @P07, @P39, @P08" _
@@ -5113,6 +5070,7 @@ Public Class OIT0003OrderDetail
             " SELECT" _
             & "    ORDERNO" _
             & "    , DETAILNO" _
+            & "    , SHIPORDER" _
             & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
@@ -5161,6 +5119,7 @@ Public Class OIT0003OrderDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
+                Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 2)   '発送順
                 Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '貨物駅入線順
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
@@ -5209,6 +5168,7 @@ Public Class OIT0003OrderDetail
                     'DB更新
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     PARA02.Value = OIT0003row("DETAILNO")             '受注明細№
+                    PARA40.Value = OIT0003row("SHIPORDER")            '発送順
                     PARA33.Value = OIT0003row("LINEORDER")            '貨物駅入線順
                     PARA03.Value = OIT0003row("TANKNO")               'タンク車№
                     PARA04.Value = ""                                 '費用科目
@@ -5224,7 +5184,7 @@ Public Class OIT0003OrderDetail
                         OrElse OIT0003row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
                         PARA37.Value = BaseDllConst.CONST_ORDERINFO_ALERT_82
                     Else
-                        PARA37.Value = ""
+                        PARA37.Value = OIT0003row("ORDERINFO")
                     End If
 
                     PARA23.Value = OIT0003row("SHIPPERSCODE")         '荷主コード
@@ -5315,7 +5275,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -5642,7 +5602,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -6928,10 +6888,10 @@ Public Class OIT0003OrderDetail
 
         End Try
 
-        If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
-            '○メッセージ表示
-            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-        End If
+        'If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
+        '    '○メッセージ表示
+        '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'End If
 
     End Sub
 
@@ -7608,13 +7568,13 @@ Public Class OIT0003OrderDetail
                                 End If
                                 Select Case WW_JRINSPECTIONFLG
                                     Case "1"
-                                        updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                                         updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                                     Case "2"
-                                        updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                                         updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                                     Case "3"
-                                        updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                                         updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                                 End Select
                             Else
@@ -7637,13 +7597,13 @@ Public Class OIT0003OrderDetail
                                 End If
                                 Select Case WW_JRALLINSPECTIONFLG
                                     Case "1"
-                                        updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                                         updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                                     Case "2"
-                                        updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                                         updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                                     Case "3"
-                                        updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                                         updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                                 End Select
                             Else
@@ -8043,6 +8003,94 @@ Public Class OIT0003OrderDetail
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示設定処理(受注進行ステータス)
+    ''' </summary>
+    Protected Sub WW_ScreenOrderStatusSet()
+        '〇 受注ステータスが"受注手配"の場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            '〇(受注TBL)受注進行ステータス更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_200)
+                CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_200, Me.TxtOrderStatus.Text, WW_DUMMY)
+                work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200
+                work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+
+                '○ 画面表示データ復元
+                Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                    If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                        OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                        OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                    End If
+                Next
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+            End Using
+
+            '〇 受注ステータスが"手配"へ変更された場合
+            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
+                WF_DTAB_CHANGE_NO.Value = "1"
+                WF_Detail_TABChange()
+
+                '〇タンク車所在の更新
+                WW_TankShozaiSet()
+
+                '### 臨海鉄道対応 ####################################################################################
+                '五井営業所、甲子営業所、袖ヶ浦営業所の場合
+                '積込列車番号の入力を可能とする。
+                If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+                    '臨海鉄道対象のため有効にする。
+                    WW_RINKAIFLG = True
+
+                End If
+                '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
+                '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
+                'タブ「タンク車明細」へ業務を移行する。
+                '※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
+                If WW_RINKAIFLG = False _
+                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
+                    '〇(受注TBL)受注進行ステータス更新
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_300)
+                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_300, Me.TxtOrderStatus.Text, WW_DUMMY)
+                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300
+                        work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+
+                        '○ 画面表示データ復元
+                        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                            End If
+                        Next
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+                    End Using
+
+                    WF_DTAB_CHANGE_NO.Value = "2"
+                    WF_Detail_TABChange()
+
+                    '〇タンク車所在の更新
+                    WW_TankShozaiSet()
+                End If
+                '#####################################################################################################
+
+            End If
+
+        End If
     End Sub
 
     ''' <summary>
@@ -8932,13 +8980,14 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
-        '貨物駅入線順でソートし、重複がないかチェックする。
-        OIT0003tbl_dv.Sort = "LINEORDER"
+        '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
+        '発送順でソートし、重複がないかチェックする。
+        OIT0003tbl_dv.Sort = "SHIPORDER"
         For Each drv As DataRowView In OIT0003tbl_dv
-            If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") <> "" AndAlso chkLineOrder = drv("LINEORDER") Then
-                Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                WW_CheckMES1 = "貨物駅入線順重複エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+            If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkLineOrder = drv("SHIPORDER") Then
+                Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "発送順重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
                 O_RTN = "ERR"
                 Exit Sub
@@ -8949,6 +8998,29 @@ Public Class OIT0003OrderDetail
                 chkLineOrder = drv("LINEORDER")
             End If
         Next
+        '### END  #############################################################################################
+
+        '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
+        '　※上記以外の営業所については、入力しないためチェックは未実施。
+        If Me.TxtOrderOfficeCode.Text = "011203" Then
+            '貨物駅入線順でソートし、重複がないかチェックする。
+            OIT0003tbl_dv.Sort = "LINEORDER"
+            For Each drv As DataRowView In OIT0003tbl_dv
+                If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") <> "" AndAlso chkLineOrder = drv("LINEORDER") Then
+                    Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WW_CheckMES1 = "貨物駅入線順重複エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+
+                '行削除したデータの場合は退避しない。
+                If drv("HIDDEN") <> "1" Then
+                    chkLineOrder = drv("LINEORDER")
+                End If
+            Next
+        End If
 
         '(一覧)チェック
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
@@ -8964,15 +9036,32 @@ Public Class OIT0003OrderDetail
                 Exit Sub
             End If
 
-            '(一覧)貨物駅入線順(空白チェック)
-            If OIT0003row("LINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)貨物駅入線順", needsPopUp:=True)
+            '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
+            '(一覧)発送順(空白チェック)
+            If OIT0003row("SHIPORDER") = "" And OIT0003row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
 
-                WW_CheckMES1 = "貨物駅入線順未設定エラー。"
+                WW_CheckMES1 = "発送順未設定エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
                 O_RTN = "ERR"
                 Exit Sub
+            End If
+            '### END  #############################################################################################
+
+            '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
+            '　※上記以外の営業所については、入力しないためチェックは未実施。
+            If Me.TxtOrderOfficeCode.Text = "011203" Then
+                '(一覧)貨物駅入線順(空白チェック)
+                If OIT0003row("LINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)貨物駅入線順", needsPopUp:=True)
+
+                    WW_CheckMES1 = "貨物駅入線順未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
             End If
 
             '(一覧)タンク車割当状況(未割当チェック)
@@ -9710,20 +9799,41 @@ Public Class OIT0003OrderDetail
             WW_GetValue = {"", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch(OIT0003row("LASTOILCODE") + OIT0003row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0003row("OILCODE") + OIT0003row("ORDERINGTYPE"), WW_GetValue)
 
+            '前回黒油
             If WW_GetValue(2) = "1" Then
                 'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_83
+                'OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_83
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
+                O_RTN = "ERR1"
                 'Exit Sub
-            Else
-                OIT0003row("ORDERINFO") = ""
-                OIT0003row("ORDERINFONAME") = ""
 
+                '前回揮発油
+            ElseIf WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3" Then
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+                WW_CheckMES1 = "前回油種と油種の整合性エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    '受注明細TBLの受注情報を更新
+                    WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+                End Using
+
+                If O_RTN <> "ERR1" Then O_RTN = "ERR2"
+            Else
+                If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99 _
+                    OrElse OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98 Then
+                    OIT0003row("ORDERINFO") = ""
+                    OIT0003row("ORDERINFONAME") = ""
+                End If
             End If
         Next
 
@@ -9782,9 +9892,10 @@ Public Class OIT0003OrderDetail
                 Master.SaveTable(OIT0003tbl)
                 Exit Sub
             Else
-                OIT0003row("ORDERINFO") = ""
-                OIT0003row("ORDERINFONAME") = ""
-
+                If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_84 Then
+                    OIT0003row("ORDERINFO") = ""
+                    OIT0003row("ORDERINFONAME") = ""
+                End If
             End If
         Next
 
@@ -9895,7 +10006,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10012,8 +10123,10 @@ Public Class OIT0003OrderDetail
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
 
                         Else
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
+                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                                OIT0003row("ORDERINFO") = ""
+                                OIT0003row("ORDERINFONAME") = ""
+                            End If
                         End If
                     Next
                 Next
@@ -10033,7 +10146,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10151,8 +10264,10 @@ Public Class OIT0003OrderDetail
 
                             Exit For
                         Else
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
+                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_97 Then
+                                OIT0003row("ORDERINFO") = ""
+                                OIT0003row("ORDERINFONAME") = ""
+                            End If
                         End If
                     Next
                 Next
@@ -10172,7 +10287,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10303,7 +10418,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -10375,8 +10490,10 @@ Public Class OIT0003OrderDetail
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
 
                         Else
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
+                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_90 Then
+                                OIT0003row("ORDERINFO") = ""
+                                OIT0003row("ORDERINFONAME") = ""
+                            End If
                         End If
                     Next
                 Next
@@ -10397,7 +10514,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -11024,6 +11141,7 @@ Public Class OIT0003OrderDetail
                 Dim tblObj = DirectCast(divObj.Controls(0), Table)
 
                 '受注進行ステータスが"受注受付"の場合
+                '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
@@ -11032,6 +11150,9 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                                AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
                     Next
@@ -11043,6 +11164,7 @@ Public Class OIT0003OrderDetail
                     '受注進行ステータス＝"240:手配中(入換指示未入力)"
                     '受注進行ステータス＝"250:手配中(積込指示未入力)"
                     '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
+                    '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
                 ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
@@ -11057,18 +11179,22 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                                AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
                     Next
 
-                    '受注進行ステータスが"受注受付"以外の場合
+                    '受注進行ステータスが"300：手配完了"以降のステータスの場合
                 Else
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _

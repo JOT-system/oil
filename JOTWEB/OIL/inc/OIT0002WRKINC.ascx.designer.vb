@@ -48,7 +48,7 @@ Partial Public Class OIT0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_RETSTATION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_RETSTATION2 コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class OIT0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_RETSTATION2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_STYMD コントロール。
     '''</summary>
@@ -111,7 +111,16 @@ Partial Public Class OIT0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TRAINNO2 As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_TRAINNAME2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TRAINNAME2 As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_SELECT コントロール。
     '''</summary>

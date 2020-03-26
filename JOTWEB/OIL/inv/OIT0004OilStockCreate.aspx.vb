@@ -172,6 +172,8 @@ Public Class OIT0004OilStockCreate
             '対象列車取得（ここはまだベタ打ち）
             If canShowSuggestList Then
                 trainList = GetTargetTrain(sqlCon, salesOffice, shipper, consignee)
+                'システム管理外列車付与(受注作成しない、在庫計算だけ使う)
+                'trainList = GetUnmanagedTrain(sqlCon, trainList, salesOffice, shipper, consignee)
             End If
             '抽出結果を画面データクラスに展開
             dispDataObj = New DispDataClass(daysList, trainList, oilTypeList, salesOffice, shipper, consignee)
@@ -229,7 +231,10 @@ Public Class OIT0004OilStockCreate
         End Using
         '取得値を元に再計算
         dispDataObj.RecalcStockList(False)
-
+        '****************************************
+        '画面共通タイトルの左下に油槽所設定
+        '****************************************
+        Master.SetTitleLeftBottomText(dispDataObj.ConsigneeName)
         '****************************************
         '生成したデータを画面に貼り付け
         '****************************************
@@ -605,6 +610,11 @@ Public Class OIT0004OilStockCreate
                 End Using
 
             End Using
+            If targetTrainList IsNot Nothing Then
+                For i = 0 To targetTrainList.Count - 1 Step 1
+                    'targetTrainList(i) = retVal
+                Next i
+            End If
             Return retVal
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, Me.Title)
@@ -1159,6 +1169,51 @@ Public Class OIT0004OilStockCreate
             Next odrItm
 
         Next sgItm
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 管理対象外列車が必要な油槽所か判定し管理外の列車情報を追加
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="trainList"></param>
+    ''' <param name="salesOffice"></param>
+    ''' <param name="shipper"></param>
+    ''' <param name="consignee"></param>
+    ''' <returns></returns>
+    Private Function GetUnmanagedTrain(sqlCon As SqlConnection, trainList As Dictionary(Of String, TrainListItem),
+                                       salesOffice As String, shipper As String, consignee As String) As Dictionary(Of String, TrainListItem)
+        Dim retVal As Dictionary(Of String, TrainListItem) = trainList
+        Dim sqlStr As New StringBuilder
+        '1レコード想定
+        sqlStr.AppendLine("SELECT rtrim(FX.VALUE3)  AS TRAINNO")
+        sqlStr.AppendLine("      ,rtrim(FX.VALUE4)  AS TRAINNAME")
+        sqlStr.AppendLine("      ,rtrim(FX.VALUE5)  AS MAXVOLUME")
+        sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
+        sqlStr.AppendLine(" WHERE FX.CAMPCODE = @CAMPCODE")
+        sqlStr.AppendLine("   AND FX.CLASS    = @CLASS")
+        sqlStr.AppendLine("   AND FX.KEYCODE  = @OFFICECODE")
+        sqlStr.AppendLine("   AND FX.VALUE1   = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@CAMPCODE", SqlDbType.NVarChar).Value = "01"
+                .Add("@CLASS", SqlDbType.NVarChar).Value = "UNMANAGEDTRAIN"
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = salesOffice
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = consignee
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows Then
+                    sqlDr.Read()
+                    Dim trNo As String = Convert.ToString(sqlDr("TRAINNO"))
+                    Dim trName As String = Convert.ToString(sqlDr("TRAINNAME"))
+                    Dim trMaxVol As Decimal = CDec(Convert.ToString(sqlDr("MAXVOLUME")))
+                    Dim trItem As New TrainListItem(trNo, trName, trMaxVol)
+                    trItem.UnmanagedTrain = True '管理外フラグをOnに変更
+                End If
+            End Using 'sqlDr
+        End Using 'sqlCmd
         Return retVal
     End Function
     ''' <summary>
@@ -3534,6 +3589,11 @@ Public Class OIT0004OilStockCreate
                 End If
             End Get
         End Property
+        ''' <summary>
+        ''' 管理対象外列車(受注作成、シミュレーション対象外の列車判定用)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property UnmanagedTrain As Boolean = False
         ''' <summary>
         ''' コンストラクタ
         ''' </summary>

@@ -31,9 +31,49 @@ function InitDisplay() {
     bindDispLorry();
     //フォーカスを合わせる
     forcusObj();
-
+    bindContentHorizonalScroll();
 }
-
+// 〇コンテンツ横スクロールイベントのバインド
+function bindContentHorizonalScroll() {
+    let headerBox = document.getElementById('headerbox');
+    let buttonBox = document.querySelector('.actionButtonBox');
+    if (headerBox === null) {
+        return;
+    }
+    if (buttonBox === null) {
+        return;
+    }
+    headerBox.addEventListener('scroll', (function (headerBox, buttonBox) {
+        return function () {
+            resizeButtonBox(headerBox, buttonBox);
+        };
+    })(headerBox, buttonBox), false);
+    window.addEventListener('resize', (function (leftTableObj) {
+        return function () {
+            resizeButtonBox(headerBox, buttonBox);
+        };
+    })(headerBox, buttonBox), false);
+    // バインド時初期実行
+    resizeButtonBox(headerBox, buttonBox);
+}
+function resizeButtonBox(headerBox, buttonBox) {
+    let widthheaaderBox = headerBox.offsetWidth;
+    let leftSideObj = document.querySelector(".leftSide");
+    let rightSideObj = document.querySelector(".rightSide");
+    widthheaaderBox = widthheaaderBox - 16;
+    buttonBox.style.width = widthheaaderBox + 'px';
+    let negMarginLeft = 0;
+    if (widthheaaderBox < 1250 && headerBox.scrollLeft !== 0) {
+        negMarginLeft = -1 * headerBox.scrollLeft;
+    }
+    leftSideObj.style.marginLeft = negMarginLeft + "px";
+    if (negMarginLeft === 0) {
+        rightSideObj.style.marginLeft = 'auto';
+    } else {
+        rightSideObj.style.marginLeft = 0;
+    }
+    
+}
 // 〇提案数の合計計算イベントバインド(暫定関数)
 function bindSuggestSummary(suggestColumnDivList) {
     //日付・列車列のループ

@@ -232,7 +232,13 @@ Public Class GRIS0001Title
                 titlebox.Attributes("class") = "titlebox"
         End Select
     End Sub
-
+    ''' <summary>
+    ''' ヘッダー左下文言設定メソッド
+    ''' </summary>
+    ''' <param name="leftBottomText"></param>
+    Public Sub SetLeftBottomMessage(leftBottomText As String)
+        Me.lblCommonHeaderLeftBottom.Text = leftBottomText
+    End Sub
     ' ******************************************************************************
     ' ***  端末種別取得（全社サーバーか否か判定）                                ***     
     ' ***   2019/09/02利用中止                                                   ***     

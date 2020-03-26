@@ -79,7 +79,7 @@ Public Class OILMasterPage
         Else
             'フッター初期化
             footer.Initialize()
-
+            title.SetLeftBottomMessage("")
             '画面間情報取得処理
             SetMAPValue()
         End If
@@ -122,6 +122,7 @@ Public Class OILMasterPage
             Else
                 '○ 全画面共通-タイトル設定
                 Dim WW_RTN As String = String.Empty
+
                 '                title.SetTitle(MF_MAPID.Value, MF_MAPvariant.Value, COMPANYCODE, WW_RTN, CS0050SESSION.USERID)
                 title.SetTitle(MF_MAPID.Value, MF_MENU_ROLE.Value, COMPANYCODE, WW_RTN, CS0050SESSION.USERID)
                 If Not isNormal(WW_RTN) Then
@@ -212,6 +213,7 @@ Public Class OILMasterPage
             Dim btnText As HtmlInputText = DirectCast(obj, HtmlInputText)
 
             btnText.Value = String.Empty
+
         End If
     End Sub
 #End Region
@@ -422,6 +424,14 @@ Public Class OILMasterPage
         Server.Transfer("~/OIL/M00001MENU.aspx")
         CS0050SESSION.VIEW_MAPID = "M00001"
         Me.MAPID = "M00001"
+    End Sub
+    ''' <summary>
+    ''' 画面左下メッセージを設定
+    ''' </summary>
+    ''' <param name="text"></param>
+    ''' <remarks>ポストバック以外は初期化されます</remarks>
+    Public Sub SetTitleLeftBottomText(text As String)
+        title.SetLeftBottomMessage(text)
     End Sub
     ''' <summary>
     ''' メッセージの設定処理

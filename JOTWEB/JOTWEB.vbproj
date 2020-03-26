@@ -140,6 +140,7 @@
     <Content Include="img\矢印R.png" />
     <Content Include="OIL\img\a_cat.png" />
     <Content Include="OIL\img\calendar.png" />
+    <Content Include="OIL\img\caution.png" />
     <Content Include="OIL\img\datalink.png" />
     <Content Include="OIL\img\e_cat.png" />
     <Content Include="OIL\img\iconError.png" />

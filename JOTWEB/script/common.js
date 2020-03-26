@@ -153,7 +153,7 @@ window.addEventListener('DOMContentLoaded', function () {
     /* ************************************  */
     /* 通常テキストフィールドのEntarタブ移動 */
     /* ************************************  */
-
+    commonBindNormalEnterToNextTabStep();
 });
 
 // 処理後カーソルを戻す
@@ -1992,23 +1992,49 @@ function ConvartWideCharToNormal(obj) {
     //repVal = repVal.match(/-?\d+\.?\d*/);
     obj.value = repVal;
 }
-function commonBindNormalEnterToVerticalTabStep() {
-    let inputObjList = document.querySelectorAll('input[type=text]:not([disabled]):not([tabindex="-1"]):not([rownum])');
+/**
+ *  リストテーブルを除くテーブルにつきEnterキーで次のテキストボックスにタブを移すイベントバインド
+ * @return {undefined} なし
+ * @description 
+ */
+function commonBindNormalEnterToNextTabStep() {
+    let inputObjList = document.querySelectorAll('input[type=password],div:not([hidden=hidden]) input[type=text]:not([disabled]):not([tabindex="-1"]):not([rownum])');
+    if (inputObjList === null) {
+        return;
+    }
+    /* 画面表示していないオブジェクト判定 */
+    let visibleInputObj = [];
     for (let i = 0, len = inputObjList.length; i < len; ++i) {
-        let textBox = inputObjList[i];
-        textBox.addEventListener('keypress', (function (textBox, panelId) {
+        if (inputObjList[i].clientWidth === 0) {
+            continue;
+        }
+        let dispStyle = window.getComputedStyle(inputObjList[i]);
+        if (dispStyle.display === 'none') {
+            continue;
+        }
+        visibleInputObj.push(inputObjList[i]);
+
+    }
+
+    for (let i = 0, len = visibleInputObj.length; i < len; ++i) {
+        let textBox = visibleInputObj[i];
+        let nextTextObj = visibleInputObj[0];
+        if (visibleInputObj.length !== i + 1) {
+            nextTextObj = visibleInputObj[i + 1];
+        }
+        textBox.addEventListener('keypress', (function (textBox, nextTextObj) {
             return function () {
                 if (event.key === 'Enter') {
                     if (commonKeyEnterProgress === false) {
                         commonKeyEnterProgress = true; //Enter連打抑止
-                        commonListEnterToVerticalTabStep(textBox, panelId);
+                        nextTextObj.focus();
                         return setTimeout(function () {
                             commonKeyEnterProgress = false;　///Enter連打抑止
                         }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に
                     }
                 }
             };
-        })(textBox, panelId), true);
+        })(textBox, nextTextObj), true);
     }
 }
 /**

@@ -3842,7 +3842,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        LINEORDER         = @P33, TANKNO       = @P03, ORDERINFO    = @P34" _
+            & "        TANKNO            = @P03, ORDERINFO    = @P34" _
             & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
             & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK       = @P38" _
@@ -3853,7 +3853,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO            , LINEORDER" _
+            & "        ( ORDERNO         , DETAILNO" _
             & "        , TANKNO          , KAMOKU              , ORDERINFO" _
             & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
             & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
@@ -3865,7 +3865,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02, @P33" _
+            & "        ( @P01, @P02" _
             & "        , @P03, @P04, @P34" _
             & "        , @P23, @P24, @P05, @P35" _
             & "        , @P36, @P37, @P06, @P25" _
@@ -3889,7 +3889,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             " SELECT" _
             & "    ORDERNO" _
             & "    , DETAILNO" _
-            & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , ORDERINFO" _
@@ -3939,7 +3938,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
-                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '入線順
+                'Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '入線順
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
@@ -3992,7 +3991,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     'PARA01.Value = OIT0001row("ORDERNO")             '受注№
                     PARA02.Value = OIT0001row("DETAILNO")             '受注明細№
-                    PARA33.Value = ""                                 '入線順
+                    'PARA33.Value = ""                                 '入線順
                     PARA03.Value = OIT0001row("TANKNO")               'タンク車№
                     PARA04.Value = OIT0001row("KAMOKU")               '費用科目
                     PARA34.Value = ""                                 '受注情報

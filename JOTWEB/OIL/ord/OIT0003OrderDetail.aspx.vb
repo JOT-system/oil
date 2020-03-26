@@ -854,8 +854,9 @@ Public Class OIT0003OrderDetail
             & " , @P05                                           AS TANKQUOTA" _
             & " , ''                                             AS LINKNO" _
             & " , ''                                             AS LINKDETAILNO" _
-            & " , ''                                             AS LINEORDER" _
+            & " , ''                                             AS SHIPORDER" _
             & " , ''                                             AS TANKNO" _
+            & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS MODEL" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
@@ -923,8 +924,9 @@ Public Class OIT0003OrderDetail
                 & "   END                                                AS TANKQUOTA" _
                 & " , ''                                                 AS LINKNO" _
                 & " , ''                                                 AS LINKDETAILNO" _
-                & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
+                & " , ISNULL(RTRIM(OIT0003.SHIPORDER), '')               AS SHIPORDER" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
+                & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
                 & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -1171,8 +1173,9 @@ Public Class OIT0003OrderDetail
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPORDER, '')                           AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -1289,8 +1292,9 @@ Public Class OIT0003OrderDetail
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPORDER, '')                           AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -5020,7 +5024,7 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        LINEORDER             = @P33, TANKNO               = @P03" _
+            & "        SHIPORDER             = @P40, LINEORDER            = @P33, TANKNO       = @P03" _
             & "        , ORDERINFO           = @P37, SHIPPERSCODE         = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE = @P35" _
             & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE    = @P39, JOINT        = @P08" _
@@ -5037,7 +5041,7 @@ Public Class OIT0003OrderDetail
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO            , LINEORDER          , TANKNO" _
+            & "        ( ORDERNO         , DETAILNO            , SHIPORDER          , LINEORDER          , TANKNO" _
             & "        , KAMOKU          , ORDERINFO           , SHIPPERSCODE       , SHIPPERSNAME" _
             & "        , OILCODE         , OILNAME             , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINTCODE          , JOINT" _
@@ -5048,7 +5052,7 @@ Public Class OIT0003OrderDetail
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02, @P33, @P03" _
+            & "        ( @P01, @P02, @P40, @P33, @P03" _
             & "        , @P04, @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
             & "        , @P06, @P25, @P07, @P39, @P08" _
@@ -5066,6 +5070,7 @@ Public Class OIT0003OrderDetail
             " SELECT" _
             & "    ORDERNO" _
             & "    , DETAILNO" _
+            & "    , SHIPORDER" _
             & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
@@ -5114,6 +5119,7 @@ Public Class OIT0003OrderDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
+                Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 2)   '発送順
                 Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '貨物駅入線順
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
@@ -5162,6 +5168,7 @@ Public Class OIT0003OrderDetail
                     'DB更新
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     PARA02.Value = OIT0003row("DETAILNO")             '受注明細№
+                    PARA40.Value = OIT0003row("SHIPORDER")            '発送順
                     PARA33.Value = OIT0003row("LINEORDER")            '貨物駅入線順
                     PARA03.Value = OIT0003row("TANKNO")               'タンク車№
                     PARA04.Value = ""                                 '費用科目
@@ -8973,6 +8980,26 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
+        '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
+        '発送順でソートし、重複がないかチェックする。
+        OIT0003tbl_dv.Sort = "SHIPORDER"
+        For Each drv As DataRowView In OIT0003tbl_dv
+            If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkLineOrder = drv("SHIPORDER") Then
+                Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "発送順重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
+            '行削除したデータの場合は退避しない。
+            If drv("HIDDEN") <> "1" Then
+                chkLineOrder = drv("LINEORDER")
+            End If
+        Next
+        '### END  #############################################################################################
+
         '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
         '　※上記以外の営業所については、入力しないためチェックは未実施。
         If Me.TxtOrderOfficeCode.Text = "011203" Then
@@ -9008,6 +9035,19 @@ Public Class OIT0003OrderDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
+
+            '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
+            '(一覧)発送順(空白チェック)
+            If OIT0003row("SHIPORDER") = "" And OIT0003row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
+
+                WW_CheckMES1 = "発送順未設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            '### END  #############################################################################################
 
             '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
             '　※上記以外の営業所については、入力しないためチェックは未実施。
@@ -11146,14 +11186,15 @@ Public Class OIT0003OrderDetail
                         Next
                     Next
 
-                    '受注進行ステータスが"受注受付"以外の場合
+                    '受注進行ステータスが"300：手配完了"以降のステータスの場合
                 Else
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGETRAINNO") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _

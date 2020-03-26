@@ -288,6 +288,7 @@
     <Compile Include="inc\GRCO0100XLSUP.ashx.vb">
       <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
     </Compile>
+    <Compile Include="OIL\com\EntryHistory.vb" />
     <Compile Include="OIL\inc\GRM00002WRKINC.ascx.designer.vb">
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
     </Compile>

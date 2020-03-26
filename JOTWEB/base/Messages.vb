@@ -538,6 +538,10 @@ Public Module Messages
         ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR As String = "20036"
+        ''' <summary>
+        ''' 発送順序重複エラー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_REPEAT_ERROR As String = "20037"
 
 #End Region
 

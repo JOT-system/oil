@@ -5,7 +5,7 @@ Imports System.Net
 Public Class M00000LOGON
     Inherits System.Web.UI.Page
 
-    'セッション情報
+    'セッション情報     
     Private CS0050Session As New CS0050SESSION
 
     '画面ID

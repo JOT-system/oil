@@ -159,6 +159,7 @@
     <Content Include="OIL\img\statistics.png" />
     <Content Include="OIL\img\tank.png" />
     <Content Include="OIL\img\unlockKey.png" />
+    <Content Include="OIL\img\warning.png" />
     <Content Include="OIL\img\w_cat.png" />
     <Content Include="OIL\inc\GRM00002WRKINC.ascx" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />

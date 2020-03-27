@@ -421,6 +421,7 @@ Public Class OIT0004OilStockCreate
                 dispValues = EditEmptyTurnCarsNum(sqlCon, dispValues)
                 If dispValues.HasMoveInsideItem Then
                     dispValues.MiDispData = EditEmptyTurnCarsNum(sqlCon, dispValues.MiDispData)
+                    dispValues.MiDispData.RecalcStockList()
                 End If
             End If
         End Using

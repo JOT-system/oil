@@ -21,6 +21,8 @@ Public Class OIT0003OrderDetail
     Private OIT0003WK4tbl As DataTable                              '作業用4テーブル
     Private OIT0003WK5tbl As DataTable                              '作業用4テーブル
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
+    Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -312,7 +314,7 @@ Public Class OIT0003OrderDetail
             '   受注進行ステータス＝"230:手配中(託送指示手配済)"
             '   受注進行ステータス＝"240:手配中(入換指示未入力)"
             '   受注進行ステータス＝"250:手配中(積込指示未入力)"
-            '   受注進行ステータス＝"260:手配中(入換積込指示手配済)"
+            '   受注進行ステータス＝"260:手配中(託送指示未手配)"
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
@@ -2165,6 +2167,13 @@ Public Class OIT0003OrderDetail
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
 
+            '### START 受注履歴テーブルの追加(2020/03/26) #############
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                WW_InsertOrderHistory(SQLcon)
+            End Using
+            '### END   ################################################
+
             '○メッセージ表示
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
@@ -3595,6 +3604,13 @@ Public Class OIT0003OrderDetail
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
+
+            '### START 受注履歴テーブルの追加(2020/03/26) #############
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                WW_InsertOrderHistory(SQLcon)
+            End Using
+            '### END   ################################################
 
             '○メッセージ表示
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
@@ -8111,6 +8127,9 @@ Public Class OIT0003OrderDetail
                         '○ 画面表示データ保存
                         Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
+                        '### START 受注履歴テーブルの追加(2020/03/26) #############
+                        WW_InsertOrderHistory(SQLcon)
+                        '### END   ################################################
                     End Using
 
                     WF_DTAB_CHANGE_NO.Value = "2"
@@ -8132,7 +8151,7 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_ScreenOrderStatusSet(ByRef O_VALUE As String)
 
         '◆一度に設定をしない場合の対応
-        '　受注進行ステータス＝"260:手配中(入換積込指示手配済)"
+        '　受注進行ステータス＝"260:手配中(託送指示未手配)"
         '　託送指示フラグが"1"(手配)の場合
         If work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_260 _
             AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
@@ -8159,7 +8178,7 @@ Public Class OIT0003OrderDetail
                 '受注進行ステータス＝"230:手配中(託送指示手配済)"
                 '受注進行ステータス＝"240:手配中(入換指示未入力)"
                 '受注進行ステータス＝"250:手配中(積込指示未入力)"
-                '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
+                '受注進行ステータス＝"260:手配中(託送指示未手配)"
             Case BaseDllConst.CONST_ORDERSTATUS_200,
                  BaseDllConst.CONST_ORDERSTATUS_210,
                  BaseDllConst.CONST_ORDERSTATUS_220,
@@ -8179,14 +8198,14 @@ Public Class OIT0003OrderDetail
                     'かつ、積込指示入力＝"0:未完了"
                     'かつ、託送指示入力＝"0:未完了"の場合
                 ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
-                    '手配中(入換指示手配済)
+                    '手配中(入換指示入力済)
                     O_VALUE = CONST_ORDERSTATUS_210
 
                     '入換指示入力＝"0:未完了"
                     'かつ、積込指示入力＝"1:完了"
                     'かつ、託送指示入力＝"0:未完了"の場合
                 ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
-                    '手配中(積込指示手配済)
+                    '手配中(積込指示入力済)
                     O_VALUE = CONST_ORDERSTATUS_220
 
                     '入換指示入力＝"0:未完了"
@@ -8200,21 +8219,21 @@ Public Class OIT0003OrderDetail
                     'かつ、積込指示入力＝"1:完了"
                     'かつ、託送指示入力＝"1:完了"の場合
                 ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
-                    '手配中(入換指示未手配)
+                    '手配中(入換指示未入力)
                     O_VALUE = CONST_ORDERSTATUS_240
 
                     '入換指示入力＝"1:完了"
                     'かつ、積込指示入力＝"0:未完了"
                     'かつ、託送指示入力＝"1:完了"の場合
                 ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
-                    '手配中(積込指示未手配)
+                    '手配中(積込指示未入力)
                     O_VALUE = CONST_ORDERSTATUS_250
 
                     '入換指示入力＝"1:完了"
                     'かつ、積込指示入力＝"1:完了"
                     'かつ、託送指示入力＝"0:未完了"の場合
                 ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
-                    '手配中(入換積込指示手配済)
+                    '手配中(託送指示未手配)
                     O_VALUE = CONST_ORDERSTATUS_260
 
                 End If
@@ -8326,7 +8345,7 @@ Public Class OIT0003OrderDetail
         '受注情報が以下の場合は、(実績)の日付の入力を制限
         '100:受注受付, 200:手配, 210:手配中（入換指示入力済）, 220:手配中（積込指示入力済）
         '230:手配中（託送指示手配済）, 240:手配中（入換指示未入力）, 250:手配中（積込指示未入力）
-        '260:手配中（入換積込指示手配済）
+        '260:手配中（託送指示未手配）
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
@@ -8488,7 +8507,7 @@ Public Class OIT0003OrderDetail
             '受注進行ステータスが以下の場合
             '210:手配中（入換指示入力済）, 220:手配中（積込指示入力済）
             '230:手配中（託送指示手配済）, 240:手配中（入換指示未入力）, 250:手配中（積込指示未入力）
-            '260:手配中（入換積込指示手配済）
+            '260:手配中（託送指示未手配）
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
@@ -11344,7 +11363,7 @@ Public Class OIT0003OrderDetail
                     '受注進行ステータス＝"230:手配中(託送指示手配済)"
                     '受注進行ステータス＝"240:手配中(入換指示未入力)"
                     '受注進行ステータス＝"250:手配中(積込指示未入力)"
-                    '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
+                    '受注進行ステータス＝"260:手配中(託送指示未手配)"
                     '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
                 ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
@@ -11400,7 +11419,7 @@ Public Class OIT0003OrderDetail
                 '受注進行ステータス＝"230:手配中(託送指示手配済)"
                 '受注進行ステータス＝"240:手配中(入換指示未入力)"
                 '受注進行ステータス＝"250:手配中(積込指示未入力)"
-                '受注進行ステータス＝"260:手配中(入換積込指示手配済)"
+                '受注進行ステータス＝"260:手配中(託送指示未手配)"
                     Case BaseDllConst.CONST_ORDERSTATUS_200,
                          BaseDllConst.CONST_ORDERSTATUS_210,
                          BaseDllConst.CONST_ORDERSTATUS_220,
@@ -11485,6 +11504,104 @@ Public Class OIT0003OrderDetail
 
 
         End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    Private Sub WW_InsertOrderHistory(ByVal SQLcon As SqlConnection)
+        Dim WW_GetHistoryNo() As String = {""}
+        WW_FixvalueMasterSearch("", "NEWHISTORYNOGET", "", WW_GetHistoryNo)
+
+        '◯受注履歴テーブル格納用
+        If IsNothing(OIT0003His1tbl) Then
+            OIT0003His1tbl = New DataTable
+        End If
+
+        If OIT0003His1tbl.Columns.Count <> 0 Then
+            OIT0003His1tbl.Columns.Clear()
+        End If
+        OIT0003His1tbl.Clear()
+
+        '◯受注明細履歴テーブル格納用
+        If IsNothing(OIT0003His2tbl) Then
+            OIT0003His2tbl = New DataTable
+        End If
+
+        If OIT0003His2tbl.Columns.Count <> 0 Then
+            OIT0003His2tbl.Columns.Clear()
+        End If
+        OIT0003His2tbl.Clear()
+
+        '○ 受注TBL検索SQL
+        Dim SQLOrderStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0002.*" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & String.Format(" WHERE OIT0002.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        '○ 受注明細TBL検索SQL
+        Dim SQLOrderDetailStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0003.*" _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & String.Format(" WHERE OIT0003.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLOrderStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003His1tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003His1tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using SQLcmd As New SqlCommand(SQLOrderDetailStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003His2tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003His2tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using tran = SQLcon.BeginTransaction
+                '■受注履歴テーブル
+                EntryHistory.InsertOrderHistory(SQLcon, tran, OIT0003His1tbl.Rows(0))
+
+                '■受注明細履歴テーブル
+                For Each OIT0001His2rowtbl In OIT0003His2tbl.Rows
+                    EntryHistory.InsertOrderDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                Next
+
+                'トランザクションコミット
+                tran.Commit()
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D ORDERHISTORY")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D ORDERHISTORY"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 

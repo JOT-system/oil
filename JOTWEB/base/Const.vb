@@ -426,29 +426,33 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_250 As String = "250"
     ''' <summary>
-    ''' 260:手配中（入換積込指示手配済）
+    ''' 260:手配中（託送指示未手配）入換積込手配連絡（未手配）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_260 As String = "260"
     ''' <summary>
-    ''' 270:手配中（託送指示未手配）
+    ''' 270:手配中（入換積込指示手配済）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_270 As String = "270"
     ''' <summary>
-    ''' 280:手配中（入換積込未連絡）
+    ''' 280:手配中（託送指示未手配）入換積込手配連絡（手配・結果受理）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_280 As String = "280"
     ''' <summary>
-    ''' 290:手配中（入換積込未確認）
+    ''' 290:手配中（入換積込未連絡）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_290 As String = "290"
     ''' <summary>
-    ''' 300:手配完了
+    ''' 300:手配中（入換積込未確認）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_300 As String = "300"
     ''' <summary>
-    ''' 310:受注確定
+    ''' 310:手配完了
     ''' </summary>
     Public Const CONST_ORDERSTATUS_310 As String = "310"
+    ''' <summary>
+    ''' 320:受注確定
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_320 As String = "320"
     ''' <summary>
     ''' 350:受注確定((実績)発日設定済み)
     ''' </summary>

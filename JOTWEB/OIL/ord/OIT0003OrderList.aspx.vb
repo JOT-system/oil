@@ -876,6 +876,7 @@ Public Class OIT0003OrderList
         '〇 受注進行ステータスが"900(受注キャンセル)"の場合は何もしない
         WW_ORDERSTATUS = OIT0003tbl.Rows(WW_LINECNT)("ORDERSTATUS")
         If WW_ORDERSTATUS = BaseDllConst.CONST_ORDERSTATUS_900 Then
+            Master.Output(C_MESSAGE_NO.OIL_CANCEL_ENTRY_ORDER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
 
@@ -1298,6 +1299,7 @@ Public Class OIT0003OrderList
             For Each OIT0003UPDrow In OIT0003tbl.Rows
                 If OIT0003UPDrow("OPERATION") = "on" Then
                     PARA01.Value = OIT0003UPDrow("ORDERNO")
+                    work.WF_SEL_ORDERNUMBER.Text = OIT0003UPDrow("ORDERNO")
 
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID

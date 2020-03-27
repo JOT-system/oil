@@ -2113,10 +2113,10 @@ Public Class OIT0004OilStockCreate
                     CONST_ORDERSTATUS_200, CONST_ORDERSTATUS_210,
                     CONST_ORDERSTATUS_220, CONST_ORDERSTATUS_230,
                     CONST_ORDERSTATUS_240, CONST_ORDERSTATUS_250,
-                    CONST_ORDERSTATUS_260, CONST_ORDERSTATUS_280,
-                    CONST_ORDERSTATUS_290, CONST_ORDERSTATUS_300,
-                    CONST_ORDERSTATUS_310}.
-                    Contains(orderItm.OrderStatus) Then
+                    CONST_ORDERSTATUS_260, CONST_ORDERSTATUS_270,
+                    CONST_ORDERSTATUS_280, CONST_ORDERSTATUS_290,
+                    CONST_ORDERSTATUS_300, CONST_ORDERSTATUS_310
+                   }.Contains(orderItm.OrderStatus) Then
                 '戻り値エラー情報に格納
                 retMessage.Add(New EntryOrderResultItm With {
                                .AccDate = chkItm.dayInfo.KeyString,

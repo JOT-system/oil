@@ -21,6 +21,8 @@ Public Class OIT0003OrderDetail
     Private OIT0003WK4tbl As DataTable                              '作業用4テーブル
     Private OIT0003WK5tbl As DataTable                              '作業用4テーブル
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
+    Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -2165,6 +2167,13 @@ Public Class OIT0003OrderDetail
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
 
+            '### START 受注履歴テーブルの追加(2020/03/26) #############
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                WW_InsertOrderHistory(SQLcon)
+            End Using
+            '### END   ################################################
+
             '○メッセージ表示
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
@@ -3595,6 +3604,13 @@ Public Class OIT0003OrderDetail
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
+
+            '### START 受注履歴テーブルの追加(2020/03/26) #############
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                WW_InsertOrderHistory(SQLcon)
+            End Using
+            '### END   ################################################
 
             '○メッセージ表示
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
@@ -8111,6 +8127,9 @@ Public Class OIT0003OrderDetail
                         '○ 画面表示データ保存
                         Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
+                        '### START 受注履歴テーブルの追加(2020/03/26) #############
+                        WW_InsertOrderHistory(SQLcon)
+                        '### END   ################################################
                     End Using
 
                     WF_DTAB_CHANGE_NO.Value = "2"
@@ -11485,6 +11504,104 @@ Public Class OIT0003OrderDetail
 
 
         End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    Private Sub WW_InsertOrderHistory(ByVal SQLcon As SqlConnection)
+        Dim WW_GetHistoryNo() As String = {""}
+        WW_FixvalueMasterSearch("", "NEWHISTORYNOGET", "", WW_GetHistoryNo)
+
+        '◯受注履歴テーブル格納用
+        If IsNothing(OIT0003His1tbl) Then
+            OIT0003His1tbl = New DataTable
+        End If
+
+        If OIT0003His1tbl.Columns.Count <> 0 Then
+            OIT0003His1tbl.Columns.Clear()
+        End If
+        OIT0003His1tbl.Clear()
+
+        '◯受注明細履歴テーブル格納用
+        If IsNothing(OIT0003His2tbl) Then
+            OIT0003His2tbl = New DataTable
+        End If
+
+        If OIT0003His2tbl.Columns.Count <> 0 Then
+            OIT0003His2tbl.Columns.Clear()
+        End If
+        OIT0003His2tbl.Clear()
+
+        '○ 受注TBL検索SQL
+        Dim SQLOrderStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0002.*" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & String.Format(" WHERE OIT0002.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        '○ 受注明細TBL検索SQL
+        Dim SQLOrderDetailStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0003.*" _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & String.Format(" WHERE OIT0003.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLOrderStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003His1tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003His1tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using SQLcmd As New SqlCommand(SQLOrderDetailStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003His2tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003His2tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using tran = SQLcon.BeginTransaction
+                '■受注履歴テーブル
+                EntryHistory.InsertOrderHistory(SQLcon, tran, OIT0003His1tbl.Rows(0))
+
+                '■受注明細履歴テーブル
+                For Each OIT0001His2rowtbl In OIT0003His2tbl.Rows
+                    EntryHistory.InsertOrderDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                Next
+
+                'トランザクションコミット
+                tran.Commit()
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D ORDERHISTORY")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D ORDERHISTORY"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 

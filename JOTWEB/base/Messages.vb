@@ -555,6 +555,10 @@ Public Module Messages
         ''' 取り扱える油種が存在しません。油種マスタの確認をしてください。
         ''' </summary>
         Public Const OIL_STOCK_OILINFO_NOTEXISTS As String = "20040"
+        ''' <summary>
+        ''' 受注がキャンセルされているため選択できません。
+        ''' </summary>
+        Public Const OIL_CANCEL_ENTRY_ORDER As String = "20041"
 #End Region
 
 

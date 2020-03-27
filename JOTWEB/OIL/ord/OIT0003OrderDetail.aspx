@@ -29,6 +29,8 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
+                <input type="button" id="WF_ButtonCONTACT" class="btn-sticky" value="手配連絡" onclick="ButtonClick('WF_ButtonCONTACT');" />
+                <input type="button" id="WF_ButtonRESULT" class="btn-sticky" value="結果受理" onclick="ButtonClick('WF_ButtonRESULT');" />
                 <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
                 <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
@@ -656,6 +658,10 @@
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         <!-- 貨車連結切替用フラグ -->
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
+        <!-- 手配連絡フラグ -->
+        <input id="WF_CONTACTFLG" runat="server" value="" type="text" />
+        <!-- 結果受理フラグ -->
+        <input id="WF_RESULTFLG" runat="server" value="" type="text" />
         <!-- 託送指示フラグ -->
         <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
         <!-- 画面ボタン制御 -->

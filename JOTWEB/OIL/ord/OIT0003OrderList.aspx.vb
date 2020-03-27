@@ -684,6 +684,10 @@ Public Class OIT0003OrderList
         work.WF_SEL_CREATEFLG.Text = "1"
         '作成フラグ(1：貨車連結未使用, 2：貨車連結使用)
         work.WF_SEL_CREATELINKFLG.Text = "1"
+        '手配連絡フラグ(0：未連絡, 1：連絡)
+        work.WF_SEL_CONTACTFLG.Text = "0"
+        '結果受理フラグ(0：未受理, 1：受理)
+        work.WF_SEL_RESULTFLG.Text = "0"
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = "0"
         '○ 画面表示データ保存
@@ -825,6 +829,10 @@ Public Class OIT0003OrderList
         work.WF_SEL_CREATEFLG.Text = "1"
         '作成フラグ(1：貨車連結未使用, 2：貨車連結使用)
         work.WF_SEL_CREATELINKFLG.Text = "2"
+        '手配連絡フラグ(0：未連絡, 1：連絡)
+        work.WF_SEL_CONTACTFLG.Text = "0"
+        '結果受理フラグ(0：未受理, 1：受理)
+        work.WF_SEL_RESULTFLG.Text = "0"
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = "0"
 
@@ -1032,6 +1040,10 @@ Public Class OIT0003OrderList
         work.WF_SEL_CREATEFLG.Text = "2"
         '作成フラグ(1：貨車連結未使用, 2：貨車連結使用)
         work.WF_SEL_CREATELINKFLG.Text = "1"
+        '手配連絡フラグ(0：未連絡, 1：連絡)
+        'work.WF_SEL_CONTACTFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("CONTACTFLG")
+        '結果受理フラグ(0：未受理, 1：受理)
+        'work.WF_SEL_RESULTFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("RESULTFLG")
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELIVERYFLG")
 

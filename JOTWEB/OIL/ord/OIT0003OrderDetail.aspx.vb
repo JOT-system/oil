@@ -101,6 +101,10 @@ Public Class OIT0003OrderDetail
                     'End If
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonCONTACT"               '手配連絡ボタン押下
+                            WF_ButtonCONTACT_Click()
+                        Case "WF_ButtonRESULT"                '結果受理ボタン押下
+                            WF_ButtonRESULT_Click()
                         Case "WF_ButtonDELIVERY"              '託送指示ボタン押下
                             WF_ButtonDELIVERY_Click()
                         Case "WF_ButtonINSERT"                '油種数登録ボタン押下
@@ -171,6 +175,7 @@ Public Class OIT0003OrderDetail
             Else
                 '○ 初期化処理
                 Initialize()
+
             End If
 
             '○ 画面モード(更新・参照)設定
@@ -194,9 +199,63 @@ Public Class OIT0003OrderDetail
                 WF_CREATELINKFLG.Value = "2"
             End If
 
-            '○ 託送指示フラグ(0：未手配, 1：手配)設定
-            '　 受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
-            '### ステータス追加(仮) #################################
+            '◯手配連絡フラグ(0：未連絡, 1：連絡)設定
+            '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_CONTACTFLG.Text = "1" _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
+                '手配連絡ボタンを非活性
+                WF_CONTACTFLG.Value = "1"
+
+            Else
+                '手配連絡ボタンを活性
+                WF_CONTACTFLG.Value = "0"
+
+            End If
+
+            '◯結果受理フラグ(0：未受理, 1：受理)設定
+            '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_RESULTFLG.Text = "1" _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
+                '結果受理ボタンを非活性
+                WF_RESULTFLG.Value = "1"
+
+            Else
+                '手配連絡が"0"(未連絡)の場合
+                If work.WF_SEL_CONTACTFLG.Text = "0" Then
+                    '結果受理ボタンを非活性
+                    WF_RESULTFLG.Value = "1"
+                Else
+                    '結果受理ボタンを活性
+                    WF_RESULTFLG.Value = "0"
+                End If
+            End If
+
+            '◯託送指示フラグ(0：未手配, 1：手配)設定
+            '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
             If work.WF_SEL_DELIVERYFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
@@ -210,15 +269,17 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
                 '託送指示ボタンを非活性
                 WF_DELIVERYFLG.Value = "1"
+
             Else
                 '託送指示ボタンを活性
                 WF_DELIVERYFLG.Value = "0"
+
             End If
 
             '◯受注進行ステータスが310:手配完了以降のステータスに変更された場合
-            '### ステータス追加(仮) #################################
             If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
@@ -2118,6 +2179,27 @@ Public Class OIT0003OrderDetail
         TBLview = Nothing
     End Sub
 
+
+    ''' <summary>
+    ''' 手配連絡ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCONTACT_Click()
+        '手配連絡フラグを"1"(連絡)にする。
+        work.WF_SEL_CONTACTFLG.Text = "1"
+
+    End Sub
+
+    ''' <summary>
+    ''' 結果受理ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonRESULT_Click()
+        '結果受理フラグを"1"(結果受理)にする。
+        work.WF_SEL_RESULTFLG.Text = "1"
+
+    End Sub
+
     ''' <summary>
     ''' 託送指示ボタン押下時処理
     ''' </summary>
@@ -2130,7 +2212,7 @@ Public Class OIT0003OrderDetail
         work.WF_SEL_DELIVERYFLG.Text = "1"
 
         '受注TBL更新
-        WW_UpdateDeliveryFlg("1")
+        WW_UpdateRelatedFlg("1", "DELIVERYFLG")
 
         '〇 受注進行ステータスの状態
         WW_ScreenOrderStatusSet(strOrderStatus)
@@ -6945,25 +7027,28 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
-    ''' (受注TBL)託送指示フラグ更新
+    ''' (受注TBL)フラグ関連更新
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_UpdateDeliveryFlg(ByVal I_Value As String)
+    Protected Sub WW_UpdateRelatedFlg(ByVal I_Value As String, Optional ByVal I_PARA01 As String = Nothing)
 
         Try
             'DataBase接続文字
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
-            '更新SQL文･･･受注TBLの託送指示フラグを更新
+            '更新SQL文･･･受注TBLの各フラグを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0002_ORDER " _
-                    & "    SET DELIVERYFLG = @P03, " _
-                    & "        UPDYMD      = @P11, " _
+                    & "    SET UPDYMD      = @P11, " _
                     & "        UPDUSER     = @P12, " _
                     & "        UPDTERMID   = @P13, " _
-                    & "        RECEIVEYMD  = @P14  " _
-                    & "  WHERE ORDERNO     = @P01  " _
+                    & "        RECEIVEYMD  = @P14, "
+
+            SQLStr &= String.Format("        {0}   = @P03 ", I_PARA01)
+
+            SQLStr &=
+                    "  WHERE ORDERNO     = @P01  " _
                     & "    AND DELFLG     <> @P02; "
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -6994,9 +7079,9 @@ Public Class OIT0003OrderDetail
             SQLcmd = Nothing
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_DELIVERYFLG UPDATE")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_" + I_PARA01 + "UPDATE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_DELIVERYFLG UPDATE"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_" + I_PARA01 + "UPDATE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -7006,7 +7091,7 @@ Public Class OIT0003OrderDetail
         End Try
 
         '○メッセージ表示
-        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

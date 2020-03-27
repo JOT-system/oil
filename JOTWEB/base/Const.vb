@@ -373,6 +373,10 @@ Public Module BaseDllConst
     ''' 前回黒油
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_99 As String = "99"
+    ''' <summary>
+    ''' 発送順重複
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_100 As String = "100"
 
     ''' <summary>
     ''' 失注（荷主都合）

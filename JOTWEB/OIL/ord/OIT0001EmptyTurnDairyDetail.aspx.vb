@@ -1964,16 +1964,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
-        '〇列車重複チェック(同一レコードがすでに登録済みかチェック)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            WW_CheckTrainRepeat(WW_ERRCODE, SQLcon)
-            If WW_ERRCODE = "ERR" Then
-                Exit Sub
-            End If
-        End Using
-
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
             '受注DB追加・更新
@@ -1989,6 +1979,33 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 WW_UpdateOrderDetail(SQLcon)
             End Using
+        End If
+
+        '〇列車重複チェック(同一レコードがすでに登録済みかチェック)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_CheckTrainRepeat(WW_ERRCODE, SQLcon)
+            If WW_ERRCODE = "ERR" Then
+                Exit Sub
+            End If
+        End Using
+
+        '○ 同一レコードチェック
+        If isNormal(WW_ERRCODE) Then
+            ''受注DB追加・更新
+            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            '    SQLcon.Open()       'DataBase接続
+
+            '    WW_UpdateOrder(SQLcon)
+            'End Using
+
+            ''受注明細DB追加・更新
+            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            '    SQLcon.Open()       'DataBase接続
+
+            '    WW_UpdateOrderDetail(SQLcon)
+            'End Using
 
             '◯新規作成(空回日報から作成)したデータの場合
             If work.WF_SEL_EMPTYTURNFLG.Text = "1" Then
@@ -3034,7 +3051,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "   AND OIT0002.DEPDATE         = @P03 " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.STACKINGFLG     = @P05 " _
-            & "   AND OIT0002.DELFLG         <> @P06 "
+            & "   AND OIT0002.CONSIGNEECODE   = @P06 " _
+            & "   AND OIT0002.DELFLG         <> @P07 "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -3043,13 +3061,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '積置可否フラグ
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10) '荷受人コード
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA2.Value = Me.TxtHeadOfficeTrain.Text
                 PARA3.Value = Me.TxtDepDate.Text
                 PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARA5.Value = work.WF_SEL_STACKINGFLG.Text
-                PARA6.Value = C_DELETE_FLG.DELETE
+                PARA6.Value = work.WF_SEL_CONSIGNEECODE.Text
+                PARA7.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

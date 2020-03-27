@@ -2292,7 +2292,7 @@ Public Class OIT0004OilStockCreate
                     End If
                     '履歴登録（オーダー基本部）
                     If {OrderItem.OrderItemEntryType.Insert, OrderItem.OrderItemEntryType.Update}.Contains(orderItm.EntryType) Then
-                        'EntryHistory.InsertOrderHistory(sqlCon, tran, orderItm.ToHistoryDataTable(historyNo, mapId).Rows(0))
+                        EntryHistory.InsertOrderHistory(sqlCon, tran, orderItm.ToHistoryDataTable(historyNo, mapId).Rows(0))
                     End If
                     'オーダー詳細部ループ
                     For Each detailItm In orderItm.DetailList
@@ -2303,7 +2303,7 @@ Public Class OIT0004OilStockCreate
                             DeleteOrderDetail(sqlCon, tran, detailItm)
                         End If
                         '履歴登録（オーダー詳細部）
-                        'EntryHistory.InsertOrderDetailHistory(sqlCon, tran, detailItm.ToHistoryDataTable(historyNo, mapId).Rows(0))
+                        EntryHistory.InsertOrderDetailHistory(sqlCon, tran, detailItm.ToHistoryDataTable(historyNo, mapId).Rows(0))
                     Next 'detailItm
 
                     'トランザクションコミット
@@ -5679,10 +5679,23 @@ Public Class OIT0004OilStockCreate
             Dim retDt = ToDataTable()
             retDt.Columns.Add("HISTORYNO", GetType(String))
             retDt.Columns.Add("MAPID", GetType(String))
-            With retDt.Rows(0)
-                .Item("HISTORYNO") = historyNo
-                .Item("MAPID") = mapId
-            End With
+            Dim targetRow As DataRow = retDt.Rows(0)
+
+            targetRow.Item("HISTORYNO") = historyNo
+            targetRow.Item("MAPID") = mapId
+
+            Dim midifiyDateTyleFields As New List(Of String) From {"ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE", "KEIJYOYMD"}
+            For Each fieldName In midifiyDateTyleFields
+                Dim val As String = Convert.ToString(targetRow.Item(fieldName))
+                retDt.Columns.Remove(fieldName)
+                retDt.Columns.Add(fieldName, GetType(Date))
+                If val = "" Then
+                    targetRow.Item(fieldName) = CType(DBNull.Value, Object)
+                Else
+                    targetRow.Item(fieldName) = val
+                End If
+            Next fieldName
+
             Return retDt
         End Function
     End Class
@@ -6237,10 +6250,23 @@ Public Class OIT0004OilStockCreate
             Dim retDt = ToDataTable()
             retDt.Columns.Add("HISTORYNO", GetType(String))
             retDt.Columns.Add("MAPID", GetType(String))
-            With retDt.Rows(0)
-                .Item("HISTORYNO") = historyNo
-                .Item("MAPID") = mapId
-            End With
+            Dim targetRow As DataRow = retDt.Rows(0)
+
+            targetRow.Item("HISTORYNO") = historyNo
+            targetRow.Item("MAPID") = mapId
+
+            Dim midifiyDateTyleFields As New List(Of String) From {"ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE"}
+            For Each fieldName In midifiyDateTyleFields
+                Dim val As String = Convert.ToString(targetRow.Item(fieldName))
+                retDt.Columns.Remove(fieldName)
+                retDt.Columns.Add(fieldName, GetType(Date))
+                If val = "" Then
+                    targetRow.Item(fieldName) = CType(DBNull.Value, Object)
+                Else
+                    targetRow.Item(fieldName) = val
+                End If
+            Next fieldName
+
             Return retDt
         End Function
     End Class

@@ -219,9 +219,16 @@ Public Class OIT0003OrderDetail
                 WF_CONTACTFLG.Value = "1"
 
             Else
-                '手配連絡ボタンを活性
-                WF_CONTACTFLG.Value = "0"
-
+                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+                    '手配連絡ボタンを活性
+                    WF_CONTACTFLG.Value = "0"
+                Else
+                    '手配連絡ボタンを非活性
+                    WF_CONTACTFLG.Value = "1"
+                End If
             End If
 
             '◯結果受理フラグ(0：未受理, 1：受理)設定
@@ -244,13 +251,23 @@ Public Class OIT0003OrderDetail
                 WF_RESULTFLG.Value = "1"
 
             Else
-                '手配連絡が"0"(未連絡)の場合
-                If work.WF_SEL_CONTACTFLG.Text = "0" Then
+                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+
+                    '手配連絡が"1"(連絡)の場合
+                    If work.WF_SEL_CONTACTFLG.Text = "1" Then
+                        '結果受理ボタンを活性
+                        WF_RESULTFLG.Value = "0"
+                    Else
+                        '結果受理ボタンを非活性
+                        WF_RESULTFLG.Value = "1"
+                    End If
+                Else
                     '結果受理ボタンを非活性
                     WF_RESULTFLG.Value = "1"
-                Else
-                    '結果受理ボタンを活性
-                    WF_RESULTFLG.Value = "0"
+
                 End If
             End If
 

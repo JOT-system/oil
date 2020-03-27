@@ -279,6 +279,7 @@ Public Class OIT0002LinkList
             & "      Else '' End AS INFONOW " _
             & "    , ISNULL(RTRIM(OIT0004.PREORDERNO), '')                       AS PREORDERNO " _
             & "    , ISNULL(RTRIM(OIT0004.TRAINNO), '')                          AS TRAINNO " _
+            & "    , ISNULL(RTRIM(OIT0004.TRAINNAME), '')                        AS TRAINNAME " _
             & "    , ISNULL(RTRIM(OIT0004.OFFICECODE), '')                       AS OFFICECODE " _
             & "    , ''                                                          AS OFFICENAME " _
             & "    , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')                   AS DEPSTATIONNAME " _
@@ -364,6 +365,7 @@ Public Class OIT0002LinkList
               " GROUP BY " _
             & "      LINKNO " _
             & "	    ,TRAINNO " _
+            & "	    ,TRAINNAME " _
             & "	    ,STATUS " _
             & "	    ,INFO " _
             & "	    ,PREORDERNO " _
@@ -1118,6 +1120,7 @@ Public Class OIT0002LinkList
 
         '本線列車
         work.WF_SEL_TRAINNO2.Text = ""
+        work.WF_SEL_TRAINNAME2.Text = ""
 
         '登録営業所コード
         work.WF_SEL_OFFICECODE.Text = ""
@@ -1295,6 +1298,7 @@ Public Class OIT0002LinkList
 
         '本線列車
         work.WF_SEL_TRAINNO2.Text = OIT0002tbl.Rows(WW_LINECNT)("TRAINNO")
+        work.WF_SEL_TRAINNAME2.Text = OIT0002tbl.Rows(WW_LINECNT)("TRAINNAME")
 
         '登録営業所コード
         work.WF_SEL_OFFICECODE.Text = OIT0002tbl.Rows(WW_LINECNT)("OFFICECODE")

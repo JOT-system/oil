@@ -539,6 +539,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR As String = "20036"
         ''' <summary>
+        ''' 発送順序重複エラー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_REPEAT_ERROR As String = "20037"
+
+        ''' <summary>
         ''' 受注作成をスキップした受注提案タンク車数表の日付/列車があります
         ''' </summary>
         Public Const OIL_SKIPPED_ORDER_ENTRIES_EXISTS As String = "20038"

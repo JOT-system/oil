@@ -16,6 +16,9 @@ Public Class OIT0003OrderList
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
+    Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
+    Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -1313,6 +1316,10 @@ Public Class OIT0003OrderList
             SQLcmd.Dispose()
             SQLcmd = Nothing
 
+            '### START 受注履歴テーブルの追加(2020/03/26) #############
+            WW_InsertOrderHistory(SQLcon)
+            '### END   ################################################
+
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D DELETE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
@@ -1331,6 +1338,224 @@ Public Class OIT0003OrderList
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
+    End Sub
+
+    ''' <summary>
+    ''' 受注履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    Private Sub WW_InsertOrderHistory(ByVal SQLcon As SqlConnection)
+        Dim WW_GetHistoryNo() As String = {""}
+        WW_FixvalueMasterSearch("", "NEWHISTORYNOGET", "", WW_GetHistoryNo)
+
+        '◯受注履歴テーブル格納用
+        If IsNothing(OIT0003His1tbl) Then
+            OIT0003His1tbl = New DataTable
+        End If
+
+        If OIT0003His1tbl.Columns.Count <> 0 Then
+            OIT0003His1tbl.Columns.Clear()
+        End If
+        OIT0003His1tbl.Clear()
+
+        '◯受注明細履歴テーブル格納用
+        If IsNothing(OIT0003His2tbl) Then
+            OIT0003His2tbl = New DataTable
+        End If
+
+        If OIT0003His2tbl.Columns.Count <> 0 Then
+            OIT0003His2tbl.Columns.Clear()
+        End If
+        OIT0003His2tbl.Clear()
+
+        '○ 受注TBL検索SQL
+        Dim SQLOrderStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0002.*" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & String.Format(" WHERE OIT0002.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        '○ 受注明細TBL検索SQL
+        Dim SQLOrderDetailStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0003.*" _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & String.Format(" WHERE OIT0003.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLOrderStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003His1tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003His1tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using SQLcmd As New SqlCommand(SQLOrderDetailStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003His2tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003His2tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using tran = SQLcon.BeginTransaction
+                '■受注履歴テーブル
+                EntryHistory.InsertOrderHistory(SQLcon, tran, OIT0003His1tbl.Rows(0))
+
+                '■受注明細履歴テーブル
+                For Each OIT0001His2rowtbl In OIT0003His2tbl.Rows
+                    EntryHistory.InsertOrderDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                Next
+
+                'トランザクションコミット
+                tran.Commit()
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D ORDERHISTORY")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D ORDERHISTORY"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' マスタ検索処理
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <param name="O_VALUE"></param>
+    Protected Sub WW_FixvalueMasterSearch(ByVal I_CODE As String,
+                                          ByVal I_CLASS As String,
+                                          ByVal I_KEYCODE As String,
+                                          ByRef O_VALUE() As String,
+                                          Optional ByVal I_PARA01 As String = Nothing)
+
+        If IsNothing(OIT0003Fixvaltbl) Then
+            OIT0003Fixvaltbl = New DataTable
+        End If
+
+        If OIT0003Fixvaltbl.Columns.Count <> 0 Then
+            OIT0003Fixvaltbl.Columns.Clear()
+        End If
+
+        OIT0003Fixvaltbl.Clear()
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '検索SQL文
+            Dim SQLStr As String =
+               " SELECT" _
+                & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '')    AS CAMPCODE" _
+                & " , ISNULL(RTRIM(VIW0001.CLASS), '')       AS CLASS" _
+                & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')     AS KEYCODE" _
+                & " , ISNULL(RTRIM(VIW0001.STYMD), '')       AS STYMD" _
+                & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')      AS ENDYMD" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE1), '')      AS VALUE1" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE2), '')      AS VALUE2" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE3), '')      AS VALUE3" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE4), '')      AS VALUE4" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE5), '')      AS VALUE5" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE6), '')      AS VALUE6" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE7), '')      AS VALUE7" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE8), '')      AS VALUE8" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE9), '')      AS VALUE9" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE10), '')     AS VALUE10" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE11), '')     AS VALUE11" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE12), '')     AS VALUE12" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE13), '')     AS VALUE13" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE14), '')     AS VALUE14" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE15), '')     AS VALUE15" _
+                & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '')   AS SYSTEMKEYFLG" _
+                & " , ISNULL(RTRIM(VIW0001.DELFLG), '')      AS DELFLG" _
+                & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
+                & " WHERE VIW0001.CLASS = @P01" _
+                & " AND VIW0001.DELFLG <> @P03"
+
+            '○ 条件指定で指定されたものでSQLで可能なものを追加する
+            '会社コード
+            If Not String.IsNullOrEmpty(I_CODE) Then
+                SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
+            End If
+            'マスターキー
+            If Not String.IsNullOrEmpty(I_KEYCODE) Then
+                SQLStr &= String.Format("    AND VIW0001.KEYCODE = '{0}'", I_KEYCODE)
+            End If
+
+            SQLStr &=
+                  " ORDER BY" _
+                & "    VIW0001.KEYCODE"
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+                'Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+                PARA01.Value = I_CLASS
+                'PARA02.Value = I_KEYCODE
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003Fixvaltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003Fixvaltbl.Load(SQLdr)
+                End Using
+
+                If I_KEYCODE.Equals("") Then
+                    'Dim i As Integer = 0 '2020/3/23 三宅 Delete
+                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows '(全抽出結果回るので要検討
+                        'O_VALUE(i) = OIT0003WKrow("KEYCODE") 2020/3/23 三宅 全部KEYCODE(列車NO)が格納されてしまうので修正しました（問題なければこのコメント消してください)
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+                        Next
+                        'i += 1 '2020/3/23 三宅 Delete
+                    Next
+                Else
+                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+                        Next
+                    Next
+                End If
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D MASTER_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D MASTER_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>

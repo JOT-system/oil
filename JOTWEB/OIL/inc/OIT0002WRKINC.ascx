@@ -13,6 +13,7 @@
     <asp:TextBox ID="WF_SEL_ENDYMD2" runat="server"></asp:TextBox>         <!-- 終了年月日2 -->
     <asp:TextBox ID="WF_SEL_TRAINNO" runat="server"></asp:TextBox>         <!-- 本線列車 -->
     <asp:TextBox ID="WF_SEL_TRAINNO2" runat="server"></asp:TextBox>         <!-- 本線列車2 -->
+    <asp:TextBox ID="WF_SEL_TRAINNAME2" runat="server"></asp:TextBox>         <!-- 本線列車名2 -->
     <asp:TextBox ID="WF_SEL_SELECT" runat="server"></asp:TextBox>           <!-- ステータス選択 -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>        <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>         <!-- 削除フラグ -->

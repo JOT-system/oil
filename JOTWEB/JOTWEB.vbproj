@@ -159,6 +159,7 @@
     <Content Include="OIL\img\statistics.png" />
     <Content Include="OIL\img\tank.png" />
     <Content Include="OIL\img\unlockKey.png" />
+    <Content Include="OIL\img\warning.png" />
     <Content Include="OIL\img\w_cat.png" />
     <Content Include="OIL\inc\GRM00002WRKINC.ascx" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />
@@ -288,6 +289,7 @@
     <Compile Include="inc\GRCO0100XLSUP.ashx.vb">
       <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
     </Compile>
+    <Compile Include="OIL\com\EntryHistory.vb" />
     <Compile Include="OIL\inc\GRM00002WRKINC.ascx.designer.vb">
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
     </Compile>
@@ -655,24 +657,6 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="Microsoft.Office.Core">
-      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>8</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="Microsoft.Office.Interop.Excel1">
-      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>9</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="VBIDE">
       <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
       <VersionMajor>5</VersionMajor>

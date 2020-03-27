@@ -538,7 +538,18 @@ Public Module Messages
         ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR As String = "20036"
-
+        ''' <summary>
+        ''' 受注作成をスキップした受注提案タンク車数表の日付/列車があります
+        ''' </summary>
+        Public Const OIL_SKIPPED_ORDER_ENTRIES_EXISTS As String = "20038"
+        ''' <summary>
+        ''' 受注提案可能な油槽所ですが、取り扱える列車が存在しないため。「受注提案タンク車数表」を非表示にしました。
+        ''' </summary>
+        Public Const OIL_SUGGEST_TRAIN_NOTEXISTS As String = "20039"
+        ''' <summary>
+        ''' 取り扱える油種が存在しません。油種マスタの確認をしてください。
+        ''' </summary>
+        Public Const OIL_STOCK_OILINFO_NOTEXISTS As String = "20040"
 #End Region
 
 

@@ -135,7 +135,7 @@ Public Class OIT0004OilStockCreate
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
-
+        Dim mesNo As String = C_MESSAGE_NO.NORMAL
         '○ 検索画面からの遷移
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then
             'Grid情報保存先のファイル名
@@ -166,6 +166,10 @@ Public Class OIT0004OilStockCreate
             daysList = GetTargetDateList(sqlCon, baseDate)
             '対象油種取得
             oilTypeList = GetTargetOilType(sqlCon, salesOffice, consignee)
+            If oilTypeList Is Nothing OrElse oilTypeList.Count = 0 Then
+                '取り扱い油種が無い場合は何もできないので終了
+                mesNo = C_MESSAGE_NO.OIL_STOCK_OILINFO_NOTEXISTS
+            End If
             '提案一覧表示可否取得
             Dim canShowSuggestList As Boolean = Me.IsShowSuggestList(sqlCon, consignee)
 
@@ -173,7 +177,12 @@ Public Class OIT0004OilStockCreate
             If canShowSuggestList Then
                 trainList = GetTargetTrain(sqlCon, salesOffice, shipper, consignee)
                 'システム管理外列車付与(受注作成しない、在庫計算だけ使う)
-                'trainList = GetUnmanagedTrain(sqlCon, trainList, salesOffice, shipper, consignee)
+                trainList = GetUnmanagedTrain(sqlCon, trainList, salesOffice, shipper, consignee)
+                '結果として取り扱い列車が0の場合提案一覧を表示できない為提案表を非表示にする
+                If trainList Is Nothing OrElse trainList.Count = 0 Then
+                    canShowSuggestList = False
+                    mesNo = C_MESSAGE_NO.OIL_SUGGEST_TRAIN_NOTEXISTS
+                End If
             End If
             '抽出結果を画面データクラスに展開
             dispDataObj = New DispDataClass(daysList, trainList, oilTypeList, salesOffice, shipper, consignee)
@@ -197,12 +206,12 @@ Public Class OIT0004OilStockCreate
             dispDataObj.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, dispDataObj)
             '構内取り設定がある場合、構内取りデータ取得
             If dispDataObj.HasMoveInsideItem Then
-                '構内取りではない油種「合計」文言を中計と変更
-                dispDataObj.SuggestOilNameList(DispDataClass.SUMMARY_CODE).OilName = "中計"
                 '表構えの為親と構内取り元と同じ列車
                 If canShowSuggestList Then
-                    Dim targetTrainList As List(Of String) = trainList.Keys.ToList
-                    mitrainList = GetTargetTrain(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiShippersCode, dispDataObj.MiConsignee, targetTrainList)
+                    '構内取りではない油種「合計」文言を中計と変更
+                    dispDataObj.SuggestOilNameList(DispDataClass.SUMMARY_CODE).OilName = "中計"
+                    'Dim targetTrainList As List(Of String) = trainList.Keys.ToList
+                    mitrainList = GetTargetTrain(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiShippersCode, dispDataObj.Consignee, trainList)
                 End If
                 '油種は持っている元に合わせる（最終的に元と一致する油種じゃないと認めない？）
                 miOilTypeList = GetTargetOilType(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiConsignee)
@@ -270,6 +279,9 @@ Public Class OIT0004OilStockCreate
             lstItem.Selected = True
         Next
 
+        If mesNo <> C_MESSAGE_NO.NORMAL Then
+            Master.Output(mesNo, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        End If
     End Sub
     ''' <summary>
     ''' 自動提案ボタン押下時処理
@@ -380,7 +392,7 @@ Public Class OIT0004OilStockCreate
 
                 rightview.AddErrorReport("■" & Trim(dummyLabel.Text))
             Next
-            Master.Output(C_MESSAGE_NO.BOX_ERROR_EXIST, C_MESSAGE_TYPE.INF, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_SKIPPED_ORDER_ENTRIES_EXISTS, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
         End If
 
     End Sub
@@ -519,10 +531,10 @@ Public Class OIT0004OilStockCreate
     ''' <returns>キー：列車No,値：列車アイテムクラス
     ''' 営業所、油槽所を元に取得した列車情報</returns>
     ''' <remarks>一旦戻り値が無い場合は提案表を出さない仕組みとする</remarks>
-    Private Function GetTargetTrain(sqlCon As SqlConnection, salesOffice As String, shipper As String, consignee As String, Optional targetTrainList As List(Of String) = Nothing) As Dictionary(Of String, TrainListItem)
+    Private Function GetTargetTrain(sqlCon As SqlConnection, salesOffice As String, shipper As String, consignee As String, Optional targetTrainList As Dictionary(Of String, TrainListItem) = Nothing) As Dictionary(Of String, TrainListItem)
         Try
+            Dim resultVal As New Dictionary(Of String, TrainListItem)
             Dim retVal As New Dictionary(Of String, TrainListItem)
-
             Dim sqlStr As New StringBuilder
             sqlStr.AppendLine("SELECT TR.TRAINNO")     '列車No
             sqlStr.AppendLine("      ,isnull(TR.TRAINNAME,'') AS TRAINNAME")
@@ -598,22 +610,37 @@ Public Class OIT0004OilStockCreate
                             .PatName = Convert.ToString(sqlDr("PATNAME"))
                             }
                         '重複列車番号はスキップ
-                        If retVal.ContainsKey(tlItem.TrainNo) Then
+                        If resultVal.ContainsKey(tlItem.TrainNo) Then
                             Continue While
                         End If
                         '構内取り対応(構内取り元の列車Noが存在しない場合はスキップ)
-                        If targetTrainList IsNot Nothing AndAlso targetTrainList.Contains(tlItem.TrainNo) = False Then
+                        If targetTrainList IsNot Nothing AndAlso targetTrainList.ContainsKey(tlItem.TrainNo) = False Then
                             Continue While
                         End If
-                        retVal.Add(tlItem.TrainNo, tlItem)
+                        resultVal.Add(tlItem.TrainNo, tlItem)
                     End While
                 End Using
 
             End Using
+            '構内取り側の列車と通常側の列車Noを合わせる
             If targetTrainList IsNot Nothing Then
+                '構内取になく上部にある列車Noをダミー指定
                 For i = 0 To targetTrainList.Count - 1 Step 1
-                    'targetTrainList(i) = retVal
+                    Dim retValItm As TrainListItem
+                    If resultVal.ContainsKey(targetTrainList.Keys(i)) Then
+                        retValItm = resultVal(targetTrainList.Keys(i))
+                    Else
+                        '構内取側に存在しない場合は追加
+                        With targetTrainList.Values(i)
+                            retValItm = New TrainListItem(.TrainNo, .TrainName & "（構内取側列車未存在）", .MaxVolume)
+                            retValItm.UnmanagedTrain = True 'ない場合は管理対象外とする
+                        End With
+
+                    End If
+                    retVal.Add(retValItm.TrainNo, retValItm)
                 Next i
+            Else
+                retVal = resultVal
             End If
             Return retVal
         Catch ex As Exception
@@ -1211,6 +1238,7 @@ Public Class OIT0004OilStockCreate
                     Dim trMaxVol As Decimal = CDec(Convert.ToString(sqlDr("MAXVOLUME")))
                     Dim trItem As New TrainListItem(trNo, trName, trMaxVol)
                     trItem.UnmanagedTrain = True '管理外フラグをOnに変更
+                    retVal.Add(trItem.TrainNo, trItem)
                 End If
             End Using 'sqlDr
         End Using 'sqlCmd
@@ -1618,6 +1646,7 @@ Public Class OIT0004OilStockCreate
         End If
         sqlStat.AppendLine("SELECT ISNULL(RTRIM(DTL.ORDERNO),'')                 AS ORDERNO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.DETAILNO),'')                AS DETAILNO")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.SHIPORDER),'')               AS SHIPORDER")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.LINEORDER),'')               AS LINEORDER")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.TANKNO),'')                  AS TANKNO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.KAMOKU),'')                  AS KAMOKU")
@@ -2074,7 +2103,9 @@ Public Class OIT0004OilStockCreate
                     CONST_ORDERSTATUS_200, CONST_ORDERSTATUS_210,
                     CONST_ORDERSTATUS_220, CONST_ORDERSTATUS_230,
                     CONST_ORDERSTATUS_240, CONST_ORDERSTATUS_250,
-                    CONST_ORDERSTATUS_260, CONST_ORDERSTATUS_300}.
+                    CONST_ORDERSTATUS_260, CONST_ORDERSTATUS_270,
+                    CONST_ORDERSTATUS_280, CONST_ORDERSTATUS_290,
+                    CONST_ORDERSTATUS_300}.
                     Contains(orderItm.OrderStatus) Then
                 '戻り値エラー情報に格納
                 retMessage.Add(New EntryOrderResultItm With {
@@ -2587,7 +2618,7 @@ Public Class OIT0004OilStockCreate
     Public Sub InsertOrderDetail(sqlCon As SqlConnection, sqlTran As SqlTransaction, detailItem As OrderDetailItem)
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("INSERT INTO OIL.OIT0003_DETAIL")
-        sqlStat.AppendLine("   (ORDERNO,DETAILNO,LINEORDER,TANKNO,KAMOKU,ORDERINFO,")
+        sqlStat.AppendLine("   (ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,ORDERINFO,")
         sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,")
         sqlStat.AppendLine("    ORDERINGTYPE,ORDERINGOILNAME,")
         sqlStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
@@ -2605,7 +2636,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlStat.AppendLine("    VALUES")
-        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@LINEORDER,@TANKNO,@KAMOKU,@ORDERINFO,")
+        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,@ORDERINFO,")
         sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,")
         sqlStat.AppendLine("    @ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
@@ -2627,6 +2658,7 @@ Public Class OIT0004OilStockCreate
             With sqlCmd.Parameters
                 .Add("ORDERNO", SqlDbType.NVarChar).Value = detailItem.OrderNo
                 .Add("DETAILNO", SqlDbType.NVarChar).Value = detailItem.DetailNo
+                .Add("SHIPORDER", SqlDbType.NVarChar).Value = detailItem.ShipOrder
                 .Add("LINEORDER", SqlDbType.NVarChar).Value = detailItem.LineOrder
                 .Add("TANKNO", SqlDbType.NVarChar).Value = detailItem.TankNo
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = detailItem.Kamoku
@@ -4103,6 +4135,10 @@ Public Class OIT0004OilStockCreate
                     If suggestTrainItem.TrainLock = True Then
                         Continue For
                     End If
+                    'システム管理対象外の列車の場合計算しない
+                    If suggestTrainItem.TrainInfo.UnmanagedTrain Then
+                        Continue For
+                    End If
                     '計算対象チェックをOn
                     suggestTrainItem.CheckValue = True
                     finishIncremental = False
@@ -4177,6 +4213,10 @@ Public Class OIT0004OilStockCreate
                 For Each trainItm In daysItm.SuggestOrderItem.Values
                     '列車にチェックついていないデータは対象がいの為スキップ
                     If trainItm.CheckValue = False Then
+                        Continue For
+                    End If
+                    '管理対象外の列車の場合は不整合データを受注登録させないためスキップ
+                    If trainItm.TrainInfo.UnmanagedTrain Then
                         Continue For
                     End If
                     itm = New SelectedSuggestValItem
@@ -5608,6 +5648,7 @@ Public Class OIT0004OilStockCreate
             'SQLDRの各フィールド値をプロパティにセット
             Me.OrderNo = orderItm.OrderNo
             Me.DetailNo = detailNo
+            Me.ShipOrder = ""
             Me.LineOrder = ""
             Me.TankNo = ""
             Me.Kamoku = ""
@@ -5680,6 +5721,7 @@ Public Class OIT0004OilStockCreate
             'SQLDRの各フィールド値をプロパティにセット
             Me.OrderNo = Convert.ToString(sqlDr("ORDERNO"))
             Me.DetailNo = Convert.ToString(sqlDr("DETAILNO"))
+            Me.ShipOrder = Convert.ToString(sqlDr("SHIPORDER"))
             Me.LineOrder = Convert.ToString(sqlDr("LINEORDER"))
             Me.TankNo = Convert.ToString(sqlDr("TANKNO"))
             Me.Kamoku = Convert.ToString(sqlDr("KAMOKU"))
@@ -5749,6 +5791,11 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property DetailNo As String
+        ''' <summary>
+        ''' 発送順
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ShipOrder As String
         ''' <summary>
         ''' 入線順
         ''' </summary>
@@ -6017,7 +6064,7 @@ Public Class OIT0004OilStockCreate
             Dim retDt As New DataTable
             With retDt.Columns
                 Dim fieldList As New List(Of String) From {
-                   "ORDERNO", "DETAILNO", "LINEORDER", "TANKNO", "KAMOKU", "ORDERINFO",
+                   "ORDERNO", "DETAILNO", "SHIPORDER", "LINEORDER", "TANKNO", "KAMOKU", "ORDERINFO",
                    "SHIPPERSCODE", "SHIPPERSNAME", "OILCODE", "OILNAME", "ORDERINGTYPE",
                    "ORDERINGOILNAME", "CARSNUMBER", "CARSAMOUNT", "RETURNDATETRAIN",
                    "JOINTCODE", "JOINT", "REMARK", "CHANGETRAINNO", "CHANGETRAINNAME",
@@ -6044,6 +6091,7 @@ Public Class OIT0004OilStockCreate
 
             dr("ORDERNO") = Me.OrderNo
             dr("DETAILNO") = Me.DetailNo
+            dr("SHIPORDER") = Me.ShipOrder
             dr("LINEORDER") = Me.LineOrder
             dr("TANKNO") = Me.TankNo
             dr("KAMOKU") = Me.Kamoku

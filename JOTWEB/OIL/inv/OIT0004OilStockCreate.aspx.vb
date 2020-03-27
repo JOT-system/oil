@@ -344,6 +344,7 @@ Public Class OIT0004OilStockCreate
         End If
         'SQL接続
         Dim orderInfoList As Dictionary(Of String, OrderItem)
+        Dim historyNo As String = ""
         Dim retMsg As List(Of EntryOrderResultItm)
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
@@ -351,10 +352,17 @@ Public Class OIT0004OilStockCreate
             orderInfoList = GetEmptyTurnOrder(sqlCon, dispClass)
             orderInfoList = GetEmptyTurnDetail(sqlCon, dispClass, orderInfoList)
             orderInfoList = GetEmptyTurnMaxDetailNo(sqlCon, dispClass, orderInfoList)
+            '履歴番号取得
+            Dim entryResult As EntryOrderResultItm = Nothing
+            historyNo = GetNewOrderHistoryNo(sqlCon, entryResult)
+            If historyNo = "" Then
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ERR, "受注履歴番号取得", needsPopUp:=True)
+                Return
+            End If
             '******************************
             '更新処理実行
             '******************************
-            retMsg = EntryOrderInfo(sqlCon, dispClass, orderInfoList)
+            retMsg = EntryOrderInfo(sqlCon, dispClass, orderInfoList, historyNo, Me.Title)
             '構内取りありの場合(構内取り分のデータを登録
             If dispClass.HasMoveInsideItem Then
                 '構内取り分既登録受注情報取得
@@ -362,7 +370,7 @@ Public Class OIT0004OilStockCreate
                 orderInfoList = GetEmptyTurnDetail(sqlCon, dispClass.MiDispData, orderInfoList)
                 orderInfoList = GetEmptyTurnMaxDetailNo(sqlCon, dispClass.MiDispData, orderInfoList)
                 '構内取り分の受注情報登録
-                Dim retMiMes = EntryOrderInfo(sqlCon, dispClass.MiDispData, orderInfoList)
+                Dim retMiMes = EntryOrderInfo(sqlCon, dispClass.MiDispData, orderInfoList, historyNo, Me.Title)
 
                 retMsg.AddRange(retMiMes) '構内取り以外の処理結果メッセージをマージ
             End If
@@ -2045,9 +2053,10 @@ Public Class OIT0004OilStockCreate
     ''' <param name="sqlCon"></param>
     ''' <param name="dispDataClass"></param>
     ''' <param name="entredOrderList"></param>
+    ''' <param name="historyNo">履歴番号</param>
     ''' <returns></returns>
     ''' <remarks>別途他関数で登録・更新・削除フラグ立て処理は実行する</remarks>
-    Private Function EntryOrderInfo(ByVal sqlCon As SqlConnection, dispDataClass As DispDataClass, entredOrderList As Dictionary(Of String, OrderItem)) As List(Of EntryOrderResultItm)
+    Private Function EntryOrderInfo(ByVal sqlCon As SqlConnection, dispDataClass As DispDataClass, entredOrderList As Dictionary(Of String, OrderItem), historyNo As String, mapId As String) As List(Of EntryOrderResultItm)
         Dim procDtm As Date = Now
         Dim sqlTran As SqlTransaction = Nothing
         Dim checkedItmList = dispDataClass.GetSuggestCheckedItem
@@ -2271,6 +2280,7 @@ Public Class OIT0004OilStockCreate
             Try
                 detailNo = ""
                 odrNo = ""
+
                 '日付列車単位でのトランザクション
                 Using tran = sqlCon.BeginTransaction
                     odrNo = orderItm.OrderNo
@@ -2280,6 +2290,10 @@ Public Class OIT0004OilStockCreate
                     ElseIf orderItm.EntryType = OrderItem.OrderItemEntryType.Update Then
                         UpdateOrder(sqlCon, tran, orderItm)
                     End If
+                    '履歴登録（オーダー基本部）
+                    If {OrderItem.OrderItemEntryType.Insert, OrderItem.OrderItemEntryType.Update}.Contains(orderItm.EntryType) Then
+                        'EntryHistory.InsertOrderHistory(sqlCon, tran, orderItm.ToHistoryDataTable(historyNo, mapId).Rows(0))
+                    End If
                     'オーダー詳細部ループ
                     For Each detailItm In orderItm.DetailList
                         detailNo = detailItm.DetailNo
@@ -2288,6 +2302,8 @@ Public Class OIT0004OilStockCreate
                         ElseIf detailItm.EntryType = OrderDetailItem.DetailEntryType.Delete Then
                             DeleteOrderDetail(sqlCon, tran, detailItm)
                         End If
+                        '履歴登録（オーダー詳細部）
+                        'EntryHistory.InsertOrderDetailHistory(sqlCon, tran, detailItm.ToHistoryDataTable(historyNo, mapId).Rows(0))
                     Next 'detailItm
 
                     'トランザクションコミット
@@ -2778,6 +2794,53 @@ Public Class OIT0004OilStockCreate
         End If
 
     End Sub
+    ''' <summary>
+    ''' 受注履歴テーブル用の履歴番号取得
+    ''' </summary>
+    ''' <returns>履歴番号</returns>
+    Private Function GetNewOrderHistoryNo(ByVal sqlCon As SqlConnection, ByRef errMes As EntryOrderResultItm) As String
+        errMes = Nothing
+        Dim retVal As String = ""
+        Try
+            Dim sqlStr As New StringBuilder
+            sqlStr.AppendLine("SELECT FX.KEYCODE  AS HISTORYNO")
+            sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
+            sqlStr.AppendLine(" WHERE FX.CLASS    = @CLASS")
+            sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
+            Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@CLASS", SqlDbType.NVarChar).Value = "NEWHISTORYNOGET"
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows Then
+                        sqlDr.Read()
+                        retVal = Convert.ToString(sqlDr("HISTORYNO"))
+                    Else
+                        '取得できないと後続処理ができないのでエラー扱い
+                        errMes = New EntryOrderResultItm
+                        errMes.MessageId = C_MESSAGE_NO.MASTER_NOT_FOUND_ERROR
+                        errMes.Message = "NEWHISTORYNOGET"
+                    End If
+                End Using 'sqlDr
+            End Using
+        Catch ex As Exception
+            errMes = New EntryOrderResultItm
+            errMes.MessageId = C_MESSAGE_NO.DB_ERROR
+            errMes.Message = "GetNewHistoryNo Error"
+            errMes.StackTrace = ex.ToString()
+
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0004C MASTER_SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004C MASTER_SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+        End Try
+        Return retVal
+    End Function
     ''' <summary>
     ''' ジャーナル書き込み
     ''' </summary>
@@ -5606,6 +5669,22 @@ Public Class OIT0004OilStockCreate
             retDt.Rows.Add(dr)
             Return retDt
         End Function
+        ''' <summary>
+        ''' 履歴登録用データテーブル作成
+        ''' </summary>
+        ''' <param name="historyNo"></param>
+        ''' <param name="mapId"></param>
+        ''' <returns></returns>
+        Public Function ToHistoryDataTable(historyNo As String, mapId As String) As DataTable
+            Dim retDt = ToDataTable()
+            retDt.Columns.Add("HISTORYNO", GetType(String))
+            retDt.Columns.Add("MAPID", GetType(String))
+            With retDt.Rows(0)
+                .Item("HISTORYNO") = historyNo
+                .Item("MAPID") = mapId
+            End With
+            Return retDt
+        End Function
     End Class
     ''' <summary>
     ''' 受注詳細アイテムクラス
@@ -6147,6 +6226,22 @@ Public Class OIT0004OilStockCreate
             retDt.Rows.Add(dr)
             Return retDt
 
+        End Function
+        ''' <summary>
+        ''' 履歴登録用データテーブル作成
+        ''' </summary>
+        ''' <param name="historyNo"></param>
+        ''' <param name="mapId"></param>
+        ''' <returns></returns>
+        Public Function ToHistoryDataTable(historyNo As String, mapId As String) As DataTable
+            Dim retDt = ToDataTable()
+            retDt.Columns.Add("HISTORYNO", GetType(String))
+            retDt.Columns.Add("MAPID", GetType(String))
+            With retDt.Rows(0)
+                .Item("HISTORYNO") = historyNo
+                .Item("MAPID") = mapId
+            End With
+            Return retDt
         End Function
     End Class
     ''' <summary>

@@ -1,12 +1,19 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Imports System.Data.SqlClient
+''' <summary>
+''' 履歴テーブル登録クラス
+''' </summary>
+''' <remarks>各種履歴テーブルに登録する際はこちらに定義</remarks>
 Public Class EntryHistory
 
     ''' <summary>
     ''' 受注履歴TBL追加処理
     ''' </summary>
-    ''' <param name="sqlCon"></param>
-    ''' <param name="sqlTran"></param>
-    ''' <param name="drOrder"></param>
+    ''' <param name="sqlCon">接続オブジェクト</param>
+    ''' <param name="sqlTran">トランザクションオブジェクト(トランザクションを利用しない場合はNothing指定)</param>
+    ''' <param name="drOrder">履歴用の受注テーブル行オブジェクト</param>
+    ''' <remarks>通常の受注明細テーブルに「履歴番号」と「画面ID」(呼出し側のMe.Title）
+    ''' フィールドを追加したデータ行オブジェクト</remarks>
     Public Shared Sub InsertOrderHistory(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
         '◯受注TBL
         Dim sqlOrderStat As New StringBuilder
@@ -158,6 +165,9 @@ Public Class EntryHistory
     ''' <param name="sqlCon"></param>
     ''' <param name="sqlTran"></param>
     ''' <param name="drOrder"></param>
+    ''' <remarks>通常の受注明細テーブルに「履歴番号」(InsertOrderHistoryで採番した履歴番号と合わせる)
+    ''' と「画面ID」(呼出し側のMe.Title）の
+    ''' フィールドを追加したデータ行オブジェクト</remarks>
     Public Shared Sub InsertOrderDetailHistory(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
 
         '◯受注明細TBL

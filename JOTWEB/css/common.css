@@ -1325,6 +1325,65 @@ div[data-generated='1'] tr td > div[style] {
     max-height:24px;
     margin-top:-3px;
 }
+/* ******************** */
+/* テーブル表内のマーク */
+/* ******************** */
+div[data-generated='1'] .safe,
+div[data-generated='1'] .warning,
+div[data-generated='1'] .caution{
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+    text-align: center;
+    font-size: 22px;
+}
+/* これ色設定いずれ不要：文字を表示しないので */
+div[data-generated='1'] .safe {
+    color:green
+}
+div[data-generated='1'] .warning {
+    color:yellow
+}
+div[data-generated='1'] .caution {
+    color:red
+}
+/* 各レベルニ応じた画像設定 */
+/* SAFE用(旧緑●)の設定いずれ、スタイル全消して表示しない */
+div[data-generated='1'] .safe:after {
+    /*margin-top:2px;
+    width: 24px;
+    height: 24px;
+    content: "";
+    display: block;
+    background-image: url('../oil/img/safe.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left:calc(50% - 12px);*/ /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
+}
+/* warning用(旧黄●)の設定 */
+div[data-generated='1'] .warning:after {
+    margin-top:2px;
+    width: 24px;
+    height: 24px;
+    content: "";
+    display: block;
+    background-image: url('../oil/img/warning.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left:calc(50% - 12px); /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
+}
+/* after用(旧赤●)の設定 */
+div[data-generated='1'] .caution:after {
+    margin-top: 3px;
+    width: 21px;
+    height: 21px;
+    content: "";
+    display: block;
+    background-image: url('../oil/img/caution.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left: calc(50% - 10.5px); /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
+}
 div[data-generated='1'] input[type=text],
 div[data-generated='1'] input[type=number]{
     height: 1.6em;

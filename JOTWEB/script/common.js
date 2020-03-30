@@ -158,6 +158,10 @@ window.addEventListener('DOMContentLoaded', function () {
     /* ダブルタップイベントの紐づけ(一覧のダブルクリック、および画面右上) */
     /* ************************************  */
     commonBindDblTapEvents();
+    /* ************************************  */
+    /* 受注情報行ハイライト                  */
+    /* ************************************  */
+    commonSetHasOrderInfoToHighlight();
 });
 
 // 処理後カーソルを戻す
@@ -1408,6 +1412,59 @@ function commonBindDblTapEvents() {
         })(dblClickObj), true);
     }
 }
+/**
+ * 一覧表の情報列が存在する場合ハイライトする情報を仕込む(cssでハイライトは定義)
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonSetHasOrderInfoToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let orderStatusFieldName = 'ORDERINFONAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + orderStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+            
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent === '') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+        }
+    }
+}
+
 /**
  * 左ボックステーブル表示の検索ボタン押下時イベント
  * のタグを追加する

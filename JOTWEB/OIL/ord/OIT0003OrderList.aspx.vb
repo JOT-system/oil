@@ -275,6 +275,8 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
             & " , ''                                                 AS STACKINGNAME" _
             & " , ISNULL(RTRIM(OIT0002.USEPROPRIETYFLG), '')   　    AS USEPROPRIETYFLG" _
+            & " , ISNULL(RTRIM(OIT0002.CONTACTFLG), '')   　         AS CONTACTFLG" _
+            & " , ISNULL(RTRIM(OIT0002.RESULTFLG), '')   　          AS RESULTFLG" _
             & " , ISNULL(RTRIM(OIT0002.DELIVERYFLG), '')   　        AS DELIVERYFLG" _
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
@@ -1041,9 +1043,9 @@ Public Class OIT0003OrderList
         '作成フラグ(1：貨車連結未使用, 2：貨車連結使用)
         work.WF_SEL_CREATELINKFLG.Text = "1"
         '手配連絡フラグ(0：未連絡, 1：連絡)
-        'work.WF_SEL_CONTACTFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("CONTACTFLG")
+        work.WF_SEL_CONTACTFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("CONTACTFLG")
         '結果受理フラグ(0：未受理, 1：受理)
-        'work.WF_SEL_RESULTFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("RESULTFLG")
+        work.WF_SEL_RESULTFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("RESULTFLG")
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELIVERYFLG")
 

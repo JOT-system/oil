@@ -82,7 +82,8 @@ function InitDisplay() {
         }
         //〇タブ２
         else if (objDtabNo === "1") {
-            if (document.getElementById('WF_MAPButtonControl').value === "1") {
+            if (document.getElementById('WF_MAPButtonControl').value === "1"
+                || document.getElementById('WF_MAPButtonControl').value === "2") {
                 //非活性
                 document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "disabled";
                 document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "disabled";

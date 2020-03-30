@@ -154,6 +154,14 @@ window.addEventListener('DOMContentLoaded', function () {
     /* 通常テキストフィールドのEntarタブ移動 */
     /* ************************************  */
     commonBindNormalEnterToNextTabStep();
+    /* ************************************  */
+    /* ダブルタップイベントの紐づけ(一覧のダブルクリック、および画面右上) */
+    /* ************************************  */
+    commonBindDblTapEvents();
+    /* ************************************  */
+    /* 受注情報行ハイライト                  */
+    /* ************************************  */
+    commonSetHasOrderInfoToHighlight();
 });
 
 // 処理後カーソルを戻す
@@ -1357,6 +1365,106 @@ function ListDbClick(obj, lineCnt) {
         document.forms[0].submit();
     }
 }
+var commonTapCnt = 0;
+/**
+ * リストの行およびヘルプのダブルクリックイベントをダブルタップでも反応させる
+ * @return {undefined} なし
+ * @description ダブルタップされたら、ダブルクリックイベントを発火させる
+ */
+function commonBindDblTapEvents() {
+    // タッチイベントが存在しないデバイスか判定
+    if (window.ontouchstart !== null) {
+        // タッチデバイスではない場合終了
+        return;
+    }
+    // ダブルクリックが紐づいているオブジェクトの検索
+    let dblClickObjects = document.querySelectorAll('[ondblclick*="r_boxDisplay("],[ondblclick*="ListDbClick("]');
+    // オブジェクトが存在しない場合は終了
+    if (dblClickObjects === null) {
+        return;
+    }
+    if (dblClickObjects.length === 0) {
+        return;
+    }
+    // ダブルタップ検知イベントのバインド
+    for (let i = 0; i < dblClickObjects.length; i++) {
+        let dblClickObj = dblClickObjects[i];
+        dblClickObj.addEventListener('touchstart', (function (dblClickObj) {
+            return function () {
+                if (!commonTapCnt) {
+                    // タップ回数を増加
+                    commonTapCnt = commonTapCnt + 1;
+
+                    // 350ミリ秒だけ、タップ回数を維持
+                    setTimeout(function () {
+                        commonTapCnt = 0;
+                    }, 350);
+                } else {
+                    // ダブルタップされたら自身に紐づいているダブルクリックイベントを発火
+                    commonTapCnt = 0;
+                    var evt = document.createEvent('MouseEvent');
+                    evt.initMouseEvent('dblclick', !0, !0, window, 0, 0, 0, 0, 0, !1, !1, !1, !1, 0, null);
+                    dblClickObj.dispatchEvent(evt);
+                    event.stopPropagation(); // ブラウザのタップアクション拡大をさせない対策
+                }
+
+            };
+        })(dblClickObj), true);
+    }
+}
+/**
+ * 一覧表の情報列が存在する場合ハイライトする情報を仕込む(cssでハイライトは定義)
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonSetHasOrderInfoToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let orderStatusFieldName = 'ORDERINFONAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + orderStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+            
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent === '') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+        }
+    }
+}
+
 /**
  * 左ボックステーブル表示の検索ボタン押下時イベント
  * のタグを追加する

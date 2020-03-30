@@ -101,6 +101,10 @@ Public Class OIT0003OrderDetail
                     'End If
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonCONTACT"               '手配連絡ボタン押下
+                            WF_ButtonCONTACT_Click()
+                        Case "WF_ButtonRESULT"                '結果受理ボタン押下
+                            WF_ButtonRESULT_Click()
                         Case "WF_ButtonDELIVERY"              '託送指示ボタン押下
                             WF_ButtonDELIVERY_Click()
                         Case "WF_ButtonINSERT"                '油種数登録ボタン押下
@@ -171,6 +175,7 @@ Public Class OIT0003OrderDetail
             Else
                 '○ 初期化処理
                 Initialize()
+
             End If
 
             '○ 画面モード(更新・参照)設定
@@ -194,13 +199,12 @@ Public Class OIT0003OrderDetail
                 WF_CREATELINKFLG.Value = "2"
             End If
 
-            '○ 託送指示フラグ(0：未手配, 1：手配)設定
-            '　 受注進行ステータスが100:受注受付, または300:手配完了以降のステータスに変更された場合
-            '### ステータス追加(仮) #################################
-            If work.WF_SEL_DELIVERYFLG.Text = "1" _
+            '◯手配連絡フラグ(0：未連絡, 1：連絡)設定
+            '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_CONTACTFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
@@ -210,17 +214,111 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
-                '託送指示ボタンを非活性
-                WF_DELIVERYFLG.Value = "1"
+
+                '手配連絡ボタンを非活性
+                WF_CONTACTFLG.Value = "1"
+
             Else
-                '託送指示ボタンを活性
-                WF_DELIVERYFLG.Value = "0"
+                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+                    '手配連絡ボタンを活性
+                    WF_CONTACTFLG.Value = "0"
+
+                    '★臨海鉄道対応(臨海鉄道でない営業所)
+                    '(入換・積込の運用がないため、"200：手配"の場合に手配連絡ボタンを活性にする。)
+                ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
+                    AndAlso WW_RINKAIFLG = False Then
+                    'AndAlso Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 Then
+                    '手配連絡ボタンを活性
+                    WF_CONTACTFLG.Value = "0"
+
+                Else
+                    '手配連絡ボタンを非活性
+                    WF_CONTACTFLG.Value = "1"
+                End If
             End If
 
-            '◯受注進行ステータスが300:手配完了以降のステータスに変更された場合
-            '### ステータス追加(仮) #################################
-            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+            '◯結果受理フラグ(0：未受理, 1：受理)設定
+            '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_RESULTFLG.Text = "1" _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
+                '結果受理ボタンを非活性
+                WF_RESULTFLG.Value = "1"
+
+            Else
+                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+
+                    '手配連絡が"1"(連絡)の場合
+                    If work.WF_SEL_CONTACTFLG.Text = "1" Then
+                        '結果受理ボタンを活性
+                        WF_RESULTFLG.Value = "0"
+                    Else
+                        '結果受理ボタンを非活性
+                        WF_RESULTFLG.Value = "1"
+                    End If
+                Else
+                    '結果受理ボタンを非活性
+                    WF_RESULTFLG.Value = "1"
+
+                End If
+            End If
+
+            '◯託送指示フラグ(0：未手配, 1：手配)設定
+            '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_DELIVERYFLG.Text = "1" _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
+                '託送指示ボタンを非活性
+                WF_DELIVERYFLG.Value = "1"
+
+            Else
+                '★臨海鉄道対応(臨海鉄道である営業所)
+                '　または、三重塩浜営業所の場合
+                If WW_RINKAIFLG = True _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 Then
+                    '託送指示ボタンを活性
+                    WF_DELIVERYFLG.Value = "0"
+
+                Else
+                    '託送指示ボタンを非活性
+                    WF_DELIVERYFLG.Value = "1"
+
+                End If
+            End If
+
+            '◯受注進行ステータスが310:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
@@ -233,6 +331,17 @@ Public Class OIT0003OrderDetail
 
                 'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "1"
+
+            Else
+                '★臨海鉄道対応(臨海鉄道でない営業所)
+                '(入換・積込の運用がないため、更新ボタンを活性にする。)
+                If WW_RINKAIFLG = False Then
+                    'タブ「入換・積込指示」のボタンを非活性
+                    WF_MAPButtonControl.Value = "2"
+                Else
+                    WF_MAPButtonControl.Value = "0"
+                End If
+
             End If
 
         Finally
@@ -315,23 +424,33 @@ Public Class OIT0003OrderDetail
             '   受注進行ステータス＝"240:手配中(入換指示未入力)"
             '   受注進行ステータス＝"250:手配中(積込指示未入力)"
             '   受注進行ステータス＝"260:手配中(託送指示未手配)"
+            '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+            '   受注進行ステータス＝"270:手配中(入換積込指示手配済)"
+            '   受注進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
+            '   受注進行ステータス＝"290:手配中(入換積込未連絡)"
+            '   受注進行ステータス＝"300:手配中(入換積込未確認)"
+            '### END   ##################################################################
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             WF_DTAB_CHANGE_NO.Value = "1"
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
             '〇 (一覧)テキストボックスの制御(読取専用)
             WW_ListTextBoxReadControl()
 
-            '〇 受注進行ステータスが"手配完了"へ変更された場合
+            '〇 受注進行ステータスが"310:手配完了"へ変更された場合
             '### ステータス追加(仮) #################################
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
@@ -369,21 +488,21 @@ Public Class OIT0003OrderDetail
         '作成(貨車連結用)フラグ(２：更新)　かつ、作成モード(１：新規)
         If work.WF_SEL_CREATELINKFLG.Text = "2" _
             AndAlso work.WF_SEL_CREATEFLG.Text = "1" Then
-            TxtOrderOfficeCode.Text = work.WF_SEL_LINK_ORDERSALESOFFICE.Text
-            CODENAME_get("SALESOFFICE", TxtOrderOfficeCode.Text, TxtOrderOffice.Text, WW_RTN_SW)
+            Me.TxtOrderOfficeCode.Text = work.WF_SEL_LINK_ORDERSALESOFFICE.Text
+            CODENAME_get("SALESOFFICE", Me.TxtOrderOfficeCode.Text, Me.TxtOrderOffice.Text, WW_RTN_SW)
 
-            work.WF_SEL_ORDERSALESOFFICE.Text = TxtOrderOffice.Text
-            work.WF_SEL_ORDERSALESOFFICECODE.Text = TxtOrderOfficeCode.Text
+            work.WF_SEL_ORDERSALESOFFICE.Text = Me.TxtOrderOffice.Text
+            work.WF_SEL_ORDERSALESOFFICECODE.Text = Me.TxtOrderOfficeCode.Text
 
             '作成モード(２：更新)
         ElseIf work.WF_SEL_CREATEFLG.Text = "2" Then
-            TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
-            TxtOrderOfficeCode.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
+            Me.TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
+            Me.TxtOrderOfficeCode.Text = work.WF_SEL_ORDERSALESOFFICECODE.Text
 
             '作成モード(１：新規登録)
         Else
-            TxtOrderOffice.Text = work.WF_SEL_SALESOFFICE.Text
-            TxtOrderOfficeCode.Text = work.WF_SEL_SALESOFFICECODE.Text
+            Me.TxtOrderOffice.Text = work.WF_SEL_SALESOFFICE.Text
+            Me.TxtOrderOfficeCode.Text = work.WF_SEL_SALESOFFICECODE.Text
 
         End If
 
@@ -392,7 +511,7 @@ Public Class OIT0003OrderDetail
             work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
             CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_100, work.WF_SEL_ORDERSTATUSNM.Text, WW_DUMMY)
         End If
-        TxtOrderStatus.Text = work.WF_SEL_ORDERSTATUSNM.Text
+        Me.TxtOrderStatus.Text = work.WF_SEL_ORDERSTATUSNM.Text
 
         '情報
         If work.WF_SEL_STACKINGFLG.Text = "" Then
@@ -408,61 +527,61 @@ Public Class OIT0003OrderDetail
 
         '受注パターン
         CODENAME_get("ORDERTYPE", work.WF_SEL_PATTERNCODE.Text, work.WF_SEL_PATTERNNAME.Text, WW_DUMMY)
-        TxtOrderType.Text = work.WF_SEL_PATTERNNAME.Text
+        Me.TxtOrderType.Text = work.WF_SEL_PATTERNNAME.Text
 
         'オーダー№
         If work.WF_SEL_ORDERNUMBER.Text = "" Then
             Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch("", "NEWORDERNOGET", "", WW_GetValue)
             work.WF_SEL_ORDERNUMBER.Text = WW_GetValue(0)
-            TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
+            Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
         Else
-            TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
+            Me.TxtOrderNo.Text = work.WF_SEL_ORDERNUMBER.Text
         End If
 
         '〇 作成(貨車連結用)フラグ(２：更新)　かつ、作成モード(１：新規)
         If work.WF_SEL_CREATELINKFLG.Text = "2" _
             AndAlso work.WF_SEL_CREATEFLG.Text = "1" Then
 
-            TxtTrainNo.Text = work.WF_SEL_LINK_TRAIN.Text
-            TxtTrainName.Text = work.WF_SEL_LINK_TRAINNAME.Text
+            Me.TxtTrainNo.Text = work.WF_SEL_LINK_TRAIN.Text
+            Me.TxtTrainName.Text = work.WF_SEL_LINK_TRAINNAME.Text
 
             '〇 貨車連結表のみで作成の場合、取得した列車名から各値を取得し設定する。
             WW_TRAINNUMBER_FIND(work.WF_SEL_LINK_TRAINNAME.Text)
         Else
             '本線列車
-            TxtTrainNo.Text = work.WF_SEL_TRAIN.Text
-            TxtTrainName.Text = work.WF_SEL_TRAINNAME.Text
+            Me.TxtTrainNo.Text = work.WF_SEL_TRAIN.Text
+            Me.TxtTrainName.Text = work.WF_SEL_TRAINNAME.Text
             '荷主
-            TxtShippersCode.Text = work.WF_SEL_SHIPPERSCODE.Text
+            Me.TxtShippersCode.Text = work.WF_SEL_SHIPPERSCODE.Text
             '荷受人
-            TxtConsigneeCode.Text = work.WF_SEL_CONSIGNEECODE.Text
+            Me.TxtConsigneeCode.Text = work.WF_SEL_CONSIGNEECODE.Text
             '発駅
-            TxtDepstationCode.Text = work.WF_SEL_DEPARTURESTATION.Text
+            Me.TxtDepstationCode.Text = work.WF_SEL_DEPARTURESTATION.Text
             '着駅
-            TxtArrstationCode.Text = work.WF_SEL_ARRIVALSTATION.Text
+            Me.TxtArrstationCode.Text = work.WF_SEL_ARRIVALSTATION.Text
             '(予定)積込日
-            TxtLoadingDate.Text = work.WF_SEL_LODDATE.Text
+            Me.TxtLoadingDate.Text = work.WF_SEL_LODDATE.Text
             '(予定)発日
-            TxtDepDate.Text = work.WF_SEL_DEPDATE.Text
+            Me.TxtDepDate.Text = work.WF_SEL_DEPDATE.Text
             '(予定)積車着日
-            TxtArrDate.Text = work.WF_SEL_ARRDATE.Text
+            Me.TxtArrDate.Text = work.WF_SEL_ARRDATE.Text
             '(予定)受入日
-            TxtAccDate.Text = work.WF_SEL_ACCDATE.Text
+            Me.TxtAccDate.Text = work.WF_SEL_ACCDATE.Text
             '(予定)空車着日
-            TxtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
+            Me.TxtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
         End If
 
         '(実績)積込日
-        TxtActualLoadingDate.Text = work.WF_SEL_ACTUALLODDATE.Text
+        Me.TxtActualLoadingDate.Text = work.WF_SEL_ACTUALLODDATE.Text
         '(実績)発日
-        TxtActualDepDate.Text = work.WF_SEL_ACTUALDEPDATE.Text
+        Me.TxtActualDepDate.Text = work.WF_SEL_ACTUALDEPDATE.Text
         '(実績)積車着日
-        TxtActualArrDate.Text = work.WF_SEL_ACTUALARRDATE.Text
+        Me.TxtActualArrDate.Text = work.WF_SEL_ACTUALARRDATE.Text
         '(実績)受入日
-        TxtActualAccDate.Text = work.WF_SEL_ACTUALACCDATE.Text
+        Me.TxtActualAccDate.Text = work.WF_SEL_ACTUALACCDATE.Text
         '(実績)空車着日
-        TxtActualEmparrDate.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
+        Me.TxtActualEmparrDate.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
 
         '○ 油種別タンク車数(車)データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -474,136 +593,135 @@ Public Class OIT0003OrderDetail
         '計上月
         If work.WF_SEL_KEIJYOYMD.Text <> "" Then
             Dim dt As DateTime = DateTime.ParseExact(work.WF_SEL_KEIJYOYMD.Text, "yyyy/MM/dd", Nothing)
-            TxtBudgetMonth.Text = dt.Year.ToString() + "/" + dt.Month.ToString("00")
+            Me.TxtBudgetMonth.Text = dt.Year.ToString() + "/" + dt.Month.ToString("00")
         Else
-            TxtBudgetMonth.Text = work.WF_SEL_KEIJYOYMD.Text
+            Me.TxtBudgetMonth.Text = work.WF_SEL_KEIJYOYMD.Text
         End If
 
         If work.WF_SEL_CREATEFLG.Text = "2" Then
             '売上合計金額(税抜)
-            TxtTotalSales.Text = work.WF_SEL_SALSE.Text
+            Me.TxtTotalSales.Text = work.WF_SEL_SALSE.Text
             '支払合計金額(税抜)
-            TxtTitalPayment.Text = work.WF_SEL_PAYMENT.Text
+            Me.TxtTitalPayment.Text = work.WF_SEL_PAYMENT.Text
             '売上合計金額(税額)
-            TxtTotalSales2.Text = work.WF_SEL_TOTALSALSE.Text
+            Me.TxtTotalSales2.Text = work.WF_SEL_TOTALSALSE.Text
             '支払合計金額(税額)
-            TxtTitalPayment2.Text = work.WF_SEL_TOTALPAYMENT.Text
+            Me.TxtTitalPayment2.Text = work.WF_SEL_TOTALPAYMENT.Text
         Else
             '売上合計金額(税抜)
-            TxtTotalSales.Text = "0"
+            Me.TxtTotalSales.Text = "0"
             '支払合計金額(税抜)
-            TxtTitalPayment.Text = "0"
+            Me.TxtTitalPayment.Text = "0"
             '売上合計金額(税額)
-            TxtTotalSales2.Text = "0"
+            Me.TxtTotalSales2.Text = "0"
             '支払合計金額(税額)
-            TxtTitalPayment2.Text = "0"
+            Me.TxtTitalPayment2.Text = "0"
         End If
 
         '● タブ「タンク車割当」
         '　■油種別タンク車数(車)
         If work.WF_SEL_CREATEFLG.Text = "2" Then
             'ハイオク(タンク車数)
-            TxtHTank.Text = work.WF_SEL_HIGHOCTANE_TANKCAR.Text
+            Me.TxtHTank.Text = work.WF_SEL_HIGHOCTANE_TANKCAR.Text
             'レギュラー(タンク車数)
-            TxtRTank.Text = work.WF_SEL_REGULAR_TANKCAR.Text
+            Me.TxtRTank.Text = work.WF_SEL_REGULAR_TANKCAR.Text
             '灯油(タンク車数)
-            TxtTTank.Text = work.WF_SEL_KEROSENE_TANKCAR.Text
+            Me.TxtTTank.Text = work.WF_SEL_KEROSENE_TANKCAR.Text
             '未添加灯油(タンク車数)
-            TxtMTTank.Text = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text
+            Me.TxtMTTank.Text = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text
             '軽油(タンク車数)
-            TxtKTank.Text = work.WF_SEL_DIESEL_TANKCAR.Text
+            Me.TxtKTank.Text = work.WF_SEL_DIESEL_TANKCAR.Text
             '3号軽油(タンク車数)
-            TxtK3Tank.Text = work.WF_SEL_NUM3DIESEL_TANKCAR.Text
+            Me.TxtK3Tank.Text = work.WF_SEL_NUM3DIESEL_TANKCAR.Text
             '5号軽油(タンク車数)
-            TxtK5Tank.Text = work.WF_SEL_NUM5DIESEL_TANKCAR.Text
+            Me.TxtK5Tank.Text = work.WF_SEL_NUM5DIESEL_TANKCAR.Text
             '10号軽油(タンク車数)
-            TxtK10Tank.Text = work.WF_SEL_NUM10DIESEL_TANKCAR.Text
+            Me.TxtK10Tank.Text = work.WF_SEL_NUM10DIESEL_TANKCAR.Text
             'LSA(タンク車数)
-            TxtLTank.Text = work.WF_SEL_LSA_TANKCAR.Text
+            Me.TxtLTank.Text = work.WF_SEL_LSA_TANKCAR.Text
             'A重油(タンク車数)
-            TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
+            Me.TxtATank.Text = work.WF_SEL_AHEAVY_TANKCAR.Text
         Else
             'ハイオク(タンク車数)
-            TxtHTank.Text = "0"
+            Me.TxtHTank.Text = "0"
             'レギュラー(タンク車数)
-            TxtRTank.Text = "0"
+            Me.TxtRTank.Text = "0"
             '灯油(タンク車数)
-            TxtTTank.Text = "0"
+            Me.TxtTTank.Text = "0"
             '未添加灯油(タンク車数)
-            TxtMTTank.Text = "0"
+            Me.TxtMTTank.Text = "0"
             '軽油(タンク車数)
-            TxtKTank.Text = "0"
+            Me.TxtKTank.Text = "0"
             '3号軽油(タンク車数)
-            TxtK3Tank.Text = "0"
+            Me.TxtK3Tank.Text = "0"
             '5号軽油(タンク車数)
-            TxtK5Tank.Text = "0"
+            Me.TxtK5Tank.Text = "0"
             '10号軽油(タンク車数)
-            TxtK10Tank.Text = "0"
+            Me.TxtK10Tank.Text = "0"
             'LSA(タンク車数)
-            TxtLTank.Text = "0"
+            Me.TxtLTank.Text = "0"
             'A重油(タンク車数)
-            TxtATank.Text = "0"
+            Me.TxtATank.Text = "0"
         End If
-
 
         '　■割当後　油種別タンク車数(車)
         If work.WF_SEL_CREATEFLG.Text = "2" Then
             'ハイオク(タンク車数)
-            TxtHTank_w.Text = work.WF_SEL_HIGHOCTANECH_TANKCAR.Text
+            Me.TxtHTank_w.Text = work.WF_SEL_HIGHOCTANECH_TANKCAR.Text
             'レギュラー(タンク車数)
-            TxtRTank_w.Text = work.WF_SEL_REGULARCH_TANKCAR.Text
+            Me.TxtRTank_w.Text = work.WF_SEL_REGULARCH_TANKCAR.Text
             '灯油(タンク車数)
-            TxtTTank_w.Text = work.WF_SEL_KEROSENECH_TANKCAR.Text
+            Me.TxtTTank_w.Text = work.WF_SEL_KEROSENECH_TANKCAR.Text
             '未添加灯油(タンク車数)
-            TxtMTTank_w.Text = work.WF_SEL_NOTADDED_KEROSENECH_TANKCAR.Text
+            Me.TxtMTTank_w.Text = work.WF_SEL_NOTADDED_KEROSENECH_TANKCAR.Text
             '軽油(タンク車数)
-            TxtKTank_w.Text = work.WF_SEL_DIESELCH_TANKCAR.Text
+            Me.TxtKTank_w.Text = work.WF_SEL_DIESELCH_TANKCAR.Text
             '3号軽油(タンク車数)
-            TxtK3Tank_w.Text = work.WF_SEL_NUM3DIESELCH_TANKCAR.Text
+            Me.TxtK3Tank_w.Text = work.WF_SEL_NUM3DIESELCH_TANKCAR.Text
             '5号軽油(タンク車数)
-            TxtK5Tank_w.Text = work.WF_SEL_NUM5DIESELCH_TANKCAR.Text
+            Me.TxtK5Tank_w.Text = work.WF_SEL_NUM5DIESELCH_TANKCAR.Text
             '10号軽油(タンク車数)
-            TxtK10Tank_w.Text = work.WF_SEL_NUM10DIESELCH_TANKCAR.Text
+            Me.TxtK10Tank_w.Text = work.WF_SEL_NUM10DIESELCH_TANKCAR.Text
             'LSA(タンク車数)
-            TxtLTank_w.Text = work.WF_SEL_LSACH_TANKCAR.Text
+            Me.TxtLTank_w.Text = work.WF_SEL_LSACH_TANKCAR.Text
             'A重油(タンク車数)
-            TxtATank_w.Text = work.WF_SEL_AHEAVYCH_TANKCAR.Text
+            Me.TxtATank_w.Text = work.WF_SEL_AHEAVYCH_TANKCAR.Text
         Else
             'ハイオク(タンク車数)
-            TxtHTank_w.Text = "0"
+            Me.TxtHTank_w.Text = "0"
             'レギュラー(タンク車数)
-            TxtRTank_w.Text = "0"
+            Me.TxtRTank_w.Text = "0"
             '灯油(タンク車数)
-            TxtTTank_w.Text = "0"
+            Me.TxtTTank_w.Text = "0"
             '未添加灯油(タンク車数)
-            TxtMTTank_w.Text = "0"
+            Me.TxtMTTank_w.Text = "0"
             '軽油(タンク車数)
-            TxtKTank_w.Text = "0"
+            Me.TxtKTank_w.Text = "0"
             '3号軽油(タンク車数)
-            TxtK3Tank_w.Text = "0"
+            Me.TxtK3Tank_w.Text = "0"
             '5号軽油(タンク車数)
-            TxtK5Tank_w.Text = "0"
+            Me.TxtK5Tank_w.Text = "0"
             '10号軽油(タンク車数)
-            TxtK10Tank_w.Text = "0"
+            Me.TxtK10Tank_w.Text = "0"
             'LSA(タンク車数)
-            TxtLTank_w.Text = "0"
+            Me.TxtLTank_w.Text = "0"
             'A重油(タンク車数)
-            TxtATank_w.Text = "0"
+            Me.TxtATank_w.Text = "0"
         End If
 
         '○ 名称設定処理
         '会社コード
-        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)
+        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, Me.WF_CAMPCODE_TEXT.Text, WW_DUMMY)
         '運用部署
-        CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_UORG_TEXT.Text, WW_DUMMY)
+        CODENAME_get("UORG", work.WF_SEL_UORG.Text, Me.WF_UORG_TEXT.Text, WW_DUMMY)
         '荷主
-        CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_DUMMY)
+        CODENAME_get("SHIPPERS", Me.TxtShippersCode.Text, Me.LblShippersName.Text, WW_DUMMY)
         '荷受人
-        CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_DUMMY)
+        CODENAME_get("CONSIGNEE", Me.TxtConsigneeCode.Text, Me.LblConsigneeName.Text, WW_DUMMY)
         '発駅
-        CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
+        CODENAME_get("DEPSTATION", Me.TxtDepstationCode.Text, Me.LblDepstationName.Text, WW_DUMMY)
         '着駅
-        CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
+        CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_DUMMY)
 
     End Sub
 
@@ -1176,7 +1294,7 @@ Public Class OIT0003OrderDetail
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(TMP0001.SHIPORDER, '')                           AS SHIPORDER" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPORDER), '')                          AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
@@ -1295,7 +1413,7 @@ Public Class OIT0003OrderDetail
             & "   END                                                           AS TANKQUOTA" _
             & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                             AS LINKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
-            & " , ISNULL(RTRIM(TMP0001.SHIPORDER, '')                           AS SHIPORDER" _
+            & " , ISNULL(RTRIM(TMP0001.SHIPORDER), '')                          AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
@@ -2118,6 +2236,51 @@ Public Class OIT0003OrderDetail
         TBLview = Nothing
     End Sub
 
+
+    ''' <summary>
+    ''' 手配連絡ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCONTACT_Click()
+
+        Dim strOrderStatus As String = ""
+
+        '手配連絡フラグを"1"(連絡)にする。
+        work.WF_SEL_CONTACTFLG.Text = "1"
+
+        '受注TBL更新
+        WW_UpdateRelatedFlg("1", "CONTACTFLG")
+
+        '〇 受注進行ステータスの状態を取得
+        WW_ScreenOrderStatusSet(strOrderStatus)
+
+        '〇 受注進行ステータスの変更分を反映
+        WW_ScreenOrderStatusChgRef(strOrderStatus)
+
+    End Sub
+
+    ''' <summary>
+    ''' 結果受理ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonRESULT_Click()
+
+        Dim strOrderStatus As String = ""
+
+        '結果受理フラグを"1"(結果受理)にする。
+        work.WF_SEL_RESULTFLG.Text = "1"
+
+        '受注TBL更新
+        WW_UpdateRelatedFlg("1", "RESULTFLG")
+
+        '〇 受注進行ステータスの状態を取得
+        WW_ScreenOrderStatusSet(strOrderStatus)
+
+        '〇 受注進行ステータスの変更分を反映
+        WW_ScreenOrderStatusChgRef(strOrderStatus)
+
+    End Sub
+
     ''' <summary>
     ''' 託送指示ボタン押下時処理
     ''' </summary>
@@ -2130,53 +2293,13 @@ Public Class OIT0003OrderDetail
         work.WF_SEL_DELIVERYFLG.Text = "1"
 
         '受注TBL更新
-        WW_UpdateDeliveryFlg("1")
+        WW_UpdateRelatedFlg("1", "DELIVERYFLG")
 
-        '〇 受注進行ステータスの状態
+        '〇 受注進行ステータスの状態を取得
         WW_ScreenOrderStatusSet(strOrderStatus)
 
-        '受注進行ステータスに変更があった場合
-        If strOrderStatus <> "" Then
-            '〇(受注TBL)受注進行ステータス更新
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-
-                WW_UpdateOrderStatus(strOrderStatus)
-                CODENAME_get("ORDERSTATUS", strOrderStatus, TxtOrderStatus.Text, WW_DUMMY)
-                work.WF_SEL_ORDERSTATUS.Text = strOrderStatus
-                work.WF_SEL_ORDERSTATUSNM.Text = TxtOrderStatus.Text
-            End Using
-        End If
-
-        '○ 画面表示データ復元
-        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-
-        For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
-            If OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                OIT0003row("ORDERSTATUS") = strOrderStatus
-                OIT0003row("ORDERSTATUSNAME") = TxtOrderStatus.Text
-                OIT0003row("DELIVERYFLG") = "1"
-            End If
-        Next
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-
-        '〇 受注ステータスが"手配完了"へ変更された場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
-            WF_DTAB_CHANGE_NO.Value = "2"
-            WF_Detail_TABChange()
-
-            '### START 受注履歴テーブルの追加(2020/03/26) #############
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-                WW_InsertOrderHistory(SQLcon)
-            End Using
-            '### END   ################################################
-
-            '○メッセージ表示
-            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
-        End If
+        '〇 受注進行ステータスの変更分を反映
+        WW_ScreenOrderStatusChgRef(strOrderStatus)
 
     End Sub
 
@@ -2189,9 +2312,9 @@ Public Class OIT0003OrderDetail
         '着駅コードが未設定の場合
         '※一覧を作成するにあたり、基地コード・荷受人を取得するために、
         '　着駅コードは必須となるため
-        If TxtArrstationCode.Text = "" Then
+        If Me.TxtArrstationCode.Text = "" Then
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "着駅", needsPopUp:=True)
-            TxtArrstationCode.Focus()
+            Me.TxtArrstationCode.Focus()
             WW_CheckERR("着駅入力エラー。", C_MESSAGE_NO.PREREQUISITE_ERROR)
             Exit Sub
         End If
@@ -2206,8 +2329,14 @@ Public Class OIT0003OrderDetail
         Dim i As Integer = 0
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
             i += 1
-            OIT0003row("LINEORDER") = i        '貨物駅入線順
+            OIT0003row("SHIPORDER") = i        '発送順
 
+            '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
+            '　※上記以外の営業所については、入力しないため値は未入力。
+            If Me.TxtOrderOfficeCode.Text = "011203" Then
+                OIT0003row("LINEORDER") = i    '貨物駅入線順
+
+            End If
         Next
 
         '○ 画面表示データ保存
@@ -2235,12 +2364,12 @@ Public Class OIT0003OrderDetail
         '〇 受注営業所チェック
         '受注営業所が選択されていない場合は、他の検索(LEFTBOX)は表示させない制御をする
         '※受注営業所は他の検索するためのKEYとして使用するため
-        If WF_FIELD.Value <> "TxtOrderOffice" AndAlso TxtOrderOffice.Text = "" Then
+        If WF_FIELD.Value <> "TxtOrderOffice" AndAlso Me.TxtOrderOffice.Text = "" Then
             Master.Output(C_MESSAGE_NO.OIL_ORDEROFFICE_UNSELECT, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            TxtArrstationCode.Focus()
+            Me.TxtArrstationCode.Focus()
             WW_CheckERR("受注営業所が未選択。", C_MESSAGE_NO.OIL_ORDEROFFICE_UNSELECT)
             WF_LeftboxOpen.Value = ""   'LeftBoxを表示させない
-            TxtOrderOffice.Focus()
+            Me.TxtOrderOffice.Focus()
             Exit Sub
         End If
 
@@ -2272,12 +2401,12 @@ Public Class OIT0003OrderDetail
 
                             '〇 画面(受注営業所).テキストボックスが未設定
                             'If work.WF_SEL_ORDERSALESOFFICECODE.Text = "" Then
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtOrderOffice.Text)
                             'Else
                             '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtOrderOffice.Text)
                             'End If
                         Else
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtOrderOffice.Text)
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtOrderOffice.Text)
                         End If
                     End If
                     '########################################
@@ -2287,13 +2416,13 @@ Public Class OIT0003OrderDetail
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
-                            If TxtOrderOffice.Text = "" Then
-                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderType.Text)
+                            If Me.TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtOrderType.Text)
                             Else
-                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtOrderType.Text)
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, Me.TxtOrderType.Text)
                             End If
                         Else
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtOrderType.Text)
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtOrderType.Text)
                         End If
                     End If
 
@@ -2302,13 +2431,13 @@ Public Class OIT0003OrderDetail
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
-                            If TxtOrderOffice.Text = "" Then
-                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtShippersCode.Text)
+                            If Me.TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtShippersCode.Text)
                             Else
-                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtShippersCode.Text)
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, Me.TxtShippersCode.Text)
                             End If
                         Else
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtShippersCode.Text)
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtShippersCode.Text)
                         End If
                     End If
 
@@ -2317,13 +2446,13 @@ Public Class OIT0003OrderDetail
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
-                            If TxtOrderOffice.Text = "" Then
-                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtConsigneeCode.Text)
+                            If Me.TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtConsigneeCode.Text)
                             Else
-                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtConsigneeCode.Text)
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, Me.TxtConsigneeCode.Text)
                             End If
                         Else
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtConsigneeCode.Text)
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtConsigneeCode.Text)
                         End If
                     End If
 
@@ -2332,13 +2461,13 @@ Public Class OIT0003OrderDetail
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
-                            If TxtOrderOffice.Text = "" Then
-                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtTrainNo.Text)
+                            If Me.TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtTrainNo.Text)
                             Else
-                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, TxtTrainNo.Text)
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_ORDERSALESOFFICECODE.Text, Me.TxtTrainNo.Text)
                             End If
                         Else
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, TxtTrainNo.Text)
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtTrainNo.Text)
                         End If
                     End If
 
@@ -2347,13 +2476,13 @@ Public Class OIT0003OrderDetail
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
-                            If TxtOrderOffice.Text = "" Then
-                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "1", TxtDepstationCode.Text)
+                            If Me.TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "1", Me.TxtDepstationCode.Text)
                             Else
-                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_ORDERSALESOFFICECODE.Text + "1", TxtDepstationCode.Text)
+                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_ORDERSALESOFFICECODE.Text + "1", Me.TxtDepstationCode.Text)
                             End If
                         Else
-                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", TxtDepstationCode.Text)
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", Me.TxtDepstationCode.Text)
                         End If
                     End If
 
@@ -2362,13 +2491,13 @@ Public Class OIT0003OrderDetail
                         '〇 検索(営業所).テキストボックスが未設定
                         If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                             '〇 画面(受注営業所).テキストボックスが未設定
-                            If TxtOrderOffice.Text = "" Then
-                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "2", TxtArrstationCode.Text)
+                            If Me.TxtOrderOffice.Text = "" Then
+                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "2", Me.TxtArrstationCode.Text)
                             Else
-                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_ORDERSALESOFFICECODE.Text + "2", TxtArrstationCode.Text)
+                                prmData = work.CreateSTATIONPTParam(work.WF_SEL_ORDERSALESOFFICECODE.Text + "2", Me.TxtArrstationCode.Text)
                             End If
                         Else
-                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", TxtArrstationCode.Text)
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", Me.TxtArrstationCode.Text)
                         End If
                     End If
 
@@ -2426,34 +2555,34 @@ Public Class OIT0003OrderDetail
                     Select Case WF_FIELD.Value
                         '(予定)積込日
                         Case "TxtLoadingDate"
-                            .WF_Calendar.Text = TxtLoadingDate.Text
+                            .WF_Calendar.Text = Me.TxtLoadingDate.Text
                         '(予定)発日
                         Case "TxtDepDate"
-                            .WF_Calendar.Text = TxtDepDate.Text
+                            .WF_Calendar.Text = Me.TxtDepDate.Text
                         '(予定)積車着日
                         Case "TxtArrDate"
-                            .WF_Calendar.Text = TxtArrDate.Text
+                            .WF_Calendar.Text = Me.TxtArrDate.Text
                         '(予定)受入日
                         Case "TxtAccDate"
-                            .WF_Calendar.Text = TxtAccDate.Text
+                            .WF_Calendar.Text = Me.TxtAccDate.Text
                         '(予定)空車着日
                         Case "TxtEmparrDate"
-                            .WF_Calendar.Text = TxtEmparrDate.Text
+                            .WF_Calendar.Text = Me.TxtEmparrDate.Text
                         '(実績)積込日
                         Case "TxtActualLoadingDate"
-                            .WF_Calendar.Text = TxtActualLoadingDate.Text
+                            .WF_Calendar.Text = Me.TxtActualLoadingDate.Text
                         '(実績)発日
                         Case "TxtActualDepDate"
-                            .WF_Calendar.Text = TxtActualDepDate.Text
+                            .WF_Calendar.Text = Me.TxtActualDepDate.Text
                         '(実績)積車着日
                         Case "TxtActualArrDate"
-                            .WF_Calendar.Text = TxtActualArrDate.Text
+                            .WF_Calendar.Text = Me.TxtActualArrDate.Text
                         '(実績)受入日
                         Case "TxtActualAccDate"
-                            .WF_Calendar.Text = TxtActualAccDate.Text
+                            .WF_Calendar.Text = Me.TxtActualAccDate.Text
                         '(実績)空車着日
                         Case "TxtActualEmparrDate"
-                            .WF_Calendar.Text = TxtActualEmparrDate.Text
+                            .WF_Calendar.Text = Me.TxtActualEmparrDate.Text
                     End Select
                     .ActiveCalendar()
 
@@ -2496,44 +2625,44 @@ Public Class OIT0003OrderDetail
         Select Case WF_FIELD.Value
             '会社コード
             Case "WF_CAMPCODE"
-                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, Me.WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
             '運用部署
             Case "WF_UORG"
-                CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("UORG", WF_UORG.Text, Me.WF_UORG_TEXT.Text, WW_RTN_SW)
 
             '荷主
             Case "TxtShippersCode"
-                CODENAME_get("SHIPPERS", TxtShippersCode.Text, LblShippersName.Text, WW_RTN_SW)
+                CODENAME_get("SHIPPERS", Me.TxtShippersCode.Text, Me.LblShippersName.Text, WW_RTN_SW)
 
             '荷受人
             Case "TxtConsigneeCode"
-                CODENAME_get("CONSIGNEE", TxtConsigneeCode.Text, LblConsigneeName.Text, WW_RTN_SW)
+                CODENAME_get("CONSIGNEE", Me.TxtConsigneeCode.Text, Me.LblConsigneeName.Text, WW_RTN_SW)
 
             '本線列車
             Case "TxtTrainNo"
 
-                If TxtTrainNo.Text = "" Then
+                If Me.TxtTrainNo.Text = "" Then
                     '発駅
-                    TxtDepstationCode.Text = ""
-                    LblDepstationName.Text = ""
+                    Me.TxtDepstationCode.Text = ""
+                    Me.LblDepstationName.Text = ""
                     '着駅
-                    TxtArrstationCode.Text = ""
-                    LblArrstationName.Text = ""
+                    Me.TxtArrstationCode.Text = ""
+                    Me.LblArrstationName.Text = ""
                     '荷主
-                    TxtShippersCode.Text = ""
-                    LblShippersName.Text = ""
+                    Me.TxtShippersCode.Text = ""
+                    Me.LblShippersName.Text = ""
                     '荷受人
-                    TxtConsigneeCode.Text = ""
-                    LblConsigneeName.Text = ""
+                    Me.TxtConsigneeCode.Text = ""
+                    Me.LblConsigneeName.Text = ""
                     '受注パターン
-                    TxtOrderType.Text = ""
+                    Me.TxtOrderType.Text = ""
 
                     '〇 (予定)の日付を設定
-                    TxtLoadingDate.Text = ""
-                    TxtDepDate.Text = ""
-                    TxtArrDate.Text = ""
-                    TxtAccDate.Text = ""
-                    TxtEmparrDate.Text = ""
+                    Me.TxtLoadingDate.Text = ""
+                    Me.TxtDepDate.Text = ""
+                    Me.TxtArrDate.Text = ""
+                    Me.TxtAccDate.Text = ""
+                    Me.TxtEmparrDate.Text = ""
 
                     work.WF_SEL_SHIPPERSCODE.Text = ""
                     work.WF_SEL_SHIPPERSNAME.Text = ""
@@ -2552,13 +2681,13 @@ Public Class OIT0003OrderDetail
                 '〇 検索(営業所).テキストボックスが未設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                     '〇 画面(受注営業所).テキストボックスが未設定
-                    If TxtOrderOffice.Text = "" Then
-                        WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                    If Me.TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", Me.TxtTrainNo.Text, WW_GetValue)
                     Else
-                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER", Me.TxtTrainNo.Text, WW_GetValue)
                     End If
                 Else
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", TxtTrainNo.Text, WW_GetValue)
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", Me.TxtTrainNo.Text, WW_GetValue)
                 End If
 
                 '指定された本線列車№で値が取得できない場合はエラー判定
@@ -2569,19 +2698,19 @@ Public Class OIT0003OrderDetail
                 End If
 
                 '発駅
-                TxtDepstationCode.Text = WW_GetValue(1)
-                CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_DUMMY)
+                Me.TxtDepstationCode.Text = WW_GetValue(1)
+                CODENAME_get("DEPSTATION", Me.TxtDepstationCode.Text, Me.LblDepstationName.Text, WW_DUMMY)
                 '着駅
-                TxtArrstationCode.Text = WW_GetValue(2)
-                CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_DUMMY)
-                TxtTrainNo.Focus()
+                Me.TxtArrstationCode.Text = WW_GetValue(2)
+                CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_DUMMY)
+                Me.TxtTrainNo.Focus()
 
                 '〇 (予定)の日付を設定
-                TxtLoadingDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
-                TxtDepDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
-                TxtArrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
-                TxtAccDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
-                TxtEmparrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                Me.TxtLoadingDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                Me.TxtDepDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                Me.TxtArrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                Me.TxtAccDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                Me.TxtEmparrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
 
                 ''〇 (予定)の日付を設定
                 'TxtLoadingDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
@@ -2605,23 +2734,23 @@ Public Class OIT0003OrderDetail
                 '〇 検索(営業所).テキストボックスが未設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                     '〇 画面(受注営業所).テキストボックスが未設定
-                    If TxtOrderOffice.Text = "" Then
-                        WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    If Me.TxtOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
                     Else
-                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
                     End If
                 Else
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", TxtArrstationCode.Text, WW_GetValue)
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
                 End If
 
                 '荷主
-                TxtShippersCode.Text = WW_GetValue(0)
-                LblShippersName.Text = WW_GetValue(1)
+                Me.TxtShippersCode.Text = WW_GetValue(0)
+                Me.LblShippersName.Text = WW_GetValue(1)
                 '荷受人
-                TxtConsigneeCode.Text = WW_GetValue(4)
-                LblConsigneeName.Text = WW_GetValue(5)
+                Me.TxtConsigneeCode.Text = WW_GetValue(4)
+                Me.LblConsigneeName.Text = WW_GetValue(5)
                 '受注パターン
-                TxtOrderType.Text = WW_GetValue(7)
+                Me.TxtOrderType.Text = WW_GetValue(7)
 
                 work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
                 work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -2634,11 +2763,11 @@ Public Class OIT0003OrderDetail
 
             '発駅
             Case "TxtDepstationCode"
-                CODENAME_get("DEPSTATION", TxtDepstationCode.Text, LblDepstationName.Text, WW_RTN_SW)
+                CODENAME_get("DEPSTATION", Me.TxtDepstationCode.Text, Me.LblDepstationName.Text, WW_RTN_SW)
 
             '着駅
             Case "TxtArrstationCode"
-                CODENAME_get("ARRSTATION", TxtArrstationCode.Text, LblArrstationName.Text, WW_RTN_SW)
+                CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_RTN_SW)
 
         End Select
 
@@ -3538,8 +3667,8 @@ Public Class OIT0003OrderDetail
                 Case BaseDllConst.CONST_ORDERSTATUS_200
                     '積込指示入力＝"1:完了"の場合
                     If WW_LoadingInput = "1" Then
-                        '手配完了
-                        strOrderStatus = CONST_ORDERSTATUS_300
+                        '310:手配完了
+                        strOrderStatus = CONST_ORDERSTATUS_310
                         CODENAME_get("ORDERSTATUS", strOrderStatus, Me.TxtOrderStatus.Text, WW_DUMMY)
                     End If
             End Select
@@ -3600,8 +3729,8 @@ Public Class OIT0003OrderDetail
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
         End If
 
-        '〇 受注ステータスが"手配完了"へ変更された場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+        '〇 受注ステータスが"310:手配完了"へ変更された場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
 
@@ -3670,8 +3799,8 @@ Public Class OIT0003OrderDetail
         '### 受注進行ステータスチェック START ##############################################
         '受注進行ステータスの状態
         Select Case work.WF_SEL_ORDERSTATUS.Text
-            '"300:手配完了"
-            Case BaseDllConst.CONST_ORDERSTATUS_300
+            '"310:手配完了"
+            Case BaseDllConst.CONST_ORDERSTATUS_310
                 '(一覧)数量の入力チェック
                 '0(デフォルト値)以外が入力されていれば、入力していると判断
                 Dim chkCarsAmount As Boolean = True
@@ -3707,7 +3836,7 @@ Public Class OIT0003OrderDetail
 
                 '(実績)積込日の入力が完了、かつ(一覧)数量の入力がすべて完了
                 If Me.TxtActualLoadingDate.Text <> "" AndAlso chkCarsAmount = True Then
-                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_310
+                    strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_320
 
                     '### 油種数量(数値)が0(kl)の場合はエラー表示 ##################
                 ElseIf chkCarsAmount = False Then
@@ -3758,8 +3887,8 @@ Public Class OIT0003OrderDetail
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
                 End If
 
-            '"310:受注確定"
-            Case BaseDllConst.CONST_ORDERSTATUS_310,
+            '"320:受注確定"
+            Case BaseDllConst.CONST_ORDERSTATUS_320,
                  BaseDllConst.CONST_ORDERSTATUS_350
 
                 '### ステータス追加(仮) #################################
@@ -4532,7 +4661,7 @@ Public Class OIT0003OrderDetail
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME    , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION      , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , RETSTATION   , RETSTATIONNAME  , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS, ORDERINFO " _
-            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , DELIVERYFLG" _
+            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG" _
             & "        , LODDATE      , DEPDATE         , ARRDATE" _
             & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE" _
             & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK           , HTANK               , TTANK" _
@@ -4554,7 +4683,7 @@ Public Class OIT0003OrderDetail
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
             & "        , @P17, @P18, @P19, @P20, @P21, @P22" _
-            & "        , @P95, @P92, @P23, @P94" _
+            & "        , @P95, @P92, @P23, @P96, @P97, @P94" _
             & "        , @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30, @P31" _
             & "        , @P32, @P33, @P34, @P35, @P36" _
@@ -4603,6 +4732,8 @@ Public Class OIT0003OrderDetail
             & "    , EMPTYTURNFLG" _
             & "    , STACKINGFLG" _
             & "    , USEPROPRIETYFLG" _
+            & "    , CONTACTFLG" _
+            & "    , RESULTFLG" _
             & "    , DELIVERYFLG" _
             & "    , LODDATE" _
             & "    , DEPDATE" _
@@ -4706,6 +4837,8 @@ Public Class OIT0003OrderDetail
                 Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.NVarChar, 1)  '空回日報可否フラグ
                 Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
+                Dim PARA96 As SqlParameter = SQLcmd.Parameters.Add("@P96", SqlDbType.NVarChar, 1)  '手配連絡フラグ
+                Dim PARA97 As SqlParameter = SQLcmd.Parameters.Add("@P97", SqlDbType.NVarChar, 1)  '結果受理フラグ
                 Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.NVarChar, 1)  '託送指示フラグ
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)         '積込日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)         '発日（予定）
@@ -4844,11 +4977,13 @@ Public Class OIT0003OrderDetail
                     End If
 
                     PARA23.Value = "1"                                    '利用可否フラグ(1:利用可能)
+                    PARA96.Value = work.WF_SEL_CONTACTFLG.Text            '手配連絡フラグ(0:未連絡)
+                    PARA97.Value = work.WF_SEL_RESULTFLG.Text             '結果受理フラグ(0:未受理)
                     PARA94.Value = work.WF_SEL_DELIVERYFLG.Text           '託送指示フラグ(0:未手配, 1:手配)
-                    PARA24.Value = Me.TxtLoadingDate.Text                    '積込日（予定）
-                    PARA25.Value = Me.TxtDepDate.Text                        '発日（予定）
-                    PARA26.Value = Me.TxtArrDate.Text                        '積車着日（予定）
-                    PARA27.Value = Me.TxtAccDate.Text                        '受入日（予定）
+                    PARA24.Value = Me.TxtLoadingDate.Text                 '積込日（予定）
+                    PARA25.Value = Me.TxtDepDate.Text                     '発日（予定）
+                    PARA26.Value = Me.TxtArrDate.Text                     '積車着日（予定）
+                    PARA27.Value = Me.TxtAccDate.Text                     '受入日（予定）
                     '空車着日（予定）
                     If Me.TxtEmparrDate.Text = "" Then
                         PARA28.Value = DBNull.Value
@@ -6313,6 +6448,8 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')   　        AS STACKINGFLG" _
             & " , ''                                                 AS STACKINGNAME" _
             & " , ISNULL(RTRIM(OIT0002.USEPROPRIETYFLG), '')   　    AS USEPROPRIETYFLG" _
+            & " , ISNULL(RTRIM(OIT0002.CONTACTFLG), '')   　         AS CONTACTFLG" _
+            & " , ISNULL(RTRIM(OIT0002.RESULTFLG), '')   　          AS RESULTFLG" _
             & " , ISNULL(RTRIM(OIT0002.DELIVERYFLG), '')   　        AS DELIVERYFLG" _
             & " , CASE ISNULL(RTRIM(OIT0002.ORDERINFO), '')" _
             & "   WHEN '80' THEN '<div style=""letter-spacing:normal;color:red;"">'  + ISNULL(RTRIM(OIT0002.TRAINNO), '') + '</div>'" _
@@ -6945,25 +7082,28 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
-    ''' (受注TBL)託送指示フラグ更新
+    ''' (受注TBL)フラグ関連更新
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_UpdateDeliveryFlg(ByVal I_Value As String)
+    Protected Sub WW_UpdateRelatedFlg(ByVal I_Value As String, Optional ByVal I_PARA01 As String = Nothing)
 
         Try
             'DataBase接続文字
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
-            '更新SQL文･･･受注TBLの託送指示フラグを更新
+            '更新SQL文･･･受注TBLの各フラグを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0002_ORDER " _
-                    & "    SET DELIVERYFLG = @P03, " _
-                    & "        UPDYMD      = @P11, " _
+                    & "    SET UPDYMD      = @P11, " _
                     & "        UPDUSER     = @P12, " _
                     & "        UPDTERMID   = @P13, " _
-                    & "        RECEIVEYMD  = @P14  " _
-                    & "  WHERE ORDERNO     = @P01  " _
+                    & "        RECEIVEYMD  = @P14, "
+
+            SQLStr &= String.Format("        {0}   = @P03 ", I_PARA01)
+
+            SQLStr &=
+                    "  WHERE ORDERNO     = @P01  " _
                     & "    AND DELFLG     <> @P02; "
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -6994,9 +7134,9 @@ Public Class OIT0003OrderDetail
             SQLcmd = Nothing
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_DELIVERYFLG UPDATE")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_" + I_PARA01 + "UPDATE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_DELIVERYFLG UPDATE"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_" + I_PARA01 + "UPDATE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -7006,7 +7146,7 @@ Public Class OIT0003OrderDetail
         End Try
 
         '○メッセージ表示
-        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -8101,43 +8241,46 @@ Public Class OIT0003OrderDetail
                     WW_RINKAIFLG = True
 
                 End If
-                '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
-                '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
-                'タブ「タンク車明細」へ業務を移行する。
-                '※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
-                If WW_RINKAIFLG = False _
-                    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
-                    '〇(受注TBL)受注進行ステータス更新
-                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()       'DataBase接続
 
-                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_300)
-                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_300, Me.TxtOrderStatus.Text, WW_DUMMY)
-                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300
-                        work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+                '### 入換・積込業者とのやり取りを実施する運用を追加したため下記の処理を廃止(2020/03/30) ##############
+                ''臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
+                ''入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
+                ''タブ「タンク車明細」へ業務を移行する。
+                ''※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
+                'If WW_RINKAIFLG = False _
+                '    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
+                '    '〇(受注TBL)受注進行ステータス更新
+                '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '        SQLcon.Open()       'DataBase接続
 
-                        '○ 画面表示データ復元
-                        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-                        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
-                                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
-                            End If
-                        Next
-                        '○ 画面表示データ保存
-                        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                '        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_310)
+                '        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_310, Me.TxtOrderStatus.Text, WW_DUMMY)
+                '        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310
+                '        work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
 
-                        '### START 受注履歴テーブルの追加(2020/03/26) #############
-                        WW_InsertOrderHistory(SQLcon)
-                        '### END   ################################################
-                    End Using
+                '        '○ 画面表示データ復元
+                '        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                '        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                '            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                '                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                '                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                '            End If
+                '        Next
+                '        '○ 画面表示データ保存
+                '        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
-                    WF_DTAB_CHANGE_NO.Value = "2"
-                    WF_Detail_TABChange()
+                '        '### START 受注履歴テーブルの追加(2020/03/26) #############
+                '        WW_InsertOrderHistory(SQLcon)
+                '        '### END   ################################################
+                '    End Using
 
-                    '〇タンク車所在の更新
-                    WW_TankShozaiSet()
-                End If
+                '    WF_DTAB_CHANGE_NO.Value = "2"
+                '    WF_Detail_TABChange()
+
+                '    '〇タンク車所在の更新
+                '    WW_TankShozaiSet()
+                'End If
+                '#####################################################################################################
                 '#####################################################################################################
 
             End If
@@ -8155,22 +8298,61 @@ Public Class OIT0003OrderDetail
         '　託送指示フラグが"1"(手配)の場合
         If work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_260 _
             AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
-            '手配完了
-            O_VALUE = CONST_ORDERSTATUS_300
+            '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+            '310:手配完了
+            'O_VALUE = CONST_ORDERSTATUS_310
+
+            '### 特に何もしない #########################################################
+
+            '### END   ##################################################################
+            'Exit Sub
+
+            '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+            '★臨海鉄道ではない営業所対応
+            '　営業所＝"仙台新港営業所", 営業所＝"根岸営業所", 営業所＝"四日市営業所"
+            '　受注進行ステータス＝"200:手配"
+        ElseIf (work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 _
+                OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011402 _
+                OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_012401) _
+                AndAlso (work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_200 _
+                         OrElse work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_300) Then
+
+            '　手配連絡フラグが"1"(連絡)、かつ結果受理が"0"(未受理)の場合
+            If work.WF_SEL_CONTACTFLG.Text = "1" AndAlso work.WF_SEL_RESULTFLG.Text = "0" Then
+                '300:手配中(入換積込未確認)
+                O_VALUE = CONST_ORDERSTATUS_300
+
+                '　手配連絡フラグが"1"(連絡)、かつ結果受理が"1"(受理)の場合
+            ElseIf work.WF_SEL_CONTACTFLG.Text = "1" AndAlso work.WF_SEL_RESULTFLG.Text = "1" Then
+                '310:手配完了
+                O_VALUE = CONST_ORDERSTATUS_310
+
+            End If
             Exit Sub
+            '### END   ##################################################################
 
             '　営業所＝"三重塩浜営業所"
             '　受注進行ステータス＝"200:手配"
-            '　託送指示フラグが"1"(手配)の場合
         ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 _
-            AndAlso work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_200 _
-            AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
-            '手配完了
-            O_VALUE = CONST_ORDERSTATUS_300
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = CONST_ORDERSTATUS_200 Then
+            '　託送指示フラグが"1"(手配)の場合
+            If work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                '290:手配中(入換積込未連絡)
+                O_VALUE = CONST_ORDERSTATUS_290
+
+                '　手配連絡フラグが"1"(連絡)の場合
+            ElseIf work.WF_SEL_CONTACTFLG.Text = "1" Then
+                '270:手配中(入換積込指示手配済)
+                O_VALUE = CONST_ORDERSTATUS_270
+
+            End If
+
             Exit Sub
 
         End If
 
+        '◯受注進行ステータスの状態によって値を更新
+        '　入換・積込
         Select Case work.WF_SEL_ORDERSTATUS.Text
                 '受注進行ステータス＝"200:手配中"
                 '受注進行ステータス＝"210:手配中(入換指示入力済)"
@@ -8188,56 +8370,170 @@ Public Class OIT0003OrderDetail
                  BaseDllConst.CONST_ORDERSTATUS_260
 
                 '入換指示入力＝"1:完了"
-                'かつ、積込指示入力＝"1:完了"
-                'かつ、託送指示入力＝"1:完了"の場合
+                'かつ、積込指示入力＝"1:未完了"
+                'かつ、託送指示入力＝"1:未手配"の場合
                 If WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
-                    '手配完了
-                    O_VALUE = CONST_ORDERSTATUS_300
+                    '290:手配中(入換積込未連絡)
+                    O_VALUE = CONST_ORDERSTATUS_290
 
                     '入換指示入力＝"1:完了"
                     'かつ、積込指示入力＝"0:未完了"
-                    'かつ、託送指示入力＝"0:未完了"の場合
+                    'かつ、託送指示入力＝"0:未手配"の場合
                 ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
                     '手配中(入換指示入力済)
                     O_VALUE = CONST_ORDERSTATUS_210
 
                     '入換指示入力＝"0:未完了"
                     'かつ、積込指示入力＝"1:完了"
-                    'かつ、託送指示入力＝"0:未完了"の場合
+                    'かつ、託送指示入力＝"0:未手配"の場合
                 ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
                     '手配中(積込指示入力済)
                     O_VALUE = CONST_ORDERSTATUS_220
 
                     '入換指示入力＝"0:未完了"
                     'かつ、積込指示入力＝"0:未完了"
-                    'かつ、託送指示入力＝"1:完了"の場合
+                    'かつ、託送指示入力＝"1:手配"の場合
                 ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
                     '手配中(託送指示手配済)
                     O_VALUE = CONST_ORDERSTATUS_230
 
                     '入換指示入力＝"0:未完了"
                     'かつ、積込指示入力＝"1:完了"
-                    'かつ、託送指示入力＝"1:完了"の場合
+                    'かつ、託送指示入力＝"1:手配"の場合
                 ElseIf WW_SwapInput = "0" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
                     '手配中(入換指示未入力)
                     O_VALUE = CONST_ORDERSTATUS_240
 
                     '入換指示入力＝"1:完了"
                     'かつ、積込指示入力＝"0:未完了"
-                    'かつ、託送指示入力＝"1:完了"の場合
+                    'かつ、託送指示入力＝"1:手配"の場合
                 ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "0" AndAlso work.WF_SEL_DELIVERYFLG.Text = "1" Then
                     '手配中(積込指示未入力)
                     O_VALUE = CONST_ORDERSTATUS_250
 
                     '入換指示入力＝"1:完了"
                     'かつ、積込指示入力＝"1:完了"
-                    'かつ、託送指示入力＝"0:未完了"の場合
+                    'かつ、託送指示入力＝"0:未手配"の場合
                 ElseIf WW_SwapInput = "1" AndAlso WW_LoadingInput = "1" AndAlso work.WF_SEL_DELIVERYFLG.Text = "0" Then
                     '手配中(託送指示未手配)
                     O_VALUE = CONST_ORDERSTATUS_260
 
                 End If
         End Select
+
+        '◯受注進行ステータスの状態によって値を更新
+        '　入換・積込後の業者連絡
+        Select Case work.WF_SEL_ORDERSTATUS.Text
+                '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+                '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                '受注進行ステータス＝"270:手配中(入換積込指示手配済)"
+                '受注進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
+                '受注進行ステータス＝"290:手配中(入換積込未連絡)"
+                '受注進行ステータス＝"300:手配中(入換積込未確認)"
+            Case BaseDllConst.CONST_ORDERSTATUS_260,
+                         BaseDllConst.CONST_ORDERSTATUS_270,
+                         BaseDllConst.CONST_ORDERSTATUS_280,
+                         BaseDllConst.CONST_ORDERSTATUS_290,
+                         BaseDllConst.CONST_ORDERSTATUS_300
+
+                '託送指示入力＝"1:手配"
+                'かつ、手配連絡＝"1:連絡"
+                'かつ、結果受理＝"1:受理"の場合
+                If work.WF_SEL_DELIVERYFLG.Text = "1" _
+                            AndAlso work.WF_SEL_CONTACTFLG.Text = "1" _
+                            AndAlso work.WF_SEL_RESULTFLG.Text = "1" Then
+                    '310:手配完了
+                    O_VALUE = CONST_ORDERSTATUS_310
+
+                    '託送指示入力＝"0:未手配"
+                    'かつ、手配連絡＝"1:連絡"
+                    'かつ、結果受理＝"0:未受理"の場合
+                ElseIf work.WF_SEL_DELIVERYFLG.Text = "0" _
+                            AndAlso work.WF_SEL_CONTACTFLG.Text = "1" _
+                            AndAlso work.WF_SEL_RESULTFLG.Text = "0" Then
+                    '270:手配中(入換積込指示手配済)
+                    O_VALUE = CONST_ORDERSTATUS_270
+
+                    '託送指示入力＝"0:未手配"
+                    'かつ、手配連絡＝"1:連絡"
+                    'かつ、結果受理＝"1:受理"の場合
+                ElseIf work.WF_SEL_DELIVERYFLG.Text = "0" _
+                            AndAlso work.WF_SEL_CONTACTFLG.Text = "1" _
+                            AndAlso work.WF_SEL_RESULTFLG.Text = "1" Then
+                    '280:手配中(託送指示未手配)入換積込手配連絡（手配・結果受理）
+                    O_VALUE = CONST_ORDERSTATUS_280
+
+                    '託送指示入力＝"1:手配"
+                    'かつ、手配連絡＝"0:未連絡"
+                    'かつ、結果受理＝"0:未受理"の場合
+                ElseIf work.WF_SEL_DELIVERYFLG.Text = "1" _
+                            AndAlso work.WF_SEL_CONTACTFLG.Text = "0" _
+                            AndAlso work.WF_SEL_RESULTFLG.Text = "0" Then
+                    '290:手配中(入換積込未連絡)
+                    O_VALUE = CONST_ORDERSTATUS_290
+
+                    '託送指示入力＝"1:手配"
+                    'かつ、手配連絡＝"1:連絡"
+                    'かつ、結果受理＝"0:未受理"の場合
+                ElseIf work.WF_SEL_DELIVERYFLG.Text = "1" _
+                            AndAlso work.WF_SEL_CONTACTFLG.Text = "1" _
+                            AndAlso work.WF_SEL_RESULTFLG.Text = "0" Then
+                    '300:手配中(入換積込未確認)
+                    O_VALUE = CONST_ORDERSTATUS_300
+
+                End If
+                '### END   ##################################################################
+        End Select
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示設定処理(受注進行ステータス(変更分を反映))
+    ''' </summary>
+    Protected Sub WW_ScreenOrderStatusChgRef(ByVal O_VALUE As String)
+
+        '受注進行ステータスに変更があった場合
+        If O_VALUE <> "" Then
+            '〇(受注TBL)受注進行ステータス更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateOrderStatus(O_VALUE)
+                CODENAME_get("ORDERSTATUS", O_VALUE, Me.TxtOrderStatus.Text, WW_DUMMY)
+                work.WF_SEL_ORDERSTATUS.Text = O_VALUE
+                work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+
+            End Using
+
+            '○ 画面表示データ復元
+            Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+
+            For Each OIT0003row As DataRow In OIT0003WKtbl.Rows
+                If OIT0003row("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                    OIT0003row("ORDERSTATUS") = O_VALUE
+                    OIT0003row("ORDERSTATUSNAME") = Me.TxtOrderStatus.Text
+                End If
+            Next
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+        End If
+
+        '〇 受注ステータスが"310:手配完了"へ変更された場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+            WF_DTAB_CHANGE_NO.Value = "2"
+            WF_Detail_TABChange()
+
+            '### START 受注履歴テーブルの追加(2020/03/26) #############
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                WW_InsertOrderHistory(SQLcon)
+            End Using
+            '### END   ################################################
+
+            '○メッセージ表示
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
+
     End Sub
 
     ''' <summary>
@@ -8267,14 +8563,24 @@ Public Class OIT0003OrderDetail
             WF_Dtab04.Enabled = False
             pnlSummaryArea.Visible = False
 
-            '200:手配, 210～270:手配中の場合は、タブ「タンク車割当」、タブ「入換指示・積込指示」を許可
+            '200:手配, 210～300:手配中の場合は、タブ「タンク車割当」、タブ「入換指示・積込指示」を許可
+            '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+            '   受注進行ステータス＝"270:手配中(入換積込指示手配済)"
+            '   受注進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
+            '   受注進行ステータス＝"290:手配中(入換積込未連絡)"
+            '   受注進行ステータス＝"300:手配中(入換積込未確認)"
+            '### END   ##################################################################
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
             WF_Dtab01.Enabled = True
             WF_Dtab02.Enabled = True
             WF_Dtab03.Enabled = False
@@ -8346,6 +8652,10 @@ Public Class OIT0003OrderDetail
         '100:受注受付, 200:手配, 210:手配中（入換指示入力済）, 220:手配中（積込指示入力済）
         '230:手配中（託送指示手配済）, 240:手配中（入換指示未入力）, 250:手配中（積込指示未入力）
         '260:手配中（託送指示未手配）
+        '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+        '270:手配中(入換積込指示手配済), 280:手配中(託送指示未手配)入換積込手配連絡（手配・結果受理）
+        '290:手配中(入換積込未連絡), 300:手配中(入換積込未確認)
+        '### END   ##################################################################
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
@@ -8353,7 +8663,11 @@ Public Class OIT0003OrderDetail
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
 
             '(実績)積込日
             Me.TxtActualLoadingDate.Enabled = False
@@ -8366,9 +8680,9 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = False
 
-            '受注情報が「300:手配完了」の場合は、(実績)すべての日付の入力を制限
-            '300:手配完了
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            '受注情報が「310:手配完了」の場合は、(実績)すべての日付の入力を制限
+            '310:手配完了
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             '(実績)積込日
             Me.TxtActualLoadingDate.Enabled = True
             '(実績)発日
@@ -8380,9 +8694,9 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
 
-            '受注情報が「310:受注確定」の場合は、(実績)積込日の入力を制限
-            '310:受注確定
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+            '受注情報が「320:受注確定」の場合は、(実績)積込日の入力を制限
+            '320:受注確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 Then
             '(実績)積込日
             Me.TxtActualLoadingDate.Enabled = False
             '(実績)発日
@@ -8508,24 +8822,32 @@ Public Class OIT0003OrderDetail
             '210:手配中（入換指示入力済）, 220:手配中（積込指示入力済）
             '230:手配中（託送指示手配済）, 240:手配中（入換指示未入力）, 250:手配中（積込指示未入力）
             '260:手配中（託送指示未手配）
+            '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+            '270:手配中(入換積込指示手配済), 280:手配中(託送指示未手配)入換積込手配連絡（手配・結果受理）
+            '290:手配中(入換積込未連絡), 300:手配中(入換積込未確認)
+            '### END   ##################################################################
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
 
             '### 特になし ###############################################################
 
-            '受注進行ステータスが「300:手配完了」の場合
-            '300:手配完了
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
-
-            '### 特になし ###############################################################
-
-            '受注進行ステータスが「310:受注確定」の場合
-            '310:受注確定
+            '受注進行ステータスが「310:手配完了」の場合
+            '310:手配完了
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+
+            '### 特になし ###############################################################
+
+            '受注進行ステータスが「320:受注確定」の場合
+            '320:受注確定
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 Then
             '引数１：所在地コード　⇒　変更なし(空白)
             '引数２：タンク車状態　⇒　変更なし(空白)
             '引数３：積車区分　　　⇒　変更あり("F"(積車))
@@ -9579,9 +9901,9 @@ Public Class OIT0003OrderDetail
         '    -1 : dt1はdt2より前の日
         '     1 : dt1はdt2より後の日
         '(実績)積込日 と　現在日付を比較
-        '受注進行ステータスが"300:手配完了"の場合
+        '受注進行ステータスが"310:手配完了"の場合
         If Me.TxtActualLoadingDate.Text <> "" _
-            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             iresult = Date.Parse(Me.TxtActualLoadingDate.Text).CompareTo(DateTime.Today)
             'If iresult = -1 Then
             '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
@@ -9595,9 +9917,9 @@ Public Class OIT0003OrderDetail
         End If
 
         '(実績)発日 と　現在日付を比較
-        '受注進行ステータスが"310:受注確定"の場合
+        '受注進行ステータスが"320:受注確定"の場合
         If Me.TxtActualDepDate.Text <> "" _
-            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 Then
             iresult = Date.Parse(Me.TxtActualDepDate.Text).CompareTo(DateTime.Today)
             'If iresult = -1 Then
             '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発日", needsPopUp:=True)
@@ -9853,7 +10175,7 @@ Public Class OIT0003OrderDetail
             WW_FixvalueMasterSearch(OIT0003row("LASTOILCODE") + OIT0003row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0003row("OILCODE") + OIT0003row("ORDERINGTYPE"), WW_GetValue)
 
             '前回黒油
-            If WW_GetValue(2) = "1" Then
+            If WW_GetValue(2) = "1" AndAlso OIT0003row("DELFLG") = "0" Then
                 'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 'OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_83
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
@@ -9866,7 +10188,7 @@ Public Class OIT0003OrderDetail
                 'Exit Sub
 
                 '前回揮発油
-            ElseIf WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3" Then
+            ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso OIT0003row("DELFLG") = "0" Then
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
@@ -9927,7 +10249,7 @@ Public Class OIT0003OrderDetail
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
 
             '高速列車区分＝"1"(高速列車)、かつ型式<>"タキ1000"の場合はエラー
-            If WW_GetValue(5) = "1" And OIT0003row("MODEL") <> "タキ1000" Then
+            If WW_GetValue(5) = "1" AndAlso OIT0003row("MODEL") <> "タキ1000" AndAlso OIT0003row("DELFLG") = "0" Then
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_84
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 
@@ -11364,6 +11686,12 @@ Public Class OIT0003OrderDetail
                     '受注進行ステータス＝"240:手配中(入換指示未入力)"
                     '受注進行ステータス＝"250:手配中(積込指示未入力)"
                     '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                    '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+                    '受注進行ステータス＝"270:手配中(入換積込指示手配済)"
+                    '受注進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
+                    '受注進行ステータス＝"290:手配中(入換積込未連絡)"
+                    '受注進行ステータス＝"300:手配中(入換積込未確認)"
+                    '### END   ##################################################################
                     '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
                 ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
@@ -11371,7 +11699,11 @@ Public Class OIT0003OrderDetail
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 Then
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
@@ -11386,7 +11718,7 @@ Public Class OIT0003OrderDetail
                         Next
                     Next
 
-                    '受注進行ステータスが"300：手配完了"以降のステータスの場合
+                    '受注進行ステータスが"310：手配完了"以降のステータスの場合
                 Else
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
@@ -11420,13 +11752,23 @@ Public Class OIT0003OrderDetail
                 '受注進行ステータス＝"240:手配中(入換指示未入力)"
                 '受注進行ステータス＝"250:手配中(積込指示未入力)"
                 '受注進行ステータス＝"260:手配中(託送指示未手配)"
+                '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+                '受注進行ステータス＝"270:手配中(入換積込指示手配済)"
+                '受注進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
+                '受注進行ステータス＝"290:手配中(入換積込未連絡)"
+                '受注進行ステータス＝"300:手配中(入換積込未確認)"
+                '### END   ##################################################################
                     Case BaseDllConst.CONST_ORDERSTATUS_200,
                          BaseDllConst.CONST_ORDERSTATUS_210,
                          BaseDllConst.CONST_ORDERSTATUS_220,
                          BaseDllConst.CONST_ORDERSTATUS_230,
                          BaseDllConst.CONST_ORDERSTATUS_240,
                          BaseDllConst.CONST_ORDERSTATUS_250,
-                         BaseDllConst.CONST_ORDERSTATUS_260
+                         BaseDllConst.CONST_ORDERSTATUS_260,
+                         BaseDllConst.CONST_ORDERSTATUS_270,
+                         BaseDllConst.CONST_ORDERSTATUS_280,
+                         BaseDllConst.CONST_ORDERSTATUS_290,
+                         BaseDllConst.CONST_ORDERSTATUS_300
                         '五井営業所、甲子営業所、袖ヶ浦営業所の場合
                         '積込列車番号の入力を可能とする。
                         If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _

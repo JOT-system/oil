@@ -1134,6 +1134,7 @@ div[data-generated="1"] td, div[data-generated="1"] th {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
 /* ------------------------------
    CS0013ProfViewでの生成Table
    スタイル定義
@@ -1506,7 +1507,17 @@ div[data-generated="1"] tr.hover td,
 div[data-generated="1"] tr.hover th {
     background-color: #FFDADA !important;
 }
-
+/* ------------------------------
+受注情報有の場合の設定
+------------------------------ */
+div[data-generated="1"] tr.hasOrderInfoValue td,
+div[data-generated="1"] tr.hasOrderInfoValue th {
+    background-color: indianred;
+}
+div[data-generated="1"] tr.hasOrderInfoValue.hover td,
+div[data-generated="1"] tr.hasOrderInfoValue.hover th {
+    background-color: #32a3a3 !important;
+}
 /* ************************ */
 /* タブ下部の入力エリア     */
 /* ************************ */

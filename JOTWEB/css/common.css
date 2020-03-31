@@ -467,6 +467,7 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
 /* 画面名称 */
 #tblTitlebox tr:nth-child(1) td:nth-child(2) {
     font-size: x-large;
+    font-weight:900;
     vertical-align: middle;
     text-align: center;
 }

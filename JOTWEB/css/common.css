@@ -468,10 +468,26 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
 #tblTitlebox tr:nth-child(1) td:nth-child(2) {
     font-size: x-large;
     font-weight:900;
-    background-image:url(../img/oillogo.png);
     vertical-align: middle;
     text-align: center;
+    width:100%;
 }
+#WF_TITLETEXT {
+    overflow:hidden;
+    width:100%;
+}
+#WF_TITLETEXT::before {
+    width: 100px;
+    height: 28px;
+    margin-bottom:0px;
+    margin-right:-20px;
+    background-image: url(../img/oillogo.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    content: "";
+    display: inline-block;
+}
+#tblTitlebox tr:nth-child(1) td:nth-child(2)
 #tblTitlebox tr:nth-child(1) td:nth-child(3) {
     vertical-align:top;
     text-align:left;

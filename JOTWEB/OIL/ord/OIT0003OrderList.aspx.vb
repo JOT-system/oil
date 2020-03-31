@@ -466,8 +466,19 @@ Public Class OIT0003OrderList
         'チェックボックス判定
         For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
             If OIT0003tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                If OIT0003tbl.Rows(i)("OPERATION") = "" AndAlso OIT0003tbl.Rows(i)("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 Then
-                    OIT0003tbl.Rows(i)("OPERATION") = "on"
+                If OIT0003tbl.Rows(i)("OPERATION") = "" Then
+                    If (OIT0003tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_900 _
+                             OrElse OIT0003tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_500 _
+                             OrElse OIT0003tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_550 _
+                             OrElse OIT0003tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_600 _
+                             OrElse OIT0003tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_700 _
+                             OrElse OIT0003tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_800) Then
+                        OIT0003tbl.Rows(i)("OPERATION") = ""
+
+                    Else
+                        OIT0003tbl.Rows(i)("OPERATION") = "on"
+
+                    End If
                 Else
                     OIT0003tbl.Rows(i)("OPERATION") = ""
                 End If
@@ -1301,6 +1312,11 @@ Public Class OIT0003OrderList
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
 
+            '受注キャンセルする情報取得用
+            Dim strOrderSts As String = ""          '受注進行ステータス
+            Dim strDepstation As String = ""        '発駅コード
+            Dim strArrstation As String = ""        '着駅コード
+
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
 
             Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
@@ -1314,6 +1330,9 @@ Public Class OIT0003OrderList
                 If OIT0003UPDrow("OPERATION") = "on" Then
                     PARA01.Value = OIT0003UPDrow("ORDERNO")
                     work.WF_SEL_ORDERNUMBER.Text = OIT0003UPDrow("ORDERNO")
+                    strOrderSts = OIT0003UPDrow("ORDERSTATUS")
+                    strDepstation = OIT0003UPDrow("DEPSTATION")
+                    strArrstation = OIT0003UPDrow("ARRSTATION")
 
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
@@ -1335,6 +1354,59 @@ Public Class OIT0003OrderList
             '### START 受注履歴テーブルの追加(2020/03/26) #############
             WW_InsertOrderHistory(SQLcon)
             '### END   ################################################
+
+            '### START 受注キャンセル時のタンク車所在の更新処理を追加(2020/03/31) ###############################
+            For Each OIT0003His2tblrow In OIT0003His2tbl.Rows
+                Select Case strOrderSts
+                    Case BaseDllConst.CONST_ORDERSTATUS_100
+
+                    '### 何もしない####################
+
+                    Case BaseDllConst.CONST_ORDERSTATUS_200,
+                         BaseDllConst.CONST_ORDERSTATUS_210,
+                         BaseDllConst.CONST_ORDERSTATUS_220,
+                         BaseDllConst.CONST_ORDERSTATUS_230,
+                         BaseDllConst.CONST_ORDERSTATUS_240,
+                         BaseDllConst.CONST_ORDERSTATUS_250,
+                         BaseDllConst.CONST_ORDERSTATUS_260,
+                         BaseDllConst.CONST_ORDERSTATUS_270,
+                         BaseDllConst.CONST_ORDERSTATUS_280,
+                         BaseDllConst.CONST_ORDERSTATUS_290,
+                         BaseDllConst.CONST_ORDERSTATUS_300,
+                         BaseDllConst.CONST_ORDERSTATUS_310,
+                         BaseDllConst.CONST_ORDERSTATUS_320
+                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"))
+
+                    Case BaseDllConst.CONST_ORDERSTATUS_350
+                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                        '引数１：所在地コード　⇒　変更あり(発駅)
+                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        WW_UpdateTankShozai(strDepstation, "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"))
+
+                    Case BaseDllConst.CONST_ORDERSTATUS_400,
+                         BaseDllConst.CONST_ORDERSTATUS_450
+
+                    '### 何もしない####################
+
+                '※"500：検収中"のステータス以降についてはキャンセルができない仕様だが
+                '　条件は追加しておく
+                    Case BaseDllConst.CONST_ORDERSTATUS_500,
+                         BaseDllConst.CONST_ORDERSTATUS_550,
+                         BaseDllConst.CONST_ORDERSTATUS_600,
+                         BaseDllConst.CONST_ORDERSTATUS_700,
+                         BaseDllConst.CONST_ORDERSTATUS_800,
+                         BaseDllConst.CONST_ORDERSTATUS_900
+
+                        '### 何もしない####################
+
+                End Select
+            Next
+            '### END  ###########################################################################################
 
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D DELETE")
@@ -1450,6 +1522,109 @@ Public Class OIT0003OrderList
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' (タンク車所在TBL)所在地の内容を更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
+                                      ByVal I_STATUS As String,
+                                      ByVal I_KBN As String,
+                                      Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal upEmparrDate As Boolean = False,
+                                      Optional ByVal I_EmparrDate As String = Nothing,
+                                      Optional ByVal upActualEmparrDate As Boolean = False,
+                                      Optional ByVal I_ActualEmparrDate As String = Nothing)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLの託送指示フラグを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0005_SHOZAI " _
+                    & "    SET "
+
+            '○ 更新内容が指定されていれば追加する
+            '所在地コード
+            If Not String.IsNullOrEmpty(I_LOCATION) Then
+                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+            End If
+            'タンク車状態コード
+            If Not String.IsNullOrEmpty(I_STATUS) Then
+                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+            End If
+            '積車区分
+            If Not String.IsNullOrEmpty(I_KBN) Then
+                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            '空車着日（予定）
+            If upEmparrDate = True Then
+                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", I_EmparrDate)
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+            End If
+            '空車着日（実績）
+            If upActualEmparrDate = True Then
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+            End If
+
+            SQLStr &=
+                      "        UPDYMD       = @P11, " _
+                    & "        UPDUSER      = @P12, " _
+                    & "        UPDTERMID    = @P13, " _
+                    & "        RECEIVEYMD   = @P14  " _
+                    & "  WHERE TANKNUMBER   = @P01  " _
+                    & "    AND DELFLG      <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA02.Value = C_DELETE_FLG.DELETE
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            If I_TANKNO = "" Then
+                '(一覧)で設定しているタンク車をKEYに更新
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    PARA01.Value = OIT0003row("TANKNO")
+                    SQLcmd.ExecuteNonQuery()
+                Next
+            Else
+                '指定されたタンク車№をKEYに更新
+                PARA01.Value = I_TANKNO
+                SQLcmd.ExecuteNonQuery()
+
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_TANKSHOZAI UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_TANKSHOZAI UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
         End Try
 
     End Sub

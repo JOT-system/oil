@@ -99,9 +99,9 @@
 
             <!-- 着駅 -->
             <div class="inputItem">
-                <a id="WF_ARRSTATION_LABEL">目的</a>
+                <a id="WF_ARRSTATION_LABEL">着駅</a>
                 <a class="ef" id="WF_ARRSTATION" ondblclick="Field_DBclick('TxtArrstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstationCode');">
-                    <asp:TextBox ID="TxtArrstationCode" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
+                    <asp:TextBox ID="TxtArrstationCode" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
                 </a>
                 <a id="WF_ARRSTATION_TEXT" >
                     <asp:Label ID="LblArrstationName" runat="server" CssClass="WF_TEXT"></asp:Label>

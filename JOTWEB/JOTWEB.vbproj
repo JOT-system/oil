@@ -126,6 +126,8 @@
     <Content Include="OIL\css\OIM0005S.css" />
     <Content Include="OIL\css\OIM0004S.css" />
     <Content Include="OIL\css\OIT0002S.css" />
+    <Content Include="OIL\css\OIT0006S.css" />
+    <Content Include="OIL\for\OIT0006OutOfServiceSearch.aspx" />
     <Content Include="OIL\img\404cat.png" />
     <Content Include="OIL\css\ex\bootstrap.min.css" />
     <Content Include="css\common.css" />
@@ -178,6 +180,7 @@
     <Content Include="OIL\inc\OIM0005WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0004WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0001WRKINC.ascx" />
+    <Content Include="OIL\inc\OIT0006WRKINC.ascx" />
     <Content Include="OIL\inv\OIT0004OilStockCreate.aspx" />
     <Content Include="OIL\inv\OIT0004OilStockSearch.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocCondition.aspx" />
@@ -208,6 +211,7 @@
     <Content Include="OIL\ord\OIT0003OrderList.aspx" />
     <Content Include="OIL\ord\OIT0003OrderSearch.aspx" />
     <Content Include="OIL\script\OIT0003B.js" />
+    <Content Include="OIL\script\OIT0006S.js" />
     <Content Include="OIL\script\OIT0004C.js" />
     <Content Include="OIL\script\OIT0005C.js" />
     <Content Include="OIL\script\OIT0005S.js" />
@@ -291,6 +295,13 @@
       <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
     </Compile>
     <Compile Include="OIL\com\EntryHistory.vb" />
+    <Compile Include="OIL\for\OIT0006OutOfServiceSearch.aspx.designer.vb">
+      <DependentUpon>OIT0006OutOfServiceSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\for\OIT0006OutOfServiceSearch.aspx.vb">
+      <DependentUpon>OIT0006OutOfServiceSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="OIL\inc\GRM00002WRKINC.ascx.designer.vb">
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
     </Compile>
@@ -352,6 +363,13 @@
     </Compile>
     <Compile Include="OIL\inc\OIT0001WRKINC.ascx.vb">
       <DependentUpon>OIT0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0006WRKINC.ascx.designer.vb">
+      <DependentUpon>OIT0006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0006WRKINC.ascx.vb">
+      <DependentUpon>OIT0006WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inv\OIT0004OilStockCreate.aspx.designer.vb">
@@ -651,7 +669,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="OIL\dat\" />
-    <Folder Include="OIL\for\" />
     <Folder Include="OIL\pay\" />
   </ItemGroup>
   <ItemGroup>

@@ -32,4 +32,24 @@
     <!-- 着駅(名) -->
     <asp:TextBox ID="WF_SEL_ARRIVALSTATIONNM" runat="server"></asp:TextBox>
 
+    <!-- ■共通 -->
+    <!-- 作成フラグ -->
+    <asp:TextBox ID="WF_SEL_CREATEFLG" runat="server"></asp:TextBox>
+
+    <!-- 更新データ(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
+
+    <!-- 明細画面(タブ１)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB1TBL" runat="server"></asp:TextBox>
+    <!-- 明細画面(タブ２)(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPTAB2TBL" runat="server"></asp:TextBox>
+
+    <!-- 基地コード -->
+    <asp:TextBox ID="WF_SEL_BASECODE" runat="server"></asp:TextBox>
+    <!-- 基地名 -->
+    <asp:TextBox ID="WF_SEL_BASENAME" runat="server"></asp:TextBox>
+
+    <!-- MAPID退避(受注明細画面への遷移制御のため) -->
+    <asp:TextBox ID="WF_SEL_MAPIDBACKUP" runat="server"></asp:TextBox>
+
 </div>

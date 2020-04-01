@@ -1,0 +1,31 @@
+﻿/* 左ヘッダー行スタイル */
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 37px;
+}
+
+/* 右ヘッダー行スタイル */
+div[data-generated="1"] div[id$="_HR"] table tr {
+    height: 37px;
+}
+
+/* 左(固定データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"] {
+    top: 37px;
+}
+/* 右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DR"] {
+    top: 37px;
+}
+
+/* 受付情報のツールチップをOFFにする */
+div[data-generated="1"] td:nth-child(4) {
+    pointer-events: none;
+}
+/* Operetion枠の左マージンを個別指定 */
+.Operation {
+    margin-left: 0.7em;
+}
+/* 横スクロールを出す最小幅を個別指定 */
+.headerboxOnly {
+    min-width: 750px; /* (共通指定 650pxだと小さすぎる為) */
+}

@@ -177,6 +177,7 @@
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
     <Content Include="M00000LOGON.aspx" />
+    <Content Include="OIL\loc\OIT0005TankLocDetail.aspx" />
     <Content Include="OIL\inc\OIT0005WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0004WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0003WRKINC.ascx" />
@@ -322,6 +323,13 @@
     <Compile Include="OIL\inc\GRM00002WRKINC.ascx.vb">
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\loc\OIT0005TankLocDetail.aspx.designer.vb">
+      <DependentUpon>OIT0005TankLocDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\loc\OIT0005TankLocDetail.aspx.vb">
+      <DependentUpon>OIT0005TankLocDetail.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\OIT0005WRKINC.ascx.designer.vb">
       <DependentUpon>OIT0005WRKINC.ascx</DependentUpon>

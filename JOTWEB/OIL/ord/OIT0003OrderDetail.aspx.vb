@@ -4619,7 +4619,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 受注TBL登録更新
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続文字</param>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrder(ByVal SQLcon As SqlConnection)
 
@@ -5187,7 +5187,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 受注明細TBL登録更新
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続文字</param>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderDetail(ByVal SQLcon As SqlConnection)
 
@@ -5466,7 +5466,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 貨車連結表TBL登録更新
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続文字</param>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateLink(ByVal SQLcon As SqlConnection)
 
@@ -5793,7 +5793,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' (受注TBL)タンク車数更新
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続</param>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderTankCnt(ByVal SQLcon As SqlConnection)
 
@@ -6073,7 +6073,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 受注明細TBL更新
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続</param>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderDetail_TAB2(ByVal SQLcon As SqlConnection)
 
@@ -6165,7 +6165,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 受注TBL更新
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続</param>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrder_TAB3(ByVal SQLcon As SqlConnection)
 
@@ -6263,7 +6263,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 受注明細TBL更新
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続</param>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderDetail_TAB3(ByVal SQLcon As SqlConnection)
 
@@ -6404,7 +6404,7 @@ Public Class OIT0003OrderDetail
     ''' <summary>
     ''' 受注(一覧)表示用
     ''' </summary>
-    ''' <param name="SQLcon"></param>
+    ''' <param name="SQLcon">SQL接続</param>
     ''' <remarks></remarks>
     Protected Sub WW_OrderListTBLSet(ByVal SQLcon As SqlConnection)
 

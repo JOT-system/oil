@@ -1316,6 +1316,7 @@ Public Class OIT0003OrderList
             Dim strOrderSts As String = ""          '受注進行ステータス
             Dim strDepstation As String = ""        '発駅コード
             Dim strArrstation As String = ""        '着駅コード
+            Dim strLinkNoMade As String = ""        '作成_貨車連結順序表№
 
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
 
@@ -1333,6 +1334,7 @@ Public Class OIT0003OrderList
                     strOrderSts = OIT0003UPDrow("ORDERSTATUS")
                     strDepstation = OIT0003UPDrow("DEPSTATION")
                     strArrstation = OIT0003UPDrow("ARRSTATION")
+                    strLinkNoMade = OIT0003UPDrow("TANKLINKNOMADE")
 
                     PARA11.Value = Date.Now
                     PARA12.Value = Master.USERID
@@ -1360,8 +1362,9 @@ Public Class OIT0003OrderList
                 Select Case strOrderSts
                     Case BaseDllConst.CONST_ORDERSTATUS_100
 
-                    '### 何もしない####################
+                        '### 何もしない####################
 
+                    '200:手配　～　310：手配完了
                     Case BaseDllConst.CONST_ORDERSTATUS_200,
                          BaseDllConst.CONST_ORDERSTATUS_210,
                          BaseDllConst.CONST_ORDERSTATUS_220,
@@ -1381,6 +1384,7 @@ Public Class OIT0003OrderList
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"))
 
+                    '350：受注確定
                     Case BaseDllConst.CONST_ORDERSTATUS_350
                         '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
                         '引数１：所在地コード　⇒　変更あり(発駅)
@@ -1388,13 +1392,14 @@ Public Class OIT0003OrderList
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         WW_UpdateTankShozai(strDepstation, "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"))
 
+                    '400：受入確認中, 450:受入確認中(受入日入力)
                     Case BaseDllConst.CONST_ORDERSTATUS_400,
                          BaseDllConst.CONST_ORDERSTATUS_450
 
-                    '### 何もしない####################
+                        '### 何もしない####################
 
-                '※"500：検収中"のステータス以降についてはキャンセルができない仕様だが
-                '　条件は追加しておく
+                    '※"500：検収中"のステータス以降についてはキャンセルができない仕様だが
+                    '　条件は追加しておく
                     Case BaseDllConst.CONST_ORDERSTATUS_500,
                          BaseDllConst.CONST_ORDERSTATUS_550,
                          BaseDllConst.CONST_ORDERSTATUS_600,
@@ -1406,6 +1411,39 @@ Public Class OIT0003OrderList
 
                 End Select
             Next
+
+            '受注進行ステータスの状態によって、貨車連結順序表を利用不可にする。
+            Select Case strOrderSts
+                Case BaseDllConst.CONST_ORDERSTATUS_350,
+                     BaseDllConst.CONST_ORDERSTATUS_400,
+                     BaseDllConst.CONST_ORDERSTATUS_450
+
+                    WW_UpdateLink(strLinkNoMade, "2")
+
+                Case BaseDllConst.CONST_ORDERSTATUS_100,
+                     BaseDllConst.CONST_ORDERSTATUS_200,
+                     BaseDllConst.CONST_ORDERSTATUS_210,
+                     BaseDllConst.CONST_ORDERSTATUS_220,
+                     BaseDllConst.CONST_ORDERSTATUS_230,
+                     BaseDllConst.CONST_ORDERSTATUS_240,
+                     BaseDllConst.CONST_ORDERSTATUS_250,
+                     BaseDllConst.CONST_ORDERSTATUS_260,
+                     BaseDllConst.CONST_ORDERSTATUS_270,
+                     BaseDllConst.CONST_ORDERSTATUS_280,
+                     BaseDllConst.CONST_ORDERSTATUS_290,
+                     BaseDllConst.CONST_ORDERSTATUS_300,
+                     BaseDllConst.CONST_ORDERSTATUS_310,
+                     BaseDllConst.CONST_ORDERSTATUS_320,
+                     BaseDllConst.CONST_ORDERSTATUS_500,
+                     BaseDllConst.CONST_ORDERSTATUS_550,
+                     BaseDllConst.CONST_ORDERSTATUS_600,
+                     BaseDllConst.CONST_ORDERSTATUS_700,
+                     BaseDllConst.CONST_ORDERSTATUS_800,
+                     BaseDllConst.CONST_ORDERSTATUS_900
+
+                    '### 何もしない####################
+
+            End Select
             '### END  ###########################################################################################
 
         Catch ex As Exception
@@ -1431,7 +1469,7 @@ Public Class OIT0003OrderList
     ''' <summary>
     ''' 受注履歴TBL追加処理
     ''' </summary>
-    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlCon">SQL接続</param>
     Private Sub WW_InsertOrderHistory(ByVal SQLcon As SqlConnection)
         Dim WW_GetHistoryNo() As String = {""}
         WW_FixvalueMasterSearch("", "NEWHISTORYNOGET", "", WW_GetHistoryNo)
@@ -1522,6 +1560,92 @@ Public Class OIT0003OrderList
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' (貨車連結順序表TBL)の内容を更新
+    ''' </summary>
+    ''' <param name="I_LINKNO">貨車連結順序表№</param>
+    ''' <param name="I_STATUS">利用可否(1:利用可, 2:利用不可)</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateLink(ByVal I_LINKNO As String,
+                                ByVal I_STATUS As String,
+                                Optional ByVal I_LINKDETAILNO As String = Nothing,
+                                Optional ByVal I_TANKNO As String = Nothing)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･貨車連結順序表TBLのステータスを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0004_LINK " _
+                    & "    SET "
+
+            '○ 更新内容が指定されていれば追加する
+            'ステータス
+            If Not String.IsNullOrEmpty(I_STATUS) Then
+                SQLStr &= String.Format("        STATUS = '{0}', ", I_STATUS)
+            End If
+
+            SQLStr &=
+                      "        UPDYMD       = @P11, " _
+                    & "        UPDUSER      = @P12, " _
+                    & "        UPDTERMID    = @P13, " _
+                    & "        RECEIVEYMD   = @P14  " _
+                    & "  WHERE LINKNO       = @P01  "
+
+            '○ 追加条件が指定されていれば追加する
+            '貨車連結順序表明細№
+            If Not String.IsNullOrEmpty(I_LINKDETAILNO) Then
+                SQLStr &= String.Format("    AND LINKDETAILNO = '{0}', ", I_LINKDETAILNO)
+            End If
+
+            'タンク車№
+            If Not String.IsNullOrEmpty(I_TANKNO) Then
+                SQLStr &= String.Format("    AND TANKNUMBER   = '{0}', ", I_TANKNO)
+            End If
+
+            SQLStr &= "    AND DELFLG      <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  '貨車連結順序表№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = I_LINKNO
+            PARA02.Value = C_DELETE_FLG.DELETE
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L_LINK UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L_LINK UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
         End Try
 
     End Sub

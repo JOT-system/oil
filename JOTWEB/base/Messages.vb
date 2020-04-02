@@ -559,6 +559,10 @@ Public Module Messages
         ''' 受注がキャンセルされているため選択できません。
         ''' </summary>
         Public Const OIL_CANCEL_ENTRY_ORDER As String = "20041"
+        ''' <summary>
+        ''' 回送がキャンセルされているため選択できません。
+        ''' </summary>
+        Public Const OIL_CANCEL_ENTRY_OUTOFSERVICE As String = "20042"
 #End Region
 
 

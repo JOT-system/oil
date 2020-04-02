@@ -78,7 +78,7 @@
             <!-- 状態 -->
             <div class="inputItem">
                 <a id="WF_STATUS_LABEL">状態</a>
-                <a class="ef" id="WF_STATUS" ondblclick="Field_DBclick('TxtStatus', <%=LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS%>);" onchange="TextBox_change('TxtStatus');">
+                <a class="ef" id="WF_STATUS" ondblclick="Field_DBclick('TxtStatus', <%=LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS%>);" onchange="TextBox_change('TxtStatus');">
                     <asp:TextBox ID="TxtStatus" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="3"></asp:TextBox>
                 </a>
                 <a id="WF_STATUS_TEXT" >
@@ -89,7 +89,7 @@
             <!-- 目的 -->
             <div class="inputItem">
                 <a id="WF_OBJECTIVE_LABEL">目的</a>
-                <a class="ef" id="WF_OBJECTIVE" ondblclick="Field_DBclick('TxtObjective', <%=LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST%>);" onchange="TextBox_change('TxtObjective');">
+                <a class="ef" id="WF_OBJECTIVE" ondblclick="Field_DBclick('TxtObjective', <%=LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE%>);" onchange="TextBox_change('TxtObjective');">
                     <asp:TextBox ID="TxtObjective" runat="server"  CssClass="boxIcon" onblur="MsgClear();" MaxLength="1"></asp:TextBox>
                 </a>
                 <a id="WF_OBJECTIVE_TEXT" >

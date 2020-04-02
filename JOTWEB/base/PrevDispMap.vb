@@ -80,15 +80,15 @@ Public Module PrevDispMap
         ''' <summary>
         ''' 回送検索
         ''' </summary>
-        Public Const OIT0006S As String = "ASP.OIL_ORD_OIT0006OUTOFSERVICESEARCH_ASPX"
+        Public Const OIT0006S As String = "ASP.OIL_FOR_OIT0006OUTOFSERVICESEARCH_ASPX"
         ''' <summary>
         ''' 回送一覧
         ''' </summary>
-        Public Const OIT0006L As String = "ASP.OIL_ORD_OIT0006OUTOFSERVICELIST_ASPX"
+        Public Const OIT0006L As String = "ASP.OIL_FOR_OIT0006OUTOFSERVICELIST_ASPX"
         ''' <summary>
         ''' 回送明細
         ''' </summary>
-        Public Const OIT0006D As String = "ASP.OIL_ORD_OIT0006OUTOFSERVICEDETAIL_ASPX"
+        Public Const OIT0006D As String = "ASP.OIL_FOR_OIT0006OUTOFSERVICEDETAIL_ASPX"
         ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>

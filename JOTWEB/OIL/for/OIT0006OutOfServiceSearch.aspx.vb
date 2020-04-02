@@ -107,7 +107,7 @@ Public Class OIT0006OutOfServiceSearch
             '状態
             Me.TxtStatus.Text = work.WF_SEL_STATUSCODE.Text
             '目的
-            Me.TxtObjective.Text = work.WF_SEL_OBJECTIVECODE.Text
+            Me.TxtObjective.Text = work.WF_SEL_OBJECTIVECODEMAP.Text
             '着駅
             Me.TxtArrstationCode.Text = work.WF_SEL_ARRIVALSTATIONMAP.Text
 
@@ -146,9 +146,9 @@ Public Class OIT0006OutOfServiceSearch
         CODENAME_get("OFFICECODE", Me.TxtSalesOffice.Text, Me.LblSalesOfficeName.Text, WW_DUMMY)
         '状態
         CODENAME_get("STATUS", Me.TxtStatus.Text, Me.LblStatusName.Text, WW_DUMMY)
-        '状態
-        CODENAME_get("DEPARRSTATIONFLG", Me.TxtObjective.Text, Me.LblObjective.Text, WW_DUMMY)
-        '状態
+        '目的
+        CODENAME_get("OBJECTIVECODE", Me.TxtObjective.Text, Me.LblObjective.Text, WW_DUMMY)
+        '着駅
         CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_DUMMY)
 
     End Sub
@@ -200,6 +200,7 @@ Public Class OIT0006OutOfServiceSearch
         work.WF_SEL_STATUSCODE.Text = Me.TxtStatus.Text
         work.WF_SEL_STATUS.Text = Me.LblStatusName.Text
         '目的
+        work.WF_SEL_OBJECTIVECODEMAP.Text = Me.TxtObjective.Text
         work.WF_SEL_OBJECTIVECODE.Text = Me.TxtObjective.Text
         work.WF_SEL_OBJECTIVENAME.Text = Me.LblObjective.Text
         '着駅
@@ -447,7 +448,7 @@ Public Class OIT0006OutOfServiceSearch
                 CODENAME_get("STATUS", Me.TxtStatus.Text, Me.LblStatusName.Text, WW_RTN_SW)
             '目的
             Case "TxtObjective"
-                CODENAME_get("DEPARRSTATIONFLG", Me.TxtObjective.Text, Me.LblObjective.Text, WW_RTN_SW)
+                CODENAME_get("OBJECTIVECODE", Me.TxtObjective.Text, Me.LblObjective.Text, WW_RTN_SW)
             '着駅
             Case "TxtArrstationCode"
                 CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_RTN_SW)
@@ -637,7 +638,7 @@ Public Class OIT0006OutOfServiceSearch
                 Case "STATUS"           '状態
                     prmData = work.CreateORDERSTATUSParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "DEPARRSTATIONFLG" '目的
+                Case "OBJECTIVECODE"    '目的
                     prmData = work.CreateORDERSTATUSParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ARRSTATION"       '着駅

@@ -137,6 +137,10 @@ Public Class GRIS0005LeftBox
         LC_JOINTLIST
         LC_STACKING
         LC_TANKNUMBERLINK
+        LC_KAISOUSTATUS
+        LC_KAISOUINFO
+        LC_KAISOUTYPE
+        LC_OBJECTIVECODE
     End Enum
 
     ''' <summary>
@@ -219,6 +223,10 @@ Public Class GRIS0005LeftBox
         LP_JOINTLIST
         LP_STACKING
         LP_TANKNUMBERLINK
+        LP_KAISOUSTATUS
+        LP_KAISOUINFO
+        LP_KAISOUTYPE
+        LP_OBJECTIVECODE
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -580,6 +588,14 @@ Public Class GRIS0005LeftBox
                 '受注情報
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORDERINFO"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS
+                '回送進行ステータス
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "KAISOUSTATUS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_KAISOUINFO
+                '回送情報
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "KAISOUINFO"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY
                 '利用可否
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "USEPROPRIETY"
@@ -659,6 +675,10 @@ Public Class GRIS0005LeftBox
                 '受注パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORDERPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_KAISOUTYPE
+                '回送パターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "KAISOUPATTERN"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_PRODUCTSEGLIST
                 '品種パターン(受発注用)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN_SEG"
@@ -678,6 +698,10 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST
                 '発着駅フラグ
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "DEPARRSTATIONFLG"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE
+                '目的
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OBJECTIVECODE"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_FILLINGPOINT
                 '充填ポイント

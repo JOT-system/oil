@@ -1,95 +1,96 @@
 Option Strict On
 Imports System.Data.SqlClient
+''' æ–‡å­—ã‚³ãƒ¼ãƒ‰ãƒã‚§ãƒƒã‚¯
 ''' <summary>
-''' ƒRƒ“ƒsƒ…[ƒ^–¼‘¶Ýƒ`ƒFƒbƒN
+''' ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿åå­˜åœ¨ãƒã‚§ãƒƒã‚¯ 
 ''' </summary>
-''' <remarks>Žw’è‚³‚ê‚½’[–––¼‚ªDB‚É“o˜^‚³‚ê‚Ä‚¢‚é‚©Šm”F‚·‚é</remarks>
+''' <remarks>æŒ‡å®šã•ã‚ŒãŸç«¯æœ«åãŒDBã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‹ç¢ºèªã™ã‚‹</remarks>
 Public Structure CS0006TERMchk
 
     ''' <summary>
-    ''' ƒRƒ“ƒsƒ…[ƒ^–¼
+    ''' ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å
     ''' </summary>
-    ''' <value>Šm”F‚·‚éƒRƒ“ƒsƒ…[ƒ^–¼</value>
+    ''' <value>ç¢ºèªã™ã‚‹ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å</value>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property TERMID() As String
 
     ''' <summary>
-    ''' ’[––Ý’u‰ïŽÐ
+    ''' ç«¯æœ«è¨­ç½®ä¼šç¤¾
     ''' </summary>
-    ''' <value>‰ïŽÐƒR[ƒh</value>
-    ''' <returns>’[––Ý’uêŠ‚Ì‰ïŽÐƒR[ƒh</returns>
+    ''' <value>ä¼šç¤¾ã‚³ãƒ¼ãƒ‰</value>
+    ''' <returns>ç«¯æœ«è¨­ç½®å ´æ‰€ã®ä¼šç¤¾ã‚³ãƒ¼ãƒ‰</returns>
     ''' <remarks></remarks>
     Public Property TERMCAMP() As String
 
     ''' <summary>
-    ''' ’[––Ý’u•”
+    ''' ç«¯æœ«è¨­ç½®éƒ¨ç½²
     ''' </summary>
-    ''' <value>•”ƒR[ƒh</value>
-    ''' <returns>’[––Ý’uêŠ‚Ì•”ƒR[ƒh</returns>
+    ''' <value>éƒ¨ç½²ã‚³ãƒ¼ãƒ‰</value>
+    ''' <returns>ç«¯æœ«è¨­ç½®å ´æ‰€ã®éƒ¨ç½²ã‚³ãƒ¼ãƒ‰</returns>
     ''' <remarks></remarks>
     Public Property TERMORG() As String
 
     ''' <summary>
-    ''' ŠÇ—•”
+    ''' ç®¡ç†éƒ¨ç½²
     ''' </summary>
-    ''' <value>•”ƒR[ƒh</value>
-    ''' <returns>’[––ŠÇ—‚Ì•”ƒR[ƒh</returns>
+    ''' <value>éƒ¨ç½²ã‚³ãƒ¼ãƒ‰</value>
+    ''' <returns>ç«¯æœ«ç®¡ç†ã®éƒ¨ç½²ã‚³ãƒ¼ãƒ‰</returns>
     ''' <remarks></remarks>
     Public Property MORG() As String
 
     ''' <summary>
-    ''' ƒGƒ‰[ƒR[ƒh
+    ''' ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
     ''' </summary>
-    ''' <value>ƒGƒ‰[ƒR[ƒh</value>
-    ''' <returns>0;³íA‚»‚êˆÈŠOFƒGƒ‰[</returns>
+    ''' <value>ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰</value>
+    ''' <returns>0;æ­£å¸¸ã€ãã‚Œä»¥å¤–ï¼šã‚¨ãƒ©ãƒ¼</returns>
     ''' <remarks>OK:00000,ERR:00002(Customize),ERR:00003(DBerr),ERR:00005(TERM err)</remarks>
     Public Property ERR() As String
 
 
     ''' <summary>
-    ''' \‘¢‘Ì/ŠÖ”–¼
+    ''' æ§‹é€ ä½“/é–¢æ•°å
     ''' </summary>
     ''' <remarks></remarks>
     Public Const METHOD_NAME As String = "CS0006TERMchk"
 
     ''' <summary>
-    ''' ƒ`ƒFƒbƒNˆ—
+    ''' ãƒã‚§ãƒƒã‚¯å‡¦ç†
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub CS0006TERMchk()
-        'œIn PARAMƒ`ƒFƒbƒN
-        'PARAM01:ƒRƒ“ƒsƒ…[ƒ^–¼
+        'â—In PARAMãƒã‚§ãƒƒã‚¯
+        'PARAM01:ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿å
         If IsNothing(TERMID) Then
             ERR = C_MESSAGE_NO.DLL_IF_ERROR
 
             Dim CS0011LOGWRITE As New CS0011LOGWrite                'LogOutput DirString Get
-            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBƒNƒ‰ƒX–¼
+            CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                'SUBã‚¯ãƒ©ã‚¹å
             CS0011LOGWRITE.INFPOSI = "TERMID"                            '
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT             'ƒƒbƒZ[ƒWƒ^ƒCƒv
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT             'ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¿ã‚¤ãƒ—
             CS0011LOGWRITE.TEXT = C_MESSAGE_TEXT.IN_PARAM_ERROR_TEXT
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DLL_IF_ERROR
-            CS0011LOGWRITE.CS0011LOGWrite()                            'ƒƒOo—Í
+            CS0011LOGWRITE.CS0011LOGWrite()                            'ãƒ­ã‚°å‡ºåŠ›
             Exit Sub
         End If
-        'ƒZƒbƒVƒ‡ƒ“ŠÇ—
+        'ã‚»ãƒƒã‚·ãƒ§ãƒ³ç®¡ç†
         Dim sm As New CS0050SESSION
         '****************
-        '*** ‹¤’ÊéŒ¾ ***
+        '*** å…±é€šå®£è¨€ ***
         '****************
-        'DataBaseÚ‘±•¶Žš
+        'DataBaseæŽ¥ç¶šæ–‡å­—
         Using SQLcon = sm.getConnection
-            'œƒRƒ“ƒsƒ…[ƒ^–¼‚Ì—LŒøƒ`ƒFƒbƒN
+            'â—ã‚³ãƒ³ãƒ”ãƒ¥ãƒ¼ã‚¿åã®æœ‰åŠ¹ãƒã‚§ãƒƒã‚¯
             Try
 
 
-                SQLcon.Open() 'DataBaseÚ‘±(Open)
+                SQLcon.Open() 'DataBaseæŽ¥ç¶š(Open)
 
                 Dim WW_CNT As Integer = 0
                 TERMCAMP = ""
                 TERMORG = ""
 
-                'MessageŒŸõSQL•¶
+                'Messageæ¤œç´¢SQLæ–‡
                 Dim SQLStr As String =
                      "SELECT rtrim(TERMID) as TERMID , rtrim(TERMCAMP) as TERMCAMP , rtrim(TERMORG) as TERMORG , rtrim(MORG) as MORG" _
                    & " FROM  com.OIS0001_TERM " _
@@ -126,12 +127,12 @@ Public Structure CS0006TERMchk
             Catch ex As Exception
 
                 Dim CS0011LOGWrite As New CS0011LOGWrite                    'LogOutput DirString Get
-                CS0011LOGWrite.INFSUBCLASS = METHOD_NAME                    'SUBƒNƒ‰ƒX–¼
-                CS0011LOGWRITE.INFPOSI = "DB:OIS0001_TERM Select"             '
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWRITE.TEXT = ex.ToString()
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ƒƒOo—Í
+                CS0011LOGWrite.INFSUBCLASS = METHOD_NAME                    'SUBã‚¯ãƒ©ã‚¹å
+                CS0011LOGWrite.INFPOSI = "DB:OIS0001_TERM Select"             '
+                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWrite.TEXT = ex.ToString()
+                CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWrite.CS0011LOGWrite()                             'ãƒ­ã‚°å‡ºåŠ›
 
                 ERR = C_MESSAGE_NO.DB_ERROR
 

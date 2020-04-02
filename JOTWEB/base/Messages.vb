@@ -28,6 +28,10 @@ Public Module Messages
         ''' 異常
         ''' </summary>
         Public Const ABORT As String = "A"
+        ''' <summary>
+        ''' 確認
+        ''' </summary>
+        Public Const QUES As String = "Q"
     End Class
 
     ''' <summary>
@@ -518,7 +522,47 @@ Public Module Messages
         ''' 新規受注№が取得できませんでした。
         ''' </summary>
         Public Const OIL_CANNOT_GET_NEW_ORDERNO As String = "20032"
+        ''' <summary>
+        ''' 受注キャンセルしますよろしいですか？
+        ''' </summary>
+        Public Const OIL_CONFIRM_CANCEL_ORDER As String = "20033"
+        ''' <summary>
+        ''' キャンセルデータ未存在
+        ''' </summary>
+        Public Const OIL_CANCELDATA_NOTFOUND As String = "20034"
+        ''' <summary>
+        ''' キャンセル行未存在
+        ''' </summary>
+        Public Const OIL_CANCELLINE_NOTFOUND As String = "20035"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR As String = "20036"
+        ''' <summary>
+        ''' 発送順序重複エラー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_REPEAT_ERROR As String = "20037"
 
+        ''' <summary>
+        ''' 受注作成をスキップした受注提案タンク車数表の日付/列車があります
+        ''' </summary>
+        Public Const OIL_SKIPPED_ORDER_ENTRIES_EXISTS As String = "20038"
+        ''' <summary>
+        ''' 受注提案可能な油槽所ですが、取り扱える列車が存在しないため。「受注提案タンク車数表」を非表示にしました。
+        ''' </summary>
+        Public Const OIL_SUGGEST_TRAIN_NOTEXISTS As String = "20039"
+        ''' <summary>
+        ''' 取り扱える油種が存在しません。油種マスタの確認をしてください。
+        ''' </summary>
+        Public Const OIL_STOCK_OILINFO_NOTEXISTS As String = "20040"
+        ''' <summary>
+        ''' 受注がキャンセルされているため選択できません。
+        ''' </summary>
+        Public Const OIL_CANCEL_ENTRY_ORDER As String = "20041"
+        ''' <summary>
+        ''' 回送がキャンセルされているため選択できません。
+        ''' </summary>
+        Public Const OIL_CANCEL_ENTRY_OUTOFSERVICE As String = "20042"
 #End Region
 
 

@@ -15,6 +15,26 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 手配完了ボタン活性／非活性
+    if (document.getElementById('WF_CONTACTFLG').value === "0") {
+        //活性 
+        document.getElementById("WF_ButtonCONTACT").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonCONTACT").disabled = "disabled";
+    }
+
+    //〇 結果受理ボタン活性／非活性
+    if (document.getElementById('WF_RESULTFLG').value === "0") {
+        //活性 
+        document.getElementById("WF_ButtonRESULT").disabled = "";
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonRESULT").disabled = "disabled";
+    }
+
     //〇 託送指示ボタン活性／非活性
     if (document.getElementById('WF_DELIVERYFLG').value === "0") {
         //活性 
@@ -62,7 +82,8 @@ function InitDisplay() {
         }
         //〇タブ２
         else if (objDtabNo === "1") {
-            if (document.getElementById('WF_MAPButtonControl').value === "1") {
+            if (document.getElementById('WF_MAPButtonControl').value === "1"
+                || document.getElementById('WF_MAPButtonControl').value === "2") {
                 //非活性
                 document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "disabled";
                 document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "disabled";
@@ -142,7 +163,11 @@ function InitDisplay() {
             continue;
         }
         // 一覧表のイベントバインド
-        bindListCommonEvents(arrListId[i], IsPostBack,true);
+        //bindListCommonEvents(arrListId[i], IsPostBack, true);
+        //bindListCommonEvents(pnlListAreaId, IsPostBack);
+        bindListCommonEvents(arrListId[i], IsPostBack, true, true, true, false);
+        // テキストボックスEnter縦移動イベントバインド
+        commonBindEnterToVerticalTabStep();
         // チェックボックス変更
         ChangeCheckBox(arrListId[i]);
     }

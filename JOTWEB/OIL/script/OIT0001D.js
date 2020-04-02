@@ -60,9 +60,11 @@ function InitDisplay() {
     AdjustHeaderFooterContents('detailbox');
     /* 共通一覧のスクロールイベント紐づけ */
     document.getElementById(pnlListAreaId).style.display = "none"; // 一旦レスポンス用
-    bindListCommonEvents(pnlListAreaId, IsPostBack);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, false, true, true,false);
     // チェックボックス
     ChangeCheckBox();
+    // テキストボックスEnter縦移動イベントバインド
+    commonBindEnterToVerticalTabStep();
     document.getElementById(pnlListAreaId).style.display = "block"; // 一旦レスポンス用
     document.forms[0].style.visibility = ''; // 一旦レスポンス用
 }

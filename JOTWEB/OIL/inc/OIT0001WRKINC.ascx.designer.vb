@@ -77,6 +77,15 @@ Partial Public Class OIT0001WRKINC
     Public WithEvents WF_SEL_TRAINNUMBER As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_SEL_STACKINGFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_STACKINGFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_SEL_LINECNT コントロール。
     '''</summary>
     '''<remarks>
@@ -120,7 +129,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INFORMATION As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_EMPTYTURNFLG コントロール。
     '''</summary>
@@ -129,7 +138,7 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_EMPTYTURNFLG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ORDERSALESOFFICE コントロール。
     '''</summary>
@@ -147,7 +156,16 @@ Partial Public Class OIT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TRAIN As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_TRAINNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TRAINNAME As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_DEPARTURESTATION コントロール。
     '''</summary>

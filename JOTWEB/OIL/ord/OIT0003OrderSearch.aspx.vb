@@ -119,6 +119,10 @@ Public Class OIT0003OrderSearch
         Me.TxtUnloading.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtStatus.Attributes("onkeyPress") = "CheckNum()"
 
+        '(予定)積込日・(予定)発日を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
+        Me.TxtDateStart.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.TxtDepDateStart.Attributes("onkeyPress") = "CheckCalendar()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIT0003WRKINC.MAPIDS
         rightview.MAPID = OIT0003WRKINC.MAPIDL

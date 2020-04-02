@@ -2372,6 +2372,77 @@ Public Class OIM0005TankCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            '次回交検年月日(JR）
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRINSPECTIONDATE", OIM0005INProw("JRINSPECTIONDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If OIM0005INProw("JRINSPECTIONDATE") <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(OIM0005INProw("JRINSPECTIONDATE"), "次回交検年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR)入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    Else
+                        OIM0005INProw("JRINSPECTIONDATE") = CDate(OIM0005INProw("JRINSPECTIONDATE")).ToString("yyyy/MM/dd")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR)入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '次回交検年月日
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INSPECTIONDATE", OIM0005INProw("INSPECTIONDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If OIM0005INProw("INSPECTIONDATE") <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(OIM0005INProw("INSPECTIONDATE"), "次回交検年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回交検年月日入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    Else
+                        OIM0005INProw("INSPECTIONDATE") = CDate(OIM0005INProw("INSPECTIONDATE")).ToString("yyyy/MM/dd")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(次回交検年月日入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '次回指定年月日(JR)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRSPECIFIEDDATE", OIM0005INProw("JRSPECIFIEDDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                If OIM0005INProw("JRSPECIFIEDDATE") <> "" Then
+                    '年月日チェック
+                    WW_CheckDate(OIM0005INProw("JRSPECIFIEDDATE"), "次回指定年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
+                    If dateErrFlag = "1" Then
+                        WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)入力エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    Else
+                        OIM0005INProw("JRSPECIFIEDDATE") = CDate(OIM0005INProw("JRSPECIFIEDDATE")).ToString("yyyy/MM/dd")
+                    End If
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)入力エラー)です。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
 
             '次回指定年月日
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "SPECIFIEDDATE", OIM0005INProw("SPECIFIEDDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -2459,78 +2530,6 @@ Public Class OIM0005TankCreate
                 'End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(次回全検時経年入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '次回交検年月日(JR）
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRINSPECTIONDATE", OIM0005INProw("JRINSPECTIONDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                If OIM0005INProw("JRINSPECTIONDATE") <> "" Then
-                    '年月日チェック
-                    WW_CheckDate(OIM0005INProw("JRINSPECTIONDATE"), "次回交検年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
-                    If dateErrFlag = "1" Then
-                        WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR)入力エラー)です。"
-                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                        WW_LINE_ERR = "ERR"
-                        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    Else
-                        OIM0005INProw("JRINSPECTIONDATE") = CDate(OIM0005INProw("JRINSPECTIONDATE")).ToString("yyyy/MM/dd")
-                    End If
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(次回交検年月日(JR)入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '次回交検年月日
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "INSPECTIONDATE", OIM0005INProw("INSPECTIONDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                If OIM0005INProw("INSPECTIONDATE") <> "" Then
-                    '年月日チェック
-                    WW_CheckDate(OIM0005INProw("INSPECTIONDATE"), "次回交検年月日", WW_CS0024FCHECKERR, dateErrFlag)
-                    If dateErrFlag = "1" Then
-                        WW_CheckMES1 = "・更新できないレコード(次回交検年月日入力エラー)です。"
-                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                        WW_LINE_ERR = "ERR"
-                        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    Else
-                        OIM0005INProw("INSPECTIONDATE") = CDate(OIM0005INProw("INSPECTIONDATE")).ToString("yyyy/MM/dd")
-                    End If
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(次回交検年月日入力エラー)です。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-
-            '次回指定年月日(JR)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JRSPECIFIEDDATE", OIM0005INProw("JRSPECIFIEDDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                If OIM0005INProw("JRSPECIFIEDDATE") <> "" Then
-                    '年月日チェック
-                    WW_CheckDate(OIM0005INProw("JRSPECIFIEDDATE"), "次回指定年月日(JR)", WW_CS0024FCHECKERR, dateErrFlag)
-                    If dateErrFlag = "1" Then
-                        WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)入力エラー)です。"
-                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
-                        WW_LINE_ERR = "ERR"
-                        O_RTN = C_MESSAGE_NO.PREREQUISITE_ERROR
-                    Else
-                        OIM0005INProw("JRSPECIFIEDDATE") = CDate(OIM0005INProw("JRSPECIFIEDDATE")).ToString("yyyy/MM/dd")
-                    End If
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(次回指定年月日(JR)入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"

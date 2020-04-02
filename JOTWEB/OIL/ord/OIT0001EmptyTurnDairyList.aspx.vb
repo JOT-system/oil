@@ -260,6 +260,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')               AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
@@ -633,6 +634,7 @@ Public Class OIT0001EmptyTurnDairyList
 
         '本線列車
         work.WF_SEL_TRAIN.Text = ""
+        work.WF_SEL_TRAINNAME.Text = ""
         '発駅
         work.WF_SEL_DEPARTURESTATION.Text = ""
         '着駅
@@ -768,6 +770,7 @@ Public Class OIT0001EmptyTurnDairyList
 
         '本線列車
         work.WF_SEL_TRAIN.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNO")
+        work.WF_SEL_TRAINNAME.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNAME")
         '発駅
         work.WF_SEL_DEPARTURESTATION.Text = OIT0001tbl.Rows(WW_LINECNT)("DEPSTATION")
         '着駅

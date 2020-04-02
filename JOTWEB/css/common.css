@@ -467,9 +467,27 @@ input[type=number][readonly].calendarIcon:not(.iconOnly) {
 /* 画面名称 */
 #tblTitlebox tr:nth-child(1) td:nth-child(2) {
     font-size: x-large;
+    font-weight:900;
     vertical-align: middle;
     text-align: center;
+    width:100%;
 }
+#WF_TITLETEXT {
+    overflow:hidden;
+    width:100%;
+}
+#WF_TITLETEXT::before {
+    width: 100px;
+    height: 28px;
+    margin-bottom:0px;
+    margin-right:-20px;
+    background-image: url(../img/oillogo.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    content: "";
+    display: inline-block;
+}
+#tblTitlebox tr:nth-child(1) td:nth-child(2)
 #tblTitlebox tr:nth-child(1) td:nth-child(3) {
     vertical-align:top;
     text-align:left;
@@ -1134,6 +1152,7 @@ div[data-generated="1"] td, div[data-generated="1"] th {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
 /* ------------------------------
    CS0013ProfViewでの生成Table
    スタイル定義
@@ -1325,6 +1344,65 @@ div[data-generated='1'] tr td > div[style] {
     max-height:24px;
     margin-top:-3px;
 }
+/* ******************** */
+/* テーブル表内のマーク */
+/* ******************** */
+div[data-generated='1'] .safe,
+div[data-generated='1'] .warning,
+div[data-generated='1'] .caution{
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+    text-align: center;
+    font-size: 22px;
+}
+/* これ色設定いずれ不要：文字を表示しないので */
+div[data-generated='1'] .safe {
+    color:green
+}
+div[data-generated='1'] .warning {
+    color:yellow
+}
+div[data-generated='1'] .caution {
+    color:red
+}
+/* 各レベルニ応じた画像設定 */
+/* SAFE用(旧緑●)の設定いずれ、スタイル全消して表示しない */
+div[data-generated='1'] .safe:after {
+    /*margin-top:2px;
+    width: 24px;
+    height: 24px;
+    content: "";
+    display: block;
+    background-image: url('../oil/img/safe.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left:calc(50% - 12px);*/ /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
+}
+/* warning用(旧黄●)の設定 */
+div[data-generated='1'] .warning:after {
+    margin-top:2px;
+    width: 24px;
+    height: 24px;
+    content: "";
+    display: block;
+    background-image: url('../oil/img/warning.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left:calc(50% - 12px); /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
+}
+/* after用(旧赤●)の設定 */
+div[data-generated='1'] .caution:after {
+    margin-top: 3px;
+    width: 21px;
+    height: 21px;
+    content: "";
+    display: block;
+    background-image: url('../oil/img/caution.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left: calc(50% - 10.5px); /* 中央寄せに、全体50%横幅 - (このWidth / 2) */
+}
 div[data-generated='1'] input[type=text],
 div[data-generated='1'] input[type=number]{
     height: 1.6em;
@@ -1447,7 +1525,17 @@ div[data-generated="1"] tr.hover td,
 div[data-generated="1"] tr.hover th {
     background-color: #FFDADA !important;
 }
-
+/* ------------------------------
+受注情報有の場合の設定
+------------------------------ */
+div[data-generated="1"] tr.hasOrderInfoValue td,
+div[data-generated="1"] tr.hasOrderInfoValue th {
+    background-color: indianred;
+}
+div[data-generated="1"] tr.hasOrderInfoValue.hover td,
+div[data-generated="1"] tr.hasOrderInfoValue.hover th {
+    background-color: #32a3a3 !important;
+}
 /* ************************ */
 /* タブ下部の入力エリア     */
 /* ************************ */
@@ -1745,16 +1833,12 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     margin-right: 10px;
 }
 
-
-
-
-
-#pnlCommonMessageText #lblCommonMessageText[data-naeiw="A"]:before {
-    width: 60px;
-    height: 60px;
+#pnlCommonMessageText #lblCommonMessageText[data-naeiw="Q"]:before {
+    width: 30px;
+    height: 30px;
     content: "";
     display: table-cell;
-    background-image: url('../oil/img/a_cat.png');
+    background-image: url('../oil/img/q_cat.png');
     background-repeat: no-repeat;
     background-size: contain;
     float: left;

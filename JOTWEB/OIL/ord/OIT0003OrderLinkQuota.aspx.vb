@@ -335,7 +335,15 @@ Public Class OIT0003OrderLinkQuota
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 1) '削除フラグ
                 PARA1.Value = Master.USER_ORG
                 'PARA1.Value = work.WF_SEL_SALESOFFICECODE.Text
-                PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
+                '### START（2020年3月24日 森川) #############
+                '利用可能日の条件を登録日⇒(予定)積込日へ変更
+                'PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
+                If work.WF_SEL_LODDATE.Text.Equals("") Then
+                    PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
+                Else
+                    PARA2.Value = work.WF_SEL_LODDATE.Text
+                End If
+                '### END  ###################################
                 'PARA3.Value = work.WF_SEL_TRAIN.Text
                 PARA4.Value = C_DELETE_FLG.DELETE
 

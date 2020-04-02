@@ -13,10 +13,17 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001UPDtbl As DataTable                              '更新用テーブル
     Private OIT0001WKtbl As DataTable                               '作業用テーブル
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル
+    Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
     Private Const CONST_DETAIL_TABID As String = "DTL1"             '明細部ID
+
+    '◯交検・全件アラート表示用
+    Private Const CONST_ALERT_STATUS_SAFE As String = "'<div class=""safe""></div>'"
+    Private Const CONST_ALERT_STATUS_WARNING As String = "'<div class=""warning""></div>'"
+    Private Const CONST_ALERT_STATUS_CAUTION As String = "'<div class=""caution""></div>'"
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -191,6 +198,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         'Me.TxtOrderOffice.Text = work.WF_SEL_ORDERSALESOFFICE.Text
         '本線列車
         Me.TxtHeadOfficeTrain.Text = work.WF_SEL_TRAIN.Text
+        Me.TxtHeadOfficeTrainName.Text = work.WF_SEL_TRAINNAME.Text
         '発駅
         Me.TxtDepstation.Text = work.WF_SEL_DEPARTURESTATION.Text
         '着駅
@@ -464,10 +472,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0005.PREORDERINGOILNAME), '')  AS PREORDERINGOILNAME" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
             & "   END                                                                      AS JRINSPECTIONALERT" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
@@ -479,10 +487,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), '')               AS JRINSPECTIONDATE" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '<div style=""text-align:center;font-size:22px;color:red;"">●</div>'" _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN " + CONST_ALERT_STATUS_CAUTION _
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
-            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>'" _
-            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '<div style=""text-align:center;font-size:22px;color:green;"">●</div>'" _
+            & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN " + CONST_ALERT_STATUS_WARNING _
+            & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN " + CONST_ALERT_STATUS_SAFE _
             & "   END                                                                      AS JRALLINSPECTIONALERT" _
             & " , CASE" _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
@@ -1202,6 +1210,18 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
                 'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
+                '積置可否フラグ
+                '(積置列車:T, 非積置列車：N)
+                If WW_GetValue(12) = "T" Then
+                    '"1"(積置あり)を設定
+                    work.WF_SEL_STACKINGFLG.Text = "1"
+                ElseIf WW_GetValue(12) = "N" Then
+                    '"1"(積置なし)を設定
+                    work.WF_SEL_STACKINGFLG.Text = "2"
+                Else
+                    work.WF_SEL_STACKINGFLG.Text = "2"
+                End If
+
                 '発駅
                 TxtDepstation.Text = WW_GetValue(1)
                 CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
@@ -1397,13 +1417,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                         End If
                         Select Case WW_JRINSPECTIONFLG
                             Case "1"
-                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                                 updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                             Case "2"
-                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                                 updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                             Case "3"
-                                updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                                 updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                         End Select
                     Else
@@ -1426,13 +1446,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                         End If
                         Select Case WW_JRALLINSPECTIONFLG
                             Case "1"
-                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                                updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                                 updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                             Case "2"
-                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                                updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                                 updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                             Case "3"
-                                updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                                updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                                 updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                         End Select
                     Else
@@ -1944,16 +1964,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
-        '〇列車重複チェック(同一レコードがすでに登録済みかチェック)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            WW_CheckTrainRepeat(WW_ERRCODE, SQLcon)
-            If WW_ERRCODE = "ERR" Then
-                Exit Sub
-            End If
-        End Using
-
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
             '受注DB追加・更新
@@ -1969,6 +1979,33 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 WW_UpdateOrderDetail(SQLcon)
             End Using
+        End If
+
+        '〇列車重複チェック(同一レコードがすでに登録済みかチェック)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_CheckTrainRepeat(WW_ERRCODE, SQLcon)
+            If WW_ERRCODE = "ERR" Then
+                Exit Sub
+            End If
+        End Using
+
+        '○ 同一レコードチェック
+        If isNormal(WW_ERRCODE) Then
+            ''受注DB追加・更新
+            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            '    SQLcon.Open()       'DataBase接続
+
+            '    WW_UpdateOrder(SQLcon)
+            'End Using
+
+            ''受注明細DB追加・更新
+            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            '    SQLcon.Open()       'DataBase接続
+
+            '    WW_UpdateOrderDetail(SQLcon)
+            'End Using
 
             '◯新規作成(空回日報から作成)したデータの場合
             If work.WF_SEL_EMPTYTURNFLG.Text = "1" Then
@@ -1985,6 +2022,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 SQLcon.Open()       'DataBase接続
                 WW_OrderListTBLSet(SQLcon)
             End Using
+
+            '### START 受注履歴テーブルの追加(2020/03/26) #############
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                WW_InsertOrderHistory(SQLcon)
+            End Using
+            '### END   ################################################
 
         End If
 
@@ -2186,11 +2230,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
                     Select Case WW_JRINSPECTIONFLG
                         Case "1"
-                            OIT0001INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            OIT0001INProw("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                         Case "2"
-                            OIT0001INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            OIT0001INProw("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                         Case "3"
-                            OIT0001INProw("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            OIT0001INProw("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                     End Select
                 Else
                     OIT0001INProw("JRINSPECTIONALERT") = ""
@@ -2212,11 +2256,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
                     Select Case WW_JRALLINSPECTIONFLG
                         Case "1"
-                            OIT0001INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            OIT0001INProw("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                         Case "2"
-                            OIT0001INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            OIT0001INProw("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                         Case "3"
-                            OIT0001INProw("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            OIT0001INProw("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                     End Select
                 Else
                     OIT0001INProw("JRALLINSPECTIONALERT") = ""
@@ -2432,13 +2476,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
                     Select Case WW_JRINSPECTIONFLG
                         Case "1"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                             updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                         Case "2"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                             updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                         Case "3"
-                            updHeader.Item("JRINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                             updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                     End Select
                 Else
@@ -2462,13 +2506,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
                     Select Case WW_JRALLINSPECTIONFLG
                         Case "1"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:red;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
                             updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
                         Case "2"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:yellow;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
                             updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
                         Case "3"
-                            updHeader.Item("JRALLINSPECTIONALERT") = "<div style=""text-align:center;font-size:22px;color:green;"">●</div>"
+                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
                             updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
                     End Select
                 Else
@@ -3006,7 +3050,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "   AND OIT0002.TRAINNO         = @P02 " _
             & "   AND OIT0002.DEPDATE         = @P03 " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
-            & "   AND OIT0002.DELFLG         <> @P05 "
+            & "   AND OIT0002.STACKINGFLG     = @P05 " _
+            & "   AND OIT0002.CONSIGNEECODE   = @P06 " _
+            & "   AND OIT0002.DELFLG         <> @P07 "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -3014,12 +3060,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '積置可否フラグ
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10) '荷受人コード
+                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
-                PARA2.Value = TxtHeadOfficeTrain.Text
-                PARA3.Value = TxtDepDate.Text
+                PARA2.Value = Me.TxtHeadOfficeTrain.Text
+                PARA3.Value = Me.TxtDepDate.Text
                 PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
-                PARA5.Value = C_DELETE_FLG.DELETE
+                PARA5.Value = work.WF_SEL_STACKINGFLG.Text
+                PARA6.Value = work.WF_SEL_CONSIGNEECODE.Text
+                PARA7.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3346,7 +3396,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME    , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION      , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , RETSTATION   , RETSTATIONNAME  , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS, ORDERINFO    " _
-            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , DELIVERYFLG" _
+            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG" _
             & "        , LODDATE      , DEPDATE         , ARRDATE" _
             & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE" _
             & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK           , HTANK               , TTANK" _
@@ -3368,7 +3418,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
             & "        , @P17, @P18, @P19, @P20, @P21, @P22" _
-            & "        , @P95, @P92, @P23, @P94" _
+            & "        , @P95, @P92, @P23, @P96, @P97, @P94" _
             & "        , @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30, @P31" _
             & "        , @P32, @P33, @P34, @P35, @P36" _
@@ -3417,6 +3467,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , EMPTYTURNFLG" _
             & "    , STACKINGFLG" _
             & "    , USEPROPRIETYFLG" _
+            & "    , CONTACTFLG" _
+            & "    , RESULTFLG" _
             & "    , DELIVERYFLG" _
             & "    , LODDATE" _
             & "    , DEPDATE" _
@@ -3520,6 +3572,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA95 As SqlParameter = SQLcmd.Parameters.Add("@P95", SqlDbType.NVarChar, 1)  '空回日報可否フラグ
                 Dim PARA92 As SqlParameter = SQLcmd.Parameters.Add("@P92", SqlDbType.NVarChar, 1)  '積置可否フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 1)  '利用可否フラグ
+                Dim PARA96 As SqlParameter = SQLcmd.Parameters.Add("@P96", SqlDbType.NVarChar, 1)  '手配連絡フラグ
+                Dim PARA97 As SqlParameter = SQLcmd.Parameters.Add("@P97", SqlDbType.NVarChar, 1)  '結果受理フラグ
                 Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.NVarChar, 1)  '託送指示フラグ
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)         '積込日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)         '発日（予定）
@@ -3601,8 +3655,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     'DB更新
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     'PARA01.Value = OIT0001row("ORDERNO")              '受注№
-                    PARA02.Value = TxtHeadOfficeTrain.Text            '本線列車
-                    PARA93.Value = TxtHeadOfficeTrainName.Text        '本線列車名
+                    PARA02.Value = Me.TxtHeadOfficeTrain.Text         '本線列車
+                    PARA93.Value = Me.TxtHeadOfficeTrainName.Text     '本線列車名
                     PARA03.Value = OIT0001row("ORDERYMD")             '受注登録日
                     PARA04.Value = work.WF_SEL_SALESOFFICECODE.Text   '受注営業所コード
                     PARA05.Value = work.WF_SEL_SALESOFFICE.Text       '受注営業所名
@@ -3670,6 +3724,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
 
                     PARA23.Value = "1"                                '利用可否フラグ(1:利用可能)
+                    PARA96.Value = "0"                                '手配連絡フラグ(0:未連絡)
+                    PARA97.Value = "0"                                '結果受理フラグ(0:未受理)
                     PARA94.Value = "0"                                '託送指示フラグ(0:未手配)
                     PARA24.Value = TxtLoadingDate.Text                '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                    '発日（予定）
@@ -3821,7 +3877,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        LINEORDER         = @P33, TANKNO       = @P03, ORDERINFO    = @P34" _
+            & "        TANKNO            = @P03, ORDERINFO    = @P34" _
             & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
             & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK       = @P38" _
@@ -3832,7 +3888,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO            , LINEORDER" _
+            & "        ( ORDERNO         , DETAILNO" _
             & "        , TANKNO          , KAMOKU              , ORDERINFO" _
             & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
             & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
@@ -3844,7 +3900,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02, @P33" _
+            & "        ( @P01, @P02" _
             & "        , @P03, @P04, @P34" _
             & "        , @P23, @P24, @P05, @P35" _
             & "        , @P36, @P37, @P06, @P25" _
@@ -3868,7 +3924,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             " SELECT" _
             & "    ORDERNO" _
             & "    , DETAILNO" _
-            & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , ORDERINFO" _
@@ -3918,7 +3973,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
-                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '入線順
+                'Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '入線順
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
@@ -3971,7 +4026,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     'PARA01.Value = OIT0001row("ORDERNO")             '受注№
                     PARA02.Value = OIT0001row("DETAILNO")             '受注明細№
-                    PARA33.Value = ""                                 '入線順
+                    'PARA33.Value = ""                                 '入線順
                     PARA03.Value = OIT0001row("TANKNO")               'タンク車№
                     PARA04.Value = OIT0001row("KAMOKU")               '費用科目
                     PARA34.Value = ""                                 '受注情報
@@ -4376,6 +4431,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
             & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')               AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
@@ -4824,4 +4880,103 @@ Public Class OIT0001EmptyTurnDairyDetail
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' 受注履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    Private Sub WW_InsertOrderHistory(ByVal SQLcon As SqlConnection)
+        Dim WW_GetHistoryNo() As String = {""}
+        WW_FixvalueMasterSearch("", "NEWHISTORYNOGET", "", WW_GetHistoryNo)
+
+        '◯受注履歴テーブル格納用
+        If IsNothing(OIT0001His1tbl) Then
+            OIT0001His1tbl = New DataTable
+        End If
+
+        If OIT0001His1tbl.Columns.Count <> 0 Then
+            OIT0001His1tbl.Columns.Clear()
+        End If
+        OIT0001His1tbl.Clear()
+
+        '◯受注明細履歴テーブル格納用
+        If IsNothing(OIT0001His2tbl) Then
+            OIT0001His2tbl = New DataTable
+        End If
+
+        If OIT0001His2tbl.Columns.Count <> 0 Then
+            OIT0001His2tbl.Columns.Clear()
+        End If
+        OIT0001His2tbl.Clear()
+
+        '○ 受注TBL検索SQL
+        Dim SQLOrderStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0002.*" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & String.Format(" WHERE OIT0002.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        '○ 受注明細TBL検索SQL
+        Dim SQLOrderDetailStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0003.*" _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & String.Format(" WHERE OIT0003.ORDERNO = '{0}'", work.WF_SEL_ORDERNUMBER.Text)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLOrderStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001His1tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001His1tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using SQLcmd As New SqlCommand(SQLOrderDetailStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001His2tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001His2tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using tran = SQLcon.BeginTransaction
+                '■受注履歴テーブル
+                EntryHistory.InsertOrderHistory(SQLcon, tran, OIT0001His1tbl.Rows(0))
+
+                '■受注明細履歴テーブル
+                For Each OIT0001His2rowtbl In OIT0001His2tbl.Rows
+                    EntryHistory.InsertOrderDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                Next
+
+                'トランザクションコミット
+                tran.Commit()
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D ORDERHISTORY")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D ORDERHISTORY"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
 End Class

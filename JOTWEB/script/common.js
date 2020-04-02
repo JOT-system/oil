@@ -1,6 +1,7 @@
 ﻿/**
  * @fileoverview システム共通JavaScript処理
  */
+var commonKeyEnterProgress = false;
 /**
  * ロード時処理
  * @param {object} なし
@@ -149,6 +150,18 @@ window.addEventListener('DOMContentLoaded', function () {
     /* イベントバインド                     */
     /* ************************************ */
     bindcommonListChangedInput();
+    /* ************************************  */
+    /* 通常テキストフィールドのEntarタブ移動 */
+    /* ************************************  */
+    commonBindNormalEnterToNextTabStep();
+    /* ************************************  */
+    /* ダブルタップイベントの紐づけ(一覧のダブルクリック、および画面右上) */
+    /* ************************************  */
+    commonBindDblTapEvents();
+    /* ************************************  */
+    /* 受注情報行ハイライト                  */
+    /* ************************************  */
+    commonSetHasOrderInfoToHighlight();
 });
 
 // 処理後カーソルを戻す
@@ -1208,6 +1221,7 @@ function getCommonListScrollXpos(listId) {
     }
     return retValue;
 }
+
 /**
  * リストの横スクロール位置をwebStrage(セッションストレージ)に保持する
  * @param {string}listId リスト全体のオブジェクトID
@@ -1351,6 +1365,106 @@ function ListDbClick(obj, lineCnt) {
         document.forms[0].submit();
     }
 }
+var commonTapCnt = 0;
+/**
+ * リストの行およびヘルプのダブルクリックイベントをダブルタップでも反応させる
+ * @return {undefined} なし
+ * @description ダブルタップされたら、ダブルクリックイベントを発火させる
+ */
+function commonBindDblTapEvents() {
+    // タッチイベントが存在しないデバイスか判定
+    if (window.ontouchstart !== null) {
+        // タッチデバイスではない場合終了
+        return;
+    }
+    // ダブルクリックが紐づいているオブジェクトの検索
+    let dblClickObjects = document.querySelectorAll('[ondblclick*="r_boxDisplay("],[ondblclick*="ListDbClick("]');
+    // オブジェクトが存在しない場合は終了
+    if (dblClickObjects === null) {
+        return;
+    }
+    if (dblClickObjects.length === 0) {
+        return;
+    }
+    // ダブルタップ検知イベントのバインド
+    for (let i = 0; i < dblClickObjects.length; i++) {
+        let dblClickObj = dblClickObjects[i];
+        dblClickObj.addEventListener('touchstart', (function (dblClickObj) {
+            return function () {
+                if (!commonTapCnt) {
+                    // タップ回数を増加
+                    commonTapCnt = commonTapCnt + 1;
+
+                    // 350ミリ秒だけ、タップ回数を維持
+                    setTimeout(function () {
+                        commonTapCnt = 0;
+                    }, 350);
+                } else {
+                    // ダブルタップされたら自身に紐づいているダブルクリックイベントを発火
+                    commonTapCnt = 0;
+                    var evt = document.createEvent('MouseEvent');
+                    evt.initMouseEvent('dblclick', !0, !0, window, 0, 0, 0, 0, 0, !1, !1, !1, !1, 0, null);
+                    dblClickObj.dispatchEvent(evt);
+                    event.stopPropagation(); // ブラウザのタップアクション拡大をさせない対策
+                }
+
+            };
+        })(dblClickObj), true);
+    }
+}
+/**
+ * 一覧表の情報列が存在する場合ハイライトする情報を仕込む(cssでハイライトは定義)
+ * @return {undefined} なし
+ * @description 左ボックステーブル表示のフィルタイベント
+ */
+function commonSetHasOrderInfoToHighlight() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        // 情報フィールドが存在するかチェック
+        let orderStatusFieldName = 'ORDERINFONAME';
+        let infoHeader = generatedTable.querySelector("th[cellfieldname='" + orderStatusFieldName + "']");
+        if (infoHeader === null) {
+            //存在しない場合はスキップ
+            continue;
+        }
+        // リストの列番号取得
+        let colIdx = infoHeader.cellIndex;
+        // 右可変行オブジェクトの取得
+        let dataAreaDrObj = document.getElementById(panelId + "_DR");
+        //右可変行が未存在なら終了
+        if (dataAreaDrObj === null) {
+            return;
+        }
+        let rightTableObj = dataAreaDrObj.querySelector('table');
+        if (rightTableObj === null) {
+            return;
+        }
+        let leftTableObj = document.getElementById(panelId + "_DL").querySelector('table');
+        for (let rowIdx = 0, rowlen = rightTableObj.rows.length; rowIdx < rowlen; rowIdx++) {
+            // ありえないがデータ列のインデックス（最大カラム数）が情報カラムの位置より小さい場合
+            if (rightTableObj.rows[rowIdx].cells.length < colIdx) {
+                // ループの終了
+                break;
+            }
+            
+            let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
+            if (cellObj.textContent === '') {
+                continue;
+            }
+            rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+        }
+    }
+}
+
 /**
  * 左ボックステーブル表示の検索ボタン押下時イベント
  * のタグを追加する
@@ -1957,6 +2071,13 @@ function CheckNum() {
         event.preventDefault(); // IEはこれで効く
     }
 }
+// 〇カレンダー値のみ入力可能
+function CheckCalendar() {
+    if (event.keyCode < 47 || event.keyCode > 57) {
+        window.event.returnValue = false; // IEだと効かないので↓追加
+        event.preventDefault(); // IEはこれで効く
+    }
+}
 // 〇全角⇔半角変換
 function ConvartWideCharToNormal(obj) {
     if (obj === null) {
@@ -1978,6 +2099,169 @@ function ConvartWideCharToNormal(obj) {
     repVal = repVal.replace(/[^-^0-9^\.]/g, "");
     //repVal = repVal.match(/-?\d+\.?\d*/);
     obj.value = repVal;
+}
+/**
+ *  リストテーブルを除くテーブルにつきEnterキーで次のテキストボックスにタブを移すイベントバインド
+ * @return {undefined} なし
+ * @description 
+ */
+function commonBindNormalEnterToNextTabStep() {
+    let inputObjList = document.querySelectorAll('input[type=password],div:not([hidden=hidden]) input[type=text]:not([disabled]):not([tabindex="-1"]):not([rownum])');
+    if (inputObjList === null) {
+        return;
+    }
+    /* 画面表示していないオブジェクト判定 */
+    let visibleInputObj = [];
+    for (let i = 0, len = inputObjList.length; i < len; ++i) {
+        if (inputObjList[i].clientWidth === 0) {
+            continue;
+        }
+        let dispStyle = window.getComputedStyle(inputObjList[i]);
+        if (dispStyle.display === 'none') {
+            continue;
+        }
+        visibleInputObj.push(inputObjList[i]);
+
+    }
+
+    for (let i = 0, len = visibleInputObj.length; i < len; ++i) {
+        let textBox = visibleInputObj[i];
+        let nextTextObj = visibleInputObj[0];
+        if (visibleInputObj.length !== i + 1) {
+            nextTextObj = visibleInputObj[i + 1];
+        }
+        textBox.addEventListener('keypress', (function (textBox, nextTextObj) {
+            return function () {
+                if (event.key === 'Enter') {
+                    if (commonKeyEnterProgress === false) {
+                        commonKeyEnterProgress = true; //Enter連打抑止
+                        nextTextObj.focus();
+                        return setTimeout(function () {
+                            commonKeyEnterProgress = false;　///Enter連打抑止
+                        }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に
+                    }
+                }
+            };
+        })(textBox, nextTextObj), true);
+    }
+}
+/**
+ *  リストテーブルのEnterキーで下のテキストにタブを移すイベントバインド
+ * @return {undefined} なし
+ * @description 
+ */
+function commonBindEnterToVerticalTabStep() {
+    let generatedTables = document.querySelectorAll("div[data-generated='1']");
+    if (generatedTables === null) {
+        return;
+    }
+    if (generatedTables.length === 0) {
+        return;
+    }
+    let focusObjKey = document.forms[0].id + "ListFocusObjId";
+    if (sessionStorage.getItem(focusObjKey) !== null) {
+        if (IsPostBack === undefined) {
+            sessionStorage.removeItem(focusObjKey);
+        }
+        if (IsPostBack === '1') {
+            focusObjId = sessionStorage.getItem(focusObjKey);
+            setTimeout(function () {
+                document.getElementById(focusObjId).focus();
+                sessionStorage.removeItem(focusObjKey);
+            }, 10);
+        } else {
+            sessionStorage.removeItem(focusObjKey);
+        }
+
+    }
+
+    for (let i = 0, len = generatedTables.length; i < len; ++i) {
+        let generatedTable = generatedTables[i];
+        let panelId = generatedTable.id;
+        //生成したテーブルオブジェクトのテキストボックス確認
+        let textBoxes = generatedTable.querySelectorAll('input[type=text]');
+        //テキストボックスが無ければ次の描画されたリストテーブルへ
+        if (textBoxes === null) {
+            continue;
+        }
+        // テキストボックスのループ
+        for (let j = 0; j < textBoxes.length; j++) {
+            let textBox = textBoxes[j];
+            let lineCnt = textBox.attributes.getNamedItem("rownum").value;
+            let fieldName = textBox.id.substring(("txt" + panelId).length);
+            fieldName = fieldName.substring(0, fieldName.length - lineCnt.length);
+            let nextTextFieldName = fieldName;
+            if (textBoxes.length === j + 1) {
+                // 最後のテキストボックスは先頭のフィールド
+                nextTextFieldName = textBoxes[0].id.substring(("txt" + panelId).length);
+                nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
+            } else if (textBoxes.length > j + 1) {
+                nextTextFieldName = textBoxes[j + 1].id.substring(("txt" + panelId).length);
+                nextTextFieldName = nextTextFieldName.substring(0, nextTextFieldName.length - lineCnt.length);
+            }
+
+            textBox.dataset.fieldName = fieldName;
+            textBox.dataset.nextTextFieldName = nextTextFieldName;
+            textBox.addEventListener('keypress', (function (textBox, panelId) {
+                return function () {
+                    if (event.key === 'Enter') {
+                        if (commonKeyEnterProgress === false) {
+                            commonKeyEnterProgress = true; //Enter連打抑止
+                            commonListEnterToVerticalTabStep(textBox, panelId);
+                            return setTimeout(function () {
+                                commonKeyEnterProgress = false;　///Enter連打抑止
+                            }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に
+                        }
+                    }
+                 };
+            })(textBox, panelId), true);
+        }
+    }
+}
+/**
+ *  リストテーブルのEnterキーで下のテキストにタブを移すイベント
+ * @param {Node} textBox テキストボックス
+ * @param {string} panelId テキストボックス
+ * @return {undefined} なし
+ * @description 
+ */
+function commonListEnterToVerticalTabStep(textBox, panelId) {
+    let curLineCnt = Number(textBox.attributes.getNamedItem("rownum").value);
+    let fieldName = textBox.dataset.fieldName;
+    let nextTextFieldName = textBox.dataset.nextTextFieldName;
+    let found = false;
+    let focusNode;
+    let maxLineCnt = 999;
+    let targetObjPrefix = "txt" + panelId + fieldName;
+    while (found === false) {
+        curLineCnt = curLineCnt + 1;
+        let targetObj = targetObjPrefix + curLineCnt;
+        focusNode = document.getElementById(targetObj);
+        if (focusNode !== null) {
+            found = true;
+        } else {
+            curLineCnt = 0;
+
+            targetObjPrefix = "txt" + panelId + nextTextFieldName;
+        }
+
+        // 無限ループ抑止
+        if (maxLineCnt === curLineCnt) {
+            found = true;
+        }
+    }
+
+    var parentNodeObj = textBox.parentNode;
+    if (parentNodeObj.hasAttribute('onchange')) {
+        var focusObjKey = document.forms[0].id + "ListFocusObjId";
+        sessionStorage.setItem(focusObjKey, focusNode.id);
+    }
+    //var retValue = sessionStorage.getItem(forcusObjKey);
+    //if (retValue === null) {
+    //    retValue = '';
+    //}
+    focusNode.focus();
+    return;
 }
 /**
  *  リッチテキスト入力画面オープン

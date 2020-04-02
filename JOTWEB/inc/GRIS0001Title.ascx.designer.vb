@@ -50,6 +50,15 @@ Partial Public Class GRIS0001Title
     Protected WithEvents WF_TITLECAMP As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''lblCommonHeaderLeftBottom コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblCommonHeaderLeftBottom As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_TITLEDATE コントロール。
     '''</summary>
     '''<remarks>

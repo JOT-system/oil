@@ -126,6 +126,13 @@ Public Class OIT0002LinkSearch
             End If
         End If
 
+        '空車着駅（発駅）・列車番号を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.WF_RETSTATION_CODE.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_TRAINNO_CODE.Attributes("onkeyPress") = "CheckNum()"
+
+        '利用可能日を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
+        Me.WF_STYMD_CODE.Attributes("onkeyPress") = "CheckCalendar()"
+
         '○ RightBox情報設定
         rightview.MAPIDS = OIT0002WRKINC.MAPIDS
         rightview.MAPID = OIT0002WRKINC.MAPIDL

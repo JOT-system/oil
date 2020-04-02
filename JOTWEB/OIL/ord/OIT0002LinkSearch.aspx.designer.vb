@@ -77,15 +77,6 @@ Partial Public Class OIT0002LinkSearch
     Protected WithEvents WF_STYMD_CODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ENDYMD_CODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ENDYMD_CODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_TRAINNO_CODE コントロール。
     '''</summary>
     '''<remarks>

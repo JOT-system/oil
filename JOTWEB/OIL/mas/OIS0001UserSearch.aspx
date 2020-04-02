@@ -40,14 +40,14 @@
             <div class="inputItem">
                 <a id="WF_STYMD_LABEL" class="requiredMark">有効年月日（開始）</a>
                 <a class="ef" id="WF_STYMD" ondblclick="Field_DBclick('WF_STYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="WF_STYMD_CODE" runat="server" CssClass="calendarIcon"  onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
             </div>
             <!-- 有効年月日(終了） -->
             <div class="inputItem">
                 <a id="WF_ENDYMD_LABEL" >有効年月日（終了）</a>
                 <a class="ef" id="WF_ENDYMD" ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="WF_ENDYMD_CODE" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="WF_ENDYMD_CODE" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
             </div>
 

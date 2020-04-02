@@ -1,0 +1,365 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 1.6em;
+    font-size: 13.5px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-bottom:1px;
+}
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+#divContensbox{
+    height:calc(100% - 2.4em - 1.4em);
+}
+ /* コンテンツの最小横幅 */
+.headerbox, .detailbox,#tabBox {
+    min-width: 1220px;
+}
+.detailbox a {
+    font-size:12.8px;
+}
+.headerbox a {
+    font-size: 0.8em;
+}
+.actionButtonBox {
+    padding:5px;
+}
+/* ************************** */
+/* ヘッダー入力欄の全体の設定 */
+/* ************************** */
+#headerDispArea {
+    padding-left: 20px;
+    padding-bottom: 10px;
+}
+.headerInput {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1190px;
+    box-sizing: border-box;
+}
+/* 1項目のサイズ */
+.headerInput > span {
+    display:inline-block;
+    width:220px;
+    white-space:nowrap;
+    margin:1px;
+}
+.headerInput > span.left {
+    width:250px;
+}
+.headerInput > span.doubleItem {
+    width:470px;
+}
+
+.headerInput > span > a {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 1px;
+}
+/* ヘッダー入力欄の項目名 */
+.headerInput > span > a:nth-child(1) {
+    width:65px;
+}
+/* 最も左に来る列の項目名サイズ */
+.headerInput > span.left > a:nth-child(1),
+.headerInput > span.doubleItem > a:nth-child(1) {
+    width:95px;
+}
+
+/* 入力ボックス */
+.headerInput > span > a:nth-child(2) {
+    width:140px;
+    white-space:nowrap;
+    overflow:hidden;
+}
+/* 【受注パターン】のテキストボックスの長さ */
+.headerInput > span.doubleItem > a:nth-child(2) {
+    width:365px;
+}
+.headerInput > span > a:nth-child(2) input[type=text] {
+    width: 100% !important;
+}
+
+/* ID chkOrderInfoチェックボックス自体を非表示 */
+#chkOrderInfo {
+    display: none;
+}
+    /* チェックボックスの隣のラベルのスタイル(未チェック時) */
+    #chkOrderInfo + label:after {
+        background-color: lightgray;
+        content: "　積置なし";
+        color: white;
+        display: inline-block;
+        font-weight: bold;
+        width: 70px;
+    }
+    /* チェックボックスの隣のラベルのスタイル(未チェック時) */
+    #chkOrderInfo:checked + label:after {
+        background-color: lightgray;
+        content: "　積置あり";
+        color: black;
+        font-weight: bold;
+        width: 70px;
+    }
+
+
+/* ************************** */
+/* ヘッダーエリアの合計欄     */
+/* ************************** */
+/* 車数・kl表(全体) */
+.summaryTable {
+    margin-top:10px;
+    margin-bottom:5px;
+}
+/* 車数・kl表(各行) */
+.summaryTable div {
+    display: flex;
+    vertical-align: middle;
+    align-items: center;
+}
+/* 車数・kl表(セル) */
+.summaryTable div a {
+    display:inline-block;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+/* 車数・kl表一列目の幅 */
+.summaryTable div a:nth-child(1) {
+    width:125px;
+}
+/* 車数・kl表二列目以降の幅 */
+.summaryTable div a:nth-child(n+2) {
+    width:75px;
+    text-align:center;
+}
+
+/* 車数・kl表データセルの枠スタイル */
+.summaryTable div:nth-child(n+2) a:nth-child(n+2) {
+    border: 1px solid;
+    border-color: lightgray;
+}
+
+/* 車数・kl表合計に配置したテキストボックス上記で
+   枠スタイルを設定している為テキストボックス自体の枠は消す */
+.summaryTable input[type=text] {
+    width:100%;
+    border:none;
+    border-radius:0;
+    text-align:right;
+}
+/* 各金額合計表 */
+.summaryAmount {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    height: auto;
+}
+.summaryAmount > * {
+    display:inline-block;
+    vertical-align:middle;
+    overflow:hidden;
+    white-space :nowrap;
+    margin:2px;
+}
+.summaryAmount input[type=text] {
+    width:100%;
+}
+/* 計上月列 */
+.summaryAmount :nth-child(1) {
+    width:120px;
+    text-align:right;
+    height:100%;
+}
+/* 計上月テキストボックス列 */
+.summaryAmount :nth-child(2) {
+    width:80px;
+}
+/* 売上・支払合計金額、文言列 */
+.summaryAmount :nth-child(3),
+.summaryAmount :nth-child(5){
+    width:117px;
+    text-align:right;
+}
+
+/* 売上・支払合計金額テキストボックス列 */
+.summaryAmount :nth-child(4),
+.summaryAmount :nth-child(6){
+    width:135px;
+    text-align:right;
+}
+/* ************** */
+/* 詳細部         */
+/* ************** */
+#detailbox {
+    /* font-size: 13.5px; */
+    /*height: calc(100% - 1.4em);*/ /* コンテンツ全体のフッターメッセージのサイズを引く */
+    position: relative;
+    bottom: 0px;
+    min-height: 230px;
+}
+/* ************** */
+/* タブレイアウト */
+/* ************** */
+#tabBox {
+    width: 100%;
+    background-color: gray;
+    border-top: 2px solid gray;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    font-size: 0;
+}
+#tabBox .leftside {
+    width:auto;
+
+}
+#tabBox .rightSide{
+    margin-left:auto;
+}
+/* 最左タブの左間隔をあける */
+[data-itemelm=tab]:nth-child(1) {
+    margin-left: 2px;
+}
+/* タブ基本設定 */
+[data-itemelm=tab] {
+    font-size: 13.5px;
+    box-sizing: border-box;
+    display: inline-block;
+    min-width: 105px;
+    width: auto;
+    padding: 5px;
+    margin-right: 2px;
+    text-align: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    color: rgba(1, 60, 65, 0.5);
+    background-color: lightgray;
+    border-left: 1px solid lightgray; /* この背景色と線の色は合わせる */
+    border-right: 1px solid lightgray; /* この背景色と線の色は合わせる */
+    border-top: 1px solid lightgray; /* この背景色と線の色は合わせる */
+    border-bottom: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    margin-bottom: -1px;
+}
+/* タブマウスオーバー時設定 */
+[data-itemelm=tab]:hover {
+    cursor:pointer;
+    background-color:rgba(237,237,237,0.5); 
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-top: 1px solid lightgray;
+}
+/* 選択されたタブ設定 */
+[data-itemelm=tab].selected {
+    font-weight:bold;
+    cursor:default;
+    pointer-events:none; /* クリックイベントを発生させない */
+    color: #000000;
+    margin-bottom: -1px;
+    background-color: rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    border-left: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    border-right: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    border-top: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+}
+[data-itemelm=tab].aspNetDisabled {
+    pointer-events:none; /* クリックイベントを発生させない */
+}
+#hideHeader:after {
+    color: white;
+    text-decoration-color: white;
+    font-weight: bold;
+    font-size: 13.5px;
+    height: 100%;
+    display: block;
+    vertical-align: middle;
+    padding-right: 5px;
+    content: "上部隠す"
+}
+#hideHeader.hideHeader:after {
+    content: "上部表示"
+}
+#hideHeader:hover {
+    cursor: pointer;
+    color: white;
+    text-decoration-color: white;
+    text-decoration: underline;
+}
+/* ヘッダー部分を隠す */
+#headerDispArea.hideHeader {
+    display:none;
+}
+/* ************** */
+/* 下段共通レイアウト */
+/* ************** */
+detailBottom {
+    width:100%;
+    height:100%;
+}
+/* 一覧表のくずれ補正 */
+div[id^=pnlListArea] {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin-left: 2px;
+}
+div[data-generated='1'] div[id$='_HR'] {
+    /*position: relative;*/
+}
+div[data-generated='1'] tr td > div[style] {
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+}
+/* 一覧表ヘッダー部の２行補正 */
+/* 左ヘッダー行スタイル,右ヘッダー行スタイル*/
+div[data-generated="1"] div[id$="_HR"] table tr,
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 37px;
+}
+/* 左(固定データテーブル用)DIV,右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"],
+div[data-generated="1"] div[id$="_DR"] {
+    top: 37px; /* ヘッダー行スタイルのheightに合わせる */
+}
+
+/* ******************************** */
+/* タブ「タンク車割当」関連レイアウト */
+/* ******************************** */
+.summaryTable.wariate {
+    margin-left: 5px;
+}
+/* 車数・kl表一列目の幅(「割当後」文言分大きくとる) */
+.summaryTable.wariate:nth-child(2) div a:nth-child(1) {
+    width: 190px;
+    padding-right:5px;
+    text-align:right;
+}
+/* 一覧のReadOnlyの制御 */
+div[id^=pnlListArea] input[type=text][readonly]:not(.iconOnly) {
+    color: #737373;
+    background-color:rgb(240,240,240);
+}
+div[id^=pnlListArea] input[type=text][readonly]:not(.iconOnly):hover {
+    color: #737373;
+    background-color:rgb(240,240,240);
+    border-color:skyblue;
+    background-image:none;
+    box-shadow :none;
+}

@@ -43,7 +43,7 @@ Public Class OIT0006OutOfServiceList
     Private WW_RTN_SW As String = ""
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
-    Private WW_ORDERSTATUS As String = ""                           '受注進行ステータス
+    Private WW_KAISOUSTATUS As String = ""                           '受注進行ステータス
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
@@ -62,9 +62,9 @@ Public Class OIT0006OutOfServiceList
                         Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
                             WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonOUTOFSERVICE_CANCEL" 'キャンセルボタン押下
-                            'WF_ButtonOUTOFSERVICE_CANCEL_Click()
+                            WF_ButtonOUTOFSERVICE_CANCEL_Click()
                         Case "WF_ButtonINSERT"          '回送新規作成ボタン押下
-                            'WF_ButtonINSERT_Click()
+                            WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
@@ -82,11 +82,11 @@ Public Class OIT0006OutOfServiceList
                     End Select
 
                     '○ 一覧再表示処理
-                    'DisplayGrid()
+                    DisplayGrid()
                 End If
             Else
                 '○ 初期化処理
-                'Initialize()
+                Initialize()
             End If
 
             '○ 画面モード(更新・参照)設定
@@ -190,7 +190,7 @@ Public Class OIT0006OutOfServiceList
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
 
-                'MAPDataGet(SQLcon)
+                MAPDataGet(SQLcon)
             End Using
         End If
 
@@ -228,6 +228,161 @@ Public Class OIT0006OutOfServiceList
     End Sub
 
     ''' <summary>
+    ''' 画面表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub MAPDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0006tbl) Then
+            OIT0006tbl = New DataTable
+        End If
+
+        If OIT0006tbl.Columns.Count <> 0 Then
+            OIT0006tbl.Columns.Clear()
+        End If
+
+        OIT0006tbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+
+        Dim SQLStr As String =
+              " SELECT" _
+            & "   0                                                   AS LINECNT" _
+            & " , ''                                                  AS OPERATION" _
+            & " , CAST(OIT0006.UPDTIMSTP AS bigint)                   AS TIMSTP" _
+            & " , 1                                                   AS 'SELECT'" _
+            & " , 0                                                   AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0006.KAISOUNO), '')   　            AS KAISOUNO" _
+            & " , ISNULL(RTRIM(OIT0006.KAISOUTYPE), '')   　          AS KAISOUTYPE" _
+            & " , ISNULL(RTRIM(OIT0006.TRAINNO), '')                  AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0006.TRAINNAME), '')                AS TRAINNAME" _
+            & " , ISNULL(FORMAT(OIT0006.KAISOUYMD, 'yyyy/MM/dd'), '') AS KAISOUYMD" _
+            & " , ISNULL(RTRIM(OIT0006.OFFICECODE), '')               AS OFFICECODE" _
+            & " , ISNULL(RTRIM(OIT0006.OFFICENAME), '')               AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0006.SHIPPERSCODE), '')             AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(OIT0006.SHIPPERSNAME), '')             AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(OIT0006.BASECODE), '')                 AS BASECODE" _
+            & " , ISNULL(RTRIM(OIT0006.BASENAME), '')                 AS BASENAME" _
+            & " , ISNULL(RTRIM(OIT0006.CONSIGNEECODE), '')            AS CONSIGNEECODE" _
+            & " , ISNULL(RTRIM(OIT0006.CONSIGNEENAME), '')            AS CONSIGNEENAME" _
+            & " , ISNULL(RTRIM(OIT0006.DEPSTATION), '')               AS DEPSTATION" _
+            & " , ISNULL(RTRIM(OIT0006.DEPSTATIONNAME), '')           AS DEPSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0006.ARRSTATION), '')               AS ARRSTATION" _
+            & " , ISNULL(RTRIM(OIT0006.ARRSTATIONNAME), '')           AS ARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0006.OBJECTIVECODE), '')            AS OBJECTIVECODE" _
+            & " , ''                                                  AS OBJECTIVENAME" _
+            & " , ISNULL(RTRIM(OIT0006.KAISOUSTATUS), '')             AS KAISOUSTATUS" _
+            & " , ISNULL(RTRIM(OIS0015_1.VALUE1), '')                 AS KAISOUSTATUSNAME" _
+            & " , ISNULL(RTRIM(OIT0006.KAISOUINFO), '')               AS KAISOUINFO" _
+            & " , ISNULL(RTRIM(OIS0015_2.VALUE1), '')                 AS KAISOUINFONAME" _
+            & " , ISNULL(RTRIM(OIT0006.FAREFLG), '')   　             AS FAREFLG" _
+            & " , ISNULL(RTRIM(OIT0006.USEPROPRIETYFLG), '')   　     AS USEPROPRIETYFLG" _
+            & " , ISNULL(FORMAT(OIT0006.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
+            & " , ISNULL(FORMAT(OIT0006.ACTUALDEPDATE, 'yyyy/MM/dd'), '')     AS ACTUALDEPDATE" _
+            & " , ISNULL(FORMAT(OIT0006.ARRDATE, 'yyyy/MM/dd'), '')           AS ARRDATE" _
+            & " , ISNULL(FORMAT(OIT0006.ACTUALARRDATE, 'yyyy/MM/dd'), '')     AS ACTUALARRDATE" _
+            & " , ISNULL(FORMAT(OIT0006.ACCDATE, 'yyyy/MM/dd'), '')           AS ACCDATE" _
+            & " , ISNULL(FORMAT(OIT0006.ACTUALACCDATE, 'yyyy/MM/dd'), '')     AS ACTUALACCDATE" _
+            & " , ISNULL(FORMAT(OIT0006.EMPARRDATE, 'yyyy/MM/dd'), '')        AS EMPARRDATE" _
+            & " , ISNULL(FORMAT(OIT0006.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')  AS ACTUALEMPARRDATE" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALTANK), '')   　           AS TOTALTANK" _
+            & " , ISNULL(RTRIM(OIT0006.ORDERNO), '')                  AS ORDERNO" _
+            & " , ISNULL(FORMAT(OIT0006.KEIJYOYMD, 'yyyy/MM/dd'), '')         AS KEIJYOYMD" _
+            & " , ISNULL(RTRIM(OIT0006.SALSE), '')                   AS SALSE" _
+            & " , ISNULL(RTRIM(OIT0006.SALSETAX), '')                AS SALSETAX" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALSALSE), '')              AS TOTALSALSE" _
+            & " , ISNULL(RTRIM(OIT0006.PAYMENT), '')                 AS PAYMENT" _
+            & " , ISNULL(RTRIM(OIT0006.PAYMENTTAX), '')              AS PAYMENTTAX" _
+            & " , ISNULL(RTRIM(OIT0006.TOTALPAYMENT), '')            AS TOTALPAYMENT" _
+            & " , ISNULL(RTRIM(OIT0006.DELFLG), '')                  AS DELFLG" _
+            & " FROM OIL.OIT0006_KAISOU OIT0006 " _
+            & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
+            & "        VIW0003.ORGCODE    = @P1 " _
+            & "    AND VIW0003.OFFICECODE = OIT0006.OFFICECODE " _
+            & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_1 ON " _
+            & "        OIS0015_1.CLASS   = 'KAISOUSTATUS' " _
+            & "    AND OIS0015_1.KEYCODE = OIT0006.KAISOUSTATUS " _
+            & "  LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
+            & "        OIS0015_2.CLASS   = 'KAISOUINFO' " _
+            & "    AND OIS0015_2.KEYCODE = OIT0006.KAISOUINFO " _
+            & " WHERE OIT0006.DELFLG     <> @P3" _
+            & "   AND OIT0006.DEPDATE    >= @P2"
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '営業所
+        If Not String.IsNullOrEmpty(work.WF_SEL_SALESOFFICECODE.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODE.Text)
+        End If
+        '列車番号
+        If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.TRAINNO = '{0}'", work.WF_SEL_TRAINNUMBER.Text)
+        End If
+        '状態(回送進行ステータス)
+        If Not String.IsNullOrEmpty(work.WF_SEL_STATUSCODE.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.KAISOUSTATUS = '{0}'", work.WF_SEL_STATUSCODE.Text)
+        End If
+        '目的
+        If Not String.IsNullOrEmpty(work.WF_SEL_OBJECTIVECODE.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.OBJECTIVECODE = '{0}'", work.WF_SEL_OBJECTIVECODE.Text)
+        End If
+        '着駅
+        If Not String.IsNullOrEmpty(work.WF_SEL_ARRIVALSTATION.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.ARRSTATION = '{0}'", work.WF_SEL_ARRIVALSTATION.Text)
+        End If
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    OIT0006.KAISOUNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar)     '組織コード
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.DateTime)     '年月日(開始)
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)  '削除フラグ
+
+                PARA1.Value = Master.USER_ORG
+                PARA2.Value = work.WF_SEL_DATE.Text
+                PARA3.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0006tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0006tbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0006row As DataRow In OIT0006tbl.Rows
+                    i += 1
+                    OIT0006row("LINECNT") = i        'LINECNT
+
+                    '◯名称取得
+                    '目的
+                    CODENAME_get("OBJECTIVECODE", OIT0006row("OBJECTIVECODE"), OIT0006row("OBJECTIVENAME"), WW_RTN_SW)
+
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006L SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006L Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
     ''' チェックボックス(選択)クリック処理
     ''' </summary>
     Protected Sub WF_CheckBoxSELECT_Click()
@@ -239,12 +394,12 @@ Public Class OIT0006OutOfServiceList
         For i As Integer = 0 To OIT0006tbl.Rows.Count - 1
             If OIT0006tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
                 If OIT0006tbl.Rows(i)("OPERATION") = "" Then
-                    If (OIT0006tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_900 _
-                             OrElse OIT0006tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_500 _
-                             OrElse OIT0006tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_550 _
-                             OrElse OIT0006tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_600 _
-                             OrElse OIT0006tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_700 _
-                             OrElse OIT0006tbl.Rows(i)("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_800) Then
+                    If (OIT0006tbl.Rows(i)("KAISOUSTATUS") = BaseDllConst.CONST_KAISOUSTATUS_900 _
+                             OrElse OIT0006tbl.Rows(i)("KAISOUSTATUS") = BaseDllConst.CONST_KAISOUSTATUS_500 _
+                             OrElse OIT0006tbl.Rows(i)("KAISOUSTATUS") = BaseDllConst.CONST_KAISOUSTATUS_550 _
+                             OrElse OIT0006tbl.Rows(i)("KAISOUSTATUS") = BaseDllConst.CONST_KAISOUSTATUS_600 _
+                             OrElse OIT0006tbl.Rows(i)("KAISOUSTATUS") = BaseDllConst.CONST_KAISOUSTATUS_700 _
+                             OrElse OIT0006tbl.Rows(i)("KAISOUSTATUS") = BaseDllConst.CONST_KAISOUSTATUS_800) Then
                         OIT0006tbl.Rows(i)("OPERATION") = ""
 
                     Else
@@ -272,7 +427,7 @@ Public Class OIT0006OutOfServiceList
 
         '全チェックボックスON
         For i As Integer = 0 To OIT0006tbl.Rows.Count - 1
-            If OIT0006tbl.Rows(i)("HIDDEN") = "0" AndAlso OIT0006tbl.Rows(i)("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 Then
+            If OIT0006tbl.Rows(i)("HIDDEN") = "0" AndAlso OIT0006tbl.Rows(i)("KAISOUSTATUS") <> BaseDllConst.CONST_KAISOUSTATUS_900 Then
                 OIT0006tbl.Rows(i)("OPERATION") = "on"
             End If
         Next
@@ -316,7 +471,7 @@ Public Class OIT0006OutOfServiceList
         '行が選択されているかチェック
         For Each OIT0006UPDrow In OIT0006tbl.Rows
             If OIT0006UPDrow("OPERATION") = "on" Then
-                If OIT0006UPDrow("ORDERSTATUS") <> BaseDllConst.CONST_ORDERSTATUS_900 Then
+                If OIT0006UPDrow("KAISOUSTATUS") <> BaseDllConst.CONST_KAISOUSTATUS_900 Then
                     SelectChk = True
                 End If
             End If
@@ -334,8 +489,8 @@ Public Class OIT0006OutOfServiceList
             Exit Sub
         End If
 
-        '◯確認メッセージ(受注キャンセルの確認)
-        Master.Output(C_MESSAGE_NO.OIL_CONFIRM_CANCEL_ORDER,
+        '◯確認メッセージ(回送キャンセルの確認)
+        Master.Output(C_MESSAGE_NO.OIL_CONFIRM_CANCEL_KAISOU,
                       C_MESSAGE_TYPE.QUES,
                       needsPopUp:=True,
                       messageBoxTitle:="",
@@ -349,7 +504,101 @@ Public Class OIT0006OutOfServiceList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
-        '### 遷移する項目を書く ##############################
+        '選択行
+        work.WF_SEL_LINECNT.Text = ""
+        '登録日
+        work.WF_SEL_REGISTRATIONDATE.Text = ""
+        '回送営業所(名)
+        work.WF_SEL_KAISOUSALESOFFICE.Text = ""
+        '回送営業所(コード)
+        work.WF_SEL_KAISOUSALESOFFICECODE.Text = ""
+        '荷主(名)
+        work.WF_SEL_SHIPPERSNAME.Text = ""
+        '荷主(コード)
+        work.WF_SEL_SHIPPERSCODE.Text = ""
+        '荷受人(名)
+        work.WF_SEL_CONSIGNEENAME.Text = ""
+        '荷受人(コード)
+        work.WF_SEL_CONSIGNEECODE.Text = ""
+        'パターンコード(名)
+        work.WF_SEL_PATTERNNAME.Text = ""
+        'パターンコード
+        work.WF_SEL_PATTERNCODE.Text = ""
+
+        '回送進行ステータス(名)
+        CODENAME_get("KAISOUSTATUS", BaseDllConst.CONST_KAISOUSTATUS_100, work.WF_SEL_KAISOUSTATUSNM.Text, WW_RTN_SW)
+        '回送進行ステータス(コード)
+        work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_100
+        '回送情報(名)
+        work.WF_SEL_INFORMATIONNM.Text = ""
+        '回送情報(コード)
+        work.WF_SEL_INFORMATION.Text = ""
+
+        '回送№
+        work.WF_SEL_KAISOUNUMBER.Text = ""
+        '回送目的(名)
+        work.WF_SEL_OBJECTIVENAME.Text = ""
+        '回送目的(コード)
+        work.WF_SEL_OBJECTIVECODE.Text = ""
+        '本線列車
+        work.WF_SEL_TRAIN.Text = ""
+        '本線列車名
+        work.WF_SEL_TRAINNAME.Text = ""
+
+        '発駅(名)
+        work.WF_SEL_DEPARTURESTATIONNM.Text = ""
+        '発駅(コード)
+        work.WF_SEL_DEPARTURESTATION.Text = ""
+        '着駅(名)
+        work.WF_SEL_ARRIVALSTATIONNM.Text = ""
+        '着駅(コード)
+        work.WF_SEL_ARRIVALSTATION.Text = ""
+        '合計車数
+        work.WF_SEL_TANKCARTOTAL.Text = "0"
+
+        '発日(予定)
+        work.WF_SEL_DEPDATE.Text = ""
+        '着日(予定)
+        work.WF_SEL_ARRDATE.Text = ""
+        '受入日(予定)
+        work.WF_SEL_ACCDATE.Text = ""
+        '空車着日(予定)
+        work.WF_SEL_EMPARRDATE.Text = ""
+        '発日(実績)
+        work.WF_SEL_ACTUALDEPDATE.Text = ""
+        '着日(実績)
+        work.WF_SEL_ACTUALARRDATE.Text = ""
+        '受入日(実績)
+        work.WF_SEL_ACTUALACCDATE.Text = ""
+        '空車着日(実績)
+        work.WF_SEL_ACTUALEMPARRDATE.Text = ""
+        '受注№
+        work.WF_SEL_ORDERNUMBER.Text = ""
+
+        '計上年月日
+        work.WF_SEL_KEIJYOYMD.Text = ""
+        '売上金額
+        work.WF_SEL_SALSE.Text = "0"
+        '売上消費税額
+        work.WF_SEL_SALSETAX.Text = "0"
+        '売上合計金額
+        work.WF_SEL_TOTALSALSE.Text = "0"
+        '支払金額
+        work.WF_SEL_PAYMENT.Text = "0"
+        '支払消費税額
+        work.WF_SEL_PAYMENTTAX.Text = "0"
+        '支払合計金額
+        work.WF_SEL_TOTALPAYMENT.Text = "0"
+
+        '削除フラグ
+        work.WF_SEL_DELFLG.Text = "0"
+        '作成フラグ(1：新規登録, 2：更新)
+        work.WF_SEL_CREATEFLG.Text = "1"
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0006tbl)
+
+        WF_GridDBclick.Text = ""
 
         '○ 遷移先(登録画面)退避データ保存先の作成
         WW_CreateXMLSaveFile()
@@ -391,19 +640,103 @@ Public Class OIT0006OutOfServiceList
             Exit Sub
         End Try
 
-        ''〇 受注進行ステータスが"900(受注キャンセル)"の場合は何もしない
-        'WW_ORDERSTATUS = OIT0006tbl.Rows(WW_LINECNT)("ORDERSTATUS")
-        'If WW_ORDERSTATUS = BaseDllConst.CONST_ORDERSTATUS_900 Then
-        '    Master.Output(C_MESSAGE_NO.OIL_CANCEL_ENTRY_OUTOFSERVICE, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-        '    Exit Sub
-        'End If
+        '〇 回送進行ステータスが"900(回送キャンセル)"の場合は何もしない
+        WW_KAISOUSTATUS = OIT0006tbl.Rows(WW_LINECNT)("KAISOUSTATUS")
+        If WW_KAISOUSTATUS = BaseDllConst.CONST_KAISOUSTATUS_900 Then
+            Master.Output(C_MESSAGE_NO.OIL_CANCEL_ENTRY_OUTOFSERVICE, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
 
+        '選択行
+        work.WF_SEL_LINECNT.Text = OIT0006tbl.Rows(WW_LINECNT)("LINECNT")
+        '登録日
+        work.WF_SEL_REGISTRATIONDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUYMD")
+        '回送営業所(名)
+        work.WF_SEL_KAISOUSALESOFFICE.Text = OIT0006tbl.Rows(WW_LINECNT)("OFFICENAME")
+        '回送営業所(コード)
+        work.WF_SEL_KAISOUSALESOFFICECODE.Text = OIT0006tbl.Rows(WW_LINECNT)("OFFICECODE")
+        '荷主(名)
+        work.WF_SEL_SHIPPERSNAME.Text = OIT0006tbl.Rows(WW_LINECNT)("SHIPPERSNAME")
+        '荷主(コード)
+        work.WF_SEL_SHIPPERSCODE.Text = OIT0006tbl.Rows(WW_LINECNT)("SHIPPERSCODE")
+        '荷受人(名)
+        work.WF_SEL_CONSIGNEENAME.Text = OIT0006tbl.Rows(WW_LINECNT)("CONSIGNEENAME")
+        '荷受人(コード)
+        work.WF_SEL_CONSIGNEECODE.Text = OIT0006tbl.Rows(WW_LINECNT)("CONSIGNEECODE")
+        'パターンコード(名)
+        work.WF_SEL_PATTERNNAME.Text = ""
+        'パターンコード
+        work.WF_SEL_PATTERNCODE.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUTYPE")
 
-        '### 回送明細に渡す項目をかく
+        '回送進行ステータス(名)
+        work.WF_SEL_KAISOUSTATUSNM.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUSTATUSNM")
+        '回送進行ステータス(コード)
+        work.WF_SEL_KAISOUSTATUS.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUSTATUS")
+        '回送情報(名)
+        work.WF_SEL_INFORMATIONNM.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUINFONM")
+        '回送情報(コード)
+        work.WF_SEL_INFORMATION.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUINFO")
 
+        '回送№
+        work.WF_SEL_KAISOUNUMBER.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUNO")
+        '回送目的(名)
+        work.WF_SEL_OBJECTIVENAME.Text = OIT0006tbl.Rows(WW_LINECNT)("OBJECTIVENAME")
+        '回送目的(コード)
+        work.WF_SEL_OBJECTIVECODE.Text = OIT0006tbl.Rows(WW_LINECNT)("OBJECTIVECODE")
+        '本線列車
+        work.WF_SEL_TRAIN.Text = OIT0006tbl.Rows(WW_LINECNT)("TRAINNO")
+        '本線列車名
+        work.WF_SEL_TRAINNAME.Text = OIT0006tbl.Rows(WW_LINECNT)("TRAINNAME")
 
+        '発駅(名)
+        work.WF_SEL_DEPARTURESTATIONNM.Text = OIT0006tbl.Rows(WW_LINECNT)("DEPSTATIONNAME")
+        '発駅(コード)
+        work.WF_SEL_DEPARTURESTATION.Text = OIT0006tbl.Rows(WW_LINECNT)("DEPSTATION")
+        '着駅(名)
+        work.WF_SEL_ARRIVALSTATIONNM.Text = OIT0006tbl.Rows(WW_LINECNT)("ARRSTATIONNAME")
+        '着駅(コード)
+        work.WF_SEL_ARRIVALSTATION.Text = OIT0006tbl.Rows(WW_LINECNT)("ARRSTATION")
+        '合計車数
+        work.WF_SEL_TANKCARTOTAL.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALTANK")
+
+        '発日(予定)
+        work.WF_SEL_DEPDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("DEPDATE")
+        '着日(予定)
+        work.WF_SEL_ARRDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("ARRDATE")
+        '受入日(予定)
+        work.WF_SEL_ACCDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("ACCDATE")
+        '空車着日(予定)
+        work.WF_SEL_EMPARRDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("EMPARRDATE")
+        '発日(実績)
+        work.WF_SEL_ACTUALDEPDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("ACTUALDEPDATE")
+        '着日(実績)
+        work.WF_SEL_ACTUALARRDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("ACTUALARRDATE")
+        '受入日(実績)
+        work.WF_SEL_ACTUALACCDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("ACTUALACCDATE")
+        '空車着日(実績)
+        work.WF_SEL_ACTUALEMPARRDATE.Text = OIT0006tbl.Rows(WW_LINECNT)("ACTUALEMPARRDATE")
+        '受注№
+        work.WF_SEL_ORDERNUMBER.Text = OIT0006tbl.Rows(WW_LINECNT)("ORDERNO")
+
+        '計上年月日
+        work.WF_SEL_KEIJYOYMD.Text = OIT0006tbl.Rows(WW_LINECNT)("KEIJYOYMD")
+        '売上金額
+        work.WF_SEL_SALSE.Text = OIT0006tbl.Rows(WW_LINECNT)("SALSE")
+        '売上消費税額
+        work.WF_SEL_SALSETAX.Text = OIT0006tbl.Rows(WW_LINECNT)("SALSETAX")
+        '売上合計金額
+        work.WF_SEL_TOTALSALSE.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALSALSE")
+        '支払金額
+        work.WF_SEL_PAYMENT.Text = OIT0006tbl.Rows(WW_LINECNT)("PAYMENT")
+        '支払消費税額
+        work.WF_SEL_PAYMENTTAX.Text = OIT0006tbl.Rows(WW_LINECNT)("PAYMENTTAX")
+        '支払合計金額
+        work.WF_SEL_TOTALPAYMENT.Text = OIT0006tbl.Rows(WW_LINECNT)("TOTALPAYMENT")
+
+        '削除フラグ
+        work.WF_SEL_DELFLG.Text = OIT0006tbl.Rows(WW_LINECNT)("DELFLG")
         '作成フラグ(1：新規登録, 2：更新)
-        work.WF_SEL_CREATEFLG.Text = "1"
+        work.WF_SEL_CREATEFLG.Text = "2"
 
         '○ 状態をクリア
         For Each OIT0006row As DataRow In OIT0006tbl.Rows
@@ -569,6 +902,69 @@ Public Class OIT0006OutOfServiceList
 
         TBLview.Dispose()
         TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' 名称取得
+    ''' </summary>
+    ''' <param name="I_FIELD"></param>
+    ''' <param name="I_VALUE"></param>
+    ''' <param name="O_TEXT"></param>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
+
+        O_TEXT = ""
+        O_RTN = ""
+
+        If I_VALUE = "" Then
+            O_RTN = C_MESSAGE_NO.NORMAL
+            Exit Sub
+        End If
+        Dim prmData As New Hashtable
+
+        Try
+            Select Case I_FIELD
+                Case "CAMPCODE"         '会社コード
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "UORG"             '運用部署
+                    prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "DELFLG"           '削除
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
+
+                Case "KAISOUSTATUS"     '回送進行ステータス
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "KAISOUSTATUS"))
+
+                Case "KAISOUINFO"       '回送情報
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_KAISOUINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "KAISOUINFO"))
+
+                Case "SALESOFFICE"      '営業所
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
+
+                Case "KAISOUTYPE"       '回送パターン
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_KAISOUTYPE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "KAISOUTYPE"))
+
+                Case "OBJECTIVECODE"    '目的
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "OBJECTIVECODE"))
+
+                Case "DEPSTATION"       '発駅
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPSTATION"))
+
+                Case "ARRSTATION"       '着駅
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ARRSTATION"))
+
+                Case "TANKNO"           'タンク車
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "TANKNO"))
+
+            End Select
+        Catch ex As Exception
+            O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
+            Exit Sub
+        End Try
 
     End Sub
 

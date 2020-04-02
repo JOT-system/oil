@@ -34,7 +34,8 @@
                             <div class="valueName"><span><%# Eval("Value2Name") %></span></div>
                             <div class="value"><span><%# CDec(Eval("Value2")).ToString("#,##0 両") %></span></div>
                             <div class="button">
-                            <input id="btnShowList" type="button" value="内訳を見る" class="btn-sticky" runat="server" onclick="ButtonClick('WF_ButtonShowList');" />
+                            <input id="btnShowList" type="button" value="内訳を見る" class="btn-sticky" runat="server" onclick='<%# "ButtonClick(""WF_ButtonShowList" & Eval("DetailType") & """);"  %>'
+                               disabled='<%# if(CDec(Eval("Value1")) = 0 AndAlso CDec(Eval("Value2")) = 0, "True", "False") %>' />
                             </div>
                         </div>
                     </ItemTemplate>

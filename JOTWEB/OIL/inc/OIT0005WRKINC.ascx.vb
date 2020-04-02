@@ -7,6 +7,7 @@ Public Class OIT0005WRKINC
     Public Const MAPIDS As String = "OIT0005S"       'MAPID(条件)
     Public Const MAPIDC As String = "OIT0005C"       'MAPID(状況)
     Public Const MAPIDL As String = "OIT0005L"       'MAPID(一覧)
+    Public Const MAPIDD As String = "OIT0005D"       'MAPID(詳細(登録))
 
     '' <summary>
     '' ワークデータ初期化処理
@@ -62,5 +63,44 @@ Public Class OIT0005WRKINC
         End If
         CreateFIXParam = prmData
     End Function
+    ''' <summary>
+    ''' ビューNo取得メソッド
+    ''' </summary>
+    ''' <param name="detailType">状況表種類(1:残車,2:輸送,3:回送,4:その他)</param>
+    ''' <returns></returns>
+    Public Function GetTankViewName(detailType As String) As String
+        Dim viewName As String = ""
+        Select Case detailType
+            Case "1" '残車状況
+                viewName = "OIL.VIW0008_TANKLOC01_ZANSHA"
+            Case "2" '輸送状況
+                viewName = "OIL.VIW0008_TANKLOC02_TRANS"
+            Case "3" '回送状況
+                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+            Case "4" 'その他状況
+                viewName = "OIL.VIW0008_TANKLOC04_OTHERS"
+        End Select
+        Return viewName
+    End Function
+    ''' <summary>
+    ''' ビューソート部分取得メソッド
+    ''' </summary>
+    ''' <param name="detailType">状況表種類(1:残車,2:輸送,3:回送,4:その他)</param>
+    ''' <returns></returns>
+    Public Function GetTankViewOrderByString(detailType As String) As String
+        Dim viewName As String = ""
+        Select Case detailType
+            Case "1" '残車状況
+                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "2" '輸送状況
+                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "3" '回送状況
+                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "4" 'その他状況
+                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+        End Select
+        Return viewName
+    End Function
+
 
 End Class

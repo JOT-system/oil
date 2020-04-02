@@ -7,15 +7,19 @@
 <%@ Register Src="~/OIL/inc/OIT0005WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="OIT0005LH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/OIL/css/OIT0005C.css")%>' rel="stylesheet" type="text/css" />
+    <link href='<%=ResolveUrl("~/OIL/css/OIT0005L.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0005L.js")%>'></script>
+    <script type="text/javascript">
+        var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
+        var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
+    </script>
 </asp:Content>
 <asp:Content ID="OIT0005L" ContentPlaceHolderID="contents1" runat="server">
         <div class="headerboxOnly" id="headerbox">
             <div class="actionButtonBox">
                 <div class="leftSide">
-                    <input type="button" id="WF_ButtonSelectAll"           class="btn-sticky" value="全選択" onclick="ButtonClick('WF_ButtonSelectAll');" />
-                    <input type="button" id="WF_ButtonSelectOff"           class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSelectOff');" />
+<%--                    <input type="button" id="WF_ButtonSelectAll"           class="btn-sticky" value="全選択" onclick="ButtonClick('WF_ButtonSelectAll');" />
+                    <input type="button" id="WF_ButtonSelectOff"           class="btn-sticky" value="選択解除" onclick="ButtonClick('WF_ButtonSelectOff');" />--%>
                 </div>
                 <div class="rightSide">
                     <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
@@ -25,9 +29,7 @@
                     <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   visible="false" onclick="ButtonClick('WF_ButtonLAST');"></div>
                 </div>
             </div> <!-- End class=actionButtonBox -->
-            <div id="CONDITIONAREA">
-
-            </div>
+            <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div> <!-- End class=headerboxOnly -->
     <!-- rightbox レイアウト -->
     <MSINC:rightview id="rightview" runat="server" />

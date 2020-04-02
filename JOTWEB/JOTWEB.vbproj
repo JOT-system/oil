@@ -126,6 +126,7 @@
     <Content Include="OIL\css\OIM0005S.css" />
     <Content Include="OIL\css\OIM0004S.css" />
     <Content Include="OIL\css\OIT0002S.css" />
+    <Content Include="OIL\css\OIT0005L.css" />
     <Content Include="OIL\img\404cat.png" />
     <Content Include="OIL\css\ex\bootstrap.min.css" />
     <Content Include="css\common.css" />
@@ -158,6 +159,8 @@
     <Content Include="OIL\img\q_cat.png" />
     <Content Include="OIL\img\richText.png" />
     <Content Include="OIL\img\statistics.png" />
+    <Content Include="OIL\img\suitekiEmptyIcon.png" />
+    <Content Include="OIL\img\suitekiIcon.png" />
     <Content Include="OIL\img\tank.png" />
     <Content Include="OIL\img\unlockKey.png" />
     <Content Include="OIL\img\warning.png" />
@@ -210,6 +213,7 @@
     <Content Include="OIL\script\OIT0003B.js" />
     <Content Include="OIL\script\OIT0004C.js" />
     <Content Include="OIL\script\OIT0005C.js" />
+    <Content Include="OIL\script\OIT0005L.js" />
     <Content Include="OIL\script\OIT0005S.js" />
     <Content Include="OIL\script\OIT0004S.js" />
     <Content Include="OIL\script\OIS0001C.js" />

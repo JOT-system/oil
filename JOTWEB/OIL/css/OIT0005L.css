@@ -1,0 +1,21 @@
+﻿.actionButtonBox {
+    margin: 10px;
+    margin-right:0px;
+    padding-right:20px;
+}
+#pnlListArea div.empty:after {
+    content: '';
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    background-size: contain;
+    background-image: url('../img/suitekiEmptyIcon.png');
+}
+#pnlListArea div.full:before {
+    content: '';
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    background-size: contain;
+    background-image: url('../img/suitekiIcon.png');
+}

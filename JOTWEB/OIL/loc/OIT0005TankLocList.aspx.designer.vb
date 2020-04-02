@@ -32,6 +32,15 @@ Partial Public Class OIT0005TankLocList
     Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
     
     '''<summary>
+    '''pnlListArea コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

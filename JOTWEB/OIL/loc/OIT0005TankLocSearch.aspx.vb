@@ -17,6 +17,7 @@ Public Class OIT0005TankLocSearch
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+
     '○ 共通処理結果
     Private WW_ERR_SW As String
     Private WW_RTN_SW As String

@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIT0006OutOfServiceDetail
-    
+
     '''<summary>
     '''WF_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_CAMPCODE_TEXT コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CAMPCODE_TEXT As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_UORG コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_UORG As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_UORG_TEXT コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_UORG_TEXT As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''pnlHeaderInput コントロール。
     '''</summary>
@@ -57,25 +57,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlHeaderInput As Global.System.Web.UI.WebControls.Panel
-    
-    '''<summary>
-    '''TxtKaisouType コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtKaisouType As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''TxtKaisouTypeCode コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtKaisouTypeCode As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtKaisouOrderNo コントロール。
     '''</summary>
@@ -84,7 +66,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtKaisouOrderNo As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtKaisouStatus コントロール。
     '''</summary>
@@ -93,7 +75,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtKaisouStatus As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtKaisouOrderOffice コントロール。
     '''</summary>
@@ -102,7 +84,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtKaisouOrderOffice As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtKaisouOrderOfficeCode コントロール。
     '''</summary>
@@ -111,7 +93,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtKaisouOrderOfficeCode As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtTrainNo コントロール。
     '''</summary>
@@ -120,7 +102,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtTrainNo As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtTrainName コントロール。
     '''</summary>
@@ -129,7 +111,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtTrainName As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtTankCnt コントロール。
     '''</summary>
@@ -138,7 +120,25 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtTankCnt As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''TxtKaisouType コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtKaisouType As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''TxtKaisouTypeCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtKaisouTypeCode As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''TxtDepstationCode コントロール。
     '''</summary>
@@ -147,7 +147,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtDepstationCode As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''LblDepstationName コントロール。
     '''</summary>
@@ -156,7 +156,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents LblDepstationName As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''TxtArrstationCode コントロール。
     '''</summary>
@@ -165,7 +165,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtArrstationCode As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''LblArrstationName コントロール。
     '''</summary>
@@ -174,7 +174,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents LblArrstationName As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''TxtDepDate コントロール。
     '''</summary>
@@ -183,7 +183,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtDepDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtArrDate コントロール。
     '''</summary>
@@ -192,7 +192,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtArrDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtAccDate コントロール。
     '''</summary>
@@ -201,7 +201,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtAccDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtEmparrDate コントロール。
     '''</summary>
@@ -210,7 +210,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtEmparrDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtActualDepDate コントロール。
     '''</summary>
@@ -219,7 +219,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtActualDepDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtActualArrDate コントロール。
     '''</summary>
@@ -228,7 +228,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtActualArrDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtActualAccDate コントロール。
     '''</summary>
@@ -237,7 +237,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtActualAccDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''TxtActualEmparrDate コントロール。
     '''</summary>
@@ -246,7 +246,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtActualEmparrDate As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_Dtab01 コントロール。
     '''</summary>
@@ -255,7 +255,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_Dtab01 As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_Dtab02 コントロール。
     '''</summary>
@@ -264,7 +264,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_Dtab02 As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_DetailMView コントロール。
     '''</summary>
@@ -273,7 +273,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DetailMView As Global.System.Web.UI.WebControls.MultiView
-    
+
     '''<summary>
     '''WF_DView1 コントロール。
     '''</summary>
@@ -282,7 +282,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DView1 As Global.System.Web.UI.WebControls.View
-    
+
     '''<summary>
     '''pnlListArea1 コントロール。
     '''</summary>
@@ -291,7 +291,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlListArea1 As Global.System.Web.UI.WebControls.Panel
-    
+
     '''<summary>
     '''WF_DView2 コントロール。
     '''</summary>
@@ -300,7 +300,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DView2 As Global.System.Web.UI.WebControls.View
-    
+
     '''<summary>
     '''pnlListArea2 コントロール。
     '''</summary>
@@ -309,7 +309,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlListArea2 As Global.System.Web.UI.WebControls.Panel
-    
+
     '''<summary>
     '''rightview コントロール。
     '''</summary>
@@ -318,7 +318,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
-    
+
     '''<summary>
     '''leftview コントロール。
     '''</summary>
@@ -327,7 +327,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-    
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -336,7 +336,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.OIT0006WRKINC
-    
+
     '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>
@@ -345,7 +345,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_GridPosition コントロール。
     '''</summary>
@@ -354,7 +354,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
@@ -363,7 +363,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_FIELD_REP コントロール。
     '''</summary>
@@ -372,7 +372,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_SelectedIndex コントロール。
     '''</summary>
@@ -381,7 +381,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_DISP コントロール。
     '''</summary>
@@ -390,7 +390,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DISP As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_LeftMViewChange コントロール。
     '''</summary>
@@ -399,7 +399,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
@@ -408,7 +408,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_RightViewChange コントロール。
     '''</summary>
@@ -417,7 +417,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
@@ -426,7 +426,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_PrintURL コントロール。
     '''</summary>
@@ -435,7 +435,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_BOXChange コントロール。
     '''</summary>
@@ -444,7 +444,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -453,7 +453,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_MAPpermitcode コントロール。
     '''</summary>
@@ -462,7 +462,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_CREATEFLG コントロール。
     '''</summary>
@@ -471,7 +471,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CREATEFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_CREATELINKFLG コントロール。
     '''</summary>
@@ -480,7 +480,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CREATELINKFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_CONTACTFLG コントロール。
     '''</summary>
@@ -489,7 +489,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CONTACTFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_RESULTFLG コントロール。
     '''</summary>
@@ -498,7 +498,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RESULTFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_DELIVERYFLG コントロール。
     '''</summary>
@@ -507,7 +507,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DELIVERYFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_MAPButtonControl コントロール。
     '''</summary>
@@ -516,7 +516,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPButtonControl As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_DTAB_CHANGE_NO コントロール。
     '''</summary>
@@ -525,7 +525,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DTAB_CHANGE_NO As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''hdnDispHeaderItems コントロール。
     '''</summary>
@@ -534,7 +534,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnDispHeaderItems As Global.System.Web.UI.WebControls.HiddenField
-    
+
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -543,7 +543,7 @@ Partial Public Class OIT0006OutOfServiceDetail
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB.OILMasterPage
         Get
-            Return CType(MyBase.Master,JOTWEB.OILMasterPage)
+            Return CType(MyBase.Master, JOTWEB.OILMasterPage)
         End Get
     End Property
 End Class

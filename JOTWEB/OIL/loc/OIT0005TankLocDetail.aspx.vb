@@ -97,7 +97,7 @@ Public Class OIT0005TankLocDetail
     Protected Sub Initialize()
 
         '○画面ID設定
-        Master.MAPID = OIM0004WRKINC.MAPIDC
+        Master.MAPID = OIT0005WRKINC.MAPIDD
         '○HELP表示有無設定
         Master.dispHelp = False
         '○D&D有無設定
@@ -134,11 +134,11 @@ Public Class OIT0005TankLocDetail
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        '○ 検索画面からの遷移
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0005L Then
-            'Grid情報保存先のファイル名
-            Master.CreateXMLSaveFile()
-        End If
+        ''○ 検索画面からの遷移
+        'If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0005L Then
+        '    'Grid情報保存先のファイル名
+        '    Master.CreateXMLSaveFile()
+        'End If
 
         '○ 名称設定処理
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
@@ -637,9 +637,9 @@ Public Class OIT0005TankLocDetail
     ''' </summary>
     ''' <param name="MESSAGE1"></param>
     ''' <param name="MESSAGE2"></param>
-    ''' <param name="OIM0004row"></param>
+    ''' <param name="OIT0005row"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIM0004row As DataRow = Nothing)
+    Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIT0005row As DataRow = Nothing)
 
         Dim WW_ERR_MES As String = ""
         WW_ERR_MES = MESSAGE1

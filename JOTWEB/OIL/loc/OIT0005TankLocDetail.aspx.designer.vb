@@ -32,6 +32,60 @@ Partial Public Class OIT0005TankLocDetail
     Protected WithEvents WF_Sel_TANKNUMBER As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''LblBranchCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblBranchCode As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtBranchCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtBranchCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblOfficeCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblOfficeCode As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtOfficeCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOfficeCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblLocationCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblLocationCode As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtLocationCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtLocationCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''LblTypeNameKana コントロール。
     '''</summary>
     '''<remarks>

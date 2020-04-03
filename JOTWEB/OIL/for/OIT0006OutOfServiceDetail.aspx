@@ -27,7 +27,6 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
-<%--                <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="油種数登録" onclick="ButtonClick('WF_ButtonINSERT');" />--%>
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
         </div>
@@ -62,8 +61,9 @@
                 <!-- ■　回送パターン　■ -->
                 <span class="doubleItem">
                     <a id="WF_KAISOUTYPE_LABEL" class="requiredMark">回送パターン</a>
-                    <a class="ef" id="WF_KAISOUTYPE">
-                        <asp:TextBox ID="TxtKaisouType" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
+                    <a class="ef" id="WF_KAISOUTYPE" ondblclick="Field_DBclick('TxtKaisouType', <%=LIST_BOX_CLASSIFICATION.LC_KAISOUTYPE%>);" onchange="TextBox_change('TxtKaisouType');">
+                        <asp:TextBox ID="TxtKaisouType" runat="server" ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
+                        <asp:TextBox ID="TxtKaisouTypeCode" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>
                 <span></span>
@@ -91,9 +91,9 @@
                 <!-- ■　回送登録営業所　■ -->
                 <span class="left">
                     <a id="WF_OFFICECODE_LABEL" class="requiredMark">回送登録営業所</a>
-                    <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
-                        <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="20"></asp:TextBox>
-                        <asp:TextBox ID="TxtOrderOfficeCode" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
+                    <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtKaisouOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtKaisouOrderOffice');">
+                        <asp:TextBox ID="TxtKaisouOrderOffice" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="20"></asp:TextBox>
+                        <asp:TextBox ID="TxtKaisouOrderOfficeCode" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                     </a>
                 </span>
                 <!-- ■　本線列車　■ -->
@@ -109,7 +109,7 @@
                     <a class="ef" id="WF_TANKCNT">
                         <asp:TextBox ID="TxtTankCnt" runat="server" onblur="MsgClear();" MaxLength="2"></asp:TextBox>
                     </a>
-                    <input type="button" id="WF_ButtonDETAIL" class="btn-sticky" value="明細を作る" onclick="ButtonClick('WF_ButtonDETAIL');" />
+                    <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="明細を作る" onclick="ButtonClick('WF_ButtonINSERT');" />
                 </span>
                 <span></span>
                 <span></span>

@@ -68,6 +68,15 @@ Partial Public Class OIT0006OutOfServiceDetail
     Protected WithEvents TxtKaisouType As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtKaisouTypeCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtKaisouTypeCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtKaisouOrderNo コントロール。
     '''</summary>
     '''<remarks>
@@ -86,22 +95,22 @@ Partial Public Class OIT0006OutOfServiceDetail
     Protected WithEvents TxtKaisouStatus As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtOrderOffice コントロール。
+    '''TxtKaisouOrderOffice コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOrderOffice As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtKaisouOrderOffice As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtOrderOfficeCode コントロール。
+    '''TxtKaisouOrderOfficeCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtOrderOfficeCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtKaisouOrderOfficeCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtTrainNo コントロール。

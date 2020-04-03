@@ -84,12 +84,10 @@ Public Class OIT0006OutOfServiceDetail
                     'End If
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonINSERT"                'XXXXXボタン押下
+                        Case "WF_ButtonINSERT"                '明細を作るボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"                   '戻るボタン押下
                             WF_ButtonEND_Click()
-                        Case "WF_ButtonDETAIL"               '明細を作るボタン押下
-                            WF_ButtonDETAIL_Click()
                         Case "WF_Field_DBClick"               'フィールドダブルクリック
                             WF_FIELD_DBClick()
                         Case "WF_CheckBoxSELECT"              'チェックボックス(選択)クリック
@@ -582,6 +580,143 @@ Public Class OIT0006OutOfServiceDetail
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_DBClick()
 
+        '〇 回送登録営業所チェック
+        '回送登録営業所が選択されていない場合は、他の検索(LEFTBOX)は表示させない制御をする
+        '※回送登録営業所は他の検索するためのKEYとして使用するため
+        If WF_FIELD.Value <> "TxtKaisouOrderOffice" AndAlso Me.TxtKaisouOrderOffice.Text = "" Then
+            Master.Output(C_MESSAGE_NO.OIL_KAISOUOFFICE_UNSELECT, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Me.TxtArrstationCode.Focus()
+            'WW_CheckERR("回送登録営業所が未選択。", C_MESSAGE_NO.OIL_KAISOUOFFICE_UNSELECT)
+            WF_LeftboxOpen.Value = ""   'LeftBoxを表示させない
+            Me.TxtKaisouOrderOffice.Focus()
+            Exit Sub
+        End If
+
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+                    '会社コード
+                    Dim prmData As New Hashtable
+                    prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
+
+                    '運用部署
+                    If WF_FIELD.Value = "WF_UORG" Then
+                        prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
+                    End If
+
+                    '回送登録営業所
+                    If WF_FIELD.Value = "TxtKaisouOrderOffice" Then
+                        '〇 検索(営業所).テキストボックスが未設定
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtKaisouOrderOffice.Text)
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtKaisouOrderOffice.Text)
+                        End If
+                    End If
+
+                    '本線列車
+                    If WF_FIELD.Value = "TxtTrainNo" Then
+                        '〇 検索(営業所).テキストボックスが未設定
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            '〇 画面(回送登録営業所).テキストボックスが未設定
+                            If Me.TxtKaisouOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtTrainNo.Text)
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(Me.TxtKaisouOrderOfficeCode.Text, Me.TxtTrainNo.Text)
+                            End If
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtTrainNo.Text)
+                        End If
+                    End If
+
+                    '回送パターン
+                    If WF_FIELD.Value = "TxtKaisouType" Then
+                        '〇 検索(営業所).テキストボックスが未設定
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            '〇 画面(回送登録営業所).テキストボックスが未設定
+                            If Me.TxtKaisouOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, Me.TxtKaisouType.Text)
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(Me.TxtKaisouOrderOfficeCode.Text, Me.TxtKaisouType.Text)
+                            End If
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, Me.TxtKaisouType.Text)
+                        End If
+                    End If
+
+                    '発駅
+                    If WF_FIELD.Value = "TxtDepstationCode" Then
+                        '〇 検索(営業所).テキストボックスが未設定
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            '〇 画面(回送登録営業所).テキストボックスが未設定
+                            If Me.TxtKaisouOrderOffice.Text = "" Then
+                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "1", Me.TxtDepstationCode.Text)
+                            Else
+                                prmData = work.CreateSTATIONPTParam(Me.TxtKaisouOrderOfficeCode.Text + "1", Me.TxtDepstationCode.Text)
+                            End If
+                        Else
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "1", Me.TxtDepstationCode.Text)
+                        End If
+                    End If
+
+                    '着駅
+                    If WF_FIELD.Value = "TxtArrstationCode" Then
+                        '〇 検索(営業所).テキストボックスが未設定
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            '〇 画面(回送登録営業所).テキストボックスが未設定
+                            If Me.TxtKaisouOrderOffice.Text = "" Then
+                                prmData = work.CreateSTATIONPTParam(Master.USER_ORG + "2", Me.TxtArrstationCode.Text)
+                            Else
+                                prmData = work.CreateSTATIONPTParam(Me.TxtKaisouOrderOfficeCode.Text + "2", Me.TxtArrstationCode.Text)
+                            End If
+                        Else
+                            prmData = work.CreateSTATIONPTParam(work.WF_SEL_SALESOFFICECODE.Text + "2", Me.TxtArrstationCode.Text)
+                        End If
+                    End If
+
+                    .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                    .ActiveListBox()
+
+                Else
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        '(予定)発日
+                        Case "TxtDepDate"
+                            .WF_Calendar.Text = Me.TxtDepDate.Text
+                        '(予定)着日
+                        Case "TxtArrDate"
+                            .WF_Calendar.Text = Me.TxtArrDate.Text
+                        '(予定)受入日
+                        Case "TxtAccDate"
+                            .WF_Calendar.Text = Me.TxtAccDate.Text
+                        '(予定)空車着日
+                        Case "TxtEmparrDate"
+                            .WF_Calendar.Text = Me.TxtEmparrDate.Text
+                        '(実績)発日
+                        Case "TxtActualDepDate"
+                            .WF_Calendar.Text = Me.TxtActualDepDate.Text
+                        '(実績)着日
+                        Case "TxtActualArrDate"
+                            .WF_Calendar.Text = Me.TxtActualArrDate.Text
+                        '(実績)受入日
+                        Case "TxtActualAccDate"
+                            .WF_Calendar.Text = Me.TxtActualAccDate.Text
+                        '(実績)空車着日
+                        Case "TxtActualEmparrDate"
+                            .WF_Calendar.Text = Me.TxtActualEmparrDate.Text
+                    End Select
+                    .ActiveCalendar()
+                End If
+            End With
+
+        End If
+
     End Sub
 
     ''' <summary>
@@ -625,6 +760,254 @@ Public Class OIT0006OutOfServiceDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonSel_Click()
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '○ 選択内容を取得
+        '### LeftBoxマルチ対応(20200217) START #####################################################
+        If leftview.ActiveViewIdx = 2 Then
+            '一覧表表示時
+            Dim selectedLeftTableVal = leftview.GetLeftTableValue()
+            WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
+            WW_SelectText = selectedLeftTableVal("VALUE1")
+            '### LeftBoxマルチ対応(20200217) END   #####################################################
+        ElseIf leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "WF_CAMPCODE"          '会社コード
+                WF_CAMPCODE.Text = WW_SelectValue
+                WF_CAMPCODE_TEXT.Text = WW_SelectText
+                WF_CAMPCODE.Focus()
+
+            Case "WF_UORG"              '運用部署
+                WF_UORG.Text = WW_SelectValue
+                WF_UORG_TEXT.Text = WW_SelectText
+                WF_UORG.Focus()
+
+            '回送登録営業所
+            Case "TxtKaisouOrderOffice"
+                '別の回送登録営業所が設定された場合
+                If Me.TxtKaisouOrderOffice.Text <> WW_SelectText Then
+                    Me.TxtKaisouOrderOffice.Text = WW_SelectText
+                    Me.TxtKaisouOrderOfficeCode.Text = WW_SelectValue
+
+                    'work.WF_SEL_SALESOFFICECODE.Text = WW_SelectValue
+                    'work.WF_SEL_SALESOFFICE.Text = WW_SelectText
+                    'work.WF_SEL_ORDERSALESOFFICECODE.Text = WW_SelectValue
+                    'work.WF_SEL_ORDERSALESOFFICE.Text = WW_SelectText
+
+                    '○ テキストボックスを初期化
+                    '回送パターン
+                    Me.TxtKaisouType.Text = ""
+                    '本線列車
+                    Me.TxtTrainNo.Text = ""
+                    'タンク車数
+                    Me.TxtTankCnt.Text = ""
+                    '発駅
+                    Me.TxtDepstationCode.Text = ""
+                    Me.LblDepstationName.Text = ""
+                    '着駅
+                    Me.TxtArrstationCode.Text = ""
+                    Me.LblArrstationName.Text = ""
+                    '(予定)日付
+                    Me.TxtDepDate.Text = ""
+                    Me.TxtArrDate.Text = ""
+                    Me.TxtAccDate.Text = ""
+                    Me.TxtEmparrDate.Text = ""
+
+                    '○ 一覧の初期化画面表示データ取得
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        '######################################################
+                        '回送登録営業所を変更した時点で、新規登録と同様の扱いとする。
+                        work.WF_SEL_CREATEFLG.Text = "1"
+                        '######################################################
+                        'MAPDataGet(SQLcon, 0)
+                    End Using
+
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0006tbl)
+
+                End If
+                Me.TxtTrainNo.Focus()
+
+            '本線列車
+            Case "TxtTrainNo"
+                Me.TxtTrainNo.Text = WW_SelectValue
+                Me.TxtTrainName.Text = WW_SelectText
+                Me.TxtTrainNo.Focus()
+
+            '回送パターン
+            Case "TxtKaisouType"
+                Me.TxtKaisouTypeCode.Text = WW_SelectValue
+                Me.TxtKaisouType.Text = WW_SelectText
+                Me.TxtKaisouType.Focus()
+
+            '発駅
+            Case "TxtDepstationCode"
+                Me.TxtDepstationCode.Text = WW_SelectValue
+                Me.LblDepstationName.Text = WW_SelectText
+                Me.TxtDepstationCode.Focus()
+
+            '着駅
+            Case "TxtDepstationCode"
+                Me.TxtDepstationCode.Text = WW_SelectValue
+                Me.LblDepstationName.Text = WW_SelectText
+                Me.TxtDepstationCode.Focus()
+
+
+            '(予定)発日
+            Case "TxtDepDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtDepDate.Text = ""
+                    Else
+                        Me.TxtDepDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtDepDate.Focus()
+
+            '(予定)着日
+            Case "TxtArrDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtArrDate.Text = ""
+                    Else
+                        Me.TxtArrDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtArrDate.Focus()
+
+            '(予定)受入日
+            Case "TxtAccDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtAccDate.Text = ""
+                    Else
+                        Me.TxtAccDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtAccDate.Focus()
+
+            '(予定)空車着日
+            Case "TxtEmparrDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtEmparrDate.Text = ""
+                    Else
+                        Me.TxtEmparrDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtEmparrDate.Focus()
+
+            '(実績)発日
+            Case "TxtActualDepDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtActualDepDate.Text = ""
+                    Else
+                        Me.TxtActualDepDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtActualDepDate.Focus()
+
+                '(実績)発日に入力された日付を、(一覧)発日に反映させる。
+                For Each OIT0006tab1row As DataRow In OIT0006tbl.Rows
+                    OIT0006tab1row("ACTUALDEPDATE") = Me.TxtActualDepDate.Text
+                Next
+                '○ 画面表示データ保存
+                If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
+
+            '(実績)着日
+            Case "TxtActualArrDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtActualArrDate.Text = ""
+                    Else
+                        Me.TxtActualArrDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtActualArrDate.Focus()
+
+                '(実績)積込着日に入力された日付を、(一覧)積込着日に反映させる。
+                For Each OIT0006tab1row As DataRow In OIT0006tbl.Rows
+                    OIT0006tab1row("ACTUALARRDATE") = Me.TxtActualArrDate.Text
+                Next
+                '○ 画面表示データ保存
+                If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
+
+            '(実績)受入日
+            Case "TxtActualAccDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtActualAccDate.Text = ""
+                    Else
+                        Me.TxtActualAccDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtActualAccDate.Focus()
+
+                '(実績)受入日に入力された日付を、(一覧)受入日に反映させる。
+                For Each OIT0006tab1row As DataRow In OIT0006tbl.Rows
+                    OIT0006tab1row("ACTUALACCDATE") = Me.TxtActualAccDate.Text
+                Next
+                '○ 画面表示データ保存
+                If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
+
+            '(実績)空車着日
+            Case "TxtActualEmparrDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.TxtActualEmparrDate.Text = ""
+                    Else
+                        Me.TxtActualEmparrDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.TxtActualEmparrDate.Focus()
+
+                '(実績)空車着日に入力された日付を、(一覧)空車着日に反映させる。
+                For Each OIT0006tab1row As DataRow In OIT0006tbl.Rows
+                    OIT0006tab1row("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
+                Next
+                '○ 画面表示データ保存
+                If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
+
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
 
     End Sub
 

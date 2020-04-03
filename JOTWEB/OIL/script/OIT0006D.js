@@ -18,15 +18,13 @@ function InitDisplay() {
     //〇 更新ボタン活性／非活性
     let objDtabNo = document.getElementById("WF_DTAB_CHANGE_NO").value;
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
-        //油種数登録ボタン活性／非活性(新規登録、更新で切り分け)
+        //明細を作るボタン活性／非活性(新規登録、更新で切り分け)
         if (document.getElementById('WF_CREATEFLG').value === "1") {
             //活性
-            //document.getElementById("WF_ButtonINSERT").disabled = "";
-            document.getElementById("WF_ButtonDETAIL").disabled = "";
+            document.getElementById("WF_ButtonINSERT").disabled = "";
         } else if (document.getElementById('WF_CREATEFLG').value === "2") {
             //非活性
-            //document.getElementById("WF_ButtonINSERT").disabled = "disabled";
-            document.getElementById("WF_ButtonDETAIL").disabled = "";
+            document.getElementById("WF_ButtonINSERT").disabled = "disabled";
         }
 
         //〇タブ１

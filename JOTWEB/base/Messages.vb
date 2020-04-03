@@ -567,7 +567,10 @@ Public Module Messages
         ''' 回送キャンセルしますよろしいですか？
         ''' </summary>
         Public Const OIL_CONFIRM_CANCEL_KAISOU As String = "20043"
-
+        ''' <summary>
+        ''' 回送営業所未選択
+        ''' </summary>
+        Public Const OIL_KAISOUOFFICE_UNSELECT As String = "20044"
 #End Region
 
 

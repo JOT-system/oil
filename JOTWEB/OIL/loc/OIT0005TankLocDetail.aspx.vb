@@ -61,6 +61,8 @@ Public Class OIT0005TankLocDetail
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
                             WF_RIGHTBOX_Change()
+                        Case "btnCommonConfirmOk"
+                            UpdateConfirmOk_Click()
                     End Select
 
                 End If
@@ -119,7 +121,7 @@ Public Class OIT0005TankLocDetail
         rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize(WW_DUMMY)
-
+        Master.RecoverTable(OIT0005tbl, work.WF_LISTSEL_INPTBL.Text)
         '○ 画面の値設定
         WW_MAPValueSet()
 
@@ -139,7 +141,18 @@ Public Class OIT0005TankLocDetail
         '    'Grid情報保存先のファイル名
         '    Master.CreateXMLSaveFile()
         'End If
-
+        Dim selectedDr As DataRow = (From dr As DataRow In Me.OIT0005tbl Where Convert.ToString(dr("TANKNUMBER")) = work.WF_LISTSEL_TANKNUMBER.Text).FirstOrDefault
+        If selectedDr IsNot Nothing Then
+            WF_Sel_TANKNUMBER.Text = Convert.ToString(selectedDr("TANKNUMBER"))
+            Dim txtObj As TextBox
+            Dim masterCph = DirectCast(Master.FindControl("contents1"), ContentPlaceHolder)
+            For Each col As DataColumn In OIT0005tbl.Columns
+                txtObj = DirectCast(masterCph.FindControl("Txt" & col.ColumnName), TextBox)
+                If txtObj IsNot Nothing Then
+                    txtObj.Text = Convert.ToString(selectedDr(col.ColumnName))
+                End If
+            Next col
+        End If
         '○ 名称設定処理
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
         'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署
@@ -195,17 +208,22 @@ Public Class OIT0005TankLocDetail
 
         '○ エラーレポート準備
         rightview.SetErrorReport("")
-
+        Master.Output(C_MESSAGE_NO.OIL_CONFIRM_UPDATE_TANKLOCATION, C_MESSAGE_TYPE.QUES, needsPopUp:=True, messageBoxTitle:="", IsConfirm:=True)
 
 
         '############# おためし #############
         If isNormal(WW_ERR_SW) Then
             '前ページ遷移
-            Master.TransitionPrevPage()
+            'Master.TransitionPrevPage()
         End If
 
     End Sub
-
+    ''' <summary>
+    ''' 更新OKボタンクリック時
+    ''' </summary>
+    Protected Sub UpdateConfirmOk_Click()
+        Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.INF, "まだ機能未実装です！", needsPopUp:=True)
+    End Sub
 
     ''' <summary>
     ''' 詳細画面-クリアボタン押下時処理
@@ -264,7 +282,7 @@ Public Class OIT0005TankLocDetail
                     '    prmData = work.CreateSTATIONPTParam(work.WF_SEL_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
                     '発着駅フラグ 
                     Case "TxtDepArrStation"
-                        prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, TxtDepArrStation.Text)
+                        'prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, TxtDepArrStation.Text)
 
                     '削除フラグ   
                     Case "WF_DELFLG"
@@ -294,7 +312,7 @@ Public Class OIT0005TankLocDetail
             '    CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
             '発着駅フラグ
             Case "TxtDepArrStation"
-                CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStationName.Text, WW_RTN_SW)
+                'CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStationName.Text, WW_RTN_SW)
             '削除フラグ
             Case "WF_DELFLG"
                 'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
@@ -381,9 +399,9 @@ Public Class OIT0005TankLocDetail
 
                     '発着駅フラグ
                 Case "TxtDepArrStation"
-                    TxtDepArrStation.Text = WW_SelectValue
-                    LblDepArrStationName.Text = WW_SelectText
-                    TxtDepArrStation.Focus()
+                    'TxtDepArrStation.Text = WW_SelectValue
+                    'LblDepArrStationName.Text = WW_SelectText
+                    'TxtDepArrStation.Focus()
             End Select
         Else
         End If
@@ -435,7 +453,7 @@ Public Class OIT0005TankLocDetail
 
                     '発着駅フラグ
                 Case "TxtDepArrStation"
-                    TxtDepArrStation.Focus()
+                    'TxtDepArrStation.Focus()
 
             End Select
         Else

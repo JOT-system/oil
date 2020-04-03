@@ -86,58 +86,202 @@ Partial Public Class OIT0005TankLocDetail
     Protected WithEvents TxtLocationCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''LblTypeNameKana コントロール。
+    '''LblTankStatus コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblTypeNameKana As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents LblTankStatus As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtTypeNameKana コントロール。
+    '''TxtTankStatus コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtTypeNameKana As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtTankStatus As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''LblTypeNameKanaText コントロール。
+    '''LblLoadingKbn コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblTypeNameKanaText As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents LblLoadingKbn As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblDepArrStation コントロール。
+    '''TxtLoadingKbn コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblDepArrStation As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents TxtLoadingKbn As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtDepArrStation コントロール。
+    '''LblEmpArrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtDepArrStation As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents LblEmpArrDate As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblDepArrStationName コントロール。
+    '''TxtEmpArrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblDepArrStationName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents TxtEmpArrDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblActualEmpArrDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblActualEmpArrDate As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtActualEmpArrDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtActualEmpArrDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblOilCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblOilCode As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtOilCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOilCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblOilCodeText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblOilCodeText As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''LblOrderingType コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblOrderingType As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtOrderingType コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOrderingType As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblOrderingOilName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblOrderingOilName As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtOrderingOilName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOrderingOilName As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblLastOilCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblLastOilCode As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtLastOilCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtLastOilCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblLastOilCodeText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblLastOilCodeText As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''LblPreOrderingType コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblPreOrderingType As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtPreOrderingType コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtPreOrderingType As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblPreOrderingOilName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblPreOrderingOilName As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtPreOrderingOilName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtPreOrderingOilName As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''rightview コントロール。

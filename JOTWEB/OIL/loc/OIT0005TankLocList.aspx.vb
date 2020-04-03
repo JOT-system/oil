@@ -26,6 +26,8 @@ Public Class OIT0005TankLocList
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_GridDBclick"           'GridViewダブルクリック
+                            WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
@@ -232,6 +234,34 @@ Public Class OIT0005TankLocList
 
         '○ 前画面遷移
         Master.TransitionPrevPage()
+
+    End Sub
+    ''' <summary>
+    ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_Grid_DBClick()
+
+        Dim WW_LINECNT As Integer = 0
+        Dim WW_FIELD_OBJ As Object = Nothing
+        Dim WW_VALUE As String = ""
+        Dim WW_TEXT As String = ""
+        '○ LINECNT取得
+        Try
+            WW_LINECNT = Integer.Parse(WF_GridDBclick.Text)
+        Catch ex As Exception
+            Exit Sub
+        End Try
+        Dim tankNo As String = (From dr As DataRow In Me.OIT0005tbl Where CInt(dr("LINECNT")) = WW_LINECNT Select Convert.ToString(dr("TANKNUMBER"))).FirstOrDefault
+        work.WF_LISTSEL_INPTBL.Text = Master.XMLsaveF
+        work.WF_LISTSEL_TANKNUMBER.Text = tankNo
+        '○画面切替設定
+        WF_BOXChange.Value = "detailbox"
+
+        WF_GridDBclick.Text = ""
+
+        '登録画面ページへ遷移
+        Master.TransitionPage()
 
     End Sub
     ''' <summary>

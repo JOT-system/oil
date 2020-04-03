@@ -21,8 +21,8 @@
                     <div class="leftSide">
                     </div>
                     <div class="rightSide">
-                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="更新" onclick="ButtonClick('WF_UPDATE');" />
-                        <input type="button" id="WF_CLEAR" class="btn-sticky" value="クリア"  onclick="ButtonClick('WF_CLEAR');" />
+                        <input type="button" id="WF_UPDATE" class="btn-sticky" value="DB更新" onclick="ButtonClick('WF_UPDATE');" />
+                        <input type="button" id="WF_CLEAR" class="btn-sticky" value="戻る"  onclick="ButtonClick('WF_CLEAR');" />
                     </div>
                 </div>
             </div>
@@ -33,6 +33,7 @@
                     <span>
                         <asp:Label ID="WF_Sel_TANKNUMBER_L" runat="server" Text="タンク車番号" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:Label ID="WF_Sel_TANKNUMBER" runat="server" CssClass="WF_TEXT"></asp:Label>
+                        <span></span>
                     </span>
 
                 </p>
@@ -41,6 +42,7 @@
                     <span class="ef" id="WF_BRANCHCODE">
                         <asp:Label ID="LblBranchCode" runat="server" Text="管轄支店コード" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtBranchCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
                     </span>
                 </p>
                 <p id="KEY_LINE_3">
@@ -48,50 +50,90 @@
                     <span class="ef" id="WF_OFFICECODE">
                         <asp:Label ID="LblOfficeCode" runat="server" Text="所属営業所コード" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtOfficeCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
                     </span>
 
                     <!-- 所在地コード -->
                     <span class="ef" id="WF_LOCATIONCODE">
                         <asp:Label ID="LblLocationCode" runat="server" Text="所在地コード" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtLocationCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
                     </span>
                 </p>
 
                 <p id="KEY_LINE_4">
-                    <!-- 貨物駅名称 -->
-                    <span class="ef" id="WF_STATIONNAME">
-
+                    <!-- タンク車状態コード -->
+                    <span class="ef" id="WF_TANKSTATUS">
+                        <asp:Label ID="LblTankStatus" runat="server" Text="タンク車状態コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtTankStatus" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
                     </span>
 
-                    <!-- 貨物駅名称カナ -->
-                    <span class="ef" id="WF_STATIONNAMEKANA">
-
+                    <!-- 積車区分 -->
+                    <span class="ef" id="WF_LOADINGKBN">
+                        <asp:Label ID="LblLoadingKbn" runat="server" Text="積車区分" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtLoadingKbn" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
                     </span>
                 </p>
 
                 <p id="KEY_LINE_5">
-                    <!-- 貨物駅種別名称 -->
-                    <span class="ef" id="WF_STATIONTYPENAME">
-
+                    <!-- 空車着日（予定） -->
+                    <span class="ef" id="WF_EMPARRDATE">
+                        <asp:Label ID="LblEmpArrDate" runat="server" Text="空車着日（予定）" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtEmpArrDate" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
                     </span>
 
-                    <!-- 貨物駅種別名称カナ -->
-                    <span class="ef" id="WF_STATIONTYPENAMEKANA">
-                        <asp:Label ID="LblTypeNameKana" runat="server" Text="貨物駅種別名称カナ" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtTypeNameKana" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                        <asp:Label ID="LblTypeNameKanaText" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    <!-- 空車着日（実績） -->
+                    <span class="ef" id="WF_ACTUALEMPARRDATE">
+                        <asp:Label ID="LblActualEmpArrDate" runat="server" Text="空車着日（実績）" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtActualEmpArrDate" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
                     </span>
                 </p>
                 <p id="KEY_LINE_6">
-                    <!-- 発着駅フラグ -->
-                    <span class="ef" id="WF_DEPARRSTATION">
-                        <asp:Label ID="LblDepArrStation" runat="server" Text="発着駅フラグ" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <span ondblclick="Field_DBclick('TxtDepArrStation', <%=LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST%>)" onchange="TextBox_change('TxtDepArrStation');">
-                            <asp:TextBox ID="TxtDepArrStation" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
-                        </span>
-                        <asp:Label ID="LblDepArrStationName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    <!-- 積車油種コード -->
+                    <span class="ef" id="WF_OILCODE">
+                        <asp:Label ID="LblOilCode" runat="server" Text="積車油種" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtOilCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <asp:Label ID="LblOilCodeText" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label>
                     </span>
-                    <span></span>
+                    <!-- 油種区分(受発注用) -->
+                    <span class="ef" id="WF_ORDERINGTYPE">
+                        <asp:Label ID="LblOrderingType" runat="server" Text="油種区分(受発注用)" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtOrderingType" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
+                    </span>
+                </p>
+                <p id="KEY_LINE_7">
+                    <!-- 油種名(受発注用) -->
+                    <span class="ef" id="WF_ORDERINGOILNAME">
+                        <asp:Label ID="LblOrderingOilName" runat="server" Text="前回油種" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtOrderingOilName" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
+                    </span>
+                    <!-- 前回油種 -->
+                    <span class="ef" id="WF_LASTOILCODE">
+                        <asp:Label ID="LblLastOilCode" runat="server" Text="前回油種" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtLastOilCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <asp:Label ID="LblLastOilCodeText" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label>
+                    </span>
+
+                </p>
+                <p id="KEY_LINE_8">
+                    <!-- 前回油種区分(受発注用) -->
+                    <span class="ef" id="WF_PreOrderingType">
+                        <asp:Label ID="LblPreOrderingType" runat="server" Text="前回油種区分(受発注用)" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtPreOrderingType" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
+                    </span>
+                    <!-- 前回油種名(受発注用) -->
+                    <span class="ef" id="WF_PREORDERINGOILNAME">
+                        <asp:Label ID="LblPreOrderingOilName" runat="server" Text="前回油種名(受発注用)" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtPreOrderingOilName" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span></span>
+                    </span>
                 </p>
             </div>
         </div>

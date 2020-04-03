@@ -57,7 +57,7 @@
 
         <!-- ○ 変動項目 ○ -->
         <div id="headerDispArea"> <!-- このdivで括られた領域を表示非表示する -->
-            <asp:Panel ID="pnlHeaderInput" CssClass="headerInput" runat="server">
+            <asp:Panel ID="pnlHeaderInput" CssClass="commonHeaderInput" runat="server">
                 <!-- ■　回送パターン　■ -->
                 <span class="doubleItem">
                     <a id="WF_KAISOUTYPE_LABEL" class="requiredMark">回送パターン</a>
@@ -66,6 +66,7 @@
                         <asp:TextBox ID="TxtKaisouTypeCode" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>
+                <span></span>
                 <span></span>
                 <span></span>
                 <span></span>
@@ -142,7 +143,7 @@
                         </a>
                     </span>
                 </span>
-
+                <span></span>
                 <!-- ■　(予定)発日　■ -->
                 <span class="left">
                     <a id="WF_DEPDATE_LABEL" class="requiredMark">(予定)発日</a>

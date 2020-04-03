@@ -3,40 +3,13 @@ body:before {
     content: url(../img/leftbox.png) url(../img/calendar.png);
     display: none;
 }
-/* テキストボックス補正 */
-input[type=text] {
-    height: 1.6em;
-    font-size: 13.5px;
-    box-sizing: border-box;
-    padding-top:1px;
-    padding-bottom:1px;
-}
-.boxIconArea div, .calendarIconArea div {
-    margin-top: calc(100% - 12.5px);
-}
-/* アイコン位置補正 */
-/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-    .calendarIconArea div, .boxIconArea div {
-        margin-top: calc(100% - 12px);
-    }
-}
-/* Edgeも通ってしまうので打ち消す */
-_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
-    margin-top: calc(100% - 12.5px);
-}
+
 #divContensbox{
     height:calc(100% - 2.4em - 1.4em);
 }
  /* コンテンツの最小横幅 */
-.headerbox, .detailbox,#tabBox {
-    min-width: 1220px;
-}
-.detailbox a {
-    font-size:12.8px;
-}
-.headerbox a {
-    font-size: 0.8em;
+.headerbox, .detailbox, #tabBox {
+    min-width: 1340px;
 }
 .actionButtonBox {
     padding:5px;
@@ -45,58 +18,50 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 /* ヘッダー入力欄の全体の設定 */
 /* ************************** */
 #headerDispArea {
-    padding-left: 20px;
-    padding-bottom: 10px;
-}
-.headerInput {
-    display: flex;
-    flex-wrap: wrap;
-    width: 1190px;
     box-sizing: border-box;
+    padding-bottom:20px;
 }
-/* 1項目のサイズ */
-.headerInput > span {
-    display:inline-block;
-    width:220px;
-    white-space:nowrap;
-    margin:1px;
+.commonHeaderInput {
+    margin-left:10px;
 }
-.headerInput > span.left {
-    width:250px;
+/* 一列目の文言幅 */
+.commonHeaderInput > span:nth-child(5n+1) > a:nth-child(1) {
+    width: 130px;
 }
-.headerInput > span.doubleItem {
-    width:470px;
+.commonHeaderInput > span:not(:nth-child(5n+1)) > a:nth-child(1) {
+    width: 90px; /* 共通設定は115px */
 }
 
-.headerInput > span > a {
-    display: inline-block;
-    vertical-align: middle;
-    padding: 1px;
+.commonHeaderInput > span:not(:nth-child(5n+1)) {
+    /* 一項目の共通設定幅280px - (共通設定115px - 上記width) */
+    width: 260px;
 }
-/* ヘッダー入力欄の項目名 */
-.headerInput > span > a:nth-child(1) {
-    width:65px;
+.commonHeaderInput > span > a:nth-child(2) {
+    width:135px;
 }
-/* 最も左に来る列の項目名サイズ */
-.headerInput > span.left > a:nth-child(1),
-.headerInput > span.doubleItem > a:nth-child(1) {
-    width:95px;
+.commonHeaderInput > span.doubleItem:not(:nth-child(5n+1)) {
+    width: calc(260px * 2);
 }
 
-/* 入力ボックス */
-.headerInput > span > a:nth-child(2) {
-    width:140px;
-    white-space:nowrap;
-    overflow:hidden;
+.commonHeaderInput > span.doubleItem:nth-child(5n+1) {
+    width: calc(280px + 260px);
 }
-/* 【受注パターン】のテキストボックスの長さ */
-.headerInput > span.doubleItem > a:nth-child(2) {
-    width:365px;
+.commonHeaderInput > span.doubleItem + span {
+    display:none;
 }
-.headerInput > span > a:nth-child(2) input[type=text] {
-    width: 100% !important;
+.commonHeaderInput > span.doubleItem > a:nth-child(2) {
+    width: 376px;
 }
-
+.commonHeaderInput {
+    width: 1330px;
+}
+.commonHeaderInput input[type=text] {
+    width:100%;
+}
+.commonHeaderInput input[type=button] {
+    margin-bottom:-10px;
+    height:28px;
+}
 /* ID chkOrderInfoチェックボックス自体を非表示 */
 #chkOrderInfo {
     display: none;
@@ -120,91 +85,7 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     }
 
 
-/* ************************** */
-/* ヘッダーエリアの合計欄     */
-/* ************************** */
-/* 車数・kl表(全体) */
-.summaryTable {
-    margin-top:10px;
-    margin-bottom:5px;
-}
-/* 車数・kl表(各行) */
-.summaryTable div {
-    display: flex;
-    vertical-align: middle;
-    align-items: center;
-}
-/* 車数・kl表(セル) */
-.summaryTable div a {
-    display:inline-block;
-    overflow:hidden;
-    box-sizing:border-box;
-}
-/* 車数・kl表一列目の幅 */
-.summaryTable div a:nth-child(1) {
-    width:125px;
-}
-/* 車数・kl表二列目以降の幅 */
-.summaryTable div a:nth-child(n+2) {
-    width:75px;
-    text-align:center;
-}
 
-/* 車数・kl表データセルの枠スタイル */
-.summaryTable div:nth-child(n+2) a:nth-child(n+2) {
-    border: 1px solid;
-    border-color: lightgray;
-}
-
-/* 車数・kl表合計に配置したテキストボックス上記で
-   枠スタイルを設定している為テキストボックス自体の枠は消す */
-.summaryTable input[type=text] {
-    width:100%;
-    border:none;
-    border-radius:0;
-    text-align:right;
-}
-/* 各金額合計表 */
-.summaryAmount {
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    vertical-align: middle;
-    height: auto;
-}
-.summaryAmount > * {
-    display:inline-block;
-    vertical-align:middle;
-    overflow:hidden;
-    white-space :nowrap;
-    margin:2px;
-}
-.summaryAmount input[type=text] {
-    width:100%;
-}
-/* 計上月列 */
-.summaryAmount :nth-child(1) {
-    width:120px;
-    text-align:right;
-    height:100%;
-}
-/* 計上月テキストボックス列 */
-.summaryAmount :nth-child(2) {
-    width:80px;
-}
-/* 売上・支払合計金額、文言列 */
-.summaryAmount :nth-child(3),
-.summaryAmount :nth-child(5){
-    width:117px;
-    text-align:right;
-}
-
-/* 売上・支払合計金額テキストボックス列 */
-.summaryAmount :nth-child(4),
-.summaryAmount :nth-child(6){
-    width:135px;
-    text-align:right;
-}
 /* ************** */
 /* 詳細部         */
 /* ************** */

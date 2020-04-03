@@ -34,20 +34,26 @@
                         <asp:Label ID="WF_Sel_TANKNUMBER_L" runat="server" Text="タンク車番号" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:Label ID="WF_Sel_TANKNUMBER" runat="server" CssClass="WF_TEXT"></asp:Label>
                     </span>
+
                 </p>
                 <p id="KEY_LINE_2">
-                    <!-- 削除フラグ -->
-
+                    <!-- 管轄支店コード -->
+                    <span class="ef" id="WF_BRANCHCODE">
+                        <asp:Label ID="LblBranchCode" runat="server" Text="管轄支店コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtBranchCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                    </span>
                 </p>
                 <p id="KEY_LINE_3">
-                    <!-- 貨物駅コード -->
-                    <span class="ef" id="WF_STATIONCODE">
-
+                    <!-- 所属営業所コード -->
+                    <span class="ef" id="WF_OFFICECODE">
+                        <asp:Label ID="LblOfficeCode" runat="server" Text="所属営業所コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtOfficeCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
                     </span>
 
-                    <!-- 貨物コード枝番 -->
-                    <span class="ef" id="WF_BRANCH">
-
+                    <!-- 所在地コード -->
+                    <span class="ef" id="WF_LOCATIONCODE">
+                        <asp:Label ID="LblLocationCode" runat="server" Text="所在地コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="TxtLocationCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
                     </span>
                 </p>
 

@@ -13,4 +13,5 @@
     <asp:TextBox ID="WF_COND_DETAILTYPENAME" runat="server"></asp:TextBox> <!-- 選択された詳細タイプ名 -->
     <!-- 一覧画面用で設定 -->
     <asp:TextBox ID="WF_LISTSEL_TANKNUMBER" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_LISTSEL_INPTBL" runat="server"></asp:TextBox> <!-- 一覧画面のデータファイルパス -->
 </div>

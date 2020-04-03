@@ -78,6 +78,10 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIT0005L As String = "ASP.OIL_LOC_OIT0005TANKLOCLIST_ASPX"
         ''' <summary>
+        ''' タンク車所在登録
+        ''' </summary>
+        Public Const OIT0005D As String = "ASP.OIL_LOC_OIT0005TANKLOCDETAIL_ASPX"
+        ''' <summary>
         ''' 回送検索
         ''' </summary>
         Public Const OIT0006S As String = "ASP.OIL_FOR_OIT0006OUTOFSERVICESEARCH_ASPX"

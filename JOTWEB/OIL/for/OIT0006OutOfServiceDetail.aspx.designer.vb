@@ -122,6 +122,15 @@ Partial Public Class OIT0006OutOfServiceDetail
     Protected WithEvents TxtTrainName As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtTankCnt コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTankCnt As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtDepstationCode コントロール。
     '''</summary>
     '''<remarks>

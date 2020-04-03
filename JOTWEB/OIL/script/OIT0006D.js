@@ -15,48 +15,18 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
-    //〇 手配完了ボタン活性／非活性
-    if (document.getElementById('WF_CONTACTFLG').value === "0") {
-        //活性 
-        document.getElementById("WF_ButtonCONTACT").disabled = "";
-    }
-    else {
-        //非活性
-        document.getElementById("WF_ButtonCONTACT").disabled = "disabled";
-    }
-
-    //〇 結果受理ボタン活性／非活性
-    if (document.getElementById('WF_RESULTFLG').value === "0") {
-        //活性 
-        document.getElementById("WF_ButtonRESULT").disabled = "";
-    }
-    else {
-        //非活性
-        document.getElementById("WF_ButtonRESULT").disabled = "disabled";
-    }
-
-    //〇 託送指示ボタン活性／非活性
-    if (document.getElementById('WF_DELIVERYFLG').value === "0") {
-        //活性 
-        document.getElementById("WF_ButtonDELIVERY").disabled = "";
-    }
-    else {
-        //非活性
-        document.getElementById("WF_ButtonDELIVERY").disabled = "disabled";
-    }
-
     //〇 更新ボタン活性／非活性
     let objDtabNo = document.getElementById("WF_DTAB_CHANGE_NO").value;
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //油種数登録ボタン活性／非活性(新規登録、更新で切り分け)
-        if (document.getElementById('WF_CREATEFLG').value === "1"
-            && document.getElementById('WF_SEL_CREATELINKFLG').value === "1") {
+        if (document.getElementById('WF_CREATEFLG').value === "1") {
             //活性
-            document.getElementById("WF_ButtonINSERT").disabled = "";
-        } else if (document.getElementById('WF_CREATEFLG').value === "2" 
-                   || document.getElementById('WF_SEL_CREATELINKFLG').value === "2") {
+            //document.getElementById("WF_ButtonINSERT").disabled = "";
+            document.getElementById("WF_ButtonDETAIL").disabled = "";
+        } else if (document.getElementById('WF_CREATEFLG').value === "2") {
             //非活性
-            document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+            //document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+            document.getElementById("WF_ButtonDETAIL").disabled = "";
         }
 
         //〇タブ１
@@ -80,32 +50,14 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
             }
         }
-        //〇タブ２
-        else if (objDtabNo === "1") {
-            if (document.getElementById('WF_MAPButtonControl').value === "1"
-                || document.getElementById('WF_MAPButtonControl').value === "2") {
-                //非活性
-                document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "disabled";
-                document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "disabled";
-            }
-            else {
-                //活性
-                document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "";
-                document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "";
-            }
-        }
-        //〇タブ３
-        else if (objDtabNo === "2") {
-            document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
-        }
-        ////〇タブ４
-        //else if (objDtabNo === "3") {
+        ////〇タブ２
+        //else if (objDtabNo === "1") {
         //}
 
     } else {
         //非活性 
-        document.getElementById("WF_ButtonDELIVERY").disabled = "disabled";
-        document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+        //document.getElementById("WF_ButtonDELIVERY").disabled = "disabled";
+        //document.getElementById("WF_ButtonINSERT").disabled = "disabled";
         //〇タブ１
         if (objDtabNo === "0") {
             document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
@@ -114,17 +66,8 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
         }
-        //〇タブ２
-        else if (objDtabNo === "1") {
-            document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "disabled";
-            document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "disabled";
-        }
-        //〇タブ３
-        else if (objDtabNo === "2") {
-            document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
-        }
-        ////〇タブ４
-        //else if (objDtabNo === "3") {
+        ////〇タブ２
+        //else if (objDtabNo === "1") {
         //}
     }
 
@@ -148,12 +91,6 @@ function InitDisplay() {
     }
     if (typeof pnlListAreaId2 !== 'undefined') {
         arrListId.push(pnlListAreaId2);
-    }
-    if (typeof pnlListAreaId3 !== 'undefined') {
-        arrListId.push(pnlListAreaId3);
-    }
-    if (typeof pnlListAreaId4 !== 'undefined') {
-        arrListId.push(pnlListAreaId4);
     }
     /* 対象の一覧表IDをループ */
     for (let i = 0, len = arrListId.length; i < len; ++i) {

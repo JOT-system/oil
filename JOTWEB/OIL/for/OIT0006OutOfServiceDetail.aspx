@@ -104,7 +104,13 @@
                         <asp:TextBox ID="TxtTrainName" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>
-                <span></span>
+                <span>
+                    <a id="WF_TANKCNT_LABEL" class="requiredMark">タンク車数</a>
+                    <a class="ef" id="WF_TANKCNT">
+                        <asp:TextBox ID="TxtTankCnt" runat="server" onblur="MsgClear();" MaxLength="2"></asp:TextBox>
+                    </a>
+                    <input type="button" id="WF_ButtonDETAIL" class="btn-sticky" value="明細を作る" onclick="ButtonClick('WF_ButtonDETAIL');" />
+                </span>
                 <span></span>
                 <span></span>
 

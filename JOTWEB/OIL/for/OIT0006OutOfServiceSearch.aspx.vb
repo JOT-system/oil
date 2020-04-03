@@ -326,7 +326,7 @@ Public Class OIT0006OutOfServiceSearch
 
         '目的
         If Me.TxtObjective.Text <> "" Then
-            Master.CheckField(WF_CAMPCODE.Text, "OBJECTIVE", Me.TxtObjective.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(WF_CAMPCODE.Text, "OBJECTIVECODE", Me.TxtObjective.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR)
                 Me.TxtObjective.Focus()

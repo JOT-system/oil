@@ -669,11 +669,11 @@ Public Class OIT0006OutOfServiceList
         work.WF_SEL_PATTERNCODE.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUTYPE")
 
         '回送進行ステータス(名)
-        work.WF_SEL_KAISOUSTATUSNM.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUSTATUSNM")
+        work.WF_SEL_KAISOUSTATUSNM.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUSTATUSNAME")
         '回送進行ステータス(コード)
         work.WF_SEL_KAISOUSTATUS.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUSTATUS")
         '回送情報(名)
-        work.WF_SEL_INFORMATIONNM.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUINFONM")
+        work.WF_SEL_INFORMATIONNM.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUINFONAME")
         '回送情報(コード)
         work.WF_SEL_INFORMATION.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUINFO")
 

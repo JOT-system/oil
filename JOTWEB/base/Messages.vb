@@ -567,7 +567,6 @@ Public Module Messages
         ''' 回送キャンセルしますよろしいですか？
         ''' </summary>
         Public Const OIL_CONFIRM_CANCEL_KAISOU As String = "20043"
-
         ''' <summary>
         ''' 回送営業所未選択
         ''' </summary>
@@ -576,7 +575,6 @@ Public Module Messages
         ''' タンク所在を更新します。本当によろしいですか？
         ''' </summary>
         Public Const OIL_CONFIRM_UPDATE_TANKLOCATION As String = "20045"
-
 #End Region
 
 

@@ -68,6 +68,15 @@ Partial Public Class OIT0005TankLocSearch
     Protected WithEvents LblSalesOfficeName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''tileSalesOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

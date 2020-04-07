@@ -5,6 +5,7 @@
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIT0005WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/GRC0001TILESELECTORWRKINC.ascx" TagName="tilelist" TagPrefix="MSINC"  %>
 
 <asp:Content ID="OIT0005SH" ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0005S.js")%>'></script>
@@ -52,6 +53,14 @@
                     <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
+            <div class="inputItem" style="display:none;">
+                <a id="WF_Test"  class="requiredMark">所属先</a>
+                <a>
+                    <MSINC:tilelist ID="tileSalesOffice" runat="server" />
+                </a>
+                <a></a>
+            </div>
+            
         </div>
     </div>
 

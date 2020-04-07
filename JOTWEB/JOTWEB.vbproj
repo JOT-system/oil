@@ -171,6 +171,7 @@
     <Content Include="OIL\img\unlockKey.png" />
     <Content Include="OIL\img\warning.png" />
     <Content Include="OIL\img\w_cat.png" />
+    <Content Include="OIL\inc\GRC0001TILESELECTORWRKINC.ascx" />
     <Content Include="OIL\inc\GRM00002WRKINC.ascx" />
     <Content Include="OIL\inc\GRM00001WRKINC.ascx" />
     <Content Include="inc\GRIS0001Title.ascx" />
@@ -326,6 +327,13 @@
     <Compile Include="OIL\for\OIT0006OutOfServiceSearch.aspx.vb">
       <DependentUpon>OIT0006OutOfServiceSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\GRC0001TILESELECTORWRKINC.ascx.designer.vb">
+      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\GRC0001TILESELECTORWRKINC.ascx.vb">
+      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\GRM00002WRKINC.ascx.designer.vb">
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>

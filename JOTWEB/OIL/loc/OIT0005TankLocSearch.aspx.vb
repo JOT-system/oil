@@ -1,5 +1,6 @@
 ﻿Option Strict On
 Imports JOTWEB.GRIS0005LeftBox
+Imports JOTWEB.GRC0001TILESELECTORWRKINC
 ''' <summary>
 ''' タンク所在管理検索画面クラス
 ''' </summary>
@@ -57,6 +58,7 @@ Public Class OIT0005TankLocSearch
         Else
             '○ 初期化処理
             Initialize()
+
         End If
 
     End Sub
@@ -112,7 +114,18 @@ Public Class OIT0005TankLocSearch
                 End If
 
             End If
+            '〇仮置き
+            Dim paramData As Hashtable = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
+            Me.tileSalesOffice.ListBoxClassification = LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
+            Me.tileSalesOffice.ParamData = paramData
+            Me.tileSalesOffice.LeftObj = leftview
+            Me.tileSalesOffice.SetTileValues()
 
+            If {"jot_sys_1", "jot_oil_1"}.Contains(Master.ROLE_MAP) Then
+                Me.tileSalesOffice.SelectAll()
+            Else
+                Me.tileSalesOffice.SelectSingleItem(Master.USER_ORG)
+            End If
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0005C Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
@@ -159,7 +172,6 @@ Public Class OIT0005TankLocSearch
         work.WF_SEL_SALESOFFICECODEMAP.Text = TxtSalesOffice.Text
         work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
         work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
-
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
             Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)

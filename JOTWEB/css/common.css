@@ -405,6 +405,10 @@ input[type=number][readonly].boxIcon:not(.iconOnly),
 input[type=number][readonly].calendarIcon:not(.iconOnly) {
     padding-left: 0.3em;
 }
+div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(240, 240, 240);
+    pointer-events:none;
+}
 /* ------------------------------
 
     擬似フレーム　スタイル定義

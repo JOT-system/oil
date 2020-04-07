@@ -53,7 +53,7 @@
                     <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </div>
-            <div class="inputItem" style="display:none;">
+            <div class="inputItem" >
                 <a id="WF_Test"  class="requiredMark">所属先</a>
                 <a>
                     <MSINC:tilelist ID="tileSalesOffice" runat="server" />

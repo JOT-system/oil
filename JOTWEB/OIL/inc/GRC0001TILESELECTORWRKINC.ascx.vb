@@ -155,9 +155,15 @@ Public Class GRC0001TILESELECTORWRKINC
     ''' <returns></returns>
     Public Function GetListItemsStr() As String
         Dim transVal As New TransKeepValues
-        Dim enumVal = DirectCast([Enum].ToObject(GetType(ListSelectionMode), CInt(Me.txtGrc0001SelectionMode.Text)), ListSelectionMode)
-        transVal.SelectionMode = enumVal
+        Dim enumSelModeVal = DirectCast([Enum].ToObject(GetType(ListSelectionMode), CInt(Me.txtGrc0001SelectionMode.Text)), ListSelectionMode)
+        transVal.SelectionMode = enumSelModeVal
+
         transVal.NeedsPostbackAfterSelect = Convert.ToBoolean(Me.txtGrc0001NeedsAfterPostBack.Text)
+
+        Dim enmListClassVal = DirectCast([Enum].ToObject(GetType(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION), CInt(Me.txtGrc0001ListClass.Text)), GRIS0005LeftBox.LIST_BOX_CLASSIFICATION)
+        transVal.ListBoxClassification = enmListClassVal
+
+        'transVal.ListValues =
 
         Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
         Dim base64Str As String = ""

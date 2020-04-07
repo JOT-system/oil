@@ -66,7 +66,16 @@ Partial Public Class OIT0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OWNERCODE As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_SALESOFFICE_LIST コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SALESOFFICE_LIST As Global.System.Web.UI.WebControls.ListBox
+
     '''<summary>
     '''WF_COND_DETAILTYPE コントロール。
     '''</summary>
@@ -93,7 +102,7 @@ Partial Public Class OIT0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_LISTSEL_TANKNUMBER As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_LISTSEL_INPTBL コントロール。
     '''</summary>

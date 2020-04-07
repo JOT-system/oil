@@ -3293,10 +3293,10 @@ Public Class OIT0003OrderDetail
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 LINEADD")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB1 SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB1 LINEADD"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -5428,7 +5428,7 @@ Public Class OIT0003OrderDetail
                     End Using
 
                     For Each OIT0003UPDrow As DataRow In OIT0003UPDtbl.Rows
-                        CS0020JOURNAL.TABLENM = "OIT0003L"
+                        CS0020JOURNAL.TABLENM = "OIT0003D"
                         CS0020JOURNAL.ACTION = "UPDATE_INSERT"
                         CS0020JOURNAL.ROW = OIT0003UPDrow
                         CS0020JOURNAL.CS0020JOURNAL()
@@ -9370,7 +9370,7 @@ Public Class OIT0003OrderDetail
 
             '行削除したデータの場合は退避しない。
             If drv("HIDDEN") <> "1" Then
-                chkShipOrder = drv("LINEORDER")
+                chkShipOrder = drv("SHIPORDER")
             End If
         Next
         '### END  #############################################################################################

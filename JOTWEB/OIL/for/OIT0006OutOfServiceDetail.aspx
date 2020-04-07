@@ -93,6 +93,7 @@
                         <asp:TextBox ID="TxtTrainName" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>
+                <!-- ■　タンク車数　■ -->
                 <span>
                     <a id="WF_TANKCNT_LABEL" class="requiredMark">タンク車数</a>
                     <a class="ef" id="WF_TANKCNT">
@@ -112,10 +113,11 @@
                     </a>
                 </span>
                 <span></span>
+                <!-- ■　運賃フラグ　■ -->
                 <span>
                     <a id="WF_FAREFLG_LABEL" class="requiredMark">片道</a>
                     <a id="WF_FAREFLG">
-                        <input type="checkbox" id="WF_FAREFLG_CHECKBOX" />
+                        <asp:CheckBox ID="ChkSelect" runat="server" />
                     </a>
                 </span>
                 <span></span>
@@ -124,7 +126,7 @@
                 <!-- ■　発駅　■ -->
                 <span class="left">
                     <a id="WF_DEPSTATION_LABEL" class="requiredMark">発駅</a>
-                    <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstationCode');">
+                    <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON%>);" onchange="TextBox_change('TxtDepstationCode');">
                         <asp:TextBox ID="TxtDepstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
                     </a>
                 </span>
@@ -138,7 +140,7 @@
                 <!-- ■　着駅　■ -->
                 <span>
                     <a id="WF_ARRSTATION_LABEL" class="requiredMark">着駅</a>
-                    <a class="ef" id="WF_ARRSTATIONCODE" ondblclick="Field_DBclick('TxtArrstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtArrstationCode');">
+                    <a class="ef" id="WF_ARRSTATIONCODE" ondblclick="Field_DBclick('TxtArrstationCode', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE_FOCUSON%>);" onchange="TextBox_change('TxtArrstationCode');">
                         <asp:TextBox ID="TxtArrstationCode" runat="server"  ReadOnly="true" CssClass="boxIcon iconOnly" onblur="MsgClear();" MaxLength="7"></asp:TextBox>
                     </a>
                 </span>
@@ -158,9 +160,9 @@
                     </a>
                 </span>
 
-                <!-- ■　(予定)積車着日　■ -->
+                <!-- ■　(予定)着日　■ -->
                 <span>
-                    <a id="WF_ARRDATE_LABEL" class="requiredMark">積車着日</a>
+                    <a id="WF_ARRDATE_LABEL" class="requiredMark">着日</a>
                     <a class="ef" id="WF_ARRDATE" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtArrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                     </a>
@@ -193,7 +195,7 @@
 
                 <!-- ■　(実績)積車着日　■ -->
                 <span>
-                    <a id="WF_ACTUALARRDATE_LABEL" class="requiredMark">積車着日</a>
+                    <a id="WF_ACTUALARRDATE_LABEL" class="requiredMark">着日</a>
                     <a class="ef" id="WF_ACTUALARRDATE" ondblclick="Field_DBclick('TxtActualArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtActualArrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                     </a>
@@ -307,12 +309,6 @@
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 新規・更新切替用フラグ -->
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
-        <!-- 貨車連結切替用フラグ -->
-        <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
-        <!-- 手配連絡フラグ -->
-        <input id="WF_CONTACTFLG" runat="server" value="" type="text" />
-        <!-- 結果受理フラグ -->
-        <input id="WF_RESULTFLG" runat="server" value="" type="text" />
         <!-- 託送指示フラグ -->
         <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
         <!-- 画面ボタン制御 -->

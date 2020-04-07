@@ -93,7 +93,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_STATUS As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_OBJECTIVECODEMAP コントロール。
     '''</summary>
@@ -102,7 +102,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OBJECTIVECODEMAP As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ARRIVALSTATIONMAP コントロール。
     '''</summary>
@@ -246,7 +246,16 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_PATTERNNAME As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_FAREFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_FAREFLG As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_DEPARTURESTATION コントロール。
     '''</summary>

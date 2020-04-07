@@ -524,6 +524,8 @@ Public Class OIT0006OutOfServiceList
         work.WF_SEL_PATTERNNAME.Text = ""
         'パターンコード
         work.WF_SEL_PATTERNCODE.Text = ""
+        '運賃フラグ
+        work.WF_SEL_FAREFLG.Text = "2"
 
         '回送進行ステータス(名)
         CODENAME_get("KAISOUSTATUS", BaseDllConst.CONST_KAISOUSTATUS_100, work.WF_SEL_KAISOUSTATUSNM.Text, WW_RTN_SW)
@@ -667,6 +669,8 @@ Public Class OIT0006OutOfServiceList
         work.WF_SEL_PATTERNNAME.Text = ""
         'パターンコード
         work.WF_SEL_PATTERNCODE.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUTYPE")
+        '運賃フラグ
+        work.WF_SEL_FAREFLG.Text = OIT0006tbl.Rows(WW_LINECNT)("FAREFLG")
 
         '回送進行ステータス(名)
         work.WF_SEL_KAISOUSTATUSNM.Text = OIT0006tbl.Rows(WW_LINECNT)("KAISOUSTATUSNAME")

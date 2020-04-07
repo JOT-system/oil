@@ -32,6 +32,12 @@ Public Class OIT0005TankLocList
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
+                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
+                            WF_ButtonFIRST_Click()
+                        Case "WF_ButtonLAST"            '最終頁ボタン押下
+                            WF_ButtonLAST_Click()
+                        Case "chklGroupFilter"
+                            chklGroupFilter_Change()
                         Case "WF_ButtonEND"                 '戻るボタン押下
                             WF_ButtonEND_Click()
                     End Select
@@ -108,10 +114,27 @@ Public Class OIT0005TankLocList
         '状況名称をヘッダー左下に設定
         '**********************************************
         Master.SetTitleLeftBottomText(work.WF_COND_DETAILTYPENAME.Text)
+
         '****************************************
         '生成したデータを画面に貼り付け
         '*************************
         GridViewInitialize()
+        '**********************************************
+        '絞り込みタブを設定
+        '**********************************************
+        Me.chklGroupFilter.DataSource = OIT0005WRKINC.DispDataClass.GetDetailInsideNames(work.WF_COND_DETAILTYPE.Text)
+        Me.chklGroupFilter.DataValueField = "Key"
+        Me.chklGroupFilter.DataTextField = "Value"
+        Me.chklGroupFilter.DataBind()
+        Dim rowCnt As Integer = 0
+        Dim fieldName As String = ""
+        For Each chkGrp In Me.chklGroupFilter.Items.Cast(Of ListItem)
+            chkGrp.Selected = True
+            fieldName = String.Format("ISCOUNT{0}GROUP", chkGrp.Value)
+            rowCnt = (From dr As DataRow In Me.OIT0005tbl Where dr(fieldName).Equals("1")).Count
+            chkGrp.Text = chkGrp.Text & "(" & rowCnt.ToString("#,##0両") & ")"
+        Next chkGrp
+
     End Sub
     ''' <summary>
     ''' GridViewデータ設定
@@ -178,6 +201,7 @@ Public Class OIT0005TankLocList
 
         OIT0005tbl.Clear()
         Dim viewName As String = work.GetTankViewName(work.WF_COND_DETAILTYPE.Text)
+        Dim salesOfficeInstat As String = GRC0001TILESELECTORWRKINC.GetSelectedSqlInStatement(work.WF_SEL_SALESOFFICE_TILES.Text)
         Dim sotrOrderValue As String = work.GetTankViewOrderByString(work.WF_COND_DETAILTYPE.Text)
         Dim sqlStat As New StringBuilder
         sqlStat.AppendFormat("SELECT ROW_NUMBER() OVER(ORDER BY {0})  AS LINECNT", sotrOrderValue).AppendLine()
@@ -187,14 +211,12 @@ Public Class OIT0005TankLocList
         sqlStat.AppendLine("      ,0  AS HIDDEN")
         sqlStat.AppendLine("      ,VTS.* ") 'ビューのフィールド追加しても動作可能なようにしている(削った場合は要稼働確認)
         sqlStat.AppendFormat("  FROM {0} VTS", viewName).AppendLine()
-        sqlStat.AppendLine(" WHERE VTS.OFFICECODE = @OFFICECODE")
+        sqlStat.AppendFormat(" WHERE VTS.OFFICECODE in ({0})", salesOfficeInstat).AppendLine()
         sqlStat.AppendFormat(" ORDER BY {0}", sotrOrderValue).AppendLine()
 
         Try
             Using sqlCmd As New SqlCommand(sqlStat.ToString, SQLcon)
-                With sqlCmd.Parameters
-                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = work.WF_SEL_SALESOFFICECODE.Text
-                End With
+
                 Using SQLdr As SqlDataReader = sqlCmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
@@ -237,6 +259,44 @@ Public Class OIT0005TankLocList
 
     End Sub
     ''' <summary>
+    ''' フィルタタイル変更時イベント
+    ''' </summary>
+    Protected Sub chklGroupFilter_Change()
+        WF_GridPosition.Text = "1"
+    End Sub
+    ''' <summary>
+    ''' 先頭頁ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonFIRST_Click()
+
+        '○ 先頭頁に移動
+        WF_GridPosition.Text = "1"
+
+    End Sub
+
+    ''' <summary>
+    ''' 最終頁ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonLAST_Click()
+
+        '○ ソート
+        Dim TBLview As New DataView(OIT0005tbl)
+        TBLview.RowFilter = "HIDDEN = 0"
+
+        '○ 最終頁に移動
+        If TBLview.Count Mod 10 = 0 Then
+            WF_GridPosition.Text = (TBLview.Count - (TBLview.Count Mod 10)).ToString
+        Else
+            WF_GridPosition.Text = (TBLview.Count - (TBLview.Count Mod 10) + 1).ToString
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
+    ''' <summary>
     ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
     ''' </summary>
     ''' <remarks></remarks>
@@ -272,9 +332,23 @@ Public Class OIT0005TankLocList
 
         Dim WW_GridPosition As Integer          '表示位置(開始)
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
-
+        Dim qFilterQue = (From chklItm In Me.chklGroupFilter.Items.Cast(Of ListItem) Where chklItm.Selected Select chklItm.Value)
+        Dim filterKeyValues As List(Of String)
+        If qFilterQue.Any Then
+            filterKeyValues = qFilterQue.ToList
+        Else
+            filterKeyValues = New List(Of String)
+        End If
         '○ 表示対象行カウント(絞り込み対象)
+        Dim fieldName As String = "ISCOUNT{0}GROUP"
         For Each OIT0005row As DataRow In OIT0005tbl.Rows
+            OIT0005row("HIDDEN") = "1"
+            For Each filterKeyValue In filterKeyValues
+                If Convert.ToString(OIT0005row(String.Format(fieldName, filterKeyValue))).Equals("1") Then
+                    OIT0005row("HIDDEN") = "0"
+                End If
+            Next
+
             If Convert.ToString(OIT0005row("HIDDEN")) = "0" Then
                 WW_DataCNT += 1
                 '行(LINECNT)を再設定する。既存項目(SELECT)を利用

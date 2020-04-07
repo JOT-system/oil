@@ -101,21 +101,22 @@ Public Class OIT0005TankLocSearch
             Dim shipperCode As String = ""
             Dim consigneeCode As String = ""
             prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
-            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
+            Dim dummyTxtSalesOffice As String = ""
+            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, dummyTxtSalesOffice)
             leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, WW_DUMMY, prmData)
             If leftview.WF_LeftListBox.Items IsNot Nothing Then
                 '一旦根岸(011402)'本当はログインユーザーのORG
                 Dim foundItem = leftview.WF_LeftListBox.Items.FindByValue("011402")
                 'Dim foundItem = leftview.WF_LeftListBox.Items.FindByValue(Master.USER_ORG)
                 If foundItem IsNot Nothing Then
-                    TxtSalesOffice.Text = foundItem.Value
+                    dummyTxtSalesOffice = foundItem.Value
                 Else
-                    TxtSalesOffice.Text = leftview.WF_LeftListBox.Items(0).Value
+                    dummyTxtSalesOffice = leftview.WF_LeftListBox.Items(0).Value
                 End If
 
             End If
             '〇仮置き
-            Dim paramData As Hashtable = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
+            Dim paramData As Hashtable = work.CreateSALESOFFICEParam(Master.USER_ORG, dummyTxtSalesOffice)
             Me.tileSalesOffice.ListBoxClassification = LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
             Me.tileSalesOffice.ParamData = paramData
             Me.tileSalesOffice.LeftObj = leftview
@@ -130,7 +131,7 @@ Public Class OIT0005TankLocSearch
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
             WF_ORG.Text = work.WF_SEL_ORG.Text            '組織コード
-            TxtSalesOffice.Text = work.WF_SEL_SALESOFFICECODEMAP.Text '所属先
+            Me.tileSalesOffice.Recover(work.WF_SEL_SALESOFFICE_TILES.Text) '所属先（タイル選択）
         End If
 
         '○ RightBox情報設定
@@ -148,8 +149,6 @@ Public Class OIT0005TankLocSearch
         '○ 名称設定処理
         'CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_DUMMY)         '会社コード
         'CODENAME_get("ORG", WF_ORG.Text, WF_ORG_TEXT.Text, WW_DUMMY)         '組織コード
-        '所属先
-        CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_DUMMY)
 
     End Sub
 
@@ -169,9 +168,7 @@ Public Class OIT0005TankLocSearch
         work.WF_SEL_CAMPCODE.Text = WF_CAMPCODE.Text        '会社コード
         work.WF_SEL_ORG.Text = WF_ORG.Text                  '組織コード
         '営業所
-        work.WF_SEL_SALESOFFICECODEMAP.Text = TxtSalesOffice.Text
-        work.WF_SEL_SALESOFFICECODE.Text = TxtSalesOffice.Text
-        work.WF_SEL_SALESOFFICE.Text = LblSalesOfficeName.Text
+        work.WF_SEL_SALESOFFICE_TILES.Text = Me.tileSalesOffice.GetListItemsStr
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
             Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
@@ -205,22 +202,28 @@ Public Class OIT0005TankLocSearch
 
         '○ 単項目チェック
         '所属先
-        Master.CheckField(WF_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
-            If Not isNormal(WW_RTN_SW) Then
-                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "所属先 : " & TxtSalesOffice.Text, needsPopUp:=True)
-                TxtSalesOffice.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        Else
-            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "所属先", needsPopUp:=True)
-            TxtSalesOffice.Focus()
+        'Master.CheckField(WF_CAMPCODE.Text, "OFFICECODE", TxtSalesOffice.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        'If isNormal(WW_CS0024FCHECKERR) Then
+        '    CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
+        '    If Not isNormal(WW_RTN_SW) Then
+        '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "所属先 : " & TxtSalesOffice.Text, needsPopUp:=True)
+        '        TxtSalesOffice.Focus()
+        '        O_RTN = "ERR"
+        '        Exit Sub
+        '    End If
+        'Else
+        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "所属先", needsPopUp:=True)
+        '    TxtSalesOffice.Focus()
+        '    O_RTN = "ERR"
+        '    Exit Sub
+        'End If
+        '選択項目が1つもない場合
+        If Me.tileSalesOffice.HasSelectedValue = False Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "所属先", needsPopUp:=True)
+            Me.tileSalesOffice.Focus()
             O_RTN = "ERR"
-            Exit Sub
+            Return
         End If
-
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -307,7 +310,7 @@ Public Class OIT0005TankLocSearch
                         '所属先
                         If WF_FIELD.Value = "TxtSalesOffice" Then
                             'prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, TxtSalesOffice.Text)
-                            prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
+                            'prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtSalesOffice.Text)
                         End If
 
                         Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
@@ -328,10 +331,8 @@ Public Class OIT0005TankLocSearch
         Dim fieldName As String = ""
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            '営業所
-            Case "TxtSalesOffice"
-                CODENAME_get("OFFICECODE", TxtSalesOffice.Text, LblSalesOfficeName.Text, WW_RTN_SW)
-                fieldName = "所属先"
+
+            Case Else
 
         End Select
 
@@ -365,10 +366,8 @@ Public Class OIT0005TankLocSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "TxtSalesOffice"       '所属先
-                TxtSalesOffice.Text = WW_SelectValue
-                LblSalesOfficeName.Text = WW_SelectText
-                TxtSalesOffice.Focus()
+            Case Else
+
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -387,7 +386,7 @@ Public Class OIT0005TankLocSearch
         '○ フォーカスセット
         Select Case WF_FIELD.Value
             Case "TxtSalesOffice"
-                TxtSalesOffice.Focus()
+                'TxtSalesOffice.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行

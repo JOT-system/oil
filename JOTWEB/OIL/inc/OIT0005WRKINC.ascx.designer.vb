@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIT0005WRKINC
-    
+
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class OIT0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_SEL_ORG コントロール。
     '''</summary>
@@ -30,34 +30,7 @@ Partial Public Class OIT0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORG As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_SEL_SALESOFFICECODEMAP コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_SALESOFFICECODEMAP As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_SEL_SALESOFFICECODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_SALESOFFICECODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_SEL_SALESOFFICE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_SALESOFFICE As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_SEL_OWNERCODE コントロール。
     '''</summary>
@@ -68,13 +41,13 @@ Partial Public Class OIT0005WRKINC
     Public WithEvents WF_SEL_OWNERCODE As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_SALESOFFICE_LIST コントロール。
+    '''WF_SEL_SALESOFFICE_TILES コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_SALESOFFICE_LIST As Global.System.Web.UI.WebControls.ListBox
+    Public WithEvents WF_SEL_SALESOFFICE_TILES As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_COND_DETAILTYPE コントロール。
@@ -84,7 +57,7 @@ Partial Public Class OIT0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_COND_DETAILTYPE As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_COND_DETAILTYPENAME コントロール。
     '''</summary>
@@ -93,7 +66,7 @@ Partial Public Class OIT0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_COND_DETAILTYPENAME As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_LISTSEL_TANKNUMBER コントロール。
     '''</summary>
@@ -102,7 +75,7 @@ Partial Public Class OIT0005WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_LISTSEL_TANKNUMBER As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_LISTSEL_INPTBL コントロール。
     '''</summary>

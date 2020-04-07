@@ -25,10 +25,15 @@
                     <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
                     <input type="button" id="WF_ButtonUpdateList"    class="btn-sticky" value="明細更新" onclick="ButtonClick('WF_ButtonUpdateList');" />
                     <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
-                    <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   visible="false" onclick="ButtonClick('WF_ButtonFIRST');"></div>
-                    <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   visible="false" onclick="ButtonClick('WF_ButtonLAST');"></div>
+                    <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                    <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   onclick="ButtonClick('WF_ButtonLAST');"></div>
                 </div>
             </div> <!-- End class=actionButtonBox -->
+            <div class="filterArea">
+                <div class="grc0001Wrapper" onchange="ButtonClick('chklGroupFilter');">
+                    <asp:CheckBoxList ID="chklGroupFilter" runat="server" RepeatLayout="UnorderedList"></asp:CheckBoxList>
+                </div>
+            </div>
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
         </div> <!-- End class=headerboxOnly -->
     <!-- rightbox レイアウト -->

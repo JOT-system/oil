@@ -1,6 +1,7 @@
 ﻿Option Strict On
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
+Imports JOTWEB.OIT0005WRKINC
 ''' <summary>
 ''' タンク所在管理状況画面クラス
 ''' </summary>
@@ -132,15 +133,14 @@ Public Class OIT0005TankLocCondition
         '**********************************************
         '画面情報を元に各対象リストを生成
         '**********************************************
-        Dim salesOffice As String = work.WF_SEL_SALESOFFICECODE.Text
-        Dim salesOfficeName As String = work.WF_SEL_SALESOFFICE.Text
+        Dim salesOfficeInStat As String = GRC0001TILESELECTORWRKINC.GetSelectedSqlInStatement(work.WF_SEL_SALESOFFICE_TILES.Text)
 
-        Dim dispData As New DispDataClass(salesOffice)
+        Dim dispData As New DispDataClass(salesOfficeInStat)
         'DBよりデータ取得しタンク数量取得
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             For Each condItm In dispData.ConditionList
-                condItm = GetTankCondCount(sqlCon, condItm, dispData.SalesOffice)
+                condItm = GetTankCondCount(sqlCon, condItm, dispData.SalesOfficeInStat)
             Next condItm
         End Using
         '****************************************
@@ -154,9 +154,9 @@ Public Class OIT0005TankLocCondition
     ''' </summary>
     ''' <param name="sqlCon">接続オブジェクト</param>
     ''' <param name="condItem">１パネル分の画面情報クラス</param>
-    ''' <param name="salesOffice">営業所コード</param>
+    ''' <param name="salesOfficeInStat">営業所コード</param>
     ''' <returns></returns>
-    Private Function GetTankCondCount(sqlCon As SqlConnection, condItem As ConditionItem, salesOffice As String) As ConditionItem
+    Private Function GetTankCondCount(sqlCon As SqlConnection, condItem As ConditionItem, salesOfficeInStat As String) As ConditionItem
         Dim retVal = condItem
         Dim viewName As String = work.GetTankViewName(condItem.DetailType)
         'ビュー名が取得できない場合はそのまま終了
@@ -169,11 +169,9 @@ Public Class OIT0005TankLocCondition
         sqlStat.AppendLine("       ISNULL(SUM(CASE WHEN VTS.ISCOUNT1GROUP='1' THEN 1 ELSE 0 END),0) AS COUNTGROUP1")
         sqlStat.AppendLine("      ,ISNULL(SUM(CASE WHEN VTS.ISCOUNT2GROUP='1' THEN 1 ELSE 0 END),0) AS COUNTGROUP2")
         sqlStat.AppendFormat("  FROM {0} VTS", viewName).AppendLine()
-        sqlStat.AppendLine(" WHERE VTS.OFFICECODE = @OFFICECODE")
+        sqlStat.AppendFormat(" WHERE VTS.OFFICECODE IN ({0})", salesOfficeInStat)
         Using sqlCmd = New SqlCommand(sqlStat.ToString, sqlCon)
-            With sqlCmd.Parameters
-                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = salesOffice
-            End With
+
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 Dim retVal1 As Decimal = 0
                 Dim retVal2 As Decimal = 0
@@ -240,57 +238,5 @@ Public Class OIT0005TankLocCondition
             Master.TransitionPage()
         End If
     End Sub
-    ''' <summary>
-    ''' 画面表示アイテム保持クラス
-    ''' </summary>
-    <Serializable>
-    Public Class DispDataClass
-        Public Property SalesOffice As String = ""
-        Public Property ConditionList As List(Of ConditionItem)
-        ''' <summary>
-        ''' コンストラクタ
-        ''' </summary>
-        Sub New(salesOffice As String)
-            Me.SalesOffice = salesOffice
-            Me.ConditionList = New List(Of ConditionItem)
-            Me.ConditionList.AddRange({New ConditionItem("1", "残車状況", "残車数", 0, "交検間近", 0),
-                                       New ConditionItem("2", "輸送状況", "翌日発送分", 0, "輸送中", 0),
-                                       New ConditionItem("3", "回送状況", "回送指示中分", 0, "回送中", 0),
-                                       New ConditionItem("4", "その他状況", "留置", 0, "その他", 0)})
-
-        End Sub
-        ''' <summary>
-        ''' 状況表名の取得
-        ''' </summary>
-        ''' <param name="detailType"></param>
-        ''' <returns></returns>
-        Public Shared Function GetDetailTypeName(detailType As String) As String
-            Dim tmpDetailType As New DispDataClass("")
-            Dim retVal As String = (From itm In tmpDetailType.ConditionList Where itm.DetailType = detailType Select itm.ConditionName).FirstOrDefault
-            Return retVal
-        End Function
-    End Class
-    ''' <summary>
-    ''' 画面表示のボックスアイテム
-    ''' </summary>
-    <Serializable>
-    Public Class ConditionItem
-        Public Sub New(detailType As String, conditionName As String, value1Name As String, value1 As Decimal,
-                       value2Name As String, value2 As Decimal)
-            Me.DetailType = detailType
-            Me.ConditionName = conditionName
-            Me.Value1Name = value1Name
-            Me.Value1 = value1
-            Me.Value2Name = value2Name
-            Me.Value2 = value2
-
-        End Sub
-        Public Property DetailType As String = ""
-        Public Property ConditionName As String = ""
-        Public Property Value1Name As String = ""
-        Public Property Value1 As Decimal = 0
-        Public Property Value2Name As String = ""
-        Public Property Value2 As Decimal = 0
-    End Class
 
 End Class

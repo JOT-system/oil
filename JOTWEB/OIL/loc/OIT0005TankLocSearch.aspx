@@ -44,15 +44,6 @@
                 </a>
             </div>
             <!-- 所属先 -->
-            <div class="inputItem">
-                <a id="WF_OFFICECODE_LABEL"  class="requiredMark">所属先</a>
-                <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
-                    <asp:TextBox ID="TxtSalesOffice" runat="server"  CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
-                </a>
-                <a id="WF_OFFICECODE_TEXT" >
-                    <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
-            </div>
             <div class="inputItem" >
                 <a id="WF_Test"  class="requiredMark">所属先</a>
                 <a>

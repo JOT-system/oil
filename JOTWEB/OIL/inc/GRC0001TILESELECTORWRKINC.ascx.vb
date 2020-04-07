@@ -145,9 +145,23 @@ Public Class GRC0001TILESELECTORWRKINC
     ''' <summary>
     ''' この画面に戻る際の復元
     ''' </summary>
-    ''' <param name="listObj"></param>
-    Public Sub Recover(listObj As ListBox)
-        Me.chklGrc0001SelectionBox.Items.AddRange((From itm As ListItem In listObj.Items.Cast(Of ListItem) Select itm).ToArray)
+    ''' <param name="base64Str"></param>
+    Public Sub Recover(base64Str As String)
+        Dim transVal = DecodeBase64(base64Str)
+        '保持情報の復元
+        Me.txtGrc0001ListClass.Text = CInt(transVal.ListBoxClassification).ToString
+        Me.txtGrc0001NeedsAfterPostBack.Text = Convert.ToString(transVal.NeedsPostbackAfterSelect)
+        Me.txtGrc0001SelectionMode.Text = CInt(transVal.SelectionMode).ToString
+        'タイルチェックの復元
+        'リストが無い場合は何もしない
+        If transVal.ListValues Is Nothing OrElse transVal.ListValues.Count = 0 Then
+            Return
+        End If
+        Dim qselectedItm = (From itm In transVal.ListValues Select New ListItem(itm.Value, itm.Key) With {.Selected = itm.Selected})
+        If qselectedItm.Any = False Then
+            Return
+        End If
+        Me.chklGrc0001SelectionBox.Items.AddRange(qselectedItm.ToArray)
     End Sub
     ''' <summary>
     ''' 値をWorkIncに退避するBase64Encode文字
@@ -163,7 +177,8 @@ Public Class GRC0001TILESELECTORWRKINC
         Dim enmListClassVal = DirectCast([Enum].ToObject(GetType(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION), CInt(Me.txtGrc0001ListClass.Text)), GRIS0005LeftBox.LIST_BOX_CLASSIFICATION)
         transVal.ListBoxClassification = enmListClassVal
 
-        'transVal.ListValues =
+        transVal.ListValues = (From itm In Me.chklGrc0001SelectionBox.Items.Cast(Of ListItem)
+                               Select New TransKeepValues.ListValue(itm.Value, itm.Text, itm.Selected)).ToList
 
         Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
         Dim base64Str As String = ""
@@ -184,12 +199,89 @@ Public Class GRC0001TILESELECTORWRKINC
         Return base64Str
     End Function
     ''' <summary>
-    ''' 
+    ''' 選択(複数)されたアイテムのみのリストボックスを取得。※単一の値が取りたい場合は別メソッドがあります
     ''' </summary>
-    ''' <param name="base64Str"></param>
+    ''' <param name="base64Str">GetListItemsStrで退避した文字列</param>
     ''' <returns></returns>
-    Public Shared Function GetListData(base64Str As String) As ListBox
+    Public Shared Function GetSelectedListData(base64Str As String) As ListBox
+        '未選択を含むリストの情報をすべて復元
+        Dim allValues As TransKeepValues = DecodeBase64(base64Str)
+        Dim retVal As New ListBox
+        'リストが無い場合は何もしない
+        If allValues.ListValues Is Nothing OrElse allValues.ListValues.Count = 0 Then
+            Return retVal
+        End If
+        Dim qselectedItm = (From itm In allValues.ListValues Where itm.Selected Select New ListItem(itm.Value, itm.Key) With {.Selected = itm.Selected})
+        If qselectedItm.Any = False Then
+            Return retVal
+        End If
+        retVal.Items.AddRange(qselectedItm.ToArray)
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 選択されたコード値を取得(複数選択の場合は先頭、選択が無ければブランク)
+    ''' </summary>
+    ''' <param name="base64Str">GetListItemsStrで退避した文字列</param>
+    ''' <returns></returns>
+    Public Shared Function GetSelectedSingleValue(base64Str As String) As String
+        Dim listData = GetSelectedListData(base64Str)
+        If listData Is Nothing OrElse listData.Items.Count = 0 Then
+            Return ""
+        End If
+        Return listData.Items(0).Value
+    End Function
+    ''' <summary>
+    ''' 選択されたコード値を取得(複数選択の場合は先頭、選択が無ければブランク)
+    ''' </summary>
+    ''' <param name="base64Str">GetListItemsStrで退避した文字列</param>
+    ''' <returns></returns>
+    Public Shared Function GetSelectedSingleText(base64Str As String) As String
+        Dim listData = GetSelectedListData(base64Str)
+        If listData Is Nothing OrElse listData.Items.Count = 0 Then
+            Return ""
+        End If
+        Return listData.Items(0).Text
+    End Function
+    ''' <summary>
+    ''' SQLのInステートメント用の文字列を生成(選択されたコード値を'[コード]','[コード]'・・・で返却)
+    ''' </summary>
+    ''' <param name="base64Str">GetListItemsStrで退避した文字列</param>
+    ''' <returns></returns>
+    ''' <remarks>選択が無ければブランクで返却します</remarks>
+    Public Shared Function GetSelectedSqlInStatement(base64Str As String) As String
 
+        '未選択を含むリストの情報をすべて復元
+        Dim allValues As TransKeepValues = DecodeBase64(base64Str)
+        Dim retVal As New ListBox
+        'リストが無い場合は何もしない
+        If allValues.ListValues Is Nothing OrElse allValues.ListValues.Count = 0 Then
+            Return ""
+        End If
+        Dim qselectedItm = (From itm In allValues.ListValues Where itm.Selected Select "'" & itm.Key & "'")
+        If qselectedItm.Any = False Then
+            Return ""
+        End If
+        Return String.Join(",", qselectedItm)
+    End Function
+    ''' <summary>
+    ''' 画面引継ぎのBase64文字をデコードしTransKeepValuesに格納
+    ''' </summary>
+    ''' <param name="base64Str">GetListItemsStrで退避した文字列</param>
+    ''' <returns></returns>
+    Private Shared Function DecodeBase64(base64Str As String) As TransKeepValues
+        Dim retVal As TransKeepValues
+        Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+        Dim conmressedByte As Byte()
+        conmressedByte = Convert.FromBase64String(base64Str)
+        '取得した文字をByte化し解凍、画面利用クラスに再格納
+        Using inpMs As New IO.MemoryStream(conmressedByte),
+              outMs As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(inpMs, IO.Compression.CompressionMode.Decompress)
+            ds.CopyTo(outMs)
+            outMs.Position = 0
+            retVal = DirectCast(formatter.Deserialize(outMs), TransKeepValues)
+        End Using
+        Return retVal
     End Function
     ''' <summary>
     ''' 次画面遷移時に保持する情報クラス
@@ -225,6 +317,36 @@ Public Class GRC0001TILESELECTORWRKINC
         ''' 画面上のタイル情報
         ''' </summary>
         ''' <returns></returns>
-        Public Property ListValues As List(Of ListItem)
+        Public Property ListValues As List(Of ListValue)
+        ''' <summary>
+        ''' リストアイテム情報保持クラス
+        ''' </summary>
+        <Serializable>
+        Public Class ListValue
+            ''' <summary>
+            ''' コンストラクタ
+            ''' </summary>
+            ''' <param name="key">コード値</param>
+            ''' <param name="value">表示値</param>
+            ''' <param name="selected">選択</param>
+            Public Sub New(key As String, value As String, selected As Boolean)
+                Me.Key = key
+                Me.Value = value
+                Me.Selected = selected
+            End Sub
+
+            ''' <summary>
+            ''' コード値
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Key As String
+            ''' <summary>
+            ''' 表示値
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property Value As String
+            '選択(True:選択、False:未選択)
+            Public Property Selected As Boolean
+        End Class
     End Class
 End Class

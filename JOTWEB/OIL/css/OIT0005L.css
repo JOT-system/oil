@@ -19,3 +19,12 @@
     background-size: contain;
     background-image: url('../img/suitekiIcon.png');
 }
+.filterArea {
+    padding-left:10px;
+}
+.grc0001Wrapper ul {
+    width:600px
+}
+.grc0001Wrapper input[type=checkbox] + label {
+    width: 250px
+}

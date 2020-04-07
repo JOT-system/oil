@@ -3562,9 +3562,15 @@ Public Class OIT0002LinkDetail
             If WW_GetValue(0) <> "" Then
                 '★タンク車所在の更新
                 '引数１：所在地コード　⇒　変更あり(空車着駅（発駅）)
-                '引数２：タンク車状態　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
                 '引数３：積車区分　　　⇒　変更なし(空白)
-                WW_UpdateTankShozai(Me.TxtRetstation.Text, "", "", I_TANKNO:=WW_GetValue(0))
+                WW_UpdateTankShozai(Me.TxtRetstation.Text, "3", "", I_TANKNO:=WW_GetValue(0))
+            Else
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                WW_UpdateTankShozai("", "3", "", I_TANKNO:=WW_GetValue(0))
 
             End If
 

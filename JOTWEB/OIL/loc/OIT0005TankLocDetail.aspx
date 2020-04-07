@@ -41,7 +41,9 @@
                     <!-- 管轄支店コード -->
                     <span class="ef" id="WF_BRANCHCODE">
                         <asp:Label ID="LblBranchCode" runat="server" Text="管轄支店コード" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtBranchCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
+                            <asp:TextBox ID="TxtBranchCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
+                        </span>
                         <span></span>
                     </span>
                 </p>
@@ -49,14 +51,18 @@
                     <!-- 所属営業所コード -->
                     <span class="ef" id="WF_OFFICECODE">
                         <asp:Label ID="LblOfficeCode" runat="server" Text="所属営業所コード" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtOfficeCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
+                            <asp:TextBox ID="TxtOfficeCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>                        
+                        </span>
                         <span></span>
                     </span>
 
                     <!-- 所在地コード -->
                     <span class="ef" id="WF_LOCATIONCODE">
                         <asp:Label ID="LblLocationCode" runat="server" Text="所在地コード" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtLocationCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
+                            <asp:TextBox ID="TxtLocationCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
+                        </span>
                         <span></span>
                     </span>
                 </p>
@@ -81,14 +87,18 @@
                     <!-- 空車着日（予定） -->
                     <span class="ef" id="WF_EMPARRDATE">
                         <asp:Label ID="LblEmpArrDate" runat="server" Text="空車着日（予定）" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtEmpArrDate" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
+                            <asp:TextBox ID="TxtEmpArrDate" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon" ></asp:TextBox>
+                        </span>
                         <span></span>
                     </span>
 
                     <!-- 空車着日（実績） -->
                     <span class="ef" id="WF_ACTUALEMPARRDATE">
                         <asp:Label ID="LblActualEmpArrDate" runat="server" Text="空車着日（実績）" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtActualEmpArrDate" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
+                        <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
+                            <asp:TextBox ID="TxtActualEmpArrDate" runat="server" CssClass="WF_TEXTBOX_CSS calendarIcon" ></asp:TextBox>
+                        </span>
                         <span></span>
                     </span>
                 </p>
@@ -96,8 +106,10 @@
                     <!-- 積車油種コード -->
                     <span class="ef" id="WF_OILCODE">
                         <asp:Label ID="LblOilCode" runat="server" Text="積車油種" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtOilCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
-                        <asp:Label ID="LblOilCodeText" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
+                            <asp:TextBox ID="TxtOilCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
+                        </span>
+                        <asp:Label ID="LblOilCodeText" runat="server" Text="" ></asp:Label>
                     </span>
                     <!-- 油種区分(受発注用) -->
                     <span class="ef" id="WF_ORDERINGTYPE">
@@ -116,8 +128,10 @@
                     <!-- 前回油種 -->
                     <span class="ef" id="WF_LASTOILCODE">
                         <asp:Label ID="LblLastOilCode" runat="server" Text="前回油種" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtLastOilCode" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
-                        <asp:Label ID="LblLastOilCodeText" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
+                            <asp:TextBox ID="TxtLastOilCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
+                        </span>
+                        <asp:Label ID="LblLastOilCodeText" runat="server" Text="" ></asp:Label>
                     </span>
 
                 </p>

@@ -91,8 +91,16 @@
                 <a id="WF_SW_LABEL">ステータス選択</a>
        
                 <a  class="inline-radio" id="checkbox">
-                    <div><asp:RadioButton ID="WF_SW1" runat="server" GroupName="WF_SW" Text="利用可のみ表示" /></div>
-                    <div><asp:RadioButton ID="WF_SW2" runat="server" GroupName="WF_SW" Text="全て表示" /></div>
+                    <div class="grc0001Wrapper">
+                        <ul>
+                            <li>
+                                <asp:RadioButton ID="WF_SW1" runat="server" GroupName="WF_SW" Text="利用可のみ表示" />
+                            </li>
+                            <li>
+                                <asp:RadioButton ID="WF_SW2" runat="server" GroupName="WF_SW" Text="全て表示" />
+                            </li>
+                        </ul>
+                    </div>
                 </a>
             </div>
         </div> <!-- End inputBox -->

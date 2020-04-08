@@ -27,6 +27,7 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
+                <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
             </div>
         </div>
@@ -73,9 +74,20 @@
                         <asp:TextBox ID="TxtKaisouStatus" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                     </a>
                 </span>
-                <span></span>
-                <span></span>
-                <span></span>
+                <!-- ■　目的　■ -->
+                <span>
+                    <a id="WF_OBJECTIVE_LABEL">目的</a>
+                    <a class="ef" id="WF_OBJECTIVE" ondblclick="Field_DBclick('TxtObjective', <%=LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE%>);" onchange="TextBox_change('TxtObjective');">
+                        <asp:TextBox ID="TxtObjective" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="1"></asp:TextBox>
+                    </a>
+                </span>
+                <span class ="left">
+                    <span>
+                        <a id="WF_OBJECTIVENAME">
+                            <asp:Label ID="LblObjective" runat="server"></asp:Label>
+                        </a>
+                    </span>
+                </span>                <span></span>
 
                 <!-- ■　回送登録営業所　■ -->
                 <span class="left">
@@ -249,6 +261,7 @@
                     </div>
                     <div class="rightSide">
                         <input type="button" id="WF_ButtonUPDATE_TAB1" class="btn-sticky" value="割当確定"  onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
+                        <input type="button" id="WF_ButtonUPDATE_MEISAI_TAB1" class="btn-sticky" value="明細更新"  onclick="ButtonClick('WF_ButtonUPDATE_TAB1');" />
                     </div>
                 </div> <!-- END actionButtonBox -->
                 <!-- 一覧レイアウト -->

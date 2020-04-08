@@ -280,6 +280,7 @@ Public Class OIT0006OutOfServiceList
             & " , ISNULL(RTRIM(OIS0015_2.VALUE1), '')                 AS KAISOUINFONAME" _
             & " , ISNULL(RTRIM(OIT0006.FAREFLG), '')   　             AS FAREFLG" _
             & " , ISNULL(RTRIM(OIT0006.USEPROPRIETYFLG), '')   　     AS USEPROPRIETYFLG" _
+            & " , ISNULL(RTRIM(OIT0006.DELIVERYFLG), '')   　         AS DELIVERYFLG" _
             & " , ISNULL(FORMAT(OIT0006.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
             & " , ISNULL(FORMAT(OIT0006.ACTUALDEPDATE, 'yyyy/MM/dd'), '')     AS ACTUALDEPDATE" _
             & " , ISNULL(FORMAT(OIT0006.ARRDATE, 'yyyy/MM/dd'), '')           AS ARRDATE" _
@@ -596,6 +597,8 @@ Public Class OIT0006OutOfServiceList
         work.WF_SEL_DELFLG.Text = "0"
         '作成フラグ(1：新規登録, 2：更新)
         work.WF_SEL_CREATEFLG.Text = "1"
+        '託送指示フラグ(0：未手配, 1:手配)
+        work.WF_SEL_DELIVERYFLG.Text = "0"
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0006tbl)
@@ -742,6 +745,8 @@ Public Class OIT0006OutOfServiceList
         work.WF_SEL_DELFLG.Text = OIT0006tbl.Rows(WW_LINECNT)("DELFLG")
         '作成フラグ(1：新規登録, 2：更新)
         work.WF_SEL_CREATEFLG.Text = "2"
+        '託送指示フラグ(0：未手配, 1:手配)
+        work.WF_SEL_DELIVERYFLG.Text = OIT0006tbl.Rows(WW_LINECNT)("DELIVERYFLG")
 
         '○ 状態をクリア
         For Each OIT0006row As DataRow In OIT0006tbl.Rows
@@ -1260,10 +1265,10 @@ Public Class OIT0006OutOfServiceList
             End Using
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D KAISOUHISTORY")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006L KAISOUHISTORY")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0006D KAISOUHISTORY"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006L KAISOUHISTORY"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

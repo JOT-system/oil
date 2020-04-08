@@ -1018,12 +1018,39 @@ Public Class OIT0006OutOfServiceDetail
                         'End If
                     End If
 
+                    '(一覧)タンク車№, 
+                    If WF_FIELD.Value = "TANKNO" Then
+                        '〇 検索(営業所).テキストボックスが未設定
+                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            '〇 画面(回送登録営業所).テキストボックスが未設定
+                            If Me.TxtKaisouOrderOffice.Text = "" Then
+                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                            Else
+                                prmData = work.CreateSALESOFFICEParam(Me.TxtKaisouOrderOfficeCode.Text, "")
+                            End If
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                        End If
+
+                        '### LeftBoxマルチ対応(20200217) START #####################################################
+                        If WF_FIELD.Value = "TANKNO" Then
+
+                            '↓暫定一覧対応 2020/02/13 グループ会社版を復活させ石油システムに合わない部分は直す
+                            Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                            .SetTableList(enumVal, WW_DUMMY, prmData)
+                            .ActiveTable()
+                            Return
+                            '↑暫定一覧対応 2020/02/13
+                        End If
+                        '### LeftBoxマルチ対応(20200217) END   #####################################################
+                    End If
+
                     .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                     .ActiveListBox()
 
                 Else
-                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
-                    Select Case WF_FIELD.Value
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
                         '(予定)発日
                         Case "TxtDepDate"
                             .WF_Calendar.Text = Me.TxtDepDate.Text

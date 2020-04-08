@@ -275,4 +275,160 @@ Public Class EntryHistory
         End Using
     End Sub
 
+    ''' <summary>
+    ''' 回送履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon">接続オブジェクト</param>
+    ''' <param name="sqlTran">トランザクションオブジェクト(トランザクションを利用しない場合はNothing指定)</param>
+    ''' <param name="drOrder">履歴用の回送テーブル行オブジェクト</param>
+    ''' <remarks>通常の回送明細テーブルに「履歴番号」と「画面ID」(呼出し側のMe.Title）
+    ''' フィールドを追加したデータ行オブジェクト</remarks>
+    Public Shared Sub InsertKaisouHistory(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
+
+        '◯回送TBL
+        Dim sqlKaisouStat As New StringBuilder
+        sqlKaisouStat.AppendLine("INSERT INTO OIL.HIS0003_KAISOU")
+        sqlKaisouStat.AppendLine("   (HISTORYNO,MAPID,KAISOUNO,KAISOUTYPE,TRAINNO,TRAINNAME,KAISOUYMD,OFFICECODE,OFFICENAME,")
+        sqlKaisouStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,BASECODE,BASENAME,CONSIGNEECODE,CONSIGNEENAME,")
+        sqlKaisouStat.AppendLine("    DEPSTATION,DEPSTATIONNAME,ARRSTATION,ARRSTATIONNAME,OBJECTIVECODE,")
+        sqlKaisouStat.AppendLine("    KAISOUSTATUS,KAISOUINFO,FAREFLG,USEPROPRIETYFLG,")
+        sqlKaisouStat.AppendLine("    DEPDATE,ARRDATE,ACCDATE,EMPARRDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
+        sqlKaisouStat.AppendLine("    TOTALTANK,ORDERNO,KEIJYOYMD,")
+        sqlKaisouStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlKaisouStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
+        sqlKaisouStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
+        sqlKaisouStat.AppendLine("    VALUES")
+        sqlKaisouStat.AppendLine("   (@HISTORYNO,@MAPID,@KAISOUNO,@KAISOUTYPE,@TRAINNO,@TRAINNAME,@KAISOUYMD,@OFFICECODE,@OFFICENAME,")
+        sqlKaisouStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@BASECODE,@BASENAME,@CONSIGNEECODE,@CONSIGNEENAME,")
+        sqlKaisouStat.AppendLine("    @DEPSTATION,@DEPSTATIONNAME,@ARRSTATION,@ARRSTATIONNAME,@OBJECTIVECODE,")
+        sqlKaisouStat.AppendLine("    @KAISOUSTATUS,@KAISOUINFO,@FAREFLG,@USEPROPRIETYFLG,")
+        sqlKaisouStat.AppendLine("    @DEPDATE,@ARRDATE,@ACCDATE,@EMPARRDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
+        sqlKaisouStat.AppendLine("    @TOTALTANK,@ORDERNO,@KEIJYOYMD,")
+        sqlKaisouStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlKaisouStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
+        sqlKaisouStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
+
+        Using sqlKaisouCmd As New SqlCommand(sqlKaisouStat.ToString, sqlCon, sqlTran)
+            With sqlKaisouCmd.Parameters
+                .Add("HISTORYNO", SqlDbType.NVarChar).Value = drOrder("HISTORYNO")
+                .Add("MAPID", SqlDbType.NVarChar).Value = drOrder("MAPID")
+                .Add("KAISOUNO", SqlDbType.NVarChar).Value = drOrder("KAISOUNO")
+                .Add("KAISOUTYPE", SqlDbType.NVarChar).Value = drOrder("KAISOUTYPE")
+                .Add("TRAINNO", SqlDbType.NVarChar).Value = drOrder("TRAINNO")
+                .Add("TRAINNAME", SqlDbType.NVarChar).Value = drOrder("TRAINNAME")
+                .Add("KAISOUYMD", SqlDbType.Date).Value = drOrder("KAISOUYMD")
+                .Add("OFFICECODE", SqlDbType.NVarChar).Value = drOrder("OFFICECODE")
+                .Add("OFFICENAME", SqlDbType.NVarChar).Value = drOrder("OFFICENAME")
+                .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
+                .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")
+                .Add("BASECODE", SqlDbType.NVarChar).Value = drOrder("BASECODE")
+                .Add("BASENAME", SqlDbType.NVarChar).Value = drOrder("BASENAME")
+                .Add("CONSIGNEECODE", SqlDbType.NVarChar).Value = drOrder("CONSIGNEECODE")
+                .Add("CONSIGNEENAME", SqlDbType.NVarChar).Value = drOrder("CONSIGNEENAME")
+                .Add("DEPSTATION", SqlDbType.NVarChar).Value = drOrder("DEPSTATION")
+                .Add("DEPSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("DEPSTATIONNAME")
+                .Add("ARRSTATION", SqlDbType.NVarChar).Value = drOrder("ARRSTATION")
+                .Add("ARRSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("ARRSTATIONNAME")
+                .Add("OBJECTIVECODE", SqlDbType.NVarChar).Value = drOrder("OBJECTIVECODE")
+                .Add("KAISOUSTATUS", SqlDbType.NVarChar).Value = drOrder("KAISOUSTATUS")
+                .Add("KAISOUINFO", SqlDbType.NVarChar).Value = drOrder("KAISOUINFO")
+                .Add("FAREFLG", SqlDbType.NVarChar).Value = drOrder("FAREFLG")
+                .Add("USEPROPRIETYFLG", SqlDbType.NVarChar).Value = drOrder("USEPROPRIETYFLG")
+                .Add("DEPDATE", SqlDbType.Date).Value = drOrder("DEPDATE")
+                .Add("ARRDATE", SqlDbType.Date).Value = drOrder("ARRDATE")
+                .Add("ACCDATE", SqlDbType.Date).Value = drOrder("ACCDATE")
+                .Add("EMPARRDATE", SqlDbType.Date).Value = drOrder("EMPARRDATE")
+                .Add("ACTUALDEPDATE", SqlDbType.Date).Value = If(drOrder.IsNull("ACTUALDEPDATE"), CType(DBNull.Value, Object), drOrder("ACTUALDEPDATE"))
+                .Add("ACTUALARRDATE", SqlDbType.Date).Value = If(drOrder.IsNull("ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
+                .Add("ACTUALACCDATE", SqlDbType.Date).Value = If(drOrder.IsNull("ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
+                .Add("ACTUALEMPARRDATE", SqlDbType.Date).Value = If(drOrder.IsNull("ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
+                .Add("TOTALTANK", SqlDbType.Int).Value = drOrder("TOTALTANK")
+                .Add("ORDERNO", SqlDbType.NVarChar).Value = drOrder("ORDERNO")
+                .Add("KEIJYOYMD", SqlDbType.Date).Value = If(drOrder.IsNull("KEIJYOYMD"), CType(DBNull.Value, Object), drOrder("KEIJYOYMD"))
+                .Add("SALSE", SqlDbType.Int).Value = drOrder("SALSE")
+                .Add("SALSETAX", SqlDbType.Int).Value = drOrder("SALSETAX")
+                .Add("TOTALSALSE", SqlDbType.Int).Value = drOrder("TOTALSALSE")
+                .Add("PAYMENT", SqlDbType.Int).Value = drOrder("PAYMENT")
+                .Add("PAYMENTTAX", SqlDbType.Int).Value = drOrder("PAYMENTTAX")
+                .Add("TOTALPAYMENT", SqlDbType.Int).Value = drOrder("TOTALPAYMENT")
+                .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
+                .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
+                .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
+                .Add("INITTERMID", SqlDbType.NVarChar).Value = drOrder("INITTERMID")
+                .Add("UPDYMD", SqlDbType.DateTime).Value = drOrder("UPDYMD")
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = drOrder("UPDUSER")
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = drOrder("UPDTERMID")
+                .Add("RECEIVEYMD", SqlDbType.DateTime).Value = drOrder("RECEIVEYMD")
+            End With
+            sqlKaisouCmd.CommandTimeout = 300
+            sqlKaisouCmd.ExecuteNonQuery()
+        End Using
+
+    End Sub
+
+    ''' <summary>
+    ''' 回送明細履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <param name="drOrder"></param>
+    ''' <remarks>通常の回送明細テーブルに「履歴番号」(InsertKaisouHistoryで採番した履歴番号と合わせる)
+    ''' と「画面ID」(呼出し側のMe.Title）の
+    ''' フィールドを追加したデータ行オブジェクト</remarks>
+    Public Shared Sub InsertKaisouDetailHistory(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
+
+        '◯回送明細TBL
+        Dim sqlDetailStat As New StringBuilder
+        sqlDetailStat.AppendLine("INSERT INTO OIL.HIS0004_KAISOUDETAIL")
+        sqlDetailStat.AppendLine("   (HISTORYNO,MAPID,KAISOUNO,DETAILNO,SHIPORDER,TANKNO,KAMOKU,")
+        sqlDetailStat.AppendLine("    KAISOUINFO,CARSNUMBER,REMARK,")
+        sqlDetailStat.AppendLine("    ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
+        sqlDetailStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlDetailStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
+        sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
+        sqlDetailStat.AppendLine("    VALUES")
+        sqlDetailStat.AppendLine("   (@HISTORYNO,@MAPID,@KAISOUNO,@DETAILNO,@SHIPORDER,@TANKNO,@KAMOKU,")
+        sqlDetailStat.AppendLine("    @KAISOUINFO,@CARSNUMBER,@REMARK,")
+        sqlDetailStat.AppendLine("    @ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
+        sqlDetailStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlDetailStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
+        sqlDetailStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD )")
+
+        Using sqlDetailCmd As New SqlCommand(sqlDetailStat.ToString, sqlCon, sqlTran)
+            With sqlDetailCmd.Parameters
+                .Add("HISTORYNO", SqlDbType.NVarChar).Value = drOrder("HISTORYNO")
+                .Add("MAPID", SqlDbType.NVarChar).Value = drOrder("MAPID")
+                .Add("KAISOUNO", SqlDbType.NVarChar).Value = drOrder("KAISOUNO")
+                .Add("DETAILNO", SqlDbType.NVarChar).Value = drOrder("DETAILNO")
+                .Add("SHIPORDER", SqlDbType.NVarChar).Value = drOrder("SHIPORDER")
+                .Add("TANKNO", SqlDbType.NVarChar).Value = drOrder("TANKNO")
+                .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
+                .Add("KAISOUINFO", SqlDbType.NVarChar).Value = drOrder("KAISOUINFO")
+                .Add("CARSNUMBER", SqlDbType.NVarChar).Value = drOrder("CARSNUMBER")
+                .Add("REMARK", SqlDbType.NVarChar).Value = drOrder("REMARK")
+                .Add("ACTUALDEPDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALDEPDATE"), CType(DBNull.Value, Object), drOrder("ACTUALDEPDATE"))
+                .Add("ACTUALARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
+                .Add("ACTUALACCDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
+                .Add("ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
+                .Add("SALSE", SqlDbType.NVarChar).Value = drOrder("SALSE")
+                .Add("SALSETAX", SqlDbType.NVarChar).Value = drOrder("SALSETAX")
+                .Add("TOTALSALSE", SqlDbType.NVarChar).Value = drOrder("TOTALSALSE")
+                .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("PAYMENT")
+                .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("PAYMENTTAX")
+                .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
+                .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
+                .Add("INITYMD", SqlDbType.NVarChar).Value = drOrder("INITYMD")
+                .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
+                .Add("INITTERMID", SqlDbType.NVarChar).Value = drOrder("INITTERMID")
+                .Add("UPDYMD", SqlDbType.NVarChar).Value = drOrder("UPDYMD")
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = drOrder("UPDUSER")
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = drOrder("UPDTERMID")
+                .Add("RECEIVEYMD", SqlDbType.NVarChar).Value = drOrder("RECEIVEYMD")
+            End With
+            sqlDetailCmd.CommandTimeout = 300
+            sqlDetailCmd.ExecuteNonQuery()
+        End Using
+
+    End Sub
+
 End Class

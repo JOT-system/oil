@@ -4654,11 +4654,27 @@ Public Class OIT0006OutOfServiceDetail
                     '### 特に何もしない ####################################
 
                 Else
-                    '★タンク車所在の更新
-                    '引数１：所在地コード　⇒　変更あり(発駅)
-                    '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                    '引数３：積車区分　　　⇒　変更なし(空白)
-                    WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"))
+
+                    '回送画面の目的が"5:疎開留置"の場合
+                    If Me.TxtObjective.Text = "5" Then
+                        '★タンク車所在の更新
+                        '引数１：所在地コード　　　⇒　変更なし(空白)
+                        '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
+                        '引数３：積車区分　　　　　⇒　変更なし(空白)
+                        '引数４：所属営業所コード　⇒　変更なし(空白)
+                        '引数５：タンク車№　　　　⇒　指定あり
+                        WW_UpdateTankShozai("", "3", "", I_OFFICE:="", I_TANKNO:=OIT0006row("TANKNO"))
+
+                    Else
+                        '★タンク車所在の更新
+                        '引数１：所在地コード　　　⇒　変更あり(発駅)
+                        '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
+                        '引数３：積車区分　　　　　⇒　変更なし(空白)
+                        '引数４：タンク車№　　　　⇒　指定あり
+                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"))
+
+                    End If
+
 
                 End If
             Next
@@ -4760,6 +4776,7 @@ Public Class OIT0006OutOfServiceDetail
     Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
                                       ByVal I_STATUS As String,
                                       ByVal I_KBN As String,
+                                      Optional ByVal I_OFFICE As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal upActualEmparrDate As Boolean = False)
@@ -4775,6 +4792,10 @@ Public Class OIT0006OutOfServiceDetail
                     & "    SET "
 
             '○ 更新内容が指定されていれば追加する
+            '所属営業所コード
+            If Not String.IsNullOrEmpty(I_LOCATION) Then
+                SQLStr &= String.Format("        OFFICECODE   = '{0}', ", I_OFFICE)
+            End If
             '所在地コード
             If Not String.IsNullOrEmpty(I_LOCATION) Then
                 SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)

@@ -82,6 +82,8 @@ Public Class GRIS0005LeftBox
     ''' <item><description>LC_BRANCH        : 管轄支店のリストを作成（タンク所在向け）</description></item>
     ''' <item><description>LC_BELONGTOOFFICE: 所属営業所（支店含む）のリストを作成（タンク所在向け）</description></item>
     ''' <item><description>LC_BRANCHOFFICESTATION: 管轄所属・駅関連付けのリストを作成（タンク所在向け）</description></item>
+    ''' <item><description>LC_TANKSTATUS: タンク車状態のリストを作成</description></item>
+    ''' <item><description>LC_LOADINGKBN: 積車状態リストを作成</description></item>
     ''' </list>
     Public Enum LIST_BOX_CLASSIFICATION
         LC_COMPANY
@@ -147,6 +149,8 @@ Public Class GRIS0005LeftBox
         LC_BRANCH
         LC_BELONGTOOFFICE
         LC_BRANCHOFFICESTATION
+        LC_TANKSTATUS
+        LC_LOADINGKBN
     End Enum
 
     ''' <summary>
@@ -730,7 +734,14 @@ Public Class GRIS0005LeftBox
                 '管轄所属・駅関連付け
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BRANCHOFFICESTATION"
                 lbox = CreateFixValueList(Params, O_RTN)
-
+            Case LIST_BOX_CLASSIFICATION.LC_TANKSTATUS
+                'タンク車状態
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKSTATUS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_LOADINGKBN
+                '積車区分
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "LOADINGKBN"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing

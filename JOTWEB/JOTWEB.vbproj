@@ -220,6 +220,7 @@
     <Content Include="OIL\ord\OIT0003OrderList.aspx" />
     <Content Include="OIL\ord\OIT0003OrderSearch.aspx" />
     <Content Include="OIL\script\OIT0003B.js" />
+    <Content Include="OIL\script\OIT0005D.js" />
     <Content Include="OIL\script\OIT0006D.js" />
     <Content Include="OIL\script\OIT0006L.js" />
     <Content Include="OIL\script\OIT0006S.js" />

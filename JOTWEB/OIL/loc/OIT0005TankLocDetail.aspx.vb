@@ -49,6 +49,8 @@ Public Class OIT0005TankLocDetail
                             WF_UPDATE_Click()
                         Case "WF_CLEAR"                 'クリアボタン押下
                             WF_CLEAR_Click()
+                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                            WF_FIELD_DBClick()
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
                             WF_FIELD_Change()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
@@ -152,45 +154,12 @@ Public Class OIT0005TankLocDetail
                     txtObj.Text = Convert.ToString(selectedDr(col.ColumnName))
                 End If
             Next col
+            CODENAME_get("BRANCH", TxtBranchCode.Text, LblBranchCodeText.Text, WW_DUMMY)
+            CODENAME_get("BELONGTOOFFICE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_DUMMY)
+            CODENAME_get("BRANCHOFFICESTATION", TxtLocationCode.Text, LblLocationCodeText.Text, WW_DUMMY)
+            CODENAME_get("TANKSTATUS", TxtTankStatus.Text, LblTankStatusText.Text, WW_DUMMY)
+            CODENAME_get("LOADINGKBN", TxtLoadingKbn.Text, LblLoadingKbnText.Text, WW_DUMMY)
         End If
-        '○ 名称設定処理
-        'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
-        'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署
-
-        ''貨物駅コード・貨物コード枝番・発着駅フラグ・削除フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
-        'Me.TxtStationCode.Attributes("onkeyPress") = "CheckNum()"
-        'Me.TxtBranch.Attributes("onkeyPress") = "CheckNum()"
-        'Me.TxtDepArrStation.Attributes("onkeyPress") = "CheckNum()"
-        'Me.WF_DELFLG.Attributes("onkeyPress") = "CheckNum()"
-
-        ''選択行
-        'WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
-
-        ''貨物車コード
-        'TxtStationCode.Text = work.WF_SEL_STATIONCODE2.Text
-
-        ''貨物コード枝番
-        'TxtBranch.Text = work.WF_SEL_BRANCH2.Text
-
-        ''貨物駅名称
-        'TxtStationName.Text = work.WF_SEL_STATONNAME.Text
-
-        ''貨物駅名称カナ
-        'TxtStationNameKana.Text = work.WF_SEL_STATIONNAMEKANA.Text
-
-        ''貨物駅種別名称
-        'TxtTypeName.Text = work.WF_SEL_TYPENAME.Text
-
-        ''貨物駅種別名称カナ
-        'TxtTypeNameKana.Text = work.WF_SEL_TYPENAMEKANA.Text
-
-        ''発着駅フラグ
-        'TxtDepArrStation.Text = work.WF_SEL_DEPARRSTATIONFLG2.Text
-        'CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStationName.Text, WW_DUMMY)
-
-        ''削除
-        'WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
-        'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
 
     End Sub
 
@@ -272,26 +241,45 @@ Public Class OIT0005TankLocDetail
             End If
 
             With leftview
-                '会社コード
-                Dim prmData As New Hashtable
+                If CInt(WF_LeftMViewChange.Value) <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+                    '会社コード
+                    Dim prmData As New Hashtable
 
-                'フィールドによってパラメーターを変える
-                Select Case WW_FIELD
-                    ''貨物車コード 
-                    'Case "STATIONCODE"
-                    '    prmData = work.CreateSTATIONPTParam(work.WF_SEL_CAMPCODE.Text, TxtStationCode.Text & TxtBranch.Text)
-                    '発着駅フラグ 
-                    Case "TxtDepArrStation"
-                        'prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, TxtDepArrStation.Text)
+                    'フィールドによってパラメーターを変える
+                    Select Case WW_FIELD
+                        Case "TxtBranchCode" '管轄支店コード
+                            prmData = work.CreateFIXParam(Master.USER_ORG)
+                        Case "TxtOfficeCode" '所属営業所コード
+                            prmData = work.CreateFIXParam(Master.USER_ORG)
+                        Case "TxtLocationCode" '所在地コード
+                            Dim targetOffice As String = Me.TxtOfficeCode.Text
+                            prmData = work.CreateFIXParam(targetOffice)
+                        Case "TxtTankStatus" '所属営業所コード
+                            prmData = work.CreateFIXParam("ZZ")
+                            'prmData.Add(GRIS0005LeftBox.C_PARAMETERS.LP_ADDITINALCONDITION, "KEYCODE <> ''")
+                        Case "TxtLoadingKbn" '所在地コード
+                            prmData = work.CreateFIXParam("ZZ")
+                        Case Else
 
-                    '削除フラグ   
-                    Case "WF_DELFLG"
-                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
-                        prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
-                End Select
-                Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
-                .SetListBox(enumVal, WW_DUMMY, prmData)
-                .ActiveListBox()
+
+                    End Select
+                    Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                    .SetListBox(enumVal, WW_DUMMY, prmData)
+                    .ActiveListBox()
+                Else
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        '空車着日（予定）
+                        Case "TxtEmpArrDate"
+                            .WF_Calendar.Text = TxtEmpArrDate.Text
+                        '空車着日（実績）
+                        Case "TxtActualEmpArrDate"
+                            .WF_Calendar.Text = TxtActualEmpArrDate.Text
+
+                    End Select
+                    .ActiveCalendar()
+                End If
+
             End With
         End If
 
@@ -304,6 +292,18 @@ Public Class OIT0005TankLocDetail
     Protected Sub WF_FIELD_Change()
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
+            Case "TxtBranchCode" '管轄支店コード
+                CODENAME_get("BRANCH", TxtBranchCode.Text, LblBranchCodeText.Text, WW_RTN_SW)
+            Case "TxtOfficeCode" '所属営業所コード
+                CODENAME_get("BELONGTOOFFICE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_RTN_SW)
+                TxtLocationCode.Text = ""
+                LblLocationCodeText.Text = ""
+            Case "TxtLocationCode" '所在地コード
+                CODENAME_get("BRANCHOFFICESTATION", TxtLocationCode.Text, LblLocationCodeText.Text, WW_RTN_SW)
+            Case "TxtTankStatus" 'タンク車状況
+                CODENAME_get("TANKSTATUS", TxtTankStatus.Text, LblTankStatusText.Text, WW_RTN_SW)
+            Case "TxtLoadingKbn" '積車区分
+                CODENAME_get("LOADINGKBN", TxtLoadingKbn.Text, LblLoadingKbnText.Text, WW_RTN_SW)
             ''会社コード
             'Case "WF_CAMPCODE"
             '    CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
@@ -354,54 +354,52 @@ Public Class OIT0005TankLocDetail
         '○ 選択内容を画面項目へセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除
-                Case "WF_DELFLG"
-                    'WF_DELFLG.Text = WW_SelectValue
-                    'WF_DELFLG_TEXT.Text = WW_SelectText
-                    'WF_DELFLG.Focus()
-
-                '    '貨物駅コード
-                'Case "STATIONCODE"
-                '    TxtStationCode.Text = WW_SelectValue.Substring(0, 4)
-                '    LblStationCodeText.Text = WW_SelectText
-                '    TxtBranch.Text = WW_SelectValue.Substring(4)
-                '    TxtStationCode.Focus()
-
-                '    '貨物コード枝番
-                'Case "BRANCH"
-                '    TxtBranch.Text = WW_SelectValue
-                '    LblBranchText.Text = WW_SelectText
-                '    TxtBranch.Focus()
-
-                '    '貨物駅名称
-                'Case "STATONNAME"
-                '    TxtStationName.Text = WW_SelectValue
-                '    LblStationNameText.Text = WW_SelectText
-                '    TxtStationName.Focus()
-
-                '    '貨物駅名称カナ
-                'Case "STATIONNAMEKANA"
-                '    TxtStationNameKana.Text = WW_SelectValue
-                '    LblStationNameKanaText.Text = WW_SelectText
-                '    TxtStationNameKana.Focus()
-
-                '    '貨物駅種別名称
-                'Case "TYPENAME"
-                '    TxtTypeName.Text = WW_SelectValue
-                '    LblTypeNameText.Text = WW_SelectText
-                '    TxtTypeName.Focus()
-
-                '    '貨物駅種別名称カナ
-                'Case "TYPENAMEKANA"
-                '    TxtTypeNameKana.Text = WW_SelectValue
-                '    LblTypeNameKanaText.Text = WW_SelectText
-                '    TxtTypeNameKana.Focus()
-
-                    '発着駅フラグ
-                Case "TxtDepArrStation"
-                    'TxtDepArrStation.Text = WW_SelectValue
-                    'LblDepArrStationName.Text = WW_SelectText
-                    'TxtDepArrStation.Focus()
+                Case "TxtBranchCode" '管轄支店コード
+                    TxtBranchCode.Text = WW_SelectValue
+                    LblBranchCodeText.Text = WW_SelectText
+                    TxtBranchCode.Focus()
+                Case "TxtOfficeCode" '所属営業所コード
+                    TxtOfficeCode.Text = WW_SelectValue
+                    LblOfficeCodeText.Text = WW_SelectText
+                    TxtOfficeCode.Focus()
+                    TxtLocationCode.Text = ""
+                    LblLocationCodeText.Text = ""
+                Case "TxtLocationCode" '所在地コード
+                    TxtLocationCode.Text = WW_SelectValue
+                    LblLocationCodeText.Text = WW_SelectText
+                    TxtLocationCode.Focus()
+                Case "TxtTankStatus" 'タンク車状況
+                    TxtTankStatus.Text = WW_SelectValue
+                    LblTankStatusText.Text = WW_SelectText
+                    TxtTankStatus.Focus()
+                Case "TxtLoadingKbn" '積車区分
+                    TxtLoadingKbn.Text = WW_SelectValue
+                    LblLoadingKbnText.Text = WW_SelectText
+                    TxtLoadingKbn.Focus()
+                Case "TxtEmpArrDate"       '空車着日（予定）
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                            TxtEmpArrDate.Text = ""
+                        Else
+                            TxtEmpArrDate.Text = leftview.WF_Calendar.Text
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    TxtEmpArrDate.Focus()
+                Case "TxtActualEmpArrDate"       '空車着日（実績）
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                            TxtActualEmpArrDate.Text = ""
+                        Else
+                            TxtActualEmpArrDate.Text = leftview.WF_Calendar.Text
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    TxtActualEmpArrDate.Focus()
             End Select
         Else
         End If
@@ -851,18 +849,27 @@ Public Class OIT0005TankLocDetail
 
         Try
             Select Case I_FIELD
+                Case "BRANCH" '管轄支店コード
+                    prmData = work.CreateFIXParam(Master.USER_ORG, "BRANCH")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BRANCH, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BELONGTOOFFICE" '所属営業所コード
+                    prmData = work.CreateFIXParam(Master.USER_ORG, "BELONGTOOFFICE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "BRANCHOFFICESTATION" '所在地コード
+                    prmData = work.CreateFIXParam(Me.TxtOfficeCode.Text, "BRANCHOFFICESTATION")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BRANCHOFFICESTATION, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "TANKSTATUS" 'タンク車状況
+                    prmData = work.CreateFIXParam("ZZ", "TANKSTATUS")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKSTATUS, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "LOADINGKBN" '積車区分
+                    prmData = work.CreateFIXParam("ZZ", "LOADINGKBN")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_LOADINGKBN, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "UORG"             '運用部署
                     'prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-
-                Case "DEPARRSTATIONFLG" '発着駅フラグ
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEPARRSTATIONLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DEPARRSTATIONFLG"))
-
-                Case "DELFLG"           '削除
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "DELFLG"))
 
             End Select
         Catch ex As Exception

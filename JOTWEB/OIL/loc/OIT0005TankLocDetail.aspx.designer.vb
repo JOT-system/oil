@@ -50,6 +50,15 @@ Partial Public Class OIT0005TankLocDetail
     Protected WithEvents TxtBranchCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''LblBranchCodeText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblBranchCodeText As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''LblOfficeCode コントロール。
     '''</summary>
     '''<remarks>
@@ -66,6 +75,15 @@ Partial Public Class OIT0005TankLocDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtOfficeCode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblOfficeCodeText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblOfficeCodeText As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''LblLocationCode コントロール。
@@ -86,6 +104,15 @@ Partial Public Class OIT0005TankLocDetail
     Protected WithEvents TxtLocationCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''LblLocationCodeText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblLocationCodeText As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''LblTankStatus コントロール。
     '''</summary>
     '''<remarks>
@@ -104,6 +131,15 @@ Partial Public Class OIT0005TankLocDetail
     Protected WithEvents TxtTankStatus As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''LblTankStatusText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblTankStatusText As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''LblLoadingKbn コントロール。
     '''</summary>
     '''<remarks>
@@ -120,6 +156,15 @@ Partial Public Class OIT0005TankLocDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtLoadingKbn As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblLoadingKbnText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblLoadingKbnText As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''LblEmpArrDate コントロール。

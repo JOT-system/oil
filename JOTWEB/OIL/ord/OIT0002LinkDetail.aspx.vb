@@ -3554,6 +3554,11 @@ Public Class OIT0002LinkDetail
 
         Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         For Each OIT0002row As DataRow In OIT0002tbl.Rows
+
+            If OIT0002row("TANKNUMBER") = "" Then
+                Continue For
+            End If
+
             '★(一覧)タンク車番号がOT本社、または在日米軍のリース車かチェック
             FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0002row("TANKNUMBER"), WW_GetValue)
 

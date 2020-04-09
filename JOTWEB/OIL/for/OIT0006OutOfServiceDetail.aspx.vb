@@ -61,6 +61,7 @@ Public Class OIT0006OutOfServiceDetail
     Private CS0052DetailView As New CS0052DetailView                'Repeterオブジェクト作成
 
     '○ 共通処理結果
+    Private WW_TAB1_SW As String = ""
     Private WW_ERR_SW As String = ""
     Private WW_RTN_SW As String = ""
     Private WW_DUMMY As String = ""
@@ -84,6 +85,8 @@ Public Class OIT0006OutOfServiceDetail
                     'End If
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonDELIVERY"              '託送指示ボタン押下
+                            WF_ButtonDELIVERY_Click()
                         Case "WF_ButtonINSERT"                '明細を作るボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"                   '戻るボタン押下
@@ -114,6 +117,10 @@ Public Class OIT0006OutOfServiceDetail
                             WF_ButtonLINE_ADD_Click()
                         Case "WF_ButtonUPDATE_TAB1",          '更新ボタン押下
                              "WF_ButtonUPDATE_TAB2"
+                            WW_TAB1_SW = "1"
+                            WF_ButtonUPDATE_Click()
+                        Case "WF_ButtonUPDATE_MEISAI_TAB1"    '明細更新ボタン押下
+                            WW_TAB1_SW = "2"
                             WF_ButtonUPDATE_Click()
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
@@ -157,6 +164,49 @@ Public Class OIT0006OutOfServiceDetail
                 WF_CREATEFLG.Value = "1"
             Else
                 WF_CREATEFLG.Value = "2"
+            End If
+
+            '◯託送指示フラグ(0：未手配, 1：手配)設定
+            '　または、回送進行ステータスが100:回送受付, または250:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_DELIVERYFLG.Text = "1" _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_100 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_300 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_350 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_400 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_450 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_550 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_600 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_700 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_800 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_900 Then
+
+                '託送指示ボタンを非活性
+                WF_DELIVERYFLG.Value = "1"
+
+            Else
+                '託送指示ボタンを活性
+                WF_DELIVERYFLG.Value = "0"
+
+            End If
+
+            '◯回送進行ステータスが250:手配完了以降のステータスに変更された場合
+            If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_300 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_350 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_400 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_450 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_550 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_600 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_700 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_800 _
+                OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_900 Then
+
+                'タブ「タンク車割当」のボタンをすべて非活性
+                WF_MAPButtonControl.Value = "1"
+
             End If
 
         Finally
@@ -243,7 +293,7 @@ Public Class OIT0006OutOfServiceDetail
             ' 回送進行ステータスが"100:回送受付"以外の場合
             If work.WF_SEL_KAISOUSTATUS.Text <> BaseDllConst.CONST_KAISOUSTATUS_100 Then
                 '〇 (一覧)テキストボックスの制御(読取専用)
-                'WW_ListTextBoxReadControl()
+                WW_ListTextBoxReadControl()
 
             End If
 
@@ -256,7 +306,7 @@ Public Class OIT0006OutOfServiceDetail
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
             '〇 (一覧)テキストボックスの制御(読取専用)
-            'WW_ListTextBoxReadControl()
+            WW_ListTextBoxReadControl()
 
         Else
             WF_DTAB_CHANGE_NO.Value = "0"
@@ -447,7 +497,7 @@ Public Class OIT0006OutOfServiceDetail
         WF_DetailMView.ActiveViewIndex = 0
 
         '〇 (一覧)テキストボックスの制御(読取専用)
-        'WW_ListTextBoxReadControl()
+        WW_ListTextBoxReadControl()
 
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
@@ -763,7 +813,7 @@ Public Class OIT0006OutOfServiceDetail
         CS0013ProfView.CS0013ProfView()
 
         '〇 (一覧)テキストボックスの制御(読取専用)
-        'WW_ListTextBoxReadControl()
+        WW_ListTextBoxReadControl()
 
         '○ クリア
         If TBLview.Count = 0 Then
@@ -845,7 +895,7 @@ Public Class OIT0006OutOfServiceDetail
         CS0013ProfView.CS0013ProfView()
 
         '〇 (一覧)テキストボックスの制御(読取専用)
-        'WW_ListTextBoxReadControl()
+        WW_ListTextBoxReadControl()
 
         '○ クリア
         If TBLview.Count = 0 Then
@@ -858,6 +908,23 @@ Public Class OIT0006OutOfServiceDetail
         TBLview = Nothing
     End Sub
 #End Region
+
+    ''' <summary>
+    ''' 託送指示ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonDELIVERY_Click()
+
+        '託送指示フラグを"1"(手配)にする。
+        work.WF_SEL_DELIVERYFLG.Text = "1"
+
+        '回送TBL更新
+        WW_UpdateRelatedFlg("1", "DELIVERYFLG")
+
+        '〇 回送進行ステータスの状態を取得
+        WW_ScreenKaisouStatusSet()
+
+    End Sub
 
     ''' <summary>
     ''' 明細を作るボタン押下時処理
@@ -1215,6 +1282,12 @@ Public Class OIT0006OutOfServiceDetail
                 Me.TxtKaisouType.Text = WW_SelectText
                 Me.TxtKaisouType.Focus()
 
+            '目的
+            Case "TxtObjective"
+                Me.TxtObjective.Text = WW_SelectValue
+                Me.LblObjective.Text = WW_SelectText
+                Me.TxtObjective.Focus()
+
             '発駅
             Case "TxtDepstationCode"
                 Me.TxtDepstationCode.Text = WW_SelectValue
@@ -1367,6 +1440,139 @@ Public Class OIT0006OutOfServiceDetail
                 '○ 画面表示データ保存
                 If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
 
+            'タブ「タンク車割当」 ⇒　(一覧)タンク車№
+            '                   　    (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)空車着日
+            Case "TANKNO",
+                 "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE"
+                '○ LINECNT取得
+                Dim WW_LINECNT As Integer = 0
+                If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+                '○ 設定項目取得
+                Dim WW_SETTEXT As String = WW_SelectText
+                Dim WW_SETVALUE As String = WW_SelectValue
+
+                '各タブにより設定を制御
+                Select Case WF_DetailMView.ActiveViewIndex
+                    '◆タンク車割当
+                    Case 0
+                        '○ 画面表示データ復元
+                        If Not Master.RecoverTable(OIT0006tbl) Then Exit Sub
+
+                        '○ 対象ヘッダー取得
+                        Dim updHeader = OIT0006tbl.AsEnumerable.
+                            FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+                        If IsNothing(updHeader) Then Exit Sub
+
+                        '〇 一覧項目へ設定
+                        'タンク車№を一覧に設定
+                        If WF_FIELD.Value = "TANKNO" Then
+                            Dim WW_TANKNUMBER As String = WW_SETVALUE
+                            Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
+                            updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
+
+                            '〇 検索(営業所).テキストボックスが未設定
+                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                                '〇 画面(回送登録営業所).テキストボックスが未設定
+                                If Me.TxtKaisouOrderOffice.Text = "" Then
+                                    WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                                Else
+                                    WW_FixvalueMasterSearch(Me.TxtKaisouOrderOfficeCode.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                                End If
+                            Else
+                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                            End If
+
+                            '交検日
+                            Dim WW_JRINSPECTIONCNT As String
+                            updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
+                            If WW_GetValue(2) <> "" Then
+                                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+
+                                Dim WW_JRINSPECTIONFLG As String
+                                If WW_JRINSPECTIONCNT <= 3 Then
+                                    WW_JRINSPECTIONFLG = "1"
+                                ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                                    WW_JRINSPECTIONFLG = "2"
+                                Else
+                                    WW_JRINSPECTIONFLG = "3"
+                                End If
+                                Select Case WW_JRINSPECTIONFLG
+                                    Case "1"
+                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
+                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                                    Case "2"
+                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
+                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                                    Case "3"
+                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
+                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                                End Select
+                            Else
+                                updHeader.Item("JRINSPECTIONALERT") = ""
+                            End If
+
+                            '全検日
+                            Dim WW_JRALLINSPECTIONCNT As String
+                            updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
+                            If WW_GetValue(3) <> "" Then
+                                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+
+                                Dim WW_JRALLINSPECTIONFLG As String
+                                If WW_JRALLINSPECTIONCNT <= 3 Then
+                                    WW_JRALLINSPECTIONFLG = "1"
+                                ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                                    WW_JRALLINSPECTIONFLG = "2"
+                                Else
+                                    WW_JRALLINSPECTIONFLG = "3"
+                                End If
+                                Select Case WW_JRALLINSPECTIONFLG
+                                    Case "1"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
+                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                                    Case "2"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
+                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                                    Case "3"
+                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
+                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                                End Select
+                            Else
+                                updHeader.Item("JRALLINSPECTIONALERT") = ""
+                            End If
+
+                            '〇 タンク車割当状況チェック
+                            'WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+
+                            '(一覧)(実績)発日, (一覧)(実績)積車積込日, 
+                            '(一覧)(実績)受入日, (一覧)(実績)空車着日を一覧に設定
+                        ElseIf WF_FIELD.Value = "ACTUALDEPDATE" _
+                            OrElse WF_FIELD.Value = "ACTUALARRDATE" _
+                            OrElse WF_FIELD.Value = "ACTUALACCDATE" _
+                            OrElse WF_FIELD.Value = "ACTUALEMPARRDATE" Then
+
+                            Dim WW_DATE As Date
+                            Try
+                                Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                                If WW_DATE < C_DEFAULT_YMD Then
+                                    updHeader.Item(WF_FIELD.Value) = ""
+                                Else
+                                    updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
+                                End If
+                            Catch ex As Exception
+                            End Try
+
+                        End If
+
+                        '○ 画面表示データ保存
+                        If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
+
+                        '◆費用入力
+                    Case 1
+
+                End Select
+
+
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -1388,6 +1594,8 @@ Public Class OIT0006OutOfServiceDetail
                 WF_UORG.Focus()
             Case "TxtTrainNo"                '本線列車
                 Me.TxtTrainNo.Focus()
+            Case "TxtObjective"              '目的
+                Me.TxtObjective.Focus()
             Case "TxtDepstationCode"         '発駅
                 Me.TxtDepstationCode.Focus()
             Case "TxtArrstationCode"         '着駅
@@ -1867,8 +2075,16 @@ Public Class OIT0006OutOfServiceDetail
         '〇 選択されたタブ一覧の各更新ボタン押下時の制御
         'タブ「タンク車割当」
         If WF_DetailMView.ActiveViewIndex = "0" Then
-            '割当確定ボタン押下時
-            WW_ButtonUPDATE_TAB1()
+
+            If WW_TAB1_SW = "1" Then
+                '割当確定ボタン押下時
+                WW_ButtonUPDATE_TAB1()
+
+            ElseIf WW_TAB1_SW = "2" Then
+                ''明細更新ボタン押下時
+                'WW_ButtonUPDATE_MEISAI_TAB1()
+
+            End If
 
             'タブ「費用入力」
         ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
@@ -1948,6 +2164,9 @@ Public Class OIT0006OutOfServiceDetail
             Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
             Exit Sub
         End If
+
+        '画面表示設定処理(回送進行ステータス)
+        WW_ScreenKaisouStatusSet()
 
     End Sub
 
@@ -2484,10 +2703,10 @@ Public Class OIT0006OutOfServiceDetail
             End Using
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D UPDATE_INSERT_ORDER")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D UPDATE_INSERT_KAISOU")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0006D UPDATE_INSERT_ORDER"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006D UPDATE_INSERT_KAISOU"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -3064,6 +3283,7 @@ Public Class OIT0006OutOfServiceDetail
         Dim OIT0006tbl_DUMMY As DataTable = OIT0006tbl.Copy
         Dim OIT0006tbl_dv As DataView = New DataView(OIT0006tbl_DUMMY)
         Dim chkShipOrder As String = ""
+        Dim chkTankNo As String = ""
 
         OIT0006tbl_dv.Sort = "SHIPORDER"
         For Each drv As DataRowView In OIT0006tbl_dv
@@ -3082,6 +3302,33 @@ Public Class OIT0006OutOfServiceDetail
             End If
         Next
 
+        'タンク車Noでソートし、重複がないかチェックする。
+        OIT0006tbl_dv.Sort = "TANKNO"
+        For Each drv As DataRowView In OIT0006tbl_dv
+            If drv("HIDDEN") <> "1" AndAlso drv("TANKNO") <> "" AndAlso chkTankNo = drv("TANKNO") Then
+                Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckMES1 = "タンク車№重複エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                O_RTN = "ERR"
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = OIT0006tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = drv("LINECNT"))
+                updHeader.Item("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
+                CODENAME_get("KAISOUINFO", updHeader.Item("KAISOUINFO"), updHeader.Item("KAISOUINFONAME"), WW_DUMMY)
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0006tbl)
+                Exit Sub
+            End If
+
+            '行削除したデータの場合は退避しない。
+            If drv("HIDDEN") <> "1" Then
+                chkTankNo = drv("TANKNO")
+            End If
+        Next
+
         '(一覧)チェック
         For Each OIT0006row As DataRow In OIT0006tbl.Rows
 
@@ -3095,6 +3342,18 @@ Public Class OIT0006OutOfServiceDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
+
+            '(一覧)タンク車No(空白チェック)
+            If OIT0006row("TANKNO") = "" And OIT0006row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)タンク車No", needsPopUp:=True)
+
+                WW_CheckMES1 = "タンク車No未設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0006row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
         Next
 
         '○ 正常メッセージ
@@ -3222,13 +3481,19 @@ Public Class OIT0006OutOfServiceDetail
 
         End If
 
-        '〇 受注内容の制御
+        '〇 回送内容の制御
         '100:回送受付以外の場合は、回送内容(ヘッダーの内容)の変更を不可とする。
         If work.WF_SEL_KAISOUSTATUS.Text <> BaseDllConst.CONST_KAISOUSTATUS_100 Then
             '回送登録営業所
             Me.TxtKaisouOrderOffice.Enabled = False
             '本線列車
             Me.TxtTrainNo.Enabled = False
+            'タンク車数
+            Me.TxtTankCnt.Enabled = False
+            '回送パターン
+            Me.TxtKaisouType.Enabled = False
+            '運賃フラグ
+            Me.ChkSelect.Enabled = False
             '発駅
             Me.TxtDepstationCode.Enabled = False
             '着駅
@@ -3247,6 +3512,12 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtKaisouOrderOffice.Enabled = True
             '本線列車
             Me.TxtTrainNo.Enabled = True
+            'タンク車数
+            Me.TxtTankCnt.Enabled = True
+            '回送パターン
+            Me.TxtKaisouType.Enabled = True
+            '運賃フラグ
+            Me.ChkSelect.Enabled = True
             '発駅
             Me.TxtDepstationCode.Enabled = True
             '着駅
@@ -3374,6 +3645,663 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualEmparrDate.Enabled = True
 
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示設定処理(回送進行ステータス)
+    ''' </summary>
+    Protected Sub WW_ScreenKaisouStatusSet()
+
+        '〇 回送ステータスが"100:回送受付"の場合
+        If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_100 Then
+
+            '画面表示設定処理(回送進行ステータス(変更分を反映))
+            WW_ScreenKaisouStatusChgRef(BaseDllConst.CONST_KAISOUSTATUS_200)
+
+            ''〇(回送TBL)回送進行ステータス更新
+            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            '    SQLcon.Open()       'DataBase接続
+
+            '    WW_UpdateKaisouStatus(BaseDllConst.CONST_KAISOUSTATUS_200)
+            '    CODENAME_get("KAISOUSTATUS", BaseDllConst.CONST_KAISOUSTATUS_200, Me.TxtKaisouStatus.Text, WW_DUMMY)
+            '    work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_200
+            '    work.WF_SEL_KAISOUSTATUSNM.Text = Me.TxtKaisouStatus.Text
+
+            '    '○ 画面表示データ復元
+            '    Master.RecoverTable(OIT0006WKtbl, work.WF_SEL_INPTBL.Text)
+            '    For Each OIT0006WKrow As DataRow In OIT0006WKtbl.Rows
+            '        If OIT0006WKrow("KAISOUNO") = work.WF_SEL_KAISOUNUMBER.Text Then
+            '            OIT0006WKrow("KAISOUSTATUS") = work.WF_SEL_KAISOUSTATUS.Text
+            '            OIT0006WKrow("KAISOUSTATUSNAME") = work.WF_SEL_KAISOUSTATUSNM.Text
+            '        End If
+            '    Next
+            '    '○ 画面表示データ保存
+            '    Master.SaveTable(OIT0006WKtbl, work.WF_SEL_INPTBL.Text)
+
+            'End Using
+
+            '〇 受注ステータスが"手配"へ変更された場合
+            If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_200 Then
+                'WF_DTAB_CHANGE_NO.Value = "1"
+                'WF_Detail_TABChange()
+
+                '〇タンク車所在の更新
+                WW_TankShozaiSet()
+
+            End If
+
+            '〇 回送ステータスが"200:手配"の場合
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_200 Then
+
+            '託送指示入力＝"1:手配"
+            If work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                '画面表示設定処理(回送進行ステータス(変更分を反映))
+                WW_ScreenKaisouStatusChgRef(BaseDllConst.CONST_KAISOUSTATUS_250)
+
+            End If
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControl()
+
+        Select Case WF_DetailMView.ActiveViewIndex
+           'タンク車割当
+            Case 0
+                '〇 (一覧)テキストボックスの制御(読取専用)
+                Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
+                Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+                '回送進行ステータスが"100:回送受付"
+                '回送進行ステータスが"200:手配"
+                '回送進行ステータスが"210:手配中"
+                If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_100 _
+                    OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_200 _
+                    OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_210 Then
+                    For Each rowitem As TableRow In tblObj.Rows
+                        For Each cellObj As TableCell In rowitem.Controls
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
+                        Next
+                    Next
+
+                    '受注進行ステータスが"250：手配完了"以降のステータスの場合
+                Else
+
+                    For Each rowitem As TableRow In tblObj.Rows
+                        For Each cellObj As TableCell In rowitem.Controls
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            End If
+                        Next
+                    Next
+                End If
+
+            '費用入力
+            Case 1
+                '〇 (一覧)テキストボックスの制御(読取専用)
+                Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
+                Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+                '〇 回送進行ステータスの状態
+                Select Case work.WF_SEL_KAISOUSTATUS.Text
+                '回送進行ステータス＝"200:手配中"
+                '回送進行ステータス＝"210:手配中(入換指示入力済)"
+                '回送進行ステータス＝"220:手配中(積込指示入力済)"
+                '回送進行ステータス＝"230:手配中(託送指示手配済)"
+                '回送進行ステータス＝"240:手配中(入換指示未入力)"
+                '回送進行ステータス＝"250:手配中(積込指示未入力)"
+                '回送進行ステータス＝"260:手配中(託送指示未手配)"
+                '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+                '回送進行ステータス＝"270:手配中(入換積込指示手配済)"
+                '回送進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
+                '回送進行ステータス＝"290:手配中(入換積込未連絡)"
+                '回送進行ステータス＝"300:手配中(入換積込未確認)"
+                '### END   ##################################################################
+                    Case BaseDllConst.CONST_KAISOUSTATUS_200,
+                         BaseDllConst.CONST_KAISOUSTATUS_210,
+                         BaseDllConst.CONST_KAISOUSTATUS_250,
+                         BaseDllConst.CONST_KAISOUSTATUS_300
+
+                    Case Else
+
+                End Select
+
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' タンク車所在設定処理
+    ''' </summary>
+    Protected Sub WW_TankShozaiSet()
+
+        '〇タンク車所在の更新
+        '回送進行ステータスが以下の場合
+        '100:回送受付
+        If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_100 Then
+
+            '### 特になし ###############################################################
+
+            '回送進行ステータスが以下の場合
+            '200:手配
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_200 Then
+
+            '★タンク車所在の更新
+            '引数１：所在地コード　⇒　変更なし(空白)
+            '引数２：タンク車状態　⇒　変更あり("1"(発送))
+            '引数３：積車区分　　　⇒　変更なし(空白)
+            '引数４：(予定)空車着日⇒　更新対象(画面項目)
+            WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
+
+            '回送進行ステータスが以下の場合
+            '210:手配中
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_210 Then
+
+            '### 特になし ###############################################################
+
+            '回送進行ステータスが「250:手配完了」の場合
+            '250:手配完了
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 Then
+
+            '### 特になし ###############################################################
+
+            '回送進行ステータスが「300:回送確定」の場合
+            '300:回送確定
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_300 Then
+
+            '### 特になし ###############################################################
+
+            '(実績)発日の入力が完了
+            If Me.TxtActualDepDate.Text <> "" Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "")
+            End If
+
+            '回送進行ステータスが「350:回送確定」の場合
+            '350:回送確定
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_350 Then
+            '引数１：所在地コード　⇒　変更あり(着駅)
+            '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+            '引数３：積車区分　　　⇒　変更なし(空白)
+            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "")
+
+            '回送進行ステータスが「400:受入確認中」の場合
+            '400:受入確認中
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_400 Then
+
+            '### 特になし ###############################################################
+
+            '(実績)受入日の入力が完了
+            If Me.TxtActualAccDate.Text <> "" Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "")
+            End If
+
+            '回送進行ステータスが「450:受入確認中」の場合
+            '450:受入確認中
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_450 Then
+            '★タンク車所在の更新
+            '引数１：所在地コード　⇒　変更あり(着駅)
+            '引数２：タンク車状態　⇒　変更あり("3"(到着))
+            '引数３：積車区分　　　⇒　変更なし(空白)
+            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "")
+
+            '回送進行ステータスが「500:検収中」の場合
+            '500:検収中
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 Then
+
+            '割り当てたタンク車のチェック
+            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            For Each OIT0006row As DataRow In OIT0006tbl.Rows
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+                '★(一覧)タンク車NoがOT本社、または在日米軍のリース車かチェック
+                WW_FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0006row("TANKNO"), WW_GetValue)
+
+                'タンク車がOT本社、または在日米軍のリース車の場合
+                If WW_GetValue(0) <> "" Then
+
+                    '### 特に何もしない ####################################
+
+                Else
+                    '★タンク車所在の更新
+                    '引数１：所在地コード　⇒　変更あり(発駅)
+                    '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                    '引数３：積車区分　　　⇒　変更なし(空白)
+                    WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"))
+
+                End If
+            Next
+
+            '550:検収済
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_550 Then
+            '### 特になし ###############################################################
+
+            '600:費用確定
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_600 Then
+            '### 特になし ###############################################################
+
+            '700:経理未計上
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_700 Then
+            '### 特になし ###############################################################
+
+            '800:経理計上
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_800 Then
+            '### 特になし ###############################################################
+
+            '900:回送キャンセル
+        ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_900 Then
+            '### 特になし ###############################################################
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' (回送TBL)回送進行ステータス更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateKaisouStatus(ByVal I_Value As String)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･回送TBLの回送進行ステータスを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0006_KAISOU " _
+                    & "    SET KAISOUSTATUS = @P03, " _
+                    & "        UPDYMD       = @P11, " _
+                    & "        UPDUSER      = @P12, " _
+                    & "        UPDTERMID    = @P13, " _
+                    & "        RECEIVEYMD   = @P14  " _
+                    & "  WHERE KAISOUNO     = @P01  " _
+                    & "    AND DELFLG      <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = work.WF_SEL_KAISOUNUMBER.Text
+            PARA02.Value = C_DELETE_FLG.DELETE
+            PARA03.Value = I_Value
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D_KAISOUSTATUS UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006D_KAISOUSTATUS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' (タンク車所在TBL)所在地の内容を更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
+                                      ByVal I_STATUS As String,
+                                      ByVal I_KBN As String,
+                                      Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal upEmparrDate As Boolean = False,
+                                      Optional ByVal upActualEmparrDate As Boolean = False)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLの託送指示フラグを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0005_SHOZAI " _
+                    & "    SET "
+
+            '○ 更新内容が指定されていれば追加する
+            '所在地コード
+            If Not String.IsNullOrEmpty(I_LOCATION) Then
+                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+            End If
+            'タンク車状態コード
+            If Not String.IsNullOrEmpty(I_STATUS) Then
+                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+            End If
+            '積車区分
+            If Not String.IsNullOrEmpty(I_KBN) Then
+                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            '空車着日（予定）
+            If upEmparrDate = True Then
+                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+            End If
+            '空車着日（実績）
+            If upActualEmparrDate = True Then
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", Me.TxtActualEmparrDate.Text)
+            End If
+
+            SQLStr &=
+                      "        UPDYMD       = @P11, " _
+                    & "        UPDUSER      = @P12, " _
+                    & "        UPDTERMID    = @P13, " _
+                    & "        RECEIVEYMD   = @P14  " _
+                    & "  WHERE TANKNUMBER   = @P01  " _
+                    & "    AND DELFLG      <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA02.Value = C_DELETE_FLG.DELETE
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            If I_TANKNO = "" Then
+                '(一覧)で設定しているタンク車をKEYに更新
+                For Each OIT0006row As DataRow In OIT0006tbl.Rows
+                    PARA01.Value = OIT0006row("TANKNO")
+                    SQLcmd.ExecuteNonQuery()
+                Next
+            Else
+                '指定されたタンク車№をKEYに更新
+                PARA01.Value = I_TANKNO
+                SQLcmd.ExecuteNonQuery()
+
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D_TANKSHOZAI UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006D_TANKSHOZAI UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        'If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
+        '    '○メッセージ表示
+        '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'End If
+
+    End Sub
+
+    ''' <summary>
+    ''' (回送TBL)フラグ関連更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateRelatedFlg(ByVal I_Value As String, Optional ByVal I_PARA01 As String = Nothing)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･回送TBLの各フラグを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0006_KAISOU " _
+                    & "    SET UPDYMD      = @P11, " _
+                    & "        UPDUSER     = @P12, " _
+                    & "        UPDTERMID   = @P13, " _
+                    & "        RECEIVEYMD  = @P14, "
+
+            SQLStr &= String.Format("        {0}   = @P03 ", I_PARA01)
+
+            SQLStr &=
+                    "  WHERE KAISOUNO     = @P01  " _
+                    & "    AND DELFLG     <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = work.WF_SEL_KAISOUNUMBER.Text
+            PARA02.Value = C_DELETE_FLG.DELETE
+            PARA03.Value = I_Value
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D_" + I_PARA01 + "UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006D_" + I_PARA01 + "UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示設定処理(回送進行ステータス(変更分を反映))
+    ''' </summary>
+    Protected Sub WW_ScreenKaisouStatusChgRef(ByVal O_VALUE As String)
+
+        '回送進行ステータスに変更があった場合
+        If O_VALUE <> "" Then
+            '〇(回送TBL)回送進行ステータス更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateKaisouStatus(O_VALUE)
+                CODENAME_get("KAISOUSTATUS", O_VALUE, Me.TxtKaisouStatus.Text, WW_DUMMY)
+                work.WF_SEL_KAISOUSTATUS.Text = O_VALUE
+                work.WF_SEL_KAISOUSTATUSNM.Text = Me.TxtKaisouStatus.Text
+
+            End Using
+
+            '○ 画面表示データ復元
+            Master.RecoverTable(OIT0006WKtbl, work.WF_SEL_INPTBL.Text)
+
+            For Each OIT0006row As DataRow In OIT0006WKtbl.Rows
+                If OIT0006row("KAISOUNO") = work.WF_SEL_KAISOUNUMBER.Text Then
+                    OIT0006row("KAISOUSTATUS") = O_VALUE
+                    OIT0006row("KAISOUSTATUSNAME") = Me.TxtKaisouStatus.Text
+                End If
+            Next
+
+            '○ 画面表示データ保存
+            Master.SaveTable(OIT0006WKtbl, work.WF_SEL_INPTBL.Text)
+        End If
+
+        '〇 受注ステータスが"250:手配完了"へ変更された場合
+        If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 Then
+            'WF_DTAB_CHANGE_NO.Value = "2"
+            'WF_Detail_TABChange()
+
+            '### START 回送履歴テーブルの追加(2020/03/26) #############
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                WW_InsertKaisouHistory(SQLcon)
+            End Using
+            '### END   ################################################
+
+            '○メッセージ表示
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 回送履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon">SQL接続</param>
+    Private Sub WW_InsertKaisouHistory(ByVal SQLcon As SqlConnection)
+        Dim WW_GetHistoryNo() As String = {""}
+        WW_FixvalueMasterSearch("", "NEWHISTORYNOGET", "", WW_GetHistoryNo)
+
+        '◯回送履歴テーブル格納用
+        If IsNothing(OIT0006His1tbl) Then
+            OIT0006His1tbl = New DataTable
+        End If
+
+        If OIT0006His1tbl.Columns.Count <> 0 Then
+            OIT0006His1tbl.Columns.Clear()
+        End If
+        OIT0006His1tbl.Clear()
+
+        '◯回送明細履歴テーブル格納用
+        If IsNothing(OIT0006His2tbl) Then
+            OIT0006His2tbl = New DataTable
+        End If
+
+        If OIT0006His2tbl.Columns.Count <> 0 Then
+            OIT0006His2tbl.Columns.Clear()
+        End If
+        OIT0006His2tbl.Clear()
+
+        '○ 回送TBL検索SQL
+        Dim SQLOrderStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0006.*" _
+            & " FROM OIL.OIT0006_KAISOU OIT0006 " _
+            & String.Format(" WHERE OIT0006.KAISOUNO = '{0}'", work.WF_SEL_KAISOUNUMBER.Text)
+
+        '○ 回送明細TBL検索SQL
+        Dim SQLOrderDetailStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0007.*" _
+            & " FROM OIL.OIT0007_KAISOUDETAIL OIT0007 " _
+            & String.Format(" WHERE OIT0007.KAISOUNO = '{0}'", work.WF_SEL_KAISOUNUMBER.Text)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLOrderStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0006His1tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0006His1tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using SQLcmd As New SqlCommand(SQLOrderDetailStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0006His2tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0006His2tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using tran = SQLcon.BeginTransaction
+                '■回送履歴テーブル
+                EntryHistory.InsertKaisouHistory(SQLcon, tran, OIT0006His1tbl.Rows(0))
+
+                '■回送明細履歴テーブル
+                For Each OIT0001His2rowtbl In OIT0006His2tbl.Rows
+                    EntryHistory.InsertKaisouDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                Next
+
+                'トランザクションコミット
+                tran.Commit()
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0006D KAISOUHISTORY")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0006D KAISOUHISTORY"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -3557,7 +4485,6 @@ Public Class OIT0006OutOfServiceDetail
         End Try
 
     End Sub
-
 
     ''' <summary>
     ''' 詳細画面初期化

@@ -77,6 +77,24 @@ Partial Public Class OIT0006OutOfServiceDetail
     Protected WithEvents TxtKaisouStatus As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtObjective コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtObjective As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblObjective コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblObjective As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''TxtKaisouOrderOffice コントロール。
     '''</summary>
     '''<remarks>

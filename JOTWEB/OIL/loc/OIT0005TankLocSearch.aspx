@@ -45,7 +45,7 @@
             </div>
             <!-- 所属先 -->
             <div class="inputItem" >
-                <a id="WF_Test"  class="requiredMark">所属先</a>
+                <a id="WF_Test"  class="requiredMark">タンク車を管轄する支店・営業所を選ぶ</a>
                 <a>
                     <MSINC:tilelist ID="tileSalesOffice" runat="server" />
                 </a>

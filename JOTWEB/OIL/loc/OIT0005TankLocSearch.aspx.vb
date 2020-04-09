@@ -116,8 +116,9 @@ Public Class OIT0005TankLocSearch
 
             End If
             '〇仮置き
-            Dim paramData As Hashtable = work.CreateSALESOFFICEParam(Master.USER_ORG, dummyTxtSalesOffice)
-            Me.tileSalesOffice.ListBoxClassification = LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
+            'Dim paramData As Hashtable = work.CreateSALESOFFICEParam(Master.USER_ORG, dummyTxtSalesOffice)
+            Dim paramData As Hashtable = work.CreateFIXParam(Master.USER_ORG)
+            Me.tileSalesOffice.ListBoxClassification = LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE
             Me.tileSalesOffice.ParamData = paramData
             Me.tileSalesOffice.LeftObj = leftview
             Me.tileSalesOffice.SetTileValues()

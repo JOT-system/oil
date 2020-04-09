@@ -79,6 +79,9 @@ Public Class GRIS0005LeftBox
     ''' <item><description>LC_CALENDAR      : カレンダー表示を行う</description></item>
     ''' <item><description>LC_FIX_VALUE     : 固定値区分のリストを作成</description></item>
     ''' <item><description>LC_STATIONCODE   : 貨物駅パターンのリストを作成</description></item>
+    ''' <item><description>LC_BRANCH        : 管轄支店のリストを作成（タンク所在向け）</description></item>
+    ''' <item><description>LC_BELONGTOOFFICE: 所属営業所（支店含む）のリストを作成（タンク所在向け）</description></item>
+    ''' <item><description>LC_BRANCHOFFICESTATION: 管轄所属・駅関連付けのリストを作成（タンク所在向け）</description></item>
     ''' </list>
     Public Enum LIST_BOX_CLASSIFICATION
         LC_COMPANY
@@ -141,6 +144,9 @@ Public Class GRIS0005LeftBox
         LC_KAISOUINFO
         LC_KAISOUTYPE
         LC_OBJECTIVECODE
+        LC_BRANCH
+        LC_BELONGTOOFFICE
+        LC_BRANCHOFFICESTATION
     End Enum
 
     ''' <summary>
@@ -710,6 +716,21 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_STATION
                 '貨物駅
                 lbox = CreateStationList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BRANCH
+                '管轄支店取得
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BRANCH"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE
+                '所属営業所
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BELONGTOOFFICE"
+                Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "VALUE2," &
+                                                                  "KEYCODE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BRANCHOFFICESTATION
+                '管轄所属・駅関連付け
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BRANCHOFFICESTATION"
+                lbox = CreateFixValueList(Params, O_RTN)
+
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing

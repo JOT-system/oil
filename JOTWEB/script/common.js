@@ -2106,20 +2106,20 @@ function ConvartWideCharToNormal(obj) {
  * @description 
  */
 function commonBindNormalEnterToNextTabStep() {
-    let inputObjList = document.querySelectorAll('input[type=password],div:not([hidden=hidden]) input[type=text]:not([disabled]):not([tabindex="-1"]):not([rownum])');
+    let inputObjList = document.querySelectorAll('input[type=password],input[type=text]:not([disabled]):not([tabindex="-1"]):not([rownum])');
     if (inputObjList === null) {
         return;
     }
     /* 画面表示していないオブジェクト判定 */
     let visibleInputObj = [];
     for (let i = 0, len = inputObjList.length; i < len; ++i) {
-        if (inputObjList[i].clientWidth === 0) {
-            continue;
-        }
-        let dispStyle = window.getComputedStyle(inputObjList[i]);
-        if (dispStyle.display === 'none') {
-            continue;
-        }
+        //if (inputObjList[i].clientWidth === 0) {
+        //    continue;
+        //}
+        //let dispStyle = window.getComputedStyle(inputObjList[i]);
+        //if (dispStyle.display === 'none') {
+        //    continue;
+        //}
         visibleInputObj.push(inputObjList[i]);
 
     }
@@ -2130,12 +2130,37 @@ function commonBindNormalEnterToNextTabStep() {
         if (visibleInputObj.length !== i + 1) {
             nextTextObj = visibleInputObj[i + 1];
         }
+        textBox.dataset.nexttextid = nextTextObj.id;
         textBox.addEventListener('keypress', (function (textBox, nextTextObj) {
             return function () {
                 if (event.key === 'Enter') {
                     if (commonKeyEnterProgress === false) {
                         commonKeyEnterProgress = true; //Enter連打抑止
-                        nextTextObj.focus();
+                        let foundDisplayText = false;
+                        let wkNextTextObj = nextTextObj;
+                        let loopCnt = 0;
+                        while (!foundDisplayText) {
+                            loopCnt = loopCnt + 1;
+                            // 全部テキストボックスが見えない状態での無限ループ抑止
+                            if (loopCnt >= 2000) {
+                                break;
+                            }
+                            // hidden等で見えない状態・親などのスタイルで実際見えない状態
+                            // の場合はスキップ
+                            if (wkNextTextObj.clientWidth === 0) {
+                                wkNextTextObj = document.getElementById(wkNextTextObj.dataset.nexttextid);
+                                continue;
+                            }
+                            let dispStyle = window.getComputedStyle(wkNextTextObj);
+                            if (dispStyle.display === 'none') {
+                                wkNextTextObj = document.getElementById(wkNextTextObj.dataset.nexttextid);
+                                continue;
+                            }
+                            // ここまで来た場合は存在するのでループ終了
+                            foundDisplayText = true;
+                        }
+
+                        wkNextTextObj.focus();
                         return setTimeout(function () {
                             commonKeyEnterProgress = false;　///Enter連打抑止
                         }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に

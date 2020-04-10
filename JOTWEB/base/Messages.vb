@@ -563,6 +563,18 @@ Public Module Messages
         ''' 回送がキャンセルされているため選択できません。
         ''' </summary>
         Public Const OIL_CANCEL_ENTRY_OUTOFSERVICE As String = "20042"
+        ''' <summary>
+        ''' 回送キャンセルしますよろしいですか？
+        ''' </summary>
+        Public Const OIL_CONFIRM_CANCEL_KAISOU As String = "20043"
+        ''' <summary>
+        ''' 回送営業所未選択
+        ''' </summary>
+        Public Const OIL_KAISOUOFFICE_UNSELECT As String = "20044"
+        ''' <summary>
+        ''' タンク所在を更新します。本当によろしいですか？
+        ''' </summary>
+        Public Const OIL_CONFIRM_UPDATE_TANKLOCATION As String = "20045"
 #End Region
 
 

@@ -3293,10 +3293,10 @@ Public Class OIT0003OrderDetail
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 LINEADD")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB1 SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB1 LINEADD"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -5428,7 +5428,7 @@ Public Class OIT0003OrderDetail
                     End Using
 
                     For Each OIT0003UPDrow As DataRow In OIT0003UPDtbl.Rows
-                        CS0020JOURNAL.TABLENM = "OIT0003L"
+                        CS0020JOURNAL.TABLENM = "OIT0003D"
                         CS0020JOURNAL.ACTION = "UPDATE_INSERT"
                         CS0020JOURNAL.ROW = OIT0003UPDrow
                         CS0020JOURNAL.CS0020JOURNAL()
@@ -5644,9 +5644,14 @@ Public Class OIT0003OrderDetail
                         PARA03.Value = WW_DATENOW.AddDays(1)
                     End If
 
+                    '★(一覧)タンク車№がOT本社、または在日米軍のリース車かチェック
+                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                    WW_FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0003row("TANKNO"), WW_GetValue)
+
                     'ステータス
-                    '(実績)発日が入力されている場合
-                    If Me.TxtActualDepDate.Text <> "" Then
+                    '(実績)発日が入力されている場合、
+                    'かつ(一覧)タンク車№がOT本社、または在日米軍のリース車ではない場合
+                    If Me.TxtActualDepDate.Text <> "" AndAlso WW_GetValue(0) = "" Then
                         '◯ (予定)(発日) = (実績)発日
                         If Me.TxtDepDate.Text = Me.TxtActualDepDate.Text Then
                             '◯ (予定)空車着日(前日) = (実績)発日
@@ -8904,11 +8909,35 @@ Public Class OIT0003OrderDetail
             '受注進行ステータスが「500:検収中」の場合
             '500:検収中
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
-            '★タンク車所在の更新
-            '引数１：所在地コード　⇒　変更あり(発駅)
-            '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
-            '引数３：積車区分　　　⇒　変更あり("E"(空車))
-            WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E")
+
+            '割り当てたタンク車のチェック
+            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+                '★(一覧)タンク車NoがOT本社、または在日米軍のリース車かチェック
+                WW_FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0003row("TANKNO"), WW_GetValue)
+
+                'タンク車がOT本社、または在日米軍のリース車の場合
+                If WW_GetValue(0) <> "" Then
+
+                    '### 特に何もしない ####################################
+
+                    ''★タンク車所在の更新(### 所在地はそのまま更新しない###)
+                    ''引数１：所在地コード　⇒　変更なし(空白)
+                    ''引数２：タンク車状態　⇒　変更あり("3"(到着))
+                    ''引数３：積車区分　　　⇒　変更あり("E"(空車))
+                    'WW_UpdateTankShozai("", "3", "E")
+
+                Else
+                    '★タンク車所在の更新
+                    '引数１：所在地コード　⇒　変更あり(発駅)
+                    '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                    '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                    WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E")
+
+                End If
+            Next
 
             '550:検収済
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 Then
@@ -9370,7 +9399,7 @@ Public Class OIT0003OrderDetail
 
             '行削除したデータの場合は退避しない。
             If drv("HIDDEN") <> "1" Then
-                chkShipOrder = drv("LINEORDER")
+                chkShipOrder = drv("SHIPORDER")
             End If
         Next
         '### END  #############################################################################################

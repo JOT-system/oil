@@ -50,22 +50,13 @@ Partial Public Class OIT0005TankLocSearch
     Protected WithEvents WF_ORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtSalesOffice コントロール。
+    '''tileSalesOffice コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtSalesOffice As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''LblSalesOfficeName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents LblSalesOfficeName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
     
     '''<summary>
     '''rightview コントロール。

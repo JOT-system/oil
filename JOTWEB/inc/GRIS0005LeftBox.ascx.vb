@@ -79,6 +79,11 @@ Public Class GRIS0005LeftBox
     ''' <item><description>LC_CALENDAR      : カレンダー表示を行う</description></item>
     ''' <item><description>LC_FIX_VALUE     : 固定値区分のリストを作成</description></item>
     ''' <item><description>LC_STATIONCODE   : 貨物駅パターンのリストを作成</description></item>
+    ''' <item><description>LC_BRANCH        : 管轄支店のリストを作成（タンク所在向け）</description></item>
+    ''' <item><description>LC_BELONGTOOFFICE: 所属営業所（支店含む）のリストを作成（タンク所在向け）</description></item>
+    ''' <item><description>LC_BRANCHOFFICESTATION: 管轄所属・駅関連付けのリストを作成（タンク所在向け）</description></item>
+    ''' <item><description>LC_TANKSTATUS: タンク車状態のリストを作成</description></item>
+    ''' <item><description>LC_LOADINGKBN: 積車状態リストを作成</description></item>
     ''' </list>
     Public Enum LIST_BOX_CLASSIFICATION
         LC_COMPANY
@@ -137,6 +142,15 @@ Public Class GRIS0005LeftBox
         LC_JOINTLIST
         LC_STACKING
         LC_TANKNUMBERLINK
+        LC_KAISOUSTATUS
+        LC_KAISOUINFO
+        LC_KAISOUTYPE
+        LC_OBJECTIVECODE
+        LC_BRANCH
+        LC_BELONGTOOFFICE
+        LC_BRANCHOFFICESTATION
+        LC_TANKSTATUS
+        LC_LOADINGKBN
     End Enum
 
     ''' <summary>
@@ -219,6 +233,10 @@ Public Class GRIS0005LeftBox
         LP_JOINTLIST
         LP_STACKING
         LP_TANKNUMBERLINK
+        LP_KAISOUSTATUS
+        LP_KAISOUINFO
+        LP_KAISOUTYPE
+        LP_OBJECTIVECODE
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -580,6 +598,14 @@ Public Class GRIS0005LeftBox
                 '受注情報
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORDERINFO"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_KAISOUSTATUS
+                '回送進行ステータス
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "KAISOUSTATUS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_KAISOUINFO
+                '回送情報
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "KAISOUINFO"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY
                 '利用可否
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "USEPROPRIETY"
@@ -659,6 +685,10 @@ Public Class GRIS0005LeftBox
                 '受注パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORDERPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_KAISOUTYPE
+                '回送パターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "KAISOUPATTERN"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_PRODUCTSEGLIST
                 '品種パターン(受発注用)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "PRODUCTPATTERN_SEG"
@@ -679,6 +709,10 @@ Public Class GRIS0005LeftBox
                 '発着駅フラグ
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "DEPARRSTATIONFLG"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE
+                '目的
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OBJECTIVECODE"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_FILLINGPOINT
                 '充填ポイント
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "FILLINGPOINT"
@@ -686,6 +720,28 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_STATION
                 '貨物駅
                 lbox = CreateStationList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BRANCH
+                '管轄支店取得
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BRANCH"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE
+                '所属営業所
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BELONGTOOFFICE"
+                Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "VALUE2," &
+                                                                  "KEYCODE"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_BRANCHOFFICESTATION
+                '管轄所属・駅関連付け
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BRANCHOFFICESTATION"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TANKSTATUS
+                'タンク車状態
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKSTATUS"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_LOADINGKBN
+                '積車区分
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "LOADINGKBN"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing

@@ -5,6 +5,7 @@
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIT0005WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/GRC0001TILESELECTORWRKINC.ascx" TagName="tilelist" TagPrefix="MSINC"  %>
 
 <asp:Content ID="OIT0005SH" ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0005S.js")%>'></script>
@@ -43,15 +44,14 @@
                 </a>
             </div>
             <!-- 所属先 -->
-            <div class="inputItem">
-                <a id="WF_OFFICECODE_LABEL"  class="requiredMark">所属先</a>
-                <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtSalesOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtSalesOffice');">
-                    <asp:TextBox ID="TxtSalesOffice" runat="server"  CssClass="boxIcon" onblur="MsgClear();"></asp:TextBox>
+            <div class="inputItem" >
+                <a id="WF_Test"  class="requiredMark">タンク車を管轄する支店・営業所を選ぶ</a>
+                <a>
+                    <MSINC:tilelist ID="tileSalesOffice" runat="server" />
                 </a>
-                <a id="WF_OFFICECODE_TEXT" >
-                    <asp:Label ID="LblSalesOfficeName" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
+                <a></a>
             </div>
+            
         </div>
     </div>
 

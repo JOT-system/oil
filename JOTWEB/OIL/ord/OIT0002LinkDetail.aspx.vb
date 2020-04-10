@@ -205,6 +205,9 @@ Public Class OIT0002LinkDetail
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        WW_ListTextBoxReadControl()
+
     End Sub
 
     ''' <summary>
@@ -627,6 +630,9 @@ Public Class OIT0002LinkDetail
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
 
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        WW_ListTextBoxReadControl()
+
         '○ クリア
         If TBLview.Count = 0 Then
             WF_GridPosition.Text = "1"
@@ -636,6 +642,9 @@ Public Class OIT0002LinkDetail
 
         TBLview.Dispose()
         TBLview = Nothing
+
+        '〇タンク車所在の更新
+        WW_TankShozaiSet()
 
     End Sub
 
@@ -682,12 +691,20 @@ Public Class OIT0002LinkDetail
             MAPDataGet(SQLcon, 0)
         End Using
 
-        Dim i As Integer = 0
-        For Each OIT0002row As DataRow In OIT0002tbl.Rows
-            i += 1
-            OIT0002row("LINEORDER") = i        '貨物駅入線順
+        '### 指摘票内部(No170)対象の営業所のみチェックをするように変更(20200407) ################################
+        '営業所が"011201(五井営業所)", "011202(甲子営業所)", "011203(袖ヶ浦営業所)"が対象
+        If work.WF_SEL_OFFICECODE.Text = "011201" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011202" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011203" Then
 
-        Next
+            Dim i As Integer = 0
+            For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                i += 1
+                OIT0002row("LINEORDER") = i        '貨物駅入線順
+
+            Next
+        End If
+        '########################################################################################################
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0002tbl)
@@ -2209,18 +2226,106 @@ Public Class OIT0002LinkDetail
             chkTankNo = drv("TANKNUMBER")
         Next
 
-        '入線順序でソートし、重複がないかチェックする。
-        OIT0002tbl_dv.Sort = "LINEORDER"
-        For Each drv As DataRowView In OIT0002tbl_dv
-            If drv("LINEORDER") <> "" AndAlso chkTankNo = drv("LINEORDER") Then
-                Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                WW_CheckMES1 = "入線順序重複エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
-                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+        '### 指摘票内部(No170)対象の営業所のみチェックをするように変更(20200407) ################################
+        '営業所が"011201(五井営業所)", "011202(甲子営業所)", "011203(袖ヶ浦営業所)"が対象
+        If work.WF_SEL_OFFICECODE.Text = "011201" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011202" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011203" Then
+
+            '(一覧)入線順序でソートし、重複がないかチェックする。
+            OIT0002tbl_dv.Sort = "LINEORDER"
+            For Each drv As DataRowView In OIT0002tbl_dv
+                If drv("LINEORDER") <> "" AndAlso chkTankNo = drv("LINEORDER") Then
+                    Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WW_CheckMES1 = "入線順序重複エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+                chkTankNo = drv("LINEORDER")
+            Next
+
+        End If
+        '########################################################################################################
+
+        '★(一覧)空白チェック
+        '### 各営業所に対して、(一覧)の項目のチェックを実施(20200407) ###########################################
+        '営業所が"011201(五井営業所)", "011202(甲子営業所)", "011203(袖ヶ浦営業所)"が対象
+        If work.WF_SEL_OFFICECODE.Text = "011201" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011202" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011203" Then
+
+            For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                '必須項目が全部空白の行はスキップする
+                If Trim(OIT0002row("LINETRAINNO")) = "" And
+                        Trim(OIT0002row("LINEORDER")) = "" And
+                        Trim(OIT0002row("TANKNUMBER")) = "" Then
+                    Continue For
+                End If
+
+                '(一覧)入線列車番号(空白チェック)
+                If OIT0002row("LINETRAINNO") = "" And OIT0002row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)入線列車番号", needsPopUp:=True)
+
+                    WW_CheckMES1 = "入線列車番号未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0002row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+
+                '(一覧)入線順序(空白チェック)
+                If OIT0002row("LINEORDER") = "" And OIT0002row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)入線順序", needsPopUp:=True)
+
+                    WW_CheckMES1 = "入線順序未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0002row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+
+                '(一覧)タンク車番号(空白チェック)
+                If OIT0002row("TANKNUMBER") = "" And OIT0002row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)タンク車番号", needsPopUp:=True)
+
+                    WW_CheckMES1 = "タンク車番号未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0002row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+
+            Next
+
+        Else
+            For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                '(一覧)タンク車番号(空白チェック)
+                If OIT0002row("TANKNUMBER") = "" And OIT0002row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)タンク車番号", needsPopUp:=True)
+
+                    WW_CheckMES1 = "タンク車番号未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0002row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            Next
+        End If
+        '########################################################################################################
+
+        '(一覧)タンク車番号マスタチェック
+        Dim strTankName As String = ""
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+            '存在チェック
+            CODENAME_get("TANKNO", OIT0002row("TANKNUMBER"), strTankName, WW_RTN_SW)
+            If Not isNormal(WW_RTN_SW) Then
+                Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR,
+                              "タンク車番号 : " & OIT0002row("TANKNUMBER"), needsPopUp:=True)
                 O_RTN = "ERR"
                 Exit Sub
             End If
-            chkTankNo = drv("LINEORDER")
         Next
 
         '○ 正常メッセージ
@@ -2683,24 +2788,31 @@ Public Class OIT0002LinkDetail
                     If Trim(OIT0002row("LINETRAINNO")) = "" And
                             Trim(OIT0002row("LINEORDER")) = "" And
                             Trim(OIT0002row("TANKNUMBER")) = "" Then
-                        '何もしない
+
+                        '### 何もしない #############################
+
                     Else    '必須項目が1～2個空白の行がある場合、エラーを出す
-                        If Trim(OIT0002row("LINETRAINNO")) = "" Or
-                                Trim(OIT0002row("LINEORDER")) = "" Or
-                                Trim(OIT0002row("TANKNUMBER")) = "" Then
+                        '### WW_CHECKにてチェックをするように変更したためコメントアウト ####################################################
+                        'If Trim(OIT0002row("LINETRAINNO")) = "" Or
+                        '        Trim(OIT0002row("LINEORDER")) = "" Or
+                        '        Trim(OIT0002row("TANKNUMBER")) = "" Then
 
-                            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D UPDATE_INSERT_ORDER" & " （入線列車番号、入線順序、タンク車番号のいずれかが未入力です）", needsPopUp:=True)
+                        'Master.Output(C_MESSAGE_NO.DB_ERROR, 
+                        'C_MESSAGE_TYPE.ABORT,
+                        '                "OIT0002D UPDATE_INSERT_ORDER" & " （入線列車番号、入線順序、タンク車番号のいずれかが未入力です）",
+                        '                needsPopUp:=True)
+                        'CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+                        'CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
+                        'CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        'CS0011LOGWrite.TEXT = "必須項目エラー"
+                        'CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.PREREQUISITE_ERROR
+                        'CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+                        'WF_UPDERRFLG.Value = "1"
+                        'Exit Sub
+                        '###################################################################################################################
 
-                            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                            CS0011LOGWrite.INFPOSI = "DB:OIT0002D UPDATE_INSERT_ORDER"
-                            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                            CS0011LOGWrite.TEXT = "必須項目エラー"
-                            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.PREREQUISITE_ERROR
-                            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-                            WF_UPDERRFLG.Value = "1"
-                            Exit Sub
-                        Else '必須項目が入力されている行のカウント
-                            CNT_ROWS += 1
+                        'Else '必須項目が入力されている行のカウント
+                        CNT_ROWS += 1
                             Dim WW_DATENOW As DateTime = Date.Now
 
                             'DB更新
@@ -2837,7 +2949,7 @@ Public Class OIT0002LinkDetail
                                     Exit Sub
                                 End If
                             Next
-                        End If
+                        'End If
                     End If
                 Next
 
@@ -3403,6 +3515,188 @@ Public Class OIT0002LinkDetail
     End Sub
 
     ''' <summary>
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControl()
+
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+        For Each rowitem As TableRow In tblObj.Rows
+            For Each cellObj As TableCell In rowitem.Controls
+                '(一覧)入線列車番号, (一覧)入線順序が対象
+                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINETRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINEORDER") Then
+                    '営業所が"011201(五井営業所)", "011202(甲子営業所)", "011203(袖ヶ浦営業所)"が対象
+                    If work.WF_SEL_OFFICECODE.Text = "011201" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011202" _
+                        OrElse work.WF_SEL_OFFICECODE.Text = "011203" Then
+
+                        '### 入力対象のため何もしない ####################
+
+                    Else
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+
+                    End If
+
+                End If
+            Next
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' タンク車所在設定処理
+    ''' </summary>
+    Protected Sub WW_TankShozaiSet()
+
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+
+            If OIT0002row("TANKNUMBER") = "" Then
+                Continue For
+            End If
+
+            '★(一覧)タンク車番号がOT本社、または在日米軍のリース車かチェック
+            FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0002row("TANKNUMBER"), WW_GetValue)
+
+            'タンク車がOT本社、または在日米軍のリース車の場合
+            'タンク車所在の所在地を空車着駅(発駅)に更新する。
+            If WW_GetValue(0) <> "" Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更あり(空車着駅（発駅）)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                '引数４：タンク車№　　⇒　指定あり
+                WW_UpdateTankShozai(Me.TxtRetstation.Text, "3", "", I_TANKNO:=OIT0002row("TANKNUMBER"))
+            Else
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                '引数４：所属営業所コード　⇒　変更あり(登録営業所)
+                '引数５：タンク車№　　　　⇒　指定あり
+                WW_UpdateTankShozai("", "3", "", I_OFFICE:=work.WF_SEL_OFFICECODE.Text, I_TANKNO:=OIT0002row("TANKNUMBER"))
+
+            End If
+
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' (タンク車所在TBL)所在地の内容を更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
+                                      ByVal I_STATUS As String,
+                                      ByVal I_KBN As String,
+                                      Optional ByVal I_OFFICE As String = Nothing,
+                                      Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal upEmparrDate As Boolean = False,
+                                      Optional ByVal upActualEmparrDate As Boolean = False)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLの託送指示フラグを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0005_SHOZAI " _
+                    & "    SET "
+
+            '○ 更新内容が指定されていれば追加する
+            '所属営業所コード
+            If Not String.IsNullOrEmpty(I_OFFICE) Then
+                SQLStr &= String.Format("        OFFICECODE   = '{0}', ", I_OFFICE)
+            End If
+            '所在地コード
+            If Not String.IsNullOrEmpty(I_LOCATION) Then
+                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+            End If
+            'タンク車状態コード
+            If Not String.IsNullOrEmpty(I_STATUS) Then
+                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+            End If
+            '積車区分
+            If Not String.IsNullOrEmpty(I_KBN) Then
+                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            ''空車着日（予定）
+            'If upEmparrDate = True Then
+            '    SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
+            '    SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+            'End If
+            ''空車着日（実績）
+            'If upActualEmparrDate = True Then
+            '    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", Me.TxtActualEmparrDate.Text)
+            'End If
+
+            SQLStr &=
+                      "        UPDYMD       = @P11, " _
+                    & "        UPDUSER      = @P12, " _
+                    & "        UPDTERMID    = @P13, " _
+                    & "        RECEIVEYMD   = @P14  " _
+                    & "  WHERE TANKNUMBER   = @P01  " _
+                    & "    AND DELFLG      <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA02.Value = C_DELETE_FLG.DELETE
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            If I_TANKNO = "" Then
+                '(一覧)で設定しているタンク車をKEYに更新
+                For Each OIT0002row As DataRow In OIT0002tbl.Rows
+                    PARA01.Value = OIT0002row("TANKNUMBER")
+                    SQLcmd.ExecuteNonQuery()
+                Next
+            Else
+                '指定されたタンク車№をKEYに更新
+                PARA01.Value = I_TANKNO
+                SQLcmd.ExecuteNonQuery()
+
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D_TANKSHOZAI UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002D_TANKSHOZAI UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        'If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
+        '    '○メッセージ表示
+        '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'End If
+
+    End Sub
+
+    ''' <summary>
     ''' 名称取得
     ''' </summary>
     ''' <param name="I_FIELD"></param>
@@ -3447,6 +3741,9 @@ Public Class OIT0002LinkDetail
 
                 Case "PRODUCTPATTERN"   '油種
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_PRODUCTLIST, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN"))
+
+                Case "TANKNO"           'タンク車
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "TANKNO"))
 
             End Select
         Catch ex As Exception

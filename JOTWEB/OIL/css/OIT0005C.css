@@ -80,3 +80,8 @@
     color:rgb(46,117,182);
     border: 1px solid rgb(46,117,182);
 }
+.conditionItem .button input[type=button]:disabled {
+    background-color:gray;
+    color:rgb(255,255,255);
+    border:1px solid gray;
+}

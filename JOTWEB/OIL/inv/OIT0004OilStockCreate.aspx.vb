@@ -165,7 +165,7 @@ Public Class OIT0004OilStockCreate
             '日付情報取得（祝祭日含む）
             daysList = GetTargetDateList(sqlCon, baseDate)
             '対象油種取得
-            oilTypeList = GetTargetOilType(sqlCon, salesOffice, consignee)
+            oilTypeList = GetTargetOilType(sqlCon, salesOffice, consignee, shipper)
             If oilTypeList Is Nothing OrElse oilTypeList.Count = 0 Then
                 '取り扱い油種が無い場合は何もできないので終了
                 mesNo = C_MESSAGE_NO.OIL_STOCK_OILINFO_NOTEXISTS
@@ -214,7 +214,7 @@ Public Class OIT0004OilStockCreate
                     mitrainList = GetTargetTrain(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiShippersCode, dispDataObj.Consignee, trainList)
                 End If
                 '油種は持っている元に合わせる（最終的に元と一致する油種じゃないと認めない？）
-                miOilTypeList = GetTargetOilType(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiConsignee)
+                miOilTypeList = GetTargetOilType(sqlCon, dispDataObj.MiSalesOffice, dispDataObj.MiConsignee, dispDataObj.MiShippersCode)
                 '構内取り用の画面表示クラス生成
                 dispDataObj.MiDispData = New DispDataClass(daysList, mitrainList, miOilTypeList, dispDataObj.MiSalesOffice, dispDataObj.MiShippersCode, dispDataObj.MiConsignee)
                 dispDataObj.MiDispData.SalesOfficeName = dispDataObj.MiSalesOfficeName
@@ -734,8 +734,9 @@ Public Class OIT0004OilStockCreate
     ''' <param name="sqlCon">SQL接続オブジェクト</param>
     ''' <param name="salesOffice">営業所</param>
     ''' <param name="consignee">油槽所（荷受人）コード</param>
+    ''' <param name="shipper">荷主コード</param>
     ''' <returns>キー:油種コード、値：油種アイテムクラス</returns>
-    Private Function GetTargetOilType(sqlCon As SqlConnection, salesOffice As String, consignee As String) As Dictionary(Of String, OilItem)
+    Private Function GetTargetOilType(sqlCon As SqlConnection, salesOffice As String, consignee As String, shipper As String) As Dictionary(Of String, OilItem)
         Dim retVal As New Dictionary(Of String, OilItem)
         '営業所に対応する油種コード取得
         Dim sqlStr As New StringBuilder
@@ -768,6 +769,7 @@ Public Class OIT0004OilStockCreate
         sqlConsigneeOilType.AppendLine("WHERE FV.CAMPCODE = @CAMPCODE")
         sqlConsigneeOilType.AppendLine("  AND FV.CLASS    = @CLASS")
         sqlConsigneeOilType.AppendLine("  AND FV.KEYCODE  = @CONSIGNEE")
+        sqlConsigneeOilType.AppendLine("  AND FV.VALUE7　 = @SHIPPERSCODE")
         sqlConsigneeOilType.AppendLine("  AND FV.DELFLG   = @DELFLG")
 
         'DBより取得を行い取得情報付与
@@ -779,6 +781,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = "0"
                 .Add("@STOCKFLG", SqlDbType.NVarChar).Value = "9" '不等号条件
                 .Add("@CONSIGNEE", SqlDbType.NVarChar).Value = consignee
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = shipper
             End With
             paramCampCode.Value = salesOffice
             paramClass.Value = "PRODUCTPATTERN"

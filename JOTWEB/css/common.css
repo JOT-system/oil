@@ -405,6 +405,10 @@ input[type=number][readonly].boxIcon:not(.iconOnly),
 input[type=number][readonly].calendarIcon:not(.iconOnly) {
     padding-left: 0.3em;
 }
+div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(240, 240, 240);
+    pointer-events:none;
+}
 /* ------------------------------
 
     擬似フレーム　スタイル定義
@@ -1640,6 +1644,62 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     white-space: nowrap; /* 折り返させない */
     text-overflow: ellipsis; /* 領域越を点々表示 */
 }
+/*  ----------------------------------  */
+/* タイル選択カスタムコントロールの設定 */
+/*  ----------------------------------  */
+.grc0001Wrapper input[type=checkbox],
+.grc0001Wrapper input[type=radio] {
+    display: none;
+}
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label{
+    display:flex;
+    width:130px;
+    padding-left:5px;
+    padding-right:5px;
+    height:40px;
+    text-align :center;
+    justify-content:center;
+    align-items:center;
+    color:#737373;
+    border:2px solid rgb(91,155,213);
+    border-radius:5px;
+    margin-right:5px;
+    margin-bottom:5px;
+    font-weight:bold;
+    position:relative;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label{
+    background-color:rgb(157,195,230);
+    color:rgb(255,255,255);
+}
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before{
+    position:absolute;
+    left:2px;
+    content:"✔";
+    color:red;
+}
+.grc0001Wrapper input[type=checkbox] + label:hover,
+.grc0001Wrapper input[type=radio] + label:hover{
+    cursor:pointer;
+    background-color:rgba(157,195,230,0.5);
+    color:#737373;
+}
+.grc0001Wrapper ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width:450px;
+}
+
+.grc0001Settings {
+    display: none;
+}
+
 /*  ------------------------------  */
 /* ロード時のウェイトスタイル       */
 /*  ------------------------------  */

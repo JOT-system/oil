@@ -1,0 +1,260 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+
+#divContensbox{
+    height:calc(100% - 2.4em - 1.4em);
+}
+ /* コンテンツの最小横幅 */
+.headerbox, .detailbox, #tabBox {
+    min-width: 1340px;
+}
+.actionButtonBox {
+    padding:5px;
+}
+/* ************************** */
+/* ヘッダー入力欄の全体の設定 */
+/* ************************** */
+#headerDispArea {
+    box-sizing: border-box;
+    padding-bottom:20px;
+}
+.commonHeaderInput {
+    margin-left:10px;
+}
+/* 一列目の文言幅 */
+.commonHeaderInput > span:nth-child(5n+1) > a:nth-child(1) {
+    width: 130px;
+}
+.commonHeaderInput > span:not(:nth-child(5n+1)) > a:nth-child(1) {
+    width: 90px; /* 共通設定は115px */
+}
+
+.commonHeaderInput > span:not(:nth-child(5n+1)) {
+    /* 一項目の共通設定幅280px - (共通設定115px - 上記width) */
+    width: 260px;
+}
+.commonHeaderInput > span > a:nth-child(2) {
+    width:135px;
+}
+.commonHeaderInput > span.doubleItem:not(:nth-child(5n+1)) {
+    width: calc(260px * 2);
+}
+
+.commonHeaderInput > span.doubleItem:nth-child(5n+1) {
+    width: calc(280px + 260px);
+}
+.commonHeaderInput > span.doubleItem + span {
+    display:none;
+}
+.commonHeaderInput > span.doubleItem > a:nth-child(2) {
+    width: 376px;
+}
+.commonHeaderInput {
+    width: 1330px;
+}
+.commonHeaderInput input[type=text] {
+    width:100%;
+}
+.commonHeaderInput input[type=button] {
+    margin-bottom:-10px;
+    height:28px;
+}
+/* ID chkOrderInfoチェックボックス自体を非表示 */
+#chkOrderInfo {
+    display: none;
+}
+    /* チェックボックスの隣のラベルのスタイル(未チェック時) */
+    #chkOrderInfo + label:after {
+        background-color: lightgray;
+        content: "　積置なし";
+        color: white;
+        display: inline-block;
+        font-weight: bold;
+        width: 70px;
+    }
+    /* チェックボックスの隣のラベルのスタイル(未チェック時) */
+    #chkOrderInfo:checked + label:after {
+        background-color: lightgray;
+        content: "　積置あり";
+        color: black;
+        font-weight: bold;
+        width: 70px;
+    }
+
+
+
+/* ************** */
+/* 詳細部         */
+/* ************** */
+#detailbox {
+    /* font-size: 13.5px; */
+    /*height: calc(100% - 1.4em);*/ /* コンテンツ全体のフッターメッセージのサイズを引く */
+    position: relative;
+    bottom: 0px;
+    min-height: 230px;
+}
+/* ************** */
+/* タブレイアウト */
+/* ************** */
+#tabBox {
+    width: 100%;
+    background-color: gray;
+    border-top: 2px solid gray;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    font-size: 0;
+}
+#tabBox .leftside {
+    width:auto;
+
+}
+#tabBox .rightSide{
+    margin-left:auto;
+}
+/* 最左タブの左間隔をあける */
+[data-itemelm=tab]:nth-child(1) {
+    margin-left: 2px;
+}
+/* タブ基本設定 */
+[data-itemelm=tab] {
+    font-size: 13.5px;
+    box-sizing: border-box;
+    display: inline-block;
+    min-width: 105px;
+    width: auto;
+    padding: 5px;
+    margin-right: 2px;
+    text-align: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    color: rgba(1, 60, 65, 0.5);
+    background-color: lightgray;
+    border-left: 1px solid lightgray; /* この背景色と線の色は合わせる */
+    border-right: 1px solid lightgray; /* この背景色と線の色は合わせる */
+    border-top: 1px solid lightgray; /* この背景色と線の色は合わせる */
+    border-bottom: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    margin-bottom: -1px;
+}
+/* タブマウスオーバー時設定 */
+[data-itemelm=tab]:hover {
+    cursor:pointer;
+    background-color:rgba(237,237,237,0.5); 
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-top: 1px solid lightgray;
+}
+/* 選択されたタブ設定 */
+[data-itemelm=tab].selected {
+    font-weight:bold;
+    cursor:default;
+    pointer-events:none; /* クリックイベントを発生させない */
+    color: #000000;
+    margin-bottom: -1px;
+    background-color: rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    border-left: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    border-right: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+    border-top: 1px solid rgb(237,237,237); /* 詳細欄の背景と合わせる */
+}
+[data-itemelm=tab].aspNetDisabled {
+    pointer-events:none; /* クリックイベントを発生させない */
+}
+#hideHeader:after {
+    color: white;
+    text-decoration-color: white;
+    font-weight: bold;
+    font-size: 13.5px;
+    height: 100%;
+    display: block;
+    vertical-align: middle;
+    padding-right: 5px;
+    content: "上部隠す"
+}
+#hideHeader.hideHeader:after {
+    content: "上部表示"
+}
+#hideHeader:hover {
+    cursor: pointer;
+    color: white;
+    text-decoration-color: white;
+    text-decoration: underline;
+}
+/* ヘッダー部分を隠す */
+#headerDispArea.hideHeader {
+    display:none;
+}
+/* ************** */
+/* 下段共通レイアウト */
+/* ************** */
+detailBottom {
+    width:100%;
+    height:100%;
+}
+/* 一覧表のくずれ補正 */
+div[id^=pnlListArea] {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin-left: 2px;
+}
+div[data-generated='1'] div[id$='_HR'] {
+    /*position: relative;*/
+}
+div[data-generated='1'] tr td > div[style] {
+    overflow:hidden;
+    max-height:24px;
+    margin-top:-3px;
+}
+/* 一覧表ヘッダー部の２行補正 */
+/* 左ヘッダー行スタイル,右ヘッダー行スタイル*/
+div[data-generated="1"] div[id$="_HR"] table tr,
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 37px;
+}
+/* 左(固定データテーブル用)DIV,右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"],
+div[data-generated="1"] div[id$="_DR"] {
+    top: 37px; /* ヘッダー行スタイルのheightに合わせる */
+}
+
+/* ******************************** */
+/* タブ「タンク車割当」関連レイアウト */
+/* ******************************** */
+.summaryTable.wariate {
+    margin-left: 5px;
+}
+/* 車数・kl表一列目の幅(「割当後」文言分大きくとる) */
+.summaryTable.wariate:nth-child(2) div a:nth-child(1) {
+    width: 190px;
+    padding-right:5px;
+    text-align:right;
+}
+/* 一覧のReadOnlyの制御 */
+div[id^=pnlListArea] input[type=text][readonly]:not(.iconOnly) {
+    color: #737373;
+    background-color:rgb(240,240,240);
+}
+div[id^=pnlListArea] input[type=text][readonly]:not(.iconOnly):hover {
+    color: #737373;
+    background-color:rgb(240,240,240);
+    border-color:skyblue;
+    background-image:none;
+    box-shadow :none;
+}
+div[id^=pnlListArea] .boxIconArea div, div[id^=pnlListArea] .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    div[id^=pnlListArea] .calendarIconArea div, div[id^=pnlListArea] .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, div[id^=pnlListArea] .calendarIconArea div, div[id^=pnlListArea] .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}

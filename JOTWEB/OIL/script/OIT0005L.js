@@ -17,5 +17,6 @@ function InitDisplay() {
 
     // 左ボックス拡張機能追加
     addLeftBoxExtention(leftListExtentionTarget);
-
+    /* 共通一覧のスクロールイベント紐づけ */
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 }

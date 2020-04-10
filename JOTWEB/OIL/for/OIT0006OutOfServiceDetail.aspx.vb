@@ -4657,13 +4657,30 @@ Public Class OIT0006OutOfServiceDetail
 
                     '回送画面の目的が"5:疎開留置"の場合
                     If Me.TxtObjective.Text = "5" Then
+
+                        Dim strOfficeCode As String = ""
+
+                        Select Case Me.TxtKaisouOrderOfficeCode.Text
+                            Case "010402"
+                                '東北支店
+                                strOfficeCode = "010401"
+
+                            Case "011201", "011202", "011203", "011402"
+                                '関東支店
+                                strOfficeCode = "011401"
+
+                            Case "012401", "012402"
+                                '中部支店
+                                strOfficeCode = "012301"
+                        End Select
+
                         '★タンク車所在の更新
                         '引数１：所在地コード　　　⇒　変更なし(空白)
                         '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　　　⇒　変更なし(空白)
                         '引数４：所属営業所コード　⇒　変更なし(空白)
                         '引数５：タンク車№　　　　⇒　指定あり
-                        WW_UpdateTankShozai("", "3", "", I_OFFICE:="", I_TANKNO:=OIT0006row("TANKNO"))
+                        WW_UpdateTankShozai("", "3", "", I_OFFICE:=strOfficeCode, I_TANKNO:=OIT0006row("TANKNO"))
 
                     Else
                         '★タンク車所在の更新

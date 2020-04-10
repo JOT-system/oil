@@ -1092,17 +1092,19 @@ Public Class OIT0006OutOfServiceDetail
 
                     '(一覧)タンク車№, 
                     If WF_FIELD.Value = "TANKNO" Then
-                        '〇 検索(営業所).テキストボックスが未設定
-                        If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                            '〇 画面(回送登録営業所).テキストボックスが未設定
-                            If Me.TxtKaisouOrderOffice.Text = "" Then
-                                prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
-                            Else
-                                prmData = work.CreateSALESOFFICEParam(Me.TxtKaisouOrderOfficeCode.Text, "")
-                            End If
-                        Else
-                            prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
-                        End If
+                        ''〇 検索(営業所).テキストボックスが未設定
+                        'If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                        '    '〇 画面(回送登録営業所).テキストボックスが未設定
+                        '    If Me.TxtKaisouOrderOffice.Text = "" Then
+                        '        prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, "")
+                        '    Else
+                        '        prmData = work.CreateSALESOFFICEParam(Me.TxtKaisouOrderOfficeCode.Text, "")
+                        '    End If
+                        'Else
+                        '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
+                        'End If
+
+                        prmData = work.CreateSALESOFFICEParam(Me.TxtDepstationCode.Text, "")
 
                         '### LeftBoxマルチ対応(20200217) START #####################################################
                         If WF_FIELD.Value = "TANKNO" Then
@@ -1519,23 +1521,26 @@ Public Class OIT0006OutOfServiceDetail
                             Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                             updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
 
-                            '〇 検索(営業所).テキストボックスが未設定
-                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                                '〇 画面(回送登録営業所).テキストボックスが未設定
-                                If Me.TxtKaisouOrderOffice.Text = "" Then
-                                    WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                                Else
-                                    WW_FixvalueMasterSearch(Me.TxtKaisouOrderOfficeCode.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                                End If
-                            Else
-                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                            End If
+                            ''〇 検索(営業所).テキストボックスが未設定
+                            'If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                            '    '〇 画面(回送登録営業所).テキストボックスが未設定
+                            '    If Me.TxtKaisouOrderOffice.Text = "" Then
+                            '        WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                            '    Else
+                            '        WW_FixvalueMasterSearch(Me.TxtKaisouOrderOfficeCode.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                            '    End If
+                            'Else
+                            '    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
+                            'End If
+
+                            WW_FixvalueMasterSearch(Me.TxtDepstationCode.Text, "TANKNUMBER_KAISOU", WW_TANKNUMBER, WW_GetValue)
 
                             '交検日
                             Dim WW_JRINSPECTIONCNT As String
-                            updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                            If WW_GetValue(2) <> "" Then
-                                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+                            'updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
+                            updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(11)
+                            If WW_GetValue(11) <> "" Then
+                                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(11)))
 
                                 Dim WW_JRINSPECTIONFLG As String
                                 If WW_JRINSPECTIONCNT <= 3 Then
@@ -1562,9 +1567,10 @@ Public Class OIT0006OutOfServiceDetail
 
                             '全検日
                             Dim WW_JRALLINSPECTIONCNT As String
-                            updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                            If WW_GetValue(3) <> "" Then
-                                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+                            'updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
+                            updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(12)
+                            If WW_GetValue(12) <> "" Then
+                                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(12)))
 
                                 Dim WW_JRALLINSPECTIONFLG As String
                                 If WW_JRALLINSPECTIONCNT <= 3 Then
@@ -1592,7 +1598,7 @@ Public Class OIT0006OutOfServiceDetail
                             '〇 タンク車割当状況チェック
                             'WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
 
-                            '(一覧)(実績)発日, (一覧)(実績)積車積込日, 
+                            '(一覧)(実績)発日, 　(一覧)(実績)着日, 
                             '(一覧)(実績)受入日, (一覧)(実績)空車着日を一覧に設定
                         ElseIf WF_FIELD.Value = "ACTUALDEPDATE" _
                             OrElse WF_FIELD.Value = "ACTUALARRDATE" _
@@ -2469,17 +2475,19 @@ Public Class OIT0006OutOfServiceDetail
                     Exit Select
                 End If
 
-                '〇 検索(営業所).テキストボックスが未設定
-                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    '〇 画面(受注営業所).テキストボックスが未設定
-                    If Me.TxtKaisouOrderOffice.Text = "" Then
-                        WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                    Else
-                        WW_FixvalueMasterSearch(Me.TxtKaisouOrderOfficeCode.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                    End If
-                Else
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                End If
+                ''〇 検索(営業所).テキストボックスが未設定
+                'If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                '    '〇 画面(受注営業所).テキストボックスが未設定
+                '    If Me.TxtKaisouOrderOffice.Text = "" Then
+                '        WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                '    Else
+                '        WW_FixvalueMasterSearch(Me.TxtKaisouOrderOfficeCode.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                '    End If
+                'Else
+                '    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
+                'End If
+
+                WW_FixvalueMasterSearch(Me.TxtDepstationCode.Text, "TANKNUMBER_KAISOU", WW_ListValue, WW_GetValue)
 
                 'タンク車№
                 updHeader.Item("TANKNO") = WW_ListValue
@@ -2489,9 +2497,10 @@ Public Class OIT0006OutOfServiceDetail
                 '交検日
                 Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                 Dim WW_JRINSPECTIONCNT As String
-                updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                If WW_GetValue(2) <> "" Then
-                    WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+                'updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
+                updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(11)
+                If WW_GetValue(11) <> "" Then
+                    WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(11)))
 
                     Dim WW_JRINSPECTIONFLG As String
                     If WW_JRINSPECTIONCNT <= 3 Then
@@ -2519,9 +2528,10 @@ Public Class OIT0006OutOfServiceDetail
 
                 '全検日
                 Dim WW_JRALLINSPECTIONCNT As String
-                updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                If WW_GetValue(3) <> "" Then
-                    WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+                'updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
+                updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(12)
+                If WW_GetValue(12) <> "" Then
+                    WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(12)))
 
                     Dim WW_JRALLINSPECTIONFLG As String
                     If WW_JRALLINSPECTIONCNT <= 3 Then

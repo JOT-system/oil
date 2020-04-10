@@ -171,7 +171,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         document.getElementById('WF_FIELD').value = fieldNM;
 
         if (fieldNM === "TANKNO") {
-            document.getElementById('WF_LeftMViewChange').value = 20;
+            //document.getElementById('WF_LeftMViewChange').value = 20;
+            document.getElementById('WF_LeftMViewChange').value = 65;
         }
         else if (fieldNM === "OILNAME") {
             document.getElementById('WF_LeftMViewChange').value = 24;

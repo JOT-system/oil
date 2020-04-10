@@ -575,6 +575,10 @@ Public Module Messages
         ''' タンク所在を更新します。本当によろしいですか？
         ''' </summary>
         Public Const OIL_CONFIRM_UPDATE_TANKLOCATION As String = "20045"
+        ''' <summary>
+        ''' タンク車(積車)使用メッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_LOADING_USE As String = "20046"
 #End Region
 
 

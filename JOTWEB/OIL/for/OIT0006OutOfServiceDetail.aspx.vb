@@ -2562,19 +2562,20 @@ Public Class OIT0006OutOfServiceDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0006_KAISOU" _
             & "    SET" _
-            & "        KAISOUTYPE      = @P02  , TRAINNO        = @P03, TRAINNAME     = @P04" _
-            & "        , KAISOUYMD     = @P05  , OFFICECODE     = @P06, OFFICENAME    = @P07" _
-            & "        , SHIPPERSCODE  = @P08  , SHIPPERSNAME   = @P09, BASECODE      = @P10, BASENAME         = @P11" _
-            & "        , CONSIGNEECODE = @P12  , CONSIGNEENAME  = @P13, DEPSTATION    = @P14, DEPSTATIONNAME   = @P15" _
-            & "        , ARRSTATION    = @P16  , ARRSTATIONNAME = @P17, OBJECTIVECODE = @P18" _
-            & "        , KAISOUSTATUS  = @P19  , KAISOUINFO     = @P20, FAREFLG       = @P21, USEPROPRIETYFLG  = @P22" _
-            & "        , DEPDATE       = @P23  , ARRDATE        = @P24, ACCDATE       = @P25, EMPARRDATE       = @P26" _
-            & "        , ACTUALDEPDATE = @P27  , ACTUALARRDATE  = @P28, ACTUALACCDATE = @P29, ACTUALEMPARRDATE = @P30" _
-            & "        , TOTALTANK     = @P31  , ORDERNO        = @P32, KEIJYOYMD     = @P33" _
-            & "        , SALSE         = @P34  , SALSETAX       = @P35, TOTALSALSE    = @P36" _
-            & "        , PAYMENT       = @P37  , PAYMENTTAX     = @P38, TOTALPAYMENT  = @P39, DELFLG           = @P40" _
-            & "        , INITYMD       = @P41  , INITUSER       = @P42, INITTERMID    = @P43" _
-            & "        , UPDYMD        = @P44  , UPDUSER        = @P45, UPDTERMID     = @P46, RECEIVEYMD       = @P47" _
+            & "        KAISOUTYPE      = @P02  , TRAINNO         = @P03, TRAINNAME     = @P04" _
+            & "        , KAISOUYMD     = @P05  , OFFICECODE      = @P06, OFFICENAME    = @P07" _
+            & "        , SHIPPERSCODE  = @P08  , SHIPPERSNAME    = @P09, BASECODE      = @P10, BASENAME         = @P11" _
+            & "        , CONSIGNEECODE = @P12  , CONSIGNEENAME   = @P13, DEPSTATION    = @P14, DEPSTATIONNAME   = @P15" _
+            & "        , ARRSTATION    = @P16  , ARRSTATIONNAME  = @P17, OBJECTIVECODE = @P18" _
+            & "        , KAISOUSTATUS  = @P19  , KAISOUINFO      = @P20" _
+            & "        , FAREFLG       = @P21  , USEPROPRIETYFLG = @P22, DELIVERYFLG   = @P48" _
+            & "        , DEPDATE       = @P23  , ARRDATE         = @P24, ACCDATE       = @P25, EMPARRDATE       = @P26" _
+            & "        , ACTUALDEPDATE = @P27  , ACTUALARRDATE   = @P28, ACTUALACCDATE = @P29, ACTUALEMPARRDATE = @P30" _
+            & "        , TOTALTANK     = @P31  , ORDERNO         = @P32, KEIJYOYMD     = @P33" _
+            & "        , SALSE         = @P34  , SALSETAX        = @P35, TOTALSALSE    = @P36" _
+            & "        , PAYMENT       = @P37  , PAYMENTTAX      = @P38, TOTALPAYMENT  = @P39, DELFLG           = @P40" _
+            & "        , INITYMD       = @P41  , INITUSER        = @P42, INITTERMID    = @P43" _
+            & "        , UPDYMD        = @P44  , UPDUSER         = @P45, UPDTERMID     = @P46, RECEIVEYMD       = @P47" _
             & "    WHERE" _
             & "        KAISOUNO          = @P01" _
             & " IF (@@FETCH_STATUS <> 0)" _
@@ -2584,7 +2585,7 @@ Public Class OIT0006OutOfServiceDetail
             & "        , SHIPPERSCODE , SHIPPERSNAME   , BASECODE     , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME  , DEPSTATION   , DEPSTATIONNAME" _
             & "        , ARRSTATION   , ARRSTATIONNAME , OBJECTIVECODE" _
-            & "        , KAISOUSTATUS , KAISOUINFO     , FAREFLG      , USEPROPRIETYFLG" _
+            & "        , KAISOUSTATUS , KAISOUINFO     , FAREFLG      , USEPROPRIETYFLG , DELIVERYFLG" _
             & "        , DEPDATE,       ARRDATE        , ACCDATE      , EMPARRDATE" _
             & "        , ACTUALDEPDATE, ACTUALARRDATE  , ACTUALACCDATE, ACTUALEMPARRDATE" _
             & "        , TOTALTANK,     ORDERNO        , KEIJYOYMD" _
@@ -2598,7 +2599,7 @@ Public Class OIT0006OutOfServiceDetail
             & "        , @P08, @P09, @P10, @P11" _
             & "        , @P12, @P13, @P14, @P15" _
             & "        , @P16, @P17, @P18" _
-            & "        , @P19, @P20, @P21, @P22" _
+            & "        , @P19, @P20, @P21, @P22, @P48" _
             & "        , @P23, @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30" _
             & "        , @P31, @P32, @P33" _
@@ -2634,6 +2635,7 @@ Public Class OIT0006OutOfServiceDetail
             & "    , KAISOUINFO" _
             & "    , FAREFLG" _
             & "    , USEPROPRIETYFLG" _
+            & "    , DELIVERYFLG" _
             & "    , DEPDATE" _
             & "    , ARRDATE" _
             & "    , ACCDATE" _
@@ -2688,6 +2690,7 @@ Public Class OIT0006OutOfServiceDetail
                 Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar) '回送情報
                 Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar) '運賃フラグ
                 Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar) '利用可否フラグ
+                Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.NVarChar) '託送指示フラグ
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.Date)     '発日（予定）
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)     '着日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)     '受入日（予定）
@@ -2751,6 +2754,7 @@ Public Class OIT0006OutOfServiceDetail
                 End If
 
                 PARA22.Value = "1"                                '利用可否フラグ(1:利用可 2:利用不可)
+                PARA48.Value = work.WF_SEL_DELIVERYFLG.Text       '託送指示フラグ(0:未手配 1:手配)
 
                 PARA23.Value = Me.TxtDepDate.Text                 '発日（予定）
                 PARA24.Value = Me.TxtArrDate.Text                 '着日（予定）
@@ -3168,7 +3172,8 @@ Public Class OIT0006OutOfServiceDetail
             '更新SQL文･･･回送明細TBLの各項目をを更新
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0007_KAISOUDETAIL " _
-                    & "    SET ACTUALDEPDATE        = @P04, " _
+                    & "    SET REMARK               = @P12, " _
+                    & "        ACTUALDEPDATE        = @P04, " _
                     & "        ACTUALARRDATE        = @P05, " _
                     & "        ACTUALACCDATE        = @P06, " _
                     & "        ACTUALEMPARRDATE     = @P07, " _
@@ -3186,6 +3191,7 @@ Public Class OIT0006OutOfServiceDetail
             Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  '回送№
             Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '回送明細No
             Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '削除フラグ
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)  '備考
             Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Date)      '発日（実績）
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.Date)      '着日（実績）
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.Date)      '受入日（実績）
@@ -3200,6 +3206,9 @@ Public Class OIT0006OutOfServiceDetail
                 PARA01.Value = OIT0006row("KAISOUNO")
                 PARA02.Value = OIT0006row("DETAILNO")
                 PARA03.Value = C_DELETE_FLG.DELETE
+
+                '記事欄
+                PARA12.Value = OIT0006row("REMARK")
 
                 '発日（実績）
                 If OIT0006row("ACTUALDEPDATE") = "" Then
@@ -3343,8 +3352,8 @@ Public Class OIT0006OutOfServiceDetail
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         '営業所
-        If Not String.IsNullOrEmpty(work.WF_SEL_SALESOFFICECODE.Text) Then
-            SQLStr &= String.Format("    AND OIT0006.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODE.Text)
+        If Not String.IsNullOrEmpty(work.WF_SEL_SALESOFFICECODEMAP.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.OFFICECODE = '{0}'", work.WF_SEL_SALESOFFICECODEMAP.Text)
         End If
         '列車番号
         If Not String.IsNullOrEmpty(work.WF_SEL_TRAINNUMBER.Text) Then
@@ -3355,12 +3364,12 @@ Public Class OIT0006OutOfServiceDetail
             SQLStr &= String.Format("    AND OIT0006.KAISOUSTATUS = '{0}'", work.WF_SEL_STATUSCODE.Text)
         End If
         '目的
-        If Not String.IsNullOrEmpty(work.WF_SEL_OBJECTIVECODE.Text) Then
-            SQLStr &= String.Format("    AND OIT0006.OBJECTIVECODE = '{0}'", work.WF_SEL_OBJECTIVECODE.Text)
+        If Not String.IsNullOrEmpty(work.WF_SEL_OBJECTIVECODEMAP.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.OBJECTIVECODE = '{0}'", work.WF_SEL_OBJECTIVECODEMAP.Text)
         End If
         '着駅
-        If Not String.IsNullOrEmpty(work.WF_SEL_ARRIVALSTATION.Text) Then
-            SQLStr &= String.Format("    AND OIT0006.ARRSTATION = '{0}'", work.WF_SEL_ARRIVALSTATION.Text)
+        If Not String.IsNullOrEmpty(work.WF_SEL_ARRIVALSTATIONMAP.Text) Then
+            SQLStr &= String.Format("    AND OIT0006.ARRSTATION = '{0}'", work.WF_SEL_ARRIVALSTATIONMAP.Text)
         End If
 
         SQLStr &=

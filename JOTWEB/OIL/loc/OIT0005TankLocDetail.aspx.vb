@@ -154,9 +154,9 @@ Public Class OIT0005TankLocDetail
                     txtObj.Text = Convert.ToString(selectedDr(col.ColumnName))
                 End If
             Next col
-            CODENAME_get("BRANCH", TxtBranchCode.Text, LblBranchCodeText.Text, WW_DUMMY)
-            CODENAME_get("BELONGTOOFFICE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_DUMMY)
-            CODENAME_get("BRANCHOFFICESTATION", TxtLocationCode.Text, LblLocationCodeText.Text, WW_DUMMY)
+            CODENAME_get("BRANCHCODE", TxtBranchCode.Text, LblBranchCodeText.Text, WW_DUMMY)
+            CODENAME_get("OFFICECODE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_DUMMY)
+            CODENAME_get("LOCATIONCODE", TxtLocationCode.Text, LblLocationCodeText.Text, WW_DUMMY)
             CODENAME_get("TANKSTATUS", TxtTankStatus.Text, LblTankStatusText.Text, WW_DUMMY)
             CODENAME_get("LOADINGKBN", TxtLoadingKbn.Text, LblLoadingKbnText.Text, WW_DUMMY)
         End If
@@ -177,14 +177,15 @@ Public Class OIT0005TankLocDetail
 
         '○ エラーレポート準備
         rightview.SetErrorReport("")
-        Master.Output(C_MESSAGE_NO.OIL_CONFIRM_UPDATE_TANKLOCATION, C_MESSAGE_TYPE.QUES, needsPopUp:=True, messageBoxTitle:="", IsConfirm:=True)
 
-
+        '○ 項目チェック
+        INPTableCheck(WW_ERR_SW)
         '############# おためし #############
-        If isNormal(WW_ERR_SW) Then
-            '前ページ遷移
-            'Master.TransitionPrevPage()
+        If isNormal(WW_ERR_SW) = False Then
+            Return
         End If
+
+        Master.Output(C_MESSAGE_NO.OIL_CONFIRM_UPDATE_TANKLOCATION, C_MESSAGE_TYPE.QUES, needsPopUp:=True, messageBoxTitle:="", IsConfirm:=True)
 
     End Sub
     ''' <summary>
@@ -290,21 +291,27 @@ Public Class OIT0005TankLocDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
+        Dim mesParam As String = ""
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
             Case "TxtBranchCode" '管轄支店コード
-                CODENAME_get("BRANCH", TxtBranchCode.Text, LblBranchCodeText.Text, WW_RTN_SW)
+                CODENAME_get("BRANCHCODE", TxtBranchCode.Text, LblBranchCodeText.Text, WW_RTN_SW)
+                mesParam = LblBranchCode.Text
             Case "TxtOfficeCode" '所属営業所コード
-                CODENAME_get("BELONGTOOFFICE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_RTN_SW)
+                CODENAME_get("OFFICECODE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_RTN_SW)
+                mesParam = LblOfficeCode.Text
                 TxtLocationCode.Text = ""
                 LblLocationCodeText.Text = ""
             Case "TxtLocationCode" '所在地コード
-                CODENAME_get("BRANCHOFFICESTATION", TxtLocationCode.Text, LblLocationCodeText.Text, WW_RTN_SW)
+                CODENAME_get("LOCATIONCODE", TxtLocationCode.Text, LblLocationCodeText.Text, WW_RTN_SW)
+                mesParam = LblLocationCode.Text
             Case "TxtTankStatus" 'タンク車状況
                 CODENAME_get("TANKSTATUS", TxtTankStatus.Text, LblTankStatusText.Text, WW_RTN_SW)
+                mesParam = LblTankStatus.Text
             Case "TxtLoadingKbn" '積車区分
                 CODENAME_get("LOADINGKBN", TxtLoadingKbn.Text, LblLoadingKbnText.Text, WW_RTN_SW)
-            ''会社コード
+                mesParam = LblLoadingKbn.Text
+                ''会社コード
             'Case "WF_CAMPCODE"
             '    CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
             ''運用部署
@@ -323,11 +330,7 @@ Public Class OIT0005TankLocDetail
         If isNormal(WW_RTN_SW) Then
             Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
         Else
-            If WF_FIELD.Value = "WF_DELFLG" Then
-                Master.Output(C_MESSAGE_NO.OIL_DELFLG_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Else
-                Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
-            End If
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR, mesParam)
         End If
     End Sub
 
@@ -535,116 +538,47 @@ Public Class OIT0005TankLocDetail
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             WW_LINE_ERR = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            Exit Sub
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Return
         End If
+        '○ 単項目チェック
+        '単項目、一覧チェックを行うリスト定義（FieldName:データフィールドマスタのFIELDに合わせる
+        '                                      TextObject:チェック対象のテキストボックス
+        '                                      DispName:項目名称
+        '                                      NeedsListCheck:リストチェック必要有無)
+        Dim checkSingleAndLists = {New With {.FieldName = "BRANCHCODE", .TextObject = Me.TxtBranchCode, .DispName = LblBranchCode.Text, .NeedsListCheck = True},
+                                   New With {.FieldName = "OFFICECODE", .TextObject = Me.TxtOfficeCode, .DispName = LblOfficeCode.Text, .NeedsListCheck = True},
+                                   New With {.FieldName = "LOCATIONCODE", .TextObject = Me.TxtLocationCode, .DispName = LblLocationCode.Text, .NeedsListCheck = True},
+                                   New With {.FieldName = "TANKSTATUS", .TextObject = Me.TxtTankStatus, .DispName = LblTankStatus.Text, .NeedsListCheck = True},
+                                   New With {.FieldName = "LOADINGKBN", .TextObject = Me.TxtLoadingKbn, .DispName = LblLoadingKbn.Text, .NeedsListCheck = True},
+                                   New With {.FieldName = "EMPARRDATE", .TextObject = Me.TxtEmpArrDate, .DispName = LblEmpArrDate.Text, .NeedsListCheck = False},
+                                   New With {.FieldName = "ACTUALEMPARRDATE", .TextObject = Me.TxtActualEmpArrDate, .DispName = LblActualEmpArrDate.Text, .NeedsListCheck = False}
+                                  }
+        '各チェック対象項目をループ
+        For Each chkItm In checkSingleAndLists
+            '○ 単項目チェック
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, chkItm.FieldName, chkItm.TextObject.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                'リストチェック
+                If chkItm.NeedsListCheck = False Then
+                    'リストチェック不要な場合は次にスキップ
+                    Continue For
+                End If
+                CODENAME_get(chkItm.FieldName, chkItm.TextObject.Text, WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, chkItm.DispName, needsPopUp:=True)
+                    O_RTN = "ERR"
+                    chkItm.TextObject.Focus()
+                    Return
+                End If
+            Else
+                Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, chkItm.DispName, needsPopUp:=True)
+                O_RTN = WW_CS0024FCHECKERR
+                chkItm.TextObject.Focus()
+                Return
+            End If
 
-        ''○ 単項目チェック
-        'For Each OIM0004INProw As DataRow In OIt0005INPtbl.Rows
-
-        '    WW_LINE_ERR = ""
-
-        '    '削除フラグ(バリデーションチェック）
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DELFLG", OIM0004INProw("DELFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        '値存在チェック
-        '        CODENAME_get("DELFLG", OIM0004INProw("DELFLG"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(削除コードエラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
-
-        '    '貨物駅コード(バリデーションチェック)
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STATIONCODE", OIM0004INProw("STATIONCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If Not isNormal(WW_CS0024FCHECKERR) Then
-        '        WW_CheckMES1 = "貨物駅コード入力エラー。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
-
-        '    '貨物コード枝番(バリデーションチェック)
-        '    '貨物コード枝番が設定されている場合のみチェック
-        '    If Not String.IsNullOrEmpty(OIM0004INProw("BRANCH")) Then
-        '        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "BRANCH", OIM0004INProw("BRANCH"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '        If Not isNormal(WW_CS0024FCHECKERR) Then
-        '            WW_CheckMES1 = "貨物コード枝番入力エラー。"
-        '            WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    End If
-
-        '    '発着駅フラグ(バリデーションチェック）
-        '    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "DEPARRSTATIONFLG", OIM0004INProw("DEPARRSTATIONFLG"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        '    If isNormal(WW_CS0024FCHECKERR) Then
-        '        '値存在チェック
-        '        CODENAME_get("DEPARRSTATIONFLG", OIM0004INProw("DEPARRSTATIONFLG"), WW_DUMMY, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            WW_CheckMES1 = "・更新できないレコード(発着駅フラグエラー)です。"
-        '            WW_CheckMES2 = "マスタに存在しません。"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '        End If
-        '    Else
-        '        WW_CheckMES1 = "・更新できないレコード(発着駅フラグエラー)です。"
-        '        WW_CheckMES2 = WW_CS0024FCHECKREPORT
-        '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
-        '        WW_LINE_ERR = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
-
-        '    '一意制約チェック
-        '    '同一レコードの更新の場合、チェック対象外
-        '    If OIM0004INProw("STATIONCODE") = work.WF_SEL_STATIONCODE2.Text _
-        '        AndAlso OIM0004INProw("BRANCH") = work.WF_SEL_BRANCH2.Text Then
-
-        '    Else
-        '        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-        '            'DataBase接続
-        '            SQLcon.Open()
-
-        '            '一意制約チェック
-        '            UniqueKeyCheck(SQLcon, WW_UniqueKeyCHECK)
-        '        End Using
-
-        '        If Not isNormal(WW_UniqueKeyCHECK) Then
-        '            WW_CheckMES1 = "一意制約違反。"
-        '            WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
-        '                           "([" & OIM0004INProw("STATIONCODE") & "]" &
-        '                           " [" & OIM0004INProw("BRANCH") & "])"
-        '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0004INProw)
-        '            WW_LINE_ERR = "ERR"
-        '            O_RTN = C_MESSAGE_NO.OIL_PRIMARYKEY_REPEAT_ERROR
-        '        End If
-        '    End If
-
-        '    If WW_LINE_ERR = "" Then
-        '        If OIM0004INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
-        '            OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        '        End If
-        '    Else
-        '        If WW_LINE_ERR = CONST_PATTERNERR Then
-        '            '関連チェックエラーをセット
-        '            OIM0004INProw.Item("OPERATION") = CONST_PATTERNERR
-        '        Else
-        '            '単項目チェックエラーをセット
-        '            OIM0004INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-        '        End If
-        '    End If
-        'Next
+        Next chkItm
 
     End Sub
 
@@ -849,13 +783,13 @@ Public Class OIT0005TankLocDetail
 
         Try
             Select Case I_FIELD
-                Case "BRANCH" '管轄支店コード
+                Case "BRANCHCODE" '管轄支店コード
                     prmData = work.CreateFIXParam(Master.USER_ORG, "BRANCH")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BRANCH, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "BELONGTOOFFICE" '所属営業所コード
+                Case "OFFICECODE" '所属営業所コード
                     prmData = work.CreateFIXParam(Master.USER_ORG, "BELONGTOOFFICE")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "BRANCHOFFICESTATION" '所在地コード
+                Case "LOCATIONCODE" '所在地コード
                     prmData = work.CreateFIXParam(Me.TxtOfficeCode.Text, "BRANCHOFFICESTATION")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BRANCHOFFICESTATION, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "TANKSTATUS" 'タンク車状況

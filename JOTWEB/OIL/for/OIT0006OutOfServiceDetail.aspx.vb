@@ -1287,6 +1287,49 @@ Public Class OIT0006OutOfServiceDetail
                 Me.TxtKaisouType.Text = WW_SelectText
                 Me.TxtKaisouType.Focus()
 
+                '★下記の回送パターンの場合は着駅(浮島町)を設定する。
+                '　01:修理-JOT負担発払
+                '　02:修理-JOT負担着払
+                '　03:修理-他社負担
+                '　04:ＭＣ-JOT負担発払
+                '　05:ＭＣ-JOT負担着払
+                '　06:ＭＣ-他社負担
+                If Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_01 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_02 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_03 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_04 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_05 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_06 Then
+
+                    '着駅(浮島町)
+                    Me.TxtArrstationCode.Text = "450704"
+                    CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_DUMMY)
+                Else
+                    Me.TxtArrstationCode.Text = ""
+                    Me.LblArrstationName.Text = ""
+                End If
+
+                '★下記の回送パターンの場合は片道(チェックボックス)を設定する。
+                '　09:疎開留置-JOT負担発払
+                '　10:疎開留置-JOT負担着払
+                '　11:疎開留置-他社負担
+                '　12:移動-JOT負担発払
+                '　13:移動-JOT負担着払
+                '　14:移動-他社負担
+                If Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_09 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_10 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_11 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_12 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_13 _
+                    OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_14 Then
+
+                    '片道(チェックボックス)をON
+                    Me.ChkSelect.Checked = True
+                Else
+                    '片道(チェックボックス)をOFF
+                    Me.ChkSelect.Checked = False
+                End If
+
             '目的
             Case "TxtObjective"
                 Me.TxtObjective.Text = WW_SelectValue
@@ -2255,6 +2298,16 @@ Public Class OIT0006OutOfServiceDetail
                     AndAlso Me.TxtActualAccDate.Text <> "" _
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
+
+                    '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+                ElseIf Me.TxtActualDepDate.Text <> "" _
+                    AndAlso Me.TxtActualArrDate.Text <> "" _
+                    AndAlso (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6) _
+                    AndAlso Me.TxtActualEmparrDate.Text <> "" Then
+                    strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
+                    '############################################################################
+
                 End If
 
             '"400:受入確認中"
@@ -2271,6 +2324,14 @@ Public Class OIT0006OutOfServiceDetail
                 If Me.TxtActualAccDate.Text <> "" _
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
+
+                    '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+                ElseIf (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6) _
+                    AndAlso Me.TxtActualEmparrDate.Text <> "" Then
+                    strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
+                    '############################################################################
+
                 End If
 
             '"500:検収中"
@@ -2758,7 +2819,16 @@ Public Class OIT0006OutOfServiceDetail
 
                 PARA23.Value = Me.TxtDepDate.Text                 '発日（予定）
                 PARA24.Value = Me.TxtArrDate.Text                 '着日（予定）
-                PARA25.Value = Me.TxtAccDate.Text                 '受入日（予定）
+
+                '### 目的が"5:疎開留置", "6:移動"の場合は、受入日はNULLを設定 ###########
+                '受入日（予定）
+                If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+                    PARA25.Value = DBNull.Value
+                    '########################################################################
+                Else
+                    PARA25.Value = Me.TxtAccDate.Text
+                End If
                 PARA26.Value = Me.TxtEmparrDate.Text              '空車着日（予定）
 
                 PARA27.Value = DBNull.Value                       '発日（実績）
@@ -3573,25 +3643,34 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '(予定)受入日
-        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCDATE", Me.TxtAccDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        If isNormal(WW_CS0024FCHECKERR) Then
-            Try
-                Date.TryParse(Me.TxtAccDate.Text, WW_STYMD)
-            Catch ex As Exception
-                WW_STYMD = C_DEFAULT_YMD
-            End Try
+        '### 目的が"5:疎開留置", "6:移動"の場合は、受入日のチェックを実施しない ###########
+        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+
+            '### 特に何もしない ##########################################
+
         Else
-            '年月日チェック
-            WW_CheckDate(Me.TxtAccDate.Text, "(予定)受入日", WW_CS0024FCHECKERR)
-            'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
-            Me.TxtAccDate.Focus()
-            WW_CheckMES1 = "受入日入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
+            '(予定)受入日
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCDATE", Me.TxtAccDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(Me.TxtAccDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+                '年月日チェック
+                WW_CheckDate(Me.TxtAccDate.Text, "(予定)受入日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
+                Me.TxtAccDate.Focus()
+                WW_CheckMES1 = "受入日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
+        '##################################################################################
 
         '(予定)空車着日
         Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EMPARRDATE", Me.TxtEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
@@ -3845,10 +3924,10 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '(予定)積車着日 と　現在日付を比較
+        '(予定)着日 と　現在日付を比較
         iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(DateTime.Today)
         If iresult = -1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)積車着日", needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)着日", needsPopUp:=True)
             Me.TxtArrDate.Focus()
             WW_CheckMES1 = "(予定日)過去日付エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
@@ -3857,17 +3936,26 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '(予定)受入日 と　現在日付を比較
-        iresult = Date.Parse(Me.TxtAccDate.Text).CompareTo(DateTime.Today)
-        If iresult = -1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
-            Me.TxtAccDate.Focus()
-            WW_CheckMES1 = "(予定日)過去日付エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
+        '### 目的が"5:疎開留置", "6:移動"の場合は、受入日のチェックを実施しない ###########
+        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+
+            '### 特に何もしない ##########################################
+
+        Else
+            '(予定)受入日 と　現在日付を比較
+            iresult = Date.Parse(Me.TxtAccDate.Text).CompareTo(DateTime.Today)
+            If iresult = -1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
+                Me.TxtAccDate.Focus()
+                WW_CheckMES1 = "(予定日)過去日付エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
+        '##################################################################################
 
         '(予定)空車着日 と　現在日付を比較
         iresult = Date.Parse(Me.TxtEmparrDate.Text).CompareTo(DateTime.Today)
@@ -3887,10 +3975,10 @@ Public Class OIT0006OutOfServiceDetail
         '     0 : dt1とdt2は同じ日
         '    -1 : dt1はdt2より前の日
         '     1 : dt1はdt2より後の日
-        '(予定)発日 と　(予定)積車着日を比較
+        '(予定)発日 と　(予定)着日を比較
         iresult = Date.Parse(Me.TxtDepDate.Text).CompareTo(Date.Parse(Me.TxtArrDate.Text))
         If iresult = 1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)発日 > (予定)積車着日", needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)発日 > (予定)着日", needsPopUp:=True)
             Me.TxtArrDate.Focus()
             WW_CheckMES1 = "(予定日)入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
@@ -3899,28 +3987,49 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '(予定)積車着日 と　(予定)受入日を比較
-        iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(Date.Parse(Me.TxtAccDate.Text))
-        If iresult = 1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)積車着日 > (予定)受入日", needsPopUp:=True)
-            Me.TxtAccDate.Focus()
-            WW_CheckMES1 = "(予定日)入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
-        End If
 
-        '(予定)受入日 と　(予定)空車着日を比較
-        iresult = Date.Parse(Me.TxtAccDate.Text).CompareTo(Date.Parse(Me.TxtEmparrDate.Text))
-        If iresult = 1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日 > (予定)空車着日", needsPopUp:=True)
-            Me.TxtEmparrDate.Focus()
-            WW_CheckMES1 = "(予定日)入力エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
+        '### 目的が"5:疎開留置", "6:移動"の場合は、受入日のチェックを実施しない ###########
+        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+
+            '(予定)着日 と　(予定)空車着日を比較
+            iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(Date.Parse(Me.TxtEmparrDate.Text))
+            If iresult = 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)着日 > (予定)空車着日", needsPopUp:=True)
+                Me.TxtEmparrDate.Focus()
+                WW_CheckMES1 = "(予定日)入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            '##################################################################################
+
+        Else
+            '(予定)着日 と　(予定)受入日を比較
+            iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(Date.Parse(Me.TxtAccDate.Text))
+            If iresult = 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)着日 > (予定)受入日", needsPopUp:=True)
+                Me.TxtAccDate.Focus()
+                WW_CheckMES1 = "(予定日)入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
+            '(予定)受入日 と　(予定)空車着日を比較
+            iresult = Date.Parse(Me.TxtAccDate.Text).CompareTo(Date.Parse(Me.TxtEmparrDate.Text))
+            If iresult = 1 Then
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日 > (予定)空車着日", needsPopUp:=True)
+                Me.TxtEmparrDate.Focus()
+                WW_CheckMES1 = "(予定日)入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+
         End If
 
     End Sub
@@ -4322,8 +4431,18 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtDepDate.Enabled = True
             '(予定)積車着日
             Me.TxtArrDate.Enabled = True
-            '(予定)受入日
-            Me.TxtAccDate.Enabled = True
+
+            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+                '(予定)受入日
+                Me.TxtAccDate.Enabled = False
+            Else
+                '(予定)受入日
+                Me.TxtAccDate.Enabled = True
+            End If
+            '############################################################################
+
             '(予定)空車着日
             Me.TxtEmparrDate.Enabled = True
         End If
@@ -4344,15 +4463,24 @@ Public Class OIT0006OutOfServiceDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = False
 
-            '受注情報が「250:手配完了」の場合は、(実績)すべての日付の入力を制限
+            '受注情報が「250:手配完了」の場合は、(実績)すべての日付の入力を解放
             '250:手配完了
         ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_250 Then
             '(実績)発日
             Me.TxtActualDepDate.Enabled = True
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
-            '(実績)受入日
-            Me.TxtActualAccDate.Enabled = True
+
+            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = False
+            Else
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = True
+            End If
+            '############################################################################
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
 
@@ -4377,8 +4505,18 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualDepDate.Enabled = False
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
-            '(実績)受入日
-            Me.TxtActualAccDate.Enabled = True
+
+            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = False
+            Else
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = True
+            End If
+            '############################################################################
+
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
 
@@ -4389,8 +4527,18 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualDepDate.Enabled = False
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = False
-            '(実績)受入日
-            Me.TxtActualAccDate.Enabled = True
+
+            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = False
+            Else
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = True
+            End If
+            '############################################################################
+
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = True
 
@@ -4519,12 +4667,34 @@ Public Class OIT0006OutOfServiceDetail
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
 
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
+                            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+                            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
+                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+
+                                '(実績)発日, (実績)着日, (実績)空車着日を入力可能とする。
+                                If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+
+                                    '(実績)受入日は入力不可とする。
+                                ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+
+                                End If
+                                '############################################################################
+
+                            Else
+                                '(実績)のすべてを入力可能とする。
+                                If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
+
                             End If
+
                         Next
                     Next
                 End If
@@ -4670,17 +4840,21 @@ Public Class OIT0006OutOfServiceDetail
                         Dim strOfficeCode As String = ""
 
                         Select Case Me.TxtKaisouOrderOfficeCode.Text
-                            Case "010402"
+                            Case BaseDllConst.CONST_OFFICECODE_010402
                                 '東北支店
-                                strOfficeCode = "010401"
+                                strOfficeCode = BaseDllConst.CONST_OFFICECODE_010401
 
-                            Case "011201", "011202", "011203", "011402"
+                            Case BaseDllConst.CONST_OFFICECODE_011201,
+                                 BaseDllConst.CONST_OFFICECODE_011202,
+                                 BaseDllConst.CONST_OFFICECODE_011203,
+                                 BaseDllConst.CONST_OFFICECODE_011402
                                 '関東支店
-                                strOfficeCode = "011401"
+                                strOfficeCode = BaseDllConst.CONST_OFFICECODE_011401
 
-                            Case "012401", "012402"
+                            Case BaseDllConst.CONST_OFFICECODE_012401,
+                                 BaseDllConst.CONST_OFFICECODE_012402
                                 '中部支店
-                                strOfficeCode = "012301"
+                                strOfficeCode = BaseDllConst.CONST_OFFICECODE_012301
                         End Select
 
                         '★タンク車所在の更新

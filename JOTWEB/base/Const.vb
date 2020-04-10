@@ -550,6 +550,93 @@ Public Module BaseDllConst
     Public Const CONST_KAISOUSTATUS_900 As String = "900"
 #End Region
 
+#Region "目的"
+    ''' <summary>
+    ''' 1:MC
+    ''' </summary>
+    Public Const CONST_OBJECTCODE_1 As String = "1"
+    ''' <summary>
+    ''' 2:交検
+    ''' </summary>
+    Public Const CONST_OBJECTCODE_2 As String = "2"
+    ''' <summary>
+    ''' 3:全検
+    ''' </summary>
+    Public Const CONST_OBJECTCODE_3 As String = "3"
+    ''' <summary>
+    ''' 4:修理
+    ''' </summary>
+    Public Const CONST_OBJECTCODE_4 As String = "4"
+    ''' <summary>
+    ''' 5:疎開留置
+    ''' </summary>
+    Public Const CONST_OBJECTCODE_5 As String = "5"
+    ''' <summary>
+    ''' 6:移動
+    ''' </summary>
+    Public Const CONST_OBJECTCODE_6 As String = "6"
+
+#End Region
+
+#Region "回送パターン"
+    ''' <summary>
+    ''' 01:修理-JOT負担発払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_01 As String = "修理-JOT負担発払"
+    ''' <summary>
+    ''' 02:修理-JOT負担着払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_02 As String = "修理-JOT負担着払"
+    ''' <summary>
+    ''' 03:修理-他社負担
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_03 As String = "修理-他社負担"
+    ''' <summary>
+    ''' 04:ＭＣ-JOT負担発払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_04 As String = "ＭＣ-JOT負担発払"
+    ''' <summary>
+    ''' 05:ＭＣ-JOT負担着払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_05 As String = "ＭＣ-JOT負担着払"
+    ''' <summary>
+    ''' 06:ＭＣ-他社負担
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_06 As String = "ＭＣ-他社負担"
+    ''' <summary>
+    ''' 07:交検-他社負担
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_07 As String = "交検-他社負担"
+    ''' <summary>
+    ''' 08:全件-他社負担
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_08 As String = "全件-他社負担"
+    ''' <summary>
+    ''' 09:疎開留置-JOT負担発払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_09 As String = "疎開留置-JOT負担発払"
+    ''' <summary>
+    ''' 10:疎開留置-JOT負担着払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_10 As String = "疎開留置-JOT負担着払"
+    ''' <summary>
+    ''' 11:疎開留置-他社負担
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_11 As String = "疎開留置-他社負担"
+    ''' <summary>
+    ''' 12:移動-JOT負担発払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_12 As String = "移動-JOT負担発払"
+    ''' <summary>
+    ''' 13:移動-JOT負担着払
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_13 As String = "移動-JOT負担着払"
+    ''' <summary>
+    ''' 14:移動-他社負担
+    ''' </summary>
+    Public Const CONST_KAISOUPATTERN_14 As String = "移動-他社負担"
+
+#End Region
 
 #Region "油種"
     ''' <summary>

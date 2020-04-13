@@ -456,8 +456,8 @@ Public Class OIT0006OutOfServiceDetail
         '〇タブ「費用入力」表示用
         GridViewInitializeTab2()
 
-        ''〇タンク車所在の更新
-        'WW_TankShozaiSet()
+        '〇タンク車所在の更新
+        WW_TankShozaiSet()
 
     End Sub
 
@@ -748,7 +748,7 @@ Public Class OIT0006OutOfServiceDetail
         WW_ScreenEnabledSet()
 
         '〇タンク車所在の更新
-        'WW_TankShozaiSet()
+        WW_TankShozaiSet()
 
     End Sub
 
@@ -1900,7 +1900,8 @@ Public Class OIT0006OutOfServiceDetail
                     '引数１：所在地コード　⇒　変更なし(空白)
                     '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更なし(空白)
-                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0006UPDrow("TANKNO"))
+                    '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0006UPDrow("TANKNO"), I_SITUATION:="1")
 
                 Else
                     i += 1
@@ -5032,7 +5033,8 @@ Public Class OIT0006OutOfServiceDetail
             '引数２：タンク車状態　⇒　変更あり("1"(発送))
             '引数３：積車区分　　　⇒　変更なし(空白)
             '引数４：(予定)空車着日⇒　更新対象(画面項目)
-            WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
+            '引数５：タンク車状況　⇒　変更あり("3"(回送中))
+            WW_UpdateTankShozai("", "1", "", upEmparrDate:=True, I_SITUATION:="3")
 
             '回送進行ステータスが以下の場合
             '210:手配中
@@ -5139,7 +5141,7 @@ Public Class OIT0006OutOfServiceDetail
                         '引数１：所在地コード　　　⇒　変更なし(空白)
                         '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　　　⇒　変更なし(空白)
-                        '引数４：所属営業所コード　⇒　変更なし(空白)
+                        '引数４：所属営業所コード　⇒　変更なし(支店)
                         '引数５：タンク車№　　　　⇒　指定あり
                         WW_UpdateTankShozai("", "3", "", I_OFFICE:=strOfficeCode, I_TANKNO:=OIT0006row("TANKNO"))
 
@@ -5149,7 +5151,8 @@ Public Class OIT0006OutOfServiceDetail
                         '引数２：タンク車状態　　　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　　　⇒　変更なし(空白)
                         '引数４：タンク車№　　　　⇒　指定あり
-                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"))
+                        '引数５：タンク車状況　　　⇒　変更あり("1"(残車))
+                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "3", "", I_TANKNO:=OIT0006row("TANKNO"), I_SITUATION:="1")
 
                     End If
 
@@ -5340,6 +5343,7 @@ Public Class OIT0006OutOfServiceDetail
                                       ByVal I_STATUS As String,
                                       ByVal I_KBN As String,
                                       Optional ByVal I_OFFICE As String = Nothing,
+                                      Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal upActualEmparrDate As Boolean = False)
@@ -5370,6 +5374,10 @@ Public Class OIT0006OutOfServiceDetail
             '積車区分
             If Not String.IsNullOrEmpty(I_KBN) Then
                 SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            'タンク車状況コード
+            If Not String.IsNullOrEmpty(I_SITUATION) Then
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
             End If
             '空車着日（予定）
             If upEmparrDate = True Then

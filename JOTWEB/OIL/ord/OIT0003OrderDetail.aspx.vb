@@ -3039,7 +3039,8 @@ Public Class OIT0003OrderDetail
                     '引数１：所在地コード　⇒　変更なし(空白)
                     '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更なし(空白)
-                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"))
+                    '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1")
 
                 Else
                     i += 1
@@ -6987,6 +6988,7 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
                                       ByVal I_STATUS As String,
                                       ByVal I_KBN As String,
+                                      Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal upActualEmparrDate As Boolean = False)
@@ -7014,6 +7016,10 @@ Public Class OIT0003OrderDetail
             If Not String.IsNullOrEmpty(I_KBN) Then
                 SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
             End If
+            'タンク車状況コード
+            If Not String.IsNullOrEmpty(I_SITUATION) Then
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+            End If
             '空車着日（予定）
             If upEmparrDate = True Then
                 SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
@@ -7025,12 +7031,13 @@ Public Class OIT0003OrderDetail
             End If
 
             SQLStr &=
-                      "        UPDYMD       = @P11, " _
-                    & "        UPDUSER      = @P12, " _
-                    & "        UPDTERMID    = @P13, " _
-                    & "        RECEIVEYMD   = @P14  " _
-                    & "  WHERE TANKNUMBER   = @P01  " _
-                    & "    AND DELFLG      <> @P02; "
+                      "        UPDYMD         = @P11, " _
+                    & "        UPDUSER        = @P12, " _
+                    & "        UPDTERMID      = @P13, " _
+                    & "        RECEIVEYMD     = @P14  " _
+                    & "  WHERE TANKNUMBER     = @P01  " _
+                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND DELFLG        <> @P02; "
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
@@ -8856,7 +8863,8 @@ Public Class OIT0003OrderDetail
             '引数１：所在地コード　⇒　変更なし(空白)
             '引数２：タンク車状態　⇒　変更なし(空白)
             '引数３：積車区分　　　⇒　変更あり("F"(積車))
-            WW_UpdateTankShozai("", "", "F")
+            '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+            WW_UpdateTankShozai("", "", "F", I_SITUATION:="2")
 
             '(実績)発日の入力が完了
             If Me.TxtActualDepDate.Text <> "" Then
@@ -8864,7 +8872,8 @@ Public Class OIT0003OrderDetail
                 '引数１：所在地コード　⇒　変更あり(着駅)
                 '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
                 '引数３：積車区分　　　⇒　変更なし(空白)
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "")
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "", I_SITUATION:="2")
             End If
 
             '### ステータス追加(仮) #################################
@@ -8874,7 +8883,8 @@ Public Class OIT0003OrderDetail
             '引数１：所在地コード　⇒　変更あり(着駅)
             '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
             '引数３：積車区分　　　⇒　変更あり("F"(積車))
-            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F")
+            '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
             '########################################################
 
             '受注進行ステータスが「400:受入確認中」の場合
@@ -8884,7 +8894,8 @@ Public Class OIT0003OrderDetail
             '引数１：所在地コード　⇒　変更あり(着駅)
             '引数２：タンク車状態　⇒　変更あり("3"(到着))
             '引数３：積車区分　　　⇒　変更なし(空白)
-            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "")
+            '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "", I_SITUATION:="2")
 
             '(実績)受入日の入力が完了
             If Me.TxtActualAccDate.Text <> "" Then
@@ -8934,7 +8945,8 @@ Public Class OIT0003OrderDetail
                     '引数１：所在地コード　⇒　変更あり(発駅)
                     '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
                     '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                    WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E")
+                    '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                    WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1")
 
                 End If
             Next

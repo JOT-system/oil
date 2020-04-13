@@ -579,6 +579,10 @@ Public Module Messages
         ''' タンク車(積車)使用メッセージ
         ''' </summary>
         Public Const OIL_TANKNO_LOADING_USE As String = "20046"
+        ''' <summary>
+        ''' タンク車(発送中)使用メッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_SHIPPING_USE As String = "20047"
 #End Region
 
 

@@ -13,6 +13,7 @@ Public Class OIT0005TankLocList
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
+    Private CS0030REPORT As New CS0030REPORT                        '帳票出力
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -32,6 +33,8 @@ Public Class OIT0005TankLocList
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
+                        Case "WF_ButtonCSV"             'ダウンロードボタン押下
+                            WF_ButtonDownload_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
                             WF_ButtonFIRST_Click()
                         Case "WF_ButtonLAST"            '最終頁ボタン押下
@@ -80,20 +83,21 @@ Public Class OIT0005TankLocList
         '○Grid情報保存先のファイル名
         Master.CreateXMLSaveFile()
 
-        ''○初期値設定
-        'WF_FIELD.Value = ""
-        'WF_ButtonClick.Value = ""
-        'WF_LeftboxOpen.Value = ""
-        'WF_RightboxOpen.Value = ""
-        'rightview.ResetIndex()
-        'leftview.ActiveListBox()
+        '○初期値設定
+        WF_FIELD.Value = ""
+        WF_ButtonClick.Value = ""
+        WF_LeftboxOpen.Value = ""
+        WF_RightboxOpen.Value = ""
+        rightview.ResetIndex()
+        leftview.ActiveListBox()
 
-        ''右Boxへの値設定
-        'rightview.MAPID = Master.MAPID
-        'rightview.MAPVARI = Master.MAPvariant
-        'rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
-        'rightview.PROFID = Master.PROF_REPORT
-        'rightview.Initialize(WW_DUMMY)
+        '右Boxへの値設定
+        rightview.MAPID = Master.MAPID
+        rightview.MAPVARI = Master.MAPvariant
+        rightview.COMPCODE = work.WF_SEL_CAMPCODE.Text
+        rightview.PROFID = Master.PROF_REPORT
+        Dim rtn As String = ""
+        rightview.Initialize(rtn)
 
         '○ 画面の値設定
         WW_MAPValueSet()
@@ -246,6 +250,34 @@ Public Class OIT0005TankLocList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_Grid_Scroll()
+
+    End Sub
+    ''' <summary>
+    ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonDownload_Click()
+
+        '○ 帳票出力
+        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
+        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
+        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
+        CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
+        CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
+        CS0030REPORT.TBLDATA = OIT0005tbl                       'データ参照  Table
+        CS0030REPORT.CS0030REPORT()
+        If Not isNormal(CS0030REPORT.ERR) Then
+            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+            Else
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
+            End If
+            Exit Sub
+        End If
+
+        '○ 別画面でExcelを表示
+        WF_PrintURL.Value = CS0030REPORT.URL
+        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
 
     End Sub
     ''' <summary>

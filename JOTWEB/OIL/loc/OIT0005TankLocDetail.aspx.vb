@@ -154,6 +154,10 @@ Public Class OIT0005TankLocDetail
                     txtObj.Text = Convert.ToString(selectedDr(col.ColumnName))
                 End If
             Next col
+            '油種名をラベルに設定
+            Me.LblOilCodeText.Text = Convert.ToString(selectedDr("OILNAME"))
+            Me.LblLastOilCodeText.Text = Convert.ToString(selectedDr("LASTOILNAME"))
+            'コードより名称を設定
             CODENAME_get("BRANCHCODE", TxtBranchCode.Text, LblBranchCodeText.Text, WW_DUMMY)
             CODENAME_get("OFFICECODE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_DUMMY)
             CODENAME_get("LOCATIONCODE", TxtLocationCode.Text, LblLocationCodeText.Text, WW_DUMMY)
@@ -192,7 +196,42 @@ Public Class OIT0005TankLocDetail
     ''' 更新OKボタンクリック時
     ''' </summary>
     Protected Sub UpdateConfirmOk_Click()
-        Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.INF, "まだ機能未実装です！", needsPopUp:=True)
+        'Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.INF, "まだ機能未実装です！", needsPopUp:=True)
+        'Return
+        Dim updateDr As DataRow = Me.OIT0005tbl.NewRow
+        '画面表示時の内容を更新データRowに移す
+        Dim targetRow As DataRow = (From dr As DataRow In Me.OIT0005tbl Where dr("TANKNUMBER").Equals(Me.WF_Sel_TANKNUMBER.Text)).FirstOrDefault
+        For Each colObj As DataColumn In Me.OIT0005tbl.Columns
+            updateDr(colObj.ColumnName) = targetRow(colObj.ColumnName)
+        Next
+        '画面に表示している内容を更新データRowに書き込む
+        updateDr("BRANCHCODE") = Me.TxtBranchCode.Text
+        updateDr("OFFICECODE") = Me.TxtOfficeCode.Text
+        updateDr("LOCATIONCODE") = Me.TxtLocationCode.Text
+        updateDr("TANKSTATUS") = Me.TxtTankStatus.Text
+        updateDr("LOADINGKBN") = Me.TxtLoadingKbn.Text
+        updateDr("EMPARRDATE") = If(Me.TxtEmpArrDate.Text = "", CType(DBNull.Value, Object), Me.TxtEmpArrDate.Text)
+        updateDr("ACTUALEMPARRDATE") = If(Me.TxtActualEmpArrDate.Text = "", CType(DBNull.Value, Object), Me.TxtActualEmpArrDate.Text)
+        updateDr("OILCODE") = Me.TxtOilCode.Text
+        updateDr("OILNAME") = Me.LblOilCodeText.Text
+        updateDr("ORDERINGTYPE") = Me.TxtOrderingType.Text
+        updateDr("ORDERINGOILNAME") = Me.TxtOrderingOilName.Text
+        updateDr("LASTOILCODE") = Me.TxtLastOilCode.Text
+        updateDr("LASTOILNAME") = Me.LblLastOilCodeText.Text
+        updateDr("PREORDERINGTYPE") = Me.TxtPreOrderingType.Text
+        updateDr("PREORDERINGOILNAME") = Me.TxtPreOrderingOilName.Text
+        updateDr("UPDYMD") = Now.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+        updateDr("UPDUSER") = Master.USERID
+        updateDr("UPDTERMID") = Master.USERTERMID
+        updateDr("RECEIVEYMD") = C_DEFAULT_YMD
+
+        Using sqlCon = CS0050SESSION.getConnection
+            sqlCon.Open()
+            UpdateShozai(sqlCon, Nothing, updateDr)
+        End Using
+
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
+
     End Sub
 
     ''' <summary>
@@ -311,19 +350,6 @@ Public Class OIT0005TankLocDetail
             Case "TxtLoadingKbn" '積車区分
                 CODENAME_get("LOADINGKBN", TxtLoadingKbn.Text, LblLoadingKbnText.Text, WW_RTN_SW)
                 mesParam = LblLoadingKbn.Text
-                ''会社コード
-            'Case "WF_CAMPCODE"
-            '    CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
-            ''運用部署
-            'Case "WF_UORG"
-            '    CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
-            '発着駅フラグ
-            Case "TxtDepArrStation"
-                'CODENAME_get("DEPARRSTATIONFLG", TxtDepArrStation.Text, LblDepArrStationName.Text, WW_RTN_SW)
-            '削除フラグ
-            Case "WF_DELFLG"
-                'CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_RTN_SW)
-
         End Select
 
         '○ メッセージ表示
@@ -424,38 +450,20 @@ Public Class OIT0005TankLocDetail
         '○ フォーカスセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除
-                Case "WF_DELFLG"
-                    'WF_DELFLG.Focus()
-
-                '    '貨物駅コード
-                'Case "STATIONCODE"
-                '    TxtStationCode.Focus()
-
-                '    '貨物コード枝番
-                'Case "BRANCH"
-                '    TxtBranch.Focus()
-
-                '    '貨物駅名称
-                'Case "STATONNAME"
-                '    TxtStationName.Focus()
-
-                '    '貨物駅名称カナ
-                'Case "STATIONNAMEKANA"
-                '    TxtStationNameKana.Focus()
-
-                '    '貨物駅種別名称
-                'Case "TYPENAME"
-                '    TxtTypeName.Focus()
-
-                '    '貨物駅種別名称カナ
-                'Case "TYPENAMEKANA"
-                '    TxtTypeNameKana.Focus()
-
-                    '発着駅フラグ
-                Case "TxtDepArrStation"
-                    'TxtDepArrStation.Focus()
-
+                Case "TxtBranchCode" '管轄支店コード
+                    TxtBranchCode.Focus()
+                Case "TxtOfficeCode" '所属営業所コード
+                    TxtOfficeCode.Focus()
+                Case "TxtLocationCode" '所在地コード
+                    TxtLocationCode.Focus()
+                Case "TxtTankStatus" 'タンク車状況
+                    TxtTankStatus.Focus()
+                Case "TxtLoadingKbn" '積車区分
+                    TxtLoadingKbn.Focus()
+                Case "TxtEmpArrDate"       '空車着日（予定）
+                    TxtEmpArrDate.Focus()
+                Case "TxtActualEmpArrDate"       '空車着日（実績）
+                    TxtActualEmpArrDate.Focus()
             End Select
         Else
         End If
@@ -533,11 +541,11 @@ Public Class OIT0005TankLocDetail
         CS0025AUTHORget.CS0025AUTHORget()
         If isNormal(CS0025AUTHORget.ERR) AndAlso CS0025AUTHORget.PERMITCODE = C_PERMISSION.UPDATE Then
         Else
-            WW_CheckMES1 = "・更新できないレコード(ユーザ更新権限なし)です。"
-            WW_CheckMES2 = ""
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            WW_LINE_ERR = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'WW_CheckMES1 = "・更新できないレコード(ユーザ更新権限なし)です。"
+            'WW_CheckMES2 = ""
+            'WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            'WW_LINE_ERR = "ERR"
+            'O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Return
         End If
@@ -582,186 +590,34 @@ Public Class OIT0005TankLocDetail
 
     End Sub
 
-    ''' <summary>
-    ''' エラーレポート編集
-    ''' </summary>
-    ''' <param name="MESSAGE1"></param>
-    ''' <param name="MESSAGE2"></param>
-    ''' <param name="OIT0005row"></param>
-    ''' <remarks></remarks>
-    Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIT0005row As DataRow = Nothing)
+    '''' <summary>
+    '''' エラーレポート編集
+    '''' </summary>
+    '''' <param name="MESSAGE1"></param>
+    '''' <param name="MESSAGE2"></param>
+    '''' <param name="OIT0005row"></param>
+    '''' <remarks></remarks>
+    'Protected Sub WW_CheckERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIT0005row As DataRow = Nothing)
 
-        Dim WW_ERR_MES As String = ""
-        WW_ERR_MES = MESSAGE1
-        If MESSAGE2 <> "" Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
-        End If
+    '    Dim WW_ERR_MES As String = ""
+    '    WW_ERR_MES = MESSAGE1
+    '    If MESSAGE2 <> "" Then
+    '        WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+    '    End If
 
-        'If Not IsNothing(OIM0004row) Then
-        '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅コード       =" & OIM0004row("STATIONCODE") & " , "
-        '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物コード枝番     =" & OIM0004row("BRANCH") & " , "
-        '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅名称         =" & OIM0004row("STATONNAME") & " , "
-        '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅名称カナ     =" & OIM0004row("STATIONNAMEKANA") & " , "
-        '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅種別名称     =" & OIM0004row("TYPENAME") & " , "
-        '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅種別名称カナ =" & OIM0004row("TYPENAMEKANA") & " , "
-        '    WW_ERR_MES &= ControlChars.NewLine & "  --> 削除               =" & OIM0004row("DELFLG")
-        'End If
+    '    'If Not IsNothing(OIM0004row) Then
+    '    '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅コード       =" & OIM0004row("STATIONCODE") & " , "
+    '    '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物コード枝番     =" & OIM0004row("BRANCH") & " , "
+    '    '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅名称         =" & OIM0004row("STATONNAME") & " , "
+    '    '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅名称カナ     =" & OIM0004row("STATIONNAMEKANA") & " , "
+    '    '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅種別名称     =" & OIM0004row("TYPENAME") & " , "
+    '    '    WW_ERR_MES &= ControlChars.NewLine & "  --> 貨物駅種別名称カナ =" & OIM0004row("TYPENAMEKANA") & " , "
+    '    '    WW_ERR_MES &= ControlChars.NewLine & "  --> 削除               =" & OIM0004row("DELFLG")
+    '    'End If
 
-        rightview.AddErrorReport(WW_ERR_MES)
+    '    rightview.AddErrorReport(WW_ERR_MES)
 
-    End Sub
-
-
-    ''' <summary>
-    ''' OIM0004tbl更新
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub OIM0004tbl_UPD()
-
-        ''○ 画面状態設定
-        'For Each OIM0004row As DataRow In OIM0004tbl.Rows
-        '    Select Case OIM0004row("OPERATION")
-        '        Case C_LIST_OPERATION_CODE.NODATA
-        '            OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        '        Case C_LIST_OPERATION_CODE.NODISP
-        '            OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        '        Case C_LIST_OPERATION_CODE.SELECTED
-        '            OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        '        Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
-        '            OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        '        Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
-        '            OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-        '    End Select
-        'Next
-
-        ''○ 追加変更判定
-        'For Each OIM0004INProw As DataRow In OIM0004INPtbl.Rows
-
-        '    'エラーレコード読み飛ばし
-        '    If OIM0004INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
-        '        Continue For
-        '    End If
-
-        '    OIM0004INProw.Item("OPERATION") = CONST_INSERT
-
-        '    'KEY項目が等しい時
-        '    For Each OIM0004row As DataRow In OIM0004tbl.Rows
-        '        If OIM0004row("STATIONCODE") = OIM0004INProw("STATIONCODE") AndAlso
-        '            OIM0004row("BRANCH") = OIM0004INProw("BRANCH") Then
-        '            'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
-        '            If OIM0004row("DELFLG") = OIM0004INProw("DELFLG") AndAlso
-        '                OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
-        '            Else
-        '                'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
-        '                OIM0004INProw("OPERATION") = CONST_UPDATE
-        '                Exit For
-        '            End If
-
-        '            Exit For
-
-        '        End If
-        '    Next
-        'Next
-
-        ''○ 変更有無判定　&　入力値反映
-        'For Each OIM0004INProw As DataRow In OIM0004INPtbl.Rows
-        '    Select Case OIM0004INProw("OPERATION")
-        '        Case CONST_UPDATE
-        '            TBL_UPDATE_SUB(OIM0004INProw)
-        '        Case CONST_INSERT
-        '            TBL_INSERT_SUB(OIM0004INProw)
-        '        Case CONST_PATTERNERR
-        '            '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
-        '            TBL_INSERT_SUB(OIM0004INProw)
-        '        Case C_LIST_OPERATION_CODE.ERRORED
-        '            TBL_ERR_SUB(OIM0004INProw)
-        '    End Select
-        'Next
-
-    End Sub
-
-    ''' <summary>
-    ''' 更新予定データの一覧更新時処理
-    ''' </summary>
-    ''' <param name="OIM0004INProw"></param>
-    ''' <remarks></remarks>
-    Protected Sub TBL_UPDATE_SUB(ByRef OIM0004INProw As DataRow)
-
-        'For Each OIM0004row As DataRow In OIM0004tbl.Rows
-
-        '    '同一レコードか判定
-        '    If OIM0004INProw("STATIONCODE") = OIM0004row("STATIONCODE") AndAlso
-        '        OIM0004INProw("BRANCH") = OIM0004row("BRANCH") Then
-        '        '画面入力テーブル項目設定
-        '        OIM0004INProw("LINECNT") = OIM0004row("LINECNT")
-        '        OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        '        OIM0004INProw("TIMSTP") = OIM0004row("TIMSTP")
-        '        OIM0004INProw("SELECT") = 1
-        '        OIM0004INProw("HIDDEN") = 0
-
-        '        '項目テーブル項目設定
-        '        OIM0004row.ItemArray = OIM0004INProw.ItemArray
-        '        Exit For
-        '    End If
-        'Next
-
-    End Sub
-
-    ''' <summary>
-    ''' 追加予定データの一覧登録時処理
-    ''' </summary>
-    ''' <param name="OIM0004INProw"></param>
-    ''' <remarks></remarks>
-    Protected Sub TBL_INSERT_SUB(ByRef OIM0004INProw As DataRow)
-
-        ''○ 項目テーブル項目設定
-        'Dim OIM0004row As DataRow = OIM0004tbl.NewRow
-        'OIM0004row.ItemArray = OIM0004INProw.ItemArray
-
-        'OIM0004row("LINECNT") = OIM0004tbl.Rows.Count + 1
-        'If OIM0004INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
-        '    OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        'Else
-        '    '            OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
-        '    OIM0004row("OPERATION") = C_LIST_OPERATION_CODE.INSERTING
-        'End If
-
-        'OIM0004row("TIMSTP") = "0"
-        'OIM0004row("SELECT") = 1
-        'OIM0004row("HIDDEN") = 0
-
-        'OIM0004tbl.Rows.Add(OIM0004row)
-
-    End Sub
-
-
-    ''' <summary>
-    ''' エラーデータの一覧登録時処理
-    ''' </summary>
-    ''' <param name="OIM0004INProw"></param>
-    ''' <remarks></remarks>
-    Protected Sub TBL_ERR_SUB(ByRef OIM0004INProw As DataRow)
-
-        'For Each OIM0004row As DataRow In OIM0004tbl.Rows
-
-        '    '同一レコードか判定
-        '    If OIM0004INProw("STATIONCODE") = OIM0004row("STATIONCODE") AndAlso
-        '       OIM0004INProw("BRANCH") = OIM0004row("BRANCH") Then
-        '        '画面入力テーブル項目設定
-        '        OIM0004INProw("LINECNT") = OIM0004row("LINECNT")
-        '        OIM0004INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
-        '        OIM0004INProw("TIMSTP") = OIM0004row("TIMSTP")
-        '        OIM0004INProw("SELECT") = 1
-        '        OIM0004INProw("HIDDEN") = 0
-
-        '        '項目テーブル項目設定
-        '        OIM0004row.ItemArray = OIM0004INProw.ItemArray
-        '        Exit For
-        '    End If
-        'Next
-
-    End Sub
-
+    'End Sub
     ''' <summary>
     ''' 名称取得
     ''' </summary>
@@ -812,5 +668,76 @@ Public Class OIT0005TankLocDetail
         End Try
 
     End Sub
+    ''' <summary>
+    ''' オーダー基本情報更新処理
+    ''' </summary>
+    ''' <param name="sqlCon">SQL接続オブジェクト</param>
+    ''' <param name="sqlTran">トランザクションオブジェクト</param>
+    ''' <param name="targetRow">更新対象行</param>
+    Private Sub UpdateShozai(sqlCon As SqlConnection, sqlTran As SqlTransaction, targetRow As DataRow)
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("UPDATE OIL.OIT0005_SHOZAI")
+        sqlStat.AppendLine("   SET  BRANCHCODE         = @BRANCHCODE")
+        sqlStat.AppendLine("       ,OFFICECODE         = @OFFICECODE")
+        sqlStat.AppendLine("       ,LOCATIONCODE       = @LOCATIONCODE")
+        sqlStat.AppendLine("       ,TANKSTATUS         = @TANKSTATUS")
+        sqlStat.AppendLine("       ,LOADINGKBN         = @LOADINGKBN")
+        sqlStat.AppendLine("       ,EMPARRDATE         = @EMPARRDATE")
+        sqlStat.AppendLine("       ,ACTUALEMPARRDATE   = @ACTUALEMPARRDATE")
+        sqlStat.AppendLine("       ,OILCODE            = @OILCODE")
+        sqlStat.AppendLine("       ,OILNAME            = @OILNAME")
+        sqlStat.AppendLine("       ,ORDERINGTYPE       = @ORDERINGTYPE")
+        sqlStat.AppendLine("       ,ORDERINGOILNAME    = @ORDERINGOILNAME")
+        sqlStat.AppendLine("       ,LASTOILCODE        = @LASTOILCODE")
+        sqlStat.AppendLine("       ,LASTOILNAME        = @LASTOILNAME")
+        sqlStat.AppendLine("       ,PREORDERINGTYPE    = @PREORDERINGTYPE")
+        sqlStat.AppendLine("       ,PREORDERINGOILNAME = @PREORDERINGOILNAME")
+        sqlStat.AppendLine("       ,UPDYMD             = @UPDYMD")
+        sqlStat.AppendLine("       ,UPDUSER            = @UPDUSER")
+        sqlStat.AppendLine("       ,UPDTERMID          = @UPDTERMID")
+        sqlStat.AppendLine("       ,RECEIVEYMD         = @RECEIVEYMD")
+        sqlStat.AppendLine(" WHERE TANKNUMBER = @TANKNUMBER")
 
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            With sqlCmd.Parameters
+                .Add("TANKNUMBER", SqlDbType.NVarChar).Value = targetRow("TANKNUMBER")
+                .Add("BRANCHCODE", SqlDbType.NVarChar).Value = targetRow("BRANCHCODE")
+                .Add("OFFICECODE", SqlDbType.NVarChar).Value = targetRow("OFFICECODE")
+                .Add("LOCATIONCODE", SqlDbType.NVarChar).Value = targetRow("LOCATIONCODE")
+                .Add("TANKSTATUS", SqlDbType.NVarChar).Value = targetRow("TANKSTATUS")
+                .Add("LOADINGKBN", SqlDbType.NVarChar).Value = targetRow("LOADINGKBN")
+                .Add("EMPARRDATE", SqlDbType.Date).Value = targetRow("EMPARRDATE")
+                .Add("ACTUALEMPARRDATE", SqlDbType.Date).Value = targetRow("ACTUALEMPARRDATE")
+                .Add("OILCODE", SqlDbType.NVarChar).Value = targetRow("OILCODE")
+                .Add("OILNAME", SqlDbType.NVarChar).Value = targetRow("OILNAME")
+                .Add("ORDERINGTYPE", SqlDbType.NVarChar).Value = targetRow("ORDERINGTYPE")
+                .Add("ORDERINGOILNAME", SqlDbType.NVarChar).Value = targetRow("ORDERINGOILNAME")
+                .Add("LASTOILCODE", SqlDbType.NVarChar).Value = targetRow("LASTOILCODE")
+                .Add("LASTOILNAME", SqlDbType.NVarChar).Value = targetRow("LASTOILNAME")
+                .Add("PREORDERINGTYPE", SqlDbType.NVarChar).Value = targetRow("PREORDERINGTYPE")
+                .Add("PREORDERINGOILNAME", SqlDbType.NVarChar).Value = targetRow("PREORDERINGOILNAME")
+                .Add("UPDYMD", SqlDbType.DateTime).Value = targetRow("UPDYMD")
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = targetRow("UPDUSER")
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = targetRow("UPDTERMID")
+                .Add("RECEIVEYMD", SqlDbType.DateTime).Value = targetRow("RECEIVEYMD")
+            End With
+            sqlCmd.CommandTimeout = 300
+            sqlCmd.ExecuteNonQuery()
+        End Using
+        CS0020JOURNAL.TABLENM = "OIT0005_SHOZAI"
+        CS0020JOURNAL.ACTION = "UPDATE"
+        CS0020JOURNAL.ROW = targetRow
+        CS0020JOURNAL.CS0020JOURNAL()
+        If Not isNormal(CS0020JOURNAL.ERR) Then
+            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+            Return
+        End If
+    End Sub
 End Class

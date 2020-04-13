@@ -123,7 +123,7 @@
                         <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
                             <asp:TextBox ID="TxtOilCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
                         </span>
-                        <asp:Label ID="LblOilCodeText" runat="server" Text="" maxlength="4" onkeypress="CheckNum();" ></asp:Label>
+                        <asp:Label ID="LblOilCodeText" runat="server" Text="" maxlength="4" onkeypress="CheckNum();" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
                 <p id="KEY_LINE_7">
@@ -149,7 +149,7 @@
                         <span ondblclick="Field_DBclick('dummy', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('dummy');">
                             <asp:TextBox ID="TxtLastOilCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" ></asp:TextBox>
                         </span>
-                        <asp:Label ID="LblLastOilCodeText" runat="server" Text="" maxlength="4" onkeypress="CheckNum();" ></asp:Label>
+                        <asp:Label ID="LblLastOilCodeText" runat="server" Text="" maxlength="4" onkeypress="CheckNum();" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
                 <p id="KEY_LINE_9">

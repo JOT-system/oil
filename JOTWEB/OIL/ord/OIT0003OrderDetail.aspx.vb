@@ -9004,9 +9004,12 @@ Public Class OIT0003OrderDetail
                         '■タンク車割当状況＝"未割当"の場合
                     Case CONST_TANKNO_STATUS_MIWARI
 
+                        '### 特に何もしない ###############
 
                         '■タンク車割当状況＝"不可"の場合
                     Case CONST_TANKNO_STATUS_FUKA
+
+                        '### 特に何もしない ###############
 
                 End Select
 

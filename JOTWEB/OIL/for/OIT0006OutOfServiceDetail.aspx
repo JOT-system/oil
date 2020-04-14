@@ -101,7 +101,8 @@
                 <span>
                     <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
                     <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">
-                        <asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>
+                        <asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>
+                        <%--<asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>--%>
                         <asp:TextBox ID="TxtTrainName" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>

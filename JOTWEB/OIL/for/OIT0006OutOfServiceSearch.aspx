@@ -58,9 +58,9 @@
                 </a>
             </div>
 
-            <!-- 年月日 -->
+            <!-- 年月日((予定)発日) -->
             <div class="inputItem">
-                <a id="WF_DATE_LABEL" class="requiredMark">年月日</a>
+                <a id="WF_DATE_LABEL" class="requiredMark">(予定)発日</a>
                 <a class="ef" id="WF_DATE" ondblclick="Field_DBclick('TxtDateStart', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox ID="TxtDateStart" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
                 </a>

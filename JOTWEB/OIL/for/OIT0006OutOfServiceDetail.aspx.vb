@@ -3517,7 +3517,11 @@ Public Class OIT0006OutOfServiceDetail
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)  '削除フラグ
 
                 PARA1.Value = Master.USER_ORG
-                PARA2.Value = work.WF_SEL_DATE.Text
+                If work.WF_SEL_DATE.Text = "" Then
+                    PARA2.Value = Date.Now
+                Else
+                    PARA2.Value = work.WF_SEL_DATE.Text
+                End If
                 PARA3.Value = C_DELETE_FLG.DELETE
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -4716,6 +4720,7 @@ Public Class OIT0006OutOfServiceDetail
                 OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
                 '(予定)受入日
                 Me.TxtAccDate.Enabled = False
+                Me.TxtAccDate.Text = ""
             Else
                 '(予定)受入日
                 Me.TxtAccDate.Enabled = True

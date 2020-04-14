@@ -1208,7 +1208,128 @@ Public Class OIT0006OutOfServiceDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            '会社コード
+            Case "WF_CAMPCODE"
+                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, Me.WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+            '運用部署
+            Case "WF_UORG"
+                CODENAME_get("UORG", WF_UORG.Text, Me.WF_UORG_TEXT.Text, WW_RTN_SW)
 
+            '本線列車
+            Case "TxtTrainNo"
+
+                If Me.TxtTrainNo.Text = "" Then
+                    ''発駅
+                    'Me.TxtDepstationCode.Text = ""
+                    'Me.LblDepstationName.Text = ""
+                    ''着駅
+                    'Me.TxtArrstationCode.Text = ""
+                    'Me.LblArrstationName.Text = ""
+
+                    ''〇 (予定)の日付を設定
+                    'Me.TxtDepDate.Text = ""
+                    'Me.TxtArrDate.Text = ""
+                    'Me.TxtAccDate.Text = ""
+                    'Me.TxtEmparrDate.Text = ""
+
+                    'work.WF_SEL_SHIPPERSCODE.Text = ""
+                    'work.WF_SEL_SHIPPERSNAME.Text = ""
+                    'work.WF_SEL_BASECODE.Text = ""
+                    'work.WF_SEL_BASENAME.Text = ""
+                    'work.WF_SEL_CONSIGNEECODE.Text = ""
+                    'work.WF_SEL_CONSIGNEENAME.Text = ""
+                    'work.WF_SEL_PATTERNCODE.Text = ""
+                    'work.WF_SEL_PATTERNNAME.Text = ""
+
+                    Exit Select
+                End If
+
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+
+                '〇 検索(営業所).テキストボックスが未設定
+                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                    '〇 画面(回送登録営業所).テキストボックスが未設定
+                    If Me.TxtKaisouOrderOffice.Text = "" Then
+                        WW_FixvalueMasterSearch(Master.USER_ORG, "TRAINNUMBER", Me.TxtTrainNo.Text, WW_GetValue)
+                    Else
+                        WW_FixvalueMasterSearch(Me.TxtKaisouOrderOfficeCode.Text, "TRAINNUMBER", Me.TxtTrainNo.Text, WW_GetValue)
+                    End If
+                Else
+                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", Me.TxtTrainNo.Text, WW_GetValue)
+                End If
+
+                '指定された本線列車№で値が取得できない場合はエラー判定
+                If WW_GetValue(0) = "" Then
+                    WW_RTN_SW = C_MESSAGE_NO.OIL_TRAIN_MASTER_NOTFOUND
+                Else
+                    WW_RTN_SW = C_MESSAGE_NO.NORMAL
+                End If
+
+                ''発駅
+                'Me.TxtDepstationCode.Text = WW_GetValue(1)
+                'CODENAME_get("DEPSTATION", Me.TxtDepstationCode.Text, Me.LblDepstationName.Text, WW_DUMMY)
+                ''着駅
+                'Me.TxtArrstationCode.Text = WW_GetValue(2)
+                'CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_DUMMY)
+                'Me.TxtTrainNo.Focus()
+
+                ''〇 (予定)の日付を設定
+                'Me.TxtDepDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                'Me.TxtArrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                'Me.TxtAccDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+                'Me.TxtEmparrDate.Text = Now.AddDays(1).ToString("yyyy/MM/dd")
+
+                ''〇営業所配下情報を取得・設定
+                'WW_GetValue = {"", "", "", "", "", "", "", ""}
+
+                ''〇 検索(営業所).テキストボックスが未設定
+                'If work.WF_SEL_SALESOFFICECODE.Text = "" Then
+                '    '〇 画面(回送登録営業所).テキストボックスが未設定
+                '    If Me.TxtKaisouOrderOffice.Text = "" Then
+                '        WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
+                '    Else
+                '        WW_FixvalueMasterSearch(Me.TxtKaisouOrderOfficeCode.Text, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
+                '    End If
+                'Else
+                '    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
+                'End If
+
+                'work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
+                'work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
+                'work.WF_SEL_BASECODE.Text = WW_GetValue(2)
+                'work.WF_SEL_BASENAME.Text = WW_GetValue(3)
+                'work.WF_SEL_CONSIGNEECODE.Text = WW_GetValue(4)
+                'work.WF_SEL_CONSIGNEENAME.Text = WW_GetValue(5)
+                'work.WF_SEL_PATTERNCODE.Text = WW_GetValue(6)
+                'work.WF_SEL_PATTERNNAME.Text = WW_GetValue(7)
+
+            '発駅
+            Case "TxtDepstationCode"
+                CODENAME_get("DEPSTATION", Me.TxtDepstationCode.Text, Me.LblDepstationName.Text, WW_RTN_SW)
+
+            '着駅
+            Case "TxtArrstationCode"
+                CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_RTN_SW)
+
+        End Select
+
+        '○ メッセージ表示
+        If isNormal(WW_RTN_SW) Then
+            Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
+        Else
+            Select Case WF_FIELD.Value
+                Case "TxtTrainNo"
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+                Case "TxtDepstationCode"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "発駅")
+                Case "TxtArrstationCode"
+                    Master.Output(C_MESSAGE_NO.OIL_STATION_MASTER_NOTFOUND, C_MESSAGE_TYPE.ERR, "着駅")
+                Case Else
+                    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
+            End Select
+        End If
     End Sub
 
 #Region "LeftBox関連操作"
@@ -3453,6 +3574,7 @@ Public Class OIT0006OutOfServiceDetail
             & " , ISNULL(RTRIM(OIS0015_2.VALUE1), '')                 AS KAISOUINFONAME" _
             & " , ISNULL(RTRIM(OIT0006.FAREFLG), '')   　             AS FAREFLG" _
             & " , ISNULL(RTRIM(OIT0006.USEPROPRIETYFLG), '')   　     AS USEPROPRIETYFLG" _
+            & " , ISNULL(RTRIM(OIT0006.DELIVERYFLG), '')   　         AS DELIVERYFLG" _
             & " , ISNULL(FORMAT(OIT0006.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
             & " , ISNULL(FORMAT(OIT0006.ACTUALDEPDATE, 'yyyy/MM/dd'), '')     AS ACTUALDEPDATE" _
             & " , ISNULL(FORMAT(OIT0006.ARRDATE, 'yyyy/MM/dd'), '')           AS ARRDATE" _

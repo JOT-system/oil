@@ -96,8 +96,19 @@
                         </span>
                     </span>
                 </p>
-
                 <p id="KEY_LINE_5">
+                    <!-- タンク車状況 -->
+                    <span class="ef" id="WF_TANKSITUATION">
+                        <asp:Label ID="LblTankSituation" runat="server" Text="タンク車状況" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                        <span ondblclick="Field_DBclick('TxtTankSituation', <%=LIST_BOX_CLASSIFICATION.LC_TANKSITUATION %>)" onchange="TextBox_change('TxtTankSituation');">
+                            <asp:TextBox ID="TxtTankSituation" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1" onkeypress="CheckNum();"></asp:TextBox>
+                        </span>
+                        <span>
+                            <asp:Label ID="LblTankSituationText" runat="server" Text="" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        </span>
+                    </span>
+                </p>
+                <p id="KEY_LINE_6">
                     <!-- 空車着日（予定） -->
                     <span class="ef" id="WF_EMPARRDATE">
                         <asp:Label ID="LblEmpArrDate" runat="server" Text="空車着日（予定）" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -116,7 +127,7 @@
                         <span></span>
                     </span>
                 </p>
-                <p id="KEY_LINE_6">
+                <p id="KEY_LINE_7">
                     <!-- 積車油種コード -->
                     <span class="ef" id="WF_OILCODE">
                         <asp:Label ID="LblOilCode" runat="server" Text="積車油種" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -126,7 +137,7 @@
                         <asp:Label ID="LblOilCodeText" runat="server" Text="" maxlength="4" onkeypress="CheckNum();" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_7">
+                <p id="KEY_LINE_8">
                     <!-- 油種区分(受発注用) -->
                     <span class="ef" id="WF_ORDERINGTYPE">
                         <asp:Label ID="LblOrderingType" runat="server" Text="油種区分(受発注用)" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -142,7 +153,7 @@
 
 
                 </p>
-                <p id="KEY_LINE_8">
+                <p id="KEY_LINE_9">
                     <!-- 前回油種 -->
                     <span class="ef" id="WF_LASTOILCODE">
                         <asp:Label ID="LblLastOilCode" runat="server" Text="前回油種" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -152,7 +163,7 @@
                         <asp:Label ID="LblLastOilCodeText" runat="server" Text="" maxlength="4" onkeypress="CheckNum();" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
-                <p id="KEY_LINE_9">
+                <p id="KEY_LINE_10">
                     <!-- 前回油種区分(受発注用) -->
                     <span class="ef" id="WF_PreOrderingType">
                         <asp:Label ID="LblPreOrderingType" runat="server" Text="前回油種区分(受発注用)" CssClass="WF_TEXT_LEFT"></asp:Label>

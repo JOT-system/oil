@@ -163,6 +163,7 @@ Public Class OIT0005TankLocDetail
             CODENAME_get("LOCATIONCODE", TxtLocationCode.Text, LblLocationCodeText.Text, WW_DUMMY)
             CODENAME_get("TANKSTATUS", TxtTankStatus.Text, LblTankStatusText.Text, WW_DUMMY)
             CODENAME_get("LOADINGKBN", TxtLoadingKbn.Text, LblLoadingKbnText.Text, WW_DUMMY)
+            CODENAME_get("TANKSITUATION", TxtTankSituation.Text, LblTankSituationText.Text, WW_DUMMY)
         End If
 
     End Sub
@@ -210,6 +211,7 @@ Public Class OIT0005TankLocDetail
         updateDr("LOCATIONCODE") = Me.TxtLocationCode.Text
         updateDr("TANKSTATUS") = Me.TxtTankStatus.Text
         updateDr("LOADINGKBN") = Me.TxtLoadingKbn.Text
+        updateDr("TANKSITUATION") = Me.TxtTankSituation.Text
         updateDr("EMPARRDATE") = If(Me.TxtEmpArrDate.Text = "", CType(DBNull.Value, Object), Me.TxtEmpArrDate.Text)
         updateDr("ACTUALEMPARRDATE") = If(Me.TxtActualEmpArrDate.Text = "", CType(DBNull.Value, Object), Me.TxtActualEmpArrDate.Text)
         updateDr("OILCODE") = Me.TxtOilCode.Text
@@ -299,6 +301,8 @@ Public Class OIT0005TankLocDetail
                             'prmData.Add(GRIS0005LeftBox.C_PARAMETERS.LP_ADDITINALCONDITION, "KEYCODE <> ''")
                         Case "TxtLoadingKbn" '所在地コード
                             prmData = work.CreateFIXParam("ZZ")
+                        Case "TxtTankSituation" '所在地コード
+                            prmData = work.CreateFIXParam("ZZ")
                         Case Else
 
 
@@ -350,6 +354,9 @@ Public Class OIT0005TankLocDetail
             Case "TxtLoadingKbn" '積車区分
                 CODENAME_get("LOADINGKBN", TxtLoadingKbn.Text, LblLoadingKbnText.Text, WW_RTN_SW)
                 mesParam = LblLoadingKbn.Text
+            Case "TxtTankSituation" 'タンク車状況
+                CODENAME_get("TANKSITUATION", TxtTankSituation.Text, LblTankSituationText.Text, WW_RTN_SW)
+                mesParam = LblTankSituation.Text
         End Select
 
         '○ メッセージ表示
@@ -405,6 +412,11 @@ Public Class OIT0005TankLocDetail
                     TxtLoadingKbn.Text = WW_SelectValue
                     LblLoadingKbnText.Text = WW_SelectText
                     TxtLoadingKbn.Focus()
+                Case "TxtTankSituation" 'タンク車状況
+                    TxtTankSituation.Text = WW_SelectValue
+                    LblTankSituationText.Text = WW_SelectText
+                    TxtTankSituation.Focus()
+
                 Case "TxtEmpArrDate"       '空車着日（予定）
                     Dim WW_DATE As Date
                     Try
@@ -460,6 +472,9 @@ Public Class OIT0005TankLocDetail
                     TxtTankStatus.Focus()
                 Case "TxtLoadingKbn" '積車区分
                     TxtLoadingKbn.Focus()
+                Case "TxtTankSituation" 'タンク車状況
+                    TxtTankSituation.Focus()
+
                 Case "TxtEmpArrDate"       '空車着日（予定）
                     TxtEmpArrDate.Focus()
                 Case "TxtActualEmpArrDate"       '空車着日（実績）
@@ -559,6 +574,7 @@ Public Class OIT0005TankLocDetail
                                    New With {.FieldName = "LOCATIONCODE", .TextObject = Me.TxtLocationCode, .DispName = LblLocationCode.Text, .NeedsListCheck = True},
                                    New With {.FieldName = "TANKSTATUS", .TextObject = Me.TxtTankStatus, .DispName = LblTankStatus.Text, .NeedsListCheck = True},
                                    New With {.FieldName = "LOADINGKBN", .TextObject = Me.TxtLoadingKbn, .DispName = LblLoadingKbn.Text, .NeedsListCheck = True},
+                                   New With {.FieldName = "TANKSITUATION", .TextObject = Me.TxtTankSituation, .DispName = LblTankSituation.Text, .NeedsListCheck = True},
                                    New With {.FieldName = "EMPARRDATE", .TextObject = Me.TxtEmpArrDate, .DispName = LblEmpArrDate.Text, .NeedsListCheck = False},
                                    New With {.FieldName = "ACTUALEMPARRDATE", .TextObject = Me.TxtActualEmpArrDate, .DispName = LblActualEmpArrDate.Text, .NeedsListCheck = False}
                                   }
@@ -648,12 +664,17 @@ Public Class OIT0005TankLocDetail
                 Case "LOCATIONCODE" '所在地コード
                     prmData = work.CreateFIXParam(Me.TxtOfficeCode.Text, "BRANCHOFFICESTATION")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BRANCHOFFICESTATION, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "TANKSTATUS" 'タンク車状況
+                Case "TANKSTATUS" 'タンク車状態
                     prmData = work.CreateFIXParam("ZZ", "TANKSTATUS")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKSTATUS, I_VALUE, O_TEXT, O_RTN, prmData)
+
                 Case "LOADINGKBN" '積車区分
                     prmData = work.CreateFIXParam("ZZ", "LOADINGKBN")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_LOADINGKBN, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "TANKSITUATION" 'タンク車状況
+                    prmData = work.CreateFIXParam("ZZ", "TANKSITUATION")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKSITUATION, I_VALUE, O_TEXT, O_RTN, prmData)
+
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
@@ -682,6 +703,7 @@ Public Class OIT0005TankLocDetail
         sqlStat.AppendLine("       ,LOCATIONCODE       = @LOCATIONCODE")
         sqlStat.AppendLine("       ,TANKSTATUS         = @TANKSTATUS")
         sqlStat.AppendLine("       ,LOADINGKBN         = @LOADINGKBN")
+        sqlStat.AppendLine("       ,TANKSITUATION      = @TANKSITUATION")
         sqlStat.AppendLine("       ,EMPARRDATE         = @EMPARRDATE")
         sqlStat.AppendLine("       ,ACTUALEMPARRDATE   = @ACTUALEMPARRDATE")
         sqlStat.AppendLine("       ,OILCODE            = @OILCODE")
@@ -706,6 +728,7 @@ Public Class OIT0005TankLocDetail
                 .Add("LOCATIONCODE", SqlDbType.NVarChar).Value = targetRow("LOCATIONCODE")
                 .Add("TANKSTATUS", SqlDbType.NVarChar).Value = targetRow("TANKSTATUS")
                 .Add("LOADINGKBN", SqlDbType.NVarChar).Value = targetRow("LOADINGKBN")
+                .Add("TANKSITUATION", SqlDbType.NVarChar).Value = targetRow("TANKSITUATION")
                 .Add("EMPARRDATE", SqlDbType.Date).Value = targetRow("EMPARRDATE")
                 .Add("ACTUALEMPARRDATE", SqlDbType.Date).Value = targetRow("ACTUALEMPARRDATE")
                 .Add("OILCODE", SqlDbType.NVarChar).Value = targetRow("OILCODE")

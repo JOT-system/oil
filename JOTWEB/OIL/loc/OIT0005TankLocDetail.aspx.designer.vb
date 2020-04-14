@@ -167,6 +167,33 @@ Partial Public Class OIT0005TankLocDetail
     Protected WithEvents LblLoadingKbnText As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''LblTankSituation コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblTankSituation As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtTankSituation コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTankSituation As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblTankSituationText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblTankSituationText As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''LblEmpArrDate コントロール。
     '''</summary>
     '''<remarks>

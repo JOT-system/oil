@@ -349,8 +349,20 @@
                                                 </span>
                                             </div>
                                             <div><%--受入--%>
-                                                <span class='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive < 0, "minus", "") %>'>
-                                                    <%# DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive.ToString("#,##0") %>
+                                                <span class='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive) AndAlso DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive < 0, "minus", "") %>'>
+                                                    <asp:TextBox ID="txtReceive" runat="server" 
+                                                        Text='<%# If(IsNumeric(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive),
+                                                                                                         Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive).ToString("#,##0"),
+                                                                                                         DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive) %>'
+                                                        Visible='<%# If(pnlSuggestList.Visible, False, True) %>'
+                                                        data-textfield="Receive"
+                                                        Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.StockListItem).DaysItem.IsPastDay,
+                                                                                    "False",
+                                                                                    "True") %>' >
+                                                    </asp:TextBox>
+                                                    <asp:Label ID="lblReceive" runat="server" 
+                                                        Text='<%# Decimal.Parse(DirectCast(Eval("Value"), DispDataClass.StockListItem).Receive).ToString("#,##0") %>'
+                                                        Visible='<%# If(pnlSuggestList.Visible, True, False) %>'></asp:Label>
                                                 </span>
                                             </div>
                                             <div class="receiveFromLorry"><%-- ﾛｰﾘｰ受入 --%>

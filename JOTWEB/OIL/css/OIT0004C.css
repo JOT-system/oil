@@ -486,6 +486,7 @@ span.morningStockIdx0 {
 }
 #divStockList input[type=text][name$="txtSend"],
 #divStockList input[type=number][name$="txtSend"],
+#divStockList input[type=text][name$="txtReceive"],
 #divStockList input[type=text][name$="txtReceiveFromLorry"],
 #divStockList input[type=number][name$="txtReceiveFromLorry"] {
     width: calc(100% + 5.5px);

@@ -920,7 +920,7 @@ Public Class OIT0004OilStockCreate
                             If .StockItemList.ContainsKey(targetDate) Then
                                 recvVal = Decimal.Parse(Convert.ToString(sqlDr("AMOUNT")))
                                 With .StockItemList(targetDate)
-                                    .Receive = recvVal
+                                    .Receive = recvVal.ToString
                                 End With
                             End If
                         End With
@@ -1073,7 +1073,7 @@ Public Class OIT0004OilStockCreate
                     dateValue = stockListCol.StockItemList(curDate)
                     dateValue.MorningStock = Convert.ToString(sqlDr("MORSTOCK")) '朝在庫
                     dateValue.Send = Convert.ToString(sqlDr("SHIPPINGVOL")) '払出
-                    dateValue.Receive = Decimal.Parse(Convert.ToString(sqlDr("ARRVOL")))  '受入
+                    dateValue.Receive = Decimal.Parse(Convert.ToString(sqlDr("ARRVOL"))).ToString   '受入
                     dateValue.ReceiveFromLorry = Convert.ToString(sqlDr("ARRLORRYVOL")) '払出
                 End While 'sqlDr.Read
             End Using 'sqlDr
@@ -1485,7 +1485,7 @@ Public Class OIT0004OilStockCreate
                             If weight <> 0 Then
                                 stockReceiveVal = Math.Floor(Convert.ToDecimal(sqlDr("CARSNUMBER")) * 45 / weight)
                             End If
-                            .Receive = stockReceiveVal
+                            .Receive = stockReceiveVal.ToString
                         End With
 
                     End While
@@ -2998,6 +2998,16 @@ Public Class OIT0004OilStockCreate
                         WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                         Return False
                     End If 'isNormal(WW_CS0024FCHECKERR) 
+                    Master.CheckField(work.WF_SEL_CAMPCODE.Text, "RECEIVEFROMLORRY", itm.ReceiveFromLorry, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+
+                    If Not isNormal(WW_CS0024FCHECKERR) Then
+                        Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, I_PARA01:="ﾛｰﾘｰ受入", needsPopUp:=True)
+                        AppendForcusObject(itm.ReceiveFromLorryClientId)
+                        WW_CheckMES1 = String.Format("受入入力エラー。日付:{0},油種:{1}", itm.DaysItem.DispDate, oilName)
+                        WW_CheckMES2 = C_MESSAGE_NO.NUMERIC_VALUE_ERROR
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                        Return False
+                    End If 'isNormal(WW_CS0024FCHECKERR) 
                 Next itm
             Next stockListItem
         End If
@@ -3364,6 +3374,8 @@ Public Class OIT0004OilStockCreate
         Dim sendVal As String = ""
         Dim morningStockObj As TextBox = Nothing
         Dim morningStockVal As String = ""
+        Dim receiveObj As TextBox = Nothing
+        Dim receiveVal As String = ""
         Dim receiveFromLorryObj As TextBox = Nothing
         Dim receiveFromLorryVal As String = ""
         Dim stockListClass = dispDataClass.StockList
@@ -3383,6 +3395,10 @@ Public Class OIT0004OilStockCreate
                 sendVal = sendObj.Text
                 morningStockObj = DirectCast(repStockValItem.FindControl("txtMorningStock"), TextBox)
                 morningStockVal = morningStockObj.Text
+
+                receiveObj = DirectCast(repStockValItem.FindControl("txtReceive"), TextBox)
+                receiveVal = receiveObj.Text
+
                 receiveFromLorryObj = DirectCast(repStockValItem.FindControl("txtReceiveFromLorry"), TextBox)
                 receiveFromLorryVal = receiveFromLorryObj.Text
 
@@ -3391,6 +3407,10 @@ Public Class OIT0004OilStockCreate
                 stockListItm.SendTextClientId = sendObj.ClientID
                 stockListItm.MorningStock = morningStockVal
                 stockListItm.MorningStockClientId = morningStockObj.ClientID
+                If dispDataClass.ShowSuggestList = False Then
+                    stockListItm.Receive = receiveVal
+                    stockListItm.ReceiveClientId = receiveObj.ClientID
+                End If
                 stockListItm.ReceiveFromLorry = receiveFromLorryVal
                 stockListItm.ReceiveFromLorryClientId = receiveFromLorryObj.ClientID
             Next repStockValItem
@@ -4127,7 +4147,7 @@ Public Class OIT0004OilStockCreate
                     '◆受入数 (提案リストの値)
                     If Me.ShowSuggestList = True AndAlso itm.DaysItem.IsBeforeToday = False AndAlso needsSumSuggestValue Then
                         '提案リスト表示時
-                        itm.Receive = GetSummarySuggestValue(itmDate, oilCode)
+                        itm.Receive = GetSummarySuggestValue(itmDate, oilCode).ToString
                     Else
                         'itm.Receive = 0 '？？？？？ここはどうする
                     End If
@@ -4572,7 +4592,7 @@ Public Class OIT0004OilStockCreate
                 Me.LastEveningStock = 12345
                 Me.Retentiondays = 0
                 Me.MorningStock = "0"
-                Me.Receive = 0
+                Me.Receive = "0"
                 Me.ReceiveFromLorry = "0"
                 Me.Send = "0" '画面入力項目の為文字
                 Me.EveningStock = 0
@@ -4616,7 +4636,12 @@ Public Class OIT0004OilStockCreate
             ''' </summary>
             ''' <returns></returns>
             ''' <remarks>シミュレーション値を格納</remarks>
-            Public Property Receive As Decimal
+            Public Property Receive As String
+            ''' <summary>
+            ''' 受入(画面入力エリアのテキストボックスID)
+            ''' </summary>
+            ''' <returns></returns>
+            Public Property ReceiveClientId As String
             ''' <summary>
             ''' ローリー受入
             ''' </summary>
@@ -4635,7 +4660,7 @@ Public Class OIT0004OilStockCreate
             Public ReadOnly Property SummaryReceive As Decimal
                 Get
                     Dim retVal As Decimal
-                    retVal = Me.Receive
+                    retVal = If(IsNumeric(Me.Receive), CDec(Me.Receive), 0)
                     Dim lorryVal As Decimal = 0
                     If Decimal.TryParse(Me.ReceiveFromLorry, lorryVal) Then
                         retVal = retVal + lorryVal

@@ -115,7 +115,8 @@ textarea {
     box-sizing: border-box;
     ime-mode: inactive;
     /* color: #000000; /* 黒 */
-    color: #737373;
+    /* color: #737373; */ /* 4/14変更前 */
+    color: #404040;
     padding: 6px 4px 6px 4px; /* Top Right Bottom Left */
     /* border-color: rgba(176, 176, 276, 0.6); */
     border-color: skyblue;

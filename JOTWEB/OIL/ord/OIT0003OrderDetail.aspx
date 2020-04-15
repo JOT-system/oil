@@ -603,6 +603,16 @@
 
             <!-- ■ Tab No4　費用入力　■ -->
             <asp:View ID="WF_DView4" runat="server">
+                <!-- ボタン -->
+                <div class="actionButtonBox">
+                    <div class="leftSide">
+                        選択した明細の<input type="button" id="WF_ButtonLINE_LIFTED_TAB4" class="btn-sticky" value="行削除"  onclick="ButtonClick('WF_ButtonLINE_LIFTED_TAB4');" />
+                        <input type="button" id="WF_ButtonLINE_ADD_TAB4" class="btn-sticky" value="行追加"  onclick="ButtonClick('WF_ButtonLINE_ADD_TAB4');" />
+                    </div>
+                    <div class="rightSide">
+                        <input type="button" id="WF_ButtonUPDATE_TAB4" class="btn-sticky" value="訂正更新"  onclick="ButtonClick('WF_ButtonUPDATE_TAB4');" />
+                    </div>
+                </div>
                 <!-- 一覧レイアウト -->
                 <asp:panel id="pnlListArea4" runat="server" ></asp:panel>
             </asp:View>

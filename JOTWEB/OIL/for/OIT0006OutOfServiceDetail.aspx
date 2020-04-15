@@ -78,7 +78,7 @@
                 <span>
                     <a id="WF_OBJECTIVE_LABEL">目的</a>
                     <a class="ef" id="WF_OBJECTIVE" ondblclick="Field_DBclick('TxtObjective', <%=LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE%>);" onchange="TextBox_change('TxtObjective');">
-                        <asp:TextBox ID="TxtObjective" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="1"></asp:TextBox>
+                        <asp:TextBox ID="TxtObjective" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="2"></asp:TextBox>
                     </a>
                 </span>
                 <span class ="left">

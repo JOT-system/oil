@@ -759,6 +759,9 @@ Public Class OIT0003OrderDetail
         '〇タブ「タンク車明細」表示用
         GridViewInitializeTab3()
 
+        '〇タブ「費用入力」表示用
+        GridViewInitializeTab4()
+
         '〇タンク車所在の更新
         WW_TankShozaiSet()
 
@@ -899,6 +902,55 @@ Public Class OIT0003OrderDetail
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea3
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+        If Not isNormal(CS0013ProfView.ERR) Then
+            Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
+            Exit Sub
+        End If
+
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        WW_ListTextBoxReadControl()
+
+        '○ 先頭行に合わせる
+        WF_GridPosition.Text = "1"
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' GridViewデータ設定(タブ「費用入力」表示用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GridViewInitializeTab4()
+        '○ 画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGetTab4(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+        '○ 一覧表示データ編集(性能対策)
+        Dim TBLview As DataView = New DataView(OIT0003tbl_tab4)
+
+        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+
+        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID + "TAB4"
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea4
         CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
@@ -1856,6 +1908,85 @@ Public Class OIT0003OrderDetail
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' 画面表示データ取得(タブ「費用入力」一覧表示用)
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub MAPDataGetTab4(ByVal SQLcon As SqlConnection)
+        If IsNothing(OIT0003tbl_tab4) Then
+            OIT0003tbl_tab4 = New DataTable
+        End If
+
+        If OIT0003tbl_tab4.Columns.Count <> 0 Then
+            OIT0003tbl_tab4.Columns.Clear()
+        End If
+
+        OIT0003tbl_tab4.Clear()
+
+        '○ 一覧表示用検索SQL
+        '　一覧説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+                  " SELECT" _
+                & "   0                                                  AS LINECNT" _
+                & " , ''                                                 AS OPERATION" _
+                & " , CAST(OIT0002.UPDTIMSTP AS bigint)                  AS TIMSTP" _
+                & " , 1                                                  AS 'SELECT'" _
+                & " , 0                                                  AS HIDDEN" _
+                & " FROM OIL.OIT0002_ORDER OIT0002 " _
+                & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+                & "       OIT0002.ORDERNO = OIT0003.ORDERNO" _
+                & "       AND OIT0003.DELFLG <> @P02" _
+                & " WHERE OIT0002.ORDERNO = @P01" _
+                & " AND OIT0002.DELFLG <> @P02"
+
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    RIGHT('00' + OIT0003.LINEORDER, 2)"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+
+                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003tbl_tab4.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003tbl_tab4.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003tab4row As DataRow In OIT0003tbl_tab4.Rows
+                    i += 1
+                    OIT0003tab4row("LINECNT") = i        'LINECNT
+
+                Next
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB4 SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB4 Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
 
     ''' <summary>
     ''' 一覧再表示処理

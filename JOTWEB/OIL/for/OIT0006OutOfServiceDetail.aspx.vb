@@ -1431,6 +1431,13 @@ Public Class OIT0006OutOfServiceDetail
                 Me.TxtKaisouType.Text = WW_SelectText
                 Me.TxtKaisouType.Focus()
 
+                '回送パターンの情報を取得
+                WW_FixvalueMasterSearch(Me.WF_CAMPCODE.Text, "KAISOUPATTERN", Me.TxtKaisouTypeCode.Text, WW_GetValue)
+
+                '目的の設定
+                Me.TxtObjective.Text = WW_GetValue(2)
+                Me.LblObjective.Text = WW_GetValue(3)
+
                 '★下記の回送パターンの場合は着駅(浮島町)を設定する。
                 '　01:修理-JOT負担発払
                 '　02:修理-JOT負担着払
@@ -2464,11 +2471,11 @@ Public Class OIT0006OutOfServiceDetail
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
 
-                    '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
+                    '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
                 ElseIf Me.TxtActualDepDate.Text <> "" _
                     AndAlso Me.TxtActualArrDate.Text <> "" _
-                    AndAlso (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6) _
+                    AndAlso (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25) _
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
                     '############################################################################
@@ -2491,8 +2498,8 @@ Public Class OIT0006OutOfServiceDetail
                     strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
 
                     '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
-                ElseIf (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6) _
+                ElseIf (Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25) _
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
                     '############################################################################
@@ -3005,10 +3012,10 @@ Public Class OIT0006OutOfServiceDetail
                 PARA23.Value = Me.TxtDepDate.Text                 '発日（予定）
                 PARA24.Value = Me.TxtArrDate.Text                 '着日（予定）
 
-                '### 目的が"5:疎開留置", "6:移動"の場合は、受入日はNULLを設定 ###########
+                '### 目的が"24:疎開留置", "25:移動"の場合は、受入日はNULLを設定 ###########
                 '受入日（予定）
-                If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+                If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
                     PARA25.Value = DBNull.Value
                     '########################################################################
                 Else
@@ -3833,9 +3840,9 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '### 目的が"5:疎開留置", "6:移動"の場合は、受入日のチェックを実施しない ###########
-        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+        '### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
+        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
 
             '### 特に何もしない ##########################################
 
@@ -4136,9 +4143,9 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '### 目的が"5:疎開留置", "6:移動"の場合は、受入日のチェックを実施しない ###########
-        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+        '### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
+        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
 
             '### 特に何もしない ##########################################
 
@@ -4188,9 +4195,9 @@ Public Class OIT0006OutOfServiceDetail
         End If
 
 
-        '### 目的が"5:疎開留置", "6:移動"の場合は、受入日のチェックを実施しない ###########
-        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+        '### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
+        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
 
             '(予定)着日 と　(予定)空車着日を比較
             iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(Date.Parse(Me.TxtEmparrDate.Text))
@@ -4837,9 +4844,9 @@ Public Class OIT0006OutOfServiceDetail
             '(予定)積車着日
             Me.TxtArrDate.Enabled = True
 
-            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
                 '(予定)受入日
                 Me.TxtAccDate.Enabled = False
                 Me.TxtAccDate.Text = ""
@@ -4877,9 +4884,9 @@ Public Class OIT0006OutOfServiceDetail
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
 
-            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
                 '(実績)受入日
                 Me.TxtActualAccDate.Enabled = False
             Else
@@ -4912,9 +4919,9 @@ Public Class OIT0006OutOfServiceDetail
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
 
-            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
                 '(実績)受入日
                 Me.TxtActualAccDate.Enabled = False
             Else
@@ -4934,9 +4941,9 @@ Public Class OIT0006OutOfServiceDetail
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = False
 
-            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
+            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
                 '(実績)受入日
                 Me.TxtActualAccDate.Enabled = False
             Else
@@ -5073,9 +5080,9 @@ Public Class OIT0006OutOfServiceDetail
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
 
-                            '### 目的が"5:疎開留置", "6:移動"の場合は、受入日の入力を省略する ###########
-                            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_5 _
-                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_6 Then
+                            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
+                            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
 
                                 '(実績)発日, (実績)着日, (実績)空車着日を入力可能とする。
                                 If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _

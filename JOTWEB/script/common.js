@@ -2404,3 +2404,104 @@ function commonOpenNewTab(urlText) {
     document.forms[0].submit();
     currentForm.target = '';
 }
+/**
+ *  年月選択Pickerの表示イベントバインド
+ * @return {undefined} なし
+ * @description 
+ */
+function commonBindMonthPicker() {
+    let targetTextBoxes = document.querySelectorAll("input[type=text][data-monthpicker]");
+    for (let i = 0; i < targetTextBoxes.length; i++) {
+        targetTextBox = targetTextBoxes[i];
+        targetTextId = targetTextBox.id;
+        /* 対象のテキストをspanで括る */
+        let spanWrapper = document.createElement('span');
+        spanWrapper.classList.add('commonMonthWrapperPicker');
+        targetTextBox.parentNode.insertBefore(spanWrapper, targetTextBox);
+        spanWrapper.appendChild(targetTextBox);
+        targetTextBox = document.getElementById(targetTextId);
+
+        targetTextBox.addEventListener('click', (function (targetTextBox) {
+            return function () {
+                commonDispMonthPicker(targetTextBox);
+            };
+        })(targetTextBox), true);
+    }
+}
+/**
+ *  年月選択Pickerの表示イベントバインド
+ * @param {Element} targetTextBox 入力テキストID
+ * @return {undefined} なし
+ * @description 
+ */
+function commonDispMonthPicker(targetTextBox) {
+    // 初期表示年月の設定
+    let currentYear = (new Date()).getFullYear();
+    let currentMonth = 0;
+    if (targetTextBox.value !== '') {
+        currentYear = targetTextBox.substring(1, 4);
+        monthString = targetTextBox.substring(6);
+        if (targetTextBox.length === 3) {
+            currentMonth = monthString.substring(1, 2);
+        } else {
+            currentMonth = monthString.substring(1, 1);
+        }
+    }
+    // MonthPickerIDの定義
+    let monthPickerId = 'commonMonthList';
+    // 既に表示されている場合は消す
+    let findObj = document.getElementById(monthPickerId);
+    if (findObj !== null) {
+        findObj.parentNode.removeChild(findObj);
+    }
+    //DatePickerElementの生成
+    let parentObj = targetTextBox.parentNode;
+    let divNode = document.createElement('div');
+    divNode.id = monthPickerId;
+
+    divNode.classList.add('commonMonthListWrapper');
+
+    let insideInnerHtml = "<div><div class='commonMonthListHeader'><span id='spnCommonPrevYear'>＜</span><span id='spnCommonDispYear'>" + currentYear + "年</span><span id='spnCommonNextYear'>＞</span></div>";
+    insideInnerHtml = insideInnerHtml + "<hr />";
+    insideInnerHtml = insideInnerHtml +
+        "<div class='commonMonthListBody' data-dispyear='" + currentYear + "' data-year='" + currentYear + "' data-month='" + currentMonth + "'>";
+    for (let i = 1; i < 13; i++) {
+        let selectedVal = '';
+        if (currentMonth === i) {
+            selectedVal = 'selected';
+        }
+        insideInnerHtml = insideInnerHtml + "<span data-month='" + i + "' class='" + selectedVal + "'>" + i + "月</span>";
+    }
+    insideInnerHtml = insideInnerHtml +
+        "</div></div>";
+    divNode.innerHTML = insideInnerHtml;
+    parentObj.appendChild(divNode);
+    // 消込処理(年月ポップアップにフォーカスがなくなって１秒経過で消す)
+    setTimeout(function () {
+        commonDeleteMonthPicker();
+    }, 1000); // 初期表示でポップアップに１秒フォーカスが当たらないと消す
+    let monthPickerInsideDiv = document.getElementById(monthPickerId).querySelector('div');
+    monthPickerInsideDiv.addEventListener('mouseout', (function () {
+        return function () {
+            setTimeout(function () {
+                commonDeleteMonthPicker();
+            }, 700); // 初期よりちょい短めに判定700msで消す
+        };
+    })(), true);
+}
+/**
+ *  年月選択Pickerの消込
+ * @return {undefined} なし
+ * @description 
+ */
+function commonDeleteMonthPicker() {
+    // MonthPickerIDの定義
+    let monthPickerId = document.getElementById('commonMonthList');
+    if (monthPickerId === null) {
+        return;
+    }
+    let hasHover = monthPickerId.querySelector(':hover');
+    if (hasHover === null) {
+       monthPickerId.parentNode.removeChild(monthPickerId);
+    }
+}

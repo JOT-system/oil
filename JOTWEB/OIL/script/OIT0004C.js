@@ -32,6 +32,8 @@ function InitDisplay() {
     //フォーカスを合わせる
     forcusObj();
     bindContentHorizonalScroll();
+    //月選択バインド
+    commonBindMonthPicker();
 }
 // 〇コンテンツ横スクロールイベントのバインド
 function bindContentHorizonalScroll() {
@@ -63,7 +65,7 @@ function resizeButtonBox(headerBox, buttonBox) {
     widthheaaderBox = widthheaaderBox - 16;
     buttonBox.style.width = widthheaaderBox + 'px';
     let negMarginLeft = 0;
-    if (widthheaaderBox < 1250 && headerBox.scrollLeft !== 0) {
+    if (widthheaaderBox < 1320 && headerBox.scrollLeft !== 0) {
         negMarginLeft = -1 * headerBox.scrollLeft;
     }
     leftSideObj.style.marginLeft = negMarginLeft + "px";

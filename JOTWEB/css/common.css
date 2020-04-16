@@ -1993,3 +1993,89 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     max-height: calc(100vh - 100px);
     max-width: calc(100vw - 60px);
 }
+/* ------------------------------
+    月選択ポップアップスタイル
+------------------------------ */
+.commonMonthWrapperPicker {
+    position:relative;
+    display:inline-block;
+}
+.commonMonthListWrapper {
+    position:absolute;
+    left:0;
+    top:20px;
+    //z-index:10;
+
+}
+.commonMonthListWrapper > div {
+    position: fixed;
+    //z-index:10;
+    width:200px;
+    margin:5px;
+    border-radius:5px;
+    border:1px solid gray;
+    padding:5px;
+    overflow:hidden;
+    color:black;
+    background-color:rgba(255,255,255,0.85);
+}
+.commonMonthListWrapper span {
+    display:inline-block;
+}
+.commonMonthListHeader {
+    margin:5px;
+}
+.commonMonthListHeader span:nth-child(1),
+.commonMonthListHeader span:nth-child(3){
+    border:1px solid gray;
+    border-radius:5px;
+    padding:2px;
+    padding-bottom:0;
+    width:20px;
+    height:20px;
+    line-height:20px;
+    vertical-align :middle;
+    text-align:center;
+    font-weight:bold;
+}
+.commonMonthListHeader span:nth-child(1):hover,
+.commonMonthListHeader span:nth-child(3):hover{
+
+    border:1px solid #2bb6c1;
+    background-color:#2bb6c1;
+    color:#fff;
+    cursor:pointer;
+}
+.commonMonthListHeader span:nth-child(2) {
+    width:140px;
+    vertical-align :middle;
+    text-align:center;
+}
+.commonMonthListBody {
+    margin-top:2px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.commonMonthListBody span{
+    border:1px solid gray;
+    border-radius:5px;
+    padding:2px;
+    //padding-bottom:0;
+    width:41px;
+    margin:1px;
+    vertical-align :middle;
+    text-align:center;
+    font-weight:bold;
+    overflow:hidden;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.commonMonthListBody span:hover {
+    border: 1px solid #2bb6c1;
+    background-color: #2bb6c1;
+    color: #fff;
+    cursor: pointer;
+}

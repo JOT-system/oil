@@ -32,12 +32,16 @@
                     <input type="button" id="WF_ButtonAUTOSUGGESTION" runat="server" class="btn-sticky" value="自動提案"     onclick="ButtonClick('WF_ButtonAUTOSUGGESTION');" />
                     <input type="button" id="WF_ButtonORDERLIST"      runat="server" class="btn-sticky" value="受注作成"     onclick="ButtonClick('WF_ButtonORDERLIST');" />
                     <input type="button" id="WF_ButtonINPUTCLEAR"     runat="server" class="btn-sticky" value="入力値クリア" onclick="ButtonClick('WF_ButtonINPUTCLEAR');" />
-                    <input type="button" id="WF_ButtonGETEMPTURN"     runat="server" class="btn-sticky" value="受入数 空回日報取込" onclick="ButtonClick('WF_ButtonGETEMPTURN');" />
+                    <input type="button" id="WF_ButtonGETEMPTURN"     runat="server" class="btn-sticky" value="空回日報取込" onclick="ButtonClick('WF_ButtonGETEMPTURN');" />
                 </div>
 
                 <div class="rightSide">
                     <input type="button" id="WF_ButtonRECULC"        class="btn-sticky" value="在庫表再計算"     onclick="ButtonClick('WF_ButtonRECULC');" />
                     <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="在庫表保存"     onclick="ButtonClick('WF_ButtonUPDATE');" />
+                    <span id="spnDownloadMonth">
+                        <asp:Label ID="lblDownloadMonth" runat="server" Text="帳票年月"></asp:Label>
+                        <asp:TextBox ID="txtDownloadMonth" runat="server" ReadOnly="true" data-monthpicker="1"></asp:TextBox>
+                    </span>
                     <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
                     <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                     <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   visible="false" onclick="ButtonClick('WF_ButtonFIRST');"></div>

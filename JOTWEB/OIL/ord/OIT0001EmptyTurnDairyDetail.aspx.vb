@@ -3328,7 +3328,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtTTank.Enabled = True
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
-                    TxtMTTank.Enabled = True
+                    '★根岸営業所の場合
+                    If work.WF_SEL_SALESOFFICECODE.Text = "011402" Then
+                        TxtMTTank.Enabled = False
+                    Else
+                        TxtMTTank.Enabled = True
+                    End If
                     '軽油
                 Case BaseDllConst.CONST_KTank1, BaseDllConst.CONST_KTank2
                     TxtKTank.Enabled = True

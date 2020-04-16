@@ -68,6 +68,24 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents WF_ButtonGETEMPTURN As Global.System.Web.UI.HtmlControls.HtmlInputButton
     
     '''<summary>
+    '''lblDownloadMonth コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblDownloadMonth As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtDownloadMonth コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtDownloadMonth As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
     '''<remarks>

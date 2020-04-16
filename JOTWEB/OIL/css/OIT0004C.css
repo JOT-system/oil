@@ -13,13 +13,14 @@
     margin-top:10px;
 }
 /* 上部テキストボックス */
-#WF_INVENTORYDAYS {
+#WF_INVENTORYDAYS,
+#txtDownloadMonth {
     height: 24px;
     margin: 0;
     padding-top: 1px;
     padding-bottom: 0px;
-    width:80px;
-    text-align :right;
+    width: 80px;
+    text-align: right;
 }
 /* ********** */
 /* 提案表定義 */
@@ -792,7 +793,7 @@ _:-ms-lang(x)::backdrop,
 /* ↓ボタン固定ここから↓   */
 /* ************************ */
 #pnlSuggestList {
-    margin-top:25px;
+    margin-top:30px;
 }
 .actionButtonBox {
     margin: 0px;

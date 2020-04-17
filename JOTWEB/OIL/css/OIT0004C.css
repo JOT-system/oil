@@ -22,6 +22,10 @@
     width: 80px;
     text-align: right;
 }
+#txtDownloadMonth {
+    text-align:left;
+    padding-left:1px;
+}
 /* ********** */
 /* 提案表定義 */
 /* ********** */

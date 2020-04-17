@@ -2021,6 +2021,8 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
 }
 .commonMonthListWrapper span {
     display:inline-block;
+    -ms-user-select: none;
+    user-select: none;
 }
 .commonMonthListHeader {
     margin:5px;
@@ -2051,31 +2053,42 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     vertical-align :middle;
     text-align:center;
 }
-.commonMonthListBody {
-    margin-top:2px;
+.commonMonthPickerListBody {
+    margin-top: 2px;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
 }
-.commonMonthListBody span{
-    border:1px solid gray;
-    border-radius:5px;
-    padding:2px;
+.commonMonthPickerListBody span {
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 2px;
     //padding-bottom:0;
-    width:41px;
-    margin:1px;
-    vertical-align :middle;
-    text-align:center;
-    font-weight:bold;
-    overflow:hidden;
-    padding-top:10px;
-    padding-bottom:10px;
+    width: 41px;
+    margin: 1px;
+    vertical-align: middle;
+    text-align: center;
+    font-weight: bold;
+    overflow: hidden;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
-.commonMonthListBody span:hover {
+.commonMonthPickerListBody span.selected {
+    background-color: lightgray;
+}
+.commonMonthPickerListBody span:hover {
     border: 1px solid #2bb6c1;
     background-color: #2bb6c1;
     color: #fff;
     cursor: pointer;
 }
+
+#spnCommonMonthPickerDispYear:before {
+    content: attr(data-dispyear) "年";
+}
+#divCommonMonthListBody .monthTile:before {
+    content: attr(data-month) "月";
+}
+

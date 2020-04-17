@@ -40,7 +40,7 @@
                     <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="在庫表保存"     onclick="ButtonClick('WF_ButtonUPDATE');" />
                     <span id="spnDownloadMonth">
                         <asp:Label ID="lblDownloadMonth" runat="server" Text="帳票年月"></asp:Label>
-                        <asp:TextBox ID="txtDownloadMonth" runat="server" ReadOnly="true" data-monthpicker="1"></asp:TextBox>
+                        <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
                     </span>
                     <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
                     <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />

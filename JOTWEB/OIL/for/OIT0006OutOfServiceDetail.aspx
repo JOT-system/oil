@@ -206,7 +206,7 @@
                     </a>
                 </span>
 
-                <!-- ■　(実績)積車着日　■ -->
+                <!-- ■　(実績)着日　■ -->
                 <span>
                     <a id="WF_ACTUALARRDATE_LABEL" class="requiredMark">着日</a>
                     <a class="ef" id="WF_ACTUALARRDATE" ondblclick="Field_DBclick('TxtActualArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">

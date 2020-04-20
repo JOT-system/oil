@@ -152,8 +152,8 @@ Public Class OIT0003OrderDetail
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"              'マウスホイール(Down)
                             WF_Grid_Scroll()
-                        'Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
-                        '    WF_FILEUPLOAD()
+                        Case "WF_EXCEL_UPLOAD"                'ファイルアップロード
+                            'WF_FILEUPLOAD()
                         Case "WF_RadioButonClick"             '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"                  '(右ボックス)メモ欄更新
@@ -4167,6 +4167,549 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+#Region "Excelアップロード"
+    ''' <summary>
+    ''' ファイルアップロード時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FILEUPLOAD()
+
+        '○ エラーレポート準備
+        rightview.SetErrorReport("")
+
+        '○ UPLOAD XLSデータ取得
+        CS0023XLSUPLOAD.CAMPCODE = work.WF_SEL_CAMPCODE.Text        '会社コード
+        CS0023XLSUPLOAD.MAPID = Master.MAPID                        '画面ID
+        'CS0023XLSUPLOAD.PROFID = Master.PROF_REPORT                 'ﾌﾟﾛﾌｧｲﾙID
+        CS0023XLSUPLOAD.CS0023XLSUPLOAD(I_PROFID:=Master.PROF_REPORT)
+        If isNormal(CS0023XLSUPLOAD.ERR) Then
+            If CS0023XLSUPLOAD.TBLDATA.Rows.Count = 0 Then
+                Master.Output(C_MESSAGE_NO.REGISTRATION_RECORD_NOT_EXIST_ERROR, C_MESSAGE_TYPE.ERR)
+                Exit Sub
+            End If
+        Else
+            Master.Output(CS0023XLSUPLOAD.ERR, C_MESSAGE_TYPE.ABORT, "CS0023XLSUPLOAD")
+            Exit Sub
+        End If
+
+        '○ CS0023XLSUPLOAD.TBLDATAの入力値整備
+        Dim WW_COLUMNS As New List(Of String)
+        For Each XLSTBLcol As DataColumn In CS0023XLSUPLOAD.TBLDATA.Columns
+            WW_COLUMNS.Add(XLSTBLcol.ColumnName.ToString())
+        Next
+
+        Dim CS0023XLSTBLrow As DataRow = CS0023XLSUPLOAD.TBLDATA.NewRow
+        For Each XLSTBLrow As DataRow In CS0023XLSUPLOAD.TBLDATA.Rows
+            CS0023XLSTBLrow.ItemArray = XLSTBLrow.ItemArray
+
+            For Each XLSTBLcol As DataColumn In CS0023XLSUPLOAD.TBLDATA.Columns
+                If IsDBNull(CS0023XLSTBLrow.Item(XLSTBLcol)) OrElse IsNothing(CS0023XLSTBLrow.Item(XLSTBLcol)) Then
+                    CS0023XLSTBLrow.Item(XLSTBLcol) = ""
+                End If
+            Next
+
+            XLSTBLrow.ItemArray = CS0023XLSTBLrow.ItemArray
+        Next
+
+        '○ XLSUPLOAD明細⇒INPtbl
+        Master.CreateEmptyTable(OIT0003INPtbl)
+
+        '★新規受注№の取得
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+        WW_FixvalueMasterSearch("", "NEWORDERNOGET", "", WW_GetValue)
+        work.WF_SEL_ORDERNUMBER.Text = WW_GetValue(0)
+
+        '★受注明細№
+        Dim intDETAILNO As Integer = 1
+
+        For Each XLSTBLrow As DataRow In CS0023XLSUPLOAD.TBLDATA.Rows
+            Dim OIT0003INProw As DataRow = OIT0003INPtbl.NewRow
+
+            '○ 初期クリア
+            For Each OIT0003INPcol As DataColumn In OIT0003INPtbl.Columns
+                If IsDBNull(OIT0003INProw.Item(OIT0003INPcol)) OrElse IsNothing(OIT0003INProw.Item(OIT0003INPcol)) Then
+                    Select Case OIT0003INPcol.ColumnName
+                        Case "LINECNT"
+                            OIT0003INProw.Item(OIT0003INPcol) = 0
+                        Case "OPERATION"
+                            OIT0003INProw.Item(OIT0003INPcol) = C_LIST_OPERATION_CODE.NODATA
+                        Case "TIMSTP"
+                            OIT0003INProw.Item(OIT0003INPcol) = 0
+                        Case "SELECT"
+                            OIT0003INProw.Item(OIT0003INPcol) = 1
+                        Case "HIDDEN"
+                            OIT0003INProw.Item(OIT0003INPcol) = 0
+                        Case Else
+                            OIT0003INProw.Item(OIT0003INPcol) = ""
+                    End Select
+                End If
+            Next
+
+            '○ 変更元情報をデフォルト設定
+            If WW_COLUMNS.IndexOf("ORDERNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("DETAILNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("SHIPPERSCODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("SHIPPERSNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("BASECODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("BASENAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("CONSIGNEECODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("CONSIGNEENAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("ORDERINFO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("ORDERINFONAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("OILCODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("OILNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("ORDERINGTYPE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("ORDERINGOILNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("TANKQUOTA") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LINKNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("SHIPORDER") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("TANKNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LINEORDER") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("MODEL") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRINSPECTIONALERT") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRINSPECTIONALERTSTR") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRALLINSPECTIONALERT") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRALLINSPECTIONALERTSTR") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LASTOILCODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("LASTOILNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("PREORDERINGTYPE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("PREORDERINGOILNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("CHANGETRAINNO") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("CHANGETRAINNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("SECONDCONSIGNEECODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("SECONDCONSIGNEENAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("SECONDARRSTATION") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("SECONDARRSTATIONNAME") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("CHANGERETSTATION") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("CHANGERETSTATIONNAME") >= 0 Then
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    If XLSTBLrow("ORDERNO") = OIT0003row("ORDERNO") AndAlso
+                        XLSTBLrow("DETAILNO") = OIT0003row("DETAILNO") AndAlso
+                        XLSTBLrow("SHIPPERSCODE") = OIT0003row("SHIPPERSCODE") AndAlso
+                        XLSTBLrow("SHIPPERSNAME") = OIT0003row("SHIPPERSNAME") AndAlso
+                        XLSTBLrow("BASECODE") = OIT0003row("BASECODE") AndAlso
+                        XLSTBLrow("BASENAME") = OIT0003row("BASENAME") AndAlso
+                        XLSTBLrow("CONSIGNEECODE") = OIT0003row("CONSIGNEECODE") AndAlso
+                        XLSTBLrow("CONSIGNEENAME") = OIT0003row("CONSIGNEENAME") AndAlso
+                        XLSTBLrow("ORDERINFO") = OIT0003row("ORDERINFO") AndAlso
+                        XLSTBLrow("ORDERINFONAME") = OIT0003row("ORDERINFONAME") AndAlso
+                        XLSTBLrow("OILCODE") = OIT0003row("OILCODE") AndAlso
+                        XLSTBLrow("OILNAME") = OIT0003row("OILNAME") AndAlso
+                        XLSTBLrow("ORDERINGTYPE") = OIT0003row("ORDERINGTYPE") AndAlso
+                        XLSTBLrow("ORDERINGOILNAME") = OIT0003row("ORDERINGOILNAME") AndAlso
+                        XLSTBLrow("TANKQUOTA") = OIT0003row("TANKQUOTA") AndAlso
+                        XLSTBLrow("LINKNO") = OIT0003row("LINKNO") AndAlso
+                        XLSTBLrow("LINKDETAILNO") = OIT0003row("LINKDETAILNO") AndAlso
+                        XLSTBLrow("SHIPORDER") = OIT0003row("SHIPORDER") AndAlso
+                        XLSTBLrow("TANKNO") = OIT0003row("TANKNO") AndAlso
+                        XLSTBLrow("LINEORDER") = OIT0003row("LINEORDER") AndAlso
+                        XLSTBLrow("MODEL") = OIT0003row("MODEL") AndAlso
+                        XLSTBLrow("JRINSPECTIONALERT") = OIT0003row("JRINSPECTIONALERT") AndAlso
+                        XLSTBLrow("JRINSPECTIONALERTSTR") = OIT0003row("JRINSPECTIONALERTSTR") AndAlso
+                        XLSTBLrow("JRINSPECTIONDATE") = OIT0003row("JRINSPECTIONDATE") AndAlso
+                        XLSTBLrow("JRALLINSPECTIONALERT") = OIT0003row("JRALLINSPECTIONALERT") AndAlso
+                        XLSTBLrow("JRALLINSPECTIONALERTSTR") = OIT0003row("JRALLINSPECTIONALERTSTR") AndAlso
+                        XLSTBLrow("JRALLINSPECTIONDATE") = OIT0003row("JRALLINSPECTIONDATE") AndAlso
+                        XLSTBLrow("LASTOILCODE") = OIT0003row("LASTOILCODE") AndAlso
+                        XLSTBLrow("LASTOILNAME") = OIT0003row("LASTOILNAME") AndAlso
+                        XLSTBLrow("PREORDERINGTYPE") = OIT0003row("PREORDERINGTYPE") AndAlso
+                        XLSTBLrow("PREORDERINGOILNAME") = OIT0003row("PREORDERINGOILNAME") AndAlso
+                        XLSTBLrow("CHANGETRAINNO") = OIT0003row("CHANGETRAINNO") AndAlso
+                        XLSTBLrow("CHANGETRAINNAME") = OIT0003row("CHANGETRAINNAME") AndAlso
+                        XLSTBLrow("SECONDCONSIGNEECODE") = OIT0003row("SECONDCONSIGNEECODE") AndAlso
+                        XLSTBLrow("SECONDCONSIGNEENAME") = OIT0003row("SECONDCONSIGNEENAME") AndAlso
+                        XLSTBLrow("SECONDARRSTATION") = OIT0003row("SECONDARRSTATION") AndAlso
+                        XLSTBLrow("SECONDARRSTATIONNAME") = OIT0003row("SECONDARRSTATIONNAME") AndAlso
+                        XLSTBLrow("CHANGERETSTATION") = OIT0003row("CHANGERETSTATION") AndAlso
+                        XLSTBLrow("CHANGERETSTATIONNAME") = OIT0003row("CHANGERETSTATIONNAME") Then
+                        OIT0003INProw.ItemArray = OIT0003row.ItemArray
+                        Exit For
+                    End If
+                Next
+            End If
+
+            '○ 項目セット
+            '受注№
+            OIT0003INProw("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text
+
+            '受注明細№
+            OIT0003INProw("DETAILNO") = intDETAILNO.ToString("000")
+
+            '荷主コード
+            If WW_COLUMNS.IndexOf("SHIPPERSCODE") >= 0 Then
+                OIT0003INProw("SHIPPERSCODE") = XLSTBLrow("SHIPPERSCODE")
+            End If
+
+            '荷主名
+            If XLSTBLrow("SHIPPERSNAME") <> "" Then
+                If WW_COLUMNS.IndexOf("SHIPPERSNAME") >= 0 Then
+                    OIT0003INProw("SHIPPERSNAME") = XLSTBLrow("SHIPPERSNAME")
+                End If
+            Else
+                CODENAME_get("SHIPPERS", OIT0003INProw("SHIPPERSCODE"), OIT0003INProw("SHIPPERSNAME"), WW_DUMMY)
+            End If
+
+            '基地コード
+            If WW_COLUMNS.IndexOf("BASECODE") >= 0 Then
+                OIT0003INProw("BASECODE") = XLSTBLrow("BASECODE")
+            End If
+
+            '基地名
+            If WW_COLUMNS.IndexOf("BASENAME") >= 0 Then
+                OIT0003INProw("BASENAME") = XLSTBLrow("BASENAME")
+            End If
+
+            '荷受人コード
+            If WW_COLUMNS.IndexOf("CONSIGNEECODE") >= 0 Then
+                OIT0003INProw("CONSIGNEECODE") = XLSTBLrow("CONSIGNEECODE")
+            End If
+
+            '荷受人名
+            If WW_COLUMNS.IndexOf("CONSIGNEENAME") >= 0 Then
+                OIT0003INProw("CONSIGNEENAME") = XLSTBLrow("CONSIGNEENAME")
+            End If
+
+            '情報
+            If WW_COLUMNS.IndexOf("ORDERINFO") >= 0 Then
+                OIT0003INProw("ORDERINFO") = XLSTBLrow("ORDERINFO")
+            End If
+
+            '情報名
+            If XLSTBLrow("ORDERINFONAME") <> "" Then
+                If WW_COLUMNS.IndexOf("ORDERINFONAME") >= 0 Then
+                    OIT0003INProw("ORDERINFONAME") = XLSTBLrow("ORDERINFONAME")
+                End If
+            Else
+                CODENAME_get("ORDERINFO", OIT0003INProw("ORDERINFO"), OIT0003INProw("ORDERINFONAME"), WW_DUMMY)
+            End If
+
+            '油種コード
+            If WW_COLUMNS.IndexOf("OILCODE") >= 0 Then
+                OIT0003INProw("OILCODE") = XLSTBLrow("OILCODE")
+            End If
+
+            '油種名
+            If WW_COLUMNS.IndexOf("OILNAME") >= 0 Then
+                OIT0003INProw("OILNAME") = XLSTBLrow("OILNAME")
+            End If
+
+            '油種区分
+            If WW_COLUMNS.IndexOf("ORDERINGTYPE") >= 0 Then
+                OIT0003INProw("ORDERINGTYPE") = XLSTBLrow("ORDERINGTYPE")
+            End If
+
+            '受注油種
+            If WW_COLUMNS.IndexOf("ORDERINGOILNAME") >= 0 Then
+                OIT0003INProw("ORDERINGOILNAME") = XLSTBLrow("ORDERINGOILNAME")
+            End If
+
+            'タンク車割当状況
+            If WW_COLUMNS.IndexOf("TANKQUOTA") >= 0 Then
+                OIT0003INProw("TANKQUOTA") = XLSTBLrow("TANKQUOTA")
+            End If
+
+            '貨車連結順序表№
+            If WW_COLUMNS.IndexOf("LINKNO") >= 0 Then
+                OIT0003INProw("LINKNO") = XLSTBLrow("LINKNO")
+            End If
+
+            '貨車連結順序表明細№
+            If WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
+                OIT0003INProw("LINKDETAILNO") = XLSTBLrow("LINKDETAILNO")
+            End If
+
+            '発送順
+            If WW_COLUMNS.IndexOf("SHIPORDER") >= 0 Then
+                OIT0003INProw("SHIPORDER") = XLSTBLrow("SHIPORDER")
+            End If
+
+            'タンク車№
+            If WW_COLUMNS.IndexOf("TANKNO") >= 0 Then
+                OIT0003INProw("TANKNO") = XLSTBLrow("TANKNO")
+            End If
+
+            '貨物駅入線順
+            If WW_COLUMNS.IndexOf("LINEORDER") >= 0 Then
+                OIT0003INProw("LINEORDER") = XLSTBLrow("LINEORDER")
+            End If
+
+            '形式
+            If WW_COLUMNS.IndexOf("MODEL") >= 0 Then
+                OIT0003INProw("MODEL") = XLSTBLrow("MODEL")
+            End If
+
+            '交検アラート
+            If WW_COLUMNS.IndexOf("JRINSPECTIONALERT") >= 0 Then
+                OIT0003INProw("JRINSPECTIONALERT") = XLSTBLrow("JRINSPECTIONALERT")
+            End If
+
+            '交検アラート文言
+            If WW_COLUMNS.IndexOf("JRINSPECTIONALERTSTR") >= 0 Then
+                OIT0003INProw("JRINSPECTIONALERTSTR") = XLSTBLrow("JRINSPECTIONALERTSTR")
+            End If
+
+            '交検日
+            If WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 Then
+                OIT0003INProw("JRINSPECTIONDATE") = XLSTBLrow("JRINSPECTIONDATE")
+            End If
+
+            '全検アラート
+            If WW_COLUMNS.IndexOf("JRALLINSPECTIONALERT") >= 0 Then
+                OIT0003INProw("JRALLINSPECTIONALERT") = XLSTBLrow("JRALLINSPECTIONALERT")
+            End If
+
+            '全検アラート文言
+            If WW_COLUMNS.IndexOf("JRALLINSPECTIONALERTSTR") >= 0 Then
+                OIT0003INProw("JRALLINSPECTIONALERTSTR") = XLSTBLrow("JRALLINSPECTIONALERTSTR")
+            End If
+
+            '全検日
+            If WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 Then
+                OIT0003INProw("JRALLINSPECTIONDATE") = XLSTBLrow("JRALLINSPECTIONDATE")
+            End If
+
+            '前回油種コード
+            If WW_COLUMNS.IndexOf("LASTOILCODE") >= 0 Then
+                OIT0003INProw("LASTOILCODE") = XLSTBLrow("LASTOILCODE")
+            End If
+
+            '前回油種名
+            If WW_COLUMNS.IndexOf("LASTOILNAME") >= 0 Then
+                OIT0003INProw("LASTOILNAME") = XLSTBLrow("LASTOILNAME")
+            End If
+
+            '前回油種区分
+            If WW_COLUMNS.IndexOf("PREORDERINGTYPE") >= 0 Then
+                OIT0003INProw("PREORDERINGTYPE") = XLSTBLrow("PREORDERINGTYPE")
+            End If
+
+            '前回受注油種
+            If WW_COLUMNS.IndexOf("PREORDERINGOILNAME") >= 0 Then
+                OIT0003INProw("PREORDERINGOILNAME") = XLSTBLrow("PREORDERINGOILNAME")
+            End If
+
+            '本線列車（変更後）
+            If WW_COLUMNS.IndexOf("CHANGETRAINNO") >= 0 Then
+                OIT0003INProw("CHANGETRAINNO") = XLSTBLrow("CHANGETRAINNO")
+            End If
+
+            '本線列車名
+            If WW_COLUMNS.IndexOf("CHANGETRAINNAME") >= 0 Then
+                OIT0003INProw("CHANGETRAINNAME") = XLSTBLrow("CHANGETRAINNAME")
+            End If
+
+            '第2荷受人コード
+            If WW_COLUMNS.IndexOf("SECONDCONSIGNEECODE") >= 0 Then
+                OIT0003INProw("SECONDCONSIGNEECODE") = XLSTBLrow("SECONDCONSIGNEECODE")
+            End If
+
+            '第2荷受人
+            If WW_COLUMNS.IndexOf("SECONDCONSIGNEENAME") >= 0 Then
+                OIT0003INProw("SECONDCONSIGNEENAME") = XLSTBLrow("SECONDCONSIGNEENAME")
+            End If
+
+            '第2着駅コード
+            If WW_COLUMNS.IndexOf("SECONDARRSTATION") >= 0 Then
+                OIT0003INProw("SECONDARRSTATION") = XLSTBLrow("SECONDARRSTATION")
+            End If
+
+            '第2着駅
+            If WW_COLUMNS.IndexOf("SECONDARRSTATIONNAME") >= 0 Then
+                OIT0003INProw("SECONDARRSTATIONNAME") = XLSTBLrow("SECONDARRSTATIONNAME")
+            End If
+
+            '空車着駅コード（変更後）
+            If WW_COLUMNS.IndexOf("CHANGERETSTATION") >= 0 Then
+                OIT0003INProw("CHANGERETSTATION") = XLSTBLrow("CHANGERETSTATION")
+            End If
+
+            '空車着駅名（変更後）
+            If WW_COLUMNS.IndexOf("CHANGERETSTATIONNAME") >= 0 Then
+                OIT0003INProw("CHANGERETSTATIONNAME") = XLSTBLrow("CHANGERETSTATIONNAME")
+            End If
+
+            '削除フラグ
+            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                OIT0003INProw("DELFLG") = XLSTBLrow("DELFLG")
+            End If
+
+            OIT0003INPtbl.Rows.Add(OIT0003INProw)
+            intDETAILNO += 1
+        Next
+
+        '○ 項目チェック
+        'INPTableCheck(WW_ERR_SW)
+
+        '○ 入力値のテーブル反映
+        OIT0003tbl_UPD()
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+        '○ メッセージ表示
+        If isNormal(WW_ERR_SW) Then
+            Master.Output(C_MESSAGE_NO.IMPORT_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        Else
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR)
+        End If
+
+        '○ Close
+        CS0023XLSUPLOAD.TBLDATA.Dispose()
+        CS0023XLSUPLOAD.TBLDATA.Clear()
+
+    End Sub
+
+    ''' <summary>
+    ''' OIT0003tbl更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub OIT0003tbl_UPD()
+
+        '○ 画面状態設定
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            Select Case OIT0003row("OPERATION")
+                Case C_LIST_OPERATION_CODE.NODATA
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.NODISP
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
+                    OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+            End Select
+        Next
+
+        '○ 追加変更判定
+        For Each OIT0003INProw As DataRow In OIT0003INPtbl.Rows
+
+            'エラーレコード読み飛ばし
+            If OIT0003INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
+                Continue For
+            End If
+
+            OIT0003INProw.Item("OPERATION") = CONST_INSERT
+
+            'KEY項目が等しい時
+            For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                If OIT0003row("ORDERNO") = OIT0003INProw("ORDERNO") AndAlso
+                    OIT0003row("DETAILNO") = OIT0003INProw("DETAILNO") Then
+                    'KEY項目以外の項目に変更がないときは「操作」の項目は空白にする
+                    If OIT0003row("DELFLG") = OIT0003INProw("DELFLG") AndAlso
+                        OIT0003INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
+                    Else
+                        'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
+                        OIT0003INProw("OPERATION") = CONST_UPDATE
+                        Exit For
+                    End If
+
+                    Exit For
+
+                End If
+            Next
+        Next
+
+        '○ 変更有無判定　&　入力値反映
+        For Each OIT0003INProw As DataRow In OIT0003INPtbl.Rows
+            Select Case OIT0003INProw("OPERATION")
+                Case CONST_UPDATE
+                    TBL_UPDATE_SUB(OIT0003INProw)
+                Case CONST_INSERT
+                    TBL_INSERT_SUB(OIT0003INProw)
+                Case CONST_PATTERNERR
+                    '関連チェックエラーの場合、キーが変わるため、行追加してエラーレコードを表示させる
+                    TBL_INSERT_SUB(OIT0003INProw)
+                Case C_LIST_OPERATION_CODE.ERRORED
+                    TBL_ERR_SUB(OIT0003INProw)
+            End Select
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 更新予定データの一覧更新時処理
+    ''' </summary>
+    ''' <param name="OIT0003INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_UPDATE_SUB(ByRef OIT0003INProw As DataRow)
+
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+            '同一レコードか判定
+            If OIT0003INProw("ORDERNO") = OIT0003row("ORDERNO") AndAlso
+                OIT0003INProw("DETAILNO") = OIT0003row("DETAILNO") Then
+                '画面入力テーブル項目設定
+                OIT0003INProw("LINECNT") = OIT0003row("LINECNT")
+                OIT0003INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                OIT0003INProw("TIMSTP") = OIT0003row("TIMSTP")
+                OIT0003INProw("SELECT") = 1
+                OIT0003INProw("HIDDEN") = 0
+
+                '項目テーブル項目設定
+                OIT0003row.ItemArray = OIT0003INProw.ItemArray
+                Exit For
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 追加予定データの一覧登録時処理
+    ''' </summary>
+    ''' <param name="OIT0003INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_INSERT_SUB(ByRef OIT0003INProw As DataRow)
+
+        '○ 項目テーブル項目設定
+        Dim OIT0003row As DataRow = OIT0003tbl.NewRow
+        OIT0003row.ItemArray = OIT0003INProw.ItemArray
+
+        OIT0003row("LINECNT") = OIT0003tbl.Rows.Count + 1
+        If OIT0003INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.UPDATING Then
+            OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+        Else
+            OIT0003row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+        End If
+
+        OIT0003row("TIMSTP") = "0"
+        OIT0003row("SELECT") = 1
+        OIT0003row("HIDDEN") = 0
+
+        OIT0003tbl.Rows.Add(OIT0003row)
+
+    End Sub
+
+    ''' <summary>
+    ''' エラーデータの一覧登録時処理
+    ''' </summary>
+    ''' <param name="OIT0003INProw"></param>
+    ''' <remarks></remarks>
+    Protected Sub TBL_ERR_SUB(ByRef OIT0003INProw As DataRow)
+
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+            '同一レコードか判定
+            If OIT0003INProw("ORDERNO") = OIT0003row("ORDERNO") AndAlso
+               OIT0003INProw("DETAILNO") = OIT0003row("DETAILNO") Then
+                '画面入力テーブル項目設定
+                OIT0003INProw("LINECNT") = OIT0003row("LINECNT")
+                OIT0003INProw("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                OIT0003INProw("TIMSTP") = OIT0003row("TIMSTP")
+                OIT0003INProw("SELECT") = 1
+                OIT0003INProw("HIDDEN") = 0
+
+                '項目テーブル項目設定
+                OIT0003row.ItemArray = OIT0003INProw.ItemArray
+                Exit For
+            End If
+        Next
+
+    End Sub
+#End Region
 
     ''' <summary>
     ''' リスト変更時処理

@@ -70,7 +70,7 @@ Public Class OIT0004OilStockCreate
                         Case "WF_ButtonUPDATE" '更新ボタン押下
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonCSV" 'ダウンロードボタン押下
-
+                            WF_ButtonDownload_Click()
                         Case "WF_ButtonEND"                 '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_RadioButonClick"
@@ -173,7 +173,7 @@ Public Class OIT0004OilStockCreate
             '提案一覧表示可否取得
             Dim canShowSuggestList As Boolean = Me.IsShowSuggestList(sqlCon, consignee)
 
-            '対象列車取得（ここはまだベタ打ち）
+            '対象列車取得
             If canShowSuggestList Then
                 trainList = GetTargetTrain(sqlCon, salesOffice, shipper, consignee)
                 'システム管理外列車付与(受注作成しない、在庫計算だけ使う)
@@ -519,6 +519,116 @@ Public Class OIT0004OilStockCreate
         End Using
 
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+    End Sub
+    ''' <summary>
+    ''' ダウンロードボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonDownload_Click()
+        '******************************
+        '入力チェック（年月のみ）
+        '******************************
+        If WW_Check(Nothing, WF_ButtonClick.Value) = False Then
+            Return
+        End If
+        '******************************
+        '画面入力情報を取得
+        '******************************
+        Dim dispClass = GetThisScreenData(Me.frvSuggest, Me.repStockOilTypeItem)
+        '******************************
+        'データ収集（画面情報とは異なる日付範囲）
+        '******************************
+        Dim printData As DispDataClass = Nothing
+        Dim showLorry As String = ""
+        With Nothing 'スコープ限定
+            Dim baseDate As String = CDate(Me.txtDownloadMonth.Text & "/01").AddDays(-5).ToString("yyyy/MM/dd")
+
+            Dim daysList As Dictionary(Of String, DaysItem)
+            Dim oilTypeList As Dictionary(Of String, OilItem)
+            Dim trainList As New Dictionary(Of String, TrainListItem)
+
+            Dim mitrainList As Dictionary(Of String, TrainListItem) = Nothing
+            Dim miOilTypeList As Dictionary(Of String, OilItem) = Nothing
+            Using sqlCon = CS0050SESSION.getConnection
+                sqlCon.Open()
+                '日付情報取得（祝祭日含む）
+                daysList = GetTargetDateList(sqlCon, baseDate, daySpan:=40)
+                '対象油種取得
+                oilTypeList = GetTargetOilType(sqlCon, dispClass.SalesOffice, dispClass.Consignee, dispClass.Shipper)
+                '対象列車取得
+                Dim canShowSuggestList As Boolean = Me.IsShowSuggestList(sqlCon, dispClass.Consignee)
+                If canShowSuggestList Then
+                    trainList = GetTargetTrain(sqlCon, dispClass.SalesOffice, dispClass.Shipper, dispClass.Consignee)
+                    'システム管理外列車付与(受注作成しない、在庫計算だけ使う)
+                    trainList = GetUnmanagedTrain(sqlCon, trainList, dispClass.SalesOffice, dispClass.Shipper, dispClass.Consignee)
+                    '結果として取り扱い列車が0の場合提案一覧を表示できない為提案表を非表示にする
+                    If trainList Is Nothing OrElse trainList.Count = 0 Then
+                        canShowSuggestList = False
+                    End If
+                End If
+                '抽出結果を画面データクラスに展開
+                printData = New DispDataClass(daysList, trainList, oilTypeList, dispClass.SalesOffice, dispClass.Shipper, dispClass.Consignee)
+                printData.SalesOfficeName = dispClass.SalesOfficeName
+                printData.ShipperName = dispClass.ShipperName
+                printData.ConsigneeName = dispClass.ConsigneeName
+                '提案一覧表示可否設定
+                printData.ShowSuggestList = canShowSuggestList
+                '前週出荷平均の取得
+                printData = GetLastShipAverage(sqlCon, printData)
+                'ローリー初期表示判定
+                showLorry = IsShowLorryValue(sqlCon, dispClass.Consignee)
+                '構内取り有無取得
+                printData = GetMoveInsideData(sqlCon, printData)
+                '既登録データ取得
+                printData = GetTargetStockData(sqlCon, printData)
+                '過去日以外の日付について受入数取得
+                printData = GetReciveFromOrder(sqlCon, printData)
+                '列車運行情報の取得
+                printData = GetTrainOperation(sqlCon, printData)
+                printData.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, printData)
+                '構内取り設定がある場合、構内取りデータ取得
+                If printData.HasMoveInsideItem Then
+                    '表構えの為親と構内取り元と同じ列車
+                    If canShowSuggestList Then
+                        '構内取りではない油種「合計」文言を中計と変更
+                        printData.SuggestOilNameList(DispDataClass.SUMMARY_CODE).OilName = "中計"
+                        'Dim targetTrainList As List(Of String) = trainList.Keys.ToList
+                        mitrainList = GetTargetTrain(sqlCon, printData.MiSalesOffice, printData.MiShippersCode, printData.Consignee, trainList)
+                    End If
+                    '油種は持っている元に合わせる（最終的に元と一致する油種じゃないと認めない？）
+                    miOilTypeList = GetTargetOilType(sqlCon, printData.MiSalesOffice, printData.MiConsignee, printData.MiShippersCode)
+                    '構内取り用の画面表示クラス生成
+                    printData.MiDispData = New DispDataClass(daysList, mitrainList, miOilTypeList, printData.MiSalesOffice, printData.MiShippersCode, printData.MiConsignee)
+                    printData.MiDispData.SalesOfficeName = printData.MiSalesOfficeName
+                    printData.MiDispData.ShipperName = printData.MiShippersName
+                    printData.MiDispData.ConsigneeName = printData.MiConsigneeName
+                    printData.MiDispData.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, printData.MiDispData)
+                    '前週出荷平均の取得
+                    printData.MiDispData = GetLastShipAverage(sqlCon, printData.MiDispData)
+                    '既登録データ取得
+                    printData.MiDispData = GetTargetStockData(sqlCon, printData.MiDispData)
+                    '過去日以外の日付について受入数取得
+                    printData.MiDispData = GetReciveFromOrder(sqlCon, printData.MiDispData)
+                    printData.MiDispData.RecalcStockList(False)
+                    'メインクラスに構内取り情報を紐づけ（参照設定）
+                    For Each suggestListItem In printData.SuggestList
+                        Dim key = suggestListItem.Key
+                        Dim item = printData.MiDispData.SuggestList(key).SuggestOrderItem
+                        suggestListItem.Value.SuggestMiOrderItem = item
+                        suggestListItem.Value.RelateMoveInside()
+                    Next 'suggestListItem
+                End If
+                '取得値を元に再計算
+                printData.RecalcStockList(False)
+            End Using
+        End With
+
+
+        Using repCbj = New OIT0004CustomReport(Master.MAPID, Master.MAPID & ".xlsx", printData)
+            Dim url = repCbj.CreateExcelPrintData
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
     End Sub
     ''' <summary>
     ''' 戻るボタン押下時処理
@@ -2885,6 +2995,25 @@ Public Class OIT0004OilStockCreate
         Dim WW_CS0024FCHECKREPORT As String = ""
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
+        'ダウンロードボタン押下時は年月のみチェック
+        If callerButton = "WF_ButtonCSV" Then
+            If Me.txtDownloadMonth.Text.Trim = "" Then
+                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="帳票年月", needsPopUp:=True)
+                AppendForcusObject(txtDownloadMonth.ClientID)
+                WW_CheckMES1 = "帳票年月入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                Return False
+            End If
+            If IsDate(Me.txtDownloadMonth.Text.Trim & "/01") = False Then
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_PARA01:="帳票年月", needsPopUp:=True)
+                AppendForcusObject(txtDownloadMonth.ClientID)
+                WW_CheckMES1 = "帳票年月入力エラー。" & "(" & Me.txtDownloadMonth.Text.Trim & ")"
+                WW_CheckMES2 = C_MESSAGE_NO.DATE_FORMAT_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            End If
+            Return True
+        End If
         '受注提案タンク車数の一覧を表示している場合
         If checkObj.ShowSuggestList = True Then
             '画面ボタン欄の在庫維持日数(自動提案の場合のみチェック)

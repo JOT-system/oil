@@ -407,6 +407,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS ORDERYMD" _
             & " , @P12                                           AS ORDERTYPE" _
             & " , @P13                                           AS ORDERTYPENAME" _
+            & " , ''                                             AS ORDERINFO" _
+            & " , ''                                             AS ORDERINFONAME" _
             & " , @P3                                            AS SHIPPERSCODE" _
             & " , @P4                                            AS SHIPPERSNAME" _
             & " , @P5                                            AS BASECODE" _
@@ -455,6 +457,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '')            AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')           AS ORDERTYPE" _
             & " , ''                                             AS ORDERTYPENAME" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINFO), '')           AS ORDERINFO" _
+            & " , ''                                             AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')        AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')        AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '')            AS BASECODE" _
@@ -606,6 +610,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
                     i += 1
                     OIT0001row("LINECNT") = i        'LINECNT
+
+                    '受注情報
+                    CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+
                 Next
             End Using
         Catch ex As Exception
@@ -1760,6 +1768,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
             & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS ORDERYMD" _
+            & " , @P12                                           AS ORDERTYPE" _
+            & " , @P13                                           AS ORDERTYPENAME" _
+            & " , ''                                             AS ORDERINFO" _
+            & " , ''                                             AS ORDERINFONAME" _
             & " , @P02                                           AS SHIPPERSCODE" _
             & " , @P03                                           AS SHIPPERSNAME" _
             & " , @P04                                           AS BASECODE" _
@@ -1819,6 +1831,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10) '荷受人コード
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 40) '荷受人名
 
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 9) '受注パターン
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 100) '受注パターン名
+
                 Dim strOrderNo As String = ""
                 Dim intDetailNo As Integer = 0
                 For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
@@ -1831,6 +1846,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA5.Value = work.WF_SEL_BASENAME.Text
                     PARA6.Value = work.WF_SEL_CONSIGNEECODE.Text
                     PARA7.Value = work.WF_SEL_CONSIGNEENAME.Text
+                    PARA12.Value = work.WF_SEL_PATTERNCODE.Text
+                    PARA13.Value = work.WF_SEL_PATTERNNAME.Text
                 Next
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -2743,6 +2760,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
                 O_RTN = "ERR"
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = OIT0001tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = drv("LINECNT"))
+                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
+                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0001tbl)
                 Exit Sub
             End If
 

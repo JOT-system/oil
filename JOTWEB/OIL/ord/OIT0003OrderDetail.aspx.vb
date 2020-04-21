@@ -4246,85 +4246,19 @@ Public Class OIT0003OrderDetail
             Next
 
             '○ 変更元情報をデフォルト設定
-            If WW_COLUMNS.IndexOf("ORDERNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("DETAILNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SHIPPERSCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SHIPPERSNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("BASECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("BASENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CONSIGNEECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CONSIGNEENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ORDERINFO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ORDERINFONAME") >= 0 AndAlso
+            If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 AndAlso
+                WW_COLUMNS.IndexOf("TRAINNAME") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("OILCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("OILNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ORDERINGTYPE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("ORDERINGOILNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("TANKQUOTA") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LINKNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("SHIPORDER") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("TANKNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LINEORDER") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("MODEL") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRINSPECTIONALERT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRINSPECTIONALERTSTR") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRALLINSPECTIONALERT") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRALLINSPECTIONALERTSTR") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LASTOILCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("LASTOILNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("PREORDERINGTYPE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("PREORDERINGOILNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CHANGETRAINNO") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CHANGETRAINNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SECONDCONSIGNEECODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SECONDCONSIGNEENAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SECONDARRSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("SECONDARRSTATIONNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CHANGERETSTATION") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CHANGERETSTATIONNAME") >= 0 Then
+                WW_COLUMNS.IndexOf("LINEORDER") >= 0 Then
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
-                    If XLSTBLrow("ORDERNO") = OIT0003row("ORDERNO") AndAlso
-                        XLSTBLrow("DETAILNO") = OIT0003row("DETAILNO") AndAlso
-                        XLSTBLrow("SHIPPERSCODE") = OIT0003row("SHIPPERSCODE") AndAlso
-                        XLSTBLrow("SHIPPERSNAME") = OIT0003row("SHIPPERSNAME") AndAlso
-                        XLSTBLrow("BASECODE") = OIT0003row("BASECODE") AndAlso
-                        XLSTBLrow("BASENAME") = OIT0003row("BASENAME") AndAlso
-                        XLSTBLrow("CONSIGNEECODE") = OIT0003row("CONSIGNEECODE") AndAlso
-                        XLSTBLrow("CONSIGNEENAME") = OIT0003row("CONSIGNEENAME") AndAlso
-                        XLSTBLrow("ORDERINFO") = OIT0003row("ORDERINFO") AndAlso
-                        XLSTBLrow("ORDERINFONAME") = OIT0003row("ORDERINFONAME") AndAlso
+                    If XLSTBLrow("OFFICECODE") = OIT0003row("OFFICECODE") AndAlso
+                        XLSTBLrow("TRAINNAME") = OIT0003row("TRAINNAME") AndAlso
                         XLSTBLrow("OILCODE") = OIT0003row("OILCODE") AndAlso
-                        XLSTBLrow("OILNAME") = OIT0003row("OILNAME") AndAlso
-                        XLSTBLrow("ORDERINGTYPE") = OIT0003row("ORDERINGTYPE") AndAlso
-                        XLSTBLrow("ORDERINGOILNAME") = OIT0003row("ORDERINGOILNAME") AndAlso
-                        XLSTBLrow("TANKQUOTA") = OIT0003row("TANKQUOTA") AndAlso
-                        XLSTBLrow("LINKNO") = OIT0003row("LINKNO") AndAlso
-                        XLSTBLrow("LINKDETAILNO") = OIT0003row("LINKDETAILNO") AndAlso
                         XLSTBLrow("SHIPORDER") = OIT0003row("SHIPORDER") AndAlso
                         XLSTBLrow("TANKNO") = OIT0003row("TANKNO") AndAlso
-                        XLSTBLrow("LINEORDER") = OIT0003row("LINEORDER") AndAlso
-                        XLSTBLrow("MODEL") = OIT0003row("MODEL") AndAlso
-                        XLSTBLrow("JRINSPECTIONALERT") = OIT0003row("JRINSPECTIONALERT") AndAlso
-                        XLSTBLrow("JRINSPECTIONALERTSTR") = OIT0003row("JRINSPECTIONALERTSTR") AndAlso
-                        XLSTBLrow("JRINSPECTIONDATE") = OIT0003row("JRINSPECTIONDATE") AndAlso
-                        XLSTBLrow("JRALLINSPECTIONALERT") = OIT0003row("JRALLINSPECTIONALERT") AndAlso
-                        XLSTBLrow("JRALLINSPECTIONALERTSTR") = OIT0003row("JRALLINSPECTIONALERTSTR") AndAlso
-                        XLSTBLrow("JRALLINSPECTIONDATE") = OIT0003row("JRALLINSPECTIONDATE") AndAlso
-                        XLSTBLrow("LASTOILCODE") = OIT0003row("LASTOILCODE") AndAlso
-                        XLSTBLrow("LASTOILNAME") = OIT0003row("LASTOILNAME") AndAlso
-                        XLSTBLrow("PREORDERINGTYPE") = OIT0003row("PREORDERINGTYPE") AndAlso
-                        XLSTBLrow("PREORDERINGOILNAME") = OIT0003row("PREORDERINGOILNAME") AndAlso
-                        XLSTBLrow("CHANGETRAINNO") = OIT0003row("CHANGETRAINNO") AndAlso
-                        XLSTBLrow("CHANGETRAINNAME") = OIT0003row("CHANGETRAINNAME") AndAlso
-                        XLSTBLrow("SECONDCONSIGNEECODE") = OIT0003row("SECONDCONSIGNEECODE") AndAlso
-                        XLSTBLrow("SECONDCONSIGNEENAME") = OIT0003row("SECONDCONSIGNEENAME") AndAlso
-                        XLSTBLrow("SECONDARRSTATION") = OIT0003row("SECONDARRSTATION") AndAlso
-                        XLSTBLrow("SECONDARRSTATIONNAME") = OIT0003row("SECONDARRSTATIONNAME") AndAlso
-                        XLSTBLrow("CHANGERETSTATION") = OIT0003row("CHANGERETSTATION") AndAlso
-                        XLSTBLrow("CHANGERETSTATIONNAME") = OIT0003row("CHANGERETSTATIONNAME") Then
+                        XLSTBLrow("LINEORDER") = OIT0003row("LINEORDER") Then
                         OIT0003INProw.ItemArray = OIT0003row.ItemArray
                         Exit For
                     End If
@@ -4332,204 +4266,179 @@ Public Class OIT0003OrderDetail
             End If
 
             '○ 項目セット
+            Dim WW_GetFieldValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+            '受注営業所コード
+            If WW_COLUMNS.IndexOf("OFFICECODE") >= 0 Then
+                'OIT0003INProw("OFFICECODE") = XLSTBLrow("OFFICECODE")
+                Me.TxtOrderOfficeCode.Text = XLSTBLrow("OFFICECODE")
+                CODENAME_get("SALESOFFICE", Me.TxtOrderOfficeCode.Text, Me.TxtOrderOffice.Text, WW_RTN_SW)
+            End If
+
+            '本線列車名
+            If WW_COLUMNS.IndexOf("TRAINNAME") >= 0 Then
+                'OIT0003INProw("TRAINNAME") = XLSTBLrow("TRAINNAME")
+                Me.TxtTrainName.Text = XLSTBLrow("TRAINNAME")
+            End If
+
+            '本線列車
+            If WW_COLUMNS.IndexOf("TRAINNO") >= 0 Then
+                'OIT0003INProw("TRAINNO") = XLSTBLrow("TRAINNO")
+                Me.TxtTrainNo.Text = XLSTBLrow("TRAINNO")
+            End If
+
             '受注№
             OIT0003INProw("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text
 
             '受注明細№
             OIT0003INProw("DETAILNO") = intDETAILNO.ToString("000")
 
-            '荷主コード
-            If WW_COLUMNS.IndexOf("SHIPPERSCODE") >= 0 Then
-                OIT0003INProw("SHIPPERSCODE") = XLSTBLrow("SHIPPERSCODE")
-            End If
-
-            '荷主名
-            If XLSTBLrow("SHIPPERSNAME") <> "" Then
-                If WW_COLUMNS.IndexOf("SHIPPERSNAME") >= 0 Then
-                    OIT0003INProw("SHIPPERSNAME") = XLSTBLrow("SHIPPERSNAME")
-                End If
-            Else
-                CODENAME_get("SHIPPERS", OIT0003INProw("SHIPPERSCODE"), OIT0003INProw("SHIPPERSNAME"), WW_DUMMY)
-            End If
-
-            '基地コード
-            If WW_COLUMNS.IndexOf("BASECODE") >= 0 Then
-                OIT0003INProw("BASECODE") = XLSTBLrow("BASECODE")
-            End If
-
-            '基地名
-            If WW_COLUMNS.IndexOf("BASENAME") >= 0 Then
-                OIT0003INProw("BASENAME") = XLSTBLrow("BASENAME")
-            End If
-
-            '荷受人コード
-            If WW_COLUMNS.IndexOf("CONSIGNEECODE") >= 0 Then
-                OIT0003INProw("CONSIGNEECODE") = XLSTBLrow("CONSIGNEECODE")
-            End If
-
-            '荷受人名
-            If WW_COLUMNS.IndexOf("CONSIGNEENAME") >= 0 Then
-                OIT0003INProw("CONSIGNEENAME") = XLSTBLrow("CONSIGNEENAME")
-            End If
-
-            '情報
-            If WW_COLUMNS.IndexOf("ORDERINFO") >= 0 Then
-                OIT0003INProw("ORDERINFO") = XLSTBLrow("ORDERINFO")
-            End If
-
-            '情報名
-            If XLSTBLrow("ORDERINFONAME") <> "" Then
-                If WW_COLUMNS.IndexOf("ORDERINFONAME") >= 0 Then
-                    OIT0003INProw("ORDERINFONAME") = XLSTBLrow("ORDERINFONAME")
-                End If
-            Else
-                CODENAME_get("ORDERINFO", OIT0003INProw("ORDERINFO"), OIT0003INProw("ORDERINFONAME"), WW_DUMMY)
-            End If
-
+            '### 油種情報取得 ##########################################################################################
             '油種コード
             If WW_COLUMNS.IndexOf("OILCODE") >= 0 Then
                 OIT0003INProw("OILCODE") = XLSTBLrow("OILCODE")
             End If
-
+            '配列初期化
+            WW_GetFieldValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            '油種情報を取得
+            WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", OIT0003INProw("OILCODE"), WW_GetFieldValue)
             '油種名
-            If WW_COLUMNS.IndexOf("OILNAME") >= 0 Then
-                OIT0003INProw("OILNAME") = XLSTBLrow("OILNAME")
-            End If
-
+            OIT0003INProw("OILNAME") = WW_GetValue(0)
             '油種区分
-            If WW_COLUMNS.IndexOf("ORDERINGTYPE") >= 0 Then
-                OIT0003INProw("ORDERINGTYPE") = XLSTBLrow("ORDERINGTYPE")
-            End If
-
+            OIT0003INProw("ORDERINGTYPE") = WW_GetValue(1)
             '受注油種
-            If WW_COLUMNS.IndexOf("ORDERINGOILNAME") >= 0 Then
-                OIT0003INProw("ORDERINGOILNAME") = XLSTBLrow("ORDERINGOILNAME")
-            End If
+            OIT0003INProw("ORDERINGOILNAME") = WW_GetValue(2)
+            '###########################################################################################################
 
             'タンク車割当状況
-            If WW_COLUMNS.IndexOf("TANKQUOTA") >= 0 Then
-                OIT0003INProw("TANKQUOTA") = XLSTBLrow("TANKQUOTA")
-            End If
-
-            '貨車連結順序表№
-            If WW_COLUMNS.IndexOf("LINKNO") >= 0 Then
-                OIT0003INProw("LINKNO") = XLSTBLrow("LINKNO")
-            End If
-
-            '貨車連結順序表明細№
-            If WW_COLUMNS.IndexOf("LINKDETAILNO") >= 0 Then
-                OIT0003INProw("LINKDETAILNO") = XLSTBLrow("LINKDETAILNO")
-            End If
 
             '発送順
             If WW_COLUMNS.IndexOf("SHIPORDER") >= 0 Then
                 OIT0003INProw("SHIPORDER") = XLSTBLrow("SHIPORDER")
             End If
 
+            '### タンク車情報取得 ######################################################################################
             'タンク車№
             If WW_COLUMNS.IndexOf("TANKNO") >= 0 Then
                 OIT0003INProw("TANKNO") = XLSTBLrow("TANKNO")
             End If
+            '配列初期化
+            WW_GetFieldValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "TANKNUMBER", OIT0003INProw("TANKNO"), WW_GetFieldValue)
+            '形式
+            OIT0003INProw("MODEL") = WW_GetValue(7)
+            '前回油種コード
+            OIT0003INProw("LASTOILCODE") = WW_GetValue(1)
+            '前回油種名
+            OIT0003INProw("LASTOILNAME") = WW_GetValue(4)
+            '前回油種区分
+            OIT0003INProw("PREORDERINGTYPE") = WW_GetValue(5)
+            '前回受注油種
+            OIT0003INProw("PREORDERINGOILNAME") = WW_GetValue(6)
+            '交検日
+            Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
+            Dim WW_JRINSPECTIONCNT As String
+            OIT0003INProw("JRINSPECTIONDATE") = WW_GetValue(2)
+            If WW_GetValue(2) <> "" Then
+                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
+
+                Dim WW_JRINSPECTIONFLG As String
+                If WW_JRINSPECTIONCNT <= 3 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
+                Select Case WW_JRINSPECTIONFLG
+                    Case "1"
+                        OIT0003INProw("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
+                        OIT0003INProw("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                    Case "2"
+                        OIT0003INProw("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
+                        OIT0003INProw("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                    Case "3"
+                        OIT0003INProw("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
+                        OIT0003INProw("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                End Select
+            Else
+                OIT0003INProw("JRINSPECTIONALERT") = ""
+            End If
+
+            '全検日
+            Dim WW_JRALLINSPECTIONCNT As String
+            OIT0003INProw("JRALLINSPECTIONDATE") = WW_GetValue(3)
+            If WW_GetValue(3) <> "" Then
+                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
+
+                Dim WW_JRALLINSPECTIONFLG As String
+                If WW_JRALLINSPECTIONCNT <= 3 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
+                Select Case WW_JRALLINSPECTIONFLG
+                    Case "1"
+                        OIT0003INProw("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
+                        OIT0003INProw("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
+                    Case "2"
+                        OIT0003INProw("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
+                        OIT0003INProw("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
+                    Case "3"
+                        OIT0003INProw("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
+                        OIT0003INProw("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
+                End Select
+            Else
+                OIT0003INProw("JRALLINSPECTIONALERT") = ""
+            End If
+            '###########################################################################################################
 
             '貨物駅入線順
             If WW_COLUMNS.IndexOf("LINEORDER") >= 0 Then
                 OIT0003INProw("LINEORDER") = XLSTBLrow("LINEORDER")
             End If
 
-            '形式
-            If WW_COLUMNS.IndexOf("MODEL") >= 0 Then
-                OIT0003INProw("MODEL") = XLSTBLrow("MODEL")
-            End If
+            ''本線列車（変更後）
+            'If WW_COLUMNS.IndexOf("CHANGETRAINNO") >= 0 Then
+            '    OIT0003INProw("CHANGETRAINNO") = XLSTBLrow("CHANGETRAINNO")
+            'End If
 
-            '交検アラート
-            If WW_COLUMNS.IndexOf("JRINSPECTIONALERT") >= 0 Then
-                OIT0003INProw("JRINSPECTIONALERT") = XLSTBLrow("JRINSPECTIONALERT")
-            End If
+            ''本線列車名
+            'If WW_COLUMNS.IndexOf("CHANGETRAINNAME") >= 0 Then
+            '    OIT0003INProw("CHANGETRAINNAME") = XLSTBLrow("CHANGETRAINNAME")
+            'End If
 
-            '交検アラート文言
-            If WW_COLUMNS.IndexOf("JRINSPECTIONALERTSTR") >= 0 Then
-                OIT0003INProw("JRINSPECTIONALERTSTR") = XLSTBLrow("JRINSPECTIONALERTSTR")
-            End If
+            ''第2荷受人コード
+            'If WW_COLUMNS.IndexOf("SECONDCONSIGNEECODE") >= 0 Then
+            '    OIT0003INProw("SECONDCONSIGNEECODE") = XLSTBLrow("SECONDCONSIGNEECODE")
+            'End If
 
-            '交検日
-            If WW_COLUMNS.IndexOf("JRINSPECTIONDATE") >= 0 Then
-                OIT0003INProw("JRINSPECTIONDATE") = XLSTBLrow("JRINSPECTIONDATE")
-            End If
+            ''第2荷受人
+            'If WW_COLUMNS.IndexOf("SECONDCONSIGNEENAME") >= 0 Then
+            '    OIT0003INProw("SECONDCONSIGNEENAME") = XLSTBLrow("SECONDCONSIGNEENAME")
+            'End If
 
-            '全検アラート
-            If WW_COLUMNS.IndexOf("JRALLINSPECTIONALERT") >= 0 Then
-                OIT0003INProw("JRALLINSPECTIONALERT") = XLSTBLrow("JRALLINSPECTIONALERT")
-            End If
+            ''第2着駅コード
+            'If WW_COLUMNS.IndexOf("SECONDARRSTATION") >= 0 Then
+            '    OIT0003INProw("SECONDARRSTATION") = XLSTBLrow("SECONDARRSTATION")
+            'End If
 
-            '全検アラート文言
-            If WW_COLUMNS.IndexOf("JRALLINSPECTIONALERTSTR") >= 0 Then
-                OIT0003INProw("JRALLINSPECTIONALERTSTR") = XLSTBLrow("JRALLINSPECTIONALERTSTR")
-            End If
+            ''第2着駅
+            'If WW_COLUMNS.IndexOf("SECONDARRSTATIONNAME") >= 0 Then
+            '    OIT0003INProw("SECONDARRSTATIONNAME") = XLSTBLrow("SECONDARRSTATIONNAME")
+            'End If
 
-            '全検日
-            If WW_COLUMNS.IndexOf("JRALLINSPECTIONDATE") >= 0 Then
-                OIT0003INProw("JRALLINSPECTIONDATE") = XLSTBLrow("JRALLINSPECTIONDATE")
-            End If
+            ''空車着駅コード（変更後）
+            'If WW_COLUMNS.IndexOf("CHANGERETSTATION") >= 0 Then
+            '    OIT0003INProw("CHANGERETSTATION") = XLSTBLrow("CHANGERETSTATION")
+            'End If
 
-            '前回油種コード
-            If WW_COLUMNS.IndexOf("LASTOILCODE") >= 0 Then
-                OIT0003INProw("LASTOILCODE") = XLSTBLrow("LASTOILCODE")
-            End If
-
-            '前回油種名
-            If WW_COLUMNS.IndexOf("LASTOILNAME") >= 0 Then
-                OIT0003INProw("LASTOILNAME") = XLSTBLrow("LASTOILNAME")
-            End If
-
-            '前回油種区分
-            If WW_COLUMNS.IndexOf("PREORDERINGTYPE") >= 0 Then
-                OIT0003INProw("PREORDERINGTYPE") = XLSTBLrow("PREORDERINGTYPE")
-            End If
-
-            '前回受注油種
-            If WW_COLUMNS.IndexOf("PREORDERINGOILNAME") >= 0 Then
-                OIT0003INProw("PREORDERINGOILNAME") = XLSTBLrow("PREORDERINGOILNAME")
-            End If
-
-            '本線列車（変更後）
-            If WW_COLUMNS.IndexOf("CHANGETRAINNO") >= 0 Then
-                OIT0003INProw("CHANGETRAINNO") = XLSTBLrow("CHANGETRAINNO")
-            End If
-
-            '本線列車名
-            If WW_COLUMNS.IndexOf("CHANGETRAINNAME") >= 0 Then
-                OIT0003INProw("CHANGETRAINNAME") = XLSTBLrow("CHANGETRAINNAME")
-            End If
-
-            '第2荷受人コード
-            If WW_COLUMNS.IndexOf("SECONDCONSIGNEECODE") >= 0 Then
-                OIT0003INProw("SECONDCONSIGNEECODE") = XLSTBLrow("SECONDCONSIGNEECODE")
-            End If
-
-            '第2荷受人
-            If WW_COLUMNS.IndexOf("SECONDCONSIGNEENAME") >= 0 Then
-                OIT0003INProw("SECONDCONSIGNEENAME") = XLSTBLrow("SECONDCONSIGNEENAME")
-            End If
-
-            '第2着駅コード
-            If WW_COLUMNS.IndexOf("SECONDARRSTATION") >= 0 Then
-                OIT0003INProw("SECONDARRSTATION") = XLSTBLrow("SECONDARRSTATION")
-            End If
-
-            '第2着駅
-            If WW_COLUMNS.IndexOf("SECONDARRSTATIONNAME") >= 0 Then
-                OIT0003INProw("SECONDARRSTATIONNAME") = XLSTBLrow("SECONDARRSTATIONNAME")
-            End If
-
-            '空車着駅コード（変更後）
-            If WW_COLUMNS.IndexOf("CHANGERETSTATION") >= 0 Then
-                OIT0003INProw("CHANGERETSTATION") = XLSTBLrow("CHANGERETSTATION")
-            End If
-
-            '空車着駅名（変更後）
-            If WW_COLUMNS.IndexOf("CHANGERETSTATIONNAME") >= 0 Then
-                OIT0003INProw("CHANGERETSTATIONNAME") = XLSTBLrow("CHANGERETSTATIONNAME")
-            End If
+            ''空車着駅名（変更後）
+            'If WW_COLUMNS.IndexOf("CHANGERETSTATIONNAME") >= 0 Then
+            '    OIT0003INProw("CHANGERETSTATIONNAME") = XLSTBLrow("CHANGERETSTATIONNAME")
+            'End If
 
             '削除フラグ
             If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
@@ -4539,6 +4448,9 @@ Public Class OIT0003OrderDetail
             OIT0003INPtbl.Rows.Add(OIT0003INProw)
             intDETAILNO += 1
         Next
+
+        '〇 取得した列車名から各値を取得し設定する。
+        WW_TRAINNUMBER_FIND(Me.TxtTrainName.Text)
 
         '○ 項目チェック
         'INPTableCheck(WW_ERR_SW)

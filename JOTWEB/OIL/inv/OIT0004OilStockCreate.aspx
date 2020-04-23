@@ -64,7 +64,7 @@
                             <span>内訳</span>
                         </div>
                         <div id="suggestLeftRecvTitle" style='height:calc(<%# Eval("SuggestOilNameList").Count %> * 24px)'>
-                            <span>受入数</span>
+                            <span>受入車数</span>
                         </div>
                         <%-- 構内取り用の見出し --%>
                         <asp:PlaceHolder ID="phmiSuggestLeftRectTitle" runat="server" Visible='<%# Eval("HasMoveInsideItem") %>'>

@@ -619,12 +619,30 @@ Public Class OIT0004OilStockCreate
                 End If
                 '取得値を元に再計算
                 printData.RecalcStockList(False)
+                '空回日報の車数を埋める
+                If printData.ShowSuggestList = False Then
+                    printData = EditOtEmptyTurnCarsNum(sqlCon, printData)
+                    'printData.RecalcStockList()
+                Else
+                    printData = EditEmptyTurnCarsNum(sqlCon, printData)
+                    If printData.HasMoveInsideItem Then
+                        printData.MiDispData = EditEmptyTurnCarsNum(sqlCon, printData.MiDispData)
+                        'YprintData.MiDispData.RecalcStockList()
+                    End If
+                End If
+
             End Using
         End With
-
-
+        '******************************
+        '帳票作成処理の実行
+        '******************************
         Using repCbj = New OIT0004CustomReport(Master.MAPID, Master.MAPID & ".xlsx", printData)
-            Dim url = repCbj.CreateExcelPrintData
+            Dim url As String
+            Try
+                url = repCbj.CreateExcelPrintData
+            Catch ex As Exception
+                Return
+            End Try
             '○ 別画面でExcelを表示
             WF_PrintURL.Value = url
             ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
@@ -690,7 +708,7 @@ Public Class OIT0004OilStockCreate
             sqlStr.AppendLine("   AND FX.DELFLG     = @DELFLG")
             sqlStr.AppendLine("   AND TR.OFFICECODE = @SALESOFFICE")
             sqlStr.AppendLine("   AND TR.DELFLG     = @DELFLG")
-            sqlStr.AppendLine(" ORDER BY TR.TRAINNO,TR.TSUMI")
+            sqlStr.AppendLine(" ORDER BY TR.ZAIKOSORT,TR.TRAINNO,TR.TSUMI")
 
 
             Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)

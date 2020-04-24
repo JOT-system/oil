@@ -59,6 +59,26 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                    "PRINTWORK",
                                                    CS0050SESSION.USERID)
+        'ディレクトリが存在しない場合は生成
+        If IO.Directory.Exists(Me.UploadRootPath) = False Then
+            IO.Directory.CreateDirectory(Me.UploadRootPath)
+        End If
+        '前日プリフィックスのアップロードファイルが残っていた場合は削除
+        Dim targetFiles = IO.Directory.GetFiles(Me.UploadRootPath, "*.*")
+        Dim keepFilePrefix As String = Now.ToString("yyyyMMdd")
+        For Each targetFile In targetFiles
+            Dim fileName As String = IO.Path.GetFileName(targetFile)
+            '今日の日付が先頭のファイル名の場合は残す
+            If fileName.StartsWith(keepFilePrefix) Then
+                Continue For
+            End If
+            Try
+                IO.File.Delete(targetFile)
+            Catch ex As Exception
+                '削除時のエラーは無視
+            End Try
+        Next targetFile
+        'URLのルートを表示
         Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
 
         'Excelアプリケーションオブジェクトの生成

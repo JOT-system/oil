@@ -227,7 +227,7 @@ Public Class OIT0004OilStockCreate
                 dispDataObj.MiDispData = GetTargetStockData(sqlCon, dispDataObj.MiDispData)
                 '過去日以外の日付について受入数取得
                 dispDataObj.MiDispData = GetReciveFromOrder(sqlCon, dispDataObj.MiDispData)
-                'dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
+                dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
                 dispDataObj.MiDispData.RecalcStockList(False)
                 'メインクラスに構内取り情報を紐づけ（参照設定）
                 For Each suggestListItem In dispDataObj.SuggestList
@@ -237,7 +237,7 @@ Public Class OIT0004OilStockCreate
                     suggestListItem.Value.RelateMoveInside()
                 Next 'suggestListItem
             Else
-                'dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
+                dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
             End If
             '既登録データ抽出
         End Using
@@ -510,15 +510,23 @@ Public Class OIT0004OilStockCreate
         End If
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
-            Dim errNum As String = ""
-            If EntryStockData(sqlCon, dispValues, errNum, Date.Now) = False Then
-                Return
-            End If
-            If dispValues.HasMoveInsideItem Then
-                If EntryStockData(sqlCon, dispValues.MiDispData, errNum, Date.Now) = False Then
+            Using sqlTran = sqlCon.BeginTransaction
+                Dim errNum As String = ""
+                If EntryStockData(sqlCon, dispValues, errNum, Date.Now, sqlTran) = False Then
                     Return
                 End If
-            End If
+                If dispValues.HasMoveInsideItem Then
+                    If EntryStockData(sqlCon, dispValues.MiDispData, errNum, Date.Now, sqlTran) = False Then
+                        Return
+                    End If
+                End If
+                '提案表の値を格納
+                If EntryUkeireOilstock(sqlCon, dispValues, errNum, Date.Now, sqlTran) = False Then
+                    Return
+                End If
+                sqlTran.Commit()
+            End Using
+
         End Using
 
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
@@ -611,6 +619,7 @@ Public Class OIT0004OilStockCreate
                     printData.MiDispData = GetTargetStockData(sqlCon, printData.MiDispData)
                     '過去日以外の日付について受入数取得
                     printData.MiDispData = GetReciveFromOrder(sqlCon, printData.MiDispData)
+                    printData = GetUkeireOilstock(sqlCon, printData)
                     printData.MiDispData.RecalcStockList(False)
                     'メインクラスに構内取り情報を紐づけ（参照設定）
                     For Each suggestListItem In printData.SuggestList
@@ -619,20 +628,22 @@ Public Class OIT0004OilStockCreate
                         suggestListItem.Value.SuggestMiOrderItem = item
                         suggestListItem.Value.RelateMoveInside()
                     Next 'suggestListItem
+                Else
+                    printData = GetUkeireOilstock(sqlCon, printData)
                 End If
                 '取得値を元に再計算
                 printData.RecalcStockList(False)
-                '空回日報の車数を埋める
-                If printData.ShowSuggestList = False Then
-                    printData = EditOtEmptyTurnCarsNum(sqlCon, printData)
-                    'printData.RecalcStockList()
-                Else
-                    printData = EditEmptyTurnCarsNum(sqlCon, printData)
-                    If printData.HasMoveInsideItem Then
-                        printData.MiDispData = EditEmptyTurnCarsNum(sqlCon, printData.MiDispData)
-                        'YprintData.MiDispData.RecalcStockList()
-                    End If
-                End If
+                ''空回日報の車数を埋める
+                'If printData.ShowSuggestList = False Then
+                '    printData = EditOtEmptyTurnCarsNum(sqlCon, printData)
+                '    'printData.RecalcStockList()
+                'Else
+                '    printData = EditEmptyTurnCarsNum(sqlCon, printData)
+                '    If printData.HasMoveInsideItem Then
+                '        printData.MiDispData = EditEmptyTurnCarsNum(sqlCon, printData.MiDispData)
+                '        'YprintData.MiDispData.RecalcStockList()
+                '    End If
+                'End If
 
             End Using
         End With
@@ -1667,13 +1678,13 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("     , isnull(UOS.LTANK2,0)    AS LTANK2")
         sqlStr.AppendLine("     , isnull(UOS.ATANK2,0)    AS ATANK2")
 
-        sqlStr.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK  UOS")
+        sqlStr.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK UOS")
         sqlStr.AppendLine(" WHERE UOS.STOCKYMD   BETWEEN @DATE_FROM AND @DATE_TO")
         sqlStr.AppendLine("   AND UOS.OFFICECODE      = @OFFICECODE")
         sqlStr.AppendLine("   AND UOS.SHIPPERSCODE    = @SHIPPERSCODE")
         sqlStr.AppendLine("   AND UOS.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND UOS.DELFLG          = @DELFLG")
-        sqlStr.AppendLine(" GROUP BY UOS.TRAINNO,UOS.STOCKYMD")
+
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
@@ -1699,11 +1710,16 @@ Public Class OIT0004OilStockCreate
                             Continue While
                         End If
                         '対象の列車を保持していない場合はスキップ
-                        If retVal.SuggestList(targetDate).SuggestLoadingItem.ContainsKey(trainNo) = False Then
+                        If retVal.HasMoveInsideItem AndAlso retVal.SuggestList(targetDate).SuggestOrderItem.ContainsKey(trainNo) = False Then
                             Continue While
                         End If
                         Dim suggestDayTrainItm = retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem
-                        Dim miSuggestDayTrainItm = retVal.MiDispData.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem
+                        Dim miSuggestDayTrainItm As Dictionary(Of String, DispDataClass.SuggestItem.SuggestValue)
+                        If retVal.HasMoveInsideItem Then
+                            miSuggestDayTrainItm = retVal.MiDispData.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem
+                        Else
+                            miSuggestDayTrainItm = Nothing
+                        End If
 
                         For Each oilCodeToFieldName In oilCodeToFieldNameList
                             oilCode = oilCodeToFieldName.Key
@@ -1714,7 +1730,7 @@ Public Class OIT0004OilStockCreate
                             If suggestDayTrainItm.ContainsKey(oilCode) Then
                                 suggestDayTrainItm(oilCode).ItemValue = trainNum.ToString
                             End If
-                            If miSuggestDayTrainItm.ContainsKey(oilCode) Then
+                            If retVal.HasMoveInsideItem AndAlso miSuggestDayTrainItm.ContainsKey(oilCode) Then
                                 miSuggestDayTrainItm(oilCode).ItemValue = miTrainNum.ToString
                             End If
 
@@ -2077,7 +2093,7 @@ Public Class OIT0004OilStockCreate
     ''' <remarks>データがあれば更新、なければ追加（OIT0001_OILSTOCKテーブル内での履歴登録は無し）
     ''' 一旦、新規登録後に油種マスタから削除された後の更新パターンは考慮しない
     ''' （このパターンは画面上は出ないが宙に浮いたDELFLGが生きたままのデータが残る想定）</remarks>
-    Private Function EntryStockData(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#) As Boolean
+    Private Function EntryStockData(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing) As Boolean
 
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("DECLARE @hensuu AS bigint ;")
@@ -2200,7 +2216,7 @@ Public Class OIT0004OilStockCreate
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,UPDUSER))     AS UPDUSER")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,UPDTERMID))   AS UPDTERMID")
         journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,RECEIVEYMD))  AS RECEIVEYMD")
-        journalSqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK")
+        journalSqlStat.AppendLine("  FROM OIL.OIT0001_OILSTOCK WITH(nolock)")
         journalSqlStat.AppendLine(" WHERE OFFICECODE    = @OFFICECODE")
         journalSqlStat.AppendLine("   AND SHIPPERSCODE  = @SHIPPERSCODE")
         journalSqlStat.AppendLine("   AND CONSIGNEECODE = @CONSIGNEECODE")
@@ -2212,8 +2228,7 @@ Public Class OIT0004OilStockCreate
         End If
 
         'トランザクションしない場合は「sqlCon.BeginTransaction」→「nothing」
-        Using tran As SqlTransaction = sqlCon.BeginTransaction(),
-              sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, tran)
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
             sqlCmd.CommandTimeout = 300
             '固定パラメータ
             With sqlCmd.Parameters
@@ -2266,8 +2281,279 @@ Public Class OIT0004OilStockCreate
                     sqlCmd.ExecuteNonQuery()
                 Next daysValue
             Next stockItem
-            'コミット
-            tran.Commit()
+
+            'ジャーナル用のデータ取得
+            sqlCmd.CommandText = journalSqlStat.ToString
+            Using journalDt As New DataTable,
+                  SQLdr As SqlDataReader = sqlCmd.ExecuteReader()
+                For index As Integer = 0 To SQLdr.FieldCount - 1
+                    journalDt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                Next
+
+                journalDt.Load(SQLdr)
+                OutputJournal(journalDt)
+                journalDt.Clear()
+            End Using 'journalDt,journalDt
+        End Using 'tran,sqlCmd
+        Return True
+
+    End Function
+    ''' <summary>
+    ''' 在庫受入車数テーブルの更新
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="dispDataClass"></param>
+    ''' <param name="errNum"></param>
+    ''' <param name="procDtm"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <returns></returns>
+    Private Function EntryUkeireOilstock(sqlCon As SqlConnection, dispDataClass As DispDataClass, ByRef errNum As String, Optional procDtm As Date = #1900/01/01#, Optional sqlTran As SqlTransaction = Nothing) As Boolean
+
+        '提案表車数の表示が無い場合はスキップ
+        If dispDataClass.ShowSuggestList = False Then
+            Return True
+        End If
+        '列車チェックボックス確認(この返却はあくまでチェックがある日付グループを返す)
+        Dim qSelected = (From sugItm In dispDataClass.SuggestList
+                         Where (From trItm In sugItm.Value.SuggestOrderItem.Values
+                                Where trItm.CheckValue).Any)
+        '1つもチェックが無ければスキップ
+        If qSelected.Any = False Then
+            Return True
+        End If
+        '油種コードをフィールド名に割り当てる変数
+        Dim oilCodeToFieldNameList As New Dictionary(Of String, String) From {
+            {"1101", "RTANK"}, {"1001", "HTANK"}, {"1301", "TTANK"}, {"1302", "MTTANK"},
+            {"1401", "KTANK"}, {"1404", "K3TANK"}, {"2201", "LTANK"}, {"2101", "ATANK"}}
+
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("DECLARE @hensuu AS bigint ;")
+        sqlStat.AppendLine("    SET @hensuu = 0 ;")
+        sqlStat.AppendLine("DECLARE hensuu CURSOR FOR")
+        sqlStat.AppendLine("    SELECT ")
+        sqlStat.AppendLine("           CAST(UPDTIMSTP AS bigint) AS hensuu")
+        sqlStat.AppendLine("      FROM OIL.OIT0009_UKEIREOILSTOCK")
+        sqlStat.AppendLine("     WHERE STOCKYMD      = @STOCKYMD")
+        sqlStat.AppendLine("       AND OFFICECODE    = @OFFICECODE")
+        sqlStat.AppendLine("       AND SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStat.AppendLine("       AND CONSIGNEECODE = @CONSIGNEECODE")
+        sqlStat.AppendLine("       AND TRAINNO       = @TRAINNO")
+        sqlStat.AppendLine("   OPEN hensuu ;")
+        sqlStat.AppendLine("  FETCH NEXT FROM hensuu INTO @hensuu ;")
+        'UPDATE
+        sqlStat.AppendLine("     IF (@@FETCH_STATUS = 0)")
+        sqlStat.AppendLine("         UPDATE OIL.OIT0009_UKEIREOILSTOCK")
+        sqlStat.AppendLine("            SET RTANK1     = @RTANK1")
+        sqlStat.AppendLine("               ,HTANK1     = @HTANK1")
+        sqlStat.AppendLine("               ,TTANK1     = @TTANK1")
+        sqlStat.AppendLine("               ,MTTANK1    = @MTTANK1")
+        sqlStat.AppendLine("               ,KTANK1     = @KTANK1")
+        sqlStat.AppendLine("               ,K3TANK1    = @K3TANK1")
+        sqlStat.AppendLine("               ,LTANK1     = @LTANK1")
+        sqlStat.AppendLine("               ,ATANK1     = @ATANK1")
+        sqlStat.AppendLine("               ,RTANK2     = @RTANK2")
+        sqlStat.AppendLine("               ,HTANK2     = @HTANK2")
+        sqlStat.AppendLine("               ,TTANK2     = @TTANK2")
+        sqlStat.AppendLine("               ,MTTANK2    = @MTTANK2")
+        sqlStat.AppendLine("               ,KTANK2     = @KTANK2")
+        sqlStat.AppendLine("               ,K3TANK2    = @K3TANK2")
+        sqlStat.AppendLine("               ,LTANK2     = @LTANK2")
+        sqlStat.AppendLine("               ,ATANK2     = @ATANK2")
+        sqlStat.AppendLine("               ,DELFLG     = @DELFLG")
+        sqlStat.AppendLine("               ,UPDYMD     = @UPDYMD")
+        sqlStat.AppendLine("               ,UPDUSER    = @UPDUSER")
+        sqlStat.AppendLine("               ,UPDTERMID  = @UPDTERMID")
+        sqlStat.AppendLine("               ,RECEIVEYMD = @RECEIVEYMD")
+        sqlStat.AppendLine("          WHERE STOCKYMD      = @STOCKYMD")
+        sqlStat.AppendLine("            AND OFFICECODE    = @OFFICECODE")
+        sqlStat.AppendLine("            AND SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStat.AppendLine("            AND CONSIGNEECODE = @CONSIGNEECODE")
+        sqlStat.AppendLine("            AND TRAINNO       = @TRAINNO")
+        'INSERT
+        sqlStat.AppendLine("     IF (@@FETCH_STATUS <> 0)")
+        sqlStat.AppendLine("         INSERT INTO OIL.OIT0009_UKEIREOILSTOCK (")
+        sqlStat.AppendLine("             STOCKYMD")
+        sqlStat.AppendLine("            ,OFFICECODE")
+        sqlStat.AppendLine("            ,SHIPPERSCODE")
+        sqlStat.AppendLine("            ,CONSIGNEECODE")
+        sqlStat.AppendLine("            ,TRAINNO")
+        sqlStat.AppendLine("            ,RTANK1")
+        sqlStat.AppendLine("            ,HTANK1")
+        sqlStat.AppendLine("            ,TTANK1")
+        sqlStat.AppendLine("            ,MTTANK1")
+        sqlStat.AppendLine("            ,KTANK1")
+        sqlStat.AppendLine("            ,K3TANK1")
+        sqlStat.AppendLine("            ,LTANK1")
+        sqlStat.AppendLine("            ,ATANK1")
+        sqlStat.AppendLine("            ,RTANK2")
+        sqlStat.AppendLine("            ,HTANK2")
+        sqlStat.AppendLine("            ,TTANK2")
+        sqlStat.AppendLine("            ,MTTANK2")
+        sqlStat.AppendLine("            ,KTANK2")
+        sqlStat.AppendLine("            ,K3TANK2")
+        sqlStat.AppendLine("            ,LTANK2")
+        sqlStat.AppendLine("            ,ATANK2")
+        sqlStat.AppendLine("            ,DELFLG")
+        sqlStat.AppendLine("            ,INITYMD")
+        sqlStat.AppendLine("            ,INITUSER")
+        sqlStat.AppendLine("            ,INITTERMID")
+        sqlStat.AppendLine("            ,UPDYMD")
+        sqlStat.AppendLine("            ,UPDUSER")
+        sqlStat.AppendLine("            ,UPDTERMID")
+        sqlStat.AppendLine("            ,RECEIVEYMD")
+        sqlStat.AppendLine("         ) VALUES (")
+        sqlStat.AppendLine("             @STOCKYMD")
+        sqlStat.AppendLine("            ,@OFFICECODE")
+        sqlStat.AppendLine("            ,@SHIPPERSCODE")
+        sqlStat.AppendLine("            ,@CONSIGNEECODE")
+        sqlStat.AppendLine("            ,@TRAINNO")
+        sqlStat.AppendLine("            ,@RTANK1")
+        sqlStat.AppendLine("            ,@HTANK1")
+        sqlStat.AppendLine("            ,@TTANK1")
+        sqlStat.AppendLine("            ,@MTTANK1")
+        sqlStat.AppendLine("            ,@KTANK1")
+        sqlStat.AppendLine("            ,@K3TANK1")
+        sqlStat.AppendLine("            ,@LTANK1")
+        sqlStat.AppendLine("            ,@ATANK1")
+        sqlStat.AppendLine("            ,@RTANK2")
+        sqlStat.AppendLine("            ,@HTANK2")
+        sqlStat.AppendLine("            ,@TTANK2")
+        sqlStat.AppendLine("            ,@MTTANK2")
+        sqlStat.AppendLine("            ,@KTANK2")
+        sqlStat.AppendLine("            ,@K3TANK2")
+        sqlStat.AppendLine("            ,@LTANK2")
+        sqlStat.AppendLine("            ,@ATANK2")
+        sqlStat.AppendLine("            ,@DELFLG")
+        sqlStat.AppendLine("            ,@INITYMD")
+        sqlStat.AppendLine("            ,@INITUSER")
+        sqlStat.AppendLine("            ,@INITTERMID")
+        sqlStat.AppendLine("            ,@UPDYMD")
+        sqlStat.AppendLine("            ,@UPDUSER")
+        sqlStat.AppendLine("            ,@UPDTERMID")
+        sqlStat.AppendLine("            ,@RECEIVEYMD")
+        sqlStat.AppendLine("         );")
+        sqlStat.AppendLine("  CLOSE hensuu ;")
+        sqlStat.AppendLine("DEALLOCATE hensuu ;")
+
+        'ジャーナル用記載用データ抽出SQL（この関数で登録されたものを取得想定（登録するDBのキーを変えた際は注意））
+        Dim journalSqlStat As New StringBuilder
+        journalSqlStat.AppendLine("SELECT ")
+        journalSqlStat.AppendLine("             STOCKYMD")
+        journalSqlStat.AppendLine("            ,OFFICECODE")
+        journalSqlStat.AppendLine("            ,SHIPPERSCODE")
+        journalSqlStat.AppendLine("            ,CONSIGNEECODE")
+        journalSqlStat.AppendLine("            ,TRAINNO")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,RTANK1))  AS RTANK1")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,HTANK1))  AS HTANK1")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,TTANK1))  AS TTANK1")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,MTTANK1)) AS MTTANK1")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,KTANK1))  AS KTANK1")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,K3TANK1)) AS K3TANK1")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,LTANK1))  AS LTANK1")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ATANK1))  AS ATANK1")
+
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,RTANK2))  AS RTANK2")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,HTANK2))  AS HTANK2")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,TTANK2))  AS TTANK2")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,MTTANK2)) AS MTTANK2")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,KTANK2))  AS KTANK2")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,K3TANK2)) AS K3TANK2")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,LTANK2))  AS LTANK2")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,ATANK2))  AS ATANK2")
+
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,DELFLG))      AS DELFLG")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,INITYMD))     AS INITYMD")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,INITUSER))    AS INITUSER")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,INITTERMID))  AS INITTERMID")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,UPDYMD))      AS UPDYMD")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,UPDUSER))     AS UPDUSER")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,UPDTERMID))   AS UPDTERMID")
+        journalSqlStat.AppendLine("            ,convert(nvarchar,isnull(null,RECEIVEYMD))  AS RECEIVEYMD")
+        journalSqlStat.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK WITH(nolock)")
+        journalSqlStat.AppendLine(" WHERE OFFICECODE    = @OFFICECODE")
+        journalSqlStat.AppendLine("   AND SHIPPERSCODE  = @SHIPPERSCODE")
+        journalSqlStat.AppendLine("   AND CONSIGNEECODE = @CONSIGNEECODE")
+        journalSqlStat.AppendLine("   AND UPDYMD        = @UPDYMD")
+
+        '処理日付引数が初期値なら現時刻設定
+        If procDtm.ToString("yyyy/MM/dd").Equals("1900/01/01") Then
+            procDtm = Now
+        End If
+
+        'トランザクションしない場合は「sqlCon.BeginTransaction」→「nothing」
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            sqlCmd.CommandTimeout = 300
+            '固定パラメータ
+            With sqlCmd.Parameters
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispDataClass.SalesOffice
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispDataClass.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispDataClass.Consignee
+
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                .Add("@INITYMD", SqlDbType.DateTime).Value = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+                .Add("@INITUSER", SqlDbType.NVarChar).Value = Master.USERID
+                .Add("@INITTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                .Add("@UPDYMD", SqlDbType.DateTime).Value = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+                .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
+                .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = C_DEFAULT_YMD
+            End With
+            '変動パラメータ
+            Dim paramTrainNo = sqlCmd.Parameters.Add("@TRAINNO", SqlDbType.NVarChar)
+            Dim paramStockYmd = sqlCmd.Parameters.Add("@STOCKYMD", SqlDbType.Date)
+            Dim paramTrainCntList As New Dictionary(Of String, SqlParameter)
+            For Each oilCodeToFieldItm In oilCodeToFieldNameList
+                Dim keyField1 As String = oilCodeToFieldItm.Value & "1"
+                Dim keyField2 As String = oilCodeToFieldItm.Value & "2"
+                paramTrainCntList.Add(keyField1, sqlCmd.Parameters.Add("@" & keyField1, SqlDbType.Int))
+                paramTrainCntList.Add(keyField2, sqlCmd.Parameters.Add("@" & keyField2, SqlDbType.Int))
+            Next
+
+            '画面データをループしテーブル更新
+            '油種別のループ
+            Dim miValues As DispDataClass.SuggestItem.SuggestValues = Nothing
+            For Each suggestDaysList In qSelected
+                paramStockYmd.Value = suggestDaysList.Key
+                For Each trItm In suggestDaysList.Value.SuggestOrderItem.Values
+                    miValues = Nothing
+                    If trItm.CheckValue = False Then
+                        Continue For
+                    End If
+                    paramTrainNo.Value = trItm.TrainInfo.TrainNo
+                    If dispDataClass.HasMoveInsideItem Then
+                        If dispDataClass.MiDispData.SuggestList.ContainsKey(suggestDaysList.Key) AndAlso
+                           dispDataClass.MiDispData.SuggestList(suggestDaysList.Key).SuggestOrderItem.ContainsKey(trItm.TrainInfo.TrainNo) Then
+                            With dispDataClass.MiDispData.SuggestList(suggestDaysList.Key)
+                                miValues = .SuggestOrderItem(trItm.TrainInfo.TrainNo)
+                            End With
+                        End If
+                    End If
+                    '各値を0クリア
+                    For Each prmTrainCnt In paramTrainCntList.Values
+                        prmTrainCnt.Value = 0
+                    Next prmTrainCnt
+                    '通常表のループ
+                    For Each oilItm In trItm.SuggestValuesItem
+                        If oilCodeToFieldNameList.ContainsKey(oilItm.Key) = False Then
+                            Continue For
+                        End If
+                        Dim fieldName As String = oilCodeToFieldNameList(oilItm.Key) & "1"
+                        paramTrainCntList(fieldName).Value = CInt(oilItm.Value.ItemValue)
+                    Next
+                    '構内取り表のループ
+                    If dispDataClass.HasMoveInsideItem AndAlso miValues IsNot Nothing Then
+                        For Each oilItm In miValues.SuggestValuesItem
+                            If oilCodeToFieldNameList.ContainsKey(oilItm.Key) = False Then
+                                Continue For
+                            End If
+                            Dim fieldName As String = oilCodeToFieldNameList(oilItm.Key) & "2"
+                            paramTrainCntList(fieldName).Value = CInt(oilItm.Value.ItemValue)
+                        Next
+                    End If
+                    sqlCmd.ExecuteNonQuery()
+                Next trItm
+            Next suggestDaysList
+
             'ジャーナル用のデータ取得
             sqlCmd.CommandText = journalSqlStat.ToString
             Using journalDt As New DataTable,

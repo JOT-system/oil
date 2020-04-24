@@ -227,6 +227,7 @@ Public Class OIT0004OilStockCreate
                 dispDataObj.MiDispData = GetTargetStockData(sqlCon, dispDataObj.MiDispData)
                 '過去日以外の日付について受入数取得
                 dispDataObj.MiDispData = GetReciveFromOrder(sqlCon, dispDataObj.MiDispData)
+                'dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
                 dispDataObj.MiDispData.RecalcStockList(False)
                 'メインクラスに構内取り情報を紐づけ（参照設定）
                 For Each suggestListItem In dispDataObj.SuggestList
@@ -235,6 +236,8 @@ Public Class OIT0004OilStockCreate
                     suggestListItem.Value.SuggestMiOrderItem = item
                     suggestListItem.Value.RelateMoveInside()
                 Next 'suggestListItem
+            Else
+                'dispDataObj = GetUkeireOilstock(sqlCon, dispDataObj)
             End If
             '既登録データ抽出
         End Using
@@ -995,6 +998,7 @@ Public Class OIT0004OilStockCreate
     Private Function GetReciveFromOrder(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
         Dim sqlStr As New StringBuilder
         Dim retVal = dispData
+        Return retVal '2020/4/24 受注より取得は廃止(完全に不要と判明したら関数まるまる削除）
         '検索値の設定(過去日じゃない日付リストを取得）
         Dim qdataVal = From itm In dispData.StockDate
                        Where itm.Value.IsPastDay = False
@@ -1616,6 +1620,105 @@ Public Class OIT0004OilStockCreate
                             .Receive = stockReceiveVal.ToString
                         End With
 
+                    End While
+                End If
+            End Using 'sqlDr
+        End Using
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 受入車数の取得
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="dispData"></param>
+    ''' <returns></returns>
+    Private Function GetUkeireOilstock(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        Dim retVal = dispData
+        If dispData.ShowSuggestList = False Then
+            '提案表の表示が無い場合は意味がないのでスキップ
+            Return dispData
+        End If
+        Dim sqlStr As New StringBuilder
+        '油種コードをフィールド名に割り当てる変数
+        Dim oilCodeToFieldNameList As New Dictionary(Of String, String) From {
+            {"1101", "RTANK"}, {"1001", "HTANK"}, {"1301", "TTANK"}, {"1302", "MTTANK"},
+            {"1401", "KTANK"}, {"1404", "K3TANK"}, {"2201", "LTANK"}, {"2101", "ATANK"}}
+        '検索値の設定
+        Dim dateFrom As String = dispData.StockDate.First.Value.KeyString
+        Dim dateTo As String = dispData.StockDate.Last.Value.KeyString
+        sqlStr.AppendLine("SELECT UOS.TRAINNO")
+        sqlStr.AppendLine("     , format(UOS.STOCKYMD,'yyyy/MM/dd') AS STOCKYMD")
+
+        sqlStr.AppendLine("     , isnull(UOS.RTANK1,0)    AS RTANK1")
+        sqlStr.AppendLine("     , isnull(UOS.HTANK1,0)    AS HTANK1")
+        sqlStr.AppendLine("     , isnull(UOS.TTANK1,0)    AS TTANK1")
+        sqlStr.AppendLine("     , isnull(UOS.MTTANK1,0)   AS MTTANK1")
+        sqlStr.AppendLine("     , isnull(UOS.KTANK1,0)    AS KTANK1")
+        sqlStr.AppendLine("     , isnull(UOS.K3TANK1,0)   AS K3TANK1")
+        sqlStr.AppendLine("     , isnull(UOS.LTANK1,0)    AS LTANK1")
+        sqlStr.AppendLine("     , isnull(UOS.ATANK1,0)    AS ATANK1")
+
+        sqlStr.AppendLine("     , isnull(UOS.RTANK2,0)    AS RTANK2")
+        sqlStr.AppendLine("     , isnull(UOS.HTANK2,0)    AS HTANK2")
+        sqlStr.AppendLine("     , isnull(UOS.TTANK2,0)    AS TTANK2")
+        sqlStr.AppendLine("     , isnull(UOS.MTTANK2,0)   AS MTTANK2")
+        sqlStr.AppendLine("     , isnull(UOS.KTANK2,0)    AS KTANK2")
+        sqlStr.AppendLine("     , isnull(UOS.K3TANK2,0)   AS K3TANK2")
+        sqlStr.AppendLine("     , isnull(UOS.LTANK2,0)    AS LTANK2")
+        sqlStr.AppendLine("     , isnull(UOS.ATANK2,0)    AS ATANK2")
+
+        sqlStr.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK  UOS")
+        sqlStr.AppendLine(" WHERE UOS.STOCKYMD   BETWEEN @DATE_FROM AND @DATE_TO")
+        sqlStr.AppendLine("   AND UOS.OFFICECODE      = @OFFICECODE")
+        sqlStr.AppendLine("   AND UOS.SHIPPERSCODE    = @SHIPPERSCODE")
+        sqlStr.AppendLine("   AND UOS.CONSIGNEECODE   = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND UOS.DELFLG          = @DELFLG")
+        sqlStr.AppendLine(" GROUP BY UOS.TRAINNO,UOS.STOCKYMD")
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                .Add("@DATE_FROM", SqlDbType.Date).Value = dateFrom
+                .Add("@DATE_TO", SqlDbType.Date).Value = dateTo
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows Then
+                    Dim oilCode As String = ""
+                    Dim trainNo As String = ""
+                    Dim targetDate As String = ""
+                    Dim trainNum As Decimal = 0D
+                    Dim miTrainNum As Decimal = 0D
+                    While sqlDr.Read
+                        targetDate = Convert.ToString(sqlDr("STOCKYMD"))
+                        trainNo = Convert.ToString(sqlDr("TRAINNO"))
+                        '対象日付を保持していない場合はスキップ
+                        If retVal.SuggestList.ContainsKey(targetDate) = False Then
+                            Continue While
+                        End If
+                        '対象の列車を保持していない場合はスキップ
+                        If retVal.SuggestList(targetDate).SuggestLoadingItem.ContainsKey(trainNo) = False Then
+                            Continue While
+                        End If
+                        Dim suggestDayTrainItm = retVal.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem
+                        Dim miSuggestDayTrainItm = retVal.MiDispData.SuggestList(targetDate).SuggestOrderItem(trainNo).SuggestValuesItem
+
+                        For Each oilCodeToFieldName In oilCodeToFieldNameList
+                            oilCode = oilCodeToFieldName.Key
+
+                            trainNum = Convert.ToDecimal(sqlDr(oilCodeToFieldName.Value & "1"))
+                            miTrainNum = Convert.ToDecimal(sqlDr(oilCodeToFieldName.Value & "2"))
+                            '対象の油種にテーブル内容を転記
+                            If suggestDayTrainItm.ContainsKey(oilCode) Then
+                                suggestDayTrainItm(oilCode).ItemValue = trainNum.ToString
+                            End If
+                            If miSuggestDayTrainItm.ContainsKey(oilCode) Then
+                                miSuggestDayTrainItm(oilCode).ItemValue = miTrainNum.ToString
+                            End If
+
+                        Next oilCodeToFieldName
                     End While
                 End If
             End Using 'sqlDr

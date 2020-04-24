@@ -14,6 +14,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003tbl_tab3 As DataTable                            '一覧格納用テーブル(タブ３用)
     Private OIT0003tbl_tab4 As DataTable                            '一覧格納用テーブル(タブ４用)
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
+    Private OIT0003INPtbl_tab4 As DataTable                         'チェック用テーブル(タブ４用)
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
     Private OIT0003WK2tbl As DataTable                              '作業用2テーブル
@@ -84,7 +85,7 @@ Public Class OIT0003OrderDetail
                     Master.RecoverTable(OIT0003tbl)
                     Master.RecoverTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
                     Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
-                    'Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+                    Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
                     '○ 画面編集データ取得＆保存(サーバー側で設定した内容を取得し保存する。)
                     If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl, pnlListArea1) Then
@@ -96,9 +97,9 @@ Public Class OIT0003OrderDetail
                     If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl_tab3, pnlListArea3) Then
                         Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
                     End If
-                    'If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl_tab4, pnlListArea4) Then
-                    '    Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
-                    'End If
+                    If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl_tab4, pnlListArea4) Then
+                        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+                    End If
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonCONTACT"               '手配連絡ボタン押下
@@ -925,6 +926,7 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+#Region "タブ「費用入力」関連処理"
     ''' <summary>
     ''' GridViewデータ設定(タブ「費用入力」表示用)
     ''' </summary>
@@ -934,6 +936,10 @@ Public Class OIT0003OrderDetail
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
+            '勘定科目明細作成
+            WW_InsertRequestAccountDetail(SQLcon)
+
+            '費用入力一覧(勘定科目サマリー作成)
             MAPDataGetTab4(SQLcon)
         End Using
 
@@ -973,6 +979,410 @@ Public Class OIT0003OrderDetail
         TBLview = Nothing
 
     End Sub
+
+    ''' <summary>
+    ''' 請求科目（明細）データ作成処理
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_InsertRequestAccountDetail(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003INPtbl_tab4) Then
+            OIT0003INPtbl_tab4 = New DataTable
+        End If
+
+        If OIT0003INPtbl_tab4.Columns.Count <> 0 Then
+            OIT0003INPtbl_tab4.Columns.Clear()
+        End If
+
+        OIT0003INPtbl_tab4.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String = ""
+        Dim SQLSelectStr As String = ""
+        Dim SQLFromStr1 As String = ""
+        Dim SQLFromStr2 As String = ""
+        Dim SQLTempTblStr As String = ""
+
+        '削除・追加用
+        SQLTempTblStr =
+          " DELETE FROM OIL.TMP0002RATE; " _
+        & " INSERT INTO OIL.TMP0002RATE "
+
+        '共通SELECT用
+        SQLSelectStr =
+          " SELECT" _
+        & "   0                                                  AS LINECNT" _
+        & " , ''                                                 AS OPERATION" _
+        & " , ''                                                 AS TIMSTP" _
+        & " , 1                                                  AS 'SELECT'" _
+        & " , 0                                                  AS HIDDEN" _
+        & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')                 AS ORDERNO" _
+        & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')                AS DETAILNO" _
+        & " , ISNULL(RTRIM(OIM0010.PATCODE), '')                 AS PATCODE" _
+        & " , ISNULL(RTRIM(OIM0010.PATNAME), '')                 AS PATNAME" _
+        & " , ISNULL(RTRIM(OIM0010.ACCOUNTCODE), '')             AS ACCOUNTCODE" _
+        & " , ISNULL(RTRIM(VIW0012.ACCOUNTNAME), '')             AS ACCOUNTNAME" _
+        & " , ISNULL(RTRIM(OIM0010.SEGMENTCODE), '')             AS SEGMENTCODE" _
+        & " , ISNULL(RTRIM(VIW0012.SEGMENTNAME), '')             AS SEGMENTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.BREAKDOWN), '')               AS BREAKDOWN" _
+        & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
+        & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')            AS SHIPPERSNAME" _
+        & " , ISNULL(RTRIM(OIT0002.BASECODE), '')                AS BASECODE" _
+        & " , ISNULL(RTRIM(OIT0002.BASENAME), '')                AS BASENAME" _
+        & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')              AS OFFICECODE" _
+        & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
+        & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')              AS DEPSTATION" _
+        & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
+        & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
+        & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
+        & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')           AS CONSIGNEECODE" _
+        & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')           AS CONSIGNEENAME" _
+        & " , ISNULL(RTRIM(OIT0002.KEIJYOYMD), NULL)             AS KEIJYOYMD" _
+        & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
+        & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')               AS TRAINNAME" _
+        & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
+        & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
+        & " , ISNULL(RTRIM(OIT0003.CARSNUMBER), '')              AS CARSNUMBER" _
+        & " , ISNULL(RTRIM(OIT0003.CARSAMOUNT), '')              AS CARSAMOUNT" _
+        & " , ISNULL(RTRIM(OIM0005.LOAD), '')                    AS LOAD" _
+        & " , ISNULL(RTRIM(OIT0003.OILCODE), '')                 AS OILCODE" _
+        & " , ISNULL(RTRIM(OIT0003.OILNAME), '')                 AS OILNAME" _
+        & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')            AS ORDERINGTYPE" _
+        & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS ORDERINGOILNAME" _
+        & " , ISNULL(RTRIM(OIT0003.CHANGETRAINNO), '')           AS CHANGETRAINNO" _
+        & " , ISNULL(RTRIM(OIT0003.CHANGETRAINNAME), '')         AS CHANGETRAINNAME" _
+        & " , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEECODE), '')     AS SECONDCONSIGNEECODE" _
+        & " , ISNULL(RTRIM(OIT0003.SECONDCONSIGNEENAME), '')     AS SECONDCONSIGNEENAME" _
+        & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATION), '')        AS SECONDARRSTATION" _
+        & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATIONNAME), '')    AS SECONDARRSTATIONNAME" _
+        & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATION), '')        AS CHANGERETSTATION" _
+        & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATIONNAME), '')    AS CHANGERETSTATIONNAME" _
+        & " , ISNULL(RTRIM(VIW0012.TRKBN), '')                   AS TRKBN" _
+        & " , ISNULL(RTRIM(VIW0012.TRKBNNAME), '')               AS TRKBNNAME" _
+        & " , ISNULL(RTRIM(VIW0012.KIRO), '')                    AS KIRO" _
+        & " , ISNULL(RTRIM(VIW0012.BRANCH), '')                  AS BRANCH"
+
+        '共通FROM用1
+        SQLFromStr1 =
+          " FROM OIL.OIT0002_ORDER OIT0002 " _
+        & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+        & "       OIT0003.ORDERNO = OIT0002.ORDERNO" _
+        & "       AND OIT0003.DELFLG <> @P02" _
+        & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+        & "       OIT0003.TANKNO = OIM0005.TANKNUMBER" _
+        & "       AND OIM0005.DELFLG <> @P02" _
+        & " LEFT JOIN OIL.OIM0010_PATTERN OIM0010 ON " _
+        & "       OIM0010.PATCODE = OIT0002.ORDERTYPE" _
+        & "       AND OIM0010.WORKCODE = '9'" _
+        & "       AND OIM0010.DELFLG <> @P02"
+
+        '共通FROM用2
+        SQLFromStr2 =
+          "       VIW0012.ACCOUNTCODE = OIM0010.ACCOUNTCODE" _
+        & "       AND VIW0012.SEGMENTCODE = OIM0010.SEGMENTCODE" _
+        & "       AND VIW0012.SHIPPERSCODE = OIT0003.SHIPPERSCODE" _
+        & "       AND VIW0012.BASECODE = OIT0002.BASECODE" _
+        & "       AND VIW0012.OFFICECODE = OIT0002.OFFICECODE" _
+        & "       AND VIW0012.DEPSTATION = OIT0002.DEPSTATION" _
+        & "       AND VIW0012.ARRSTATION = OIT0002.ARRSTATION" _
+        & "       AND VIW0012.CONSIGNEECODE = OIT0002.CONSIGNEECODE" _
+        & "       AND VIW0012.LOAD = OIM0005.LOAD"
+
+        '★作成SQL
+        '#############################################################################
+        '　勘定科目(元請輸送)
+        '　セグメント(タンク車使用料)
+        '#############################################################################
+        SQLStr =
+            SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.TCCALCKBN), '')                  AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.TCCHARGE), '')                   AS CHARGE" _
+        & " , ''                                                    AS JRDISCOUNT" _
+        & " , ''                                                    AS OTDISCOUNT" _
+        & " , ''                                                    AS JOTDISCOUNT" _
+        & " , ''                                                    AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.TCDISCOUNT1), '')                AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.TCDISCOUNT2), '')                AS DISCOUNT2" _
+        & " , ISNULL(RTRIM(VIW0012.TCDISCOUNT3), '')                AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.TCAPPLYCHARGE), '')              AS APPLYCHARGE" _
+        & " , ''                                                    AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.TCINVOICECODE), '')              AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.TCINVOICENAME), '')              AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.TCINVOICEDEPTNAME), '')          AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.TCPAYEECODE), '')                AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.TCPAYEENAME), '')                 AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.TCPAYEEDEPTNAME), '')            AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_41010101_10101 VIW0012 ON " _
+        & SQLFromStr2 _
+        & "       And VIW0012.SENDAI_MORIOKA_FLAG =" _
+        & "           Case WHEN OIT0002.BASECODE = '0401' AND OIT0002.CONSIGNEECODE = '51' THEN" _
+        & "                Case WHEN OIT0003.OILCODE = '1001' OR OIT0003.OILCODE = '1101' THEN '1' ELSE '2' END" _
+        & "           Else '0' END" _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        '#############################################################################
+        '　勘定科目(元請輸送)
+        '　セグメント(鉄道運賃)
+        '#############################################################################
+        SQLStr &=
+          " UNION ALL " _
+        & SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.FARECALCKBN), '')                AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.SYOTEIHAZFARE), '')              AS CHARGE" _
+        & " , ISNULL(RTRIM(VIW0012.HAZJRDISCOUNT), '')              AS JRDISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.HAZOTDISCOUNT), '')              AS OTDISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.HAZJOTDISCOUNT), '')             AS JOTDISCOUNT" _
+        & " , ''                                                    AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.HAZDISCOUNT1), '')               AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.HAZDISCOUNT2), '')               AS DISCOUNT2" _
+        & " , ''                                                    AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.HAZFARE), '')                    AS APPLYCHARGE" _
+        & " , ISNULL(RTRIM(VIW0012.RETURNFARE), '')                 AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.FAREINVOICECODE), '')            AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.FAREINVOICENAME), '')            AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.FAREINVOICEDEPTNAME), '')        AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.FAREPAYEECODE), '')              AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.FAREPAYEENAME), '')               AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.FAREPAYEEDEPTNAME), '')          AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_41010101_10102_1 VIW0012 ON " _
+        & SQLFromStr2 _
+        & "       And VIW0012.SENDAI_MORIOKA_FLAG =" _
+        & "           Case WHEN OIT0003.OILCODE = '1001' OR OIT0003.OILCODE = '1101' THEN '1' ELSE '2' END" _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        SQLStr &=
+          " UNION ALL " _
+        & SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.MOTCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.MOTCHARGE), '')                  AS CHARGE" _
+        & " , ''                                                    AS JRDISCOUNT" _
+        & " , ''                                                    AS OTDISCOUNT" _
+        & " , ''                                                    AS JOTDISCOUNT" _
+        & " , ''                                                    AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.MOTDISCOUNT1), '')               AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.MOTDISCOUNT2), '')               AS DISCOUNT2" _
+        & " , ISNULL(RTRIM(VIW0012.MOTDISCOUNT3), '')               AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.MOTAPPLYCHARGE), '')             AS APPLYCHARGE" _
+        & " , ''                                                    AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.MOTINVOICECODE), '')             AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.MOTINVOICENAME), '')             AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.MOTINVOICEDEPTNAME), '')         AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.MOTPAYEECODE), '')               AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.MOTPAYEENAME), '')               AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.MOTPAYEEDEPTNAME), '')           AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_41010101_10102_2 VIW0012 ON " _
+        & SQLFromStr2 _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        '#############################################################################
+        '　勘定科目(元請輸送)
+        '　セグメント(業務料)
+        '#############################################################################
+        SQLStr &=
+          " UNION ALL " _
+        & SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.WRKCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.WRKCHARGE), '')                  AS CHARGE" _
+        & " , ''                                                    AS JRDISCOUNT" _
+        & " , ''                                                    AS OTDISCOUNT" _
+        & " , ''                                                    AS JOTDISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.WRKDISCOUNT), '')                AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.WRKDISCOUNT1), '')               AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.WRKDISCOUNT2), '')               AS DISCOUNT2" _
+        & " , ISNULL(RTRIM(VIW0012.WRKDISCOUNT3), '')               AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.WRKAPPLYCHARGE), '')             AS APPLYCHARGE" _
+        & " , ''                                                    AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.WRKINVOICECODE), '')             AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.WRKINVOICENAME), '')             AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.WRKINVOICEDEPTNAME), '')         AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.WRKPAYEECODE), '')               AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.WRKPAYEENAME), '')                AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.WRKPAYEEDEPTNAME), '')           AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_41010101_10103 VIW0012 ON " _
+        & SQLFromStr2 _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        '#############################################################################
+        '　勘定科目(元請輸送)
+        '　セグメント(取扱料)
+        '#############################################################################
+        SQLStr &=
+          " UNION ALL " _
+        & SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.HNDCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.HNDCAHRGE), '')                  AS CHARGE" _
+        & " , ''                                                    AS JRDISCOUNT" _
+        & " , ''                                                    AS OTDISCOUNT" _
+        & " , ''                                                    AS JOTDISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.HNDDISCOUNT), '')                AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.HNDDISCOUNT1), '')               AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.HNDDISCOUNT2), '')               AS DISCOUNT2" _
+        & " , ISNULL(RTRIM(VIW0012.HNDDISCOUNT3), '')               AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.HNDAPPLYCHARGE), '')             AS APPLYCHARGE" _
+        & " , ''                                                    AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.HNDINVOICECODE), '')             AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.HNDINVOICENAME), '')             AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.HNDINVOICEDEPTNAME), '')         AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.HNDPAYEECODE), '')               AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.HNDPAYEENAME), '')                AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.HNDPAYEEDEPTNAME), '')           AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_41010101_10104 VIW0012 ON " _
+        & SQLFromStr2 _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        '#############################################################################
+        '　勘定科目(元請輸送)
+        '　セグメント(ＯＴ業務料)
+        '#############################################################################
+        SQLStr &=
+          " UNION ALL " _
+        & SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.OTCALCKBN), '')                  AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.OTCAHRGE), '')                   AS CHARGE" _
+        & " , ''                                                    AS JRDISCOUNT" _
+        & " , ''                                                    AS OTDISCOUNT" _
+        & " , ''                                                    AS JOTDISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.OTDISCOUNT), '')                 AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.OTDISCOUNT1), '')                AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.OTDISCOUNT2), '')                AS DISCOUNT2" _
+        & " , ISNULL(RTRIM(VIW0012.OTDISCOUNT3), '')                AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.OTAPPLYCHARGE), '')              AS APPLYCHARGE" _
+        & " , ''                                                    AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.OTINVOICECODE), '')              AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.OTINVOICENAME), '')              AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.OTINVOICEDEPTNAME), '')          AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.OTPAYEECODE), '')                AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.OTPAYEENAME), '')                 AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.OTPAYEEDEPTNAME), '')            AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_41010101_10105 VIW0012 ON " _
+        & SQLFromStr2 _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        '#############################################################################
+        '　勘定科目(元請輸送)
+        '　セグメント(運賃手数料)
+        '#############################################################################
+        SQLStr &=
+          " UNION ALL " _
+        & SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.FRTCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.FRTCAHRGE), '')                  AS CHARGE" _
+        & " , ''                                                    AS JRDISCOUNT" _
+        & " , ''                                                    AS OTDISCOUNT" _
+        & " , ''                                                    AS JOTDISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.FRTDISCOUNT), '')                AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.FRTDISCOUNT1), '')               AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.FRTDISCOUNT2), '')               AS DISCOUNT2" _
+        & " , ISNULL(RTRIM(VIW0012.FRTDISCOUNT3), '')               AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.FRTAPPLYCHARGE), '')             AS APPLYCHARGE" _
+        & " , ''                                                    AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.FRTINVOICECODE), '')             AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.FRTINVOICENAME), '')             AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.FRTINVOICEDEPTNAME), '')         AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.FRTPAYEECODE), '')               AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.FRTPAYEENAME), '')                AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.FRTPAYEEDEPTNAME), '')           AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_41010101_10106 VIW0012 ON " _
+        & SQLFromStr2 _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        '#############################################################################
+        '　勘定科目(委託作業費)
+        '　セグメント(通運取扱その他)
+        '#############################################################################
+        SQLStr &=
+          " UNION ALL " _
+        & SQLSelectStr _
+        & " , ISNULL(RTRIM(VIW0012.COMCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.COMCAHRGE), '')                  AS CHARGE" _
+        & " , ''                                                    AS JRDISCOUNT" _
+        & " , ''                                                    AS OTDISCOUNT" _
+        & " , ''                                                    AS JOTDISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.COMDISCOUNT), '')                AS DISCOUNT" _
+        & " , ISNULL(RTRIM(VIW0012.COMDISCOUNT1), '')               AS DISCOUNT1" _
+        & " , ISNULL(RTRIM(VIW0012.COMDISCOUNT2), '')               AS DISCOUNT2" _
+        & " , ISNULL(RTRIM(VIW0012.COMDISCOUNT3), '')               AS DISCOUNT3" _
+        & " , ISNULL(RTRIM(VIW0012.COMAPPLYCHARGE), '')             AS APPLYCHARGE" _
+        & " , ''                                                    AS RETURNFARE" _
+        & " , ISNULL(RTRIM(VIW0012.COMINVOICECODE), '')             AS INVOICECODE" _
+        & " , ISNULL(RTRIM(VIW0012.COMINVOICENAME), '')             AS INVOICENAME" _
+        & " , ISNULL(RTRIM(VIW0012.COMINVOICEDEPTNAME), '')         AS INVOICEDEPTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.COMPAYEECODE), '')               AS PAYEECODE" _
+        & " , ISNULL(RTRIM(VIW0012.COMPAYEENAME), '')                AS PAYEENAME" _
+        & " , ISNULL(RTRIM(VIW0012.COMPAYEEDEPTNAME), '')           AS PAYEEDEPTNAME" _
+        & SQLFromStr1 _
+        & " INNER JOIN OIL.VIW0012_SALES_51020104_10106 VIW0012 ON " _
+        & SQLFromStr2 _
+        & " WHERE OIT0002.ORDERNO = @P01 " _
+        & " AND OIT0002.DELFLG <> @P02 "
+
+        '削除・追加用にSELECT分を追加
+        SQLTempTblStr &= SQLStr
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                'tmp作成用
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARATMP02 As SqlParameter = SQLTMPcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARATMP01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARATMP02.Value = C_DELETE_FLG.DELETE
+
+                SQLTMPcmd.ExecuteNonQuery()
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003INPtbl_tab4.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003INPtbl_tab4.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003row As DataRow In OIT0003INPtbl_tab4.Rows
+                    i += 1
+                    OIT0003row("LINECNT") = i        'LINECNT
+                Next
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB4 InsertRequestAccountDetail")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB4 InsertRequestAccountDetail"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+#End Region
 
     ''' <summary>
     ''' 画面表示データ取得
@@ -1932,27 +2342,72 @@ Public Class OIT0003OrderDetail
                   " SELECT" _
                 & "   0                                                  AS LINECNT" _
                 & " , ''                                                 AS OPERATION" _
-                & " , CAST(OIT0002.UPDTIMSTP AS bigint)                  AS TIMSTP" _
+                & " , '0'                                                AS TIMSTP" _
                 & " , 1                                                  AS 'SELECT'" _
                 & " , 0                                                  AS HIDDEN" _
-                & " FROM OIL.OIT0002_ORDER OIT0002 " _
-                & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
-                & "       OIT0002.ORDERNO = OIT0003.ORDERNO" _
-                & "       AND OIT0003.DELFLG <> @P02" _
-                & " WHERE OIT0002.ORDERNO = @P01" _
-                & " AND OIT0002.DELFLG <> @P02"
+                & " , TMP0002.ORDERNO                                    AS ORDERNO" _
+                & " , TMP0002.SHIPPERSCODE                               AS SHIPPERSCODE" _
+                & " , TMP0002.SHIPPERSNAME                               AS SHIPPERSNAME" _
+                & " , TMP0002.BASECODE                                   AS BASECODE" _
+                & " , TMP0002.BASENAME                                   AS BASENAME" _
+                & " , TMP0002.OFFICECODE                                 AS OFFICECODE" _
+                & " , TMP0002.OFFICENAME                                 AS OFFICENAME" _
+                & " , TMP0002.CONSIGNEECODE                              AS CONSIGNEECODE" _
+                & " , TMP0002.CONSIGNEENAME                              AS CONSIGNEENAME" _
+                & " , TMP0002.ACCOUNTCODE + '　' + TMP0002.SEGMENTCODE   AS ACCOUNTCODE" _
+                & " , TMP0002.ACCOUNTNAME + '　' + TMP0002.SEGMENTNAME   AS ACCOUNTNAME" _
+                & " , TMP0002.BREAKDOWN                                  AS BREAKDOWN" _
+                & " , TMP0002.CALCKBN                                    AS CALCKBN" _
+                & " , CASE " _
+                & "   WHEN TMP0002.CALCKBN = '1' THEN " _
+                & "        SUM(TMP0002.CARSNUMBER) " _
+                & "   WHEN TMP0002.CALCKBN = '2' THEN " _
+                & "        SUM(TMP0002.CARSAMOUNT) " _
+                & "   WHEN TMP0002.CALCKBN = '3' THEN " _
+                & "        SUM(TMP0002.LOAD) " _
+                & "   END CARSAMOUNT" _
+                & " , CAST(TMP0002.APPLYCHARGE AS DECIMAL(12, 3))        AS APPLYCHARGE" _
+                & " , CAST(ROUND(CASE " _
+                & "   WHEN TMP0002.CALCKBN = '1' THEN " _
+                & "        SUM(TMP0002.CARSNUMBER * TMP0002.APPLYCHARGE) " _
+                & "   WHEN TMP0002.CALCKBN = '2' THEN " _
+                & "        SUM(TMP0002.CARSAMOUNT * TMP0002.APPLYCHARGE) " _
+                & "   WHEN TMP0002.CALCKBN = '3' THEN " _
+                & "        SUM(TMP0002.LOAD * TMP0002.APPLYCHARGE) " _
+                & "   END, 3) AS DECIMAL(12, 3)) APPLYCHARGESUM" _
+                & " , CAST(ROUND(CASE " _
+                & "   WHEN TMP0002.CALCKBN = '1' THEN " _
+                & "        SUM(TMP0002.CARSNUMBER * (TMP0002.APPLYCHARGE * @P01)) " _
+                & "   WHEN TMP0002.CALCKBN = '2' THEN " _
+                & "        SUM(TMP0002.CARSAMOUNT * (TMP0002.APPLYCHARGE * @P01)) " _
+                & "   WHEN TMP0002.CALCKBN = '3' THEN " _
+                & "        SUM(TMP0002.LOAD * (TMP0002.APPLYCHARGE * @P01)) " _
+                & "   END, 3) AS DECIMAL(12, 3)) CONSUMPTIONTAX" _
+                & " , TMP0002.INVOICECODE                                AS INVOICECODE" _
+                & " , TMP0002.INVOICENAME                                AS INVOICENAME" _
+                & " , TMP0002.INVOICEDEPTNAME                            AS INVOICEDEPTNAME" _
+                & " , TMP0002.PAYEECODE                                  AS PAYEECODE" _
+                & " , TMP0002.PAYEENAME                                  AS PAYEENAME" _
+                & " , TMP0002.PAYEEDEPTNAME                              AS PAYEEDEPTNAME" _
+                & " FROM OIL.TMP0002RATE TMP0002 "
 
-        'SQLStr &=
-        '      " ORDER BY" _
-        '    & "    RIGHT('00' + OIT0003.LINEORDER, 2)"
+        SQLStr &=
+                " GROUP BY TMP0002.ORDERNO, TMP0002.SHIPPERSCODE, TMP0002.SHIPPERSNAME" _
+              & " , TMP0002.BASECODE, TMP0002.BASENAME, TMP0002.OFFICECODE, TMP0002.OFFICENAME" _
+              & " , TMP0002.CONSIGNEECODE, TMP0002.CONSIGNEENAME" _
+              & " , TMP0002.ACCOUNTCODE, TMP0002.ACCOUNTNAME, TMP0002.SEGMENTCODE, TMP0002.SEGMENTNAME" _
+              & " , TMP0002.BREAKDOWN, TMP0002.CALCKBN, TMP0002.APPLYCHARGE" _
+              & " , TMP0002.INVOICECODE, TMP0002.INVOICENAME, TMP0002.INVOICEDEPTNAME" _
+              & " , TMP0002.PAYEECODE, TMP0002.PAYEENAME, TMP0002.PAYEEDEPTNAME"
+
+        SQLStr &=
+              " ORDER BY TMP0002.ACCOUNTCODE, TMP0002.SEGMENTCODE"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
-                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Decimal) '消費税
 
-                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
-                PARA02.Value = C_DELETE_FLG.DELETE
+                PARA01.Value = 0.1
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -4110,7 +4565,7 @@ Public Class OIT0003OrderDetail
         End If
         '### 受注進行ステータスチェック END   ##############################################
 
-        '◎ 画面表示データ取得
+        '◎ タブ「タンク車明細」画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
@@ -4119,6 +4574,20 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+        '◎ タブ「費用入力」画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            '勘定科目明細作成
+            WW_InsertRequestAccountDetail(SQLcon)
+
+            '費用入力一覧(勘定科目サマリー作成)
+            MAPDataGetTab4(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
     End Sub
 
@@ -9185,12 +9654,20 @@ Public Class OIT0003OrderDetail
             WF_Dtab04.Enabled = False
             pnlSummaryArea.Visible = False
 
-            '上記以外は、タブ「タンク車明細」の許可
-        Else
+            '310:手配完了の場合は、タブ「タンク車明細」を許可
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
             WF_Dtab01.Enabled = True
             WF_Dtab02.Enabled = True
             WF_Dtab03.Enabled = True
             WF_Dtab04.Enabled = False
+            pnlSummaryArea.Visible = True
+
+            '上記以外は、タブ「費用入力」の許可
+        Else
+            WF_Dtab01.Enabled = True
+            WF_Dtab02.Enabled = True
+            WF_Dtab03.Enabled = True
+            WF_Dtab04.Enabled = True
             pnlSummaryArea.Visible = True
 
         End If

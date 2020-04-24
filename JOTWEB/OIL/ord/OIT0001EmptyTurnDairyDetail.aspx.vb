@@ -15,6 +15,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0001Reporttbl As DataTable                           '帳票用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
@@ -1915,12 +1916,34 @@ Public Class OIT0001EmptyTurnDairyDetail
 
     End Sub
 
+#Region "帳票処理"
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDownload_Click()
 
+        ''******************************
+        ''帳票データ取得処理
+        ''******************************
+
+
+        ''******************************
+        ''帳票作成処理の実行
+        ''******************************
+        'Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & ".xlsx", OIT0001Reporttbl)
+        '    Dim url As String
+        '    Try
+        '        url = repCbj.CreateExcelPrintData
+        '    Catch ex As Exception
+        '        Return
+        '    End Try
+        '    '○ 別画面でExcelを表示
+        '    WF_PrintURL.Value = url
+        '    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        'End Using
+
+        '### 共通帳票処理をコメント ##################################################################
         '○ 帳票出力
         CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
         CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
@@ -1941,8 +1964,50 @@ Public Class OIT0001EmptyTurnDairyDetail
         '○ 別画面でExcelを表示
         WF_PrintURL.Value = CS0030REPORT.URL
         ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        '#############################################################################################
 
     End Sub
+
+    ''' <summary>
+    ''' 帳票表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0001Reporttbl) Then
+            OIT0001Reporttbl = New DataTable
+        End If
+
+        If OIT0001Reporttbl.Columns.Count <> 0 Then
+            OIT0001Reporttbl.Columns.Clear()
+        End If
+
+        OIT0001Reporttbl.Clear()
+
+        Try
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001Reporttbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+#End Region
 
     ''' <summary>
     ''' 空回日報確定ボタン押下時処理

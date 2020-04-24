@@ -322,16 +322,21 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+
+                'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
+                WF_MAPButtonControl.Value = "1"
+
+                '◯受注進行ステータスが500:検収中以降のステータスに変更された場合
+            ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
 
-                'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
-                WF_MAPButtonControl.Value = "1"
+                'タブ「タンク車割当」, タブ「入換・積込指示」, タブ「タンク車明細」のボタンをすべて非活性
+                WF_MAPButtonControl.Value = "3"
 
             Else
                 '★臨海鉄道対応(臨海鉄道でない営業所)
@@ -454,9 +459,22 @@ Public Class OIT0003OrderDetail
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
             WF_DTAB_CHANGE_NO.Value = "2"
+            WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
+
+            '〇 (一覧)テキストボックスの制御(読取専用)
+            WW_ListTextBoxReadControl()
+
+            '〇 受注進行ステータスが"500:検収中"へ変更された場合
+            '### ステータス追加(仮) #################################
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 Then
+
+            WF_DTAB_CHANGE_NO.Value = "3"
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
             '〇 (一覧)テキストボックスの制御(読取専用)
@@ -4588,6 +4606,15 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+        '〇 受注ステータスが"500:検収中"へ変更された場合
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
+            WF_DTAB_CHANGE_NO.Value = "3"
+            WF_Detail_TABChange()
+
+            '○メッセージ表示
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 
@@ -12933,20 +12960,48 @@ Public Class OIT0003OrderDetail
                 Dim divObj = DirectCast(pnlListArea3.FindControl(pnlListArea3.ID & "_DR"), Panel)
                 Dim tblObj = DirectCast(divObj.Controls(0), Table)
 
-                For Each rowitem As TableRow In tblObj.Rows
-                    For Each cellObj As TableCell In rowitem.Controls
-                        If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
-                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") Then
-                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                        End If
-                    Next
-                Next
+                '〇 受注進行ステータスの状態
+                Select Case work.WF_SEL_ORDERSTATUS.Text
+                    Case BaseDllConst.CONST_ORDERSTATUS_310,
+                         BaseDllConst.CONST_ORDERSTATUS_320,
+                         BaseDllConst.CONST_ORDERSTATUS_350,
+                         BaseDllConst.CONST_ORDERSTATUS_400,
+                         BaseDllConst.CONST_ORDERSTATUS_450
+
+                        For Each rowitem As TableRow In tblObj.Rows
+                            For Each cellObj As TableCell In rowitem.Controls
+                                If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
+                            Next
+                        Next
+
+                    Case Else
+                        For Each rowitem As TableRow In tblObj.Rows
+                            For Each cellObj As TableCell In rowitem.Controls
+                                If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
+                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
+                            Next
+                        Next
+                End Select
 
                 '費用入力
             Case 3

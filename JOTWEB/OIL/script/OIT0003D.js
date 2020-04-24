@@ -61,7 +61,8 @@ function InitDisplay() {
 
         //〇タブ１
         if (objDtabNo === "0") {
-            if (document.getElementById('WF_MAPButtonControl').value === "1") {
+            if (document.getElementById('WF_MAPButtonControl').value === "1"
+                || document.getElementById('WF_MAPButtonControl').value === "3") {
                 //非活性
                 document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
                 document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
@@ -83,7 +84,8 @@ function InitDisplay() {
         //〇タブ２
         else if (objDtabNo === "1") {
             if (document.getElementById('WF_MAPButtonControl').value === "1"
-                || document.getElementById('WF_MAPButtonControl').value === "2") {
+                || document.getElementById('WF_MAPButtonControl').value === "2"
+                || document.getElementById('WF_MAPButtonControl').value === "3") {
                 //非活性
                 document.getElementById("WF_ButtonUPDATE_TAB2").disabled = "disabled";
                 document.getElementById("WF_ButtonFILLINGALL_TAB2").disabled = "disabled";
@@ -96,7 +98,14 @@ function InitDisplay() {
         }
         //〇タブ３
         else if (objDtabNo === "2") {
-            document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
+            if (document.getElementById('WF_MAPButtonControl').value === "3") {
+                //非活性
+                document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
+            }
+            else {
+                //活性
+                document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
+            }
         }
         ////〇タブ４
         //else if (objDtabNo === "3") {

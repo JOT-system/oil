@@ -1839,6 +1839,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.TOTALTANKCH),'')      AS TOTALTANKCH")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.TANKLINKNO),'')       AS TANKLINKNO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.TANKLINKNOMADE),'')   AS TANKLINKNOMADE")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.BILLINGNO),'')        AS BILLINGNO")
         sqlStat.AppendLine("      ,format(ODR.KEIJYOYMD,'yyyy/MM/dd')     AS KEIJYOYMD")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.SALSE),'')            AS SALSE")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.SALSETAX),'')         AS SALSETAX")
@@ -2924,7 +2925,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    RTANKCH,HTANKCH,TTANKCH,MTTANKCH,KTANKCH,K3TANKCH,K5TANKCH,K10TANKCH,LTANKCH,ATANKCH,")
         sqlStat.AppendLine("    OTHER1OTANKCH,OTHER2OTANKCH,OTHER3OTANKCH,OTHER4OTANKCH,OTHER5OTANKCH,")
         sqlStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
-        sqlStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,KEIJYOYMD,")
+        sqlStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,BILLINGNO,KEIJYOYMD,")
         sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
         sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
@@ -2941,7 +2942,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    @RTANKCH,@HTANKCH,@TTANKCH,@MTTANKCH,@KTANKCH,@K3TANKCH,@K5TANKCH,@K10TANKCH,@LTANKCH,@ATANKCH,")
         sqlStat.AppendLine("    @OTHER1OTANKCH,@OTHER2OTANKCH,@OTHER3OTANKCH,@OTHER4OTANKCH,@OTHER5OTANKCH,")
         sqlStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
-        sqlStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@KEIJYOYMD,")
+        sqlStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@BILLINGNO,@KEIJYOYMD,")
         sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
         sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
@@ -3031,6 +3032,7 @@ Public Class OIT0004OilStockCreate
                 .Add("TOTALTANKCH", SqlDbType.Int).Value = orderItm.TotalTankCh
                 .Add("TANKLINKNO", SqlDbType.NVarChar).Value = orderItm.TankLinkNo
                 .Add("TANKLINKNOMADE", SqlDbType.NVarChar).Value = orderItm.TankLinkNoMade
+                .Add("BILLINGNO", SqlDbType.NVarChar).Value = orderItm.BILLINGNO
                 .Add("KEIJYOYMD", SqlDbType.Date).Value = If(orderItm.KeijyoYmd = "", CType(DBNull.Value, Object), orderItm.KeijyoYmd)
                 .Add("SALSE", SqlDbType.Int).Value = orderItm.Salse
                 .Add("SALSETAX", SqlDbType.Int).Value = orderItm.SalseTax
@@ -5412,6 +5414,7 @@ Public Class OIT0004OilStockCreate
             Me.TotalTankCh = "0"
             Me.TankLinkNo = "" '貨車連結順序表№(ブランク)
             Me.TankLinkNoMade = "" '作成_貨車連結順序表№(ブランク → null）
+            Me.BillingNo = ""
             Me.KeijyoYmd = "" '計上日(ブランク)
             '金額系はオール0
             Me.Salse = "0"
@@ -5526,6 +5529,7 @@ Public Class OIT0004OilStockCreate
             Me.TotalTankCh = Convert.ToString(sqlDr("TOTALTANKCH"))
             Me.TankLinkNo = Convert.ToString(sqlDr("TANKLINKNO"))
             Me.TankLinkNoMade = Convert.ToString(sqlDr("TANKLINKNOMADE"))
+            Me.BillingNo = Convert.ToString(sqlDr("BILLINGNO"))
             Me.KeijyoYmd = Convert.ToString(sqlDr("KEIJYOYMD"))
             Me.Salse = Convert.ToString(sqlDr("SALSE"))
             Me.SalseTax = Convert.ToString(sqlDr("SALSETAX"))
@@ -5964,6 +5968,11 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property TankLinkNoMade As String
         ''' <summary>
+        ''' 請求番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property BillingNo As String
+        ''' <summary>
         ''' 計上日
         ''' </summary>
         ''' <returns></returns>
@@ -6145,7 +6154,7 @@ Public Class OIT0004OilStockCreate
                     "RTANKCH", "HTANKCH", "TTANKCH", "MTTANKCH", "KTANKCH", "K3TANKCH", "K5TANKCH", "K10TANKCH", "LTANKCH", "ATANKCH",
                     "OTHER1OTANKCH", "OTHER2OTANKCH", "OTHER3OTANKCH", "OTHER4OTANKCH", "OTHER5OTANKCH",
                     "OTHER6OTANKCH", "OTHER7OTANKCH", "OTHER8OTANKCH", "OTHER9OTANKCH", "OTHER10OTANKCH",
-                    "TOTALTANKCH", "TANKLINKNO", "TANKLINKNOMADE", "KEIJYOYMD",
+                    "TOTALTANKCH", "TANKLINKNO", "TANKLINKNOMADE", "BILLINGNO", "KEIJYOYMD",
                     "SALSE", "SALSETAX", "TOTALSALSE", "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT",
                     "DELFLG", "INITYMD", "INITUSER", "INITTERMID", "UPDYMD", "UPDUSER", "UPDTERMID", "RECEIVEYMD"}
                 For Each fieldName In fieldList
@@ -6237,6 +6246,7 @@ Public Class OIT0004OilStockCreate
             dr("TOTALTANKCH") = Me.TotalTankCh
             dr("TANKLINKNO") = Me.TankLinkNo
             dr("TANKLINKNOMADE") = Me.TankLinkNoMade
+            dr("BILLINGNO") = Me.BillingNo
             dr("KEIJYOYMD") = Me.KeijyoYmd
             dr("SALSE") = Me.Salse
             dr("SALSETAX") = Me.SalseTax

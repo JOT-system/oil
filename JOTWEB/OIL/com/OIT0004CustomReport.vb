@@ -324,7 +324,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 '******************
                 '提案欄の値を展開
                 '******************
-                EditTrainNum("F" & miTrainNumStartRow, maxTrainCnt, Me.PrintData.MiDispData)
+                EditTrainNum("F" & miTrainNumStartRow, maxTrainCnt, Me.PrintData.MiDispData, True)
             End If
 
         Catch ex As Exception
@@ -351,7 +351,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
     ''' <param name="startAddrs">開始位置</param>
     ''' <param name="maxTrainCnt">最大車両数</param>
     ''' <param name="suggestList">提案表</param>
-    Private Sub EditTrainNum(startAddrs As String, maxTrainCnt As Integer, suggestList As OIT0004OilStockCreate.DispDataClass)
+    Private Sub EditTrainNum(startAddrs As String, maxTrainCnt As Integer, suggestList As OIT0004OilStockCreate.DispDataClass, Optional isMiArea As Boolean = False)
         Dim rngTmp1 As Excel.Range = Nothing
         Dim rngTmp2 As Excel.Range = Nothing
         Dim rngTmp3 As Excel.Range = Nothing
@@ -385,7 +385,12 @@ Public Class OIT0004CustomReport : Implements IDisposable
                             For rowCnt = 0 To suggestList.OilTypeList.Count - 1
                                 trainNumList(rowCnt, i) = .SuggestValuesItem.Values(rowCnt).ItemValue
                             Next
-                            trainNumList(suggestList.OilTypeList.Count, i) = String.Format("=SUM(R[-{0}]C:R[-1]C)", suggestList.OilTypeList.Count)
+                            If isMiArea Then
+                                trainNumList(suggestList.OilTypeList.Count, i) = String.Format("=SUM(R[-{0}]C:R[-1]C)", suggestList.OilTypeList.Count + 1)
+                            Else
+                                trainNumList(suggestList.OilTypeList.Count, i) = String.Format("=SUM(R[-{0}]C:R[-1]C)", suggestList.OilTypeList.Count)
+                            End If
+
                         End With
 
                     End If

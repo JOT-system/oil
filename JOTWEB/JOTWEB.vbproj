@@ -151,6 +151,9 @@
     <Content Include="OIL\img\caution.png" />
     <Content Include="OIL\img\datalink.png" />
     <Content Include="OIL\img\e_cat.png" />
+    <Content Include="OIL\img\guidanceIconE.png" />
+    <Content Include="OIL\img\guidanceIconI.png" />
+    <Content Include="OIL\img\guidanceIconW.png" />
     <Content Include="OIL\img\iconError.png" />
     <Content Include="OIL\img\iconInfo.png" />
     <Content Include="OIL\img\iconWarn.png" />

@@ -154,6 +154,8 @@ Public Class GRIS0005LeftBox
         LC_LOADINGKBN
         LC_TANKNUMBER_KAISOU
         LC_TANKSITUATION
+        LC_ACCOUNTLIST
+        LC_TORILIST
     End Enum
 
     ''' <summary>
@@ -241,6 +243,8 @@ Public Class GRIS0005LeftBox
         LP_KAISOUTYPE
         LP_OBJECTIVECODE
         LP_TANKNUMBER_KAISOU
+        LP_ACCOUNTLIST
+        LP_TORILIST
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -577,6 +581,10 @@ Public Class GRIS0005LeftBox
                 'タンク車型式
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKMODEL"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TORILIST
+                '取引先
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TORIMASTER"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
                 '営業所(組織コード)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SALESOFFICE"
@@ -753,6 +761,10 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_TANKSITUATION
                 'タンク車状況
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKSITUATION"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_ACCOUNTLIST
+                '科目パターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ACCOUNTPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー

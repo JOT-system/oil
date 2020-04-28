@@ -16,11 +16,13 @@ Public Class OIT0003OrderDetail
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003INPtbl_tab4 As DataTable                         'チェック用テーブル(タブ４用)
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
+    Private OIT0003UPDtbl_tab4 As DataTable                         '更新用テーブル(タブ４用)
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
     Private OIT0003WK2tbl As DataTable                              '作業用2テーブル
     Private OIT0003WK3tbl As DataTable                              '作業用3テーブル
     Private OIT0003WK4tbl As DataTable                              '作業用4テーブル
     Private OIT0003WK5tbl As DataTable                              '作業用4テーブル
+    Private OIT0003WKtbl_tab4 As DataTable                          '作業用テーブル(タブ４用)
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル
@@ -959,6 +961,10 @@ Public Class OIT0003OrderDetail
 
             '費用入力一覧(勘定科目サマリー作成)
             MAPDataGetTab4(SQLcon)
+
+            '費用入力一覧(勘定科目追加項目作成)
+            MAPDataADDTab4(SQLcon)
+
         End Using
 
         '○ 画面表示データ保存
@@ -1045,6 +1051,7 @@ Public Class OIT0003OrderDetail
         & " , ISNULL(RTRIM(VIW0012.ACCOUNTNAME), '')             AS ACCOUNTNAME" _
         & " , ISNULL(RTRIM(OIM0010.SEGMENTCODE), '')             AS SEGMENTCODE" _
         & " , ISNULL(RTRIM(VIW0012.SEGMENTNAME), '')             AS SEGMENTNAME" _
+        & " , ISNULL(RTRIM(VIW0012.BREAKDOWNCODE), '')           AS BREAKDOWNCODE" _
         & " , ISNULL(RTRIM(VIW0012.BREAKDOWN), '')               AS BREAKDOWN" _
         & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')            AS SHIPPERSCODE" _
         & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')            AS SHIPPERSNAME" _
@@ -1058,7 +1065,7 @@ Public Class OIT0003OrderDetail
         & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
         & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')           AS CONSIGNEECODE" _
         & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')           AS CONSIGNEENAME" _
-        & " , ISNULL(RTRIM(OIT0002.KEIJYOYMD), NULL)             AS KEIJYOYMD" _
+        & " , ISNULL(RTRIM(OIT0002.KEIJYOYMD), FORMAT(GETDATE(), 'yyyy/MM/dd'))             AS KEIJYOYMD" _
         & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                 AS TRAINNO" _
         & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')               AS TRAINNAME" _
         & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
@@ -1117,6 +1124,7 @@ Public Class OIT0003OrderDetail
         SQLStr =
             SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.TCCALCKBN), '')                  AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.TCCALCKBNNAME), '')              AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.TCCHARGE), '')                   AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -1151,6 +1159,7 @@ Public Class OIT0003OrderDetail
           " UNION ALL " _
         & SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.FARECALCKBN), '')                AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.FARECALCKBNNAME), '')            AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.SYOTEIHAZFARE), '')              AS CHARGE" _
         & " , ISNULL(RTRIM(VIW0012.HAZJRDISCOUNT), '')              AS JRDISCOUNT" _
         & " , ISNULL(RTRIM(VIW0012.HAZOTDISCOUNT), '')              AS OTDISCOUNT" _
@@ -1179,6 +1188,7 @@ Public Class OIT0003OrderDetail
           " UNION ALL " _
         & SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.MOTCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.MOTCALCKBNNAME), '')             AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.MOTCHARGE), '')                  AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -1209,6 +1219,7 @@ Public Class OIT0003OrderDetail
           " UNION ALL " _
         & SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.WRKCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.WRKCALCKBNNAME), '')             AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.WRKCHARGE), '')                  AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -1239,6 +1250,7 @@ Public Class OIT0003OrderDetail
           " UNION ALL " _
         & SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.HNDCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.HNDCALCKBNNAME), '')             AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.HNDCAHRGE), '')                  AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -1269,6 +1281,7 @@ Public Class OIT0003OrderDetail
           " UNION ALL " _
         & SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.OTCALCKBN), '')                  AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.OTCALCKBNNAME), '')              AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.OTCAHRGE), '')                   AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -1299,6 +1312,7 @@ Public Class OIT0003OrderDetail
           " UNION ALL " _
         & SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.FRTCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.FRTCALCKBNNAME), '')             AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.FRTCAHRGE), '')                  AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -1329,6 +1343,7 @@ Public Class OIT0003OrderDetail
           " UNION ALL " _
         & SQLSelectStr _
         & " , ISNULL(RTRIM(VIW0012.COMCALCKBN), '')                 AS CALCKBN" _
+        & " , ISNULL(RTRIM(VIW0012.COMCALCKBNNAME), '')             AS CALCKBNNAME" _
         & " , ISNULL(RTRIM(VIW0012.COMCAHRGE), '')                  AS CHARGE" _
         & " , ''                                                    AS JRDISCOUNT" _
         & " , ''                                                    AS OTDISCOUNT" _
@@ -2337,6 +2352,7 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+#Region "タブ「費用入力」一覧表示用"
     ''' <summary>
     ''' 画面表示データ取得(タブ「費用入力」一覧表示用)
     ''' </summary>
@@ -2363,6 +2379,8 @@ Public Class OIT0003OrderDetail
                 & " , '0'                                                AS TIMSTP" _
                 & " , 1                                                  AS 'SELECT'" _
                 & " , 0                                                  AS HIDDEN" _
+                & " , @P01                                               AS BILLINGNO" _
+                & " , ''                                                 AS BILLINGDETAILNO" _
                 & " , TMP0002.ORDERNO                                    AS ORDERNO" _
                 & " , TMP0002.SHIPPERSCODE                               AS SHIPPERSCODE" _
                 & " , TMP0002.SHIPPERSNAME                               AS SHIPPERSNAME" _
@@ -2372,18 +2390,28 @@ Public Class OIT0003OrderDetail
                 & " , TMP0002.OFFICENAME                                 AS OFFICENAME" _
                 & " , TMP0002.CONSIGNEECODE                              AS CONSIGNEECODE" _
                 & " , TMP0002.CONSIGNEENAME                              AS CONSIGNEENAME" _
-                & " , TMP0002.ACCOUNTCODE + '　' + TMP0002.SEGMENTCODE   AS ACCOUNTCODE" _
-                & " , TMP0002.ACCOUNTNAME + '　' + TMP0002.SEGMENTNAME   AS ACCOUNTNAME" _
+                & " , '1'                                                AS CALCACCOUNT" _
+                & " , '1'                                                AS AKAKURO" _
+                & " , FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM')               AS KEIJYOYM" _
+                & " , TMP0002.KEIJYOYMD                                  AS KEIJYOYMD" _
+                & " , TMP0002.ACCOUNTCODE + '　' + TMP0002.SEGMENTCODE   AS ACCSEGCODE" _
+                & " , TMP0002.ACCOUNTNAME + '　' + TMP0002.SEGMENTNAME   AS ACCSEGNAME" _
+                & " , TMP0002.ACCOUNTCODE                                AS ACCOUNTCODE" _
+                & " , TMP0002.ACCOUNTNAME                                AS ACCOUNTNAME" _
+                & " , TMP0002.SEGMENTCODE                                AS SEGMENTCODE" _
+                & " , TMP0002.SEGMENTNAME                                AS SEGMENTNAME" _
+                & " , TMP0002.BREAKDOWNCODE                              AS BREAKDOWNCODE" _
                 & " , TMP0002.BREAKDOWN                                  AS BREAKDOWN" _
                 & " , TMP0002.CALCKBN                                    AS CALCKBN" _
-                & " , CASE " _
+                & " , TMP0002.CALCKBNNAME                                AS CALCKBNNAME" _
+                & " , CAST(CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
                 & "        SUM(TMP0002.CARSNUMBER) " _
                 & "   WHEN TMP0002.CALCKBN = '2' THEN " _
                 & "        SUM(TMP0002.CARSAMOUNT) " _
                 & "   WHEN TMP0002.CALCKBN = '3' THEN " _
                 & "        SUM(TMP0002.LOAD) " _
-                & "   END CARSAMOUNT" _
+                & "   END AS VARCHAR(10)) CARSAMOUNT" _
                 & " , CAST(TMP0002.APPLYCHARGE AS DECIMAL(12, 3))        AS APPLYCHARGE" _
                 & " , CAST(ROUND(CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
@@ -2395,11 +2423,11 @@ Public Class OIT0003OrderDetail
                 & "   END, 3) AS DECIMAL(12, 3)) APPLYCHARGESUM" _
                 & " , CAST(ROUND(CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
-                & "        SUM(TMP0002.CARSNUMBER * (TMP0002.APPLYCHARGE * @P01)) " _
+                & "        SUM(TMP0002.CARSNUMBER * (TMP0002.APPLYCHARGE * @P02)) " _
                 & "   WHEN TMP0002.CALCKBN = '2' THEN " _
-                & "        SUM(TMP0002.CARSAMOUNT * (TMP0002.APPLYCHARGE * @P01)) " _
+                & "        SUM(TMP0002.CARSAMOUNT * (TMP0002.APPLYCHARGE * @P02)) " _
                 & "   WHEN TMP0002.CALCKBN = '3' THEN " _
-                & "        SUM(TMP0002.LOAD * (TMP0002.APPLYCHARGE * @P01)) " _
+                & "        SUM(TMP0002.LOAD * (TMP0002.APPLYCHARGE * @P02)) " _
                 & "   END, 3) AS DECIMAL(12, 3)) CONSUMPTIONTAX" _
                 & " , TMP0002.INVOICECODE                                AS INVOICECODE" _
                 & " , TMP0002.INVOICENAME                                AS INVOICENAME" _
@@ -2412,9 +2440,9 @@ Public Class OIT0003OrderDetail
         SQLStr &=
                 " GROUP BY TMP0002.ORDERNO, TMP0002.SHIPPERSCODE, TMP0002.SHIPPERSNAME" _
               & " , TMP0002.BASECODE, TMP0002.BASENAME, TMP0002.OFFICECODE, TMP0002.OFFICENAME" _
-              & " , TMP0002.CONSIGNEECODE, TMP0002.CONSIGNEENAME" _
+              & " , TMP0002.CONSIGNEECODE, TMP0002.CONSIGNEENAME, TMP0002.KEIJYOYMD" _
               & " , TMP0002.ACCOUNTCODE, TMP0002.ACCOUNTNAME, TMP0002.SEGMENTCODE, TMP0002.SEGMENTNAME" _
-              & " , TMP0002.BREAKDOWN, TMP0002.CALCKBN, TMP0002.APPLYCHARGE" _
+              & " , TMP0002.BREAKDOWNCODE, TMP0002.BREAKDOWN, TMP0002.CALCKBN, TMP0002.CALCKBNNAME, TMP0002.APPLYCHARGE" _
               & " , TMP0002.INVOICECODE, TMP0002.INVOICENAME, TMP0002.INVOICEDEPTNAME" _
               & " , TMP0002.PAYEECODE, TMP0002.PAYEENAME, TMP0002.PAYEEDEPTNAME"
 
@@ -2423,9 +2451,11 @@ Public Class OIT0003OrderDetail
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Decimal) '消費税
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Decimal) '消費税
 
-                PARA01.Value = 0.1
+                PARA01.Value = work.WF_SEL_BILLINGNO.Text
+                PARA02.Value = 0.1
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -2440,7 +2470,11 @@ Public Class OIT0003OrderDetail
                 Dim i As Integer = 0
                 For Each OIT0003tab4row As DataRow In OIT0003tbl_tab4.Rows
                     i += 1
-                    OIT0003tab4row("LINECNT") = i        'LINECNT
+
+                    'LINECNT
+                    OIT0003tab4row("LINECNT") = i
+                    '数量(単位を後ろに付ける)
+                    OIT0003tab4row("CARSAMOUNT") = OIT0003tab4row("CARSAMOUNT") + OIT0003tab4row("CALCKBNNAME")
 
                 Next
 
@@ -2460,6 +2494,104 @@ Public Class OIT0003OrderDetail
 
     End Sub
 
+    ''' <summary>
+    ''' 画面表示データ取得(タブ「費用入力」一覧表示用(追加項目用))
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub MAPDataADDTab4(ByVal SQLcon As SqlConnection)
+
+        '○ 一覧表示用検索SQL
+        '　一覧説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+                  " SELECT" _
+                & "   0                                                  AS LINECNT" _
+                & " , ''                                                 AS OPERATION" _
+                & " , '0'                                                AS TIMSTP" _
+                & " , 1                                                  AS 'SELECT'" _
+                & " , 0                                                  AS HIDDEN" _
+                & " , OIT0010.BILLINGNO                                  AS BILLINGNO" _
+                & " , OIT0010.BILLINGDETAILNO                            AS BILLINGDETAILNO" _
+                & " , OIT0010.ORDERNO                                    AS ORDERNO" _
+                & " , ''                                                 AS SHIPPERSCODE" _
+                & " , ''                                                 AS SHIPPERSNAME" _
+                & " , ''                                                 AS BASECODE" _
+                & " , ''                                                 AS BASENAME" _
+                & " , ''                                                 AS OFFICECODE" _
+                & " , ''                                                 AS OFFICENAME" _
+                & " , ''                                                 AS CONSIGNEECODE" _
+                & " , ''                                                 AS CONSIGNEENAME" _
+                & " , OIT0010.CALCACCOUNT                                AS CALCACCOUNT" _
+                & " , OIT0010.AKAKURO                                    AS AKAKURO" _
+                & " , FORMAT(OIT0010.KEIJYOYMD, 'yyyy/MM')               AS KEIJYOYM" _
+                & " , OIT0010.KEIJYOYMD                                  AS KEIJYOYMD" _
+                & " , OIT0010.ACCOUNTCODE + '　' + OIT0010.SEGMENTCODE   AS ACCSEGCODE" _
+                & " , OIT0010.ACCOUNTNAME + '　' + OIT0010.SEGMENTNAME   AS ACCSEGNAME" _
+                & " , OIT0010.ACCOUNTCODE                                AS ACCOUNTCODE" _
+                & " , OIT0010.ACCOUNTNAME                                AS ACCOUNTNAME" _
+                & " , OIT0010.SEGMENTCODE                                AS SEGMENTCODE" _
+                & " , OIT0010.SEGMENTNAME                                AS SEGMENTNAME" _
+                & " , OIT0010.SEGMENTBRANCHCODE                          AS BREAKDOWNCODE" _
+                & " , OIT0010.SEGMENTBRANCHNAME                          AS BREAKDOWN" _
+                & " , OIT0010.CALCACCOUNT                                AS CALCKBN" _
+                & " , CAST(OIT0010.QUANTITY AS DECIMAL(12, 3))           AS CARSAMOUNT" _
+                & " , CAST(OIT0010.UNITPRICE AS DECIMAL(12, 3))          AS APPLYCHARGE" _
+                & " , CAST(OIT0010.AMOUNT AS DECIMAL(12, 3))             AS APPLYCHARGESUM" _
+                & " , CAST(OIT0010.TAX AS DECIMAL(12, 3))                AS CONSUMPTIONTAX" _
+                & " , OIT0010.INVOICECODE                                AS INVOICECODE" _
+                & " , OIT0010.INVOICENAME                                AS INVOICENAME" _
+                & " , OIT0010.INVOICEDEPTNAME                            AS INVOICEDEPTNAME" _
+                & " , OIT0010.PAYEECODE                                  AS PAYEECODE" _
+                & " , OIT0010.PAYEENAME                                  AS PAYEENAME" _
+                & " , OIT0010.PAYEEDEPTNAME                              AS PAYEEDEPTNAME" _
+                & " FROM OIL.OIT0010_ORDERBILLING OIT0010 " _
+                & " WHERE " _
+                & "     OIT0010.BILLINGNO   = @P01 " _
+                & " AND OIT0010.CALCACCOUNT = '2' " _
+                & " AND OIT0010.DELFLG      <> @P02;"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+
+                PARA01.Value = work.WF_SEL_BILLINGNO.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003tbl_tab4.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003tab4row As DataRow In OIT0003tbl_tab4.Rows
+
+                    If OIT0003tab4row("LINECNT").ToString() <> "0" Then
+                        i = OIT0003tab4row("LINECNT")
+                    Else
+                        i += 1
+                        OIT0003tab4row("LINECNT") = i   'LINECNT
+                    End If
+                Next
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB4 ADDSELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB4 AddSelect"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+#End Region
 
     ''' <summary>
     ''' 一覧再表示処理
@@ -3936,6 +4068,123 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     Protected Sub WW_ButtonLINE_ADD_TAB4()
 
+        If IsNothing(OIT0003WKtbl_tab4) Then
+            OIT0003WKtbl_tab4 = New DataTable
+        End If
+
+        If OIT0003WKtbl_tab4.Columns.Count <> 0 Then
+            OIT0003WKtbl_tab4.Columns.Clear()
+        End If
+
+        OIT0003WKtbl_tab4.Clear()
+
+        'DataBase接続文字
+        Dim SQLcon = CS0050SESSION.getConnection
+        SQLcon.Open() 'DataBase接続(Open)
+
+        '○ 追加SQL
+        '　 説明　：　行追加用SQL
+        Dim SQLStr As String =
+              " SELECT TOP (1)" _
+            & "   0                                                  AS LINECNT" _
+            & " , ''                                                 AS OPERATION" _
+            & " , '0'                                                AS TIMSTP" _
+            & " , 1                                                  AS 'SELECT'" _
+            & " , 0                                                  AS HIDDEN" _
+            & " , @P01                                               AS BILLINGNO" _
+            & " , ''                                                 AS BILLINGDETAILNO" _
+            & " , @P02                                               AS ORDERNO" _
+            & " , ''                                                 AS SHIPPERSCODE" _
+            & " , ''                                                 AS SHIPPERSNAME" _
+            & " , ''                                                 AS BASECODE" _
+            & " , ''                                                 AS BASENAME" _
+            & " , ''                                                 AS OFFICECODE" _
+            & " , ''                                                 AS OFFICENAME" _
+            & " , ''                                                 AS CONSIGNEECODE" _
+            & " , ''                                                 AS CONSIGNEENAME" _
+            & " , '2'                                                AS CALCACCOUNT" _
+            & " , '1'                                                AS AKAKURO" _
+            & " , FORMAT(GETDATE(), 'yyyy/MM')                       AS KEIJYOYM" _
+            & " , FORMAT(GETDATE(), 'yyyy/MM/dd')                    AS KEIJYOYMD" _
+            & " , ''                                                 AS ACCSEGCODE" _
+            & " , ''                                                 AS ACCSEGNAME" _
+            & " , ''                                                 AS ACCOUNTCODE" _
+            & " , ''                                                 AS ACCOUNTNAME" _
+            & " , ''                                                 AS SEGMENTCODE" _
+            & " , ''                                                 AS SEGMENTNAME" _
+            & " , ''                                                 AS BREAKDOWNCODE" _
+            & " , ''                                                 AS BREAKDOWN" _
+            & " , '2'                                                AS CALCKBN" _
+            & " , 0                                               AS CARSAMOUNT" _
+            & " , 0                                               AS APPLYCHARGE" _
+            & " , 0                                               AS APPLYCHARGESUM" _
+            & " , 0                                               AS CONSUMPTIONTAX" _
+            & " , ''                                                 AS INVOICECODE" _
+            & " , ''                                                 AS INVOICENAME" _
+            & " , ''                                                 AS INVOICEDEPTNAME" _
+            & " , ''                                                 AS PAYEECODE" _
+            & " , ''                                                 AS PAYEENAME" _
+            & " , ''                                                 AS PAYEEDEPTNAME" _
+            & " FROM sys.all_objects "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 11) '受注№
+
+                PARA1.Value = work.WF_SEL_BILLINGNO.Text
+                PARA2.Value = work.WF_SEL_ORDERNUMBER.Text
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003tbl_tab4.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                Dim j As Integer = 9000
+                Dim intDetailNo As Integer = 0
+                For Each OIT0003row As DataRow In OIT0003tbl_tab4.Rows
+
+                    '行追加データに既存の受注№を設定する。
+                    '既存データがなく新規データの場合は、SQLでの項目[受注№]を利用
+                    If OIT0003row("BILLINGDETAILNO") = "" Then
+                        intDetailNo += 1
+                        OIT0003row("BILLINGDETAILNO") = intDetailNo.ToString("000")
+
+                    Else
+                        intDetailNo = OIT0003row("BILLINGDETAILNO")
+
+                    End If
+
+                    '削除対象データと通常データとそれぞれでLINECNTを振り分ける
+                    If OIT0003row("HIDDEN") = 1 Then
+                        j += 1
+                        OIT0003row("LINECNT") = j        'LINECNT
+                    Else
+                        i += 1
+                        OIT0003row("LINECNT") = i        'LINECNT
+                    End If
+
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB4 LINEADD")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB4 LINEADD"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
     End Sub
 
     ''' <summary>
@@ -3962,7 +4211,7 @@ Public Class OIT0003OrderDetail
 
             'タブ「費用入力」
         ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
-            'XXXボタン押下時
+            '訂正更新ボタン押下時
             WW_ButtonUPDATE_TAB4()
 
         End If
@@ -4602,6 +4851,10 @@ Public Class OIT0003OrderDetail
 
             '費用入力一覧(勘定科目サマリー作成)
             MAPDataGetTab4(SQLcon)
+
+            '費用入力一覧(勘定科目追加項目作成)
+            MAPDataADDTab4(SQLcon)
+
         End Using
 
         '○ 画面表示データ保存
@@ -4619,10 +4872,25 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
-    ''' XXXボタン押下時処理(タブ「費用入力」)
+    ''' 訂正更新ボタン押下時処理(タブ「費用入力」)
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_ButtonUPDATE_TAB4()
+
+        '受注費用DB追加・更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            '受注費用(TBL)追加・更新
+            WW_UpdateOrderBilling(SQLcon)
+
+            '受注(TBL)更新
+            WW_UpdateOrder_TAB4(SQLcon)
+
+            '受注(一覧)画面表示データ取得
+            WW_OrderListTBLSet(SQLcon)
+
+        End Using
 
     End Sub
 
@@ -5140,6 +5408,7 @@ Public Class OIT0003OrderDetail
 
                 '費用入力
             Case 3
+                WW_ListChange_TAB4()
 
         End Select
 
@@ -5519,6 +5788,34 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+    End Sub
+    ''' <summary>
+    ''' リスト変更時処理(タブ「費用入力」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ListChange_TAB4()
+        '○ LINECNT取得
+        Dim WW_LINECNT As Integer = 0
+        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = OIT0003tbl_tab4.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        '○ 設定項目取得
+        '対象フォーム項目取得
+        Dim WW_ListValue = Request.Form("txt" & pnlListArea4.ID & WF_FIELD.Value & WF_GridDBclick.Text)
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        Select Case WF_FIELD.Value
+            Case "APPLYCHARGESUM"       '(一覧)金額
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
     End Sub
 
@@ -7489,6 +7786,357 @@ Public Class OIT0003OrderDetail
 
 #End Region
 
+#Region "タブ「費用入力」各テーブル更新"
+    ''' <summary>
+    ''' 受注費用TBL登録更新
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrderBilling(ByVal SQLcon As SqlConnection)
+
+        '○ ＤＢ削除
+        Dim SQLTempTblStr As String =
+          " DELETE FROM OIL.OIT0010_ORDERBILLING WHERE BILLINGNO = @P01; " _
+
+        '○ ＤＢ更新
+        Dim SQLStr As String =
+              " DECLARE @hensuu AS bigint ;" _
+            & "    SET @hensuu = 0 ;" _
+            & " DECLARE hensuu CURSOR FOR" _
+            & "    SELECT" _
+            & "        CAST(UPDTIMSTP AS bigint) AS hensuu" _
+            & "    FROM" _
+            & "        OIL.OIT0010_ORDERBILLING" _
+            & "    WHERE" _
+            & "        BILLINGNO          = @P01" _
+            & "    AND BILLINGDETAILNO    = @P02" _
+            & " OPEN hensuu ;" _
+            & " FETCH NEXT FROM hensuu INTO @hensuu ;" _
+            & " IF (@@FETCH_STATUS = 0)" _
+            & "    UPDATE OIL.OIT0010_ORDERBILLING" _
+            & "    SET" _
+            & "        KEIJYOYMD           = @P03  , AKAKURO           = @P04" _
+            & "        , ORDERNO           = @P05  , TANKNO            = @P06" _
+            & "        , OFFICECODE        = @P07  , OFFICENAME        = @P08, CALCACCOUNT = @P09" _
+            & "        , ACCOUNTCODE       = @P10  , ACCOUNTNAME       = @P11" _
+            & "        , SEGMENTCODE       = @P12  , SEGMENTNAME       = @P13" _
+            & "        , SEGMENTBRANCHCODE = @P14  , SEGMENTBRANCHNAME = @P15" _
+            & "        , ACCOUNTTYPE       = @P16  , ACCOUNTTYPENAME   = @P17" _
+            & "        , QUANTITY          = @P18" _
+            & "        , UNITPRICE         = @P19  , AMOUNT            = @P20" _
+            & "        , TAX               = @P21  , INVOICECODE       = @P22" _
+            & "        , INVOICENAME       = @P23  , INVOICEDEPTNAME   = @P24" _
+            & "        , PAYEECODE         = @P25  , PAYEENAME         = @P26" _
+            & "        , PAYEEDEPTNAME     = @P27  , TEKIYOU           = @P28" _
+            & "        , BIKOU             = @P29" _
+            & "        , UPDYMD            = @P34  , UPDUSER           = @P35" _
+            & "        , UPDTERMID         = @P36  , RECEIVEYMD        = @P37" _
+            & "    WHERE" _
+            & "        BILLINGNO       = @P01" _
+            & "    AND BILLINGDETAILNO = @P02" _
+            & " IF (@@FETCH_STATUS <> 0)" _
+            & "    INSERT INTO OIL.OIT0010_ORDERBILLING" _
+            & "        ( BILLINGNO        , BILLINGDETAILNO  , KEIJYOYMD      , AKAKURO        , ORDERNO" _
+            & "        , TANKNO           , OFFICECODE       , OFFICENAME     , CALCACCOUNT" _
+            & "        , ACCOUNTCODE      , ACCOUNTNAME      , SEGMENTCODE    , SEGMENTNAME" _
+            & "        , SEGMENTBRANCHCODE, SEGMENTBRANCHNAME, ACCOUNTTYPE    , ACCOUNTTYPENAME" _
+            & "        , QUANTITY         , UNITPRICE        , AMOUNT         , TAX" _
+            & "        , INVOICECODE      , INVOICENAME      , INVOICEDEPTNAME" _
+            & "        , PAYEECODE        , PAYEENAME        , PAYEEDEPTNAME" _
+            & "        , TEKIYOU          , BIKOU            , DELFLG" _
+            & "        , INITYMD          , INITUSER         , INITTERMID" _
+            & "        , UPDYMD           , UPDUSER          , UPDTERMID      , RECEIVEYMD)" _
+            & "    VALUES" _
+            & "        ( @P01, @P02, @P03, @P04, @P05" _
+            & "        , @P06, @P07, @P08, @P09" _
+            & "        , @P10, @P11, @P12, @P13" _
+            & "        , @P14, @P15, @P16, @P17" _
+            & "        , @P18, @P19, @P20, @P21" _
+            & "        , @P22, @P23, @P24" _
+            & "        , @P25, @P26, @P27" _
+            & "        , @P28, @P29, @P30" _
+            & "        , @P31, @P32, @P33" _
+            & "        , @P34, @P35, @P36, @P37) ;" _
+            & " CLOSE hensuu ;" _
+            & " DEALLOCATE hensuu ;"
+
+        '○ 更新ジャーナル出力
+        Dim SQLJnl As String =
+            " SELECT" _
+            & "    BILLINGNO" _
+            & "    , BILLINGDETAILNO" _
+            & "    , KEIJYOYMD" _
+            & "    , AKAKURO" _
+            & "    , ORDERNO" _
+            & "    , TANKNO" _
+            & "    , OFFICECODE" _
+            & "    , OFFICENAME" _
+            & "    , CALCACCOUNT" _
+            & "    , ACCOUNTCODE" _
+            & "    , ACCOUNTNAME" _
+            & "    , SEGMENTCODE" _
+            & "    , SEGMENTNAME" _
+            & "    , SEGMENTBRANCHCODE" _
+            & "    , SEGMENTBRANCHNAME" _
+            & "    , ACCOUNTTYPE" _
+            & "    , ACCOUNTTYPENAME" _
+            & "    , QUANTITY" _
+            & "    , UNITPRICE" _
+            & "    , AMOUNT" _
+            & "    , TAX" _
+            & "    , INVOICECODE" _
+            & "    , INVOICENAME" _
+            & "    , INVOICEDEPTNAME" _
+            & "    , PAYEECODE" _
+            & "    , PAYEENAME" _
+            & "    , PAYEEDEPTNAME" _
+            & "    , TEKIYOU" _
+            & "    , BIKOU" _
+            & "    , DELFLG" _
+            & "    , INITYMD" _
+            & "    , INITUSER" _
+            & "    , INITTERMID" _
+            & "    , UPDYMD" _
+            & "    , UPDUSER" _
+            & "    , UPDTERMID" _
+            & "    , RECEIVEYMD" _
+            & " FROM" _
+            & "    OIL.OIT0010_ORDERBILLING" _
+            & " WHERE" _
+            & "        BILLINGNO       = @P01" _
+            & "    AND BILLINGDETAILNO = @P02"
+
+        Try
+            Using SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon),
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon),
+                  SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+
+                '★削除作成用
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                PARATMP01.Value = work.WF_SEL_BILLINGNO.Text
+
+                '　削除実行
+                SQLTMPcmd.ExecuteNonQuery()
+
+                '★追加・更新用
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '支払請求№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '支払請求明細№
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)          '計上年月日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)   '赤黒区分
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 11)  '受注№
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 8)   'タンク車№
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 6)   '受注営業所コード
+                Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 20)  '受注営業所名
+                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 1)   '計算科目
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 8)   '科目コード
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 40)  '科目名
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 5)   'セグメント
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 40)  'セグメント名
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 2)   'セグメント枝番
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 40)  'セグメント枝番名
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 2)   '科目区分
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 40)  '科目区分名
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.Decimal)       '数量
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.Money)         '単価
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.Money)         '金額
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.Money)         '税額
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 10)  '請求先コード
+                Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 40)  '請求先名
+                Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 40)  '請求先部門名
+                Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.NVarChar, 10)  '支払先コード
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.NVarChar, 40)  '支払先名
+                Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.NVarChar, 40)  '支払先部門名
+                Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.NVarChar)      '摘要
+                Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.NVarChar)      '備考
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 1)   '削除フラグ
+                Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.DateTime)      '登録年月日
+                Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 20)  '登録ユーザーＩＤ
+                Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 20)  '登録端末
+                Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.DateTime)      '更新年月日
+                Dim PARA35 As SqlParameter = SQLcmd.Parameters.Add("@P35", SqlDbType.NVarChar, 20)  '更新ユーザーＩＤ
+                Dim PARA36 As SqlParameter = SQLcmd.Parameters.Add("@P36", SqlDbType.NVarChar, 20)  '更新端末
+                Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.DateTime)      '集信日時
+
+                Dim JPARA01 As SqlParameter = SQLcmdJnl.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
+                Dim JPARA02 As SqlParameter = SQLcmdJnl.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '支払請求明細№
+
+                Dim WW_DATENOW As DateTime = Date.Now
+
+                '支払請求№チェック
+                If work.WF_SEL_BILLINGNO.Text = "" Then
+                    '★新規支払請求№の取得
+                    Dim WW_GetValue() As String = {"", "", "", "", "", "", "", ""}
+                    WW_FixvalueMasterSearch("", "NEWBILLINGNOGET", "", WW_GetValue)
+                    work.WF_SEL_BILLINGNO.Text = WW_GetValue(0)
+                End If
+
+                Dim i As Integer = 0
+                Dim reg As New Regex("[^0-9^.]")
+                For Each OIT0003tab4row As DataRow In OIT0003tbl_tab4.Rows
+                    i += 1
+                    'DB更新
+                    PARA01.Value = work.WF_SEL_BILLINGNO.Text          '支払請求№
+                    PARA02.Value = i.ToString("000")                   '支払請求明細№
+                    PARA03.Value = OIT0003tab4row("KEIJYOYMD")         '計上年月日
+                    PARA04.Value = OIT0003tab4row("AKAKURO")           '赤黒区分
+                    PARA05.Value = OIT0003tab4row("ORDERNO")           '受注№
+                    PARA06.Value = ""                                  'タンク車№
+                    PARA07.Value = OIT0003tab4row("OFFICECODE")        '受注営業所コード
+                    PARA08.Value = OIT0003tab4row("OFFICENAME")        '受注営業所名
+                    PARA09.Value = OIT0003tab4row("CALCACCOUNT")       '計算科目
+                    PARA10.Value = OIT0003tab4row("ACCOUNTCODE")       '科目コード
+                    PARA11.Value = OIT0003tab4row("ACCOUNTNAME")       '科目名
+                    PARA12.Value = OIT0003tab4row("SEGMENTCODE")       'セグメント
+                    PARA13.Value = OIT0003tab4row("SEGMENTNAME")       'セグメント名
+                    PARA14.Value = OIT0003tab4row("BREAKDOWNCODE")     'セグメント枝番
+                    PARA15.Value = OIT0003tab4row("BREAKDOWN")         'セグメント枝番名
+                    PARA16.Value = OIT0003tab4row("CALCKBN")           '科目区分
+                    PARA17.Value = ""                                  '科目区分名
+
+                    PARA18.Value = reg.Replace(OIT0003tab4row("CARSAMOUNT"), "")        '数量
+                    PARA19.Value = OIT0003tab4row("APPLYCHARGE")       '単価
+                    PARA20.Value = OIT0003tab4row("APPLYCHARGESUM")    '金額
+                    PARA21.Value = OIT0003tab4row("CONSUMPTIONTAX")    '税額
+                    PARA22.Value = OIT0003tab4row("INVOICECODE")       '請求先コード
+                    PARA23.Value = OIT0003tab4row("INVOICENAME")       '請求先名
+                    PARA24.Value = OIT0003tab4row("INVOICEDEPTNAME")   '請求先部門名
+                    PARA25.Value = OIT0003tab4row("PAYEECODE")         '支払先コード
+                    PARA26.Value = OIT0003tab4row("PAYEENAME")         '支払先名
+                    PARA27.Value = OIT0003tab4row("PAYEEDEPTNAME")     '支払先部門名
+                    'PARA28.Value = OIT0003tab4row("TEKIYOU")           '摘要
+                    'PARA29.Value = OIT0003tab4row("BIKOU")             '備考
+                    PARA28.Value = ""             '摘要
+                    PARA29.Value = ""             '備考
+                    PARA30.Value = "0"                                 '削除フラグ
+                    PARA31.Value = WW_DATENOW                          '登録年月日
+                    PARA32.Value = Master.USERID                       '登録ユーザーID
+                    PARA33.Value = Master.USERTERMID                   '登録端末
+                    PARA34.Value = WW_DATENOW                          '更新年月日
+                    PARA35.Value = Master.USERID                       '更新ユーザーID
+                    PARA36.Value = Master.USERTERMID                   '更新端末
+                    PARA37.Value = C_DEFAULT_YMD
+
+                    SQLcmd.CommandTimeout = 300
+                    SQLcmd.ExecuteNonQuery()
+                    OIT0003tab4row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+
+                    '更新ジャーナル出力
+                    JPARA01.Value = OIT0003tab4row("BILLINGNO")
+                    JPARA02.Value = OIT0003tab4row("BILLINGDETAILNO")
+
+                    Using SQLdr As SqlDataReader = SQLcmdJnl.ExecuteReader()
+                        If IsNothing(OIT0003UPDtbl_tab4) Then
+                            OIT0003UPDtbl_tab4 = New DataTable
+
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0003UPDtbl_tab4.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+
+                        OIT0003UPDtbl_tab4.Clear()
+                        OIT0003UPDtbl_tab4.Load(SQLdr)
+                    End Using
+
+                    For Each OIT0003UPDrow As DataRow In OIT0003UPDtbl_tab4.Rows
+                        CS0020JOURNAL.TABLENM = "OIT0003D_TAB4"
+                        CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                        CS0020JOURNAL.ROW = OIT0003UPDrow
+                        CS0020JOURNAL.CS0020JOURNAL()
+                        If Not isNormal(CS0020JOURNAL.ERR) Then
+                            Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                            CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                            CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                            CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                            CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                            CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                            Exit Sub
+                        End If
+                    Next
+                Next
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D UPDATE_ORDERBILLING")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D UPDATE_ORDERBILLING"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注TBL更新
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続</param>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrder_TAB4(ByVal SQLcon As SqlConnection)
+
+        Try
+            '更新SQL文･･･受注TBLの各項目をを更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0002_ORDER " _
+                    & "    SET BILLINGNO        = @P03, " _
+                    & "        KEIJYOYMD        = @P04, " _
+                    & "        UPDYMD           = @P08, " _
+                    & "        UPDUSER          = @P09, " _
+                    & "        UPDTERMID        = @P10, " _
+                    & "        RECEIVEYMD       = @P11  " _
+                    & "  WHERE ORDERNO          = @P01  " _
+                    & "    AND DELFLG           <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  '受注№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '支払請求№
+            Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Date)      '計上日
+            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.DateTime)  '更新年月日
+            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
+            Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '更新端末
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)  '集信日時
+
+            PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+            PARA02.Value = C_DELETE_FLG.DELETE
+            PARA03.Value = work.WF_SEL_BILLINGNO.Text
+            PARA04.Value = Date.Now.ToString("yyyy/MM/dd")
+
+            PARA08.Value = Date.Now
+            PARA09.Value = Master.USERID
+            PARA10.Value = Master.USERTERMID
+            PARA11.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_ORDER_TAB4 UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_ORDER_TAB4 UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+#End Region
     ''' <summary>
     ''' 受注(一覧)表示用
     ''' </summary>
@@ -7605,6 +8253,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNO), '')              AS TANKLINKNO" _
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
+            & " , ISNULL(RTRIM(OIT0002.BILLINGNO), '')               AS BILLINGNO" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
@@ -8727,10 +9376,12 @@ Public Class OIT0003OrderDetail
             'タブ「入換・積込指示」　⇒　(一覧)積込入線列車番号, (一覧)積込出線列車番号, (一覧)回線, (一覧)充填ポイント
             'タブ「タンク車明細」　　⇒　(一覧)(実績)積込日, (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)空車着日
             '                            (一覧)ジョイント先, (一覧)第2着駅, (一覧)第2荷受人
+            'タブ「費用入力」　　　　⇒　(一覧)計上月, (一覧)科目コード, (一覧)請求先コード, (一覧)支払先コード
             Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO",
                  "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO", "LINE", "FILLINGPOINT",
                  "ACTUALLODDATE", "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE",
-                 "JOINT", "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME"
+                 "JOINT", "SECONDARRSTATIONNAME", "SECONDCONSIGNEENAME",
+                 "KEIJYOYM", "ACCSEGCODE", "INVOICECODE", "PAYEECODE"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -9097,6 +9748,36 @@ Public Class OIT0003OrderDetail
                             FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
                         If IsNothing(updHeader) Then Exit Sub
 
+                        '〇 一覧項目へ設定
+                        '(一覧)計上月
+                        If WF_FIELD.Value = "KEIJYOYM" Then
+
+                            '(一覧)科目コード
+                        ElseIf WF_FIELD.Value = "ACCSEGCODE" Then
+
+                            '科目コード+セグメント+セグメント枝番号をKEYにして、科目コード等を取得
+                            WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "ACCOUNTPATTERN", WW_SETVALUE, WW_GetValue)
+
+                            updHeader.Item(WF_FIELD.Value) = WW_GetValue(1) + " " + WW_GetValue(3)
+                            updHeader.Item("ACCSEGNAME") = WW_GetValue(2) + " " + WW_GetValue(4)
+                            updHeader.Item("ACCOUNTCODE") = WW_GetValue(1)
+                            updHeader.Item("ACCOUNTNAME") = WW_GetValue(2)
+                            updHeader.Item("SEGMENTCODE") = WW_GetValue(3)
+                            updHeader.Item("SEGMENTNAME") = WW_GetValue(4)
+                            updHeader.Item("BREAKDOWNCODE") = WW_GetValue(5)
+                            updHeader.Item("BREAKDOWN") = WW_GetValue(6)
+
+                            '(一覧)請求先コード
+                        ElseIf WF_FIELD.Value = "INVOICECODE" Then
+                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+                            updHeader.Item("INVOICENAME") = WW_SETTEXT
+
+                            '(一覧)支払先コード
+                        ElseIf WF_FIELD.Value = "PAYEECODE" Then
+                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+                            updHeader.Item("PAYEENAME") = WW_SETTEXT
+
+                        End If
                         '### ここに書く #######
 
                         '○ 画面表示データ保存
@@ -13005,6 +13686,90 @@ Public Class OIT0003OrderDetail
 
                 '費用入力
             Case 3
+
+                Dim divObj = DirectCast(pnlListArea4.FindControl(pnlListArea4.ID & "_DR"), Panel)
+                Dim tblObj = DirectCast(divObj.Controls(0), Table)
+                Dim chkObj As CheckBox = Nothing
+                'LINECNTを除いたチェックボックスID
+                Dim chkObjIdWOLincnt As String = "chk" & pnlListArea4.ID & "OPERATION"
+                'LINECNTを含むチェックボックスID
+                Dim chkObjId As String
+                Dim chkObjType As String
+                'ループ内の対象データROW(これで計算区分の値をとれるかと）
+                Dim loopdr As DataRow = Nothing
+                'データテーブルの行Index
+                Dim rowIdx As Integer = 0
+
+                For Each rowitem As TableRow In tblObj.Rows
+                    '画面表示行が存在している場合
+                    If CS0013ProfView.SRCDATA.Rows.Count <> 0 Then
+                        loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
+                        chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
+                        '下のループより先に見つけなければいけないかもしれないので
+                        '冗長ですがこちらでループ
+                        chkObj = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObj IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+
+                        '★自動計算科目は入力は不可
+                        If chkObjType = "1" Then
+                            'チェック時処理(もちろん↓のセルループにも入れてOK）
+                            chkObj.Enabled = False
+                            For Each cellObj As TableCell In rowitem.Controls
+                                If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "BREAKDOWN") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "APPLYCHARGESUM") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICEDEPTNAME") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEEDEPTNAME") Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
+                            Next
+                            '★追加科目は入力可能
+                        Else
+                            chkObj.Enabled = True
+                            For Each cellObj As TableCell In rowitem.Controls
+                                If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
+                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
+                            Next
+                        End If
+                    End If
+
+                    rowIdx += 1
+                Next
+
+
+                ''〇 (一覧)テキストボックスの制御(読取専用)
+                'Dim divObj = DirectCast(pnlListArea4.FindControl(pnlListArea4.ID & "_DR"), Panel)
+                'Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+                'For Each rowitem As TableRow In tblObj.Rows
+                '    For Each cellObj As TableCell In rowitem.Controls
+                '        If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "BREAKDOWN") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "APPLYCHARGESUM") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACTUALACCDATE") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICEDEPTNAME") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") _
+                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEEDEPTNAME") Then
+                '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                '        End If
+                '    Next
+                'Next
 
 
         End Select

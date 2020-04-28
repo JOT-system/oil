@@ -263,6 +263,13 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "JOINT") {
             document.getElementById('WF_LeftMViewChange').value = 53;
         }
+        else if (fieldNM === "ACCSEGCODE") {
+            document.getElementById('WF_LeftMViewChange').value = 67;
+        }
+        else if (fieldNM === "INVOICECODE"
+            || fieldNM === "PAYEECODE") {
+            document.getElementById('WF_LeftMViewChange').value = 68;
+        }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 
             || fieldNM === "ACTUALARRDATE" 

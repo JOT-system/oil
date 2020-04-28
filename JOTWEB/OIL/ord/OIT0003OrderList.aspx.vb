@@ -345,6 +345,7 @@ Public Class OIT0003OrderList
             & " , ISNULL(RTRIM(OIT0002.TOTALTANKCH), '')             AS TOTALTANKCH" _
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNO), '')              AS TANKLINKNO" _
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
+            & " , ISNULL(RTRIM(OIT0002.BILLINGNO), '')               AS BILLINGNO" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')           AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.ACTUALLODDATE, 'yyyy/MM/dd'), '')     AS ACTUALLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')           AS DEPDATE" _
@@ -676,6 +677,8 @@ Public Class OIT0003OrderList
         '貨車連結順序表№
         work.WF_SEL_LINKNO.Text = ""
 
+        '支払請求№
+        work.WF_SEL_BILLINGNO.Text = ""
         '計上年月日
         work.WF_SEL_KEIJYOYMD.Text = ""
         '売上金額
@@ -821,6 +824,8 @@ Public Class OIT0003OrderList
         '貨車連結順序表№
         work.WF_SEL_LINKNO.Text = ""
 
+        '支払請求№
+        work.WF_SEL_BILLINGNO.Text = ""
         '計上年月日
         work.WF_SEL_KEIJYOYMD.Text = ""
         '売上金額
@@ -1032,6 +1037,8 @@ Public Class OIT0003OrderList
         '作成用_貨車連結順序表№
         work.WF_SEL_LINKNO_ORDER.Text = OIT0003tbl.Rows(WW_LINECNT)("TANKLINKNOMADE")
 
+        '支払請求№
+        work.WF_SEL_BILLINGNO.Text = OIT0003tbl.Rows(WW_LINECNT)("BILLINGNO")
         '計上年月日
         work.WF_SEL_KEIJYOYMD.Text = OIT0003tbl.Rows(WW_LINECNT)("KEIJYOYMD")
         '売上金額

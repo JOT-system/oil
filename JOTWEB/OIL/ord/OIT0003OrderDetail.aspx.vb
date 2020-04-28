@@ -3350,6 +3350,23 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
 
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+        'チェックボックス判定
+        For i As Integer = 0 To OIT0003tbl_tab4.Rows.Count - 1
+            If OIT0003tbl_tab4.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                If OIT0003tbl_tab4.Rows(i)("OPERATION") = "on" Then
+                    OIT0003tbl_tab4.Rows(i)("OPERATION") = ""
+                Else
+                    OIT0003tbl_tab4.Rows(i)("OPERATION") = "on"
+                End If
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
     End Sub
 
     ''' <summary>
@@ -3698,7 +3715,7 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
 
-        '■■■ OIT0001tbl関連の受注・受注明細を論理削除 ■■■
+        '■■■ OIT0003tbl関連の受注・受注明細を論理削除 ■■■
 
         Try
             'DataBase接続文字
@@ -3844,6 +3861,108 @@ Public Class OIT0003OrderDetail
     ''' 行削除ボタン押下時処理(タブ「費用入力」)
     ''' </summary>
     Protected Sub WW_ButtonLINE_LIFTED_TAB4()
+
+        Dim SelectChk As Boolean = False
+        Dim intTblCnt As Integer = 0
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+        '■■■ OIT0003tbl関連の受注・受注明細を論理削除 ■■■
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注費用を一括論理削除
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0010_ORDERBILLING  " _
+                    & "    SET UPDYMD          = @P11, " _
+                    & "        UPDUSER         = @P12, " _
+                    & "        UPDTERMID       = @P13, " _
+                    & "        RECEIVEYMD      = @P14, " _
+                    & "        DELFLG          = '1'   " _
+                    & "  WHERE BILLINGNO       = @P01  " _
+                    & "    AND BILLINGDETAILNO = @P02  " _
+                    & "    AND DELFLG          <> '1';"
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            '件数を取得
+            intTblCnt = OIT0003tbl_tab4.Rows.Count
+
+            '選択されている行は削除対象
+            Dim i As Integer = 0
+            Dim j As Integer = 9000
+            For Each OIT0003UPDrow In OIT0003tbl_tab4.Rows
+                If OIT0003UPDrow("OPERATION") = "on" Then
+
+                    If OIT0003UPDrow("LINECNT") < 9000 Then
+                        SelectChk = True
+                    End If
+
+                    j += 1
+                    OIT0003UPDrow("LINECNT") = j        'LINECNT
+                    'OIT0003UPDrow("DELFLG") = C_DELETE_FLG.DELETE
+                    OIT0003UPDrow("HIDDEN") = 1
+
+                    PARA01.Value = OIT0003UPDrow("BILLINGNO")
+                    PARA02.Value = OIT0003UPDrow("BILLINGDETAILNO")
+
+                    PARA11.Value = Date.Now
+                    PARA12.Value = Master.USERID
+                    PARA13.Value = Master.USERTERMID
+                    PARA14.Value = C_DEFAULT_YMD
+
+                    SQLcmd.ExecuteNonQuery()
+
+                Else
+                    i += 1
+                    OIT0003UPDrow("LINECNT") = i        'LINECNT
+                End If
+            Next
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB4 DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D_TAB4 DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+        '○メッセージ表示
+        '一覧件数が０件の時の行削除の場合
+        If intTblCnt = 0 Then
+            Master.Output(C_MESSAGE_NO.OIL_DELDATA_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+            '一覧件数が１件以上で未選択による行削除の場合
+        ElseIf SelectChk = False Then
+            Master.Output(C_MESSAGE_NO.OIL_DELLINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+        Else
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 
@@ -7828,7 +7947,7 @@ Public Class OIT0003OrderDetail
             & "        , INVOICENAME       = @P23  , INVOICEDEPTNAME   = @P24" _
             & "        , PAYEECODE         = @P25  , PAYEENAME         = @P26" _
             & "        , PAYEEDEPTNAME     = @P27  , TEKIYOU           = @P28" _
-            & "        , BIKOU             = @P29" _
+            & "        , BIKOU             = @P29  , DELFLG            = @P30" _
             & "        , UPDYMD            = @P34  , UPDUSER           = @P35" _
             & "        , UPDTERMID         = @P36  , RECEIVEYMD        = @P37" _
             & "    WHERE" _
@@ -8007,7 +8126,14 @@ Public Class OIT0003OrderDetail
                     'PARA29.Value = OIT0003tab4row("BIKOU")             '備考
                     PARA28.Value = ""             '摘要
                     PARA29.Value = ""             '備考
-                    PARA30.Value = "0"                                 '削除フラグ
+
+                    '削除フラグ
+                    If OIT0003tab4row("HIDDEN") = "1" Then
+                        PARA30.Value = "1"
+                    Else
+                        PARA30.Value = "0"
+                    End If
+
                     PARA31.Value = WW_DATENOW                          '登録年月日
                     PARA32.Value = Master.USERID                       '登録ユーザーID
                     PARA33.Value = Master.USERTERMID                   '登録端末

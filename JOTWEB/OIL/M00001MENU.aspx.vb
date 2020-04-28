@@ -127,6 +127,14 @@ Public Class M00001MENU
                 CS0011LOGWRITE.CS0011LOGWrite()
                 Exit Sub
             End Try
+            'ガイダンスデータ取得
+            Try
+                Dim guidanceDt As DataTable = GetGuidanceData(SQLcon)
+                Me.repGuidance.DataSource = guidanceDt
+                Me.repGuidance.DataBind()
+            Catch ex As Exception
+                Dim aa As String = ""
+            End Try
 
             '■■■ パスワード有効期限の警告表示 ■■■
             '○パスワード有効期限の警告表示
@@ -165,6 +173,7 @@ Public Class M00001MENU
                 Exit Sub
             End Try
 
+
             If DateDiff("d", Date.Now, WW_ENDYMD) < C_PASSWORD_CHANGE_LIMIT_COUNT Then
                 Master.Output(C_MESSAGE_NO.PASSWORD_INVALID_AT_SOON, C_MESSAGE_TYPE.INF)
             End If
@@ -172,6 +181,63 @@ Public Class M00001MENU
         End Using
 
     End Sub
+    ''' <summary>
+    ''' 表示用のガイダンスデータ取得
+    ''' </summary>
+    ''' <param name="sqlCon">SQLConnection</param>
+    ''' <returns>ガイダンスデータ</returns>
+    Private Function GetGuidanceData(sqlCon As SqlConnection) As DataTable
+        Dim retDt As New DataTable
+        With retDt.Columns
+            .Add("GUIDANCENO", GetType(String))
+            .Add("ENTRYDATE", GetType(String))
+            .Add("TYPE", GetType(String))
+            .Add("TITTLE", GetType(String))
+            .Add("NAIYOU", GetType(String))
+            .Add("FAILE1", GetType(String))
+        End With
+        Try
+            Dim sqlStat As New StringBuilder
+            sqlStat.AppendLine("SELECT GD.GUIDANCENO")
+            sqlStat.AppendLine("      ,format(GD.INITYMD,'yyyy/M/d') AS ENTRYDATE")
+            sqlStat.AppendLine("      ,GD.TYPE                       AS TYPE")
+            sqlStat.AppendLine("      ,GD.TITTLE                     AS TITTLE")
+            sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
+            sqlStat.AppendLine("      ,GD.FAILE1                     AS FAILE1")
+            sqlStat.AppendLine("  FROM oil.OIM0020_GUIDANCE GD")
+            sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
+            sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
+            sqlStat.AppendLine("   AND OUTFLG <> '1'")
+            sqlStat.AppendLine(" ORDER BY (CASE WHEN GD.TYPE = 'E' THEN '1'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'W' THEN '2'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'I' THEN '3'")
+            sqlStat.AppendLine("                ELSE '9'")
+            sqlStat.AppendLine("            END)")
+            sqlStat.AppendLine("          ,GD.INITYMD DESC")
+            '他のフラグや最大取得件数（条件がある場合）はあとで
+            Using sqlGuidCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                sqlGuidCmd.Parameters.Add("@DELFLG_NO", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Using sqlGuidDr As SqlDataReader = sqlGuidCmd.ExecuteReader()
+                    Dim dr As DataRow
+                    While sqlGuidDr.Read
+                        dr = retDt.NewRow
+                        dr("GUIDANCENO") = sqlGuidDr("GUIDANCENO")
+                        dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
+                        dr("TYPE") = sqlGuidDr("TYPE")
+                        dr("TITTLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITTLE")))
+                        dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU")))
+                        dr("FAILE1") = Convert.ToString(sqlGuidDr("FAILE1"))
+
+                        retDt.Rows.Add(dr)
+                    End While
+                End Using
+
+            End Using
+        Catch ex As Exception
+        End Try
+
+        Return retDt
+    End Function
     ''' <summary>
     ''' Repeater_Menu_x バインドイベント(Handlesに含めたオブジェクトが対象)
     ''' </summary>

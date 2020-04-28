@@ -13,7 +13,36 @@
 
         <!-- 全体レイアウト　Menuheaderbox -->
         <div  class="Menuheaderbox" id="Menuheaderbox">
+          <a id="guidanceArea" class="guidance">
+              <div id="guidanceList">
+                  <asp:Repeater ID="repGuidance" runat="server">
+                      <HeaderTemplate>
+                          <table class="guidanceTable">
+                      </HeaderTemplate>
+                      <ItemTemplate>
+                          <tr>
+                              <td class="guidanceType"><div class='<%# Eval("TYPE") %>'></div></td>
+                              <td class="entryDate"><%# Eval("ENTRYDATE") %></td>
+                              <td class="title"><a href="#"><%# Eval("TITTLE") %></a></td>
+                              <td class="naiyo"><%# Eval("NAIYOU") %></td>
+                              <td class="attachFile1"><a href="#"><%# Eval("FAILE1") %></a></td>
+                          </tr>
+                      </ItemTemplate>
+                      <FooterTemplate>
+                          <%#If(DirectCast(DirectCast(Container.Parent, Repeater).DataSource, System.Data.DataTable).Rows.Count = 0,
+                                                                               "<tr><td class='empty'>ガイダンスはありません</td></tr>",
+                                                                               "") %>
+                          </table>
+                      </FooterTemplate>
+                  </asp:Repeater>
+              </div>
+              <div id="guidanceOpenCloseWrapper">
+                  <div id="guidanceOpenClose">
+                    <span id="guidanceOpenCloseButton">＋ ガイダンス表示</span>
+                  </div>
+              </div>
 
+          </a>
           <!-- 在庫管理メニュー表示 ****************************************************** -->
           <a  class="Menu_L" id="Menu_L"  >
             <asp:Repeater ID="Repeater_Menu_L" runat="server" ClientIDMode="Predictable" >

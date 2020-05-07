@@ -114,10 +114,7 @@ Public Class M00000LOGON
         If isNormal(CS0008ONLINEstat.ERR) Then
             If CS0008ONLINEstat.ONLINESW = 0 Then
                 Master.Output(C_MESSAGE_NO.CLOSED_SERVICE, C_MESSAGE_TYPE.ERR)
-                WF_Guidance.Text = String.Empty
                 Exit Sub
-            Else
-                WF_Guidance.Text = WF_Guidance.Text & CS0008ONLINEstat.TEXT.Replace(vbCrLf, "<br />")
             End If
         Else
             Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
@@ -176,8 +173,22 @@ Public Class M00000LOGON
             Loop Until InStr(WW_File, "\") = 0
 
             '本日作成以外のファイルは削除
-            If Mid(WW_File, 1, 8) <> Date.Now.ToString("yyyyMMdd") Then System.IO.File.Delete(tempFile)
+            If Mid(WW_File, 1, 8) <> Date.Now.ToString("yyyyMMdd") Then
+                Try
+                    System.IO.File.Delete(tempFile)
+                Catch ex As Exception
+                End Try
+            End If
         Next
+        'ガイダンスエリアの表示
+        Using SQLcon As SqlConnection = CS0050Session.getConnection
+
+            SQLcon.Open() 'DataBase接続(Open)
+            Using guidDt As DataTable = GetGuidanceData(SQLcon)
+                Me.repGuidance.DataSource = guidDt
+                Me.repGuidance.DataBind()
+            End Using
+        End Using
         UserID.Focus()
 
     End Sub
@@ -600,6 +611,63 @@ Public Class M00000LOGON
         End Try
 
     End Sub
+    ''' <summary>
+    ''' 表示用のガイダンスデータ取得
+    ''' </summary>
+    ''' <param name="sqlCon">SQLConnection</param>
+    ''' <returns>ガイダンスデータ</returns>
+    Private Function GetGuidanceData(sqlCon As SqlConnection) As DataTable
+        Dim retDt As New DataTable
+        With retDt.Columns
+            .Add("GUIDANCENO", GetType(String))
+            .Add("ENTRYDATE", GetType(String))
+            .Add("TYPE", GetType(String))
+            .Add("TITTLE", GetType(String))
+            .Add("NAIYOU", GetType(String))
+            .Add("FAILE1", GetType(String))
+        End With
+        Try
+            Dim sqlStat As New StringBuilder
+            sqlStat.AppendLine("SELECT GD.GUIDANCENO")
+            sqlStat.AppendLine("      ,format(GD.INITYMD,'yyyy/M/d') AS ENTRYDATE")
+            sqlStat.AppendLine("      ,GD.TYPE                       AS TYPE")
+            sqlStat.AppendLine("      ,GD.TITTLE                     AS TITTLE")
+            sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
+            sqlStat.AppendLine("      ,GD.FAILE1                     AS FAILE1")
+            sqlStat.AppendLine("  FROM oil.OIM0020_GUIDANCE GD")
+            sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
+            sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
+            sqlStat.AppendLine("   AND OUTFLG = '1'")
+            sqlStat.AppendLine(" ORDER BY (CASE WHEN GD.TYPE = 'E' THEN '1'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'W' THEN '2'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'I' THEN '3'")
+            sqlStat.AppendLine("                ELSE '9'")
+            sqlStat.AppendLine("            END)")
+            sqlStat.AppendLine("          ,GD.INITYMD DESC")
+            '他のフラグや最大取得件数（条件がある場合）はあとで
+            Using sqlGuidCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                sqlGuidCmd.Parameters.Add("@DELFLG_NO", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Using sqlGuidDr As SqlDataReader = sqlGuidCmd.ExecuteReader()
+                    Dim dr As DataRow
+                    While sqlGuidDr.Read
+                        dr = retDt.NewRow
+                        dr("GUIDANCENO") = sqlGuidDr("GUIDANCENO")
+                        dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
+                        dr("TYPE") = sqlGuidDr("TYPE")
+                        dr("TITTLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITTLE")))
+                        dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU")))
+                        dr("FAILE1") = Convert.ToString(sqlGuidDr("FAILE1"))
+
+                        retDt.Rows.Add(dr)
+                    End While
+                End Using
+
+            End Using
+        Catch ex As Exception
+        End Try
+
+        Return retDt
+    End Function
 End Class
 
 

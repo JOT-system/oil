@@ -103,6 +103,7 @@
     <Content Include="img\oillogo.png" />
     <Content Include="img\right.png" />
     <Content Include="img\tank2.png" />
+    <Content Include="OIL\css\M00002.css" />
     <Content Include="OIL\css\OIM0020C.css" />
     <Content Include="OIL\css\OIM0020L.css" />
     <Content Include="OIL\css\OIM0020S.css" />

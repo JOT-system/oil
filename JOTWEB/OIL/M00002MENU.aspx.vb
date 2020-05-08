@@ -55,7 +55,7 @@ Public Class M00002MENU
                         & " SELECT                             " _
                         & "      ROWLINE + 1     AS ROWLINE    " _
                         & " FROM  ROWIDX                       " _
-                        & " WHERE ROWLINE <= 6                " _
+                        & " WHERE ROWLINE <= 30                " _
                         & ")                                   " _
                         & " SELECT                             " _
                         & "      rtrim(R.ROWLINE)               as SEQ     , " _

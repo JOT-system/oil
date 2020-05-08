@@ -4,7 +4,7 @@
 
 <asp:Content ID="MC0002H" ContentPlaceHolderID="head" runat="server">
 
-    <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/OIL/css/M00001.css")%>"/>
+    <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/OIL/css/M00002.css")%>"/>
     <script type="text/javascript" src="<%=ResolveUrl("~/OIL/script/M00001.js")%>"></script>
 
 </asp:Content> 

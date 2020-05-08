@@ -110,7 +110,10 @@ Public Class OIT0001CustomReport : Implements IDisposable
 
         Try
             '***** TODO処理 ここから *****
-
+            '◯ヘッダーの設定
+            EditHeaderArea()
+            '◯明細の設定
+            EditDetailArea()
             '***** TODO処理 ここまで *****
             'ExcelTempSheet.Delete() '雛形シート削除
 
@@ -137,6 +140,125 @@ Public Class OIT0001CustomReport : Implements IDisposable
         End Try
 
     End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定
+    ''' </summary>
+    Private Sub EditHeaderArea()
+        Dim rngTitleArea As Excel.Range = Nothing
+        Dim rngArrstationArea As Excel.Range = Nothing
+        Dim rngTrainArea As Excel.Range = Nothing
+        Dim rngLoddateArea As Excel.Range = Nothing
+        Dim rngDepdateArea As Excel.Range = Nothing
+        Dim rngArrdateArea As Excel.Range = Nothing
+        Dim rngAccdateArea As Excel.Range = Nothing
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 営業所名
+                rngTitleArea = Me.ExcelWorkSheet.Range("E3")
+                rngTitleArea.Value = PrintDatarow("OFFICENAME")
+                '◯ 向い先(着駅)
+                rngArrstationArea = Me.ExcelWorkSheet.Range("E7")
+                rngArrstationArea.Value = PrintDatarow("ARRSTATIONNAME")
+                '◯ 列車No
+                rngTrainArea = Me.ExcelWorkSheet.Range("M7")
+                rngTrainArea.Value = PrintDatarow("TRAINNO")
+                rngTrainArea = Me.ExcelWorkSheet.Range("K41")
+                rngTrainArea.Value = PrintDatarow("TRAINNO")
+                '◯ 積込日（予定）
+                rngLoddateArea = Me.ExcelWorkSheet.Range("E9")
+                rngLoddateArea.Value = PrintDatarow("LODDATE")
+                '◯ 発日（予定）
+                rngDepdateArea = Me.ExcelWorkSheet.Range("J9")
+                rngDepdateArea.Value = PrintDatarow("DEPDATE")
+                '◯ 積車着日（予定）
+                rngArrdateArea = Me.ExcelWorkSheet.Range("L9")
+                rngArrdateArea.Value = PrintDatarow("ARRDATE")
+                '◯ 受入日（予定）
+                rngAccdateArea = Me.ExcelWorkSheet.Range("N9")
+                rngAccdateArea.Value = PrintDatarow("ACCDATE")
+
+                Exit For
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngTitleArea)
+            ExcelMemoryRelease(rngArrstationArea)
+            ExcelMemoryRelease(rngTrainArea)
+            ExcelMemoryRelease(rngLoddateArea)
+            ExcelMemoryRelease(rngDepdateArea)
+            ExcelMemoryRelease(rngArrdateArea)
+            ExcelMemoryRelease(rngAccdateArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定
+    ''' </summary>
+    Private Sub EditDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 12
+            Dim strOtOilNameSave As String = ""
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 車数
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("LINECNT")
+                '◯ 荷主名
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("SHIPPERSNAME")
+                '◯ 在庫発駅(発駅)
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("DEPSTATIONNAME")
+                '◯ 油種(OT油種)
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("OTOILNAME")
+                '◯ 車(OT油種毎の件数)
+                If strOtOilNameSave <> PrintDatarow("OTOILNAME").ToString() Then
+                    rngDetailArea = Me.ExcelWorkSheet.Range("F" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("OTOILCTCNT")
+                End If
+                strOtOilNameSave = PrintDatarow("OTOILNAME").ToString()
+
+                '◯ タンク車番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("G" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("TANKNO")
+                '◯ 前回油種
+                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
+                '◯ 順位
+                '### 未使用項目 ###########################################
+                '◯ 次回交検日
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
+                '◯ 返送日列車
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
+                '◯ ジョイント先
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("JOINT")
+                '◯ 割当元
+                '### 未使用項目 ###########################################
+                '◯ 記事
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("REMARK")
+
+                i += 1
+            Next
+
+            '合計
+            rngDetailArea = Me.ExcelWorkSheet.Range("G41")
+            rngDetailArea.Value = PrintData.Rows.Count.ToString() + "車"
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+
+    End Sub
 
     ''' <summary>
     ''' Excelオブジェクトの解放

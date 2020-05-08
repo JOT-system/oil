@@ -74,6 +74,8 @@ Public Class OIT0003OrderDetail
     Private WW_SwapInput As String = "0"                            '入換指示入力(0:未 1:完了)
     Private WW_LoadingInput As String = "0"                         '積込指示入力(0:未 1:完了)
 
+    Private WW_Tax As Decimal = 0.1
+
     Private WW_ORDERINFOFLG_10 As Boolean = False                   '受注情報セット可否(情報(10:積置))
     Private WW_ORDERINFOALERMFLG_80 As Boolean = False              '受注情報セット可否(警告(80:タンク車数オーバー))
     Private WW_ORDERINFOALERMFLG_82 As Boolean = False              '受注情報セット可否(警告(82:検査間近あり))
@@ -2390,6 +2392,8 @@ Public Class OIT0003OrderDetail
                 & " , TMP0002.OFFICENAME                                 AS OFFICENAME" _
                 & " , TMP0002.CONSIGNEECODE                              AS CONSIGNEECODE" _
                 & " , TMP0002.CONSIGNEENAME                              AS CONSIGNEENAME" _
+                & " , ''                                                 AS ORDERINFO" _
+                & " , ''                                                 AS ORDERINFONAME" _
                 & " , '1'                                                AS CALCACCOUNT" _
                 & " , '1'                                                AS AKAKURO" _
                 & " , FORMAT(TMP0002.KEIJYOYMD, 'yyyy/MM')               AS KEIJYOYM" _
@@ -2404,31 +2408,35 @@ Public Class OIT0003OrderDetail
                 & " , TMP0002.BREAKDOWN                                  AS BREAKDOWN" _
                 & " , TMP0002.CALCKBN                                    AS CALCKBN" _
                 & " , TMP0002.CALCKBNNAME                                AS CALCKBNNAME" _
-                & " , CAST(CASE " _
+                & " , REPLACE(CONVERT(VARCHAR,CAST(ROUND(CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
                 & "        SUM(TMP0002.CARSNUMBER) " _
                 & "   WHEN TMP0002.CALCKBN = '2' THEN " _
                 & "        SUM(TMP0002.CARSAMOUNT) " _
                 & "   WHEN TMP0002.CALCKBN = '3' THEN " _
                 & "        SUM(TMP0002.LOAD) " _
-                & "   END AS VARCHAR(10)) CARSAMOUNT" _
-                & " , CAST(TMP0002.APPLYCHARGE AS DECIMAL(12, 3))        AS APPLYCHARGE" _
-                & " , CAST(ROUND(CASE " _
+                & "   END, 3) AS MONEY), 1),'.00' , '') CARSAMOUNT" _
+                & " , ''                                                 AS CARSAMOUNTNAME" _
+                & " , '￥' " _
+                & "  + REPLACE ( " _
+                & "   CONVERT(VARCHAR, CAST(TMP0002.APPLYCHARGE AS MONEY), 1) " _
+                & "   , '.00', '')                                       AS APPLYCHARGE" _
+                & " , '￥' + REPLACE(CONVERT(VARCHAR,CAST(ROUND(CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
                 & "        SUM(TMP0002.CARSNUMBER * TMP0002.APPLYCHARGE) " _
                 & "   WHEN TMP0002.CALCKBN = '2' THEN " _
                 & "        SUM(TMP0002.CARSAMOUNT * TMP0002.APPLYCHARGE) " _
                 & "   WHEN TMP0002.CALCKBN = '3' THEN " _
                 & "        SUM(TMP0002.LOAD * TMP0002.APPLYCHARGE) " _
-                & "   END, 3) AS DECIMAL(12, 3)) APPLYCHARGESUM" _
-                & " , CAST(ROUND(CASE " _
+                & "   END, 3) AS MONEY), 1),'.00' , '') APPLYCHARGESUM" _
+                & " , '￥' + REPLACE(CONVERT(VARCHAR,CAST(ROUND(CASE " _
                 & "   WHEN TMP0002.CALCKBN = '1' THEN " _
                 & "        SUM(TMP0002.CARSNUMBER * (TMP0002.APPLYCHARGE * @P02)) " _
                 & "   WHEN TMP0002.CALCKBN = '2' THEN " _
                 & "        SUM(TMP0002.CARSAMOUNT * (TMP0002.APPLYCHARGE * @P02)) " _
                 & "   WHEN TMP0002.CALCKBN = '3' THEN " _
                 & "        SUM(TMP0002.LOAD * (TMP0002.APPLYCHARGE * @P02)) " _
-                & "   END, 3) AS DECIMAL(12, 3)) CONSUMPTIONTAX" _
+                & "   END, 3) AS MONEY), 1),'.00' , '') CONSUMPTIONTAX" _
                 & " , TMP0002.INVOICECODE                                AS INVOICECODE" _
                 & " , TMP0002.INVOICENAME                                AS INVOICENAME" _
                 & " , TMP0002.INVOICEDEPTNAME                            AS INVOICEDEPTNAME" _
@@ -2455,7 +2463,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Decimal) '消費税
 
                 PARA01.Value = work.WF_SEL_BILLINGNO.Text
-                PARA02.Value = 0.1
+                PARA02.Value = Me.WW_Tax
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -2474,7 +2482,7 @@ Public Class OIT0003OrderDetail
                     'LINECNT
                     OIT0003tab4row("LINECNT") = i
                     '数量(単位を後ろに付ける)
-                    OIT0003tab4row("CARSAMOUNT") = OIT0003tab4row("CARSAMOUNT") + OIT0003tab4row("CALCKBNNAME")
+                    OIT0003tab4row("CARSAMOUNTNAME") = OIT0003tab4row("CARSAMOUNT").ToString() + OIT0003tab4row("CALCKBNNAME") + " "
 
                 Next
 
@@ -2522,6 +2530,8 @@ Public Class OIT0003OrderDetail
                 & " , ''                                                 AS OFFICENAME" _
                 & " , ''                                                 AS CONSIGNEECODE" _
                 & " , ''                                                 AS CONSIGNEENAME" _
+                & " , ''                                                 AS ORDERINFO" _
+                & " , ''                                                 AS ORDERINFONAME" _
                 & " , OIT0010.CALCACCOUNT                                AS CALCACCOUNT" _
                 & " , OIT0010.AKAKURO                                    AS AKAKURO" _
                 & " , FORMAT(OIT0010.KEIJYOYMD, 'yyyy/MM')               AS KEIJYOYM" _
@@ -2535,10 +2545,19 @@ Public Class OIT0003OrderDetail
                 & " , OIT0010.SEGMENTBRANCHCODE                          AS BREAKDOWNCODE" _
                 & " , OIT0010.SEGMENTBRANCHNAME                          AS BREAKDOWN" _
                 & " , OIT0010.CALCACCOUNT                                AS CALCKBN" _
-                & " , CAST(OIT0010.QUANTITY AS DECIMAL(12, 3))           AS CARSAMOUNT" _
-                & " , CAST(OIT0010.UNITPRICE AS DECIMAL(12, 3))          AS APPLYCHARGE" _
-                & " , CAST(OIT0010.AMOUNT AS DECIMAL(12, 3))             AS APPLYCHARGESUM" _
-                & " , CAST(OIT0010.TAX AS DECIMAL(12, 3))                AS CONSUMPTIONTAX" _
+                & " , REPLACE ( " _
+                & "   CONVERT(VARCHAR, CAST(ROUND(OIT0010.QUANTITY, 3) AS DECIMAL(12, 3)), 1) " _
+                & "   , '.000', '')                                       AS CARSAMOUNT " _
+                & " , ''                                                 AS CARSAMOUNTNAME" _
+                & " , ''                                                 AS APPLYCHARGE" _
+                & " , '￥'" _
+                & "  + REPLACE( " _
+                & "   CONVERT(VARCHAR, CAST(ROUND(OIT0010.AMOUNT, 3) AS MONEY), 1) " _
+                & "   , '.00', '')                                       AS APPLYCHARGESUM" _
+                & " , '￥' " _
+                & "  + REPLACE ( " _
+                & "   CONVERT(VARCHAR, CAST(ROUND(OIT0010.TAX, 3) AS MONEY), 1) " _
+                & "   , '.00', '')                                       AS CONSUMPTIONTAX " _
                 & " , OIT0010.INVOICECODE                                AS INVOICECODE" _
                 & " , OIT0010.INVOICENAME                                AS INVOICENAME" _
                 & " , OIT0010.INVOICEDEPTNAME                            AS INVOICEDEPTNAME" _
@@ -2550,6 +2569,12 @@ Public Class OIT0003OrderDetail
                 & "     OIT0010.BILLINGNO   = @P01 " _
                 & " AND OIT0010.CALCACCOUNT = '2' " _
                 & " AND OIT0010.DELFLG      <> @P02;"
+
+        '### 単価の表示部分を念のためコメント
+        '& " , '￥' " _
+        '& "  + REPLACE ( " _
+        '& "   CONVERT(VARCHAR, CAST(ROUND(OIT0010.UNITPRICE, 3) AS MONEY), 1) " _
+        '& "   , '.00', '')                                       AS APPLYCHARGE " _
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -4217,10 +4242,12 @@ Public Class OIT0003OrderDetail
             & " , ''                                                 AS SHIPPERSNAME" _
             & " , ''                                                 AS BASECODE" _
             & " , ''                                                 AS BASENAME" _
-            & " , ''                                                 AS OFFICECODE" _
-            & " , ''                                                 AS OFFICENAME" _
+            & " , @P03                                               AS OFFICECODE" _
+            & " , @P04                                               AS OFFICENAME" _
             & " , ''                                                 AS CONSIGNEECODE" _
             & " , ''                                                 AS CONSIGNEENAME" _
+            & " , ''                                                 AS ORDERINFO" _
+            & " , ''                                                 AS ORDERINFONAME" _
             & " , '2'                                                AS CALCACCOUNT" _
             & " , '1'                                                AS AKAKURO" _
             & " , FORMAT(GETDATE(), 'yyyy/MM')                       AS KEIJYOYM" _
@@ -4235,6 +4262,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                                 AS BREAKDOWN" _
             & " , '2'                                                AS CALCKBN" _
             & " , 0                                               AS CARSAMOUNT" _
+            & " , ''                                                 AS CARSAMOUNTNAME" _
             & " , 0                                               AS APPLYCHARGE" _
             & " , 0                                               AS APPLYCHARGESUM" _
             & " , 0                                               AS CONSUMPTIONTAX" _
@@ -4250,9 +4278,13 @@ Public Class OIT0003OrderDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '支払請求№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 6)  '営業所コード
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 20) '営業所名
 
                 PARA1.Value = work.WF_SEL_BILLINGNO.Text
                 PARA2.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA3.Value = work.WF_SEL_ORDERSALESOFFICECODE.Text
+                PARA4.Value = work.WF_SEL_ORDERSALESOFFICE.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ テーブル検索結果をテーブル格納
@@ -4995,6 +5027,14 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_ButtonUPDATE_TAB4()
+
+        '● 関連チェック
+        WW_CheckTab4(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
         '受注費用DB追加・更新
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -5930,7 +5970,9 @@ Public Class OIT0003OrderDetail
 
         Select Case WF_FIELD.Value
             Case "APPLYCHARGESUM"       '(一覧)金額
-                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+                updHeader.Item(WF_FIELD.Value) = "￥" + String.Format("{0:#,0}", Integer.Parse(WW_ListValue))
+                '税額(消費税)
+                updHeader.Item("CONSUMPTIONTAX") = Integer.Parse(WW_ListValue) * Me.WW_Tax
         End Select
 
         '○ 画面表示データ保存
@@ -8232,7 +8274,7 @@ Public Class OIT0003OrderDetail
             PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
             PARA02.Value = C_DELETE_FLG.DELETE
             PARA03.Value = work.WF_SEL_BILLINGNO.Text
-            PARA04.Value = Date.Now.ToString("yyyy/MM/dd")
+            PARA04.Value = work.WF_SEL_KEIJYOYMD.Text
 
             PARA08.Value = Date.Now
             PARA09.Value = Master.USERID
@@ -9877,6 +9919,18 @@ Public Class OIT0003OrderDetail
                         '〇 一覧項目へ設定
                         '(一覧)計上月
                         If WF_FIELD.Value = "KEIJYOYM" Then
+                            Dim WW_DATE As Date
+                            Try
+                                Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                                If WW_DATE < C_DEFAULT_YMD Then
+                                    updHeader.Item(WF_FIELD.Value) = ""
+                                    updHeader.Item("KEIJYOYMD") = ""
+                                Else
+                                    updHeader.Item(WF_FIELD.Value) = WW_DATE.ToString("yyyy/MM")
+                                    updHeader.Item("KEIJYOYMD") = leftview.WF_Calendar.Text
+                                End If
+                            Catch ex As Exception
+                            End Try
 
                             '(一覧)科目コード
                         ElseIf WF_FIELD.Value = "ACCSEGCODE" Then
@@ -9884,8 +9938,8 @@ Public Class OIT0003OrderDetail
                             '科目コード+セグメント+セグメント枝番号をKEYにして、科目コード等を取得
                             WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "ACCOUNTPATTERN", WW_SETVALUE, WW_GetValue)
 
-                            updHeader.Item(WF_FIELD.Value) = WW_GetValue(1) + " " + WW_GetValue(3)
-                            updHeader.Item("ACCSEGNAME") = WW_GetValue(2) + " " + WW_GetValue(4)
+                            updHeader.Item(WF_FIELD.Value) = WW_GetValue(1) + "　" + WW_GetValue(3)
+                            updHeader.Item("ACCSEGNAME") = WW_GetValue(2) + "　" + WW_GetValue(4)
                             updHeader.Item("ACCOUNTCODE") = WW_GetValue(1)
                             updHeader.Item("ACCOUNTNAME") = WW_GetValue(2)
                             updHeader.Item("SEGMENTCODE") = WW_GetValue(3)
@@ -11642,6 +11696,131 @@ Public Class OIT0003OrderDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' チェック処理(タブ「費用入力」)
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckTab4(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_STYMD As Date
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+
+        '(一覧)チェック
+        '◯　計上年月日
+        For Each OIT0003row As DataRow In OIT0003tbl_tab4.Rows
+            If OIT0003row("CALCACCOUNT") = "1" Or OIT0003row("HIDDEN") <> "0" Then Continue For
+
+            Try
+                Date.TryParse(OIT0003row("KEIJYOYMD"), WW_STYMD)
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = ""
+            Catch ex As Exception
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = "計上年月未入力"
+
+                WW_CheckMES1 = "計上年月日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListTab4ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+            End Try
+        Next
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)計上年月", needsPopUp:=True)
+            Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+            Exit Sub
+        End If
+
+        '◯　科目コード
+        For Each OIT0003row As DataRow In OIT0003tbl_tab4.Rows
+            If OIT0003row("ACCSEGCODE") = "" And OIT0003row("HIDDEN") = "0" And OIT0003row("CALCACCOUNT") <> "1" Then
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = "科目コード未入力"
+
+                WW_CheckMES1 = "科目コード設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListTab4ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+            Else
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = ""
+            End If
+        Next
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)科目コード", needsPopUp:=True)
+            Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+            Exit Sub
+        End If
+
+        '◯　金額
+        For Each OIT0003row As DataRow In OIT0003tbl_tab4.Rows
+            If OIT0003row("APPLYCHARGESUM") = 0 And OIT0003row("HIDDEN") = "0" And OIT0003row("CALCACCOUNT") <> "1" Then
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = "金額未入力"
+
+                WW_CheckMES1 = "金額設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListTab4ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+            Else
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = ""
+            End If
+        Next
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)金額", needsPopUp:=True)
+            Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+            Exit Sub
+        End If
+
+        '◯　請求先コード
+        For Each OIT0003row As DataRow In OIT0003tbl_tab4.Rows
+            If OIT0003row("INVOICECODE") = "" And OIT0003row("HIDDEN") = "0" And OIT0003row("CALCACCOUNT") <> "1" Then
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = "請求先コード未入力"
+
+                WW_CheckMES1 = "請求先コード設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListTab4ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+            Else
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = ""
+            End If
+        Next
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)請求先コード", needsPopUp:=True)
+            Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+            Exit Sub
+        End If
+
+        '◯　支払先コード
+        For Each OIT0003row As DataRow In OIT0003tbl_tab4.Rows
+            If OIT0003row("PAYEECODE") = "" And OIT0003row("HIDDEN") = "0" And OIT0003row("CALCACCOUNT") <> "1" Then
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = "支払先コード未入力"
+
+                WW_CheckMES1 = "支払先コード設定エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckListTab4ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+            Else
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = ""
+            End If
+        Next
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)支払先コード", needsPopUp:=True)
+            Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+            Exit Sub
         End If
 
     End Sub
@@ -13558,6 +13737,37 @@ Public Class OIT0003OrderDetail
             WW_ERR_MES &= ControlChars.NewLine & "  --> 受注油種           =" & OIM0003row("ORDERINGOILNAME") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車№         =" & OIM0003row("TANKNO") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 数量(kl)           =" & OIM0003row("CARSAMOUNT")
+        End If
+
+        rightview.AddErrorReport(WW_ERR_MES)
+
+    End Sub
+
+    ''' <summary>
+    ''' エラーレポート編集(一覧用(タブ「費用入力」))
+    ''' </summary>
+    ''' <param name="MESSAGE1"></param>
+    ''' <param name="MESSAGE2"></param>
+    ''' <param name="OIM0003row"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckListTab4ERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String, Optional ByVal OIM0003row As DataRow = Nothing)
+
+        Dim WW_ERR_MES As String = ""
+        WW_ERR_MES = MESSAGE1
+        If MESSAGE2 <> "" Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+        End If
+
+        If Not IsNothing(OIM0003row) Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 項番               =" & OIM0003row("LINECNT") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 計上年月           =" & OIM0003row("KEIJYOYM") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 科目コード         =" & OIM0003row("ACCSEGCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 科目名　　         =" & OIM0003row("ACCSEGNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 金額　　　         =" & OIM0003row("APPLYCHARGESUM") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請求先コード       =" & OIM0003row("INVOICECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 請求先名　　       =" & OIM0003row("INVOICENAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 支払先コード       =" & OIM0003row("PAYEECODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 支払先名　　　     =" & OIM0003row("PAYEENAME")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)

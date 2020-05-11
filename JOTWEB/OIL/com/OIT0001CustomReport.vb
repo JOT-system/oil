@@ -248,7 +248,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 i += 1
             Next
 
-            '合計
+            '◯ 合計
             rngDetailArea = Me.ExcelWorkSheet.Range("G41")
             rngDetailArea.Value = PrintData.Rows.Count.ToString() + "車"
 

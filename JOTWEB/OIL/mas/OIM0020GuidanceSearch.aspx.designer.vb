@@ -68,13 +68,13 @@ Partial Public Class OIM0020GuidanceSearch
     Protected WithEvents txtEndYmd As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''tileDisplayFields コントロール。
+    '''chklFlags コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents tileDisplayFields As Global.JOTWEB.GRC0001TILESELECTORWRKINC
+    Protected WithEvents chklFlags As Global.System.Web.UI.WebControls.CheckBoxList
     
     '''<summary>
     '''rightview コントロール。

@@ -17,21 +17,22 @@
           <a  class="Menu_L" id="Menu_L"  >
             <asp:Repeater ID="Repeater_Menu_L" runat="server" >
                 <HeaderTemplate>
-                    <table>
+                    <div>
                 </HeaderTemplate>
                 <ItemTemplate>
-                    <tr>
-                        <td >
-                            <asp:Label ID="WF_MenuLabe_L" runat="server" CssClass="WF_MenuLabel_L"></asp:Label>
-                            <asp:Label ID="WF_MenuURL_L" runat="server" Visible="False"></asp:Label>
-                            <asp:Label ID="WF_MenuVARI_L" runat="server" Visible="False"></asp:Label>
-                            <asp:Label ID="WF_MenuMAP_L" runat="server" Visible="False"></asp:Label>
-                            <asp:Button ID="WF_MenuButton_L" runat="server" CssClass="WF_MenuButton_L" OnClientClick="commonDispWait();"/>
-                        </td>
-                    </tr>
+                    <%#If(Container.ItemIndex = 0, "<div class='title'>", "")  %>
+                    <div class='<%# If(Eval("NAMES").Equals(""), "noname", "") %>'>
+                        <asp:Label ID="WF_MenuLabe_L" runat="server" CssClass="WF_MenuLabel_L"></asp:Label>
+                        <asp:Label ID="WF_MenuURL_L" runat="server" Visible="False"></asp:Label>
+                        <asp:Label ID="WF_MenuVARI_L" runat="server" Visible="False"></asp:Label>
+                        <asp:Label ID="WF_MenuMAP_L" runat="server" Visible="False"></asp:Label>
+                        <asp:Button ID="WF_MenuButton_L" runat="server" CssClass="WF_MenuButton_L" OnClientClick="commonDispWait();"/>
+                    </div>
+                    <%#If(Container.ItemIndex = 0, "</div><div class='buttons'>", "")  %>
                 </ItemTemplate>
                 <FooterTemplate>
-                    </table>
+                    </div>
+                    </div>
                 </FooterTemplate>
             </asp:Repeater>
           </a>
@@ -40,21 +41,22 @@
           <a class="Menu_R" id="Menu_R" >
             <asp:Repeater ID="Repeater_Menu_R" runat="server" >
                 <HeaderTemplate>
-                    <table>
+                    <div>
                 </HeaderTemplate>
                 <ItemTemplate>
-                    <tr>
-                        <td >
+                    <%#If(Container.ItemIndex = 0, "<div class='title'>", "")  %>
+                        <div class='<%# If(Eval("NAMES").Equals(""), "noname", "") %>'>
                             <asp:Label ID="WF_MenuLabe_R" runat="server" CssClass="WF_MenuLabel_R"></asp:Label>
                             <asp:Label ID="WF_MenuURL_R" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuVARI_R" runat="server"  Visible="False" ></asp:Label>
                             <asp:Label ID="WF_MenuMAP_R" runat="server" Visible="False"></asp:Label>
                             <asp:Button ID="WF_MenuButton_R" runat="server" CssClass="WF_MenuButton_R"  OnClientClick="commonDispWait();"/> 
-                        </td>
-                    </tr>
+                        </div>
+                    <%#If(Container.ItemIndex = 0, "</div><div class='buttons'>", "")  %>
                 </ItemTemplate>
                 <FooterTemplate>
-                    </table>
+                    </div>
+                    </div>
                 </FooterTemplate>
             </asp:Repeater>
           </a>

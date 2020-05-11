@@ -1,4 +1,6 @@
 ﻿Option Strict On
+Imports JOTWEB.GRIS0005LeftBox
+Imports JOTWEB.GRC0001TILESELECTORWRKINC
 ''' <summary>
 ''' ガイダンス検索画面クラス
 ''' </summary>
@@ -28,8 +30,6 @@ Public Class OIM0020GuidanceSearch
                         WF_ButtonEND_Click()
                     Case "WF_Field_DBClick"             'フィールドダブルクリック
                         WF_FIELD_DBClick()
-                    Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
-                        WF_FIELD_Change()
                     Case "WF_ButtonSel"                 '(左ボックス)選択ボタン押下
                         WF_ButtonSel_Click()
                     Case "WF_ButtonCan"                 '(左ボックス)キャンセルボタン押下
@@ -58,7 +58,7 @@ Public Class OIM0020GuidanceSearch
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = OIM0005WRKINC.MAPIDS
+        Master.MAPID = OIM0020WRKINC.MAPIDS
 
         txtFromYmd.Focus()
         WF_FIELD.Value = ""
@@ -88,13 +88,34 @@ Public Class OIM0020GuidanceSearch
             Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)                              '組織コード
             Master.GetFirstValue(work.WF_SEL_FROMYMD.Text, "FROMYMD", txtFromYmd.Text)    'JOT車番
             Master.GetFirstValue(work.WF_SEL_ENDYMD.Text, "ENDYMD", txtEndYmd.Text)                   '型式
+            Dim chklList = work.GetNewDisplayFlags()
+            If Not {"jot_sys_1", "jot_oil_1"}.Contains(Master.ROLE_MAP) Then
+                Dim prmData = work.CreateFIXParam(Master.USER_ORG)
+                leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE, WW_DUMMY, prmData)
+                Dim officeCodes = (From litm As ListItem In leftview.WF_LeftListBox.Items.Cast(Of ListItem) Select litm.Value)
+                chklList = (From itm In chklList Where officeCodes.Contains(itm.OfficeCode)).ToList
+            End If
+            If chklList IsNot Nothing AndAlso chklList.Count <> 0 Then
+                chklList = (From itm In chklList Order By itm.DispOrder).ToList
+            End If
+            work.WF_SEL_DISPFLAGS_LIST.Text = work.EncodeDisplayFlags(chklList)
+            Me.chklFlags.DataSource = chklList
+            Me.chklFlags.DataTextField = "DispName"
+            Me.chklFlags.DataValueField = "FieldName"
+            Me.chklFlags.DataBind()
             'Master.GetFirstValue(work.WF_SEL_USEDFLG.Text, "USEPROPRIETY", WF_USEDFLG_CODE.Text)        '利用フラグ
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0005L Then   '実行画面からの遷移
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0020L Then   '実行画面からの遷移
             '画面項目設定処理
             WF_CAMPCODE.Text = work.WF_SEL_CAMPCODE.Text            '会社コード
             WF_ORG.Text = work.WF_SEL_ORG.Text                      '組織コード
             txtFromYmd.Text = work.WF_SEL_FROMYMD.Text   'JOT車番
             txtEndYmd.Text = work.WF_SEL_ENDYMD.Text             '型式
+            Dim chklList = work.DecodeDisplayFlags(work.WF_SEL_DISPFLAGS_LIST.Text)
+            Me.chklFlags.DataSource = chklList
+            Me.chklFlags.DataTextField = "DispName"
+            Me.chklFlags.DataValueField = "FieldName"
+            Me.chklFlags.DataBind()
+
         End If
 
         ''JOT車番・利用フラグを入力するテキストボックスは数値(0～9)のみ可能とする。
@@ -102,8 +123,8 @@ Public Class OIM0020GuidanceSearch
         'Me.WF_USEDFLG_CODE.Attributes("onkeyPress") = "CheckNum()"
 
         '○ RightBox情報設定
-        rightview.MAPIDS = OIM0005WRKINC.MAPIDS
-        rightview.MAPID = OIM0005WRKINC.MAPIDL
+        rightview.MAPIDS = OIM0020WRKINC.MAPIDS
+        rightview.MAPID = OIM0020WRKINC.MAPIDL
         rightview.COMPCODE = WF_CAMPCODE.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
@@ -140,7 +161,9 @@ Public Class OIM0020GuidanceSearch
         work.WF_SEL_ORG.Text = WF_ORG.Text                    '組織コード
         work.WF_SEL_FROMYMD.Text = txtFromYmd.Text
         work.WF_SEL_ENDYMD.Text = txtEndYmd.Text
-
+        Dim chklList = work.DecodeDisplayFlags(work.WF_SEL_DISPFLAGS_LIST.Text)
+        chklList = work.SetSelectedDispFlags(Me.chklFlags, chklList)
+        work.WF_SEL_DISPFLAGS_LIST.Text = work.EncodeDisplayFlags(chklList)
         '○ 画面レイアウト設定
         If Master.VIEWID = "" Then
             Master.VIEWID = rightview.GetViewId(WF_CAMPCODE.Text)
@@ -172,66 +195,35 @@ Public Class OIM0020GuidanceSearch
         Dim WW_LINE_ERR As String = ""
 
         '○ 単項目チェック
-        'JOT車番
-        'Master.CheckField(WF_CAMPCODE.Text, "TANKNUMBER", WF_TANKNUMBER_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    '存在チェック
-        '    If WF_TANKNUMBER_CODE.Text <> "" Then
-        '        CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "JOT車番 : " & WF_TANKNUMBER_CODE.Text, needsPopUp:=True)
-        '            WF_TANKNUMBER_CODE.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "会社コード", needsPopUp:=True)
-        '    WF_TANKNUMBER_CODE.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-
-        ''型式
-        'Master.CheckField(WF_CAMPCODE.Text, "MODEL", WF_MODEL_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    If WF_MODEL_CODE.Text <> "" Then
-        '        '存在チェック
-        '        CODENAME_get("MODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "型式 : " & WF_MODEL_CODE.Text, needsPopUp:=True)
-        '            WF_MODEL_CODE.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "型式", needsPopUp:=True)
-        '    WF_MODEL_CODE.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-
-        ''利用フラグ
-        'Master.CheckField(WF_CAMPCODE.Text, "USEDFLG", WF_USEDFLG_CODE.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-        'If isNormal(WW_CS0024FCHECKERR) Then
-        '    If WF_USEDFLG_CODE.Text <> "" Then
-        '        '存在チェック
-        '        CODENAME_get("USEDFLG", WF_USEDFLG_CODE.Text, WF_USEDFLG_NAME.Text, WW_RTN_SW)
-        '        If Not isNormal(WW_RTN_SW) Then
-        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "利用フラグ : " & WF_USEDFLG_CODE.Text, needsPopUp:=True)
-        '            WF_USEDFLG_CODE.Focus()
-        '            O_RTN = "ERR"
-        '            Exit Sub
-        '        End If
-        '    End If
-        'Else
-        '    Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "利用フラグ", needsPopUp:=True)
-        '    WF_USEDFLG_CODE.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-
+        '掲載開始日
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "FROMYMD", txtFromYmd.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            'ポップアップを表示(needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "掲載開始日", needsPopUp:=True)
+            txtFromYmd.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+        '掲載終了日
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENDYMD", txtEndYmd.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            'ポップアップを表示(needsPopUp:=True)
+            Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "掲載終了日", needsPopUp:=True)
+            txtEndYmd.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+        If txtFromYmd.Text <> "" AndAlso txtEndYmd.Text <> "" Then
+            Dim fromDtm As Date = CDate(txtFromYmd.Text)
+            Dim toDtm As Date = CDate(txtEndYmd.Text)
+            If fromDtm > toDtm Then
+                'ポップアップを表示(needsPopUp:=True)
+                Master.Output(C_MESSAGE_NO.START_END_RELATION_ERROR, C_MESSAGE_TYPE.ERR, "", needsPopUp:=True)
+                txtFromYmd.Focus()
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+        End If
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -253,34 +245,26 @@ Public Class OIM0020GuidanceSearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_DBClick()
-
-        'If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
-        '    Try
-        '        Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
-        '    Catch ex As Exception
-        '        Exit Sub
-        '    End Try
-
-        '    With leftview
-        '        '会社コード
-        '        Dim prmData As New Hashtable
-        '        prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
-
-        '        'JOT車番
-        '        If WF_FIELD.Value = "WF_TANKNUMBER" Then
-        '            prmData = work.CreateTankParam(WF_CAMPCODE.Text, "TANKNUMBER")
-        '        End If
-
-        '        '型式
-        '        If WF_FIELD.Value = "WF_MODEL" Then
-        '            prmData = work.CreateTankParam(WF_CAMPCODE.Text, "TANKMODEL")
-        '        End If
-
-        '        .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
-        '        .ActiveListBox()
-        '    End With
-
-        'End If
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.Parse(WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+            With leftview
+                Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                If enumVal = LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        Case "WF_FROMYMD"
+                            .WF_Calendar.Text = txtFromYmd.Text
+                        Case "WF_ENDYMD"
+                            .WF_Calendar.Text = txtEndYmd.Text
+                    End Select
+                    .ActiveCalendar()
+                End If
+            End With
+        End If
 
     End Sub
 
@@ -289,23 +273,6 @@ Public Class OIM0020GuidanceSearch
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
-
-        ''○ 変更した項目の名称をセット
-        'Select Case WF_FIELD.Value
-        '    Case "WF_TANKNUMBER"    'JOT車番
-        '        CODENAME_get("TANKNUMBER", WF_TANKNUMBER_CODE.Text, WF_TANKNUMBER_NAME.Text, WW_RTN_SW)
-        '        'Case "WF_MODEL"             '型式
-        '        '    CODENAME_get("TANKMODEL", WF_MODEL_CODE.Text, WF_MODEL_NAME.Text, WW_RTN_SW)
-        '    Case "WF_USEDFLG"       '利用フラグ
-        '        CODENAME_get("USEDFLG", WF_USEDFLG_CODE.Text, WF_USEDFLG_NAME.Text, WW_RTN_SW)
-        'End Select
-
-        ''○ メッセージ表示
-        'If isNormal(WW_RTN_SW) Then
-        '    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.NOR)
-        'Else
-        '    Master.Output(WW_RTN_SW, C_MESSAGE_TYPE.ERR)
-        'End If
 
     End Sub
 
@@ -320,33 +287,34 @@ Public Class OIM0020GuidanceSearch
     ''' <remarks></remarks>
     Protected Sub WF_ButtonSel_Click()
 
-        'Dim WW_SelectValue As String = ""
-        'Dim WW_SelectText As String = ""
 
-        ''○ 選択内容を取得
-        'If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-        '    WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
-        '    WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
-        '    WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
-        'End If
-
-        ''○ 選択内容を画面項目へセット
-        'Select Case WF_FIELD.Value
-        '    Case "WF_TANKNUMBER"          'JOT車番
-        '        WF_TANKNUMBER_CODE.Text = WW_SelectValue
-        '        WF_TANKNUMBER_NAME.Text = WW_SelectText
-        '        WF_TANKNUMBER_CODE.Focus()
-
-        '    Case "WF_MODEL"          '型式
-        '        WF_MODEL_CODE.Text = WW_SelectValue
-        '        'WF_MODEL_NAME.Text = WW_SelectText
-        '        WF_MODEL_CODE.Focus()
-
-        '    Case "WF_USEDFLG"          '利用フラグ
-        '        WF_USEDFLG_CODE.Text = WW_SelectValue
-        '        WF_USEDFLG_NAME.Text = WW_SelectText
-        '        WF_USEDFLG_CODE.Focus()
-        'End Select
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "WF_FROMYMD"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                        txtFromYmd.Text = ""
+                    Else
+                        txtFromYmd.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                txtFromYmd.Focus()
+            Case "WF_ENDYMD"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                        txtEndYmd.Text = ""
+                    Else
+                        txtEndYmd.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                txtEndYmd.Focus()
+        End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
@@ -361,19 +329,17 @@ Public Class OIM0020GuidanceSearch
     ''' <remarks></remarks>
     Protected Sub WF_ButtonCan_Click()
 
-        ''○ フォーカスセット
-        'Select Case WF_FIELD.Value
-        '    Case "WF_TANKNUMBER"        'JOT車番
-        '        WF_TANKNUMBER_CODE.Focus()
-        '    Case "WF_MODEL"             '型式
-        '        WF_MODEL_CODE.Focus()
-        '    Case "WF_USEDFLG"           '利用フラグ
-        '        WF_USEDFLG_CODE.Focus()
-        'End Select
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "WF_FROMYMD"
+                txtFromYmd.Focus()
+            Case "WF_ENDYMD"
+                txtEndYmd.Focus()
+        End Select
 
-        ''○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-        'WF_FIELD.Value = ""
-        'WF_LeftboxOpen.Value = ""
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
 
     End Sub
 
@@ -420,40 +386,19 @@ Public Class OIM0020GuidanceSearch
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
     Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
-
-        'O_TEXT = ""
-        'O_RTN = ""
-
-        'If I_VALUE = "" Then
-        '    O_RTN = C_MESSAGE_NO.NORMAL
-        '    Exit Sub
-        'End If
-
-        'Dim prmData As New Hashtable
-        'prmData.Item(C_PARAMETERS.LP_COMPANY) = WF_CAMPCODE.Text
-
-        'Try
-        '    Select Case I_FIELD
-        '        Case "CAMPCODE"         '会社コード
-        '            leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-        '        Case "ORG"              '運用部署
-        '            prmData = work.CreateORGParam(WF_CAMPCODE.Text)
-        '            leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
-        '        Case "TANKNUMBER"       'JOT車番
-        '            prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
-        '            leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKNUMBER, I_VALUE, O_TEXT, O_RTN, prmData)
-        '        Case "MODEL"            '型式
-        '            prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
-        '            leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
-        '        Case "USEDFLG"          '利用フラグ
-        '            prmData = work.CreateTankParam(WF_CAMPCODE.Text, I_VALUE)
-        '            leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, prmData)
-        '    End Select
-        'Catch ex As Exception
-        '    O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
-        '    Exit Sub
-        'End Try
-
+    End Sub
+    ''' <summary>
+    ''' チェックボックスデータバインド時イベント
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>チェックの状態を設定する</remarks>
+    Private Sub chklFlags_DataBinding(sender As Object, e As EventArgs) Handles chklFlags.DataBinding
+        Dim chklObj As CheckBoxList = DirectCast(sender, CheckBoxList)
+        Dim chkBindItm As List(Of OIM0020WRKINC.DisplayFlag) = DirectCast(chklObj.DataSource, List(Of OIM0020WRKINC.DisplayFlag))
+        For i = 0 To chklObj.Items.Count - 1 Step 1
+            chklObj.Items(i).Selected = chkBindItm(i).Checked
+        Next
     End Sub
 
 End Class

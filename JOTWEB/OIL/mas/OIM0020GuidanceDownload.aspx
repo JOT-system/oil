@@ -1,16 +1,6 @@
-﻿<%@ Page Language="vb" AutoEventWireup="false" CodeBehind="OIM0020GuidanceDownload.aspx.vb" Inherits="JOTWEB.OIM0020GuidanceDownload" %>
-
-<!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title></title>
-</head>
-<body>
-    <form id="form1" runat="server">
-        <div>
-        </div>
-    </form>
-</body>
-</html>
+﻿<%@ Page Title="OIM0020D" Language="vb" AutoEventWireup="false" MasterPageFile="~/OIL/OILMasterPage.Master" CodeBehind="OIM0020GuidanceDownload.aspx.vb" Inherits="JOTWEB.OIM0020GuidanceDownload" %>
+<%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="contents1" runat="server">
+</asp:Content>

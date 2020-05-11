@@ -28,8 +28,9 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     display: flex; /* フレックス表示 */
     flex-wrap: wrap;
     box-sizing: border-box;
+    overflow-y: auto;
+    min-height: 430px;
 }
-
 
 /* メニュー枠の共通設定(色や画像は後述スタイルで個別設定)(aタグIDが"Menu_"で始まるもの) */
 a[id^="Menu_"] {
@@ -37,6 +38,7 @@ a[id^="Menu_"] {
     border: 1px solid rgb(255, 255, 255);
     width: 50%; /* 4列にするため100% ÷ 4 これで4あふれた幅で折り返し2行になる */
     height: 100%; /* 2行にするため50% */
+    min-height: 420px;
     overflow-y: auto;
     overflow-x: hidden; /* 横スクロールはなし */
     box-sizing: border-box;
@@ -45,14 +47,30 @@ a[id^="Menu_"] {
     background-position: left 2pt bottom 2pt;
     background-size: 25%;
 }
-    /* メニュー枠内のテーブル設定 */
-    a[id^="Menu_"] table {
-        width: 100%;
-    }
+a[id^="Menu_"] > div {
+    height:100%;
+}
+a[id^="Menu_"] > div div.title {
+    height:48px;
+}
 
-        a[id^="Menu_"] table td {
-            max-width: 100%;
-        }
+a[id^="Menu_"] div.buttons {
+    height: calc(100% - 48px);
+    min-height:370px;
+    box-sizing: border-box;
+    display:flex;
+    flex-wrap:wrap;
+    flex-direction :column;
+    padding-right:5px;
+}
+a[id^="Menu_"] div.buttons > div{
+    width:50%;
+    height:30px;
+    margin-bottom:5px;
+}
+a[id^="Menu_"] div.buttons > div.noname{
+    display:none;
+}
 /* メニュー枠内タイトルの共通設定(色や画像は後述スタイルで個別設定)(spanタグIDが"WF_MenuLabe_"で始まるもの) */
 span[id*=WF_MenuLabe_] {
     display: inline-block;
@@ -66,7 +84,7 @@ span[id*=WF_MenuLabe_] {
 }
 /* メニュー枠内ボタンの共通設定 */
 a[id^="Menu_"] input[type=submit] {
-    width: calc(50% - 2em); /* 全体幅から当マージン分を引く */
+    width: calc(100% - 2em); /* 全体幅から当マージン分を引く */
     max-width: calc(100% - 2em); /* 全体幅から当マージン分を引く */
     color: white;
     /* background-color: rgba(255, 255, 255,0.1); */ /* transparent → 白の透明度90% 0.1を増加させれば白が増します */
@@ -86,6 +104,7 @@ a[id^="Menu_"] input[type=submit] {
     white-space: nowrap;
     padding-left: 3px;
     box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.33);
+    box-sizing :border-box ;
 }
 /*在庫管理メニュー表示*/
 #Menu_L {

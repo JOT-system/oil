@@ -19,10 +19,10 @@ function InitDisplay() {
     //更新ボタン活性／非活性
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //活性
-        document.getElementById("WF_ButtonUPDATE").disabled = "";
+        //document.getElementById("WF_ButtonUPDATE").disabled = "";
     } else {
         //非活性 
-        document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
+        //document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     }
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);

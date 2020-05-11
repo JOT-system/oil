@@ -46,22 +46,24 @@
             <!-- 掲載開始日 -->
             <div class="inputItem">
                 <a id="WF_FROMYMD_LABEL">掲載開始日</a>
-                <a class="ef" id="WF_FROMYMD" ondblclick="Field_DBclick('WF_TANKNUMBER', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('txtFromYmd');">
+                <a class="ef" id="WF_FROMYMD" ondblclick="Field_DBclick('WF_FROMYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox  ID="txtFromYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
                 </a>
             </div>
             <!-- 掲載終了日 -->
             <div class="inputItem">
                 <a id="WF_ENDYMD_LABEL">掲載終了日</a>
-                <a class="ef"  id="WF_ENDYMD"  ondblclick="Field_DBclick('WF_MODEL', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);" onchange="TextBox_change('txtEndYmd');">
+                <a class="ef"  id="WF_ENDYMD"  ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox  ID="txtEndYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>
             </div>
             <!-- 掲載フラグ -->
             <div class="inputItem">
-                <a id="WF_Test"  class="requiredMark">ガイダンスを表示する支店・営業所を選ぶ</a>
+                <a id="WF_Test">ガイダンスを表示する支店・営業所を選ぶ(複数チェックはいづれかに含まれるになります)</a>
                 <a>
-                    <MSINC:tilelist ID="tileDisplayFields" runat="server" />
+                    <div class="grc0001Wrapper">
+                        <asp:CheckBoxList ID="chklFlags" runat="server" ClientIDMode="Predictable" RepeatLayout="UnorderedList"></asp:CheckBoxList>
+                    </div>
                 </a>
                 <a></a>
             </div>

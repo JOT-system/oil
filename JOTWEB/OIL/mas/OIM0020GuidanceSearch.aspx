@@ -45,14 +45,14 @@
             </div>
             <!-- 掲載開始日 -->
             <div class="inputItem">
-                <a id="WF_FROMYMD_LABEL">掲載開始日</a>
+                <a id="WF_FROMYMD_LABEL">掲載開始日(以上)</a>
                 <a class="ef" id="WF_FROMYMD" ondblclick="Field_DBclick('WF_FROMYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox  ID="txtFromYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
                 </a>
             </div>
             <!-- 掲載終了日 -->
             <div class="inputItem">
-                <a id="WF_ENDYMD_LABEL">掲載終了日</a>
+                <a id="WF_ENDYMD_LABEL">掲載終了日(以下)</a>
                 <a class="ef"  id="WF_ENDYMD"  ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                     <asp:TextBox  ID="txtEndYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                 </a>

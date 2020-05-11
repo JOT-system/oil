@@ -176,6 +176,7 @@ Public Class OIM0020GuidanceList
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
         If Not isNormal(CS0013ProfView.ERR) Then
             Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
@@ -214,88 +215,115 @@ Public Class OIM0020GuidanceList
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データをタンク車マスタから取得する
+        Dim sotrOrderValue As String = "MG.GUIDANCENO DESC"
         Dim sqlStat As New StringBuilder
-        sqlStat.AppendLine("SELECT MG.GUIDANCENO")
-        sqlStat.AppendLine("      ,")
+        sqlStat.AppendLine("SELECT ")
+        sqlStat.AppendFormat("      ROW_NUMBER() OVER(ORDER BY {0})  AS LINECNT", sotrOrderValue).AppendLine()
+        sqlStat.AppendLine("       ,'' AS OPERATION")
+        'sqlStat.AppendLine("     ,0  AS TIMSTP)
+        sqlStat.AppendLine("       ,1  AS 'SELECT'")
+        sqlStat.AppendLine("       ,0  AS HIDDEN")
+        sqlStat.AppendLine("       ,MG.GUIDANCENO")
+        sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.FROMYMD, 'yyyy/MM/dd'), NULL) AS FROMYMD")
+        sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.ENDYMD,  'yyyy/MM/dd'), NULL) AS ENDYMD")
+        sqlStat.AppendLine("       ,'<div class=""type' + MG.TYPE + '""></div>' AS DISPTYPE")
+        sqlStat.AppendLine("       ,MG.TITTLE AS TITTLE")
+        sqlStat.AppendLine("       ,MG.OUTFLG")
+        sqlStat.AppendLine("       ,MG.INFLG1")
+        sqlStat.AppendLine("       ,MG.INFLG2")
+        sqlStat.AppendLine("       ,MG.INFLG3")
+        sqlStat.AppendLine("       ,MG.INFLG4")
+        sqlStat.AppendLine("       ,MG.INFLG5")
+        sqlStat.AppendLine("       ,MG.INFLG6")
+        sqlStat.AppendLine("       ,MG.INFLG7")
+        sqlStat.AppendLine("       ,MG.INFLG8")
+        sqlStat.AppendLine("       ,MG.INFLG9")
+        sqlStat.AppendLine("       ,MG.INFLG10")
+        sqlStat.AppendLine("       ,MG.INFLG11")
+
+        sqlStat.AppendLine("       ,CASE WHEN MG.OUTFLG='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPOUTFLG")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG1='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG1")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG2='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG2")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG3='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG3")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG4='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG4")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG5='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG5")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG6='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG6")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG7='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG7")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG8='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG8")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG9='1'  THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG9")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG10='1' THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG10")
+        sqlStat.AppendLine("       ,CASE WHEN MG.INFLG11='1' THEN '<div class=""checked""></div>' ELSE '' END AS DISPINFLG11")
+        sqlStat.AppendLine("       ,MG.NAIYOU")
+        sqlStat.AppendLine("       ,MG.FAILE1")
+        sqlStat.AppendLine("       ,MG.FAILE2")
+        sqlStat.AppendLine("       ,MG.FAILE3")
+        sqlStat.AppendLine("       ,MG.FAILE4")
+        sqlStat.AppendLine("       ,MG.FAILE5")
+        sqlStat.AppendLine("       ,CASE WHEN ISNULL(MG.FAILE1,'') <> '' THEN '<div class=""hasAttachment""></div>' ELSE '' END AS HASATTACHMENT")
+        sqlStat.AppendLine("       ,format(MG.INITYMD,'yyyy/MM/dd HH:mm:ss.fff')    AS INITYMD")
+        sqlStat.AppendLine("       ,format(MG.UPDYMD ,'yyyy/MM/dd HH:mm:ss.fff')    AS UPDYMD")
         sqlStat.AppendLine("  FROM OIL.OIM0020_GUIDANCE MG")
         sqlStat.AppendLine(" WHERE MG.DELFLG = @DELFLG_NO")
+        If work.WF_SEL_FROMYMD.Text <> "" Then
+            sqlStat.AppendLine("   AND MG.FROMYMD <= @FROMYMD")
+        End If
+        If work.WF_SEL_ENDYMD.Text <> "" Then
+            sqlStat.AppendLine("   AND MG.ENDYMD >= @ENDYMD")
+        End If
+        If selectedList IsNot Nothing AndAlso selectedList.Count > 0 Then
+            sqlStat.AppendLine("   AND (")
+        End If
+        Dim isFirst = True
+        For Each selectedFlg In selectedList
+            If Not isFirst Then
+                sqlStat.Append("    OR ")
+            Else
+                sqlStat.Append("       ")
+            End If
+            isFirst = False
+            sqlStat.AppendFormat("MG.{0} = @FLAGON", selectedFlg.FieldName).AppendLine()
+        Next
+        If selectedList IsNot Nothing AndAlso selectedList.Count > 0 Then
+            sqlStat.AppendLine("   )")
+        End If
+        sqlStat.AppendFormat(" ORDER BY {0}", sotrOrderValue).AppendLine()
 
+        Try
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, SQLcon)
+                With sqlCmd.Parameters
+                    .Add("@DELFLG_NO", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
 
+                    If work.WF_SEL_FROMYMD.Text <> "" Then
+                        .Add("@FROMYMD", SqlDbType.Date).Value = work.WF_SEL_FROMYMD.Text
+                    End If
+                    If work.WF_SEL_ENDYMD.Text <> "" Then
+                        .Add("@ENDYMD", SqlDbType.Date).Value = work.WF_SEL_ENDYMD.Text
+                    End If
+                    .Add("@FLAGON", SqlDbType.NVarChar).Value = "1"
+                End With
 
-        ''○ 条件指定で指定されたものでSQLで可能なものを追加する
-        ''タンク車№
-        'If Not String.IsNullOrEmpty(work.WF_SEL_TANKNUMBER.Text) Then
-        '    SQLStr &= String.Format("    AND OIM0005.TANKNUMBER = '{0}'", work.WF_SEL_TANKNUMBER.Text)
-        'End If
+                Using SQLdr As SqlDataReader = sqlCmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIM0020tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
 
-        ''型式
-        'If Not String.IsNullOrEmpty(work.WF_SEL_MODEL.Text) Then
-        '    SQLStr &= String.Format("    AND OIM0005.MODEL = '{0}'", work.WF_SEL_MODEL.Text)
-        'End If
+                    '○ テーブル検索結果をテーブル格納
+                    OIM0020tbl.Load(SQLdr)
+                End Using
 
-        ''利用フラグ
-        'If Not String.IsNullOrEmpty(work.WF_SEL_USEDFLG.Text) Then
-        '    SQLStr &= String.Format("    AND OIM0005.USEDFLG = '{0}'", work.WF_SEL_USEDFLG.Text)
-        'End If
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0020L SELECT")
 
-        ''If work.WF_SEL_TANKNUMBER.Text = "" And
-        ''    work.WF_SEL_MODEL.Text = "" Then
-        ''    SQLStr &=
-        ''      " WHERE OIM0005.DELFLG      <> @P3"
-        ''ElseIf work.WF_SEL_TANKNUMBER.Text <> "" And
-        ''    work.WF_SEL_MODEL.Text <> "" Then
-        ''    SQLStr &=
-        ''      " WHERE OIM0005.TANKNUMBER = @P1" _
-        ''    & "   AND OIM0005.MODEL = @P2" _
-        ''    & "   AND OIM0005.DELFLG      <> @P3"
-        ''Else
-        ''    SQLStr &=
-        ''      " WHERE (OIM0005.TANKNUMBER = @P1" _
-        ''    & "   OR OIM0005.MODEL = @P2)" _
-        ''    & "   AND OIM0005.DELFLG      <> @P3"
-        ''End If
-
-        'SQLStr &=
-        '      " ORDER BY" _
-        '    & "    RIGHT('0000000000' + CAST(OIM0005.TANKNUMBER AS NVARCHAR), 10)"
-
-        'Try
-        '    Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-        '        'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 8)        'JOT車番
-        '        'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 20)       '型式
-        '        Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)        '削除フラグ
-
-        '        'PARA1.Value = work.WF_SEL_TANKNUMBER.Text
-        '        'PARA2.Value = work.WF_SEL_MODEL.Text
-        '        PARA3.Value = C_DELETE_FLG.DELETE
-
-        '        Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-        '            '○ フィールド名とフィールドの型を取得
-        '            For index As Integer = 0 To SQLdr.FieldCount - 1
-        '                OIM0020tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-        '            Next
-
-        '            '○ テーブル検索結果をテーブル格納
-        '            OIM0020tbl.Load(SQLdr)
-        '        End Using
-
-        '        Dim i As Integer = 0
-        '        For Each OIM0020row As DataRow In OIM0020tbl.Rows
-        '            i += 1
-        '            OIM0020row("LINECNT") = i        'LINECNT
-        '        Next
-        '    End Using
-        'Catch ex As Exception
-        '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIM0020L SELECT")
-
-        '    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-        '    CS0011LOGWrite.INFPOSI = "DB:OIM0020L Select"
-        '    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-        '    CS0011LOGWrite.TEXT = ex.ToString()
-        '    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-        '    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-        '    Exit Sub
-        'End Try
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIM0020L Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -364,6 +392,7 @@ Public Class OIM0020GuidanceList
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
 
         '○ クリア

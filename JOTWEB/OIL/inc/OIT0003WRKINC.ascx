@@ -228,6 +228,8 @@
     <!-- ■受注手配（費用入力）用 -->
     <!-- 支払請求№ -->
     <asp:TextBox ID="WF_SEL_BILLINGNO" runat="server"></asp:TextBox>
+    <!-- 消費税 -->
+    <asp:TextBox ID="WF_SEL_CONSUMPTIONTAX" runat="server"></asp:TextBox>
 
     <!-- ■共通 -->
     <!-- 作成フラグ -->

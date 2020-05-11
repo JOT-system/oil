@@ -74,8 +74,6 @@ Public Class OIT0003OrderDetail
     Private WW_SwapInput As String = "0"                            '入換指示入力(0:未 1:完了)
     Private WW_LoadingInput As String = "0"                         '積込指示入力(0:未 1:完了)
 
-    Private WW_Tax As Decimal = 0.1
-
     Private WW_ORDERINFOFLG_10 As Boolean = False                   '受注情報セット可否(情報(10:積置))
     Private WW_ORDERINFOALERMFLG_80 As Boolean = False              '受注情報セット可否(警告(80:タンク車数オーバー))
     Private WW_ORDERINFOALERMFLG_82 As Boolean = False              '受注情報セット可否(警告(82:検査間近あり))
@@ -745,6 +743,11 @@ Public Class OIT0003OrderDetail
         CODENAME_get("DEPSTATION", Me.TxtDepstationCode.Text, Me.LblDepstationName.Text, WW_DUMMY)
         '着駅
         CODENAME_get("ARRSTATION", Me.TxtArrstationCode.Text, Me.LblArrstationName.Text, WW_DUMMY)
+
+        '消費税の取得
+        Dim WW_GetConsumptionTax() As String = {"", "", "", "", "", "", "", ""}
+        WW_FixvalueMasterSearch("", "CONSUMPTIONTAX", "", WW_GetConsumptionTax)
+        work.WF_SEL_CONSUMPTIONTAX.Text = WW_GetConsumptionTax(1)
 
     End Sub
 
@@ -2463,7 +2466,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Decimal) '消費税
 
                 PARA01.Value = work.WF_SEL_BILLINGNO.Text
-                PARA02.Value = Me.WW_Tax
+                PARA02.Value = work.WF_SEL_CONSUMPTIONTAX.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -5972,7 +5975,7 @@ Public Class OIT0003OrderDetail
             Case "APPLYCHARGESUM"       '(一覧)金額
                 updHeader.Item(WF_FIELD.Value) = "￥" + String.Format("{0:#,0}", Integer.Parse(WW_ListValue))
                 '税額(消費税)
-                updHeader.Item("CONSUMPTIONTAX") = "￥" + String.Format("{0:#,0.00}", Integer.Parse(WW_ListValue) * Me.WW_Tax)
+                updHeader.Item("CONSUMPTIONTAX") = "￥" + String.Format("{0:#,0.00}", Integer.Parse(WW_ListValue) * work.WF_SEL_CONSUMPTIONTAX.Text)
         End Select
 
         '○ 画面表示データ保存

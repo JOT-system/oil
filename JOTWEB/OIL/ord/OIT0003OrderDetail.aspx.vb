@@ -4263,7 +4263,7 @@ Public Class OIT0003OrderDetail
             & " , '2'                                                AS CALCKBN" _
             & " , 0                                               AS CARSAMOUNT" _
             & " , ''                                                 AS CARSAMOUNTNAME" _
-            & " , 0                                               AS APPLYCHARGE" _
+            & " , ''                                                 AS APPLYCHARGE" _
             & " , 0                                               AS APPLYCHARGESUM" _
             & " , 0                                               AS CONSUMPTIONTAX" _
             & " , ''                                                 AS INVOICECODE" _
@@ -5972,7 +5972,7 @@ Public Class OIT0003OrderDetail
             Case "APPLYCHARGESUM"       '(一覧)金額
                 updHeader.Item(WF_FIELD.Value) = "￥" + String.Format("{0:#,0}", Integer.Parse(WW_ListValue))
                 '税額(消費税)
-                updHeader.Item("CONSUMPTIONTAX") = Integer.Parse(WW_ListValue) * Me.WW_Tax
+                updHeader.Item("CONSUMPTIONTAX") = "￥" + String.Format("{0:#,0.00}", Integer.Parse(WW_ListValue) * Me.WW_Tax)
         End Select
 
         '○ 画面表示データ保存
@@ -8152,12 +8152,17 @@ Public Class OIT0003OrderDetail
                     PARA14.Value = OIT0003tab4row("BREAKDOWNCODE")     'セグメント枝番
                     PARA15.Value = OIT0003tab4row("BREAKDOWN")         'セグメント枝番名
                     PARA16.Value = OIT0003tab4row("CALCKBN")           '科目区分
-                    PARA17.Value = ""                                  '科目区分名
+                    PARA17.Value = OIT0003tab4row("CALCKBNNAME")       '科目区分名
 
                     PARA18.Value = reg.Replace(OIT0003tab4row("CARSAMOUNT"), "")        '数量
-                    PARA19.Value = OIT0003tab4row("APPLYCHARGE")       '単価
-                    PARA20.Value = OIT0003tab4row("APPLYCHARGESUM")    '金額
-                    PARA21.Value = OIT0003tab4row("CONSUMPTIONTAX")    '税額
+                    '単価
+                    If OIT0003tab4row("APPLYCHARGE") = "" Then
+                        OIT0003tab4row("APPLYCHARGE") = 0
+                    Else
+                        PARA19.Value = Replace(OIT0003tab4row("APPLYCHARGE"), "￥", "")
+                    End If
+                    PARA20.Value = Replace(OIT0003tab4row("APPLYCHARGESUM"), "￥", "")    '金額
+                    PARA21.Value = Replace(OIT0003tab4row("CONSUMPTIONTAX"), "￥", "")    '税額
                     PARA22.Value = OIT0003tab4row("INVOICECODE")       '請求先コード
                     PARA23.Value = OIT0003tab4row("INVOICENAME")       '請求先名
                     PARA24.Value = OIT0003tab4row("INVOICEDEPTNAME")   '請求先部門名

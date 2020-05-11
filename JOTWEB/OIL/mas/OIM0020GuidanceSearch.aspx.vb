@@ -393,12 +393,11 @@ Public Class OIM0020GuidanceSearch
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>チェックの状態を設定する</remarks>
-    Private Sub chklFlags_DataBinding(sender As Object, e As EventArgs) Handles chklFlags.DataBinding
+    Private Sub chklFlags_DataBound(sender As Object, e As EventArgs) Handles chklFlags.DataBound
         Dim chklObj As CheckBoxList = DirectCast(sender, CheckBoxList)
         Dim chkBindItm As List(Of OIM0020WRKINC.DisplayFlag) = DirectCast(chklObj.DataSource, List(Of OIM0020WRKINC.DisplayFlag))
         For i = 0 To chklObj.Items.Count - 1 Step 1
             chklObj.Items(i).Selected = chkBindItm(i).Checked
         Next
     End Sub
-
 End Class

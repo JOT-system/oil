@@ -159,6 +159,7 @@
     <Content Include="OIL\img\guidanceIconI.png" />
     <Content Include="OIL\img\guidanceIconW.png" />
     <Content Include="OIL\img\iconError.png" />
+    <Content Include="OIL\img\IconHasAttach.png" />
     <Content Include="OIL\img\iconInfo.png" />
     <Content Include="OIL\img\iconWarn.png" />
     <Content Include="OIL\img\lockKey.png" />

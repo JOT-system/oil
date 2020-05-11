@@ -1,2 +1,49 @@
-﻿body {
+﻿div[data-generated='1'] div[id$='_HL'] table, div[data-generated='1'] div[id$='_HR'] table {
+    height: 46px;
+}
+
+div[data-generated='1'] div[id$='_DL'],
+div[data-generated='1'] div[id$='_DR'] {
+    top: 46px;
+}
+div[data-generated='1'] th[cellfieldname='HASATTACHMENT'] > div,
+div[data-generated='1'] div.hasAttachment {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+    background-image: url('../img/IconHasAttach.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+div[data-generated='1'] div.typeI {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+    background-image: url('../img/guidanceIconI.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+div[data-generated='1'] div.typeW {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+    background-image: url('../img/guidanceIconW.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+div[data-generated='1'] div.typeE {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+    background-image: url('../img/guidanceIconE.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+div[data-generated='1'] div.checked:before {
+    color:red;
+    content:"✔"
+}
+div[data-generated='1'] div[id^='pnlListArea_D'] tr {
+
 }

@@ -1,2 +1,66 @@
-﻿body {
+﻿
+.delAttachment {
+    font-weight:bold;
+    color:red;
+    cursor:pointer;
+    margin-right:5px;
+}
+.attachmentCell hr {
+    margin:5px;
+}
+table.input {
+    table-layout: fixed;
+    width:1102px;
+}
+table.input > tbody > tr > th,
+table.input > tbody > tr > td {
+    padding:5px;
+    border:1px solid darkgray;
+}
+table.input > tbody > tr > th.top {
+    vertical-align:top;
+    padding-top:10px;
+}
+table.input > tbody > tr > th {
+    background-color: rgb(221,235,247);
+}
+table.input col:nth-child(1) {
+   width:140px;
+}
+table.input col:nth-child(2) {
+   width:200px;
+}
+table.input col:nth-child(3) {
+   width:140px;
+}
+table.input col:nth-child(4) {
+   width:612px;
+}
+.grc0001Wrapper input[type=checkbox] + label, .grc0001Wrapper input[type=radio] + label {
+    height:30px;
+}
+.grc0001Wrapper.type input[type=radio] + label {
+    width:160px;
+}
+.grc0001Wrapper.type ul {
+    width: 600px;
+}
+.grc0001Wrapper.flags ul {
+    width: 900px;
+}
+#txtTitle {
+    width:calc(100% - 5px);
+}
+table.input textarea {
+    width: calc(100% - 5px);
+    min-height: 30px !important;
+    height: 120px;
+    resize:vertical;
+}
+.calendarIconArea div {
+    margin-top:0px;
+}
+#txtFromYmd,
+#txtEndYmd {
+    width:185px !important;
 }

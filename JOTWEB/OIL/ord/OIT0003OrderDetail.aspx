@@ -457,6 +457,8 @@
                         <a id="WF_LTANK_LABEL">ＬＳＡ　　</a>
                         <!-- ■　車数（A重油）　■ -->
                         <a id="WF_ATANK_LABEL">Ａ重油</a>
+                        <!-- ■　合計　■ -->
+                        <a id="WF_TOTALCNT_LABEL">合計</a>
                     </div>
                     <div class="itemRow">
                         <!-- ■　油種別タンク車数(車)　■ -->
@@ -500,6 +502,10 @@
                         <!-- ■　車数（A重油）　■ -->
                         <a class="ef" id="WF_ATANK">
                             <asp:TextBox ID="TxtATank" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                        </a>
+                        <!-- ■　合計　■ -->
+                        <a class="ef" id="WF_TOTALCNT">
+                            <asp:TextBox ID="TxtTotalCnt" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                         </a>
 
                     </div>
@@ -548,6 +554,10 @@
                         <!-- ■　車数（A重油）　■ -->
                         <a class="ef" id="WF_ATANK_W">
                             <asp:TextBox ID="TxtATank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                        </a>
+                        <!-- ■　合計　■ -->
+                        <a class="ef" id="WF_TOTALCNT_W">
+                            <asp:TextBox ID="TxtTotalCnt_w" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
                         </a>
                     </div>
                 </div>

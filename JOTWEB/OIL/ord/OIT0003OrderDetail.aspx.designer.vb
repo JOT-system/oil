@@ -689,6 +689,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtATank As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtTotalCnt コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotalCnt As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtHTank_w コントロール。
     '''</summary>
     '''<remarks>
@@ -777,6 +786,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtATank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTotalCnt_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotalCnt_w As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''pnlListArea1 コントロール。

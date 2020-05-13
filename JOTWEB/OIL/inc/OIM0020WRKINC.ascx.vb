@@ -164,4 +164,72 @@ Public Class OIM0020WRKINC
         ''' <returns></returns>
         Public Property OfficeCode As String
     End Class
+    ''' <summary>
+    ''' ガイダンス情報クラス
+    ''' </summary>
+    Public Class GuidanceItemClass
+        ''' <summary>
+        ''' ガイダンス番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property GuidanceNo As String
+        ''' <summary>
+        ''' 掲載開始日
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property FromYmd As String
+        ''' <summary>
+        ''' 掲載終了日
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property EndYmd As String
+        ''' <summary>
+        ''' 種類(I:インフォメーション,W:注意,E:障害)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Type As String
+        ''' <summary>
+        ''' タイトル
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Title As String
+        ''' <summary>
+        ''' 対象
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DispFlags As New List(Of DisplayFlag)
+        ''' <summary>
+        ''' 内容
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Naiyo As String
+        ''' <summary>
+        ''' 添付ファイル
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Attachments As New List(Of FileItemClass)
+        ''' <summary>
+        ''' 削除フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DelFlg As String
+
+        Public Property InitYmd As String
+        Public Property InitUser As String
+        Public Property InitTermId As String
+        Public Property UpdYmd As String
+        Public Property UpdUserUser As String
+        Public Property UpdTermId As String
+    End Class
+    ''' <summary>
+    ''' ファイル情報クラス
+    ''' </summary>
+    Public Class FileItemClass
+        ''' <summary>
+        ''' ファイル名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property FileName As String
+
+    End Class
 End Class

@@ -23,7 +23,7 @@
                           <tr>
                               <td class="guidanceType"><div class='<%# Eval("TYPE") %>'></div></td>
                               <td class="entryDate"><%# Eval("ENTRYDATE") %></td>
-                              <td class="title"><a href="#"><%# Eval("TITTLE") %></a></td>
+                              <td class="title"><a href="#" onclick="ButtonClick('WF_ButtonShowGuidance<%# Eval("GUIDANCENO") %>'); return false;"><%# Eval("TITTLE") %></a></td>
                               <td class="naiyo"><%# Eval("NAIYOU") %></td>
                               <td class="attachFile1"><a href="#"><%# Eval("FAILE1") %></a></td>
                           </tr>
@@ -233,6 +233,7 @@
          <!-- ***** ボタン押下 ***** -->
          <a hidden="hidden">
                 <input id="WF_ButtonClick" runat="server" value=""  type="text" />        
+                <asp:HiddenField ID="WF_HdnGuidanceUrl" visible="false" runat="server" />
           </a>
         </div>
             <!-- Work レイアウト -->

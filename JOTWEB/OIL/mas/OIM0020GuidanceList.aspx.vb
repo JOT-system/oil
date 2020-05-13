@@ -414,7 +414,7 @@ Public Class OIM0020GuidanceList
     Protected Sub WF_ButtonINSERT_Click()
 
 
-
+        work.WF_LIST_GUIDANCENO.Text = ""
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
 
@@ -568,11 +568,12 @@ Public Class OIM0020GuidanceList
         '○ LINECNT取得
         Try
             Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT)
-            WW_LINECNT -= 1
+            'WW_LINECNT -= 1
         Catch ex As Exception
             Exit Sub
         End Try
-
+        Dim guidanceNo As String = (From dr As DataRow In OIM0020tbl Where CInt(dr("LINECNT")) = WW_LINECNT Select Convert.ToString(dr("GUIDANCENO"))).FirstOrDefault
+        work.WF_LIST_GUIDANCENO.Text = guidanceNo
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
 

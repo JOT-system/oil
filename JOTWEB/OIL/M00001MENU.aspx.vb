@@ -9,7 +9,7 @@ Public Class M00001MENU
     '*共通関数宣言(BASEDLL)
     Private CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
     Private CS0050Session As New CS0050SESSION              'セッション情報
-
+    Public Property SelectedGuidanceNo As String = ""
     ''' <summary>
     '''  パスワードの変更依頼（期限切れまで何日前からか）
     ''' </summary>
@@ -23,10 +23,15 @@ Public Class M00001MENU
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         If IsPostBack Then
-
+            If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
+                If WF_ButtonClick.Value.StartsWith("WF_ButtonShowGuidance") Then
+                    WF_ButtonShowGuidance_Click()
+                End If
+            End If
         Else
             '★★★ 初期画面表示 ★★★
             Initialize()
+            WF_ButtonClick.Value = ""
         End If
 
     End Sub
@@ -133,7 +138,6 @@ Public Class M00001MENU
                 Me.repGuidance.DataSource = guidanceDt
                 Me.repGuidance.DataBind()
             Catch ex As Exception
-                Dim aa As String = ""
             End Try
 
             '■■■ パスワード有効期限の警告表示 ■■■
@@ -232,6 +236,21 @@ Public Class M00001MENU
                     End While
                 End Using
 
+            End Using
+            sqlStat = New StringBuilder
+            sqlStat.AppendLine("SELECT URL.URL")
+            sqlStat.AppendLine("  FROM COM.OIS0007_URL URL")
+            sqlStat.AppendLine(" WHERE URL.MAPID = @MAPID")
+            sqlStat.AppendLine("   AND GETDATE() BETWEEN URL.STYMD AND URL.ENDYMD")
+            sqlStat.AppendLine("   AND URL.DELFLG = @DELFLG")
+
+            Using sqlGuidUrlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                With sqlGuidUrlCmd.Parameters
+                    .Add("@MAPID", SqlDbType.NVarChar).Value = OIM0020WRKINC.MAPIDC
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Dim urlVal = sqlGuidUrlCmd.ExecuteScalar
+                Me.WF_HdnGuidanceUrl.Value = Convert.ToString(urlVal)
             End Using
         Catch ex As Exception
         End Try
@@ -400,5 +419,14 @@ Public Class M00001MENU
         'ボタン押下時、画面遷移
         Server.Transfer(WW_URL.Text)
 
+    End Sub
+    ''' <summary>
+    ''' ガイダンスリンク押下時
+    ''' </summary>
+    Private Sub WF_ButtonShowGuidance_Click()
+        Dim guidanceNo As String = WF_ButtonClick.Value.Replace("WF_ButtonShowGuidance", "")
+        Me.SelectedGuidanceNo = guidanceNo
+        'ボタン押下時、画面遷移
+        Server.Transfer(Me.WF_HdnGuidanceUrl.Value)
     End Sub
 End Class

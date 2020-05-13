@@ -1683,8 +1683,8 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     content:"✔";
     color:red;
 }
-.grc0001Wrapper input[type=checkbox] + label:hover,
-.grc0001Wrapper input[type=radio] + label:hover{
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover{
     cursor:pointer;
     background-color:rgba(157,195,230,0.5);
     color:#737373;

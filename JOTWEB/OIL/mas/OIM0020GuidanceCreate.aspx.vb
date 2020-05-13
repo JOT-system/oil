@@ -116,6 +116,16 @@ Public Class OIM0020GuidanceCreate
         '○ 検索画面からの遷移
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0020L Then
             dispVal = GetGuidance(work.WF_LIST_GUIDANCENO.Text)
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.MENU Then
+            Dim prev As M00001MENU = DirectCast(Me.PreviousPage, M00001MENU)
+            dispVal = GetGuidance(prev.SelectedGuidanceNo)
+            Me.Form.Attributes.Add("REFONLY", "1")
+            Me.txtEndYmd.Enabled = False
+            Me.txtFromYmd.Enabled = False
+            Me.txtTitle.Enabled = False
+            Me.txtNaiyou.Enabled = False
+            Me.chklFlags.Enabled = False
+            Me.rblType.Enabled = False
         End If
         '〇選択肢初期値設定
         Me.rblType.Items.Add(New ListItem("障害", "E"))

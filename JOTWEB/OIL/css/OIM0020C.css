@@ -64,3 +64,20 @@ table.input textarea {
 #txtEndYmd {
     width:185px !important;
 }
+/* 参照のみの消込 */
+form[REFONLY] #WF_UPDATE,
+form[REFONLY] #WF_CLEAR {
+    display:none;
+}
+form[REFONLY] .grc0001Wrapper input[type=checkbox] + label,
+form[REFONLY] .grc0001Wrapper input[type=radio] + label {
+    display: none;
+}
+form[REFONLY] .grc0001Wrapper input:checked + label {
+    display:flex;
+}
+form[REFONLY] .attachmentCell input[type=button],
+form[REFONLY] .attachmentCell hr,
+form[REFONLY] .attachmentCell span.delAttachment {
+    display: none;
+}

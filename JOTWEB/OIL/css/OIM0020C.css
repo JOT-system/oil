@@ -1,9 +1,12 @@
 ﻿
+.detailboxOnly {
+    min-width:1125px;
+}
 .delAttachment {
-    font-weight:bold;
-    color:red;
-    cursor:pointer;
-    margin-right:5px;
+    font-weight: bold;
+    color: red;
+    cursor: pointer;
+    margin-right: 5px;
 }
 .attachmentCell hr {
     margin:5px;
@@ -64,10 +67,46 @@ table.input textarea {
 #txtEndYmd {
     width:185px !important;
 }
+/* 添付ファイル欄 */
+.uploadLine {
+    //line-height:30px;
+}
+/* ファイルドラッグのスタイル */
+div.fileDrag {
+    border: 2px dashed transparent;
+    border-radius: 5px;
+    margin: -3px;
+    padding: 3px;
+    position: relative;
+}
+div.fileDrag.dragging {
+    border: 2px dashed darkgray;
+    //background-color:rgba(0,0,0,0.5);
+}
+div.fileDrag.dragging:after {
+    display:block;
+    width:calc(100% - 30px);
+    margin-left:-3px;
+    height:calc(100% - 30px);
+    border-radius :5px;
+    text-shadow:2px 2px 2px 2px black;
+    top:0;
+    content:"ここにドロップ";
+    font-size:20px;
+    font-weight:bold;
+    letter-spacing :2px;
+    color:white;
+    position:absolute;
+    background-color:rgba(0,0,0,0.2);
+    text-align :center;
+    padding:15px;
+    z-index:3;
+}
+
 /* 参照のみの消込 */
 form[REFONLY] #WF_UPDATE,
 form[REFONLY] #WF_CLEAR {
-    display:none;
+    display: none;
 }
 form[REFONLY] .grc0001Wrapper input[type=checkbox] + label,
 form[REFONLY] .grc0001Wrapper input[type=radio] + label {

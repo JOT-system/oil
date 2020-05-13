@@ -84,7 +84,7 @@ Public Class OIM0020GuidanceCreate
         '○HELP表示有無設定
         Master.dispHelp = False
         '○D&D有無設定
-        Master.eventDrop = True
+        Master.eventDrop = False '共通のD&Dは使わない
         '○Grid情報保存先のファイル名
         'Master.CreateXMLSaveFile()
 

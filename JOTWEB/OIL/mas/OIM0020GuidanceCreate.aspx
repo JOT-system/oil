@@ -11,6 +11,8 @@
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIM0020C.js")%>'></script>
     <script type="text/javascript">
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
+        // 添付許可拡張子
+        var acceptExtentions = ["xlsx", "docx", "pptx", "jpg", "png","bmp" , "zip", "gif", "csv", "txt", "pdf","lzh"];
     </script>
 </asp:Content>
 <asp:Content ID="OIM0020C" ContentPlaceHolderID="contents1" runat="server">
@@ -77,13 +79,19 @@
                 <tr>
                     <th class="top">添付</th>
                     <td class="attachmentCell" colspan="3">
-                        <input type="button" class="btn-sticky" value="ファイル追加" />
-                        <hr />
-                        <asp:Repeater ID="repAttachments" runat="server" ClientIDMode="Predictable">
-                            <ItemTemplate >
-                                <div><span class="delAttachment" title="削除">×</span><span><%# Eval("FileName") %></span></div>
-                            </ItemTemplate>
-                        </asp:Repeater>
+                        <div id="divAttachmentArea" class="fileDrag">
+                            <div class="uploadLine">
+                                <input type="button" class="btn-sticky" value="ファイル追加" />
+                                <span>ボタンクリック、またはここにファイルをドラッグ＆ドロップ</span>
+                                <hr />
+                            </div>
+                            <asp:Repeater ID="repAttachments" runat="server" ClientIDMode="Predictable">
+                                <ItemTemplate >
+                                    <div><span class="delAttachment" title="削除">×</span><span><%# Eval("FileName") %></span></div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+
+                        </div>
                     </td>
                 </tr>
             </tbody>

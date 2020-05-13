@@ -517,43 +517,43 @@
                         <a id="WF_OILTANKCNT_W_LABEL">割当後　油種別タンク車数(車)</a>
                         <!-- ■　車数（ハイオク）　■ -->
                         <a class="ef" id="WF_HTANK_W">
-                            <asp:TextBox ID="TxtHTank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtHTank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（レギュラー）　■ -->
                         <a class="ef" id="WF_RTANK_W">
-                            <asp:TextBox ID="TxtRTank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtRTank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（灯油）　■ -->
                         <a class="ef" id="WF_TTANK_W">
-                            <asp:TextBox ID="TxtTTank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtTTank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（未添加灯油）　■ -->
                         <a class="ef" id="WF_MTTANK_W">
-                            <asp:TextBox ID="TxtMTTank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtMTTank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（軽油）　■ -->
                         <a class="ef" id="WF_KTANK_W">
-                            <asp:TextBox ID="TxtKTank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtKTank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（３号軽油）　■ -->
                         <a class="ef" id="WF_K3TANK_W">
-                            <asp:TextBox ID="TxtK3Tank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtK3Tank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（５号軽油）　■ -->
                         <a class="ef" id="WF_K5TANK_W">
-                            <asp:TextBox ID="TxtK5Tank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtK5Tank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（１０号軽油）　■ -->
                         <a class="ef" id="WF_K10TANK_W">
-                            <asp:TextBox ID="TxtK10Tank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtK10Tank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（LSA）　■ -->
                         <a class="ef" id="WF_LTANK_W">
-                            <asp:TextBox ID="TxtLTank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtLTank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　車数（A重油）　■ -->
                         <a class="ef" id="WF_ATANK_W">
-                            <asp:TextBox ID="TxtATank_w" runat="server" onblur="MsgClear();" Enabled="false">0</asp:TextBox>
+                            <asp:TextBox ID="TxtATank_w" runat="server" onblur="MsgClear();" Enabled="false" MaxLength="2">0</asp:TextBox>
                         </a>
                         <!-- ■　合計　■ -->
                         <a class="ef" id="WF_TOTALCNT_W">

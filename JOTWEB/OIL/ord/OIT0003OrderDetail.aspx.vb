@@ -738,6 +738,18 @@ Public Class OIT0003OrderDetail
             Me.TxtTotalCnt_w.Text = "0"
         End If
 
+        '車数を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtHTank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtRTank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtTTank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtMTTank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtKTank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtK3Tank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtK5Tank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtK10Tank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtLTank_w.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtATank_w.Attributes("onkeyPress") = "CheckNum()"
+
         '○ 名称設定処理
         '会社コード
         CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, Me.WF_CAMPCODE_TEXT.Text, WW_DUMMY)
@@ -1629,9 +1641,9 @@ Public Class OIT0003OrderDetail
             '& "       AND OIT0005.LASTOILCODE = OIM0003_PAST.OILCODE" _
             '& "       AND OIM0003_PAST.DELFLG <> @P02" _
 
-            'SQLStr &=
-            '      " ORDER BY" _
-            '    & "    OIT0002.ORDERNO"
+            SQLStr &=
+                  " ORDER BY" _
+                & "    OIT0003.OILCODE"
 
         End If
         SQLTempTblStr &= SQLStr
@@ -1783,19 +1795,19 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.CONSIGNEENAME), '')                      AS CONSIGNEENAME" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFONAME), '')                      AS ORDERINFONAME" _
-            & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
-            & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
-            & " , ISNULL(RTRIM(TMP0001.ORDERINGTYPE), '')                       AS ORDERINGTYPE" _
-            & " , ISNULL(RTRIM(TMP0001.ORDERINGOILNAME), '')                    AS ORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.OILCODE), OIT0004.PREOILCODE)                 AS OILCODE" _
+            & " , ISNULL(RTRIM(TMP0001.OILNAME), OIT0004.PREOILNAME)                 AS OILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINGTYPE), OIT0004.PREORDERINGTYPE)       AS ORDERINGTYPE" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINGOILNAME), OIT0004.PREORDERINGOILNAME) AS ORDERINGOILNAME" _
             & " , CASE" _
             & "   WHEN (OIT0004.TANKNUMBER IS NULL OR TMP0001.TANKNO IS NULL) " _
-            & "    AND TMP0001.OILNAME IS NULL THEN @P04" _
+            & "    AND TMP0001.OILNAME IS NULL AND OIT0004.PREOILNAME IS NULL THEN @P04" _
             & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P05" _
             & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P05" _
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
-            & "    AND TMP0001.OILCODE IS NULL THEN @P04" _
+            & "    AND TMP0001.OILCODE IS NULL AND OIT0004.PREOILCODE IS NULL THEN @P04" _
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
             & "    AND OIT0004.PREOILCODE IS NOT NULL THEN @P06" _
             & "   ELSE @P07" _
@@ -1902,19 +1914,19 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(TMP0001.CONSIGNEENAME), '')                      AS CONSIGNEENAME" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFO), '')                          AS ORDERINFO" _
             & " , ISNULL(RTRIM(TMP0001.ORDERINFONAME), '')                      AS ORDERINFONAME" _
-            & " , ISNULL(RTRIM(TMP0001.OILCODE), '')                            AS OILCODE" _
-            & " , ISNULL(RTRIM(TMP0001.OILNAME), '')                            AS OILNAME" _
-            & " , ISNULL(RTRIM(TMP0001.ORDERINGTYPE), '')                       AS ORDERINGTYPE" _
-            & " , ISNULL(RTRIM(TMP0001.ORDERINGOILNAME), '')                    AS ORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.OILCODE), OIT0004.PREOILCODE)                 AS OILCODE" _
+            & " , ISNULL(RTRIM(TMP0001.OILNAME), OIT0004.PREOILNAME)                 AS OILNAME" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINGTYPE), OIT0004.PREORDERINGTYPE)       AS ORDERINGTYPE" _
+            & " , ISNULL(RTRIM(TMP0001.ORDERINGOILNAME), OIT0004.PREORDERINGOILNAME) AS ORDERINGOILNAME" _
             & " , CASE" _
             & "   WHEN (OIT0004.TANKNUMBER IS NULL OR TMP0001.TANKNO IS NULL) " _
-            & "    AND TMP0001.OILNAME IS NULL THEN @P04" _
+            & "    AND TMP0001.OILNAME IS NULL AND OIT0004.PREOILNAME IS NULL THEN @P04" _
             & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P05" _
             & "   WHEN (OIT0004.TANKNUMBER <> '' OR TMP0001.TANKNO <> '') " _
             & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P05" _
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
-            & "    AND TMP0001.OILCODE IS NULL THEN @P04" _
+            & "    AND TMP0001.OILCODE IS NULL AND OIT0004.PREOILCODE IS NULL THEN @P04" _
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
             & "    AND OIT0004.PREOILCODE IS NOT NULL THEN @P06" _
             & "   ELSE @P07" _
@@ -2003,9 +2015,9 @@ Public Class OIT0003OrderDetail
             & "       AND OIT0005.DELFLG <> @P03" _
             & " WHERE TMP0001.ORDERNO IS NULL "
 
-        'SQLStr &=
-        '      " ORDER BY" _
-        '    & "    OIT0004.LINKNO"
+        SQLStr &=
+              " ORDER BY" _
+            & "    ISNULL(RTRIM(TMP0001.OILCODE), OIT0004.PREOILCODE)"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
@@ -3091,22 +3103,149 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        '### 20200512-START 油種数登録制御追加 ###################################
+        'タンク車数の件数カウント用
+        Dim intTankCnt As Integer = 0
+        intTankCnt += Integer.Parse(TxtHTank_w.Text)
+        intTankCnt += Integer.Parse(TxtRTank_w.Text)
+        intTankCnt += Integer.Parse(TxtTTank_w.Text)
+        intTankCnt += Integer.Parse(TxtMTTank_w.Text)
+        intTankCnt += Integer.Parse(TxtKTank_w.Text)
+        intTankCnt += Integer.Parse(TxtK3Tank_w.Text)
+        intTankCnt += Integer.Parse(TxtK5Tank_w.Text)
+        intTankCnt += Integer.Parse(TxtK10Tank_w.Text)
+        intTankCnt += Integer.Parse(TxtLTank_w.Text)
+        intTankCnt += Integer.Parse(TxtATank_w.Text)
+        TxtTotalCnt_w.Text = intTankCnt.ToString()
+
+        '油種数が１つも入力されていない場合
+        If Me.TxtTotalCnt_w.Text = "0" Then
+            Master.Output(C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Me.TxtHTank_w.Focus()
+
+            ''〇 油種数登録ボタンのチェックを無効(False)
+            'WF_ButtonInsertFLG.Value = "FALSE"
+
+        Else
+            ''〇 油種数登録ボタンのチェックを有効(True)
+            'WF_ButtonInsertFLG.Value = "TRUE"
+
+        End If
+        '### 20200512-END   ######################################################
+
         '○ 画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            MAPDataGet(SQLcon, CONST_DETAIL_NEWLIST)
+            'MAPDataGet(SQLcon, CONST_DETAIL_NEWLIST)
+            MAPDataGet(SQLcon, intTankCnt)
         End Using
 
-        Dim i As Integer = 0
+        '### 20200512-START 油種数登録制御追加 ###################################
+        '〇画面で設定された油種コードを取得
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        Dim arrTankCode(intTankCnt) As String
+        Dim arrTankName(intTankCnt) As String
+        Dim arrTankType(intTankCnt) As String
+        Dim arrTankOrderName(intTankCnt) As String
+        Dim z As Integer = 0
+
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_HTank, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtHTank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_HTank
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_RTank, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtRTank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_RTank
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_TTank, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtTTank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_TTank
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_MTTank, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtMTTank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_MTTank
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_KTank1, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtKTank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_KTank1
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K3Tank1, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtK3Tank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_K3Tank1
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K5Tank, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtK5Tank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_K5Tank
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_K10Tank, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtK10Tank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_K10Tank
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_LTank1, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtLTank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_LTank1
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", BaseDllConst.CONST_ATank, WW_GetValue)
+        For i As Integer = 0 To Integer.Parse(Me.TxtATank_w.Text) - 1
+            arrTankCode(z) = BaseDllConst.CONST_ATank
+            arrTankName(z) = WW_GetValue(0)
+            arrTankType(z) = WW_GetValue(1)
+            arrTankOrderName(z) = WW_GetValue(2)
+            z += 1
+        Next
+        '### 20200512-END   ######################################################
+
+        Dim j As Integer = 0
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
-            i += 1
-            OIT0003row("SHIPORDER") = i        '発送順
+            OIT0003row("OILCODE") = arrTankCode(j)              '油種コード
+            OIT0003row("OILNAME") = arrTankName(j)              '油種名
+            OIT0003row("ORDERINGTYPE") = arrTankType(j)         '油種区分(受発注用)
+            OIT0003row("ORDERINGOILNAME") = arrTankOrderName(j) '油種名(受発注用)
+
+            j += 1
+            OIT0003row("SHIPORDER") = j        '発送順
 
             '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
             '　※上記以外の営業所については、入力しないため値は未入力。
             If Me.TxtOrderOfficeCode.Text = "011203" Then
-                OIT0003row("LINEORDER") = i    '貨物駅入線順
+                OIT0003row("LINEORDER") = j    '貨物駅入線順
 
             End If
         Next
@@ -4094,7 +4233,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS OILNAME" _
             & " , ''                                             AS ORDERINGTYPE" _
             & " , ''                                             AS ORDERINGOILNAME" _
-            & " , ''                                             AS TANKQUOTA" _
+            & " , '未割当'                                             AS TANKQUOTA" _
             & " , ''                                             AS LINKNO" _
             & " , ''                                             AS LINKDETAILNO" _
             & " , ''                                             AS LINEORDER" _
@@ -5897,99 +6036,11 @@ Public Class OIT0003OrderDetail
                     Exit Select
                 End If
 
-                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                '〇 検索(営業所).テキストボックスが未設定
-                If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                    '〇 画面(受注営業所).テキストボックスが未設定
-                    If Me.TxtOrderOffice.Text = "" Then
-                        WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                    Else
-                        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                    End If
-                Else
-                    WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                End If
-
-                'タンク車№
+                '設定されたタンク車Noを設定
                 updHeader.Item("TANKNO") = WW_ListValue
-                '型式
-                updHeader.Item("MODEL") = WW_GetValue(7)
-                '####################################################
-                '前回油種
-                'Dim WW_LASTOILNAME As String = ""
-                'updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
 
-                updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                updHeader.Item("LASTOILNAME") = WW_GetValue(4)
-                updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
-                updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
-                '####################################################
-
-                '交検日
-                Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
-                Dim WW_JRINSPECTIONCNT As String
-                updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                If WW_GetValue(2) <> "" Then
-                    WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
-
-                    Dim WW_JRINSPECTIONFLG As String
-                    If WW_JRINSPECTIONCNT <= 3 Then
-                        WW_JRINSPECTIONFLG = "1"
-                    ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
-                        WW_JRINSPECTIONFLG = "2"
-                    Else
-                        WW_JRINSPECTIONFLG = "3"
-                    End If
-                    Select Case WW_JRINSPECTIONFLG
-                        Case "1"
-                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                        Case "2"
-                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                        Case "3"
-                            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                    End Select
-                Else
-                    updHeader.Item("JRINSPECTIONALERT") = ""
-                    updHeader.Item("JRINSPECTIONALERTSTR") = ""
-                End If
-
-                '全検日
-                Dim WW_JRALLINSPECTIONCNT As String
-                updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                If WW_GetValue(3) <> "" Then
-                    WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
-
-                    Dim WW_JRALLINSPECTIONFLG As String
-                    If WW_JRALLINSPECTIONCNT <= 3 Then
-                        WW_JRALLINSPECTIONFLG = "1"
-                    ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
-                        WW_JRALLINSPECTIONFLG = "2"
-                    Else
-                        WW_JRALLINSPECTIONFLG = "3"
-                    End If
-                    Select Case WW_JRALLINSPECTIONFLG
-                        Case "1"
-                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                        Case "2"
-                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                        Case "3"
-                            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                    End Select
-                Else
-                    updHeader.Item("JRALLINSPECTIONALERT") = ""
-                    updHeader.Item("JRALLINSPECTIONALERTSTR") = ""
-                End If
-
-                '〇 タンク車割当状況チェック
-                WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
+                'タンク車№に紐づく情報を取得・設定
+                WW_TANKNUMBER_FIND(updHeader)
 
             Case "LINEORDER"              '(一覧)貨物駅入線順
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
@@ -6224,21 +6275,9 @@ Public Class OIT0003OrderDetail
             Case 0
                 'タンク車割当
                 WF_Dtab01.CssClass = "selected"
-
             Case 1
                 '入換・積込指示
                 WF_Dtab02.CssClass = "selected"
-
-                ''○ 画面表示データ取得
-                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                '    SQLcon.Open()       'DataBase接続
-
-                '    MAPDataGetTab2(SQLcon)
-                'End Using
-
-                ''○ 画面表示データ保存
-                'Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
-
             Case 2
                 'タンク車明細
                 WF_Dtab03.CssClass = "selected"
@@ -6745,11 +6784,7 @@ Public Class OIT0003OrderDetail
                     Else
                         PARA28.Value = Me.TxtEmparrDate.Text
                     End If
-                    'PARA24.Value = DateTime.Parse(TxtLoadingDate.Text)                '積込日（予定）
-                    'PARA25.Value = DateTime.Parse(TxtDepDate.Text)                    '発日（予定）
-                    'PARA26.Value = DateTime.Parse(TxtArrDate.Text)                    '積車着日（予定）
-                    'PARA27.Value = DateTime.Parse(TxtAccDate.Text)                    '受入日（予定）
-                    'PARA28.Value = DateTime.Parse(TxtEmparrDate.Text)                 '空車着日（予定）
+
                     '積込日（実績）
                     If Me.TxtActualLoadingDate.Text = "" Then
                         PARA29.Value = DBNull.Value
@@ -6859,7 +6894,6 @@ Public Class OIT0003OrderDetail
 
                     PARA76.Value = work.WF_SEL_LINK_LINKNO.Text       '貨車連結順序表№
                     PARA91.Value = DBNull.Value                '計上日
-                    'PARA91.Value = TxtBudgetMonth.Text                '計上日
                     PARA77.Value = 0                                  '売上金額
                     PARA78.Value = 0                                  '売上消費税額
                     PARA79.Value = 0                                  '売上合計金額
@@ -9396,6 +9430,7 @@ Public Class OIT0003OrderDetail
             Me.TxtK10Tank.Text = Me.TxtK10Tank_c.Text
             Me.TxtLTank.Text = Me.TxtLTank_c.Text
             Me.TxtATank.Text = Me.TxtATank_c.Text
+            Me.TxtTotalCnt.Text = Me.TxtTotal_c.Text
 
             SQLcmd.ExecuteNonQuery()
 
@@ -9840,101 +9875,12 @@ Public Class OIT0003OrderDetail
 
                             'タンク車№を一覧に設定
                         ElseIf WF_FIELD.Value = "TANKNO" Then
-                            'Dim WW_TANKNUMBER As String = WW_SETTEXT.Substring(0, 8).Replace("-", "")
-                            Dim WW_TANKNUMBER As String = WW_SETVALUE
-                            Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
-                            updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
 
-                            'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                            '〇 検索(営業所).テキストボックスが未設定
-                            If work.WF_SEL_SALESOFFICECODE.Text = "" Then
-                                '〇 画面(受注営業所).テキストボックスが未設定
-                                If Me.TxtOrderOffice.Text = "" Then
-                                    WW_FixvalueMasterSearch(Master.USER_ORG, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                                Else
-                                    WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                                End If
-                            Else
-                                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                            End If
+                            '設定されたタンク車Noを設定
+                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
 
-                            '型式
-                            updHeader.Item("MODEL") = WW_GetValue(7)
-
-                            '####################################################
-                            '前回油種
-                            'Dim WW_LASTOILNAME As String = ""
-                            'updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                            'CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                            'updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
-
-                            updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                            updHeader.Item("LASTOILNAME") = WW_GetValue(4)
-                            updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
-                            updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
-                            '####################################################
-
-                            '交検日
-                            Dim WW_JRINSPECTIONCNT As String
-                            updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                            If WW_GetValue(2) <> "" Then
-                                WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
-
-                                Dim WW_JRINSPECTIONFLG As String
-                                If WW_JRINSPECTIONCNT <= 3 Then
-                                    WW_JRINSPECTIONFLG = "1"
-                                ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
-                                    WW_JRINSPECTIONFLG = "2"
-                                Else
-                                    WW_JRINSPECTIONFLG = "3"
-                                End If
-                                Select Case WW_JRINSPECTIONFLG
-                                    Case "1"
-                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                                    Case "2"
-                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                                    Case "3"
-                                        updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                                        updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                                End Select
-                            Else
-                                updHeader.Item("JRINSPECTIONALERT") = ""
-                            End If
-
-                            '全検日
-                            Dim WW_JRALLINSPECTIONCNT As String
-                            updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                            If WW_GetValue(3) <> "" Then
-                                WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
-
-                                Dim WW_JRALLINSPECTIONFLG As String
-                                If WW_JRALLINSPECTIONCNT <= 3 Then
-                                    WW_JRALLINSPECTIONFLG = "1"
-                                ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
-                                    WW_JRALLINSPECTIONFLG = "2"
-                                Else
-                                    WW_JRALLINSPECTIONFLG = "3"
-                                End If
-                                Select Case WW_JRALLINSPECTIONFLG
-                                    Case "1"
-                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                                    Case "2"
-                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                                    Case "3"
-                                        updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                                        updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                                End Select
-                            Else
-                                updHeader.Item("JRALLINSPECTIONALERT") = ""
-                            End If
-
-                            '〇 タンク車割当状況チェック
-                            WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
-
+                            'タンク車№に紐づく情報を取得・設定
+                            WW_TANKNUMBER_FIND(updHeader)
 
                             '(一覧)第2着駅
                         ElseIf WF_FIELD.Value = "SECONDARRSTATIONNAME" Then
@@ -10332,14 +10278,25 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 If I_KEYCODE.Equals("") Then
-                    'Dim i As Integer = 0 '2020/3/23 三宅 Delete
-                    For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows '(全抽出結果回るので要検討
-                        'O_VALUE(i) = OIT0003WKrow("KEYCODE") 2020/3/23 三宅 全部KEYCODE(列車NO)が格納されてしまうので修正しました（問題なければこのコメント消してください)
-                        For i = 1 To O_VALUE.Length
-                            O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+
+                    If IsNothing(I_PARA01) Then
+                        'Dim i As Integer = 0 '2020/3/23 三宅 Delete
+                        For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows '(全抽出結果回るので要検討
+                            'O_VALUE(i) = OIT0003WKrow("KEYCODE") 2020/3/23 三宅 全部KEYCODE(列車NO)が格納されてしまうので修正しました（問題なければこのコメント消してください)
+                            For i = 1 To O_VALUE.Length
+                                O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
+                            Next
+                            'i += 1 '2020/3/23 三宅 Delete
                         Next
-                        'i += 1 '2020/3/23 三宅 Delete
-                    Next
+
+                    ElseIf I_PARA01 = "1" Then    '### 油種登録用の油種コードを取得 ###
+                        Dim i As Integer = 0
+                        For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
+                            O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE"))
+                            i += 1
+                        Next
+                    End If
+
                 Else
                     For Each OIT0003WKrow As DataRow In OIT0003Fixvaltbl.Rows
 
@@ -10805,6 +10762,19 @@ Public Class OIT0003OrderDetail
             Me.TxtAccDate.Enabled = False
             '(予定)空車着日
             Me.TxtEmparrDate.Enabled = False
+
+            '### 20200512-START 油種数登録制御追加 ###################################
+            Me.TxtHTank_w.Enabled = False
+            Me.TxtRTank_w.Enabled = False
+            Me.TxtTTank_w.Enabled = False
+            Me.TxtMTTank_w.Enabled = False
+            Me.TxtKTank_w.Enabled = False
+            Me.TxtK3Tank_w.Enabled = False
+            Me.TxtK5Tank_w.Enabled = False
+            Me.TxtK10Tank_w.Enabled = False
+            Me.TxtLTank_w.Enabled = False
+            Me.TxtATank_w.Enabled = False
+            '### 20200512-END   ######################################################
         Else
             '受注営業所
             Me.TxtOrderOffice.Enabled = True
@@ -10828,6 +10798,16 @@ Public Class OIT0003OrderDetail
             Me.TxtAccDate.Enabled = True
             '(予定)空車着日
             Me.TxtEmparrDate.Enabled = True
+
+            '### 20200512-START 油種数登録制御追加 ###################################
+            '★新規受注作成時のみ
+            If work.WF_SEL_CREATEFLG.Text = "1" _
+                AndAlso work.WF_SEL_CREATELINKFLG.Text = "1" Then
+                '画面表示(油種数)設定処理
+                WW_ScreenOilEnabledSet()
+            End If
+            '### 20200512-END   ######################################################
+
         End If
 
         '〇 (実績)の日付の入力可否制御
@@ -10976,6 +10956,82 @@ Public Class OIT0003OrderDetail
             Me.TxtActualEmparrDate.Enabled = True
         End If
 
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示(油種数)設定処理
+    ''' </summary>
+    Protected Sub WW_ScreenOilEnabledSet()
+
+        '〇各営業者で管理している油種を取得
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        If Me.TxtOrderOfficeCode.Text = "" Then
+            WW_FixvalueMasterSearch(Master.USER_ORG, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+        Else
+            WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PRODUCTPATTERN", "", WW_GetValue, I_PARA01:="1")
+        End If
+
+        '〇初期化
+        'ハイオク
+        Me.TxtHTank_w.Enabled = False
+        'レギュラー
+        Me.TxtRTank_w.Enabled = False
+        '灯油
+        Me.TxtTTank_w.Enabled = False
+        '未添加灯油
+        Me.TxtMTTank_w.Enabled = False
+        '軽油
+        Me.TxtKTank_w.Enabled = False
+        '３号軽油
+        Me.TxtK3Tank_w.Enabled = False
+        '軽油５
+        Me.TxtK5Tank_w.Enabled = False
+        '軽油１０
+        Me.TxtK10Tank_w.Enabled = False
+        'ＬＳＡ
+        Me.TxtLTank_w.Enabled = False
+        'Ａ重油
+        Me.TxtATank_w.Enabled = False
+
+        For i As Integer = 0 To WW_GetValue.Length - 1
+            Select Case WW_GetValue(i)
+                    'ハイオク
+                Case BaseDllConst.CONST_HTank
+                    Me.TxtHTank_w.Enabled = True
+                    'レギュラー
+                Case BaseDllConst.CONST_RTank
+                    Me.TxtRTank_w.Enabled = True
+                    '灯油
+                Case BaseDllConst.CONST_TTank
+                    Me.TxtTTank_w.Enabled = True
+                    '未添加灯油
+                Case BaseDllConst.CONST_MTTank
+                    '★根岸営業所の場合
+                    If Me.TxtOrderOfficeCode.Text = "011402" Then
+                        Me.TxtMTTank_w.Enabled = False
+                    Else
+                        Me.TxtMTTank_w.Enabled = True
+                    End If
+                    '軽油
+                Case BaseDllConst.CONST_KTank1, BaseDllConst.CONST_KTank2
+                    Me.TxtKTank_w.Enabled = True
+                    '３号軽油
+                Case BaseDllConst.CONST_K3Tank1, BaseDllConst.CONST_K3Tank2
+                    Me.TxtK3Tank_w.Enabled = True
+                    '軽油５
+                Case BaseDllConst.CONST_K5Tank
+                    Me.TxtK5Tank_w.Enabled = True
+                    '軽油１０
+                Case BaseDllConst.CONST_K10Tank
+                    Me.TxtK10Tank_w.Enabled = True
+                    'ＬＳＡ
+                Case BaseDllConst.CONST_LTank1, BaseDllConst.CONST_LTank2
+                    Me.TxtLTank_w.Enabled = True
+                    'Ａ重油
+                Case BaseDllConst.CONST_ATank
+                    Me.TxtATank_w.Enabled = True
+            End Select
+        Next
     End Sub
 
     ''' <summary>

@@ -79,9 +79,13 @@ div.fileDrag {
     padding: 3px;
     position: relative;
 }
+
 div.fileDrag.dragging {
     border: 2px dashed darkgray;
+    color: darkgray;
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
     //background-color:rgba(0,0,0,0.5);
+    cursor: default;
 }
 div.fileDrag.dragging:after {
     display:block;

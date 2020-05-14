@@ -232,4 +232,55 @@ Public Class OIM0020WRKINC
         Public Property FileName As String
 
     End Class
+    ''' <summary>
+    ''' ガイダンス番号,ファイル番号を元にパラメータを生成する
+    ''' </summary>
+    ''' <param name="guidanceNo"></param>
+    ''' <param name="FileNo"></param>
+    ''' <returns></returns>
+    Public Shared Function GetParamString(guidanceNo As String, FileNo As String, Optional isRefOnly As String = "1") As String
+        Dim r As New Random
+        Dim number As Integer = r.Next(1, 1001)
+
+        Dim dateNow As String = Now.ToString("yyyyMMddHHmmssFFF")
+        Dim fileItm As New List(Of String) From {number.ToString("00#"), guidanceNo, FileNo, isRefOnly, dateNow}
+        Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+        Dim base64Str As String = ""
+        Dim noCompressionByte As Byte()
+        'クラスをシリアライズ
+        Using ms As New IO.MemoryStream()
+            formatter.Serialize(ms, fileItm)
+            noCompressionByte = ms.ToArray
+        End Using
+
+        '圧縮シリアライズしたByteデータを圧縮し圧縮したByteデータをBase64に変換
+        Using ms As New IO.MemoryStream(),
+              ds As New IO.Compression.DeflateStream(ms, IO.Compression.CompressionMode.Compress, True)
+            ds.Write(noCompressionByte, 0, noCompressionByte.Length)
+            ds.Close()
+            Dim byteDat = ms.ToArray
+            base64Str = Convert.ToBase64String(byteDat, 0, byteDat.Length, Base64FormattingOptions.None)
+        End Using
+        Return HttpUtility.UrlEncode(base64Str)
+    End Function
+    ''' <summary>
+    ''' ガイダンス番号,ファイル番号をデコードする
+    ''' </summary>
+    ''' <param name="base64Str">base64エンコードした文字列</param>
+    ''' <returns></returns>
+    Public Shared Function DecodeParamString(base64Str As String) As List(Of String)
+        Dim retVal As List(Of String)
+        Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+        Dim compressedByte As Byte()
+        compressedByte = Convert.FromBase64String(base64Str)
+        '取得した文字をByte化し解凍、画面利用クラスに再格納
+        Using inpMs As New IO.MemoryStream(compressedByte),
+              outMs As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(inpMs, IO.Compression.CompressionMode.Decompress)
+            ds.CopyTo(outMs)
+            outMs.Position = 0
+            retVal = DirectCast(formatter.Deserialize(outMs), List(Of String))
+        End Using
+        Return retVal
+    End Function
 End Class

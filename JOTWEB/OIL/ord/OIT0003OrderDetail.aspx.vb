@@ -6090,9 +6090,14 @@ Public Class OIT0003OrderDetail
 
         Select Case WF_FIELD.Value
             Case "LOADINGIRILINEORDER"      '(一覧)積込入線順
-                '入力された値が0、または一覧の件数より大きい場合
-                If Integer.Parse(WW_ListValue) = 0 _
-                    OrElse Integer.Parse(WW_ListValue) > intListCnt Then
+
+                '入力された値が""(空文字)の場合
+                If WW_ListValue = "" Then
+                    updHeader.Item(WF_FIELD.Value) = ""
+                    updHeader.Item("LOADINGOUTLETORDER") = ""
+                    '入力された値が0、または一覧の件数より大きい場合
+                ElseIf Integer.Parse(WW_ListValue) = 0 _
+                        OrElse Integer.Parse(WW_ListValue) > intListCnt Then
                     updHeader.Item(WF_FIELD.Value) = ""
                     updHeader.Item("LOADINGOUTLETORDER") = ""
                 Else
@@ -6104,9 +6109,13 @@ Public Class OIT0003OrderDetail
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
             Case "LOADINGOUTLETORDER"       '(一覧)積込出線順
-                '入力された値が0、または一覧の件数より大きい場合
-                If Integer.Parse(WW_ListValue) = 0 _
-                    OrElse Integer.Parse(WW_ListValue) > intListCnt Then
+                '入力された値が""(空文字)の場合
+                If WW_ListValue = "" Then
+                    updHeader.Item(WF_FIELD.Value) = ""
+                    updHeader.Item("LOADINGIRILINEORDER") = ""
+                    '入力された値が0、または一覧の件数より大きい場合
+                ElseIf Integer.Parse(WW_ListValue) = 0 _
+                        OrElse Integer.Parse(WW_ListValue) > intListCnt Then
                     updHeader.Item(WF_FIELD.Value) = ""
                     updHeader.Item("LOADINGIRILINEORDER") = ""
                 Else
@@ -9144,7 +9153,8 @@ Public Class OIT0003OrderDetail
                                       Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
-                                      Optional ByVal upActualEmparrDate As Boolean = False)
+                                      Optional ByVal upActualEmparrDate As Boolean = False,
+                                      Optional ByVal upLastOilCode As Boolean = False)
 
         Try
             'DataBase接続文字
@@ -9182,6 +9192,14 @@ Public Class OIT0003OrderDetail
             If upActualEmparrDate = True Then
                 SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", Me.TxtActualEmparrDate.Text)
             End If
+            '前回油種
+            If upLastOilCode = True Then
+                SQLStr &=
+                          "        LASTOILCODE        = @P03, " _
+                        & "        LASTOILNAME        = @P04, " _
+                        & "        PREORDERINGTYPE    = @P05, " _
+                        & "        PREORDERINGOILNAME = @P06, "
+            End If
 
             SQLStr &=
                       "        UPDYMD         = @P11, " _
@@ -9211,16 +9229,34 @@ Public Class OIT0003OrderDetail
             PARA14.Value = C_DEFAULT_YMD
 
             If I_TANKNO = "" Then
-                '(一覧)で設定しているタンク車をKEYに更新
-                For Each OIT0003row As DataRow In OIT0003tbl.Rows
-                    PARA01.Value = OIT0003row("TANKNO")
-                    SQLcmd.ExecuteNonQuery()
-                Next
+                '### ★前回油種の更新 ###############################
+                If upLastOilCode = True Then
+                    Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '前回油種コード
+                    Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '前回油種名
+                    Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
+                    Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
+
+                    '(一覧)で設定しているタンク車をKEYに前回油種を更新
+                    For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                        PARA01.Value = OIT0003row("TANKNO")
+                        PARA03.Value = OIT0003row("OILCODE")
+                        PARA04.Value = OIT0003row("OILNAME")
+                        PARA05.Value = OIT0003row("ORDERINGTYPE")
+                        PARA06.Value = OIT0003row("ORDERINGOILNAME")
+                        SQLcmd.ExecuteNonQuery()
+                    Next
+
+                Else
+                    '(一覧)で設定しているタンク車をKEYに更新
+                    For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                        PARA01.Value = OIT0003row("TANKNO")
+                        SQLcmd.ExecuteNonQuery()
+                    Next
+                End If
             Else
                 '指定されたタンク車№をKEYに更新
                 PARA01.Value = I_TANKNO
                 SQLcmd.ExecuteNonQuery()
-
             End If
 
             'CLOSE
@@ -11091,7 +11127,8 @@ Public Class OIT0003OrderDetail
             '引数２：タンク車状態　⇒　変更なし(空白)
             '引数３：積車区分　　　⇒　変更あり("F"(積車))
             '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-            WW_UpdateTankShozai("", "", "F", I_SITUATION:="2")
+            '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+            WW_UpdateTankShozai("", "", "F", I_SITUATION:="2", upLastOilCode:=True)
 
             '(実績)発日の入力が完了
             If Me.TxtActualDepDate.Text <> "" Then

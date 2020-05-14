@@ -5053,7 +5053,7 @@ Public Class OIT0004OilStockCreate
                 Me.TankCapacity = oilTypeItem.MaxTankCap
                 Me.TargetStock = Math.Round(oilTypeItem.MaxTankCap * oilTypeItem.TankCapRate, 1)
                 Me.TargetStockRate = oilTypeItem.TankCapRate
-                Me.Stock80 = Math.Round(oilTypeItem.MaxTankCap * 0.8D, 1)
+                Me.Stock80 = Math.Round((oilTypeItem.MaxTankCap - oilTypeItem.DS) * 0.8D, 1)
                 Me.DS = oilTypeItem.DS
                 Me.LastShipmentAve = oilTypeItem.LastSendAverage
                 Me.StockItemList = New Dictionary(Of String, StockListItem)

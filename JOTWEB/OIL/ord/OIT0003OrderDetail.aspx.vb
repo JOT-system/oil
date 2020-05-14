@@ -3104,18 +3104,30 @@ Public Class OIT0003OrderDetail
         End If
 
         '### 20200512-START 油種数登録制御追加 ###################################
+        '★油種数の""(空文字)チェック
+        If Me.TxtHTank_w.Text = "" Then Me.TxtHTank_w.Text = "0"        '車数（ハイオク）
+        If Me.TxtRTank_w.Text = "" Then Me.TxtRTank_w.Text = "0"        '車数（レギュラー）
+        If Me.TxtTTank_w.Text = "" Then Me.TxtTTank_w.Text = "0"        '車数（灯油）
+        If Me.TxtMTTank_w.Text = "" Then Me.TxtMTTank_w.Text = "0"      '車数（未添加灯油）
+        If Me.TxtKTank_w.Text = "" Then Me.TxtKTank_w.Text = "0"        '車数（軽油）
+        If Me.TxtK3Tank_w.Text = "" Then Me.TxtK3Tank_w.Text = "0"      '車数（３号軽油）
+        If Me.TxtK5Tank_w.Text = "" Then Me.TxtK5Tank_w.Text = "0"      '車数（５号軽油）
+        If Me.TxtK10Tank_w.Text = "" Then Me.TxtK10Tank_w.Text = "0"    '車数（１０号軽油）
+        If Me.TxtLTank_w.Text = "" Then Me.TxtLTank_w.Text = "0"        '車数（LSA）
+        If Me.TxtATank_w.Text = "" Then Me.TxtATank_w.Text = "0"        '車数（A重油）
+
         'タンク車数の件数カウント用
         Dim intTankCnt As Integer = 0
-        intTankCnt += Integer.Parse(TxtHTank_w.Text)
-        intTankCnt += Integer.Parse(TxtRTank_w.Text)
-        intTankCnt += Integer.Parse(TxtTTank_w.Text)
-        intTankCnt += Integer.Parse(TxtMTTank_w.Text)
-        intTankCnt += Integer.Parse(TxtKTank_w.Text)
-        intTankCnt += Integer.Parse(TxtK3Tank_w.Text)
-        intTankCnt += Integer.Parse(TxtK5Tank_w.Text)
-        intTankCnt += Integer.Parse(TxtK10Tank_w.Text)
-        intTankCnt += Integer.Parse(TxtLTank_w.Text)
-        intTankCnt += Integer.Parse(TxtATank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtHTank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtRTank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtTTank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtMTTank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtKTank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtK3Tank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtK5Tank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtK10Tank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtLTank_w.Text)
+        intTankCnt += Integer.Parse(Me.TxtATank_w.Text)
         TxtTotalCnt_w.Text = intTankCnt.ToString()
 
         '油種数が１つも入力されていない場合

@@ -2567,7 +2567,8 @@ Public Class OIT0003OrderDetail
                 & " , OIT0010.SEGMENTNAME                                AS SEGMENTNAME" _
                 & " , OIT0010.SEGMENTBRANCHCODE                          AS BREAKDOWNCODE" _
                 & " , OIT0010.SEGMENTBRANCHNAME                          AS BREAKDOWN" _
-                & " , OIT0010.CALCACCOUNT                                AS CALCKBN" _
+                & " , OIT0010.ACCOUNTTYPE                                AS CALCKBN" _
+                & " , OIT0010.ACCOUNTTYPENAME                            AS CALCKBNNAME" _
                 & " , REPLACE ( " _
                 & "   CONVERT(VARCHAR, CAST(ROUND(OIT0010.QUANTITY, 3) AS DECIMAL(12, 3)), 1) " _
                 & "   , '.000', '')                                       AS CARSAMOUNT " _
@@ -8549,7 +8550,11 @@ Public Class OIT0003OrderDetail
             PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
             PARA02.Value = C_DELETE_FLG.DELETE
             PARA03.Value = work.WF_SEL_BILLINGNO.Text
-            PARA04.Value = work.WF_SEL_KEIJYOYMD.Text
+            If work.WF_SEL_KEIJYOYMD.Text = "" Then
+                PARA04.Value = Me.TxtActualLoadingDate.Text
+            Else
+                PARA04.Value = work.WF_SEL_KEIJYOYMD.Text
+            End If
 
             PARA08.Value = Date.Now
             PARA09.Value = Master.USERID

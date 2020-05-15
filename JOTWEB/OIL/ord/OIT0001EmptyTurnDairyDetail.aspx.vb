@@ -699,6 +699,30 @@ Public Class OIT0001EmptyTurnDairyDetail
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
 
+        '更新モードの場合は、油種数の入力を非活性とする。
+        If work.WF_SEL_CREATEFLG.Text = "2" Then
+            'ハイオク
+            Me.TxtHTank.Enabled = False
+            'レギュラー
+            Me.TxtRTank.Enabled = False
+            '灯油
+            Me.TxtTTank.Enabled = False
+            '未添加灯油
+            Me.TxtMTTank.Enabled = False
+            '軽油
+            Me.TxtKTank.Enabled = False
+            '３号軽油
+            Me.TxtK3Tank.Enabled = False
+            '軽油５
+            Me.TxtK5Tank.Enabled = False
+            '軽油１０
+            Me.TxtK10Tank.Enabled = False
+            'ＬＳＡ
+            Me.TxtLTank.Enabled = False
+            'Ａ重油
+            Me.TxtATank.Enabled = False
+        End If
+
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)

@@ -12,7 +12,10 @@
     <script type="text/javascript">
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
         // 添付許可拡張子
-        var acceptExtentions = ["xlsx", "docx", "pptx", "jpg", "png","bmp" , "zip", "gif", "csv", "txt", "pdf","lzh"];
+        var acceptExtentions = ["xlsx", "docx", "pptx", "jpg", "png", "bmp", "zip", "gif", "csv", "txt", "pdf", "lzh"];
+        var acceptExtentionsStr = "許可ファイル種類(" + acceptExtentions.join(',') + ")";
+        // ガイドライン用のUploadハンドラー
+        var handlerUrl = '<%=ResolveUrl("~/OIL/inc/OIM0020FILEUPLOAD.ashx")%>';
     </script>
 </asp:Content>
 <asp:Content ID="OIM0020C" ContentPlaceHolderID="contents1" runat="server">
@@ -80,14 +83,17 @@
                     <th class="top">添付</th>
                     <td class="attachmentCell" colspan="3">
                         <div id="divAttachmentArea" class="fileDrag">
-                            <div class="uploadLine">
-                                <input type="button" class="btn-sticky" value="ファイル追加" />
-                                <span>ボタンクリック、またはここにファイルをドラッグ＆ドロップ</span>
+                            <div id="uploadLine" class="uploadLine">
+                                <asp:FileUpload ID="fupAttachment" runat="server" />
+                                <input type="button" id="btnFileUpload" class="btn-sticky" value="ファイル追加" />
+                                <span id="uploadLineText">ボタンクリック、またはここにファイルをドラッグ＆ドロップ</span>
                                 <hr />
                             </div>
                             <asp:Repeater ID="repAttachments" runat="server" ClientIDMode="Predictable">
                                 <ItemTemplate >
-                                    <div><span class="delAttachment" title="削除">×</span><span><%# Eval("FileName") %></span></div>
+                                    <div><span class="delAttachment" title="削除" onclick='setDeleteFileName("<%# Eval("FileName") %>");ButtonClick("WF_DELETE");'>×</span>
+                                        <span><a href='<%# ResolveUrl("~/OIL/mas/OIM0020GuidanceDownload.aspx") & "?id=" & JOTWEB.OIM0020WRKINC.GetParamString("", Eval("FileName"), "0") %>' target="_blank"><%# Eval("FileName") %></a></span>
+                                    </div>
                                 </ItemTemplate>
                             </asp:Repeater>
 
@@ -139,5 +145,9 @@
             <!-- ボタン押下 -->
             <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
             <!-- 権限 -->
+            <!-- ファイル名一覧 -->
+            <input id="WF_FILENAMELIST" runat="server" value="" type="text" />
+            <!-- 削除ファイル名 -->
+            <input id="WF_DELETEFILENAME" runat="server" value="" type="text" />
         </div>
 </asp:Content>

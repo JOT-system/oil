@@ -583,6 +583,10 @@ Public Module Messages
         ''' タンク車(発送中)使用メッセージ
         ''' </summary>
         Public Const OIL_TANKNO_SHIPPING_USE As String = "20047"
+        ''' <summary>
+        ''' 添付ファイル最大数超えメッセージ
+        ''' </summary>
+        Public Const OIL_ATTACHMENT_COUNTOVER As String = "20048"
 #End Region
 
 

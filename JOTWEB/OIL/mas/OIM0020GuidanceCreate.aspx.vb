@@ -1,6 +1,7 @@
 ﻿Option Strict On
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
+Imports System.IO
 ''' <summary>
 ''' ガイダンス登録画面クラス
 ''' </summary>
@@ -23,9 +24,18 @@ Public Class OIM0020GuidanceCreate
     Private WW_RTN_SW As String = ""
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
+
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             If IsPostBack Then
+                '添付ファイルアップロード処理
+                If Me.WF_FILENAMELIST.Value <> "" Then
+                    Dim retMes = UploadAttachments()
+                    If retMes.MessageNo <> C_MESSAGE_NO.NORMAL Then
+                        Master.Output(retMes.MessageNo, C_MESSAGE_TYPE.ERR, retMes.Pram01, needsPopUp:=True)
+                    End If
+                    Me.WF_FILENAMELIST.Value = ""
+                End If
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
 
@@ -34,6 +44,8 @@ Public Class OIM0020GuidanceCreate
                         '        WF_UPDATE_Click()
                         Case "WF_CLEAR"                 'クリアボタン押下
                             WF_CLEAR_Click()
+                        Case "WF_DELETE"
+                            WF_DELETE_Click()
                             '    Case "WF_Field_DBClick"         'フィールドダブルクリック
                             '        WF_FIELD_DBClick()
                             '    Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
@@ -127,6 +139,9 @@ Public Class OIM0020GuidanceCreate
             Me.chklFlags.Enabled = False
             Me.rblType.Enabled = False
         End If
+        '添付ファイル作業フォルダの生成
+        CreateInitDir(dispVal)
+
         '〇選択肢初期値設定
         Me.rblType.Items.Add(New ListItem("障害", "E"))
         Me.rblType.Items.Add(New ListItem("インフォメーション", "I"))
@@ -146,6 +161,7 @@ Public Class OIM0020GuidanceCreate
         Me.txtNaiyou.Text = dispVal.Naiyo
         Me.repAttachments.DataSource = dispVal.Attachments
         Me.repAttachments.DataBind()
+        ViewState("DISPVALUE") = dispVal
     End Sub
     ''' <summary>
     ''' ガイダンスマスタよりデータ取得
@@ -279,6 +295,37 @@ Public Class OIM0020GuidanceCreate
 
     End Sub
     ''' <summary>
+    ''' 添付ファイル削除ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_DELETE_Click()
+        Dim retMes = New PropMes With {.MessageNo = C_MESSAGE_NO.NORMAL}
+        Dim dispVal = DirectCast(ViewState("DISPVALUE"), OIM0020WRKINC.GuidanceItemClass)
+        'ガイダンス用作業フォルダ
+        Dim guidanceWorkDir As String = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, OIM0020WRKINC.GUIDANCEROOT, "USERWORKS", CS0050SESSION.USERID)
+        If Not Directory.Exists(guidanceWorkDir) Then
+            Directory.CreateDirectory(guidanceWorkDir)
+        End If
+        Dim deleteFileName As String = Me.WF_DELETEFILENAME.Value
+        For i = dispVal.Attachments.Count - 1 To 0 Step -1
+            If dispVal.Attachments(i).FileName = deleteFileName Then
+                dispVal.Attachments.RemoveAt(i)
+                Exit For
+            End If
+        Next
+        Dim delFilePath As String = IO.Path.Combine(guidanceWorkDir, deleteFileName)
+        If IO.File.Exists(delFilePath) Then
+            Try
+                IO.File.Delete(delFilePath)
+            Catch ex As Exception
+            End Try
+        End If
+        '画面情報を書き換え
+        Me.repAttachments.DataSource = dispVal.Attachments
+        Me.repAttachments.DataBind()
+        ViewState("DISPVALUE") = dispVal
+        Return
+    End Sub
+    ''' <summary>
     ''' チェックボックスデータバインド時イベント
     ''' </summary>
     ''' <param name="sender"></param>
@@ -291,4 +338,133 @@ Public Class OIM0020GuidanceCreate
             chklObj.Items(i).Selected = chkBindItm(i).Checked
         Next
     End Sub
+    ''' <summary>
+    ''' ガイダンス処理の作業フォルダを作成する
+    ''' </summary>
+    ''' <param name="guidanceItem"></param>
+    Private Sub CreateInitDir(guidanceItem As OIM0020WRKINC.GuidanceItemClass)
+
+        '実体保存フォルダよりファイルのコピーを行う
+        If guidanceItem.GuidanceNo = "" Then
+            'ガイダンスNoが無い場合は既登録の添付ファイルはない前提なのでここで終了
+            Return
+        End If
+        'ガイダンス用作業フォルダ
+        Dim guidanceWorkDir As String = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, OIM0020WRKINC.GUIDANCEROOT, "USERWORKS", CS0050SESSION.USERID)
+        If Not Directory.Exists(guidanceWorkDir) Then
+            Directory.CreateDirectory(guidanceWorkDir)
+        End If
+        For Each tempFile As String In Directory.GetFiles(guidanceWorkDir, "*.*")
+            ' ファイルパスからファイル名を取得
+            Try
+                File.Delete(tempFile)
+            Catch ex As Exception
+            End Try
+        Next
+        '既存ファイルを作業フォルダにコピー
+        Dim guidanceDir As String = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, OIM0020WRKINC.GUIDANCEROOT, guidanceItem.GuidanceNo)
+
+        If IO.Directory.Exists(guidanceDir) = True Then
+            Dim fileNames = IO.Directory.GetFiles(guidanceDir)
+            For Each fileName In fileNames
+                If fileName = "" Then
+                    Continue For
+                End If
+                Dim targetFile As String = IO.Path.Combine(guidanceDir, fileName)
+                Dim copyPath As String = IO.Path.Combine(guidanceWorkDir, fileName)
+                Try
+                    System.IO.File.Copy(targetFile, copyPath, True)
+                Catch ex As Exception
+                End Try
+                'テーブルに登録した情報と比較、実体があり、テーブルにない場合は追加
+                If (From gitm In guidanceItem.Attachments Where gitm.FileName = fileName).Any = False Then
+                    guidanceItem.Attachments.Add(New OIM0020WRKINC.FileItemClass With {.FileName = fileName})
+                End If
+            Next fileName
+            'テーブルにあり実体がない場合は消去
+            If fileNames IsNot Nothing OrElse fileNames.Count > 0 Then
+                For i = guidanceItem.Attachments.Count - 1 To 0 Step -1
+                    If fileNames.Contains(guidanceItem.Attachments(i).FileName) = False Then
+                        guidanceItem.Attachments.RemoveAt(i)
+                    End If
+                Next
+            Else
+                guidanceItem.Attachments = New List(Of OIM0020WRKINC.FileItemClass)
+            End If
+        Else
+            guidanceItem.Attachments = New List(Of OIM0020WRKINC.FileItemClass)
+        End If
+    End Sub
+    ''' <summary>
+    ''' ファイルアップロード処理
+    ''' </summary>
+    ''' <remarks>OIM0020FILEUPLOADの処理が完了後にこちらの処理が実行されます。</remarks>
+    Private Function UploadAttachments() As PropMes
+        Dim retMes = New PropMes With {.MessageNo = C_MESSAGE_NO.NORMAL}
+        Dim tp As Type = GetType(List(Of AttachmentFile))
+        Dim serializer As New Runtime.Serialization.Json.DataContractJsonSerializer(tp)
+        Dim uploadFiles As New List(Of AttachmentFile)
+        Dim dispVal = DirectCast(ViewState("DISPVALUE"), OIM0020WRKINC.GuidanceItemClass)
+        Try
+            Using stream As New IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(Me.WF_FILENAMELIST.Value))
+                uploadFiles = DirectCast(serializer.ReadObject(stream), List(Of AttachmentFile))
+            End Using
+        Catch ex As Exception
+            Return retMes
+        End Try
+        'ガイダンス用作業フォルダ
+        Dim guidanceWorkDir As String = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, OIM0020WRKINC.GUIDANCEROOT, "USERWORKS", CS0050SESSION.USERID)
+        If Not Directory.Exists(guidanceWorkDir) Then
+            Directory.CreateDirectory(guidanceWorkDir)
+        End If
+        'アップロードワークフォルダ
+        Dim uploadWorkDir = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, "UPLOAD_TMP", CS0050SESSION.USERID)
+        If Not Directory.Exists(guidanceWorkDir) Then
+            Return retMes
+        End If
+        'アップロードしたファイルと現在画面にあるファイルをファイル名重複なしてマージ
+        Dim fileNames As List(Of String) = (From itm In dispVal.Attachments Select itm.FileName).ToList
+        Dim addedFileList As New List(Of OIM0020WRKINC.FileItemClass)
+        For Each uploadFile In uploadFiles
+            If Not fileNames.Contains(uploadFile.FileName) Then
+                fileNames.Add(uploadFile.FileName)
+                addedFileList.Add(New OIM0020WRKINC.FileItemClass With {.FileName = uploadFile.FileName})
+            End If
+        Next
+        'ファイル数が5を超えた場合はアップさせずにエラー
+        If fileNames.Count > 5 Then
+            retMes.MessageNo = C_MESSAGE_NO.OIL_ATTACHMENT_COUNTOVER
+            retMes.Pram01 = "5"
+            Return retMes
+        End If
+        'ガイダンスファイル作業フォルダにコピー
+        For Each uploadFile In uploadFiles
+            Dim targetFile As String = IO.Path.Combine(uploadWorkDir, uploadFile.FileName)
+            Dim copyPath As String = IO.Path.Combine(guidanceWorkDir, uploadFile.FileName)
+            Try
+                System.IO.File.Copy(targetFile, copyPath, True)
+            Catch ex As Exception
+            End Try
+        Next
+        If addedFileList.Count > 0 Then
+            dispVal.Attachments.AddRange(addedFileList)
+        End If
+        '画面情報を書き換え
+        Me.repAttachments.DataSource = dispVal.Attachments
+        Me.repAttachments.DataBind()
+        ViewState("DISPVALUE") = dispVal
+        Return retMes
+    End Function
+    ''' <summary>
+    ''' ファイル情報クラス
+    ''' </summary>
+    <System.Runtime.Serialization.DataContract()>
+    Public Class AttachmentFile
+        <System.Runtime.Serialization.DataMember()>
+        Public Property FileName As String
+    End Class
+    Public Class PropMes
+        Public Property MessageNo As String = ""
+        Public Property Pram01 As String = ""
+    End Class
 End Class

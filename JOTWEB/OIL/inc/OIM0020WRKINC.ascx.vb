@@ -5,6 +5,8 @@ Public Class OIM0020WRKINC
     Public Const MAPIDS As String = "OIM0020S"       'MAPID(条件)
     Public Const MAPIDL As String = "OIM0020L"       'MAPID(実行)
     Public Const MAPIDC As String = "OIM0020C"       'MAPID(更新)
+
+    Public Const GUIDANCEROOT As String = "GUIDANCE"
     '' <summary>
     '' ワークデータ初期化処理
     '' </summary>
@@ -167,6 +169,7 @@ Public Class OIM0020WRKINC
     ''' <summary>
     ''' ガイダンス情報クラス
     ''' </summary>
+    <Serializable>
     Public Class GuidanceItemClass
         ''' <summary>
         ''' ガイダンス番号
@@ -224,6 +227,7 @@ Public Class OIM0020WRKINC
     ''' <summary>
     ''' ファイル情報クラス
     ''' </summary>
+    <Serializable>
     Public Class FileItemClass
         ''' <summary>
         ''' ファイル名
@@ -236,14 +240,14 @@ Public Class OIM0020WRKINC
     ''' ガイダンス番号,ファイル番号を元にパラメータを生成する
     ''' </summary>
     ''' <param name="guidanceNo"></param>
-    ''' <param name="FileNo"></param>
+    ''' <param name="FileInfo"></param>
     ''' <returns></returns>
-    Public Shared Function GetParamString(guidanceNo As String, FileNo As String, Optional isRefOnly As String = "1") As String
+    Public Shared Function GetParamString(guidanceNo As String, FileInfo As String, Optional isRefOnly As String = "1") As String
         Dim r As New Random
         Dim number As Integer = r.Next(1, 1001)
-
+        '文字列で推察できなくする
         Dim dateNow As String = Now.ToString("yyyyMMddHHmmssFFF")
-        Dim fileItm As New List(Of String) From {number.ToString("00#"), guidanceNo, FileNo, isRefOnly, dateNow}
+        Dim fileItm As New List(Of String) From {number.ToString("00#"), guidanceNo, FileInfo, isRefOnly, dateNow}
         Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
         Dim base64Str As String = ""
         Dim noCompressionByte As Byte()
@@ -267,9 +271,9 @@ Public Class OIM0020WRKINC
     ''' ガイダンス番号,ファイル番号をデコードする
     ''' </summary>
     ''' <param name="base64Str">base64エンコードした文字列</param>
-    ''' <returns></returns>
+    ''' <returns>配列（添字0:ガイダンス番号、添字1:ファイル情報(添字2が"0":ファイル名,"1":ファイル番号)、添字3：参照先 0:作業フォルダ、1:実体フォルダ</returns>
     Public Shared Function DecodeParamString(base64Str As String) As List(Of String)
-        Dim retVal As List(Of String)
+        Dim retVal As New List(Of String)
         Dim formatter As New Runtime.Serialization.Formatters.Binary.BinaryFormatter()
         Dim compressedByte As Byte()
         compressedByte = Convert.FromBase64String(base64Str)
@@ -279,7 +283,10 @@ Public Class OIM0020WRKINC
               ds As New IO.Compression.DeflateStream(inpMs, IO.Compression.CompressionMode.Decompress)
             ds.CopyTo(outMs)
             outMs.Position = 0
-            retVal = DirectCast(formatter.Deserialize(outMs), List(Of String))
+            Dim decVal = DirectCast(formatter.Deserialize(outMs), List(Of String))
+            retVal.Add(decVal(1)) 'ガイダンス番号
+            retVal.Add(decVal(2)) 'ファイル情報
+            retVal.Add(decVal(3)) '参照(1：参照、2：作業)
         End Using
         Return retVal
     End Function

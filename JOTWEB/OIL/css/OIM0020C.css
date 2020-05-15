@@ -106,7 +106,9 @@ div.fileDrag.dragging:after {
     padding:15px;
     z-index:3;
 }
-
+#fupAttachment {
+    display:none;
+}
 /* 参照のみの消込 */
 form[REFONLY] #WF_UPDATE,
 form[REFONLY] #WF_CLEAR {

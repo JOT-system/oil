@@ -361,6 +361,9 @@
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="OIL\inc\OIM0020FILEUPLOAD.ashx.vb">
+      <DependentUpon>OIM0020FILEUPLOAD.ashx</DependentUpon>
+    </Compile>
     <Compile Include="OIL\inc\OIM0020WRKINC.ascx.designer.vb">
       <DependentUpon>OIM0020WRKINC.ascx</DependentUpon>
     </Compile>
@@ -752,6 +755,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <Content Include="OIL\inc\OIM0020FILEUPLOAD.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

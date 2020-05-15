@@ -5071,8 +5071,35 @@ Public Class OIT0006OutOfServiceDetail
 
                     '受注進行ステータスが"250：手配完了"以降のステータスの場合
                 Else
+                    '### ★選択（チェックボックス）を非活性にするための準備 ################
+                    Dim chkObj As CheckBox = Nothing
+                    '　LINECNTを除いたチェックボックスID
+                    Dim chkObjIdWOLincnt As String = "chk" & pnlListArea1.ID & "OPERATION"
+                    '　LINECNTを含むチェックボックスID
+                    Dim chkObjId As String
+                    'Dim chkObjType As String
+                    '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
+                    Dim loopdr As DataRow = Nothing
+                    '　データテーブルの行Index
+                    Dim rowIdx As Integer = 0
+                    '#######################################################################
 
                     For Each rowitem As TableRow In tblObj.Rows
+                        '### ★選択（チェックボックス）を非活性にする ######################
+                        loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
+                        chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
+                        'chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
+                        chkObj = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObj IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObj.Enabled = False
+                        '###################################################################
+
                         For Each cellObj As TableCell In rowitem.Controls
 
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
@@ -5109,6 +5136,7 @@ Public Class OIT0006OutOfServiceDetail
                             End If
 
                         Next
+                        rowIdx += 1
                     Next
                 End If
 

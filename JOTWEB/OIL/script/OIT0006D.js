@@ -52,6 +52,19 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "";
                 
             }
+            else if (document.getElementById('WF_CREATEFLG').value === "1") {
+                //非活性
+                document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonSELECT_LIFTED_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
+                //document.getElementById("WF_ButtonCSV").disabled = "";
+
+                //活性
+                document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
+                document.getElementById("WF_ButtonUPDATE_MEISAI_TAB1").disabled = "";
+
+            }
             else {
                 //活性
                 document.getElementById("WF_ButtonALLSELECT_TAB1").disabled = "";

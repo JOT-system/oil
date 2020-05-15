@@ -1439,7 +1439,6 @@ Public Class OIT0003OrderDetail
         End Try
 
     End Sub
-
 #End Region
 
     ''' <summary>
@@ -2639,9 +2638,9 @@ Public Class OIT0003OrderDetail
         End Try
 
     End Sub
-
 #End Region
 
+#Region "一覧再表示処理"
     ''' <summary>
     ''' 一覧再表示処理
     ''' </summary>
@@ -3020,7 +3019,7 @@ Public Class OIT0003OrderDetail
         TBLview.Dispose()
         TBLview = Nothing
     End Sub
-
+#End Region
 
     ''' <summary>
     ''' 手配連絡ボタン押下時処理
@@ -3129,7 +3128,7 @@ Public Class OIT0003OrderDetail
         intTankCnt += Integer.Parse(Me.TxtK10Tank_w.Text)
         intTankCnt += Integer.Parse(Me.TxtLTank_w.Text)
         intTankCnt += Integer.Parse(Me.TxtATank_w.Text)
-        TxtTotalCnt_w.Text = intTankCnt.ToString()
+        Me.TxtTotalCnt_w.Text = intTankCnt.ToString()
 
         '油種数が１つも入力されていない場合
         If Me.TxtTotalCnt_w.Text = "0" Then
@@ -3566,10 +3565,10 @@ Public Class OIT0003OrderDetail
         Select Case WF_FIELD.Value
             '会社コード
             Case "WF_CAMPCODE"
-                CODENAME_get("CAMPCODE", WF_CAMPCODE.Text, Me.WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("CAMPCODE", Me.WF_CAMPCODE.Text, Me.WF_CAMPCODE_TEXT.Text, WW_RTN_SW)
             '運用部署
             Case "WF_UORG"
-                CODENAME_get("UORG", WF_UORG.Text, Me.WF_UORG_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("UORG", Me.WF_UORG.Text, Me.WF_UORG_TEXT.Text, WW_RTN_SW)
 
             '荷主
             Case "TxtShippersCode"
@@ -3733,6 +3732,7 @@ Public Class OIT0003OrderDetail
         End If
     End Sub
 
+#Region "全選択ボタン押下時処理"
     ''' <summary>
     ''' 全選択ボタン押下時処理
     ''' </summary>
@@ -3798,7 +3798,9 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_ButtonALLSELECT_TAB4()
 
     End Sub
+#End Region
 
+#Region "全解除ボタン押下時処理"
     ''' <summary>
     ''' 全解除ボタン押下時処理
     ''' </summary>
@@ -3865,7 +3867,9 @@ Public Class OIT0003OrderDetail
     Protected Sub WW_ButtonSELECT_LIFTED_TAB4()
 
     End Sub
+#End Region
 
+#Region "行削除ボタン押下時処理"
     ''' <summary>
     ''' 行削除ボタン押下時処理
     ''' </summary>
@@ -4153,7 +4157,9 @@ Public Class OIT0003OrderDetail
         End If
 
     End Sub
+#End Region
 
+#Region "行追加ボタン押下時処理"
     ''' <summary>
     ''' 行追加ボタン押下時処理
     ''' </summary>
@@ -4500,6 +4506,7 @@ Public Class OIT0003OrderDetail
         Master.Output(C_MESSAGE_NO.TABLE_ADDION_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' 更新ボタン押下時処理
@@ -4650,20 +4657,6 @@ Public Class OIT0003OrderDetail
 
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then
-            ''受注DB追加・更新
-            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            '    SQLcon.Open()       'DataBase接続
-
-            '    WW_UpdateOrder(SQLcon)
-            'End Using
-
-            ''受注明細DB追加・更新
-            'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            '    SQLcon.Open()       'DataBase接続
-
-            '    WW_UpdateOrderDetail(SQLcon)
-            'End Using
-
             '(受注TBL)タンク車数更新
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
@@ -5254,6 +5247,34 @@ Public Class OIT0003OrderDetail
     End Sub
 
 #Region "Excelアップロード"
+
+    ''' <summary>
+    ''' ファイルアップロード時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FILEUPLOAD()
+
+        '〇 選択されたタブ一覧のファイルアップロードの制御
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            WW_ButtonFILEUPLOAD_TAB1()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            WW_ButtonFILEUPLOAD_TAB2()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            WW_ButtonFILEUPLOAD_TAB3()
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            WW_ButtonFILEUPLOAD_TAB4()
+
+        End If
+
+    End Sub
+
     ''' <summary>
     ''' ファイルアップロード時処理(タブ「タンク車割当」)
     ''' </summary>
@@ -5333,33 +5354,6 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_ButtonFILEUPLOAD_TAB4()
-
-    End Sub
-
-    ''' <summary>
-    ''' ファイルアップロード時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_FILEUPLOAD()
-
-        '〇 選択されたタブ一覧のファイルアップロードの制御
-        'タブ「タンク車割当」
-        If WF_DetailMView.ActiveViewIndex = "0" Then
-            WW_ButtonFILEUPLOAD_TAB1()
-
-            'タブ「入換・積込指示」
-        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
-            WW_ButtonFILEUPLOAD_TAB2()
-
-            'タブ「タンク車明細」
-        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
-            WW_ButtonFILEUPLOAD_TAB3()
-
-            'タブ「費用入力」
-        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
-            WW_ButtonFILEUPLOAD_TAB4()
-
-        End If
 
     End Sub
 
@@ -5912,6 +5906,7 @@ Public Class OIT0003OrderDetail
 
 #End Region
 
+#Region "リスト変更時処理"
     ''' <summary>
     ''' リスト変更時処理
     ''' </summary>
@@ -5985,23 +5980,6 @@ Public Class OIT0003OrderDetail
 
                 '〇 タンク車割当状況チェック
                 WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
-                ''タンク車割当状況＝"割当"の場合
-                'If updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI Then
-
-                '    '油種が削除("")の場合
-                '    If updHeader.Item("OILCODE") = "" Then
-                '        'タンク車割当状況＝"残車"に設定
-                '        updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN
-                '    End If
-
-                '    'タンク車割当状況＝"残車"の場合
-                'ElseIf updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_ZAN Then
-                '    '油種が設定された場合
-                '    If updHeader.Item("OILCODE") <> "" Then
-                '        'タンク車割当状況＝"割当"に設定
-                '        updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_WARI
-                '    End If
-                'End If
 
             Case "ORDERINGOILNAME"    '(一覧)油種(受発注用)
                 '〇油種が設定されている場合
@@ -6236,6 +6214,7 @@ Public Class OIT0003OrderDetail
         Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
     End Sub
+
     ''' <summary>
     ''' リスト変更時処理(タブ「費用入力」)
     ''' </summary>
@@ -6266,6 +6245,7 @@ Public Class OIT0003OrderDetail
         Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
     End Sub
+#End Region
 
     ''' <summary>
     ''' タブ切替
@@ -6848,16 +6828,6 @@ Public Class OIT0003OrderDetail
                     PARA41.Value = Me.TxtK10Tank.Text                    '車数（１０号軽油）
                     PARA42.Value = Me.TxtLTank.Text                      '車数（LSA）
                     PARA43.Value = Me.TxtATank.Text                      '車数（A重油）
-                    'PARA34.Value = work.WF_SEL_REGULAR_TANKCAR.Text   '車数（レギュラー）
-                    'PARA35.Value = work.WF_SEL_HIGHOCTANE_TANKCAR.Text '車数（ハイオク）
-                    'PARA36.Value = work.WF_SEL_KEROSENE_TANKCAR.Text  '車数（灯油）
-                    'PARA37.Value = work.WF_SEL_NOTADDED_KEROSENE_TANKCAR.Text  '車数（未添加灯油）
-                    'PARA38.Value = work.WF_SEL_DIESEL_TANKCAR.Text    '車数（軽油）
-                    'PARA39.Value = work.WF_SEL_NUM3DIESEL_TANKCAR.Text  '車数（３号軽油）
-                    'PARA40.Value = work.WF_SEL_NUM5DIESEL_TANKCAR.Text  '車数（５号軽油）
-                    'PARA41.Value = work.WF_SEL_NUM10DIESEL_TANKCAR.Text '車数（１０号軽油）
-                    'PARA42.Value = work.WF_SEL_LSA_TANKCAR.Text       '車数（LSA）
-                    'PARA43.Value = work.WF_SEL_AHEAVY_TANKCAR.Text    '車数（A重油）
                     PARA44.Value = 0                                  '車数（その他１）
                     PARA45.Value = 0                                  '車数（その他２）
                     PARA46.Value = 0                                  '車数（その他３）
@@ -6922,13 +6892,6 @@ Public Class OIT0003OrderDetail
                     PARA80.Value = 0                                  '支払金額
                     PARA81.Value = 0                                  '支払消費税額
                     PARA82.Value = 0                                  '支払合計金額
-                    'PARA77.Value = TxtTotalSales.Text                 '売上金額
-                    'PARA78.Value = Integer.Parse(TxtTotalSales2.Text) - Integer.Parse(TxtTotalSales.Text) '売上消費税額
-                    'PARA79.Value = TxtTotalSales2.Text                '売上合計金額
-                    'PARA80.Value = TxtTitalPayment.Text               '支払金額
-                    'PARA81.Value = Integer.Parse(TxtTitalPayment2.Text) - Integer.Parse(TxtTitalPayment.Text) '支払消費税額
-                    'PARA82.Value = TxtTitalPayment2.Text              '支払合計金額
-                    'PARA83.Value = OIT0003row("DELFLG")               '削除フラグ
                     PARA83.Value = "0"                                '削除フラグ
                     PARA84.Value = WW_DATENOW                         '登録年月日
                     PARA85.Value = Master.USERID                      '登録ユーザーID
@@ -9650,7 +9613,7 @@ Public Class OIT0003OrderDetail
                 '〇営業所配下情報を取得・設定
                 If work.WF_SEL_SALESOFFICECODE.Text = "" Then
                     '〇 画面(受注営業所).テキストボックスが未設定
-                    If TxtOrderOffice.Text = "" Then
+                    If Me.TxtOrderOffice.Text = "" Then
                         WW_FixvalueMasterSearch(Master.USER_ORG, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
                     Else
                         WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetValue)
@@ -10210,9 +10173,9 @@ Public Class OIT0003OrderDetail
         '○ フォーカスセット
         Select Case WF_FIELD.Value
             Case "WF_CAMPCODE"               '会社コード
-                WF_CAMPCODE.Focus()
+                Me.WF_CAMPCODE.Focus()
             Case "WF_UORG"                   '運用部署
-                WF_UORG.Focus()
+                Me.WF_UORG.Focus()
             Case "TxtShippersCode"           '荷主
                 Me.TxtShippersCode.Focus()
             Case "TxtConsigneeCode"          '荷受人
@@ -12637,8 +12600,6 @@ Public Class OIT0003OrderDetail
 
             '前回黒油
             If WW_GetValue(2) = "1" AndAlso OIT0003row("DELFLG") = "0" Then
-                'Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                'OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_83
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 
@@ -12652,6 +12613,7 @@ Public Class OIT0003OrderDetail
             ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso OIT0003row("DELFLG") = "0" Then
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)

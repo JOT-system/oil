@@ -15,6 +15,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0001Reporttbl As DataTable                           '帳票用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                 'マウススクロール時稼働行数
@@ -407,6 +408,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS ORDERYMD" _
             & " , @P12                                           AS ORDERTYPE" _
             & " , @P13                                           AS ORDERTYPENAME" _
+            & " , ''                                             AS ORDERINFO" _
+            & " , ''                                             AS ORDERINFONAME" _
             & " , @P3                                            AS SHIPPERSCODE" _
             & " , @P4                                            AS SHIPPERSNAME" _
             & " , @P5                                            AS BASECODE" _
@@ -455,6 +458,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '')            AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')           AS ORDERTYPE" _
             & " , ''                                             AS ORDERTYPENAME" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINFO), '')           AS ORDERINFO" _
+            & " , ''                                             AS ORDERINFONAME" _
             & " , ISNULL(RTRIM(OIT0003.SHIPPERSCODE), '')        AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0003.SHIPPERSNAME), '')        AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '')            AS BASECODE" _
@@ -606,6 +611,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                     End If
                     i += 1
                     OIT0001row("LINECNT") = i        'LINECNT
+
+                    '受注情報
+                    CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+
                 Next
             End Using
         Catch ex As Exception
@@ -689,6 +698,30 @@ Public Class OIT0001EmptyTurnDairyDetail
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
+
+        '更新モードの場合は、油種数の入力を非活性とする。
+        If work.WF_SEL_CREATEFLG.Text = "2" Then
+            'ハイオク
+            Me.TxtHTank.Enabled = False
+            'レギュラー
+            Me.TxtRTank.Enabled = False
+            '灯油
+            Me.TxtTTank.Enabled = False
+            '未添加灯油
+            Me.TxtMTTank.Enabled = False
+            '軽油
+            Me.TxtKTank.Enabled = False
+            '３号軽油
+            Me.TxtK3Tank.Enabled = False
+            '軽油５
+            Me.TxtK5Tank.Enabled = False
+            '軽油１０
+            Me.TxtK10Tank.Enabled = False
+            'ＬＳＡ
+            Me.TxtLTank.Enabled = False
+            'Ａ重油
+            Me.TxtATank.Enabled = False
+        End If
 
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
@@ -1760,6 +1793,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
             & " , FORMAT(GETDATE(),'yyyy/MM/dd')                 AS ORDERYMD" _
+            & " , @P12                                           AS ORDERTYPE" _
+            & " , @P13                                           AS ORDERTYPENAME" _
+            & " , ''                                             AS ORDERINFO" _
+            & " , ''                                             AS ORDERINFONAME" _
             & " , @P02                                           AS SHIPPERSCODE" _
             & " , @P03                                           AS SHIPPERSNAME" _
             & " , @P04                                           AS BASECODE" _
@@ -1819,6 +1856,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 10) '荷受人コード
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 40) '荷受人名
 
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 9) '受注パターン
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 100) '受注パターン名
+
                 Dim strOrderNo As String = ""
                 Dim intDetailNo As Integer = 0
                 For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
@@ -1831,6 +1871,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA5.Value = work.WF_SEL_BASENAME.Text
                     PARA6.Value = work.WF_SEL_CONSIGNEECODE.Text
                     PARA7.Value = work.WF_SEL_CONSIGNEENAME.Text
+                    PARA12.Value = work.WF_SEL_PATTERNCODE.Text
+                    PARA13.Value = work.WF_SEL_PATTERNNAME.Text
                 Next
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
@@ -1898,34 +1940,248 @@ Public Class OIT0001EmptyTurnDairyDetail
 
     End Sub
 
+#Region "帳票処理"
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDownload_Click()
 
-        '○ 帳票出力
-        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-        CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
-        CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
-        CS0030REPORT.TBLDATA = OIT0001tbl                       'データ参照  Table
-        CS0030REPORT.CS0030REPORT()
-        If Not isNormal(CS0030REPORT.ERR) Then
-            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
-            Else
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
-            End If
-            Exit Sub
-        End If
+        '******************************
+        '帳票表示データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
 
-        '○ 別画面でExcelを表示
-        WF_PrintURL.Value = CS0030REPORT.URL
-        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+            ExcelDataGet(SQLcon)
+        End Using
+
+        '******************************
+        '帳票作成処理の実行
+        '******************************
+        Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & ".xlsx", OIT0001Reporttbl)
+            Dim url As String
+            Try
+                url = repCbj.CreateExcelPrintData
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+        ''### 共通帳票処理をコメント ##################################################################
+        ''○ 帳票出力
+        'CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
+        'CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
+        'CS0030REPORT.MAPID = Master.MAPID                       '画面ID
+        'CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
+        'CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
+        'CS0030REPORT.TBLDATA = OIT0001tbl                       'データ参照  Table
+        'CS0030REPORT.CS0030REPORT()
+        'If Not isNormal(CS0030REPORT.ERR) Then
+        '    If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
+        '        Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR)
+        '    Else
+        '        Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
+        '    End If
+        '    Exit Sub
+        'End If
+
+        ''○ 別画面でExcelを表示
+        'WF_PrintURL.Value = CS0030REPORT.URL
+        'ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        ''#############################################################################################
 
     End Sub
+
+    ''' <summary>
+    ''' 帳票表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0001Reporttbl) Then
+            OIT0001Reporttbl = New DataTable
+        End If
+
+        If OIT0001Reporttbl.Columns.Count <> 0 Then
+            OIT0001Reporttbl.Columns.Clear()
+        End If
+
+        OIT0001Reporttbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+        " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
+            & " , OIT0002.OFFICENAME                             AS OFFICENAME" _
+            & " , OIT0002.TRAINNO                                AS TRAINNO" _
+            & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
+            & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _
+            & " , OIT0002.BASECODE                               AS BASECODE" _
+            & " , OIT0002.BASENAME                               AS BASENAME" _
+            & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
+            & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
+            & " , OIT0002.DEPSTATION                             AS DEPSTATION" _
+            & " , OIT0002.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
+            & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
+            & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
+            & " , OIT0002.LODDATE                                AS LODDATE" _
+            & " , OIT0002.DEPDATE                                AS DEPDATE" _
+            & " , OIT0002.ARRDATE                                AS ARRDATE" _
+            & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " , OIT0002.EMPARRDATE                             AS EMPARRDATE" _
+            & " , OIT0003.ACTUALLODDATE                          AS ACTUALLODDATE" _
+            & " , OIT0003.ACTUALDEPDATE                          AS ACTUALDEPDATE" _
+            & " , OIT0003.ACTUALARRDATE                          AS ACTUALARRDATE" _
+            & " , OIT0003.ACTUALACCDATE                          AS ACTUALACCDATE" _
+            & " , OIT0003.ACTUALEMPARRDATE                       AS ACTUALEMPARRDATE" _
+            & " , OIM0005.MODEL                                  AS MODEL" _
+            & " , OIT0003.TANKNO                                 AS TANKNO" _
+            & " , OIT0003.CARSNUMBER                             AS CARSNUMBER" _
+            & " , OIT0003.CARSAMOUNT                             AS CARSAMOUNT" _
+            & " , OIM0005.LOAD                                   AS LOAD" _
+            & " , OIM0005.OWNERCODE                              AS OWNERCODE" _
+            & " , OIM0005.OWNERNAME                              AS OWNERNAME" _
+            & " , OIM0005.LEASECODE                              AS LEASECODE" _
+            & " , OIM0005.LEASENAME                              AS LEASENAME" _
+            & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
+            & " , OIM0005.JRALLINSPECTIONDATE                    AS JRALLINSPECTIONDATE" _
+            & " , OIT0003.RETURNDATETRAIN                        AS RETURNDATETRAIN" _
+            & " , OIT0003.JOINTCODE                              AS JOINTCODE" _
+            & " , OIT0003.JOINT                                  AS JOINT" _
+            & " , OIT0003.REMARK                                 AS REMARK" _
+            & " , OIM0003.BIGOILCODE                             AS BIGOILCODE" _
+            & " , OIM0003.BIGOILNAME                             AS BIGOILNAME" _
+            & " , OIM0003.MIDDLEOILCODE                          AS MIDDLEOILCODE" _
+            & " , OIM0003.MIDDLEOILNAME                          AS MIDDLEOILNAME" _
+            & " , OIT0003.OILCODE                                AS OILCODE" _
+            & " , OIT0003.OILNAME                                AS OILNAME" _
+            & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+            & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
+            & " , OIM0003.OTOILNAME                              AS OTOILNAME" _
+            & " , OIM0003.SHIPPEROILCODE                         AS SHIPPEROILCODE" _
+            & " , OIM0003.SHIPPEROILNAME                         AS SHIPPEROILNAME" _
+            & " , OIM0003.CHECKOILCODE                           AS CHECKOILCODE" _
+            & " , OIM0003.CHECKOILNAME                           AS CHECKOILNAME" _
+            & " , OIT0005.LASTOILCODE                            AS LASTOILCODE" _
+            & " , OIT0005.LASTOILNAME                            AS LASTOILNAME" _
+            & " , OIT0005.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
+            & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
+            & " , OTOILCT.OTOILCODE                              AS OTOILCTCODE" _
+            & " , OTOILCT.CNT                                    AS OTOILCTCNT" _
+            & " FROM oil.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OIT0003.DELFLG <> @P02 " _
+            & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+            & "     OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0003.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0003.DELFLG <> @P02 " _
+            & " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+            & " AND OIM0005.DELFLG <> @P02 " _
+            & " LEFT JOIN oil.OIT0005_SHOZAI OIT0005 ON " _
+            & "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
+            & " AND OIT0005.DELFLG <> @P02 "
+
+        SQLStr &=
+              " LEFT JOIN ( " _
+            & "   SELECT " _
+            & "         OIT0002.ORDERNO " _
+            & "       , OIT0003.SHIPPERSCODE " _
+            & "       , OIT0003.SHIPPERSNAME " _
+            & "       , OIM0003.OTOILCODE " _
+            & "       , OIM0003.OTOILNAME " _
+            & "       , COUNT(1) AS CNT " _
+            & "   FROM oil.OIT0002_ORDER OIT0002 " _
+            & "   INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "       OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "   AND OIT0003.DELFLG <> @P02 " _
+            & "   INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+            & "       OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
+            & "   AND OIM0003.OILCODE = OIT0003.OILCODE " _
+            & "   AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & "   AND OIM0003.DELFLG <> @P02 " _
+            & "   WHERE OIT0002.ORDERNO = @P01 " _
+            & "   GROUP BY " _
+            & "         OIT0002.ORDERNO " _
+            & "       , OIT0003.SHIPPERSCODE " _
+            & "       , OIT0003.SHIPPERSNAME " _
+            & "       , OIM0003.OTOILCODE " _
+            & "       , OIM0003.OTOILNAME " _
+            & " ) OTOILCT ON " _
+            & "     OTOILCT.SHIPPERSCODE = OIT0003.SHIPPERSCODE " _
+            & " AND OTOILCT.OTOILCODE = OIM0003.OTOILCODE "
+
+        SQLStr &=
+              " WHERE OIT0002.ORDERNO = @P01 " _
+            & " AND OIT0002.DELFLG <> @P02 "
+
+        SQLStr &=
+                " ORDER BY" _
+            & "    OIT0003.SHIPPERSCODE" _
+            & "  , OIT0002.DEPSTATION" _
+            & "  , OIM0003.OTOILCODE" _
+            & "  , OIT0003.TANKNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001Reporttbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001Reporttbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0001Reprow As DataRow In OIT0001Reporttbl.Rows
+                    i += 1
+                    OIT0001Reprow("LINECNT") = i        'LINECNT
+                Next
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0001Reporttbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+#End Region
 
     ''' <summary>
     ''' 空回日報確定ボタン押下時処理
@@ -2743,6 +2999,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
                 O_RTN = "ERR"
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = OIT0001tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = drv("LINECNT"))
+                updHeader.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
+                CODENAME_get("ORDERINFO", updHeader.Item("ORDERINFO"), updHeader.Item("ORDERINFONAME"), WW_DUMMY)
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0001tbl)
                 Exit Sub
             End If
 
@@ -3328,7 +3593,12 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtTTank.Enabled = True
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
-                    TxtMTTank.Enabled = True
+                    '★根岸営業所の場合
+                    If work.WF_SEL_SALESOFFICECODE.Text = "011402" Then
+                        TxtMTTank.Enabled = False
+                    Else
+                        TxtMTTank.Enabled = True
+                    End If
                     '軽油
                 Case BaseDllConst.CONST_KTank1, BaseDllConst.CONST_KTank2
                     TxtKTank.Enabled = True

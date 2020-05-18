@@ -129,6 +129,18 @@ Public Module PrevDispMap
         ''' タンク車マスタメンテナンス（登録）
         ''' </summary>
         Public Const OIM0005C As String = "ASP.OIL_MAS_OIM0005TANKCREATE_ASPX"
+        ''' <summary>
+        ''' ガイダンスマスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0020S As String = "ASP.OIL_MAS_OIM0020GUIDANCESEARCH_ASPX"
+        ''' <summary>
+        ''' ガイダンスマスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0020L As String = "ASP.OIL_MAS_OIM0020GUIDANCELIST_ASPX"
+        ''' <summary>
+        ''' ガイダンスマスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0020C As String = "ASP.OIL_MAS_OIM0020GUIDANCECREATE_ASPX"
     End Class
 
 End Module 'End BaseDllConst

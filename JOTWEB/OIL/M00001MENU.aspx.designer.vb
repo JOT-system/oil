@@ -14,6 +14,15 @@ Option Explicit On
 Partial Public Class M00001MENU
     
     '''<summary>
+    '''repGuidance コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repGuidance As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''Repeater_Menu_L コントロール。
     '''</summary>
     '''<remarks>
@@ -93,6 +102,15 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_HdnGuidanceUrl コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_HdnGuidanceUrl As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''work コントロール。

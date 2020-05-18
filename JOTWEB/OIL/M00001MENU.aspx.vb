@@ -9,7 +9,7 @@ Public Class M00001MENU
     '*共通関数宣言(BASEDLL)
     Private CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
     Private CS0050Session As New CS0050SESSION              'セッション情報
-
+    Public Property SelectedGuidanceNo As String = ""
     ''' <summary>
     '''  パスワードの変更依頼（期限切れまで何日前からか）
     ''' </summary>
@@ -23,10 +23,15 @@ Public Class M00001MENU
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         If IsPostBack Then
-
+            If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
+                If WF_ButtonClick.Value.StartsWith("WF_ButtonShowGuidance") Then
+                    WF_ButtonShowGuidance_Click()
+                End If
+            End If
         Else
             '★★★ 初期画面表示 ★★★
             Initialize()
+            WF_ButtonClick.Value = ""
         End If
 
     End Sub
@@ -127,6 +132,13 @@ Public Class M00001MENU
                 CS0011LOGWRITE.CS0011LOGWrite()
                 Exit Sub
             End Try
+            'ガイダンスデータ取得
+            Try
+                Dim guidanceDt As DataTable = GetGuidanceData(SQLcon)
+                Me.repGuidance.DataSource = guidanceDt
+                Me.repGuidance.DataBind()
+            Catch ex As Exception
+            End Try
 
             '■■■ パスワード有効期限の警告表示 ■■■
             '○パスワード有効期限の警告表示
@@ -165,6 +177,7 @@ Public Class M00001MENU
                 Exit Sub
             End Try
 
+
             If DateDiff("d", Date.Now, WW_ENDYMD) < C_PASSWORD_CHANGE_LIMIT_COUNT Then
                 Master.Output(C_MESSAGE_NO.PASSWORD_INVALID_AT_SOON, C_MESSAGE_TYPE.INF)
             End If
@@ -172,6 +185,78 @@ Public Class M00001MENU
         End Using
 
     End Sub
+    ''' <summary>
+    ''' 表示用のガイダンスデータ取得
+    ''' </summary>
+    ''' <param name="sqlCon">SQLConnection</param>
+    ''' <returns>ガイダンスデータ</returns>
+    Private Function GetGuidanceData(sqlCon As SqlConnection) As DataTable
+        Dim retDt As New DataTable
+        With retDt.Columns
+            .Add("GUIDANCENO", GetType(String))
+            .Add("ENTRYDATE", GetType(String))
+            .Add("TYPE", GetType(String))
+            .Add("TITTLE", GetType(String))
+            .Add("NAIYOU", GetType(String))
+            .Add("FAILE1", GetType(String))
+        End With
+        Try
+            Dim sqlStat As New StringBuilder
+            sqlStat.AppendLine("SELECT GD.GUIDANCENO")
+            sqlStat.AppendLine("      ,format(GD.INITYMD,'yyyy/M/d') AS ENTRYDATE")
+            sqlStat.AppendLine("      ,GD.TYPE                       AS TYPE")
+            sqlStat.AppendLine("      ,GD.TITTLE                     AS TITTLE")
+            sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
+            sqlStat.AppendLine("      ,GD.FAILE1                     AS FAILE1")
+            sqlStat.AppendLine("  FROM oil.OIM0020_GUIDANCE GD")
+            sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
+            sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
+            sqlStat.AppendLine("   AND OUTFLG <> '1'")
+            sqlStat.AppendLine(" ORDER BY (CASE WHEN GD.TYPE = 'E' THEN '1'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'W' THEN '2'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'I' THEN '3'")
+            sqlStat.AppendLine("                ELSE '9'")
+            sqlStat.AppendLine("            END)")
+            sqlStat.AppendLine("          ,GD.INITYMD DESC")
+            '他のフラグや最大取得件数（条件がある場合）はあとで
+            Using sqlGuidCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                sqlGuidCmd.Parameters.Add("@DELFLG_NO", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Using sqlGuidDr As SqlDataReader = sqlGuidCmd.ExecuteReader()
+                    Dim dr As DataRow
+                    While sqlGuidDr.Read
+                        dr = retDt.NewRow
+                        dr("GUIDANCENO") = sqlGuidDr("GUIDANCENO")
+                        dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
+                        dr("TYPE") = sqlGuidDr("TYPE")
+                        dr("TITTLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITTLE")))
+                        dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU")))
+                        dr("FAILE1") = Convert.ToString(sqlGuidDr("FAILE1"))
+
+                        retDt.Rows.Add(dr)
+                    End While
+                End Using
+
+            End Using
+            sqlStat = New StringBuilder
+            sqlStat.AppendLine("SELECT URL.URL")
+            sqlStat.AppendLine("  FROM COM.OIS0007_URL URL")
+            sqlStat.AppendLine(" WHERE URL.MAPID = @MAPID")
+            sqlStat.AppendLine("   AND GETDATE() BETWEEN URL.STYMD AND URL.ENDYMD")
+            sqlStat.AppendLine("   AND URL.DELFLG = @DELFLG")
+
+            Using sqlGuidUrlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                With sqlGuidUrlCmd.Parameters
+                    .Add("@MAPID", SqlDbType.NVarChar).Value = OIM0020WRKINC.MAPIDC
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Dim urlVal = sqlGuidUrlCmd.ExecuteScalar
+                Me.WF_HdnGuidanceUrl.Value = Convert.ToString(urlVal)
+            End Using
+        Catch ex As Exception
+        End Try
+
+        Return retDt
+    End Function
     ''' <summary>
     ''' Repeater_Menu_x バインドイベント(Handlesに含めたオブジェクトが対象)
     ''' </summary>
@@ -334,5 +419,14 @@ Public Class M00001MENU
         'ボタン押下時、画面遷移
         Server.Transfer(WW_URL.Text)
 
+    End Sub
+    ''' <summary>
+    ''' ガイダンスリンク押下時
+    ''' </summary>
+    Private Sub WF_ButtonShowGuidance_Click()
+        Dim guidanceNo As String = WF_ButtonClick.Value.Replace("WF_ButtonShowGuidance", "")
+        Me.SelectedGuidanceNo = guidanceNo
+        'ボタン押下時、画面遷移
+        Server.Transfer(Me.WF_HdnGuidanceUrl.Value)
     End Sub
 End Class

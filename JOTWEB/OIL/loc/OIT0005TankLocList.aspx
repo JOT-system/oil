@@ -2,7 +2,7 @@
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %>
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
-<%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
+<%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIT0005WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 

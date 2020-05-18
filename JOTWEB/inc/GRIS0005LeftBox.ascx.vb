@@ -84,6 +84,7 @@ Public Class GRIS0005LeftBox
     ''' <item><description>LC_BRANCHOFFICESTATION: 管轄所属・駅関連付けのリストを作成（タンク所在向け）</description></item>
     ''' <item><description>LC_TANKSTATUS: タンク車状態のリストを作成</description></item>
     ''' <item><description>LC_LOADINGKBN: 積車状態リストを作成</description></item>
+    ''' <item><description>LC_TANKSITUATION: タンク車状況リストを作成</description></item>
     ''' </list>
     Public Enum LIST_BOX_CLASSIFICATION
         LC_COMPANY
@@ -151,6 +152,10 @@ Public Class GRIS0005LeftBox
         LC_BRANCHOFFICESTATION
         LC_TANKSTATUS
         LC_LOADINGKBN
+        LC_TANKNUMBER_KAISOU
+        LC_TANKSITUATION
+        LC_ACCOUNTLIST
+        LC_TORILIST
     End Enum
 
     ''' <summary>
@@ -237,6 +242,9 @@ Public Class GRIS0005LeftBox
         LP_KAISOUINFO
         LP_KAISOUTYPE
         LP_OBJECTIVECODE
+        LP_TANKNUMBER_KAISOU
+        LP_ACCOUNTLIST
+        LP_TORILIST
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -565,9 +573,17 @@ Public Class GRIS0005LeftBox
                 'タンク車番号(貨車連結順序表用)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBERLINK"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER_KAISOU
+                'タンク車番号(回送用)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER_KAISOU"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_TANKMODEL
                 'タンク車型式
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKMODEL"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TORILIST
+                '取引先
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TORIMASTER"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
                 '営業所(組織コード)
@@ -742,6 +758,14 @@ Public Class GRIS0005LeftBox
                 '積車区分
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "LOADINGKBN"
                 lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_TANKSITUATION
+                'タンク車状況
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKSITUATION"
+                lbox = CreateFixValueList(Params, O_RTN)
+            Case LIST_BOX_CLASSIFICATION.LC_ACCOUNTLIST
+                '科目パターン
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ACCOUNTPATTERN"
+                lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing
@@ -789,7 +813,28 @@ Public Class GRIS0005LeftBox
                      New LeftTableDefItem("VALUE11", "積車", 4),
                      New LeftTableDefItem("KEYCODE", "車番", 5, True) With {.IsNumericField = True},
                      New LeftTableDefItem("VALUE1", "型式", 6),
-                     New LeftTableDefItem("VALUE3", "交換日")}
+                     New LeftTableDefItem("VALUE3", "交検日")}
+
+            Case LIST_BOX_CLASSIFICATION.LC_TANKNUMBER_KAISOU
+                'タンク車番号(回送用)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "TANKNUMBER_KAISOU"
+
+                '初期ソート順(状態 desc,積車区分asc,車番(数値化)asc)
+                Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER) = "VALUE9 DESC," &
+                                                                  "VALUE11," &
+                                                                  "convert(int,KEYCODE)"
+
+                dispDt = CreateFixValueTable(Params, O_RTN)
+                '上記データテーブルの表示対象項目を定義(フィールド、表示名）
+                dispFieldsDef = New List(Of LeftTableDefItem) From
+                    {New LeftTableDefItem("VALUE9", "状態"),
+                     New LeftTableDefItem("VALUE5", "管轄支店", 9),
+                     New LeftTableDefItem("VALUE7", "所属営業所", 9),
+                     New LeftTableDefItem("VALUE3", "所在地", 9),
+                     New LeftTableDefItem("VALUE11", "積車", 4),
+                     New LeftTableDefItem("KEYCODE", "車番", 5, True) With {.IsNumericField = True},
+                     New LeftTableDefItem("VALUE1", "型式", 6),
+                     New LeftTableDefItem("VALUE12", "交検日")}
 
             Case LIST_BOX_CLASSIFICATION.LC_FILLINGPOINT
                 '充填ポイント

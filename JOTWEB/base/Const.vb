@@ -552,29 +552,29 @@ Public Module BaseDllConst
 
 #Region "目的"
     ''' <summary>
-    ''' 1:MC
+    ''' 20:修理
     ''' </summary>
-    Public Const CONST_OBJECTCODE_1 As String = "1"
+    Public Const CONST_OBJECTCODE_20 As String = "20"
     ''' <summary>
-    ''' 2:交検
+    ''' 21:MC
     ''' </summary>
-    Public Const CONST_OBJECTCODE_2 As String = "2"
+    Public Const CONST_OBJECTCODE_21 As String = "21"
     ''' <summary>
-    ''' 3:全検
+    ''' 22:交検
     ''' </summary>
-    Public Const CONST_OBJECTCODE_3 As String = "3"
+    Public Const CONST_OBJECTCODE_22 As String = "22"
     ''' <summary>
-    ''' 4:修理
+    ''' 23:全検
     ''' </summary>
-    Public Const CONST_OBJECTCODE_4 As String = "4"
+    Public Const CONST_OBJECTCODE_23 As String = "23"
     ''' <summary>
-    ''' 5:疎開留置
+    ''' 24:疎開留置
     ''' </summary>
-    Public Const CONST_OBJECTCODE_5 As String = "5"
+    Public Const CONST_OBJECTCODE_24 As String = "24"
     ''' <summary>
-    ''' 6:移動
+    ''' 25:移動
     ''' </summary>
-    Public Const CONST_OBJECTCODE_6 As String = "6"
+    Public Const CONST_OBJECTCODE_25 As String = "25"
 
 #End Region
 

@@ -78,7 +78,7 @@
                 <span>
                     <a id="WF_OBJECTIVE_LABEL">目的</a>
                     <a class="ef" id="WF_OBJECTIVE" ondblclick="Field_DBclick('TxtObjective', <%=LIST_BOX_CLASSIFICATION.LC_OBJECTIVECODE%>);" onchange="TextBox_change('TxtObjective');">
-                        <asp:TextBox ID="TxtObjective" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="1"></asp:TextBox>
+                        <asp:TextBox ID="TxtObjective" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="2"></asp:TextBox>
                     </a>
                 </span>
                 <span class ="left">
@@ -101,7 +101,8 @@
                 <span>
                     <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
                     <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">
-                        <asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>
+                        <asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>
+                        <%--<asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>--%>
                         <asp:TextBox ID="TxtTrainName" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>
@@ -205,7 +206,7 @@
                     </a>
                 </span>
 
-                <!-- ■　(実績)積車着日　■ -->
+                <!-- ■　(実績)着日　■ -->
                 <span>
                     <a id="WF_ACTUALARRDATE_LABEL" class="requiredMark">着日</a>
                     <a class="ef" id="WF_ACTUALARRDATE" ondblclick="Field_DBclick('TxtActualArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">

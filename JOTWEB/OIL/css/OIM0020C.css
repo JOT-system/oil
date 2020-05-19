@@ -123,6 +123,7 @@ form[REFONLY] .grc0001Wrapper input:checked + label {
 }
 form[REFONLY] .attachmentCell input[type=button],
 form[REFONLY] .attachmentCell hr,
+form[REFONLY] .attachmentCell #uploadLineText,
 form[REFONLY] .attachmentCell span.delAttachment {
     display: none;
 }

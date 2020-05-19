@@ -36,7 +36,7 @@ Public Class OIM0020WRKINC
     ''' 対象フラグの初期値取得
     ''' </summary>
     ''' <returns></returns>
-    Public Function GetNewDisplayFlags() As List(Of DisplayFlag)
+    Public Shared Function GetNewDisplayFlags() As List(Of DisplayFlag)
         Dim retVal As New List(Of DisplayFlag)
         retVal.Add(New DisplayFlag("社外", "OUTFLG", 0, ""))
         retVal.Add(New DisplayFlag("石油部", "INFLG1", 1, ""))

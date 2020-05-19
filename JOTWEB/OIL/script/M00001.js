@@ -31,8 +31,24 @@ function bindShowCloseGuidance(objButton) {
 //function getDispGuigance() {
 //    let dtm = localStorage.getItem("menu0001GuidanceSetDate");
 //    let flg = localStorage.getItem("menu0001GuidanceFlag");
-
-
+//    var dt = new Date();
+//    var y = dt.getFullYear();
+//    var m = ("00" + (dt.getMonth() + 1)).slice(-2);
+//    var d = ("00" + dt.getDate()).slice(-2);
+//    let currentDtm = y + m + d;
+//    if (dtm === null) {
+//        dtm = currentDtm;
+//        localStorage.setItem('menu0001GuidanceSetDate', dtm);
+//    }
+//    if (dtm === currentDtm) {
+//        if (flg !== null) {
+//            return flg;
+//        } else {
+//            return '1';
+//        }
+//    } else {
+//        localStorage.setItem('menu0001GuidanceSetDate', dtm);
+//    }
 //}
 //function setDispGuidance(flag) {
 

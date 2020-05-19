@@ -27,3 +27,13 @@ function bindShowCloseGuidance(objButton) {
 
 
 }
+
+//function getDispGuigance() {
+//    let dtm = localStorage.getItem("menu0001GuidanceSetDate");
+//    let flg = localStorage.getItem("menu0001GuidanceFlag");
+
+
+//}
+//function setDispGuidance(flag) {
+
+//}

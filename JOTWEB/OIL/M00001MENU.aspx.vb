@@ -137,6 +137,9 @@ Public Class M00001MENU
                 Dim guidanceDt As DataTable = GetGuidanceData(SQLcon)
                 Me.repGuidance.DataSource = guidanceDt
                 Me.repGuidance.DataBind()
+                If guidanceDt.Rows.Count = 0 Then
+                    guidanceArea.Visible = False
+                End If
             Catch ex As Exception
             End Try
 

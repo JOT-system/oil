@@ -40,7 +40,7 @@
                     <td>
                         <asp:Label ID="lblGuidanceEntryDate" runat="server" Text=""></asp:Label>
                     </td>
-                    <th>種類</th>
+                    <th><span class='requiredMark'>種類</span></th>
                     <td>
                         <div class="grc0001Wrapper type">
                             <asp:RadioButtonList ID="rblType" runat="server"  ClientIDMode="Predictable" RepeatLayout="UnorderedList"></asp:RadioButtonList>
@@ -48,13 +48,13 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>掲載開始日</th>
+                    <th><span class='requiredMark'>掲載開始日</span></th>
                     <td>
                         <a class="ef" id="WF_FROMYMD" ondblclick="Field_DBclick('WF_FROMYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                             <asp:TextBox ID="txtFromYmd" CssClass="calendarIcon" runat="server"></asp:TextBox>
                         </a>
                     </td>
-                    <th>掲載終了日</th>
+                    <th><span class='requiredMark'>掲載終了日</span></th>
                     <td>
                         <a class="ef"  id="WF_ENDYMD"  ondblclick="Field_DBclick('WF_ENDYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                             <asp:TextBox ID="txtEndYmd" CssClass="calendarIcon" runat="server"></asp:TextBox>
@@ -62,7 +62,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>タイトル</th>
+                    <th><span class='requiredMark'>タイトル</span></th>
                     <td colspan="3"><asp:TextBox ID="txtTitle" runat="server"></asp:TextBox></td>
                 </tr>
                 <tr>

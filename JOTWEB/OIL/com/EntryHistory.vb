@@ -432,4 +432,81 @@ Public Class EntryHistory
 
     End Sub
 
+    ''' <summary>
+    ''' OT空回日報履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon">接続オブジェクト</param>
+    ''' <param name="sqlTran">トランザクションオブジェクト(トランザクションを利用しない場合はNothing指定)</param>
+    ''' <param name="drOrder">履歴用の受注テーブル行オブジェクト</param>
+    ''' <remarks>通常のOT空回日報受信テーブルに「履歴番号」と「画面ID」(呼出し側のMe.Title）
+    ''' フィールドを追加したデータ行オブジェクト</remarks>
+    Public Shared Sub InsertOTNippouHistory(sqlCon As SqlConnection, sqlTran As SqlTransaction, drOrder As DataRow)
+        '◯OT空回日報TBL
+        Dim sqlOTNippouStat As New StringBuilder
+        sqlOTNippouStat.AppendLine("INSERT INTO OIL.HIS0005_OTNIPPOU")
+        sqlOTNippouStat.AppendLine("   (DATERECEIVEYMD,COMPANYNAME,TCODE,STATIONNAME,STATIONCODE,OFFICENAME,OFFICECODE,")
+        sqlOTNippouStat.AppendLine("    TRAINNO,LODDATE,DEPDATE,ARRDATE,ACCDATE,TANKCOUNT,SHIPPERSNAME,SHIPPERSCODE,")
+        sqlOTNippouStat.AppendLine("    ARRSTATIONNAME,ARRSTATIONCODE,OILCOUNT,OTOILNAME,OTOILCODE,TANKNUMBER,PREOILNAME,")
+        sqlOTNippouStat.AppendLine("    RANKING,INSPECTIONDATE,RETUNEDATE,RETRAINNO,JOINTNAME,JOINTCODE,WARIATE,KIJI,BIKOU,")
+        sqlOTNippouStat.AppendLine("    MAINOFFICE,RECEIVECOUNT,LASTRECEIVEYMD,DELFLG,INITYMD,INITUSER,INITTERMID,")
+        sqlOTNippouStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
+        sqlOTNippouStat.AppendLine("    VALUES")
+        sqlOTNippouStat.AppendLine("   (@DATERECEIVEYMD,@COMPANYNAME,@TCODE,@STATIONNAME,@STATIONCODE,@OFFICENAME,@OFFICECODE,")
+        sqlOTNippouStat.AppendLine("    @TRAINNO,@LODDATE,@DEPDATE,@ARRDATE,@ACCDATE,@TANKCOUNT,@SHIPPERSNAME,@SHIPPERSCODE,")
+        sqlOTNippouStat.AppendLine("    @ARRSTATIONNAME,@ARRSTATIONCODE,@OILCOUNT,@OTOILNAME,@OTOILCODE,@TANKNUMBER,@PREOILNAME,")
+        sqlOTNippouStat.AppendLine("    @RANKING,@INSPECTIONDATE,@RETUNEDATE,@RETRAINNO,@JOINTNAME,@JOINTCODE,@WARIATE,@KIJI,@BIKOU,")
+        sqlOTNippouStat.AppendLine("    @MAINOFFICE,@RECEIVECOUNT,@LASTRECEIVEYMD,@DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
+        sqlOTNippouStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
+
+        Using sqlOTNippouCmd As New SqlCommand(sqlOTNippouStat.ToString, sqlCon, sqlTran)
+            With sqlOTNippouCmd.Parameters
+                .Add("DATERECEIVEYMD", SqlDbType.DateTime).Value = drOrder("DATERECEIVEYMD")
+                .Add("COMPANYNAME", SqlDbType.NVarChar).Value = drOrder("COMPANYNAME")
+                .Add("TCODE", SqlDbType.NVarChar).Value = drOrder("TCODE")
+                .Add("STATIONNAME", SqlDbType.NVarChar).Value = drOrder("STATIONNAME")
+                .Add("STATIONCODE", SqlDbType.NVarChar).Value = drOrder("STATIONCODE")
+                .Add("OFFICENAME", SqlDbType.NVarChar).Value = drOrder("OFFICENAME")
+                .Add("OFFICECODE", SqlDbType.NVarChar).Value = drOrder("OFFICECODE")
+                .Add("TRAINNO", SqlDbType.NVarChar).Value = drOrder("TRAINNO")
+                .Add("LODDATE", SqlDbType.NVarChar).Value = drOrder("LODDATE")
+                .Add("DEPDATE", SqlDbType.NVarChar).Value = drOrder("DEPDATE")
+                .Add("ARRDATE", SqlDbType.NVarChar).Value = drOrder("ARRDATE")
+                .Add("ACCDATE", SqlDbType.NVarChar).Value = drOrder("ACCDATE")
+                .Add("TANKCOUNT", SqlDbType.NVarChar).Value = drOrder("TANKCOUNT")
+                .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")
+                .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
+                .Add("ARRSTATIONNAME", SqlDbType.NVarChar).Value = drOrder("ARRSTATIONNAME")
+                .Add("ARRSTATIONCODE", SqlDbType.NVarChar).Value = drOrder("ARRSTATIONCODE")
+                .Add("OILCOUNT", SqlDbType.NVarChar).Value = drOrder("OILCOUNT")
+                .Add("OTOILNAME", SqlDbType.NVarChar).Value = drOrder("OTOILNAME")
+                .Add("OTOILCODE", SqlDbType.NVarChar).Value = drOrder("OTOILCODE")
+                .Add("TANKNUMBER", SqlDbType.NVarChar).Value = drOrder("TANKNUMBER")
+                .Add("PREOILNAME", SqlDbType.NVarChar).Value = drOrder("PREOILNAME")
+                .Add("RANKING", SqlDbType.NVarChar).Value = drOrder("RANKING")
+                .Add("INSPECTIONDATE", SqlDbType.NVarChar).Value = drOrder("INSPECTIONDATE")
+                .Add("RETUNEDATE", SqlDbType.NVarChar).Value = drOrder("RETUNEDATE")
+                .Add("RETRAINNO", SqlDbType.NVarChar).Value = drOrder("RETRAINNO")
+                .Add("JOINTNAME", SqlDbType.NVarChar).Value = drOrder("JOINTNAME")
+                .Add("JOINTCODE", SqlDbType.NVarChar).Value = drOrder("JOINTCODE")
+                .Add("WARIATE", SqlDbType.NVarChar).Value = drOrder("WARIATE")
+                .Add("KIJI", SqlDbType.NVarChar).Value = drOrder("KIJI")
+                .Add("BIKOU", SqlDbType.NVarChar).Value = drOrder("BIKOU")
+                .Add("MAINOFFICE", SqlDbType.NVarChar).Value = drOrder("MAINOFFICE")
+                .Add("RECEIVECOUNT", SqlDbType.Int).Value = drOrder("RECEIVECOUNT")
+                .Add("LASTRECEIVEYMD", SqlDbType.DateTime).Value = drOrder("LASTRECEIVEYMD")
+                .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
+                .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
+                .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
+                .Add("INITTERMID", SqlDbType.NVarChar).Value = drOrder("INITTERMID")
+                .Add("UPDYMD", SqlDbType.DateTime).Value = drOrder("UPDYMD")
+                .Add("UPDUSER", SqlDbType.NVarChar).Value = drOrder("UPDUSER")
+                .Add("UPDTERMID", SqlDbType.NVarChar).Value = drOrder("UPDTERMID")
+                .Add("RECEIVEYMD", SqlDbType.DateTime).Value = drOrder("RECEIVEYMD")
+            End With
+            sqlOTNippouCmd.CommandTimeout = 300
+            sqlOTNippouCmd.ExecuteNonQuery()
+        End Using
+
+    End Sub
+
 End Class

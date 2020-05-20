@@ -137,6 +137,9 @@ Public Class M00001MENU
                 Dim guidanceDt As DataTable = GetGuidanceData(SQLcon)
                 Me.repGuidance.DataSource = guidanceDt
                 Me.repGuidance.DataBind()
+                If guidanceDt.Rows.Count = 0 Then
+                    guidanceArea.Visible = False
+                End If
             Catch ex As Exception
             End Try
 
@@ -212,6 +215,16 @@ Public Class M00001MENU
             sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
             sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
             sqlStat.AppendLine("   AND OUTFLG <> '1'")
+            Dim userOrg = Master.USER_ORG
+            If Not {"jot_oil_1", "jot_sys_1"}.Contains(CS0050Session.VIEW_MENU_MODE) Then
+                Dim targetDispFlags = OIM0020WRKINC.GetNewDisplayFlags
+                Dim showDispFlag = (From flg In targetDispFlags Where flg.OfficeCode = userOrg Select flg.FieldName).FirstOrDefault
+                If showDispFlag <> "" Then
+                    sqlStat.AppendFormat("   AND {0} = '1'", showDispFlag).AppendLine()
+                Else
+                    sqlStat.AppendLine("   AND 1 = 2")
+                End If
+            End If
             sqlStat.AppendLine(" ORDER BY (CASE WHEN GD.TYPE = 'E' THEN '1'")
             sqlStat.AppendLine("                WHEN GD.TYPE = 'W' THEN '2'")
             sqlStat.AppendLine("                WHEN GD.TYPE = 'I' THEN '3'")

@@ -40,22 +40,22 @@ Public Class OIM0020GuidanceCreate
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
 
                     Select Case WF_ButtonClick.Value
-                    '    Case "WF_UPDATE"                '表更新ボタン押下
-                        '        WF_UPDATE_Click()
+                        Case "WF_UPDATE"                '表更新ボタン押下
+                            WF_UPDATE_Click()
                         Case "WF_CLEAR"                 'クリアボタン押下
                             WF_CLEAR_Click()
                         Case "WF_DELETE"
                             WF_DELETE_Click()
-                            '    Case "WF_Field_DBClick"         'フィールドダブルクリック
-                            '        WF_FIELD_DBClick()
-                            '    Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
-                            '        WF_FIELD_Change()
-                            '    Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
-                            '    WF_ButtonSel_Click()
-                            'Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
-                            '    WF_ButtonCan_Click()
-                            'Case "WF_ListboxDBclick"        '左ボックスダブルクリック
-                            '    WF_ButtonSel_Click()
+                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                            WF_FIELD_DBClick()
+                        'Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                        '    WF_FIELD_Change()
+                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                            WF_ButtonSel_Click()
+                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                             'Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             '    WF_RadioButton_Click()
                             'Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -177,38 +177,39 @@ Public Class OIM0020GuidanceCreate
 
 
         Dim sqlStat As New StringBuilder
-            sqlStat.AppendLine("SELECT ")
-            sqlStat.AppendLine("        MG.GUIDANCENO")
-            sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.FROMYMD, 'yyyy/MM/dd'), NULL) AS FROMYMD")
-            sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.ENDYMD,  'yyyy/MM/dd'), NULL) AS ENDYMD")
-            sqlStat.AppendLine("       ,MG.TYPE")
-            sqlStat.AppendLine("       ,MG.TITTLE")
-            sqlStat.AppendLine("       ,MG.OUTFLG")
-            sqlStat.AppendLine("       ,MG.INFLG1")
-            sqlStat.AppendLine("       ,MG.INFLG2")
-            sqlStat.AppendLine("       ,MG.INFLG3")
-            sqlStat.AppendLine("       ,MG.INFLG4")
-            sqlStat.AppendLine("       ,MG.INFLG5")
-            sqlStat.AppendLine("       ,MG.INFLG6")
-            sqlStat.AppendLine("       ,MG.INFLG7")
-            sqlStat.AppendLine("       ,MG.INFLG8")
-            sqlStat.AppendLine("       ,MG.INFLG9")
-            sqlStat.AppendLine("       ,MG.INFLG10")
-            sqlStat.AppendLine("       ,MG.INFLG11")
+        sqlStat.AppendLine("SELECT ")
+        sqlStat.AppendLine("        MG.GUIDANCENO")
+        sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.FROMYMD, 'yyyy/MM/dd'), NULL) AS FROMYMD")
+        sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.ENDYMD,  'yyyy/MM/dd'), NULL) AS ENDYMD")
+        sqlStat.AppendLine("       ,MG.TYPE")
+        sqlStat.AppendLine("       ,MG.TITTLE")
+        sqlStat.AppendLine("       ,MG.OUTFLG")
+        sqlStat.AppendLine("       ,MG.INFLG1")
+        sqlStat.AppendLine("       ,MG.INFLG2")
+        sqlStat.AppendLine("       ,MG.INFLG3")
+        sqlStat.AppendLine("       ,MG.INFLG4")
+        sqlStat.AppendLine("       ,MG.INFLG5")
+        sqlStat.AppendLine("       ,MG.INFLG6")
+        sqlStat.AppendLine("       ,MG.INFLG7")
+        sqlStat.AppendLine("       ,MG.INFLG8")
+        sqlStat.AppendLine("       ,MG.INFLG9")
+        sqlStat.AppendLine("       ,MG.INFLG10")
+        sqlStat.AppendLine("       ,MG.INFLG11")
 
-            sqlStat.AppendLine("       ,MG.NAIYOU")
-            sqlStat.AppendLine("       ,MG.FAILE1")
-            sqlStat.AppendLine("       ,MG.FAILE2")
-            sqlStat.AppendLine("       ,MG.FAILE3")
-            sqlStat.AppendLine("       ,MG.FAILE4")
-            sqlStat.AppendLine("       ,MG.FAILE5")
+        sqlStat.AppendLine("       ,MG.NAIYOU")
+        sqlStat.AppendLine("       ,MG.FAILE1")
+        sqlStat.AppendLine("       ,MG.FAILE2")
+        sqlStat.AppendLine("       ,MG.FAILE3")
+        sqlStat.AppendLine("       ,MG.FAILE4")
+        sqlStat.AppendLine("       ,MG.FAILE5")
         sqlStat.AppendLine("       ,format(MG.INITYMD,'yyyy/MM/dd HH:mm')    AS INITYMD")
         sqlStat.AppendLine("       ,format(MG.UPDYMD ,'yyyy/MM/dd HH:mm:ss.fff')    AS UPDYMD")
-            sqlStat.AppendLine("  FROM OIL.OIM0020_GUIDANCE MG")
+        sqlStat.AppendLine("  FROM OIL.OIM0020_GUIDANCE MG")
         sqlStat.AppendLine(" WHERE MG.GUIDANCENO = @GUIDANCENO")
         Using sqlCon As SqlConnection = CS0050SESSION.getConnection,
               sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
             sqlCon.Open()
+            sqlCmd.CommandTimeout = 300
             sqlCmd.Parameters.Add("@GUIDANCENO", SqlDbType.NVarChar).Value = guidanceNo
 
             Using SQLdr As SqlDataReader = sqlCmd.ExecuteReader()
@@ -253,6 +254,294 @@ Public Class OIM0020GuidanceCreate
         Return retVal
     End Function
     ''' <summary>
+    ''' 入力チェック
+    ''' </summary>
+    ''' <param name="dispVal"></param>
+    ''' <returns></returns>
+    Protected Function INPCheck(dispVal As OIM0020WRKINC.GuidanceItemClass) As PropMes
+        Dim retMes As New PropMes With {.MessageNo = C_MESSAGE_NO.NORMAL}
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "FROMYMD", dispVal.FromYmd, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            retMes.MessageNo = WW_CS0024FCHECKERR
+            retMes.Pram01 = "掲載開始日"
+            Me.txtFromYmd.Focus()
+            Return retMes
+        End If
+
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENDYMD", dispVal.EndYmd, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            retMes.MessageNo = WW_CS0024FCHECKERR
+            retMes.Pram01 = "掲載終了日"
+            Me.txtFromYmd.Focus()
+            Return retMes
+        End If
+        Dim fromDtm As Date = CDate(dispVal.FromYmd)
+        Dim toDtm As Date = CDate(dispVal.EndYmd)
+        If fromDtm > toDtm Then
+            retMes.MessageNo = C_MESSAGE_NO.START_END_RELATION_ERROR
+            retMes.Pram01 = ""
+            Me.txtEndYmd.Focus()
+            Return retMes
+        End If
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TYPE", dispVal.Type, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            retMes.MessageNo = WW_CS0024FCHECKERR
+            retMes.Pram01 = "種類"
+            Return retMes
+        End If
+
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TITTLE", dispVal.Title, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            retMes.MessageNo = WW_CS0024FCHECKERR
+            retMes.Pram01 = "タイトル"
+            Me.txtTitle.Focus()
+            Return retMes
+        End If
+
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "NAIYO", dispVal.Naiyo, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        If Not isNormal(WW_CS0024FCHECKERR) Then
+            retMes.MessageNo = WW_CS0024FCHECKERR
+            retMes.Pram01 = "内容"
+            Me.txtNaiyou.Focus()
+            Return retMes
+        End If
+
+        For Each fileItm In dispVal.Attachments
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "FAILE", fileItm.FileName, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If Not isNormal(WW_CS0024FCHECKERR) Then
+                retMes.MessageNo = WW_CS0024FCHECKERR
+                retMes.Pram01 = String.Format("ファイル名({0})", fileItm.FileName)
+                Return retMes
+            End If
+        Next
+
+        Return retMes
+    End Function
+    ''' <summary>
+    ''' ガイダンステーブル更新処理
+    ''' </summary>
+    ''' <param name="dispVal"></param>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <returns></returns>
+    Private Function UpdateGuidance(dispVal As OIM0020WRKINC.GuidanceItemClass, sqlCon As SqlConnection, sqlTran As SqlTransaction) As PropMes
+        Dim retMes As New PropMes With {.MessageNo = C_MESSAGE_NO.NORMAL}
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("UPDATE OIL.OIM0020_GUIDANCE")
+        sqlStat.AppendLine("   SET FROMYMD    = @FROMYMD")
+        sqlStat.AppendLine("      ,ENDYMD     = @ENDYMD")
+        sqlStat.AppendLine("      ,TYPE       = @TYPE")
+        sqlStat.AppendLine("      ,TITTLE     = @TITTLE")
+        sqlStat.AppendLine("      ,OUTFLG     = @OUTFLG")
+        sqlStat.AppendLine("      ,INFLG1     = @INFLG1")
+        sqlStat.AppendLine("      ,INFLG2     = @INFLG2")
+        sqlStat.AppendLine("      ,INFLG3     = @INFLG3")
+        sqlStat.AppendLine("      ,INFLG4     = @INFLG4")
+        sqlStat.AppendLine("      ,INFLG5     = @INFLG5")
+        sqlStat.AppendLine("      ,INFLG6     = @INFLG6")
+        sqlStat.AppendLine("      ,INFLG7     = @INFLG7")
+        sqlStat.AppendLine("      ,INFLG8     = @INFLG8")
+        sqlStat.AppendLine("      ,INFLG9     = @INFLG9")
+        sqlStat.AppendLine("      ,INFLG10    = @INFLG10")
+        sqlStat.AppendLine("      ,INFLG11    = @INFLG11")
+        sqlStat.AppendLine("      ,NAIYOU     = @NAIYOU")
+        sqlStat.AppendLine("      ,FAILE1     = @FAILE1")
+        sqlStat.AppendLine("      ,FAILE2     = @FAILE2")
+        sqlStat.AppendLine("      ,FAILE3     = @FAILE3")
+        sqlStat.AppendLine("      ,FAILE4     = @FAILE4")
+        sqlStat.AppendLine("      ,FAILE5     = @FAILE5")
+        sqlStat.AppendLine("      ,UPDYMD     = @UPDYMD")
+        sqlStat.AppendLine("      ,UPDUSER    = @UPDUSER")
+        sqlStat.AppendLine("      ,UPDTERMID  = @UPDTERMID")
+        sqlStat.AppendLine("      ,RECEIVEYMD = @RECEIVEYMD")
+        sqlStat.AppendLine(" WHERE GUIDANCENO = @GUIDANCENO")
+
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            sqlCmd.CommandTimeout = 300
+            With sqlCmd.Parameters
+
+                .Add("@GUIDANCENO", SqlDbType.NVarChar).Value = dispVal.GuidanceNo
+
+                .Add("@FROMYMD", SqlDbType.Date).Value = dispVal.FromYmd
+                .Add("@ENDYMD", SqlDbType.Date).Value = dispVal.EndYmd
+                .Add("@TYPE", SqlDbType.NVarChar).Value = dispVal.Type
+                .Add("@TITTLE", SqlDbType.NVarChar).Value = dispVal.Title
+                .Add("@NAIYOU", SqlDbType.NVarChar).Value = dispVal.Naiyo
+                For Each flagFiels In {"OUTFLG", "INFLG1", "INFLG2", "INFLG3", "INFLG4", "INFLG5",
+                                       "INFLG6", "INFLG7", "INFLG8", "INFLG9", "INFLG10", "INFLG11"}
+                    Dim findFlag = From flagitm In dispVal.DispFlags Where flagitm.FieldName = flagFiels AndAlso flagitm.Checked
+                    If findFlag.Any Then
+                        .Add("@" & flagFiels, SqlDbType.NVarChar).Value = "1"
+                    Else
+                        .Add("@" & flagFiels, SqlDbType.NVarChar).Value = "0"
+                    End If
+                Next
+                Dim fileNo As Integer = 0
+                For Each attachItm In dispVal.Attachments
+                    If fileNo >= 5 Then
+                        Exit For
+                    End If
+                    fileNo = fileNo + 1
+                    .Add(String.Format("@FAILE{0}", fileNo), SqlDbType.NVarChar).Value = attachItm.FileName
+                Next
+
+                If fileNo < 5 Then
+                    fileNo = fileNo + 1
+                    For i = fileNo To 5
+                        .Add(String.Format("@FAILE{0}", i), SqlDbType.NVarChar).Value = ""
+                    Next
+                End If
+                .Add("@UPDYMD", SqlDbType.DateTime).Value = Now.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+                .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
+                .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = CONST_DEFAULT_RECEIVEYMD
+            End With
+            sqlCmd.ExecuteNonQuery()
+        End Using
+
+        Return retMes
+    End Function
+    ''' <summary>
+    ''' ガイダンステーブル追加処理
+    ''' </summary>
+    ''' <param name="dispVal"></param>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <returns></returns>
+    Private Function InsertGuidance(dispVal As OIM0020WRKINC.GuidanceItemClass, sqlCon As SqlConnection, sqlTran As SqlTransaction, ByRef newGuidanceNo As String, ByRef entDtm As String) As PropMes
+        Dim retMes As New PropMes With {.MessageNo = C_MESSAGE_NO.NORMAL}
+        '新ガイダンス番号の取得
+        Dim newGdWork As String = ""
+        Dim dateYmd As String = Now.ToString("yyyyMMdd")
+        Dim sqlGetNgd As New StringBuilder
+        sqlGetNgd.AppendLine("SELECT @YMD + FORMAT(ISNULL(MAX(CONVERT(int,REPLACE(GD.GUIDANCENO,@YMD,''))),0) + 1,'0000') NGD")
+        sqlGetNgd.AppendLine("  FROM OIL.OIM0020_GUIDANCE GD")
+        sqlGetNgd.AppendLine(" WHERE GD.GUIDANCENO LIKE @YMD + '%'")
+        Using sqlCmd As New SqlCommand(sqlGetNgd.ToString, sqlCon, sqlTran)
+            sqlCmd.Parameters.Add("@YMD", SqlDbType.NVarChar).Value = dateYmd
+            newGdWork = Convert.ToString(sqlCmd.ExecuteScalar())
+        End Using
+        'インサート処理実行
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("INSERT INTO OIL.OIM0020_GUIDANCE (")
+        sqlStat.AppendLine("     GUIDANCENO")
+        sqlStat.AppendLine("    ,FROMYMD")
+        sqlStat.AppendLine("    ,ENDYMD")
+        sqlStat.AppendLine("    ,TYPE")
+        sqlStat.AppendLine("    ,TITTLE")
+        sqlStat.AppendLine("    ,OUTFLG")
+        sqlStat.AppendLine("    ,INFLG1")
+        sqlStat.AppendLine("    ,INFLG2")
+        sqlStat.AppendLine("    ,INFLG3")
+        sqlStat.AppendLine("    ,INFLG4")
+        sqlStat.AppendLine("    ,INFLG5")
+        sqlStat.AppendLine("    ,INFLG6")
+        sqlStat.AppendLine("    ,INFLG7")
+        sqlStat.AppendLine("    ,INFLG8")
+        sqlStat.AppendLine("    ,INFLG9")
+        sqlStat.AppendLine("    ,INFLG10")
+        sqlStat.AppendLine("    ,INFLG11")
+        sqlStat.AppendLine("    ,NAIYOU")
+        sqlStat.AppendLine("    ,FAILE1")
+        sqlStat.AppendLine("    ,FAILE2")
+        sqlStat.AppendLine("    ,FAILE3")
+        sqlStat.AppendLine("    ,FAILE4")
+        sqlStat.AppendLine("    ,FAILE5")
+        sqlStat.AppendLine("    ,DELFLG")
+        sqlStat.AppendLine("    ,INITYMD")
+        sqlStat.AppendLine("    ,INITUSER")
+        sqlStat.AppendLine("    ,INITTERMID")
+        sqlStat.AppendLine("    ,UPDYMD")
+        sqlStat.AppendLine("    ,UPDUSER")
+        sqlStat.AppendLine("    ,UPDTERMID")
+        sqlStat.AppendLine("    ,RECEIVEYMD")
+        sqlStat.AppendLine(" ) VALUES (")
+        sqlStat.AppendLine("     @GUIDANCENO")
+        sqlStat.AppendLine("    ,@FROMYMD")
+        sqlStat.AppendLine("    ,@ENDYMD")
+        sqlStat.AppendLine("    ,@TYPE")
+        sqlStat.AppendLine("    ,@TITTLE")
+        sqlStat.AppendLine("    ,@OUTFLG")
+        sqlStat.AppendLine("    ,@INFLG1")
+        sqlStat.AppendLine("    ,@INFLG2")
+        sqlStat.AppendLine("    ,@INFLG3")
+        sqlStat.AppendLine("    ,@INFLG4")
+        sqlStat.AppendLine("    ,@INFLG5")
+        sqlStat.AppendLine("    ,@INFLG6")
+        sqlStat.AppendLine("    ,@INFLG7")
+        sqlStat.AppendLine("    ,@INFLG8")
+        sqlStat.AppendLine("    ,@INFLG9")
+        sqlStat.AppendLine("    ,@INFLG10")
+        sqlStat.AppendLine("    ,@INFLG11")
+        sqlStat.AppendLine("    ,@NAIYOU")
+        sqlStat.AppendLine("    ,@FAILE1")
+        sqlStat.AppendLine("    ,@FAILE2")
+        sqlStat.AppendLine("    ,@FAILE3")
+        sqlStat.AppendLine("    ,@FAILE4")
+        sqlStat.AppendLine("    ,@FAILE5")
+        sqlStat.AppendLine("    ,@DELFLG")
+        sqlStat.AppendLine("    ,@INITYMD")
+        sqlStat.AppendLine("    ,@INITUSER")
+        sqlStat.AppendLine("    ,@INITTERMID")
+        sqlStat.AppendLine("    ,@UPDYMD")
+        sqlStat.AppendLine("    ,@UPDUSER")
+        sqlStat.AppendLine("    ,@UPDTERMID")
+        sqlStat.AppendLine("    ,@RECEIVEYMD")
+        sqlStat.AppendLine(" )")
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            sqlCmd.CommandTimeout = 300
+            With sqlCmd.Parameters
+                .Add("@GUIDANCENO", SqlDbType.NVarChar).Value = newGdWork
+
+                .Add("@FROMYMD", SqlDbType.Date).Value = dispVal.FromYmd
+                .Add("@ENDYMD", SqlDbType.Date).Value = dispVal.EndYmd
+                .Add("@TYPE", SqlDbType.NVarChar).Value = dispVal.Type
+                .Add("@TITTLE", SqlDbType.NVarChar).Value = dispVal.Title
+                .Add("@NAIYOU", SqlDbType.NVarChar).Value = dispVal.Naiyo
+                For Each flagFiels In {"OUTFLG", "INFLG1", "INFLG2", "INFLG3", "INFLG4", "INFLG5",
+                                       "INFLG6", "INFLG7", "INFLG8", "INFLG9", "INFLG10", "INFLG11"}
+                    Dim findFlag = From flagitm In dispVal.DispFlags Where flagitm.FieldName = flagFiels AndAlso flagitm.Checked
+                    If findFlag.Any Then
+                        .Add("@" & flagFiels, SqlDbType.NVarChar).Value = "1"
+                    Else
+                        .Add("@" & flagFiels, SqlDbType.NVarChar).Value = "0"
+                    End If
+                Next
+                Dim fileNo As Integer = 0
+                For Each attachItm In dispVal.Attachments
+                    If fileNo >= 5 Then
+                        Exit For
+                    End If
+                    fileNo = fileNo + 1
+                    .Add(String.Format("@FAILE{0}", fileNo), SqlDbType.NVarChar).Value = attachItm.FileName
+                Next
+
+                If fileNo < 5 Then
+                    fileNo = fileNo + 1
+                    For i = fileNo To 5
+                        .Add(String.Format("@FAILE{0}", i), SqlDbType.NVarChar).Value = ""
+                    Next
+                End If
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Dim entDate As String = Now.ToString("yyyy/MM/dd HH:mm:ss.FFF")
+                entDtm = entDate
+                .Add("@INITYMD", SqlDbType.DateTime).Value = entDate
+                .Add("@INITUSER", SqlDbType.NVarChar).Value = Master.USERID
+                .Add("@INITTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                .Add("@UPDYMD", SqlDbType.DateTime).Value = entDate
+                .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
+                .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = CONST_DEFAULT_RECEIVEYMD
+            End With
+            sqlCmd.ExecuteNonQuery()
+        End Using
+        newGuidanceNo = newGdWork
+        Return retMes
+    End Function
+    ''' <summary>
     ''' 新規ガイダンス情報の作成
     ''' </summary>
     ''' <returns></returns>
@@ -280,6 +569,77 @@ Public Class OIM0020GuidanceCreate
         Next
         Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "NAIYOU", retVal.Naiyo)
         Return retVal
+    End Function
+    ''' <summary>
+    ''' 更新ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_UPDATE_Click()
+        WF_FIELD.Value = ""
+        WF_FIELD_REP.Value = ""
+        WF_LeftboxOpen.Value = ""
+        '画面の値収集
+        Dim dispVal = CollectDispValue()
+        '入力チェック
+        Dim retMes = INPCheck(dispVal)
+        If retMes.MessageNo <> C_MESSAGE_NO.NORMAL Then
+            Master.Output(retMes.MessageNo, C_MESSAGE_TYPE.ERR, retMes.Pram01, needsPopUp:=True)
+            Return
+        End If
+        '登録処理
+        Dim newGuidanceNo As String = ""
+        Using sqlCon = CS0050SESSION.getConnection
+            sqlCon.Open()
+            Using sqlTrn = sqlCon.BeginTransaction
+                Dim workGuidance As String = ""
+                Dim entDtm As String = ""
+                If dispVal.GuidanceNo <> "" Then
+                    UpdateGuidance(dispVal, sqlCon, sqlTrn)
+                    workGuidance = dispVal.GuidanceNo
+                    entDtm = dispVal.InitYmd
+                Else
+                    InsertGuidance(dispVal, sqlCon, sqlTrn, newGuidanceNo, entDtm)
+                    workGuidance = newGuidanceNo
+                    entDtm = CDate(entDtm).ToString("yyyy/MM/dd HH:mm")
+                End If
+                'ジャーナル生成
+                SaveJournal(workGuidance, sqlCon, sqlTrn)
+                'ファイル移動
+                MoveAttachments(workGuidance, dispVal)
+                'トランザクションコミット
+                sqlTrn.Commit()
+                'ガイダンス番号転記
+                dispVal.GuidanceNo = workGuidance
+                dispVal.InitYmd = entDtm
+                ViewState("DISPVALUE") = dispVal
+                Me.lblGuidanceEntryDate.Text = entDtm
+                Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, retMes.Pram01, needsPopUp:=True)
+            End Using
+        End Using
+    End Sub
+    ''' <summary>
+    ''' 画面入力値収集
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function CollectDispValue() As OIM0020WRKINC.GuidanceItemClass
+        Dim dispVal = DirectCast(ViewState("DISPVALUE"), OIM0020WRKINC.GuidanceItemClass)
+        dispVal.FromYmd = Me.txtFromYmd.Text
+        dispVal.EndYmd = Me.txtEndYmd.Text
+        dispVal.Title = Me.txtTitle.Text
+        dispVal.Naiyo = Me.txtNaiyou.Text
+        If Me.rblType.SelectedItem IsNot Nothing Then
+            dispVal.Type = Me.rblType.SelectedValue
+        Else
+            dispVal.Type = ""
+        End If
+        For Each flag In dispVal.DispFlags
+            Dim chkObj = Me.chklFlags.Items.FindByValue(flag.FieldName)
+            If chkObj IsNot Nothing AndAlso chkObj.Selected Then
+                flag.Checked = True
+            Else
+                flag.Checked = False
+            End If
+        Next
+        Return dispVal
     End Function
     ''' <summary>
     ''' 戻るボタン押下時処理
@@ -325,6 +685,110 @@ Public Class OIM0020GuidanceCreate
         ViewState("DISPVALUE") = dispVal
         Return
     End Sub
+
+    ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.Parse(WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+            With leftview
+                Dim enumVal = DirectCast([Enum].ToObject(GetType(LIST_BOX_CLASSIFICATION), CInt(WF_LeftMViewChange.Value)), LIST_BOX_CLASSIFICATION)
+                If enumVal = LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        Case "WF_FROMYMD"
+                            .WF_Calendar.Text = txtFromYmd.Text
+                        Case "WF_ENDYMD"
+                            .WF_Calendar.Text = txtEndYmd.Text
+                    End Select
+                    .ActiveCalendar()
+                End If
+            End With
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' フィールドチェンジ時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_Change()
+
+    End Sub
+
+
+    ' ******************************************************************************
+    ' ***  LeftBox関連操作                                                       ***
+    ' ******************************************************************************
+
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "WF_FROMYMD"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                        txtFromYmd.Text = ""
+                    Else
+                        txtFromYmd.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                txtFromYmd.Focus()
+            Case "WF_ENDYMD"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < CDate(C_DEFAULT_YMD) Then
+                        txtEndYmd.Text = ""
+                    Else
+                        txtEndYmd.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                txtEndYmd.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+
+    End Sub
+
+
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
+
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "WF_FROMYMD"
+                txtFromYmd.Focus()
+            Case "WF_ENDYMD"
+                txtEndYmd.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+
+    End Sub
+
     ''' <summary>
     ''' チェックボックスデータバインド時イベント
     ''' </summary>
@@ -366,7 +830,8 @@ Public Class OIM0020GuidanceCreate
 
         If IO.Directory.Exists(guidanceDir) = True Then
             Dim fileNames = IO.Directory.GetFiles(guidanceDir)
-            For Each fileName In fileNames
+            For Each filePath In fileNames
+                Dim fileName As String = IO.Path.GetFileName(filePath)
                 If fileName = "" Then
                     Continue For
                 End If
@@ -380,11 +845,13 @@ Public Class OIM0020GuidanceCreate
                 If (From gitm In guidanceItem.Attachments Where gitm.FileName = fileName).Any = False Then
                     guidanceItem.Attachments.Add(New OIM0020WRKINC.FileItemClass With {.FileName = fileName})
                 End If
-            Next fileName
+            Next filePath
             'テーブルにあり実体がない場合は消去
             If fileNames IsNot Nothing OrElse fileNames.Count > 0 Then
+                Dim fileNameList = (From filItm In fileNames Select IO.Path.GetFileName(filItm)).ToList
                 For i = guidanceItem.Attachments.Count - 1 To 0 Step -1
-                    If fileNames.Contains(guidanceItem.Attachments(i).FileName) = False Then
+
+                    If fileNameList.Contains(guidanceItem.Attachments(i).FileName) = False Then
                         guidanceItem.Attachments.RemoveAt(i)
                     End If
                 Next
@@ -419,7 +886,7 @@ Public Class OIM0020GuidanceCreate
         End If
         'アップロードワークフォルダ
         Dim uploadWorkDir = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, "UPLOAD_TMP", CS0050SESSION.USERID)
-        If Not Directory.Exists(guidanceWorkDir) Then
+        If Not Directory.Exists(uploadWorkDir) Then
             Return retMes
         End If
         'アップロードしたファイルと現在画面にあるファイルをファイル名重複なしてマージ
@@ -454,6 +921,130 @@ Public Class OIM0020GuidanceCreate
         Me.repAttachments.DataBind()
         ViewState("DISPVALUE") = dispVal
         Return retMes
+    End Function
+    ''' <summary>
+    ''' ガイダンス作業フォルダから実体保存フォルダにコピー
+    ''' </summary>
+    ''' <param name="targetGuiganceNo">実際に移動するガイダンス番号、下の画面クラスには新規作成の場合振られていないのでこちらを利用</param>
+    ''' <param name="guidanceItem">画面情報クラス</param>
+    ''' <returns></returns>
+    Private Function MoveAttachments(targetGuiganceNo As String, guidanceItem As OIM0020WRKINC.GuidanceItemClass) As PropMes
+        Dim retMes = New PropMes With {.MessageNo = C_MESSAGE_NO.NORMAL}
+        'ガイダンス用作業フォルダ
+        Dim guidanceWorkDir As String = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, OIM0020WRKINC.GUIDANCEROOT, "USERWORKS", CS0050SESSION.USERID)
+        If Not Directory.Exists(guidanceWorkDir) Then
+            Directory.CreateDirectory(guidanceWorkDir)
+        End If
+        'ガイダンス実体保存フォルダ
+        Dim guidanceSaveDir = IO.Path.Combine(CS0050SESSION.UPLOAD_PATH, OIM0020WRKINC.GUIDANCEROOT, targetGuiganceNo)
+        If Not Directory.Exists(guidanceSaveDir) Then
+            Directory.CreateDirectory(guidanceSaveDir)
+        Else
+            '既保存ファイルを削除
+            For Each tempFile As String In Directory.GetFiles(guidanceSaveDir, "*.*")
+                ' ファイルパスからファイル名を取得
+                Try
+                    File.Delete(tempFile)
+                Catch ex As Exception
+                End Try
+            Next
+        End If
+        'ガイダンス添付ファイルを作業から実体フォルダにコピー
+        Dim uploadFiles = (From attItm In guidanceItem.Attachments).ToList
+
+        For Each uploadFile In uploadFiles
+            Dim targetFile As String = IO.Path.Combine(guidanceWorkDir, uploadFile.FileName)
+            Dim copyPath As String = IO.Path.Combine(guidanceSaveDir, uploadFile.FileName)
+            Try
+                System.IO.File.Copy(targetFile, copyPath, True)
+            Catch ex As Exception
+            End Try
+        Next
+
+        Return retMes
+    End Function
+    ''' <summary>
+    ''' ジャーナル保存
+    ''' </summary>
+    ''' <param name="guidanceNo"></param>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <returns></returns>
+    Function SaveJournal(guidanceNo As String, sqlCon As SqlConnection, sqlTran As SqlTransaction) As PropMes
+        Dim retMes = New PropMes With {.MessageNo = C_MESSAGE_NO.NORMAL}
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("SELECT ")
+        sqlStat.AppendLine("     GUIDANCENO")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(FROMYMD, '')) AS FROMYMD")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(ENDYMD, ''))  AS ENDYMD")
+        sqlStat.AppendLine("    ,isnull(TYPE,   '') AS TYPE")
+        sqlStat.AppendLine("    ,isnull(TITTLE, '') AS TITTLE")
+        sqlStat.AppendLine("    ,isnull(OUTFLG, '') AS OUTFLG")
+        sqlStat.AppendLine("    ,isnull(INFLG1, '') AS INFLG1")
+        sqlStat.AppendLine("    ,isnull(INFLG2, '') AS INFLG2")
+        sqlStat.AppendLine("    ,isnull(INFLG3, '') AS INFLG3")
+        sqlStat.AppendLine("    ,isnull(INFLG4, '') AS INFLG4")
+        sqlStat.AppendLine("    ,isnull(INFLG5, '') AS INFLG5")
+        sqlStat.AppendLine("    ,isnull(INFLG6, '') AS INFLG6")
+        sqlStat.AppendLine("    ,isnull(INFLG7, '') AS INFLG7")
+        sqlStat.AppendLine("    ,isnull(INFLG8, '') AS INFLG8")
+        sqlStat.AppendLine("    ,isnull(INFLG9, '') AS INFLG9")
+        sqlStat.AppendLine("    ,isnull(INFLG10,'') AS INFLG10")
+        sqlStat.AppendLine("    ,isnull(INFLG11,'') AS INFLG11")
+        sqlStat.AppendLine("    ,isnull(NAIYOU,'') AS NAIYOU")
+        sqlStat.AppendLine("    ,isnull(FAILE1,'') AS FAILE1")
+        sqlStat.AppendLine("    ,isnull(FAILE2,'') AS FAILE2")
+        sqlStat.AppendLine("    ,isnull(FAILE3,'') AS FAILE3")
+        sqlStat.AppendLine("    ,isnull(FAILE4,'') AS FAILE4")
+        sqlStat.AppendLine("    ,isnull(FAILE5,'') AS FAILE5")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(DELFLG,null))      AS DELFLG")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(INITYMD,null))     AS INITYMD")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(INITUSER,null))    AS INITUSER")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(INITTERMID,null))  AS INITTERMID")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(UPDYMD,null))      AS UPDYMD")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(UPDUSER,null))     AS UPDUSER")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(UPDTERMID,null))   AS UPDTERMID")
+        sqlStat.AppendLine("    ,convert(nvarchar,isnull(RECEIVEYMD,null))  AS RECEIVEYMD")
+        sqlStat.AppendLine("  FROM OIL.OIM0020_GUIDANCE WITH(nolock)")
+        sqlStat.AppendLine(" WHERE GUIDANCENO = @GUIDANCENO")
+        'トランザクションしない場合は「sqlCon.BeginTransaction」→「nothing」
+        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+            sqlCmd.CommandTimeout = 300
+            '固定パラメータ
+            With sqlCmd.Parameters
+                .Add("@GUIDANCENO", SqlDbType.NVarChar).Value = guidanceNo
+            End With
+            'ジャーナル用のデータ取得
+            Using journalDt As New DataTable,
+                  SQLdr As SqlDataReader = sqlCmd.ExecuteReader()
+                For index As Integer = 0 To SQLdr.FieldCount - 1
+                    journalDt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                Next
+
+                journalDt.Load(SQLdr)
+
+                CS0020JOURNAL.TABLENM = "OIM0020_GUIDANCE"
+                CS0020JOURNAL.ACTION = "UPDATE_INSERT"
+                CS0020JOURNAL.ROW = journalDt.Rows(0)
+                CS0020JOURNAL.CS0020JOURNAL()
+                If Not isNormal(CS0020JOURNAL.ERR) Then
+                    Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                    CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                    CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                    CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                    CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                    retMes.MessageNo = CS0020JOURNAL.ERR
+                    retMes.Pram01 = "CS0020JOURNAL JOURNAL"
+                    Return retMes
+                End If
+                journalDt.Clear()
+            End Using 'journalDt,journalDt
+        End Using 'tran,sqlCmd
+        Return retMes
+
     End Function
     ''' <summary>
     ''' ファイル情報クラス

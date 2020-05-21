@@ -23,6 +23,11 @@ function InitDisplay() {
     bindNumericKeyPressOnly(numInputBoxList);
     //提案表の合計イベントバインド
     bindSuggestSummary(suggestCol);
+    //油種表示非表示設定復元
+    if (IsPostBack === '0') {
+        loadOiltypeSelected();
+    }
+    //油種表示非表示イベントバインド
     bindDipsOiltypeStockList();
     document.forms[0].style.display = 'block'; //高速化対応 一旦非表示にしDOM追加ごとの再描画を抑止
     // 提案表、車両ロックのイベントバインド
@@ -170,6 +175,7 @@ function bindDipsOiltypeStockList() {
                 stockRowTitle.addEventListener('click', (function (oilcode, oilName, optIdx) {
                     return function () {
                         DipsOiltypeStockList(oilcode, oilName, optIdx);
+                        saveLocalCheckedOilType();
                     };
                 })(oilcode, oilName, optIdx), false);
             }
@@ -217,6 +223,7 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
                 DipsOiltypeStockList(oilcode, oilName, optIdx);
                 let removeObj = document.getElementById(divObjid);
                 removeObj.parentNode.removeChild(removeObj);
+                saveLocalCheckedOilType();
             };
         })(oilcode, oilName, optIdx, divObjid), false);
         divObj.style.order = optIdx + 1;
@@ -265,6 +272,64 @@ function DipsOiltypeStockList(oilcode, oilName, optIdx) {
         lastStockRow.classList.add('lastRow');
     }
 
+}
+//〇選択した油種をローカルストレージに保存
+function saveLocalCheckedOilType() {
+    let officeCodeObj = document.getElementById('WF_SEL_SALESOFFICECODE');
+    if (officeCodeObj === null) {
+        return;
+    }
+    let officeCodeOilTypeKey = 'OIT0004C_OILKEY_' + officeCodeObj.value;
+    let listDispObj = document.getElementById('lstDispStockOilType');
+    let opts = listDispObj.options;
+    let saveList = [];
+    // 未チェック（非表示）している油種を配列に移動
+    for (let i = 0; i < opts.length; i++) {
+        let optItm = opts[i];
+        let oilcode = optItm.value;
+        let oilName = optItm.text;
+        if (optItm.selected === false) {
+            saveList.push({code: oilcode, value: oilName });
+        }
+    }
+    // 選択しているリストに応じ処理分岐
+    if (saveList.length === 0) {
+        // 選択していない場合は値を全削除
+        localStorage.removeItem(officeCodeOilTypeKey);
+    } else {
+        // チェックしている値のみ保存
+        let saveValue = JSON.stringify(saveList); // 配列を文字列化
+        localStorage.setItem(officeCodeOilTypeKey, saveValue); // 保存
+    }
+}
+//〇ローカルストレージに保存された選択油種を復元 
+function loadOiltypeSelected() {
+    let officeCodeObj = document.getElementById('WF_SEL_SALESOFFICECODE');
+    if (officeCodeObj === null) {
+        return;
+    }
+    let officeCodeOilTypeKey = 'OIT0004C_OILKEY_' + officeCodeObj.value;
+    let jsonString = localStorage.getItem(officeCodeOilTypeKey);
+    if (jsonString === null) {
+        return;
+    }
+    if (jsonString === '') {
+        return;
+    }
+    let selectedList = JSON.parse(jsonString);
+    let listDispObj = document.getElementById('lstDispStockOilType');
+    let opts = listDispObj.options;
+    for (let i = 0; i < opts.length; i++) {
+        let optItm = opts[i];
+        let oilcode = optItm.value;
+        let oilName = optItm.text;
+        for (let j = 0; j < selectedList.length; j++) {
+            if (selectedList[j].code === oilcode) {
+                optItm.selected = false;
+                break;
+            }
+        }
+    }
 }
 //〇ローリー表示非表示イベントバインド
 function bindDispLorry() {

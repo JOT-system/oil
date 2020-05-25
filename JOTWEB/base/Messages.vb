@@ -587,6 +587,16 @@ Public Module Messages
         ''' 添付ファイル最大数超えメッセージ
         ''' </summary>
         Public Const OIL_ATTACHMENT_COUNTOVER As String = "20048"
+        ''' <summary>
+        ''' タンク車状態未到着エラー
+        ''' </summary>
+        Public Const OIL_TANKSTATUS_ERROR As String = "20049"
+
+        ''' <summary>
+        ''' 油種数登録ボタン未使用(新規登録時(受注割当時)において)
+        ''' </summary>
+        Public Const OIL_OILREGISTER_ORDER_NOTUSE As String = "20050"
+
 #End Region
 
 

@@ -219,6 +219,7 @@ a[id^="Menu_"] input[type=submit] {
     padding: 5px;
     padding-top: 2px;
     padding-bottom: 2px;
+    vertical-align :top;
 }
 div.showGuidance a[id^="Menu_"] {
     height: calc(50% - 50px);

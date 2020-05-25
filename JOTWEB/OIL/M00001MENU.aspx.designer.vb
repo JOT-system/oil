@@ -14,6 +14,15 @@ Option Explicit On
 Partial Public Class M00001MENU
     
     '''<summary>
+    '''guidanceArea コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents guidanceArea As Global.System.Web.UI.HtmlControls.HtmlAnchor
+    
+    '''<summary>
     '''repGuidance コントロール。
     '''</summary>
     '''<remarks>

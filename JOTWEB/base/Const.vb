@@ -377,6 +377,10 @@ Public Module BaseDllConst
     ''' 発送順重複
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_100 As String = "100"
+    ''' <summary>
+    ''' タンク車状態未到着
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_101 As String = "101"
 
     ''' <summary>
     ''' 失注（荷主都合）

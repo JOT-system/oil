@@ -655,7 +655,7 @@ Public Class M00000LOGON
                         dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
                         dr("TYPE") = sqlGuidDr("TYPE")
                         dr("TITTLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITTLE")))
-                        dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU")))
+                        dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU"))).Replace(ControlChars.CrLf, "<br />").Replace(ControlChars.Cr, "<br />").Replace(ControlChars.Lf, "<br />")
                         dr("FAILE1") = Convert.ToString(sqlGuidDr("FAILE1"))
 
                         retDt.Rows.Add(dr)

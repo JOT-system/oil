@@ -402,6 +402,7 @@ Public Class OIT0003OrderDetail
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""
         WF_RightboxOpen.Value = ""
+        WF_ButtonInsertFLG.Value = "FALSE"
         rightview.ResetIndex()
         leftview.ActiveListBox()
 
@@ -3135,12 +3136,12 @@ Public Class OIT0003OrderDetail
             Master.Output(C_MESSAGE_NO.OIL_OILTANK_INPUT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Me.TxtHTank_w.Focus()
 
-            ''〇 油種数登録ボタンのチェックを無効(False)
-            'WF_ButtonInsertFLG.Value = "FALSE"
+            '〇 油種数登録ボタンのチェックを無効(False)
+            WF_ButtonInsertFLG.Value = "FALSE"
 
         Else
-            ''〇 油種数登録ボタンのチェックを有効(True)
-            'WF_ButtonInsertFLG.Value = "TRUE"
+            '〇 油種数登録ボタンのチェックを有効(True)
+            WF_ButtonInsertFLG.Value = "TRUE"
 
         End If
         '### 20200512-END   ######################################################
@@ -4549,6 +4550,14 @@ Public Class OIT0003OrderDetail
         rightview.SetErrorReport("")
 
         Dim WW_RESULT As String = ""
+
+        '〇新規登録時で油種数登録ボタンを押下しているかチェック
+        If work.WF_SEL_CREATEFLG.Text = "1" _
+            AndAlso WF_ButtonInsertFLG.Value = "FALSE" Then
+
+            Master.Output(C_MESSAGE_NO.OIL_OILREGISTER_ORDER_NOTUSE, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
 
         '○ 関連チェック
         WW_Check(WW_ERRCODE)

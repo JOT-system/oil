@@ -1085,6 +1085,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents hdnDispHeaderItems As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''WF_ButtonInsertFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonInsertFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

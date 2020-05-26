@@ -53,7 +53,8 @@ function getDispGuigance() {
             flg = '1';
         }
     } else {
-        localStorage.setItem('menu0001GuidanceSetDate', dtm);
+        flg = '1';
+        localStorage.setItem('menu0001GuidanceSetDate', currentDtm);
         localStorage.setItem("menu0001GuidanceFlag", flg);
     }
     return flg;

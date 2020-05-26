@@ -451,6 +451,9 @@
             <asp:ListBox ID="lstDispStockOilType" runat="server" SelectionMode="Multiple"></asp:ListBox>
             <!-- ローリー表示・非表示状態保持用 full or hideLorry -->
             <asp:HiddenField ID="hdnDispLorry" runat="server" Value="full" />
+            <!-- 油槽所変更値保持用 -->
+            <asp:HiddenField ID="hdnChgConsignee" runat="server" />
+            <asp:HiddenField ID="hdnChgConsigneeName" runat="server" />
             <!-- 権限 -->
         </div>
  

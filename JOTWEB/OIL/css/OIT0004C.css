@@ -54,6 +54,13 @@
 #divSuggestList div.leftColumn div:nth-child(1) {
     height:calc(24px * 3);
 }
+#pnlSuggestList[data-otmode] #divSuggestList div.leftColumn div:nth-child(1) {
+    height: calc(24px * 2);
+}
+#pnlSuggestList[data-otmode] #divSuggestList > div.oilTypeColumn > div:nth-child(3),
+#pnlSuggestList[data-otmode] #divSuggestList > div.dataColumn > div.values > div:nth-child(2) {
+    display: none;
+}
 /* 提案表直下のDivタグ */
 #divSuggestList > div {
     width: 80px;
@@ -247,6 +254,10 @@
 }
 #divSuggestList .lockImgArea.Unlocked:hover {
     background-image:  url('../img/lockKey.png');
+}
+#pnlSuggestList[data-otmode] #divSuggestList .lockImgArea {
+    background-image:none;
+    display:none;
 }
 /* *********************** */
 /* 比重表 設定             */
@@ -812,4 +823,19 @@ _:-ms-lang(x)::backdrop,
 }
 /* ************************ */
 /* ↑ボタン固定ここまで↑   */
+/* ************************ */
+/* ************************ */
+/* ↓油槽所選択ここから↓   */
+/* ************************ */
+#selHeadConsignee {
+    height: 17.5px;
+    line-height: 17.5px;
+    outline: none;
+    font-size:11.5px;
+}
+#selHeadConsignee option {
+    outline: none;
+}
+/* ************************ */
+/* ↑油槽所選択ここまで↑   */
 /* ************************ */

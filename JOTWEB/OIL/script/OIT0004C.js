@@ -556,3 +556,34 @@ function bindNumericKeyPressOnly(targetTextBoxList) {
         }
     }
 }
+/**
+ * 油槽所変更時クライアント処理
+ * @param {Element} callerObj なし
+ * @return {undefined} なし
+ */
+function changeConsignee(callerObj) {
+    let hdnConsigneeObj = document.getElementById('hdnChgConsignee');
+    let hdnConsigneeNameObj = document.getElementById('hdnChgConsigneeName');
+    let selConsignee = document.getElementById('selHeadConsignee');
+    if (hdnConsigneeObj === null) {
+        return;
+    }
+    if (selConsignee === null) {
+        return;
+    }
+    hdnConsigneeObj.value = '';
+    hdnConsigneeNameObj.value = '';
+    let opts = selConsignee.options;
+    for (let i = 0; i < opts.length; i++) {
+        let optItm = opts[i];
+        if (optItm.selected === true) {
+            let consignee = optItm.value;
+            let consigneeName = optItm.text;
+            hdnConsigneeObj.value = consignee;
+            hdnConsigneeNameObj.value = consigneeName;
+            break;
+        }
+    }
+
+    ButtonClick('ChangeConsignee');
+}

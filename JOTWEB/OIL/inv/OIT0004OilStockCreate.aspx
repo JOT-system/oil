@@ -171,9 +171,10 @@
                                                 <asp:TextBox ID="txtSuggestValue" runat="server" 
                                                     Text='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
                                                     Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE _
-                                                                                        OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True,
-                                                                                        "False",
-                                                                                        "True") %>'></asp:TextBox>
+                                                                                                                                                    OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True _
+                                                                                                                                                    OrElse Me.pnlSuggestList.Attributes.Keys.Cast(Of String).Contains("data-otmode"),
+                                                                                                                                        "False",
+                                                                                                                                        "True") %>'></asp:TextBox>
                                             </div>
                                         </ItemTemplate>
                                     </asp:Repeater>

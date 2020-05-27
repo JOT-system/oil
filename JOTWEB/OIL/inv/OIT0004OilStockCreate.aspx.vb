@@ -153,6 +153,7 @@ Public Class OIT0004OilStockCreate
         Dim shipperName As String = work.WF_SEL_SHIPPERNAME.Text
         Dim consignee As String = work.WF_SEL_CONSIGNEE.Text
         Dim consigneeName As String = work.WF_SEL_CONSIGNEENAME.Text
+        Dim isOtTrainMode As Boolean = False
         If setConsignee <> "" Then
             consignee = setConsignee
             consigneeName = SetConsigneeName
@@ -188,6 +189,12 @@ Public Class OIT0004OilStockCreate
                     canShowSuggestList = False
                     mesNo = C_MESSAGE_NO.OIL_SUGGEST_TRAIN_NOTEXISTS
                 End If
+            Else
+                isOtTrainMode = True
+                trainList = GetTagetOtTrain(sqlCon, salesOffice, shipper, consignee, daysList)
+                If trainList Is Nothing OrElse trainList.Count = 0 Then
+                    isOtTrainMode = False
+                End If
             End If
             '抽出結果を画面データクラスに展開
             dispDataObj = New DispDataClass(daysList, trainList, oilTypeList, salesOffice, shipper, consignee)
@@ -196,6 +203,8 @@ Public Class OIT0004OilStockCreate
             dispDataObj.ConsigneeName = consigneeName
             '提案一覧表示可否設定
             dispDataObj.ShowSuggestList = canShowSuggestList
+            'OT用提案一覧表示可否設定
+            dispDataObj.IsOtTrainMode = isOtTrainMode
             '前週出荷平均の取得
             dispDataObj = GetLastShipAverage(sqlCon, dispDataObj)
             'ローリー初期表示判定
@@ -273,13 +282,24 @@ Public Class OIT0004OilStockCreate
         '生成したデータを画面に貼り付け
         '****************************************
         '1.提案リスト
-        If dispDataObj.ShowSuggestList = False Then
+        Me.pnlSuggestList.Attributes.Remove("data-otmode")
+        If dispDataObj.ShowSuggestList = False AndAlso isOtTrainMode = False Then
             pnlSuggestList.Visible = False
             Me.spnInventoryDays.Visible = False
             Me.WF_ButtonAUTOSUGGESTION.Visible = False
             Me.WF_ButtonORDERLIST.Visible = False
             Me.WF_ButtonINPUTCLEAR.Visible = False
             'Me.WF_ButtonGETEMPTURN.Visible = False
+        ElseIf isOtTrainMode = True Then
+            pnlSuggestList.Visible = True
+            Me.spnInventoryDays.Visible = False
+            Me.WF_ButtonAUTOSUGGESTION.Visible = False
+            Me.WF_ButtonORDERLIST.Visible = False
+            Me.WF_ButtonINPUTCLEAR.Visible = False
+            frvSuggest.DataSource = New Object() {dispDataObj}
+            frvSuggest.DataBind()
+            Me.pnlSuggestList.Attributes.Add("data-otmode", "1")
+
         Else
             pnlSuggestList.Visible = True
             Me.spnInventoryDays.Visible = True
@@ -444,6 +464,7 @@ Public Class OIT0004OilStockCreate
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
             If dispValues.ShowSuggestList = False Then
+                dispValues = EditEmptyTurnCarsNum(sqlCon, dispValues)
                 dispValues = EditOtEmptyTurnCarsNum(sqlCon, dispValues)
                 dispValues.RecalcStockList()
             Else
@@ -455,8 +476,12 @@ Public Class OIT0004OilStockCreate
             End If
         End Using
         '1.提案リスト
-        If dispValues.ShowSuggestList = False Then
+        If dispValues.ShowSuggestList = False AndAlso dispValues.IsOtTrainMode = False Then
             pnlSuggestList.Visible = False
+        ElseIf dispValues.IsOtTrainMode = True Then
+            pnlSuggestList.Visible = True
+            frvSuggest.DataSource = New Object() {dispValues}
+            frvSuggest.DataBind()
         Else
             pnlSuggestList.Visible = True
             frvSuggest.DataSource = New Object() {dispValues}
@@ -845,6 +870,80 @@ Public Class OIT0004OilStockCreate
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select Train List"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Throw '呼出し元の後続処理を走らせたくないのでThrow 
+        End Try
+    End Function
+    ''' <summary>
+    ''' OT用の列車情報を対象期間内のオーダー情報より生成（なければそもそも作らない)
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="salesOffice"></param>
+    ''' <param name="shipper"></param>
+    ''' <param name="consignee"></param>
+    ''' <returns></returns>
+    Private Function GetTagetOtTrain(sqlCon As SqlConnection, salesOffice As String, shipper As String, consignee As String, daysList As Dictionary(Of String, DaysItem)) As Dictionary(Of String, TrainListItem)
+        Try
+            Dim resultVal As New Dictionary(Of String, TrainListItem)
+            Dim retVal As New Dictionary(Of String, TrainListItem)
+            Dim sqlStr As New StringBuilder
+            '検索値の設定
+            Dim dateFrom As String = daysList.First.Value.KeyString
+            Dim dateTo As String = daysList.Last.Value.KeyString
+
+            sqlStr.AppendLine("SELECT ODR.TRAINNO")
+            sqlStr.AppendLine("      ,MIN(ODR.TRAINNAME) AS TRAINNAME")
+            sqlStr.AppendLine("      ,ISNULL(MIN(TRA.MAXTANK1),0) AS MAXVOLUME")
+            sqlStr.AppendLine("      ,MIN(TRA.ZAIKOSORT) AS ZAIKOSORT")
+            sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+            sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
+            sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
+            sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
+            sqlStr.AppendLine("   AND DTL.OILCODE is not null")
+            sqlStr.AppendLine(" LEFT JOIN OIL.OIM0007_TRAIN TRA")
+            sqlStr.AppendLine("    ON TRA.OFFICECODE  =  @OFFICECODE")
+            sqlStr.AppendLine("   AND TRA.TRAINNO     =  ODR.TRAINNO")
+            sqlStr.AppendLine("   AND TRA.TSUMI       =  CASE WHEN ODR.STACKINGFLG = '1' THEN 'T' ELSE '2' END")
+            sqlStr.AppendLine("   AND TRA.DEPSTATION  =  ODR.DEPSTATION")
+            sqlStr.AppendLine("   AND TRA.ARRSTATION  =  ODR.ARRSTATION")
+            sqlStr.AppendLine(" WHERE ODR.ACCDATE   BETWEEN @DATE_FROM AND @ADATE_TO")
+            sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+            sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
+            sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
+            sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+            sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
+            sqlStr.AppendLine(" GROUP BY ODR.TRAINNO")
+            sqlStr.AppendLine(" ORDER BY ZAIKOSORT, ODR.TRAINNO")
+            Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@OFFICECODE", SqlDbType.NVarChar).Value = salesOffice
+                    .Add("@DATE_FROM", SqlDbType.Date).Value = dateFrom
+                    .Add("@ADATE_TO", SqlDbType.Date).Value = dateTo
+                    .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = shipper
+                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = consignee
+                    .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    While sqlDr.Read
+                        Dim trNo As String = Convert.ToString(sqlDr("TRAINNO"))
+                        Dim trName As String = Convert.ToString(sqlDr("TRAINNAME"))
+                        Dim trMaxVol As Decimal = CDec(Convert.ToString(sqlDr("MAXVOLUME")))
+                        Dim trItem As New TrainListItem(trNo, trName, trMaxVol)
+                        trItem.UnmanagedTrain = True
+                        retVal.Add(trItem.TrainNo, trItem)
+                    End While
+                End Using
+            End Using
+            Return retVal
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, Me.Title)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0004C Select Ot Train List"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1893,6 +1992,8 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.PAYMENT),'')          AS PAYMENT")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.PAYMENTTAX),'')       AS PAYMENTTAX")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.TOTALPAYMENT),'')     AS TOTALPAYMENT")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.OTFILENAME),'')       AS OTFILENAME")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.RECEIVECOUNT),'')     AS RECEIVECOUNT")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.DELFLG),'')           AS DELFLG")
         sqlStat.AppendLine("      ,format(ODR.INITYMD,'yyyy/MM/dd HH:mm:ss.fff')    AS INITYMD")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(ODR.INITUSER),'')         AS INITUSER")
@@ -3163,7 +3264,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    OTHER1OTANKCH,OTHER2OTANKCH,OTHER3OTANKCH,OTHER4OTANKCH,OTHER5OTANKCH,")
         sqlStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
         sqlStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,BILLINGNO,KEIJYOYMD,")
-        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,OTFILENAME,RECEIVECOUNT,")
         sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
         sqlStat.AppendLine("    VALUES")
@@ -3180,7 +3281,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    @OTHER1OTANKCH,@OTHER2OTANKCH,@OTHER3OTANKCH,@OTHER4OTANKCH,@OTHER5OTANKCH,")
         sqlStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
         sqlStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@BILLINGNO,@KEIJYOYMD,")
-        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,@OTFILENAME,@RECEIVECOUNT,")
         sqlStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
 
@@ -3277,6 +3378,8 @@ Public Class OIT0004OilStockCreate
                 .Add("PAYMENT", SqlDbType.Int).Value = orderItm.Payment
                 .Add("PAYMENTTAX", SqlDbType.Int).Value = orderItm.PaymentTax
                 .Add("TOTALPAYMENT", SqlDbType.Int).Value = orderItm.TotalPayment
+                .Add("OTFILENAME", SqlDbType.Int).Value = orderItm.OtFileName
+                .Add("RECEIVECOUNT", SqlDbType.Int).Value = If(orderItm.ReceiveCount = "", CType(DBNull.Value, Object), orderItm.ReceiveCount)
                 .Add("DELFLG", SqlDbType.NVarChar).Value = orderItm.DelFlg
                 .Add("INITYMD", SqlDbType.DateTime).Value = orderItm.InitYmd
                 .Add("INITUSER", SqlDbType.NVarChar).Value = orderItm.InitUser
@@ -4676,6 +4779,11 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property ShowSuggestList As Boolean = True
         ''' <summary>
+        ''' OT提案表表示(True:OTモードで表示、False：OTモードで表示しない)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property IsOtTrainMode As Boolean = False
+        ''' <summary>
         ''' 構内取りデータ有無(True:あり,False:無し(デフォルト))
         ''' </summary>
         ''' <returns></returns>
@@ -5672,6 +5780,8 @@ Public Class OIT0004OilStockCreate
             Me.Payment = "0"
             Me.PaymentTax = "0"
             Me.TotalPayment = "0"
+            Me.OtFileName = ""
+            Me.ReceiveCount = ""
             Me.DelFlg = C_DELETE_FLG.ALIVE
             Me.InitYmd = procDtm.ToString("yyyy/MM/dd HH:mm:ss.FFF")
             Me.InitUser = userID
@@ -5786,6 +5896,8 @@ Public Class OIT0004OilStockCreate
             Me.Payment = Convert.ToString(sqlDr("PAYMENT"))
             Me.PaymentTax = Convert.ToString(sqlDr("PAYMENTTAX"))
             Me.TotalPayment = Convert.ToString(sqlDr("TOTALPAYMENT"))
+            Me.OtFileName = Convert.ToString(sqlDr("OTFILENAME"))
+            Me.ReceiveCount = Convert.ToString(sqlDr("RECEIVECOUNT"))
             Me.DelFlg = Convert.ToString(sqlDr("DELFLG"))
             Me.InitYmd = Convert.ToString(sqlDr("INITYMD"))
             Me.InitUser = Convert.ToString(sqlDr("INITUSER"))
@@ -6257,6 +6369,16 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property TotalPayment As String
         ''' <summary>
+        ''' OTファイル名
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OtFileName As String
+        ''' <summary>
+        ''' OT空回日報受信回数
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ReceiveCount As String
+        ''' <summary>
         ''' 削除フラグ
         ''' </summary>
         ''' <returns></returns>
@@ -6404,7 +6526,7 @@ Public Class OIT0004OilStockCreate
                     "OTHER1OTANKCH", "OTHER2OTANKCH", "OTHER3OTANKCH", "OTHER4OTANKCH", "OTHER5OTANKCH",
                     "OTHER6OTANKCH", "OTHER7OTANKCH", "OTHER8OTANKCH", "OTHER9OTANKCH", "OTHER10OTANKCH",
                     "TOTALTANKCH", "TANKLINKNO", "TANKLINKNOMADE", "BILLINGNO", "KEIJYOYMD",
-                    "SALSE", "SALSETAX", "TOTALSALSE", "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT",
+                    "SALSE", "SALSETAX", "TOTALSALSE", "PAYMENT", "PAYMENTTAX", "TOTALPAYMENT", "OTFILENAME", "RECEIVECOUNT",
                     "DELFLG", "INITYMD", "INITUSER", "INITTERMID", "UPDYMD", "UPDUSER", "UPDTERMID", "RECEIVEYMD"}
                 For Each fieldName In fieldList
                     .Add(fieldName, GetType(String))
@@ -6503,6 +6625,8 @@ Public Class OIT0004OilStockCreate
             dr("PAYMENT") = Me.Payment
             dr("PAYMENTTAX") = Me.PaymentTax
             dr("TOTALPAYMENT") = Me.TotalPayment
+            dr("OTFILENAME") = Me.OtFileName
+            dr("RECEIVECOUNT") = Me.ReceiveCount
             dr("DELFLG") = Me.DelFlg
             dr("INITYMD") = Me.InitYmd
             dr("INITUSER") = Me.InitUser
@@ -6708,6 +6832,7 @@ Public Class OIT0004OilStockCreate
             Me.Payment = Convert.ToString(sqlDr("PAYMENT"))
             Me.PaymentTax = Convert.ToString(sqlDr("PAYMENTTAX"))
             Me.TotalPayment = Convert.ToString(sqlDr("TOTALPAYMENT"))
+
             Me.DelFlg = Convert.ToString(sqlDr("DELFLG"))
             Me.InitYmd = Convert.ToString(sqlDr("INITYMD"))
             Me.InitUser = Convert.ToString(sqlDr("INITUSER"))

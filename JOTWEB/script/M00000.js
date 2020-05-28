@@ -2,6 +2,7 @@
 function InitDisplay() {
       document.getElementById("rightb").style.visibility = "hidden";
 //    document.getElementById("rightb").style.visibility = "visible";
+    modTextUrlToLink();
 }
 
 // ○GridView処理（Enter処理）
@@ -15,4 +16,14 @@ document.onkeydown = function (event) {
         }
     }
 };
+
+function modTextUrlToLink() {
+    let naiyoObjects = document.querySelectorAll("div.naiyo");
+    for (let i = 0; i < naiyoObjects.length; i++) {
+        let innerHtmlText = naiyoObjects[i].innerHTML;
+        innerHtmlText = innerHtmlText.replace(/(http:\/\/[\x21-\x7e]+)/gi, "<a href='$1' target='_blank'>$1</a>");
+        innerHtmlText = innerHtmlText.replace(/(https:\/\/[\x21-\x7e]+)/gi, "<a href='$1' target='_blank'>$1</a>");
+        naiyoObjects[i].innerHTML = innerHtmlText;
+    }
+}
 

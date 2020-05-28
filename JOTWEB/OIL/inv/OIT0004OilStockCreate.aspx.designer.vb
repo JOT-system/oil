@@ -329,6 +329,24 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents hdnDispLorry As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''hdnChgConsignee コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnChgConsignee As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnChgConsigneeName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnChgConsigneeName As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

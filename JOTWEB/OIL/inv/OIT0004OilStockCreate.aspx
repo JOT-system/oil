@@ -171,9 +171,10 @@
                                                 <asp:TextBox ID="txtSuggestValue" runat="server" 
                                                     Text='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
                                                     Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE _
-                                                                                        OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True,
-                                                                                        "False",
-                                                                                        "True") %>'></asp:TextBox>
+                                                                                                                                                    OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True _
+                                                                                                                                                    OrElse Me.pnlSuggestList.Attributes.Keys.Cast(Of String).Contains("data-otmode"),
+                                                                                                                                        "False",
+                                                                                                                                        "True") %>'></asp:TextBox>
                                             </div>
                                         </ItemTemplate>
                                     </asp:Repeater>
@@ -451,6 +452,9 @@
             <asp:ListBox ID="lstDispStockOilType" runat="server" SelectionMode="Multiple"></asp:ListBox>
             <!-- ローリー表示・非表示状態保持用 full or hideLorry -->
             <asp:HiddenField ID="hdnDispLorry" runat="server" Value="full" />
+            <!-- 油槽所変更値保持用 -->
+            <asp:HiddenField ID="hdnChgConsignee" runat="server" />
+            <asp:HiddenField ID="hdnChgConsigneeName" runat="server" />
             <!-- 権限 -->
         </div>
  

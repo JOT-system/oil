@@ -19,6 +19,8 @@ Public Class OIT0003OrderList
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0003ReportSendaitbl As DataTable                    '帳票用(仙台)テーブル
+    Private OIT0003ReportNegishitbl As DataTable                    '帳票用(根岸)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -63,6 +65,11 @@ Public Class OIT0003OrderList
                             WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonORDER_CANCEL"     'キャンセルボタン押下
                             WF_ButtonORDER_CANCEL_Click()
+                        Case "WF_ButtonCSV",
+                             "WF_ButtonSendaiLOADCSV",
+                             "WF_ButtonNegishiSHIPCSV",
+                             "WF_ButtonNegishiLOADCSV"  'ダウンロードボタン押下
+                            WF_ButtonDownload_Click()
                         Case "WF_ButtonINSERT"          '受注新規作成ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonLinkINSERT"      '貨車連結選択ボタン押下
@@ -97,6 +104,30 @@ Public Class OIT0003OrderList
             Else
                 WF_MAPpermitcode.Value = "FALSE"
             End If
+
+            '◯ ボタン(表示・非表示)設定(各営業所にて出し分けをするため)
+            Select Case Master.USER_ORG
+                '★情報システム部/石油部
+                Case BaseDllConst.CONST_OFFICECODE_010006,
+                     BaseDllConst.CONST_OFFICECODE_010007
+                    WF_BUTTONpermitcode.Value = "0"
+                '★東北支店/仙台新港
+                Case BaseDllConst.CONST_OFFICECODE_010401,
+                     BaseDllConst.CONST_OFFICECODE_010402
+                    WF_BUTTONpermitcode.Value = "1"
+                '★関東支店/五井/甲子/袖ヶ浦/根岸
+                Case BaseDllConst.CONST_OFFICECODE_011401,
+                     BaseDllConst.CONST_OFFICECODE_011201,
+                     BaseDllConst.CONST_OFFICECODE_011202,
+                     BaseDllConst.CONST_OFFICECODE_011203,
+                     BaseDllConst.CONST_OFFICECODE_011402
+                    WF_BUTTONpermitcode.Value = "2"
+                '★中部支店/四日市/三重塩浜
+                Case BaseDllConst.CONST_OFFICECODE_012301,
+                     BaseDllConst.CONST_OFFICECODE_012401,
+                     BaseDllConst.CONST_OFFICECODE_012402
+                    WF_BUTTONpermitcode.Value = "3"
+            End Select
 
         Finally
             '○ 格納Table Close
@@ -572,6 +603,370 @@ Public Class OIT0003OrderList
 
     End Sub
 
+#Region "帳票処理"
+    ''' <summary>
+    ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonDownload_Click()
+
+        Select Case WF_ButtonClick.Value
+            Case "WF_ButtonCSV"             'ダウンロードボタン押下
+
+            'ダウンロードボタン(仙台(積込予定))押下
+            Case "WF_ButtonSendaiLOADCSV"
+
+                ''******************************
+                ''帳票表示データ取得処理
+                ''******************************
+                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '    SQLcon.Open()       'DataBase接続
+
+                '    ExcelSendaiDataGet(SQLcon)
+                'End Using
+
+                ''******************************
+                ''帳票作成処理の実行
+                ''******************************
+                'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_SENDAI_LOADPLAN.xlsx", OIT0003ReportSendaitbl)
+                '    Dim url As String
+                '    Try
+                '        url = repCbj.CreateExcelPrintSendaiData()
+                '    Catch ex As Exception
+                '        Return
+                '    End Try
+                '    '○ 別画面でExcelを表示
+                '    WF_PrintURL.Value = url
+                '    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                'End Using
+
+            'ダウンロードボタン(根岸(出荷予定))押下
+            'ダウンロードボタン(根岸(積込予定))押下
+            Case "WF_ButtonNegishiSHIPCSV",
+                 "WF_ButtonNegishiLOADCSV"
+
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    ExcelNegishiDataGet(SQLcon)
+                End Using
+
+                '******************************
+                '帳票作成処理の実行
+                '******************************
+                Select Case WF_ButtonClick.Value
+                    'ダウンロードボタン(根岸(出荷予定))押下
+                    Case "WF_ButtonNegishiSHIPCSV"
+                        Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
+                            Dim url As String
+                            Try
+                                url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN")
+                            Catch ex As Exception
+                                Return
+                            End Try
+                            '○ 別画面でExcelを表示
+                            WF_PrintURL.Value = url
+                            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                        End Using
+
+                    'ダウンロードボタン(根岸(積込予定))押下
+                    Case "WF_ButtonNegishiLOADCSV"
+                        Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_LOADPLAN.xlsx", OIT0003ReportNegishitbl)
+                            Dim url As String
+                            Try
+                                url = repCbj.CreateExcelPrintNegishiData("LOADPLAN")
+                            Catch ex As Exception
+                                Return
+                            End Try
+                            '○ 別画面でExcelを表示
+                            WF_PrintURL.Value = url
+                            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                        End Using
+
+                End Select
+        End Select
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelSendaiDataGet(ByVal SQLcon As SqlConnection)
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelNegishiDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003WKtbl) Then
+            OIT0003WKtbl = New DataTable
+        End If
+
+        If OIT0003WKtbl.Columns.Count <> 0 Then
+            OIT0003WKtbl.Columns.Clear()
+        End If
+
+        OIT0003WKtbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　充填ポイント取得用SQL
+        Dim SQLLDP As String =
+            " SELECT " _
+            & "   OIM0003.OFFICECODE                             AS OFFICECODE" _
+            & " , OIM0003.SHIPPERCODE                            AS SHIPPERCODE" _
+            & " , OIM0013.PLANTCODE                              AS PLANTCODE" _
+            & " , OIM0013.MAXLINECNT                             AS MAXLINECNT" _
+            & " , OIM0013.LOADINGPOINT                           AS LOADINGPOINT" _
+            & " , OIM0013.OILCODE                                AS OILCODE" _
+            & " , OIM0003.OILNAME                                AS OILNAME" _
+            & " , OIM0013.SEGMENTOILCODE                         AS SEGMENTOILCODE" _
+            & " , OIM0003.SEGMENTOILNAME                         AS SEGMENTOILNAME" _
+            & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
+            & " , OIM0003.OTOILNAME                              AS OTOILNAME" _
+            & " , '0'                                            AS DELFLG" _
+            & " FROM oil.OIM0013_LOAD OIM0013 " _
+            & " INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+            & "     OIM0003.OFFICECODE = @P01 " _
+            & " AND OIM0003.PLANTCODE = OIM0013.PLANTCODE " _
+            & " AND OIM0003.OILCODE = OIM0013.OILCODE "
+
+        SQLLDP &=
+                " ORDER BY" _
+            & "    OIM0013.LOADINGPOINT " _
+            & "  , OIM0013.OILCODE"
+
+        If IsNothing(OIT0003ReportNegishitbl) Then
+            OIT0003ReportNegishitbl = New DataTable
+        End If
+
+        If OIT0003ReportNegishitbl.Columns.Count <> 0 Then
+            OIT0003ReportNegishitbl.Columns.Clear()
+        End If
+
+        OIT0003ReportNegishitbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+        " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , VIW0013.No                                     AS No" _
+            & " , VIW0013.ZAIKOSORT                              AS ZAIKOSORT" _
+            & " , VIW0013.TRAINNAME                              AS TRAINNAME" _
+            & " , VIW0013.TRAINNO                                AS TRAINNO" _
+            & " , VIW0013.JRTRAINNO1                             AS JRTRAINNO1" _
+            & " , VIW0013.TSUMI                                  AS TSUMI" _
+            & " , ''                                             AS FILLINGPOINT" _
+            & " , OIT0003.OILCODE                                AS OILCODE" _
+            & " , OIM0003.OILNAME                                AS OILNAME" _
+            & " , OIM0003.OILKANA                                AS OILKANA" _
+            & " , ISNULL(CASE " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_HTank + "' THEN OIT0002.HTANK " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_RTank + "' THEN OIT0002.RTANK " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_TTank + "' THEN OIT0002.TTANK " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_MTTank + "' THEN OIT0002.MTTANK " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_KTank1 + "' THEN OIT0002.KTANK " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_K3Tank1 + "' THEN OIT0002.K3TANK " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_ATank + "' THEN OIT0002.ATANK " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_LTank1 + "' THEN OIT0002.LTANK " _
+            & "   END, 0)                                        AS TOTALTANK" _
+            & " FROM oil.VIW0013_OILFOR_NEGISHI_SHIP VIW0013 " _
+            & " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
+            & "     OIT0002.LODDATE = @P03 " _
+            & " AND OIT0002.TRAINNO = VIW0013.TRAINNO " _
+            & " AND OIT0002.OFFICECODE = @P01 " _
+            & " AND OIT0002.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OIT0003.DELFLG <> @P02 " _
+            & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+            & "     OIM0003.OFFICECODE = @P01 " _
+            & " AND OIM0003.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0003.DELFLG <> @P02 "
+
+        SQLStr &=
+                " ORDER BY" _
+            & "    VIW0013.No" _
+            & "  , VIW0013.ZAIKOSORT" _
+            & "  , OIT0003.OILCODE DESC"
+
+#Region "コメントアウト"
+        ' ### START 在庫管理(シミュレーション)の設定が前提の場合 #########################
+        '" SELECT " _
+        '    & "   0                                              AS LINECNT" _
+        '    & " , ''                                             AS OPERATION" _
+        '    & " , '0'                                            AS TIMSTP" _
+        '    & " , 1                                              AS 'SELECT'" _
+        '    & " , 0                                              AS HIDDEN" _
+        '    & " , VIW0013.No                                     AS No" _
+        '    & " , VIW0013.ZAIKOSORT                              AS ZAIKOSORT" _
+        '    & " , VIW0013.TRAINNAME                              AS TRAINNAME" _
+        '    & " , VIW0013.TRAINNO                                AS TRAINNO" _
+        '    & " , VIW0013.JRTRAINNO1                             AS JRTRAINNO1" _
+        '    & " , VIW0013.TSUMI                                  AS TSUMI" _
+        '    & " , ''                                             AS FILLINGPOINT" _
+        '    & " , VIW0013_OIL.OILCODE                            AS OILCODE" _
+        '    & " , OIM0003.OILNAME                                AS OILNAME" _
+        '    & " , ISNULL(VIW0013_OIL.TOTALTANK,0)                AS TOTALTANK" _
+        '    & " FROM oil.VIW0013_OILFOR_NEGISHI_SHIP VIW0013 " _
+        '    & " LEFT JOIN oil.VIW0013_OILSTOCK_NEGISHI_SHIP VIW0013_OIL ON " _
+        '    & "     VIW0013_OIL.STOCKYMD = FORMAT(GETDATE(), 'yyyy/MM/dd') " _
+        '    & " AND VIW0013_OIL.TRAINNO = VIW0013.TRAINNO " _
+        '    & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
+        '    & "     OIM0003.OFFICECODE = @P01 " _
+        '    & " AND OIM0003.OILCODE = VIW0013_OIL.OILCODE " _
+        '    & " AND OIM0003.DELFLG <> @P02 "
+
+        'SQLStr &=
+        '        " ORDER BY" _
+        '    & "    VIW0013.No" _
+        '    & "  , VIW0013.ZAIKOSORT" _
+        '    & "  , VIW0013_OIL.OILNUMBER"
+        ' ### END   ######################################################################
+
+        ' ### START 充填ポイント設定が前提の場合 #########################################
+        '" SELECT " _
+        '    & "   0                                              AS LINECNT" _
+        '    & " , ''                                             AS OPERATION" _
+        '    & " , '0'                                            AS TIMSTP" _
+        '    & " , 1                                              AS 'SELECT'" _
+        '    & " , 0                                              AS HIDDEN" _
+        '    & " , VIW0013.No                                     AS No" _
+        '    & " , VIW0013.ZAIKOSORT                              AS ZAIKOSORT" _
+        '    & " , VIW0013.TRAINNAME                              AS TRAINNAME" _
+        '    & " , VIW0013.TRAINNO                                AS TRAINNO" _
+        '    & " , VIW0013.JRTRAINNO1                             AS JRTRAINNO1" _
+        '    & " , VIW0013.TSUMI                                  AS TSUMI" _
+        '    & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
+        '    & " , OIT0003.OILCODE                                AS OILCODE" _
+        '    & " , OIT0003.OILNAME                                AS OILNAME" _
+        '    & " , OIT0002.TOTALTANK                              AS TOTALTANK" _
+        '    & " FROM oil.VIW0013_OILFOR_NEGISHI_SHIP VIW0013 " _
+        '    & " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
+        '    & "     OIT0002.LODDATE = FORMAT(GETDATE(), 'yyyy/MM/dd') " _
+        '    & " AND OIT0002.TRAINNO = VIW0013.TRAINNO " _
+        '    & " AND OIT0002.OFFICECODE = @P01 " _
+        '    & " AND OIT0002.DELFLG <> @P02 " _
+        '    & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+        '    & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+        '    & " AND OIT0003.DELFLG <> @P02 "
+
+        'SQLStr &=
+        '        " ORDER BY" _
+        '    & "    VIW0013.No" _
+        '    & "  , VIW0013.ZAIKOSORT" _
+        '    & "  , OIT0003.FILLINGPOINT"
+        ' ### END   ######################################################################
+#End Region
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLLDPcmd As New SqlCommand(SQLLDP, SQLcon)
+                Dim PARALDP01 As SqlParameter = SQLLDPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                PARALDP01.Value = BaseDllConst.CONST_OFFICECODE_011402
+
+                Using SQLLDPdr As SqlDataReader = SQLLDPcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLLDPdr.FieldCount - 1
+                        OIT0003WKtbl.Columns.Add(SQLLDPdr.GetName(index), SQLLDPdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WKtbl.Load(SQLLDPdr)
+                End Using
+
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                PARA01.Value = BaseDllConst.CONST_OFFICECODE_011402
+                PARA02.Value = C_DELETE_FLG.DELETE
+                'PARA03.Value = "2020/5/25"
+                PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003ReportNegishitbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportNegishitbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                Dim strTrainNo As String = ""
+                For Each OIT0003Reprow As DataRow In OIT0003ReportNegishitbl.Rows
+                    i += 1
+                    OIT0003Reprow("LINECNT") = i        'LINECNT
+
+                    '★油種コードが未設定（NULL）の場合は次のデータへ遷移
+                    If OIT0003Reprow("OILCODE") Is DBNull.Value Then
+                        '★列車No退避
+                        strTrainNo = OIT0003Reprow("TRAINNO")
+                        Continue For
+                    End If
+
+                    '★列車Noが変更になったら、充填ポイントの内容を初期化
+                    If strTrainNo <> "" AndAlso strTrainNo <> OIT0003Reprow("TRAINNO") Then
+                        For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
+                            OIT0003Wkrow("DELFLG") = "0"
+                        Next
+                    End If
+
+                    '★表示用の油種コードと充填ポイントで設定している油種コードを比較
+                    For Each OIT0003Wkrow As DataRow In OIT0003WKtbl.Rows
+                        If OIT0003Wkrow("DELFLG") <> "1" _
+                            AndAlso OIT0003Wkrow("OILCODE") = OIT0003Reprow("OILCODE") Then
+                            OIT0003Reprow("FILLINGPOINT") = OIT0003Wkrow("LOADINGPOINT")
+                            OIT0003Wkrow("DELFLG") = "1"
+
+                            '★設定した充填ポイントはすべて使用済みにする
+                            For Each OIT0003Wk2row As DataRow In OIT0003WKtbl.Rows
+                                If OIT0003Wk2row("LOADINGPOINT") = OIT0003Wkrow("LOADINGPOINT") Then
+                                    OIT0003Wk2row("DELFLG") = "1"
+                                End If
+                            Next
+                            Exit For
+                        End If
+                    Next
+
+                    '★列車No退避
+                    strTrainNo = OIT0003Reprow("TRAINNO")
+                Next
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003DNEGISHI EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003DNEGISHI EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0001Reporttbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+#End Region
+
     ''' <summary>
     ''' 受注新規作成ボタン押下時処理
     ''' </summary>
@@ -587,9 +982,10 @@ Public Class OIT0003OrderList
         '受注営業所(コード)
         work.WF_SEL_ORDERSALESOFFICECODE.Text = ""
         '受注進行ステータス(名)
-        work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
+        'work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
+        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_100, work.WF_SEL_ORDERSTATUSNM.Text, WW_DUMMY)
         '受注進行ステータス(コード)
-        work.WF_SEL_ORDERSTATUS.Text = "100"
+        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
         '受注情報(名)
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)

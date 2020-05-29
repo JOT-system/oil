@@ -286,6 +286,7 @@ Public Class OIT0004OilStockCreate
         If dispDataObj.ShowSuggestList = False AndAlso isOtTrainMode = False Then
             pnlSuggestList.Visible = False
             Me.spnInventoryDays.Visible = False
+            Me.WF_ButtonGETEMPTURN.Visible = True
             Me.WF_ButtonAUTOSUGGESTION.Visible = False
             Me.WF_ButtonORDERLIST.Visible = False
             Me.WF_ButtonINPUTCLEAR.Visible = False
@@ -293,7 +294,8 @@ Public Class OIT0004OilStockCreate
         ElseIf isOtTrainMode = True Then
             pnlSuggestList.Visible = True
             Me.spnInventoryDays.Visible = False
-            Me.WF_ButtonAUTOSUGGESTION.Visible = False
+            Me.WF_ButtonGETEMPTURN.Visible = True
+            Me.WF_ButtonAUTOSUGGESTION.Visible = True
             Me.WF_ButtonORDERLIST.Visible = False
             Me.WF_ButtonINPUTCLEAR.Visible = False
             frvSuggest.DataSource = New Object() {dispDataObj}
@@ -303,6 +305,7 @@ Public Class OIT0004OilStockCreate
         Else
             pnlSuggestList.Visible = True
             Me.spnInventoryDays.Visible = True
+            Me.WF_ButtonGETEMPTURN.Visible = False 'OT且つ取り込み対象オーダーが無いので見せる意味がない
             Me.WF_ButtonAUTOSUGGESTION.Visible = True
             Me.WF_ButtonORDERLIST.Visible = True
             Me.WF_ButtonINPUTCLEAR.Visible = True
@@ -2653,9 +2656,13 @@ Public Class OIT0004OilStockCreate
             Return True
         End If
         '列車チェックボックス確認(この返却はあくまでチェックがある日付グループを返す)
+        'Dim qSelected = (From sugItm In dispDataClass.SuggestList
+        '                 Where (From trItm In sugItm.Value.SuggestOrderItem.Values
+        '                        Where trItm.CheckValue).Any)
+        '20200529 未チェックでも保存
         Dim qSelected = (From sugItm In dispDataClass.SuggestList
-                         Where (From trItm In sugItm.Value.SuggestOrderItem.Values
-                                Where trItm.CheckValue).Any)
+                         Where (From trItm In sugItm.Value.SuggestOrderItem.Values).Any)
+
         '1つもチェックが無ければスキップ
         If qSelected.Any = False Then
             Return True
@@ -2856,7 +2863,7 @@ Public Class OIT0004OilStockCreate
                 For Each trItm In suggestDaysList.Value.SuggestOrderItem.Values
                     miValues = Nothing
                     If trItm.CheckValue = False Then
-                        Continue For
+                        'Continue For 20200529 未チェックでも保存
                     End If
                     paramTrainNo.Value = trItm.TrainInfo.TrainNo
                     If dispDataClass.HasMoveInsideItem Then
@@ -3378,7 +3385,7 @@ Public Class OIT0004OilStockCreate
                 .Add("PAYMENT", SqlDbType.Int).Value = orderItm.Payment
                 .Add("PAYMENTTAX", SqlDbType.Int).Value = orderItm.PaymentTax
                 .Add("TOTALPAYMENT", SqlDbType.Int).Value = orderItm.TotalPayment
-                .Add("OTFILENAME", SqlDbType.Int).Value = orderItm.OtFileName
+                .Add("OTFILENAME", SqlDbType.NVarChar).Value = orderItm.OtFileName
                 .Add("RECEIVECOUNT", SqlDbType.Int).Value = If(orderItm.ReceiveCount = "", CType(DBNull.Value, Object), orderItm.ReceiveCount)
                 .Add("DELFLG", SqlDbType.NVarChar).Value = orderItm.DelFlg
                 .Add("INITYMD", SqlDbType.DateTime).Value = orderItm.InitYmd
@@ -4976,7 +4983,7 @@ Public Class OIT0004OilStockCreate
 
             For Each tgtItm In Me.SuggestList(dateKey).SuggestOrderItem.Values
                 'チェックをしている値のみ合計する
-                If tgtItm.CheckValue Then
+                If tgtItm.CheckValue = True OrElse tgtItm.CheckValue = False Then　'20200529 チェック未チェックでもOK戻しやすいよう両条件入れておく本来このIF不要
                     If tgtItm.SuggestValuesItem.ContainsKey(oilCode) Then
                         '入力値 * 45 / Weight
                         Dim suggestItm = tgtItm.SuggestValuesItem(oilCode)

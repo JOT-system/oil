@@ -286,7 +286,7 @@ Public Class OIT0004OilStockCreate
         If dispDataObj.ShowSuggestList = False AndAlso isOtTrainMode = False Then
             pnlSuggestList.Visible = False
             Me.spnInventoryDays.Visible = False
-            Me.WF_ButtonGETEMPTURN.Visible = True
+            Me.WF_ButtonGETEMPTURN.Visible = False 'OT且つ取り込み対象オーダーが無いので見せる意味がない
             Me.WF_ButtonAUTOSUGGESTION.Visible = False
             Me.WF_ButtonORDERLIST.Visible = False
             Me.WF_ButtonINPUTCLEAR.Visible = False
@@ -305,7 +305,7 @@ Public Class OIT0004OilStockCreate
         Else
             pnlSuggestList.Visible = True
             Me.spnInventoryDays.Visible = True
-            Me.WF_ButtonGETEMPTURN.Visible = False 'OT且つ取り込み対象オーダーが無いので見せる意味がない
+            Me.WF_ButtonGETEMPTURN.Visible = True
             Me.WF_ButtonAUTOSUGGESTION.Visible = True
             Me.WF_ButtonORDERLIST.Visible = True
             Me.WF_ButtonINPUTCLEAR.Visible = True

@@ -800,7 +800,7 @@ Public Class OIT0003OrderList
                 " ORDER BY" _
             & "    VIW0013.No" _
             & "  , VIW0013.ZAIKOSORT" _
-            & "  , OIT0003.OILCODE DESC"
+            & "  , TOTALTANK"
 
 #Region "コメントアウト"
         ' ### START 在庫管理(シミュレーション)の設定が前提の場合 #########################

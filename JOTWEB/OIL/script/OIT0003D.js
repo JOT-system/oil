@@ -275,7 +275,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             || fieldNM === "ACTUALARRDATE" 
             || fieldNM === "ACTUALACCDATE" 
             || fieldNM === "ACTUALEMPARRDATE"
-            || fieldNM === "KEIJYOYM"){
+            || fieldNM === "KEIJYOYM"
+            || fieldNM === "JRINSPECTIONDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

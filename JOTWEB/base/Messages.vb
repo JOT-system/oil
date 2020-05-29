@@ -597,6 +597,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_OILREGISTER_ORDER_NOTUSE As String = "20050"
 
+        ''' <summary>
+        ''' タンク車(交検日(過去日))エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_KOUKENBI_PAST_ERROR As String = "20051"
+
 #End Region
 
 

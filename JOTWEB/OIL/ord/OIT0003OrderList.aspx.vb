@@ -19,7 +19,7 @@ Public Class OIT0003OrderList
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル
-    Private OIT0003ReportSendaitbl As DataTable                    '帳票用(仙台)テーブル
+    Private OIT0003Reporttbl As DataTable                           '帳票用テーブル
     Private OIT0003ReportNegishitbl As DataTable                    '帳票用(根岸)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
@@ -82,6 +82,8 @@ Public Class OIT0003OrderList
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
+                        Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
+                            'WF_FILEUPLOAD()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -613,32 +615,32 @@ Public Class OIT0003OrderList
         Select Case WF_ButtonClick.Value
             Case "WF_ButtonCSV"             'ダウンロードボタン押下
 
-            'ダウンロードボタン(仙台(積込予定))押下
+            'ダウンロードボタン(積込予定)押下
             Case "WF_ButtonSendaiLOADCSV"
 
-                ''******************************
-                ''帳票表示データ取得処理
-                ''******************************
-                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                '    SQLcon.Open()       'DataBase接続
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
 
-                '    ExcelSendaiDataGet(SQLcon)
-                'End Using
+                    ExcelCommonDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_010402)
+                End Using
 
-                ''******************************
-                ''帳票作成処理の実行
-                ''******************************
-                'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_SENDAI_LOADPLAN.xlsx", OIT0003ReportSendaitbl)
-                '    Dim url As String
-                '    Try
-                '        url = repCbj.CreateExcelPrintSendaiData()
-                '    Catch ex As Exception
-                '        Return
-                '    End Try
-                '    '○ 別画面でExcelを表示
-                '    WF_PrintURL.Value = url
-                '    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-                'End Using
+                '******************************
+                '帳票作成処理の実行
+                '******************************
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintData()
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
 
             'ダウンロードボタン(根岸(出荷予定))押下
             'ダウンロードボタン(根岸(積込予定))押下
@@ -695,7 +697,126 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub ExcelSendaiDataGet(ByVal SQLcon As SqlConnection)
+    Protected Sub ExcelCommonDataGet(ByVal SQLcon As SqlConnection, ByVal OFFICECDE As String)
+        If IsNothing(OIT0003Reporttbl) Then
+            OIT0003Reporttbl = New DataTable
+        End If
+
+        If OIT0003Reporttbl.Columns.Count <> 0 Then
+            OIT0003Reporttbl.Columns.Clear()
+        End If
+
+        OIT0003Reporttbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
+            & " , OIT0002.OFFICENAME                             AS OFFICENAME" _
+            & " , OIT0002.BASECODE                               AS BASECODE" _
+            & " , OIT0002.BASENAME                               AS BASENAME" _
+            & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
+            & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _
+            & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
+            & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
+            & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
+            & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
+            & " , ''                                             AS PLACEORDER" _
+            & " , OIT0003.OILCODE                                AS OILCODE" _
+            & " , OIT0003.OILNAME                                AS OILNAME" _
+            & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+            & " , OIM0005.MODEL                                  AS MODEL" _
+            & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
+            & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
+            & " , ''                                             AS CARSAMOUNT" _
+            & " , ''                                             AS FARE" _
+            & " , CASE " _
+            & "   WHEN OIT0002.STACKINGFLG = '1' THEN '積置' " _
+            & "   ELSE '' " _
+            & "   END                                            AS STACKING" _
+            & " , OIT0002.TRAINNO                                AS TRAINNO" _
+            & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIT0005.LASTOILCODE                            AS LASTOILCODE" _
+            & " , OIT0005.LASTOILNAME                            AS LASTOILNAME" _
+            & " , OIT0005.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
+            & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
+            & " , ''                                             AS STACKINGCNT" _
+            & " , OIT0002.LODDATE                                AS LODDATE" _
+            & " , OIT0002.DEPDATE                                AS DEPDATE" _
+            & " , OIT0002.ARRDATE                                AS ARRDATE" _
+            & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OIT0003.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+            & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+            & " AND OIM0005.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+            & "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
+            & " AND OIT0005.DELFLG <> @P02 " _
+            & " WHERE OIT0002.OFFICECODE = @P01 " _
+            & "   AND OIT0002.DELFLG <> @P02 " _
+            & "   AND OIT0002.LODDATE = @P03 "
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    OIT0002.BASECODE" _
+            & "  , OIT0003.OILCODE"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                PARA01.Value = OFFICECDE
+                PARA02.Value = C_DELETE_FLG.DELETE
+                'PARA03.Value = "2020/5/29"
+                PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003Reporttbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003Reporttbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003Reprow As DataRow In OIT0003Reporttbl.Rows
+                    i += 1
+                    OIT0003Reprow("LINECNT") = i        'LINECNT
+
+                Next
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003L EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003L EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0003Reporttbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -947,10 +1068,10 @@ Public Class OIT0003OrderList
             End Using
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003DNEGISHI EXCEL_DATAGET")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003LNEGISHI EXCEL_DATAGET")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:OIT0003DNEGISHI EXCEL_DATAGET"
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003LNEGISHI EXCEL_DATAGET"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -959,7 +1080,7 @@ Public Class OIT0003OrderList
         End Try
 
         '○ 画面表示データ保存
-        'Master.SaveTable(OIT0001Reporttbl)
+        'Master.SaveTable(OIT0003ReportNegishitbl)
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
@@ -1527,6 +1648,16 @@ Public Class OIT0003OrderList
     Protected Sub WF_Grid_Scroll()
 
     End Sub
+
+#Region "Excelアップロード"
+    ''' <summary>
+    ''' ファイルアップロード時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FILEUPLOAD()
+
+    End Sub
+#End Region
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理

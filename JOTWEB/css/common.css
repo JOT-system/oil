@@ -2010,7 +2010,7 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
 .commonMonthListWrapper > div {
     position: fixed;
     //z-index:10;
-    width:200px;
+    width:205px;
     margin:5px;
     border-radius:5px;
     border:1px solid gray;

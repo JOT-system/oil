@@ -38,11 +38,8 @@
                 <div class="rightSide">
                     <input type="button" id="WF_ButtonRECULC"        class="btn-sticky" value="在庫表再計算"     onclick="ButtonClick('WF_ButtonRECULC');" />
                     <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="在庫表保存"     onclick="ButtonClick('WF_ButtonUPDATE');" />
-                    <span id="spnDownloadMonth">
-                        <asp:Label ID="lblDownloadMonth" runat="server" Text="帳票年月"></asp:Label>
-                        <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
-                    </span>
-                    <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+
+                    <input type="button" id="WF_ButtonReport"           class="btn-sticky" value="帳票" onclick="showReportSettings();" />
                     <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                     <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   visible="false" onclick="ButtonClick('WF_ButtonFIRST');"></div>
                     <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   visible="false" onclick="ButtonClick('WF_ButtonLAST');"></div>
@@ -407,6 +404,35 @@
                 </div> <!-- End id="divStockList" -->
             </asp:Panel> <!-- End 在庫表 -->
         </div> <!-- end class="headerboxOnly" id="headerbox" -->
+        <div id="reportSettingsWrapper">
+            <div id="reportSetting">
+                <div>帳票設定</div>
+                <div>
+                    <input type="button" id="WF_ButtonCSVCancel"           class="btn-sticky" value="ｷｬﾝｾﾙ" onclick="hideReportSettings();" />
+                    <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+                </div>
+                <div>
+                    <div class="grc0001Wrapper">
+                        <ul>
+                            <li>
+                                <asp:CheckBox ID="chkJxtgReport" runat="server" Text="JXTG用帳票" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <span id="spnDownloadMonth">
+                            <asp:Label ID="lblDownloadMonth" runat="server" Text="帳票年月"></asp:Label>
+                            <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
+                    </span>
+                </div>
+                <div>
+                    <div>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- rightbox レイアウト -->
         <MSINC:rightview ID="rightview" runat="server" />
 
@@ -455,6 +481,8 @@
             <!-- 油槽所変更値保持用 -->
             <asp:HiddenField ID="hdnChgConsignee" runat="server" />
             <asp:HiddenField ID="hdnChgConsigneeName" runat="server" />
+            <!-- 帳票設定表示状態保持用 -->
+            <asp:HiddenField ID="hdnDispReportSettings" runat="server" value="0"/>
             <!-- 権限 -->
         </div>
  

@@ -295,7 +295,7 @@ Public Class OIT0004OilStockCreate
             pnlSuggestList.Visible = True
             Me.spnInventoryDays.Visible = False
             Me.WF_ButtonGETEMPTURN.Visible = True
-            Me.WF_ButtonAUTOSUGGESTION.Visible = True
+            Me.WF_ButtonAUTOSUGGESTION.Visible = False
             Me.WF_ButtonORDERLIST.Visible = False
             Me.WF_ButtonINPUTCLEAR.Visible = False
             frvSuggest.DataSource = New Object() {dispDataObj}
@@ -724,7 +724,7 @@ Public Class OIT0004OilStockCreate
         '******************************
         '帳票作成処理の実行
         '******************************
-        Using repCbj = New OIT0004CustomReport(Master.MAPID, Master.MAPID & ".xlsx", printData)
+        Using repCbj = New OIT0004CustomReportOLD(Master.MAPID, Master.MAPID & ".xlsx", printData)
             Dim url As String
             Try
                 url = repCbj.CreateExcelPrintData

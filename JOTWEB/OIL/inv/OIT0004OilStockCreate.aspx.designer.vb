@@ -68,24 +68,6 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents WF_ButtonGETEMPTURN As Global.System.Web.UI.HtmlControls.HtmlInputButton
     
     '''<summary>
-    '''lblDownloadMonth コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents lblDownloadMonth As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''txtDownloadMonth コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents txtDownloadMonth As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
     '''<remarks>
@@ -165,6 +147,33 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents repStockOilTypeItem As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
+    '''chkJxtgReport コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkJxtgReport As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
+    '''lblDownloadMonth コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblDownloadMonth As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtDownloadMonth コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtDownloadMonth As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''rightview コントロール。
@@ -345,6 +354,15 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnChgConsigneeName As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnDispReportSettings コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDispReportSettings As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''Master プロパティ。

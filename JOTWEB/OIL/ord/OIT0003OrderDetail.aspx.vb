@@ -14632,6 +14632,18 @@ Public Class OIT0003OrderDetail
                 '〇 (一覧)テキストボックスの制御(読取専用)
                 Dim divObj = DirectCast(pnlListArea3.FindControl(pnlListArea3.ID & "_DR"), Panel)
                 Dim tblObj = DirectCast(divObj.Controls(0), Table)
+                Dim chkObjST As CheckBox = Nothing
+                Dim chkObjFR As CheckBox = Nothing
+                'LINECNTを除いたチェックボックスID
+                Dim chkObjIdWOSTcnt As String = "chk" & pnlListArea3.ID & "STACKINGFLG"
+                Dim chkObjIdWOFRcnt As String = "chk" & pnlListArea3.ID & "FIRSTRETURNFLG"
+                'LINECNTを含むチェックボックスID
+                Dim chkObjSTId As String
+                Dim chkObjFRId As String
+                'ループ内の対象データROW(これで計算区分の値をとれるかと）
+                Dim loopdr As DataRow = Nothing
+                'データテーブルの行Index
+                Dim rowIdx As Integer = 0
 
                 '〇 受注進行ステータスの状態
                 Select Case work.WF_SEL_ORDERSTATUS.Text
@@ -14642,6 +14654,39 @@ Public Class OIT0003OrderDetail
                          BaseDllConst.CONST_ORDERSTATUS_450
 
                         For Each rowitem As TableRow In tblObj.Rows
+                            '画面表示行が存在している場合
+                            If OIT0003tbl_tab3.Rows.Count <> 0 Then
+                                loopdr = OIT0003tbl_tab3.Rows(rowIdx)
+                                chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
+                                chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
+                                '下のループより先に見つけなければいけないかもしれないので
+                                '冗長ですがこちらでループ
+                                chkObjST = Nothing
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
+                                    'コントロールが見つかったら脱出
+                                    If chkObjST IsNot Nothing Then
+                                        Exit For
+                                    End If
+                                Next
+                                chkObjFR = Nothing
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
+                                    'コントロールが見つかったら脱出
+                                    If chkObjFR IsNot Nothing Then
+                                        Exit For
+                                    End If
+                                Next
+
+                                '◯ 受注営業所が"011402"(根岸営業所)以外の場合
+                                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
+                                    '積込可否フラグ(チェックボックス)を非活性
+                                    chkObjST.Enabled = False
+                                    '先返し可否フラグ(チェックボックス)を非活性
+                                    chkObjFR.Enabled = False
+                                End If
+                            End If
+
                             For Each cellObj As TableCell In rowitem.Controls
                                 If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
@@ -14654,10 +14699,41 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
                             Next
+                            rowIdx += 1
                         Next
 
                     Case Else
                         For Each rowitem As TableRow In tblObj.Rows
+                            '画面表示行が存在している場合
+                            If OIT0003tbl_tab3.Rows.Count <> 0 Then
+                                loopdr = OIT0003tbl_tab3.Rows(rowIdx)
+                                chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
+                                chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
+                                '下のループより先に見つけなければいけないかもしれないので
+                                '冗長ですがこちらでループ
+                                chkObjST = Nothing
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
+                                    'コントロールが見つかったら脱出
+                                    If chkObjST IsNot Nothing Then
+                                        Exit For
+                                    End If
+                                Next
+                                chkObjFR = Nothing
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
+                                    'コントロールが見つかったら脱出
+                                    If chkObjFR IsNot Nothing Then
+                                        Exit For
+                                    End If
+                                Next
+
+                                '積込可否フラグ(チェックボックス)を非活性
+                                chkObjST.Enabled = False
+                                '先返し可否フラグ(チェックボックス)を非活性
+                                chkObjFR.Enabled = False
+
+                            End If
                             For Each cellObj As TableCell In rowitem.Controls
                                 If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
@@ -14673,6 +14749,7 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                                 End If
                             Next
+                            rowIdx += 1
                         Next
                 End Select
 
@@ -14694,8 +14771,8 @@ Public Class OIT0003OrderDetail
 
                 For Each rowitem As TableRow In tblObj.Rows
                     '画面表示行が存在している場合
-                    If CS0013ProfView.SRCDATA.Rows.Count <> 0 Then
-                        loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
+                    If OIT0003tbl_tab4.Rows.Count <> 0 Then
+                        loopdr = OIT0003tbl_tab4.Rows(rowIdx)
                         chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
                         '下のループより先に見つけなければいけないかもしれないので

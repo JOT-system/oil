@@ -176,9 +176,11 @@ Public Class OIM0005TankCreate
 
         '原籍所有者C
         WF_ORIGINOWNERCODE.Text = work.WF_SEL_ORIGINOWNERCODE.Text
+        CODENAME_get("ORIGINOWNERCODE", WF_ORIGINOWNERCODE.Text, WF_ORIGINOWNERCODE_TEXT.Text, WW_RTN_SW)
 
         '名義所有者C
         WF_OWNERCODE.Text = work.WF_SEL_OWNERCODE.Text
+        CODENAME_get("OWNERCODE", WF_OWNERCODE.Text, WF_OWNERCODE_TEXT.Text, WW_RTN_SW)
 
         'リース先C
         WF_LEASECODE.Text = work.WF_SEL_LEASECODE.Text
@@ -228,14 +230,14 @@ Public Class OIM0005TankCreate
         '塗色C
         WF_COLORCODE.Text = work.WF_SEL_COLORCODE.Text
 
-        'エネオス
-        WF_ENEOS.Text = work.WF_SEL_ENEOS.Text
+        'マークコード
+        WF_MARK.Text = work.WF_SEL_MARKCODE.Text
 
-        'エコレール
-        WF_ECO.Text = work.WF_SEL_ECO.Text
+        'マーク名
+        WF_MARKNAME.Text = work.WF_SEL_MARKNAME.Text
 
         '取得年月日
-        WF_ALLINSPECTIONDATE.Text = work.WF_SEL_ALLINSPECTIONDATE.Text
+        WF_GETDATE.Text = work.WF_SEL_GETDATE.Text
 
         '車籍編入年月日
         WF_TRANSFERDATE.Text = work.WF_SEL_TRANSFERDATE.Text
@@ -331,7 +333,7 @@ Public Class OIM0005TankCreate
         WF_OTTANKNUMBER.Text = work.WF_SEL_OTTANKNUMBER.Text
 
         'JXTG車番
-        WF_JXTGTANKNUMBER.Text = work.WF_SEL_JXTGTANKNUMBER.Text
+        WF_JXTGTANKNUMBER1.Text = work.WF_SEL_JXTGTANKNUMBER1.Text
 
         'コスモ車番
         WF_COSMOTANKNUMBER.Text = work.WF_SEL_COSMOTANKNUMBER.Text
@@ -390,6 +392,7 @@ Public Class OIM0005TankCreate
             & " , ISNULL(RTRIM(OIM0005.LOADUNIT), '')         AS LOADUNIT " _
             & " , ISNULL(RTRIM(OIM0005.VOLUME), '')         AS VOLUME " _
             & " , ISNULL(RTRIM(OIM0005.VOLUMEUNIT), '')         AS VOLUMEUNIT " _
+            & " , ISNULL(RTRIM(OIM0005.MYWEIGHT), '')         AS MYWEIGHT " _
             & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERCODE), '')         AS ORIGINOWNERCODE " _
             & " , ISNULL(RTRIM(OIM0005.ORIGINOWNERNAME), '')         AS ORIGINOWNERNAME " _
             & " , ISNULL(RTRIM(OIM0005.OWNERCODE), '')         AS OWNERCODE " _
@@ -399,6 +402,7 @@ Public Class OIM0005TankCreate
             & " , ISNULL(RTRIM(OIM0005.LEASECLASS), '')         AS LEASECLASS " _
             & " , ISNULL(RTRIM(OIM0005.LEASECLASSNEMAE), '')         AS LEASECLASSNEMAE " _
             & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTION), '')         AS AUTOEXTENTION " _
+            & " , ISNULL(RTRIM(OIM0005.AUTOEXTENTIONNAME), '')         AS AUTOEXTENTIONNAME " _
             & " , CASE WHEN OIM0005.LEASESTYMD IS NULL THEN ''                   " _
             & "   ELSE FORMAT(OIM0005.LEASESTYMD,'yyyy/MM/dd')              " _
             & "   END                                     as LEASESTYMD   " _
@@ -424,12 +428,26 @@ Public Class OIM0005TankCreate
             & " , CASE WHEN OIM0005.EXTRADINARYLIMIT IS NULL THEN ''                   " _
             & "              ELSE FORMAT(OIM0005.EXTRADINARYLIMIT,'yyyy/MM/dd')              " _
             & "   END                                     as EXTRADINARYLIMIT   " _
+            & " , ISNULL(RTRIM(OIM0005.BIGOILCODE), '')         AS BIGOILCODE " _
+            & " , ISNULL(RTRIM(OIM0005.BIGOILNAME), '')         AS BIGOILNAME " _
             & " , ISNULL(RTRIM(OIM0005.OPERATIONBASECODE), '')         AS OPERATIONBASECODE " _
             & " , ISNULL(RTRIM(OIM0005.OPERATIONBASENAME), '')         AS OPERATIONBASENAME " _
             & " , ISNULL(RTRIM(OIM0005.COLORCODE), '')         AS COLORCODE " _
             & " , ISNULL(RTRIM(OIM0005.COLORNAME), '')         AS COLORNAME " _
-            & " , ISNULL(RTRIM(OIM0005.ENEOS), '')         AS ENEOS " _
-            & " , ISNULL(RTRIM(OIM0005.ECO), '')         AS ECO " _
+            & " , ISNULL(RTRIM(OIM0005.MARKCODE), '')         AS MARKCODE " _
+            & " , ISNULL(RTRIM(OIM0005.MARKNAME), '')         AS MARKNAME " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGCODE1), '')         AS JXTGTAGCODE1 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGNAME1), '')         AS JXTGTAGNAME1 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGCODE2), '')         AS JXTGTAGCODE2 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGNAME2), '')         AS JXTGTAGNAME2 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGCODE3), '')         AS JXTGTAGCODE3 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGNAME3), '')         AS JXTGTAGNAME3 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGCODE4), '')         AS JXTGTAGCODE4 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTAGNAME4), '')         AS JXTGTAGNAME4 " _
+            & " , ISNULL(RTRIM(OIM0005.IDSSTAGCODE), '')         AS IDSSTAGCODE " _
+            & " , ISNULL(RTRIM(OIM0005.IDSSTAGNAME), '')         AS IDSSTAGNAME " _
+            & " , ISNULL(RTRIM(OIM0005.COSMOTAGCODE), '')         AS COSMOTAGCODE " _
+            & " , ISNULL(RTRIM(OIM0005.COSMOTAGNAME), '')         AS COSMOTAGNAME " _
             & " , ISNULL(RTRIM(OIM0005.RESERVE1), '')         AS RESERVE1 " _
             & " , ISNULL(RTRIM(OIM0005.RESERVE2), '')         AS RESERVE2 " _
             & " , CASE WHEN OIM0005.JRINSPECTIONDATE IS NULL THEN ''                   " _
@@ -450,19 +468,37 @@ Public Class OIM0005TankCreate
             & " , CASE WHEN OIM0005.ALLINSPECTIONDATE IS NULL THEN ''                   " _
             & "              ELSE FORMAT(OIM0005.ALLINSPECTIONDATE,'yyyy/MM/dd')              " _
             & "   END                                     as ALLINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.PREINSPECTIONDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.PREINSPECTIONDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as PREINSPECTIONDATE   " _
+            & " , CASE WHEN OIM0005.GETDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.GETDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as GETDATE   " _
             & " , CASE WHEN OIM0005.TRANSFERDATE IS NULL THEN ''                   " _
             & "              ELSE FORMAT(OIM0005.TRANSFERDATE,'yyyy/MM/dd')              " _
             & "   END                                     as TRANSFERDATE   " _
             & " , ISNULL(RTRIM(OIM0005.OBTAINEDCODE), '')         AS OBTAINEDCODE " _
+            & " , ISNULL(RTRIM(OIM0005.OBTAINEDNAME), '')         AS OBTAINEDNAME " _
             & " , CAST(ISNULL(RTRIM(OIM0005.PROGRESSYEAR), '') AS VarChar)         AS PROGRESSYEAR " _
             & " , CAST(ISNULL(RTRIM(OIM0005.NEXTPROGRESSYEAR), '') AS VarChar)         AS NEXTPROGRESSYEAR " _
+            & " , CASE WHEN OIM0005.EXCLUDEDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.EXCLUDEDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as EXCLUDEDATE   " _
+            & " , CASE WHEN OIM0005.RETIRMENTDATE IS NULL THEN ''                   " _
+            & "              ELSE FORMAT(OIM0005.RETIRMENTDATE,'yyyy/MM/dd')              " _
+            & "   END                                     as RETIRMENTDATE   " _
             & " , ISNULL(RTRIM(OIM0005.JRTANKNUMBER), '')         AS JRTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.JRTANKTYPE), '')         AS JRTANKTYPE " _
             & " , ISNULL(RTRIM(OIM0005.OLDTANKNUMBER), '')         AS OLDTANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.OTTANKNUMBER), '')         AS OTTANKNUMBER " _
-            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER), '')         AS JXTGTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER1), '')         AS JXTGTANKNUMBER1 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER2), '')         AS JXTGTANKNUMBER2 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER3), '')         AS JXTGTANKNUMBER3 " _
+            & " , ISNULL(RTRIM(OIM0005.JXTGTANKNUMBER4), '')         AS JXTGTANKNUMBER4 " _
             & " , ISNULL(RTRIM(OIM0005.COSMOTANKNUMBER), '')         AS COSMOTANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.FUJITANKNUMBER), '')         AS FUJITANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.SHELLTANKNUMBER), '')         AS SHELLTANKNUMBER " _
+            & " , ISNULL(RTRIM(OIM0005.SAPSHELLTANKNUMBER), '')         AS SAPSHELLTANKNUMBER " _
             & " , ISNULL(RTRIM(OIM0005.RESERVE3), '')         AS RESERVE3 " _
             & " , ISNULL(RTRIM(OIM0005.USEDFLG), '')         AS USEDFLG " _
             & " FROM OIL.OIM0005_TANK OIM0005 " _
@@ -530,6 +566,7 @@ Public Class OIM0005TankCreate
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIM0005C Select"
+
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -627,7 +664,7 @@ Public Class OIM0005TankCreate
         End If
 
         '○ 項目チェック
-        INPTableCheck(WW_ERR_SW)
+        ' INPTableCheck(WW_ERR_SW)
 
         '○ 入力値のテーブル反映
         If isNormal(WW_ERR_SW) Then
@@ -765,11 +802,11 @@ Public Class OIM0005TankCreate
 
         OIM0005INProw("COLORCODE") = WF_COLORCODE.Text              '塗色C
 
-        OIM0005INProw("ENEOS") = WF_ENEOS.Text              'エネオス
+        OIM0005INProw("MARKCODE") = WF_MARK.Text              'エネオス
 
-        OIM0005INProw("ECO") = WF_ECO.Text              'エコレール
+        OIM0005INProw("MARKNAME") = WF_MARKNAME.Text              'エコレール
 
-        OIM0005INProw("ALLINSPECTIONDATE") = WF_ALLINSPECTIONDATE.Text              '取得年月日
+        OIM0005INProw("GETDATE") = WF_GETDATE.Text              '取得年月日
 
         OIM0005INProw("TRANSFERDATE") = WF_TRANSFERDATE.Text              '車籍編入年月日
 
@@ -831,7 +868,7 @@ Public Class OIM0005TankCreate
 
         OIM0005INProw("OTTANKNUMBER") = WF_OTTANKNUMBER.Text              'OT車番
 
-        OIM0005INProw("JXTGTANKNUMBER") = WF_JXTGTANKNUMBER.Text              'JXTG車番
+        OIM0005INProw("JXTGTANKNUMBER1") = WF_JXTGTANKNUMBER1.Text              'JXTG車番
 
         OIM0005INProw("COSMOTANKNUMBER") = WF_COSMOTANKNUMBER.Text              'コスモ車番
 
@@ -925,9 +962,9 @@ Public Class OIM0005TankCreate
         WF_EXTRADINARYLIMIT.Text = ""            '臨時専用期限
         WF_OPERATIONBASECODE.Text = ""            '運用基地C
         WF_COLORCODE.Text = ""            '塗色C
-        WF_ENEOS.Text = ""            'エネオス
-        WF_ECO.Text = ""            'エコレール
-        WF_ALLINSPECTIONDATE.Text = ""            '取得年月日
+        WF_MARK.Text = ""            'エネオス
+        WF_MARKNAME.Text = ""            'エコレール
+        WF_GETDATE.Text = ""            '取得年月日
         WF_TRANSFERDATE.Text = ""            '車籍編入年月日
         WF_OBTAINEDCODE.Text = ""            '取得先C
         WF_USEDFLG.Text = ""                '利用フラグ
@@ -972,8 +1009,8 @@ Public Class OIM0005TankCreate
                                 .WF_Calendar.Text = WF_LIMITTEXTRADIARYSTATION.Text
                             Case "WF_EXTRADINARYLIMIT"         '臨時専用期限
                                 .WF_Calendar.Text = WF_EXTRADINARYLIMIT.Text
-                            Case "WF_ALLINSPECTIONDATE"         '取得年月日
-                                .WF_Calendar.Text = WF_ALLINSPECTIONDATE.Text
+                            Case "WF_GETDATE"         '取得年月日
+                                .WF_Calendar.Text = WF_GETDATE.Text
                             Case "WF_TRANSFERDATE"         '車籍編入年月日
                                 .WF_Calendar.Text = WF_TRANSFERDATE.Text
                             Case "WF_SPECIFIEDDATE"         '次回指定年月日
@@ -1002,9 +1039,12 @@ Public Class OIM0005TankCreate
 
                             '原籍所有者C
                             Case "WF_ORIGINOWNERCODE"
+                                prmData = work.CreateOriginOwnercodeParam(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE")
 
                             '名義所有者C
                             Case "WF_OWNERCODE"
+                                '原籍所有者コードと同じリストを開く
+                                prmData = work.CreateOriginOwnercodeParam(work.WF_SEL_CAMPCODE.Text, "ORIGINOWNERCODE")
 
                             'リース先C
                             Case "WF_LEASECODE"
@@ -1144,6 +1184,17 @@ Public Class OIM0005TankCreate
                     End Try
                     WF_LEASEENDYMD.Focus()
 
+                Case "WF_ORIGINOWNERCODE"               '原籍所有者コード
+                    WF_ORIGINOWNERCODE.Text = WW_SelectValue
+                    WF_ORIGINOWNERCODE_TEXT.Text = WW_SelectText
+                    WF_ORIGINOWNERCODE.Focus()
+
+                Case "WF_OWNERCODE"               '名義コード
+                    WF_OWNERCODE.Text = WW_SelectValue
+                    WF_OWNERCODE_TEXT.Text = WW_SelectText
+                    WF_OWNERCODE.Focus()
+
+
                 Case "WF_CURRENTSTATIONCODE"               '原常備駅C
                     WF_CURRENTSTATIONCODE.Text = WW_SelectValue
                     WF_CURRENTSTATIONCODE_TEXT.Text = WW_SelectText
@@ -1198,18 +1249,18 @@ Public Class OIM0005TankCreate
                     WF_OPERATIONBASECODE_TEXT.Text = WW_SelectText
                     WF_OPERATIONBASECODE.Focus()
 
-                Case "WF_ALLINSPECTIONDATE"             '取得年月日
+                Case "WF_GETDATE"             '取得年月日
                     Dim WW_DATE As Date
                     Try
                         Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
                         If WW_DATE < C_DEFAULT_YMD Then
-                            WF_ALLINSPECTIONDATE.Text = ""
+                            WF_GETDATE.Text = ""
                         Else
-                            WF_ALLINSPECTIONDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                            WF_GETDATE.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                         End If
                     Catch ex As Exception
                     End Try
-                    WF_ALLINSPECTIONDATE.Focus()
+                    WF_GETDATE.Focus()
 
                 Case "WF_TRANSFERDATE"            '車籍編入年月日
                     Dim WW_DATE As Date
@@ -1351,8 +1402,8 @@ Public Class OIM0005TankCreate
                 Case "WF_OPERATIONBASECODE"         '運用基地
                     WF_OPERATIONBASECODE.Focus()
 
-                Case "WF_ALLINSPECTIONDATE"         '取得年月日
-                    WF_ALLINSPECTIONDATE.Focus()
+                Case "WF_GETDATE"                   '取得年月日
+                    WF_GETDATE.Focus()
 
                 Case "WF_TRANSFERDATE"              '車籍編入年月日
                     WF_TRANSFERDATE.Focus()
@@ -1852,8 +1903,8 @@ Public Class OIM0005TankCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            'エネオス(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENEOS", OIM0005INProw("ENEOS"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'マークコード(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MARKCODE", OIM0005INProw("MARKCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ''値存在チェック
                 'CODENAME_get("ENEOS", OIM0005INProw("ENEOS"), WW_DUMMY, WW_RTN_SW)
@@ -1873,7 +1924,7 @@ Public Class OIM0005TankCreate
             End If
 
             'エコレール(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ECO", OIM0005INProw("ECO"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "MARKNAME", OIM0005INProw("MARKNAME"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 ''値存在チェック
                 'CODENAME_get("ECO", OIM0005INProw("ECO"), WW_DUMMY, WW_RTN_SW)
@@ -1893,17 +1944,17 @@ Public Class OIM0005TankCreate
             End If
 
             '取得年月日(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ALLINSPECTIONDATE", OIM0005INProw("ALLINSPECTIONDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "GETDATE", OIM0005INProw("GETDATE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '年月日チェック
-                WW_CheckDate(OIM0005INProw("ALLINSPECTIONDATE"), "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
+                WW_CheckDate(OIM0005INProw("GETDATE"), "取得年月日", WW_CS0024FCHECKERR, dateErrFlag)
                 If dateErrFlag = "1" Then
                     WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー入力エラー)です。"
                     WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                     O_RTN = "ERR"
                     Exit Sub
                 Else
-                    OIM0005INProw("ALLINSPECTIONDATE") = CDate(OIM0005INProw("ALLINSPECTIONDATE")).ToString("yyyy/MM/dd")
+                    OIM0005INProw("GETDATE") = CDate(OIM0005INProw("GETDATE")).ToString("yyyy/MM/dd")
                 End If
             Else
                 WW_CheckMES1 = "・更新できないレコード(取得年月日入力エラー入力エラー)です。"
@@ -2602,14 +2653,14 @@ Public Class OIM0005TankCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            'JXTG車番(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTANKNUMBER", OIM0005INProw("JXTGTANKNUMBER"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            'JXTG仙台車番(バリデーションチェック)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "JXTGTANKNUMBER1", OIM0005INProw("JXTGTANKNUMBER1"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
-                'If Not OIM0005INProw("JXTGTANKNUMBER") <> "" Then
+                'If Not OIM0005INProw("JXTGTANKNUMBER1") <> "" Then
                 '    '値存在チェック
-                '    CODENAME_get("JXTGTANKNUMBER", OIM0005INProw("JXTGTANKNUMBER"), WW_DUMMY, WW_RTN_SW)
+                '    CODENAME_get("JXTGTANKNUMBER1", OIM0005INProw("JXTGTANKNUMBER1"), WW_DUMMY, WW_RTN_SW)
                 '    If Not isNormal(WW_RTN_SW) Then
-                '        WW_CheckMES1 = "・更新できないレコード(JXTG車番入力エラー)です。"
+                '        WW_CheckMES1 = "・更新できないレコード(JXTG仙台車番入力エラー)です。"
                 '        WW_CheckMES2 = "マスタに存在しません。"
                 '        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 '        WW_LINE_ERR = "ERR"
@@ -2617,7 +2668,7 @@ Public Class OIM0005TankCreate
                 '    End If
                 'End If
             Else
-                WW_CheckMES1 = "・更新できないレコード(JXTG車番入力エラー)です。"
+                WW_CheckMES1 = "・更新できないレコード(JXTG仙台車番入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0005INProw)
                 WW_LINE_ERR = "ERR"
@@ -2847,9 +2898,9 @@ Public Class OIM0005TankCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> 臨時専用期限 =" & OIM0005row("EXTRADINARYLIMIT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 運用基地C =" & OIM0005row("OPERATIONBASECODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 塗色C =" & OIM0005row("COLORCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エネオス =" & OIM0005row("ENEOS") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> エコレール =" & OIM0005row("ECO") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 取得年月日 =" & OIM0005row("ALLINSPECTIONDATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> マークコード =" & OIM0005row("MARKCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> マーク名 =" & OIM0005row("MARKNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 取得年月日 =" & OIM0005row("GETDATE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 車籍編入年月日 =" & OIM0005row("TRANSFERDATE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 取得先C =" & OIM0005row("OBTAINEDCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 形式 =" & OIM0005row("MODEL") & " , "
@@ -2881,7 +2932,7 @@ Public Class OIM0005TankCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> JR車番 =" & OIM0005row("JRTANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 旧JOT車番 =" & OIM0005row("OLDTANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> OT車番 =" & OIM0005row("OTTANKNUMBER") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> JXTG車番 =" & OIM0005row("JXTGTANKNUMBER") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> JXTG仙台車番 =" & OIM0005row("JXTGTANKNUMBER1") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> コスモ車番 =" & OIM0005row("COSMOTANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 富士石油車番 =" & OIM0005row("FUJITANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 出光昭シ車番 =" & OIM0005row("SHELLTANKNUMBER") & " , "
@@ -2949,8 +3000,8 @@ Public Class OIM0005TankCreate
                         OIM0005row("EXTRADINARYLIMIT") = OIM0005INProw("EXTRADINARYLIMIT") AndAlso
                         OIM0005row("OPERATIONBASECODE") = OIM0005INProw("OPERATIONBASECODE") AndAlso
                         OIM0005row("COLORCODE") = OIM0005INProw("COLORCODE") AndAlso
-                        OIM0005row("ENEOS") = OIM0005INProw("ENEOS") AndAlso
-                        OIM0005row("ECO") = OIM0005INProw("ECO") AndAlso
+                        OIM0005row("MARKCODE") = OIM0005INProw("MARKCODE") AndAlso
+                        OIM0005row("MARKNAME") = OIM0005INProw("MARKNAME") AndAlso
                         OIM0005row("ALLINSPECTIONDATE") = OIM0005INProw("ALLINSPECTIONDATE") AndAlso
                         OIM0005row("TRANSFERDATE") = OIM0005INProw("TRANSFERDATE") AndAlso
                         OIM0005row("OBTAINEDCODE") = OIM0005INProw("OBTAINEDCODE") AndAlso
@@ -2960,6 +3011,7 @@ Public Class OIM0005TankCreate
                         OIM0005row("LOADUNIT") = OIM0005INProw("LOADUNIT") AndAlso
                         OIM0005row("VOLUME") = OIM0005INProw("VOLUME") AndAlso
                         OIM0005row("VOLUMEUNIT") = OIM0005INProw("VOLUMEUNIT") AndAlso
+                        OIM0005row("MYWEIGHT") = OIM0005INProw("MYWEIGHT") AndAlso
                         OIM0005row("ORIGINOWNERNAME") = OIM0005INProw("ORIGINOWNERNAME") AndAlso
                         OIM0005row("OWNERNAME") = OIM0005INProw("OWNERNAME") AndAlso
                         OIM0005row("LEASENAME") = OIM0005INProw("LEASENAME") AndAlso
@@ -2983,7 +3035,7 @@ Public Class OIM0005TankCreate
                         OIM0005row("JRTANKNUMBER") = OIM0005INProw("JRTANKNUMBER") AndAlso
                         OIM0005row("OLDTANKNUMBER") = OIM0005INProw("OLDTANKNUMBER") AndAlso
                         OIM0005row("OTTANKNUMBER") = OIM0005INProw("OTTANKNUMBER") AndAlso
-                        OIM0005row("JXTGTANKNUMBER") = OIM0005INProw("JXTGTANKNUMBER") AndAlso
+                        OIM0005row("JXTGTANKNUMBER1") = OIM0005INProw("JXTGTANKNUMBER1") AndAlso
                         OIM0005row("COSMOTANKNUMBER") = OIM0005INProw("COSMOTANKNUMBER") AndAlso
                         OIM0005row("FUJITANKNUMBER") = OIM0005INProw("FUJITANKNUMBER") AndAlso
                         OIM0005row("SHELLTANKNUMBER") = OIM0005INProw("SHELLTANKNUMBER") AndAlso
@@ -3130,6 +3182,16 @@ Public Class OIM0005TankCreate
                 Case "MODEL"            '型式
                     prmData = work.CreateTankParam(WF_MODEL.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_TANKMODEL, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "ORIGINOWNERCODE"　 '原籍所有者コード
+                    prmData = work.CreateOriginOwnercodeParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORIGINOWNERCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "OWNERCODE"　 '名義所有者コード
+                    prmData = work.CreateOriginOwnercodeParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORIGINOWNERCODE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+
                 Case "STATIONPATTERN"　 '原常備駅C、臨時常備駅C
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)

@@ -916,6 +916,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        WF_DetailMView.ActiveViewIndex = 1
         '〇 (一覧)テキストボックスの制御(読取専用)
         WW_ListTextBoxReadControl()
 
@@ -965,6 +966,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        WF_DetailMView.ActiveViewIndex = 2
         '〇 (一覧)テキストボックスの制御(読取専用)
         WW_ListTextBoxReadControl()
 
@@ -1023,6 +1025,7 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        WF_DetailMView.ActiveViewIndex = 3
         '〇 (一覧)テキストボックスの制御(読取専用)
         WW_ListTextBoxReadControl()
 

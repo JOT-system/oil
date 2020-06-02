@@ -120,8 +120,10 @@ Public Class OIT0003OrderDetail
                             WF_ButtonEND_Click()
                         Case "WF_Field_DBClick"               'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        Case "WF_CheckBoxSELECT"              'チェックボックス(選択)クリック
-                            WF_CheckBoxSELECT_Click()
+                        Case "WF_CheckBoxSELECT",
+                             "WF_CheckBoxSELECTSTACKING",
+                             "WF_CheckBoxSELECTFIRSTRETURN"   'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"          'フィールドチェンジ
                             WF_FIELD_Change()
                         Case "WF_ButtonSel"                   '(左ボックス)選択ボタン押下
@@ -2270,18 +2272,16 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS ORDERINGOILNAME" _
                 & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
-                & " , ISNULL(RTRIM(OIT0003.STACKINGFLG), '')             AS STACKINGFLG" _
                 & " , CASE ISNULL(RTRIM(OIT0003.STACKINGFLG), '')" _
-                & "   WHEN '1' THEN '積置'" _
+                & "   WHEN '1' THEN 'on'" _
                 & "   WHEN '2' THEN ''" _
                 & "   ELSE ''" _
-                & "   END                                                AS STACKINGFLGNAME" _
-                & " , ISNULL(RTRIM(OIT0003.FIRSTRETURNFLG), '')          AS FIRSTRETURNFLG" _
+                & "   END                                                AS STACKINGFLG" _
                 & " , CASE ISNULL(RTRIM(OIT0003.FIRSTRETURNFLG), '')" _
-                & "   WHEN '1' THEN '先返し'" _
+                & "   WHEN '1' THEN 'on'" _
                 & "   WHEN '2' THEN ''" _
                 & "   ELSE ''" _
-                & "   END                                                AS FIRSTRETURNFLGNAME" _
+                & "   END                                                AS FIRSTRETURNFLG" _
                 & " , ISNULL(RTRIM(OIT0002.TANKLINKNO), '')              AS LINKNO" _
                 & " , ''                                                 AS LINKDETAILNO" _
                 & " , CASE" _
@@ -3550,11 +3550,37 @@ Public Class OIT0003OrderDetail
         End If
     End Sub
 
+#Region "チェックボックス(選択)クリック処理"
     ''' <summary>
     ''' チェックボックス(選択)クリック処理
     ''' </summary>
-    Protected Sub WF_CheckBoxSELECT_Click()
+    Protected Sub WF_CheckBoxSELECT_Click(ByVal chkFieldName As String)
 
+        '〇 選択されたチェックボックスを制御
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+            WW_CheckBoxSELECT_TAB1()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            WW_CheckBoxSELECT_TAB2()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            WW_CheckBoxSELECT_TAB3(chkFieldName)
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            WW_CheckBoxSELECT_TAB4()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理(タブ「タンク車割当」)
+    ''' </summary>
+    Protected Sub WW_CheckBoxSELECT_TAB1()
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
 
@@ -3571,7 +3597,57 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
+    End Sub
 
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理(タブ「入換・積込指示」)
+    ''' </summary>
+    Protected Sub WW_CheckBoxSELECT_TAB2()
+
+    End Sub
+
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理(タブ「タンク車明細」)
+    ''' </summary>
+    Protected Sub WW_CheckBoxSELECT_TAB3(ByVal chkFieldName As String)
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+        Select Case chkFieldName
+            Case "WF_CheckBoxSELECTSTACKING"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
+                    If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0003tbl_tab3.Rows(i)("STACKINGFLG") = "on" Then
+                            OIT0003tbl_tab3.Rows(i)("STACKINGFLG") = ""
+                        Else
+                            OIT0003tbl_tab3.Rows(i)("STACKINGFLG") = "on"
+                        End If
+                    End If
+                Next
+            Case "WF_CheckBoxSELECTFIRSTRETURN"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
+                    If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on" Then
+                            OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = ""
+                        Else
+                            OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on"
+                        End If
+                    End If
+                Next
+        End Select
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+    End Sub
+
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理(タブ「費用入力」)
+    ''' </summary>
+    Protected Sub WW_CheckBoxSELECT_TAB4()
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
@@ -3588,8 +3664,8 @@ Public Class OIT0003OrderDetail
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
-
     End Sub
+#End Region
 
     ''' <summary>
     ''' フィールドチェンジ時処理
@@ -4242,7 +4318,7 @@ Public Class OIT0003OrderDetail
 
         'If work.WF_SEL_ORDERNUMBER.Text = "" Then
         '○ 作成モード(１：新規登録, ２：更新)設定
-        If work.WF_SEL_CREATEFLG.Text = "1" Then
+        If work.WF_SEL_CREATEFLG.Text = "1" OrElse OIT0003tbl.Rows.Count = 0 Then
             SQLStrNum =
             " SELECT " _
             & "  @P01   AS ORDERNO" _
@@ -7053,7 +7129,8 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO         , DETAILNO            , SHIPORDER          , LINEORDER          , TANKNO" _
-            & "        , KAMOKU          , ORDERINFO           , SHIPPERSCODE       , SHIPPERSNAME" _
+            & "        , KAMOKU          , STACKINGFLG         , FIRSTRETURNFLG" _
+            & "        , ORDERINFO       , SHIPPERSCODE        , SHIPPERSNAME" _
             & "        , OILCODE         , OILNAME             , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINTCODE          , JOINT" _
             & "        , CHANGETRAINNO   , CHANGETRAINNAME     , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
@@ -7064,7 +7141,8 @@ Public Class OIT0003OrderDetail
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P40, @P33, @P03" _
-            & "        , @P04, @P37, @P23, @P24" _
+            & "        , @P04, @P41, @P42" _
+            & "        , @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
             & "        , @P06, @P25, @P07, @P39, @P08" _
             & "        , @P26, @P38, @P27, @P28" _
@@ -7085,6 +7163,8 @@ Public Class OIT0003OrderDetail
             & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , KAMOKU" _
+            & "    , STACKINGFLG" _
+            & "    , FIRSTRETURNFLG" _
             & "    , ORDERINFO" _
             & "    , SHIPPERSCODE" _
             & "    , SHIPPERSNAME" _
@@ -7134,6 +7214,8 @@ Public Class OIT0003OrderDetail
                 Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '貨物駅入線順
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
+                Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.NVarChar)      '積置可否フラグ
+                Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar)      '先返し可否フラグ
                 Dim PARA37 As SqlParameter = SQLcmd.Parameters.Add("@P37", SqlDbType.NVarChar, 2)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
@@ -7183,6 +7265,9 @@ Public Class OIT0003OrderDetail
                     PARA33.Value = OIT0003row("LINEORDER")            '貨物駅入線順
                     PARA03.Value = OIT0003row("TANKNO")               'タンク車№
                     PARA04.Value = ""                                 '費用科目
+
+                    PARA41.Value = "2"                                '積置可否フラグ(1:積置あり 2:積置なし)
+                    PARA42.Value = "2"                                '先返し可否フラグ(1:先返しあり 2:先返しなし)
 
                     '# 受注情報
                     '交付アラートが「3日以内のタンク車」または「4日～6日のタンク車」の場合
@@ -8120,6 +8205,8 @@ Public Class OIT0003OrderDetail
                     & "        SECONDARRSTATIONNAME = @P15, " _
                     & "        CHANGERETSTATION     = @P16, " _
                     & "        CHANGERETSTATIONNAME = @P17, " _
+                    & "        STACKINGFLG          = @P24, " _
+                    & "        FIRSTRETURNFLG       = @P25, " _
                     & "        UPDYMD               = @P18, " _
                     & "        UPDUSER              = @P19, " _
                     & "        UPDTERMID            = @P20, " _
@@ -8150,6 +8237,8 @@ Public Class OIT0003OrderDetail
             Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", System.Data.SqlDbType.NVarChar)  '第2着駅名
             Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '空車着駅コード（変更後）
             Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", System.Data.SqlDbType.NVarChar)  '空車着駅名（変更後）
+            Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", System.Data.SqlDbType.NVarChar)  '積置可否フラグ
+            Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", System.Data.SqlDbType.NVarChar)  '先返し可否フラグ
 
             Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", System.Data.SqlDbType.DateTime)  '更新年月日
             Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
@@ -8202,6 +8291,19 @@ Public Class OIT0003OrderDetail
                 PARA15.Value = OIT0003tab3row("SECONDARRSTATIONNAME")
                 PARA16.Value = OIT0003tab3row("CHANGERETSTATION")
                 PARA17.Value = OIT0003tab3row("CHANGERETSTATIONNAME")
+
+                '# 積置可否フラグ(1:積置あり 2:積置なし)
+                If OIT0003tab3row("STACKINGFLG") = "on" Then
+                    PARA24.Value = "1"
+                Else
+                    PARA24.Value = "2"
+                End If
+                '# 先返し可否フラグ(1:先返しあり 2:先返しなし)
+                If OIT0003tab3row("FIRSTRETURNFLG") = "on" Then
+                    PARA25.Value = "1"
+                Else
+                    PARA25.Value = "2"
+                End If
 
                 PARA18.Value = Date.Now
                 PARA19.Value = Master.USERID

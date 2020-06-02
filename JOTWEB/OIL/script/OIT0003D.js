@@ -179,6 +179,8 @@ function InitDisplay() {
         commonBindEnterToVerticalTabStep();
         // チェックボックス変更
         ChangeCheckBox(arrListId[i]);
+        // チェックボックス変更(Light)
+        ChangeCheckBoxLight(arrListId[i]);
     }
 }
 
@@ -208,12 +210,58 @@ function ChangeCheckBox(listId) {
 }
 
 
+// ○チェックボックス変更(Light)
+function ChangeCheckBoxLight(listId) {
+    var objDataLightSide = document.getElementById(listId + "_DR");
+    if (objDataLightSide === null) {
+        return;
+    }
+    var objLightTable = objDataLightSide.children[0];
+
+    var chkObjsLight1 = objLightTable.querySelectorAll("input[id^='chk" + listId + "STACKINGFLG']");
+    var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "STACKINGFLG']");
+    var chkObjsLight2 = objLightTable.querySelectorAll("input[id^='chk" + listId + "FIRSTRETURNFLG']");
+    var spnObjsLight2 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "FIRSTRETURNFLG']");
+
+    for (let i = 0; i < chkObjsLight1.length; i++) {
+
+        if (chkObjsLight1[i] !== null) {
+            if (spnObjsLight1[i].innerText === "on") {
+                chkObjsLight1[i].checked = true;
+            } else {
+                chkObjsLight1[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight2.length; i++) {
+
+        if (chkObjsLight2[i] !== null) {
+            if (spnObjsLight2[i].innerText === "on") {
+                chkObjsLight2[i].checked = true;
+            } else {
+                chkObjsLight2[i].checked = false;
+            }
+        }
+    }
+}
+
+
 // ○チェックボックス選択
-function SelectCheckBox(obj, lineCnt) {
+function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+
+        surfix = '';
+        if (fieldName === 'STACKINGFLG') {
+            surfix = 'STACKING'
+        }
+        if (fieldName === 'FIRSTRETURNFLG') {
+            surfix = 'FIRSTRETURN'
+        }
+
         document.getElementById("WF_SelectedIndex").value = lineCnt;
-        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }

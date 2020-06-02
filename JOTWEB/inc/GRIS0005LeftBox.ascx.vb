@@ -156,6 +156,8 @@ Public Class GRIS0005LeftBox
         LC_TANKSITUATION
         LC_ACCOUNTLIST
         LC_TORILIST
+        LC_ORIGINOWNERCODE
+        LC_OWNERCODE
     End Enum
 
     ''' <summary>
@@ -245,6 +247,8 @@ Public Class GRIS0005LeftBox
         LP_TANKNUMBER_KAISOU
         LP_ACCOUNTLIST
         LP_TORILIST
+        LP_ORIGINOWNERCODE
+        LP_OWNERCODE
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -648,11 +652,11 @@ Public Class GRIS0005LeftBox
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_ORIGINOWNER
                 '原籍所有者
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORIGINOWNER"
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORIGINOWNERCODE"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_OWNER
                 '名義所有者
-                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OWNER"
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OWNERCODE"
                 lbox = CreateFixValueList(Params, O_RTN)
             Case LIST_BOX_CLASSIFICATION.LC_LEASE
                 'リース先
@@ -766,6 +770,18 @@ Public Class GRIS0005LeftBox
                 '科目パターン
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ACCOUNTPATTERN"
                 lbox = CreateFixValueList(Params, O_RTN)
+
+            Case LIST_BOX_CLASSIFICATION.LC_ORIGINOWNERCODE
+                '原籍所有者コード
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "ORIGINOWNERCODE"
+                lbox = CreateFixValueList(Params, O_RTN)
+
+            Case LIST_BOX_CLASSIFICATION.LC_OWNERCODE
+                '名義所有者コード
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OWNERCODE"
+                lbox = CreateFixValueList(Params, O_RTN)
+
+
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー
                 lbox = Nothing

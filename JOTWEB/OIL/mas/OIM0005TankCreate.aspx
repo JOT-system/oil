@@ -71,7 +71,7 @@
                     <!-- 名義所有者C -->
                     <span class="ef">
                         <asp:Label ID="WF_OWNERCODE_L" runat="server" Text="名義所有者C" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <span ondblclick="Field_DBclick('WF_OWNERCODE', <%=LIST_BOX_CLASSIFICATION.LC_OWNER%>);" onchange="TextBox_change('WF_OWNERCODE');">
+                        <span ondblclick="Field_DBclick('WF_OWNERCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORIGINOWNER%>);" onchange="TextBox_change('WF_OWNERCODE');">
                             <asp:TextBox ID="WF_OWNERCODE" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="WF_OWNERCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
@@ -79,6 +79,23 @@
                 </p>
 
                 <p id="KEY_LINE_4">
+                    <!-- 原籍所有者 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_ORIGINOWNERNAME_L" runat="server" Text="原籍所有者" CssClass="WF_TEXT_LABEL"></asp:Label>
+                      <asp:TextBox ID="WF_ORIGINOWNERNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                        <asp:Label ID="WF_ORIGINOWNERNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+
+                    <!-- 名義所有者 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_OWNERNAME_L" runat="server" Text="名義所有者" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_OWNERNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                        <asp:Label ID="WF_OWNERNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+
+                <p id="KEY_LINE_5">
                     <!-- リース先C -->
                     <span class="ef">
                         <asp:Label ID="WF_LEASECODE_L" runat="server" Text="リース先C" CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -98,7 +115,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_5">
+                <p id="KEY_LINE_6">
                     <!-- 自動延長 -->
                     <span class="ef">
                         <asp:Label ID="WF_AUTOEXTENTION_L" runat="server" Text="自動延長"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -116,7 +133,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_6">
+                <p id="KEY_LINE_7">
                     <!-- リース満了年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_LEASEENDYMD_L" runat="server" Text="リース満了年月日"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -135,7 +152,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_7">
+                <p id="KEY_LINE_8">
                     <!-- 原常備駅C -->
                     <span class="ef">
                         <asp:Label ID="WF_CURRENTSTATIONCODE_L" runat="server" Text="原常備駅C"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -155,7 +172,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_8">
+                <p id="KEY_LINE_9">
                     <!-- 第三者使用期限 -->
                     <span class="ef">
                         <asp:Label ID="WF_USERLIMIT_L" runat="server" Text="第三者使用期限"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -175,7 +192,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_9">
+                <p id="KEY_LINE_10">
                     <!-- 原専用種別C -->
                     <span class="ef">
                         <asp:Label ID="WF_DEDICATETYPECODE_L" runat="server" Text="原専用種別C"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -195,7 +212,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_10">
+                <p id="KEY_LINE_11">
                     <!-- 臨時専用期限 -->
                     <span class="ef">
                         <asp:Label ID="WF_EXTRADINARYLIMIT_L" runat="server" Text="臨時専用期限"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -215,7 +232,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_11">
+                <p id="KEY_LINE_12">
                     <!-- 塗色C -->
                     <span class="ef">
                         <asp:Label ID="WF_COLORCODE_L" runat="server" Text="塗色C"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -225,33 +242,33 @@
                         <asp:Label ID="WF_COLORCODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
-                    <!-- エネオス -->
+                    <!-- マークコード-->
                     <span class="ef">
-                        <asp:Label ID="WF_ENEOS_L" runat="server" Text="エネオス"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_ENEOS" runat="server"  CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                        <asp:Label ID="WF_ENEOS_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-                </p>
-
-                <p id="KEY_LINE_12">
-                    <!-- エコレール -->
-                    <span class="ef">
-                        <asp:Label ID="WF_ECO_L" runat="server" Text="エコレール"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <asp:TextBox ID="WF_ECO" runat="server"  CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                        <asp:Label ID="WF_ECO_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-
-                    <!-- 取得年月日 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_ALLINSPECTIONDATE_L" runat="server" Text="取得年月日"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
-                        <span ondblclick="Field_DBclick('WF_ALLINSPECTIONDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
-                            <asp:TextBox ID="WF_ALLINSPECTIONDATE" runat="server"  CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
-                        </span>
-                        <asp:Label ID="WF_ALLINSPECTIONDATE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_MARK_L" runat="server" Text="マークコード"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
+                        <asp:TextBox ID="WF_MARK" runat="server"  CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                        <asp:Label ID="WF_MARK_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 
                 <p id="KEY_LINE_13">
+                    <!-- マーク名 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_MARKNAME_L" runat="server" Text="エコレール"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
+                        <asp:TextBox ID="WF_MARKNAME" runat="server"  CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                        <asp:Label ID="WF_MARKNAME_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+
+                    <!-- 取得年月日 -->
+                    <span class="ef">
+                        <asp:Label ID="WF_GETDATE_L" runat="server" Text="取得年月日"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
+                        <span ondblclick="Field_DBclick('WF_GETDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>)">
+                            <asp:TextBox ID="WF_GETDATE" runat="server"  CssClass="WF_TEXTBOX_CSS calendarIcon"></asp:TextBox>
+                        </span>
+                        <asp:Label ID="WF_GETDATE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                    </span>
+                </p>
+
+                <p id="KEY_LINE_14">
                     <!-- 車籍編入年月日 -->
                     <span class="ef">
                         <asp:Label ID="WF_TRANSFERDATE_L" runat="server" Text="車籍編入年月日"  CssClass="WF_TEXT_LABEL requiredMark"></asp:Label>
@@ -271,7 +288,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_14">
+                <p id="KEY_LINE_15">
                     <!-- 形式 -->
                     <span class="ef">
                         <asp:Label ID="WF_MODEL_L" runat="server" Text="形式" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -289,7 +306,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_15">
+                <p id="KEY_LINE_16">
                     <!-- 荷重 -->
                     <span class="ef">
                         <asp:Label ID="WF_LOAD_L" runat="server" Text="荷重" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -305,7 +322,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_16">
+                <p id="KEY_LINE_17">
                     <!-- 容積 -->
                     <span class="ef">
                         <asp:Label ID="WF_VOLUME_L" runat="server" Text="容積" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -321,21 +338,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_17">
-                    <!-- 原籍所有者 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_ORIGINOWNERNAME_L" runat="server" Text="原籍所有者" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_ORIGINOWNERNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                        <asp:Label ID="WF_ORIGINOWNERNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
 
-                    <!-- 名義所有者 -->
-                    <span class="ef">
-                        <asp:Label ID="WF_OWNERNAME_L" runat="server" Text="名義所有者" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_OWNERNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                        <asp:Label ID="WF_OWNERNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
-                </p>
 
                 <p id="KEY_LINE_18">
                     <!-- リース先 -->
@@ -515,11 +518,11 @@
                         <asp:Label ID="WF_OTTANKNUMBER_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
-                    <!-- JXTG車番 -->
+                    <!-- JXTG仙台車番 -->
                     <span class="ef">
-                        <asp:Label ID="WF_JXTGTANKNUMBER_L" runat="server" Text="JXTG車番" CssClass="WF_TEXT_LABEL"></asp:Label>
-                        <asp:TextBox ID="WF_JXTGTANKNUMBER" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                        <asp:Label ID="WF_JXTGTANKNUMBER_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                        <asp:Label ID="WF_JXTGTANKNUMBER1_L" runat="server" Text="JXTG仙台車番" CssClass="WF_TEXT_LABEL"></asp:Label>
+                        <asp:TextBox ID="WF_JXTGTANKNUMBER1" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                        <asp:Label ID="WF_JXTGTANKNUMBER1_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 

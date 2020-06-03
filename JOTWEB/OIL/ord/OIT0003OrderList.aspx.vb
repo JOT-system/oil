@@ -727,7 +727,7 @@ Public Class OIT0003OrderList
             & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
             & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
             & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
-            & " , ''                                             AS PLACEORDER" _
+            & " , ''                                             AS LODPOINT" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
@@ -735,19 +735,14 @@ Public Class OIT0003OrderList
             & " , OIM0005.MODEL                                  AS MODEL" _
             & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
-            & " , ''                                             AS CARSAMOUNT" _
-            & " , ''                                             AS FARE" _
+            & " , ''                                             AS RESERVEAMOUNT" _
             & " , CASE " _
             & "   WHEN OIT0002.STACKINGFLG = '1' THEN '積置' " _
             & "   ELSE '' " _
             & "   END                                            AS STACKING" _
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
-            & " , OIT0005.LASTOILCODE                            AS LASTOILCODE" _
-            & " , OIT0005.LASTOILNAME                            AS LASTOILNAME" _
-            & " , OIT0005.PREORDERINGTYPE                        AS PREORDERINGTYPE" _
-            & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
-            & " , ''                                             AS STACKINGCNT" _
+            & " , OIT0002.TOTALTANKCH                            AS TOTALTANK" _
             & " , OIT0002.LODDATE                                AS LODDATE" _
             & " , OIT0002.DEPDATE                                AS DEPDATE" _
             & " , OIT0002.ARRDATE                                AS ARRDATE" _
@@ -759,12 +754,13 @@ Public Class OIT0003OrderList
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
             & " AND OIM0005.DELFLG <> @P02 " _
-            & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
-            & "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
-            & " AND OIT0005.DELFLG <> @P02 " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
             & "   AND OIT0002.LODDATE = @P03 "
+
+        '& " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+        '& "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
+        '& " AND OIT0005.DELFLG <> @P02 " _
 
         SQLStr &=
               " ORDER BY" _

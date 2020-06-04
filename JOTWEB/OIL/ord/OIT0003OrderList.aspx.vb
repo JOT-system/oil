@@ -1912,7 +1912,8 @@ Public Class OIT0003OrderList
                         '引数１：所在地コード　⇒　変更なし(空白)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
-                        WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"))
+                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                        WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1")
 
                     '350：受注確定
                     Case BaseDllConst.CONST_ORDERSTATUS_350
@@ -2187,6 +2188,7 @@ Public Class OIT0003OrderList
     Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
                                       ByVal I_STATUS As String,
                                       ByVal I_KBN As String,
+                                      Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal I_EmparrDate As String = Nothing,
@@ -2215,6 +2217,10 @@ Public Class OIT0003OrderList
             '積車区分
             If Not String.IsNullOrEmpty(I_KBN) Then
                 SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            'タンク車状況コード
+            If Not String.IsNullOrEmpty(I_SITUATION) Then
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
             End If
             '空車着日（予定）
             If upEmparrDate = True Then

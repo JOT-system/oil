@@ -22,12 +22,61 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
         document.getElementById("WF_ButtonORDER_CANCEL").disabled = "";
         document.getElementById("WF_ButtonINSERT").disabled = "";
+
+        //★石油部/情報システム部
+        if (document.getElementById('WF_BUTTONpermitcode').value === "0") {
+
+            //再表示(仙台)
+            document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "inlineblock";
+            document.getElementById("WF_ButtonSendaiLOADCSV").value = "積込予定(仙)";
+
+            //再表示(根岸)
+            document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "inlineblock";
+            document.getElementById("WF_ButtonNegishiSHIPCSV").value = "出荷予定(根)";
+            document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "inlineblock";
+            document.getElementById("WF_ButtonNegishiLOADCSV").value = "積込予定(根)";
+
+        //★東北支店/仙台
+        } else if (document.getElementById('WF_BUTTONpermitcode').value === "1") {
+            
+            //再表示(仙台)
+            //document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "inlineblock";
+            document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "none";
+
+            //非表示(根岸)
+            document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "none";
+            document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "none";
+        
+        //★関東支店/五井/甲子/袖ヶ浦/根岸
+        } else if (document.getElementById('WF_BUTTONpermitcode').value === "2") {
+
+            //非表示(仙台)
+            document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "none";
+
+            //再表示(根岸)
+            document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "inlineblock";
+            document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "inlineblock";
+        
+        //★中部支店/四日市/三重塩浜
+        } else if (document.getElementById('WF_BUTTONpermitcode').value === "3") {
+
+            //非表示(仙台)
+            document.getElementById("WF_ButtonSendaiLOADCSV").style.display = "none";
+
+            //非表示(根岸)
+            document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "none";
+            document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "none";
+        }
     } else {
         //非活性 
         document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonORDER_CANCEL").disabled = "disabled";
         document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+        //非表示
+        document.getElementById("WF_ButtonNegishiSHIPCSV").style.display = "none";
+        document.getElementById("WF_ButtonNegishiLOADCSV").style.display = "none";
+
     }
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);

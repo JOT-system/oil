@@ -2214,6 +2214,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
+        '〇 タンク車状態チェック
+        WW_CheckTankStatus(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+
         '〇前回油種と油種の整合性チェック
         WW_CheckLastOilConsistency(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
@@ -3257,6 +3263,64 @@ Public Class OIT0001EmptyTurnDairyDetail
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
                 O_RTN = "ERR"
                 Exit Sub
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' タンク車状態チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckTankStatus(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_OfficeCode As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '〇 検索(営業所).テキストボックスが未設定
+        WW_OfficeCode = work.WF_SEL_SALESOFFICECODE.Text
+
+        'タンク車状態チェック
+        '(1:発送　2:到着予定　3:到着　4:交検　5:全検　6:修理　7:疎開留置)
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+
+            If OIT0001row("DELFLG") = "0" Then
+                'タンク車情報を取得
+                WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0001row("TANKNO"), WW_GetValue)
+
+                'タンク車状態
+                Select Case WW_GetValue(11)
+                        'タンク車状態が"2"(到着予定), "3"(到着)の場合
+                    Case "2", "3"
+                        If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101 Then
+                            OIT0001row("ORDERINFO") = ""
+                            OIT0001row("ORDERINFONAME") = ""
+                        End If
+                        'タンク車状態が"2"(到着予定), "3"(到着)以外の場合
+                    Case Else
+                        OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
+                        CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+
+                        Master.Output(C_MESSAGE_NO.OIL_TANKSTATUS_ERROR,
+                              C_MESSAGE_TYPE.ERR,
+                              "(" + OIT0001row("TANKNO") + ")" + WW_GetValue(9),
+                              needsPopUp:=True)
+
+                        WW_CheckMES1 = "タンク車状態未到着エラー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.OIL_TANKSTATUS_ERROR
+                        WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
+                        O_RTN = "ERR"
+
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0001tbl)
+                        Exit Sub
+                End Select
             End If
         Next
 

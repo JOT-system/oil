@@ -2126,7 +2126,7 @@ Public Class OIT0006OutOfServiceDetail
         Dim SQLStrNum As String
 
         '○ 作成モード(１：新規登録, ２：更新)設定
-        If work.WF_SEL_CREATEFLG.Text = "1" Then
+        If work.WF_SEL_CREATEFLG.Text = "1" OrElse OIT0006tbl.Rows.Count = 0 Then
             SQLStrNum =
             " SELECT " _
             & "  @P01   AS KAISOUNO" _

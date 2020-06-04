@@ -231,6 +231,15 @@ Public Module BaseDllConst
 
 #Region "営業所"
     ''' <summary>
+    ''' 情報システム部
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010006 As String = "010006"
+    ''' <summary>
+    ''' 石油部
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010007 As String = "010007"
+
+    ''' <summary>
     ''' 東北支店
     ''' </summary>
     Public Const CONST_OFFICECODE_010401 As String = "010401"

@@ -68,24 +68,6 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents WF_ButtonGETEMPTURN As Global.System.Web.UI.HtmlControls.HtmlInputButton
     
     '''<summary>
-    '''lblDownloadMonth コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents lblDownloadMonth As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''txtDownloadMonth コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents txtDownloadMonth As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
     '''<remarks>
@@ -345,6 +327,78 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnChgConsigneeName As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnDispReportSettings コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDispReportSettings As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''chkPrintJXTG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkPrintJXTG As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
+    '''Label1 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents Label1 As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtDownloadMonth コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtDownloadMonth As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''lblReportFromDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportFromDate As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtReportFromDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportFromDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''lblReportToDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportToDate As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtReportToDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportToDate As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''Master プロパティ。

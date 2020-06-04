@@ -207,6 +207,23 @@ Public Class OIT0003OrderList
             Master.RecoverTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
         End If
 
+        '### 帳票ポップアップの設定 ###################################################################
+        '〇仮置き
+        'Dim paramData As Hashtable = work.CreateSALESOFFICEParam(Master.USER_ORG, dummyTxtSalesOffice)
+        Dim paramData As Hashtable = work.CreateFIXParam(Master.USER_ORG)
+        Me.tileSalesOffice.ListBoxClassification = LIST_BOX_CLASSIFICATION.LC_SALESOFFICE
+        Me.tileSalesOffice.ParamData = paramData
+        Me.tileSalesOffice.LeftObj = leftview
+        Me.tileSalesOffice.SelectionMode = ListSelectionMode.Single
+        Me.tileSalesOffice.NeedsPostbackAfterSelect = True
+        Me.tileSalesOffice.SetTileValues()
+
+        'RadioButton1.Visible = False
+
+        ''帳票のポップアップを閉じる
+        'Master.HideCustomPopUp()
+        '##############################################################################################
+
         ''○ 名称設定処理
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
         'CODENAME_get("UORG", work.WF_SEL_UORG.Text, WF_SELUORG_TEXT.Text, WW_DUMMY)                     '運用部署

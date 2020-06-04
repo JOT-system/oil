@@ -230,6 +230,33 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents WF_BUTTONpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''tileSalesOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
+    
+    '''<summary>
+    '''RadioButton1 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents RadioButton1 As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''RadioButton2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents RadioButton2 As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
     '''lblReportFromDate コントロール。
     '''</summary>
     '''<remarks>

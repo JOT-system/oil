@@ -6,6 +6,7 @@
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIT0003WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/OIL/inc/GRC0001TILESELECTORWRKINC.ascx" TagName="tilelist" TagPrefix="MSINC"  %>
 
 <asp:Content ID="OIT0003LH" ContentPlaceHolderID="head" runat="server">
     <link href='<%=ResolveUrl("~/OIL/css/OIT0003L.css")%>' rel="stylesheet" type="text/css" /> 
@@ -47,7 +48,7 @@
                         <input type="button" id="WF_ButtonSendaiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonSendaiLOADCSV');" />
                         <input type="button" id="WF_ButtonNegishiSHIPCSV" class="btn-sticky" value="出荷予定" onclick="ButtonClick('WF_ButtonNegishiSHIPCSV');" />
                         <input type="button" id="WF_ButtonNegishiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonNegishiLOADCSV');" />
-                        <input type="button" id="WF_ButtonTyohyo" class="btn-sticky" value="帳票" onclick="ButtonClick('commonShowCustomPopup();');" />
+                        <%--<input type="button" id="WF_ButtonTyohyo" class="btn-sticky" value="帳票" onclick="commonShowCustomPopup();" />--%>
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"   onclick="ButtonClick('WF_ButtonEND');" />
                         <!-- 先頭行・末尾行ボタンを表示させる場合は divの括りを無くして WF_ButtonXXXを外だしにすれば出ます -->
                         <div style="display:none;">
@@ -134,6 +135,19 @@
                 <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
         </span>
     </div>--%>
+    <div>
+        <MSINC:tilelist ID="tileSalesOffice" runat="server" />
+    </div>
+        <div class="grc0001Wrapper">
+            <ul>
+                <li>
+                    <asp:RadioButton ID="RadioButton1" runat="server" GroupName="WF_SW" Text="出荷予定" />
+                </li>
+                <li>
+                    <asp:RadioButton ID="RadioButton2" runat="server" GroupName="WF_SW" Text="積込予定" />
+                </li>
+            </ul>
+        </div>
     <div>
         <span id="spnFromDate">
             <asp:Label ID="lblReportFromDate" runat="server" Text="年月日"></asp:Label>

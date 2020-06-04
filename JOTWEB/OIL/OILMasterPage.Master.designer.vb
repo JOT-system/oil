@@ -50,6 +50,24 @@ Partial Public Class OILMasterPage
     Protected WithEvents contents1 As Global.System.Web.UI.WebControls.ContentPlaceHolder
     
     '''<summary>
+    '''contentsPopUpTitle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents contentsPopUpTitle As Global.System.Web.UI.WebControls.ContentPlaceHolder
+    
+    '''<summary>
+    '''contentsPopUpInside コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents contentsPopUpInside As Global.System.Web.UI.WebControls.ContentPlaceHolder
+    
+    '''<summary>
     '''footer コントロール。
     '''</summary>
     '''<remarks>
@@ -273,4 +291,13 @@ Partial Public Class OILMasterPage
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents MF_ALERT As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''MF_SHOWCUSTOMOPOUP コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents MF_SHOWCUSTOMOPOUP As Global.System.Web.UI.WebControls.HiddenField
 End Class

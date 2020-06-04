@@ -38,6 +38,15 @@ window.addEventListener('load', function () {
  * @return {undefined} なし
  */
 window.addEventListener('DOMContentLoaded', function () {
+    let dummyObj = document.createElement('div');
+    dummyObj.id = 'dummyLoading';
+    dummyObj.style.position = 'fixed';
+    dummyObj.style.width = '100vw';
+    dummyObj.style.height = '100vh';
+    dummyObj.style.zIndex = '9999';
+    dummyObj.style.backgroundColor = 'rgba(55, 55, 55, 0.6)';
+    dummyObj.style.cursor = 'wait';
+    document.body.appendChild(dummyObj);
     // 画面初期処理(個別のInitDisplay関数未定義の場合はスキップ)
     if (typeof InitDisplay === 'function') {
         InitDisplay();
@@ -162,6 +171,30 @@ window.addEventListener('DOMContentLoaded', function () {
     /* 受注情報行ハイライト                  */
     /* ************************************  */
     commonSetHasOrderInfoToHighlight();
+    /* ************************************  */
+    /* カスタムポップアップ                  */
+    /* ************************************  */
+    let dispCustomPopUpObj = document.getElementById('MF_SHOWCUSTOMOPOUP');
+    let divContentsPopUpWrapperObj = document.getElementById('divContentsPopUpWrapper');
+    if (divContentsPopUpWrapperObj !== null) {
+        okButtonObj = document.getElementById('WF_ButtonOkCommonPopUp');
+        if (okButtonObj !== null) {
+            if (typeof customPopUpOkButtonName !== "undefined") {
+                okButtonObj.value = customPopUpOkButtonName;
+            }
+        }
+        
+        if (dispCustomPopUpObj.value === '1') {
+            commonShowCustomPopup();
+        } else {
+            commonHideCustomPopup();
+        }
+    }
+    /* ************************************  */
+    /* 共通タイルチェックイベントバインド    */
+    /* ************************************  */
+    commonBindSingleCheckOnly();
+    document.body.removeChild(dummyObj);
 });
 
 // 処理後カーソルを戻す
@@ -1456,11 +1489,16 @@ function commonSetHasOrderInfoToHighlight() {
             }
             
             let cellObj = rightTableObj.rows[rowIdx].cells[colIdx];
-            if (cellObj.textContent === '') {
+            if (cellObj.textContent === '' || cellObj.textContent === '積置') {
                 continue;
             }
             rightTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
             leftTableObj.rows[rowIdx].classList.add('hasOrderInfoValue');
+            //ワーニング（黄色）判定
+            if (cellObj.textContent === '検査間近有' || cellObj.textContent === '前回揮発油') {
+                rightTableObj.rows[rowIdx].classList.add('warnInfo');
+                leftTableObj.rows[rowIdx].classList.add('warnInfo');
+            }
         }
     }
 }
@@ -2567,4 +2605,65 @@ function commonMonthPickerMonthClick(targetTextBox, monthTileObjId) {
         return;
     }
     monthPickerId.parentNode.removeChild(monthPickerId);
+}
+/* カスタムポップアップ表示 */
+function commonShowCustomPopup() {
+    let customPopUpAreaObj = document.getElementById('divContentsPopUpWrapper');
+    let dispCustomPopUpObj = document.getElementById('MF_SHOWCUSTOMOPOUP');
+    let WF_ButtonOkCommonPopUpObj = document.getElementById('WF_ButtonOkCommonPopUp');
+    customPopUpAreaObj.style.display = 'block';
+    dispCustomPopUpObj.value = '1';
+    WF_ButtonOkCommonPopUpObj.focus();
+}
+/* カスタムポップアップ非表示 */
+function commonHideCustomPopup() {
+    let customPopUpAreaObj = document.getElementById('divContentsPopUpWrapper');
+    let dispCustomPopUpObj = document.getElementById('MF_SHOWCUSTOMOPOUP');
+    customPopUpAreaObj.style.display = 'none';
+    dispCustomPopUpObj.value = '0';
+}
+/* タイルボックスコントロール */
+function commonBindSingleCheckOnly() {
+    let tailObjects = document.querySelectorAll('ul[id$="_chklGrc0001SelectionBox"]');
+    if (tailObjects === null) {
+        return;
+    }
+    for (let i = 0; i < tailObjects.length; i++) {
+        let tailObject = tailObjects[i];
+
+        let multiSetting = tailObject.parentNode.querySelector('input[data-id=SelectionMode]');
+        if (multiSetting === null) {
+            continue;
+        }
+
+        if (multiSetting.value === '1') {
+            continue;
+        }
+
+        let insideCheckBoxes = tailObject.querySelectorAll('input[type=checkbox]');
+        if (insideCheckBoxes === null) {
+            return;
+        }
+        for (let j = 0; j < insideCheckBoxes.length; j++) {
+            let insideCheckBox = insideCheckBoxes[j];
+            let parentId = tailObject.id;
+            let targetId = insideCheckBox.id;
+            insideCheckBox.addEventListener('click', (function (parentId, targetId) {
+                return function () {
+                    commonTailSingleCheck(parentId, targetId);
+                };
+            })(parentId, targetId), false);
+        }
+    }
+}
+function commonTailSingleCheck(parentId, targetId) {
+    let parentObj = document.getElementById(parentId);
+    let targetObj = document.getElementById(targetId);
+    let currentVal = targetObj.checked;
+    let insideCheckBoxes = parentObj.querySelectorAll('input[type=checkbox]');
+    for (let i = 0; i < insideCheckBoxes.length; i++) {
+        let insideCheckBox = insideCheckBoxes[i];
+        insideCheckBox.checked = false;
+    }
+    targetObj.checked = currentVal;
 }

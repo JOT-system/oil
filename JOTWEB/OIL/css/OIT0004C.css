@@ -228,7 +228,6 @@
     border:none !important;
     background-repeat: no-repeat;
     background-size: contain;
-    //float: right;
     pointer-events: auto; 
     cursor:pointer !important;
     position:relative;
@@ -315,13 +314,11 @@ div.weightListOilType {
 #divStockList,
 #divStockList div{
     box-sizing:border-box;
-    //padding:2px;
 }
 #divStockList > div.header,
 #divStockList > div.oilTypeData {
     display:flex;
     flex-wrap: nowrap;
-    //border:1px solid darkgray; /* 暫定 */
 }
 #divStockList div.lastMargin {
     margin-left:auto;
@@ -334,7 +331,6 @@ span.minus {
 /* データ行の１～６列目の幅を足す
    ※余白要素があるので手動でバランスとる */
 #divStockList div.emptyBox {
-    //width:411px;
     width: calc(90px + 110px + 70px + 95px);
     min-width: calc(90px + 110px + 70px + 95px);
 }
@@ -362,7 +358,6 @@ span.minus {
 #divStockList div.col5{
     width:110px;
     min-width:110px;
-    //text-align:center;
     display:flex;
     flex-wrap: nowrap;
     flex-direction:column;
@@ -404,7 +399,6 @@ span.minus {
 #divStockList div.col4 > div > span,
 #divStockList div.col5 > div > span{
     display:inline-block;
-    //margin-top:calc(100% / 3 - 5px);
 }
 #divStockList div.col3 > div > span,
 #divStockList div.col5 > div > span {
@@ -496,8 +490,6 @@ span.morningStockIdx0 {
 }
 #divStockList input[type=text][data-textfield="MorningStock"],
 #divStockList input[type=number][data-textfield="MorningStock"] {
-    // height: 18px;
-    //line-height:0.8em;
     width: calc(100% + 5.5px);
 }
 #divStockList input[type=text][name$="txtSend"],
@@ -743,10 +735,8 @@ div.oilTypeData div.col1 span[data-tiptext] {
     display: block;
     padding: 0.2em 0.5em;
     content: attr(data-tiptext);
-    //white-space: nowrap;
     color: #ffffff;
     border-radius: 6px;
-    //background: #1b2538;
     background-color: RGBA(27, 37, 56, 0.8);
     font-size:0.8em;
     z-index:5;
@@ -839,48 +829,17 @@ _:-ms-lang(x)::backdrop,
 /* ************************ */
 /* ↑油槽所選択ここまで↑   */
 /* ************************ */
-/* ********************************** */
-/* ↓帳票設定ポップアップここから↓   */
-/* ********************************** */
-#reportSettingsWrapper {
-    position: fixed;
-    z-index: 9950;
-    background-color: rgba(55, 55, 55, 0.6);
-    width: 100%;
-    height: 100%;
-    min-height: 100vh;
-    max-height: 100vh;
-    display: none;
-    margin-bottom:-10px;
-    top: 0;
-    left: 0;
-    bottom:0;
-    overflow: auto;
+
+/* ************************ */
+/* ポップアップ内コンテンツ */
+/* ************************ */
+div.popUpContents > div {
+    margin-bottom:5px;
 }
-#reportSetting {
-    background-color: rgb(240,240,240);
-    box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
-    height: auto;
-    min-height: 300px;
-    width:500px;
-    min-width:500px;
-    margin-left:calc(50vw - 250px);
-    margin-top:calc(10vh);
-    //border: 1px solid black;
-    border-radius: 5px;
+#txtReportFromDate,
+#txtReportToDate {
+    width: 150px !important;
 }
-#reportSetting > div:nth-child(1) {
-    font-weight:bold;
-    width:100%;
-    height:20px;
-    background:linear-gradient(to bottom, #8BACCD, rgb(240,240,240));
-    border-top-left-radius:5px;
-    border-top-right-radius:5px;
+.calendarIconArea div {
+    margin-top:calc(100% - 14px) !important;
 }
-#reportSetting > div {
-    padding:10px;
-    box-sizing :border-box;
-}
-/* ********************************** */
-/* ↑帳票設定ポップアップここまで↑   */
-/* ********************************** */

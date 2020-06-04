@@ -39,15 +39,6 @@ function InitDisplay() {
     bindContentHorizonalScroll();
     //月選択バインド
     commonBindMonthPicker();
-    // 帳票設定表示
-    let dispReportSettingsObj = document.getElementById('hdnDispReportSettings');
-    if (dispReportSettingsObj !== null) {
-        if (dispReportSettingsObj.value === '1') {
-            showReportSettings();
-        } else {
-            hideReportSettings();
-        }
-    }
 }
 // 〇コンテンツ横スクロールイベントのバインド
 function bindContentHorizonalScroll() {
@@ -595,18 +586,4 @@ function changeConsignee(callerObj) {
     }
 
     ButtonClick('ChangeConsignee');
-}
-/* レポート設定ポップアップ表示 */
-function showReportSettings() {
-    let repotSetrtingAreaObj = document.getElementById('reportSettingsWrapper');
-    let dispReportSettingsObj = document.getElementById('hdnDispReportSettings');
-    repotSetrtingAreaObj.style.display = 'block';
-    dispReportSettingsObj.value = '1';
-}
-/* レポート設定ポップアップ非表示 */
-function hideReportSettings() {
-    let repotSetrtingAreaObj = document.getElementById('reportSettingsWrapper');
-    let dispReportSettingsObj = document.getElementById('hdnDispReportSettings');
-    repotSetrtingAreaObj.style.display = 'none';
-    dispReportSettingsObj.value = '0';
 }

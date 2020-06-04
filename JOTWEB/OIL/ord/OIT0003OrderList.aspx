@@ -13,6 +13,8 @@
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
+        //共通ポップアップボタン名
+        var customPopUpOkButtonName = 'ﾀﾞｳﾝﾛｰﾄﾞ';
     </script>
 </asp:Content>
  
@@ -42,9 +44,10 @@
                         <a style="display:none;">
                             <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
                         </a>
-                        <input type="button" id="WF_ButtonSendaiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonSendaiLOADCSV');" />
+<%--                        <input type="button" id="WF_ButtonSendaiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonSendaiLOADCSV');" />--%>
                         <input type="button" id="WF_ButtonNegishiSHIPCSV" class="btn-sticky" value="出荷予定" onclick="ButtonClick('WF_ButtonNegishiSHIPCSV');" />
                         <input type="button" id="WF_ButtonNegishiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonNegishiLOADCSV');" />
+                        <input type="button" id="WF_ButtonTyohyo" class="btn-sticky" value="帳票" onclick="ButtonClick('commonShowCustomPopup();');" />
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"   onclick="ButtonClick('WF_ButtonEND');" />
                         <!-- 先頭行・末尾行ボタンを表示させる場合は divの括りを無くして WF_ButtonXXXを外だしにすれば出ます -->
                         <div style="display:none;">
@@ -108,4 +111,43 @@
             <input id="WF_BUTTONpermitcode" runat="server" value="" type="text" />
         </div>
  
+</asp:Content>
+
+<%--ポップアップタイトルバーの文字--%>
+<asp:Content ID="ctCostumPopUpTitle" ContentPlaceHolderID ="contentsPopUpTitle" runat="server">
+    帳票
+</asp:Content>
+<%--ポップアップタイトルバーの内容--%>
+<asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
+<%--    <div>
+        <div class="grc0001Wrapper">
+            <ul>
+                <li>
+                    <asp:CheckBox ID="chkPrintJXTG" runat="server" Text="JXTG用帳票" />
+                </li>
+            </ul>
+        </div>
+    </div>--%>
+<%--    <div>
+        <span id="spnDownloadMonth" style="display:none;">
+                <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
+                <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
+        </span>
+    </div>--%>
+    <div>
+        <span id="spnFromDate">
+            <asp:Label ID="lblReportFromDate" runat="server" Text="年月日"></asp:Label>
+            <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>
+<%--    <div>
+        <span id="spnToDate">
+            <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
+            <a class="ef" id="aReportToDate" ondblclick="Field_DBclick('txtReportToDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:TextBox ID="txtReportToDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>--%>
 </asp:Content>

@@ -3616,6 +3616,11 @@ Public Class OIT0003OrderDetail
 
         Select Case chkFieldName
             Case "WF_CheckBoxSELECTSTACKING"
+                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                    Exit Select
+                End If
+
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
@@ -3624,9 +3629,21 @@ Public Class OIT0003OrderDetail
                         Else
                             OIT0003tbl_tab3.Rows(i)("STACKINGFLG") = "on"
                         End If
+
+                        '★チェックボックスのON,OFFチェック
+                        If OIT0003tbl_tab3.Rows(i)("STACKINGFLG") = "on" Then
+                            OIT0003tbl_tab3.Rows(i)("ACTUALLODDATE") = Date.Parse(Me.TxtDepDate.Text).AddDays(-1).ToString()
+                        Else
+                            OIT0003tbl_tab3.Rows(i)("ACTUALLODDATE") = Me.TxtLoadingDate.Text
+                        End If
+
                     End If
                 Next
             Case "WF_CheckBoxSELECTFIRSTRETURN"
+                '◯ 受注営業所が"011402"(根岸営業所)以外の場合
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
+                    Exit Select
+                End If
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
@@ -9946,6 +9963,7 @@ Public Class OIT0003OrderDetail
 
                 '(実績)積込日に入力された日付を、(一覧)積込日に反映させる。
                 For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                    If OIT0003tab3row("ACTUALLODDATE") <> "" Then Continue For
                     OIT0003tab3row("ACTUALLODDATE") = Me.TxtActualLoadingDate.Text
                 Next
                 '○ 画面表示データ保存
@@ -10326,6 +10344,27 @@ Public Class OIT0003OrderDetail
                                 Else
                                     updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
                                 End If
+
+                                '(一覧)(実績)積込日の場合
+                                If WF_FIELD.Value = "ACTUALLODDATE" Then
+                                    '○ 過去日付チェック
+                                    '例) iresult = dt1.Date.CompareTo(dt2.Date)
+                                    '    iresultの意味
+                                    '     0 : dt1とdt2は同じ日
+                                    '    -1 : dt1はdt2より前の日
+                                    '     1 : dt1はdt2より後の日
+                                    '(予定)積込日 と　現在日付を比較
+                                    Dim iresult As Integer = Date.Parse(leftview.WF_Calendar.Text).CompareTo(Date.Parse(Me.TxtDepDate.Text))
+                                    '◯ (一覧)積込日＜(予定)発日
+                                    If iresult = -1 Then
+                                        '★積置(チェックボックスON)
+                                        updHeader.Item("STACKINGFLG") = "on"
+                                    Else
+                                        '★積置(チェックボックスOFF)
+                                        updHeader.Item("STACKINGFLG") = ""
+                                    End If
+                                End If
+
                             Catch ex As Exception
                             End Try
 
@@ -14678,10 +14717,13 @@ Public Class OIT0003OrderDetail
                                     End If
                                 Next
 
-                                '◯ 受注営業所が"011402"(根岸営業所)以外の場合
-                                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
+                                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
                                     '積込可否フラグ(チェックボックス)を非活性
                                     chkObjST.Enabled = False
+                                End If
+                                '◯ 受注営業所が"011402"(根岸営業所)以外の場合
+                                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
                                     '先返し可否フラグ(チェックボックス)を非活性
                                     chkObjFR.Enabled = False
                                 End If

@@ -1506,6 +1506,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS LINKDETAILNO" _
             & " , ''                                             AS SHIPORDER" _
             & " , ''                                             AS TANKNO" _
+            & " , ''                                             AS TANKSTATUS" _
             & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS MODEL" _
             & " , ''                                             AS JRINSPECTIONALERT" _
@@ -1576,6 +1577,7 @@ Public Class OIT0003OrderDetail
                 & " , ''                                                 AS LINKDETAILNO" _
                 & " , ISNULL(RTRIM(OIT0003.SHIPORDER), '')               AS SHIPORDER" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
+                & " , ISNULL(RTRIM(OIT0005.TANKSTATUS), '')              AS TANKSTATUS" _
                 & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')               AS LINEORDER" _
                 & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
                 & " , CASE" _
@@ -1825,6 +1827,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
             & " , ISNULL(RTRIM(TMP0001.SHIPORDER), '')                          AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0005.TANKSTATUS), '')                         AS TANKSTATUS" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
@@ -1944,6 +1947,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                       AS LINKDETAILNO" _
             & " , ISNULL(RTRIM(TMP0001.SHIPORDER), '')                          AS SHIPORDER" _
             & " , ISNULL(RTRIM(OIM0005.TANKNUMBER), '')                         AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0005.TANKSTATUS), '')                         AS TANKSTATUS" _
             & " , ISNULL(RTRIM(OIT0004.LINEORDER), TMP0001.LINEORDER)           AS LINEORDER" _
             & " , ISNULL(RTRIM(OIM0005.MODEL), '')                              AS MODEL" _
             & " , CASE" _
@@ -4380,11 +4384,12 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS OILNAME" _
             & " , ''                                             AS ORDERINGTYPE" _
             & " , ''                                             AS ORDERINGOILNAME" _
-            & " , '未割当'                                             AS TANKQUOTA" _
+            & " , '未割当'                                       AS TANKQUOTA" _
             & " , ''                                             AS LINKNO" _
             & " , ''                                             AS LINKDETAILNO" _
             & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS TANKNO" _
+            & " , ''                                             AS TANKSTATUS" _
             & " , ''                                             AS MODEL" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
@@ -4646,26 +4651,26 @@ Public Class OIT0003OrderDetail
         'タブ「タンク車割当」
         If WF_DetailMView.ActiveViewIndex = "0" Then
             '割当確定ボタン押下時
-            WW_ButtonUPDATE_TAB1()
             Me.WW_UPBUTTONFLG = "1"
+            WW_ButtonUPDATE_TAB1()
 
             'タブ「入換・積込指示」
         ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
             '入力内容登録ボタン押下時
-            WW_ButtonUPDATE_TAB2()
             Me.WW_UPBUTTONFLG = "2"
+            WW_ButtonUPDATE_TAB2()
 
             'タブ「タンク車明細」
         ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
             '明細更新ボタン押下時
-            WW_ButtonUPDATE_TAB3()
             Me.WW_UPBUTTONFLG = "3"
+            WW_ButtonUPDATE_TAB3()
 
             'タブ「費用入力」
         ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
             '訂正更新ボタン押下時
-            WW_ButtonUPDATE_TAB4()
             Me.WW_UPBUTTONFLG = "4"
+            WW_ButtonUPDATE_TAB4()
 
         End If
 
@@ -4817,6 +4822,8 @@ Public Class OIT0003OrderDetail
 
         End If
 
+        '〇タンク車所在の更新
+        WW_TankShozaiSet()
         '### START ######################################################
         '★ GridView初期設定
         '○ 画面表示データ再取得(受注(明細)画面表示データ取得)
@@ -12964,7 +12971,7 @@ Public Class OIT0003OrderDetail
         '(1:発送　2:到着予定　3:到着　4:交検　5:全検　6:修理　7:疎開留置)
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
 
-            If OIT0003row("DELFLG") = "0" Then
+            If OIT0003row("DELFLG") = "0" AndAlso OIT0003row("TANKSTATUS") = "" Then
                 'タンク車情報を取得
                 WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0003row("TANKNO"), WW_GetValue)
 
@@ -14519,6 +14526,14 @@ Public Class OIT0003OrderDetail
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+
+                    Dim loopdr As DataRow = Nothing
+                    Dim rowIdx As Integer = 0
+                    Dim chkTankNocnt As String = "txt" & pnlListArea1.ID & "TANKNO"
+                    Dim chkTankNo As String = ""
+                    Dim chkJRInspectionDatecnt As String = "txt" & pnlListArea1.ID & "JRINSPECTIONDATE"
+                    Dim chkJRInspectionDate As String = ""
+
                     For Each rowitem As TableRow In tblObj.Rows
                         For Each cellObj As TableCell In rowitem.Controls
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
@@ -14530,8 +14545,38 @@ Public Class OIT0003OrderDetail
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
                                 AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                'ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") _
+                                '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
+                                '    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
+
+                        '★タンク車の状態が「発送」の場合は、入力を許可しない。
+                        '画面表示行が存在している場合
+                        If OIT0003tbl.Rows.Count <> 0 Then
+                            loopdr = OIT0003tbl.Rows(rowIdx)
+                            If loopdr("TANKSTATUS") = "1" AndAlso loopdr("DELFLG") = "0" Then
+                                '◯ タンク車№
+                                chkTankNo = chkTankNocnt & Convert.ToString(loopdr("LINECNT"))
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    'コントロールが見つかったら脱出
+                                    If cellObj.Text.Contains(chkTankNo) Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                        Exit For
+                                    End If
+                                Next
+                                '◯ 交検日
+                                chkJRInspectionDate = chkJRInspectionDatecnt & Convert.ToString(loopdr("LINECNT"))
+                                For Each cellObj As TableCell In rowitem.Controls
+                                    'コントロールが見つかったら脱出
+                                    If cellObj.Text.Contains(chkJRInspectionDate) Then
+                                        cellObj.Text = cellObj.Text.Replace(" readonly='readonly' class='iconOnly'>", " readonly='readonly'>")
+                                        Exit For
+                                    End If
+                                Next
+                            End If
+                        End If
+                        rowIdx += 1
                     Next
 
                     '受注進行ステータスが"310：手配完了"以降のステータスの場合

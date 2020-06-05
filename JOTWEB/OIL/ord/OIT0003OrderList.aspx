@@ -136,32 +136,26 @@
         </span>
     </div>--%>
     <div>
+        <span id="spnLodDate">
+            <asp:Label ID="lblReportLodDate" runat="server" Text="積込日"></asp:Label>
+            <a class="ef" id="aReportLodDate" ondblclick="Field_DBclick('txtReportLodDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:TextBox ID="txtReportLodDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>
+    <br/>
+    <div>
         <MSINC:tilelist ID="tileSalesOffice" runat="server" />
     </div>
-        <div class="grc0001Wrapper">
-            <ul>
-                <li>
-                    <asp:RadioButton ID="RadioButton1" runat="server" GroupName="WF_SW" Text="出荷予定" />
-                </li>
-                <li>
-                    <asp:RadioButton ID="RadioButton2" runat="server" GroupName="WF_SW" Text="積込予定" />
-                </li>
-            </ul>
-        </div>
-    <div>
-        <span id="spnFromDate">
-            <asp:Label ID="lblReportFromDate" runat="server" Text="年月日"></asp:Label>
-            <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
-            </a>
-        </span>
+    <br/>
+    <div class="grc0001Wrapper">
+        <ul>
+            <li>
+                <asp:RadioButton ID="rbShipBtn" runat="server" GroupName="WF_SW" Text="出荷予定" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定" />
+            </li>
+        </ul>
     </div>
-<%--    <div>
-        <span id="spnToDate">
-            <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
-            <a class="ef" id="aReportToDate" ondblclick="Field_DBclick('txtReportToDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                <asp:TextBox ID="txtReportToDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
-            </a>
-        </span>
-    </div>--%>
 </asp:Content>

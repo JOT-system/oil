@@ -29,8 +29,8 @@ div[data-generated="1"] td:nth-child(4) {
 .headerboxOnly {
     min-width: 750px; /* (共通指定 650pxだと小さすぎる為) */
 }
-#txtReportFromDate,
-#txtReportToDate {
+/* 帳票ポップアップ個別指定*/
+#txtReportLodDate{
     width: 150px !important;
 }
 

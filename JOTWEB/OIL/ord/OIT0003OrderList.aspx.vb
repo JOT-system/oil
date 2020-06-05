@@ -76,6 +76,8 @@ Public Class OIT0003OrderList
                             WF_ButtonLinkINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
+                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                            WF_FIELD_DBClick()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
@@ -84,6 +86,8 @@ Public Class OIT0003OrderList
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
                             'WF_FILEUPLOAD()
+                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                            WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -1411,6 +1415,37 @@ Public Class OIT0003OrderList
     End Sub
 
     ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
+
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
+
+                    '###　特になし ####################################################
+
+                Else
+                    '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                    Select Case WF_FIELD.Value
+                        '(帳票ポップアップ)積込日
+                        Case "txtReportLodDate"
+                            .WF_Calendar.Text = Me.txtReportLodDate.Text
+                    End Select
+                    .ActiveCalendar()
+                End If
+            End With
+        End If
+    End Sub
+
+    ''' <summary>
     ''' 一覧画面-明細行ダブルクリック時処理 (GridView ---> detailbox)
     ''' </summary>
     ''' <remarks></remarks>
@@ -1671,6 +1706,55 @@ Public Class OIT0003OrderList
 
     End Sub
 #End Region
+
+    ' ******************************************************************************
+    ' ***  LeftBox関連操作                                                       ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '○ 選択内容を取得
+        '### LeftBoxマルチ対応(20200217) START #####################################################
+        If leftview.ActiveViewIdx = 2 Then
+            '一覧表表示時
+            Dim selectedLeftTableVal = leftview.GetLeftTableValue()
+            WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
+            WW_SelectText = selectedLeftTableVal("VALUE1")
+            '### LeftBoxマルチ対応(20200217) END   #####################################################
+        ElseIf leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            '(帳票ポップアップ)積込日
+            Case "txtReportLodDate"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE < C_DEFAULT_YMD Then
+                        Me.txtReportLodDate.Text = ""
+                    Else
+                        Me.txtReportLodDate.Text = leftview.WF_Calendar.Text
+                    End If
+                Catch ex As Exception
+                End Try
+                Me.txtReportLodDate.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+
+    End Sub
 
     ''' <summary>
     ''' RightBoxラジオボタン選択処理

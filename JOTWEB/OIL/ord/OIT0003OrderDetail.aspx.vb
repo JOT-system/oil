@@ -3276,7 +3276,11 @@ Public Class OIT0003OrderDetail
             OIT0003row("ORDERINGOILNAME") = arrTankOrderName(j) '油種名(受発注用)
 
             j += 1
-            OIT0003row("SHIPORDER") = j        '発送順
+            '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合は値を設定
+            '　※上記以外(2:発送対象外)については、入力しないため値は未入力。
+            If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+                OIT0003row("SHIPORDER") = j    '発送順
+            End If
 
             '◯袖ヶ浦営業所のみ貨物駅入線順の値を設定
             '　※上記以外の営業所については、入力しないため値は未入力。
@@ -4769,16 +4773,20 @@ Public Class OIT0003OrderDetail
             End If
         End Using
 
-        '列車発送順重複チェック(同じ列車(発日も一緒)で発送順がすでに登録済みかチェック)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+        '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
+        '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
+        If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+            '列車発送順重複チェック(同じ列車(発日も一緒)で発送順がすでに登録済みかチェック)
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            WW_CheckTrainShipRepeat(WW_ERRCODE, SQLcon)
-            If WW_ERRCODE = "ERR" Then
-                Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                Exit Sub
-            End If
-        End Using
+                WW_CheckTrainShipRepeat(WW_ERRCODE, SQLcon)
+                If WW_ERRCODE = "ERR" Then
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    Exit Sub
+                End If
+            End Using
+        End If
 
         '列車タンク車重複チェック(同じ列車(発日も一緒)でタンク車がすでに登録済みかチェック)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -11368,7 +11376,15 @@ Public Class OIT0003OrderDetail
         '100:受注受付
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
 
-            '### 特になし ###############################################################
+            '★割当確定ボタン押下時に更新
+            If Me.WW_UPBUTTONFLG = "1" Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("1"(発送))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                '引数４：(予定)空車着日⇒　更新対象(画面項目)
+                WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
+            End If
 
             '受注進行ステータスが以下の場合
             '200:手配
@@ -11954,25 +11970,29 @@ Public Class OIT0003OrderDetail
             End If
         Next
 
-        '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
-        '発送順でソートし、重複がないかチェックする。
-        OIT0003tbl_dv.Sort = "SHIPORDER"
-        For Each drv As DataRowView In OIT0003tbl_dv
-            If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
-                Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                WW_CheckMES1 = "発送順重複エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR
-                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
+        '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
+        '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
+        If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+            '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
+            '発送順でソートし、重複がないかチェックする。
+            OIT0003tbl_dv.Sort = "SHIPORDER"
+            For Each drv As DataRowView In OIT0003tbl_dv
+                If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WW_CheckMES1 = "発送順重複エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
 
-            '行削除したデータの場合は退避しない。
-            If drv("HIDDEN") <> "1" Then
-                chkShipOrder = drv("SHIPORDER")
-            End If
-        Next
-        '### END  #############################################################################################
+                '行削除したデータの場合は退避しない。
+                If drv("HIDDEN") <> "1" Then
+                    chkShipOrder = drv("SHIPORDER")
+                End If
+            Next
+            '### END  #############################################################################################
+        End If
 
         '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
         '　※上記以外の営業所については、入力しないためチェックは未実施。
@@ -12010,18 +12030,22 @@ Public Class OIT0003OrderDetail
                 Exit Sub
             End If
 
-            '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
-            '(一覧)発送順(空白チェック)
-            If OIT0003row("SHIPORDER") = "" And OIT0003row("DELFLG") = "0" Then
-                Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
+            '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
+            '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
+            If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
+                '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
+                '(一覧)発送順(空白チェック)
+                If OIT0003row("SHIPORDER") = "" And OIT0003row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)発送順", needsPopUp:=True)
 
-                WW_CheckMES1 = "発送順未設定エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                O_RTN = "ERR"
-                Exit Sub
+                    WW_CheckMES1 = "発送順未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+                '### END  #############################################################################################
             End If
-            '### END  #############################################################################################
 
             '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
             '　※上記以外の営業所については、入力しないためチェックは未実施。
@@ -14243,6 +14267,9 @@ Public Class OIT0003OrderDetail
             work.WF_SEL_STACKINGFLG.Text = "2"
         End If
 
+        '発送順区分
+        work.WF_SEL_SHIPORDERCLASS.Text = WW_GetValue(13)
+
         '発駅
         Me.TxtDepstationCode.Text = WW_GetValue(1)
         work.WF_SEL_DEPARTURESTATION.Text = Me.TxtDepstationCode.Text
@@ -14497,6 +14524,9 @@ Public Class OIT0003OrderDetail
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
                                 AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
+                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
                     Next
@@ -14545,9 +14575,9 @@ Public Class OIT0003OrderDetail
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
                                 AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                                'ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") _
-                                '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") Then
-                                '    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
+                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             End If
                         Next
 

@@ -1240,6 +1240,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_RESULTFLG.Text = "0"
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = "0"
+        '発送順区分
+        work.WF_SEL_SHIPORDERCLASS.Text = ""
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
 
@@ -1387,6 +1389,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_RESULTFLG.Text = "0"
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = "0"
+        '発送順区分
+        work.WF_SEL_SHIPORDERCLASS.Text = ""
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
@@ -1455,6 +1459,7 @@ Public Class OIT0003OrderList
         Dim WW_FIELD_OBJ As Object = Nothing
         Dim WW_VALUE As String = ""
         Dim WW_TEXT As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
         '○ LINECNT取得
         Try
@@ -1631,6 +1636,11 @@ Public Class OIT0003OrderList
         work.WF_SEL_RESULTFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("RESULTFLG")
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELIVERYFLG")
+
+        '発送順区分
+        WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        work.WF_SEL_SHIPORDERCLASS.Text = WW_GetValue(13)
 
         '○ 状態をクリア
         For Each OIT0003row As DataRow In OIT0003tbl.Rows

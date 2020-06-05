@@ -266,4 +266,7 @@
     <!-- 託送指示フラグ -->
     <asp:TextBox ID="WF_SEL_DELIVERYFLG" runat="server"></asp:TextBox>
 
+    <!-- 発送順区分 -->
+    <asp:TextBox ID="WF_SEL_SHIPORDERCLASS" runat="server"></asp:TextBox>
+
 </div>

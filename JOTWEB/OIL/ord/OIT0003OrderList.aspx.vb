@@ -1935,6 +1935,8 @@ Public Class OIT0003OrderList
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderStatusCancel()
 
+        Dim StatusChk As Boolean = False
+
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0003tbl)
 
@@ -2034,6 +2036,8 @@ Public Class OIT0003OrderList
 
                     '350：受注確定
                     Case BaseDllConst.CONST_ORDERSTATUS_350
+                        StatusChk = True
+
                         '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
                         '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
@@ -2110,7 +2114,11 @@ Public Class OIT0003OrderList
         Master.SaveTable(OIT0003tbl)
 
         '○メッセージ表示
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If StatusChk = True Then
+            Master.Output(C_MESSAGE_NO.OIL_TANKNO_INFO_MESSAGE, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        Else
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 

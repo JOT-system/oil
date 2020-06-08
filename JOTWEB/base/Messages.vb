@@ -602,6 +602,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_TANKNO_KOUKENBI_PAST_ERROR As String = "20051"
 
+        ''' <summary>
+        ''' タンク車(インフォメーション)メッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_INFO_MESSAGE As String = "20052"
+
 #End Region
 
 

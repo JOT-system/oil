@@ -94,6 +94,10 @@ Public Class OIT0003OrderList
                             WF_RIGHTBOX_Change()
                         Case "btnCommonConfirmOk"       '確認メッセージ
                             WW_UpdateOrderStatusCancel()
+                        Case "tileSalesOffice"          '帳票ポップアップ(営業所(チェックボックス)選択)
+                            WF_TyohyoSalesOfficeSelect()
+                        Case "WF_ButtonOkCommonPopUp"   '帳票ポップアップ(ダウンロードボタン押下)
+                            WF_TyohyoDownloadClick()
                     End Select
 
                     '○ 一覧再表示処理
@@ -222,7 +226,9 @@ Public Class OIT0003OrderList
         Me.tileSalesOffice.NeedsPostbackAfterSelect = True
         Me.tileSalesOffice.SetTileValues()
 
-        'RadioButton1.Visible = False
+        'ラジオボタンを非表示にする。
+        rbShipBtn.Visible = False
+        rbLoadBtn.Visible = False
 
         ''帳票のポップアップを閉じる
         'Master.HideCustomPopUp()
@@ -2107,6 +2113,77 @@ Public Class OIT0003OrderList
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
+
+#Region "帳票ポップアップ"
+    ''' <summary>
+    ''' 帳票ポップアップ(営業所(チェックボックス)選択)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_TyohyoSalesOfficeSelect()
+
+        '選択したチェックボックス(営業所)の名称を取得
+        work.WF_SEL_TH_ORDERSALESOFFICENAME.Text = tileSalesOffice.GetSelectedSingleText()
+        '選択したチェックボックス(営業所)のコードを取得
+        work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = tileSalesOffice.GetSelectedSingleValue()
+
+        Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
+            '◯積込予定
+            Case BaseDllConst.CONST_OFFICECODE_010402,
+                 BaseDllConst.CONST_OFFICECODE_011202,
+                 BaseDllConst.CONST_OFFICECODE_011203,
+                 BaseDllConst.CONST_OFFICECODE_012401,
+                 BaseDllConst.CONST_OFFICECODE_012402
+                '出荷予定(ラジオボタン)を非表示
+                rbShipBtn.Visible = False
+                '積込予定(ラジオボタン)を表示
+                rbLoadBtn.Visible = True
+
+            '◯出荷予定、積込予定
+            '　五井営業所
+            '　根岸営業所
+            Case BaseDllConst.CONST_OFFICECODE_011201,
+                 BaseDllConst.CONST_OFFICECODE_011402
+                '出荷予定(ラジオボタン)を表示
+                rbShipBtn.Visible = True
+                '積込予定(ラジオボタン)を表示
+                rbLoadBtn.Visible = True
+
+            Case Else
+                '出荷予定(ラジオボタン)を非表示
+                rbShipBtn.Visible = False
+                '積込予定(ラジオボタン)を非表示
+                rbLoadBtn.Visible = False
+
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' 帳票ポップアップ(ダウンロードボタン押下)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_TyohyoDownloadClick()
+
+        '◯ 積込日(空白)チェック
+        If Me.txtReportLodDate.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "積込日が未設定です。", needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '◯ 営業所(未選択)チェック
+        If work.WF_SEL_TH_ORDERSALESOFFICECODE.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "営業所が未選択です。", needsPopUp:=True)
+            Exit Sub
+        End If
+
+        '◯ 帳票(未選択)チェック
+        If Me.rbShipBtn.Checked = False AndAlso Me.rbLoadBtn.Checked = False Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "帳票が未選択です。", needsPopUp:=True)
+            Exit Sub
+        End If
+
+    End Sub
+#End Region
 
     ''' <summary>
     ''' 受注履歴TBL追加処理

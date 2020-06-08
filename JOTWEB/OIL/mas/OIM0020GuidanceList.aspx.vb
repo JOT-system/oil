@@ -265,10 +265,10 @@ Public Class OIM0020GuidanceList
         sqlStat.AppendLine("  FROM OIL.OIM0020_GUIDANCE MG")
         sqlStat.AppendLine(" WHERE MG.DELFLG = @DELFLG_NO")
         If work.WF_SEL_FROMYMD.Text <> "" Then
-            sqlStat.AppendLine("   AND MG.FROMYMD <= @FROMYMD")
+            sqlStat.AppendLine("   AND MG.FROMYMD >= @FROMYMD")
         End If
         If work.WF_SEL_ENDYMD.Text <> "" Then
-            sqlStat.AppendLine("   AND MG.ENDYMD >= @ENDYMD")
+            sqlStat.AppendLine("   AND MG.ENDYMD <= @ENDYMD")
         End If
         If selectedList IsNot Nothing AndAlso selectedList.Count > 0 Then
             sqlStat.AppendLine("   AND (")

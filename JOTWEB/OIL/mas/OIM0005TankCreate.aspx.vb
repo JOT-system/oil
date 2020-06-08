@@ -1187,11 +1187,15 @@ Public Class OIM0005TankCreate
                 Case "WF_ORIGINOWNERCODE"               '原籍所有者コード
                     WF_ORIGINOWNERCODE.Text = WW_SelectValue
                     WF_ORIGINOWNERCODE_TEXT.Text = WW_SelectText
+                    '原籍所有者名の入力値も変更する
+                    WF_ORIGINOWNERNAME.Text = WW_SelectText
                     WF_ORIGINOWNERCODE.Focus()
 
                 Case "WF_OWNERCODE"               '名義コード
                     WF_OWNERCODE.Text = WW_SelectValue
                     WF_OWNERCODE_TEXT.Text = WW_SelectText
+                    '名義有者名の入力値も変更する
+                    WF_OWNERNAME.Text = WW_SelectText
                     WF_OWNERCODE.Focus()
 
 

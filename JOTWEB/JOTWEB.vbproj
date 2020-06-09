@@ -266,6 +266,7 @@
     <Content Include="OIL\script\OIM0004S.js" />
     <Content Include="script\calendar.js" />
     <Content Include="script\common.js" />
+    <Content Include="script\easyselectbox.min.js" />
     <Content Include="script\event.js" />
     <Content Include="OIL\script\M00001.js" />
     <Content Include="script\M00000.js" />

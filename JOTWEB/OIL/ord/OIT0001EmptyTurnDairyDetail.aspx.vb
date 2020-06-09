@@ -1315,6 +1315,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtLoadingDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                Me.TxtDepDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
+                Me.TxtArrDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                Me.TxtAccDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                Me.TxtEmparrDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                '### 2020608 END   ########################################################################################
+
             Case "TxtDepDate"           '(予定)発日
                 Dim WW_DATE As Date
                 Try
@@ -1327,6 +1340,24 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtDepDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                If Integer.Parse(WW_GetValue(6)) = 0 Then
+                    Me.TxtArrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                ElseIf Integer.Parse(WW_GetValue(6)) > 0 Then
+                    Me.TxtArrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                End If
+                '### 2020608 END   ########################################################################################
+
             Case "TxtArrDate"           '(予定)積車着日
                 Dim WW_DATE As Date
                 Try
@@ -1339,6 +1370,22 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtArrDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                If Integer.Parse(WW_GetValue(8)) = 0 Then
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                ElseIf Integer.Parse(WW_GetValue(8)) > 0 Then
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(8))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(8))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                End If
+                '### 2020608 END   ########################################################################################
+
             Case "TxtAccDate"           '(予定)受入日
                 Dim WW_DATE As Date
                 Try
@@ -1351,6 +1398,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtAccDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                If Integer.Parse(WW_GetValue(9)) = 0 Then
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtAccDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                ElseIf Integer.Parse(WW_GetValue(9)) > 0 Then
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtAccDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(9))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                End If
+                '### 2020608 END   ########################################################################################
 
             Case "TxtEmparrDate"           '(予定)空車着日
                 Dim WW_DATE As Date

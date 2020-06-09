@@ -45,10 +45,12 @@
                         <a style="display:none;">
                             <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
                         </a>
-                        <input type="button" id="WF_ButtonSendaiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonSendaiLOADCSV');" />
-                        <input type="button" id="WF_ButtonNegishiSHIPCSV" class="btn-sticky" value="出荷予定" onclick="ButtonClick('WF_ButtonNegishiSHIPCSV');" />
-                        <input type="button" id="WF_ButtonNegishiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonNegishiLOADCSV');" />
-                        <%--<input type="button" id="WF_ButtonTyohyo" class="btn-sticky" value="帳票" onclick="commonShowCustomPopup();" />--%>
+                            <input type="button" id="WF_ButtonSendaiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonSendaiLOADCSV');" />
+                            <input type="button" id="WF_ButtonNegishiSHIPCSV" class="btn-sticky" value="出荷予定" onclick="ButtonClick('WF_ButtonNegishiSHIPCSV');" />
+                            <input type="button" id="WF_ButtonNegishiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonNegishiLOADCSV');" />
+                        <a style="display:none;">
+                        <input type="button" id="WF_ButtonTyohyo" class="btn-sticky" value="帳票" onclick="commonShowCustomPopup();" />
+                        </a>
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"   onclick="ButtonClick('WF_ButtonEND');" />
                         <!-- 先頭行・末尾行ボタンを表示させる場合は divの括りを無くして WF_ButtonXXXを外だしにすれば出ます -->
                         <div style="display:none;">

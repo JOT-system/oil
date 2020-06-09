@@ -112,7 +112,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData() As String
+    Public Function CreateExcelPrintData(ByVal officeCode As String) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -123,7 +123,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '◯ヘッダーの設定
             EditLoadHeaderArea()
             '◯明細の設定
-            EditLoadDetailArea()
+            EditLoadDetailArea(officeCode)
             '***** TODO処理 ここまで *****
             ExcelTempSheet.Delete() '雛形シート削除
 
@@ -187,7 +187,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票の明細設定(積込予定表(根岸以外))
     ''' </summary>
-    Private Sub EditLoadDetailArea()
+    Private Sub EditLoadDetailArea(ByVal officeCode As String)
         Dim rngDetailArea As Excel.Range = Nothing
         Dim rngTmp As Excel.Range = Nothing
         Dim rngSummary As Excel.Range = Nothing
@@ -198,22 +198,24 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Dim i As Integer = 5
             For Each PrintDatarow As DataRow In PrintData.Rows
 
-                ''★ 前回の列車名と今回の列車名が不一致
-                'If strTrainNameSave <> "" _
-                '    AndAlso strTrainNameSave <> PrintDatarow("TRAINNAME").ToString() Then
+                '★ 五井営業所の場合のみ合計車数を表示
+                '　 かつ前回の列車名と今回の列車名が不一致
+                If officeCode = BaseDllConst.CONST_OFFICECODE_011201 _
+                    AndAlso strTrainNameSave <> "" _
+                    AndAlso strTrainNameSave <> PrintDatarow("TRAINNAME").ToString() Then
 
-                '    '★tmpシートより合計行をコピーして値を設定
-                '    rngSummary = Me.ExcelTempSheet.Range("B1:P1")
-                '    rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "P" + i.ToString())
-                '    'rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
-                '    rngSummary.Copy(rngTmp)
+                    '★tmpシートより合計行をコピーして値を設定
+                    rngSummary = Me.ExcelTempSheet.Range("B1:P1")
+                    rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "P" + i.ToString())
+                    'rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
+                    rngSummary.Copy(rngTmp)
 
-                '    '◯ 合計車数
-                '    rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                '    rngDetailArea.Value = strTotalTankSave + "両"
+                    '◯ 合計車数
+                    rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                    rngDetailArea.Value = strTotalTankSave + "両"
 
-                '    i += 1
-                'End If
+                    i += 1
+                End If
 
                 '◯ No
                 rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
@@ -264,15 +266,18 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 i += 1
             Next
 
-            ''★tmpシートより合計行をコピーして値を設定
-            'rngSummary = Me.ExcelTempSheet.Range("B1:O1")
-            'rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "O" + i.ToString())
-            ''rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
-            'rngSummary.Copy(rngTmp)
+            '★ 五井営業所の場合のみ合計車数を表示
+            If officeCode = BaseDllConst.CONST_OFFICECODE_011201 Then
+                '★tmpシートより合計行をコピーして値を設定
+                rngSummary = Me.ExcelTempSheet.Range("B1:O1")
+                rngTmp = Me.ExcelWorkSheet.Range("B" + i.ToString(), "O" + i.ToString())
+                'rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
+                rngSummary.Copy(rngTmp)
 
-            ''◯ 合計車数
-            'rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-            'rngDetailArea.Value = strTotalTankSave + "両"
+                '◯ 合計車数
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                rngDetailArea.Value = strTotalTankSave + "両"
+            End If
 
         Catch ex As Exception
             Throw

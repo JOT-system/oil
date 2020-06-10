@@ -693,7 +693,7 @@ Public Class OIT0003OrderList
                         Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
                             Dim url As String
                             Try
-                                url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN")
+                                url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Now.AddDays(1).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP")))
                             Catch ex As Exception
                                 Return
                             End Try
@@ -707,7 +707,7 @@ Public Class OIT0003OrderList
                         Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_LOADPLAN.xlsx", OIT0003ReportNegishitbl)
                             Dim url As String
                             Try
-                                url = repCbj.CreateExcelPrintNegishiData("LOADPLAN")
+                                url = repCbj.CreateExcelPrintNegishiData("LOADPLAN", Now.AddDays(1).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP")))
                             Catch ex As Exception
                                 Return
                             End Try
@@ -1945,7 +1945,7 @@ Public Class OIT0003OrderList
                 'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_GOI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
                 '    Dim url As String
                 '    Try
-                '        url = repCbj.CreateExcelPrintGoiData("SHIPPLAN")
+                '        url = repCbj.CreateExcelPrintGoiData("SHIPPLAN", lodDate)
                 '    Catch ex As Exception
                 '        Return
                 '    End Try
@@ -1989,7 +1989,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN")
+                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", lodDate)
                     Catch ex As Exception
                         Return
                     End Try
@@ -2003,7 +2003,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_LOADPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintNegishiData("LOADPLAN")
+                        url = repCbj.CreateExcelPrintNegishiData("LOADPLAN", lodDate)
                     Catch ex As Exception
                         Return
                     End Try
@@ -2322,7 +2322,7 @@ Public Class OIT0003OrderList
                 " ORDER BY" _
             & "    VIW0013.No" _
             & "  , VIW0013.ZAIKOSORT" _
-            & "  , TOTALTANK"
+            & "  , TOTALTANK　DESC"
 
 #Region "コメントアウト"
         ' ### START 在庫管理(シミュレーション)の設定が前提の場合 #########################

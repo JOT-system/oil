@@ -438,7 +438,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String) As String
+    Public Function CreateExcelPrintNegishiData(ByVal repPtn As String, ByVal lodDate As String) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -448,12 +448,12 @@ Public Class OIT0003CustomReport : Implements IDisposable
             '***** TODO処理 ここから *****
             If repPtn = "SHIPPLAN" Then
                 '◯ヘッダーの設定
-                EditNegishiShipHeaderArea()
+                EditNegishiShipHeaderArea(lodDate)
                 '◯明細の設定
                 EditNegishiShipDetailArea()
             ElseIf repPtn = "LOADPLAN" Then
                 '◯ヘッダーの設定
-                EditNegishiLoadHeaderArea()
+                EditNegishiLoadHeaderArea(lodDate)
                 '◯明細の設定
                 EditNegishiLoadDetailArea()
             End If
@@ -488,11 +488,14 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(根岸))
     ''' </summary>
-    Private Sub EditNegishiShipHeaderArea()
+    Private Sub EditNegishiShipHeaderArea(ByVal lodDate As String)
         Dim rngHeaderArea As Excel.Range = Nothing
-        Dim valueYear As String = Now.AddDays(1).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
-        Dim valueMonth As String = Now.AddDays(1).ToString("MM", New Globalization.CultureInfo("ja-JP"))
-        Dim valueDay As String = Now.AddDays(1).ToString("dd", New Globalization.CultureInfo("ja-JP"))
+        'Dim valueYear As String = Now.AddDays(1).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
+        'Dim valueMonth As String = Now.AddDays(1).ToString("MM", New Globalization.CultureInfo("ja-JP"))
+        'Dim valueDay As String = Now.AddDays(1).ToString("dd", New Globalization.CultureInfo("ja-JP"))
+        Dim valueYear As String = Date.Parse(lodDate).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
+        Dim valueMonth As String = Date.Parse(lodDate).ToString("MM", New Globalization.CultureInfo("ja-JP"))
+        Dim valueDay As String = Date.Parse(lodDate).ToString("dd", New Globalization.CultureInfo("ja-JP"))
 
         Try
             '年
@@ -601,9 +604,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(積込予定表(根岸))
     ''' </summary>
-    Private Sub EditNegishiLoadHeaderArea()
+    Private Sub EditNegishiLoadHeaderArea(ByVal lodDate As String)
         Dim rngHeaderArea As Excel.Range = Nothing
-        Dim value As String = Now.AddDays(1).ToString("yyyy年MM月dd日（ddd）", New Globalization.CultureInfo("ja-JP"))
+        'Dim value As String = Now.AddDays(1).ToString("yyyy年MM月dd日（ddd）", New Globalization.CultureInfo("ja-JP"))
+        Dim value As String = Date.Parse(lodDate).ToString("yyyy年MM月dd日（ddd）", New Globalization.CultureInfo("ja-JP"))
 
         Try
             'タイトル

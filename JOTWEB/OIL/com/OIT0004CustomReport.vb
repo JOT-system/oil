@@ -32,6 +32,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
     ''' </summary>
     Private ExcelTempSheet As Excel.Worksheet
 
+    Private xlProcId As Integer
     ''' <summary>
     ''' 雛形ファイルパス
     ''' </summary>
@@ -39,8 +40,14 @@ Public Class OIT0004CustomReport : Implements IDisposable
     Private UploadRootPath As String = ""
     Private UrlRoot As String = ""
     Private PrintData As OIT0004OilStockCreate.DispDataClass
-    Private xlProcId As Integer
-
+    ''' <summary>
+    ''' WindowハンドルよりProcessIDを取得
+    ''' </summary>
+    ''' <param name="hwnd"></param>
+    ''' <param name="lpdwProcessId"></param>
+    ''' <returns></returns>
+    ''' <remarks>ExcelのWindowハンドルを探しプロセスIDを取得
+    ''' 当処理で使用したExcelのプロセスIDが残っていた場合KILLする為使用</remarks>
     Private Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
               ByRef lpdwProcessId As Integer) As Integer
     ''' <summary>
@@ -48,17 +55,18 @@ Public Class OIT0004CustomReport : Implements IDisposable
     ''' </summary>
     ''' <param name="mapId">帳票格納先のMAPID</param>
     ''' <param name="excelFileName">Excelファイル名（フルパスではない)</param>
+    ''' <param name="printDataClass"></param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, excelFileName As String, printDataClass As OIT0004OilStockCreate.DispDataClass)
         Dim CS0050SESSION As New CS0050SESSION
         Me.PrintData = printDataClass
         Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
-                                                      "PRINTFORMAT",
-                                                      C_DEFAULT_DATAKEY,
-                                                      mapId, excelFileName)
+                                              "PRINTFORMAT",
+                                              C_DEFAULT_DATAKEY,
+                                              mapId, excelFileName)
         Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
-                                                   "PRINTWORK",
-                                                   CS0050SESSION.USERID)
+                                           "PRINTWORK",
+                                           CS0050SESSION.USERID)
         'ディレクトリが存在しない場合は生成
         If IO.Directory.Exists(Me.UploadRootPath) = False Then
             IO.Directory.CreateDirectory(Me.UploadRootPath)
@@ -80,7 +88,6 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Next targetFile
         'URLのルートを表示
         Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
-
         'Excelアプリケーションオブジェクトの生成
         Me.ExcelAppObj = New Excel.Application
         ExcelAppObj.DisplayAlerts = False
@@ -96,7 +103,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
     End Sub
     ''' <summary>
-    ''' テンプレートを元に帳票を作成しダウンロードURLを生成する
+    ''' テンプレートを元に帳票を作成しダウンロードURLを生成するメソッド
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
@@ -104,20 +111,12 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
-        Dim retByte() As Byte
         Try
-            '***** TODO処理 ここから *****
-            'rngWrite = Me.ExcelWorkSheet.Range("A1")
-            'rngWrite.Value = "test"
-            '〇〇月度＋油槽所名の設定
-            EditDateConsignee()
-            '日付の設定
-            EditDateArea()
-            '提案表部分の作成
-            EditSuggestArea()
-            '在庫表部分の作成
-            EditStockArea()
-            '***** TODO処理 ここまで *****
+            '***** 生成処理群ここから *****
+            '* 油種（行）、日付（列）を元に雛形の罫線を拡張し体裁を整える
+            ExtentDisplayFormat()
+
+            '***** 生成処理群ここまで *****
             ExcelTempSheet.Delete() '雛形シート削除
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -125,13 +124,6 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
             End SyncLock
             Me.ExcelBookObj.Close(False)
-            'ストリーム生成
-            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-                Dim binaryLength = Convert.ToInt32(fs.Length)
-                ReDim retByte(binaryLength)
-                fs.Read(retByte, 0, binaryLength)
-                fs.Flush()
-            End Using
             Return UrlRoot & tmpFileName
         Catch ex As Exception
             Throw '呼出し元にThrow
@@ -140,421 +132,328 @@ Public Class OIT0004CustomReport : Implements IDisposable
         End Try
     End Function
     ''' <summary>
-    ''' 帳票の日付、タイトル設定
+    ''' 油種、日付に応じ罫線書式等を雛形より拡張する
     ''' </summary>
-    Private Sub EditDateConsignee()
-        Dim targetDate As String = Me.PrintData.StockDate.Values(6).ItemDate.ToString("yyyy年M月度")
-        Dim consignee As String = Me.PrintData.ConsigneeName
-        Dim title As String = String.Format("{0} ({1})", targetDate, consignee)
-        Dim rngTitleArea As Excel.Range = Nothing
+    Private Sub ExtentDisplayFormat()
+        Dim rngSingleFlame As Excel.Range = Nothing
+        Dim rngPageteBase As Excel.Range = Nothing
+        Dim rngPasteOffset As Excel.Range = Nothing
+        Dim rngValueSet As Excel.Range = Nothing
+        Dim rngFooter As Excel.Range = Nothing
+        Dim rngFooterRow As Excel.Range = Nothing
+        Dim fntColor As Excel.Font = Nothing
+        Dim intrColor As Excel.Interior = Nothing
+        '油種色定義
+        Dim colorSettings = New OilTypeColorSettings
+        '表の先頭行、最終行保持用
+        Dim firstRowNum As Integer = 0
+        Dim lastRowNum As Integer = 0
+        Dim miFirstRowNum As Integer = 0
+        Dim miLastRowNum As Integer = 0
+        '
+        Dim footerRowNum As Integer = 0
+        '******************************
+        '油種の行拡張
+        '******************************
         Try
-            rngTitleArea = Me.ExcelWorkSheet.Range("B2")
-            rngTitleArea.Value = title
-        Catch ex As Exception
-            Throw
-        Finally
-            ExcelMemoryRelease(rngTitleArea)
-        End Try
+            rngPageteBase = Me.ExcelWorkSheet.Range("RNG_LEFTHEADER")
+            rngSingleFlame = Me.ExcelWorkSheet.Range("RNG_LEFTHEADER")
+            rngFooter = Me.ExcelTempSheet.Range("RNG_CONSIGNEEFOOTER")
 
-    End Sub
-    ''' <summary>
-    ''' 出力帳票日付部分の設定
-    ''' </summary>
-    Private Sub EditDateArea()
-        Dim startDate As Date = DateSerial(Now.Year, Now.Month, Now.Day)
-        startDate = (From itm In Me.PrintData.StockDate.Values Select itm.ItemDate).FirstOrDefault
-        Dim rngCell As Excel.Range = Nothing
-        Try
-            rngCell = Me.ExcelWorkSheet.Range("RNG_DATE_FIRST")
-            rngCell.Value = startDate
-        Catch ex As Exception
-            Throw
-        Finally
-            ExcelMemoryRelease(rngCell)
-        End Try
-    End Sub
-    ''' <summary>
-    ''' 提案エリアの生成
-    ''' </summary>
-    Private Sub EditSuggestArea()
-        Dim rngWork As Excel.Range = Nothing
-        Dim rngTmp As Excel.Range = Nothing
-        Dim rngSummary As Excel.Range = Nothing
-        Dim rngData As Excel.Range = Nothing
-        Dim rngCell As Excel.Range = Nothing
-        Dim baseSummaryAdrs As String = ""
-        Dim maxTrainCnt As Integer = 5
-        Dim rngInterSect As Excel.Range = Nothing
-        Dim rngDataArea As Excel.Range = Nothing
-        Dim brds As Excel.Borders = Nothing
-        Dim brdItem As Excel.Border = Nothing
-        Dim exlErrs As Excel.Errors = Nothing
-        Dim exlErr As Excel.Error = Nothing
-        Dim cell As Excel.Range = Nothing
-        Try
-            '*************
-            '提案欄非表示の場合はテンプレートより対象行削除し終了
-            '*************
-            If Me.PrintData.ShowSuggestList = False Then
-                rngWork = Me.ExcelWorkSheet.Range("3:8")
-                rngWork.Delete(Excel.XlDeleteShiftDirection.xlShiftUp)
-                Return
-            End If
-            '*************
-            '列車情報の転記(意図的に数式で値を設定し「数字が文字」のビックリマークを抑止)
-            '*************
-            rngTmp = Me.ExcelWorkSheet.Range("RNG_TRAIN")
-            maxTrainCnt = rngTmp.Count
-            Dim trainList(0, maxTrainCnt - 1) As Object
-            For i = 0 To maxTrainCnt - 1
-                If i > Me.PrintData.TrainList.Count - 1 Then
-                    trainList(0, i) = "="""""
-                Else
-                    trainList(0, i) = "=""" & Me.PrintData.TrainList.Values(i).TrainNo & """ & """""
+            rngFooterRow = rngFooter.Rows
+            footerRowNum = rngFooterRow.Count
+            ExcelMemoryRelease(rngFooterRow)
+            ExcelMemoryRelease(rngFooter)
+            Dim pasteOffset = 0
+            Dim lastOilCode As String = Me.PrintData.StockList.Last.Value.OilInfo.OilCode
+
+            For Each stkItm In Me.PrintData.StockList.Values
+                rngPasteOffset = rngPageteBase.Offset(RowOffset:=pasteOffset * 10)
+                If pasteOffset <> 0 Then
+                    rngSingleFlame.Copy(rngPasteOffset)
                 End If
-            Next
-            rngTmp.Value = trainList
-            Erase trainList
-            trainList = Nothing
-            ExcelMemoryRelease(rngTmp)
-            '*************
-            '油種数の退避
-            '*************
-            Dim oilTypeRowCnt = Me.PrintData.SuggestOilNameList.Count
-            '******************************
-            '提案欄油種行の拡張（罫線維持）
-            '******************************
-            rngInterSect = Me.ExcelWorkSheet.Range("RNG_INTERSECT")
-            rngTmp = Me.ExcelWorkSheet.Range(String.Format("5:{0}", oilTypeRowCnt + 2))
-            Dim interSectAdrs As String = Me.ExcelAppObj.Intersect(rngTmp, rngInterSect).Address
-            rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
-            rngDataArea = Me.ExcelWorkSheet.Range(interSectAdrs)
-            brds = rngDataArea.Borders
-            brdItem = brds(Excel.XlBordersIndex.xlInsideHorizontal)
-            brdItem.LineStyle = Excel.XlLineStyle.xlContinuous
-            brdItem.ColorIndex = 0
-            brdItem.TintAndShade = 0
-            brdItem.Weight = Excel.XlBorderWeight.xlThin
-            ExcelMemoryRelease(brdItem)
+                '***********************
+                '各油種毎の値を設定する
+                '***********************
+                '油種名
+                rngValueSet = DirectCast(rngPasteOffset(1, 1), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.OilName
+                fntColor = rngValueSet.Font
+                fntColor.Color = colorSettings.GetColor(stkItm.OilInfo.OilCode).FontColor
+                intrColor = rngValueSet.Interior
+                intrColor.Color = colorSettings.GetColor(stkItm.OilInfo.OilCode).BackGroundColor
+                ExcelMemoryRelease(fntColor)
+                ExcelMemoryRelease(intrColor)
+                ExcelMemoryRelease(rngValueSet)
+                '総容量
+                rngValueSet = DirectCast(rngPasteOffset(2, 2), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.MaxTankCap
+                ExcelMemoryRelease(rngValueSet)
+                'D/S
+                rngValueSet = DirectCast(rngPasteOffset(3, 2), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.DS
+                ExcelMemoryRelease(rngValueSet)
+                ''出荷可能 → 総容量 - D/S テンプレートの数式設定の為不要
+                'rngValueSet = DirectCast(rngPasteOffset(4, 2), Excel.Range)
+                'rngValueSet.Value = stkItm.OilInfo.MaxTankCap
+                'ExcelMemoryRelease(rngValueSet)
+                '目標在庫
+                rngValueSet = DirectCast(rngPasteOffset(5, 2), Excel.Range)
+                rngValueSet.Value = stkItm.TargetStock
+                ExcelMemoryRelease(rngValueSet)
+                '平均積高
+                rngValueSet = DirectCast(rngPasteOffset(9, 2), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.LastSendAverage 'ここ不明なので一旦前週
+                ExcelMemoryRelease(rngValueSet)
+                '最終行まで到達時の処理
+                If lastOilCode = stkItm.OilInfo.OilCode Then
+                    '先頭行と最終行の保持
+                    firstRowNum = rngPageteBase.Row
+                    rngValueSet = DirectCast(rngPasteOffset(10, 2), Excel.Range)
+                    lastRowNum = rngValueSet.Row
+                    ExcelMemoryRelease(rngValueSet)
+                    '最左列に油槽所名を縦書きで設定
+                    rngValueSet = Me.ExcelWorkSheet.Range(String.Format("B{0}:B{1}", firstRowNum, lastRowNum))
+                    rngValueSet.Value = Me.PrintData.ConsigneeName
+                    rngValueSet.MergeCells = True
+                    rngValueSet.Orientation = Excel.XlOrientation.xlVertical
+                    rngValueSet.BorderAround2(Excel.XlLineStyle.xlContinuous,
+                                              Excel.XlBorderWeight.xlMedium)
+                    rngValueSet.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+                    ExcelMemoryRelease(rngValueSet)
+                    '最下部の罫線を太く
+                    Dim bdrs As Excel.Borders
+                    Dim bdrBtm As Excel.Border
+                    bdrs = rngPasteOffset.Borders
+                    bdrBtm = bdrs(Excel.XlBordersIndex.xlEdgeBottom)
+                    bdrBtm.Weight = Excel.XlBorderWeight.xlMedium
+                    bdrBtm.LineStyle = Excel.XlLineStyle.xlContinuous
+                    ExcelMemoryRelease(bdrBtm)
+                    ExcelMemoryRelease(bdrs)
+                End If
 
-            brdItem = brds(Excel.XlBordersIndex.xlEdgeBottom)
-            brdItem.LineStyle = Excel.XlLineStyle.xlContinuous
-            brdItem.ColorIndex = 0
-            brdItem.TintAndShade = 0
-            brdItem.Weight = Excel.XlBorderWeight.xlThin
-            ExcelMemoryRelease(brdItem)
-            ExcelMemoryRelease(brds)
-            ExcelMemoryRelease(rngDataArea)
-            ExcelMemoryRelease(rngTmp)
-            '*************
-            '合計行の追記
-            '*************
-            rngSummary = Me.ExcelTempSheet.Range("RNG_SUG_SUMMARY")
-            rngTmp = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", oilTypeRowCnt + 3))
-            rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
-            rngSummary.Copy(rngTmp)
-            rngCell = CType(rngTmp(1, 2), Excel.Range)
-            baseSummaryAdrs = rngCell.Address
-            ExcelMemoryRelease(rngCell)
-            ExcelMemoryRelease(rngTmp)
-            '*************
-            '油種名の設定
-            '*************
-            Dim oilNameList = (From oilItm In PrintData.SuggestOilNameList.Values Where oilItm.OilCode <> OIT0004OilStockCreate.DispDataClass.SUMMARY_CODE Select oilItm.OilName).ToList
-            Dim oilNameArray(oilNameList.Count - 1, 0) As String
-            Dim oilIdx As Integer = 0
-            For Each oilNameItm In oilNameList
-                oilNameArray(oilIdx, 0) = oilNameItm
-                oilIdx = oilIdx + 1
+                pasteOffset = pasteOffset + 1
+                ExcelMemoryRelease(rngPasteOffset)
             Next
-            rngTmp = Me.ExcelWorkSheet.Range("RNG_SUG_OILNAME_START")
-            rngWork = rngTmp.Offset(1)
-            Dim trainNumStartRow = rngWork.Address(True, False).Split("$"c)(1)
-            rngCell = rngWork.Resize(RowSize:=oilNameList.Count)
-            rngCell.Value = oilNameArray
-            ExcelMemoryRelease(rngCell)
-            ExcelMemoryRelease(rngWork)
-            ExcelMemoryRelease(rngTmp)
-            '******************
-            '車数の設定
-            '******************
-            EditTrainNum("F" & trainNumStartRow, maxTrainCnt, Me.PrintData)
-            '******************
-            '提案欄の値を展開
-            '******************
-            If Me.PrintData.HasMoveInsideItem Then
-                '構内取りではないほうの合計文言変更
-                rngCell = Me.ExcelWorkSheet.Range(baseSummaryAdrs)
-                rngCell.Value = "中計(両)"
-                ExcelMemoryRelease(rngCell)
-                'データ表のレイアウト取得
-                rngData = Me.ExcelTempSheet.Range("RNG_SUG_DATAROW")
-                'データ行の追加
-                Dim miStartRow = oilTypeRowCnt + 5
-                oilTypeRowCnt = Me.PrintData.MiDispData.SuggestOilNameList.Count
-                rngTmp = Me.ExcelWorkSheet.Range(String.Format("{0}:{1}", miStartRow, miStartRow + oilTypeRowCnt - 1))
-
-                rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromLeftOrAbove)
-                ExcelMemoryRelease(rngTmp)
-                '罫線情報をペースト
-                rngTmp = Me.ExcelWorkSheet.Range(String.Format("{0}:{1}", miStartRow, miStartRow + oilTypeRowCnt - 1))
-                rngData.Copy(rngTmp)
-                ExcelMemoryRelease(rngTmp)
-                '合計欄のペースト
-                rngTmp = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", miStartRow + oilTypeRowCnt - 1))
-                rngSummary.Copy(rngTmp)
-                ExcelMemoryRelease(rngTmp)
-                '油種名の設定
-                Dim miOilStartRow = oilNameList.Count + 2
-                oilNameList = (From oilItm In PrintData.MiDispData.SuggestOilNameList.Values Where oilItm.OilCode <> OIT0004OilStockCreate.DispDataClass.SUMMARY_CODE Select oilItm.OilName).ToList
-                ReDim oilNameArray(oilNameList.Count - 1, 0)
-                oilIdx = 0
-                For Each oilNameItm In oilNameList
-                    oilNameArray(oilIdx, 0) = oilNameItm
-                    oilIdx = oilIdx + 1
-                Next
-                rngTmp = Me.ExcelWorkSheet.Range("RNG_SUG_OILNAME_START")
-                rngWork = rngTmp.Offset(miOilStartRow)
-                Dim miTrainNumStartRow = rngWork.Address(True, False).Split("$"c)(1)
-                rngCell = rngWork.Resize(RowSize:=oilNameList.Count)
-                rngCell.Value = oilNameArray
-                ExcelMemoryRelease(rngCell)
-                ExcelMemoryRelease(rngWork)
-                ExcelMemoryRelease(rngTmp)
-                '******************
-                '提案欄の値を展開
-                '******************
-                EditTrainNum("F" & miTrainNumStartRow, maxTrainCnt, Me.PrintData.MiDispData, True)
+            '構内取りが無ければ油種の設定はしない
+            If Me.PrintData.HasMoveInsideItem = False Then
+                Exit Try '油種設定のTry Catchスコープの脱出
             End If
+            '構内取り分の油種設定
+            Dim pasteOffsetStart As Integer = pasteOffset
+
+            For Each stkItm In Me.PrintData.MiDispData.StockList.Values
+                rngPasteOffset = rngPageteBase.Offset(RowOffset:=(pasteOffset * 10) + (footerRowNum))
+                If pasteOffsetStart = pasteOffset Then
+                    miFirstRowNum = rngPasteOffset.Row
+                End If
+                rngSingleFlame.Copy(rngPasteOffset)
+
+                '***********************
+                '各油種毎の値を設定する
+                '***********************
+                '油種名
+                rngValueSet = DirectCast(rngPasteOffset(1, 1), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.OilName
+                fntColor = rngValueSet.Font
+                fntColor.Color = colorSettings.GetColor(stkItm.OilInfo.OilCode).FontColor
+                intrColor = rngValueSet.Interior
+                intrColor.Color = colorSettings.GetColor(stkItm.OilInfo.OilCode).BackGroundColor
+                ExcelMemoryRelease(fntColor)
+                ExcelMemoryRelease(intrColor)
+                ExcelMemoryRelease(rngValueSet)
+                '総容量
+                rngValueSet = DirectCast(rngPasteOffset(2, 2), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.MaxTankCap
+                ExcelMemoryRelease(rngValueSet)
+                'D/S
+                rngValueSet = DirectCast(rngPasteOffset(3, 2), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.DS
+                ExcelMemoryRelease(rngValueSet)
+                ''出荷可能 → 総容量 - D/S テンプレートの数式設定の為不要
+                'rngValueSet = DirectCast(rngPasteOffset(4, 2), Excel.Range)
+                'rngValueSet.Value = stkItm.OilInfo.MaxTankCap
+                'ExcelMemoryRelease(rngValueSet)
+                '目標在庫
+                rngValueSet = DirectCast(rngPasteOffset(5, 2), Excel.Range)
+                rngValueSet.Value = stkItm.TargetStock
+                ExcelMemoryRelease(rngValueSet)
+                '平均積高
+                rngValueSet = DirectCast(rngPasteOffset(9, 2), Excel.Range)
+                rngValueSet.Value = stkItm.OilInfo.LastSendAverage 'ここ不明なので一旦前週
+                ExcelMemoryRelease(rngValueSet)
+                '最終行まで到達時の処理
+                If lastOilCode = stkItm.OilInfo.OilCode Then
+                    '先頭行と最終行の保持
+
+                    rngValueSet = DirectCast(rngPasteOffset(10, 2), Excel.Range)
+                    miLastRowNum = rngValueSet.Row
+                    ExcelMemoryRelease(rngValueSet)
+                    '最左列に油槽所名を縦書きで設定
+                    rngValueSet = Me.ExcelWorkSheet.Range(String.Format("B{0}:B{1}", miFirstRowNum, miLastRowNum))
+                    rngValueSet.Value = Me.PrintData.MiConsigneeName
+                    rngValueSet.MergeCells = True
+                    ExcelMemoryRelease(intrColor)
+
+                    rngValueSet.Orientation = Excel.XlOrientation.xlVertical
+                    rngValueSet.BorderAround2(Excel.XlLineStyle.xlContinuous,
+                                              Excel.XlBorderWeight.xlMedium)
+                    rngValueSet.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter
+
+                    ExcelMemoryRelease(rngValueSet)
+                    '最下部の罫線を太く
+                    Dim bdrs As Excel.Borders
+                    Dim bdrBtm As Excel.Border
+                    bdrs = rngPasteOffset.Borders
+                    bdrBtm = bdrs(Excel.XlBordersIndex.xlEdgeBottom)
+                    bdrBtm.Weight = Excel.XlBorderWeight.xlMedium
+                    bdrBtm.LineStyle = Excel.XlLineStyle.xlContinuous
+                    ExcelMemoryRelease(bdrBtm)
+                    ExcelMemoryRelease(bdrs)
+                End If
+
+                pasteOffset = pasteOffset + 1
+                ExcelMemoryRelease(rngPasteOffset)
+
+            Next
 
         Catch ex As Exception
             Throw
         Finally
-            ExcelMemoryRelease(rngWork)
-            ExcelMemoryRelease(rngTmp)
-            ExcelMemoryRelease(rngSummary)
-            ExcelMemoryRelease(rngData)
-            ExcelMemoryRelease(rngCell)
-            ExcelMemoryRelease(rngInterSect)
-            ExcelMemoryRelease(brdItem)
-            ExcelMemoryRelease(brds)
-            ExcelMemoryRelease(rngDataArea)
-            ExcelMemoryRelease(exlErr)
-            ExcelMemoryRelease(exlErrs)
-            ExcelMemoryRelease(cell)
+            ExcelMemoryRelease(rngPasteOffset)
+            ExcelMemoryRelease(rngSingleFlame)
+            ExcelMemoryRelease(rngPageteBase)
+            ExcelMemoryRelease(rngFooterRow)
+            ExcelMemoryRelease(rngFooter)
         End Try
+        '******************************
+        '日付の列拡張
+        '******************************
+        Dim dataColString = "G"
+        Dim rngColumns As Excel.Range = Nothing
+        Dim rngTmpPasteStartColumn As Excel.Range = Nothing
+        Dim rngPasteTargetColumns As Excel.Range = Nothing
+        Dim rngDateSet As Excel.Range = Nothing
+        Try
+            rngColumns = Me.ExcelWorkSheet.Range(String.Format("{0}:{0}", dataColString))
+            rngTmpPasteStartColumn = rngColumns.Offset(ColumnOffset:=1)
+            rngPasteTargetColumns = rngTmpPasteStartColumn.Resize(ColumnSize:=Me.PrintData.StockDate.Count - 1)
+            rngColumns.Copy(rngPasteTargetColumns)
 
+            ''最下部の罫線を太く
+            Dim rowsItems = {New With {.startRow = 2, .lastRow = lastRowNum},
+                            New With {.startRow = miFirstRowNum, .lastRow = miLastRowNum}}
+            For Each rowsItem In rowsItems
+                If rowsItem.lastRow = 0 Then
+                    Continue For
+                End If
+                Dim rngRow As Excel.Range
+                rngRow = Me.ExcelWorkSheet.Range(String.Format("{0}:{1}", rowsItem.startRow, rowsItem.lastRow))
+                Dim rngBorderArea As Excel.Range
+                rngBorderArea = Me.ExcelAppObj.Intersect(rngPasteTargetColumns, rngRow)
+
+                Dim bdrs As Excel.Borders
+                Dim bdrRgt As Excel.Border
+                bdrs = rngBorderArea.Borders
+                bdrRgt = bdrs(Excel.XlBordersIndex.xlEdgeRight)
+                bdrRgt.Weight = Excel.XlBorderWeight.xlMedium
+                bdrRgt.LineStyle = Excel.XlLineStyle.xlContinuous
+                ExcelMemoryRelease(bdrRgt)
+                ExcelMemoryRelease(bdrs)
+                ExcelMemoryRelease(rngBorderArea)
+                ExcelMemoryRelease(rngRow)
+            Next
+
+
+            '最左に日付を設定※他はExcelテンプレートにて左隣の日付 + 1日となる
+            rngDateSet = DirectCast(rngColumns(2, 1), Excel.Range)
+            rngDateSet.Value = Me.PrintData.StockDate.Values.First.ItemDate
+            ExcelMemoryRelease(rngDateSet)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngTmpPasteStartColumn)
+            ExcelMemoryRelease(rngPasteTargetColumns)
+            ExcelMemoryRelease(rngColumns)
+        End Try
+        '******************************
+        '表フッターの設定（構内取りが在ればその上）
+        '******************************
+        Try
+            rngFooter = Me.ExcelTempSheet.Range("RNG_CONSIGNEEFOOTER")
+            Dim rngPasteFooter As Excel.Range
+            rngPasteFooter = Me.ExcelWorkSheet.Range(String.Format("{0}:{1}", lastRowNum + 1, lastRowNum + footerRowNum))
+            rngFooter.Copy(rngPasteFooter)
+            ExcelMemoryRelease(rngFooter)
+            ExcelMemoryRelease(rngPasteFooter)
+        Catch ex As Exception
+            ExcelMemoryRelease(rngFooter)
+        End Try
     End Sub
     ''' <summary>
-    ''' 一覧表（上部）の両数を格納
+    ''' 帳票色設定クラス
     ''' </summary>
-    ''' <param name="startAddrs">開始位置</param>
-    ''' <param name="maxTrainCnt">最大車両数</param>
-    ''' <param name="suggestList">提案表</param>
-    Private Sub EditTrainNum(startAddrs As String, maxTrainCnt As Integer, suggestList As OIT0004OilStockCreate.DispDataClass, Optional isMiArea As Boolean = False)
-        Dim rngTmp1 As Excel.Range = Nothing
-        Dim rngTmp2 As Excel.Range = Nothing
-        Dim rngTmp3 As Excel.Range = Nothing
+    Private Class OilTypeColorSettings
+        Private ColorSettings As Dictionary(Of String, OilTypeColorSetting)
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New()
+            Me.ColorSettings = New Dictionary(Of String, OilTypeColorSetting)
+            'ハイオク
+            Me.ColorSettings.Add("1001", New OilTypeColorSetting(RGB(255, 255, 0), RGB(20, 23, 26)))
+            'レギュラー
+            Me.ColorSettings.Add("1101", New OilTypeColorSetting(RGB(255, 192, 0), RGB(255, 255, 255)))
+            '灯油
+            Me.ColorSettings.Add("1301", New OilTypeColorSetting(RGB(255, 255, 255), RGB(20, 23, 26)))
+            '未添加灯油
+            Me.ColorSettings.Add("1302", New OilTypeColorSetting(RGB(221, 245, 253), RGB(20, 23, 26)))
+            '軽油
+            Me.ColorSettings.Add("1401", New OilTypeColorSetting(RGB(0, 176, 80), RGB(255, 255, 255)))
+            '3号軽油
+            Me.ColorSettings.Add("1404", New OilTypeColorSetting(RGB(146, 208, 80), RGB(255, 255, 255)))
+            'A重油
+            Me.ColorSettings.Add("2101", New OilTypeColorSetting(RGB(0, 112, 192), RGB(255, 255, 255)))
+            'LSA
+            Me.ColorSettings.Add("2201", New OilTypeColorSetting(RGB(0, 176, 240), RGB(255, 255, 255)))
+        End Sub
+        ''' <summary>
+        ''' 油種別の色情報取得
+        ''' </summary>
+        ''' <param name="oilTypeCode"></param>
+        ''' <returns></returns>
+        Public Function GetColor(oilTypeCode As String) As OilTypeColorSetting
+            If Me.ColorSettings.ContainsKey(oilTypeCode) Then
+                Return Me.ColorSettings(oilTypeCode)
+            Else
+                Return New OilTypeColorSetting(RGB(51, 152, 109), RGB(255, 255, 255))
+            End If
+        End Function
 
-        Dim rngAveTmp1 As Excel.Range = Nothing
-        Dim rngAveTmp2 As Excel.Range = Nothing
-
-        rngTmp1 = Me.ExcelWorkSheet.Range(startAddrs)
-        rngTmp2 = rngTmp1.Resize(suggestList.OilTypeList.Count + 1, maxTrainCnt)
-        rngTmp3 = rngTmp2.Offset(0)
-        rngAveTmp1 = rngTmp1.Resize(suggestList.OilTypeList.Count)
-        rngAveTmp2 = rngAveTmp1.Offset(ColumnOffset:=-3)
-        Try
-            Dim oilAve = (From oilItm In suggestList.OilTypeList.Values Select oilItm.LastSendAverage).ToList
-            Dim oilAveArray(oilAve.Count - 1, 0) As Object
-            For oilAveIdx = 0 To oilAve.Count - 1
-                oilAveArray(oilAveIdx, 0) = oilAve(oilAveIdx)
-            Next
-            rngAveTmp2.Value = oilAveArray
-            rngAveTmp2.NumberFormat = "#,##0"
-            Dim trainNumList(suggestList.OilTypeList.Count, maxTrainCnt - 1) As Object
-            Dim dateIdx = 1
-            For Each sugItm In suggestList.SuggestList.Values
-                For i = 0 To maxTrainCnt - 1
-                    If i > suggestList.TrainList.Count - 1 Then
-                        For rowCnt = 0 To suggestList.OilTypeList.Count - 1
-                            trainNumList(rowCnt, i) = "="""""
-                        Next
-                    Else
-                        With sugItm.SuggestOrderItem.Values(i)
-                            For rowCnt = 0 To suggestList.OilTypeList.Count - 1
-                                trainNumList(rowCnt, i) = .SuggestValuesItem.Values(rowCnt).ItemValue
-                            Next
-                            If isMiArea Then
-                                trainNumList(suggestList.OilTypeList.Count, i) = String.Format("=SUM(R[-{0}]C:R[-1]C)", suggestList.OilTypeList.Count + 1)
-                            Else
-                                trainNumList(suggestList.OilTypeList.Count, i) = String.Format("=SUM(R[-{0}]C:R[-1]C)", suggestList.OilTypeList.Count)
-                            End If
-
-                        End With
-
-                    End If
-                Next i
-                rngTmp3.Value = trainNumList
-                rngTmp3.HorizontalAlignment = Excel.XlHAlign.xlHAlignRight
-                ExcelMemoryRelease(rngTmp3)
-                rngTmp3 = rngTmp2.Offset(ColumnOffset:=maxTrainCnt * dateIdx)
-                dateIdx = dateIdx + 1
-            Next sugItm '日付のループ
-            ExcelMemoryRelease(rngTmp3)
-        Catch ex As Exception
-            Throw
-        Finally
-
-            ExcelMemoryRelease(rngTmp3)
-            ExcelMemoryRelease(rngTmp2)
-            ExcelMemoryRelease(rngAveTmp2)
-            ExcelMemoryRelease(rngAveTmp1)
-            ExcelMemoryRelease(rngTmp1)
-        End Try
-    End Sub
+    End Class
     ''' <summary>
-    ''' 在庫表部分の生成
+    ''' 色設定クラス
     ''' </summary>
-    Private Sub EditStockArea()
-        Dim rngTmp As Excel.Range = Nothing
-        Dim rngWork As Excel.Range = Nothing
-        Dim rngCell As Excel.Range = Nothing
-        Dim rngInterSect As Excel.Range = Nothing
-        Dim rngDataArea As Excel.Range = Nothing
+    Private Class OilTypeColorSetting
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New(backGroundColor As Integer, fontColor As Integer)
+            Me.BackGroundColor = backGroundColor
+            Me.FontColor = fontColor
+        End Sub
 
-        Dim brds As Excel.Borders
-        Dim brdItem As Excel.Border
-        Try
-            '******************************
-            'データ開始行の取得
-            '******************************
-            rngTmp = Me.ExcelWorkSheet.Range("RNG_STC_OILNAME_START")
-            rngWork = rngTmp.Offset(1)
-            Dim startRow = rngWork.Address(True, False).Split("$"c)(1)
-            ExcelMemoryRelease(rngWork)
-            ExcelMemoryRelease(rngTmp)
-            '******************************
-            '提案欄油種行の拡張（罫線維持）
-            '******************************
-            Dim oilTypeRowCnt = Me.PrintData.StockList.Values.Count
-            rngInterSect = Me.ExcelWorkSheet.Range("RNG_INTERSECT")
-            rngTmp = Me.ExcelWorkSheet.Range(String.Format("{0}:{1}", startRow, CInt(startRow) + oilTypeRowCnt - 2))
-            Dim interSectAdrs As String = Me.ExcelAppObj.Intersect(rngTmp, rngInterSect).Address
-            rngTmp.Insert(Excel.XlInsertShiftDirection.xlShiftDown, Excel.XlInsertFormatOrigin.xlFormatFromRightOrBelow)
-            rngDataArea = Me.ExcelWorkSheet.Range(interSectAdrs)
-            brds = rngDataArea.Borders
-            brdItem = brds(Excel.XlBordersIndex.xlInsideHorizontal)
-            brdItem.LineStyle = Excel.XlLineStyle.xlContinuous
-            brdItem.ColorIndex = 0
-            brdItem.TintAndShade = 0
-            brdItem.Weight = Excel.XlBorderWeight.xlThin
-            ExcelMemoryRelease(brdItem)
-
-            brdItem = brds(Excel.XlBordersIndex.xlEdgeBottom)
-            brdItem.LineStyle = Excel.XlLineStyle.xlContinuous
-            brdItem.ColorIndex = 0
-            brdItem.TintAndShade = 0
-            brdItem.Weight = Excel.XlBorderWeight.xlThin
-            ExcelMemoryRelease(brdItem)
-
-
-            brdItem = brds(Excel.XlBordersIndex.xlEdgeTop)
-            brdItem.LineStyle = Excel.XlLineStyle.xlContinuous
-            brdItem.ColorIndex = 0
-            brdItem.TintAndShade = 0
-            brdItem.Weight = Excel.XlBorderWeight.xlMedium
-            ExcelMemoryRelease(brdItem)
-
-            ExcelMemoryRelease(brds)
-            ExcelMemoryRelease(rngDataArea)
-            ExcelMemoryRelease(rngTmp)
-
-            '******************************
-            '油種名の設定
-            '******************************
-            Dim oilNameList = (From oilItm In PrintData.SuggestOilNameList.Values Where oilItm.OilCode <> OIT0004OilStockCreate.DispDataClass.SUMMARY_CODE Select oilItm.OilName).ToList
-            Dim oilNameArray(oilNameList.Count - 1, 0) As String
-            Dim oilIdx As Integer = 0
-            For Each oilNameItm In oilNameList
-                oilNameArray(oilIdx, 0) = oilNameItm
-                oilIdx = oilIdx + 1
-            Next
-            rngTmp = Me.ExcelWorkSheet.Range("RNG_STC_OILNAME_START")
-            rngWork = rngTmp.Offset(1)
-            rngCell = rngWork.Resize(RowSize:=oilNameList.Count)
-            rngCell.Value = oilNameArray
-            ExcelMemoryRelease(rngCell)
-            ExcelMemoryRelease(rngWork)
-            ExcelMemoryRelease(rngTmp)
-            '******************************
-            '容量在庫下限の設定
-            '******************************
-            '3列、n(油種分)行の配列生成
-            Dim qOilInfo = (From oilInfoItm In Me.PrintData.StockList.Values Select oilInfoItm)
-            Dim oilInfo(qOilInfo.Count - 1, 2) As Object
-            oilIdx = 0
-            For Each oilItm In qOilInfo
-                oilInfo(oilIdx, 0) = oilItm.TankCapacity  '1列目(タンク容量)
-                oilInfo(oilIdx, 1) = oilItm.TargetStock  '2列目(適正在庫)
-                oilInfo(oilIdx, 2) = "" '3列目(下限)※一旦ブランク
-                oilIdx = oilIdx + 1
-            Next
-            rngTmp = Me.ExcelWorkSheet.Range("RNG_STC_OILNAME_START")
-            rngWork = rngTmp.Offset(1, 1)
-            rngCell = rngWork.Resize(RowSize:=oilNameList.Count, ColumnSize:=3)
-            rngCell.Value = oilInfo
-            ExcelMemoryRelease(rngCell)
-            ExcelMemoryRelease(rngWork)
-            ExcelMemoryRelease(rngTmp)
-            '******************************
-            '各日付のデータ設定
-            '******************************
-            oilIdx = 0
-            '横軸の最大数(5(朝在庫～適正比の５カラム） × 日付）
-            Dim maxHolizonalColumns = (5 * Me.PrintData.StockDate.Count) - 1
-            Dim oilCnt As Integer = qOilInfo.Count
-            Dim oilSummaryFormula As String = String.Format("=SUM(R[-{0}]C:R[-1]C)", oilCnt)
-            Dim pasteVal(oilCnt, maxHolizonalColumns) As Object
-            Dim daysIdx = 0
-            For Each oilItm In qOilInfo
-                For Each stckItm In oilItm.StockItemList.Values
-                    pasteVal(oilIdx, daysIdx) = stckItm.MorningStock
-                    pasteVal(oilIdx, daysIdx + 1) = stckItm.Send
-                    pasteVal(oilIdx, daysIdx + 2) = stckItm.SummaryReceive
-                    pasteVal(oilIdx, daysIdx + 3) = stckItm.EveningStock
-                    pasteVal(oilIdx, daysIdx + 4) = "=IF(RC[-1]<RC4,RC[-1]-RC4,IF(RC[-1]<RC5,RC[-1]-RC5,""""))"
-                    If oilIdx = 0 Then
-                        pasteVal(oilCnt, daysIdx) = oilSummaryFormula
-                        pasteVal(oilCnt, daysIdx + 1) = oilSummaryFormula
-                        pasteVal(oilCnt, daysIdx + 2) = oilSummaryFormula
-                        pasteVal(oilCnt, daysIdx + 3) = oilSummaryFormula
-                        pasteVal(oilCnt, daysIdx + 4) = oilSummaryFormula
-                    End If
-                    daysIdx = daysIdx + 5
-
-                Next
-                oilIdx = oilIdx + 1
-                daysIdx = 0
-            Next
-            rngTmp = Me.ExcelWorkSheet.Range("RNG_STC_OILNAME_START")
-            rngWork = rngTmp.Offset(1, 4)
-            rngCell = rngWork.Resize(RowSize:=oilNameList.Count + 1, ColumnSize:=maxHolizonalColumns + 1)
-            rngCell.Value = pasteVal
-            ExcelMemoryRelease(rngCell)
-            ExcelMemoryRelease(rngWork)
-            ExcelMemoryRelease(rngTmp)
-        Catch ex As Exception
-            Throw
-        Finally
-            ExcelMemoryRelease(rngCell)
-            ExcelMemoryRelease(rngWork)
-            ExcelMemoryRelease(rngTmp)
-            ExcelMemoryRelease(rngDataArea)
-            ExcelMemoryRelease(rngInterSect)
-        End Try
-
-    End Sub
+        ''' <summary>
+        ''' 背景色
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property BackGroundColor As Integer
+        ''' <summary>
+        ''' 文字色
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property FontColor As Integer
+    End Class
     ''' <summary>
     ''' Excelオブジェクトの解放
     ''' </summary>
@@ -576,8 +475,6 @@ Public Class OIT0004CustomReport : Implements IDisposable
         End If
 
     End Sub
-
-
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' 重複する呼び出しを検出するには
 
@@ -587,6 +484,9 @@ Public Class OIT0004CustomReport : Implements IDisposable
             If disposing Then
                 ' TODO: マネージド状態を破棄します (マネージド オブジェクト)。
             End If
+
+            ' TODO: アンマネージド リソース (アンマネージド オブジェクト) を解放し、下の Finalize() をオーバーライドします。
+            ' TODO: 大きなフィールドを null に設定します。
             'Excel 作業シートオブジェクトの解放
             ExcelMemoryRelease(ExcelTempSheet)
             'Excel Sheetオブジェクトの解放
@@ -612,20 +512,22 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 Catch ex As Exception
                 End Try
             End If
-            ExcelMemoryRelease(ExcelAppObj)
-            Try
-                '念のため当処理で起動したプロセスが残っていたらKill
-                Dim xproc As Process = Process.GetProcessById(Me.xlProcId)
-                If Not xproc.HasExited Then
-                    xproc.Kill()
-                End If
-            Catch ex As Exception
-            End Try
-
+            ExcelProcEnd()
         End If
         disposedValue = True
     End Sub
-
+    Private Sub ExcelProcEnd()
+        ExcelMemoryRelease(ExcelAppObj)
+        Try
+            '念のため当処理で起動したプロセスが残っていたらKill
+            Dim xproc As Process = Process.GetProcessById(Me.xlProcId)
+            System.Threading.Thread.Sleep(100) 'Waitかけないとプロセスが終了しきらない為
+            If Not xproc.HasExited Then
+                xproc.Kill()
+            End If
+        Catch ex As Exception
+        End Try
+    End Sub
     ' TODO: 上の Dispose(disposing As Boolean) にアンマネージド リソースを解放するコードが含まれる場合にのみ Finalize() をオーバーライドします。
     'Protected Overrides Sub Finalize()
     '    ' このコードを変更しないでください。クリーンアップ コードを上の Dispose(disposing As Boolean) に記述します。
@@ -641,4 +543,5 @@ Public Class OIT0004CustomReport : Implements IDisposable
         ' GC.SuppressFinalize(Me)
     End Sub
 #End Region
+
 End Class

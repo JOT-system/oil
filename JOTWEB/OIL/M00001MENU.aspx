@@ -13,7 +13,7 @@
 
         <!-- 全体レイアウト　Menuheaderbox -->
         <div  class="Menuheaderbox" id="Menuheaderbox">
-          <a id="guidanceArea" class="guidance">
+          <a id="guidanceArea" class="guidance" runat="server">
               <div id="guidanceList">
                   <asp:Repeater ID="repGuidance" runat="server">
                       <HeaderTemplate>

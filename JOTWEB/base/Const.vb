@@ -231,6 +231,15 @@ Public Module BaseDllConst
 
 #Region "営業所"
     ''' <summary>
+    ''' 情報システム部
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010006 As String = "010006"
+    ''' <summary>
+    ''' 石油部
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010007 As String = "010007"
+
+    ''' <summary>
     ''' 東北支店
     ''' </summary>
     Public Const CONST_OFFICECODE_010401 As String = "010401"
@@ -377,6 +386,10 @@ Public Module BaseDllConst
     ''' 発送順重複
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_100 As String = "100"
+    ''' <summary>
+    ''' タンク車状態未到着
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_101 As String = "101"
 
     ''' <summary>
     ''' 失注（荷主都合）

@@ -172,6 +172,11 @@
     <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>
 
+    <!-- 帳票ポップアップ(営業所(コード)) -->
+    <asp:TextBox ID="WF_SEL_TH_ORDERSALESOFFICECODE" runat="server"></asp:TextBox>
+    <!-- 帳票ポップアップ(営業所(名)) -->
+    <asp:TextBox ID="WF_SEL_TH_ORDERSALESOFFICENAME" runat="server"></asp:TextBox>
+
     <!-- ■受注タンク車割当用 -->
     <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_LINK_LINECNT" runat="server"></asp:TextBox>
@@ -265,5 +270,8 @@
     <asp:TextBox ID="WF_SEL_RESULTFLG" runat="server"></asp:TextBox>
     <!-- 託送指示フラグ -->
     <asp:TextBox ID="WF_SEL_DELIVERYFLG" runat="server"></asp:TextBox>
+
+    <!-- 発送順区分 -->
+    <asp:TextBox ID="WF_SEL_SHIPORDERCLASS" runat="server"></asp:TextBox>
 
 </div>

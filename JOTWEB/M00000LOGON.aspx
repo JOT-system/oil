@@ -60,7 +60,7 @@
                                 </div>
                                 <div class="otherLine">
                                     <div class="naiyo"><%# Eval("NAIYOU") %></div>
-                                    <div class="attachFile1"><a href="#"><%# Eval("FAILE1") %></a></div>
+                                    <div class="attachFile1"><a href='<%# ResolveUrl("~/OIL/mas/OIM0020GuidanceDownload.aspx") & "?id=" & JOTWEB.OIM0020WRKINC.GetParamString(Eval("GUIDANCENO"), "1") %>' target="_blank"><%# Eval("FAILE1") %></a></div>
                                 </div>
                             </li>
                         </ItemTemplate>

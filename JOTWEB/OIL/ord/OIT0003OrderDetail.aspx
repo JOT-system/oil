@@ -690,5 +690,7 @@
         <input id="WF_DTAB_CHANGE_NO" runat="server" value="" type="text"/>
         <!-- ヘッダーを表示するか保持、"1"(表示:初期値),"0"(非表示)  -->
         <asp:HiddenField ID="hdnDispHeaderItems" runat="server" Value="1" />
+        <!-- 油種数登録ボタン押下フラグ(True:有効, False：無効) -->
+        <input id="WF_ButtonInsertFLG" runat="server" value="" type="text" />
     </div>
 </asp:Content>

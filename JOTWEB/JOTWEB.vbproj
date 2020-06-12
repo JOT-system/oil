@@ -276,6 +276,7 @@
     <Content Include="OIL\script\OIM0004S.js" />
     <Content Include="script\calendar.js" />
     <Content Include="script\common.js" />
+    <Content Include="script\easyselectbox.min.js" />
     <Content Include="script\event.js" />
     <Content Include="OIL\script\M00001.js" />
     <Content Include="script\M00000.js" />
@@ -335,7 +336,9 @@
     </Compile>
     <Compile Include="OIL\com\EntryHistory.vb" />
     <Compile Include="OIL\com\OIT0001CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0003CustomReport.vb" />
     <Compile Include="OIL\com\OIT0004CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0004CustomReportOLD.vb" />
     <Compile Include="OIL\for\OIT0006OutOfServiceDetail.aspx.designer.vb">
       <DependentUpon>OIT0006OutOfServiceDetail.aspx</DependentUpon>
     </Compile>

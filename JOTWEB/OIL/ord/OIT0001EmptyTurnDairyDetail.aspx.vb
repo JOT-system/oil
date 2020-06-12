@@ -435,20 +435,31 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
             & " , ''                                             AS REMARK" _
-            & " , '0'                                            AS DELFLG" _
-            & " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO" _
-            & " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
+            & " , '0'                                            AS DELFLG"
+
+            '### 20200609 START #######################################################
+            If work.WF_SEL_ORDERNUMBER.Text = "" Then
+                SQLStr &=
+                  " , 'O' + FORMAT(GETDATE(),'yyyyMMdd') + @P1       AS ORDERNO"
+            Else
+                SQLStr &=
+                  " , @P1                                            AS ORDERNO"
+            End If
+            '### 20200609 END   #######################################################
+
+            SQLStr &=
+              " , FORMAT(ROW_NUMBER() OVER(ORDER BY name),'000') AS DETAILNO" _
             & " , ''                                             AS KAMOKU" _
             & " , ''                                             AS ORDERSTATUS" _
             & " FROM sys.all_objects "
 
             SQLStr &=
-                  " ORDER BY" _
-                & "    LINECNT"
+                      " ORDER BY" _
+                    & "    LINECNT"
 
             '明細データダブルクリック
         ElseIf work.WF_SEL_CREATEFLG.Text = "2" Then
-            SQLStr =
+                SQLStr =
               " SELECT" _
             & "   0                                              AS LINECNT" _
             & " , ''                                             AS OPERATION" _
@@ -583,7 +594,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '新規登録の場合
                 If work.WF_SEL_CREATEFLG.Text = "1" Then
                     For Each OIT0001WKrow As DataRow In OIT0001WKtbl.Rows
-                        PARA1.Value = OIT0001WKrow("ORDERNO_NUM")
+                        If work.WF_SEL_ORDERNUMBER.Text = "" Then
+                            PARA1.Value = OIT0001WKrow("ORDERNO_NUM")
+                        Else
+                            PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
+                        End If
                         PARA2.Value = C_DELETE_FLG.ALIVE
                     Next
 
@@ -721,6 +736,27 @@ Public Class OIT0001EmptyTurnDairyDetail
             Me.TxtLTank.Enabled = False
             'Ａ重油
             Me.TxtATank.Enabled = False
+        Else
+            'ハイオク
+            Me.TxtHTank.Enabled = True
+            'レギュラー
+            Me.TxtRTank.Enabled = True
+            '灯油
+            Me.TxtTTank.Enabled = True
+            '未添加灯油
+            Me.TxtMTTank.Enabled = True
+            '軽油
+            Me.TxtKTank.Enabled = True
+            '３号軽油
+            Me.TxtK3Tank.Enabled = True
+            '軽油５
+            Me.TxtK5Tank.Enabled = True
+            '軽油１０
+            Me.TxtK10Tank.Enabled = True
+            'ＬＳＡ
+            Me.TxtLTank.Enabled = True
+            'Ａ重油
+            Me.TxtATank.Enabled = True
         End If
 
         '〇 (一覧)テキストボックスの制御(読取専用)
@@ -1315,6 +1351,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtLoadingDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                Me.TxtDepDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
+                Me.TxtArrDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                Me.TxtAccDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                Me.TxtEmparrDate.Text = Date.Parse(Me.TxtLoadingDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                '### 2020608 END   ########################################################################################
+
             Case "TxtDepDate"           '(予定)発日
                 Dim WW_DATE As Date
                 Try
@@ -1327,6 +1376,24 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtDepDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                If Integer.Parse(WW_GetValue(6)) = 0 Then
+                    Me.TxtArrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                ElseIf Integer.Parse(WW_GetValue(6)) > 0 Then
+                    Me.TxtArrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtDepDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                End If
+                '### 2020608 END   ########################################################################################
+
             Case "TxtArrDate"           '(予定)積車着日
                 Dim WW_DATE As Date
                 Try
@@ -1339,6 +1406,22 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtArrDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                If Integer.Parse(WW_GetValue(8)) = 0 Then
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                ElseIf Integer.Parse(WW_GetValue(8)) > 0 Then
+                    Me.TxtAccDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(8))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtArrDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(8))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                End If
+                '### 2020608 END   ########################################################################################
+
             Case "TxtAccDate"           '(予定)受入日
                 Dim WW_DATE As Date
                 Try
@@ -1351,6 +1434,19 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Catch ex As Exception
                 End Try
                 TxtAccDate.Focus()
+
+                '### 2020608 START ########################################################################################
+                '◯ 列車(名称)から日数を取得
+                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", Me.TxtHeadOfficeTrainName.Text, WW_GetValue)
+
+                '〇 (予定)の日付を設定
+                If Integer.Parse(WW_GetValue(9)) = 0 Then
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtAccDate.Text).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                ElseIf Integer.Parse(WW_GetValue(9)) > 0 Then
+                    Me.TxtEmparrDate.Text = Date.Parse(Me.TxtAccDate.Text).AddDays((-1 * Integer.Parse(WW_GetValue(9))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                End If
+                '### 2020608 END   ########################################################################################
 
             Case "TxtEmparrDate"           '(予定)空車着日
                 Dim WW_DATE As Date
@@ -1687,6 +1783,40 @@ Public Class OIT0001EmptyTurnDairyDetail
             'CLOSE
             SQLcmd.Dispose()
             SQLcmd = Nothing
+
+            '### 20200609 START(内部No178) #################################################
+            '一覧明細の件数を取得
+            Dim cntTbl As Integer = OIT0001tbl.Select("DELFLG <> '1'").Count
+            If cntTbl = 0 Then
+                '★ 一覧明細がすべて削除(0件)になった場合は、すべてのステータスを初期値に戻す
+                '◯ 受注TBLのステータス初期化
+                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_100,
+                                     InitializeFlg:=True)
+
+                '◯ 画面定義変数の初期化
+                '　★作成モード(１：新規登録, ２：更新)設定
+                work.WF_SEL_CREATEFLG.Text = "1"
+                '　★車数
+                Me.TxtHTank.Text = "0"
+                Me.TxtRTank.Text = "0"
+                Me.TxtTTank.Text = "0"
+                Me.TxtMTTank.Text = "0"
+                Me.TxtKTank.Text = "0"
+                Me.TxtK3Tank.Text = "0"
+                Me.TxtK5Tank.Text = "0"
+                Me.TxtK10Tank.Text = "0"
+                Me.TxtLTank.Text = "0"
+                Me.TxtATank.Text = "0"
+                Me.TxtTotalTank.Text = "0"
+
+            End If
+
+            '(受注TBL)タンク車数更新
+            WW_UpdateOrderTankCnt(SQLcon)
+
+            '空回日報(一覧)画面表示データ取得
+            WW_OrderListTBLSet(SQLcon)
+            '### 20200609 END  (内部No178) #################################################
 
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D DELETE")
@@ -2210,6 +2340,12 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         '〇日付妥当性チェック
         WW_CheckValidityDate(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+
+        '〇 タンク車状態チェック
+        WW_CheckTankStatus(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
             Exit Sub
         End If
@@ -3263,6 +3399,64 @@ Public Class OIT0001EmptyTurnDairyDetail
     End Sub
 
     ''' <summary>
+    ''' タンク車状態チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckTankStatus(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_OfficeCode As String = ""
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '〇 検索(営業所).テキストボックスが未設定
+        WW_OfficeCode = work.WF_SEL_SALESOFFICECODE.Text
+
+        'タンク車状態チェック
+        '(1:発送　2:到着予定　3:到着　4:交検　5:全検　6:修理　7:疎開留置)
+        For Each OIT0001row As DataRow In OIT0001tbl.Rows
+
+            If OIT0001row("TANKNO") <> "" AndAlso OIT0001row("DELFLG") = "0" Then
+                'タンク車情報を取得
+                WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0001row("TANKNO"), WW_GetValue)
+
+                'タンク車状態
+                Select Case WW_GetValue(11)
+                        'タンク車状態が"2"(到着予定), "3"(到着)の場合
+                    Case "2", "3"
+                        If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101 Then
+                            OIT0001row("ORDERINFO") = ""
+                            OIT0001row("ORDERINFONAME") = ""
+                        End If
+                        'タンク車状態が"2"(到着予定), "3"(到着)以外の場合
+                    Case Else
+                        OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
+                        CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+
+                        Master.Output(C_MESSAGE_NO.OIL_TANKSTATUS_ERROR,
+                              C_MESSAGE_TYPE.ERR,
+                              "(" + OIT0001row("TANKNO") + ")" + WW_GetValue(9),
+                              needsPopUp:=True)
+
+                        WW_CheckMES1 = "タンク車状態未到着エラー。"
+                        WW_CheckMES2 = C_MESSAGE_NO.OIL_TANKSTATUS_ERROR
+                        WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
+                        O_RTN = "ERR"
+
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0001tbl)
+                        Exit Sub
+                End Select
+            End If
+        Next
+
+    End Sub
+
+    ''' <summary>
     ''' 列車重複チェック(同一レコードがすでに登録済みかチェック)
     ''' </summary>
     ''' <param name="O_RTN"></param>
@@ -4130,6 +4324,10 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderDetail(ByVal SQLcon As SqlConnection)
 
+        '○ ＤＢ削除
+        Dim SQLTempTblStr As String =
+          " DELETE FROM OIL.OIT0003_DETAIL WHERE ORDERNO = @P01 AND DELFLG = '1'; " _
+
         '○ ＤＢ更新
         Dim SQLStr As String =
               " DECLARE @hensuu AS bigint ;" _
@@ -4240,7 +4438,16 @@ Public Class OIT0001EmptyTurnDairyDetail
         '& "   AND  KAMOKU   = @P04"
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+            Using SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon),
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+
+                '★削除作成用
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                PARATMP01.Value = work.WF_SEL_ORDERNUMBER.Text
+
+                '　削除実行
+                SQLTMPcmd.ExecuteNonQuery()
+
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
                 'Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.NVarChar, 2)   '入線順
@@ -4396,6 +4603,133 @@ Public Class OIT0001EmptyTurnDairyDetail
         End Try
 
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' (受注TBL)受注進行ステータス更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateOrderStatus(ByVal I_Value As String,
+                                       Optional ByVal InitializeFlg As Boolean = False)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･受注TBLの受注進行ステータス、及び貨車連結順序表№を更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0002_ORDER " _
+                    & "    SET ORDERSTATUS = @P03, "
+            '& "        TANKLINKNO  = @P04, "
+
+            '### 20200609 START(内部No178) #################################################
+            '○ 条件指定で指定されたものでSQLで可能なものを追加する
+            If InitializeFlg = True Then
+                '空回日報可否フラグ
+                ' 0：未作成, 1：作成(空回日報から作成), 2：作成(在庫管理から作成)
+                SQLStr &= String.Format("        EMPTYTURNFLG = '{0}', ", "1")
+                '積置可否フラグ
+                ' 1：積置あり, 2：積置なし
+                SQLStr &= String.Format("        STACKINGFLG  = '{0}', ", "2")
+                '利用可否フラグ
+                ' 1：利用可, 2：利用不可
+                SQLStr &= String.Format("        USEPROPRIETYFLG = '{0}', ", "1")
+                '手配連絡フラグ
+                ' 0：未連絡, 1：連絡
+                SQLStr &= String.Format("        CONTACTFLG = '{0}', ", "0")
+                '結果受理フラグ
+                ' 0：未受理, 1：受理
+                SQLStr &= String.Format("        RESULTFLG = '{0}', ", "0")
+                '託送指示フラグ
+                ' 0：未手配, 1：手配
+                SQLStr &= String.Format("        DELIVERYFLG = '{0}', ", "0")
+                '車数
+                SQLStr &= String.Format("        RTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        HTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        TTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        MTTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        KTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        K3TANK = '{0}', ", "0")
+                SQLStr &= String.Format("        K5TANK = '{0}', ", "0")
+                SQLStr &= String.Format("        K10TANK = '{0}', ", "0")
+                SQLStr &= String.Format("        LTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        ATANK = '{0}', ", "0")
+                SQLStr &= String.Format("        TOTALTANK = '{0}', ", "0")
+                '変更後_車数
+                SQLStr &= String.Format("        RTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        HTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        TTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        MTTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        KTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        K3TANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        K5TANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        K10TANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        LTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        ATANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        TOTALTANKCH = '{0}', ", "0")
+
+                ''貨車連結順序表№
+                'SQLStr &= String.Format("        TANKLINKNO = '{0}', ", "")
+                ''作成_貨車連結順序表№
+                'SQLStr &= String.Format("        TANKLINKNOMADE = '{0}', ", "")
+                ''支払請求№
+                'SQLStr &= String.Format("        BILLINGNO = '{0}', ", "")
+            End If
+            '### 20200609 END  (内部No178) #################################################
+
+            SQLStr &=
+                      "        UPDYMD      = @P11, " _
+                    & "        UPDUSER     = @P12, " _
+                    & "        UPDTERMID   = @P13, " _
+                    & "        RECEIVEYMD  = @P14  " _
+                    & "  WHERE ORDERNO     = @P01  " _
+                    & "    AND DELFLG     <> @P02; "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)
+            Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)
+            'Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+            PARA02.Value = C_DELETE_FLG.DELETE
+            PARA03.Value = I_Value
+            'PARA04.Value = work.WF_SEL_LINK_LINKNO.Text
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D_ORDERSTATUS UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D_ORDERSTATUS UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

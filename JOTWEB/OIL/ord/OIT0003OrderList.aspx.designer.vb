@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class OIT0003OrderList
-    
+
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_SEL_CAMPNAME コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_SELUORG_L コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SELUORG_L As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_SELUORG_TEXT コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SELUORG_TEXT As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
+
     '''<summary>
     '''WF_ButtonLAST コントロール。
     '''</summary>
@@ -66,7 +66,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
+
     '''<summary>
     '''pnlListArea コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
-    
+
     '''<summary>
     '''rightview コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
-    
+
     '''<summary>
     '''leftview コントロール。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB.GRIS0005LeftBox
-    
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -102,7 +102,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.OIT0003WRKINC
-    
+
     '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>
@@ -111,7 +111,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_GridPosition コントロール。
     '''</summary>
@@ -120,7 +120,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
@@ -129,7 +129,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_FIELD_REP コントロール。
     '''</summary>
@@ -138,7 +138,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_SelectedIndex コントロール。
     '''</summary>
@@ -147,7 +147,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_LeftMViewChange コントロール。
     '''</summary>
@@ -156,7 +156,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
@@ -165,7 +165,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_RightViewChange コントロール。
     '''</summary>
@@ -174,7 +174,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
@@ -183,7 +183,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_PrintURL コントロール。
     '''</summary>
@@ -192,7 +192,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_BOXChange コントロール。
     '''</summary>
@@ -201,7 +201,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -210,7 +210,7 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_MAPpermitcode コントロール。
     '''</summary>
@@ -219,7 +219,61 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
+    '''<summary>
+    '''WF_BUTTONpermitcode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BUTTONpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+
+    '''<summary>
+    '''lblReportLodDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportLodDate As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''txtReportLodDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportLodDate As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''tileSalesOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
+
+    '''<summary>
+    '''rbShipBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbShipBtn As Global.System.Web.UI.WebControls.RadioButton
+
+    '''<summary>
+    '''rbLoadBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbLoadBtn As Global.System.Web.UI.WebControls.RadioButton
+
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -228,7 +282,7 @@ Partial Public Class OIT0003OrderList
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB.OILMasterPage
         Get
-            Return CType(MyBase.Master,JOTWEB.OILMasterPage)
+            Return CType(MyBase.Master, JOTWEB.OILMasterPage)
         End Get
     End Property
 End Class

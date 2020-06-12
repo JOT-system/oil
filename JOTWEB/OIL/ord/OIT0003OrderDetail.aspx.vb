@@ -11565,7 +11565,7 @@ Public Class OIT0003OrderDetail
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
 
             '★割当確定ボタン押下時に更新
-            If Me.WW_UPBUTTONFLG = "1" Then
+            If Me.WW_UPBUTTONFLG = "1" AndAlso isNormal(WW_ERRCODE) Then
                 '★タンク車所在の更新
                 '引数１：所在地コード　⇒　変更なし(空白)
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))
@@ -11579,7 +11579,7 @@ Public Class OIT0003OrderDetail
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
 
             '★割当確定ボタン押下時に更新
-            If Me.WW_UPBUTTONFLG = "1" Then
+            If Me.WW_UPBUTTONFLG = "1" AndAlso isNormal(WW_ERRCODE) Then
                 '★タンク車所在の更新
                 '引数１：所在地コード　⇒　変更なし(空白)
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))

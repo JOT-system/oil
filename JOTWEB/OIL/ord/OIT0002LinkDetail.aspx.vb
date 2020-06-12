@@ -950,6 +950,11 @@ Public Class OIT0002LinkDetail
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                         SQLcon.Open()       'DataBase接続
 
+                        '######################################################
+                        '受注営業所を変更した時点で、新規登録と同様の扱いとする。
+                        work.WF_SEL_CREATEFLG.Text = "1"
+                        work.WF_SEL_PANEL.Value = ""
+                        '######################################################
                         MAPDataGet(SQLcon, 0)
                     End Using
 

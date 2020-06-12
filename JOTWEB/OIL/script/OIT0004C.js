@@ -24,7 +24,10 @@ function InitDisplay() {
     //提案表の合計イベントバインド
     bindSuggestSummary(suggestCol);
     //油種表示非表示設定復元
-    if (IsPostBack === '0') {
+    let hdnChgConsigneeFirstLoadObj = document.getElementById('hdnChgConsigneeFirstLoad');
+
+    if (IsPostBack === '0' || hdnChgConsigneeFirstLoadObj.value === '1') {
+        hdnChgConsigneeFirstLoadObj.value = '0';
         loadOiltypeSelected();
     }
     //油種表示非表示イベントバインド
@@ -39,6 +42,8 @@ function InitDisplay() {
     bindContentHorizonalScroll();
     //月選択バインド
     commonBindMonthPicker();
+    //JXTGチェックイベントバインド
+    bindJxtgCheckBox();
 }
 // 〇コンテンツ横スクロールイベントのバインド
 function bindContentHorizonalScroll() {
@@ -586,4 +591,29 @@ function changeConsignee(callerObj) {
     }
 
     ButtonClick('ChangeConsignee');
+}
+// JXTG帳票のチェック時のイベントをバインド
+function bindJxtgCheckBox() {
+    let chkObj = document.getElementById('chkPrintJXTG');
+    if (chkObj === null) {
+        return;
+    }
+    chkObj.addEventListener('click', (function () {
+        return function () {
+            jxtgCheckChange();
+        };
+    })(), true);
+
+}
+function jxtgCheckChange() {
+    let chkObj = document.getElementById('chkPrintJXTG');
+    let hdnShowPnlToDateObj = document.getElementById('hdnShowPnlToDate');
+    let pnlObj = document.getElementById('pnlToDate');
+    if (chkObj.checked) {
+        hdnShowPnlToDateObj.value = '0';
+        pnlObj.style.display = 'none';
+    } else {
+        hdnShowPnlToDateObj.value = '1';
+        pnlObj.style.display = '';
+    }
 }

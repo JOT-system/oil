@@ -454,6 +454,8 @@
             <!-- 油槽所変更値保持用 -->
             <asp:HiddenField ID="hdnChgConsignee" runat="server" />
             <asp:HiddenField ID="hdnChgConsigneeName" runat="server" />
+            <!-- 油槽所変更時初回ロード 0:通常、1:初回 -->
+            <asp:HiddenField ID="hdnChgConsigneeFirstLoad" runat="server" Value="0" />
             <!-- 帳票設定表示状態保持用 -->
             <asp:HiddenField ID="hdnDispReportSettings" runat="server" value="0"/>
             <!-- 権限 -->
@@ -466,7 +468,7 @@
 </asp:Content>
 <%--ポップアップタイトルバーの内容--%>
 <asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
-    <div>
+    <div id="divChkJxtg" runat="server">
         <div class="grc0001Wrapper">
             <ul>
                 <li>
@@ -489,7 +491,8 @@
             </a>
         </span>
     </div>
-    <div>
+    <div id="pnlToDate" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %>>
+        <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
         <span id="spnToDate">
             <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
             <a class="ef" id="aReportToDate" ondblclick="Field_DBclick('txtReportToDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">

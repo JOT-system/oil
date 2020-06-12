@@ -329,6 +329,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents hdnChgConsigneeName As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''hdnChgConsigneeFirstLoad コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnChgConsigneeFirstLoad As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''hdnDispReportSettings コントロール。
     '''</summary>
     '''<remarks>
@@ -336,6 +345,15 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnDispReportSettings As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''divChkJxtg コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents divChkJxtg As Global.System.Web.UI.HtmlControls.HtmlGenericControl
     
     '''<summary>
     '''chkPrintJXTG コントロール。
@@ -381,6 +399,15 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtReportFromDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''hdnShowPnlToDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnShowPnlToDate As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''lblReportToDate コントロール。

@@ -4141,6 +4141,66 @@ Public Class OIT0003OrderDetail
             SQLcmd.Dispose()
             SQLcmd = Nothing
 
+            '### 20200609 START(内部No178) #################################################
+            '一覧明細の件数を取得
+            Dim cntTbl As Integer = OIT0003tbl.Select("DELFLG <> '1'").Count
+            If cntTbl = 0 Then
+                '★ 一覧明細がすべて削除(0件)になった場合は、すべてのステータスを初期値に戻す
+                '◯ 受注TBLのステータス初期化
+                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_100,
+                                     InitializeFlg:=True)
+
+                '◯ 画面定義変数の初期化
+                '　★受注進行ステータス(100:受注受付)
+                Me.TxtOrderStatus.Text = "受注受付"
+                work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
+                '　★作成モード(１：新規登録, ２：更新)設定
+                work.WF_SEL_CREATEFLG.Text = "1"
+                '　★作成モード(１：貨車連結未使用, ２：貨車連結使用)設定
+                work.WF_SEL_CREATELINKFLG.Text = "1"
+                '　★手配連絡フラグ(0：未連絡, 1：連絡)設定
+                work.WF_SEL_CONTACTFLG.Text = "0"
+                '　★結果受理フラグ(0：未受理, 1：受理)設定
+                work.WF_SEL_RESULTFLG.Text = "0"
+                '　★託送指示フラグ(0：未手配, 1：手配)設定
+                work.WF_SEL_DELIVERYFLG.Text = "0"
+                '　★車数
+                Me.TxtHTank.Text = "0"
+                Me.TxtRTank.Text = "0"
+                Me.TxtTTank.Text = "0"
+                Me.TxtMTTank.Text = "0"
+                Me.TxtKTank.Text = "0"
+                Me.TxtK3Tank.Text = "0"
+                Me.TxtK5Tank.Text = "0"
+                Me.TxtK10Tank.Text = "0"
+                Me.TxtLTank.Text = "0"
+                Me.TxtATank.Text = "0"
+                Me.TxtTotalCnt.Text = "0"
+                '　★車数(割当後)
+                Me.TxtHTank_w.Text = "0"
+                Me.TxtRTank_w.Text = "0"
+                Me.TxtTTank_w.Text = "0"
+                Me.TxtMTTank_w.Text = "0"
+                Me.TxtKTank_w.Text = "0"
+                Me.TxtK3Tank_w.Text = "0"
+                Me.TxtK5Tank_w.Text = "0"
+                Me.TxtK10Tank_w.Text = "0"
+                Me.TxtLTank_w.Text = "0"
+                Me.TxtATank_w.Text = "0"
+                Me.TxtTotalCnt_w.Text = "0"
+
+                '〇 油種数登録ボタンのチェックを無効(False)
+                WF_ButtonInsertFLG.Value = "FALSE"
+
+            End If
+
+            '(受注TBL)タンク車数更新
+            WW_UpdateOrderTankCnt(SQLcon)
+
+            '受注(一覧)表示用
+            WW_OrderListTBLSet(SQLcon)
+            '### 20200609 END  (内部No178) #################################################
+
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D_TAB1 DELETE")
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
@@ -7126,6 +7186,10 @@ Public Class OIT0003OrderDetail
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderDetail(ByVal SQLcon As SqlConnection)
 
+        '○ ＤＢ削除
+        Dim SQLTempTblStr As String =
+          " DELETE FROM OIL.OIT0003_DETAIL WHERE ORDERNO = @P01 AND DELFLG = '1'; " _
+
         '○ ＤＢ更新
         Dim SQLStr As String =
               " DECLARE @hensuu AS bigint ;" _
@@ -7239,7 +7303,16 @@ Public Class OIT0003OrderDetail
         '& "    , UPDTIMSTP" _
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+            Using SQLTMPcmd As New SqlCommand(SQLTempTblStr, SQLcon),
+                  SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLcmdJnl As New SqlCommand(SQLJnl, SQLcon)
+
+                '★削除作成用
+                Dim PARATMP01 As SqlParameter = SQLTMPcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                PARATMP01.Value = work.WF_SEL_ORDERNUMBER.Text
+
+                '　削除実行
+                SQLTMPcmd.ExecuteNonQuery()
+
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)   '受注明細№
                 Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 2)   '発送順
@@ -9160,7 +9233,8 @@ Public Class OIT0003OrderDetail
     ''' (受注TBL)受注進行ステータス更新
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_UpdateOrderStatus(ByVal I_Value As String)
+    Protected Sub WW_UpdateOrderStatus(ByVal I_Value As String,
+                                       Optional ByVal InitializeFlg As Boolean = False)
 
         Try
             'DataBase接続文字
@@ -9171,8 +9245,65 @@ Public Class OIT0003OrderDetail
             Dim SQLStr As String =
                     " UPDATE OIL.OIT0002_ORDER " _
                     & "    SET ORDERSTATUS = @P03, " _
-                    & "        TANKLINKNO  = @P04, " _
-                    & "        UPDYMD      = @P11, " _
+                    & "        TANKLINKNO  = @P04, "
+
+            '### 20200609 START(内部No178) #################################################
+            '○ 条件指定で指定されたものでSQLで可能なものを追加する
+            If InitializeFlg = True Then
+                '空回日報可否フラグ
+                ' 0：未作成, 1：作成(空回日報から作成), 2：作成(在庫管理から作成)
+                SQLStr &= String.Format("        EMPTYTURNFLG = '{0}', ", "0")
+                '積置可否フラグ
+                ' 1：積置あり, 2：積置なし
+                SQLStr &= String.Format("        STACKINGFLG  = '{0}', ", "2")
+                '利用可否フラグ
+                ' 1：利用可, 2：利用不可
+                SQLStr &= String.Format("        USEPROPRIETYFLG = '{0}', ", "1")
+                '手配連絡フラグ
+                ' 0：未連絡, 1：連絡
+                SQLStr &= String.Format("        CONTACTFLG = '{0}', ", "0")
+                '結果受理フラグ
+                ' 0：未受理, 1：受理
+                SQLStr &= String.Format("        RESULTFLG = '{0}', ", "0")
+                '託送指示フラグ
+                ' 0：未手配, 1：手配
+                SQLStr &= String.Format("        DELIVERYFLG = '{0}', ", "0")
+                '車数
+                SQLStr &= String.Format("        RTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        HTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        TTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        MTTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        KTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        K3TANK = '{0}', ", "0")
+                SQLStr &= String.Format("        K5TANK = '{0}', ", "0")
+                SQLStr &= String.Format("        K10TANK = '{0}', ", "0")
+                SQLStr &= String.Format("        LTANK = '{0}', ", "0")
+                SQLStr &= String.Format("        ATANK = '{0}', ", "0")
+                SQLStr &= String.Format("        TOTALTANK = '{0}', ", "0")
+                '変更後_車数
+                SQLStr &= String.Format("        RTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        HTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        TTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        MTTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        KTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        K3TANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        K5TANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        K10TANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        LTANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        ATANKCH = '{0}', ", "0")
+                SQLStr &= String.Format("        TOTALTANKCH = '{0}', ", "0")
+
+                ''貨車連結順序表№
+                'SQLStr &= String.Format("        TANKLINKNO = '{0}', ", "")
+                ''作成_貨車連結順序表№
+                'SQLStr &= String.Format("        TANKLINKNOMADE = '{0}', ", "")
+                ''支払請求№
+                'SQLStr &= String.Format("        BILLINGNO = '{0}', ", "")
+            End If
+            '### 20200609 END  (内部No178) #################################################
+
+            SQLStr &=
+                      "        UPDYMD      = @P11, " _
                     & "        UPDUSER     = @P12, " _
                     & "        UPDTERMID   = @P13, " _
                     & "        RECEIVEYMD  = @P14  " _

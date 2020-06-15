@@ -11523,7 +11523,21 @@ Public Class OIT0003OrderDetail
                     Me.TxtRTank_w.Enabled = True
                     '灯油
                 Case BaseDllConst.CONST_TTank
-                    Me.TxtTTank_w.Enabled = True
+                    '### 2020/06/15 START ########################################################
+                    '★根岸営業所の場合
+                    If Me.TxtOrderOfficeCode.Text = "011402" Then
+                        '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
+                        If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
+                            OrElse Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
+                            '入力を未許可にする。
+                            Me.TxtTTank_w.Enabled = False
+                        Else
+                            Me.TxtTTank_w.Enabled = True
+                        End If
+                    Else
+                        Me.TxtTTank_w.Enabled = True
+                    End If
+                    '### 2020/06/15 END   ########################################################
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
                     '★根岸営業所の場合

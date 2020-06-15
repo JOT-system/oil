@@ -3767,7 +3767,21 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtRTank.Enabled = True
                     '灯油
                 Case BaseDllConst.CONST_TTank
-                    TxtTTank.Enabled = True
+                    '### 2020/06/15 START ########################################################
+                    '★根岸営業所の場合
+                    If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
+                        '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
+                        If work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
+                            OrElse work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
+                            '入力を未許可にする。
+                            Me.TxtTTank.Enabled = False
+                        Else
+                            Me.TxtTTank.Enabled = True
+                        End If
+                    Else
+                        TxtTTank.Enabled = True
+                    End If
+                    '### 2020/06/15 END   ########################################################
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
                     '★根岸営業所の場合

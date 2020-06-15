@@ -284,6 +284,53 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "荷受人"
+    ''' <summary>
+    ''' JXTG北信油槽所
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_10 As String = "10"
+    ''' <summary>
+    ''' JXTG甲府油槽所
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_20 As String = "20"
+    ''' <summary>
+    ''' コウショウ高崎
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_30 As String = "30"
+    ''' <summary>
+    ''' JONET松本
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_40 As String = "40"
+    ''' <summary>
+    ''' OT盛岡
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_51 As String = "51"
+    ''' <summary>
+    ''' OT郡山
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_52 As String = "52"
+    ''' <summary>
+    ''' OT宇都宮
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_53 As String = "53"
+    ''' <summary>
+    ''' OT高崎
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_54 As String = "54"
+    ''' <summary>
+    ''' OT八王子
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_55 As String = "55"
+    ''' <summary>
+    ''' OT松本
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_56 As String = "56"
+    ''' <summary>
+    ''' 愛知機関区
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_70 As String = "70"
+#End Region
+
 #Region "受注情報"
     ''' <summary>
     ''' 積置

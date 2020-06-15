@@ -11528,7 +11528,16 @@ Public Class OIT0003OrderDetail
                 Case BaseDllConst.CONST_MTTank
                     '★根岸営業所の場合
                     If Me.TxtOrderOfficeCode.Text = "011402" Then
-                        Me.TxtMTTank_w.Enabled = False
+                        '### 2020/06/15 START ########################################################
+                        '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
+                        If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
+                            OrElse Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
+                            '入力を許可する。
+                            Me.TxtMTTank_w.Enabled = True
+                        Else
+                            Me.TxtMTTank_w.Enabled = False
+                        End If
+                        '### 2020/06/15 END   ########################################################
                     Else
                         Me.TxtMTTank_w.Enabled = True
                     End If

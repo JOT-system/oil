@@ -737,26 +737,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             'Ａ重油
             Me.TxtATank.Enabled = False
         Else
-            'ハイオク
-            Me.TxtHTank.Enabled = True
-            'レギュラー
-            Me.TxtRTank.Enabled = True
-            '灯油
-            Me.TxtTTank.Enabled = True
-            '未添加灯油
-            Me.TxtMTTank.Enabled = True
-            '軽油
-            Me.TxtKTank.Enabled = True
-            '３号軽油
-            Me.TxtK3Tank.Enabled = True
-            '軽油５
-            Me.TxtK5Tank.Enabled = True
-            '軽油１０
-            Me.TxtK10Tank.Enabled = True
-            'ＬＳＡ
-            Me.TxtLTank.Enabled = True
-            'Ａ重油
-            Me.TxtATank.Enabled = True
+            '画面表示設定処理
+            WW_ScreenEnabledSet()
+
         End If
 
         '〇 (一覧)テキストボックスの制御(読取専用)
@@ -3784,12 +3767,35 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtRTank.Enabled = True
                     '灯油
                 Case BaseDllConst.CONST_TTank
-                    TxtTTank.Enabled = True
+                    '### 2020/06/15 START ########################################################
+                    '★根岸営業所の場合
+                    If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
+                        '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
+                        If work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
+                            OrElse work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
+                            '入力を未許可にする。
+                            Me.TxtTTank.Enabled = False
+                        Else
+                            Me.TxtTTank.Enabled = True
+                        End If
+                    Else
+                        TxtTTank.Enabled = True
+                    End If
+                    '### 2020/06/15 END   ########################################################
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
                     '★根岸営業所の場合
-                    If work.WF_SEL_SALESOFFICECODE.Text = "011402" Then
-                        TxtMTTank.Enabled = False
+                    If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
+                        '### 2020/06/15 START ########################################################
+                        '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
+                        If work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
+                            OrElse work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
+                            '入力を許可する。
+                            Me.TxtMTTank.Enabled = True
+                        Else
+                            Me.TxtMTTank.Enabled = False
+                        End If
+                        '### 2020/06/15 END   ########################################################
                     Else
                         TxtMTTank.Enabled = True
                     End If

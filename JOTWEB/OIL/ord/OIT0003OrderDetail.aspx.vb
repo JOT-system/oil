@@ -9947,6 +9947,18 @@ Public Class OIT0003OrderDetail
                     Me.TxtArrDate.Text = ""
                     Me.TxtAccDate.Text = ""
                     Me.TxtEmparrDate.Text = ""
+                    '(割当後)タンク車割当
+                    Me.TxtHTank_w.Text = "0"
+                    Me.TxtRTank_w.Text = "0"
+                    Me.TxtTTank_w.Text = "0"
+                    Me.TxtMTTank_w.Text = "0"
+                    Me.TxtKTank_w.Text = "0"
+                    Me.TxtK3Tank_w.Text = "0"
+                    Me.TxtK5Tank_w.Text = "0"
+                    Me.TxtK10Tank_w.Text = "0"
+                    Me.TxtLTank_w.Text = "0"
+                    Me.TxtATank_w.Text = "0"
+                    Me.TxtTotalCnt_w.Text = "0"
 
                     '○ 一覧の初期化画面表示データ取得
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -11523,12 +11535,35 @@ Public Class OIT0003OrderDetail
                     Me.TxtRTank_w.Enabled = True
                     '灯油
                 Case BaseDllConst.CONST_TTank
-                    Me.TxtTTank_w.Enabled = True
+                    '### 2020/06/15 START ########################################################
+                    '★根岸営業所の場合
+                    If Me.TxtOrderOfficeCode.Text = "011402" Then
+                        '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
+                        If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
+                            OrElse Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
+                            '入力を未許可にする。
+                            Me.TxtTTank_w.Enabled = False
+                        Else
+                            Me.TxtTTank_w.Enabled = True
+                        End If
+                    Else
+                        Me.TxtTTank_w.Enabled = True
+                    End If
+                    '### 2020/06/15 END   ########################################################
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
                     '★根岸営業所の場合
                     If Me.TxtOrderOfficeCode.Text = "011402" Then
-                        Me.TxtMTTank_w.Enabled = False
+                        '### 2020/06/15 START ########################################################
+                        '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
+                        If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
+                            OrElse Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
+                            '入力を許可する。
+                            Me.TxtMTTank_w.Enabled = True
+                        Else
+                            Me.TxtMTTank_w.Enabled = False
+                        End If
+                        '### 2020/06/15 END   ########################################################
                     Else
                         Me.TxtMTTank_w.Enabled = True
                     End If
@@ -11565,7 +11600,7 @@ Public Class OIT0003OrderDetail
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
 
             '★割当確定ボタン押下時に更新
-            If Me.WW_UPBUTTONFLG = "1" Then
+            If Me.WW_UPBUTTONFLG = "1" AndAlso isNormal(WW_ERRCODE) Then
                 '★タンク車所在の更新
                 '引数１：所在地コード　⇒　変更なし(空白)
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))
@@ -11579,7 +11614,7 @@ Public Class OIT0003OrderDetail
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
 
             '★割当確定ボタン押下時に更新
-            If Me.WW_UPBUTTONFLG = "1" Then
+            If Me.WW_UPBUTTONFLG = "1" AndAlso isNormal(WW_ERRCODE) Then
                 '★タンク車所在の更新
                 '引数１：所在地コード　⇒　変更なし(空白)
                 '引数２：タンク車状態　⇒　変更あり("1"(発送))

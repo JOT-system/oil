@@ -5026,14 +5026,24 @@ Public Class OIT0003OrderDetail
 
             '★臨海鉄道対象の場合
         Else
-            WW_CheckLoadingSpecs(WW_ERRCODE, WW_Message)
-            If WW_ERRCODE = "ERR" _
-            OrElse WW_ERRCODE = "ERR1" _
-            OrElse WW_ERRCODE = "ERR2" _
-            OrElse WW_ERRCODE = "ERR3" Then
+            '### 20200616 START((全体)No74対応) ######################################
+            '★袖ヶ浦営業所の場合、充填ポイント未設定のため未チェック
+            If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '積込指示入力(0:未 1:完了)
-                WW_LoadingInput = "0"
+                WW_LoadingInput = "1"
+                '### 20200616 END  ((全体)No74対応) ######################################
 
+            Else
+                '積場スペックチェック
+                WW_CheckLoadingSpecs(WW_ERRCODE, WW_Message)
+                If WW_ERRCODE = "ERR" _
+                OrElse WW_ERRCODE = "ERR1" _
+                OrElse WW_ERRCODE = "ERR2" _
+                OrElse WW_ERRCODE = "ERR3" Then
+                    '積込指示入力(0:未 1:完了)
+                    WW_LoadingInput = "0"
+
+                End If
             End If
         End If
 
@@ -7207,34 +7217,36 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        SHIPORDER             = @P40, LINEORDER            = @P33, TANKNO       = @P03" _
-            & "        , ORDERINFO           = @P37, SHIPPERSCODE         = @P23, SHIPPERSNAME = @P24" _
-            & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE = @P35" _
-            & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE    = @P39, JOINT        = @P08" _
-            & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
-            & "        , SECONDCONSIGNEECODE = @P27, SECONDCONSIGNEENAME  = @P28" _
-            & "        , SECONDARRSTATION    = @P29, SECONDARRSTATIONNAME = @P30" _
-            & "        , CHANGERETSTATION    = @P31, CHANGERETSTATIONNAME = @P32" _
-            & "        , SALSE               = @P09, SALSETAX             = @P10, TOTALSALSE   = @P11" _
-            & "        , PAYMENT             = @P12, PAYMENTTAX           = @P13, TOTALPAYMENT = @P14" _
-            & "        , UPDYMD              = @P19, UPDUSER              = @P20" _
-            & "        , UPDTERMID           = @P21, RECEIVEYMD           = @P22" _
+            & "        SHIPORDER               = @P40, LINEORDER               = @P33, TANKNO              = @P03" _
+            & "        , ORDERINFO             = @P37, SHIPPERSCODE            = @P23, SHIPPERSNAME        = @P24" _
+            & "        , OILCODE               = @P05, OILNAME                 = @P34, ORDERINGTYPE        = @P35" _
+            & "        , ORDERINGOILNAME       = @P36, RETURNDATETRAIN         = @P07, JOINTCODE           = @P39, JOINT = @P08" _
+            & "        , CHANGETRAINNO         = @P26, CHANGETRAINNAME         = @P38" _
+            & "        , SECONDCONSIGNEECODE   = @P27, SECONDCONSIGNEENAME     = @P28" _
+            & "        , SECONDARRSTATION      = @P29, SECONDARRSTATIONNAME    = @P30" _
+            & "        , CHANGERETSTATION      = @P31, CHANGERETSTATIONNAME    = @P32" _
+            & "        , LOADINGIRILINEORDER   = @P43, LOADINGOUTLETORDER      = @P44" _
+            & "        , SALSE                 = @P09, SALSETAX                = @P10, TOTALSALSE          = @P11" _
+            & "        , PAYMENT               = @P12, PAYMENTTAX              = @P13, TOTALPAYMENT        = @P14" _
+            & "        , UPDYMD                = @P19, UPDUSER                 = @P20" _
+            & "        , UPDTERMID             = @P21, RECEIVEYMD              = @P22" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO            , SHIPORDER          , LINEORDER          , TANKNO" _
-            & "        , KAMOKU          , STACKINGFLG         , FIRSTRETURNFLG" _
-            & "        , ORDERINFO       , SHIPPERSCODE        , SHIPPERSNAME" _
-            & "        , OILCODE         , OILNAME             , ORDERINGTYPE       , ORDERINGOILNAME" _
-            & "        , CARSNUMBER      , CARSAMOUNT          , RETURNDATETRAIN    , JOINTCODE          , JOINT" _
-            & "        , CHANGETRAINNO   , CHANGETRAINNAME     , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
-            & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CHANGERETSTATION   , CHANGERETSTATIONNAME" _
-            & "        , SALSE           , SALSETAX            , TOTALSALSE" _
-            & "        , PAYMENT         , PAYMENTTAX          , TOTALPAYMENT" _
-            & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
-            & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
+            & "        ( ORDERNO              , DETAILNO               , SHIPORDER          , LINEORDER           , TANKNO" _
+            & "        , KAMOKU               , STACKINGFLG            , FIRSTRETURNFLG" _
+            & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
+            & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
+            & "        , CARSNUMBER           , CARSAMOUNT             , RETURNDATETRAIN    , JOINTCODE           , JOINT" _
+            & "        , CHANGETRAINNO        , CHANGETRAINNAME        , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
+            & "        , SECONDARRSTATION     , SECONDARRSTATIONNAME   , CHANGERETSTATION   , CHANGERETSTATIONNAME" _
+            & "        , LOADINGIRILINEORDER  , LOADINGOUTLETORDER" _
+            & "        , SALSE                , SALSETAX               , TOTALSALSE" _
+            & "        , PAYMENT              , PAYMENTTAX             , TOTALPAYMENT" _
+            & "        , DELFLG               , INITYMD                , INITUSER           , INITTERMID" _
+            & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P40, @P33, @P03" _
             & "        , @P04, @P41, @P42" _
@@ -7243,6 +7255,7 @@ Public Class OIT0003OrderDetail
             & "        , @P06, @P25, @P07, @P39, @P08" _
             & "        , @P26, @P38, @P27, @P28" _
             & "        , @P29, @P30, @P31, @P32" _
+            & "        , @P43, @P44" _
             & "        , @P09, @P10, @P11" _
             & "        , @P12, @P13, @P14" _
             & "        , @P15, @P16, @P17, @P18" _
@@ -7281,6 +7294,8 @@ Public Class OIT0003OrderDetail
             & "    , SECONDARRSTATIONNAME" _
             & "    , CHANGERETSTATION" _
             & "    , CHANGERETSTATIONNAME" _
+            & "    , LOADINGIRILINEORDER" _
+            & "    , LOADINGOUTLETORDER" _
             & "    , SALSE" _
             & "    , SALSETAX" _
             & "    , TOTALSALSE" _
@@ -7341,6 +7356,8 @@ Public Class OIT0003OrderDetail
                 Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.NVarChar, 40)  '第2着駅名
                 Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 7)   '空車着駅コード（変更後）
                 Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 40)  '空車着駅名（変更後）
+                Dim PARA43 As SqlParameter = SQLcmd.Parameters.Add("@P43", SqlDbType.NVarChar, 2)   '積込入線順
+                Dim PARA44 As SqlParameter = SQLcmd.Parameters.Add("@P44", SqlDbType.NVarChar, 2)   '積込出線順
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Int)           '売上金額
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Int)           '売上消費税額
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Int)           '売上合計金額
@@ -7407,6 +7424,24 @@ Public Class OIT0003OrderDetail
                     PARA30.Value = OIT0003row("SECONDARRSTATIONNAME") '第2着駅名
                     PARA31.Value = OIT0003row("CHANGERETSTATION")     '空車着駅コード（変更後）
                     PARA32.Value = OIT0003row("CHANGERETSTATIONNAME") '空車着駅名（変更後）
+
+                    '### 20200616 START((全体)No74対応) ######################################
+                    '積込入線順
+                    '★五井・甲子・袖ヶ浦の場合
+                    If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                        OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203) _
+                        AndAlso OIT0003row("LINEORDER") <> "" Then
+                        '貨物駅入線順を積込入線順に設定
+                        PARA43.Value = OIT0003row("LINEORDER")
+                        '積込出線順に(明細数 - 積込入線順 + 1)設定
+                        PARA44.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
+                    Else
+                        PARA43.Value = ""
+                        PARA44.Value = ""
+                    End If
+                    '### 20200616 END  ((全体)No74対応) ######################################
+
                     PARA09.Value = "0"                                '売上金額
                     PARA10.Value = "0"                                '売上消費税額
                     PARA11.Value = "0"                                '売上合計金額
@@ -11537,7 +11572,7 @@ Public Class OIT0003OrderDetail
                 Case BaseDllConst.CONST_TTank
                     '### 2020/06/15 START ########################################################
                     '★根岸営業所の場合
-                    If Me.TxtOrderOfficeCode.Text = "011402" Then
+                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
                         '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
                         If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
                             OrElse Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
@@ -11553,7 +11588,7 @@ Public Class OIT0003OrderDetail
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
                     '★根岸営業所の場合
-                    If Me.TxtOrderOfficeCode.Text = "011402" Then
+                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
                         '### 2020/06/15 START ########################################################
                         '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
                         If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
@@ -12219,7 +12254,7 @@ Public Class OIT0003OrderDetail
 
         '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
         '　※上記以外の営業所については、入力しないためチェックは未実施。
-        If Me.TxtOrderOfficeCode.Text = "011203" Then
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
             '貨物駅入線順でソートし、重複がないかチェックする。
             OIT0003tbl_dv.Sort = "LINEORDER"
             For Each drv As DataRowView In OIT0003tbl_dv
@@ -12272,7 +12307,7 @@ Public Class OIT0003OrderDetail
 
             '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
             '　※上記以外の営業所については、入力しないためチェックは未実施。
-            If Me.TxtOrderOfficeCode.Text = "011203" Then
+            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
                 '(一覧)貨物駅入線順(空白チェック)
                 If OIT0003row("LINEORDER") = "" And OIT0003row("DELFLG") = "0" Then
                     Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)貨物駅入線順", needsPopUp:=True)
@@ -12360,16 +12395,21 @@ Public Class OIT0003OrderDetail
                 Exit Sub
             End If
 
-            ''(一覧)回線(空白チェック)
-            'If OIT0003row("LINE") = "" And OIT0003row("DELFLG") = "0" Then
-            '    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)回線", needsPopUp:=True)
+            '### 20200616 START((全体)No74対応) ######################################
+            '★袖ヶ浦営業所の場合
+            If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '(一覧)回線(空白チェック)
+                If OIT0003row("LINE") = "" And OIT0003row("DELFLG") = "0" Then
+                    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "(一覧)回線", needsPopUp:=True)
 
-            '    WW_CheckMES1 = "回線未設定エラー。"
-            '    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-            '    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-            '    O_RTN = "ERR"
-            '    Exit Sub
-            'End If
+                    WW_CheckMES1 = "回線未設定エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                    WW_CheckListTab2ERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            End If
+            '### 20200616 END  ((全体)No74対応) ######################################
 
             ''(一覧)充填ポイント(空白チェック)
             'If OIT0003row("FILLINGPOINT") = "" And OIT0003row("DELFLG") = "0" Then
@@ -14745,7 +14785,7 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
-                                AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
+                                AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011203 Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
@@ -14796,7 +14836,7 @@ Public Class OIT0003OrderDetail
                             OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
-                                AndAlso Me.TxtOrderOfficeCode.Text <> "011203" Then
+                                AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011203 Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
                                 AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
@@ -14927,6 +14967,13 @@ Public Class OIT0003OrderDetail
                                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") Then
                                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                     End If
+                                    '### 20200616 START((全体)No74対応) ######################################
+                                    '★袖ヶ浦営業所の場合、充填ポイントを入力不可とする。
+                                    If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 _
+                                        AndAlso cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    End If
+                                    '### 20200616 END  ((全体)No74対応) ######################################
                                 Next
                             Next
 

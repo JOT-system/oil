@@ -9947,6 +9947,18 @@ Public Class OIT0003OrderDetail
                     Me.TxtArrDate.Text = ""
                     Me.TxtAccDate.Text = ""
                     Me.TxtEmparrDate.Text = ""
+                    '(割当後)タンク車割当
+                    Me.TxtHTank_w.Text = "0"
+                    Me.TxtRTank_w.Text = "0"
+                    Me.TxtTTank_w.Text = "0"
+                    Me.TxtMTTank_w.Text = "0"
+                    Me.TxtKTank_w.Text = "0"
+                    Me.TxtK3Tank_w.Text = "0"
+                    Me.TxtK5Tank_w.Text = "0"
+                    Me.TxtK10Tank_w.Text = "0"
+                    Me.TxtLTank_w.Text = "0"
+                    Me.TxtATank_w.Text = "0"
+                    Me.TxtTotalCnt_w.Text = "0"
 
                     '○ 一覧の初期化画面表示データ取得
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection

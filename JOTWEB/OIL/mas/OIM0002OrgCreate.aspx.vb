@@ -444,6 +444,10 @@ Public Class OIM0002OrgCreate
         OIM0002INProw("NAMEKANAS") = Me.TxtOrgNameKanaS.Text              '組織名称カナ（短）
         OIM0002INProw("DELFLG") = Me.TxtDelFlg.Text                       '削除
 
+        '○ 名称取得
+        '会社名
+        CODENAME_get("CAMPCODE", OIM0002INProw("CAMPCODE"), OIM0002INProw("CAMPNAME"), WW_DUMMY)
+
         '○ チェック用テーブルに登録する
         OIM0002INPtbl.Rows.Add(OIM0002INProw)
 

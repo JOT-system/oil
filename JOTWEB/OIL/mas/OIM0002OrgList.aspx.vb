@@ -182,10 +182,10 @@ Public Class OIM0002OrgList
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIM0002C Then
             Master.RecoverTable(OIM0002tbl, work.WF_SEL_INPTBL.Text)
         End If
-
+        '20200615杉山テスト的に修正　2に変更
         '○ 名称設定処理
-        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, work.WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
-        CODENAME_get("ORGCODE", work.WF_SEL_ORGCODE.Text, work.WF_SEL_ORGNAME.Text, WW_DUMMY)                '組織コード
+        CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE2.Text, work.WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
+        CODENAME_get("ORGCODE", work.WF_SEL_ORGCODE2.Text, work.WF_SEL_ORGNAME.Text, WW_DUMMY)                '組織コード
 
     End Sub
 
@@ -1573,20 +1573,40 @@ Public Class OIM0002OrgList
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '会社コード(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "CAMPCODE", OIM0002INProw("CAMPCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "会社コード入力エラー。数値を入力してください。"
+            '会社コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "CAMPCODE", OIM0002INProw("CAMPCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("CAMPCODE", OIM0002INProw("CAMPCODE"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(会社コード入力エラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(会社コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            '組織コード(バリデーションチェック)
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ORGCODE", OIM0002INProw("ORGCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If Not isNormal(WW_CS0024FCHECKERR) Then
-                WW_CheckMES1 = "組織コード入力エラー。数値を入力してください。"
+            '組織コード(バリデーションチェック）
+            Master.CheckField(Master.USERCAMP, "ORGCODE", OIM0002INProw("ORGCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                '値存在チェック
+                CODENAME_get("ORGCODE", OIM0002INProw("ORGCODE"), WW_DUMMY, WW_RTN_SW)
+                If Not isNormal(WW_RTN_SW) Then
+                    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
+                WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
                 WW_LINE_ERR = "ERR"
@@ -1818,7 +1838,15 @@ Public Class OIM0002OrgList
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
-
+                Case "UORG"             '運用部署
+                    Dim AUTHORITYALL_FLG As String = "0"
+                    If work.WF_SEL_CAMPCODE.Text = "" Then '会社コードが空の場合
+                        AUTHORITYALL_FLG = "1"
+                    Else '会社コードに入力済みの場合
+                        AUTHORITYALL_FLG = "2"
+                    End If
+                    prmData = work.CreateORGParam(work.WF_SEL_CAMPCODE.Text, AUTHORITYALL_FLG)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORGCODE"             '組織コード
                     Dim AUTHORITYALL_FLG As String = "0"
                     If work.WF_SEL_CAMPCODE2.Text = "" Then '会社コードが空の場合

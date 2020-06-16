@@ -67,7 +67,7 @@
                     <span class="ef">
                         <asp:Label ID="LblDelFlg" runat="server" Text="削除フラグ" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_DELFLG', <%=LIST_BOX_CLASSIFICATION.LC_DELFLG%>)" onchange="TextBox_change('WF_DELFLG');">
-                        <asp:TextBox ID="TxtDelFlg" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="4"></asp:TextBox></span>
+                        <asp:TextBox ID="TxtDelFlg" runat="server" ReadOnly="true" CssClass="WF_TEXTBOX_CSS boxIcon iconOnly" MaxLength="1"></asp:TextBox></span>
                         <asp:Label ID="Label1" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -85,7 +85,7 @@
                     <span class="ef" id="WF_ORGCODE">
                         <asp:Label ID="LblOrgCode" runat="server" Text="組織コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                         <span ondblclick="Field_DBclick('WF_ORGCODE', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('WF_ORGCODE');">
-                        <asp:TextBox ID="TxtOrgCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="2"></asp:TextBox></span>
+                        <asp:TextBox ID="TxtOrgCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox></span>
                         <asp:Label ID="Label3" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -111,7 +111,7 @@
                     <!-- 組織名称 -->
                     <span class="ef" id="WF_ORGNAME">
                         <asp:Label ID="LblOrgName" runat="server" Text="組織名称" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtOrgName" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="1"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrgName" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="50"></asp:TextBox>
                         <asp:Label ID="Label6" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -119,7 +119,7 @@
                     <!-- 組織名称（短） -->
                     <span class="ef" id="WF_ORGNAMES">
                         <asp:Label ID="LblOrgNameS" runat="server" Text="組織名称（短）" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtOrgNameS" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="1"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrgNameS" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="20"></asp:TextBox>
                         <asp:Label ID="Label7" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -127,7 +127,7 @@
                     <!-- 組織名称カナ -->
                     <span class="ef" id="WF_ORGNAMEKANA">
                         <asp:Label ID="LblOegNameKana" runat="server" Text="組織名称カナ" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtOrgNameKana" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="1"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrgNameKana" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="50"></asp:TextBox>
                         <asp:Label ID="Label8" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
@@ -135,7 +135,7 @@
                     <!-- 組織名称カナ（短） -->
                     <span class="ef" id="WF_ORGNAMEKANAS">
                         <asp:Label ID="LblOrgNameKanaS" runat="server" Text="組織名称カナ（短）" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <asp:TextBox ID="TxtOrgNameKanaS" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="1"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrgNameKanaS" runat="server" CssClass="WF_TEXTBOX_CSS " MaxLength="20"></asp:TextBox>
                         <asp:Label ID="Label9" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>

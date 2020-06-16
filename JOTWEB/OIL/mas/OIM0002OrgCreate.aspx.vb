@@ -431,17 +431,18 @@ Public Class OIM0002OrgCreate
         OIM0002INProw("SELECT") = 1
         OIM0002INProw("HIDDEN") = 0
 
-        OIM0002INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text           '会社コード
-        OIM0002INProw("UORG") = work.WF_SEL_ORGCODE.Text                '運用部署
+        'OIM0002INProw("CAMPCODE") = work.WF_SEL_CAMPCODE.Text           '会社コード
+        'OIM0002INProw("UORG") = work.WF_SEL_ORGCODE.Text                '運用部署
 
-        OIM0002INProw("DELFLG") = Me.TxtDelFlg.Text                      '削除
-
-        OIM0002INProw("CAMPCODE2") = Me.TxtCampCode.Text                  '会社コード
-        OIM0002INProw("ORGCODE2") = Me.TxtOrgCode.Text                    '組織コード
-        OIM0002INProw("ORGNNAME") = Me.TxtOrgName.Text                   '組織名称
-        OIM0002INProw("ORGNAMES") = Me.TxtOrgNameS.Text                  '組織名称（短）
-        OIM0002INProw("ORGNAMEKANA") = Me.TxtOrgNameKana.Text            '組織名称カナ
-        OIM0002INProw("ORGNAMEKANAS") = Me.TxtOrgNameKanaS.Text          '組織名称カナ（短）
+        OIM0002INProw("CAMPCODE") = Me.TxtCampCode.Text                  '会社コード
+        OIM0002INProw("ORGCODE") = Me.TxtOrgCode.Text                    '組織コード
+        OIM0002INProw("STYMD") = Me.TxtStYmd.Text                         '開始年月日
+        OIM0002INProw("ENDYMD") = Me.TxtEndYmd.Text                       '組織コード
+        OIM0002INProw("NAME") = Me.TxtOrgName.Text                       '組織名称
+        OIM0002INProw("NAMES") = Me.TxtOrgNameS.Text                      '組織名称（短）
+        OIM0002INProw("NAMEKANA") = Me.TxtOrgNameKana.Text                '組織名称カナ
+        OIM0002INProw("NAMEKANAS") = Me.TxtOrgNameKanaS.Text              '組織名称カナ（短）
+        OIM0002INProw("DELFLG") = Me.TxtDelFlg.Text                       '削除
 
         '○ チェック用テーブルに登録する
         OIM0002INPtbl.Rows.Add(OIM0002INProw)
@@ -608,7 +609,7 @@ Public Class OIM0002OrgCreate
             ''会社コード
             Case "WF_CAMPCODE"
                 CODENAME_get("CAMPCODE", TxtCampCode.Text, Label2.Text, WW_RTN_SW)
-            ''運用部署
+            ''組織コード
             'Case "WF_UORG"
             '    CODENAME_get("UORG", WF_UORG.Text, WF_UORG_TEXT.Text, WW_RTN_SW)
             '削除フラグ
@@ -985,10 +986,12 @@ Public Class OIM0002OrgCreate
         If Not IsNothing(OIM0002row) Then
             WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード         =" & OIM0002row("CAMPCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード         =" & OIM0002row("ORGCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称           =" & OIM0002row("ORGNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称（短）     =" & OIM0002row("ORGNAMES") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ       =" & OIM0002row("ORGNAMEKANA") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ（短） =" & OIM0002row("ORGNAMEKANAS") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日         =" & OIM0002row("STYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日         =" & OIM0002row("ENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称           =" & OIM0002row("NAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称（短）     =" & OIM0002row("NAMES") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ       =" & OIM0002row("NAMEKANA") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ（短） =" & OIM0002row("NAMEKANAS") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除               =" & OIM0002row("DELFLG")
         End If
 
@@ -1173,6 +1176,10 @@ Public Class OIM0002OrgCreate
 
                 Case "UORG"             '運用部署
                     prmData = work.CreateORGParam2(work.WF_SEL_CAMPCODE.Text)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "ORGCODE"             '運用部署
+                    prmData = work.CreateORGParam2(work.WF_SEL_CAMPCODE2.Text)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "DELFLG"           '削除

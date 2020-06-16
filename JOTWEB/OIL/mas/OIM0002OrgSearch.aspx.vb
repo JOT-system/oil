@@ -249,10 +249,10 @@ Public Class OIM0002OrgSearch
         Master.CheckField(TxtCampCodeMy.Text, "ORGCODE", TxtOrgCodeMy.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             If WW_TEXT = "" Then
-                TxtOrgCode.Text = ""
+                TxtOrgCodeMy.Text = ""
             Else
                 '存在チェック
-                CODENAME_get("ORGCODE", TxtOrgCodeMy.Text, txtOrgNameMy.Text, WW_RTN_SW)
+                CODENAME_get("UORG", TxtOrgCodeMy.Text, txtOrgNameMy.Text, WW_RTN_SW)
                 If Not isNormal(WW_RTN_SW) Then
                     Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & TxtOrgCodeMy.Text)
                     TxtOrgCodeMy.Focus()
@@ -379,7 +379,7 @@ Public Class OIM0002OrgSearch
                 CODENAME_get("CAMPCODE", TxtCampCode.Text, txtCampName.Text, WW_RTN_SW)
             '組織コード
             Case "WF_ORGCODE"
-                CODENAME_get("UORG", TxtOrgCode.Text, txtOrgName.Text, WW_RTN_SW)
+                CODENAME_get("ORGCODE", TxtOrgCode.Text, txtOrgName.Text, WW_RTN_SW)
         End Select
 
         '○ メッセージ表示
@@ -515,12 +515,21 @@ Public Class OIM0002OrgSearch
         End If
 
         Dim prmData As New Hashtable
-        prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtCampCode.Text
+        'prmData.Item(C_PARAMETERS.LP_COMPANY) = TxtCampCode.Text
 
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "UORG"             '組織コード
+                    Dim AUTHORITYALL_FLG As String = "0"
+                    If TxtCampCode.Text = "" Then '会社コードが空の場合
+                        AUTHORITYALL_FLG = "1"
+                    Else '会社コードに入力済みの場合
+                        AUTHORITYALL_FLG = "2"
+                    End If
+                    prmData = work.CreateORGParam(TxtCampCodeMy.Text, AUTHORITYALL_FLG)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "ORGCODE"             '組織コード
                     Dim AUTHORITYALL_FLG As String = "0"
                     If TxtCampCode.Text = "" Then '会社コードが空の場合

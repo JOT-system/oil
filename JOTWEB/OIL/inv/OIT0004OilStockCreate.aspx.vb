@@ -1468,8 +1468,10 @@ Public Class OIT0004OilStockCreate
                 End While 'sqlDr.Read
             End Using 'sqlDr
             '上記抽出結果なし且つ範囲が未来日部分に関して１年前の過去実績の払出を設定
-            paramFromDate.Value = fromDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
-            paramToDate.Value = toDateObj.ItemDate.AddYears(-1).ToString("yyyy/MM/dd")
+            '前年同様日考慮抽出⇒52週分前の日数を引く
+            Dim dateSpan As Integer = 7 * 52 '52週分前の日数を引く
+            paramFromDate.Value = fromDateObj.ItemDate.AddDays(dateSpan * -1).ToString("yyyy/MM/dd")
+            paramToDate.Value = toDateObj.ItemDate.AddYears(dateSpan * -1).ToString("yyyy/MM/dd")
             Using sqlDr = sqlCmd.ExecuteReader
                 Dim curDate As String = ""
                 Dim oilCode As String = ""
@@ -1478,7 +1480,7 @@ Public Class OIT0004OilStockCreate
                 While sqlDr.Read
                     curDate = Convert.ToString(sqlDr("STOCKYMD"))
                     oilCode = Convert.ToString(sqlDr("OILCODE"))
-                    curDate = CDate(curDate).AddYears(1).ToString("yyyy/MM/dd")
+                    curDate = CDate(curDate).AddDays(dateSpan).ToString("yyyy/MM/dd")
 
                     '対象油種を保持していない場合
                     If dispData.StockList.ContainsKey(oilCode) = False Then
@@ -2060,7 +2062,8 @@ Public Class OIT0004OilStockCreate
         Dim qOfficeCodes = (From itm As DataRow In retDt Group By office = Convert.ToString(itm("OFFICECODE")) Into Group Select office).ToList
         Dim officeCodes As New Dictionary(Of String, String)
         For Each officeCode In qOfficeCodes
-            Dim officeName = (From itm As DataRow In retDt Where Convert.ToString(itm("OFFICECODE")) = "" Select Convert.ToString(itm("OFFICENAME"))).FirstOrDefault
+            Dim officeName = (From itm As DataRow In retDt Where Convert.ToString(itm("OFFICECODE")) = officeCode Select Convert.ToString(itm("OFFICENAME"))).FirstOrDefault
+            officeName = officeName.Replace("営業所", "")
             officeCodes.Add(officeCode, officeName)
         Next
         If officeCodes Is Nothing OrElse officeCodes.Count = 0 Then

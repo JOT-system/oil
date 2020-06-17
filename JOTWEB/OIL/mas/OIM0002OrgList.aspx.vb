@@ -1641,22 +1641,27 @@ Public Class OIM0002OrgList
 
             '組織コード(バリデーションチェック）
             Master.CheckField(Master.USERCAMP, "ORGCODE", OIM0002INProw("ORGCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
-                CODENAME_get("ORGCODE", OIM0002INProw("ORGCODE"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
+                'CODENAME_get("ORGCODE", OIM0002INProw("ORGCODE"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+                WW_CheckMES1 = "組織コード入力エラー。数値を入力してください。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
                 WW_LINE_ERR = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'Else
+                '    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
+                '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             If WW_LINE_ERR = "" Then

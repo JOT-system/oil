@@ -164,6 +164,11 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
     border-radius:0;
     text-align:right;
 }
+/* 車数の非活性時のスタイル */
+.summaryTable input[type=text]:disabled {
+    background-color:darkgrey;
+    color:black
+}
 /* 各金額合計表 */
 .summaryAmount {
     box-sizing: border-box;

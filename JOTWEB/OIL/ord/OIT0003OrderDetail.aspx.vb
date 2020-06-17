@@ -394,6 +394,13 @@ Public Class OIT0003OrderDetail
         Else
             'Master.MAPID = OIT0003WRKINC.MAPIDD + "MAIN"
             work.WF_SEL_MAPIDBACKUP.Text = OIT0003WRKINC.MAPIDD + "MAIN"
+
+            '手配連絡フラグ(0：未連絡, 1：連絡)
+            work.WF_SEL_CONTACTFLG.Text = "0"
+            '結果受理フラグ(0：未受理, 1：受理)
+            work.WF_SEL_RESULTFLG.Text = "0"
+            '託送指示フラグ(0：未手配, 1:手配)
+            work.WF_SEL_DELIVERYFLG.Text = "0"
         End If
 
         '○HELP表示有無設定

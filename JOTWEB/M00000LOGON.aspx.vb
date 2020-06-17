@@ -617,6 +617,10 @@ Public Class M00000LOGON
                     SQLdr = Nothing
 
                 End Using
+                'SQL コネクションクローズ
+                SQLcon.Close()
+                SQLcon.Dispose()
+
             End Using
 
         Catch ex As Exception
@@ -684,7 +688,17 @@ Public Class M00000LOGON
                 End Using
 
             End Using
+
+            'SQLコネクションクローズ
+            sqlCon.Close()
+            sqlCon.Dispose()
+
         Catch ex As Exception
+
+            'SQLコネクションクローズ
+            sqlCon.Close()
+            sqlCon.Dispose()
+
         End Try
 
         Return retDt

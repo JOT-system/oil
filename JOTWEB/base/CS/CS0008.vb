@@ -102,7 +102,14 @@ Public Class CS0008ONLINEstat : Implements IDisposable
                     'Close
                     SQLdr.Close() 'Reader(Close)
                 End Using 'SQLdr
+
+                SQLcon.Close()
+                SQLcon.Dispose()
+
             End Using 'SQLcon, SQLcmd
+
+
+
 
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get

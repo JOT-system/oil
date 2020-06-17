@@ -268,6 +268,7 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')             AS STACKINGFLG" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')  AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')  AS DEPDATE" _
             & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '')  AS ARRDATE" _
@@ -748,6 +749,8 @@ Public Class OIT0001EmptyTurnDairyList
         work.WF_SEL_ORDERSALESOFFICE.Text = ""
         '空回日報可否フラグ(0：未作成, 1:作成)
         work.WF_SEL_EMPTYTURNFLG.Text = "1"
+        '積置可否フラグ(1：積置あり, 2:積置なし)
+        work.WF_SEL_STACKINGFLG.Text = "2"
 
         '本線列車
         work.WF_SEL_TRAIN.Text = ""
@@ -884,6 +887,8 @@ Public Class OIT0001EmptyTurnDairyList
         work.WF_SEL_ORDERSALESOFFICE.Text = OIT0001tbl.Rows(WW_LINECNT)("OFFICENAME")
         '空回日報可否フラグ(0：未作成, 1:作成)
         work.WF_SEL_EMPTYTURNFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("EMPTYTURNFLG")
+        '積置可否フラグ(1：積置あり, 2:積置なし)
+        work.WF_SEL_STACKINGFLG.Text = OIT0001tbl.Rows(WW_LINECNT)("STACKINGFLG")
 
         '本線列車
         work.WF_SEL_TRAIN.Text = OIT0001tbl.Rows(WW_LINECNT)("TRAINNO")

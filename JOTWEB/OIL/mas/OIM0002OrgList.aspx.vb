@@ -1,7 +1,7 @@
 ﻿''************************************************************
 ' 組織マスタメンテ登録画面
-' 作成日 2019/10/29
-' 更新日 2019/10/29
+' 作成日 2020/5/26
+' 更新日 2020/10/26
 ' 作成者 JOT杉山
 ' 更新車 JOT杉山
 '
@@ -185,7 +185,7 @@ Public Class OIM0002OrgList
         '20200615杉山テスト的に修正　2に変更
         '○ 名称設定処理
         CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE2.Text, work.WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
-        CODENAME_get("ORGCODE", work.WF_SEL_ORGCODE2.Text, work.WF_SEL_ORGNAME.Text, WW_DUMMY)                '組織コード
+        'CODENAME_get("ORGCODE", work.WF_SEL_ORGCODE2.Text, work.WF_SEL_ORGNAME.Text, WW_DUMMY)                '組織コード
 
     End Sub
 
@@ -1837,6 +1837,7 @@ Public Class OIM0002OrgList
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
+                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "UORG"             '運用部署
                     Dim AUTHORITYALL_FLG As String = "0"

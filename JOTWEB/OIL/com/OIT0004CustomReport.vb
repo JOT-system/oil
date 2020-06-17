@@ -114,9 +114,11 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Try
             '***** 生成処理群ここから *****
             '* 油種（行）、日付（列）を元に雛形の罫線を拡張し体裁を整える
-            ExtentDisplayFormat()
-
+            Dim posInfo As ExcelPositions = ExtentDisplayFormat()
+            '* 数値埋め処理
+            EditNumberArea(posInfo)
             '***** 生成処理群ここまで *****
+
             ExcelTempSheet.Delete() '雛形シート削除
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -134,7 +136,9 @@ Public Class OIT0004CustomReport : Implements IDisposable
     ''' <summary>
     ''' 油種、日付に応じ罫線書式等を雛形より拡張する
     ''' </summary>
-    Private Sub ExtentDisplayFormat()
+    ''' <returns>表数値の開始行・終了行を保持</returns>
+    Private Function ExtentDisplayFormat() As ExcelPositions
+        Dim retPosInfo As New ExcelPositions
         Dim rngSingleFlame As Excel.Range = Nothing
         Dim rngPageteBase As Excel.Range = Nothing
         Dim rngPasteOffset As Excel.Range = Nothing
@@ -160,12 +164,31 @@ Public Class OIT0004CustomReport : Implements IDisposable
             rngSingleFlame = Me.ExcelWorkSheet.Range("RNG_LEFTHEADER")
             rngFooter = Me.ExcelTempSheet.Range("RNG_CONSIGNEEFOOTER")
 
-            rngFooterRow = rngFooter.Rows
+            rngFooterRow = rngFooter.Rows()
             footerRowNum = rngFooterRow.Count
             ExcelMemoryRelease(rngFooterRow)
             ExcelMemoryRelease(rngFooter)
             Dim pasteOffset = 0
             Dim lastOilCode As String = Me.PrintData.StockList.Last.Value.OilInfo.OilCode
+            Dim trainNumNameTop As String = ""
+            Dim trainNumNameBottom As String = ""
+            If Me.PrintData.PrintTrainNums.Count > 0 AndAlso Me.PrintData.PrintTrainNums.Values.First.PrintTrainNumList.Values.Count > 0 Then
+                trainNumNameTop = Me.PrintData.PrintTrainNums.Values.First.PrintTrainNumList.First.Value.OfficeName
+                If Me.PrintData.PrintTrainNums.Values.First.PrintTrainNumList.Values.Count > 1 Then
+                    trainNumNameBottom = Me.PrintData.PrintTrainNums.Values.First.PrintTrainNumList.Values(1).OfficeName
+                End If
+            End If
+
+            Dim miTrainNumNameTop As String = ""
+            Dim miTrainNumNameBottom As String = ""
+            If Me.PrintData.HasMoveInsideItem AndAlso
+                Me.PrintData.MiDispData.PrintTrainNums.Count > 0 AndAlso
+                Me.PrintData.MiDispData.PrintTrainNums.Values.First.PrintTrainNumList.Values.Count > 0 Then
+                miTrainNumNameTop = Me.PrintData.MiDispData.PrintTrainNums.Values.First.PrintTrainNumList.First.Value.OfficeName
+                If Me.PrintData.MiDispData.PrintTrainNums.Values.First.PrintTrainNumList.Values.Count > 1 Then
+                    miTrainNumNameBottom = Me.PrintData.MiDispData.PrintTrainNums.Values.First.PrintTrainNumList.Values(1).OfficeName
+                End If
+            End If
 
             For Each stkItm In Me.PrintData.StockList.Values
                 rngPasteOffset = rngPageteBase.Offset(RowOffset:=pasteOffset * 10)
@@ -205,6 +228,15 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 rngValueSet = DirectCast(rngPasteOffset(9, 2), Excel.Range)
                 rngValueSet.Value = stkItm.OilInfo.LastSendAverage 'ここ不明なので一旦前週
                 ExcelMemoryRelease(rngValueSet)
+                '車数列ヘッダー上
+                rngValueSet = DirectCast(rngPasteOffset(7, 4), Excel.Range)
+                rngValueSet.Value = trainNumNameTop 'ここ不明なので一旦前週
+                ExcelMemoryRelease(rngValueSet)
+                '車数列ヘッダー下
+                rngValueSet = DirectCast(rngPasteOffset(8, 4), Excel.Range)
+                rngValueSet.Value = trainNumNameBottom 'ここ不明なので一旦前週
+                ExcelMemoryRelease(rngValueSet)
+
                 '最終行まで到達時の処理
                 If lastOilCode = stkItm.OilInfo.OilCode Then
                     '先頭行と最終行の保持
@@ -281,6 +313,14 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 '平均積高
                 rngValueSet = DirectCast(rngPasteOffset(9, 2), Excel.Range)
                 rngValueSet.Value = stkItm.OilInfo.LastSendAverage 'ここ不明なので一旦前週
+                ExcelMemoryRelease(rngValueSet)
+                '車数列ヘッダー上
+                rngValueSet = DirectCast(rngPasteOffset(7, 4), Excel.Range)
+                rngValueSet.Value = miTrainNumNameTop 'ここ不明なので一旦前週
+                ExcelMemoryRelease(rngValueSet)
+                '車数列ヘッダー下
+                rngValueSet = DirectCast(rngPasteOffset(8, 4), Excel.Range)
+                rngValueSet.Value = miTrainNumNameBottom 'ここ不明なので一旦前週
                 ExcelMemoryRelease(rngValueSet)
                 '最終行まで到達時の処理
                 If lastOilCode = stkItm.OilInfo.OilCode Then
@@ -389,6 +429,132 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Catch ex As Exception
             ExcelMemoryRelease(rngFooter)
         End Try
+        retPosInfo.FirstRowNum = firstRowNum
+        retPosInfo.LastRowNum = lastRowNum
+        retPosInfo.MiFirstRowNum = miFirstRowNum
+        retPosInfo.MiLastRowNum = miLastRowNum
+
+        Return retPosInfo
+    End Function
+    ''' <summary>
+    ''' 一覧表の数字部分の設定
+    ''' </summary>
+    ''' <param name="posInfo"></param>
+    Private Sub EditNumberArea(posInfo As ExcelPositions)
+        Dim rngAllCell As Excel.Range = Nothing
+        Dim rngBasePasteArea As Excel.Range = Nothing
+        Dim rngPasteArea As Excel.Range = Nothing
+        Try
+            '一括貼り付け用の領域定義
+            '在庫部分
+            Dim morningStock(0, 0) As Object '初日のみ設定他は数式の為1セル
+            Dim ukrireHaraiDasiNums As Object(,) '受入払出
+            Dim hoyuNums As Object(,) '保有日数
+
+            '車数部分
+            Dim syaSu As Object(,)
+            'ローリー部分
+            Dim lorryNum As Object(,)
+            Dim oilCnt As Integer = 0
+            Dim daysMax = Me.PrintData.StockDate.Count - 1
+            rngAllCell = Me.ExcelWorkSheet.Cells
+            Dim rngStartCell As Excel.Range = DirectCast(rngAllCell(posInfo.FirstRowNum, 7), Excel.Range)
+            Dim rngEndCell As Excel.Range = DirectCast(rngAllCell(posInfo.FirstRowNum + 10 - 1, 7 + daysMax), Excel.Range)
+            rngBasePasteArea = Me.ExcelWorkSheet.Range(rngStartCell, rngEndCell)
+            ExcelMemoryRelease(rngStartCell)
+            ExcelMemoryRelease(rngEndCell)
+            ExcelMemoryRelease(rngAllCell)
+            'ExcelMemoryRelease(rngAllCell)
+            '通常部油種別ループ
+            For Each oilItem In Me.PrintData.StockList.Values
+                ReDim ukrireHaraiDasiNums(1, daysMax)
+                ReDim hoyuNums(0, daysMax)
+                ReDim syaSu(1, daysMax)
+                ReDim lorryNum(0, daysMax)
+                Dim trainNumList As OIT0004OilStockCreate.PrintTrainNumCollection = Nothing
+                If Me.PrintData.PrintTrainNums.ContainsKey(oilItem.OilInfo.OilCode) Then
+                    trainNumList = Me.PrintData.PrintTrainNums(oilItem.OilInfo.OilCode)
+                Else
+                    trainNumList = Nothing
+                End If
+                '日付別ループ
+                Dim daysCnt As Integer = 0
+                For Each dateItem In oilItem.StockItemList.Values
+
+                    If daysCnt = 0 Then
+                        morningStock(0, 0) = dateItem.MorningStock
+                    End If
+                    '受入数
+                    ukrireHaraiDasiNums(0, daysCnt) = CDec(dateItem.Receive)
+                    '払出数
+                    ukrireHaraiDasiNums(1, daysCnt) = CDec(dateItem.Send)
+                    '保有日数
+                    hoyuNums(0, daysCnt) = dateItem.Retentiondays
+                    If trainNumList.PrintTrainNumList.Count > 0 Then
+                        syaSu(0, daysCnt) = trainNumList.PrintTrainNumList.Values(0).PrintTrainItems.Values(daysCnt).TrainNum
+                        If trainNumList.PrintTrainNumList.Count > 1 Then
+                            syaSu(1, daysCnt) = trainNumList.PrintTrainNumList.Values(1).PrintTrainItems.Values(daysCnt).TrainNum
+                        Else
+                            syaSu(1, daysCnt) = ""
+                        End If
+                    Else
+                        syaSu(0, daysCnt) = ""
+                        syaSu(1, daysCnt) = ""
+                    End If
+                    'ローリー受入
+
+                    lorryNum(0, daysCnt) = CDec(dateItem.ReceiveFromLorry)
+                    daysCnt = daysCnt + 1
+                Next dateItem
+                'Excelに貼り付け
+                rngPasteArea = rngBasePasteArea.Offset(RowOffset:=10 * oilCnt)
+                Dim rngRowsObj As Excel.Range = Nothing
+                Dim rngPasteRow As Excel.Range = Nothing
+                Dim targetRowObj As Excel.ListRow = Nothing
+
+                Try
+                    '朝在庫
+                    rngPasteRow = DirectCast(rngPasteArea(1, 1), Excel.Range)
+                    rngPasteRow.Value = morningStock
+                    ExcelMemoryRelease(rngPasteRow)
+                    '受入払出
+                    rngRowsObj = rngPasteArea.Rows
+                    rngPasteRow = DirectCast(rngRowsObj("3:4"), Excel.Range)
+                    rngPasteRow.Value = ukrireHaraiDasiNums
+                    ExcelMemoryRelease(rngPasteRow)
+                    '保有日数
+                    'targetRowObj = DirectCast(rngPasteArea.Rows("6:6"), Excel.Range)
+                    rngPasteRow = DirectCast(rngRowsObj("6:6"), Excel.Range)
+                    rngPasteRow.Value = hoyuNums
+                    ExcelMemoryRelease(rngPasteRow)
+                    '車数
+                    rngPasteRow = DirectCast(rngRowsObj("7:8"), Excel.Range)
+                    rngPasteRow.Value = lorryNum
+                    ExcelMemoryRelease(rngPasteRow)
+                    '車数
+                    rngPasteRow = DirectCast(rngRowsObj("10:10"), Excel.Range)
+                    rngPasteRow.Value = lorryNum
+                    ExcelMemoryRelease(rngPasteRow)
+                    'Rowsオブジェクトの解放
+                    ExcelMemoryRelease(rngRowsObj)
+                Catch ex As Exception
+                    Throw
+                Finally
+                    ExcelMemoryRelease(rngPasteRow)
+                    ExcelMemoryRelease(rngPasteArea)
+                End Try
+                oilCnt = oilCnt + 1
+                ExcelMemoryRelease(rngPasteArea)
+            Next oilItem
+            ExcelMemoryRelease(rngBasePasteArea)
+            ExcelMemoryRelease(rngAllCell)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngBasePasteArea)
+            ExcelMemoryRelease(rngAllCell)
+        End Try
+
     End Sub
     ''' <summary>
     ''' 帳票色設定クラス
@@ -475,6 +641,32 @@ Public Class OIT0004CustomReport : Implements IDisposable
         End If
 
     End Sub
+    ''' <summary>
+    ''' エクセルの座標保持クラス
+    ''' </summary>
+    Private Class ExcelPositions
+        ''' <summary>
+        ''' 通常の開始位置
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property FirstRowNum As Integer
+        ''' <summary>
+        ''' 通常の終了位置
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property LastRowNum As Integer
+        ''' <summary>
+        ''' 構内取り開始位置
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MiFirstRowNum As Integer
+        ''' <summary>
+        ''' 構内取り終了位置
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MiLastRowNum As Integer
+
+    End Class
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' 重複する呼び出しを検出するには
 

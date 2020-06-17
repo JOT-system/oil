@@ -30,7 +30,7 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_CAMPCODE2 コントロール。
     '''</summary>
@@ -39,6 +39,15 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE2 As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_CAMPCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CAMPCODE_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_CAMPNAME コントロール。
@@ -57,7 +66,7 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORGCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ORGCODE2 コントロール。
     '''</summary>
@@ -66,6 +75,15 @@ Partial Public Class OIM0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORGCODE2 As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_ORGCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_ORGCODE_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_ORGNAME コントロール。

@@ -520,6 +520,7 @@ Public Class OIM0002OrgSearch
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
+                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "UORG"             '組織コード
                     Dim AUTHORITYALL_FLG As String = "0"

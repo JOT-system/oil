@@ -223,7 +223,7 @@ Public Class OIM0002OrgList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.None
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
         CS0013ProfView.LEVENT = "ondblclick"
         CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
@@ -911,12 +911,14 @@ Public Class OIM0002OrgList
 
         '会社コード
         'TxtCampCode.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPCODE")
-        work.WF_SEL_CAMPCODE2.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPCODE")
-
+        '2020/06/16杉山修正
+        'work.WF_SEL_CAMPCODE2.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPCODE")
+        work.WF_SEL_CAMPCODE_L.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPCODE")
         '組織コード
         'TxtOrgCode.Text = OIM0002tbl.Rows(WW_LINECNT)("ORGCODE")
-        work.WF_SEL_ORGCODE2.Text = OIM0002tbl.Rows(WW_LINECNT)("ORGCODE")
-
+        'work.WF_SEL_ORGCODE2.Text = OIM0002tbl.Rows(WW_LINECNT)("ORGCODE")
+        '2020/06/16杉山修正
+        work.WF_SEL_ORGCODE_L.Text = OIM0002tbl.Rows(WW_LINECNT)("ORGCODE")
         '組織名
         'TxtCampName.Text = OIM0002tbl.Rows(WW_LINECNT)("CAMPNAME")
         work.WF_SEL_ORGNAME.Text = OIM0002tbl.Rows(WW_LINECNT)("NAME")
@@ -1072,36 +1074,80 @@ Public Class OIM0002OrgList
             '○ 変更元情報をデフォルト設定
             If WW_COLUMNS.IndexOf("CAMPCODE") >= 0 AndAlso
                 WW_COLUMNS.IndexOf("ORGCODE") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CAMPNAME") >= 0 AndAlso
-                WW_COLUMNS.IndexOf("CAMPNAMEKANA") >= 0 Then
+                WW_COLUMNS.IndexOf("STYMD") >= 0 Then
                 For Each OIM0002row As DataRow In OIM0002tbl.Rows
                     If XLSTBLrow("CAMPCODE") = OIM0002row("CAMPCODE") AndAlso
                         XLSTBLrow("ORGCODE") = OIM0002row("ORGCODE") AndAlso
-                        XLSTBLrow("CAMPNAME") = OIM0002row("CAMPNAME") AndAlso
-                        XLSTBLrow("CAMPNAMEKANA") = OIM0002row("CAMPNAMEKANA") Then
+                        XLSTBLrow("STYMD") = OIM0002row("STYMD") AndAlso
+                        XLSTBLrow("ENDYMD") = OIM0002row("ENDYMD") AndAlso
+                        XLSTBLrow("NAME") = OIM0002row("NAME") AndAlso
+                        XLSTBLrow("NAMES") = OIM0002row("NAMES") AndAlso
+                        XLSTBLrow("NAMEKANA") = OIM0002row("NAMEKANA") AndAlso
+                        XLSTBLrow("NAMEKANAS") = OIM0002row("NAMEKANAS") Then
+
                         OIM0002INProw.ItemArray = OIM0002row.ItemArray
                         Exit For
                     End If
                 Next
             End If
-            '○ 項目セット
+            ''○ 項目セット
+            ''会社コード
+            'OIM0002INProw.Item("CAMPCODE") = work.WF_SEL_CAMPCODE.Text
+
+            ''組織コード
+            'OIM0002INProw.Item("ORGCODE") = work.WF_SEL_ORGCODE.Text
+
             '会社コード
-            OIM0002INProw.Item("CAMPCODE") = work.WF_SEL_CAMPCODE.Text
+            If WW_COLUMNS.IndexOf("CAMPCODE") >= 0 Then
+                OIM0002INProw("CAMPCODE") = XLSTBLrow("CAMPCODE")
+            End If
 
-        '組織コード
-        OIM0002INProw.Item("ORGCODE") = work.WF_SEL_ORGCODE.Text
+            '組織コード
+            If WW_COLUMNS.IndexOf("ORGCODE") >= 0 Then
+                OIM0002INProw("ORGCODE") = XLSTBLrow("ORGCODE")
+            End If
 
-        '会社名称
-        If WW_COLUMNS.IndexOf("CAMPNAME") >= 0 Then
-            OIM0002INProw("CAMPNAME") = XLSTBLrow("CAMPNAME")
-        End If
+            '組織名称
+            If WW_COLUMNS.IndexOf("NAME") >= 0 Then
+                OIM0002INProw("NAME") = XLSTBLrow("NAME")
+            End If
 
-        '会社名称カナ
-        If WW_COLUMNS.IndexOf("CAMPNAMEKANA") >= 0 Then
-            OIM0002INProw("CAMPNAMEKANA") = XLSTBLrow("CAMPNAMEKANA")
-        End If
+            '組織名称（短）
+            If WW_COLUMNS.IndexOf("NAMES") >= 0 Then
+                OIM0002INProw("NAMES") = XLSTBLrow("NAMES")
+            End If
 
-        OIM0002INPtbl.Rows.Add(OIM0002INProw)
+            '組織名称カナ
+            If WW_COLUMNS.IndexOf("NAMEKANA") >= 0 Then
+                OIM0002INProw("NAMEKANA") = XLSTBLrow("NAMEKANA")
+            End If
+
+            '組織名称カナ（短）
+            If WW_COLUMNS.IndexOf("NAMEKANAS") >= 0 Then
+                OIM0002INProw("NAMEKANAS") = XLSTBLrow("NAMEKANAS")
+            End If
+
+            '開始年月日
+            If WW_COLUMNS.IndexOf("STYMD") >= 0 Then
+                OIM0002INProw("STYMD") = XLSTBLrow("STYMD")
+            End If
+
+            '終了年月日
+            If WW_COLUMNS.IndexOf("ENDYMD") >= 0 Then
+                OIM0002INProw("ENDYMD") = XLSTBLrow("ENDYMD")
+            End If
+
+            '削除フラグ
+            If WW_COLUMNS.IndexOf("DELFLG") >= 0 Then
+                OIM0002INProw("DELFLG") = XLSTBLrow("DELFLG")
+            Else
+                OIM0002INProw("DELFLG") = "0"
+            End If
+
+            '会社名称
+            CODENAME_get("CAMPCODE", OIM0002INProw("CAMPCODE"), OIM0002INProw("CAMPNAME"), WW_DUMMY)
+
+            OIM0002INPtbl.Rows.Add(OIM0002INProw)
         Next
 
         '○ 項目チェック
@@ -1595,18 +1641,23 @@ Public Class OIM0002OrgList
 
             '組織コード(バリデーションチェック）
             Master.CheckField(Master.USERCAMP, "ORGCODE", OIM0002INProw("ORGCODE"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
+            If Not isNormal(WW_CS0024FCHECKERR) Then
                 '値存在チェック
-                CODENAME_get("ORGCODE", OIM0002INProw("ORGCODE"), WW_DUMMY, WW_RTN_SW)
-                If Not isNormal(WW_RTN_SW) Then
-                    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
-                    WW_CheckMES2 = "マスタに存在しません。"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
-                    WW_LINE_ERR = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-            Else
-                WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
+                'CODENAME_get("ORGCODE", OIM0002INProw("ORGCODE"), WW_DUMMY, WW_RTN_SW)
+                'If Not isNormal(WW_RTN_SW) Then
+                '    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
+                '    WW_CheckMES2 = "マスタに存在しません。"
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                'End If
+                'Else
+                '    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
+                '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
+                '    WW_LINE_ERR = "ERR"
+                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                WW_CheckMES1 = "組織コード入力エラー。数値を入力してください。"
                 WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
                 WW_LINE_ERR = "ERR"
@@ -1646,10 +1697,14 @@ Public Class OIM0002OrgList
         End If
 
         If Not IsNothing(OIM0002row) Then
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード       =" & OIM0002row("CAMPCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード     =" & OIM0002row("ORGCODE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社名称         =" & OIM0002row("CAMPNAME") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社名称カナ     =" & OIM0002row("CAMPNAMEKANA") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 会社コード         =" & OIM0002row("CAMPCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織コード         =" & OIM0002row("ORGCODE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 開始年月日         =" & OIM0002row("STYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 終了年月日         =" & OIM0002row("ENDYMD") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称           =" & OIM0002row("NAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称（短）     =" & OIM0002row("NAMES") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ       =" & OIM0002row("NAMEKANA") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 組織名称カナ（短） =" & OIM0002row("NAMEKANAS") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除               =" & OIM0002row("DELFLG")
         End If
 

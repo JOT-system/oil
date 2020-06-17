@@ -7,11 +7,13 @@
     <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>
     <asp:TextBox ID="WF_SEL_CAMPCODE2" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_CAMPCODE_L" runat="server"></asp:TextBox>
     <!-- 会社名称 -->
     <asp:TextBox ID="WF_SEL_CAMPNAME" runat="server"></asp:TextBox>
     <!-- 組織コード -->
     <asp:TextBox ID="WF_SEL_ORGCODE" runat="server"></asp:TextBox>
     <asp:TextBox ID="WF_SEL_ORGCODE2" runat="server"></asp:TextBox>
+    <asp:TextBox ID="WF_SEL_ORGCODE_L" runat="server"></asp:TextBox>
     <!-- 組織名 -->
     <asp:TextBox ID="WF_SEL_ORGNAME" runat="server"></asp:TextBox>
     <!-- 組織名（短） -->

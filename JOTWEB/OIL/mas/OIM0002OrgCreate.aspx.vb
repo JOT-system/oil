@@ -201,11 +201,15 @@ Public Class OIM0002OrgCreate
         WF_Sel_LINECNT.Text = work.WF_SEL_LINECNT.Text
 
         '会社コード2
-        TxtCampCode.Text = work.WF_SEL_CAMPCODE2.Text
+        '2020/06/16杉山修正
+        'TxtCampCode.Text = work.WF_SEL_CAMPCODE2.Text
+        TxtCampCode.Text = work.WF_SEL_CAMPCODE_L.Text
         CODENAME_get("CAMPCODE", TxtCampCode.Text, Label2.Text, WW_RTN_SW)
 
         '組織コード2
-        TxtOrgCode.Text = work.WF_SEL_ORGCODE2.Text
+        '2020/06/16杉山修正
+        'TxtOrgCode.Text = work.WF_SEL_ORGCODE2.Text
+        TxtOrgCode.Text = work.WF_SEL_ORGCODE_L.Text
         'CODENAME_get("ORGCODE", TxtOrgCode.Text, Label3.Text, WW_DUMMY)
 
         '組織名称
@@ -830,7 +834,7 @@ Public Class OIM0002OrgCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             '開始年月日(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "STYMD", OIM0002INProw("STYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "STYMD", OIM0002INProw("STYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '年月日チェック
                 WW_CheckDate(OIM0002INProw("STYMD"), "開始年月日", WW_CS0024FCHECKERR, dateErrFlag)
@@ -851,7 +855,7 @@ Public Class OIM0002OrgCreate
             End If
 
             '終了年月日(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "ENDYMD", OIM0002INProw("ENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ENDYMD", OIM0002INProw("ENDYMD"), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
                 '年月日チェック
                 WW_CheckDate(OIM0002INProw("ENDYMD"), "終了年月日", WW_CS0024FCHECKERR, dateErrFlag)
@@ -896,8 +900,9 @@ Public Class OIM0002OrgCreate
 
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
-            If OIM0002INProw("CAMPCODE") = work.WF_SEL_CAMPCODE2.Text _
-                AndAlso OIM0002INProw("ORGCODE") = work.WF_SEL_ORGCODE2.Text Then
+            '2020/06/16杉山修正
+            If OIM0002INProw("CAMPCODE") = work.WF_SEL_CAMPCODE_L.Text _
+                AndAlso OIM0002INProw("ORGCODE") = work.WF_SEL_ORGCODE_L.Text Then
 
             Else
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1176,6 +1181,7 @@ Public Class OIM0002OrgCreate
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
+                    prmData.Item(C_PARAMETERS.LP_TYPEMODE) = GL0001CompList.LC_COMPANY_TYPE.ALL
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, prmData)
 
                 Case "UORG"             '運用部署

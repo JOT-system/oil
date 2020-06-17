@@ -1651,17 +1651,17 @@ Public Class OIM0002OrgList
                 '    WW_LINE_ERR = "ERR"
                 '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 'End If
-                WW_CheckMES1 = "組織コード入力エラー。数値を入力してください。"
-                WW_CheckMES2 = WW_CS0024FCHECKREPORT
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
-                WW_LINE_ERR = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 'Else
                 '    WW_CheckMES1 = "・更新できないレコード(組織コード入力エラー)です。"
                 '    WW_CheckMES2 = WW_CS0024FCHECKREPORT
                 '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
                 '    WW_LINE_ERR = "ERR"
                 '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                WW_CheckMES1 = "組織コード入力エラー。数値を入力してください。"
+                WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIM0002INProw)
+                WW_LINE_ERR = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
             If WW_LINE_ERR = "" Then

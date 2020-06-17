@@ -356,6 +356,11 @@ Public Class M00000LOGON
                 End Using
 
             Catch ex As Exception
+                'SQL コネクションクローズ
+                SQLcon.Close()
+                SQLcon.Dispose()
+
+
                 Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0004_USER SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
@@ -417,6 +422,12 @@ Public Class M00000LOGON
 
                     End Using
                 Catch ex As Exception
+
+                    'SQL コネクションクローズ
+                    SQLcon.Close()
+                    SQLcon.Dispose()
+
+
                     Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS UPDATE")
                     CS0011LOGWRITE.INFSUBCLASS = "Main"
                     CS0011LOGWRITE.INFPOSI = "OIS0005_USERPASS Update"
@@ -451,6 +462,11 @@ Public Class M00000LOGON
 
                 End Using
             Catch ex As Exception
+
+                'SQL コネクションクローズ
+                SQLcon.Close()
+                SQLcon.Dispose()
+
                 Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS UPDATE")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"
@@ -461,6 +477,10 @@ Public Class M00000LOGON
                 CS0011LOGWRITE.CS0011LOGWrite()
                 Exit Sub
             End Try
+
+            'SQL コネクションクローズ
+            SQLcon.Close()
+            SQLcon.Dispose()
 
             '■■■　終了処理　■■■
 

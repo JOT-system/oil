@@ -8,7 +8,7 @@ Public Class OIT0005TankLocList
     Private OIT0005tbl As DataTable                                 '一覧格納用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
+    Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
 
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理

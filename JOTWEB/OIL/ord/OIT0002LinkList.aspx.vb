@@ -1658,13 +1658,13 @@ Public Class OIT0002LinkList
                 & " , '1'                                              AS STATUS" _
                 & " , ''                                               AS INFO" _
                 & " , ''                                               AS PREORDERNO" _
-                & " , SUBSTRING(OIT0011.ARTICLE, 1, 4)                 AS TRAINNO" _
+                & " , OIT0011.TRAINNO                                  AS TRAINNO" _
                 & " , ISNULL(OIM0007.TRAINNAME, '')                    AS TRAINNAME" _
-                & " , ISNULL(OIM0007.OFFICECODE, '')                   AS OFFICECODE" _
-                & " , OIM0004_TYAKU.STATIONCODE + OIM0004_TYAKU.BRANCH AS DEPSTATION" _
-                & " , OIT0011.DEPSTATIONNAME                           AS DEPSTATIONNAME" _
-                & " , OIM0004_HATSU.STATIONCODE + OIM0004_HATSU.BRANCH AS RETSTATION" _
-                & " , OIT0011.ARRSTATIONNAME                           AS RETSTATIONNAME" _
+                & " , VIW0002.OFFICECODE                               AS OFFICECODE" _
+                & " , VIW0002.DEPSTATION                               AS DEPSTATION" _
+                & " , VIW0002.DEPSTATIONNAME                           AS DEPSTATIONNAME" _
+                & " , VIW0002.ARRSTATION                               AS RETSTATION" _
+                & " , VIW0002.ARRSTATIONNAME                           AS RETSTATIONNAME" _
                 & " , NULL                                             AS EMPARRDATE" _
                 & " , NULL                                             AS ACTUALEMPARRDATE" _
                 & " , ''                                               AS LINETRAINNO" _
@@ -1685,14 +1685,24 @@ Public Class OIT0002LinkList
 
             SQLLinkStr &=
                   " FROM OIL.OIT0011_RLINK OIT0011" _
-                & " LEFT JOIN OIL.OIM0004_STATION OIM0004_HATSU ON" _
-                & "  REPLACE(REPLACE(OIM0004_HATSU.STATONNAME, '（', ''), '）', '') = OIT0011.ARRSTATIONNAME" _
-                & " LEFT JOIN OIL.OIM0004_STATION OIM0004_TYAKU ON" _
-                & "  REPLACE(REPLACE(OIM0004_TYAKU.STATONNAME, '（', ''), '）', '') = OIT0011.DEPSTATIONNAME" _
+                & " LEFT JOIN OIL.VIW0002_LINKCONVERTMASTER VIW0002 ON" _
+                & "  VIW0002.DEPSTATIONNAME = OIT0011.DEPSTATIONNAME" _
+                & "  AND VIW0002.ARRSTATIONNAME = OIT0011.ARRSTATIONNAME" _
                 & " LEFT JOIN OIL.OIM0007_TRAIN OIM0007 ON" _
-                & "  OIM0007.OTTRAINNO = SUBSTRING(OIT0011.ARTICLE,1,4)" _
-                & "  AND OIM0007.DEPSTATION = OIM0004_HATSU.STATIONCODE + OIM0004_HATSU.BRANCH" _
-                & "  AND OIM0007.ARRSTATION = OIM0004_TYAKU.STATIONCODE + OIM0004_TYAKU.BRANCH"
+                & "  OIM0007.OTTRAINNO = OIT0011.TRAINNO" _
+                & "  AND OIM0007.DEPSTATION = VIW0002.DEPSTATION" _
+                & "  AND OIM0007.ARRSTATION = VIW0002.ARRSTATION"
+
+            'SQLLinkStr &=
+            '      " FROM OIL.OIT0011_RLINK OIT0011" _
+            '    & " LEFT JOIN OIL.OIM0004_STATION OIM0004_HATSU ON" _
+            '    & "  REPLACE(REPLACE(OIM0004_HATSU.STATONNAME, '（', ''), '）', '') = OIT0011.ARRSTATIONNAME" _
+            '    & " LEFT JOIN OIL.OIM0004_STATION OIM0004_TYAKU ON" _
+            '    & "  REPLACE(REPLACE(OIM0004_TYAKU.STATONNAME, '（', ''), '）', '') = OIT0011.DEPSTATIONNAME" _
+            '    & " LEFT JOIN OIL.OIM0007_TRAIN OIM0007 ON" _
+            '    & "  OIM0007.OTTRAINNO = SUBSTRING(OIT0011.ARTICLE,1,4)" _
+            '    & "  AND OIM0007.DEPSTATION = OIM0004_HATSU.STATIONCODE + OIM0004_HATSU.BRANCH" _
+            '    & "  AND OIM0007.ARRSTATION = OIM0004_TYAKU.STATIONCODE + OIM0004_TYAKU.BRANCH"
 
             SQLLinkStr &= String.Format(" WHERE OIT0011.DELFLG <> '{0}'", C_DELETE_FLG.DELETE) _
                 & "  AND OIT0011.TRUCKSYMBOL <> ''" _

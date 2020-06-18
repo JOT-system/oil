@@ -10884,14 +10884,6 @@ Public Class OIT0003OrderDetail
                         For i = 1 To O_VALUE.Length
                             O_VALUE(i - 1) = OIT0003WKrow("VALUE" & i.ToString())
                         Next
-                        'O_VALUE(0) = OIT0003WKrow("VALUE1")
-                        'O_VALUE(1) = OIT0003WKrow("VALUE2")
-                        'O_VALUE(2) = OIT0003WKrow("VALUE3")
-                        'O_VALUE(3) = OIT0003WKrow("VALUE4")
-                        'O_VALUE(4) = OIT0003WKrow("VALUE5")
-                        'O_VALUE(5) = OIT0003WKrow("VALUE6")
-                        'O_VALUE(6) = OIT0003WKrow("VALUE7")
-                        'O_VALUE(7) = OIT0003WKrow("VALUE8")
                     Next
                 End If
             End Using
@@ -11585,7 +11577,7 @@ Public Class OIT0003OrderDetail
                     Me.TxtRTank_w.Enabled = True
                     '灯油
                 Case BaseDllConst.CONST_TTank
-                    '### 2020/06/15 START ########################################################
+                    '### 20200615 START((全体)No73対応) ##########################################
                     '★根岸営業所の場合
                     If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
                         '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
@@ -11599,12 +11591,12 @@ Public Class OIT0003OrderDetail
                     Else
                         Me.TxtTTank_w.Enabled = True
                     End If
-                    '### 2020/06/15 END   ########################################################
+                    '### 20200615 END  ((全体)No73対応) ##########################################
                     '未添加灯油
                 Case BaseDllConst.CONST_MTTank
                     '★根岸営業所の場合
                     If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
-                        '### 2020/06/15 START ########################################################
+                        '### 20200615 START((全体)No73対応) ##########################################
                         '★JXTG北信油槽所, 及びJXTG甲府油槽所の場合
                         If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_10 _
                             OrElse Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_20 Then
@@ -11613,7 +11605,7 @@ Public Class OIT0003OrderDetail
                         Else
                             Me.TxtMTTank_w.Enabled = False
                         End If
-                        '### 2020/06/15 END   ########################################################
+                        '### 20200615 END  ((全体)No73対応) ##########################################
                     Else
                         Me.TxtMTTank_w.Enabled = True
                     End If

@@ -20,14 +20,18 @@ Public Class OIT0003OrderDetail
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
     Private OIT0003WK2tbl As DataTable                              '作業用2テーブル(同一列車(同一発日)チェック用)
     Private OIT0003WK3tbl As DataTable                              '作業用3テーブル(同一列車(同一発日)タンク車チェック用)
-    Private OIT0003WK4tbl As DataTable                              '作業用4テーブル
-    Private OIT0003WK5tbl As DataTable                              '作業用5テーブル
+    Private OIT0003WK4tbl As DataTable                              '作業用4テーブル(列車入線順重複チェック用)
+    Private OIT0003WK5tbl As DataTable                              '作業用5テーブル(列車発送順重複チェック用)
     Private OIT0003WK6tbl As DataTable                              '作業用6テーブル(異なる列車(同一発日)チェック用)
     Private OIT0003WK7tbl As DataTable                              '作業用7テーブル(異なる列車(同一発日)タンク車チェック用)
     Private OIT0003WKtbl_tab4 As DataTable                          '作業用テーブル(タブ４用)
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
-    Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル
-    Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル(受注履歴)
+    Private OIT0003His2tbl As DataTable                             '履歴格納用テーブル(受注明細履歴)
+    'Private OIT0003FIDtbl_tab1 As DataTable                         '検索用テーブル(タブ１用)
+    'Private OIT0003FIDtbl_tab2 As DataTable                         '検索用テーブル(タブ２用)
+    Private OIT0003FIDtbl_tab3 As DataTable                         '検索用テーブル(タブ３用)
+    'Private OIT0003FIDtbl_tab4 As DataTable                         '検索用テーブル(タブ４用)
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 7                  'マウススクロール時稼働行数
@@ -74,6 +78,7 @@ Public Class OIT0003OrderDetail
     Private WW_UPBUTTONFLG As String = "0"                          '更新用ボタンフラグ(1:割当確定, 2:入力内容登録, 3:明細更新, 4:訂正更新)
 
     Private WW_RINKAIFLG As Boolean = False                         '臨海鉄道対象可否(TRUE：対象, FALSE:未対象)
+    Private WW_USEORDERFLG As Boolean = False                       '使用受注オーダー可否(TRUE：使用中, FALSE:未使用)
 
     Private WW_SwapInput As String = "0"                            '入換指示入力(0:未 1:完了)
     Private WW_LoadingInput As String = "0"                         '積込指示入力(0:未 1:完了)
@@ -106,8 +111,9 @@ Public Class OIT0003OrderDetail
                     If CS0013ProfView.SetDispListTextBoxValues(OIT0003tbl_tab4, pnlListArea4) Then
                         Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
                     End If
-                    '◯ 更新用ボタンフラグ初期化
+                    '◯ フラグ初期化
                     Me.WW_UPBUTTONFLG = "0"
+                    Me.WW_USEORDERFLG = False
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonCONTACT"               '手配連絡ボタン押下
@@ -441,7 +447,7 @@ Public Class OIT0003OrderDetail
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
             '〇 受注進行ステータスが下記内容へ変更された場合
-            '   受注進行ステータス＝"200:手配中"
+            '   受注進行ステータス＝"200:手配"
             '   受注進行ステータス＝"210:手配中(入換指示入力済)"
             '   受注進行ステータス＝"220:手配中(積込指示入力済)"
             '   受注進行ステータス＝"230:手配中(託送指示手配済)"
@@ -483,6 +489,12 @@ Public Class OIT0003OrderDetail
 
             '〇 (一覧)テキストボックスの制御(読取専用)
             WW_ListTextBoxReadControl()
+
+            '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+            If Me.WW_USEORDERFLG = True Then
+                Master.Output(C_MESSAGE_NO.OIL_ORDERNO_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            End If
+            '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
             '〇 受注進行ステータスが"500:検収中"へ変更された場合
             '### ステータス追加(仮) #################################
@@ -951,6 +963,11 @@ Public Class OIT0003OrderDetail
             MAPDataGetTab3(SQLcon)
         End Using
 
+        '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+        '◯受注№存在チェック
+        WW_OrderNoExistChk()
+        '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
@@ -976,6 +993,18 @@ Public Class OIT0003OrderDetail
             Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
             Exit Sub
         End If
+
+        '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            '指定タンク車№が他の受注オーダーで使用中の場合は、(実績)日付を許可しない。
+            If OIT0003tab3row("USEORDERNO") = "" Then
+                Continue For
+            ElseIf OIT0003tab3row("USEORDERNO") <> Me.TxtOrderNo.Text Then
+                '使用受注オーダーを使用中に変更
+                Me.WW_USEORDERFLG = True
+            End If
+        Next
+        '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
         WF_DetailMView.ActiveViewIndex = 2
         '〇 (一覧)テキストボックスの制御(読取専用)
@@ -2285,6 +2314,10 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS ORDERINGOILNAME" _
                 & " , ISNULL(RTRIM(OIM0005.MODEL), '')                   AS MODEL" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
+                & " , ISNULL(RTRIM(OIT0005.TANKSTATUS), '')              AS TANKSTATUS" _
+                & " , ISNULL(RTRIM(OIT0005.LOADINGKBN), '')              AS LOADINGKBN" _
+                & " , ISNULL(RTRIM(OIT0005.TANKSITUATION), '')           AS TANKSITUATION" _
+                & " , ISNULL(RTRIM(OIT0005.USEORDERNO), '')              AS USEORDERNO" _
                 & " , CASE ISNULL(RTRIM(OIT0003.STACKINGFLG), '')" _
                 & "   WHEN '1' THEN 'on'" _
                 & "   WHEN '2' THEN ''" _
@@ -2354,6 +2387,9 @@ Public Class OIT0003OrderDetail
                 & " LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
                 & "        OIS0015_2.CLASS   = 'ORDERINFO' " _
                 & "    AND OIS0015_2.KEYCODE = OIT0003.ORDERINFO " _
+                & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
+                & "       OIT0003.TANKNO = OIT0005.TANKNUMBER" _
+                & "       AND OIT0005.DELFLG <> @P02" _
                 & " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
 
@@ -2700,6 +2736,12 @@ Public Class OIT0003OrderDetail
 
             DisplayGrid_TAB3()
 
+            '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+            If Me.WW_USEORDERFLG = True Then
+                Master.Output(C_MESSAGE_NO.OIL_ORDERNO_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            End If
+            '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+
             'タブ「費用入力」
         ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
             Master.RecoverTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
@@ -2710,6 +2752,11 @@ Public Class OIT0003OrderDetail
 
         '〇 画面表示設定処理
         WW_ScreenEnabledSet()
+
+        '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+        '◯受注№存在チェック
+        WW_OrderNoExistChk()
+        '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
         '〇タンク車所在の更新
         WW_TankShozaiSet()
@@ -2957,6 +3004,18 @@ Public Class OIT0003OrderDetail
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
+
+        '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            '指定タンク車№が他の受注オーダーで使用中の場合は、(実績)日付を許可しない。
+            If OIT0003tab3row("USEORDERNO") = "" Then
+                Continue For
+            ElseIf OIT0003tab3row("USEORDERNO") <> Me.TxtOrderNo.Text Then
+                '使用受注オーダーを使用中に変更
+                Me.WW_USEORDERFLG = True
+            End If
+        Next
+        '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
         '〇 (一覧)テキストボックスの制御(読取専用)
         WW_ListTextBoxReadControl()
@@ -5064,7 +5123,7 @@ Public Class OIT0003OrderDetail
         If WW_RINKAIFLG = False Then
             '〇 受注進行ステータスの状態
             Select Case work.WF_SEL_ORDERSTATUS.Text
-                '受注進行ステータス＝"200:手配中"
+                '受注進行ステータス＝"200:手配"
                 Case BaseDllConst.CONST_ORDERSTATUS_200
                     '積込指示入力＝"1:完了"の場合
                     If WW_LoadingInput = "1" Then
@@ -9569,6 +9628,9 @@ Public Class OIT0003OrderDetail
                                       ByVal I_KBN As String,
                                       Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal I_ORDERNO As String = Nothing,
+                                      Optional ByVal I_EMPARRDATE As String = Nothing,
+                                      Optional ByVal I_AEMPARRDATE As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal upActualEmparrDate As Boolean = False,
                                       Optional ByVal upLastOilCode As Boolean = False)
@@ -9600,14 +9662,29 @@ Public Class OIT0003OrderDetail
             If Not String.IsNullOrEmpty(I_SITUATION) Then
                 SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
             End If
+
+            '★空車着日（予定）が未設定の場合は、オーダー中の空車着日（予定）を設定
+            If String.IsNullOrEmpty(I_EMPARRDATE) Then I_EMPARRDATE = Me.TxtEmparrDate.Text
             '空車着日（予定）
             If upEmparrDate = True Then
-                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
+                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", I_EMPARRDATE)
                 SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
             End If
+
+            '★空車着日（実績）が未設定の場合は、オーダー中の空車着日（実績）を設定
+            If String.IsNullOrEmpty(I_AEMPARRDATE) Then I_AEMPARRDATE = Me.TxtActualEmparrDate.Text
+            '★受注Noが未設定の場合は、オーダー中の受注№を設定
+            If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
             '空車着日（実績）
             If upActualEmparrDate = True Then
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", Me.TxtActualEmparrDate.Text)
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+                '### 20200618 START 受注での使用をリセットする対応 #########################################
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
+                '### 20200618 END   受注での使用をリセットする対応 #########################################
+            Else
+                '### 20200618 START 受注での使用を設定する対応 #############################################
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", I_ORDERNO)
+                '### 20200618 END   受注での使用を設定する対応 #############################################
             End If
             '前回油種
             If upLastOilCode = True Then
@@ -9625,7 +9702,19 @@ Public Class OIT0003OrderDetail
                     & "        RECEIVEYMD     = @P14  " _
                     & "  WHERE TANKNUMBER     = @P01  " _
                     & "    AND TANKSITUATION <> '3' " _
-                    & "    AND DELFLG        <> @P02; "
+                    & "    AND DELFLG        <> @P02 "
+
+            '### 20200618 START 受注での使用をリセットする対応 #########################################
+            '空車着日（実績）
+            If upActualEmparrDate = True Then
+                SQLStr &=
+                      "    AND USEORDERNO    <> ''; "
+            Else
+                SQLStr &=
+                      "    AND (USEORDERNO     = '' "
+                SQLStr &= String.Format(" OR USEORDERNO = '{0}');", I_ORDERNO)
+            End If
+            '### 20200618 END   受注での使用をリセットする対応 #########################################
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
@@ -11060,7 +11149,7 @@ Public Class OIT0003OrderDetail
         '◯受注進行ステータスの状態によって値を更新
         '　入換・積込
         Select Case work.WF_SEL_ORDERSTATUS.Text
-                '受注進行ステータス＝"200:手配中"
+                '受注進行ステータス＝"200:手配"
                 '受注進行ステータス＝"210:手配中(入換指示入力済)"
                 '受注進行ステータス＝"220:手配中(積込指示入力済)"
                 '受注進行ステータス＝"230:手配中(託送指示手配済)"
@@ -11695,97 +11784,126 @@ Public Class OIT0003OrderDetail
             '受注進行ステータスが「320:受注確定」の場合
             '320:受注確定
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 Then
-            '引数１：所在地コード　⇒　変更なし(空白)
-            '引数２：タンク車状態　⇒　変更なし(空白)
-            '引数３：積車区分　　　⇒　変更あり("F"(積車))
-            '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-            '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-            WW_UpdateTankShozai("", "", "F", I_SITUATION:="2", upLastOilCode:=True)
 
-            '(実績)発日の入力が完了
-            If Me.TxtActualDepDate.Text <> "" Then
-                '★タンク車所在の更新
-                '引数１：所在地コード　⇒　変更あり(着駅)
-                '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
-                '引数３：積車区分　　　⇒　変更なし(空白)
+            '★明細更新ボタン押下時に更新
+            If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更なし(空白)
+                '引数３：積車区分　　　⇒　変更あり("F"(積車))
                 '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "", I_SITUATION:="2")
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                'WW_UpdateTankShozai("", "", "F", I_SITUATION:="2", upLastOilCode:=True)
+                WW_UpdateTankShozai("", "1", "F", I_SITUATION:="2", upLastOilCode:=True)
+
+                '(実績)発日の入力が完了
+                If Me.TxtActualDepDate.Text <> "" Then
+                    '★タンク車所在の更新
+                    '引数１：所在地コード　⇒　変更あり(着駅)
+                    '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                    '引数３：積車区分　　　⇒　変更なし(空白)
+                    '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                    'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "", I_SITUATION:="2")
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
+                End If
             End If
 
             '### ステータス追加(仮) #################################
             '受注進行ステータスが「300:受注確定」の場合
             '350:受注確定
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 Then
-            '引数１：所在地コード　⇒　変更あり(着駅)
-            '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
-            '引数３：積車区分　　　⇒　変更あり("F"(積車))
-            '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
+
+            '★明細更新ボタン押下時に更新
+            If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                '引数３：積車区分　　　⇒　変更あり("F"(積車))
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
+            End If
             '########################################################
 
             '受注進行ステータスが「400:受入確認中」の場合
             '400:受入確認中
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 Then
-            '★タンク車所在の更新
-            '引数１：所在地コード　⇒　変更あり(着駅)
-            '引数２：タンク車状態　⇒　変更あり("3"(到着))
-            '引数３：積車区分　　　⇒　変更なし(空白)
-            '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "", I_SITUATION:="2")
 
-            '(実績)受入日の入力が完了
-            If Me.TxtActualAccDate.Text <> "" Then
+            '★明細更新ボタン押下時に更新
+            If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
                 '★タンク車所在の更新
-                '引数１：所在地コード　⇒　変更なし(空白)
-                '引数２：タンク車状態　⇒　変更なし(空白)
-                '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                WW_UpdateTankShozai("", "", "E")
+                '引数１：所在地コード　⇒　変更あり(着駅)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "", I_SITUATION:="2")
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "F", I_SITUATION:="2")
+
+                '(実績)受入日の入力が完了
+                If Me.TxtActualAccDate.Text <> "" Then
+                    '★タンク車所在の更新
+                    '引数１：所在地コード　⇒　変更なし(空白)
+                    '引数２：タンク車状態　⇒　変更なし(空白)
+                    '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                    'WW_UpdateTankShozai("", "", "E")
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
+                End If
             End If
 
             '### ステータス追加(仮) #################################
             '受注進行ステータスが「450:受入確認中」の場合
             '450:受入確認中
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
-            '★タンク車所在の更新
-            '引数１：所在地コード　⇒　変更なし(空白)
-            '引数２：タンク車状態　⇒　変更あり("3"(到着))
-            '引数３：積車区分　　　⇒　変更あり("E"(空車))
-            WW_UpdateTankShozai("", "3", "E")
+
+            '★明細更新ボタン押下時に更新
+            If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                'WW_UpdateTankShozai("", "3", "E")
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
+            End If
             '########################################################
 
             '受注進行ステータスが「500:検収中」の場合
             '500:検収中
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
 
-            '割り当てたタンク車のチェック
-            Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-            For Each OIT0003row As DataRow In OIT0003tbl.Rows
-                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            '★明細更新ボタン押下時に更新
+            If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
+                '割り当てたタンク車のチェック
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
-                '★(一覧)タンク車NoがOT本社、または在日米軍のリース車かチェック
-                WW_FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0003row("TANKNO"), WW_GetValue)
+                    '★(一覧)タンク車NoがOT本社、または在日米軍のリース車かチェック
+                    WW_FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0003row("TANKNO"), WW_GetValue)
 
-                'タンク車がOT本社、または在日米軍のリース車の場合
-                If WW_GetValue(0) <> "" Then
+                    'タンク車がOT本社、または在日米軍のリース車の場合
+                    If WW_GetValue(0) <> "" Then
 
-                    '### 特に何もしない ####################################
+                        '### 特に何もしない ####################################
 
-                    ''★タンク車所在の更新(### 所在地はそのまま更新しない###)
-                    ''引数１：所在地コード　⇒　変更なし(空白)
-                    ''引数２：タンク車状態　⇒　変更あり("3"(到着))
-                    ''引数３：積車区分　　　⇒　変更あり("E"(空車))
-                    'WW_UpdateTankShozai("", "3", "E")
+                        ''★タンク車所在の更新(### 所在地はそのまま更新しない###)
+                        ''引数１：所在地コード　⇒　変更なし(空白)
+                        ''引数２：タンク車状態　⇒　変更あり("3"(到着))
+                        ''引数３：積車区分　　　⇒　変更あり("E"(空車))
+                        'WW_UpdateTankShozai("", "3", "E")
 
-                Else
-                    '★タンク車所在の更新
-                    '引数１：所在地コード　⇒　変更あり(発駅)
-                    '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
-                    '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                    '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                    WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1")
+                    Else
+                        '★タンク車所在の更新
+                        '引数１：所在地コード　⇒　変更あり(発駅)
+                        '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                        '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True)
 
-                End If
-            Next
+                        '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                        '受注オーダーしているタンク車の存在確認
+                        WW_FindOrderTank()
+                        '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+
+                    End If
+                Next
+            End If
 
             '550:検収済
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 Then
@@ -11952,6 +12070,41 @@ Public Class OIT0003OrderDetail
 
         End Select
 
+    End Sub
+
+    ''' <summary>
+    ''' 受注№存在チェック(オーダーしたタンク車№が他のオーダーで使用していないか)
+    ''' </summary>
+    Protected Sub WW_OrderNoExistChk()
+        '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+
+            If OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101 Then
+                OIT0003tab3row("ORDERINFO") = ""
+                OIT0003tab3row("ORDERINFONAME") = ""
+            End If
+
+            '指定タンク車№が他の受注オーダーで使用中の場合は、(実績)日付を許可しない。
+            If OIT0003tab3row("USEORDERNO") = "" Then
+                Continue For
+            ElseIf OIT0003tab3row("USEORDERNO") <> Me.TxtOrderNo.Text Then
+                '(実績)積込日
+                Me.TxtActualLoadingDate.Enabled = False
+                '(実績)発日
+                Me.TxtActualDepDate.Enabled = False
+                '(実績)積車着日
+                Me.TxtActualArrDate.Enabled = False
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = False
+                '(実績)空車着日
+                Me.TxtActualEmparrDate.Enabled = False
+
+                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
+                CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+            End If
+        Next
+        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+        '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
     End Sub
 
     ''' <summary>
@@ -13268,6 +13421,14 @@ Public Class OIT0003OrderDetail
             If OIT0003row("DELFLG") = "0" AndAlso OIT0003row("TANKSTATUS") = "" Then
                 'タンク車情報を取得
                 WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0003row("TANKNO"), WW_GetValue)
+
+                '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                '使用受注№が設定されている場合
+                If WW_GetValue(12) <> "" Then
+                    '次のレコードに進む（SKIPする）
+                    Continue For
+                End If
+                '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
                 'タンク車状態
                 Select Case WW_GetValue(11)
@@ -14908,6 +15069,299 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 受注オーダーしているタンク車の存在確認
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_FindOrderTank()
+
+        '○ 受注登録しているタンク車№を検索
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_ORDERTANK_FIND(WW_ERRCODE, SQLcon)
+        End Using
+        If WW_ERRCODE = "ERR" Then Exit Sub
+
+        '◯ 受注登録しているタンク車が存在した場合
+        If OIT0003FIDtbl_tab3.Rows.Count <> 0 Then
+
+            '存在したタンク車№だけ、タンク車所在の更新を実施
+            For Each OIT0003FIDrow As DataRow In OIT0003FIDtbl_tab3.Rows
+                '〇タンク車所在の更新
+                '受注進行ステータスが以下の場合
+                Select Case OIT0003FIDrow("ORDERSTATUS")
+                    '100:受注受付
+                    Case BaseDllConst.CONST_ORDERSTATUS_100
+                        '### 特になし #########################
+
+                    '200:手配
+                    '210:手配中（入換指示入力済）, 220:手配中（積込指示入力済）
+                    '230:手配中（託送指示手配済）, 240:手配中（入換指示未入力）, 250:手配中（積込指示未入力）
+                    '260:手配中（託送指示未手配）
+                    '270:手配中(入換積込指示手配済), 280:手配中(託送指示未手配)入換積込手配連絡（手配・結果受理）
+                    '290:手配中(入換積込未連絡), 300:手配中(入換積込未確認)
+                    '310:手配完了
+                    Case BaseDllConst.CONST_ORDERSTATUS_200,
+                         BaseDllConst.CONST_ORDERSTATUS_210,
+                         BaseDllConst.CONST_ORDERSTATUS_220,
+                         BaseDllConst.CONST_ORDERSTATUS_230,
+                         BaseDllConst.CONST_ORDERSTATUS_240,
+                         BaseDllConst.CONST_ORDERSTATUS_250,
+                         BaseDllConst.CONST_ORDERSTATUS_260,
+                         BaseDllConst.CONST_ORDERSTATUS_270,
+                         BaseDllConst.CONST_ORDERSTATUS_280,
+                         BaseDllConst.CONST_ORDERSTATUS_290,
+                         BaseDllConst.CONST_ORDERSTATUS_300,
+                         BaseDllConst.CONST_ORDERSTATUS_310
+
+                        '★タンク車所在の更新
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更あり("1"(発送))
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数４：(予定)空車着日⇒　更新対象(画面項目)
+                        WW_UpdateTankShozai("", "1", "", upEmparrDate:=True,
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_EMPARRDATE:=OIT0003FIDrow("EMPARRDATE"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+
+                    '320:受注確定((実績)積込日設定済み)
+                    Case BaseDllConst.CONST_ORDERSTATUS_320
+
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更なし(空白)
+                        '引数３：積車区分　　　⇒　変更あり("F"(積車))
+                        '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        WW_UpdateTankShozai("", "1", "F", I_SITUATION:="2", upLastOilCode:=True,
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+
+                    '350:受注確定((実績)発日設定済み)
+                    Case BaseDllConst.CONST_ORDERSTATUS_350
+
+                        '★タンク車所在の更新
+                        '引数１：所在地コード　⇒　変更あり(着駅)
+                        '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "2", "F", I_SITUATION:="2",
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+
+                    '400:受入確認中((実績)積車着日設定済み)
+                    Case BaseDllConst.CONST_ORDERSTATUS_400
+
+                        '★タンク車所在の更新
+                        '引数１：所在地コード　⇒　変更あり(着駅)
+                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "F", I_SITUATION:="2",
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+
+                    '450:受入確認中((実績)受入日設定済み)
+                    Case BaseDllConst.CONST_ORDERSTATUS_450
+
+                        '★タンク車所在の更新
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更なし(空白)
+                        '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                        WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "E", I_SITUATION:="2",
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+
+                End Select
+            Next
+        Else
+            '### 特になし #########################
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注登録しているタンク車№を検索
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    Private Sub WW_ORDERTANK_FIND(ByRef O_RTN As String, ByVal SQLcon As SqlConnection)
+
+        O_RTN = C_MESSAGE_NO.NORMAL
+
+        If IsNothing(OIT0003FIDtbl_tab3) Then
+            OIT0003FIDtbl_tab3 = New DataTable
+        End If
+
+        If OIT0003FIDtbl_tab3.Columns.Count <> 0 Then
+            OIT0003FIDtbl_tab3.Columns.Clear()
+        End If
+
+        OIT0003FIDtbl_tab3.Clear()
+
+        '○ 検索SQL
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+            " SELECT" _
+            & "   ISNULL(RTRIM(MERGE_TBL.ORDERNO), '')                  AS ORDERNO" _
+            & " , ISNULL(RTRIM(MERGE_TBL.ORDERSTATUS), '')              AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(MERGE_TBL.OFFICECODE), '')               AS OFFICECODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.OFFICENAME), '')               AS OFFICENAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.SHIPPERSCODE), '')             AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.SHIPPERSNAME), '')             AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.BASECODE), '')                 AS BASECODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.BASENAME), '')                 AS BASENAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.CONSIGNEECODE), '')            AS CONSIGNEECODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.CONSIGNEENAME), '')            AS CONSIGNEENAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.TANKNO), '')                   AS TANKNO" _
+            & " , ISNULL(RTRIM(MERGE_TBL.OILCODE), '')                  AS OILCODE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.OILNAME), '')                  AS OILNAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.ORDERINGTYPE), '')             AS ORDERINGTYPE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.ORDERINGOILNAME), '')          AS ORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.DEPSTATION), '')               AS DEPSTATION" _
+            & " , ISNULL(RTRIM(MERGE_TBL.DEPSTATIONNAME), '')           AS DEPSTATIONNAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.ARRSTATION), '')               AS ARRSTATION" _
+            & " , ISNULL(RTRIM(MERGE_TBL.ARRSTATIONNAME), '')           AS ARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(MERGE_TBL.LODDATE), '')                  AS LODDATE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.DEPDATE), '')                  AS DEPDATE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.ARRDATE), '')                  AS ARRDATE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.ACCDATE), '')                  AS ACCDATE" _
+            & " , ISNULL(RTRIM(MERGE_TBL.EMPARRDATE), '')               AS EMPARRDATE" _
+            & " FROM ( " _
+            & "     SELECT " _
+            & "           OIT0003.* " _
+            & "         , ROW_NUMBER() OVER(PARTITION BY OIT0003.TANKNO ORDER BY OIT0003.LODDATE) RNUM "
+
+        '①受注テーブルと受注明細テーブルの情報を取得(利用可能のデータ)
+        SQLStr &=
+              "     FROM ( " _
+            & "         SELECT " _
+            & "               OIT0002.ORDERNO " _
+            & "             , OIT0002.ORDERSTATUS " _
+            & "             , OIT0002.OFFICECODE " _
+            & "             , OIT0002.OFFICENAME " _
+            & "             , OIT0003.SHIPPERSCODE " _
+            & "             , OIT0003.SHIPPERSNAME " _
+            & "             , OIT0002.BASECODE " _
+            & "             , OIT0002.BASENAME " _
+            & "             , OIT0002.CONSIGNEECODE " _
+            & "             , OIT0002.CONSIGNEENAME " _
+            & "             , OIT0002.DEPSTATION " _
+            & "             , OIT0002.DEPSTATIONNAME " _
+            & "             , OIT0002.ARRSTATION " _
+            & "             , OIT0002.ARRSTATIONNAME " _
+            & "             , OIT0002.LODDATE " _
+            & "             , OIT0002.DEPDATE " _
+            & "             , OIT0002.ARRDATE " _
+            & "             , OIT0002.ACCDATE " _
+            & "             , OIT0002.EMPARRDATE " _
+            & "             , OIT0003.TANKNO " _
+            & "             , OIT0003.OILCODE " _
+            & "             , OIT0003.OILNAME " _
+            & "             , OIT0003.ORDERINGTYPE " _
+            & "             , OIT0003.ORDERINGOILNAME " _
+            & "         FROM OIL.OIT0002_ORDER OIT0002 " _
+            & "         INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "               OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "               AND OIT0003.DELFLG <> @P02" _
+            & "         WHERE OIT0002.USEPROPRIETYFLG = '1' " _
+            & "         AND OIT0002.DELFLG <> @P02" _
+            & "     ) OIT0003"
+
+        '②現在指定している受注オーダーの情報を取得
+        SQLStr &=
+              "     INNER JOIN ( " _
+            & "         SELECT " _
+            & "               OIT0002.ORDERNO " _
+            & "             , OIT0002.ORDERSTATUS " _
+            & "             , OIT0002.OFFICECODE " _
+            & "             , OIT0002.OFFICENAME " _
+            & "             , OIT0003.SHIPPERSCODE " _
+            & "             , OIT0003.SHIPPERSNAME " _
+            & "             , OIT0002.BASECODE " _
+            & "             , OIT0002.BASENAME " _
+            & "             , OIT0002.CONSIGNEECODE " _
+            & "             , OIT0002.CONSIGNEENAME " _
+            & "             , OIT0002.DEPSTATION " _
+            & "             , OIT0002.DEPSTATIONNAME " _
+            & "             , OIT0002.ARRSTATION " _
+            & "             , OIT0002.ARRSTATIONNAME " _
+            & "             , OIT0002.LODDATE " _
+            & "             , OIT0002.DEPDATE " _
+            & "             , OIT0002.ARRDATE " _
+            & "             , OIT0002.ACCDATE " _
+            & "             , OIT0002.EMPARRDATE " _
+            & "             , OIT0003.TANKNO " _
+            & "             , OIT0003.OILCODE " _
+            & "             , OIT0003.OILNAME " _
+            & "             , OIT0003.ORDERINGTYPE " _
+            & "             , OIT0003.ORDERINGOILNAME " _
+            & "         FROM OIL.OIT0002_ORDER OIT0002 " _
+            & "         INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "               OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "               AND OIT0003.ORDERNO = @P01 " _
+            & "               AND OIT0003.DELFLG <> @P02" _
+            & "     ) OIT0003_GEN ON "
+
+        '②の受注オーダー以外でタンク車Noを使用している受注オーダーがないか、①のデータから検索
+        SQLStr &=
+              "           OIT0003_GEN.TANKNO = OIT0003.TANKNO " _
+            & "           AND OIT0003_GEN.DEPDATE < OIT0003.DEPDATE " _
+            & "     WHERE OIT0003.ORDERNO <> @P01" _
+            & "     AND OIT0003.TANKNO IN ("
+
+        '一覧に設定しているタンク車№を条件に設定
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            If OIT0003row("LINECNT") = 1 Then
+                SQLStr &= "'" & OIT0003row("TANKNO") & "' "
+            Else
+                SQLStr &= ", '" & OIT0003row("TANKNO") & "' "
+            End If
+        Next
+
+        '※一致したデータが複数ある場合、一番(予定)発日が過去の日を取得
+        SQLStr &=
+             "      )" _
+            & " ) MERGE_TBL" _
+            & " WHERE MERGE_TBL.RNUM = 1"
+
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    MERGE_TBL.ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003FIDtbl_tab3.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003FIDtbl_tab3.Load(SQLdr)
+                End Using
+
+                'Dim i As Integer = 0
+                'For Each OIT0003FIDtab3row As DataRow In OIT0003FIDtbl_tab3.Rows
+                '    i += 1
+                '    OIT0003FIDtab3row("LINECNT") = i        'LINECNT
+                'Next
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003D FIND_ORDERTANK")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003D FIND_ORDERTANK"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        Master.Output(C_MESSAGE_NO.DATA_FILTER_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
     ''' (一覧)テキストボックスの制御(読取専用)
     ''' </summary>
     ''' <remarks></remarks>
@@ -14917,166 +15371,199 @@ Public Class OIT0003OrderDetail
            'タンク車割当
             Case 0
                 '〇 (一覧)テキストボックスの制御(読取専用)
-                Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
-                Dim tblObj = DirectCast(divObj.Controls(0), Table)
-
-                '受注進行ステータスが"受注受付"の場合
-                '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
-                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
-                    For Each rowitem As TableRow In tblObj.Rows
-                        For Each cellObj As TableCell In rowitem.Controls
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
-                                AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011203 Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
-                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            End If
-                        Next
-                    Next
-
-                    '受注進行ステータス＝"200:手配中"
-                    '受注進行ステータス＝"210:手配中(入換指示入力済)"
-                    '受注進行ステータス＝"220:手配中(積込指示入力済)"
-                    '受注進行ステータス＝"230:手配中(託送指示手配済)"
-                    '受注進行ステータス＝"240:手配中(入換指示未入力)"
-                    '受注進行ステータス＝"250:手配中(積込指示未入力)"
-                    '受注進行ステータス＝"260:手配中(託送指示未手配)"
-                    '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
-                    '受注進行ステータス＝"270:手配中(入換積込指示手配済)"
-                    '受注進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
-                    '受注進行ステータス＝"290:手配中(入換積込未連絡)"
-                    '受注進行ステータス＝"300:手配中(入換積込未確認)"
-                    '### END   ##################################################################
-                    '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
-                ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
-                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
-
-                    Dim loopdr As DataRow = Nothing
-                    Dim rowIdx As Integer = 0
-                    Dim chkTankNocnt As String = "txt" & pnlListArea1.ID & "TANKNO"
-                    Dim chkTankNo As String = ""
-                    Dim chkJRInspectionDatecnt As String = "txt" & pnlListArea1.ID & "JRINSPECTIONDATE"
-                    Dim chkJRInspectionDate As String = ""
-
-                    For Each rowitem As TableRow In tblObj.Rows
-                        For Each cellObj As TableCell In rowitem.Controls
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
-                                AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011203 Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
-                                AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            End If
-                        Next
-
-                        '★タンク車の状態が「発送」の場合は、入力を許可しない。
-                        '画面表示行が存在している場合
-                        If OIT0003tbl.Rows.Count <> 0 Then
-                            loopdr = OIT0003tbl.Rows(rowIdx)
-                            If loopdr("TANKSTATUS") = "1" AndAlso loopdr("DELFLG") = "0" Then
-                                '◯ タンク車№
-                                chkTankNo = chkTankNocnt & Convert.ToString(loopdr("LINECNT"))
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    'コントロールが見つかったら脱出
-                                    If cellObj.Text.Contains(chkTankNo) Then
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                                        Exit For
-                                    End If
-                                Next
-                                '◯ 交検日
-                                chkJRInspectionDate = chkJRInspectionDatecnt & Convert.ToString(loopdr("LINECNT"))
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    'コントロールが見つかったら脱出
-                                    If cellObj.Text.Contains(chkJRInspectionDate) Then
-                                        cellObj.Text = cellObj.Text.Replace(" readonly='readonly' class='iconOnly'>", " readonly='readonly'>")
-                                        Exit For
-                                    End If
-                                Next
-                            End If
-                        End If
-                        rowIdx += 1
-                    Next
-
-                    '受注進行ステータスが"310：手配完了"以降のステータスの場合
-                Else
-                    '### ★選択（チェックボックス）を非活性にするための準備 ################
-                    Dim chkObj As CheckBox = Nothing
-                    '　LINECNTを除いたチェックボックスID
-                    Dim chkObjIdWOLincnt As String = "chk" & pnlListArea1.ID & "OPERATION"
-                    '　LINECNTを含むチェックボックスID
-                    Dim chkObjId As String
-                    'Dim chkObjType As String
-                    '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
-                    Dim loopdr As DataRow = Nothing
-                    '　データテーブルの行Index
-                    Dim rowIdx As Integer = 0
-                    '#######################################################################
-
-                    For Each rowitem As TableRow In tblObj.Rows
-                        '### ★選択（チェックボックス）を非活性にする ######################
-                        loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
-                        chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
-                        'chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
-                        chkObj = Nothing
-                        For Each cellObj As TableCell In rowitem.Controls
-                            chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
-                            'コントロールが見つかったら脱出
-                            If chkObj IsNot Nothing Then
-                                Exit For
-                            End If
-                        Next
-                        chkObj.Enabled = False
-                        '###################################################################
-
-                        For Each cellObj As TableCell In rowitem.Controls
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGETRAINNO") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
-                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGERETSTATIONNAME") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            End If
-                        Next
-                        rowIdx += 1
-                    Next
-                End If
+                WW_ListTextBoxReadControlTab1()
 
             '入換・積込指示
             Case 1
                 '〇 (一覧)テキストボックスの制御(読取専用)
-                Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
-                Dim tblObj = DirectCast(divObj.Controls(0), Table)
+                WW_ListTextBoxReadControlTab2()
 
-                '〇 受注進行ステータスの状態
-                Select Case work.WF_SEL_ORDERSTATUS.Text
-                '受注進行ステータス＝"200:手配中"
+            'タンク車明細
+            Case 2
+                '〇 (一覧)テキストボックスの制御(読取専用)
+                WW_ListTextBoxReadControlTab3()
+
+                '費用入力
+            Case 3
+                '〇 (一覧)テキストボックスの制御(読取専用)
+                WW_ListTextBoxReadControlTab4()
+
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' タブ(タンク車割当)
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControlTab1()
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+        '受注進行ステータスが"受注受付"の場合
+        '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                        AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011203 Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
+                        AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+            Next
+
+            '受注進行ステータス＝"200:手配"
+            '受注進行ステータス＝"210:手配中(入換指示入力済)"
+            '受注進行ステータス＝"220:手配中(積込指示入力済)"
+            '受注進行ステータス＝"230:手配中(託送指示手配済)"
+            '受注進行ステータス＝"240:手配中(入換指示未入力)"
+            '受注進行ステータス＝"250:手配中(積込指示未入力)"
+            '受注進行ステータス＝"260:手配中(託送指示未手配)"
+            '### START (20200330)入換・積込業者との進捗管理を実施する運用追加対応 #######
+            '受注進行ステータス＝"270:手配中(入換積込指示手配済)"
+            '受注進行ステータス＝"280:手配中(託送指示未手配)"入換積込手配連絡（手配・結果受理）
+            '受注進行ステータス＝"290:手配中(入換積込未連絡)"
+            '受注進行ステータス＝"300:手配中(入換積込未確認)"
+            '### END   ##################################################################
+            '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_230 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_240 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_250 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+
+            Dim loopdr As DataRow = Nothing
+            Dim rowIdx As Integer = 0
+            Dim chkTankNocnt As String = "txt" & pnlListArea1.ID & "TANKNO"
+            Dim chkTankNo As String = ""
+            Dim chkJRInspectionDatecnt As String = "txt" & pnlListArea1.ID & "JRINSPECTIONDATE"
+            Dim chkJRInspectionDate As String = ""
+
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                        AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011203 Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
+                        AndAlso work.WF_SEL_SHIPORDERCLASS.Text = "2" Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+
+                '★タンク車の状態が「発送」の場合は、入力を許可しない。
+                '画面表示行が存在している場合
+                If OIT0003tbl.Rows.Count <> 0 Then
+                    loopdr = OIT0003tbl.Rows(rowIdx)
+                    If loopdr("TANKSTATUS") = "1" AndAlso loopdr("DELFLG") = "0" Then
+                        '◯ タンク車№
+                        chkTankNo = chkTankNocnt & Convert.ToString(loopdr("LINECNT"))
+                        For Each cellObj As TableCell In rowitem.Controls
+                            'コントロールが見つかったら脱出
+                            If cellObj.Text.Contains(chkTankNo) Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Exit For
+                            End If
+                        Next
+                        '◯ 交検日
+                        chkJRInspectionDate = chkJRInspectionDatecnt & Convert.ToString(loopdr("LINECNT"))
+                        For Each cellObj As TableCell In rowitem.Controls
+                            'コントロールが見つかったら脱出
+                            If cellObj.Text.Contains(chkJRInspectionDate) Then
+                                cellObj.Text = cellObj.Text.Replace(" readonly='readonly' class='iconOnly'>", " readonly='readonly'>")
+                                Exit For
+                            End If
+                        Next
+                    End If
+                End If
+                rowIdx += 1
+            Next
+
+            '受注進行ステータスが"310：手配完了"以降のステータスの場合
+        Else
+            '### ★選択（チェックボックス）を非活性にするための準備 ################
+            Dim chkObj As CheckBox = Nothing
+            '　LINECNTを除いたチェックボックスID
+            Dim chkObjIdWOLincnt As String = "chk" & pnlListArea1.ID & "OPERATION"
+            '　LINECNTを含むチェックボックスID
+            Dim chkObjId As String
+            'Dim chkObjType As String
+            '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
+            Dim loopdr As DataRow = Nothing
+            '　データテーブルの行Index
+            Dim rowIdx As Integer = 0
+            '#######################################################################
+
+            For Each rowitem As TableRow In tblObj.Rows
+                '### ★選択（チェックボックス）を非活性にする ######################
+                loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
+                chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
+                'chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
+                chkObj = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObj IsNot Nothing Then
+                        Exit For
+                    End If
+                Next
+                chkObj.Enabled = False
+                '###################################################################
+
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "LINEORDER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "JRINSPECTIONDATE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGETRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDCONSIGNEENAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SECONDARRSTATIONNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "CHANGERETSTATIONNAME") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+                rowIdx += 1
+            Next
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' タブ(入換・積込指示)
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControlTab2()
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+        '〇 受注進行ステータスの状態
+        Select Case work.WF_SEL_ORDERSTATUS.Text
+                '受注進行ステータス＝"200:手配"
                 '受注進行ステータス＝"210:手配中(入換指示入力済)"
                 '受注進行ステータス＝"220:手配中(積込指示入力済)"
                 '受注進行ステータス＝"230:手配中(託送指示手配済)"
@@ -15089,140 +15576,158 @@ Public Class OIT0003OrderDetail
                 '受注進行ステータス＝"290:手配中(入換積込未連絡)"
                 '受注進行ステータス＝"300:手配中(入換積込未確認)"
                 '### END   ##################################################################
-                    Case BaseDllConst.CONST_ORDERSTATUS_200,
-                         BaseDllConst.CONST_ORDERSTATUS_210,
-                         BaseDllConst.CONST_ORDERSTATUS_220,
-                         BaseDllConst.CONST_ORDERSTATUS_230,
-                         BaseDllConst.CONST_ORDERSTATUS_240,
-                         BaseDllConst.CONST_ORDERSTATUS_250,
-                         BaseDllConst.CONST_ORDERSTATUS_260,
-                         BaseDllConst.CONST_ORDERSTATUS_270,
-                         BaseDllConst.CONST_ORDERSTATUS_280,
-                         BaseDllConst.CONST_ORDERSTATUS_290,
-                         BaseDllConst.CONST_ORDERSTATUS_300
-                        '五井営業所、甲子営業所、袖ヶ浦営業所の場合
-                        '積込列車番号の入力を可能とする。
-                        If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                            OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+            Case BaseDllConst.CONST_ORDERSTATUS_200,
+                 BaseDllConst.CONST_ORDERSTATUS_210,
+                 BaseDllConst.CONST_ORDERSTATUS_220,
+                 BaseDllConst.CONST_ORDERSTATUS_230,
+                 BaseDllConst.CONST_ORDERSTATUS_240,
+                 BaseDllConst.CONST_ORDERSTATUS_250,
+                 BaseDllConst.CONST_ORDERSTATUS_260,
+                 BaseDllConst.CONST_ORDERSTATUS_270,
+                 BaseDllConst.CONST_ORDERSTATUS_280,
+                 BaseDllConst.CONST_ORDERSTATUS_290,
+                 BaseDllConst.CONST_ORDERSTATUS_300
+                '五井営業所、甲子営業所、袖ヶ浦営業所の場合
+                '積込列車番号の入力を可能とする。
+                If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
 
-                            WW_RINKAIFLG = True
+                    WW_RINKAIFLG = True
 
-                            For Each rowitem As TableRow In tblObj.Rows
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") Then
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                                    End If
-                                    '### 20200616 START((全体)No74対応) ######################################
-                                    '★袖ヶ浦営業所の場合、充填ポイントを入力不可とする。
-                                    If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 _
-                                        AndAlso cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") Then
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                                    End If
-                                    '### 20200616 END  ((全体)No74対応) ######################################
-                                Next
-                            Next
-
-                            '上記以外(仙台営業所、根岸営業所、四日市営業所、三重塩浜営業所)の場合
-                            '積込列車番号の入力を不可とする。
-                            '充填ポイントの入力を不可とする。(20200221石油部打合せ内容反映)
-                        Else
-                            For Each rowitem As TableRow In tblObj.Rows
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LINE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
-                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                                    End If
-                                Next
-                            Next
-
-                        End If
-
-                    Case Else
-                        For Each rowitem As TableRow In tblObj.Rows
-                            For Each cellObj As TableCell In rowitem.Controls
-                                If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LINE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                                End If
-                            Next
-                        Next
-                End Select
-
-            'タンク車明細
-            Case 2
-                '〇 (一覧)テキストボックスの制御(読取専用)
-                Dim divObj = DirectCast(pnlListArea3.FindControl(pnlListArea3.ID & "_DR"), Panel)
-                Dim tblObj = DirectCast(divObj.Controls(0), Table)
-                Dim chkObjST As CheckBox = Nothing
-                Dim chkObjFR As CheckBox = Nothing
-                'LINECNTを除いたチェックボックスID
-                Dim chkObjIdWOSTcnt As String = "chk" & pnlListArea3.ID & "STACKINGFLG"
-                Dim chkObjIdWOFRcnt As String = "chk" & pnlListArea3.ID & "FIRSTRETURNFLG"
-                'LINECNTを含むチェックボックスID
-                Dim chkObjSTId As String
-                Dim chkObjFRId As String
-                'ループ内の対象データROW(これで計算区分の値をとれるかと）
-                Dim loopdr As DataRow = Nothing
-                'データテーブルの行Index
-                Dim rowIdx As Integer = 0
-
-                '〇 受注進行ステータスの状態
-                Select Case work.WF_SEL_ORDERSTATUS.Text
-                    Case BaseDllConst.CONST_ORDERSTATUS_310,
-                         BaseDllConst.CONST_ORDERSTATUS_320,
-                         BaseDllConst.CONST_ORDERSTATUS_350,
-                         BaseDllConst.CONST_ORDERSTATUS_400,
-                         BaseDllConst.CONST_ORDERSTATUS_450
-
-                        For Each rowitem As TableRow In tblObj.Rows
-                            '画面表示行が存在している場合
-                            If OIT0003tbl_tab3.Rows.Count <> 0 Then
-                                loopdr = OIT0003tbl_tab3.Rows(rowIdx)
-                                chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
-                                chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
-                                '下のループより先に見つけなければいけないかもしれないので
-                                '冗長ですがこちらでループ
-                                chkObjST = Nothing
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
-                                    'コントロールが見つかったら脱出
-                                    If chkObjST IsNot Nothing Then
-                                        Exit For
-                                    End If
-                                Next
-                                chkObjFR = Nothing
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
-                                    'コントロールが見つかったら脱出
-                                    If chkObjFR IsNot Nothing Then
-                                        Exit For
-                                    End If
-                                Next
-
-                                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
-                                    '積込可否フラグ(チェックボックス)を非活性
-                                    chkObjST.Enabled = False
-                                End If
-                                '◯ 受注営業所が"011402"(根岸営業所)以外の場合
-                                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 Then
-                                    '先返し可否フラグ(チェックボックス)を非活性
-                                    chkObjFR.Enabled = False
-                                End If
+                    For Each rowitem As TableRow In tblObj.Rows
+                        For Each cellObj As TableCell In rowitem.Controls
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                             End If
+                            '### 20200616 START((全体)No74対応) ######################################
+                            '★袖ヶ浦営業所の場合、充填ポイントを入力不可とする。
+                            If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 _
+                                AndAlso cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
+                            '### 20200616 END  ((全体)No74対応) ######################################
+                        Next
+                    Next
 
-                            For Each cellObj As TableCell In rowitem.Controls
-                                If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
+                    '上記以外(仙台営業所、根岸営業所、四日市営業所、三重塩浜営業所)の場合
+                    '積込列車番号の入力を不可とする。
+                    '充填ポイントの入力を不可とする。(20200221石油部打合せ内容反映)
+                Else
+                    For Each rowitem As TableRow In tblObj.Rows
+                        For Each cellObj As TableCell In rowitem.Controls
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LINE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            End If
+                        Next
+                    Next
+
+                End If
+
+            Case Else
+                For Each rowitem As TableRow In tblObj.Rows
+                    For Each cellObj As TableCell In rowitem.Controls
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINETRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGIRILINEORDER") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LINE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "FILLINGPOINT") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETTRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea2.ID & "LOADINGOUTLETORDER") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                    Next
+                Next
+        End Select
+    End Sub
+
+    ''' <summary>
+    ''' タブ(タンク車明細)
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControlTab3()
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea3.FindControl(pnlListArea3.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        Dim chkObjST As CheckBox = Nothing
+        Dim chkObjFR As CheckBox = Nothing
+        'LINECNTを除いたチェックボックスID
+        Dim chkObjIdWOSTcnt As String = "chk" & pnlListArea3.ID & "STACKINGFLG"
+        Dim chkObjIdWOFRcnt As String = "chk" & pnlListArea3.ID & "FIRSTRETURNFLG"
+        'LINECNTを含むチェックボックスID
+        Dim chkObjSTId As String
+        Dim chkObjFRId As String
+        'ループ内の対象データROW(これで計算区分の値をとれるかと）
+        Dim loopdr As DataRow = Nothing
+        'データテーブルの行Index
+        Dim rowIdx As Integer = 0
+
+        '〇 受注進行ステータスの状態
+        Select Case work.WF_SEL_ORDERSTATUS.Text
+            Case BaseDllConst.CONST_ORDERSTATUS_310,
+                 BaseDllConst.CONST_ORDERSTATUS_320,
+                 BaseDllConst.CONST_ORDERSTATUS_350,
+                 BaseDllConst.CONST_ORDERSTATUS_400,
+                 BaseDllConst.CONST_ORDERSTATUS_450
+
+                For Each rowitem As TableRow In tblObj.Rows
+                    '画面表示行が存在している場合
+                    If OIT0003tbl_tab3.Rows.Count <> 0 Then
+                        loopdr = OIT0003tbl_tab3.Rows(rowIdx)
+                        chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
+                        '下のループより先に見つけなければいけないかもしれないので
+                        '冗長ですがこちらでループ
+                        chkObjST = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjST IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObjFR = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjFR IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+
+                        '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                        '### 20200618 すでに指定したタンク車№が他の受注で使用されている場合の対応 ################# 
+                        'Me.WW_USEORDERFLG(TRUE:使用中, FALSE:未使用)
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
+                            OrElse Me.WW_USEORDERFLG = True Then
+                            '積込可否フラグ(チェックボックス)を非活性
+                            chkObjST.Enabled = False
+                        End If
+                        '◯ 受注営業所が"011402"(根岸営業所)以外の場合
+                        '### 20200618 すでに指定したタンク車№が他の受注で使用されている場合の対応 ######## 
+                        'Me.WW_USEORDERFLG(TRUE:使用中, FALSE:未使用)
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 _
+                            OrElse Me.WW_USEORDERFLG = True Then
+                            '先返し可否フラグ(チェックボックス)を非活性
+                            chkObjFR.Enabled = False
+                        End If
+                    End If
+
+                    For Each cellObj As TableCell In rowitem.Controls
+                        '    ### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 ######## 
+                        '    Me.WW_USEORDERFLG(TRUE:使用中, FALSE:未使用)
+                        If Me.WW_USEORDERFLG = True Then
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
@@ -15230,153 +15735,146 @@ Public Class OIT0003OrderDetail
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                                End If
-                            Next
-                            rowIdx += 1
-                        Next
-
-                    Case Else
-                        For Each rowitem As TableRow In tblObj.Rows
-                            '画面表示行が存在している場合
-                            If OIT0003tbl_tab3.Rows.Count <> 0 Then
-                                loopdr = OIT0003tbl_tab3.Rows(rowIdx)
-                                chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
-                                chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
-                                '下のループより先に見つけなければいけないかもしれないので
-                                '冗長ですがこちらでループ
-                                chkObjST = Nothing
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
-                                    'コントロールが見つかったら脱出
-                                    If chkObjST IsNot Nothing Then
-                                        Exit For
-                                    End If
-                                Next
-                                chkObjFR = Nothing
-                                For Each cellObj As TableCell In rowitem.Controls
-                                    chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
-                                    'コントロールが見つかったら脱出
-                                    If chkObjFR IsNot Nothing Then
-                                        Exit For
-                                    End If
-                                Next
-
-                                '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
-                                '先返し可否フラグ(チェックボックス)を非活性
-                                chkObjFR.Enabled = False
-
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                'cellObj.Text = cellObj.Text.Replace("readonly='readonly' class='iconOnly'>", " readonly='readonly'>")
                             End If
-                            For Each cellObj As TableCell In rowitem.Controls
-                                If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                                End If
-                            Next
-                            rowIdx += 1
-                        Next
-                End Select
+                            '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 ######## 
+                        Else
+                            If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                            End If
+                        End If
+                    Next
+                    rowIdx += 1
+                Next
 
-                '費用入力
-            Case 3
-
-                Dim divObj = DirectCast(pnlListArea4.FindControl(pnlListArea4.ID & "_DR"), Panel)
-                Dim tblObj = DirectCast(divObj.Controls(0), Table)
-                Dim chkObj As CheckBox = Nothing
-                'LINECNTを除いたチェックボックスID
-                Dim chkObjIdWOLincnt As String = "chk" & pnlListArea4.ID & "OPERATION"
-                'LINECNTを含むチェックボックスID
-                Dim chkObjId As String
-                Dim chkObjType As String
-                'ループ内の対象データROW(これで計算区分の値をとれるかと）
-                Dim loopdr As DataRow = Nothing
-                'データテーブルの行Index
-                Dim rowIdx As Integer = 0
-
+            Case Else
                 For Each rowitem As TableRow In tblObj.Rows
                     '画面表示行が存在している場合
-                    If OIT0003tbl_tab4.Rows.Count <> 0 Then
-                        loopdr = OIT0003tbl_tab4.Rows(rowIdx)
-                        chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
-                        chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
+                    If OIT0003tbl_tab3.Rows.Count <> 0 Then
+                        loopdr = OIT0003tbl_tab3.Rows(rowIdx)
+                        chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
                         '下のループより先に見つけなければいけないかもしれないので
                         '冗長ですがこちらでループ
-                        chkObj = Nothing
+                        chkObjST = Nothing
                         For Each cellObj As TableCell In rowitem.Controls
-                            chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
+                            chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                             'コントロールが見つかったら脱出
-                            If chkObj IsNot Nothing Then
+                            If chkObjST IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObjFR = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjFR IsNot Nothing Then
                                 Exit For
                             End If
                         Next
 
-                        '★自動計算科目は入力は不可
-                        If chkObjType = "1" Then
-                            'チェック時処理(もちろん↓のセルループにも入れてOK）
-                            chkObj.Enabled = False
-                            For Each cellObj As TableCell In rowitem.Controls
-                                If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "BREAKDOWN") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "APPLYCHARGESUM") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICEDEPTNAME") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEEDEPTNAME") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                                End If
-                            Next
-                            '★追加科目は入力可能
-                        Else
-                            chkObj.Enabled = True
-                            For Each cellObj As TableCell In rowitem.Controls
-                                If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                                End If
-                            Next
-                        End If
-                    End If
+                        '積込可否フラグ(チェックボックス)を非活性
+                        chkObjST.Enabled = False
+                        '先返し可否フラグ(チェックボックス)を非活性
+                        chkObjFR.Enabled = False
 
+                    End If
+                    For Each cellObj As TableCell In rowitem.Controls
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                    Next
                     rowIdx += 1
                 Next
-
-
-                ''〇 (一覧)テキストボックスの制御(読取専用)
-                'Dim divObj = DirectCast(pnlListArea4.FindControl(pnlListArea4.ID & "_DR"), Panel)
-                'Dim tblObj = DirectCast(divObj.Controls(0), Table)
-
-                'For Each rowitem As TableRow In tblObj.Rows
-                '    For Each cellObj As TableCell In rowitem.Controls
-                '        If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "BREAKDOWN") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "APPLYCHARGESUM") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACTUALACCDATE") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICEDEPTNAME") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") _
-                '                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEEDEPTNAME") Then
-                '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                '        End If
-                '    Next
-                'Next
-
-
         End Select
+    End Sub
 
+    ''' <summary>
+    ''' タブ(費用入力)
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControlTab4()
+        Dim divObj = DirectCast(pnlListArea4.FindControl(pnlListArea4.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        Dim chkObj As CheckBox = Nothing
+        'LINECNTを除いたチェックボックスID
+        Dim chkObjIdWOLincnt As String = "chk" & pnlListArea4.ID & "OPERATION"
+        'LINECNTを含むチェックボックスID
+        Dim chkObjId As String
+        Dim chkObjType As String
+        'ループ内の対象データROW(これで計算区分の値をとれるかと）
+        Dim loopdr As DataRow = Nothing
+        'データテーブルの行Index
+        Dim rowIdx As Integer = 0
+
+        For Each rowitem As TableRow In tblObj.Rows
+            '画面表示行が存在している場合
+            If OIT0003tbl_tab4.Rows.Count <> 0 Then
+                loopdr = OIT0003tbl_tab4.Rows(rowIdx)
+                chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
+                chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
+                '下のループより先に見つけなければいけないかもしれないので
+                '冗長ですがこちらでループ
+                chkObj = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObj IsNot Nothing Then
+                        Exit For
+                    End If
+                Next
+
+                '★自動計算科目は入力は不可
+                If chkObjType = "1" Then
+                    'チェック時処理(もちろん↓のセルループにも入れてOK）
+                    chkObj.Enabled = False
+                    For Each cellObj As TableCell In rowitem.Controls
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "BREAKDOWN") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "APPLYCHARGESUM") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICEDEPTNAME") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEEDEPTNAME") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                    Next
+                    '★追加科目は入力可能
+                Else
+                    chkObj.Enabled = True
+                    For Each cellObj As TableCell In rowitem.Controls
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "KEIJYOYM") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "ACCSEGCODE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "INVOICECODE") _
+                            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea4.ID & "PAYEECODE") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        End If
+                    Next
+                End If
+            End If
+
+            rowIdx += 1
+        Next
     End Sub
 
     ''' <summary>

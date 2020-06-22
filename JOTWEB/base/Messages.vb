@@ -607,6 +607,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_TANKNO_INFO_MESSAGE As String = "20052"
 
+        ''' <summary>
+        ''' 受注No(警告)メッセージ
+        ''' </summary>
+        Public Const OIL_ORDERNO_WAR_MESSAGE As String = "20053"
+
 #End Region
 
 

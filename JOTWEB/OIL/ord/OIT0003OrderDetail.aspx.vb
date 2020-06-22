@@ -5438,6 +5438,12 @@ Public Class OIT0003OrderDetail
         End If
         '### 受注進行ステータスチェック END   ##############################################
 
+        '受注(一覧)画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            WW_OrderListTBLSet(SQLcon)
+        End Using
+
         '◎ タブ「タンク車明細」画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
@@ -10522,7 +10528,7 @@ Public Class OIT0003OrderDetail
                                         'タンク車マスタの交検日を更新
                                         WW_UpdateTankMaster(updHeader.Item("TANKNO"), I_JRINSPECTIONDATE:=updHeader.Item(WF_FIELD.Value))
                                         'タンク車№に紐づく情報を取得・設定
-                                        WW_TANKNUMBER_FIND(updHeader)
+                                        WW_TANKNUMBER_FIND(updHeader, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
 
                                     End If
 

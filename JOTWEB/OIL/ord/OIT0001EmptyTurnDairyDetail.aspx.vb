@@ -3586,16 +3586,16 @@ Public Class OIT0001EmptyTurnDairyDetail
                     OIT0001WK2tbl.Load(SQLdr)
                 End Using
 
-                '〇1件でも存在したら、登録済みエラーとして終了。
-                For Each OIT0001CHKDrow As DataRow In OIT0001WK2tbl.Rows
-                    Master.Output(C_MESSAGE_NO.OIL_ORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, OIT0001CHKDrow("ORDERNO"), needsPopUp:=True)
+                ''〇1件でも存在したら、登録済みエラーとして終了。
+                'For Each OIT0001CHKDrow As DataRow In OIT0001WK2tbl.Rows
+                '    Master.Output(C_MESSAGE_NO.OIL_ORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, OIT0001CHKDrow("ORDERNO"), needsPopUp:=True)
 
-                    WW_CheckMES1 = "受注データ登録済みエラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.OIL_ORDER_REPEAT_ERROR
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                    O_RTN = "ERR"
-                    Exit Sub
-                Next
+                '    WW_CheckMES1 = "受注データ登録済みエラー。"
+                '    WW_CheckMES2 = C_MESSAGE_NO.OIL_ORDER_REPEAT_ERROR
+                '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                '    O_RTN = "ERR"
+                '    Exit Sub
+                'Next
                 '### 20200620 END  ((全体)No79対応) ######################################
 
             End Using

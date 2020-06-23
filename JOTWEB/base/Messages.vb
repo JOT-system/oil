@@ -612,6 +612,19 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_ORDERNO_WAR_MESSAGE As String = "20053"
 
+        ''' <summary>
+        ''' 受注オーダー時の発日チェック(列車が同一かつ発日が同一の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_DEPDATE_SAMETRAIN As String = "20054"
+        ''' <summary>
+        ''' 受注オーダー時の発日チェック(列車が同一かつ発日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_DEPDATE_SAMETRAINTANKNO As String = "20055"
+        ''' <summary>
+        ''' 受注オーダー時の発日チェック(列車が別かつ発日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_DEPDATE_DIFFTRAINTANKNO As String = "20056"
+
 #End Region
 
 

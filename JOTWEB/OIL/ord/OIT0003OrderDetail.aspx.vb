@@ -4949,8 +4949,11 @@ Public Class OIT0003OrderDetail
             SQLcon.Open()       'DataBase接続
 
             WW_CheckTrainTankRepeat(WW_ERRCODE, SQLcon)
-            If WW_ERRCODE = "ERR" Then
-                Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            If WW_ERRCODE = "ERR1" Then
+                Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            ElseIf WW_ERRCODE = "ERR2" Then
+                Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 Exit Sub
             End If
         End Using
@@ -13755,10 +13758,10 @@ Public Class OIT0003OrderDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003CHKDrow As DataRow In OIT0003WK2tbl.Rows
-                    Master.Output(C_MESSAGE_NO.OIL_ORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, OIT0003CHKDrow("ORDERNO"), needsPopUp:=True)
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAIN, C_MESSAGE_TYPE.ERR, OIT0003CHKDrow("ORDERNO"), needsPopUp:=True)
 
                     WW_CheckMES1 = "受注データ登録済みエラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.OIL_ORDER_REPEAT_ERROR
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAIN
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
                     Exit Sub
@@ -14094,11 +14097,12 @@ Public Class OIT0003OrderDetail
                             WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
                             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                             'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                            O_RTN = "ERR"
+                            O_RTN = "ERR1"
 
                             '受注明細TBLの受注情報を更新
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
 
+                            Exit For
                         Else
                             If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
                                 OIT0003row("ORDERINFO") = ""
@@ -14111,7 +14115,7 @@ Public Class OIT0003OrderDetail
                 '○ 画面表示データ保存
                 Master.SaveTable(OIT0003tbl)
 
-                If O_RTN = "ERR" Then Exit Sub
+                If O_RTN = "ERR1" Then Exit Sub
 
                 '### 20200620 START((全体)No79対応) ######################################
                 Dim PARADF1 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
@@ -14146,11 +14150,12 @@ Public Class OIT0003OrderDetail
                             WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
                             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                             'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
-                            O_RTN = "ERR"
+                            O_RTN = "ERR2"
 
                             '受注明細TBLの受注情報を更新
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
 
+                            Exit For
                         Else
                             If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
                                 OIT0003row("ORDERINFO") = ""
@@ -14163,7 +14168,7 @@ Public Class OIT0003OrderDetail
                 '○ 画面表示データ保存
                 Master.SaveTable(OIT0003tbl)
 
-                If O_RTN = "ERR" Then Exit Sub
+                If O_RTN = "ERR2" Then Exit Sub
                 '### 20200620 END  ((全体)No79対応) ######################################
 
             End Using

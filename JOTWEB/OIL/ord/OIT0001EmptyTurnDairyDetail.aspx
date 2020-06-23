@@ -106,35 +106,35 @@
             <span>
                 <a id="WF_LOADINGDATE_LABEL" class="requiredMark">(予定)積込日</a>
                 <a class="ef" id="WF_LOADINGDATE" ondblclick="Field_DBclick('TxtLoadingDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="TxtLoadingDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="TxtLoadingDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
             <!-- ■　(予定)発日　■ -->
             <span>
                 <a id="WF_DEPDATE_LABEL" class="requiredMark">発日</a>
                 <a class="ef" id="WF_DEPDATE" ondblclick="Field_DBclick('TxtDepDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="TxtDepDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="TxtDepDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
             <!-- ■　(予定)積車着日　■ -->
             <span>
                 <a id="WF_ARRDATE_LABEL" class="requiredMark">積車着日</a>
                 <a class="ef" id="WF_ARRDATE" ondblclick="Field_DBclick('TxtArrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="TxtArrDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="TxtArrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
             <!-- ■　(予定)受入日　■ -->
             <span>
                 <a id="WF_ACCDATE_LABEL" class="requiredMark">受入日</a>
                 <a class="ef" id="WF_ACCDATE" ondblclick="Field_DBclick('TxtAccDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="TxtAccDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="TxtAccDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
             <!-- ■　(予定)空車着日　■ -->
             <span>
                 <a id="WF_EMPARRDATE_LABEL" class="requiredMark">空車着日</a>
                 <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="TxtEmparrDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    <asp:TextBox ID="TxtEmparrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
             

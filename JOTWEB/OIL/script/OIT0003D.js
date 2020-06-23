@@ -222,6 +222,8 @@ function ChangeCheckBoxLight(listId) {
     var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "STACKINGFLG']");
     var chkObjsLight2 = objLightTable.querySelectorAll("input[id^='chk" + listId + "FIRSTRETURNFLG']");
     var spnObjsLight2 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "FIRSTRETURNFLG']");
+    var chkObjsLight3 = objLightTable.querySelectorAll("input[id^='chk" + listId + "AFTERRETURNFLG']");
+    var spnObjsLight3 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "AFTERRETURNFLG']");
 
     for (let i = 0; i < chkObjsLight1.length; i++) {
 
@@ -244,6 +246,17 @@ function ChangeCheckBoxLight(listId) {
             }
         }
     }
+
+    for (let i = 0; i < chkObjsLight3.length; i++) {
+
+        if (chkObjsLight3[i] !== null) {
+            if (spnObjsLight3[i].innerText === "on") {
+                chkObjsLight3[i].checked = true;
+            } else {
+                chkObjsLight3[i].checked = false;
+            }
+        }
+    }
 }
 
 
@@ -258,6 +271,9 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
         }
         if (fieldName === 'FIRSTRETURNFLG') {
             surfix = 'FIRSTRETURN'
+        }
+        if (fieldName === 'AFTERRETURNFLG') {
+            surfix = 'AFTERRETURN'
         }
 
         document.getElementById("WF_SelectedIndex").value = lineCnt;

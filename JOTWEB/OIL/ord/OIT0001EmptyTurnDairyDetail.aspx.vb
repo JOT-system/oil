@@ -260,7 +260,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         '新規作成の場合(油種別タンク車数のテキストボックスの入力を可とする。)
         If work.WF_SEL_CREATEFLG.Text = "1" Then
 
-            '画面表示設定
+            '◯ 画面表示設定
             WW_ScreenEnabledSet()
 
             '新規データの作成については、受注営業所は読取専用とする。
@@ -719,33 +719,8 @@ Public Class OIT0001EmptyTurnDairyDetail
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
 
-        '更新モードの場合は、油種数の入力を非活性とする。
-        If work.WF_SEL_CREATEFLG.Text = "2" Then
-            'ハイオク
-            Me.TxtHTank.Enabled = False
-            'レギュラー
-            Me.TxtRTank.Enabled = False
-            '灯油
-            Me.TxtTTank.Enabled = False
-            '未添加灯油
-            Me.TxtMTTank.Enabled = False
-            '軽油
-            Me.TxtKTank.Enabled = False
-            '３号軽油
-            Me.TxtK3Tank.Enabled = False
-            '軽油５
-            Me.TxtK5Tank.Enabled = False
-            '軽油１０
-            Me.TxtK10Tank.Enabled = False
-            'ＬＳＡ
-            Me.TxtLTank.Enabled = False
-            'Ａ重油
-            Me.TxtATank.Enabled = False
-        Else
-            '画面表示設定処理
-            WW_ScreenEnabledSet()
-
-        End If
+        '◯ 画面表示設定処理
+        WW_ScreenEnabledSet()
 
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
@@ -1246,10 +1221,8 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 End If
 
-                '新規作成の場合(油種別タンク車数のテキストボックスの入力を可とする。)
-                If work.WF_SEL_CREATEFLG.Text = "1" Then
-                    WW_ScreenEnabledSet()
-                End If
+                '◯ 画面表示設定処理
+                WW_ScreenEnabledSet()
                 TxtOrderOffice.Focus()
 
             Case "TxtHeadOfficeTrain"   '本線列車
@@ -2335,11 +2308,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
-        '〇 タンク車状態チェック
-        WW_CheckTankStatus(WW_ERRCODE)
-        If WW_ERRCODE = "ERR" Then
-            Exit Sub
-        End If
+        '### 2020/06/23 空回日報の登録では、タンク車所在の更新は行わないのでタンク車所在のチェックは実施しない ###
+        ''〇 タンク車状態チェック
+        'WW_CheckTankStatus(WW_ERRCODE)
+        'If WW_ERRCODE = "ERR" Then
+        '    Exit Sub
+        'End If
 
         '〇前回油種と油種の整合性チェック
         WW_CheckLastOilConsistency(WW_ERRCODE)
@@ -3430,6 +3404,14 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'タンク車情報を取得
                 WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0001row("TANKNO"), WW_GetValue)
 
+                '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                '使用受注№が設定されている場合
+                If WW_GetValue(12) <> "" Then
+                    '次のレコードに進む（SKIPする）
+                    Continue For
+                End If
+                '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+
                 'タンク車状態
                 Select Case WW_GetValue(11)
                         'タンク車状態が"2"(到着予定), "3"(到着)の場合
@@ -4031,9 +4013,25 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' </summary>
     Protected Sub WW_ScreenEnabledSet()
 
-        '〇各営業者で管理している油種を取得
-        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue)
+        '### 20200623 START((全体)No76対応) ######################################
+        '◯本線列車名が未設定の場合
+        '　(日付の自動設定を行うには、本線列車名が必要なため制御をかける)
+        If Me.TxtHeadOfficeTrainName.Text = "" Then
+            '★(予定)日付を非活性にする。
+            Me.TxtLoadingDate.Enabled = False
+            Me.TxtDepDate.Enabled = False
+            Me.TxtArrDate.Enabled = False
+            Me.TxtAccDate.Enabled = False
+            Me.TxtEmparrDate.Enabled = False
+        Else
+            '★(予定)日付を活性にする。
+            Me.TxtLoadingDate.Enabled = True
+            Me.TxtDepDate.Enabled = True
+            Me.TxtArrDate.Enabled = True
+            Me.TxtAccDate.Enabled = True
+            Me.TxtEmparrDate.Enabled = True
+        End If
+        '### 20200623 END  ((全体)No76対応) ######################################
 
         '〇初期化
         'ハイオク
@@ -4056,6 +4054,13 @@ Public Class OIT0001EmptyTurnDairyDetail
         TxtLTank.Enabled = False
         'Ａ重油
         TxtATank.Enabled = False
+
+        '更新モードの場合は、油種の非活性をだけ行い処理を抜ける。
+        If work.WF_SEL_CREATEFLG.Text = "2" Then Exit Sub
+
+        '〇各営業者で管理している油種を取得
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", "", WW_GetValue)
 
         For i As Integer = 0 To WW_GetValue.Length - 1
             Select Case WW_GetValue(i)
@@ -5431,6 +5436,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')          AS DEPSTATIONNAME" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')              AS ARRSTATION" _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')          AS ARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.STACKINGFLG), '')             AS STACKINGFLG" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '')  AS LODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '')  AS DEPDATE" _
             & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '')  AS ARRDATE" _

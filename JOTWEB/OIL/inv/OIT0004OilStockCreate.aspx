@@ -478,20 +478,21 @@
         </div>
     </div>
     <div>
-        <span id="spnDownloadMonth" style="display:none;">
-                <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
-                <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
+        <span id="spnDownloadMonth" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %> >
+            <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
+            <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
+            <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
         </span>
     </div>
     <div>
-        <span id="spnFromDate">
+        <span id="spnFromDate" <%= If(hdnShowPnlToDate.Value = "1", "style='display:none;'", "") %>>
             <asp:Label ID="lblReportFromDate" runat="server" Text="開始日"></asp:Label>
             <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
     </div>
-    <div id="pnlToDate" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %>>
+<%--    <div id="pnlToDate" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %>>
         <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
         <span id="spnToDate">
             <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
@@ -499,5 +500,5 @@
                 <asp:TextBox ID="txtReportToDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
-    </div>
+    </div>--%>
 </asp:Content>

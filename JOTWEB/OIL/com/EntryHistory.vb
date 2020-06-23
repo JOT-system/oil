@@ -225,11 +225,7 @@ Public Class EntryHistory
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")
-                Try
-                    .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
-                Catch ex As Exception
-                    .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = ""
-                End Try
+                .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
                 .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
                 .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")

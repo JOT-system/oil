@@ -88,7 +88,7 @@ Public Class OIM0020GuidanceSearch
             Master.GetFirstValue(work.WF_SEL_ORG.Text, "ORG", WF_ORG.Text)                              '組織コード
             Master.GetFirstValue(work.WF_SEL_FROMYMD.Text, "FROMYMD", txtFromYmd.Text)    'JOT車番
             Master.GetFirstValue(work.WF_SEL_ENDYMD.Text, "ENDYMD", txtEndYmd.Text)                   '型式
-            Dim chklList = work.GetNewDisplayFlags()
+            Dim chklList = OIM0020WRKINC.GetNewDisplayFlags()
             If Not {"jot_sys_1", "jot_oil_1"}.Contains(Master.ROLE_MAP) Then
                 Dim prmData = work.CreateFIXParam(Master.USER_ORG)
                 leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE, WW_DUMMY, prmData)

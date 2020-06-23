@@ -365,6 +365,15 @@ Partial Public Class OIT0004OilStockCreate
     Protected WithEvents chkPrintJXTG As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
+    '''hdnShowPnlToDate コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnShowPnlToDate As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''Label1 コントロール。
     '''</summary>
     '''<remarks>
@@ -399,33 +408,6 @@ Partial Public Class OIT0004OilStockCreate
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtReportFromDate As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''hdnShowPnlToDate コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents hdnShowPnlToDate As Global.System.Web.UI.WebControls.HiddenField
-    
-    '''<summary>
-    '''lblReportToDate コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents lblReportToDate As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''txtReportToDate コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents txtReportToDate As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''Master プロパティ。

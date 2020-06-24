@@ -1824,7 +1824,7 @@ Public Class OIT0003OrderList
                     '★ 固定帳票(積込予定(共通))作成処理
                     'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
 
-                    '★ 固定帳票(積込予定(五井))作成処理
+                    '☆ 固定帳票(積込予定(五井))作成処理
                     WW_TyohyoGoiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
 
                 End If
@@ -1858,7 +1858,7 @@ Public Class OIT0003OrderList
                     WW_TyohyoNegishiCreate("SHIPPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
-                    '★ 固定帳票(積込予定(根岸))作成処理
+                    '☆ 固定帳票(積込予定(根岸))作成処理
                     WW_TyohyoNegishiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
 
                 End If
@@ -2063,7 +2063,7 @@ Public Class OIT0003OrderList
             & " , OIM0005.MODEL                                  AS MODEL" _
             & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
-            & " , ''                                             AS RESERVEAMOUNT" _
+            & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEAMOUNT" _
             & " , CASE " _
             & "   WHEN OIT0002.STACKINGFLG = '1' THEN '積置' " _
             & "   ELSE '' " _
@@ -2082,6 +2082,12 @@ Public Class OIT0003OrderList
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
             & " AND OIM0005.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIM0021_LOADRESERVE OIM0021 ON " _
+            & "     OIM0021.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0021.MODEL = OIM0005.MODEL " _
+            & " AND OIM0021.LOAD = OIM0005.LOAD " _
+            & " AND OIM0021.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0021.DELFLG <> @P02 " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
             & "   AND OIT0002.LODDATE = @P03 "

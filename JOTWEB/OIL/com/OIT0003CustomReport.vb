@@ -241,7 +241,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("TANKNUMBER")
                 '◯ 予約数量
-                '### 出力項目（空白） #####################################
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("RESERVEAMOUNT")
                 ''◯ 交検
                 'rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
                 'rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")

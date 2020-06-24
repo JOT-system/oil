@@ -608,12 +608,16 @@ function bindJxtgCheckBox() {
 function jxtgCheckChange() {
     let chkObj = document.getElementById('chkPrintJXTG');
     let hdnShowPnlToDateObj = document.getElementById('hdnShowPnlToDate');
-    let pnlObj = document.getElementById('pnlToDate');
+    let hdnPnlMonthPickerObj = document.getElementById('spnDownloadMonth');
+    let hdnPnlFromDateObj = document.getElementById('spnFromDate');
+    //let pnlObj = document.getElementById('pnlToDate');
     if (chkObj.checked) {
         hdnShowPnlToDateObj.value = '0';
-        pnlObj.style.display = 'none';
+        hdnPnlMonthPickerObj.style.display = 'none';
+        hdnPnlFromDateObj.style.display = '';
     } else {
         hdnShowPnlToDateObj.value = '1';
-        pnlObj.style.display = '';
+        hdnPnlMonthPickerObj.style.display = '';
+        hdnPnlFromDateObj.style.display = 'none';
     }
 }

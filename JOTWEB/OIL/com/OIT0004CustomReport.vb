@@ -226,15 +226,15 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngValueSet)
                 '平均積高
                 rngValueSet = DirectCast(rngPasteOffset(9, 2), Excel.Range)
-                rngValueSet.Value = stkItm.OilInfo.LastSendAverage 'ここ不明なので一旦前週
+                rngValueSet.Value = stkItm.OilInfo.PrintStockAmountAverage 'ここ不明なので一旦前週
                 ExcelMemoryRelease(rngValueSet)
                 '車数列ヘッダー上
                 rngValueSet = DirectCast(rngPasteOffset(7, 4), Excel.Range)
-                rngValueSet.Value = trainNumNameTop 'ここ不明なので一旦前週
+                rngValueSet.Value = trainNumNameTop
                 ExcelMemoryRelease(rngValueSet)
                 '車数列ヘッダー下
                 rngValueSet = DirectCast(rngPasteOffset(8, 4), Excel.Range)
-                rngValueSet.Value = trainNumNameBottom 'ここ不明なので一旦前週
+                rngValueSet.Value = trainNumNameBottom
                 ExcelMemoryRelease(rngValueSet)
 
                 '最終行まで到達時の処理
@@ -312,15 +312,15 @@ Public Class OIT0004CustomReport : Implements IDisposable
                 ExcelMemoryRelease(rngValueSet)
                 '平均積高
                 rngValueSet = DirectCast(rngPasteOffset(9, 2), Excel.Range)
-                rngValueSet.Value = stkItm.OilInfo.LastSendAverage 'ここ不明なので一旦前週
+                rngValueSet.Value = stkItm.OilInfo.PrintStockAmountAverage 'ここ不明なので一旦前週
                 ExcelMemoryRelease(rngValueSet)
                 '車数列ヘッダー上
                 rngValueSet = DirectCast(rngPasteOffset(7, 4), Excel.Range)
-                rngValueSet.Value = miTrainNumNameTop 'ここ不明なので一旦前週
+                rngValueSet.Value = miTrainNumNameTop
                 ExcelMemoryRelease(rngValueSet)
                 '車数列ヘッダー下
                 rngValueSet = DirectCast(rngPasteOffset(8, 4), Excel.Range)
-                rngValueSet.Value = miTrainNumNameBottom 'ここ不明なので一旦前週
+                rngValueSet.Value = miTrainNumNameBottom
                 ExcelMemoryRelease(rngValueSet)
                 '最終行まで到達時の処理
                 If lastOilCode = stkItm.OilInfo.OilCode Then
@@ -406,8 +406,16 @@ Public Class OIT0004CustomReport : Implements IDisposable
 
 
             '最左に日付を設定※他はExcelテンプレートにて左隣の日付 + 1日となる
-            rngDateSet = DirectCast(rngColumns(2, 1), Excel.Range)
+            rngDateSet = DirectCast(rngColumns(3, 1), Excel.Range)
             rngDateSet.Value = Me.PrintData.StockDate.Values.First.ItemDate
+            ExcelMemoryRelease(rngDateSet)
+            '休日の印を付ける
+            rngDateSet = DirectCast(rngColumns(2, 1), Excel.Range)
+            Dim rngHollidaySet As Excel.Range = Nothing
+            rngHollidaySet = rngDateSet.Resize(ColumnSize:=Me.PrintData.StockDate.Count)
+            Dim holydaysArray = (From dayItm In Me.PrintData.StockDate.Values Select If(dayItm.IsHoliday OrElse dayItm.WeekNum = "0", "1", ""))
+            rngHollidaySet.Value = holydaysArray.ToArray
+            ExcelMemoryRelease(rngHollidaySet)
             ExcelMemoryRelease(rngDateSet)
         Catch ex As Exception
             Throw
@@ -433,6 +441,24 @@ Public Class OIT0004CustomReport : Implements IDisposable
         retPosInfo.LastRowNum = lastRowNum
         retPosInfo.MiFirstRowNum = miFirstRowNum
         retPosInfo.MiLastRowNum = miLastRowNum
+        '******************************
+        '過去実績の列を非表示
+        '******************************
+        Dim rngHiddenColumns As Excel.Range = Nothing
+        Dim rngHiddenColumnObj As Excel.Range = Nothing
+        Try
+            'From入力値-7日分は過去平均の為に設定している為当該列非表示
+            rngHiddenColumns = Me.ExcelWorkSheet.Range("G:M")
+            rngHiddenColumnObj = rngHiddenColumns.Columns
+            rngHiddenColumnObj.Hidden = True
+            ExcelMemoryRelease(rngHiddenColumnObj)
+            ExcelMemoryRelease(rngHiddenColumns)
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHiddenColumnObj)
+            ExcelMemoryRelease(rngHiddenColumns)
+        End Try
 
         Return retPosInfo
     End Function
@@ -445,107 +471,138 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Dim rngBasePasteArea As Excel.Range = Nothing
         Dim rngPasteArea As Excel.Range = Nothing
         Try
-            '一括貼り付け用の領域定義
-            '在庫部分
-            Dim morningStock(0, 0) As Object '初日のみ設定他は数式の為1セル
-            Dim ukrireHaraiDasiNums As Object(,) '受入払出
-            Dim hoyuNums As Object(,) '保有日数
-
-            '車数部分
-            Dim syaSu As Object(,)
-            'ローリー部分
-            Dim lorryNum As Object(,)
-            Dim oilCnt As Integer = 0
-            Dim daysMax = Me.PrintData.StockDate.Count - 1
-            rngAllCell = Me.ExcelWorkSheet.Cells
-            Dim rngStartCell As Excel.Range = DirectCast(rngAllCell(posInfo.FirstRowNum, 7), Excel.Range)
-            Dim rngEndCell As Excel.Range = DirectCast(rngAllCell(posInfo.FirstRowNum + 10 - 1, 7 + daysMax), Excel.Range)
-            rngBasePasteArea = Me.ExcelWorkSheet.Range(rngStartCell, rngEndCell)
-            ExcelMemoryRelease(rngStartCell)
-            ExcelMemoryRelease(rngEndCell)
-            ExcelMemoryRelease(rngAllCell)
-            'ExcelMemoryRelease(rngAllCell)
-            '通常部油種別ループ
-            For Each oilItem In Me.PrintData.StockList.Values
-                ReDim ukrireHaraiDasiNums(1, daysMax)
-                ReDim hoyuNums(0, daysMax)
-                ReDim syaSu(1, daysMax)
-                ReDim lorryNum(0, daysMax)
-                Dim trainNumList As OIT0004OilStockCreate.PrintTrainNumCollection = Nothing
-                If Me.PrintData.PrintTrainNums.ContainsKey(oilItem.OilInfo.OilCode) Then
-                    trainNumList = Me.PrintData.PrintTrainNums(oilItem.OilInfo.OilCode)
-                Else
-                    trainNumList = Nothing
+            Dim targetDataList As New List(Of OIT0004OilStockCreate.DispDataClass)
+            targetDataList.Add(Me.PrintData)
+            If Me.PrintData.HasMoveInsideItem Then
+                targetDataList.Add(Me.PrintData.MiDispData)
+            End If
+            Dim loopCnt As Integer = 0
+            For Each prnItm In targetDataList
+                '一括貼り付け用の領域定義
+                '在庫部分
+                Dim morningStock(,) As Object '初日のみ設定他は数式の為1セル
+                Dim pastDaysCnt As Integer = 0 '朝在庫保持日数
+                Dim qPastDaysCnt = (From daysItm In prnItm.StockDate.Values Where daysItm.IsPastDay)
+                If qPastDaysCnt.Any Then
+                    pastDaysCnt = qPastDaysCnt.Count - 1
                 End If
-                '日付別ループ
-                Dim daysCnt As Integer = 0
-                For Each dateItem In oilItem.StockItemList.Values
+                ReDim morningStock(0, pastDaysCnt)
+                Dim ukrireHaraiDasiNums As Object(,) '受入払出
+                Dim hoyuNums As Object(,) '保有日数
 
-                    If daysCnt = 0 Then
-                        morningStock(0, 0) = dateItem.MorningStock
+                '車数部分
+                Dim syaSu As Object(,)
+                'ローリー部分
+                Dim lorryNum As Object(,)
+                Dim oilCnt As Integer = 0
+                Dim daysMax = prnItm.StockDate.Count - 1
+                rngAllCell = Me.ExcelWorkSheet.Cells
+                Dim firstRowNum As Integer = posInfo.FirstRowNum
+                If loopCnt = 1 Then
+                    firstRowNum = posInfo.MiFirstRowNum
+                End If
+                Dim rngStartCell As Excel.Range = DirectCast(rngAllCell(firstRowNum, 7), Excel.Range)
+                Dim rngEndCell As Excel.Range = DirectCast(rngAllCell(firstRowNum + 10 - 1, 7 + daysMax), Excel.Range)
+                rngBasePasteArea = Me.ExcelWorkSheet.Range(rngStartCell, rngEndCell)
+                ExcelMemoryRelease(rngStartCell)
+                ExcelMemoryRelease(rngEndCell)
+                ExcelMemoryRelease(rngAllCell)
+                'ExcelMemoryRelease(rngAllCell)
+                '通常部油種別ループ
+                For Each oilItem In prnItm.StockList.Values
+                    ReDim ukrireHaraiDasiNums(1, daysMax)
+                    ReDim hoyuNums(0, daysMax)
+                    ReDim syaSu(1, daysMax)
+                    ReDim lorryNum(0, daysMax)
+                    Dim trainNumList As OIT0004OilStockCreate.PrintTrainNumCollection = Nothing
+                    If prnItm.PrintTrainNums.ContainsKey(oilItem.OilInfo.OilCode) Then
+                        trainNumList = prnItm.PrintTrainNums(oilItem.OilInfo.OilCode)
+                    Else
+                        trainNumList = Nothing
                     End If
-                    '受入数
-                    ukrireHaraiDasiNums(0, daysCnt) = CDec(dateItem.Receive)
-                    '払出数
-                    ukrireHaraiDasiNums(1, daysCnt) = CDec(dateItem.Send)
-                    '保有日数
-                    hoyuNums(0, daysCnt) = dateItem.Retentiondays
-                    If trainNumList.PrintTrainNumList.Count > 0 Then
-                        syaSu(0, daysCnt) = trainNumList.PrintTrainNumList.Values(0).PrintTrainItems.Values(daysCnt).TrainNum
-                        If trainNumList.PrintTrainNumList.Count > 1 Then
-                            syaSu(1, daysCnt) = trainNumList.PrintTrainNumList.Values(1).PrintTrainItems.Values(daysCnt).TrainNum
+                    '日付別ループ
+                    Dim daysCnt As Integer = 0
+                    For Each dateItem In oilItem.StockItemList.Values
+
+                        If daysCnt <= pastDaysCnt Then
+                            morningStock(0, daysCnt) = CDec(dateItem.MorningStock)
+                        End If
+                        '受入数
+                        ukrireHaraiDasiNums(0, daysCnt) = CDec(dateItem.Receive)
+                        '払出数
+                        ukrireHaraiDasiNums(1, daysCnt) = CDec(dateItem.Send)
+                        '保有日数
+                        If daysCnt <= 6 Then
+                            '緑のエラーポップマークが付くので無意味ですが同じ数式
+                            hoyuNums(0, daysCnt) = "=IFERROR(R[-4]C/(SUMIFS(R[-2]C[-6]:R[-2]C,R4C[-6]:R4C,""<>(日)"") / 6),"""")" '''"="""""
                         Else
+                            '出荷可能数量 / ([日曜を含まない当日含む払出数] / 6) ※エラーの場合ブランク
+                            '上記コメント通りの数式を設定
+                            hoyuNums(0, daysCnt) = "=IFERROR(R[-4]C/(SUMIFS(R[-2]C[-6]:R[-2]C,R4C[-6]:R4C,""<>(日)"") / 6),"""")"
+                        End If
+                        'hoyuNums(0, daysCnt) = dateItem.Retentiondays
+                        If trainNumList IsNot Nothing AndAlso trainNumList.PrintTrainNumList.Count > 0 Then
+                            syaSu(0, daysCnt) = trainNumList.PrintTrainNumList.Values(0).PrintTrainItems.Values(daysCnt).TrainNum
+                            If trainNumList.PrintTrainNumList.Count > 1 Then
+                                syaSu(1, daysCnt) = trainNumList.PrintTrainNumList.Values(1).PrintTrainItems.Values(daysCnt).TrainNum
+                            Else
+                                syaSu(1, daysCnt) = ""
+                            End If
+                        Else
+                            syaSu(0, daysCnt) = ""
                             syaSu(1, daysCnt) = ""
                         End If
-                    Else
-                        syaSu(0, daysCnt) = ""
-                        syaSu(1, daysCnt) = ""
-                    End If
-                    'ローリー受入
+                        'ローリー受入
 
-                    lorryNum(0, daysCnt) = CDec(dateItem.ReceiveFromLorry)
-                    daysCnt = daysCnt + 1
-                Next dateItem
-                'Excelに貼り付け
-                rngPasteArea = rngBasePasteArea.Offset(RowOffset:=10 * oilCnt)
-                Dim rngRowsObj As Excel.Range = Nothing
-                Dim rngPasteRow As Excel.Range = Nothing
-                Dim targetRowObj As Excel.ListRow = Nothing
-
-                Try
-                    '朝在庫
-                    rngPasteRow = DirectCast(rngPasteArea(1, 1), Excel.Range)
-                    rngPasteRow.Value = morningStock
-                    ExcelMemoryRelease(rngPasteRow)
-                    '受入払出
-                    rngRowsObj = rngPasteArea.Rows
-                    rngPasteRow = DirectCast(rngRowsObj("3:4"), Excel.Range)
-                    rngPasteRow.Value = ukrireHaraiDasiNums
-                    ExcelMemoryRelease(rngPasteRow)
-                    '保有日数
-                    'targetRowObj = DirectCast(rngPasteArea.Rows("6:6"), Excel.Range)
-                    rngPasteRow = DirectCast(rngRowsObj("6:6"), Excel.Range)
-                    rngPasteRow.Value = hoyuNums
-                    ExcelMemoryRelease(rngPasteRow)
-                    '車数
-                    rngPasteRow = DirectCast(rngRowsObj("7:8"), Excel.Range)
-                    rngPasteRow.Value = lorryNum
-                    ExcelMemoryRelease(rngPasteRow)
-                    '車数
-                    rngPasteRow = DirectCast(rngRowsObj("10:10"), Excel.Range)
-                    rngPasteRow.Value = lorryNum
-                    ExcelMemoryRelease(rngPasteRow)
-                    'Rowsオブジェクトの解放
-                    ExcelMemoryRelease(rngRowsObj)
-                Catch ex As Exception
-                    Throw
-                Finally
-                    ExcelMemoryRelease(rngPasteRow)
+                        lorryNum(0, daysCnt) = CDec(dateItem.ReceiveFromLorry)
+                        daysCnt = daysCnt + 1
+                    Next dateItem
+                    'Excelに貼り付け
+                    rngPasteArea = rngBasePasteArea.Offset(RowOffset:=10 * oilCnt)
+                    Dim rngRowsObj As Excel.Range = Nothing
+                    Dim rngPasteRow As Excel.Range = Nothing
+                    Dim rngPasteResized As Excel.Range = Nothing
+                    Try
+                        '朝在庫
+                        rngPasteRow = DirectCast(rngPasteArea(1, 1), Excel.Range)
+                        rngPasteResized = rngPasteRow.Resize(ColumnSize:=pastDaysCnt + 1)
+                        rngPasteResized.Value = morningStock
+                        ExcelMemoryRelease(rngPasteResized)
+                        ExcelMemoryRelease(rngPasteRow)
+                        '受入払出
+                        rngRowsObj = rngPasteArea.Rows
+                        rngPasteRow = DirectCast(rngRowsObj("3:4"), Excel.Range)
+                        rngPasteRow.Value = ukrireHaraiDasiNums
+                        ExcelMemoryRelease(rngPasteRow)
+                        '保有日数
+                        'targetRowObj = DirectCast(rngPasteArea.Rows("6:6"), Excel.Range)
+                        rngPasteRow = DirectCast(rngRowsObj("6:6"), Excel.Range)
+                        rngPasteRow.FormulaR1C1 = hoyuNums
+                        ExcelMemoryRelease(rngPasteRow)
+                        '車数
+                        rngPasteRow = DirectCast(rngRowsObj("7:8"), Excel.Range)
+                        rngPasteRow.Value = lorryNum
+                        ExcelMemoryRelease(rngPasteRow)
+                        '車数
+                        rngPasteRow = DirectCast(rngRowsObj("10:10"), Excel.Range)
+                        rngPasteRow.Value = lorryNum
+                        ExcelMemoryRelease(rngPasteRow)
+                        'Rowsオブジェクトの解放
+                        ExcelMemoryRelease(rngRowsObj)
+                    Catch ex As Exception
+                        Throw
+                    Finally
+                        ExcelMemoryRelease(rngPasteResized)
+                        ExcelMemoryRelease(rngPasteRow)
+                        ExcelMemoryRelease(rngPasteArea)
+                    End Try
+                    oilCnt = oilCnt + 1
                     ExcelMemoryRelease(rngPasteArea)
-                End Try
-                oilCnt = oilCnt + 1
-                ExcelMemoryRelease(rngPasteArea)
-            Next oilItem
+                Next oilItem
+                ExcelMemoryRelease(rngBasePasteArea)
+                ExcelMemoryRelease(rngAllCell)
+                loopCnt = loopCnt + 1
+            Next prnItm
             ExcelMemoryRelease(rngBasePasteArea)
             ExcelMemoryRelease(rngAllCell)
         Catch ex As Exception
@@ -713,7 +770,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Try
             '念のため当処理で起動したプロセスが残っていたらKill
             Dim xproc As Process = Process.GetProcessById(Me.xlProcId)
-            System.Threading.Thread.Sleep(100) 'Waitかけないとプロセスが終了しきらない為
+            System.Threading.Thread.Sleep(200) 'Waitかけないとプロセスが終了しきらない為
             If Not xproc.HasExited Then
                 xproc.Kill()
             End If

@@ -222,7 +222,7 @@ Public Class OIM0020GuidanceCreate
                 retVal.EndYmd = Convert.ToString(SQLdr("ENDYMD"))
                 retVal.Type = Convert.ToString(SQLdr("TYPE"))
                 retVal.Title = Convert.ToString(SQLdr("TITTLE"))
-                retVal.DispFlags = work.GetNewDisplayFlags
+                retVal.DispFlags = OIM0020WRKINC.GetNewDisplayFlags()
                 Dim keyValues As New List(Of String) From {"OUTFLG", "INFLG1", "INFLG2", "INFLG3", "INFLG4", "INFLG5",
                                                    "INFLG6", "INFLG7", "INFLG8", "INFLG9", "INFLG9", "INFLG10", "INFLG11"}
                 'フラグの初期値設定
@@ -551,7 +551,7 @@ Public Class OIM0020GuidanceCreate
         Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "ENDYMD", retVal.EndYmd)
 
         Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "TYPE", retVal.Type)
-        retVal.DispFlags = work.GetNewDisplayFlags
+        retVal.DispFlags = OIM0020WRKINC.GetNewDisplayFlags()
         Dim keyValues As New List(Of String) From {"OUTFLG", "INFLG1", "INFLG2", "INFLG3", "INFLG4", "INFLG5",
                                                    "INFLG6", "INFLG7", "INFLG8", "INFLG9", "INFLG9", "INFLG10", "INFLG11"}
         'フラグの初期値設定

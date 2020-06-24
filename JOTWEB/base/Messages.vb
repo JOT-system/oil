@@ -625,6 +625,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_ORDER_DEPDATE_DIFFTRAINTANKNO As String = "20056"
 
+        ''' <summary>
+        ''' 発送順の最大値が油種合計オーバー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_OILTOTAL_OVER As String = "20057"
+
 #End Region
 
 

@@ -80,6 +80,8 @@ Public Class OIT0003OrderDetail
     Private WW_RINKAIFLG As Boolean = False                         '臨海鉄道対象可否(TRUE：対象, FALSE:未対象)
     Private WW_USEORDERFLG As Boolean = False                       '使用受注オーダー可否(TRUE：使用中, FALSE:未使用)
 
+    Private WW_SHIPORDER As String = "0"                            '発送順のMAX値(タブ「タンク車割当」)
+
     Private WW_SwapInput As String = "0"                            '入換指示入力(0:未 1:完了)
     Private WW_LoadingInput As String = "0"                         '積込指示入力(0:未 1:完了)
 
@@ -4217,7 +4219,8 @@ Public Class OIT0003OrderDetail
                     '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更なし(空白)
                     '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1")
+                    WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1",
+                                        I_AEMPARRDATE:=Me.TxtEmparrDate.Text, upActualEmparrDate:=True)
 
                 Else
                     i += 1
@@ -4988,6 +4991,14 @@ Public Class OIT0003OrderDetail
             End Using
 
         End If
+
+        '### 20200622 START((全体)No81対応) ######################################
+        '◯発送順(MAX値)と列車(油種)数のチェック
+        If Integer.Parse(Me.TxtTotalCnt_w.Text) < Integer.Parse(WW_SHIPORDER) Then
+            Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+        '### 20200622 END  ((全体)No81対応) ######################################
 
         '〇タンク車所在の更新
         WW_TankShozaiSet()
@@ -12472,6 +12483,7 @@ Public Class OIT0003OrderDetail
 
         '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
         '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
+        WW_SHIPORDER = "0"
         If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
             '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
             '発送順でソートし、重複がないかチェックする。
@@ -12493,6 +12505,7 @@ Public Class OIT0003OrderDetail
             Next
             '### END  #############################################################################################
         End If
+        WW_SHIPORDER = chkShipOrder
 
         '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
         '　※上記以外の営業所については、入力しないためチェックは未実施。

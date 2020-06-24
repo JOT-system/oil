@@ -630,6 +630,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_SHIPORDER_OILTOTAL_OVER As String = "20057"
 
+        ''' <summary>
+        ''' 受注オーダー時の積込日チェック(列車が別かつ積込日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_LODDATE_DIFFTRAINTANKNO As String = "20058"
+
 #End Region
 
 

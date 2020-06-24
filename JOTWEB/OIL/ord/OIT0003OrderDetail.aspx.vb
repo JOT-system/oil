@@ -24,6 +24,7 @@ Public Class OIT0003OrderDetail
     Private OIT0003WK5tbl As DataTable                              '作業用5テーブル(列車発送順重複チェック用)
     Private OIT0003WK6tbl As DataTable                              '作業用6テーブル(異なる列車(同一発日)チェック用)
     Private OIT0003WK7tbl As DataTable                              '作業用7テーブル(異なる列車(同一発日)タンク車チェック用)
+    Private OIT0003WK8tbl As DataTable                              '作業用7テーブル(異なる列車(同一積込日)タンク車チェック用)
     Private OIT0003WKtbl_tab4 As DataTable                          '作業用テーブル(タブ４用)
     Private OIT0003Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0003His1tbl As DataTable                             '履歴格納用テーブル(受注履歴)
@@ -4947,7 +4948,7 @@ Public Class OIT0003OrderDetail
             End Using
         End If
 
-        '列車タンク車重複チェック(同じ列車(発日も一緒)でタンク車がすでに登録済みかチェック)
+        '列車タンク車重複チェック(同一(異なる)列車(発日(積込日)も一緒)でタンク車がすでに登録済みかチェック)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
@@ -4957,6 +4958,9 @@ Public Class OIT0003OrderDetail
                 Exit Sub
             ElseIf WW_ERRCODE = "ERR2" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            ElseIf WW_ERRCODE = "ERR3" Then
+                Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                 Exit Sub
             End If
         End Using
@@ -13983,7 +13987,7 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
-    ''' 列車タンク車重複チェック(同一(異なる)列車(発日も一緒)でタンク車がすでに登録済みかチェック)
+    ''' 列車タンク車重複チェック(同一(異なる)列車(発日(積込日)も一緒)でタンク車がすでに登録済みかチェック)
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
@@ -14004,7 +14008,7 @@ Public Class OIT0003OrderDetail
 
         OIT0003WK3tbl.Clear()
 
-        '異なる列車チェック用
+        '異なる列車チェック用(同一発日)
         If IsNothing(OIT0003WK7tbl) Then
             OIT0003WK7tbl = New DataTable
         End If
@@ -14014,6 +14018,17 @@ Public Class OIT0003OrderDetail
         End If
 
         OIT0003WK7tbl.Clear()
+
+        '異なる列車チェック用(同一積込日)
+        If IsNothing(OIT0003WK8tbl) Then
+            OIT0003WK8tbl = New DataTable
+        End If
+
+        If OIT0003WK8tbl.Columns.Count <> 0 Then
+            OIT0003WK8tbl.Columns.Clear()
+        End If
+
+        OIT0003WK8tbl.Clear()
 
         '○ チェックSQL
         '　説明
@@ -14059,6 +14074,18 @@ Public Class OIT0003OrderDetail
             SQLStr &= ", '" & OIT0003row("TANKNO") & "' "
         Next
 
+        '### 20200620 START((全体)No79対応)異なる列車で同一積込日の場合###########
+        Dim SQLDiffLODTrainStr As String =
+              SQLStr _
+            & "                                  )" _
+            & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
+            & "   AND OIT0002.ORDERNO        <> @P01 " _
+            & "   AND OIT0002.LODDATE         = @P03 " _
+            & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
+            & "   AND OIT0002.DELFLG         <> @P05 " _
+            & "   AND OIT0002.TRAINNO        <> @P02 "
+        '### 20200620 END  ((全体)No79対応)異なる列車で同一積込日の場合###########
+
         SQLStr &=
               "                                  )" _
             & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
@@ -14067,17 +14094,19 @@ Public Class OIT0003OrderDetail
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 "
 
-        '### 20200620 START((全体)No79対応) ######################################
-        Dim SQLDiffTrainStr As String =
+        '### 20200620 START((全体)No79対応)異なる列車で同一発日の場合#############
+        Dim SQLDiffDEPTrainStr As String =
               SQLStr _
             & "   AND OIT0002.TRAINNO        <> @P02 "
-        '### 20200620 END  ((全体)No79対応) ######################################
+        '### 20200620 END  ((全体)No79対応)異なる列車で同一発日の場合#############
 
         SQLStr &=
               "   AND OIT0002.TRAINNO         = @P02 "
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLDiffTraincmd As New SqlCommand(SQLDiffTrainStr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon),
+                  SQLDiffDEPTraincmd As New SqlCommand(SQLDiffDEPTrainStr, SQLcon),
+                  SQLDiffLODTraincmd As New SqlCommand(SQLDiffLODTrainStr, SQLcon)
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
@@ -14130,19 +14159,19 @@ Public Class OIT0003OrderDetail
 
                 If O_RTN = "ERR1" Then Exit Sub
 
-                '### 20200620 START((全体)No79対応) ######################################
-                Dim PARADF1 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
-                Dim PARADF2 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
-                Dim PARADF3 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
-                Dim PARADF4 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                Dim PARADF5 As SqlParameter = SQLDiffTraincmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                '### 20200620 START((全体)No79対応)異なる列車で同一発日の場合#############
+                Dim PARADF1 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARADF2 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
+                Dim PARADF3 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
+                Dim PARADF4 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARADF5 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
                 PARADF1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARADF2.Value = Me.TxtTrainNo.Text
                 PARADF3.Value = Me.TxtDepDate.Text
                 PARADF4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARADF5.Value = C_DELETE_FLG.DELETE
 
-                Using SQLdr As SqlDataReader = SQLDiffTraincmd.ExecuteReader()
+                Using SQLdr As SqlDataReader = SQLDiffDEPTraincmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
                         OIT0003WK7tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
@@ -14159,7 +14188,7 @@ Public Class OIT0003OrderDetail
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 
-                            WW_CheckMES1 = "タンク車№(同一の列車番号)重複。"
+                            WW_CheckMES1 = "タンク車№(異なる列車番号)重複。"
                             WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
                             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                             'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
@@ -14182,7 +14211,61 @@ Public Class OIT0003OrderDetail
                 Master.SaveTable(OIT0003tbl)
 
                 If O_RTN = "ERR2" Then Exit Sub
-                '### 20200620 END  ((全体)No79対応) ######################################
+                '### 20200620 END  ((全体)No79対応)異なる列車で同一発日の場合#############
+
+                '### 20200620 START((全体)No79対応)異なる列車で同一積込日の場合###########
+                Dim PARALDF1 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARALDF2 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)  '本線列車
+                Dim PARALDF3 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)積込日
+                Dim PARALDF4 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARALDF5 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARALDF1.Value = work.WF_SEL_ORDERNUMBER.Text
+                PARALDF2.Value = Me.TxtTrainNo.Text
+                PARALDF3.Value = Me.TxtLoadingDate.Text
+                PARALDF4.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARALDF5.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLDiffLODTraincmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003WK8tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003WK8tbl.Load(SQLdr)
+                End Using
+
+                '〇1件でも存在したら、登録済みエラーとして終了。
+                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    For Each OIT0003CHKDrow As DataRow In OIT0003WK8tbl.Rows
+                        If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
+                            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
+                            CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+
+                            WW_CheckMES1 = "タンク車№(異なる列車番号)重複。"
+                            WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
+                            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                            'WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                            O_RTN = "ERR3"
+
+                            '受注明細TBLの受注情報を更新
+                            WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+
+                            Exit For
+                        Else
+                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                                OIT0003row("ORDERINFO") = ""
+                                OIT0003row("ORDERINFONAME") = ""
+                            End If
+                        End If
+                    Next
+                Next
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0003tbl)
+
+                If O_RTN = "ERR3" Then Exit Sub
+                '### 20200620 END  ((全体)No79対応)異なる列車で同一積込日の場合###########
 
             End Using
 

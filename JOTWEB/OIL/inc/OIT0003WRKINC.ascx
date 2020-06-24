@@ -57,6 +57,8 @@
     <asp:TextBox ID="WF_SEL_TRAIN" runat="server"></asp:TextBox>
     <!-- 列車名 -->
     <asp:TextBox ID="WF_SEL_TRAINNAME" runat="server"></asp:TextBox>
+    <!-- OT列車 -->
+    <asp:TextBox ID="WF_SEL_OTTRAIN" runat="server"></asp:TextBox>
     <!-- パターンコード -->
     <asp:TextBox ID="WF_SEL_PATTERNCODE" runat="server"></asp:TextBox>
     <!-- パターン名 -->

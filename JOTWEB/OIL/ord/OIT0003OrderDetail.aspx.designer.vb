@@ -131,6 +131,24 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtTrainName As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtOTTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOTTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtOTTrainName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOTTrainName As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtShippersCode コントロール。
     '''</summary>
     '''<remarks>

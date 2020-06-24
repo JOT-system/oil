@@ -756,6 +756,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_TRAIN.Text = ""
         '本線列車名
         work.WF_SEL_TRAINNAME.Text = ""
+        'OT本線列車
+        work.WF_SEL_OTTRAIN.Text = ""
         '荷主(名)
         work.WF_SEL_SHIPPERSNAME.Text = ""
         '荷主(コード)
@@ -909,6 +911,8 @@ Public Class OIT0003OrderList
         work.WF_SEL_TRAIN.Text = ""
         '本線列車名
         work.WF_SEL_TRAINNAME.Text = ""
+        'OT本線列車
+        work.WF_SEL_OTTRAIN.Text = ""
         '荷主(名)
         work.WF_SEL_SHIPPERSNAME.Text = ""
         '荷主(コード)
@@ -1253,10 +1257,13 @@ Public Class OIT0003OrderList
         '託送指示フラグ(0：未手配, 1:手配)
         work.WF_SEL_DELIVERYFLG.Text = OIT0003tbl.Rows(WW_LINECNT)("DELIVERYFLG")
 
-        '発送順区分
+        '★列車マスタから情報を取得
         WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
         WW_FixvalueMasterSearch(work.WF_SEL_ORDERSALESOFFICECODE.Text, "TRAINNUMBER_FIND", work.WF_SEL_TRAINNAME.Text, WW_GetValue)
+        '発送順区分
         work.WF_SEL_SHIPORDERCLASS.Text = WW_GetValue(13)
+        'OT本線列車
+        work.WF_SEL_OTTRAIN.Text = WW_GetValue(14)
 
         '○ 状態をクリア
         For Each OIT0003row As DataRow In OIT0003tbl.Rows

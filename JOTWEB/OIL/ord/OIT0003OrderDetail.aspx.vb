@@ -605,6 +605,8 @@ Public Class OIT0003OrderDetail
             '本線列車
             Me.TxtTrainNo.Text = work.WF_SEL_TRAIN.Text
             Me.TxtTrainName.Text = work.WF_SEL_TRAINNAME.Text
+            'OT列車番号
+            Me.TxtOTTrainNo.Text = work.WF_SEL_OTTRAIN.Text
             '荷主
             Me.TxtShippersCode.Text = work.WF_SEL_SHIPPERSCODE.Text
             '荷受人
@@ -12508,8 +12510,8 @@ Public Class OIT0003OrderDetail
                 End If
             Next
             '### END  #############################################################################################
+            WW_SHIPORDER = chkShipOrder
         End If
-        WW_SHIPORDER = chkShipOrder
 
         '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
         '　※上記以外の営業所については、入力しないためチェックは未実施。
@@ -15058,6 +15060,9 @@ Public Class OIT0003OrderDetail
         Else
             WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", I_Value, WW_GetValue)
         End If
+
+        '積置列車
+        Me.TxtOTTrainNo.Text = WW_GetValue(14)
 
         '積置可否フラグ
         '(積置列車:T, 非積置列車：N)

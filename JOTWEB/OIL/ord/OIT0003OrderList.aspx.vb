@@ -1313,8 +1313,15 @@ Public Class OIT0003OrderList
         '受注進行ステータス(コード)
         '〇受注進行ステータスが"100:受注受付"の場合
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
-            '受注貨車連結割当画面ページへ遷移
-            Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
+            If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                '受注貨車連結割当画面ページへ遷移
+                Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
+            Else
+                '受注明細画面ページへ遷移
+                Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
+            End If
         Else
             '受注明細画面ページへ遷移
             Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)

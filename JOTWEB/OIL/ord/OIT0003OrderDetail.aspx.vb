@@ -3719,7 +3719,7 @@ Public Class OIT0003OrderDetail
 
                         '★チェックボックスのON,OFFチェック
                         If OIT0003tbl_tab3.Rows(i)("STACKINGFLG") = "on" Then
-                            OIT0003tbl_tab3.Rows(i)("ACTUALLODDATE") = Date.Parse(Me.TxtDepDate.Text).AddDays(-1).ToString()
+                            OIT0003tbl_tab3.Rows(i)("ACTUALLODDATE") = Date.Parse(Me.TxtDepDate.Text).AddDays(-1).ToString("yyyy/MM/dd")
                         Else
                             OIT0003tbl_tab3.Rows(i)("ACTUALLODDATE") = Me.TxtLoadingDate.Text
                         End If

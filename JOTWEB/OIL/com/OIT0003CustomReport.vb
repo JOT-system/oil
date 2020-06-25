@@ -632,6 +632,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Dim strYoko As String() = {"E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V"}
             Dim iTate As Integer = 0
             Dim intTate As Integer() = {6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48}
+            Dim iTateJyogai As Integer = 0
+            Dim intTateJyogai As Integer() = {50, 52, 54, 56, 58}
             Dim jTate As Integer = 0
             Dim svTrainNo As String = ""
 
@@ -639,11 +641,28 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
                 '★列車(着駅)が変更となった場合
                 If svTrainNo <> "" AndAlso svTrainNo <> PrintDatarow("TRAINNO").ToString() Then
+                    '列を１つ右に移動
                     iYoko += 1
+                    '除外枠の行を初期化
+                    iTateJyogai = 0
                 End If
 
                 '◯ 充填ポイント
                 If PrintDatarow("FILLINGPOINT").ToString() = "" Then
+                    '### 2020/06/25 START 充填ポイントにはまらない油種は除外枠に表示 ########################################
+                    If PrintDatarow("OILKANA").ToString() <> "" Then
+                        '列車名(着駅)
+                        rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + intTateJyogai(iTateJyogai).ToString())
+                        rngDetailArea.Value = PrintDatarow("TRAINNAME").ToString().Substring(0, 1)
+
+                        '油種名
+                        rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + (intTateJyogai(iTateJyogai) + 1).ToString())
+                        rngDetailArea.Value = PrintDatarow("OILKANA")
+
+                        iTateJyogai += 1
+                    End If
+                    '### 2020/06/25 END   充填ポイントにはまらない油種は除外枠に表示 ########################################
+
                     svTrainNo = PrintDatarow("TRAINNO").ToString()
                     Continue For
                 End If

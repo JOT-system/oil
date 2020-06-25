@@ -1183,6 +1183,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '○ 本線列車, 発駅, 着駅のテキストボックスを初期化
                     TxtHeadOfficeTrain.Text = ""
+                    TxtHeadOfficeTrainName.Text = ""
                     TxtDepstation.Text = ""
                     LblDepstationName.Text = ""
                     TxtArrstation.Text = ""
@@ -1238,6 +1239,32 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 TxtHeadOfficeTrain.Text = WW_SelectValue
                 TxtHeadOfficeTrainName.Text = WW_SelectText
+                If TxtHeadOfficeTrainName.Text = "" Then
+                    '発駅
+                    TxtDepstation.Text = ""
+                    LblDepstationName.Text = ""
+                    '着駅
+                    TxtArrstation.Text = ""
+                    LblArrstationName.Text = ""
+                    '(予定)日付
+                    TxtLoadingDate.Text = ""
+                    TxtDepDate.Text = ""
+                    TxtArrDate.Text = ""
+                    TxtAccDate.Text = ""
+                    TxtEmparrDate.Text = ""
+                    '営業所配下情報
+                    work.WF_SEL_SHIPPERSCODE.Text = ""
+                    work.WF_SEL_SHIPPERSNAME.Text = ""
+                    work.WF_SEL_BASECODE.Text = ""
+                    work.WF_SEL_BASENAME.Text = ""
+                    work.WF_SEL_CONSIGNEECODE.Text = ""
+                    work.WF_SEL_CONSIGNEENAME.Text = ""
+                    work.WF_SEL_PATTERNCODE.Text = ""
+                    work.WF_SEL_PATTERNNAME.Text = ""
+
+                    Exit Select
+                End If
+
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
                 'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 

@@ -10145,40 +10145,7 @@ Public Class OIT0003OrderDetail
                     work.WF_SEL_ORDERSALESOFFICE.Text = WW_SelectText
 
                     '○ テキストボックスを初期化
-                    '荷主
-                    Me.TxtShippersCode.Text = ""
-                    Me.LblShippersName.Text = ""
-                    '荷受人
-                    Me.TxtConsigneeCode.Text = ""
-                    Me.LblConsigneeName.Text = ""
-                    '本線列車
-                    Me.TxtTrainNo.Text = ""
-                    '発駅
-                    Me.TxtDepstationCode.Text = ""
-                    Me.LblDepstationName.Text = ""
-                    '着駅
-                    Me.TxtArrstationCode.Text = ""
-                    Me.LblArrstationName.Text = ""
-                    '受注パターン
-                    Me.TxtOrderType.Text = ""
-                    '(予定)日付
-                    Me.TxtLoadingDate.Text = ""
-                    Me.TxtDepDate.Text = ""
-                    Me.TxtArrDate.Text = ""
-                    Me.TxtAccDate.Text = ""
-                    Me.TxtEmparrDate.Text = ""
-                    '(割当後)タンク車割当
-                    Me.TxtHTank_w.Text = "0"
-                    Me.TxtRTank_w.Text = "0"
-                    Me.TxtTTank_w.Text = "0"
-                    Me.TxtMTTank_w.Text = "0"
-                    Me.TxtKTank_w.Text = "0"
-                    Me.TxtK3Tank_w.Text = "0"
-                    Me.TxtK5Tank_w.Text = "0"
-                    Me.TxtK10Tank_w.Text = "0"
-                    Me.TxtLTank_w.Text = "0"
-                    Me.TxtATank_w.Text = "0"
-                    Me.TxtTotalCnt_w.Text = "0"
+                    WW_HedarItemsInitialize()
 
                     '○ 一覧の初期化画面表示データ取得
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -10210,12 +10177,36 @@ Public Class OIT0003OrderDetail
                     WW_SelectText = selectedItem.Text
                 End If
 
-                Me.TxtTrainNo.Text = WW_SelectValue
-                Me.TxtTrainName.Text = WW_SelectText
-                'WW_FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                '★再設定した列車が前回と違う場合
+                If Me.TxtTrainName.Text <> WW_SelectText Then
+                    '○ 一覧の初期化画面表示データ取得
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
 
-                '〇 取得した列車名から各値を取得し設定する。
-                WW_TRAINNUMBER_FIND(WW_SelectText)
+                        '######################################################
+                        '受注営業所を変更した時点で、新規登録と同様の扱いとする。
+                        work.WF_SEL_CREATEFLG.Text = "1"
+                        work.WF_SEL_CREATELINKFLG.Text = "1"
+                        '######################################################
+                        MAPDataGet(SQLcon, 0)
+                    End Using
+
+                    '○ 画面表示データ保存
+                    Master.SaveTable(OIT0003tbl)
+
+                    '○ テキストボックスを初期化
+                    WW_HedarItemsInitialize()
+
+                    Me.TxtTrainNo.Text = WW_SelectValue
+                    Me.TxtTrainName.Text = WW_SelectText
+                    'WW_FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+
+                    '★再設定した列車が""(空)の場合
+                    If Me.TxtTrainName.Text = "" Then Exit Select
+
+                    '〇 取得した列車名から各値を取得し設定する。
+                    WW_TRAINNUMBER_FIND(WW_SelectText)
+                End If
 
             '発駅
             Case "TxtDepstationCode"
@@ -10887,6 +10878,56 @@ Public Class OIT0003OrderDetail
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
+    End Sub
+
+    ''' <summary>
+    ''' ヘッダー項目を初期化
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_HedarItemsInitialize()
+
+        '本線列車
+        Me.TxtTrainNo.Text = ""
+        Me.TxtTrainName.Text = ""
+        'OT本線列車
+        Me.TxtOTTrainNo.Text = ""
+        Me.TxtOTTrainName.Text = ""
+        '積置フラグ("2"(積置なし)を設定)
+        work.WF_SEL_STACKINGFLG.Text = "2"
+        chkOrderInfo.Checked = False
+        '荷主
+        Me.TxtShippersCode.Text = ""
+        Me.LblShippersName.Text = ""
+        '荷受人
+        Me.TxtConsigneeCode.Text = ""
+        Me.LblConsigneeName.Text = ""
+        '発駅
+        Me.TxtDepstationCode.Text = ""
+        Me.LblDepstationName.Text = ""
+        '着駅
+        Me.TxtArrstationCode.Text = ""
+        Me.LblArrstationName.Text = ""
+        '受注パターン
+        Me.TxtOrderType.Text = ""
+        '(予定)日付
+        Me.TxtLoadingDate.Text = ""
+        Me.TxtDepDate.Text = ""
+        Me.TxtArrDate.Text = ""
+        Me.TxtAccDate.Text = ""
+        Me.TxtEmparrDate.Text = ""
+        '(割当後)タンク車割当
+        Me.TxtHTank_w.Text = "0"
+        Me.TxtRTank_w.Text = "0"
+        Me.TxtTTank_w.Text = "0"
+        Me.TxtMTTank_w.Text = "0"
+        Me.TxtKTank_w.Text = "0"
+        Me.TxtK3Tank_w.Text = "0"
+        Me.TxtK5Tank_w.Text = "0"
+        Me.TxtK10Tank_w.Text = "0"
+        Me.TxtLTank_w.Text = "0"
+        Me.TxtATank_w.Text = "0"
+        Me.TxtTotalCnt_w.Text = "0"
+
     End Sub
 
     ''' <summary>
@@ -15069,17 +15110,21 @@ Public Class OIT0003OrderDetail
 
         '積置列車
         Me.TxtOTTrainNo.Text = WW_GetValue(14)
+        Me.TxtOTTrainName.Text = ""
 
         '積置可否フラグ
         '(積置列車:T, 非積置列車：N)
         If WW_GetValue(12) = "T" Then
             '"1"(積置あり)を設定
             work.WF_SEL_STACKINGFLG.Text = "1"
+            chkOrderInfo.Checked = True
         ElseIf WW_GetValue(12) = "N" Then
-            '"1"(積置なし)を設定
+            '"2"(積置なし)を設定
             work.WF_SEL_STACKINGFLG.Text = "2"
+            chkOrderInfo.Checked = False
         Else
             work.WF_SEL_STACKINGFLG.Text = "2"
+            chkOrderInfo.Checked = False
         End If
 
         '発送順区分

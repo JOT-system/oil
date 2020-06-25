@@ -14132,6 +14132,8 @@ Public Class OIT0003OrderDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    '★行削除したデータはSKIPする。
+                    If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK3tbl.Rows
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
@@ -14185,6 +14187,8 @@ Public Class OIT0003OrderDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    '★行削除したデータはSKIPする。
+                    If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK7tbl.Rows
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
@@ -14239,6 +14243,8 @@ Public Class OIT0003OrderDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                    '★行削除したデータはSKIPする。
+                    If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK8tbl.Rows
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85

@@ -3766,6 +3766,8 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                    '★行削除したデータはSKIPする。
+                    If OIT0001row("DELFLG") = "1" Then Continue For
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK3tbl.Rows
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") _
                             AndAlso OIT0001row("TANKNO") <> "" Then
@@ -3820,6 +3822,8 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                    '★行削除したデータはSKIPする。
+                    If OIT0001row("DELFLG") = "1" Then Continue For
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK4tbl.Rows
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") _
                             AndAlso OIT0001row("TANKNO") <> "" Then

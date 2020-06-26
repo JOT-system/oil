@@ -2101,6 +2101,7 @@ Public Class OIT0003OrderList
             & " AND OIM0021.MODEL = OIM0005.MODEL " _
             & " AND OIM0021.LOAD = OIM0005.LOAD " _
             & " AND OIM0021.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0021.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
             & " AND OIM0021.DELFLG <> @P02 " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _

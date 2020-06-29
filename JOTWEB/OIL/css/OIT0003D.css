@@ -110,7 +110,7 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
         font-weight: bold;
         width: 70px;
     }
-    /* チェックボックスの隣のラベルのスタイル(未チェック時) */
+    /* チェックボックスの隣のラベルのスタイル(チェック時) */
     #chkOrderInfo:checked + label:after {
         background-color: lightgray;
         content: "　積置あり";
@@ -119,6 +119,27 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
         width: 70px;
     }
 
+/* ID chkOrderDetailInfoチェックボックス自体を非表示 */
+#chkOrderDetailInfo {
+    display: none;
+}
+    /* チェックボックスの隣のラベルのスタイル(未チェック時) */
+    #chkOrderDetailInfo + label:after {
+        background-color: lightgray;
+        content: "　積置なし";
+        color: white;
+        display: inline-block;
+        font-weight: bold;
+        width: 70px;
+    }
+    /* チェックボックスの隣のラベルのスタイル(チェック時) */
+    #chkOrderDetailInfo:checked + label:after {
+        background-color: lightgray;
+        content: "　一部積置";
+        color: black;
+        font-weight: bold;
+        width: 70px;
+    }
 
 /* ************************** */
 /* ヘッダーエリアの合計欄     */

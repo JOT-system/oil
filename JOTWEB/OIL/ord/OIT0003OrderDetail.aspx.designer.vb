@@ -86,6 +86,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents chkOrderInfo As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
+    '''chkOrderDetailInfo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkOrderDetailInfo As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''TxtOrderType コントロール。
     '''</summary>
     '''<remarks>

@@ -82,7 +82,8 @@
                     <a></a>
                     <a class="ef" id="WF_ORDERINFO">
                         <%--<asp:TextBox ID="TxtOrderInfo" runat="server" onblur="MsgClear();" Enabled="true"></asp:TextBox>--%>
-                        <asp:CheckBox ID="chkOrderInfo" runat="server" Text=" " Checked="true" Enabled ="false" />
+                        <asp:CheckBox ID="chkOrderInfo" runat="server" Text=" " Checked="true" Enabled ="false"/>
+                        <asp:CheckBox ID="chkOrderDetailInfo" runat="server" Text=" " Checked="true" Enabled ="false" Visible="false" />
                     </a>
                 </span>
                 <!-- ■　受注パターン　■ -->

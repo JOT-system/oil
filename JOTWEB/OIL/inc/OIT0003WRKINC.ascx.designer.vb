@@ -246,7 +246,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TRAINNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_OTTRAIN コントロール。
     '''</summary>
@@ -255,7 +255,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_OTTRAIN As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_PATTERNCODE コントロール。
     '''</summary>

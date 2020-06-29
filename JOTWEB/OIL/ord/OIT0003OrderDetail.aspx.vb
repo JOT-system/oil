@@ -13948,6 +13948,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')      AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')     AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')     AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')    AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')   AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')   AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '')       AS BASECODE" _
@@ -14011,6 +14012,10 @@ Public Class OIT0003OrderDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003CHKDrow As DataRow In OIT0003WK2tbl.Rows
+
+                    '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                    If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                     Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAIN, C_MESSAGE_TYPE.ERR, OIT0003CHKDrow("ORDERNO"), needsPopUp:=True)
 
                     WW_CheckMES1 = "受注データ登録済みエラー。"
@@ -14118,6 +14123,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0003.OILNAME), '')         AS OILNAME" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')    AS ORDERINGTYPE" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '') AS ORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')     AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')      AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')      AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')    AS SHIPPERSCODE" _
@@ -14180,6 +14186,10 @@ Public Class OIT0003OrderDetail
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In dt.Rows
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK5tbl.Rows
+
+                        '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                        If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                         If OIT0003CHKDrow("SHIPORDER") = OIT0003row("SHIPORDER") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_100
                             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
@@ -14283,6 +14293,7 @@ Public Class OIT0003OrderDetail
             & " , ISNULL(RTRIM(OIT0003.OILNAME), '')         AS OILNAME" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')    AS ORDERINGTYPE" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '') AS ORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')     AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')      AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')      AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')    AS SHIPPERSCODE" _
@@ -14369,6 +14380,10 @@ Public Class OIT0003OrderDetail
                     '★行削除したデータはSKIPする。
                     If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK3tbl.Rows
+
+                        '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                        If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
@@ -14431,6 +14446,10 @@ Public Class OIT0003OrderDetail
                     '★行削除したデータはSKIPする。
                     If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK7tbl.Rows
+
+                        '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                        If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
@@ -14494,6 +14513,10 @@ Public Class OIT0003OrderDetail
                     '★行削除したデータはSKIPする。
                     If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK8tbl.Rows
+
+                        '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                        If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)

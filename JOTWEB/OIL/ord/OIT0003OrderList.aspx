@@ -158,6 +158,9 @@
             <li>
                 <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定" />
             </li>
+            <li>
+                <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線予定" />
+            </li>
         </ul>
     </div>
 </asp:Content>

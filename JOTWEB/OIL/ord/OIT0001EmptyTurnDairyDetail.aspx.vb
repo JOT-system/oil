@@ -2372,6 +2372,8 @@ Public Class OIT0001EmptyTurnDairyDetail
 
             WW_CheckTrainRepeat(WW_ERRCODE, SQLcon)
             If WW_ERRCODE = "ERR" Then
+                '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
                 Exit Sub
             End If
         End Using
@@ -2383,12 +2385,18 @@ Public Class OIT0001EmptyTurnDairyDetail
             WW_CheckTrainTankRepeat(WW_ERRCODE, SQLcon)
             If WW_ERRCODE = "ERR1" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
                 Exit Sub
             ElseIf WW_ERRCODE = "ERR2" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
                 Exit Sub
             ElseIf WW_ERRCODE = "ERR3" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
                 Exit Sub
             End If
         End Using
@@ -3743,6 +3751,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "                                  )" _
             & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
             & "   AND OIT0002.ORDERNO        <> @P01 " _
+            & "   AND OIT0002.OFFICECODE      = @P06 " _
             & "   AND OIT0002.LODDATE         = @P03 " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 " _
@@ -3753,6 +3762,7 @@ Public Class OIT0001EmptyTurnDairyDetail
               "                                  )" _
             & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
             & "   AND OIT0002.ORDERNO        <> @P01 " _
+            & "   AND OIT0002.OFFICECODE      = @P06 " _
             & "   AND OIT0002.DEPDATE         = @P03 " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 "
@@ -3775,11 +3785,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 6)  '受注営業所
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA2.Value = Me.TxtHeadOfficeTrain.Text
                 PARA3.Value = Me.TxtDepDate.Text
                 PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARA5.Value = C_DELETE_FLG.DELETE
+                PARA6.Value = work.WF_SEL_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3831,11 +3843,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARADF3 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)発日
                 Dim PARADF4 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARADF5 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARADF6 As SqlParameter = SQLDiffDEPTraincmd.Parameters.Add("@P06", SqlDbType.NVarChar, 6)  '受注営業所
                 PARADF1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARADF2.Value = Me.TxtHeadOfficeTrain.Text
                 PARADF3.Value = Me.TxtDepDate.Text
                 PARADF4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARADF5.Value = C_DELETE_FLG.DELETE
+                PARADF6.Value = work.WF_SEL_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLDiffDEPTraincmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -3888,11 +3902,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARALDF3 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P03", SqlDbType.Date)         '(予定)積込日
                 Dim PARALDF4 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARALDF5 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARALDF6 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P06", SqlDbType.NVarChar, 6)  '受注営業所
                 PARALDF1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARALDF2.Value = Me.TxtHeadOfficeTrain.Text
                 PARALDF3.Value = Me.TxtLoadingDate.Text
                 PARALDF4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARALDF5.Value = C_DELETE_FLG.DELETE
+                PARALDF6.Value = work.WF_SEL_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLDiffLODTraincmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -5507,6 +5523,40 @@ Public Class OIT0001EmptyTurnDairyDetail
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0001D ORDERTANKCNTSET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' (受注TBL/受注明細TBL)受注データ削除
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_DeleteOrder(ByVal SQLcon As SqlConnection, ByVal I_ORDERNO As String)
+
+        '削除SQL文･･･受注TBL、及び受注明細TBLにおいて指定された受注Noを削除
+        Dim SQLStr As String =
+            " DELETE FROM OIL.OIT0002_ORDER WHERE ORDERNO = @P01; " _
+            & " DELETE FROM OIL.OIT0003_DETAIL WHERE ORDERNO = @P01; "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11)  '受注№
+                PARA01.Value = I_ORDERNO
+
+                SQLcmd.ExecuteNonQuery()
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D DELETEORDER")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D DELETEORDER"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

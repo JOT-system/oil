@@ -91,6 +91,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
         'Excelアプリケーションオブジェクトの生成
         Me.ExcelAppObj = New Excel.Application
         ExcelAppObj.DisplayAlerts = False
+        ExcelAppObj.ScreenUpdating = False
         Dim xlHwnd As IntPtr = CType(Me.ExcelAppObj.Hwnd, IntPtr)
         GetWindowThreadProcessId(xlHwnd, Me.xlProcId)
         'Excelワークブックオブジェクトの生成
@@ -98,6 +99,7 @@ Public Class OIT0004CustomReport : Implements IDisposable
         Me.ExcelBookObj = Me.ExcelBooksObj.Open(Me.ExcelTemplatePath,
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
+        ExcelAppObj.Calculation = Excel.XlCalculation.xlCalculationManual
         Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
         Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("在庫管理表"), Excel.Worksheet)
         Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
@@ -121,6 +123,9 @@ Public Class OIT0004CustomReport : Implements IDisposable
 
             ExcelTempSheet.Delete() '雛形シート削除
             '保存処理実行
+            ExcelAppObj.ScreenUpdating = True
+            ExcelAppObj.Calculation = Excel.XlCalculation.xlCalculationAutomatic
+            ExcelAppObj.Calculate()
             Dim saveExcelLock As New Object
             SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
                 Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)

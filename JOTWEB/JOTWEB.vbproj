@@ -348,7 +348,7 @@
     <Compile Include="OIL\com\EntryHistory.vb" />
     <Compile Include="OIL\com\OIT0001CustomReport.vb" />
     <Compile Include="OIL\com\OIT0003CustomReport.vb" />
-    <Compile Include="OIL\com\OIT0004CustomReportJXTG.vb" />
+    <Compile Include="OIL\com\OIT0004CustomReportENEOS.vb" />
     <Compile Include="OIL\com\OIT0004CustomReport.vb" />
     <Compile Include="OIL\com\OIT0004CustomReportOLD.vb" />
     <Compile Include="OIL\for\OIT0006OutOfServiceDetail.aspx.designer.vb">

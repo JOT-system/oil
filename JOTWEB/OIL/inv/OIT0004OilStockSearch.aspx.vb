@@ -403,7 +403,8 @@ Public Class OIT0004OilStockSearch
                         End If
                         '荷主
                         If WF_FIELD.Value = "TxtShipper" Then
-                            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
+                            Dim additionalCond As String = " and KEYCODE != '9999999999' " 'キグナス除く
+                            prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER", I_ADDITIONALCONDITION:=additionalCond)
                         End If
                         '油槽所
                         If WF_FIELD.Value = "WF_CONSIGNEE" Then
@@ -612,7 +613,8 @@ Public Class OIT0004OilStockSearch
                     prmData = work.CreateSALESOFFICEParam(WF_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "SHIPPER"        '荷主
-                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER")
+                    Dim additionalCond As String = " and KEYCODE != '9999999999' " 'キグナス除く
+                    prmData = work.CreateFIXParam(TxtSalesOffice.Text, "JOINTMASTER", I_ADDITIONALCONDITION:=additionalCond)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_JOINTLIST, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "CONSIGNEE"        '油槽所
                     'WF_CAMPCODE.Text

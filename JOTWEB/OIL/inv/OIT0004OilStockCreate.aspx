@@ -468,11 +468,11 @@
 </asp:Content>
 <%--ポップアップタイトルバーの内容--%>
 <asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
-    <div id="divChkJxtg" runat="server">
+    <div id="divChkEneos" runat="server">
         <div class="grc0001Wrapper">
             <ul>
                 <li>
-                    <asp:CheckBox ID="chkPrintJXTG" runat="server" Text="JXTG用帳票" />
+                    <asp:CheckBox ID="chkPrintENEOS" runat="server" Text="ENEOS用帳票" />
                 </li>
             </ul>
         </div>

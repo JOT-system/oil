@@ -226,7 +226,12 @@ Public Class EntryHistory
                 Try
                     .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
                 Catch ex As Exception
-                    .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = ""
+                    If .Contains("STACKINGORDERNO") Then
+                        .Item("STACKINGORDERNO").Value = ""
+                    Else
+                        .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = ""
+                    End If
+
                 End Try
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")

@@ -42,8 +42,8 @@ function InitDisplay() {
     bindContentHorizonalScroll();
     //月選択バインド
     commonBindMonthPicker();
-    //JXTGチェックイベントバインド
-    bindJxtgCheckBox();
+    //ENEOSチェックイベントバインド
+    bindEneosCheckBox();
 }
 // 〇コンテンツ横スクロールイベントのバインド
 function bindContentHorizonalScroll() {
@@ -592,21 +592,21 @@ function changeConsignee(callerObj) {
 
     ButtonClick('ChangeConsignee');
 }
-// JXTG帳票のチェック時のイベントをバインド
-function bindJxtgCheckBox() {
-    let chkObj = document.getElementById('chkPrintJXTG');
+// ENEOS帳票のチェック時のイベントをバインド
+function bindEneosCheckBox() {
+    let chkObj = document.getElementById('chkPrintENEOS');
     if (chkObj === null) {
         return;
     }
     chkObj.addEventListener('click', (function () {
         return function () {
-            jxtgCheckChange();
+            eneosCheckChange();
         };
     })(), true);
 
 }
-function jxtgCheckChange() {
-    let chkObj = document.getElementById('chkPrintJXTG');
+function eneosCheckChange() {
+    let chkObj = document.getElementById('chkPrintENEOS');
     let hdnShowPnlToDateObj = document.getElementById('hdnShowPnlToDate');
     let hdnPnlMonthPickerObj = document.getElementById('spnDownloadMonth');
     let hdnPnlFromDateObj = document.getElementById('spnFromDate');

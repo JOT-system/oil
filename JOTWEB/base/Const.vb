@@ -437,6 +437,10 @@ Public Module BaseDllConst
     ''' タンク車状態未到着
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_101 As String = "101"
+    ''' <summary>
+    ''' タンク車所属外
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_102 As String = "102"
 
     ''' <summary>
     ''' 失注（荷主都合）

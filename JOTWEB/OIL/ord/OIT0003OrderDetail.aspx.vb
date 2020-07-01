@@ -5889,6 +5889,17 @@ Public Class OIT0003OrderDetail
         '〇 タンク車割当状況チェック
         WW_TANKQUOTACHK("TANKNO", OIT0003row)
 
+        '### 20200701 START((全体)No96対応) ######################################
+        '★指定したタンク車№が所属営業所以外の場合
+        If WW_GetValue(13) <> Me.TxtOrderOfficeCode.Text Then
+            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
+            CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+        Else
+            OIT0003row("ORDERINFO") = ""
+            OIT0003row("ORDERINFONAME") = ""
+        End If
+        '### 20200701 END  ((全体)No96対応) ######################################
+
     End Sub
 
 #Region "コメント"
@@ -12694,8 +12705,10 @@ Public Class OIT0003OrderDetail
 
         '(一覧)チェック(準備)
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
-            OIT0003row("ORDERINFO") = ""
-            OIT0003row("ORDERINFONAME") = ""
+            If OIT0003row("ORDERINFO") <> BaseDllConst.CONST_ORDERINFO_ALERT_102 Then
+                OIT0003row("ORDERINFO") = ""
+                OIT0003row("ORDERINFONAME") = ""
+            End If
         Next
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
@@ -12836,6 +12849,20 @@ Public Class OIT0003OrderDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
+
+            '### 20200701 START((全体)No96対応) ######################################
+            '★指定したタンク車№が所属営業所以外の場合
+            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102 _
+                AndAlso OIT0003row("DELFLG") = "0" Then
+                Master.Output(C_MESSAGE_NO.OIL_ORDER_NOT_BELONGOFFICE_TANKNO_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+                WW_CheckMES1 = "タンク車No所属営業所以外。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_TANKNO_MIWARIATE_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
+            '### 20200701 END  ((全体)No96対応) ######################################
         Next
 
 

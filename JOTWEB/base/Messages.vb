@@ -635,6 +635,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_ORDER_LODDATE_DIFFTRAINTANKNO As String = "20058"
 
+        ''' <summary>
+        ''' 指定タンク車№が所属営業所以外のためエラー
+        ''' </summary>
+        Public Const OIL_ORDER_NOT_BELONGOFFICE_TANKNO_ERROR As String = "20059"
+
 #End Region
 
 

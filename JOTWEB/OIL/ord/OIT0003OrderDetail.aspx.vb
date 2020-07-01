@@ -14829,6 +14829,7 @@ Public Class OIT0003OrderDetail
         '     受注TBL, 受注明細TBLと列車マスタからMAX牽引車数の値を取得しチェックする
 
         'JR最終列車番号チェック用
+        '### 20200701 指摘票対応(全体(No98)) 積込日、発日も条件に追加 #############
         Dim SQLStr As String =
               " SELECT " _
             & "   'JR最終列車'                              AS CHECKNUMBER" _
@@ -14844,11 +14845,14 @@ Public Class OIT0003OrderDetail
             & "        VIW0006_BASE.JRTRAINNO3  = VIW0006_JR3.JRTRAINNO3 " _
             & "    AND VIW0006_BASE.MERGEDAY    = VIW0006_JR3.MERGEDAY" _
             & "    AND VIW0006_BASE.JRTRAINNO3 <> ''" _
+            & "    AND VIW0006_BASE.LODDATE = VIW0006_JR3.LODDATE" _
+            & "    AND VIW0006_BASE.DEPDATE = VIW0006_JR3.DEPDATE" _
             & " GROUP BY " _
             & "   VIW0006_JR3.JRTRAINNO3" _
             & " , VIW0006_JR3.MAXTANK3"
 
         'JR中継列車番号チェック用
+        '### 20200701 指摘票対応(全体(No98)) 積込日、発日も条件に追加 #############
         SQLStr &=
               " UNION ALL " _
             & " SELECT " _
@@ -14865,11 +14869,14 @@ Public Class OIT0003OrderDetail
             & "        VIW0006_BASE.JRTRAINNO2  = VIW0006_JR2.JRTRAINNO2 " _
             & "    AND VIW0006_BASE.MERGEDAY    = VIW0006_JR2.MERGEDAY" _
             & "    AND VIW0006_BASE.JRTRAINNO2 <> ''" _
+            & "    AND VIW0006_BASE.LODDATE = VIW0006_JR2.LODDATE" _
+            & "    AND VIW0006_BASE.DEPDATE = VIW0006_JR2.DEPDATE" _
             & " GROUP BY " _
             & "   VIW0006_JR2.JRTRAINNO2" _
             & " , VIW0006_JR2.MAXTANK2"
 
         'JR発列車番号チェック用
+        '### 20200701 指摘票対応(全体(No98)) 積込日、発日も条件に追加 #############
         SQLStr &=
               " UNION ALL " _
             & " SELECT " _
@@ -14886,6 +14893,8 @@ Public Class OIT0003OrderDetail
             & "        VIW0006_BASE.JRTRAINNO1  = VIW0006_JR1.JRTRAINNO1 " _
             & "    AND VIW0006_BASE.MERGEDAY    = VIW0006_JR1.MERGEDAY" _
             & "    AND VIW0006_BASE.JRTRAINNO1 <> ''" _
+            & "    AND VIW0006_BASE.LODDATE = VIW0006_JR1.LODDATE" _
+            & "    AND VIW0006_BASE.DEPDATE = VIW0006_JR1.DEPDATE" _
             & " GROUP BY " _
             & "   VIW0006_JR1.JRTRAINNO1" _
             & " , VIW0006_JR1.MAXTANK1"

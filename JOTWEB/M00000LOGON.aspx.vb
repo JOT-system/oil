@@ -646,18 +646,18 @@ Public Class M00000LOGON
             .Add("GUIDANCENO", GetType(String))
             .Add("ENTRYDATE", GetType(String))
             .Add("TYPE", GetType(String))
-            .Add("TITTLE", GetType(String))
+            .Add("TITLE", GetType(String))
             .Add("NAIYOU", GetType(String))
-            .Add("FAILE1", GetType(String))
+            .Add("FILE1", GetType(String))
         End With
         Try
             Dim sqlStat As New StringBuilder
             sqlStat.AppendLine("SELECT GD.GUIDANCENO")
             sqlStat.AppendLine("      ,format(GD.INITYMD,'yyyy/M/d') AS ENTRYDATE")
             sqlStat.AppendLine("      ,GD.TYPE                       AS TYPE")
-            sqlStat.AppendLine("      ,GD.TITTLE                     AS TITTLE")
+            sqlStat.AppendLine("      ,GD.TITLE                      AS TITLE")
             sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
-            sqlStat.AppendLine("      ,GD.FAILE1                     AS FAILE1")
+            sqlStat.AppendLine("      ,GD.FILE1                      AS FILE1")
             sqlStat.AppendLine("  FROM oil.OIM0020_GUIDANCE GD")
             sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
             sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
@@ -678,10 +678,10 @@ Public Class M00000LOGON
                         dr("GUIDANCENO") = sqlGuidDr("GUIDANCENO")
                         dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
                         dr("TYPE") = sqlGuidDr("TYPE")
-                        dr("TITTLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITTLE")))
+                        dr("TITLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITLE")))
                         dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU"))).Replace(ControlChars.CrLf, ControlChars.VerticalTab & "<br />").Replace(ControlChars.Cr, ControlChars.VerticalTab & "<br />").Replace(ControlChars.Lf, ControlChars.VerticalTab & "<br />")
                         dr("NAIYOU") = Convert.ToString(dr("NAIYOU")).Replace(ControlChars.VerticalTab, ControlChars.CrLf)
-                        dr("FAILE1") = Convert.ToString(sqlGuidDr("FAILE1"))
+                        dr("FILE1") = Convert.ToString(sqlGuidDr("FILE1"))
 
                         retDt.Rows.Add(dr)
                     End While

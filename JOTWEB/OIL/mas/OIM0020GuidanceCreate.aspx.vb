@@ -182,7 +182,7 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.FROMYMD, 'yyyy/MM/dd'), NULL) AS FROMYMD")
         sqlStat.AppendLine("       ,ISNULL(FORMAT(MG.ENDYMD,  'yyyy/MM/dd'), NULL) AS ENDYMD")
         sqlStat.AppendLine("       ,MG.TYPE")
-        sqlStat.AppendLine("       ,MG.TITTLE")
+        sqlStat.AppendLine("       ,MG.TITLE")
         sqlStat.AppendLine("       ,MG.OUTFLG")
         sqlStat.AppendLine("       ,MG.INFLG1")
         sqlStat.AppendLine("       ,MG.INFLG2")
@@ -197,11 +197,11 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("       ,MG.INFLG11")
 
         sqlStat.AppendLine("       ,MG.NAIYOU")
-        sqlStat.AppendLine("       ,MG.FAILE1")
-        sqlStat.AppendLine("       ,MG.FAILE2")
-        sqlStat.AppendLine("       ,MG.FAILE3")
-        sqlStat.AppendLine("       ,MG.FAILE4")
-        sqlStat.AppendLine("       ,MG.FAILE5")
+        sqlStat.AppendLine("       ,MG.FILE1")
+        sqlStat.AppendLine("       ,MG.FILE2")
+        sqlStat.AppendLine("       ,MG.FILE3")
+        sqlStat.AppendLine("       ,MG.FILE4")
+        sqlStat.AppendLine("       ,MG.FILE5")
         sqlStat.AppendLine("       ,format(MG.INITYMD,'yyyy/MM/dd HH:mm')    AS INITYMD")
         sqlStat.AppendLine("       ,format(MG.UPDYMD ,'yyyy/MM/dd HH:mm:ss.fff')    AS UPDYMD")
         sqlStat.AppendLine("  FROM OIL.OIM0020_GUIDANCE MG")
@@ -221,7 +221,7 @@ Public Class OIM0020GuidanceCreate
                 retVal.FromYmd = Convert.ToString(SQLdr("FROMYMD"))
                 retVal.EndYmd = Convert.ToString(SQLdr("ENDYMD"))
                 retVal.Type = Convert.ToString(SQLdr("TYPE"))
-                retVal.Title = Convert.ToString(SQLdr("TITTLE"))
+                retVal.Title = Convert.ToString(SQLdr("TITLE"))
                 retVal.DispFlags = OIM0020WRKINC.GetNewDisplayFlags()
                 Dim keyValues As New List(Of String) From {"OUTFLG", "INFLG1", "INFLG2", "INFLG3", "INFLG4", "INFLG5",
                                                    "INFLG6", "INFLG7", "INFLG8", "INFLG9", "INFLG9", "INFLG10", "INFLG11"}
@@ -239,7 +239,7 @@ Public Class OIM0020GuidanceCreate
                     End If
                 Next
                 retVal.Naiyo = Convert.ToString(SQLdr("NAIYOU"))
-                keyValues = New List(Of String) From {"FAILE1", "FAILE2", "FAILE3", "FAILE4", "FAILE5"}
+                keyValues = New List(Of String) From {"FILE1", "FILE2", "FILE3", "FILE4", "FILE5"}
                 For Each keyVal In keyValues
                     stringVal = Convert.ToString(SQLdr(keyVal))
                     If stringVal <> "" Then
@@ -293,7 +293,7 @@ Public Class OIM0020GuidanceCreate
             Return retMes
         End If
 
-        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TITTLE", dispVal.Title, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "TITLE", dispVal.Title, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If Not isNormal(WW_CS0024FCHECKERR) Then
             retMes.MessageNo = WW_CS0024FCHECKERR
             retMes.Pram01 = "タイトル"
@@ -310,7 +310,7 @@ Public Class OIM0020GuidanceCreate
         End If
 
         For Each fileItm In dispVal.Attachments
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "FAILE", fileItm.FileName, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "FILE", fileItm.FileName, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If Not isNormal(WW_CS0024FCHECKERR) Then
                 retMes.MessageNo = WW_CS0024FCHECKERR
                 retMes.Pram01 = String.Format("ファイル名({0})", fileItm.FileName)
@@ -334,7 +334,7 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("   SET FROMYMD    = @FROMYMD")
         sqlStat.AppendLine("      ,ENDYMD     = @ENDYMD")
         sqlStat.AppendLine("      ,TYPE       = @TYPE")
-        sqlStat.AppendLine("      ,TITTLE     = @TITTLE")
+        sqlStat.AppendLine("      ,TITLE      = @TITLE")
         sqlStat.AppendLine("      ,OUTFLG     = @OUTFLG")
         sqlStat.AppendLine("      ,INFLG1     = @INFLG1")
         sqlStat.AppendLine("      ,INFLG2     = @INFLG2")
@@ -348,11 +348,11 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("      ,INFLG10    = @INFLG10")
         sqlStat.AppendLine("      ,INFLG11    = @INFLG11")
         sqlStat.AppendLine("      ,NAIYOU     = @NAIYOU")
-        sqlStat.AppendLine("      ,FAILE1     = @FAILE1")
-        sqlStat.AppendLine("      ,FAILE2     = @FAILE2")
-        sqlStat.AppendLine("      ,FAILE3     = @FAILE3")
-        sqlStat.AppendLine("      ,FAILE4     = @FAILE4")
-        sqlStat.AppendLine("      ,FAILE5     = @FAILE5")
+        sqlStat.AppendLine("      ,FILE1      = @FILE1")
+        sqlStat.AppendLine("      ,FILE2      = @FILE2")
+        sqlStat.AppendLine("      ,FILE3      = @FILE3")
+        sqlStat.AppendLine("      ,FILE4      = @FILE4")
+        sqlStat.AppendLine("      ,FILE5      = @FILE5")
         sqlStat.AppendLine("      ,UPDYMD     = @UPDYMD")
         sqlStat.AppendLine("      ,UPDUSER    = @UPDUSER")
         sqlStat.AppendLine("      ,UPDTERMID  = @UPDTERMID")
@@ -368,7 +368,7 @@ Public Class OIM0020GuidanceCreate
                 .Add("@FROMYMD", SqlDbType.Date).Value = dispVal.FromYmd
                 .Add("@ENDYMD", SqlDbType.Date).Value = dispVal.EndYmd
                 .Add("@TYPE", SqlDbType.NVarChar).Value = dispVal.Type
-                .Add("@TITTLE", SqlDbType.NVarChar).Value = dispVal.Title
+                .Add("@TITLE", SqlDbType.NVarChar).Value = dispVal.Title
                 .Add("@NAIYOU", SqlDbType.NVarChar).Value = dispVal.Naiyo
                 For Each flagFiels In {"OUTFLG", "INFLG1", "INFLG2", "INFLG3", "INFLG4", "INFLG5",
                                        "INFLG6", "INFLG7", "INFLG8", "INFLG9", "INFLG10", "INFLG11"}
@@ -385,13 +385,13 @@ Public Class OIM0020GuidanceCreate
                         Exit For
                     End If
                     fileNo = fileNo + 1
-                    .Add(String.Format("@FAILE{0}", fileNo), SqlDbType.NVarChar).Value = attachItm.FileName
+                    .Add(String.Format("@FILE{0}", fileNo), SqlDbType.NVarChar).Value = attachItm.FileName
                 Next
 
                 If fileNo < 5 Then
                     fileNo = fileNo + 1
                     For i = fileNo To 5
-                        .Add(String.Format("@FAILE{0}", i), SqlDbType.NVarChar).Value = ""
+                        .Add(String.Format("@FILE{0}", i), SqlDbType.NVarChar).Value = ""
                     Next
                 End If
                 .Add("@UPDYMD", SqlDbType.DateTime).Value = Now.ToString("yyyy/MM/dd HH:mm:ss.FFF")
@@ -431,7 +431,7 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("    ,FROMYMD")
         sqlStat.AppendLine("    ,ENDYMD")
         sqlStat.AppendLine("    ,TYPE")
-        sqlStat.AppendLine("    ,TITTLE")
+        sqlStat.AppendLine("    ,TITLE")
         sqlStat.AppendLine("    ,OUTFLG")
         sqlStat.AppendLine("    ,INFLG1")
         sqlStat.AppendLine("    ,INFLG2")
@@ -445,11 +445,11 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("    ,INFLG10")
         sqlStat.AppendLine("    ,INFLG11")
         sqlStat.AppendLine("    ,NAIYOU")
-        sqlStat.AppendLine("    ,FAILE1")
-        sqlStat.AppendLine("    ,FAILE2")
-        sqlStat.AppendLine("    ,FAILE3")
-        sqlStat.AppendLine("    ,FAILE4")
-        sqlStat.AppendLine("    ,FAILE5")
+        sqlStat.AppendLine("    ,FILE1")
+        sqlStat.AppendLine("    ,FILE2")
+        sqlStat.AppendLine("    ,FILE3")
+        sqlStat.AppendLine("    ,FILE4")
+        sqlStat.AppendLine("    ,FILE5")
         sqlStat.AppendLine("    ,DELFLG")
         sqlStat.AppendLine("    ,INITYMD")
         sqlStat.AppendLine("    ,INITUSER")
@@ -463,7 +463,7 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("    ,@FROMYMD")
         sqlStat.AppendLine("    ,@ENDYMD")
         sqlStat.AppendLine("    ,@TYPE")
-        sqlStat.AppendLine("    ,@TITTLE")
+        sqlStat.AppendLine("    ,@TITLE")
         sqlStat.AppendLine("    ,@OUTFLG")
         sqlStat.AppendLine("    ,@INFLG1")
         sqlStat.AppendLine("    ,@INFLG2")
@@ -477,11 +477,11 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("    ,@INFLG10")
         sqlStat.AppendLine("    ,@INFLG11")
         sqlStat.AppendLine("    ,@NAIYOU")
-        sqlStat.AppendLine("    ,@FAILE1")
-        sqlStat.AppendLine("    ,@FAILE2")
-        sqlStat.AppendLine("    ,@FAILE3")
-        sqlStat.AppendLine("    ,@FAILE4")
-        sqlStat.AppendLine("    ,@FAILE5")
+        sqlStat.AppendLine("    ,@FILE1")
+        sqlStat.AppendLine("    ,@FILE2")
+        sqlStat.AppendLine("    ,@FILE3")
+        sqlStat.AppendLine("    ,@FILE4")
+        sqlStat.AppendLine("    ,@FILE5")
         sqlStat.AppendLine("    ,@DELFLG")
         sqlStat.AppendLine("    ,@INITYMD")
         sqlStat.AppendLine("    ,@INITUSER")
@@ -499,7 +499,7 @@ Public Class OIM0020GuidanceCreate
                 .Add("@FROMYMD", SqlDbType.Date).Value = dispVal.FromYmd
                 .Add("@ENDYMD", SqlDbType.Date).Value = dispVal.EndYmd
                 .Add("@TYPE", SqlDbType.NVarChar).Value = dispVal.Type
-                .Add("@TITTLE", SqlDbType.NVarChar).Value = dispVal.Title
+                .Add("@TITLE", SqlDbType.NVarChar).Value = dispVal.Title
                 .Add("@NAIYOU", SqlDbType.NVarChar).Value = dispVal.Naiyo
                 For Each flagFiels In {"OUTFLG", "INFLG1", "INFLG2", "INFLG3", "INFLG4", "INFLG5",
                                        "INFLG6", "INFLG7", "INFLG8", "INFLG9", "INFLG10", "INFLG11"}
@@ -516,13 +516,13 @@ Public Class OIM0020GuidanceCreate
                         Exit For
                     End If
                     fileNo = fileNo + 1
-                    .Add(String.Format("@FAILE{0}", fileNo), SqlDbType.NVarChar).Value = attachItm.FileName
+                    .Add(String.Format("@FILE{0}", fileNo), SqlDbType.NVarChar).Value = attachItm.FileName
                 Next
 
                 If fileNo < 5 Then
                     fileNo = fileNo + 1
                     For i = fileNo To 5
-                        .Add(String.Format("@FAILE{0}", i), SqlDbType.NVarChar).Value = ""
+                        .Add(String.Format("@FILE{0}", i), SqlDbType.NVarChar).Value = ""
                     Next
                 End If
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
@@ -978,7 +978,7 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("    ,convert(nvarchar,isnull(FROMYMD, '')) AS FROMYMD")
         sqlStat.AppendLine("    ,convert(nvarchar,isnull(ENDYMD, ''))  AS ENDYMD")
         sqlStat.AppendLine("    ,isnull(TYPE,   '') AS TYPE")
-        sqlStat.AppendLine("    ,isnull(TITTLE, '') AS TITTLE")
+        sqlStat.AppendLine("    ,isnull(TITLE, '')  AS TITLE")
         sqlStat.AppendLine("    ,isnull(OUTFLG, '') AS OUTFLG")
         sqlStat.AppendLine("    ,isnull(INFLG1, '') AS INFLG1")
         sqlStat.AppendLine("    ,isnull(INFLG2, '') AS INFLG2")
@@ -992,11 +992,11 @@ Public Class OIM0020GuidanceCreate
         sqlStat.AppendLine("    ,isnull(INFLG10,'') AS INFLG10")
         sqlStat.AppendLine("    ,isnull(INFLG11,'') AS INFLG11")
         sqlStat.AppendLine("    ,isnull(NAIYOU,'') AS NAIYOU")
-        sqlStat.AppendLine("    ,isnull(FAILE1,'') AS FAILE1")
-        sqlStat.AppendLine("    ,isnull(FAILE2,'') AS FAILE2")
-        sqlStat.AppendLine("    ,isnull(FAILE3,'') AS FAILE3")
-        sqlStat.AppendLine("    ,isnull(FAILE4,'') AS FAILE4")
-        sqlStat.AppendLine("    ,isnull(FAILE5,'') AS FAILE5")
+        sqlStat.AppendLine("    ,isnull(FILE1,'') AS FILE1")
+        sqlStat.AppendLine("    ,isnull(FILE2,'') AS FILE2")
+        sqlStat.AppendLine("    ,isnull(FILE3,'') AS FILE3")
+        sqlStat.AppendLine("    ,isnull(FILE4,'') AS FILE4")
+        sqlStat.AppendLine("    ,isnull(FILE5,'') AS FILE5")
         sqlStat.AppendLine("    ,convert(nvarchar,isnull(DELFLG,null))      AS DELFLG")
         sqlStat.AppendLine("    ,convert(nvarchar,isnull(INITYMD,null))     AS INITYMD")
         sqlStat.AppendLine("    ,convert(nvarchar,isnull(INITUSER,null))    AS INITUSER")

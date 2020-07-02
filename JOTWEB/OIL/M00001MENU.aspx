@@ -23,9 +23,9 @@
                           <tr>
                               <td class="guidanceType"><div class='<%# Eval("TYPE") %>'></div></td>
                               <td class="entryDate"><%# Eval("ENTRYDATE") %></td>
-                              <td class="title"><a href="#" onclick="ButtonClick('WF_ButtonShowGuidance<%# Eval("GUIDANCENO") %>'); return false;"><%# Eval("TITTLE") %></a></td>
+                              <td class="title"><a href="#" onclick="ButtonClick('WF_ButtonShowGuidance<%# Eval("GUIDANCENO") %>'); return false;"><%# Eval("TITLE") %></a></td>
                               <td class="naiyo"><%# Eval("NAIYOU") %></td>
-                              <td class="attachFile1"><a href='<%# ResolveUrl("~/OIL/mas/OIM0020GuidanceDownload.aspx") & "?id=" & JOTWEB.OIM0020WRKINC.GetParamString(Eval("GUIDANCENO"), "1") %>' target="_blank"><%# Eval("FAILE1") %></a></td>
+                              <td class="attachFile1"><a href='<%# ResolveUrl("~/OIL/mas/OIM0020GuidanceDownload.aspx") & "?id=" & JOTWEB.OIM0020WRKINC.GetParamString(Eval("GUIDANCENO"), "1") %>' target="_blank"><%# Eval("FILE1") %></a></td>
                           </tr>
                       </ItemTemplate>
                       <FooterTemplate>

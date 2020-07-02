@@ -73,7 +73,7 @@ Public Class OIM0020GuidanceDownload
             Return ""
         End If
         Dim sqlStat As New StringBuilder
-        sqlStat.AppendFormat("SELECT GD.FAILE{0}", fileNo).AppendLine()
+        sqlStat.AppendFormat("SELECT GD.FILE{0}", fileNo).AppendLine()
         sqlStat.AppendLine("  FROM OIL.OIM0020_GUIDANCE GD")
         sqlStat.AppendLine(" WHERE GD.GUIDANCENO = @GUIDANCENO ")
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection,

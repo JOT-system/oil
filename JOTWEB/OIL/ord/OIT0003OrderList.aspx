@@ -153,14 +153,22 @@
     <div class="grc0001Wrapper">
         <ul>
             <li>
-                <asp:RadioButton ID="rbShipBtn" runat="server" GroupName="WF_SW" Text="出荷予定" />
+                <asp:RadioButton ID="rbShipBtn" runat="server" GroupName="WF_SW" Text="出荷予定" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定" />
+                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線予定" />
+                <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線予定" onclick="reportRadioButton();" />
             </li>
         </ul>
+    </div>
+    <div id="divRTrainNo">
+        <span id="spnRTrainNo">
+            <asp:Label ID="lblReportRTrainNo" runat="server" Text="列車番号(臨海)"></asp:Label>
+            <a class="ef" id="aReportRTrainNo" ondblclick="Field_DBclick('txtReportRTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_RINKAITRAIN_INLIST%>);">
+                <asp:TextBox ID="txtReportRTrainNo" runat="server" CssClass="boxIcon iconOnly"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
     </div>
 </asp:Content>

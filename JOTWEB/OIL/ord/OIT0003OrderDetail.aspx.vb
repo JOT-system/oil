@@ -3779,7 +3779,15 @@ Public Class OIT0003OrderDetail
                         If OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on" Then
                             OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = ""
                         Else
-                            OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on"
+                            '### 20200702 START 指摘票対応(全体(No97))  ##################
+                            'OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on"
+                            If OIT0003tbl_tab3.Rows(i)("AFTERRETURNFLG") = "on" Then
+                                '★後返し(チェックボックス)にチェック有の場合
+                                '　先返し(チェックボックス)にはチェックを未許可とする。
+                            Else
+                                OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on"
+                            End If
+                            '### 20200702 END   指摘票対応(全体(No97))  ##################
                         End If
                     End If
                 Next
@@ -3789,7 +3797,7 @@ Public Class OIT0003OrderDetail
                 '◯ 受注営業所が"011402"(根岸営業所)以外の場合
                 If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 _
                     OrElse (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 _
-                            AndAlso Me.TxtTrainNo.Text <> "83") Then
+                            AndAlso Not (Me.TxtTrainNo.Text = "83" OrElse Me.TxtTrainNo.Text = "81")) Then
                     Exit Select
                 End If
                 'チェックボックス判定
@@ -3798,7 +3806,15 @@ Public Class OIT0003OrderDetail
                         If OIT0003tbl_tab3.Rows(i)("AFTERRETURNFLG") = "on" Then
                             OIT0003tbl_tab3.Rows(i)("AFTERRETURNFLG") = ""
                         Else
-                            OIT0003tbl_tab3.Rows(i)("AFTERRETURNFLG") = "on"
+                            '### 20200702 START 指摘票対応(全体(No97))  ##################
+                            'OIT0003tbl_tab3.Rows(i)("AFTERRETURNFLG") = "on"
+                            If OIT0003tbl_tab3.Rows(i)("FIRSTRETURNFLG") = "on" Then
+                                '★先返し(チェックボックス)にチェック有の場合
+                                '　後返し(チェックボックス)にはチェックを未許可とする。
+                            Else
+                                OIT0003tbl_tab3.Rows(i)("AFTERRETURNFLG") = "on"
+                            End If
+                            '### 20200702 END   指摘票対応(全体(No97))  ##################
                         End If
                     End If
                 Next
@@ -16525,7 +16541,7 @@ Public Class OIT0003OrderDetail
                                 '先返し可否フラグ(チェックボックス)を活性
                                 chkObjFR.Enabled = True
                                 '後返し可否フラグ(チェックボックス)を非活性
-                                chkObjAF.Enabled = False
+                                chkObjAF.Enabled = True
                             ElseIf Me.TxtTrainNo.Text = "83" Then
                                 '先返し可否フラグ(チェックボックス)を非活性
                                 chkObjFR.Enabled = False

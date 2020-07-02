@@ -105,21 +105,25 @@
                     <asp:Label ID="LblRetstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
                 </a>
             </span>
-            <!-- ■　(予定)空車着日　■ -->
-            <span>
-                <a id="WF_EMPARRDATE_LABEL" class="requiredMark">(予定)空車着日</a>
-                <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="TxtEmpDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
-                </a>
-            </span>
-            <span></span>
-            <!-- ■　(実績)空車着日　■ -->
-            <span>
-                <a id="WF_ACTUALEMPARRDATE_LABEL">(実績)空車着日</a>
-                <a class="ef" id="WF_ACTUALEMPARRDATE" ondblclick="Field_DBclick('TxtActEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="TxtActEmpDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
-                </a>
-            </span>
+            <!-- 20200618 START 空車着日を画面から削除 -->
+            <div style="display:none;">
+                <!-- ■　(予定)空車着日　■ -->
+                <span>
+                    <a id="WF_EMPARRDATE_LABEL" class="requiredMark">(予定)空車着日</a>
+                    <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                        <asp:TextBox ID="TxtEmpDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    </a>
+                </span>
+                <span></span>
+                <!-- ■　(実績)空車着日　■ -->
+                <span>
+                    <a id="WF_ACTUALEMPARRDATE_LABEL">(実績)空車着日</a>
+                    <a class="ef" id="WF_ACTUALEMPARRDATE" ondblclick="Field_DBclick('TxtActEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                        <asp:TextBox ID="TxtActEmpDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
+                    </a>
+                </span>
+            </div>
+            <!-- 20200618 END   空車着日を画面から削除 -->
         </div>
         <div class="summaryAreaWrapper">
             <div class="summaryArea">

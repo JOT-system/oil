@@ -2630,13 +2630,18 @@ function commonBindSingleCheckOnly() {
     }
     for (let i = 0; i < tailObjects.length; i++) {
         let tailObject = tailObjects[i];
-
+        let tailObjectControlId = tailObject.id.replace("_chklGrc0001SelectionBox",""); //レンダリング時ではないVB.NET上のID 
         let multiSetting = tailObject.parentNode.querySelector('input[data-id=SelectionMode]');
         if (multiSetting === null) {
             continue;
         }
 
-        if (multiSetting.value === '1') {
+        let needsPostBack = tailObject.parentNode.querySelector('input[data-id=NeedsAfterPostBack]');
+        if (needsPostBack === null) {
+            continue;
+        }
+
+        if (multiSetting.value === '1' && needsPostBack.value === 'False') {
             continue;
         }
 
@@ -2648,11 +2653,22 @@ function commonBindSingleCheckOnly() {
             let insideCheckBox = insideCheckBoxes[j];
             let parentId = tailObject.id;
             let targetId = insideCheckBox.id;
-            insideCheckBox.addEventListener('click', (function (parentId, targetId) {
-                return function () {
-                    commonTailSingleCheck(parentId, targetId);
-                };
-            })(parentId, targetId), false);
+            if (multiSetting.value === '0') {
+                insideCheckBox.addEventListener('click', (function (parentId, targetId) {
+                    return function () {
+                        commonTailSingleCheck(parentId, targetId);
+                    };
+                })(parentId, targetId), false);
+            }
+
+            if (needsPostBack.value !== 'False') {
+                insideCheckBox.addEventListener('click', (function (tailObjectControlId) {
+                    return function () {
+                        ButtonClick(tailObjectControlId);
+                    };
+                })(tailObjectControlId), false);
+                
+            }
         }
     }
 }

@@ -248,6 +248,15 @@ Partial Public Class OIT0003WRKINC
     Public WithEvents WF_SEL_TRAINNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_SEL_OTTRAIN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_OTTRAIN As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_SEL_PATTERNCODE コントロール。
     '''</summary>
     '''<remarks>
@@ -734,6 +743,24 @@ Partial Public Class OIT0003WRKINC
     Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_SEL_TH_ORDERSALESOFFICECODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TH_ORDERSALESOFFICECODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_TH_ORDERSALESOFFICENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TH_ORDERSALESOFFICENAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_SEL_LINK_LINECNT コントロール。
     '''</summary>
     '''<remarks>
@@ -966,7 +993,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BILLINGNO As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_CONSUMPTIONTAX コントロール。
     '''</summary>
@@ -975,7 +1002,7 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CONSUMPTIONTAX As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_CREATEFLG コントロール。
     '''</summary>
@@ -1101,4 +1128,13 @@ Partial Public Class OIT0003WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELIVERYFLG As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEL_SHIPORDERCLASS コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_SHIPORDERCLASS As Global.System.Web.UI.WebControls.TextBox
 End Class

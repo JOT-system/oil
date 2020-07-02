@@ -144,6 +144,7 @@ input[type=number]:focus,
 textarea:focus {
     border-color: rgba(1,60,65, .5);
     background-image:none;
+    outline:none;
     //box-shadow: 0 0 5px 1px rgba(218,60,65, .5);
 }
 input[type=text][disabled]:hover,
@@ -615,12 +616,13 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     margin-left: auto; /* 右に寄せる為マージンで埋める */
     box-sizing: border-box;
 }
-.actionButtonBox .btn-sticky{
-    min-width:5em;
-    width:auto;
-    padding-left:5px;
-    padding-right:5px;
-}
+    .actionButtonBox .btn-sticky {
+        min-width: 5em;
+        width: auto;
+        padding-left: 5px;
+        padding-right: 5px;
+        outline: none;
+    }
 /* ******************************** */
 /* 条件画面設定                     */
 /* ******************************** */
@@ -869,6 +871,7 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     overflow-y: auto;
     color: black;
     border: 1px solid;
+    outline: none;
     border-color: rgba(176, 176, 276, 0.6);
     background-color: rgba(255, 255, 255, 1);
     font-size: 1em;
@@ -2019,9 +2022,10 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     bottom: 0;
     overflow: auto;
 }
-#divContentsPopUpWrapper .popUpButtons input[type=button] {
-    font-family:"meiryo", "ms pgothic"  ;
-}
+    #divContentsPopUpWrapper .popUpButtons input[type=button] {
+        font-family: "meiryo", "ms pgothic";
+        outline: none;
+    }
 #divContentsPopUp {
     background-color: rgb(240,240,240);
     box-shadow: 10px 10px 10px rgba(0,0,0,0.4);

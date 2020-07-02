@@ -454,6 +454,8 @@
             <!-- 油槽所変更値保持用 -->
             <asp:HiddenField ID="hdnChgConsignee" runat="server" />
             <asp:HiddenField ID="hdnChgConsigneeName" runat="server" />
+            <!-- 油槽所変更時初回ロード 0:通常、1:初回 -->
+            <asp:HiddenField ID="hdnChgConsigneeFirstLoad" runat="server" Value="0" />
             <!-- 帳票設定表示状態保持用 -->
             <asp:HiddenField ID="hdnDispReportSettings" runat="server" value="0"/>
             <!-- 権限 -->
@@ -466,35 +468,37 @@
 </asp:Content>
 <%--ポップアップタイトルバーの内容--%>
 <asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
-    <div>
+    <div id="divChkEneos" runat="server">
         <div class="grc0001Wrapper">
             <ul>
                 <li>
-                    <asp:CheckBox ID="chkPrintJXTG" runat="server" Text="JXTG用帳票" />
+                    <asp:CheckBox ID="chkPrintENEOS" runat="server" Text="ENEOS用帳票" />
                 </li>
             </ul>
         </div>
     </div>
     <div>
-        <span id="spnDownloadMonth" style="display:none;">
-                <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
-                <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
+        <span id="spnDownloadMonth" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %> >
+            <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
+            <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
+            <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
         </span>
     </div>
     <div>
-        <span id="spnFromDate">
+        <span id="spnFromDate" <%= If(hdnShowPnlToDate.Value = "1", "style='display:none;'", "") %>>
             <asp:Label ID="lblReportFromDate" runat="server" Text="開始日"></asp:Label>
             <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
     </div>
-    <div>
+<%--    <div id="pnlToDate" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %>>
+        <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
         <span id="spnToDate">
             <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
             <a class="ef" id="aReportToDate" ondblclick="Field_DBclick('txtReportToDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                 <asp:TextBox ID="txtReportToDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
             </a>
         </span>
-    </div>
+    </div>--%>
 </asp:Content>

@@ -230,22 +230,58 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents WF_BUTTONpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''lblReportFromDate コントロール。
+    '''lblReportLodDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents lblReportFromDate As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents lblReportLodDate As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''txtReportFromDate コントロール。
+    '''txtReportLodDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents txtReportFromDate As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents txtReportLodDate As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''tileSalesOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
+    
+    '''<summary>
+    '''rbShipBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbShipBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbLoadBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbLoadBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbLineBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbLineBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''Master プロパティ。

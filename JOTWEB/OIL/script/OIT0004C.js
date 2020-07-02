@@ -24,7 +24,10 @@ function InitDisplay() {
     //提案表の合計イベントバインド
     bindSuggestSummary(suggestCol);
     //油種表示非表示設定復元
-    if (IsPostBack === '0') {
+    let hdnChgConsigneeFirstLoadObj = document.getElementById('hdnChgConsigneeFirstLoad');
+
+    if (IsPostBack === '0' || hdnChgConsigneeFirstLoadObj.value === '1') {
+        hdnChgConsigneeFirstLoadObj.value = '0';
         loadOiltypeSelected();
     }
     //油種表示非表示イベントバインド
@@ -39,6 +42,8 @@ function InitDisplay() {
     bindContentHorizonalScroll();
     //月選択バインド
     commonBindMonthPicker();
+    //ENEOSチェックイベントバインド
+    bindEneosCheckBox();
 }
 // 〇コンテンツ横スクロールイベントのバインド
 function bindContentHorizonalScroll() {
@@ -586,4 +591,33 @@ function changeConsignee(callerObj) {
     }
 
     ButtonClick('ChangeConsignee');
+}
+// ENEOS帳票のチェック時のイベントをバインド
+function bindEneosCheckBox() {
+    let chkObj = document.getElementById('chkPrintENEOS');
+    if (chkObj === null) {
+        return;
+    }
+    chkObj.addEventListener('click', (function () {
+        return function () {
+            eneosCheckChange();
+        };
+    })(), true);
+
+}
+function eneosCheckChange() {
+    let chkObj = document.getElementById('chkPrintENEOS');
+    let hdnShowPnlToDateObj = document.getElementById('hdnShowPnlToDate');
+    let hdnPnlMonthPickerObj = document.getElementById('spnDownloadMonth');
+    let hdnPnlFromDateObj = document.getElementById('spnFromDate');
+    //let pnlObj = document.getElementById('pnlToDate');
+    if (chkObj.checked) {
+        hdnShowPnlToDateObj.value = '0';
+        hdnPnlMonthPickerObj.style.display = 'none';
+        hdnPnlFromDateObj.style.display = '';
+    } else {
+        hdnShowPnlToDateObj.value = '1';
+        hdnPnlMonthPickerObj.style.display = '';
+        hdnPnlFromDateObj.style.display = 'none';
+    }
 }

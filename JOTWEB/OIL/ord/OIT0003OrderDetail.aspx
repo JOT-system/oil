@@ -82,7 +82,8 @@
                     <a></a>
                     <a class="ef" id="WF_ORDERINFO">
                         <%--<asp:TextBox ID="TxtOrderInfo" runat="server" onblur="MsgClear();" Enabled="true"></asp:TextBox>--%>
-                        <asp:CheckBox ID="chkOrderInfo" runat="server" Text=" " Checked="true" Enabled ="false" />
+                        <asp:CheckBox ID="chkOrderInfo" runat="server" Text=" " Checked="true" Enabled ="false"/>
+                        <asp:CheckBox ID="chkOrderDetailInfo" runat="server" Text=" " Checked="true" Enabled ="false" Visible="false" />
                     </a>
                 </span>
                 <!-- ■　受注パターン　■ -->
@@ -110,7 +111,14 @@
                         <asp:TextBox ID="TxtTrainName" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>
-                <span></span><span></span><span></span>
+                <span>
+                    <a id="WF_OTTRAINNO_LABEL">積置列車</a>
+                    <a class="ef" id="WF_OTTRAINNO" ondblclick="Field_DBclick('TxtOTTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtOTTrainNo');">
+                        <asp:TextBox ID="TxtOTTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4" Enabled="false"></asp:TextBox>
+                        <asp:TextBox ID="TxtOTTrainName" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
+                    </a>
+                </span>
+                <span></span><span></span>
 
                 <!-- ■　荷主　■ -->
                 <span class="left">

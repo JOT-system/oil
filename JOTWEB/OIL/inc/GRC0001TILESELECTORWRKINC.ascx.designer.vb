@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class GRC0001TILESELECTORWRKINC
-
+    
     '''<summary>
     '''chklGrc0001SelectionBox コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class GRC0001TILESELECTORWRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents chklGrc0001SelectionBox As Global.System.Web.UI.WebControls.CheckBoxList
-
+    
     '''<summary>
     '''txtGrc0001SelectionMode コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class GRC0001TILESELECTORWRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtGrc0001SelectionMode As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''txtGrc0001ListClass コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class GRC0001TILESELECTORWRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents txtGrc0001ListClass As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''txtGrc0001NeedsAfterPostBack コントロール。
     '''</summary>

@@ -219,6 +219,19 @@ Public Class GRC0001TILESELECTORWRKINC
         Return retVal
     End Function
     ''' <summary>
+    ''' 選択状態のリストボックスデータを取得(画面用)
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetSelectedListData() As ListBox
+        Dim qselectedItm = (From itm In Me.chklGrc0001SelectionBox.Items.Cast(Of ListItem) Where itm.Selected = True)
+        Dim retVal As New ListBox
+        If qselectedItm.Any = False Then
+            Return retVal
+        End If
+        retVal.Items.AddRange(qselectedItm.ToArray)
+        Return retVal
+    End Function
+    ''' <summary>
     ''' 選択されたコード値を取得(複数選択の場合は先頭、選択が無ければブランク)
     ''' </summary>
     ''' <param name="base64Str">GetListItemsStrで退避した文字列</param>
@@ -231,12 +244,35 @@ Public Class GRC0001TILESELECTORWRKINC
         Return listData.Items(0).Value
     End Function
     ''' <summary>
-    ''' 選択されたコード値を取得(複数選択の場合は先頭、選択が無ければブランク)
+    ''' 選択されたコード値を取得(複数選択の場合は先頭、選択が無ければブランク)画面用
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetSelectedSingleValue() As String
+        Dim listData = GetSelectedListData()
+        If listData Is Nothing OrElse listData.Items.Count = 0 Then
+            Return ""
+        End If
+        Return listData.Items(0).Value
+    End Function
+    ''' <summary>
+    ''' 選択された表示値を取得(複数選択の場合は先頭、選択が無ければブランク)
     ''' </summary>
     ''' <param name="base64Str">GetListItemsStrで退避した文字列</param>
     ''' <returns></returns>
     Public Shared Function GetSelectedSingleText(base64Str As String) As String
         Dim listData = GetSelectedListData(base64Str)
+        If listData Is Nothing OrElse listData.Items.Count = 0 Then
+            Return ""
+        End If
+        Return listData.Items(0).Text
+    End Function
+    ''' <summary>
+    ''' 選択された表示値を取得(複数選択の場合は先頭、選択が無ければブランク)画面用
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetSelectedSingleText() As String
+        Dim listData = GetSelectedListData()
+
         If listData Is Nothing OrElse listData.Items.Count = 0 Then
             Return ""
         End If

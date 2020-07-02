@@ -168,6 +168,7 @@ a[id^="Menu_"] input[type=submit] {
 }
 a[id^="Menu_"] input[type=submit] {
     background-image: linear-gradient(0deg, RGBA(0,0,0,0.1),RGBA(0,0,0,0.1));
+    outline: none;
 }
 /* **************************
     ガイダンス関連

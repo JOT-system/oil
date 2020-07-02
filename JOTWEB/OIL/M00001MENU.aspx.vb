@@ -266,6 +266,7 @@ Public Class M00001MENU
                 Me.WF_HdnGuidanceUrl.Value = Convert.ToString(urlVal)
             End Using
         Catch ex As Exception
+            Return retDt
         End Try
 
         Return retDt

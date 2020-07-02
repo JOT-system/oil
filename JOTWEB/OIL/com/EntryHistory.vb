@@ -223,16 +223,7 @@ Public Class EntryHistory
                 .Add("LINEORDER", SqlDbType.NVarChar).Value = drOrder("LINEORDER")
                 .Add("TANKNO", SqlDbType.NVarChar).Value = drOrder("TANKNO")
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
-                Try
-                    .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
-                Catch ex As Exception
-                    If .Contains("STACKINGORDERNO") Then
-                        .Item("STACKINGORDERNO").Value = ""
-                    Else
-                        .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = ""
-                    End If
-
-                End Try
+                .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")

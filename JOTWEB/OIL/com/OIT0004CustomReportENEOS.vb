@@ -193,22 +193,72 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
         Dim rngDateStart As Excel.Range = Nothing
         'Dim rowSettings As New Dictionary(Of String, Dictionary(Of String, String))
         Dim rowSettings As New Dictionary(Of String, String) From
-               {{"RNG_{0}_HG_ROWNAME", "1001"},
-                {"RNG_{0}_RG_ROWNAME", "1101"},
-                {"RNG_{0}_KE_ROWNAME", "1302"},
-                {"RNG_{0}_GO_ROWNAME", "1401"},
-                {"RNG_{0}_3GO_ROWNAME", "1404"},
-                {"RNG_{0}_A_ROWNAME", "2101"},
-                {"RNG_{0}_LSA_ROWNAME", "2201"}}
+               {{"1001", "RNG_{0}_HG_ROWNAME"},
+                {"1101", "RNG_{0}_RG_ROWNAME"},
+                {"1302", "RNG_{0}_KE_ROWNAME"},
+                {"1401", "RNG_{0}_GO_ROWNAME"},
+                {"1404", "RNG_{0}_3GO_ROWNAME"},
+                {"2101", "RNG_{0}_A_ROWNAME"},
+                {"2201", "RNG_{0}_LSA_ROWNAME"}}
+        Dim rngPrefix As String = "H"
 
         Try
             '起点年月日の設定、他の日付はExcel数式で+1日・・・と設定しているので不要
             rngDateStart = Me.ExcelWorkSheet.Range("RNG_FIRSTDATE")
             rngDateStart.Value = Me.HokushinData.StockDate.Values.First.ItemDate
             For Each printObj In {Me.HokushinData, Me.KouhuData}
-                If printObj.Consignee = "10" Then
-
+                If printObj.Consignee <> "10" Then
+                    rngPrefix = "K"
                 End If
+                Dim rngTargetRow As Excel.Range = Nothing
+                Dim rngOffset As Excel.Range = Nothing
+                Dim rngResize As Excel.Range = Nothing
+                Dim targetRowName As String
+                Dim pasteColHeader(0, 4) As Object
+                Dim pasteColUkeire(0, 2) As Object
+                For Each oilItm In printObj.StockList.Values
+                    If rowSettings.ContainsKey(oilItm.OilInfo.OilCode) = False Then
+                        Continue For
+                    End If
+                    targetRowName = rowSettings(oilItm.OilInfo.OilCode)
+                    targetRowName = String.Format(targetRowName, rngPrefix)
+                    rngTargetRow = Me.ExcelWorkSheet.Range(targetRowName)
+                    '列見出し部分の数値格納
+                    rngOffset = rngTargetRow.Offset(ColumnOffset:=1)
+                    rngResize = rngOffset.Resize(ColumnSize:=5)
+                    pasteColHeader(0, 0) = oilItm.TankCapacity '安全容量
+                    pasteColHeader(0, 1) = oilItm.DS 'D/S
+                    pasteColHeader(0, 2) = oilItm.Stock80  '80%在庫
+                    pasteColHeader(0, 3) = oilItm.LastShipmentAve
+                    '初日は朝在庫設定
+                    pasteColHeader(0, 4) = 0 ' oilItm.StockItemList.Values.First.MorningStockWithoutDS
+                    rngResize.Value = pasteColHeader
+
+                    ExcelMemoryRelease(rngResize)
+                    ExcelMemoryRelease(rngOffset)
+                    '日付毎のループ
+                    Dim loopcnt = 0
+                    For Each daysItm In oilItm.StockItemList.Values
+                        '受入数量（３カラム分の設定）
+                        rngOffset = rngTargetRow.Offset(ColumnOffset:=7 + (7 * loopcnt))
+                        rngResize = rngOffset.Resize(ColumnSize:=3)
+                        pasteColUkeire(0, 0) = daysItm.Print1stPositionVal
+                        pasteColUkeire(0, 1) = daysItm.Print2ndPositionVal
+                        pasteColUkeire(0, 2) = daysItm.Print3rdPositionVal
+                        rngResize.Value = pasteColUkeire
+                        ExcelMemoryRelease(rngResize)
+                        ExcelMemoryRelease(rngOffset)
+                        '払出数量の設定
+                        rngOffset = rngTargetRow.Offset(ColumnOffset:=11 + (7 * loopcnt))
+                        rngOffset.Value = 0 'CDec(daysItm.Send)
+                        ExcelMemoryRelease(rngOffset)
+                        loopcnt = loopcnt + 1
+                    Next
+                    ExcelMemoryRelease(rngTargetRow)
+
+
+                Next
+                ExcelMemoryRelease(rngTargetRow)
             Next printObj
         Catch ex As Exception
             Throw

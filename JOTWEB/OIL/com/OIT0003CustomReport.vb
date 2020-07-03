@@ -103,6 +103,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
         ElseIf excelFileName = "OIT0003L_NEGISHI_LOADPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("回線別積込"), Excel.Worksheet)
             'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+        ElseIf excelFileName = "OIT0003L_SODEGAURA_LINEPLAN.xlsx" Then
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入線方"), Excel.Worksheet)
+            'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         End If
     End Sub
 
@@ -431,6 +434,143 @@ Public Class OIT0003CustomReport : Implements IDisposable
         End Try
     End Sub
 
+#End Region
+
+#Region "ダウンロード(入線予定表(袖ヶ浦))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(出荷・積込予定表(根岸))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintSodegauraData(ByVal repPtn As String, ByVal lodDate As String, ByVal rTrainNo As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditSodegauraLineHeaderArea(lodDate)
+            '◯明細の設定
+            EditSodegauraLineDetailArea()
+            '***** TODO処理 ここまで *****
+            'ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(入線方予定表(袖ヶ浦))
+    ''' </summary>
+    Private Sub EditSodegauraLineHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 現日付
+                rngHeaderArea = Me.ExcelWorkSheet.Range("L1")
+                rngHeaderArea.Value = Now.ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
+
+                '◯ 積込日
+                'Dim value As String = PrintDatarow("ACTUALLODDATE").ToString
+                Dim value As String = PrintDatarow("LODDATE").ToString
+                '　月
+                rngHeaderArea = Me.ExcelWorkSheet.Range("E6")
+                rngHeaderArea.Value = Date.Parse(value).ToString("MM", New Globalization.CultureInfo("ja-JP")) + "月"
+                '　日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("F6")
+                rngHeaderArea.Value = Date.Parse(value).ToString("dd", New Globalization.CultureInfo("ja-JP")) + "日"
+                '　曜日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("G6")
+                rngHeaderArea.Value = Date.Parse(value).ToString("(ddd)", New Globalization.CultureInfo("ja-JP"))
+
+                '◯ 入線列車名(臨海鉄道)
+                rngHeaderArea = Me.ExcelWorkSheet.Range("I6")
+                rngHeaderArea.Value = PrintDatarow("LOADINGIRILINETRAINNAME")
+
+                '◯ 入線列車No(臨海鉄道)
+                rngHeaderArea = Me.ExcelWorkSheet.Range("C10")
+                rngHeaderArea.Value = PrintDatarow("LOADINGIRILINETRAINNO")
+
+                '◯ 出線列車No(臨海鉄道)
+                rngHeaderArea = Me.ExcelWorkSheet.Range("F10")
+                rngHeaderArea.Value = PrintDatarow("LOADINGOUTLETTRAINNO")
+
+                Exit For
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(入線方予定表(袖ヶ浦))
+    ''' </summary>
+    Private Sub EditSodegauraLineDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 12
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 発送列車
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("JRTRAINNO1")
+
+                '◯ 入線順
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("LOADINGIRILINEORDER")
+                rngDetailArea.Value = PrintDatarow("NYUSENNO")
+
+                '◯ 油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
+
+                '◯ 車両番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("G" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CARSNUMBER")
+
+                '◯ ☆入荷記
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("NYUUKA")
+
+                '◯ OT順位
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("LOADINGOUTLETORDER")
+                rngDetailArea.Value = PrintDatarow("OTRANK")
+
+                i += 1
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
 #End Region
 
 #Region "ダウンロード(出荷・積込予定表(根岸))"

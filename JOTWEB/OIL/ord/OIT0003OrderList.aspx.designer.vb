@@ -284,6 +284,24 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbLineBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
+    '''lblReportRTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportRTrainNo As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtReportRTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportRTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

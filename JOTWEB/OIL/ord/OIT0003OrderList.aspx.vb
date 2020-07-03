@@ -90,6 +90,10 @@ Public Class OIT0003OrderList
                             'WF_FILEUPLOAD()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
+                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -229,9 +233,12 @@ Public Class OIT0003OrderList
         Me.tileSalesOffice.SetTileValues()
 
         'ラジオボタンを非表示にする。
-        rbShipBtn.Visible = False
-        rbLoadBtn.Visible = False
-        rbLineBtn.Visible = False
+        Me.rbShipBtn.Visible = False
+        Me.rbLoadBtn.Visible = False
+        Me.rbLineBtn.Visible = False
+
+        'lblReportRTrainNo.Visible = False
+        'txtReportRTrainNo.Visible = False
 
         ''帳票のポップアップを閉じる
         'Master.HideCustomPopUp()
@@ -1056,8 +1063,18 @@ Public Class OIT0003OrderList
             With leftview
                 If WF_LeftMViewChange.Value <> LIST_BOX_CLASSIFICATION.LC_CALENDAR Then
 
-                    '###　特になし ####################################################
+                    '会社コード
+                    Dim prmData As New Hashtable
+                    prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
 
+                    '○ 選択内容を画面項目へセット
+                    Select Case WF_FIELD.Value
+                        '列車番号(臨海)
+                        Case "txtReportRTrainNo"
+                            prmData = work.CreateFIXParam(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
+                    End Select
+                    .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
+                    .ActiveListBox()
                 Else
                     '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                     Select Case WF_FIELD.Value
@@ -1390,12 +1407,32 @@ Public Class OIT0003OrderList
                 Catch ex As Exception
                 End Try
                 Me.txtReportLodDate.Focus()
+            '(帳票ポップアップ)列車番号(臨海)
+            Case "txtReportRTrainNo"
+                Me.txtReportRTrainNo.Text = WW_SelectValue
+                Me.txtReportRTrainNo.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
 
+    End Sub
+
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "txtReportLodDate"          '(帳票)積込日
+                Me.txtReportLodDate.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
     End Sub
 
     ''' <summary>
@@ -1832,19 +1869,25 @@ Public Class OIT0003OrderList
             Exit Sub
         End If
 
+        '◯ 帳票(入線予定)選択時チェック
+        If Me.rbLineBtn.Checked = True AndAlso Me.txtReportRTrainNo.Text = "" Then
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "列車番号(臨海)が未設定です。", needsPopUp:=True)
+            Exit Sub
+        End If
+
         '★ 各営業所の固定帳票
         Select Case work.WF_SEL_TH_ORDERSALESOFFICECODE.Text
             '◯ 仙台新港営業所
             Case BaseDllConst.CONST_OFFICECODE_010402
                 If Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
-
+                    '### 特になし ###########################################
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLineBtn.Checked = True Then     '■入線予定を選択
-
+                    '### 特になし ###########################################
 
                 End If
 
@@ -1852,48 +1895,48 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_011201
                 If Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
                     '★ 固定帳票(出荷予定(五井))作成処理
-                    WW_TyohyoGoiCreate("SHIPPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoGoiCreate("SHIPPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                     '☆ 固定帳票(積込予定(五井))作成処理
-                    WW_TyohyoGoiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoGoiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLineBtn.Checked = True Then     '■入線予定を選択
-
+                    '### 特になし ###########################################
 
                 End If
 
             '◯ 甲子営業所
             Case BaseDllConst.CONST_OFFICECODE_011202
                 If Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
-
+                    '### 特になし ###########################################
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLineBtn.Checked = True Then     '■入線予定を選択
-
+                    '### 特になし ###########################################
 
                 End If
 
             '◯ 袖ヶ浦営業所
             Case BaseDllConst.CONST_OFFICECODE_011203
                 If Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
-
+                    '### 特になし ###########################################
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
                     ''★ 固定帳票(積込予定(共通))作成処理
                     'WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
                     '★ 固定帳票(積込予定(袖ヶ浦))作成処理
-                    WW_TyohyoSodegauraCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoSodegauraCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLineBtn.Checked = True Then     '■入線予定を選択
                     '★ 固定帳票(入線予定(袖ヶ浦))作成処理
-                    WW_TyohyoSodegauraCreate("LINEPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoSodegauraCreate("LINEPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 End If
 
@@ -1901,42 +1944,42 @@ Public Class OIT0003OrderList
             Case BaseDllConst.CONST_OFFICECODE_011402
                 If Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
                     '★ 固定帳票(出荷予定(根岸))作成処理
-                    WW_TyohyoNegishiCreate("SHIPPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoNegishiCreate("SHIPPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
                     '☆ 固定帳票(積込予定(根岸))作成処理
-                    WW_TyohyoNegishiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoNegishiCreate("LOADPLAN", work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLineBtn.Checked = True Then     '■入線予定を選択
-
+                    '### 特になし ###########################################
 
                 End If
 
             '◯ 四日市営業所
             Case BaseDllConst.CONST_OFFICECODE_012401
                 If Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
-
+                    '### 特になし ###########################################
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLineBtn.Checked = True Then     '■入線予定を選択
-
+                    '### 特になし ###########################################
 
                 End If
 
             '◯ 三重塩浜営業所
             Case BaseDllConst.CONST_OFFICECODE_012402
                 If Me.rbShipBtn.Checked = True Then         '■出荷予定を選択
-
+                    '### 特になし ###########################################
 
                 ElseIf Me.rbLoadBtn.Checked = True Then     '■積込予定を選択
                     '★ 固定帳票(積込予定(共通))作成処理
-                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                    WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
                 ElseIf Me.rbLineBtn.Checked = True Then     '■入線予定を選択
-
+                    '### 特になし ###########################################
 
                 End If
         End Select
@@ -1947,7 +1990,7 @@ Public Class OIT0003OrderList
     ''' 固定帳票(積込予定(共通))作成処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_TyohyoLoadCommonCreate(ByVal officeCode As String, ByVal lodDate As String)
+    Protected Sub WW_TyohyoLoadCommonCreate(ByVal officeCode As String)
 
         '******************************
         '帳票表示データ取得処理
@@ -1955,7 +1998,7 @@ Public Class OIT0003OrderList
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            ExcelCommonDataGet(SQLcon, officeCode, lodDate:=lodDate)
+            ExcelCommonDataGet(SQLcon, officeCode, lodDate:=Me.txtReportLodDate.Text)
         End Using
 
         '******************************
@@ -1980,8 +2023,7 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_TyohyoGoiCreate(ByVal tyohyoType As String,
-                                             ByVal officeCode As String,
-                                             ByVal lodDate As String)
+                                             ByVal officeCode As String)
 
         '******************************
         '帳票作成処理の実行
@@ -1995,7 +2037,7 @@ Public Class OIT0003OrderList
                 'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 '    SQLcon.Open()       'DataBase接続
 
-                '    ExcelGoiDataGet(SQLcon, lodDate:=lodDate)
+                '    ExcelGoiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
                 'End Using
 
                 'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_GOI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
@@ -2013,7 +2055,7 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(五井(積込予定))押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
         End Select
 
@@ -2024,8 +2066,7 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_TyohyoSodegauraCreate(ByVal tyohyoType As String,
-                                             ByVal officeCode As String,
-                                             ByVal lodDate As String)
+                                             ByVal officeCode As String)
 
         '******************************
         '帳票作成処理の実行
@@ -2037,7 +2078,7 @@ Public Class OIT0003OrderList
             'ダウンロードボタン(袖ヶ浦(積込予定))押下
             Case "LOADPLAN"
                 '★ 固定帳票(積込予定(共通))作成処理
-                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text, Me.txtReportLodDate.Text)
+                WW_TyohyoLoadCommonCreate(work.WF_SEL_TH_ORDERSALESOFFICECODE.Text)
 
             'ダウンロードボタン(袖ヶ浦(入線予定))押下
             Case "LINEPLAN"
@@ -2047,20 +2088,20 @@ Public Class OIT0003OrderList
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelSodegauraDataGet(SQLcon, lodDate:=lodDate)
+                    ExcelSodegauraDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text, rTrainNo:=Me.txtReportRTrainNo.Text)
                 End Using
 
-                'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_LINEPLAN.xlsx", OIT0003ReportSodegauratbl)
-                '    Dim url As String
-                '    Try
-                '        url = repCbj.CreateExcelPrintSodegauraData("LINEPLAN", lodDate)
-                '    Catch ex As Exception
-                '        Return
-                '    End Try
-                '    '○ 別画面でExcelを表示
-                '    WF_PrintURL.Value = url
-                '    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-                'End Using
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_SODEGAURA_LINEPLAN.xlsx", OIT0003ReportSodegauratbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintSodegauraData("LINEPLAN", Me.txtReportLodDate.Text, Me.txtReportRTrainNo.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
 
         End Select
 
@@ -2072,8 +2113,7 @@ Public Class OIT0003OrderList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_TyohyoNegishiCreate(ByVal tyohyoType As String,
-                                             ByVal officeCode As String,
-                                             ByVal lodDate As String)
+                                             ByVal officeCode As String)
 
         '******************************
         '帳票表示データ取得処理
@@ -2081,7 +2121,7 @@ Public Class OIT0003OrderList
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            ExcelNegishiDataGet(SQLcon, lodDate:=lodDate)
+            ExcelNegishiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
         End Using
 
         '******************************
@@ -2093,7 +2133,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", lodDate)
+                        url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Me.txtReportLodDate.Text)
                     Catch ex As Exception
                         Return
                     End Try
@@ -2107,7 +2147,7 @@ Public Class OIT0003OrderList
                 Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_LOADPLAN.xlsx", OIT0003ReportNegishitbl)
                     Dim url As String
                     Try
-                        url = repCbj.CreateExcelPrintNegishiData("LOADPLAN", lodDate)
+                        url = repCbj.CreateExcelPrintNegishiData("LOADPLAN", Me.txtReportLodDate.Text)
                     Catch ex As Exception
                         Return
                     End Try
@@ -2337,7 +2377,8 @@ Public Class OIT0003OrderList
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
     Protected Sub ExcelSodegauraDataGet(ByVal SQLcon As SqlConnection,
-                                        Optional ByVal lodDate As String = Nothing)
+                                        Optional ByVal lodDate As String = Nothing,
+                                        Optional ByVal rTrainNo As String = Nothing)
 
         If IsNothing(OIT0003ReportSodegauratbl) Then
             OIT0003ReportSodegauratbl = New DataTable
@@ -2363,10 +2404,29 @@ Public Class OIT0003OrderList
             & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIM0007.OTTRAINNO                              AS OTTRAINNO" _
+            & " , OIM0007.JRTRAINNO1                             AS JRTRAINNO1" _
+            & " , OIM0007.JRTRAINNO2                             AS JRTRAINNO2" _
+            & " , OIM0007.JRTRAINNO3                             AS JRTRAINNO3" _
+            & " , CASE " _
+            & "   WHEN SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) <= 5 THEN 1 " _
+            & "   WHEN SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) >= 6 " _
+            & "        AND SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) <= 10 THEN 2 " _
+            & "   WHEN SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) >= 11 " _
+            & "        AND SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) <= 15 THEN 3 " _
+            & "   WHEN SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) >= 16 " _
+            & "        AND SUM(1) OVER(PARTITION BY OIT0002.TRAINNO) <= 20 THEN 4 " _
+            & "   END                                            AS TRAINSUM " _
+            & " , OIT0002.LODDATE                                AS LODDATE" _
             & " , OIT0003.ACTUALLODDATE                          AS ACTUALLODDATE" _
+            & " , ROW_NUMBER() OVER(ORDER BY OIM0007.OTFLG DESC, " _
+            & "                              OIM0007.ZAIKOSORT, " _
+            & "                              RIGHT ('00' + OIT0003.LOADINGIRILINEORDER, 2)) AS NYUSENNO" _
+            & " , ''                                             AS OTRANK" _
             & " , OIT0003.LOADINGIRILINEORDER                    AS LOADINGIRILINEORDER" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0003.LOADINGIRILINETRAINNAME                AS LOADINGIRILINETRAINNAME" _
+            & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
             & " , CASE" _
             & "   WHEN OIM0005.MODEL = 'タキ1000' THEN '1-' + OIT0003.TANKNO" _
             & "   ELSE OIT0003.TANKNO" _
@@ -2380,23 +2440,49 @@ Public Class OIT0003OrderList
             & " , OIT0003.DELFLG                                 AS DELFLG" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & "  INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
-            & "      OIT0003.ORDERNO = OIT0002.ORDERNO " _
-            & "  AND OIT0003.DELFLG <> @P02 " _
+            & "      OIT0003.ORDERNO = OIT0002.ORDERNO "
+
+        SQLStr &=
+              "  AND OIT0003.LOADINGIRILINETRAINNO = @P04 "
+
+        'If Not String.IsNullOrEmpty(rTrainNo) Then
+        '    '### 「積込入線列車番号」の条件は未設定 ##########
+        'Else
+        '    SQLStr &=
+        '      "  AND OIT0003.LOADINGIRILINETRAINNO = @P04 "
+        'End If
+
+        SQLStr &=
+              "  AND OIT0003.DELFLG <> @P02 " _
             & "  LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
             & "      OIM0005.TANKNUMBER = OIT0003.TANKNO " _
             & "  AND OIM0005.DELFLG <> @P02 " _
+            & "  LEFT JOIN oil.OIM0007_TRAIN OIM0007 ON " _
+            & "      OIM0007.OFFICECODE = OIT0002.OFFICECODE " _
+            & "  AND OIM0007.TRAINNAME = OIT0002.TRAINNAME " _
+            & "  AND OIM0007.DELFLG <> @P02 " _
+            & "  LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+            & "      TMP0005.OFFICECODE =OIT0002.OFFICECODE " _
+            & "  AND TMP0005.SHIPPERCODE = OIT0003.SHIPPERSCODE " _
+            & "  AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
+            & "  AND TMP0005.OILNo = '1' " _
+            & "  AND TMP0005.OILCODE = OIT0003.OILCODE " _
+            & "  AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
-            & " AND OIT0003.ACTUALLODDATE = @P03 "
+            & " AND OIT0002.LODDATE = @P03 "
 
         SQLStr &=
               " ORDER BY" _
-            & "    RIGHT('00' + OIT0003.LOADINGIRILINEORDER, 2) "
+            & "    OIM0007.OTFLG DESC " _
+            & " ,  OIM0007.ZAIKOSORT " _
+            & " ,  RIGHT('00' + OIT0003.LOADINGIRILINEORDER, 2) "
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 4)  '積込入線列車番号
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011203
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -2404,6 +2490,7 @@ Public Class OIT0003OrderList
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
+                PARA04.Value = rTrainNo
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -2415,37 +2502,76 @@ Public Class OIT0003OrderList
                     OIT0003ReportSodegauratbl.Load(SQLdr)
                 End Using
 
-                '件数チェックをし「入荷記」に"(入)"を入れる数を決定する。
-                Dim LineCnt As Integer = 0
-                Select Case OIT0003ReportSodegauratbl.Rows.Count
-                    Case 1 To 5
-                        LineCnt = 1
-                    Case 6 To 10
-                        LineCnt = 2
-                    Case 11 To 15
-                        LineCnt = 3
-                    Case 16 To 20
-                        LineCnt = 4
-                End Select
-
-                Dim i As Integer = 0
-                Dim j As Integer = LineCnt
-                Dim strNyuuka As String = "(入)"
+                Dim tblCnt As Integer = OIT0003ReportSodegauratbl.Rows.Count
                 For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
+                    'OT順位を降順で設定
+                    OIT0003Reprow("OTRANK") = tblCnt
+                    tblCnt -= 1
+                Next
+
+                Dim strTrainNo As String = ""
+                Dim strNyuuka As String = "(入)"
+                Dim LineCnt As Integer = 0
+                For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
+
+                    '列車Noが前回と違う場合(または初回)
+                    If strTrainNo = "" OrElse strTrainNo <> OIT0003Reprow("TRAINNO") Then
+                        '★列車の合計を設定
+                        LineCnt = OIT0003Reprow("TRAINSUM")
+                    End If
 
                     '★列車Noによって、上から設定/下から設定を切り分ける
                     Select Case OIT0003Reprow("TRAINNO")
-                        Case "5972"
-                            i += 1
-                            OIT0003Reprow("NYUUKA") = strNyuuka
-                            If LineCnt = i Then Exit For
+                        '列車№:8877, 8883は下から
                         Case "8877", "8883"
-                            If OIT0003Reprow("LOADINGOUTLETORDER") = j Then
+                            If OIT0003Reprow("LOADINGOUTLETORDER") = LineCnt Then
                                 OIT0003Reprow("NYUUKA") = strNyuuka
-                                j -= 1
+                                LineCnt -= 1
+                            End If
+                        '列車№:5461(JR:5972)は上から
+                        Case "5461"
+                            If OIT0003Reprow("LOADINGIRILINEORDER") <= LineCnt Then
+                                OIT0003Reprow("NYUUKA") = strNyuuka
                             End If
                     End Select
+
+                    '列車番号を設定(比較用)
+                    strTrainNo = OIT0003Reprow("TRAINNO")
                 Next
+
+                ''件数チェックをし「入荷記」に"(入)"を入れる数を決定する。
+                'Dim LineCnt As Integer = 0
+                'Select Case OIT0003ReportSodegauratbl.Rows.Count
+                '    Case 1 To 5
+                '        LineCnt = 1
+                '    Case 6 To 10
+                '        LineCnt = 2
+                '    Case 11 To 15
+                '        LineCnt = 3
+                '    Case 16 To 20
+                '        LineCnt = 4
+                'End Select
+
+                'Dim i As Integer = 0
+                'Dim j As Integer = LineCnt
+                'Dim strNyuuka As String = "(入)"
+                'For Each OIT0003Reprow As DataRow In OIT0003ReportSodegauratbl.Rows
+
+                '    '★列車Noによって、上から設定/下から設定を切り分ける
+                '    Select Case OIT0003Reprow("TRAINNO")
+                '        '列車№:8877, 8883は下から
+                '        Case "8877", "8883"
+                '            If OIT0003Reprow("LOADINGOUTLETORDER") = j Then
+                '                OIT0003Reprow("NYUUKA") = strNyuuka
+                '                j -= 1
+                '            End If
+                '        '列車№:5461(JR:5972)は上から
+                '        Case "5461"
+                '            i += 1
+                '            OIT0003Reprow("NYUUKA") = strNyuuka
+                '            If LineCnt = i Then Exit For
+                '    End Select
+                'Next
 
             End Using
         Catch ex As Exception

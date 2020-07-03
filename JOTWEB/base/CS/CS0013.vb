@@ -247,6 +247,7 @@ Public Class CS0013ProfView
             Using SQLcon As New SqlConnection(sm.DBCon),
                   SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(SQLcon)
                 Dim param As SqlParameter = SQLcmd.Parameters.Add("@PROFID", SqlDbType.NVarChar)
                 With SQLcmd.Parameters
                     .Add("@CAMPCODE", SqlDbType.NVarChar).Value = Me.CAMPCODE
@@ -904,6 +905,7 @@ Public Class CS0013ProfView
                 Using SQLcon = sm.getConnection,
                       SQLcmd As New SqlCommand(SQLStr, SQLcon)
                     SQLcon.Open() 'DataBase接続(Open)
+                    SqlConnection.ClearPool(SQLcon)
                     With SQLcmd.Parameters
                         .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
                         .Add("@P2", SqlDbType.NVarChar, 20).Value = classKey

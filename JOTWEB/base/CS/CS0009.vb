@@ -235,6 +235,7 @@ Public Structure CS0009MESSAGEout
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(SQLcon)
                 SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 10).Value = MESSAGENO
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     While SQLdr.Read

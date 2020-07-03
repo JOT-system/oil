@@ -80,7 +80,7 @@ Public Class GL0015StationList
         'DataBase接続文字
         Using SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
-
+            SqlConnection.ClearPool(SQLcon)
             getStationList(SQLcon)
 
         End Using

@@ -493,6 +493,7 @@ Public Class OIT0004OilStockCreate
         dispValues.SuggestValueInputValueToZero()
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
+            SqlConnection.ClearPool(sqlCon)
             If dispValues.ShowSuggestList = False Then
                 dispValues = EditEmptyTurnCarsNum(sqlCon, dispValues)
                 dispValues = EditOtEmptyTurnCarsNum(sqlCon, dispValues)

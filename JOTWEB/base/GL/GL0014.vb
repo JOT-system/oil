@@ -47,7 +47,7 @@ Public Class GL0014PLANTList
         'DataBase接続文字
         Using SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
-
+            SqlConnection.ClearPool(SQLcon)
             getPlantList(SQLcon)
 
         End Using

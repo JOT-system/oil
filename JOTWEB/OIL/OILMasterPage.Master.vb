@@ -62,7 +62,7 @@ Public Class OILMasterPage
     ''' <param name="e"></param>
     ''' <remarks></remarks >
     Protected Sub Page_Init(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Init
-
+        System.Data.SqlClient.SqlConnection.ClearAllPools()
         'ログオン及びスケジュールから呼ばれた場合はすべて無視
         If TypeOf Me.Page Is M00000LOGON Then
             Return

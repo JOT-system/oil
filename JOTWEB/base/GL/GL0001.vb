@@ -75,19 +75,17 @@ Public Class GL0001CompList
         End Try
 
         'DataBase接続文字
-        Dim SQLcon = sm.getConnection
-        SQLcon.Open() 'DataBase接続(Open)
-        Select Case TYPEMODE
-            Case CInt(LC_COMPANY_TYPE.ROLE).ToString
-                getCompList(SQLcon)
-            Case CInt(LC_COMPANY_TYPE.ALL).ToString
-                getCompAllList(SQLcon)
-        End Select
+        Using SQLcon = sm.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
+            Select Case TYPEMODE
+                Case CInt(LC_COMPANY_TYPE.ROLE).ToString
+                    getCompList(SQLcon)
+                Case CInt(LC_COMPANY_TYPE.ALL).ToString
+                    getCompAllList(SQLcon)
+            End Select
 
-
-        SQLcon.Close() 'DataBase接続(Close)
-        SQLcon.Dispose()
-        SQLcon = Nothing
+        End Using
     End Sub
     ''' <summary>
     ''' 全会社一覧取得

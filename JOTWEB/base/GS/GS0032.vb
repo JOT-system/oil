@@ -199,6 +199,7 @@ Public Class GS0032FIXVALUElst
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQL_Str, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
                     .Add("@P2", SqlDbType.NVarChar, 20).Value = CLAS
@@ -269,6 +270,7 @@ Public Class GS0032FIXVALUElst
                 Using SQLcon = sm.getConnection,
                       SQLcmd As New SqlCommand(SQL_Str, SQLcon)
                     SQLcon.Open() 'DataBase接続(Open)
+                    SqlConnection.ClearPool(SQLcon)
                     With SQLcmd.Parameters
                         .Add("@P1", SqlDbType.NVarChar, 20).Value = C_DEFAULT_DATAKEY
                         .Add("@P2", SqlDbType.NVarChar, 20).Value = CLAS

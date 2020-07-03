@@ -86,6 +86,9 @@ function InitDisplay() {
 
     // 使用有無初期設定
     ChangeOrgUse();
+
+    // (帳票)ラジオボタン
+    reportRadioButton();
 }
 
 // ○チェックボックス変更
@@ -150,5 +153,22 @@ function ChangeOrgUse(obj, lineCnt) {
             chkObj.disabled = false;
             trlst[i].getElementsByTagName("td")[2].disabled = false;
         }
+    }
+}
+
+// ◯帳票(ラジオボタンクリック)
+function reportRadioButton() {
+    let chkObj = document.getElementById('rbLineBtn');
+    let txtObj = document.getElementById('divRTrainNo'); //←表示非表示切替用
+
+    if (chkObj === null) {
+        txtObj.style.display = 'none'
+        return;
+    }
+
+    if (chkObj.checked) {
+        txtObj.style.display = 'block'
+    } else {
+        txtObj.style.display = 'none'
     }
 }

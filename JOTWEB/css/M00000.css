@@ -111,6 +111,7 @@
     border-radius: 5px;
     box-shadow: 2px 2px #1a6ea0;
     outline:none;
+    border:none;
 }
 
 #OK:hover {

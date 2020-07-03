@@ -140,6 +140,7 @@
     <Content Include="OIL\css\OIM0004S.css" />
     <Content Include="OIL\css\OIT0002S.css" />
     <Content Include="OIL\css\OIT0006S.css" />
+    <Content Include="OIL\ex\page_err_default.html" />
     <Content Include="OIL\for\OIT0006OutOfServiceDetail.aspx" />
     <Content Include="OIL\for\OIT0006OutOfServiceList.aspx" />
     <Content Include="OIL\for\OIT0006OutOfServiceSearch.aspx" />
@@ -150,7 +151,6 @@
     <Content Include="OIL\css\M00001.css" />
     <Content Include="css\M00000.css" />
     <Content Include="OIL\css\ex\custom.min.css" />
-    <Content Include="OIL\css\ex\font-awesome.min.css" />
     <Content Include="img\logo.png" />
     <Content Include="img\ヘルプ.jpg" />
     <Content Include="img\先頭頁.png" />
@@ -217,7 +217,6 @@
     <Content Include="OIL\loc\OIT0005TankLocList.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocSearch.aspx" />
     <Content Include="OIL\M00001MENU.aspx" />
-    <Content Include="OIL\css\ex\nprogress.css" />
     <Content Include="OIL\ex\page_404.html" />
     <Content Include="OIL\M00001MENU_V2.aspx" />
     <Content Include="OIL\M00002MENU.aspx" />

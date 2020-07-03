@@ -145,6 +145,7 @@ Public Class CS0007CheckAuthority
             'DataBase接続文字
             Using SQLcon = sm.getConnection
                 SQLcon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(SQLcon)
                 '●権限チェック（画面）　…　ユーザ操作権限取得
                 WW_USER_MAP_PERMIT = checkUserPermission(SQLcon, ROLECODE_MAP, C_ROLE_VARIANT.USER_PERTMIT, MAPID)
                 ''●権限チェック（画面）　…　サーバ操作権限取得

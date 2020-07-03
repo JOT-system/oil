@@ -196,7 +196,7 @@ Public Class CS0051UserInfo : Implements IDisposable
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
-
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
                     .Add("@P2", SqlDbType.Date).Value = STYMD
@@ -321,6 +321,7 @@ Public Class CS0051UserInfo : Implements IDisposable
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 30).Value = ORG
                     .Add("@P2", SqlDbType.Date).Value = STYMD

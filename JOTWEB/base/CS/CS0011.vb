@@ -124,6 +124,7 @@ Public Structure CS0011LOGWrite
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQLstr_LOGCNTL, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.Date).Value = Date.Now
                     .Add("@P2", SqlDbType.Date).Value = Date.Now

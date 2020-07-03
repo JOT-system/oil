@@ -1,0 +1,50 @@
+﻿/* ------------------------------
+ 凡例
+------------------------------ */
+
+/*
+h1 { color: red; }			--> h1要素に対して指定 
+h1, h2 { color: red; }		-->  h1 と h2要素に対して指定 
+ul li { color: red; }		-->  <ul>～</ul> の中にある li要素に対して指定 
+.sample { color: red; }		-->  class="sample" を持つ要素に対して指定 
+#sample { color: red; }		-->  id="sample" を持つ要素に対して指定 
+h1.sample { color: red; }	-->  class="sample" を持つ div要素に対して指定 
+a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して指定 
+*/
+
+/* ------------------------------
+ 擬似フレーム　スタイル定義
+------------------------------ */
+
+#Menuheaderbox {
+    width: calc(100% - 2px);
+    height: 100%;
+}
+.guidance {
+    border: 1px solid rgb(255, 255, 255);
+    height: 100px;
+    width: 100%;
+    //overflow-y: auto;
+    overflow: hidden; /* 横スクロールはなし */
+    position: relative;
+    background-color: yellow;
+}
+.menuMain {
+    width: 100%;
+    height: auto;
+    overflow: auto;
+}
+.sideMenu {
+    width: 250px;
+    height: 100%;
+    display: inline-block;
+    background-color: blue;
+    vertical-align:top;
+}
+.parsonalParts {
+    width: calc(100% - 255px);
+    height: 100%;
+    display: inline-block;
+    background-color: red;
+    vertical-align: top;
+}

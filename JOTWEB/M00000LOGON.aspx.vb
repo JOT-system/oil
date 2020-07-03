@@ -281,6 +281,23 @@ Public Class M00000LOGON
 
             Try
                 'OIS0004_USER検索SQL文
+                Dim sqlStat As New StringBuilder
+                sqlStat.AppendLine("SELECT rtrim(A.USERID)   as USERID")
+                sqlStat.AppendLine("      ,rtrim(A.CAMPCODE) as CAMPCODE")
+                sqlStat.AppendLine("      ,rtrim(A.ORG)      as ORG")
+                sqlStat.AppendLine("      ,A.STYMD")
+                sqlStat.AppendLine("      ,A.ENDYMD")
+                sqlStat.AppendLine("      ,rtrim(CONVERT(nvarchar, DecryptByKey(B.PASSWORD))) as PASSWORD")
+                sqlStat.AppendLine("      ,B.MISSCNT")
+                sqlStat.AppendLine("      ,A.INITYMD")
+                sqlStat.AppendLine("      ,A.UPDYMD")
+                sqlStat.AppendLine("      ,A.UPDTIMSTP")
+                sqlStat.AppendLine("      ,rtrim(A.MENUROLE)   as MENUROLE")
+                sqlStat.AppendLine("      ,rtrim(A.MAPROLE)    as MAPROLE")
+                sqlStat.AppendLine("      ,rtrim(A.VIEWPROFID) as VIEWPROFID")
+                sqlStat.AppendLine("      ,rtrim(A.RPRTPROFID) as RPRTPROFID")
+                sqlStat.AppendLine("      ,rtrim(A.MAPID)      as MAPID")
+
                 Dim SQL_Str As String =
                      "SELECT " _
                    & " rtrim(A.USERID)   as USERID    , " _

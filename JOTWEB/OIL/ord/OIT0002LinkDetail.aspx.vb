@@ -2820,6 +2820,14 @@ Public Class OIT0002LinkDetail
 
                 '先にアラームの確認を行う
                 Dim info As String = ""
+                '### 20200706 START 列車番号が列車マスタに未存在の場合の対応 ####################################
+                Dim iMaxtank As Integer
+                Try
+                    iMaxtank = Integer.Parse(WW_GetValue(3))
+                Catch ex As Exception
+                    iMaxtank = 99
+                End Try
+                '### 20200706 END   列車番号が列車マスタに未存在の場合の対応 ####################################
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     If Trim(OIT0002row("LINETRAINNO")) = "" Or
                                 Trim(OIT0002row("LINEORDER")) = "" Or
@@ -2835,7 +2843,7 @@ Public Class OIT0002LinkDetail
                             Exit For '優先度最大なので、判定にかかった段階でForループを抜ける
 
                             'タンク車数が「最大牽引タンク車数」より大きい場合
-                        ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
+                        ElseIf Integer.Parse(TxtTotalTank.Text) > iMaxtank Then
                             '80(タンク車数オーバー)を設定
                             info = WW_ORDERINFOALERM_80
 
@@ -3608,6 +3616,9 @@ Public Class OIT0002LinkDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                     End If
+                    '
+                ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "PREORDERINGOILNAME") Then
+                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
                 End If
             Next

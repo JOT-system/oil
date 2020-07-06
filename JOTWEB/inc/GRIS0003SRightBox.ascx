@@ -18,7 +18,7 @@
             <br />
 
             <span id="RF_VIEWLIST" style="position:relative;left:1em;top:2.3em;">
-                <asp:ListBox ID="RF_VIEW" runat="server" Width="28.4em" Height="15em" style="border: 2px solid blue;background-color: rgb(220,230,240);" ></asp:ListBox>
+                <asp:ListBox ID="RF_VIEW" runat="server" Width="28.4em" Height="15em" style="border: 0.1px solid skyblue;background-color: rgb(220,230,240);" ></asp:ListBox>
             </span>
             <br />
             
@@ -28,7 +28,7 @@
             <br />
 
             <span id="RF_VIEWDTLLIST" class="RF_DTLDISP" style="position:relative;left:1em;right:1em;top:3.3em;">
-                <asp:ListBox ID="RF_VIEW_DTL" runat="server" Width="28.4em" Height="10em" style="border: 2px solid blue;background-color: rgb(220,230,240);" ></asp:ListBox>
+                <asp:ListBox ID="RF_VIEW_DTL" runat="server" Width="28.4em" Height="10em" style="border: 0.1px solid skyblue;background-color: rgb(220,230,240);" ></asp:ListBox>
             </span><br />
 
             <div id="RF_HIDDEN_LIS">

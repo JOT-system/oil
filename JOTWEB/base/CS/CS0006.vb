@@ -85,7 +85,7 @@ Public Structure CS0006TERMchk
 
 
                 SQLcon.Open() 'DataBase接続(Open)
-
+                SqlConnection.ClearPool(SQLcon)
                 Dim WW_CNT As Integer = 0
                 TERMCAMP = ""
                 TERMORG = ""

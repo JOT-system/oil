@@ -136,27 +136,25 @@ Public Class GL0003CustomerList
         Catch ex As Exception
         End Try
         'DataBase接続文字
-        Dim SQLcon = sm.getConnection
-        SQLcon.Open() 'DataBase接続(Open)
+        Using SQLcon = sm.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
+            'Select Case TYPE
+            '    'Case LC_CUSTOMER_TYPE.OWNER
+            '    '    getOwnerList(SQLcon)
+            '    'Case LC_CUSTOMER_TYPE.OWNER_WITHTERM
+            '    '    getOwnerTermList(SQLcon)
+            '    'Case LC_CUSTOMER_TYPE.CARRIDE
+            '    '    getRideCarList(SQLcon)
+            '    'Case LC_CUSTOMER_TYPE.CARRIDE_WITHTERM
+            '    '    getRideCarTermList(SQLcon)
+            '    'Case LC_CUSTOMER_TYPE.WITHTERM
+            '    '    getCustomerTermList(SQLcon)
+            '    'Case Else
+            '    '    getCustomerList(SQLcon)
+            'End Select
 
-        'Select Case TYPE
-        '    'Case LC_CUSTOMER_TYPE.OWNER
-        '    '    getOwnerList(SQLcon)
-        '    'Case LC_CUSTOMER_TYPE.OWNER_WITHTERM
-        '    '    getOwnerTermList(SQLcon)
-        '    'Case LC_CUSTOMER_TYPE.CARRIDE
-        '    '    getRideCarList(SQLcon)
-        '    'Case LC_CUSTOMER_TYPE.CARRIDE_WITHTERM
-        '    '    getRideCarTermList(SQLcon)
-        '    'Case LC_CUSTOMER_TYPE.WITHTERM
-        '    '    getCustomerTermList(SQLcon)
-        '    'Case Else
-        '    '    getCustomerList(SQLcon)
-        'End Select
-
-        SQLcon.Close() 'DataBase接続(Close)
-        SQLcon.Dispose()
-        SQLcon = Nothing
+        End Using
 
     End Sub
 

@@ -63,7 +63,7 @@ Public Class GS0003MEMOget
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQL_Str, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
-
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
                     .Add("@P2", SqlDbType.NVarChar, 50).Value = MAPID
@@ -124,7 +124,7 @@ Public Class GS0003MEMOget
                 Using SQLcon = sm.getConnection,
                       SQLcmd As New SqlCommand(SQL_Str, SQLcon)
                     SQLcon.Open() 'DataBase接続(Open)
-
+                    SqlConnection.ClearPool(SQLcon)
                     With SQLcmd.Parameters
                         .Add("@P1", SqlDbType.NVarChar, 20).Value = USERID
                         .Add("@P2", SqlDbType.NVarChar, 50).Value = MAPID

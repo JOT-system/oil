@@ -153,10 +153,10 @@ Public Class GL0002OrgList
         Catch ex As Exception
         End Try
         'DataBase接続文字
-        Dim SQLcon = sm.getConnection
-        SQLcon.Open() 'DataBase接続(Open)
-
-        Select Case AUTHWITH
+        Using SQLcon = sm.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
+            Select Case AUTHWITH
             'Case LS_AUTHORITY_WITH.USER
             '    getOrgListWithUserAuth(SQLcon)
             'Case LS_AUTHORITY_WITH.MACHINE
@@ -165,17 +165,15 @@ Public Class GL0002OrgList
             '    getOrgListWithBothAuth(SQLcon)
             'Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ORG
             '    getOrgRelationList(SQLcon)
-            Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ALL
-                getOrgAllList(SQLcon, "1")
-            Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG
-                getOrgAllList(SQLcon, "2")
-            Case Else
-                getOrgList(SQLcon)
-        End Select
+                Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_ALL
+                    getOrgAllList(SQLcon, "1")
+                Case LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG
+                    getOrgAllList(SQLcon, "2")
+                Case Else
+                    getOrgList(SQLcon)
+            End Select
 
-        SQLcon.Close() 'DataBase接続(Close)
-        SQLcon.Dispose()
-        SQLcon = Nothing
+        End Using
 
     End Sub
 

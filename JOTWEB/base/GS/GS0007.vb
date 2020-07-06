@@ -250,7 +250,7 @@ Public Class GS0007FIXVALUElst
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
-
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 20).Value = CAMPCODE
                     .Add("@P2", SqlDbType.NVarChar, 20).Value = CLAS
@@ -305,6 +305,7 @@ Public Class GS0007FIXVALUElst
                 Using SQLcon = sm.getConnection,
                       SQLcmd As New SqlCommand(SQLStr, SQLcon)
                     SQLcon.Open() 'DataBase接続(Open)
+                    SqlConnection.ClearPool(SQLcon)
                     With SQLcmd.Parameters
                         .Add("@P1", SqlDbType.NVarChar, 20).Value = C_DEFAULT_DATAKEY
                         .Add("@P2", SqlDbType.NVarChar, 20).Value = CLAS
@@ -421,6 +422,8 @@ Public Class GS0007FIXVALUElst
             'DataBase接続文字
             Using sqlCon = sm.getConnection,
                   sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open()
+                SqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@CLASS", SqlDbType.NVarChar, 20).Value = CLAS
                     .Add("@STYMD", SqlDbType.Date).Value = Date.Now

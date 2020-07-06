@@ -905,9 +905,10 @@ Public Class OIT0003OrderList
         '受注営業所(コード)
         work.WF_SEL_ORDERSALESOFFICECODE.Text = ""
         '受注進行ステータス(名)
-        work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
+        'work.WF_SEL_ORDERSTATUSNM.Text = "受注受付"
+        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_100, work.WF_SEL_ORDERSTATUSNM.Text, WW_DUMMY)
         '受注進行ステータス(コード)
-        work.WF_SEL_ORDERSTATUS.Text = "100"
+        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
         '受注情報(名)
         work.WF_SEL_INFORMATIONNM.Text = ""
         '受注情報(コード)

@@ -4272,10 +4272,28 @@ Public Class OIT0001EmptyTurnDairyDetail
                     TxtK10Tank.Enabled = True
                     'ＬＳＡ
                 Case BaseDllConst.CONST_LTank1, BaseDllConst.CONST_LTank2
-                    TxtLTank.Enabled = True
+                    '### 20200706 START((全体)No100対応) ##########################################
+                    'TxtLTank.Enabled = True
+                    '★OT八王子の場合
+                    If work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_55 Then
+                        Me.TxtLTank.Enabled = False
+                        Me.TxtLTank.Text = 0
+                    Else
+                        Me.TxtLTank.Enabled = True
+                    End If
+                    '### 20200706 END  ((全体)No100対応) ##########################################
                     'Ａ重油
                 Case BaseDllConst.CONST_ATank
-                    TxtATank.Enabled = True
+                    '### 20200706 START((全体)No100対応) ##########################################
+                    'TxtATank.Enabled = True
+                    '★OT八王子の場合
+                    If work.WF_SEL_CONSIGNEECODE.Text = BaseDllConst.CONST_CONSIGNEECODE_55 Then
+                        Me.TxtATank.Enabled = False
+                        Me.TxtATank.Text = 0
+                    Else
+                        Me.TxtATank.Enabled = True
+                    End If
+                    '### 20200706 END  ((全体)No100対応) ##########################################
             End Select
         Next
     End Sub

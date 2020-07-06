@@ -12127,10 +12127,28 @@ Public Class OIT0003OrderDetail
                     Me.TxtK10Tank_w.Enabled = True
                     'ＬＳＡ
                 Case BaseDllConst.CONST_LTank1, BaseDllConst.CONST_LTank2
-                    Me.TxtLTank_w.Enabled = True
+                    '### 20200706 START((全体)No100対応) ##########################################
+                    'Me.TxtLTank_w.Enabled = True
+                    '★OT八王子の場合
+                    If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_55 Then
+                        Me.TxtLTank_w.Enabled = False
+                        Me.TxtLTank_w.Text = 0
+                    Else
+                        Me.TxtLTank_w.Enabled = True
+                    End If
+                    '### 20200706 END  ((全体)No100対応) ##########################################
                     'Ａ重油
                 Case BaseDllConst.CONST_ATank
-                    Me.TxtATank_w.Enabled = True
+                    '### 20200706 START((全体)No100対応) ##########################################
+                    'Me.TxtATank_w.Enabled = True
+                    '★OT八王子の場合
+                    If Me.TxtConsigneeCode.Text = BaseDllConst.CONST_CONSIGNEECODE_55 Then
+                        Me.TxtATank_w.Enabled = False
+                        Me.TxtATank_w.Text = 0
+                    Else
+                        Me.TxtATank_w.Enabled = True
+                    End If
+                    '### 20200706 END  ((全体)No100対応) ##########################################
             End Select
         Next
     End Sub

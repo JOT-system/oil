@@ -1717,9 +1717,17 @@ Public Class OIT0002LinkList
                 & "  TMP0005.OFFICECODE = VIW0002.OFFICECODE" _
                 & "  AND TMP0005.OILNo = '1'" _
                 & "  AND TMP0005.RINKAIOILCODE <> ''" _
-                & "  AND TMP0005.RINKAIOILKANA = OIT0011.ARTICLEOILNAME" _
-                & "  AND TMP0005.OILCODE IN ('1001', '1101', '1301', '1401', '2101')" _
-                & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON" _
+                & "  AND TMP0005.RINKAIOILKANA = OIT0011.ARTICLEOILNAME"
+            '& "  AND TMP0005.OILCODE IN ('1001', '1101', '1301', '1401', '2101')"
+            SQLLinkStr &= String.Format("  AND TMP0005.OILCODE IN ('{0}', '{1}', '{2}', '{3}', '{4}')",
+                                        BaseDllConst.CONST_HTank,
+                                        BaseDllConst.CONST_RTank,
+                                        BaseDllConst.CONST_TTank,
+                                        BaseDllConst.CONST_KTank1,
+                                        BaseDllConst.CONST_ATank)
+
+            SQLLinkStr &=
+                  " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON" _
                 & "  OIT0005.TANKNUMBER = OIT0011.TRUCKNO"
             SQLLinkStr &= String.Format("  AND OIT0005.DELFLG <> '{0}'", C_DELETE_FLG.DELETE)
             '### 20200706 END  ((内部)No184対応) ######################################

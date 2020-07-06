@@ -3530,6 +3530,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')      AS TRAINNAME" _
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')     AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')     AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')    AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')   AS SHIPPERSCODE" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')   AS SHIPPERSNAME" _
             & " , ISNULL(RTRIM(OIT0002.BASECODE), '')       AS BASECODE" _
@@ -3593,6 +3594,10 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0001CHKDrow As DataRow In OIT0001WKtbl.Rows
+
+                    '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                    If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                     Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAIN, C_MESSAGE_TYPE.ERR, OIT0001CHKDrow("ORDERNO"), needsPopUp:=True)
 
                     WW_CheckMES1 = "受注データ登録済みエラー。"
@@ -3718,6 +3723,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0003.OILNAME), '')         AS OILNAME" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')    AS ORDERINGTYPE" _
             & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '') AS ORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')     AS ORDERSTATUS" _
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')      AS OFFICECODE" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')      AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')    AS SHIPPERSCODE" _
@@ -3808,6 +3814,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '★行削除したデータはSKIPする。
                     If OIT0001row("DELFLG") = "1" Then Continue For
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK3tbl.Rows
+
+                        '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                        If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") _
                             AndAlso OIT0001row("TANKNO") <> "" Then
                             OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
@@ -3866,6 +3876,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '★行削除したデータはSKIPする。
                     If OIT0001row("DELFLG") = "1" Then Continue For
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK4tbl.Rows
+
+                        '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                        If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") _
                             AndAlso OIT0001row("TANKNO") <> "" Then
                             OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
@@ -3923,6 +3937,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK5tbl.Rows
+
+                        '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
+                        If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
+
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") Then
                             OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)

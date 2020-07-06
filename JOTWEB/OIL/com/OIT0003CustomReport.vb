@@ -106,6 +106,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
         ElseIf excelFileName = "OIT0003L_SODEGAURA_LINEPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入線方"), Excel.Worksheet)
             'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+        ElseIf excelFileName = "OIT0003L_KINOENE_LOADPLAN.xlsx" Then
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("出力"), Excel.Worksheet)
+            'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         End If
     End Sub
 
@@ -434,6 +437,155 @@ Public Class OIT0003CustomReport : Implements IDisposable
         End Try
     End Sub
 
+#End Region
+
+#Region "ダウンロード(積込予定表(甲子))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(積込予定表(甲子))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintKinoeneData(ByVal repPtn As String, ByVal lodDate As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditKinoeneLineHeaderArea(lodDate)
+            '◯明細の設定
+            EditKinoeneLineDetailArea()
+            '***** TODO処理 ここまで *****
+            'ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(積込予定表(甲子))
+    ''' </summary>
+    Private Sub EditKinoeneLineHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                '◯ 積込日
+                Dim value As String = lodDate
+                '　月
+                rngHeaderArea = Me.ExcelWorkSheet.Range("J3")
+                rngHeaderArea.Value = Date.Parse(value).ToString("MM", New Globalization.CultureInfo("ja-JP"))
+                '　日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("K3")
+                rngHeaderArea.Value = Date.Parse(value).ToString("dd", New Globalization.CultureInfo("ja-JP"))
+
+                Exit For
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(積込予定表(甲子))
+    ''' </summary>
+    Private Sub EditKinoeneLineDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            'Dim i As Integer = 0
+            Dim iST As Integer = 0
+            Dim i1ST As Integer = 6
+            Dim i2ST As Integer = 17
+            Dim i3ST As Integer = 28
+            Dim i4ST As Integer = 39
+            Dim sPointy As String = ""
+            Dim sOdd() As String = {"B", "C", "D", "E", "F"}
+            Dim sEven() As String = {"H", "I", "J", "K", "L"}
+            Dim sPointx() As String = {"", "", "", "", ""}
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                If sPointy = "" OrElse sPointy <> PrintDatarow("LOADINGPOINT").ToString() Then
+
+                    '積込回線により列の箇所を設定
+                    Select Case PrintDatarow("LOADINGPOINT").ToString()
+                        '★[Ｘ－１回目]
+                        Case "1", "3", "5", "7"
+                            sPointx = sOdd
+                        '★[Ｘ－２回目]
+                        Case "2", "4", "6", "8"
+                            sPointx = sEven
+                    End Select
+
+                    '積込回線により行の箇所を設定
+                    Select Case PrintDatarow("LOADINGPOINT").ToString()
+                        '★[１－１回目], [１－２回目]
+                        Case "1", "2"
+                            iST = i1ST
+                        '★[２－１回目], [２－２回目]
+                        Case "3", "4"
+                            iST = i2ST
+                        '★[３－１回目], [３－２回目]
+                        Case "5", "6"
+                            iST = i3ST
+                        '★[４－１回目], [４－２回目]
+                        Case "7", "8"
+                            iST = i4ST
+                    End Select
+                End If
+
+                ''◯ 注
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + iST.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '◯ 車両番号
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("SYARYONUMBER")
+                '◯ 油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
+                '◯ 予約数量
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("RESERVEDQUANTITY")
+                '◯ 納入先
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("DELIVERYFIRST")
+
+                iST += 1
+                sPointy = PrintDatarow("LOADINGPOINT").ToString()
+
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
 #End Region
 
 #Region "ダウンロード(入線予定表(袖ヶ浦))"

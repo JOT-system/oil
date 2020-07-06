@@ -811,6 +811,10 @@ Public Class OIT0002LinkDetail
                                 Return
                                 '↑暫定一覧対応 2020/02/13
                                 '### LeftBoxマルチ対応(20200217) END   #####################################################
+                            '(一覧)油種
+                            Case "PREORDERINGOILNAME"
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, "")
+
                         End Select
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -1049,8 +1053,8 @@ Public Class OIT0002LinkDetail
                 Catch ex As Exception
                 End Try
                 TxtActEmpDate.Focus()
-
-            Case "TANKNUMBER"   '(一覧)タンク車№
+            '(一覧)タンク車№, (一覧)油種名(受発注用)
+            Case "TANKNUMBER", "PREORDERINGOILNAME"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -1137,6 +1141,25 @@ Public Class OIT0002LinkDetail
                     Else
                         updHeader.Item("JRALLINSPECTIONALERT") = ""
                     End If
+
+                    '### 20200706 START 列車番号を手入力に変更(内部気づきより) ###########################################
+                    '(一覧)油種名(受発注用)
+                ElseIf WF_FIELD.Value = "PREORDERINGOILNAME" Then
+                    If WW_SETVALUE = "" Then
+                        updHeader.Item("PREOILCODE") = ""
+                        updHeader.Item(WF_FIELD.Value) = ""
+                        updHeader.Item("PREOILNAME") = ""
+                        updHeader.Item("PREORDERINGTYPE") = ""
+                    Else
+                        updHeader.Item("PREOILCODE") = WW_SETVALUE.Substring(0, 4)
+                        updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                        WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                        FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                        updHeader.Item("PREOILNAME") = WW_GetValue(2)
+                        updHeader.Item("PREORDERINGTYPE") = WW_GetValue(1)
+                    End If
+                    '### 20200706 END   列車番号を手入力に変更(内部気づきより) ###########################################
                 End If
 
                 '○ 画面表示データ保存

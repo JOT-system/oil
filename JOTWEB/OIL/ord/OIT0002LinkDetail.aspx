@@ -67,9 +67,14 @@
             <!-- ■　本線列車　■ -->
             <span>
                 <a id="WF_TRAIN_LABEL" class="requiredMark">本線列車</a>
-                <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">
-                    <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>
-                    <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" CssClass="boxIcon" Visible="false"></asp:TextBox>
+                <!-- 20200706 START 列車番号を手入力に変更(内部気づきより) -->
+<%--                <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">--%>
+<%--                    <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>--%>
+<%--                    <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" CssClass="boxIcon" Visible="false"></asp:TextBox>--%>
+                <a class="ef" id="WF_TRAINCODE">
+                    <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
+                    <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
+                <!-- 20200706 END   列車番号を手入力に変更(内部気づきより) -->
                 </a>
             </span>
             <span></span>

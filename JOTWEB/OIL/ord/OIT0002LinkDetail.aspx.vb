@@ -852,6 +852,8 @@ Public Class OIT0002LinkDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
             '会社コード
@@ -862,7 +864,6 @@ Public Class OIT0002LinkDetail
                 CODENAME_get("ORG", TxtHeadOfficeTrain.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
             '本線列車
             Case "TxtHeadOfficeTrain"
-                Dim WW_GetValue() As String = {"", "", "", "", ""}
                 FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
                 'FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
@@ -994,16 +995,41 @@ Public Class OIT0002LinkDetail
 
                 TxtHeadOfficeTrain.Text = WW_SelectValue
                 TxtHeadOfficeTrainName.Text = WW_SelectText
-                'FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
-                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
-
-                '空車発駅（着駅）
-                TxtDepstation.Text = WW_GetValue(2)
-                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
-                '空車着駅（発駅）
-                TxtRetstation.Text = WW_GetValue(1)
-                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
+                '### 20200707 START 列車マスタ(返送)より情報を取得し設定 ##############################
+                ''FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                'FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
+
+                ''空車発駅（着駅）
+                'TxtDepstation.Text = WW_GetValue(2)
+                'CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+                ''空車着駅（発駅）
+                'TxtRetstation.Text = WW_GetValue(1)
+                'CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
+
+                '★列車No(返送)＋空車発駅コードから、利用可能日と空車着駅コードを取得
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text,
+                                     "BTRAINNUMBER_FIND",
+                                     Me.TxtHeadOfficeTrainName.Text,
+                                     WW_GetValue)
+
+                '◯ 空車発駅
+                Me.TxtDepstation.Text = WW_GetValue(1)
+                CODENAME_get("DEPSTATION", Me.TxtDepstation.Text, Me.LblDepstationName.Text, WW_RTN_SW)
+
+                '◯ 空車着駅
+                Me.TxtRetstation.Text = WW_GetValue(2)
+                CODENAME_get("RETSTATION", Me.TxtRetstation.Text, Me.LblRetstationName.Text, WW_RTN_SW)
+
+                '〇 利用可能日
+                Dim iNextUseday As Integer
+                Try
+                    iNextUseday = Integer.Parse(WW_GetValue(6))
+                Catch ex As Exception
+                    iNextUseday = 0
+                End Try
+                Me.AvailableYMD.Text = Now.AddDays(1 + iNextUseday).ToString("yyyy/MM/dd")
+                '### 20200707 END   列車マスタ(返送)より情報を取得し設定 ##############################
 
             Case "AvailableYMD"       '利用可能日
                 Dim WW_DATE As Date
@@ -1022,6 +1048,27 @@ Public Class OIT0002LinkDetail
                 TxtDepstation.Text = WW_SelectValue
                 LblDepstationName.Text = WW_SelectText
                 TxtDepstation.Focus()
+
+                '### 20200707 START 列車マスタ(返送)より情報を取得し設定 ##############################
+                '★列車No(返送)＋空車発駅コードから、利用可能日と空車着駅コードを取得
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text,
+                                     "BTRAINNUMBER_FIND",
+                                     Me.TxtHeadOfficeTrain.Text + Me.TxtDepstation.Text,
+                                     WW_GetValue)
+
+                '◯ 空車着駅
+                Me.TxtRetstation.Text = WW_GetValue(2)
+                CODENAME_get("RETSTATION", Me.TxtRetstation.Text, Me.LblRetstationName.Text, WW_RTN_SW)
+
+                '〇 利用可能日
+                Dim iNextUseday As Integer
+                Try
+                    iNextUseday = Integer.Parse(WW_GetValue(6))
+                Catch ex As Exception
+                    iNextUseday = 0
+                End Try
+                Me.AvailableYMD.Text = Now.AddDays(1 + iNextUseday).ToString("yyyy/MM/dd")
+                '### 20200707 END   列車マスタ(返送)より情報を取得し設定 ##############################
 
             Case "TxtRetstation"        '空車着駅（発駅）
                 TxtRetstation.Text = WW_SelectValue

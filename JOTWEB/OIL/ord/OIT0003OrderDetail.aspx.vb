@@ -2005,6 +2005,8 @@ Public Class OIT0003OrderDetail
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
             & "    AND TMP0001.OILCODE IS NULL AND OIT0004.PREOILCODE IS NULL THEN @P04" _
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
+            & "    AND TMP0001.OILCODE IS NULL AND OIT0004.PREOILCODE IS NOT NULL THEN @P07" _
+            & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
             & "    AND OIT0004.PREOILCODE IS NOT NULL THEN @P06" _
             & "   ELSE @P07" _
             & "   END                                                           AS TANKQUOTA" _

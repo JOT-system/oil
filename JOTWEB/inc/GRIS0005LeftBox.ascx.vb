@@ -158,6 +158,7 @@ Public Class GRIS0005LeftBox
         LC_TORILIST
         LC_ORIGINOWNERCODE
         LC_OWNERCODE
+        LC_BTRAINNUMBER
     End Enum
 
     ''' <summary>
@@ -249,6 +250,7 @@ Public Class GRIS0005LeftBox
         LP_TORILIST
         LP_ORIGINOWNERCODE
         LP_OWNERCODE
+        LP_BTRAINNUMBER
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -781,6 +783,10 @@ Public Class GRIS0005LeftBox
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "OWNERCODE"
                 lbox = CreateFixValueList(Params, O_RTN)
 
+            Case LIST_BOX_CLASSIFICATION.LC_BTRAINNUMBER
+                '列車番号(返送)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BTRAINNUMBER"
+                lbox = CreateFixValueList(Params, O_RTN)
 
             Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                 'カレンダー

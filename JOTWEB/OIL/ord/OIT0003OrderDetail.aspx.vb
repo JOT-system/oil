@@ -79,6 +79,8 @@ Public Class OIT0003OrderDetail
 
     Private WW_UPBUTTONFLG As String = "0"                          '更新用ボタンフラグ(1:割当確定, 2:入力内容登録, 3:明細更新, 4:訂正更新)
 
+    Private WW_ORDERCNT As Integer = 0                              '受注TBLの件数を設定(0件の場合は貨車連結順序表のみと判断するため)
+
     Private WW_RINKAIFLG As Boolean = False                         '臨海鉄道対象可否(TRUE：対象, FALSE:未対象)
     Private WW_USEORDERFLG As Boolean = False                       '使用受注オーダー可否(TRUE：使用中, FALSE:未使用)
     Private WW_InitializeTAB3 As Boolean = False                    '
@@ -1805,6 +1807,8 @@ Public Class OIT0003OrderDetail
 
                     '○ テーブル検索結果をテーブル格納
                     OIT0003tbl.Load(SQLdr)
+                    '★ 作成した受注データ件数を取得
+                    WW_ORDERCNT = OIT0003tbl.Rows.Count
                 End Using
 
                 Dim i As Integer = 0
@@ -2005,6 +2009,8 @@ Public Class OIT0003OrderDetail
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
             & "    AND TMP0001.OILCODE IS NULL AND OIT0004.PREOILCODE IS NULL THEN @P04" _
             & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
+            & "    AND TMP0001.OILCODE IS NULL AND OIT0004.PREOILCODE IS NOT NULL THEN @P07" _
+            & "   WHEN (OIT0004.TANKNUMBER IS NOT NULL OR TMP0001.TANKNO IS NOT NULL) " _
             & "    AND OIT0004.PREOILCODE IS NOT NULL THEN @P06" _
             & "   ELSE @P07" _
             & "   END                                                           AS TANKQUOTA" _
@@ -2160,6 +2166,12 @@ Public Class OIT0003OrderDetail
                         OIT0003row("BASENAME") = work.WF_SEL_BASENAME.Text
                         OIT0003row("CONSIGNEECODE") = work.WF_SEL_CONSIGNEECODE.Text
                         OIT0003row("CONSIGNEENAME") = work.WF_SEL_CONSIGNEENAME.Text
+                    End If
+
+                    '★受注データが0件の場合(貨車連結順序表のみ選択)
+                    If WW_ORDERCNT = 0 Then
+                        '"割当"を設定する
+                        OIT0003row("TANKQUOTA") = CONST_TANKNO_STATUS_WARI
                     End If
 
                 Next

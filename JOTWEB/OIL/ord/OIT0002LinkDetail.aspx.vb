@@ -811,6 +811,10 @@ Public Class OIT0002LinkDetail
                                 Return
                                 '↑暫定一覧対応 2020/02/13
                                 '### LeftBoxマルチ対応(20200217) END   #####################################################
+                            '(一覧)油種
+                            Case "PREORDERINGOILNAME"
+                                prmData = work.CreateSALESOFFICEParam(work.WF_SEL_OFFICECODE.Text, "")
+
                         End Select
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
                         .ActiveListBox()
@@ -848,6 +852,8 @@ Public Class OIT0002LinkDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_FIELD_Change()
+        Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
             '会社コード
@@ -858,7 +864,6 @@ Public Class OIT0002LinkDetail
                 CODENAME_get("ORG", TxtHeadOfficeTrain.Text, WF_ORG_TEXT.Text, WW_RTN_SW)
             '本線列車
             Case "TxtHeadOfficeTrain"
-                Dim WW_GetValue() As String = {"", "", "", "", ""}
                 FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
                 'FixvalueMasterSearch("", "TRAINNUMBER", TxtHeadOfficeTrain.Text, WW_GetValue)
 
@@ -990,16 +995,41 @@ Public Class OIT0002LinkDetail
 
                 TxtHeadOfficeTrain.Text = WW_SelectValue
                 TxtHeadOfficeTrainName.Text = WW_SelectText
-                'FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
-                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
-
-                '空車発駅（着駅）
-                TxtDepstation.Text = WW_GetValue(2)
-                CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
-                '空車着駅（発駅）
-                TxtRetstation.Text = WW_GetValue(1)
-                CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
                 TxtHeadOfficeTrain.Focus()
+                '### 20200707 START 列車マスタ(返送)より情報を取得し設定 ##############################
+                ''FixvalueMasterSearch("", "TRAINNUMBER", WW_SelectValue, WW_GetValue)
+                'FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
+
+                ''空車発駅（着駅）
+                'TxtDepstation.Text = WW_GetValue(2)
+                'CODENAME_get("DEPSTATION", TxtDepstation.Text, LblDepstationName.Text, WW_DUMMY)
+                ''空車着駅（発駅）
+                'TxtRetstation.Text = WW_GetValue(1)
+                'CODENAME_get("RETSTATION", TxtRetstation.Text, LblRetstationName.Text, WW_DUMMY)
+
+                '★列車No(返送)＋空車発駅コードから、利用可能日と空車着駅コードを取得
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text,
+                                     "BTRAINNUMBER_FIND",
+                                     Me.TxtHeadOfficeTrainName.Text,
+                                     WW_GetValue)
+
+                '◯ 空車発駅
+                Me.TxtDepstation.Text = WW_GetValue(1)
+                CODENAME_get("DEPSTATION", Me.TxtDepstation.Text, Me.LblDepstationName.Text, WW_RTN_SW)
+
+                '◯ 空車着駅
+                Me.TxtRetstation.Text = WW_GetValue(2)
+                CODENAME_get("RETSTATION", Me.TxtRetstation.Text, Me.LblRetstationName.Text, WW_RTN_SW)
+
+                '〇 利用可能日
+                Dim iNextUseday As Integer
+                Try
+                    iNextUseday = Integer.Parse(WW_GetValue(6))
+                Catch ex As Exception
+                    iNextUseday = 0
+                End Try
+                Me.AvailableYMD.Text = Now.AddDays(1 + iNextUseday).ToString("yyyy/MM/dd")
+                '### 20200707 END   列車マスタ(返送)より情報を取得し設定 ##############################
 
             Case "AvailableYMD"       '利用可能日
                 Dim WW_DATE As Date
@@ -1018,6 +1048,27 @@ Public Class OIT0002LinkDetail
                 TxtDepstation.Text = WW_SelectValue
                 LblDepstationName.Text = WW_SelectText
                 TxtDepstation.Focus()
+
+                '### 20200707 START 列車マスタ(返送)より情報を取得し設定 ##############################
+                '★列車No(返送)＋空車発駅コードから、利用可能日と空車着駅コードを取得
+                FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text,
+                                     "BTRAINNUMBER_FIND",
+                                     Me.TxtHeadOfficeTrain.Text + Me.TxtDepstation.Text,
+                                     WW_GetValue)
+
+                '◯ 空車着駅
+                Me.TxtRetstation.Text = WW_GetValue(2)
+                CODENAME_get("RETSTATION", Me.TxtRetstation.Text, Me.LblRetstationName.Text, WW_RTN_SW)
+
+                '〇 利用可能日
+                Dim iNextUseday As Integer
+                Try
+                    iNextUseday = Integer.Parse(WW_GetValue(6))
+                Catch ex As Exception
+                    iNextUseday = 0
+                End Try
+                Me.AvailableYMD.Text = Now.AddDays(1 + iNextUseday).ToString("yyyy/MM/dd")
+                '### 20200707 END   列車マスタ(返送)より情報を取得し設定 ##############################
 
             Case "TxtRetstation"        '空車着駅（発駅）
                 TxtRetstation.Text = WW_SelectValue
@@ -1049,8 +1100,8 @@ Public Class OIT0002LinkDetail
                 Catch ex As Exception
                 End Try
                 TxtActEmpDate.Focus()
-
-            Case "TANKNUMBER"   '(一覧)タンク車№
+            '(一覧)タンク車№, (一覧)油種名(受発注用)
+            Case "TANKNUMBER", "PREORDERINGOILNAME"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -1137,6 +1188,25 @@ Public Class OIT0002LinkDetail
                     Else
                         updHeader.Item("JRALLINSPECTIONALERT") = ""
                     End If
+
+                    '### 20200706 START 列車番号を手入力に変更(内部気づきより) ###########################################
+                    '(一覧)油種名(受発注用)
+                ElseIf WF_FIELD.Value = "PREORDERINGOILNAME" Then
+                    If WW_SETVALUE = "" Then
+                        updHeader.Item("PREOILCODE") = ""
+                        updHeader.Item(WF_FIELD.Value) = ""
+                        updHeader.Item("PREOILNAME") = ""
+                        updHeader.Item("PREORDERINGTYPE") = ""
+                    Else
+                        updHeader.Item("PREOILCODE") = WW_SETVALUE.Substring(0, 4)
+                        updHeader.Item(WF_FIELD.Value) = WW_SETTEXT
+
+                        WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                        FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_SETVALUE, WW_GetValue)
+                        updHeader.Item("PREOILNAME") = WW_GetValue(2)
+                        updHeader.Item("PREORDERINGTYPE") = WW_GetValue(1)
+                    End If
+                    '### 20200706 END   列車番号を手入力に変更(内部気づきより) ###########################################
                 End If
 
                 '○ 画面表示データ保存
@@ -2797,6 +2867,14 @@ Public Class OIT0002LinkDetail
 
                 '先にアラームの確認を行う
                 Dim info As String = ""
+                '### 20200706 START 列車番号が列車マスタに未存在の場合の対応 ####################################
+                Dim iMaxtank As Integer
+                Try
+                    iMaxtank = Integer.Parse(WW_GetValue(3))
+                Catch ex As Exception
+                    iMaxtank = 99
+                End Try
+                '### 20200706 END   列車番号が列車マスタに未存在の場合の対応 ####################################
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     If Trim(OIT0002row("LINETRAINNO")) = "" Or
                                 Trim(OIT0002row("LINEORDER")) = "" Or
@@ -2812,7 +2890,7 @@ Public Class OIT0002LinkDetail
                             Exit For '優先度最大なので、判定にかかった段階でForループを抜ける
 
                             'タンク車数が「最大牽引タンク車数」より大きい場合
-                        ElseIf Integer.Parse(TxtTotalTank.Text) > Integer.Parse(WW_GetValue(3)) Then
+                        ElseIf Integer.Parse(TxtTotalTank.Text) > iMaxtank Then
                             '80(タンク車数オーバー)を設定
                             info = WW_ORDERINFOALERM_80
 
@@ -3585,6 +3663,9 @@ Public Class OIT0002LinkDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                     End If
+                    '
+                ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "PREORDERINGOILNAME") Then
+                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
                 End If
             Next

@@ -1462,6 +1462,10 @@ Public Class OIT0002LinkList
     Protected Sub WW_INSERT_RLINK(ByVal SQLcon As SqlConnection)
 
         Try
+            '貨車連結順序表No取得用SQL
+            Dim SQLLinkKeyNo As String =
+                  "SELECT VIW0001.VALUE1 FROM OIL.VIW0001_FIXVALUE VIW0001 WHERE VIW0001.CLASS = 'NEWLINKNOGET'"
+
             '貨車連結(臨海)順序表No取得用SQL
             Dim SQLRLinkKeyNo As String =
                   "SELECT VIW0001.VALUE1 FROM OIL.VIW0001_FIXVALUE VIW0001 WHERE VIW0001.CLASS = 'NEWRLINKNOGET'"
@@ -1473,7 +1477,7 @@ Public Class OIT0002LinkList
                 & " , TRAINNO       , SERIALNUMBER   , TRUCKSYMBOL   , TRUCKNO" _
                 & " , DEPSTATIONNAME, ARRSTATIONNAME , ARTICLENAME   , CONVERSIONAMOUNT" _
                 & " , ARTICLE       , ARTICLETRAINNO , ARTICLEOILNAME, CURRENTCARTOTAL" _
-                & " , EXTEND        , CONVERSIONTOTAL" _
+                & " , EXTEND        , CONVERSIONTOTAL, LINKNO" _
                 & " , DELFLG        , INITYMD        , INITUSER      , INITTERMID" _
                 & " , UPDYMD        , UPDUSER        , UPDTERMID     , RECEIVEYMD)"
 
@@ -1483,13 +1487,15 @@ Public Class OIT0002LinkList
                 & " , @TRAINNO       , @SERIALNUMBER   , @TRUCKSYMBOL   , @TRUCKNO" _
                 & " , @DEPSTATIONNAME, @ARRSTATIONNAME , @ARTICLENAME   , @CONVERSIONAMOUNT" _
                 & " , @ARTICLE       , @ARTICLETRAINNO , @ARTICLEOILNAME, @CURRENTCARTOTAL" _
-                & " , @EXTEND        , @CONVERSIONTOTAL" _
+                & " , @EXTEND        , @CONVERSIONTOTAL, @LINKNO" _
                 & " , @DELFLG        , @INITYMD        , @INITUSER      , @INITTERMID" _
                 & " , @UPDYMD        , @UPDUSER        , @UPDTERMID     , @RECEIVEYMD);"
 
             Using SQLKeyNocmd As New SqlCommand(SQLRLinkKeyNo, SQLcon),
-                  SQLRLinkcmd As New SqlCommand(SQLRLinkStr, SQLcon)
+                  SQLRLinkcmd As New SqlCommand(SQLRLinkStr, SQLcon),
+                  SQLKeyNo2cmd As New SqlCommand(SQLLinkKeyNo, SQLcon)
 
+                '貨車連結(臨海)順序表No取得
                 Dim sRLinkNo As String
                 Using SQLdr As SqlDataReader = SQLKeyNocmd.ExecuteReader()
                     SQLdr.Read()
@@ -1497,6 +1503,17 @@ Public Class OIT0002LinkList
                 End Using
                 'CLOSE
                 SQLKeyNocmd.Dispose()
+
+                '### 20200710 START((全体)No102対応) ######################################
+                '貨車連結順序表No取得
+                Dim sLinkNo As String = ""
+                Using SQLdr As SqlDataReader = SQLKeyNo2cmd.ExecuteReader()
+                    SQLdr.Read()
+                    sLinkNo = SQLdr(0)
+                End Using
+                'CLOSE
+                SQLKeyNo2cmd.Dispose()
+                '### 20200710 END  ((全体)No102対応) ######################################
 
                 Dim WW_DATENOW As DateTime = Date.Now
                 Dim RLINKNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar)                     '貨車連結(臨海)順序表№
@@ -1518,6 +1535,7 @@ Public Class OIT0002LinkList
                 Dim CURRENTCARTOTAL As SqlParameter = SQLRLinkcmd.Parameters.Add("@CURRENTCARTOTAL", SqlDbType.Decimal)      '現車合計
                 Dim EXTEND As SqlParameter = SQLRLinkcmd.Parameters.Add("@EXTEND", SqlDbType.Decimal)                        '延長
                 Dim CONVERSIONTOTAL As SqlParameter = SQLRLinkcmd.Parameters.Add("@CONVERSIONTOTAL", SqlDbType.Decimal)      '換算合計
+                Dim LINKNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@LINKNO", SqlDbType.NVarChar)                       '貨車連結順序表№
                 Dim DELFLG As SqlParameter = SQLRLinkcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar)                       '削除フラグ
                 Dim INITYMD As SqlParameter = SQLRLinkcmd.Parameters.Add("@INITYMD", SqlDbType.DateTime)                     '登録年月日
                 Dim INITUSER As SqlParameter = SQLRLinkcmd.Parameters.Add("@INITUSER", SqlDbType.NVarChar)                   '登録ユーザーＩＤ
@@ -1527,6 +1545,8 @@ Public Class OIT0002LinkList
                 Dim UPDTERMID As SqlParameter = SQLRLinkcmd.Parameters.Add("@UPDTERMID", SqlDbType.NVarChar)                 '更新端末
                 Dim RECEIVEYMD As SqlParameter = SQLRLinkcmd.Parameters.Add("@RECEIVEYMD", SqlDbType.DateTime)               '集信日時
 
+                '着駅名(保存用)
+                Dim strArrstationName As String = ""
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
                     '貨車連結(臨海)順序表№
                     RLINKNO.Value = sRLinkNo
@@ -1592,6 +1612,21 @@ Public Class OIT0002LinkList
                         CONVERSIONTOTAL.Value = Decimal.Parse(OIT0002EXLUProw("CONVERSIONTOTAL"))
                     End If
 
+                    '### 20200710 START((全体)No102対応) ######################################
+                    '貨車連結順序表№
+                    If strArrstationName <> "" _
+                        AndAlso strArrstationName <> ARRSTATIONNAME.Value Then
+                        Dim sLinkNoBak1 As String = sLinkNo
+                        Dim iLinkNoBak1 As Integer
+                        sLinkNo = sLinkNoBak1.Substring(0, 9)
+                        iLinkNoBak1 = Integer.Parse(sLinkNoBak1.Substring(9, 2)) + 1
+                        sLinkNo &= iLinkNoBak1.ToString("00")
+                    End If
+                    LINKNO.Value = sLinkNo
+                    '★着駅名を保存
+                    strArrstationName = ARRSTATIONNAME.Value
+                    '### 20200710 END  ((全体)No102対応) ######################################
+
                     '削除フラグ
                     DELFLG.Value = C_DELETE_FLG.ALIVE
                     '登録年月日
@@ -1651,10 +1686,6 @@ Public Class OIT0002LinkList
         Dim WW_DATENOW As DateTime = Date.Now
 
         Try
-            '貨車連結順序表No取得用SQL
-            Dim SQLLinkKeyNo As String =
-                  "SELECT VIW0001.VALUE1 FROM OIL.VIW0001_FIXVALUE VIW0001 WHERE VIW0001.CLASS = 'NEWLINKNOGET'"
-
             '更新SQL文･･･貨車連結表TBLの各フラグを更新
             Dim SQLLinkStr As String =
                   " INSERT INTO OIL.OIT0004_LINK " _
@@ -1669,7 +1700,7 @@ Public Class OIT0002LinkList
 
             SQLLinkStr &=
                   " SELECT DISTINCT" _
-                & "   @LINKNO                                          AS LINKNO" _
+                & "   OIT0011.LINKNO                                   AS LINKNO" _
                 & " , OIT0011.RLINKDETAILNO                            AS LINKDETAILNO" _
                 & " , OIT0011.REGISTRATIONDATE                         AS AVAILABLEYMD" _
                 & " , '1'                                              AS STATUS" _
@@ -1718,7 +1749,6 @@ Public Class OIT0002LinkList
                 & "  AND TMP0005.OILNo = '1'" _
                 & "  AND TMP0005.RINKAIOILCODE <> ''" _
                 & "  AND TMP0005.RINKAIOILKANA = OIT0011.ARTICLEOILNAME"
-            '& "  AND TMP0005.OILCODE IN ('1001', '1101', '1301', '1401', '2101')"
             SQLLinkStr &= String.Format("  AND TMP0005.OILCODE IN ('{0}', '{1}', '{2}', '{3}', '{4}')",
                                         BaseDllConst.CONST_HTank,
                                         BaseDllConst.CONST_RTank,
@@ -1742,26 +1772,12 @@ Public Class OIT0002LinkList
                 SQLLinkStr &= String.Format("    AND OIT0011.RLINKNO = '{0}'", I_RLinkNo)
             End If
 
-            Using SQLKeyNocmd As New SqlCommand(SQLLinkKeyNo, SQLcon),
-                  SQLLinkcmd As New SqlCommand(SQLLinkStr, SQLcon)
-
-                Dim sLinkNo As String
-                Using SQLdr As SqlDataReader = SQLKeyNocmd.ExecuteReader()
-                    SQLdr.Read()
-                    sLinkNo = SQLdr(0)
-                End Using
-                'CLOSE
-                SQLKeyNocmd.Dispose()
-
-                Dim RLINKNO As SqlParameter = SQLLinkcmd.Parameters.Add("@LINKNO", SqlDbType.NVarChar) '貨車連結順序表№
-                RLINKNO.Value = sLinkNo
-
+            Using SQLLinkcmd As New SqlCommand(SQLLinkStr, SQLcon)
                 SQLLinkcmd.CommandTimeout = 300
                 SQLLinkcmd.ExecuteNonQuery()
 
                 'CLOSE
                 SQLLinkcmd.Dispose()
-
             End Using
 
         Catch ex As Exception

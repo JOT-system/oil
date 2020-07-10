@@ -138,6 +138,16 @@ Public Class OIM0020GuidanceCreate
             Me.txtNaiyou.Enabled = False
             Me.chklFlags.Enabled = False
             Me.rblType.Enabled = False
+        ElseIf Context.Handler.ToString().ToUpper().startsWith("ASP.OIL_M00001MENU") Then
+            Dim prev As M00001MENU_V2 = DirectCast(Me.PreviousPage, M00001MENU_V2)
+            dispVal = GetGuidance(prev.SelectedGuidanceNo)
+            Me.Form.Attributes.Add("REFONLY", "1")
+            Me.txtEndYmd.Enabled = False
+            Me.txtFromYmd.Enabled = False
+            Me.txtTitle.Enabled = False
+            Me.txtNaiyou.Enabled = False
+            Me.chklFlags.Enabled = False
+            Me.rblType.Enabled = False
         End If
         '添付ファイル作業フォルダの生成
         CreateInitDir(dispVal)

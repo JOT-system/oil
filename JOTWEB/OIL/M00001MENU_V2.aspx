@@ -10,6 +10,7 @@
     <!-- 全体レイアウト　Menuheaderbox -->
     <div  class="Menuheaderbox" id="Menuheaderbox">
         <div class="menuMain">
+            <!-- 左ナビゲーション -->
             <div id="divLeftNav" class= "sideMenu">
                 <asp:Repeater ID="repLeftNav" runat="server" ClientIDMode="Predictable">
                     <HeaderTemplate>
@@ -51,9 +52,38 @@
                     </FooterTemplate>
                 </asp:Repeater>
             </div>
+            <!-- ガイダンス・個人ペインエリア -->
             <div class="guidance_parsonalArea">
-                <div class="guidance">
-
+                <!-- ガイダンスエリア -->
+                <div ID="guidanceArea" class="guidance" runat="server">
+                    <div id="guidanceList">
+                        <asp:Repeater ID="repGuidance" runat="server" ClientIDMode="Predictable">
+                            <HeaderTemplate>
+                                <table class="guidanceTable">
+                            </HeaderTemplate>
+                            <ItemTemplate>
+                                <tr>
+                                    <td class="guidanceType"><div class='<%# Eval("TYPE") %>'></div></td>
+                                    <td class="entryDate"><%# Eval("ENTRYDATE") %></td>
+                                    <td class="title"><a href="#" onclick="ButtonClick('WF_ButtonShowGuidance<%# Eval("GUIDANCENO") %>'); return false;"><%# Eval("TITLE") %></a></td>
+                                    <td class="naiyo"><%# Eval("NAIYOU") %></td>
+                                    <td class="attachFile1"><a href='<%# ResolveUrl("~/OIL/mas/OIM0020GuidanceDownload.aspx") & "?id=" & JOTWEB.OIM0020WRKINC.GetParamString(Eval("GUIDANCENO"), "1") %>' target="_blank"><%# Eval("FILE1") %></a></td>
+                                </tr>
+                            </ItemTemplate>
+                            <FooterTemplate>
+                                <%#If(DirectCast(DirectCast(Container.Parent, Repeater).DataSource, System.Data.DataTable).Rows.Count = 0,
+                                                                                                            "<tr><td class='empty'>ガイダンスはありません</td></tr>",
+                                                                                                            "") %>
+                                </table>
+                            </FooterTemplate>
+                        </asp:Repeater>
+                    </div>
+                    <!-- 個別エリア -->
+                    <div id="guidanceOpenCloseWrapper">
+                        <div id="guidanceOpenClose">
+                        <span id="guidanceOpenCloseButton">＋ ガイダンス表示</span>
+                        </div>
+                    </div>
                 </div>
                 <div class= "parsonalParts">
                     <p style="font-size:20px;">正式メニューIDではないので</p>

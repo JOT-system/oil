@@ -2,6 +2,8 @@
 <%@ MasterType VirtualPath="~/OIL/OILMasterPage.Master" %> 
 
 <%@ register src="~/OIL/inc/GRM00001WRKINC.ascx" tagname="work" tagprefix="LSINC" %>
+<%@ Register Src="~/OIL/menupane/MP0001CycleBillingStatus.ascx" TagPrefix="LSINC" TagName="MP0001CycleBillingStatus" %>
+
 <asp:Content ID="MC0001H" ContentPlaceHolderID="head" runat="server">
     <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/OIL/css/M00001V2.css")%>"/>
     <script type="text/javascript" src="<%=ResolveUrl("~/OIL/script/M00001V2.js")%>"></script>
@@ -86,8 +88,13 @@
                     </div>
                 </div>
                 <div class= "parsonalParts">
-                    <p style="font-size:20px;">正式メニューIDではないので</p>
-                    <p style="font-size:20px;">遷移先（次画面）でメニューと判定されずにあらぬ初期処理されるので含みおきを</p>
+                    <div id="paneList"> 
+                        <!-- ペインの中身は /OIL/menupane/ の各カスタムコントロールを編集 -->
+                        <!-- ここで設定したIDとユーザーマスタのOUTPUTID[n]が紐づけられる -->
+                        <!-- 月締状況 -->
+                        <LSINC:MP0001CycleBillingStatus runat="server" ID="P001" />
+
+                    </div>
                 </div>            
             </div>
         </div>

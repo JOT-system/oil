@@ -1,24 +1,11 @@
 ﻿/* ------------------------------
- 凡例
------------------------------- */
-
-/*
-h1 { color: red; }			--> h1要素に対して指定 
-h1, h2 { color: red; }		-->  h1 と h2要素に対して指定 
-ul li { color: red; }		-->  <ul>～</ul> の中にある li要素に対して指定 
-.sample { color: red; }		-->  class="sample" を持つ要素に対して指定 
-#sample { color: red; }		-->  id="sample" を持つ要素に対して指定 
-h1.sample { color: red; }	-->  class="sample" を持つ div要素に対して指定 
-a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して指定 
-*/
-
-/* ------------------------------
  擬似フレーム　スタイル定義
 ------------------------------ */
 
 #Menuheaderbox {
     width: calc(100% - 2px);
     height: 100%;
+    background-color: rgb(237,237,237);
 }
 
 .menuMain {
@@ -62,7 +49,7 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     min-height:100px;
     width: 100%;
     box-sizing: border-box;
-    background-color: red;
+    border-radius:2px;
 }
 /* ********************** */
 /* 左ナビゲーションの設定 */
@@ -285,4 +272,13 @@ div.showGuidance a[id^="Menu_"] {
 .guidanceType div.I {
     content: " ";
     background-image: url('../img/guidanceIconI.png');
+}
+/* ペインリストの共通デザイン */
+#paneList {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+#paneList * {
+    box-sizing :border-box;
 }

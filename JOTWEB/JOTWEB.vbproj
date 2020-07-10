@@ -237,6 +237,7 @@
     <Content Include="OIL\mas\OIS0001UserCreate.aspx" />
     <Content Include="OIL\mas\OIS0001UserList.aspx" />
     <Content Include="OIL\mas\OIS0001UserSearch.aspx" />
+    <Content Include="OIL\menupane\MP0001CycleBillingStatus.ascx" />
     <Content Include="OIL\ord\OIT0002LinkDetail.aspx" />
     <Content Include="OIL\ord\OIT0002LinkList.aspx" />
     <Content Include="OIL\ord\OIT0002LinkSearch.aspx" />
@@ -606,6 +607,16 @@
     </Compile>
     <Compile Include="OIL\mas\OIS0001UserSearch.aspx.vb">
       <DependentUpon>OIS0001UserSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0000Base.vb">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0001CycleBillingStatus.ascx.designer.vb">
+      <DependentUpon>MP0001CycleBillingStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0001CycleBillingStatus.ascx.vb">
+      <DependentUpon>MP0001CycleBillingStatus.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\OILMasterPage.Master.designer.vb">

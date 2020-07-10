@@ -256,6 +256,8 @@ Public Class M00000LOGON
         Dim WW_URL As String = String.Empty
         Dim WW_MENUURL As String = String.Empty
         Dim WW_chk As String = String.Empty
+        'Userメニューリスト設定
+        Dim WW_UserMenuList As New List(Of CS0050SESSION.UserMenuCostomItem)
 
         'DataBase接続文字
         Using SQLcon As SqlConnection = CS0050Session.getConnection
@@ -297,79 +299,73 @@ Public Class M00000LOGON
                 sqlStat.AppendLine("      ,rtrim(A.VIEWPROFID) as VIEWPROFID")
                 sqlStat.AppendLine("      ,rtrim(A.RPRTPROFID) as RPRTPROFID")
                 sqlStat.AppendLine("      ,rtrim(A.MAPID)      as MAPID")
+                sqlStat.AppendLine("      ,rtrim(A.VARIANT)    as VARIANT")
+                sqlStat.AppendLine("      ,rtrim(A.APPROVALID) as APPROVALID")
+                For i = 1 To 25 Step 1
+                    sqlStat.AppendFormat("      ,isnull(rtrim(A.OUTPUTID{0}),'') as OUTPUTID{0}", i).AppendLine()
+                    sqlStat.AppendFormat("      ,isnull(rtrim(A.ONOFF{0}),'')    as ONOFF{0}", i).AppendLine()
+                    sqlStat.AppendFormat("      ,isnull(A.SORTNO{0},99999)       as SORTNO{0}", i).AppendLine()
+                Next i
+                sqlStat.AppendLine("      ,B.PASSENDYMD        as PASSENDYMD")
+                sqlStat.AppendLine("  FROM        COM.OIS0004_USER       A")
+                sqlStat.AppendLine("  INNER JOIN  COM.OIS0005_USERPASS   B")
+                sqlStat.AppendLine("    ON B.USERID      = A.USERID")
+                sqlStat.AppendLine("   and B.DELFLG     <> @P4 ")
+                sqlStat.AppendLine(" Where A.USERID      = @P1 ")
+                sqlStat.AppendLine("   and A.STYMD      <= @P2")
+                sqlStat.AppendLine("   and A.ENDYMD     >= @P3")
+                sqlStat.AppendLine("   and B.PASSENDYMD >= @P3")
+                sqlStat.AppendLine("   and A.DELFLG     <> @P4")
 
-                Dim SQL_Str As String =
-                     "SELECT " _
-                   & " rtrim(A.USERID)   as USERID    , " _
-                   & " rtrim(A.CAMPCODE) as CAMPCODE  , " _
-                   & " rtrim(A.ORG)      as ORG       , " _
-                   & " A.STYMD                        , " _
-                   & " A.ENDYMD                       , " _
-                   & " rtrim(CONVERT(nvarchar, DecryptByKey(B.PASSWORD))) as PASSWORD  , " _
-                   & " B.MISSCNT                      , " _
-                   & " A.INITYMD                      , " _
-                   & " A.UPDYMD                       , " _
-                   & " A.UPDTIMSTP                    , " _
-                   & " rtrim(A.MENUROLE) as MENUROLE  , " _
-                   & " rtrim(A.MAPROLE) as MAPROLE    , " _
-                   & " rtrim(A.VIEWPROFID) as VIEWPROFID    , " _
-                   & " rtrim(A.RPRTPROFID) as RPRTPROFID    , " _
-                   & " rtrim(A.MAPID)    as MAPID     , " _
-                   & " rtrim(A.VARIANT)  as VARIANT   , " _
-                   & " rtrim(A.APPROVALID) as APPROVALID    , " _
-                   & " B.PASSENDYMD      as PASSENDYMD  " _
-                   & " FROM       COM.OIS0004_USER       A    " _
-                   & " INNER JOIN COM.OIS0005_USERPASS   B ON " _
-                   & "       B.USERID      = A.USERID   " _
-                   & "   and B.DELFLG     <> @P4        " _
-                   & " Where A.USERID      = @P1        " _
-                   & "   and A.STYMD      <= @P2        " _
-                   & "   and A.ENDYMD     >= @P3        " _
-                   & "   and B.PASSENDYMD >= @P3        " _
-                   & "   and A.DELFLG     <> @P4        "
-                Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-                    PARA1.Value = UserID.Text
-                    PARA2.Value = Date.Now
-                    PARA3.Value = Date.Now
-                    PARA4.Value = C_DELETE_FLG.DELETE
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                Using SQLcmd As New SqlCommand(sqlStat.ToString, SQLcon)
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 20).Value = UserID.Text
+                        .Add("@P2", SqlDbType.Date).Value = Date.Now
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
 
-                    WW_err = C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR
-                    If SQLdr.Read Then
-                        WW_USERID = Convert.ToString(SQLdr("USERID"))
-                        WW_PASSWORD = Convert.ToString(SQLdr("PASSWORD"))
-                        WW_USERCAMP = Convert.ToString(SQLdr("CAMPCODE"))
-                        WW_ORG = Convert.ToString(SQLdr("ORG"))
-                        WW_STYMD = CDate(SQLdr("STYMD"))
-                        WW_ENDYMD = CDate(SQLdr("ENDYMD"))
-                        WW_MISSCNT = CInt(SQLdr("MISSCNT"))
-                        If SQLdr("UPDYMD") Is DBNull.Value Then
-                            WW_UPDYMD = System.DateTime.UtcNow
-                        Else
-                            WW_UPDYMD = CDate(SQLdr("UPDYMD"))
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        WW_err = C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR
+                        If SQLdr.Read Then
+                            WW_USERID = Convert.ToString(SQLdr("USERID"))
+                            WW_PASSWORD = Convert.ToString(SQLdr("PASSWORD"))
+                            WW_USERCAMP = Convert.ToString(SQLdr("CAMPCODE"))
+                            WW_ORG = Convert.ToString(SQLdr("ORG"))
+                            WW_STYMD = CDate(SQLdr("STYMD"))
+                            WW_ENDYMD = CDate(SQLdr("ENDYMD"))
+                            WW_MISSCNT = CInt(SQLdr("MISSCNT"))
+                            If SQLdr("UPDYMD") Is DBNull.Value Then
+                                WW_UPDYMD = System.DateTime.UtcNow
+                            Else
+                                WW_UPDYMD = CDate(SQLdr("UPDYMD"))
+                            End If
+                            WW_UPDTIMSTP = CType(SQLdr("UPDTIMSTP"), Byte())
+                            '20191101-追加-START
+                            WW_MENUROLE = Convert.ToString(SQLdr("MENUROLE"))
+                            WW_MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
+                            WW_VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
+                            WW_RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
+                            WW_APPROVALID = Convert.ToString(SQLdr("APPROVALID"))
+                            '20191101-追加-END
+                            WW_MAPID = Convert.ToString(SQLdr("MAPID"))
+                            WW_VARIANT = Convert.ToString(SQLdr("VARIANT"))
+                            WW_PASSENDYMD = Convert.ToString(SQLdr("PASSENDYMD"))
+                            Dim outputId As String = ""
+                            Dim onOff As String = ""
+                            Dim sortNo As Integer = 0
+                            For i As Integer = 1 To 25
+                                outputId = Convert.ToString(SQLdr(String.Format("OUTPUTID{0}", i)))
+                                onOff = Convert.ToString(SQLdr(String.Format("ONOFF{0}", i)))
+                                sortNo = CInt(SQLdr(String.Format("SORTNO{0}", i)))
+                                Dim userMenuItm = New CS0050SESSION.UserMenuCostomItem(outputId, onOff, sortNo)
+                                WW_UserMenuList.Add(userMenuItm)
+                            Next
+
+                            WW_err = C_MESSAGE_NO.NORMAL
                         End If
-                        WW_UPDTIMSTP = CType(SQLdr("UPDTIMSTP"), Byte())
-                        '20191101-追加-START
-                        WW_MENUROLE = Convert.ToString(SQLdr("MENUROLE"))
-                        WW_MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
-                        WW_VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
-                        WW_RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
-                        WW_APPROVALID = Convert.ToString(SQLdr("APPROVALID"))
-                        '20191101-追加-END
-                        WW_MAPID = Convert.ToString(SQLdr("MAPID"))
-                        WW_VARIANT = Convert.ToString(SQLdr("VARIANT"))
-                        WW_PASSENDYMD = Convert.ToString(SQLdr("PASSENDYMD"))
-                        WW_err = C_MESSAGE_NO.NORMAL
-                    End If
 
-                    'Close
-                    SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
-
+                    End Using
                 End Using
 
             Catch ex As Exception
@@ -565,7 +561,7 @@ Public Class M00000LOGON
         CS0050Session.VIEW_MAP_VARIANT = WW_VARIANT
         CS0050Session.MAP_ETC = ""
         CS0050Session.VIEW_PERMIT = ""
-
+        CS0050Session.UserMenuCostomList = WW_UserMenuList
         Master.MAPID = WW_MAPID
         Master.USERCAMP = WW_USERCAMP
         '20191101-追加-START

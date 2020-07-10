@@ -20,31 +20,188 @@ a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して�
     width: calc(100% - 2px);
     height: 100%;
 }
-.guidance {
-    border: 1px solid rgb(255, 255, 255);
-    height: 100px;
-    width: 100%;
-    //overflow-y: auto;
-    overflow: hidden; /* 横スクロールはなし */
-    position: relative;
-    background-color: yellow;
-}
+
 .menuMain {
     width: 100%;
-    height: auto;
+    height: 100%;
     overflow: auto;
+    box-sizing: border-box;
+    font-size: 0;
 }
+.sideMenu, .parsonalParts, .parsonalParts {
+    font-size: 16px;
+}
+
 .sideMenu {
     width: 250px;
-    height: 100%;
+    //height: calc(100% - 4px);
+    height: auto;
     display: inline-block;
-    background-color: blue;
-    vertical-align:top;
+    vertical-align: top;
+    box-sizing: border-box;
+    //background-color: blue;
 }
-.parsonalParts {
+.guidance_parsonalArea {
     width: calc(100% - 255px);
     height: 100%;
     display: inline-block;
-    background-color: red;
     vertical-align: top;
+    box-sizing: border-box;
+}
+.guidance {
+    height: 100px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: yellow;
+    display:none;
+}
+.parsonalParts {
+    //height: calc(100% - 100px);
+    min-height:100px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: red;
+}
+/* ********************** */
+/* 左ナビゲーションの設定 */
+/* ********************** */
+div.parentMenu > input[type=checkbox] {
+    display: none;
+}
+div.parentMenu {
+    display: block;
+    vertical-align: middle;
+    width: 100%;
+    //height: 50px;
+}
+div.parentMenu > input[type=checkbox] + label,
+.childMenu label {
+    margin: 5px;
+    display: block;
+    text-align: left;
+    padding-left: 10px;
+    padding-top: 12px;
+    width: calc(100% - 12px);
+    height: 50px;
+    background-color: rgb(15,39,61);
+    color: rgb(255,255,255);
+    //font-weight: bold;
+    font-size: 22px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    position:relative;
+    -ms-user-select: none;
+    user-select:none; /* ボタン認識の為ユーザー選択させない */
+}
+.childMenu label {
+    background-color: rgb(22,58,90);
+}
+
+div.parentMenu > input[type=checkbox] + label:hover {
+    outline: 1px solid rgb(15,39,61);
+    background-color: rgba(15,39,61,0.5);
+    color: rgb(15,39,61);
+}
+.childMenu label:hover {
+    outline: 1px solid rgb(22,58,90);
+    background-color: rgba(22,58,90,0.15);
+    color: rgb(22,58,90);
+}
+/* 左ナビゲーション画像の共通設定 */
+div.parentMenu > input[type=checkbox] + label:before,
+.childMenu label:before{
+    margin-top: -2px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    content: " ";
+    background-image: none;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: contain;
+    float: left;
+    margin-right: 10px;
+}
+/* 左ナビゲーション画像：在庫管理 */
+div.parentMenu.Inventory > input[type=checkbox] + label:before {
+    background-image: url(../img/oiltank.png);
+}
+/* 左ナビゲーション画像：受注管理 */
+div.parentMenu.Order > input[type=checkbox] + label:before {
+    background-image: url(../img/order.png);
+}
+/* 左ナビゲーション画像：回送管理 */
+div.parentMenu.Forwarding > input[type=checkbox] + label:before {
+    background-image: url(../img/foward.png);
+}
+/* 左ナビゲーション画像：回送管理 */
+div.parentMenu.Master > input[type=checkbox] + label:before {
+    background-image: url(../img/master.png);
+}
+/* 左ナビゲーション画像：請求支払管理 */
+div.parentMenu.Billing > input[type=checkbox] + label:before {
+    background-image: url(../img/pay.png);
+}
+/* 左ナビゲーション画像：タンク車所在管理 */
+div.parentMenu.Location > input[type=checkbox] + label:before {
+    background-image: url(../img/tank.png);
+}
+/* 左ナビゲーション画像：実績・統計 */
+div.parentMenu.Report > input[type=checkbox] + label:before {
+    background-image: url(../img/statistics.png);
+}
+/* 左ナビゲーション画像：実績・統計 */
+div.parentMenu.DataLinkage > input[type=checkbox] + label:before {
+    background-image: url(../img/datalink.png);
+}
+/* 左ナビゲーション：アコーディオン展開マーク */
+div.parentMenu.hasChild > input[type=checkbox] + label {
+    padding-right: 11px;
+}
+div.parentMenu.hasChild > input[type=checkbox] + label:after {
+    position:absolute;
+    top:calc(50% - 12px);
+    right:-5px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    content: "▼";
+    background-image: none;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+div.parentMenu.hasChild > input[type=checkbox]:checked + label:after {
+    content: "▲";
+}
+/* 左ナビゲーション：メニュー２への誘導マーク */
+div.parentMenu.menu2Link > input[type=checkbox] + label {
+    padding-right: 11px;
+}
+div.parentMenu.menu2Link > input[type=checkbox] + label:after {
+    position:absolute;
+    top:calc(50% - 12px);
+    right:-5px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    content: "▶";
+    background-image: none;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* 左ナビゲーション アコーディオン */
+div.parentMenu > input[type=checkbox] + label + div {
+    display:none;
+}
+div.parentMenu > input[type=checkbox]:checked + label + div {
+    display:block;
 }

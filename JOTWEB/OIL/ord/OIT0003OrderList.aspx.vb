@@ -2319,6 +2319,8 @@ Public Class OIT0003OrderList
             & " AND OIM0021.LOAD = OIM0005.LOAD " _
             & " AND OIM0021.OILCODE = OIT0003.OILCODE " _
             & " AND OIM0021.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0021.FROMYMD <= FORMAT(GETDATE(),'yyyy/MM/dd') " _
+            & " AND OIM0021.TOYMD >= FORMAT(GETDATE(),'yyyy/MM/dd') " _
             & " AND OIM0021.DELFLG <> @P02 " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
@@ -2541,6 +2543,8 @@ Public Class OIT0003OrderList
             & "       AND OIM0021.LOAD = OIM0005.LOAD " _
             & "       AND OIM0021.OILCODE = OIT0003.OILCODE " _
             & "       AND OIM0021.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & "       AND OIM0021.FROMYMD <= FORMAT(GETDATE(),'yyyy/MM/dd') " _
+            & "       AND OIM0021.TOYMD >= FORMAT(GETDATE(),'yyyy/MM/dd') " _
             & "       AND OIM0021.DELFLG <> @P02 " _
             & "      WHERE OIT0002.OFFICECODE = @P01 " _
             & "      AND OIT0002.LODDATE = @P03 " _
@@ -2885,11 +2889,20 @@ Public Class OIT0003OrderList
             & " AND OIM0003.OILCODE = OIT0003.OILCODE " _
             & " AND OIM0003.DELFLG <> @P02 "
 
+        '### 20200710 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+        SQLStr &=
+              " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
+            & "     OIM0024.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0024.DELFLG <> @P02 "
+        '### 20200710 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+
         SQLStr &=
                 " ORDER BY" _
             & "    VIW0013.No" _
             & "  , VIW0013.ZAIKOSORT" _
-            & "  , TOTALTANK　DESC"
+            & "  , OIM0024.PRIORITYNO"
+        '& "  , TOTALTANK　DESC"
 
 #Region "コメントアウト"
         ' ### START 在庫管理(シミュレーション)の設定が前提の場合 #########################

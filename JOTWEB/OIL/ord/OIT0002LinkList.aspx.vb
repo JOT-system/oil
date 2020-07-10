@@ -1702,7 +1702,8 @@ Public Class OIT0002LinkList
                   " SELECT DISTINCT" _
                 & "   OIT0011.LINKNO                                   AS LINKNO" _
                 & " , OIT0011.RLINKDETAILNO                            AS LINKDETAILNO" _
-                & " , OIT0011.REGISTRATIONDATE                         AS AVAILABLEYMD" _
+                & " , CONVERT(NVARCHAR, (CONVERT(DATETIME, OIT0011.REGISTRATIONDATE)" _
+                & "   + (CONVERT(INT, VIW0001.VALUE7) - CONVERT(INT, VIW0001.VALUE6))), 111) AS AVAILABLEYMD" _
                 & " , '1'                                              AS STATUS" _
                 & " , ''                                               AS INFO" _
                 & " , ''                                               AS PREORDERNO" _
@@ -1761,6 +1762,14 @@ Public Class OIT0002LinkList
                 & "  OIT0005.TANKNUMBER = OIT0011.TRUCKNO"
             SQLLinkStr &= String.Format("  AND OIT0005.DELFLG <> '{0}'", C_DELETE_FLG.DELETE)
             '### 20200706 END  ((内部)No184対応) ######################################
+
+            '### 20200710 START 列車マスタ(返送)から次回利用可能日を取得 ##############
+            SQLLinkStr &=
+                  " LEFT JOIN OIL.VIW0001_FIXVALUE VIW0001 ON" _
+                & "  VIW0001.CLASS = 'BTRAINNUMBER_FIND'" _
+                & "  AND VIW0001.CAMPCODE = VIW0002.OFFICECODE" _
+                & "  AND VIW0001.KEYCODE = OIT0011.TRAINNO + VIW0002.DEPSTATION"
+            '### 20200710 END   列車マスタ(返送)から次回利用可能日を取得 ##############
 
             SQLLinkStr &= String.Format(" WHERE OIT0011.DELFLG <> '{0}'", C_DELETE_FLG.DELETE) _
                 & "  AND OIT0011.TRUCKSYMBOL <> ''" _

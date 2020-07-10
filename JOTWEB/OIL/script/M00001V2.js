@@ -1,7 +1,13 @@
 ﻿// ○OnLoad用処理（左右Box非表示）
 function InitDisplay() {
     document.getElementById("rightb").style.visibility = "hidden";
+    //左ナビゲーションのクリックイベントバインド
     bindLeftNaviClick();
+    //ガイダンス開閉のイベントバインド
+    let guidanceButton = document.getElementById('guidanceOpenCloseButton');
+    if (guidanceButton !== null) {
+        bindShowCloseGuidance(guidanceButton);
+    }
 }
 /**
  * 左ナビゲーションクリックイベントバインド
@@ -41,4 +47,73 @@ function bindLeftNaviClick() {
         })(posicol, rowline), false);
 
     }
+}
+/**
+ * 左ナビゲーションクリックイベントバインド
+ * @param {Element} objButton 対象のボタンオブジェクト
+ * @return {undefined} なし
+ */
+function bindShowCloseGuidance(objButton) {
+    let menuBox = document.getElementById('Menuheaderbox');
+    let guidanceAreaObj = document.getElementById('guidanceArea');
+    let flag = getDispGuigance();
+    if (flag === '1') {
+        menuBox.classList.add('showGuidance');
+        objButton.textContent = '× ガイダンス非表示';
+    } else {
+        objButton.textContent = '＋ ガイダンス表示';
+        guidanceAreaObj.style.height = '0px';
+    }
+    objButton.addEventListener('click', (function (objButton, menuBox, guidanceAreaObj) {
+        return function () {
+            if (menuBox.classList.contains('showGuidance')) {
+                menuBox.classList.remove('showGuidance');
+                objButton.textContent = '＋ ガイダンス表示';
+                guidanceAreaObj.style.height = '0px';
+                setDispGuidance('0');
+            } else {
+                menuBox.classList.add('showGuidance');
+                objButton.textContent = '× ガイダンス非表示';
+                guidanceAreaObj.style.height = '';
+                setDispGuidance('1');
+            }
+        };
+    })(objButton, menuBox, guidanceAreaObj), true);
+
+
+}
+/**
+ * ローカルストレージよりガイダンスの表示/非表示設定を取得
+ * @return {undefined} なし
+ */
+function getDispGuigance() {
+    let dtm = localStorage.getItem("menu0001GuidanceSetDate");
+    let flg = localStorage.getItem("menu0001GuidanceFlag");
+    var dt = new Date();
+    var y = dt.getFullYear();
+    var m = ("00" + (dt.getMonth() + 1)).slice(-2);
+    var d = ("00" + dt.getDate()).slice(-2);
+    let currentDtm = y + m + d;
+    if (dtm === null) {
+        dtm = currentDtm;
+        localStorage.setItem('menu0001GuidanceSetDate', dtm);
+    }
+    if (dtm === currentDtm) {
+        if (flg === null) {
+            flg = '1';
+        }
+    } else {
+        flg = '1';
+        localStorage.setItem('menu0001GuidanceSetDate', currentDtm);
+        localStorage.setItem("menu0001GuidanceFlag", flg);
+    }
+    return flg;
+}
+/**
+ * 左ナビゲーションクリックイベントバインド
+ * @param {string} flag 設定するフラグ
+ * @return {undefined} なし
+ */
+function setDispGuidance(flag) {
+    localStorage.setItem("menu0001GuidanceFlag", flag);
 }

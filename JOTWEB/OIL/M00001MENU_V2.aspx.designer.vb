@@ -23,6 +23,24 @@ Partial Public Class M00001MENU_V2
     Protected WithEvents repLeftNav As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
+    '''guidanceArea コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents guidanceArea As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''repGuidance コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repGuidance As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
     '''<remarks>

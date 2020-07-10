@@ -26,7 +26,8 @@ Public Class M00001MENU_V2
 
             If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                 If WF_ButtonClick.Value.StartsWith("WF_ButtonShowGuidance") Then
-                    'WF_ButtonShowGuidance_Click()
+                    WF_ButtonShowGuidance_Click()
+                    Return
                 End If
                 Select Case WF_ButtonClick.Value
                     Case "WF_ButtonLeftNavi"
@@ -63,9 +64,21 @@ Public Class M00001MENU_V2
                 CS0011LOGWRITE.CS0011LOGWrite()
                 Return
             End Try
+            '取得したデータを画面に展開
             ViewState(C_VSNAME_LEFTNAVIDATA) = menuButtonList
             Me.repLeftNav.DataSource = menuButtonList
             Me.repLeftNav.DataBind()
+            'ガイダンスマスタの表示
+            'ガイダンスデータ取得
+            Try
+                Dim guidanceDt As DataTable = GetGuidanceData(sqlCon)
+                Me.repGuidance.DataSource = guidanceDt
+                Me.repGuidance.DataBind()
+                If guidanceDt.Rows.Count = 0 Then
+                    guidanceArea.Visible = False
+                End If
+            Catch ex As Exception
+            End Try
         End Using
     End Sub
     ''' <summary>
@@ -141,6 +154,15 @@ Public Class M00001MENU_V2
 
         'ボタン押下時、画面遷移
         Server.Transfer(menuItm.Url)
+    End Sub
+    ''' <summary>
+    ''' ガイダンスリンク押下時
+    ''' </summary>
+    Private Sub WF_ButtonShowGuidance_Click()
+        Dim guidanceNo As String = WF_ButtonClick.Value.Replace("WF_ButtonShowGuidance", "")
+        Me.SelectedGuidanceNo = guidanceNo
+        'ボタン押下時、画面遷移
+        Server.Transfer(Me.WF_HdnGuidanceUrl.Value)
     End Sub
     ''' <summary>
     ''' メニューボタン情報を取得する
@@ -281,6 +303,89 @@ Public Class M00001MENU_V2
 
     End Function
     ''' <summary>
+    ''' 表示用のガイダンスデータ取得
+    ''' </summary>
+    ''' <param name="sqlCon">SQLConnection</param>
+    ''' <returns>ガイダンスデータ</returns>
+    Private Function GetGuidanceData(sqlCon As SqlConnection) As DataTable
+        Dim retDt As New DataTable
+        With retDt.Columns
+            .Add("GUIDANCENO", GetType(String))
+            .Add("ENTRYDATE", GetType(String))
+            .Add("TYPE", GetType(String))
+            .Add("TITLE", GetType(String))
+            .Add("NAIYOU", GetType(String))
+            .Add("FILE1", GetType(String))
+        End With
+        Try
+            Dim sqlStat As New StringBuilder
+            sqlStat.AppendLine("SELECT GD.GUIDANCENO")
+            sqlStat.AppendLine("      ,format(GD.INITYMD,'yyyy/M/d') AS ENTRYDATE")
+            sqlStat.AppendLine("      ,GD.TYPE                       AS TYPE")
+            sqlStat.AppendLine("      ,GD.TITLE                      AS TITLE")
+            sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
+            sqlStat.AppendLine("      ,GD.FILE1                      AS FILE1")
+            sqlStat.AppendLine("  FROM oil.OIM0020_GUIDANCE GD")
+            sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
+            sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
+            sqlStat.AppendLine("   AND OUTFLG <> '1'")
+            Dim userOrg = Master.USER_ORG
+            If Not {"jot_oil_1", "jot_sys_1"}.Contains(CS0050Session.VIEW_MENU_MODE) Then
+                Dim targetDispFlags = OIM0020WRKINC.GetNewDisplayFlags
+                Dim showDispFlag = (From flg In targetDispFlags Where flg.OfficeCode = userOrg Select flg.FieldName).FirstOrDefault
+                If showDispFlag <> "" Then
+                    sqlStat.AppendFormat("   AND {0} = '1'", showDispFlag).AppendLine()
+                Else
+                    sqlStat.AppendLine("   AND 1 = 2")
+                End If
+            End If
+            sqlStat.AppendLine(" ORDER BY (CASE WHEN GD.TYPE = 'E' THEN '1'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'W' THEN '2'")
+            sqlStat.AppendLine("                WHEN GD.TYPE = 'I' THEN '3'")
+            sqlStat.AppendLine("                ELSE '9'")
+            sqlStat.AppendLine("            END)")
+            sqlStat.AppendLine("          ,GD.INITYMD DESC")
+            '他のフラグや最大取得件数（条件がある場合）はあとで
+            Using sqlGuidCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                sqlGuidCmd.Parameters.Add("@DELFLG_NO", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Using sqlGuidDr As SqlDataReader = sqlGuidCmd.ExecuteReader()
+                    Dim dr As DataRow
+                    While sqlGuidDr.Read
+                        dr = retDt.NewRow
+                        dr("GUIDANCENO") = sqlGuidDr("GUIDANCENO")
+                        dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
+                        dr("TYPE") = sqlGuidDr("TYPE")
+                        dr("TITLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITLE")))
+                        dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU"))).Replace(ControlChars.CrLf, "<br />").Replace(ControlChars.Cr, "<br />").Replace(ControlChars.Lf, "<br />")
+                        dr("FILE1") = Convert.ToString(sqlGuidDr("FILE1"))
+
+                        retDt.Rows.Add(dr)
+                    End While
+                End Using
+
+            End Using
+            sqlStat = New StringBuilder
+            sqlStat.AppendLine("SELECT URL.URL")
+            sqlStat.AppendLine("  FROM COM.OIS0007_URL URL")
+            sqlStat.AppendLine(" WHERE URL.MAPID = @MAPID")
+            sqlStat.AppendLine("   AND GETDATE() BETWEEN URL.STYMD AND URL.ENDYMD")
+            sqlStat.AppendLine("   AND URL.DELFLG = @DELFLG")
+
+            Using sqlGuidUrlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+                With sqlGuidUrlCmd.Parameters
+                    .Add("@MAPID", SqlDbType.NVarChar).Value = OIM0020WRKINC.MAPIDC
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Dim urlVal = sqlGuidUrlCmd.ExecuteScalar
+                Me.WF_HdnGuidanceUrl.Value = Convert.ToString(urlVal)
+            End Using
+        Catch ex As Exception
+            Return retDt
+        End Try
+
+        Return retDt
+    End Function
+    ''' <summary>
     ''' 画面表示用遷移ボタンアイテムクラス
     ''' </summary>
     <Serializable>
@@ -389,4 +494,51 @@ Public Class M00001MENU_V2
         End Property
 
     End Class
+
+#Region "ViewStateを圧縮 個人用ペインでかなり大きくなると予想"
+    Protected Overrides Sub SavePageStateToPersistenceMedium(ByVal viewState As Object)
+        Dim lofF As New LosFormatter
+        Using sw As New IO.StringWriter
+            lofF.Serialize(sw, viewState)
+            Dim viewStateString = sw.ToString()
+            Dim bytes = Convert.FromBase64String(viewStateString)
+            bytes = CompressByte(bytes)
+            ClientScript.RegisterHiddenField("__VSTATE", Convert.ToBase64String(bytes))
+        End Using
+    End Sub
+    Protected Overrides Function LoadPageStateFromPersistenceMedium() As Object
+        Dim viewState As String = Request.Form("__VSTATE")
+        Dim bytes = Convert.FromBase64String(viewState)
+        bytes = DeCompressByte(bytes)
+        Dim lofF = New LosFormatter()
+        Return lofF.Deserialize(Convert.ToBase64String(bytes))
+    End Function
+    ''' <summary>
+    ''' ByteDetaを圧縮
+    ''' </summary>
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function CompressByte(data As Byte()) As Byte()
+        Using ms As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(ms, IO.Compression.CompressionMode.Compress)
+            ds.Write(data, 0, data.Length)
+            ds.Close()
+            Return ms.ToArray
+        End Using
+    End Function
+    ''' <summary>
+    ''' Byteデータを解凍
+    ''' </summary>
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function DeCompressByte(data As Byte()) As Byte()
+        Using inpMs As New IO.MemoryStream(data),
+              outMs As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(inpMs, IO.Compression.CompressionMode.Decompress)
+            ds.CopyTo(outMs)
+            Return outMs.ToArray
+        End Using
+
+    End Function
+#End Region
 End Class

@@ -241,9 +241,28 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
 
-                '手配連絡ボタンを非活性
-                WF_CONTACTFLG.Value = "1"
-
+                '### 20200710 START 指摘票対応(全体(No101))  ##################
+                ''手配連絡ボタンを非活性
+                'WF_CONTACTFLG.Value = "1"
+                '★臨海鉄道対応(手配連絡ボタン(1：連絡)済みも対象)
+                If WW_RINKAIFLG = True OrElse work.WF_SEL_CONTACTFLG.Text = "1" Then
+                    '手配連絡ボタンを非活性
+                    WF_CONTACTFLG.Value = "1"
+                Else
+                    '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
+                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                        '手配連絡ボタンを活性
+                        WF_CONTACTFLG.Value = "0"
+                    Else
+                        '手配連絡ボタンを非活性
+                        WF_CONTACTFLG.Value = "1"
+                    End If
+                End If
+                '### 20200710 END   指摘票対応(全体(No101))  ##################
             Else
                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
@@ -283,8 +302,35 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
 
-                '結果受理ボタンを非活性
-                WF_RESULTFLG.Value = "1"
+                '### 20200710 START 指摘票対応(全体(No101))  ##################
+                ''結果受理ボタンを非活性
+                'WF_RESULTFLG.Value = "1"
+                '★臨海鉄道対応(結果受理ボタン(1：受理)済みも対象)
+                If WW_RINKAIFLG = True OrElse work.WF_SEL_RESULTFLG.Text = "1" Then
+                    '結果受理ボタンを非活性
+                    WF_RESULTFLG.Value = "1"
+                Else
+                    '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
+                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+
+                        '手配連絡が"1"(連絡)の場合
+                        If work.WF_SEL_CONTACTFLG.Text = "1" Then
+                            '結果受理ボタンを活性
+                            WF_RESULTFLG.Value = "0"
+                        Else
+                            '結果受理ボタンを非活性
+                            WF_RESULTFLG.Value = "1"
+                        End If
+                    Else
+                        '結果受理ボタンを非活性
+                        WF_RESULTFLG.Value = "1"
+                    End If
+                End If
+                '### 20200710 END   指摘票対応(全体(No101))  ##################
 
             Else
                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
@@ -324,8 +370,35 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
 
-                '託送指示ボタンを非活性
-                WF_DELIVERYFLG.Value = "1"
+                '### 20200710 START 指摘票対応(全体(No101))  ##################
+                ''託送指示ボタンを非活性
+                'WF_DELIVERYFLG.Value = "1"
+                '★臨海鉄道対応(託送指示ボタン(1：手配)済みも対象)
+                If WW_RINKAIFLG = True OrElse work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                    '託送指示ボタンを非活性
+                    WF_DELIVERYFLG.Value = "1"
+                Else
+                    '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
+                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+
+                        '三重塩浜営業所の場合
+                        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 Then
+                            '託送指示ボタンを活性
+                            WF_DELIVERYFLG.Value = "0"
+                        Else
+                            '託送指示ボタンを非活性
+                            WF_DELIVERYFLG.Value = "1"
+                        End If
+                    Else
+                        '託送指示ボタンを非活性
+                        WF_DELIVERYFLG.Value = "1"
+                    End If
+                End If
+                '### 20200710 END   指摘票対応(全体(No101))  ##################
 
             Else
                 '★臨海鉄道対応(臨海鉄道である営業所)
@@ -11446,45 +11519,48 @@ Public Class OIT0003OrderDetail
 
                 End If
 
-                '### 入換・積込業者とのやり取りを実施する運用を追加したため下記の処理を廃止(2020/03/30) ##############
-                ''臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
-                ''入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、
-                ''タブ「タンク車明細」へ業務を移行する。
+                '$$$ 20200710 START((全体)No101対応) $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+                '$$$ 臨海鉄道未対象の営業所については、タブ「タンク車明細」で積込指示を実施するため処理を復活 $$$$$$$$
+                ''### 入換・積込業者とのやり取りを実施する運用を追加したため下記の処理を廃止(2020/03/30) ##############
+                '臨海鉄道未対象の営業所((東北支店、関東支店(根岸のみ)、中部支店))は、
+                '入換・積込指示の業務がないため、受注進行ステータスを"手配完了"に変更し、タブ「タンク車明細」へ業務を移行する。
                 ''※但し、「三重塩浜営業所」は託送指示のみ業務があるため除外する。
-                'If WW_RINKAIFLG = False _
-                '    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
-                '    '〇(受注TBL)受注進行ステータス更新
-                '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                '        SQLcon.Open()       'DataBase接続
+                ''If WW_RINKAIFLG = False _
+                ''    AndAlso Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_012402 Then
+                If WW_RINKAIFLG = False Then
+                    '〇(受注TBL)受注進行ステータス更新
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
 
-                '        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_310)
-                '        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_310, Me.TxtOrderStatus.Text, WW_DUMMY)
-                '        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310
-                '        work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_310)
+                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_310, Me.TxtOrderStatus.Text, WW_DUMMY)
+                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310
+                        work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
 
-                '        '○ 画面表示データ復元
-                '        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
-                '        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
-                '            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
-                '                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
-                '                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
-                '            End If
-                '        Next
-                '        '○ 画面表示データ保存
-                '        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                        '○ 画面表示データ復元
+                        Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
+                        For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                            If OIT0003WKrow("ORDERNO") = work.WF_SEL_ORDERNUMBER.Text Then
+                                OIT0003WKrow("ORDERSTATUS") = work.WF_SEL_ORDERSTATUS.Text
+                                OIT0003WKrow("ORDERSTATUSNAME") = work.WF_SEL_ORDERSTATUSNM.Text
+                            End If
+                        Next
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
 
-                '        '### START 受注履歴テーブルの追加(2020/03/26) #############
-                '        WW_InsertOrderHistory(SQLcon)
-                '        '### END   ################################################
-                '    End Using
+                        '### START 受注履歴テーブルの追加(2020/03/26) #############
+                        WW_InsertOrderHistory(SQLcon)
+                        '### END   ################################################
+                    End Using
 
-                '    WF_DTAB_CHANGE_NO.Value = "2"
-                '    WF_Detail_TABChange()
+                    WF_DTAB_CHANGE_NO.Value = "2"
+                    WF_Detail_TABChange()
 
-                '    '〇タンク車所在の更新
-                '    WW_TankShozaiSet()
-                'End If
-                '#####################################################################################################
+                    ''〇タンク車所在の更新
+                    'WW_TankShozaiSet()
+                End If
+                ''#####################################################################################################
+                '$$$ 20200710 END  ((全体)No101対応) $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
                 '#####################################################################################################
 
             End If

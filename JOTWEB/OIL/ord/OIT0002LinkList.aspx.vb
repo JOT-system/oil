@@ -1733,8 +1733,8 @@ Public Class OIT0002LinkList
             '### 20200706 END  ((内部)No184対応) ######################################
 
             SQLLinkStr &= String.Format(" WHERE OIT0011.DELFLG <> '{0}'", C_DELETE_FLG.DELETE) _
-                & "  AND OIT0011.TRUCKSYMBOL <> ''"
-            '& "  AND OIT0011.ARTICLE <> ''"
+                & "  AND OIT0011.TRUCKSYMBOL <> ''" _
+                & "  AND VIW0002.OFFICECODE IS NOT NULL"
 
             '○ 条件指定で指定されたものでSQLで可能なものを追加する
             '貨車連結(臨海)順序表№

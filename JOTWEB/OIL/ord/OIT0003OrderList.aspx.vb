@@ -2319,6 +2319,8 @@ Public Class OIT0003OrderList
             & " AND OIM0021.LOAD = OIM0005.LOAD " _
             & " AND OIM0021.OILCODE = OIT0003.OILCODE " _
             & " AND OIM0021.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0021.FROMYMD <= FORMAT(GETDATE(),'yyyy/MM/dd') " _
+            & " AND OIM0021.TOYMD >= FORMAT(GETDATE(),'yyyy/MM/dd') " _
             & " AND OIM0021.DELFLG <> @P02 " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
@@ -2541,6 +2543,8 @@ Public Class OIT0003OrderList
             & "       AND OIM0021.LOAD = OIM0005.LOAD " _
             & "       AND OIM0021.OILCODE = OIT0003.OILCODE " _
             & "       AND OIM0021.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & "       AND OIM0021.FROMYMD <= FORMAT(GETDATE(),'yyyy/MM/dd') " _
+            & "       AND OIM0021.TOYMD >= FORMAT(GETDATE(),'yyyy/MM/dd') " _
             & "       AND OIM0021.DELFLG <> @P02 " _
             & "      WHERE OIT0002.OFFICECODE = @P01 " _
             & "      AND OIT0002.LODDATE = @P03 " _

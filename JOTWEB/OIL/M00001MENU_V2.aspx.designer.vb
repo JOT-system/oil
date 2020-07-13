@@ -41,6 +41,15 @@ Partial Public Class M00001MENU_V2
     Protected WithEvents repGuidance As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
+    '''P001 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P001 As Global.JOTWEB.MP0001CycleBillingStatus
+    
+    '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
     '''<remarks>

@@ -1121,6 +1121,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents WF_ButtonInsertFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_CheckBoxFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_CheckBoxFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

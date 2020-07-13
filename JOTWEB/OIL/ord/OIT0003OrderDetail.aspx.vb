@@ -122,7 +122,7 @@ Public Class OIT0003OrderDetail
                     Me.WW_UPBUTTONFLG = "0"
                     Me.WW_USEORDERFLG = False
                     Me.WW_InitializeTAB3 = False
-
+                    Me.WF_CheckBoxFLG.Value = "FALSE"
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonCONTACT"               '手配連絡ボタン押下
                             WF_ButtonCONTACT_Click()
@@ -3753,6 +3753,7 @@ Public Class OIT0003OrderDetail
     Protected Sub WF_CheckBoxSELECT_Click(ByVal chkFieldName As String)
 
         '〇 選択されたチェックボックスを制御
+        Me.WF_CheckBoxFLG.Value = "TRUE"
         'タブ「タンク車割当」
         If WF_DetailMView.ActiveViewIndex = "0" Then
             WW_CheckBoxSELECT_TAB1()

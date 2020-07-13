@@ -196,7 +196,8 @@ function ChangeCheckBox(listId) {
 
     var chkObjs = objTable.querySelectorAll("input[id^='chk" + listId + "OPERATION']");
     var spnObjs = objTable.querySelectorAll("span[id^='hchk" + listId + "OPERATION']");
-
+    let objSelectIndex = document.getElementById("WF_SelectedIndex").value
+    let objChkboxFlg = document.getElementById("WF_CheckBoxFLG").value
     for (let i = 0; i < chkObjs.length; i++) {
 
         if (chkObjs[i] !== null) {
@@ -204,6 +205,13 @@ function ChangeCheckBox(listId) {
                 chkObjs[i].checked = true;
             } else {
                 chkObjs[i].checked = false;
+            }
+            // チェックボックスをクリック、かつ選択した行の場合
+            if (objChkboxFlg === "TRUE" && Number(objSelectIndex) === i + 1) {
+                // フォーカスを当てる
+                chkObjs[i].focus()
+                // フォーカスを外す
+                chkObjs[i].blur()
             }
         }
     }

@@ -6561,6 +6561,9 @@ Public Class OIT0003OrderDetail
                 '〇 タンク車割当状況チェック
                 WW_TANKQUOTACHK(WF_FIELD.Value, updHeader)
 
+            Case "SHIPORDER"         '(一覧)発送順
+                updHeader.Item(WF_FIELD.Value) = WW_ListValue
+
             Case "TANKNO"            '(一覧)タンク車№
 
                 '入力が空の場合は、対象項目を空文字で設定する。
@@ -12934,7 +12937,7 @@ Public Class OIT0003OrderDetail
                 End If
             Next
             '### END  #############################################################################################
-            WW_SHIPORDER = chkShipOrder
+            WW_SHIPORDER = StrConv(chkShipOrder, VbStrConv.Narrow)
         End If
 
         '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
@@ -12988,6 +12991,10 @@ Public Class OIT0003OrderDetail
                     Exit Sub
                 End If
                 '### END  #############################################################################################
+
+                '★数値(大文字)で設定されている場合は、数値(小文字)に変換する。
+                OIT0003row("SHIPORDER") = StrConv(OIT0003row("SHIPORDER"), VbStrConv.Narrow)
+
             End If
 
             '◯袖ヶ浦営業所のみ貨物駅入線順のチェックを実施
@@ -13003,6 +13010,9 @@ Public Class OIT0003OrderDetail
                     O_RTN = "ERR"
                     Exit Sub
                 End If
+
+                '★数値(大文字)で設定されている場合は、数値(小文字)に変換する。
+                OIT0003row("SHIPORDER") = StrConv(OIT0003row("LINEORDER"), VbStrConv.Narrow)
             End If
 
             '(一覧)タンク車割当状況(未割当チェック)

@@ -55,30 +55,34 @@ function bindLeftNaviClick() {
  */
 function bindShowCloseGuidance(objButton) {
     let menuBox = document.getElementById('Menuheaderbox');
-    let guidanceAreaObj = document.getElementById('guidanceArea');
+    let guidanceAreaObj = document.getElementById('guidanceList');
+    let guidanceWrapObj = document.getElementById('guidanceArea');
     let flag = getDispGuigance();
     if (flag === '1') {
         menuBox.classList.add('showGuidance');
         objButton.textContent = '× ガイダンス非表示';
     } else {
         objButton.textContent = '＋ ガイダンス表示';
-        guidanceAreaObj.style.height = '0px';
+        guidanceAreaObj.style.display = 'none';
+        guidanceWrapObj.style.height = '30px';
     }
-    objButton.addEventListener('click', (function (objButton, menuBox, guidanceAreaObj) {
+    objButton.addEventListener('click', (function (objButton, menuBox, guidanceAreaObj, guidanceWrapObj) {
         return function () {
             if (menuBox.classList.contains('showGuidance')) {
                 menuBox.classList.remove('showGuidance');
                 objButton.textContent = '＋ ガイダンス表示';
-                guidanceAreaObj.style.height = '0px';
+                guidanceAreaObj.style.display = 'none';
+                guidanceWrapObj.style.height = '30px';
                 setDispGuidance('0');
             } else {
                 menuBox.classList.add('showGuidance');
                 objButton.textContent = '× ガイダンス非表示';
-                guidanceAreaObj.style.height = '';
+                guidanceAreaObj.style.display = '';
+                guidanceWrapObj.style.height = '';
                 setDispGuidance('1');
             }
         };
-    })(objButton, menuBox, guidanceAreaObj), true);
+    })(objButton, menuBox, guidanceAreaObj, guidanceWrapObj), true);
 
 
 }

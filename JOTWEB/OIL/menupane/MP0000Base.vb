@@ -48,4 +48,31 @@ Public Class MP0000Base
             mainPane.Attributes.Add("style", String.Format(styleBase, orderObj.Value))
         End If
     End Sub
+    ''' <summary>
+    ''' オフィス選択用のコンボボックス取得
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>複数ペインで利用するため共通化</remarks>
+    Public Function GetOfficeList() As DropDownList
+        Dim letList As New DropDownList
+        Using obj As GRIS0005LeftBox = DirectCast(LoadControl("~/inc/GRIS0005LeftBox.ascx"), GRIS0005LeftBox)
+            Dim prmData As New Hashtable
+            Dim patent = DirectCast(Me.Page.Master, OILMasterPage)
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_COMPANY) = patent.USER_ORG
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_SALESOFFICE) = ""
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+            Dim WW_DUMMY As String = ""
+            obj.SetListBox(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, WW_DUMMY, prmData)
+            For Each listitm As ListItem In obj.WF_LeftListBox.Items
+                Dim ddlItm As New ListItem(listitm.Text, listitm.Value)
+                ddlItm.Selected = False
+                letList.Items.Add(ddlItm)
+            Next
+            Dim foundItem As ListItem = letList.Items.FindByValue(patent.USER_ORG)
+            If foundItem IsNot Nothing Then
+                foundItem.Selected = True
+            End If
+        End Using
+        Return letList
+    End Function
 End Class

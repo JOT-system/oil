@@ -283,26 +283,126 @@ div.showGuidance a[id^="Menu_"] {
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
+    margin-bottom:5px;
 }
 #paneList * {
     box-sizing :border-box;
 }
 .menuPaneItem {
-    overflow:hidden;
+    margin-top: 5px;
+    margin-right: 5px;
+    padding: 5px;
+    overflow: hidden;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
 }
 /* ３列幅を使うペイン設定 */
 .menuPaneItem.paneWidth3 {
-    width: 1000px;
-    min-width:1000px;
-    max-width: 1000px;
+    width: 1068px;
+    min-width:1068px;
+    max-width: 1068px;
 }
+/* ２列幅を使うペイン設定 */
 .menuPaneItem.paneWidth2 {
-    width: calc(1000px / 2);
-    min-width: calc(1000px / 2);
-    max-width: calc(1000px / 2);
+    width: calc(1063px / 2);
+    min-width: calc(1063px / 2);
+    max-width: calc(1063px / 2);
 }
+/* １列幅を使うペイン設定 */
 .menuPaneItem.paneWidth1 {
-    width: calc(1000px / 3);
-    min-width: calc(1000px / 3);
-    max-width: calc(1000px / 3);
+    width: calc(1058px / 3);
+    min-width: calc(1058px / 3);
+    max-width: calc(1058px / 3);
+}
+/* ペインタイトルエリア */
+.paneTitle {
+    width:100%;
+}
+.paneTitle > div {
+    display:inline-block;
+    vertical-align:top;
+}
+.paneTitleLeft {
+    width:calc(100% - 40px);
+    font-size:16pt;
+    font-weight:bold;
+    height:32px;
+}
+
+/* 再描画ボタンアイコン */
+.paneRefreshImg {
+    width: 100%;
+    height: 100%;
+    background-size: 32px 32px;
+    background-repeat: no-repeat;
+    background-image: url('../img/menuPaneRefresh.png');
+    
+}
+.paneTitleRefresh {
+    width: 32px;
+    height: 32px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    user-select :none;
+    overflow:hidden;
+}
+.paneTitleRefresh:hover {
+    border: 1px solid darkgray;
+    cursor:pointer;
+}
+.paneTitleRefresh:hover .paneRefreshImg {
+    animation:3s linear infinite rotationIcon;
+}
+@keyframes rotationIcon {
+    0% {
+        transform: rotate(0);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/* ペイン内ドロップダウンレイアウト(IDのプリフィックスにddlとつけたもののみ) */
+.paneContent select[id^='ddl'] {
+    height: 25px;
+    font-size: 12pt;
+    padding: 2px;
+}
+/* ******************** */
+/* 月間輸送量ペイン個別 */
+/* ******************** */
+.monthTransTable table {
+    table-layout:fixed;
+    border-collapse:collapse;
+    margin-top:5px;
+}
+/* セルの余白折り返し */
+.monthTransTable table td,
+.monthTransTable table th {
+    white-space:nowrap; /* セルオーバーで折り返さない */
+    padding:2px;
+    border:1px solid darkgray;
+}
+.monthTransTable table tr:nth-child(1) th:nth-child(1) {
+    border-top:none;
+    border-left:none;
+}
+/* その他数値セル幅 */
+.monthTransTable table th.oilType {
+    width:120px;
+}
+/* その他数値セル幅 */
+.monthTransTable table th.yesterday,
+.monthTransTable table th.today,
+.monthTransTable table th.todayTrans{
+    width:100px;
+}
+/* 列見出し（油種名）*/
+.monthTransTable .oilNameData {
+    text-align: left;
+}
+.monthTransTable td {
+    text-align:right;
 }

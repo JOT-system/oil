@@ -93,7 +93,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
         Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
-        If excelFileName = "OIT0003L_LOADPLAN.xlsx" Then
+        If excelFileName = "OIT0003L_DELIVERYPLAN.xlsx" Then
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("運送状"), Excel.Worksheet)
+            Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+        ElseIf excelFileName = "OIT0003L_LOADPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("積込指示書"), Excel.Worksheet)
             Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         ElseIf excelFileName = "OIT0003L_NEGISHI_SHIPPLAN.xlsx" _
@@ -112,9 +115,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
         End If
     End Sub
 
-#Region "ダウンロード(積込予定表(根岸以外))"
+#Region "ダウンロード(積込指示書(共通))"
     ''' <summary>
-    ''' テンプレートを元に帳票を作成しダウンロード(出荷・積込予定表(根岸))URLを生成する
+    ''' テンプレートを元に帳票を作成しダウンロード(積込指示書(共通))URLを生成する
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
@@ -158,7 +161,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Function
 
     ''' <summary>
-    ''' 帳票のヘッダー設定(積込予定表(根岸以外))
+    ''' 帳票のヘッダー設定(積込指示書(共通))
     ''' </summary>
     Private Sub EditLoadHeaderArea()
         Dim rngHeaderArea As Excel.Range = Nothing
@@ -191,7 +194,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Sub
 
     ''' <summary>
-    ''' 帳票の明細設定(積込予定表(根岸以外))
+    ''' 帳票の明細設定(積込指示書(共通))
     ''' </summary>
     Private Sub EditLoadDetailArea(ByVal officeCode As String)
         Dim rngDetailArea As Excel.Range = Nothing
@@ -588,9 +591,9 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Sub
 #End Region
 
-#Region "ダウンロード(入線予定表(袖ヶ浦))"
+#Region "ダウンロード(入線方(袖ヶ浦))"
     ''' <summary>
-    ''' テンプレートを元に帳票を作成しダウンロード(出荷・積込予定表(根岸))URLを生成する
+    ''' テンプレートを元に帳票を作成しダウンロード(入線方(袖ヶ浦))URLを生成する
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
@@ -634,7 +637,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Function
 
     ''' <summary>
-    ''' 帳票のヘッダー設定(入線方予定表(袖ヶ浦))
+    ''' 帳票のヘッダー設定(入線方(袖ヶ浦))
     ''' </summary>
     Private Sub EditSodegauraLineHeaderArea(ByVal lodDate As String)
         Dim rngHeaderArea As Excel.Range = Nothing
@@ -681,7 +684,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Sub
 
     ''' <summary>
-    ''' 帳票の明細設定(入線方予定表(袖ヶ浦))
+    ''' 帳票の明細設定(入線方(袖ヶ浦))
     ''' </summary>
     Private Sub EditSodegauraLineDetailArea()
         Dim rngDetailArea As Excel.Range = Nothing
@@ -777,7 +780,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
     End Function
 
-#Region "出荷予定表(根岸)帳票設定"
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(根岸))
     ''' </summary>
@@ -892,8 +894,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngDetailArea)
         End Try
     End Sub
-#End Region
-#Region "積込予定表(根岸)帳票設定"
+
     ''' <summary>
     ''' 帳票のヘッダー設定(積込予定表(根岸))
     ''' </summary>
@@ -983,7 +984,179 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Sub
 #End Region
 
+#Region "ダウンロード(託送指示(四日市))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(託送指示(四日市))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintYokkaichiData(ByVal repPtn As String, ByVal lodDate As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditDeliveryHeaderArea(lodDate)
+            '◯明細の設定
+            EditDeliveryDetailArea()
+            '***** TODO処理 ここまで *****
+            ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+    End Function
 #End Region
+
+#Region "ダウンロード(託送指示(三重塩浜))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(託送指示(三重塩浜))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal lodDate As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditDeliveryHeaderArea(lodDate)
+            '◯明細の設定
+            EditDeliveryDetailArea()
+            '***** TODO処理 ここまで *****
+            ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+    End Function
+#End Region
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(託送指示)
+    ''' </summary>
+    Private Sub EditDeliveryHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+        Dim value As String = Now.AddDays(0).ToString("yyyy年MM月dd日", New Globalization.CultureInfo("ja-JP"))
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '発駅名
+                rngHeaderArea = Me.ExcelWorkSheet.Range("C3")
+                rngHeaderArea.Value = PrintDatarow("DEPSTATIONNAME")
+                '発行日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("N2")
+                rngHeaderArea.Value = value
+
+                Exit For
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(託送指示)
+    ''' </summary>
+    Private Sub EditDeliveryDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 7
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '固定NO
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '協定コード
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '割増・割引C
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '品目コード
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '車種コード
+                rngDetailArea = Me.ExcelWorkSheet.Range("F" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '貨車番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("G" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("TANKNO")
+                '列車番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("TRAINNO")
+                '着駅名
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ARRSTATIONNAME")
+                '荷受人名
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME")
+                '運送状番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '屯数
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '運賃
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '受領印
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+
+                i += 1
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
 
     ''' <summary>
     ''' Excelオブジェクトの解放

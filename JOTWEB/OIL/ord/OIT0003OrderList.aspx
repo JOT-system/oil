@@ -153,16 +153,25 @@
     <div class="grc0001Wrapper">
         <ul>
             <li>
+                <asp:RadioButton ID="rbDeliveryBtn" runat="server" GroupName="WF_SW" Text="託送指示" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbDeliveryCSVBtn" runat="server" GroupName="WF_SW" Text="託送指示(CSV)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込指示" onclick="reportRadioButton();" />
+            </li>
+            <li>
                 <asp:RadioButton ID="rbShipBtn" runat="server" GroupName="WF_SW" Text="出荷予定" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定" onclick="reportRadioButton();" />
-            </li>
-            <li>
-                <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線予定" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線方" onclick="reportRadioButton();" />
             </li>
             <li>
                 <asp:RadioButton ID="rbKinoeneLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定(甲子)" onclick="reportRadioButton();" />
+            </li>
+            <li>
+                <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定(根岸)" onclick="reportRadioButton();" />
             </li>
         </ul>
     </div>

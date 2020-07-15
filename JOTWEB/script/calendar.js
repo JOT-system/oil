@@ -157,9 +157,9 @@ function carenda(num,calId) {
 
     //2020年以降　名称変更
     if (year >= 2020) {
-        gyouji_tbl[15 * 4 + 3] = "スポーツの日";
+        gyouji_tbl[9 * 4 + 3] = "スポーツの日";
     } else {
-        gyouji_tbl[15 * 4 + 3] = "体育の日";
+        gyouji_tbl[9 * 4 + 3] = "体育の日";
     }
 
     //春分の日

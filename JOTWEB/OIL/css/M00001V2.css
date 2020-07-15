@@ -364,11 +364,12 @@ div.showGuidance a[id^="Menu_"] {
         transform: rotate(360deg);
     }
 }
-/* ペイン内ドロップダウンレイアウト(IDのプリフィックスにddlとつけたもののみ) */
-.paneContent select[id^='ddl'] {
-    height: 25px;
+/* ペイン内ドロップダウンレイアウト(IDにddlMonthTransOfficeとつけたもののみ) */
+.paneContent select[id$='ddlMonthTransOffice'] {
+    height: 28px;
     font-size: 12pt;
     padding: 2px;
+    
 }
 /* ******************** */
 /* 月間輸送量ペイン個別 */

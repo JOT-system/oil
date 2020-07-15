@@ -59,6 +59,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.DataVisualization" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -170,6 +171,7 @@
     <Content Include="OIL\img\iconInfo.png" />
     <Content Include="OIL\img\iconWarn.png" />
     <Content Include="OIL\img\lockKey.png" />
+    <Content Include="OIL\img\menuPaneRefresh.png" />
     <Content Include="OIL\img\noicon.png" />
     <Content Include="OIL\img\foward.png" />
     <Content Include="OIL\img\leftbox.png" />

@@ -8,6 +8,18 @@ function InitDisplay() {
     if (guidanceButton !== null) {
         bindShowCloseGuidance(guidanceButton);
     }
+    // ポストバック時のスクロール位置復元
+    let menuVscrollObj = document.getElementById('hdnPaneAreaVScroll');
+    let menuPaneArea = document.querySelector('#Menuheaderbox > .menuMain');
+    if (menuVscrollObj !== null) {
+        if (menuPaneArea !== null) {
+            if (menuVscrollObj.value !== '') {
+                menuPaneArea.scrollTop = menuVscrollObj.value;
+                menuVscrollObj.value = '';
+            }
+            
+        }
+    }
 }
 /**
  * 左ナビゲーションクリックイベントバインド
@@ -120,4 +132,28 @@ function getDispGuigance() {
  */
 function setDispGuidance(flag) {
     localStorage.setItem("menu0001GuidanceFlag", flag);
+}
+/**
+ * 左ナビゲーションクリックイベントバインド
+ * @param {string} refreshMarkObjId リフレッシュフラグを格納するオブジェクト
+ * @return {undefined} なし
+ */
+function refreshPane(refreshMarkObjId) {
+    let refreshObj = document.getElementById(refreshMarkObjId);
+    let menuVscrollObj = document.getElementById('hdnPaneAreaVScroll');
+    let menuPaneArea = document.querySelector('#Menuheaderbox > .menuMain');
+    if (refreshObj === null) {
+        return;
+    }
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        refreshObj.value = '1';
+        if (menuVscrollObj !== null) {
+            if (menuPaneArea !== null) {
+                menuVscrollObj.value = menuPaneArea.scrollTop;
+            }
+        }
+        document.forms[0].submit();
+    }
+
 }

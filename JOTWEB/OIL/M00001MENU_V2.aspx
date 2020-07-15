@@ -112,6 +112,7 @@
             <asp:HiddenField ID="hdnPosiCol" runat="server" Value="" />
             <asp:HiddenField ID="hdnRowLine" runat="server" Value="" /> 
             <asp:HiddenField ID="WF_HdnGuidanceUrl" visible="false" runat="server" />
+            <asp:HiddenField ID="hdnPaneAreaVScroll" runat="server"  />
         </a>
     </div>
     <!-- Work レイアウト -->

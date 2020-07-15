@@ -122,6 +122,15 @@ Partial Public Class M00001MENU_V2
     Protected WithEvents WF_HdnGuidanceUrl As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
+    '''hdnPaneAreaVScroll コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnPaneAreaVScroll As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''work コントロール。
     '''</summary>
     '''<remarks>

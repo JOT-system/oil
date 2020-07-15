@@ -238,6 +238,15 @@
     <Content Include="OIL\mas\OIS0001UserList.aspx" />
     <Content Include="OIL\mas\OIS0001UserSearch.aspx" />
     <Content Include="OIL\menupane\MP0001CycleBillingStatus.ascx" />
+    <Content Include="OIL\menupane\MP0002MonthlyTransfer.ascx" />
+    <Content Include="OIL\menupane\MP0003OTLoadingSendStatus.ascx" />
+    <Content Include="OIL\menupane\MP0004ImportShipmentAmountStatus.ascx" />
+    <Content Include="OIL\menupane\MP0005ConsignmentStatus.ascx" />
+    <Content Include="OIL\menupane\MP0006LinkListImportStatus.ascx" />
+    <Content Include="OIL\menupane\MP0007BudgetYoYNums.ascx" />
+    <Content Include="OIL\menupane\MP0008BudgetYoYAmount.ascx" />
+    <Content Include="OIL\menupane\MP0009ActualTraction.ascx" />
+    <Content Include="OIL\menupane\MP0010ActualShippingExpenses.ascx" />
     <Content Include="OIL\ord\OIT0002LinkDetail.aspx" />
     <Content Include="OIL\ord\OIT0002LinkList.aspx" />
     <Content Include="OIL\ord\OIT0002LinkSearch.aspx" />
@@ -617,6 +626,69 @@
     </Compile>
     <Compile Include="OIL\menupane\MP0001CycleBillingStatus.ascx.vb">
       <DependentUpon>MP0001CycleBillingStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0002MonthlyTransfer.ascx.designer.vb">
+      <DependentUpon>MP0002MonthlyTransfer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0002MonthlyTransfer.ascx.vb">
+      <DependentUpon>MP0002MonthlyTransfer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0003OTLoadingSendStatus.ascx.designer.vb">
+      <DependentUpon>MP0003OTLoadingSendStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0003OTLoadingSendStatus.ascx.vb">
+      <DependentUpon>MP0003OTLoadingSendStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0004ImportShipmentAmountStatus.ascx.designer.vb">
+      <DependentUpon>MP0004ImportShipmentAmountStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0004ImportShipmentAmountStatus.ascx.vb">
+      <DependentUpon>MP0004ImportShipmentAmountStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0005ConsignmentStatus.ascx.designer.vb">
+      <DependentUpon>MP0005ConsignmentStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0005ConsignmentStatus.ascx.vb">
+      <DependentUpon>MP0005ConsignmentStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0006LinkListImportStatus.ascx.designer.vb">
+      <DependentUpon>MP0006LinkListImportStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0006LinkListImportStatus.ascx.vb">
+      <DependentUpon>MP0006LinkListImportStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0007BudgetYoYNums.ascx.designer.vb">
+      <DependentUpon>MP0007BudgetYoYNums.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0007BudgetYoYNums.ascx.vb">
+      <DependentUpon>MP0007BudgetYoYNums.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0008BudgetYoYAmount.ascx.designer.vb">
+      <DependentUpon>MP0008BudgetYoYAmount.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0008BudgetYoYAmount.ascx.vb">
+      <DependentUpon>MP0008BudgetYoYAmount.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0009ActualTraction.ascx.designer.vb">
+      <DependentUpon>MP0009ActualTraction.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0009ActualTraction.ascx.vb">
+      <DependentUpon>MP0009ActualTraction.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0010ActualShippingExpenses.ascx.designer.vb">
+      <DependentUpon>MP0010ActualShippingExpenses.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0010ActualShippingExpenses.ascx.vb">
+      <DependentUpon>MP0010ActualShippingExpenses.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\OILMasterPage.Master.designer.vb">

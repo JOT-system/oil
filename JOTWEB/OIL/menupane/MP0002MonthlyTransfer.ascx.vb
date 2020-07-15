@@ -1,8 +1,8 @@
 ﻿Option Strict On
 ''' <summary>
-''' 月締状況ユーザーコントロールクラス
+''' 月間輸送数量ユーザーコントロールクラス
 ''' </summary>
-Public Class MP0001CycleBillingStatus
+Public Class MP0002MonthlyTransfer
     Inherits MP0000Base
 
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load

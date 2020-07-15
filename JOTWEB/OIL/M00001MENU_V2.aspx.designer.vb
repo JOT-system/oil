@@ -50,6 +50,42 @@ Partial Public Class M00001MENU_V2
     Protected WithEvents P001 As Global.JOTWEB.MP0001CycleBillingStatus
     
     '''<summary>
+    '''P002 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P002 As Global.JOTWEB.MP0002MonthlyTransfer
+    
+    '''<summary>
+    '''P003 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P003 As Global.JOTWEB.MP0003OTLoadingSendStatus
+    
+    '''<summary>
+    '''P004 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P004 As Global.JOTWEB.MP0004ImportShipmentAmountStatus
+    
+    '''<summary>
+    '''P005 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P005 As Global.JOTWEB.MP0005ConsignmentStatus
+    
+    '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
     '''<remarks>

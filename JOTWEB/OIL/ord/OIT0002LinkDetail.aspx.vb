@@ -386,7 +386,7 @@ Public Class OIT0002LinkDetail
             & " , ''                                             AS UPDTIMSTP " _
             & " , 1                                              AS 'SELECT' " _
             & " , 0                                              AS HIDDEN " _
-            & " , ''                                             AS LINETRAINNO " _
+            & " , @P9                                            AS LINETRAINNO " _
             & " , ''                                             AS LINEORDER " _
             & " , ''                                             AS TANKNUMBER " _
             & " , ''                                             AS PREOILCODE " _
@@ -443,10 +443,10 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), '')               AS JRINSPECTIONDATE " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN '' " _
-            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P5 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '" + C_INSPECTIONALERT.ALERT_RED + "' " _
             & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4 " _
-            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P6 " _
-            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P7 " _
+            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '" + C_INSPECTIONALERT.ALERT_YELLOW + "' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '" + C_INSPECTIONALERT.ALERT_GREEN + "' " _
             & "   END                                                                      AS JRINSPECTIONALERTSTR " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN '' " _
@@ -458,15 +458,15 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), '')            AS JRALLINSPECTIONDATE " _
             & " , CASE " _
             & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN '' " _
-            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P5 " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '" + C_INSPECTIONALERT.ALERT_RED + "' " _
             & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4 " _
-            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P6 " _
-            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P7 " _
+            & "    AND DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '" + C_INSPECTIONALERT.ALERT_YELLOW + "' " _
+            & "   WHEN DATEDIFF(day, ISNULL(RTRIM(OIT0004.AVAILABLEYMD), ''), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '" + C_INSPECTIONALERT.ALERT_GREEN + "' " _
             & "   END                                                                      AS JRALLINSPECTIONALERTSTR " _
-            & " , ISNULL(FORMAT(OIT0004.AVAILABLEYMD, 'yyyy/MM/dd'), '')            AS AVAILABLEYMD " _
-            & " , ISNULL(RTRIM(OIT0004.DELFLG), '')              AS DELFLG " _
-            & " , ISNULL(RTRIM(OIT0004.LINKNO), '')             AS LINKNO " _
-            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')            AS LINKDETAILNO " _
+            & " , ISNULL(FORMAT(OIT0004.AVAILABLEYMD, 'yyyy/MM/dd'), '')                   AS AVAILABLEYMD " _
+            & " , ISNULL(RTRIM(OIT0004.DELFLG), '')                                        AS DELFLG " _
+            & " , ISNULL(RTRIM(OIT0004.LINKNO), '')                                        AS LINKNO " _
+            & " , ISNULL(RTRIM(OIT0004.LINKDETAILNO), '')                                  AS LINKDETAILNO " _
             & " FROM OIL.OIT0004_LINK OIT0004 " _
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "       OIT0004.TANKNUMBER = OIM0005.TANKNUMBER " _
@@ -504,14 +504,15 @@ Public Class OIT0002LinkDetail
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 7)  '空車発駅コード
                 Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 7)  '空車着駅コード
-                Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 20) '赤丸
-                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20) '黄丸
-                Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 20) '緑丸
+                'Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P5", SqlDbType.NVarChar, 20) '赤丸
+                'Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P6", SqlDbType.NVarChar, 20) '黄丸
+                'Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P7", SqlDbType.NVarChar, 20) '緑丸
                 Dim PARA8 As SqlParameter = SQLcmd.Parameters.Add("@P8", SqlDbType.NVarChar, 20) '利用可能日
+                Dim PARA9 As SqlParameter = SQLcmd.Parameters.Add("@P9", SqlDbType.NVarChar, 4)  '入線列車番号
 
-                PARA5.Value = C_INSPECTIONALERT.ALERT_RED
-                PARA6.Value = C_INSPECTIONALERT.ALERT_YELLOW
-                PARA7.Value = C_INSPECTIONALERT.ALERT_GREEN
+                'PARA5.Value = C_INSPECTIONALERT.ALERT_RED
+                'PARA6.Value = C_INSPECTIONALERT.ALERT_YELLOW
+                'PARA7.Value = C_INSPECTIONALERT.ALERT_GREEN
 
                 If work.WF_SEL_PANEL.Value = "" Or
                     work.WF_SEL_CREATEFLG.Text = "2" Then
@@ -519,12 +520,14 @@ Public Class OIT0002LinkDetail
                     PARA3.Value = ""
                     PARA4.Value = ""
                     PARA8.Value = ""
+                    PARA9.Value = ""
                 Else
                     'PARA0.Value = CONST_INIT_ROWS
                     PARA0.Value = O_INSCNT
                     PARA3.Value = LblDepstationName.Text
                     PARA4.Value = LblRetstationName.Text
                     PARA8.Value = AvailableYMD.Text
+                    PARA9.Value = Me.TxtHeadOfficeTrain.Text
                 End If
 
                 If work.WF_SEL_CREATEFLG.Text = 1 Then

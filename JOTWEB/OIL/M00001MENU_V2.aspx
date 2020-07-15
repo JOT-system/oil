@@ -3,6 +3,10 @@
 
 <%@ register src="~/OIL/inc/GRM00001WRKINC.ascx" tagname="work" tagprefix="LSINC" %>
 <%@ Register Src="~/OIL/menupane/MP0001CycleBillingStatus.ascx" TagPrefix="LSINC" TagName="MP0001CycleBillingStatus" %>
+<%@ Register Src="~/OIL/menupane/MP0002MonthlyTransfer.ascx" TagPrefix="LSINC" TagName="MP0002MonthlyTransfer" %>
+<%@ Register Src="~/OIL/menupane/MP0003OTLoadingSendStatus.ascx" TagPrefix="LSINC" TagName="MP0003OTLoadingSendStatus" %>
+<%@ Register Src="~/OIL/menupane/MP0004ImportShipmentAmountStatus.ascx" TagPrefix="LSINC" TagName="MP0004ImportShipmentAmountStatus" %>
+<%@ Register Src="~/OIL/menupane/MP0005ConsignmentStatus.ascx" TagPrefix="LSINC" TagName="MP0005ConsignmentStatus" %>
 
 <asp:Content ID="MC0001H" ContentPlaceHolderID="head" runat="server">
     <link rel="stylesheet" type="text/css" href="<%=ResolveUrl("~/OIL/css/M00001V2.css")%>"/>
@@ -93,7 +97,10 @@
                         <!-- ここで設定したIDとユーザーマスタのOUTPUTID[n]が紐づけられる -->
                         <!-- 月締状況 -->
                         <LSINC:MP0001CycleBillingStatus runat="server" ID="P001" />
-
+                        <LSINC:MP0002MonthlyTransfer runat="server" ID="P002" />
+                        <LSINC:MP0003OTLoadingSendStatus runat="server" ID="P003" />
+                        <LSINC:MP0004ImportShipmentAmountStatus runat="server" ID="P004" />
+                        <LSINC:MP0005ConsignmentStatus runat="server" id="P005" />
                     </div>
                 </div>            
             </div>

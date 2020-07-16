@@ -338,7 +338,7 @@ div.showGuidance a[id^="Menu_"] {
     background-size: 32px 32px;
     background-repeat: no-repeat;
     background-image: url('../img/menuPaneRefresh.png');
-    
+    position:absolute;
 }
 .paneTitleRefresh {
     width: 32px;
@@ -347,6 +347,7 @@ div.showGuidance a[id^="Menu_"] {
     border-radius: 5px;
     user-select :none;
     overflow:hidden;
+    position:relative;
 }
 .paneTitleRefresh:hover {
     border: 1px solid darkgray;

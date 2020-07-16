@@ -61,7 +61,7 @@
             <div class="monthTransRight">
                 <!-- グラフコントロール -->
                 <asp:Chart ID="chtMonthTrans" runat="server" 
-                    Width="600"
+                    Width="620"
                     BackColor="Transparent">
                     <Series>
                         <%-- 当日分のデータ設定 --%>
@@ -75,7 +75,7 @@
                             Legend="legHan"
                             >
                         </asp:Series>
-                        <%--前日分のデータ設定--%>
+                        <%--前日分のデータ設定 --%>
                         <asp:Series Name="serYesterday" 
                             ChartArea="carMonthTrans" 
                             ChartType="Bar" 
@@ -91,17 +91,22 @@
                     <ChartAreas>
                         <asp:ChartArea Name="carMonthTrans" 
                              >
-                            <%-- 下から上え横ラベルがソートされてしまうため設定 --%>
-                            <AxisX LabelAutoFitMaxFontSize="8"
+                            
+                            <AxisX LabelAutoFitMaxFontSize="12"
                                    LineColor="Gray">
-                                <LabelStyle Format="Regular" />
+                                <%-- 油種名フォント --%>
+                                <LabelStyle Font="ms pgothic, 6pt, style=Bold"  />
+                                <%-- 横軸文言とつなぐメモリ線（表示しない） --%>
                                 <MajorTickMark Enabled="false" />
-                                
+                                <%-- 横軸のグリッド線 --%>
                                 <MajorGrid Enabled="false" />
                             </AxisX>
-                            <AxisY LineColor="Gray" TitleFont="helvetica">
-                                <%-- 横軸メモリ線を消す --%>
+                            <AxisY LineColor="Gray">
+                                <%-- 縦軸メモリ線を消す --%>
                                 <MajorTickMark Enabled="false" />
+                                <%-- 数値フォント --%>
+                                <LabelStyle Font="ms pgothic, 6pt, style=Regular" Format="#,##0"  />
+                                <%-- 縦軸のグリッド線 --%>
                                 <MajorGrid LineColor="Gray"   />
                             </AxisY>
                         </asp:ChartArea>

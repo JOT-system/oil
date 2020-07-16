@@ -3461,7 +3461,7 @@ Public Class OIT0004OilStockCreate
             '**************************
             '既登録データのキー照合
             Dim qOder = (From itm In entredOrderList.Values
-                         Where itm.AccDate = chkItm.dayInfo.KeyString AndAlso
+                         Where itm.LodDate = chkItm.dayInfo.KeyString AndAlso
                               ((itm.ShippersCode = dispDataClass.Shipper AndAlso
                                 itm.JointOrder = "0") OrElse
                                (itm.JointOrder = "1" AndAlso
@@ -3473,7 +3473,7 @@ Public Class OIT0004OilStockCreate
 
             '重複オーダーチェック用クエリーJOINT設定を除き同一受入日、荷主、荷受人、列車番号のキーで抽出
             Dim qDupeOder = (From itm In entredOrderList.Values
-                             Where itm.AccDate = chkItm.dayInfo.KeyString AndAlso
+                             Where itm.LodDate = chkItm.dayInfo.KeyString AndAlso
                               itm.ShippersCode = dispDataClass.Shipper AndAlso
                               itm.ConsigneeCode = dispDataClass.Consignee AndAlso
                               itm.TrainNo = chkItm.trainInfo.TrainNo AndAlso

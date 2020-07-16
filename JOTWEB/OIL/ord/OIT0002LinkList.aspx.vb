@@ -1596,6 +1596,9 @@ Public Class OIT0002LinkList
                         ARTICLEOILNAME.Value = OIT0002EXLUProw("ARTICLE").ToString().Substring(4)
                     Catch ex As Exception
                         ARTICLEOILNAME.Value = ""
+                        If OIT0002EXLUProw("ARTICLE").ToString().Length <= 2 Then
+                            ARTICLEOILNAME.Value = OIT0002EXLUProw("ARTICLE").ToString()
+                        End If
                     End Try
                     '現車合計
                     If OIT0002EXLUProw("CURRENTCARTOTAL") = "" Then

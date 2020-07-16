@@ -2271,7 +2271,7 @@ Public Class OIT0003OrderList
                 '    ExcelGoiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
                 'End Using
 
-                'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_GOI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
+                'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_GOI_SHIPPLAN.xlsx", OIT0003ReportGoitbl)
                 '    Dim url As String
                 '    Try
                 '        url = repCbj.CreateExcelPrintGoiData("SHIPPLAN", lodDate)

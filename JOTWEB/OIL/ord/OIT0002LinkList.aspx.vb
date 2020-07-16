@@ -24,6 +24,7 @@ Public Class OIT0002LinkList
     Private OIT0002UPDtbl As DataTable                               '更新用テーブル
     Private OIT0002WKtbl As DataTable                                '作業用テーブル
     Private OIT0002EXLUPtbl As DataTable                             'EXCELアップロード用
+    Private OIT0002EXLDELtbl As DataTable                            'EXCELアップロード(削除)用
     Private OIT0002Fixvaltbl As DataTable                            '作業用テーブル(固定値マスタ取得用)
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
@@ -1461,6 +1462,17 @@ Public Class OIT0002LinkList
     ''' <param name="sqlCon">接続オブジェクト</param>
     Protected Sub WW_INSERT_RLINK(ByVal SQLcon As SqlConnection)
 
+        ''再アップロード時の削除データ取得用
+        'If IsNothing(OIT0002EXLDELtbl) Then
+        '    OIT0002EXLDELtbl = New DataTable
+        'End If
+
+        'If OIT0002EXLDELtbl.Columns.Count <> 0 Then
+        '    OIT0002EXLDELtbl.Columns.Clear()
+        'End If
+
+        'OIT0002EXLDELtbl.Clear()
+
         Try
             '貨車連結順序表No取得用SQL
             Dim SQLLinkKeyNo As String =
@@ -1490,6 +1502,9 @@ Public Class OIT0002LinkList
                 & " , @EXTEND        , @CONVERSIONTOTAL, @LINKNO" _
                 & " , @DELFLG        , @INITYMD        , @INITUSER      , @INITTERMID" _
                 & " , @UPDYMD        , @UPDUSER        , @UPDTERMID     , @RECEIVEYMD);"
+
+            'Dim SQLTempTblStr As String =
+            '  " SELECT LINKNO FROM OIL.OIT0011_RLINK WHERE REGISTRATIONDATE = @P01 AND TRAINNO = @P02;"
 
             Using SQLKeyNocmd As New SqlCommand(SQLRLinkKeyNo, SQLcon),
                   SQLRLinkcmd As New SqlCommand(SQLRLinkStr, SQLcon),

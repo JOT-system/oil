@@ -139,7 +139,7 @@ Public Class OIM0020GuidanceCreate
             Me.chklFlags.Enabled = False
             Me.rblType.Enabled = False
         ElseIf Context.Handler.ToString().ToUpper().startsWith("ASP.OIL_M00001MENU") Then
-            Dim prev As M00001MENU_V2 = DirectCast(Me.PreviousPage, M00001MENU_V2)
+            Dim prev As M00001MENU = DirectCast(Me.PreviousPage, M00001MENU)
             dispVal = GetGuidance(prev.SelectedGuidanceNo)
             Me.Form.Attributes.Add("REFONLY", "1")
             Me.txtEndYmd.Enabled = False

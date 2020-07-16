@@ -104,7 +104,7 @@
     <Content Include="img\oillogo.png" />
     <Content Include="img\right.png" />
     <Content Include="img\tank2.png" />
-    <Content Include="OIL\css\M00001V2.css" />
+    <Content Include="OIL\css\M00001.css" />
     <Content Include="OIL\css\M00002.css" />
     <Content Include="OIL\css\OIM0003C.css" />
     <Content Include="OIL\css\OIM0002C.css" />
@@ -149,7 +149,6 @@
     <Content Include="OIL\img\404cat.png" />
     <Content Include="OIL\css\ex\bootstrap.min.css" />
     <Content Include="css\common.css" />
-    <Content Include="OIL\css\M00001.css" />
     <Content Include="css\M00000.css" />
     <Content Include="OIL\css\ex\custom.min.css" />
     <Content Include="img\logo.png" />
@@ -218,9 +217,8 @@
     <Content Include="OIL\loc\OIT0005TankLocCondition.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocList.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocSearch.aspx" />
-    <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\ex\page_404.html" />
-    <Content Include="OIL\M00001MENU_V2.aspx" />
+    <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\M00002MENU.aspx" />
     <Content Include="OIL\mas\OIM0002OrgCreate.aspx" />
     <Content Include="OIL\mas\OIM0002OrgList.aspx" />
@@ -260,7 +258,7 @@
     <Content Include="OIL\ord\OIT0003OrderLinkQuota.aspx" />
     <Content Include="OIL\ord\OIT0003OrderList.aspx" />
     <Content Include="OIL\ord\OIT0003OrderSearch.aspx" />
-    <Content Include="OIL\script\M00001V2.js" />
+    <Content Include="OIL\script\M00001.js" />
     <Content Include="OIL\script\OIM0003C.js" />
     <Content Include="OIL\script\OIM0002C.js" />
     <Content Include="OIL\script\OIM0003L.js" />
@@ -303,7 +301,6 @@
     <Content Include="script\common.js" />
     <Content Include="script\easyselectbox.min.js" />
     <Content Include="script\event.js" />
-    <Content Include="OIL\script\M00001.js" />
     <Content Include="script\M00000.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -523,11 +520,11 @@
       <DependentUpon>OIT0005TankLocSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
-    <Compile Include="OIL\M00001MENU_V2.aspx.designer.vb">
-      <DependentUpon>M00001MENU_V2.aspx</DependentUpon>
+    <Compile Include="OIL\M00001MENU.aspx.designer.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
     </Compile>
-    <Compile Include="OIL\M00001MENU_V2.aspx.vb">
-      <DependentUpon>M00001MENU_V2.aspx</DependentUpon>
+    <Compile Include="OIL\M00001MENU.aspx.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\M00002MENU.aspx.designer.vb">
@@ -748,13 +745,6 @@
     </Compile>
     <Compile Include="M00000LOGON.aspx.vb">
       <DependentUpon>M00000LOGON.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="OIL\M00001MENU.aspx.designer.vb">
-      <DependentUpon>M00001MENU.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="OIL\M00001MENU.aspx.vb">
-      <DependentUpon>M00001MENU.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />

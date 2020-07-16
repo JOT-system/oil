@@ -968,7 +968,8 @@ Public Structure CS0023XLSUPLOAD
         '★Excelファイルをオープンする
         Try
             oWBooks = oXls.Workbooks
-            oWBook = oWBooks.Open(excelName)
+            '2020/07/16三宅コメント 任意ファイルすぎるので外部リンク更新メッセージ抑止と読み取り専用モードの引数は追加
+            oWBook = oWBooks.Open(excelName, UpdateLinks:=False, ReadOnly:=True)
 
         Catch ex As Exception
             'EXCEL OPENエラー
@@ -986,112 +987,119 @@ Public Structure CS0023XLSUPLOAD
             CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
             Exit Sub
         End Try
+        Try
+            '★与えられたワークシート名から、Worksheetオブジェクトを得る
+            Dim sheetName As String = excelSheetName
 
-        '★与えられたワークシート名から、Worksheetオブジェクトを得る
-        Dim sheetName As String = excelSheetName
+            oSheets = oWBook.Worksheets
+            '2020/7/16三宅メモ ↓oWBook.Sheets(1) か(0)で確か先頭のシートになります「getSheetIndex(sheetName, oSheets)」は不要
+            oSheet = DirectCast(oWBook.Sheets(getSheetIndex(sheetName, oSheets)), Excel.Worksheet)
+            'oSheet = CType(oSheets.Item(1), Excel.Worksheet)
 
-        oSheets = oWBook.Worksheets
-        oSheet = DirectCast(oWBook.Sheets(getSheetIndex(sheetName, oSheets)), Excel.Worksheet)
-        'oSheet = CType(oSheets.Item(1), Excel.Worksheet)
+            '★セルの内容を取得
+            Dim sCellAgoBehind() As String = {"", ""}
+            Dim sCellTitle() As String = {"", ""}
+            Dim sCellFooter() As String = {"", "", ""}
 
-        '★セルの内容を取得
-        Dim sCellAgoBehind() As String = {"", ""}
-        Dim sCellTitle() As String = {"", ""}
-        Dim sCellFooter() As String = {"", "", ""}
+            '◯ヘッダー情報取得
+            '　後から
+            rng = oSheet.Range("F4")
+            sCellAgoBehind(0) = rng.Text.ToString()
+            '　前から
+            rng = oSheet.Range("H4")
+            sCellAgoBehind(1) = rng.Text.ToString()
+            '　日付
+            rng = oSheet.Range("B8")
+            sCellTitle(0) = rng.Text.ToString()
+            '　列車
+            rng = oSheet.Range("F8")
+            sCellTitle(1) = rng.Text.ToString()
 
-        '◯ヘッダー情報取得
-        '　後から
-        rng = oSheet.Range("F4")
-        sCellAgoBehind(0) = rng.Text.ToString()
-        '　前から
-        rng = oSheet.Range("H4")
-        sCellAgoBehind(1) = rng.Text.ToString()
-        '　日付
-        rng = oSheet.Range("B8")
-        sCellTitle(0) = rng.Text.ToString()
-        '　列車
-        rng = oSheet.Range("F8")
-        sCellTitle(1) = rng.Text.ToString()
+            '◯フッター情報取得
+            '　現車
+            rng = oSheet.Range("C42")
+            sCellFooter(0) = rng.Text.ToString()
+            '　延長
+            rng = oSheet.Range("E42")
+            sCellFooter(1) = rng.Text.ToString()
+            '　換算
+            rng = oSheet.Range("H42")
+            sCellFooter(2) = rng.Text.ToString()
 
-        '◯フッター情報取得
-        '　現車
-        rng = oSheet.Range("C42")
-        sCellFooter(0) = rng.Text.ToString()
-        '　延長
-        rng = oSheet.Range("E42")
-        sCellFooter(1) = rng.Text.ToString()
-        '　換算
-        rng = oSheet.Range("H42")
-        sCellFooter(2) = rng.Text.ToString()
+            '◯明細情報取得
+            '　フィールド名とフィールドの型を設定
+            dt.Columns.Add("RLINKNO", Type.GetType("System.String"))
+            dt.Columns.Add("RLINKDETAILNO", Type.GetType("System.String"))
+            dt.Columns.Add("FILENAME", Type.GetType("System.String"))
+            dt.Columns.Add("AGOBEHINDFLG", Type.GetType("System.String"))
+            dt.Columns.Add("REGISTRATIONDATE", Type.GetType("System.String"))
+            dt.Columns.Add("TRAINNO", Type.GetType("System.String"))
+            dt.Columns.Add("SERIALNUMBER", Type.GetType("System.String"))
+            dt.Columns.Add("TRUCKSYMBOL", Type.GetType("System.String"))
+            dt.Columns.Add("TRUCKNO", Type.GetType("System.String"))
+            dt.Columns.Add("DEPSTATIONNAME", Type.GetType("System.String"))
+            dt.Columns.Add("ARRSTATIONNAME", Type.GetType("System.String"))
+            dt.Columns.Add("ARTICLENAME", Type.GetType("System.String"))
+            dt.Columns.Add("CONVERSIONAMOUNT", Type.GetType("System.String"))
+            dt.Columns.Add("ARTICLE", Type.GetType("System.String"))
+            dt.Columns.Add("CURRENTCARTOTAL", Type.GetType("System.String"))
+            dt.Columns.Add("EXTEND", Type.GetType("System.String"))
+            dt.Columns.Add("CONVERSIONTOTAL", Type.GetType("System.String"))
 
-        '◯明細情報取得
-        '　フィールド名とフィールドの型を設定
-        dt.Columns.Add("RLINKNO", Type.GetType("System.String"))
-        dt.Columns.Add("RLINKDETAILNO", Type.GetType("System.String"))
-        dt.Columns.Add("FILENAME", Type.GetType("System.String"))
-        dt.Columns.Add("AGOBEHINDFLG", Type.GetType("System.String"))
-        dt.Columns.Add("REGISTRATIONDATE", Type.GetType("System.String"))
-        dt.Columns.Add("TRAINNO", Type.GetType("System.String"))
-        dt.Columns.Add("SERIALNUMBER", Type.GetType("System.String"))
-        dt.Columns.Add("TRUCKSYMBOL", Type.GetType("System.String"))
-        dt.Columns.Add("TRUCKNO", Type.GetType("System.String"))
-        dt.Columns.Add("DEPSTATIONNAME", Type.GetType("System.String"))
-        dt.Columns.Add("ARRSTATIONNAME", Type.GetType("System.String"))
-        dt.Columns.Add("ARTICLENAME", Type.GetType("System.String"))
-        dt.Columns.Add("CONVERSIONAMOUNT", Type.GetType("System.String"))
-        dt.Columns.Add("ARTICLE", Type.GetType("System.String"))
-        dt.Columns.Add("CURRENTCARTOTAL", Type.GetType("System.String"))
-        dt.Columns.Add("EXTEND", Type.GetType("System.String"))
-        dt.Columns.Add("CONVERSIONTOTAL", Type.GetType("System.String"))
+            '明細行の開始
+            Dim jStart As Integer = 12
+            '明細行の終了
+            Dim jEnd As Integer = 29
+            For i As Integer = 0 To jEnd
+                dt.Rows.Add(dt.NewRow())
+                dt.Rows(i)("RLINKNO") = ""
+                dt.Rows(i)("RLINKDETAILNO") = (i + 1).ToString("000")
+                dt.Rows(i)("FILENAME") = excelFileName
+                If sCellAgoBehind(0) <> "" Then
+                    dt.Rows(i)("AGOBEHINDFLG") = "1"
+                ElseIf sCellAgoBehind(1) <> "" Then
+                    dt.Rows(i)("AGOBEHINDFLG") = "2"
+                End If
+                dt.Rows(i)("REGISTRATIONDATE") = sCellTitle(0)
+                dt.Rows(i)("TRAINNO") = sCellTitle(1)
 
-        '明細行の開始
-        Dim jStart As Integer = 12
-        '明細行の終了
-        Dim jEnd As Integer = 29
-        For i As Integer = 0 To jEnd
-            dt.Rows.Add(dt.NewRow())
-            dt.Rows(i)("RLINKNO") = ""
-            dt.Rows(i)("RLINKDETAILNO") = (i + 1).ToString("000")
-            dt.Rows(i)("FILENAME") = excelFileName
-            If sCellAgoBehind(0) <> "" Then
-                dt.Rows(i)("AGOBEHINDFLG") = "1"
-            ElseIf sCellAgoBehind(1) <> "" Then
-                dt.Rows(i)("AGOBEHINDFLG") = "2"
-            End If
-            dt.Rows(i)("REGISTRATIONDATE") = sCellTitle(0)
-            dt.Rows(i)("TRAINNO") = sCellTitle(1)
+                rng = oSheet.Range("A" + jStart.ToString())
+                dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
 
-            rng = oSheet.Range("A" + jStart.ToString())
-            dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
+                rng = oSheet.Range("B" + jStart.ToString())
+                dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
 
-            rng = oSheet.Range("B" + jStart.ToString())
-            dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
+                rng = oSheet.Range("C" + jStart.ToString())
+                dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
 
-            rng = oSheet.Range("C" + jStart.ToString())
-            dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
+                rng = oSheet.Range("D" + jStart.ToString())
+                dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
 
-            rng = oSheet.Range("D" + jStart.ToString())
-            dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
+                rng = oSheet.Range("E" + jStart.ToString())
+                dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
+                rng = oSheet.Range("F" + jStart.ToString())
+                dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
+                rng = oSheet.Range("G" + jStart.ToString())
+                dt.Rows(i)("CONVERSIONAMOUNT") = rng.Text.ToString()
+                rng = oSheet.Range("H" + jStart.ToString())
+                dt.Rows(i)("ARTICLE") = rng.Text.ToString()
 
-            rng = oSheet.Range("E" + jStart.ToString())
-            dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
-            rng = oSheet.Range("F" + jStart.ToString())
-            dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
-            rng = oSheet.Range("G" + jStart.ToString())
-            dt.Rows(i)("CONVERSIONAMOUNT") = rng.Text.ToString()
-            rng = oSheet.Range("H" + jStart.ToString())
-            dt.Rows(i)("ARTICLE") = rng.Text.ToString()
+                dt.Rows(i)("CURRENTCARTOTAL") = sCellFooter(0)
+                dt.Rows(i)("EXTEND") = sCellFooter(1)
+                dt.Rows(i)("CONVERSIONTOTAL") = sCellFooter(2)
 
-            dt.Rows(i)("CURRENTCARTOTAL") = sCellFooter(0)
-            dt.Rows(i)("EXTEND") = sCellFooter(1)
-            dt.Rows(i)("CONVERSIONTOTAL") = sCellFooter(2)
+                jStart += 1
+            Next
 
-            jStart += 1
-        Next
 
-        'Excel終了＆リリース
-        ExcelMemoryRelease(rng)
-        CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+        Catch ex As Exception
+            Throw　'呼び出し元の例外にスロー
+        Finally
+
+            'Excel終了＆リリース
+            ExcelMemoryRelease(rng)
+            CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+        End Try
 
     End Sub
 
@@ -1129,7 +1137,16 @@ Public Structure CS0023XLSUPLOAD
         End If
 
     End Sub
-
+    ''' <summary>
+    ''' WindowハンドルよりProcessIDを取得
+    ''' </summary>
+    ''' <param name="hwnd"></param>
+    ''' <param name="lpdwProcessId"></param>
+    ''' <returns></returns>
+    ''' <remarks>ExcelのWindowハンドルを探しプロセスIDを取得
+    ''' 当処理で使用したExcelのプロセスIDが残っていた場合KILLする為使用</remarks>
+    Private Declare Auto Function GetWindowThreadProcessId Lib "user32.dll" (ByVal hwnd As IntPtr,
+              ByRef lpdwProcessId As Integer) As Integer
     ''' <summary>
     ''' Excel終了＆リリース
     ''' </summary>
@@ -1157,13 +1174,26 @@ Public Structure CS0023XLSUPLOAD
             W_ExcelApp.Visible = True
         Catch err As Exception
         End Try
-
+        Dim procId As Integer
         Try
+            'Excel終了前にプロセスID取得
+            Dim xlHwnd As IntPtr = CType(W_ExcelApp.Hwnd, IntPtr)
+            GetWindowThreadProcessId(xlHwnd, procId)
+
             W_ExcelApp.Quit()
         Catch err As Exception
         End Try
 
         ExcelMemoryRelease(W_ExcelApp)          'ExcelApp を解放
+        Try
+            'Excelを解放しても該当のプロセスIDが生きている場合はプロセスをKill
+            Dim xproc As Process = Process.GetProcessById(procId)
+            System.Threading.Thread.Sleep(200) 'Waitかけないとプロセスが終了しきらない為
+            If Not xproc.HasExited Then
+                xproc.Kill()
+            End If
+        Catch ex As Exception
+        End Try
 
     End Sub
 

@@ -60,7 +60,7 @@
             <!-- グラフエリア -->
             <div class="monthTransRight">
                 <!-- グラフコントロール -->
-                <asp:Chart ID="chtMonthTrans" runat="server" 
+                <asp:Chart ID="chtMonthTrans" runat="server" EnableViewState="true"
                     Width="620"
                     BackColor="Transparent">
                     <Series>

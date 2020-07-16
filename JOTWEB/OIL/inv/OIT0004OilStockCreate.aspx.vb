@@ -672,7 +672,7 @@ Public Class OIT0004OilStockCreate
             Else
                 'ENEOS帳票のデータ取得
                 baseDate = CDate(txtReportFromDate.Text).ToString("yyyy/MM/dd")
-                toDate = CDate(txtReportFromDate.Text).AddDays(7).ToString("yyyy/MM/dd")
+                toDate = CDate(txtReportFromDate.Text).AddDays(4).ToString("yyyy/MM/dd")
                 daySpan = CInt((CDate(toDate) - CDate(baseDate)).TotalDays) + 1
                 '北信と甲府の在庫データ取得
                 Dim dispHokushin As New DispDataClass(dispClass.SalesOffice, dispClass.Shipper, CONST_CONSIGNEECODE_10)
@@ -1820,6 +1820,12 @@ Public Class OIT0004OilStockCreate
                        Where opeItm.TrainNo = targetTrainNo AndAlso
                              opeItm.WorkingDate = targetDate
                        Select Convert.ToString(opeItm.Run)).DefaultIfEmpty("1").First
+                '川崎且つ曜日が土日はロック
+                If odrItm.TrainInfo.TrainNo.Equals("川崎") AndAlso
+                  {"0", "6"}.Contains(sgItm.DayInfo.WeekNum) Then
+                    run = "0"
+                End If
+
                 If run = "0" Then
                     odrItm.TrainLock = True
                 Else

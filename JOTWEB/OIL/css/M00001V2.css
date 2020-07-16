@@ -374,10 +374,15 @@ div.showGuidance a[id^="Menu_"] {
 /* ******************** */
 /* 月間輸送量ペイン個別 */
 /* ******************** */
+/* 表とグラフを横並び */
+.monthTransLeft, .monthTransRight {
+    display:inline-block;
+    vertical-align:top;
+}
 .monthTransTable table {
-    table-layout:fixed;
-    border-collapse:collapse;
-    margin-top:5px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-top: 5px;
 }
 /* セルの余白折り返し */
 .monthTransTable table td,
@@ -386,9 +391,13 @@ div.showGuidance a[id^="Menu_"] {
     padding:2px;
     border:1px solid darkgray;
 }
+/* 左グラフの縦位置調整 */
+.monthTransRight {
+    margin-top:-15px;
+}
 .monthTransTable table tr:nth-child(1) th:nth-child(1) {
-    border-top:none;
-    border-left:none;
+    border-top: none;
+    border-left: none;
 }
 /* その他数値セル幅 */
 .monthTransTable table th.oilType {

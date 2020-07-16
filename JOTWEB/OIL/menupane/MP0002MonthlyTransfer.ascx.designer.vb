@@ -59,6 +59,15 @@ Partial Public Class MP0002MonthlyTransfer
     Protected WithEvents repMonthTrans As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
+    '''chtMonthTrans コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chtMonthTrans As Global.System.Web.UI.DataVisualization.Charting.Chart
+    
+    '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>
     '''<remarks>

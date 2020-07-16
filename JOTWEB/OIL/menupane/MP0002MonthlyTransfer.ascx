@@ -27,7 +27,7 @@
                 <div class="monthTransTable">
                     <asp:Repeater ID="repMonthTrans" runat="server" ClientIDMode="Predictable">
                         <HeaderTemplate>
-                            <table =class="tblMonthTrans">
+                            <table class="tblMonthTrans">
                                 <tr>
                                     <th class="oilType">&nbsp;</th>
                                     <th class="yesterday">前日(累計)</th>
@@ -59,7 +59,61 @@
             </div>
             <!-- グラフエリア -->
             <div class="monthTransRight">
+                <!-- グラフコントロール -->
+                <asp:Chart ID="chtMonthTrans" runat="server" 
+                    Width="600"
+                    BackColor="Transparent">
+                    <Series>
+                        <%-- 当日分のデータ設定 --%>
+                        <asp:Series Name="serToday" 
+                            ChartArea="carMonthTrans" 
+                            ChartType="Bar" 
+                            Color="#2F5197" 
+                            XValueMember="OILNAME" 
+                            YValueMembers="TODAYVAL"
+                            LegendText="当日"
+                            Legend="legHan"
+                            >
+                        </asp:Series>
+                        <%--前日分のデータ設定--%>
+                        <asp:Series Name="serYesterday" 
+                            ChartArea="carMonthTrans" 
+                            ChartType="Bar" 
+                            Color="#A6A6A6"
+                            XValueMember="OILNAME" 
+                            YValueMembers="YESTERDAYVAL"
+                            LegendText="前日"
+                            Legend="legHan"
+                            >
+                        </asp:Series>
 
+                    </Series>
+                    <ChartAreas>
+                        <asp:ChartArea Name="carMonthTrans" 
+                             >
+                            <%-- 下から上え横ラベルがソートされてしまうため設定 --%>
+                            <AxisX LabelAutoFitMaxFontSize="8"
+                                   LineColor="Gray">
+                                <LabelStyle Format="Regular" />
+                                <MajorTickMark Enabled="false" />
+                                
+                                <MajorGrid Enabled="false" />
+                            </AxisX>
+                            <AxisY LineColor="Gray" TitleFont="helvetica">
+                                <%-- 横軸メモリ線を消す --%>
+                                <MajorTickMark Enabled="false" />
+                                <MajorGrid LineColor="Gray"   />
+                            </AxisY>
+                        </asp:ChartArea>
+                    </ChartAreas>
+                    <Legends>
+                        <asp:Legend Name="legHan" 
+                            LegendStyle="row" 
+                            Docking="Top"  
+                            Alignment="Far" 
+                            BackColor="Transparent" ></asp:Legend>
+	                </Legends>
+                </asp:Chart>
             </div>
         </div>
     </div>

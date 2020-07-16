@@ -1,5 +1,6 @@
 ﻿Option Strict On
 Imports System.Data.SqlClient
+Imports System.Web.UI.DataVisualization.Charting
 Imports JOTWEB.GRIS0005LeftBox
 ''' <summary>
 ''' 月間輸送数量ユーザーコントロールクラス
@@ -63,8 +64,8 @@ Public Class MP0002MonthlyTransfer
         '受注データが無くとも全対象油種表示をさせる
         sqlStat.AppendLine("SELECT  FV.KEYCODE AS OILCODE ")
         sqlStat.AppendLine("      , FV.VALUE1  AS OILNAME ")
-        sqlStat.AppendLine("      , ISNULL(SUMVAL.YESTERDAYVAL,0) AS YESTERDAYVAL")
-        sqlStat.AppendLine("      , ISNULL(SUMVAL.YESTERDAYVAL,0) AS TODAYVAL")
+        sqlStat.AppendLine("      , CAST(Rand(CHECKSUM(NEWID())) * 1000 as INT) + 1 + ISNULL(SUMVAL.YESTERDAYVAL,0) AS YESTERDAYVAL")
+        sqlStat.AppendLine("      , CAST(Rand(CHECKSUM(NEWID())) * 1000 as INT) + 1 + ISNULL(SUMVAL.TODAYVAL,0)     AS TODAYVAL")
         sqlStat.AppendLine("      , ISNULL(SUMVAL.TODAYVAL,0) - ISNULL(SUMVAL.YESTERDAYVAL,0)  AS TODAYTRANS")
         sqlStat.AppendLine("  FROM OIL.VIW0001_FIXVALUE FV")
         sqlStat.AppendLine("  LEFT JOIN  (SELECT ODD.OILCODE")
@@ -125,5 +126,15 @@ Public Class MP0002MonthlyTransfer
         End Using
         Me.repMonthTrans.DataSource = dt
         Me.repMonthTrans.DataBind()
+        With Me.chtMonthTrans
+            Dim revData = dt
+            If dt IsNot Nothing OrElse dt.Rows.Count > 0 Then
+                revData = (From dr As DataRow In dt Order By Convert.ToString(dr("OILCODE")) Descending).CopyToDataTable
+            End If
+
+            .DataSource = revData
+            .DataBind()
+
+        End With
     End Sub
 End Class

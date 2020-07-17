@@ -46,6 +46,9 @@ Public Class OIT0002LinkList
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
 
+    '○ 貨車連結順序表アップロード用
+    Private WW_ARTICLENAME() As String = {"検", "○"}               '品名
+
     '○ 共通処理結果
     Private WW_ERR_SW As String = ""
     Private WW_RTN_SW As String = ""
@@ -1798,6 +1801,11 @@ Public Class OIT0002LinkList
             If Not String.IsNullOrEmpty(I_RLinkNo) Then
                 SQLLinkStr &= String.Format("    AND OIT0011.RLINKNO = '{0}'", I_RLinkNo)
             End If
+
+            '### 20200717 START((全体)No114対応) ######################################
+            '★ 貨車連結順序表アップロード時において、品目が交検以外を対象とする。
+            SQLLinkStr &= String.Format("    AND OIT0011.ARTICLENAME <> '{0}'", WW_ARTICLENAME)
+            '### 20200717 START((全体)No114対応) ######################################
 
             Using SQLLinkcmd As New SqlCommand(SQLLinkStr, SQLcon)
                 SQLLinkcmd.CommandTimeout = 300

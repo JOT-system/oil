@@ -3931,6 +3931,10 @@ Public Class OIT0003OrderDetail
 
             '    ### 20200717 START((全体)No112対応) ######################################
             Case "WF_CheckBoxSELECTOTTRANSPORT"
+                '◯ 輸送形態区分が"M"(請負OT混載)以外の場合
+                If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+                    Exit Select
+                End If
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then

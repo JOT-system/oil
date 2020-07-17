@@ -844,9 +844,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Case "3093", "3091", "8777", "2777"
                         i = 25
                         If PrintDatarow("TRAINNO").ToString() = "3093" Then i = i
-                        If PrintDatarow("TRAINNO").ToString() = "3091" Then i = i + 1
-                        If PrintDatarow("TRAINNO").ToString() = "8777" Then i = i + 2
-                        If PrintDatarow("TRAINNO").ToString() = "2777" Then i = i + 3
+                        'If PrintDatarow("TRAINNO").ToString() = "5166" Then i = i + 1
+                        If PrintDatarow("TRAINNO").ToString() = "3091" Then i = i + 2
+                        If PrintDatarow("TRAINNO").ToString() = "8777" Then i = i + 3
+                        'If PrintDatarow("TRAINNO").ToString() = "8099" Then i = i + 4
+                        If PrintDatarow("TRAINNO").ToString() = "2777" Then i = i + 5
                     '着駅(八王子)
                     Case "85", "87", "8097", "5692"
                         i = 31

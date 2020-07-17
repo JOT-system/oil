@@ -699,7 +699,7 @@ Public Class OIT0003OrderList
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()       'DataBase接続
 
-                    ExcelNegishiDataGet(SQLcon)
+                    ExcelNegishiDataGet(SQLcon, WF_ButtonClick.Value)
                 End Using
 
                 '******************************
@@ -2381,14 +2381,17 @@ Public Class OIT0003OrderList
     Protected Sub WW_TyohyoNegishiCreate(ByVal tyohyoType As String,
                                              ByVal officeCode As String)
 
-        '******************************
-        '帳票表示データ取得処理
-        '******************************
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+        '【出荷予定(根岸)】 または【積込予定(根岸)】の場合
+        If tyohyoType = "SHIPPLAN" OrElse tyohyoType = "NEGISHI_LOADPLAN" Then
+            '******************************
+            '帳票表示データ取得処理
+            '******************************
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            ExcelNegishiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
-        End Using
+                ExcelNegishiDataGet(SQLcon, tyohyoType, lodDate:=Me.txtReportLodDate.Text)
+            End Using
+        End If
 
         '******************************
         '帳票作成処理の実行
@@ -3063,6 +3066,7 @@ Public Class OIT0003OrderList
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
     Protected Sub ExcelNegishiDataGet(ByVal SQLcon As SqlConnection,
+                                      ByVal type As String,
                                       Optional ByVal lodDate As String = Nothing)
 
         If IsNothing(OIT0003WKtbl) Then
@@ -3123,6 +3127,7 @@ Public Class OIT0003OrderList
             & " , 0                                              AS HIDDEN" _
             & " , VIW0013.No                                     AS No" _
             & " , VIW0013.ZAIKOSORT                              AS ZAIKOSORT" _
+            & " , ROW_NUMBER() OVER(PARTITION BY VIW0013.No ORDER BY VIW0013.No, VIW0013.ZAIKOSORT, VIW0013.JRTRAINNO1) AS ZAIKOSORT_KAI" _
             & " , VIW0013.TRAINNAME                              AS TRAINNAME" _
             & " , VIW0013.TRAINNO                                AS TRAINNO" _
             & " , VIW0013.JRTRAINNO1                             AS JRTRAINNO1" _
@@ -3132,17 +3137,38 @@ Public Class OIT0003OrderList
             & " , OIM0003.OILNAME                                AS OILNAME" _
             & " , OIM0003.OILKANA                                AS OILKANA" _
             & " , ISNULL(CASE " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_HTank + "' THEN OIT0002.HTANK " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_RTank + "' THEN OIT0002.RTANK " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_TTank + "' THEN OIT0002.TTANK " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_MTTank + "' THEN OIT0002.MTTANK " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_KTank1 + "' THEN OIT0002.KTANK " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_K3Tank1 + "' THEN OIT0002.K3TANK " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_ATank + "' THEN OIT0002.ATANK " _
-            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_LTank1 + "' THEN OIT0002.LTANK " _
-            & "   END, 0)                                        AS TOTALTANK" _
-            & " FROM oil.VIW0013_OILFOR_NEGISHI_SHIP VIW0013 " _
-            & " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_HTank + "' THEN OIT0002.HTANKCH " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_RTank + "' THEN OIT0002.RTANKCH " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_TTank + "' THEN OIT0002.TTANKCH " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_MTTank + "' THEN OIT0002.MTTANKCH " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_KTank1 + "' THEN OIT0002.KTANKCH " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_K3Tank1 + "' THEN OIT0002.K3TANKCH " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_ATank + "' THEN OIT0002.ATANKCH " _
+            & "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_LTank1 + "' THEN OIT0002.LTANKCH " _
+            & "   END, 0)                                        AS TOTALTANK"
+
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_HTank + "' THEN IIF(OIT0002.HTANKCH <> 0, OIT0002.HTANKCH, OIT0002.HTANK) " _
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_RTank + "' THEN IIF(OIT0002.RTANKCH <> 0, OIT0002.RTANKCH, OIT0002.RTANK) " _
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_TTank + "' THEN IIF(OIT0002.TTANKCH <> 0, OIT0002.TTANKCH, OIT0002.TTANK) " _
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_MTTank + "' THEN IIF(OIT0002.MTTANKCH <> 0, OIT0002.MTTANKCH, OIT0002.MTTANK) " _
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_KTank1 + "' THEN IIF(OIT0002.KTANKCH <> 0, OIT0002.KTANKCH, OIT0002.KTANK) " _
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_K3Tank1 + "' THEN IIF(OIT0002.K3TANKCH <> 0, OIT0002.K3TANKCH, OIT0002.K3TANK) " _
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_ATank + "' THEN IIF(OIT0002.ATANKCH <> 0, OIT0002.ATANKCH, OIT0002.ATANK) " _
+        '& "   WHEN OIT0003.OILCODE = '" + BaseDllConst.CONST_LTank1 + "' THEN IIF(OIT0002.LTANKCH <> 0, OIT0002.LTANKCH, OIT0002.LTANK) " _
+        '& "   END, 0)                                        AS TOTALTANK"
+
+        '★帳票の種類によって(枠)を変更
+        If type = "NEGISHI_LOADPLAN" Then   '★積込予定(根岸)
+            SQLStr &=
+              " FROM oil.VIW0013_OILFOR_NEGISHI_LOAD VIW0013 "
+
+        ElseIf type = "SHIPPLAN" Then       '★出荷予定(根岸)
+            SQLStr &=
+              " FROM oil.VIW0013_OILFOR_NEGISHI_SHIP VIW0013 "
+        End If
+
+        SQLStr &=
+              " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
             & "     OIT0002.LODDATE = @P03 " _
             & " AND OIT0002.TRAINNO = VIW0013.TRAINNO " _
             & " AND OIT0002.OFFICECODE = @P01 " _
@@ -3167,6 +3193,7 @@ Public Class OIT0003OrderList
                 " ORDER BY" _
             & "    VIW0013.No" _
             & "  , VIW0013.ZAIKOSORT" _
+            & "  , VIW0013.JRTRAINNO1" _
             & "  , OIM0024.PRIORITYNO"
         '& "  , TOTALTANK　DESC"
 

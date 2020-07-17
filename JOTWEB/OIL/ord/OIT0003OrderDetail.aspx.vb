@@ -139,7 +139,8 @@ Public Class OIT0003OrderDetail
                         Case "WF_CheckBoxSELECT",
                              "WF_CheckBoxSELECTSTACKING",
                              "WF_CheckBoxSELECTFIRSTRETURN",
-                             "WF_CheckBoxSELECTAFTERRETURN"   'チェックボックス(選択)クリック
+                             "WF_CheckBoxSELECTAFTERRETURN",
+                             "WF_CheckBoxSELECTOTTRANSPORT"   'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"          'フィールドチェンジ
                             WF_FIELD_Change()
@@ -880,6 +881,15 @@ Public Class OIT0003OrderDetail
         Dim WW_GetConsumptionTax() As String = {"", "", "", "", "", "", "", ""}
         WW_FixvalueMasterSearch("", "CONSUMPTIONTAX", "", WW_GetConsumptionTax)
         work.WF_SEL_CONSUMPTIONTAX.Text = WW_GetConsumptionTax(1)
+
+        '輸送形態区分の取得
+        If Me.TxtOrderOfficeCode.Text <> "" AndAlso Me.TxtArrstationCode.Text <> "" Then
+            Dim WW_GetTrkKbn() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text, "PATTERNMASTER", Me.TxtArrstationCode.Text, WW_GetTrkKbn)
+            Me.TxtOrderTrkKbn.Text = WW_GetTrkKbn(8)
+        Else
+            Me.TxtOrderTrkKbn.Text = ""
+        End If
 
     End Sub
 
@@ -2447,6 +2457,11 @@ Public Class OIT0003OrderDetail
                 & "   WHEN '2' THEN ''" _
                 & "   ELSE ''" _
                 & "   END                                                AS AFTERRETURNFLG" _
+                & " , CASE ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '')" _
+                & "   WHEN '1' THEN 'on'" _
+                & "   WHEN '2' THEN ''" _
+                & "   ELSE ''" _
+                & "   END                                                AS OTTRANSPORTFLG" _
                 & " , ISNULL(RTRIM(OIT0002.TANKLINKNO), '')              AS LINKNO" _
                 & " , ''                                                 AS LINKDETAILNO" _
                 & " , CASE" _
@@ -2546,6 +2561,14 @@ Public Class OIT0003OrderDetail
                     i += 1
                     OIT0003tab3row("LINECNT") = i        'LINECNT
                     CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+
+                    '### 20200717 START((全体)No112対応) ######################################
+                    '★輸送形態が"M"(請負OT混載)ではない場合
+                    If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+                        'OT輸送可否フラグをすべて未チェックに変更
+                        OIT0003tab3row("OTTRANSPORTFLG") = ""
+                    End If
+                    '### 20200717 END  ((全体)No112対応) ######################################
                 Next
 
             End Using
@@ -3905,6 +3928,20 @@ Public Class OIT0003OrderDetail
                     End If
                 Next
                 '### 20200622 END  ((全体)No87対応) ######################################
+
+            '    ### 20200717 START((全体)No112対応) ######################################
+            Case "WF_CheckBoxSELECTOTTRANSPORT"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
+                    If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0003tbl_tab3.Rows(i)("OTTRANSPORTFLG") = "on" Then
+                            OIT0003tbl_tab3.Rows(i)("OTTRANSPORTFLG") = ""
+                        Else
+                            OIT0003tbl_tab3.Rows(i)("OTTRANSPORTFLG") = "on"
+                        End If
+                    End If
+                Next
+                '### 20200717 END  ((全体)No112対応) ######################################
         End Select
 
         '○ 画面表示データ保存
@@ -8691,6 +8728,7 @@ Public Class OIT0003OrderDetail
                     & "        STACKINGFLG          = @P24, " _
                     & "        FIRSTRETURNFLG       = @P25, " _
                     & "        AFTERRETURNFLG       = @P26, " _
+                    & "        OTTRANSPORTFLG       = @P28, " _
                     & "        UPDYMD               = @P18, " _
                     & "        UPDUSER              = @P19, " _
                     & "        UPDTERMID            = @P20, " _
@@ -8725,6 +8763,7 @@ Public Class OIT0003OrderDetail
             Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", System.Data.SqlDbType.NVarChar)  '積置可否フラグ
             Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", System.Data.SqlDbType.NVarChar)  '先返し可否フラグ
             Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", System.Data.SqlDbType.NVarChar)  '後返し可否フラグ
+            Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", System.Data.SqlDbType.NVarChar)  'OT輸送可否フラグ
 
             Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", System.Data.SqlDbType.DateTime)  '更新年月日
             Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
@@ -8799,6 +8838,14 @@ Public Class OIT0003OrderDetail
                     PARA26.Value = "2"
                 End If
                 '### 20200622 END  ((全体)No87対応) ######################################
+                '### 20200717 START((全体)No112対応) #####################################
+                '# OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)
+                If OIT0003tab3row("OTTRANSPORTFLG") = "on" Then
+                    PARA28.Value = "1"
+                Else
+                    PARA28.Value = "2"
+                End If
+                '### 20200717 END  ((全体)No112対応) #####################################
 
                 PARA18.Value = Date.Now
                 PARA19.Value = Master.USERID
@@ -15809,6 +15856,8 @@ Public Class OIT0003OrderDetail
         Me.LblConsigneeName.Text = WW_GetValue(5)
         '受注パターン
         Me.TxtOrderType.Text = WW_GetValue(7)
+        '輸送形態区分
+        Me.TxtOrderTrkKbn.Text = WW_GetValue(8)
 
         work.WF_SEL_SHIPPERSCODE.Text = WW_GetValue(0)
         work.WF_SEL_SHIPPERSNAME.Text = WW_GetValue(1)
@@ -16580,14 +16629,17 @@ Public Class OIT0003OrderDetail
         Dim chkObjST As CheckBox = Nothing
         Dim chkObjFR As CheckBox = Nothing
         Dim chkObjAF As CheckBox = Nothing
+        Dim chkObjOT As CheckBox = Nothing
         'LINECNTを除いたチェックボックスID
         Dim chkObjIdWOSTcnt As String = "chk" & pnlListArea3.ID & "STACKINGFLG"
         Dim chkObjIdWOFRcnt As String = "chk" & pnlListArea3.ID & "FIRSTRETURNFLG"
         Dim chkObjIdWOAFcnt As String = "chk" & pnlListArea3.ID & "AFTERRETURNFLG"
+        Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea3.ID & "OTTRANSPORTFLG"
         'LINECNTを含むチェックボックスID
         Dim chkObjSTId As String
         Dim chkObjFRId As String
         Dim chkObjAFId As String
+        Dim chkObjOTId As String
         Dim chkObjType As String = ""
         'ループ内の対象データROW(これで計算区分の値をとれるかと）
         Dim loopdr As DataRow = Nothing
@@ -16609,6 +16661,7 @@ Public Class OIT0003OrderDetail
                         chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjAFId = chkObjIdWOAFcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjType = Convert.ToString(loopdr("STACKINGORDERNO"))
                         '下のループより先に見つけなければいけないかもしれないので
                         '冗長ですがこちらでループ
@@ -16638,6 +16691,16 @@ Public Class OIT0003OrderDetail
                             End If
                         Next
                         '### 20200622 END  ((全体)No87対応) ######################################
+                        '### 20200717 START((全体)No112対応) ######################################
+                        chkObjOT = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjOT IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        '### 20200717 END  ((全体)No112対応) ######################################
 
                         '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
                         '### 20200626 積置受注№が設定されている場合(条件追加) #######################
@@ -16678,6 +16741,13 @@ Public Class OIT0003OrderDetail
                             End If
                             '### 20200622 END  ((全体)No87対応) ######################################
                         End If
+
+                        '### 20200717 START((全体)No112対応) ######################################
+                        If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+                            'OT輸送可否フラグ(チェックボックス)を非活性
+                            chkObjOT.Enabled = False
+                        End If
+                        '### 20200717 END  ((全体)No112対応) ######################################
                     End If
 
                     For Each cellObj As TableCell In rowitem.Controls

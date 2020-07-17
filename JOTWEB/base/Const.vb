@@ -642,6 +642,25 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "輸送形態"
+    ''' <summary>
+    ''' C:請負
+    ''' </summary>
+    Public Const CONST_TRKBN_C As String = "C"
+    ''' <summary>
+    ''' O:OT輸送
+    ''' </summary>
+    Public Const CONST_TRKBN_O As String = "O"
+    ''' <summary>
+    ''' M:請負OT混載
+    ''' </summary>
+    Public Const CONST_TRKBN_M As String = "M"
+    ''' <summary>
+    ''' F:回送
+    ''' </summary>
+    Public Const CONST_TRKBN_F As String = "F"
+#End Region
+
 #Region "回送パターン"
     ''' <summary>
     ''' 01:修理-JOT負担発払

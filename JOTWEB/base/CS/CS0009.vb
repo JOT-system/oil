@@ -281,7 +281,7 @@ Public Structure CS0009MESSAGEout
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME             'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIS0003_MESSAGE Select"          '
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0003_MESSAGE Select " & MESSAGENO        '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

@@ -993,8 +993,8 @@ Public Structure CS0023XLSUPLOAD
 
             oSheets = oWBook.Worksheets
             '2020/7/16三宅メモ ↓oWBook.Sheets(1) か(0)で確か先頭のシートになります「getSheetIndex(sheetName, oSheets)」は不要
-            oSheet = DirectCast(oWBook.Sheets(getSheetIndex(sheetName, oSheets)), Excel.Worksheet)
-            'oSheet = CType(oSheets.Item(1), Excel.Worksheet)
+            'oSheet = DirectCast(oWBook.Sheets(getSheetIndex(sheetName, oSheets)), Excel.Worksheet)
+            oSheet = CType(oSheets.Item(1), Excel.Worksheet)
 
             '★セルの内容を取得
             Dim sCellAgoBehind() As String = {"", ""}

@@ -178,7 +178,7 @@ Public Class EntryHistory
         Dim sqlDetailStat As New StringBuilder
         sqlDetailStat.AppendLine("INSERT INTO OIL.HIS0002_DETAIL")
         sqlDetailStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,")
-        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,FIRSTRETURNFLG,AFTERRETURNFLG,ORDERINFO,")
+        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,ORDERINFO,")
         sqlDetailStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,ORDERINGTYPE,ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    JOINTCODE,JOINT,REMARK,")
@@ -196,7 +196,7 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
         sqlDetailStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,")
-        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@ORDERINFO,")
+        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@ORDERINFO,")
         sqlDetailStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,@ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    @JOINTCODE,@JOINT,@REMARK,")
@@ -227,6 +227,11 @@ Public Class EntryHistory
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
+                Try
+                    .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = drOrder("OTTRANSPORTFLG")
+                Catch ex As Exception
+                    .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = ""
+                End Try
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
                 .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
                 .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")

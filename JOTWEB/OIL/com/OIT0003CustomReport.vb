@@ -304,7 +304,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintGoiData(ByVal repPtn As String) As String
+    Public Function CreateExcelPrintGoiData(ByVal repPtn As String, ByVal lodDate As String) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -375,63 +375,75 @@ Public Class OIT0003CustomReport : Implements IDisposable
     Private Sub EditGoiShipDetailArea()
         Dim rngDetailArea As Excel.Range = Nothing
         Dim svTrainNo As String = ""
+        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q", "R"}
+        Dim iYoko As Integer = 0
 
         Try
             Dim i As Integer = 8
             For Each PrintDatarow As DataRow In PrintData.Rows
 
-                '◯ HI-G(ハイオク)
-                rngDetailArea = Me.ExcelWorkSheet.Range("F" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                '★列車(着駅)が変更となった場合
+                If svTrainNo <> "" AndAlso svTrainNo <> PrintDatarow("OTTRAINNO").ToString() Then
+                    '行を１つ下に移動
+                    i += 1
+                End If
 
-                '◯ RE-G(レギュラー)
-                rngDetailArea = Me.ExcelWorkSheet.Range("G" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                '油種が未設定の場合は次のデータへ
+                If PrintDatarow("OILCODE").ToString() = "" Then
+                    '★列車番号を退避
+                    svTrainNo = PrintDatarow("OTTRAINNO").ToString()
+                    Continue For
+                End If
 
-                '◯ WKO(灯油)
-                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                Select Case PrintDatarow("REPORTOILNAME").ToString()
+                    '◯白油 
+                    '　HI-G(ハイオク)
+                    Case BaseDllConst.CONST_COSMO_HIG
+                        iYoko = 0
+                    '　RE-G(レギュラー)
+                    Case BaseDllConst.CONST_COSMO_REG
+                        iYoko = 1
+                    '　WKO(灯油)
+                    Case BaseDllConst.CONST_COSMO_WKO
+                        iYoko = 2
+                    '　DGO(軽油)
+                    Case BaseDllConst.CONST_COSMO_DGO
+                        iYoko = 3
+                    '　DGO.10(軽油１０)
+                    Case BaseDllConst.CONST_COSMO_DGO10
+                        iYoko = 4
+                    '　DGO.3(３号軽油)
+                    Case BaseDllConst.CONST_COSMO_DGO3
+                        iYoko = 5
+                    '　DGO.5(軽油５)
+                    Case BaseDllConst.CONST_COSMO_DGO5
+                        iYoko = 6
 
-                '◯ DGO(軽油)
-                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                    '◯黒油
+                    '　LA-1(ＬＳＡ - 1, ＬＳＡ - 1（山岳）)
+                    Case BaseDllConst.CONST_COSMO_LSA
+                        iYoko = 7
+                    '　LAブ(ＬＳＡーブレンド, ＬＳＡーブレンド（山岳）)
+                    Case BaseDllConst.CONST_COSMO_LSABU
+                        iYoko = 8
+                    '　AFO(AFO, AFO（山岳）)
+                    Case BaseDllConst.CONST_COSMO_AFO
+                        iYoko = 9
+                    '　A-SP(AFOーSP, AFOーSP（山岳）)
+                    Case BaseDllConst.CONST_COSMO_AFOSP
+                        iYoko = 10
+                    '　A(ブ(AFOーブレンド（山岳）)
+                    Case BaseDllConst.CONST_COSMO_AFOBU
+                        iYoko = 11
+                End Select
 
-                '◯ DGO.10(軽油１０)
-                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                '★帳票に値を設定
+                rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CNT")
 
-                '◯ DGO.3(３号軽油)
-                rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                '★列車番号を退避
+                svTrainNo = PrintDatarow("OTTRAINNO").ToString()
 
-                '◯ DGO.5(軽油５)
-                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ LA-1(ＬＳＡ－１, ＬＳＡ-1（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ LAブ(ＬＳＡーブレンド, ＬＳＡーブレンド（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ AFO(AFO, AFO（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ A-SP(AFOーSP, AFOーSP（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ A(ブ(AFOーブレンド（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '★列車名(着駅)を退避
-                svTrainNo = PrintDatarow("TRAINNAME").ToString()
-
-                i += 1
             Next
         Catch ex As Exception
             Throw

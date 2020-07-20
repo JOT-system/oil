@@ -2262,26 +2262,26 @@ Public Class OIT0003OrderList
 
             'ダウンロードボタン(出荷予定(五井))押下
             Case "SHIPPLAN"
-                ''******************************
-                ''帳票表示データ取得処理
-                ''******************************
-                'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                '    SQLcon.Open()       'DataBase接続
+                '******************************
+                '帳票表示データ取得処理
+                '******************************
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
 
-                '    ExcelGoiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
-                'End Using
+                    ExcelGoiDataGet(SQLcon, lodDate:=Me.txtReportLodDate.Text)
+                End Using
 
-                'Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_GOI_SHIPPLAN.xlsx", OIT0003ReportGoitbl)
-                '    Dim url As String
-                '    Try
-                '        url = repCbj.CreateExcelPrintGoiData("SHIPPLAN", lodDate)
-                '    Catch ex As Exception
-                '        Return
-                '    End Try
-                '    '○ 別画面でExcelを表示
-                '    WF_PrintURL.Value = url
-                '    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-                'End Using
+                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_GOI_SHIPPLAN.xlsx", OIT0003ReportGoitbl)
+                    Dim url As String
+                    Try
+                        url = repCbj.CreateExcelPrintGoiData("SHIPPLAN", Me.txtReportLodDate.Text)
+                    Catch ex As Exception
+                        Return
+                    End Try
+                    '○ 別画面でExcelを表示
+                    WF_PrintURL.Value = url
+                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                End Using
 
         End Select
 
@@ -2678,27 +2678,167 @@ Public Class OIT0003OrderList
 
         '○ 取得SQL
         '　 説明　：　帳票表示用SQL
-        Dim SQLStr As String = ""
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , VIW0013.No                                     AS No" _
+            & " , VIW0013.ZAIKOSORT                              AS ZAIKOSORT" _
+            & " , VIW0013.TRAINNAME                              AS TRAINNAME" _
+            & " , VIW0013.TRAINNO                                AS TRAINNO" _
+            & " , VIW0013.OTTRAINNO                              AS OTTRAINNO" _
+            & " , VIW0013.DEPSTATION                         　  AS DEPSTATION" _
+            & " , VIW0013.ARRSTATION                             AS ARRSTATION" _
+            & " , VIW0013.JRTRAINNO1                             AS JRTRAINNO1" _
+            & " , VIW0013.TSUMI                                  AS TSUMI" _
+            & " , OIT0002.OILCODE                                AS OILCODE" _
+            & " , OIT0002.OILNAME                                AS OILNAME" _
+            & " , OIT0002.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , OIT0002.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+            & " , TMP0005.REPORTOILCODE                          AS REPORTOILCODE" _
+            & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
+            & " , OIT0002.CNT                                    AS CNT" _
+            & " , OIT0002.LODDATE                                AS LODDATE" _
+            & " , OIT0002.DEPDATE                                AS DEPDATE" _
+            & " , OIT0002.ARRDATE                                AS ARRDATE" _
+            & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " FROM oil.VIW0013_OILFOR_GOI_SHIP VIW0013 "
+
+        '★受注データより油種数を取得
+        SQLStr &=
+              " LEFT JOIN ( " _
+            & "     SELECT " _
+            & "       OIT0002.OFFICECODE " _
+            & "     , OIT0002.TRAINNO " _
+            & "     , OIT0003.SHIPPERSCODE " _
+            & "     , OIT0002.BASECODE " _
+            & "     , OIT0002.STACKINGFLG " _
+            & "     , OIT0003.OILCODE " _
+            & "     , OIT0003.OILNAME " _
+            & "     , OIT0003.ORDERINGTYPE " _
+            & "     , OIT0003.ORDERINGOILNAME " _
+            & "     , OIT0003.OTTRANSPORTFLG " _
+            & "     , OIT0002.LODDATE" _
+            & "     , OIT0002.DEPDATE" _
+            & "     , OIT0002.ARRDATE" _
+            & "     , OIT0002.ACCDATE" _
+            & "     , COUNT(1) AS CNT " _
+            & "     FROM oil.OIT0002_ORDER OIT0002 " _
+            & "     INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "         OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "     AND OIT0003.DELFLG <> @P02 " _
+            & "     AND OIT0003.OTTRANSPORTFLG = @P04 " _
+            & "     WHERE " _
+            & "         OIT0002.OFFICECODE = @P01 " _
+            & "     AND OIT0002.DELFLG <> @P02 " _
+            & "     AND OIT0002.LODDATE = @P03 " _
+            & "     AND OIT0002.ORDERSTATUS <> @P06 " _
+            & "     GROUP BY " _
+            & "       OIT0002.OFFICECODE " _
+            & "     , OIT0002.TRAINNO " _
+            & "     , OIT0003.SHIPPERSCODE " _
+            & "     , OIT0002.BASECODE " _
+            & "     , OIT0002.STACKINGFLG " _
+            & "     , OIT0003.OILCODE " _
+            & "     , OIT0003.OILNAME " _
+            & "     , OIT0003.ORDERINGTYPE " _
+            & "     , OIT0003.ORDERINGOILNAME " _
+            & "     , OIT0003.OTTRANSPORTFLG " _
+            & "     , OIT0002.LODDATE" _
+            & "     , OIT0002.DEPDATE" _
+            & "     , OIT0002.ARRDATE" _
+            & "     , OIT0002.ACCDATE" _
+            & " ) OIT0002 ON " _
+            & "     OIT0002.TRAINNO = VIW0013.TRAINNO " _
+            & " AND OIT0002.STACKINGFLG = VIW0013.TSUMI " _
+
+        'SQLStr &=
+        '      " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _
+        '    & "     OIT0002.OFFICECODE = @P01 " _
+        '    & " AND OIT0002.DELFLG <> @P02 " _
+        '    & " AND OIT0002.ORDERSTATUS <> @P06 " _
+        '    & " AND OIT0002.TRAINNO = VIW0013.TRAINNO " _
+        '    & " AND OIT0002.STACKINGFLG = VIW0013.TSUMI " _
+        '    & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+        '    & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+        '    & " AND OIT0003.DELFLG <> @P02 " _
+        '    & " AND OIT0003.OTTRANSPORTFLG = @P04 "
+
+        '★変換用油種コードと紐づけ
+        SQLStr &=
+              " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+            & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE  " _
+            & " AND TMP0005.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+            & " AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
+            & " AND TMP0005.OILNo = '1' " _
+            & " AND TMP0005.OILCODE = OIT0002.OILCODE " _
+            & " AND TMP0005.SEGMENTOILCODE = OIT0002.ORDERINGTYPE "
+
+        '請負用データ取得用
+        Dim SQLStrADD As String =
+              SQLStr _
+            & " WHERE VIW0013.No <> @P05 " _
+            & " ORDER BY" _
+            & "    VIW0013.No" _
+            & "  , VIW0013.ZAIKOSORT"
+
+        SQLStr &=
+              " WHERE VIW0013.No = @P05 " _
+            & " ORDER BY" _
+            & "    VIW0013.No" _
+            & "  , VIW0013.ZAIKOSORT"
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon), SQLADDcmd As New SqlCommand(SQLStrADD, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '五井帳票No
+                Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011201
                 PARA02.Value = C_DELETE_FLG.DELETE
+                PARA06.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 If Not String.IsNullOrEmpty(lodDate) Then
                     PARA03.Value = lodDate
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
-
+                'OT輸送可否("1"(OT輸送あり))
+                PARA04.Value = "1"
+                PARA05.Value = "1"
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
                         OIT0003ReportGoitbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003ReportGoitbl.Load(SQLdr)
+                End Using
+
+                Dim PARAADD01 As SqlParameter = SQLADDcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARAADD02 As SqlParameter = SQLADDcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARAADD03 As SqlParameter = SQLADDcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARAADD04 As SqlParameter = SQLADDcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  'OT輸送可否フラグ
+                Dim PARAADD05 As SqlParameter = SQLADDcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '五井帳票No
+                Dim PARAADD06 As SqlParameter = SQLADDcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 1)  '受注進行ステータス
+                PARAADD01.Value = BaseDllConst.CONST_OFFICECODE_011201
+                PARAADD02.Value = C_DELETE_FLG.DELETE
+                PARAADD06.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                If Not String.IsNullOrEmpty(lodDate) Then
+                    PARAADD03.Value = lodDate
+                Else
+                    PARAADD03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                End If
+
+                'OT輸送可否("2"(OT輸送なし))
+                PARAADD04.Value = "2"
+                PARAADD05.Value = "1"
+                Using SQLdr As SqlDataReader = SQLADDcmd.ExecuteReader()
                     '○ テーブル検索結果をテーブル格納
                     OIT0003ReportGoitbl.Load(SQLdr)
                 End Using

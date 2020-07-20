@@ -375,7 +375,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     Private Sub EditGoiShipDetailArea()
         Dim rngDetailArea As Excel.Range = Nothing
         Dim svTrainNo As String = ""
-        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q", "R"}
+        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q"}
         Dim iYoko As Integer = 0
 
         Try
@@ -420,21 +420,21 @@ Public Class OIT0003CustomReport : Implements IDisposable
                         iYoko = 6
 
                     '◯黒油
-                    '　LA-1(ＬＳＡ - 1, ＬＳＡ - 1（山岳）)
+                    '　LA-1(ＬＳＡ - 1)
                     Case BaseDllConst.CONST_COSMO_LSA
                         iYoko = 7
-                    '　LAブ(ＬＳＡーブレンド, ＬＳＡーブレンド（山岳）)
+                    '　LAブ(ＬＳＡ - 1（山岳）)
                     Case BaseDllConst.CONST_COSMO_LSABU
                         iYoko = 8
-                    '　AFO(AFO, AFO（山岳）)
+                    '　AFO(AFO)
                     Case BaseDllConst.CONST_COSMO_AFO
                         iYoko = 9
-                    '　A-SP(AFOーSP, AFOーSP（山岳）)
+                    '　A-SP(AFO（山岳）)
                     Case BaseDllConst.CONST_COSMO_AFOSP
                         iYoko = 10
-                    '　A(ブ(AFOーブレンド（山岳）)
-                    Case BaseDllConst.CONST_COSMO_AFOBU
-                        iYoko = 11
+
+                    Case Else
+                        Continue For
                 End Select
 
                 '★帳票に値を設定

@@ -803,7 +803,7 @@ Public Module BaseDllConst
     ''' <summary>
     ''' Ａ重油SP
     ''' </summary>
-    Public Const CONST_COSMO_AFOSP As String = "AFOーSP"
+    Public Const CONST_COSMO_AFOSP As String = "A-SP"
     ''' <summary>
     ''' Ａ重油ブレンド
     ''' </summary>

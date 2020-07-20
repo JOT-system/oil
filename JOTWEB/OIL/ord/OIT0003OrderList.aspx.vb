@@ -2713,6 +2713,7 @@ Public Class OIT0003OrderList
             & "     SELECT " _
             & "       OIT0002.OFFICECODE " _
             & "     , OIT0002.TRAINNO " _
+            & "     , OIT0002.TRAINNAME " _
             & "     , OIT0003.SHIPPERSCODE " _
             & "     , OIT0002.BASECODE " _
             & "     , OIT0002.STACKINGFLG " _
@@ -2739,6 +2740,7 @@ Public Class OIT0003OrderList
             & "     GROUP BY " _
             & "       OIT0002.OFFICECODE " _
             & "     , OIT0002.TRAINNO " _
+            & "     , OIT0002.TRAINNAME " _
             & "     , OIT0003.SHIPPERSCODE " _
             & "     , OIT0002.BASECODE " _
             & "     , OIT0002.STACKINGFLG " _
@@ -2752,8 +2754,7 @@ Public Class OIT0003OrderList
             & "     , OIT0002.ARRDATE" _
             & "     , OIT0002.ACCDATE" _
             & " ) OIT0002 ON " _
-            & "     OIT0002.TRAINNO = VIW0013.TRAINNO " _
-            & " AND OIT0002.STACKINGFLG = VIW0013.TSUMI " _
+            & "     OIT0002.TRAINNAME = VIW0013.TRAINNAME "
 
         'SQLStr &=
         '      " LEFT JOIN OIL.OIT0002_ORDER OIT0002 ON " _

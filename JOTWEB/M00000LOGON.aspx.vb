@@ -205,7 +205,7 @@ Public Class M00000LOGON
         '○共通宣言
         '*共通関数宣言(APPLDLL)
         Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
-        Dim CS0009MESSAGEout As New CS0009MESSAGEout        'メッセージ出力 out
+        '   Dim CS0009MESSAGEout As New CS0009MESSAGEout        'メッセージ出力 out
         Dim CS0006TERMchk As New CS0006TERMchk              'ローカルコンピュータ名存在チェック
         Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
 

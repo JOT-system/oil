@@ -154,7 +154,8 @@ Public Structure CS0011LOGWrite
         Catch ex As Exception
             'エラーログのエラーは処理できない
             W_OUTPUTSW = "1"
-            ERR = C_MESSAGE_NO.DB_ERROR  'DB ERR
+            '  ERR = C_MESSAGE_NO.DB_ERROR  'DB ERR
+            ERR = "99999"  'DB ERR
         End Try
 
         '●エラーログ出力

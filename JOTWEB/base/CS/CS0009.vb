@@ -281,13 +281,13 @@ Public Structure CS0009MESSAGEout
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME             'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:OIS0003_MESSAGE Select"          '
+            CS0011LOGWRITE.INFPOSI = "DB:OIS0003_MESSAGE Select " & MESSAGENO        '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT                                   '
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
 
-            MESSAGEBOX.TEXT = "システム管理者へ連絡して下さい(DB OIS0003_MESSAGE Select ERR)"
+            MESSAGEBOX.Text = "システム管理者へ連絡して下さい(DB OIS0003_MESSAGE Select ERR)" & "NO:" & MESSAGENO
             MESSAGEBOX.ForeColor = Drawing.Color.Red 'red
             MESSAGEBOX.BackColor = Drawing.Color.DarkSalmon 'darksalmon
             MESSAGEBOX.Font.Bold = True

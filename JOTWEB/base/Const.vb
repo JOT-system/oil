@@ -767,6 +767,58 @@ Public Module BaseDllConst
     Public Const CONST_ATank As String = "2101"
 #End Region
 
+#Region "油種(コスモ石油)"
+    ''' <summary>
+    ''' ハイオク
+    ''' </summary>
+    Public Const CONST_COSMO_HIG As String = "HI-G"
+    ''' <summary>
+    ''' レギュラー
+    ''' </summary>
+    Public Const CONST_COSMO_REG As String = "RE-G"
+    ''' <summary>
+    ''' 灯油
+    ''' </summary>
+    Public Const CONST_COSMO_WKO As String = "WKO"
+    ''' <summary>
+    ''' 軽油
+    ''' </summary>
+    Public Const CONST_COSMO_DGO As String = "DGO"
+    ''' <summary>
+    ''' 軽油５
+    ''' </summary>
+    Public Const CONST_COSMO_DGO5 As String = "DGO.5"
+    ''' <summary>
+    ''' 軽油１０
+    ''' </summary>
+    Public Const CONST_COSMO_DGO10 As String = "DGO.10"
+    ''' <summary>
+    ''' ３号軽油
+    ''' </summary>
+    Public Const CONST_COSMO_DGO3 As String = "DGO.3"
+    ''' <summary>
+    ''' Ａ重油
+    ''' </summary>
+    Public Const CONST_COSMO_AFO As String = "AFO"
+    ''' <summary>
+    ''' Ａ重油SP
+    ''' </summary>
+    Public Const CONST_COSMO_AFOSP As String = "A-SP"
+    ''' <summary>
+    ''' Ａ重油ブレンド
+    ''' </summary>
+    Public Const CONST_COSMO_AFOBU As String = "A(ブ"
+    ''' <summary>
+    ''' ＬＳＡ
+    ''' </summary>
+    Public Const CONST_COSMO_LSA As String = "LA-1"
+    ''' <summary>
+    ''' ＬＳＡブレンド
+    ''' </summary>
+    Public Const CONST_COSMO_LSABU As String = "LAブ"
+#End Region
+
+
 #Region "海外向け"
     ''' <summary>
     ''' 集信日時の追加/更新時のデフォルト値

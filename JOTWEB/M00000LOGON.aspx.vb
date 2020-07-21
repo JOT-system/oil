@@ -44,6 +44,7 @@ Public Class M00000LOGON
 
         '   MAPmapid      : 画面間IF(MAPID)
 
+
         If IsPostBack Then
             PassWord.Attributes.Add("value", PassWord.Text)
 
@@ -208,18 +209,20 @@ Public Class M00000LOGON
         '   Dim CS0009MESSAGEout As New CS0009MESSAGEout        'メッセージ出力 out
         Dim CS0006TERMchk As New CS0006TERMchk              'ローカルコンピュータ名存在チェック
         Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
+        Dim CS001INIFILE As New CS0001INIFILEget            'INIファイル読み込み
+
 
         '○オンラインサービス判定
         '画面UserIDの会社からDB(T0001_ONLINESTAT)検索
-        CS0008ONLINEstat.CS0008ONLINEstat()
-        If isNormal(CS0008ONLINEstat.ERR) Then
-            'オンラインサービス停止時、ログオン画面へ遷移
-            If CS0008ONLINEstat.ONLINESW = 0 Then Exit Sub
+        '   CS0008ONLINEstat.CS0008ONLINEstat()
+        '  If isNormal(CS0008ONLINEstat.ERR) Then
+        'オンラインサービス停止時、ログオン画面へ遷移
+        ' If CS0008ONLINEstat.ONLINESW = 0 Then Exit Sub
 
-        Else
-            Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
-            Exit Sub
-        End If
+        'Else
+        'Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
+        'Exit Sub
+        'End If
 
         '■■■　メイン処理　■■■
         '〇ID、パスワードのいずれかが未入力なら抜ける
@@ -259,8 +262,17 @@ Public Class M00000LOGON
         'Userメニューリスト設定
         Dim WW_UserMenuList As New List(Of CS0050SESSION.UserMenuCostomItem)
 
+
+        'セッションアウト後の再INIファイル読取り
+        CS001INIFILE.CS0001INIFILEget()
+        If Not isNormal(CS001INIFILE.ERR) Then
+            Master.Output(CS001INIFILE.ERR, C_MESSAGE_TYPE.ABORT)
+            Exit Sub
+        End If
+
         'DataBase接続文字
         Using SQLcon As SqlConnection = CS0050Session.getConnection
+
             SQLcon.Open() 'DataBase接続(Open)
 
             ' パスワード　証明書オープン

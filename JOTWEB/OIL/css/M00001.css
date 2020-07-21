@@ -281,6 +281,7 @@ div.showGuidance a[id^="Menu_"] {
 /* 大枠はフレックスとする*/
 #paneList {
     width :100%;
+    min-width:1095px;
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
@@ -367,11 +368,10 @@ div.showGuidance a[id^="Menu_"] {
     }
 }
 /* ペイン内ドロップダウンレイアウト(IDにddlMonthTransOfficeとつけたもののみ) */
-.paneContent select[id$='ddlMonthTransOffice'] {
+.paneContent select.officeDdl {
     height: 28px;
     font-size: 12pt;
     padding: 2px;
-    
 }
 /* ******************** */
 /* 月間輸送量ペイン個別 */

@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class M00001MENU
-
+    
     '''<summary>
     '''repLeftNav コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents repLeftNav As Global.System.Web.UI.WebControls.Repeater
-
+    
     '''<summary>
     '''guidanceArea コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents guidanceArea As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-
+    
     '''<summary>
     '''repGuidance コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents repGuidance As Global.System.Web.UI.WebControls.Repeater
-
+    
     '''<summary>
     '''P001 コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents P001 As Global.JOTWEB.MP0001CycleBillingStatus
-
+    
     '''<summary>
     '''P002 コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents P002 As Global.JOTWEB.MP0002MonthlyTransfer
-
+    
     '''<summary>
     '''P003 コントロール。
     '''</summary>
@@ -66,7 +66,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents P003 As Global.JOTWEB.MP0003OTLoadingSendStatus
-
+    
     '''<summary>
     '''P004 コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents P004 As Global.JOTWEB.MP0004ImportShipmentAmountStatus
-
+    
     '''<summary>
     '''P005 コントロール。
     '''</summary>
@@ -84,7 +84,16 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents P005 As Global.JOTWEB.MP0005ConsignmentStatus
-
+    
+    '''<summary>
+    '''P009 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P009 As Global.JOTWEB.MP0009ActualTraction
+    
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -93,7 +102,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''hdnPosiCol コントロール。
     '''</summary>
@@ -102,7 +111,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnPosiCol As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''hdnRowLine コントロール。
     '''</summary>
@@ -111,7 +120,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnRowLine As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''WF_HdnGuidanceUrl コントロール。
     '''</summary>
@@ -120,7 +129,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_HdnGuidanceUrl As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''hdnPaneAreaVScroll コントロール。
     '''</summary>
@@ -129,7 +138,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnPaneAreaVScroll As Global.System.Web.UI.WebControls.HiddenField
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -138,7 +147,7 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB.GRM00001WRKINC
-
+    
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -147,7 +156,7 @@ Partial Public Class M00001MENU
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB.OILMasterPage
         Get
-            Return CType(MyBase.Master, JOTWEB.OILMasterPage)
+            Return CType(MyBase.Master,JOTWEB.OILMasterPage)
         End Get
     End Property
 End Class

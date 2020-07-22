@@ -21,7 +21,7 @@
                 <!-- 営業所選択 -->
                 <div class="monthTransDdl" onchange="refreshPane('<%= Me.hdnRefreshCall.ClientId %>');">
                     表示する営業所 
-                    <asp:DropDownList ID="ddlMonthTransOffice" runat="server" ClientIDMode="Predictable"></asp:DropDownList>
+                    <asp:DropDownList ID="ddlMonthTransOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
                 </div>
                 <!-- 一覧表 -->
                 <div class="monthTransTable">

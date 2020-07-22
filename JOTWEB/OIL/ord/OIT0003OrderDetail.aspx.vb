@@ -228,6 +228,9 @@ Public Class OIT0003OrderDetail
 
             '◯手配連絡フラグ(0：未連絡, 1：連絡)設定
             '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
             If work.WF_SEL_CONTACTFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
@@ -240,30 +243,34 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
 
-                '### 20200710 START 指摘票対応(全体(No101))  ##################
-                ''手配連絡ボタンを非活性
-                'WF_CONTACTFLG.Value = "1"
-                '★臨海鉄道対応(手配連絡ボタン(1：連絡)済みも対象)
-                If WW_RINKAIFLG = True OrElse work.WF_SEL_CONTACTFLG.Text = "1" Then
-                    '手配連絡ボタンを非活性
-                    WF_CONTACTFLG.Value = "1"
-                Else
-                    '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
-                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
-                        '手配連絡ボタンを活性
-                        WF_CONTACTFLG.Value = "0"
-                    Else
-                        '手配連絡ボタンを非活性
-                        WF_CONTACTFLG.Value = "1"
-                    End If
-                End If
-                '### 20200710 END   指摘票対応(全体(No101))  ##################
+                '### 20200722 START 指摘票対応(全体(No116))  ##################
+                '手配連絡ボタンを非活性
+                WF_CONTACTFLG.Value = "1"
+                ''### 20200710 START 指摘票対応(全体(No101))  ##################
+                ''★臨海鉄道対応(手配連絡ボタン(1：連絡)済みも対象)
+                'If WW_RINKAIFLG = True OrElse work.WF_SEL_CONTACTFLG.Text = "1" Then
+                '    '手配連絡ボタンを非活性
+                '    WF_CONTACTFLG.Value = "1"
+                'Else
+                '    '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
+                '    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                '        '手配連絡ボタンを活性
+                '        WF_CONTACTFLG.Value = "0"
+                '    Else
+                '        '手配連絡ボタンを非活性
+                '        WF_CONTACTFLG.Value = "1"
+                '    End If
+                'End If
+                ''### 20200710 END   指摘票対応(全体(No101))  ##################
+                '### 20200722 END   指摘票対応(全体(No116))  ##################
             Else
                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
                     OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
@@ -289,6 +296,9 @@ Public Class OIT0003OrderDetail
 
             '◯結果受理フラグ(0：未受理, 1：受理)設定
             '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
             If work.WF_SEL_RESULTFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
@@ -301,37 +311,41 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
 
-                '### 20200710 START 指摘票対応(全体(No101))  ##################
-                ''結果受理ボタンを非活性
-                'WF_RESULTFLG.Value = "1"
-                '★臨海鉄道対応(結果受理ボタン(1：受理)済みも対象)
-                If WW_RINKAIFLG = True OrElse work.WF_SEL_RESULTFLG.Text = "1" Then
-                    '結果受理ボタンを非活性
-                    WF_RESULTFLG.Value = "1"
-                Else
-                    '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
-                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                '### 20200722 START 指摘票対応(全体(No116))  ##################
+                '結果受理ボタンを非活性
+                WF_RESULTFLG.Value = "1"
+                ''### 20200710 START 指摘票対応(全体(No101))  ##################
+                ''★臨海鉄道対応(結果受理ボタン(1：受理)済みも対象)
+                'If WW_RINKAIFLG = True OrElse work.WF_SEL_RESULTFLG.Text = "1" Then
+                '    '結果受理ボタンを非活性
+                '    WF_RESULTFLG.Value = "1"
+                'Else
+                '    '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
+                '    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                '        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
 
-                        '手配連絡が"1"(連絡)の場合
-                        If work.WF_SEL_CONTACTFLG.Text = "1" Then
-                            '結果受理ボタンを活性
-                            WF_RESULTFLG.Value = "0"
-                        Else
-                            '結果受理ボタンを非活性
-                            WF_RESULTFLG.Value = "1"
-                        End If
-                    Else
-                        '結果受理ボタンを非活性
-                        WF_RESULTFLG.Value = "1"
-                    End If
-                End If
-                '### 20200710 END   指摘票対応(全体(No101))  ##################
+                '        '手配連絡が"1"(連絡)の場合
+                '        If work.WF_SEL_CONTACTFLG.Text = "1" Then
+                '            '結果受理ボタンを活性
+                '            WF_RESULTFLG.Value = "0"
+                '        Else
+                '            '結果受理ボタンを非活性
+                '            WF_RESULTFLG.Value = "1"
+                '        End If
+                '    Else
+                '        '結果受理ボタンを非活性
+                '        WF_RESULTFLG.Value = "1"
+                '    End If
+                'End If
+                ''### 20200710 END   指摘票対応(全体(No101))  ##################
+                '### 20200722 END   指摘票対応(全体(No116))  ##################
 
             Else
                 If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_260 _
@@ -357,6 +371,9 @@ Public Class OIT0003OrderDetail
 
             '◯託送指示フラグ(0：未手配, 1：手配)設定
             '　または、受注進行ステータスが100:受注受付, または310:手配完了以降のステータスに変更された場合
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
             If work.WF_SEL_DELIVERYFLG.Text = "1" _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
@@ -369,23 +386,64 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
 
                 '### 20200710 START 指摘票対応(全体(No101))  ##################
                 ''託送指示ボタンを非活性
                 'WF_DELIVERYFLG.Value = "1"
-                '★臨海鉄道対応(託送指示ボタン(1：手配)済みも対象)
-                If WW_RINKAIFLG = True OrElse work.WF_SEL_DELIVERYFLG.Text = "1" Then
-                    '託送指示ボタンを非活性
-                    WF_DELIVERYFLG.Value = "1"
+                '★臨海鉄道対応(五井営業所、甲子営業所、袖ヶ浦営業所)
+                If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '### 20200722 START 受注進行ステータスの制御を追加 #################################
+                    ''託送指示ボタンを非活性
+                    'WF_DELIVERYFLG.Value = "1"
+                    '★受注進行ステータスが下記の場合
+                    '　305:手配完了（託送未）
+                    '　310:手配完了
+                    If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+                        '託送指示ボタンを活性
+                        WF_DELIVERYFLG.Value = "0"
+                    Else
+                        '託送指示ボタンを非活性
+                        WF_DELIVERYFLG.Value = "1"
+                    End If
+                    '### 20200722 END   受注進行ステータスの制御を追加 #################################
+
+                    '★託送指示ボタン(1：手配)済み)
+                ElseIf work.WF_SEL_DELIVERYFLG.Text = "1" Then
+                    '### 20200722 START 受注進行ステータスの制御を追加 #################################
+                    ''託送指示ボタンを非活性
+                    'WF_DELIVERYFLG.Value = "1"
+                    '★三重塩浜営業所の場合
+                    '　205:手配中（千葉(根岸を除く)以外）
+                    '　305:手配完了（託送未）
+                    '　310:手配完了
+                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 _
+                        AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 _
+                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310) Then
+                        '託送指示ボタンを活性
+                        WF_DELIVERYFLG.Value = "0"
+                    Else
+                        '託送指示ボタンを非活性
+                        WF_DELIVERYFLG.Value = "1"
+                    End If
+                    '### 20200722 END   受注進行ステータスの制御を追加 #################################
+
                 Else
                     '★臨海鉄道対象外の営業所の場合は、タブ「タンク車明細」で使用可能とする。
+                    '### 20200722 受注進行ステータスの制御を追加 #################################
+                    '205:手配中（千葉(根岸を除く)以外）
                     If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
-
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+                        OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 Then
                         '三重塩浜営業所の場合
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 Then
                             '託送指示ボタンを活性
@@ -394,6 +452,11 @@ Public Class OIT0003OrderDetail
                             '託送指示ボタンを非活性
                             WF_DELIVERYFLG.Value = "1"
                         End If
+                        '### 20200722 START 受注進行ステータスの制御を追加 #################################
+                    ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
+                        '託送指示ボタンを活性
+                        WF_DELIVERYFLG.Value = "0"
+                        '### 20200722 END   受注進行ステータスの制御を追加 #################################
                     Else
                         '託送指示ボタンを非活性
                         WF_DELIVERYFLG.Value = "1"
@@ -416,9 +479,28 @@ Public Class OIT0003OrderDetail
                 End If
             End If
 
-            '◯受注進行ステータスが310:手配完了以降のステータスに変更された場合
+            '◯受注進行ステータスが310:手配完了のステータスに変更された場合
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
             If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
-                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
+                '### 20200722 START 受注進行ステータスの制御を追加 #################################
+                ''タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
+                'WF_MAPButtonControl.Value = "1"
+                '★臨海鉄道対応(臨海鉄道である営業所)
+                If WW_RINKAIFLG = True Then
+                    'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
+                    WF_MAPButtonControl.Value = "1"
+                Else
+                    'タブ「入換・積込指示」のボタンを非活性
+                    WF_MAPButtonControl.Value = "2"
+                End If
+                '### 20200722 END   受注進行ステータスの制御を追加 #################################
+
+                '◯受注進行ステータスが320:受注確定以降のステータスに変更された場合
+            ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
@@ -562,11 +644,16 @@ Public Class OIT0003OrderDetail
 
             '〇 受注進行ステータスが"310:手配完了"へ変更された場合
             '### ステータス追加(仮) #################################
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_DetailMView.ActiveViewIndex = WF_DTAB_CHANGE_NO.Value
 
@@ -5519,7 +5606,12 @@ Public Class OIT0003OrderDetail
         '受注進行ステータスの状態
         Select Case work.WF_SEL_ORDERSTATUS.Text
             '"310:手配完了"
-            Case BaseDllConst.CONST_ORDERSTATUS_310
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '"205:手配中（千葉(根岸を除く)以外）"
+            '"305:手配完了（託送未）"
+            Case BaseDllConst.CONST_ORDERSTATUS_310,
+                 BaseDllConst.CONST_ORDERSTATUS_205,
+                 BaseDllConst.CONST_ORDERSTATUS_305
 
                 '### 20200630 他の受注で同日の積込日を設定しているタンク車がないかチェック #####
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -11593,10 +11685,17 @@ Public Class OIT0003OrderDetail
                     Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                         SQLcon.Open()       'DataBase接続
 
-                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_310)
-                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_310, Me.TxtOrderStatus.Text, WW_DUMMY)
-                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310
+                        '### 20200722 START 受注進行ステータスの制御を変更 #################################
+                        'WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_310)
+                        'CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_310, Me.TxtOrderStatus.Text, WW_DUMMY)
+                        'work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310
+                        'work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+                        '★205:手配中（千葉(根岸を除く)以外）に更新
+                        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_205)
+                        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_205, Me.TxtOrderStatus.Text, WW_DUMMY)
+                        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205
                         work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+                        '### 20200722 END   受注進行ステータスの制御を変更 #################################
 
                         '○ 画面表示データ復元
                         Master.RecoverTable(OIT0003WKtbl, work.WF_SEL_INPTBL.Text)
@@ -11801,8 +11900,12 @@ Public Class OIT0003OrderDetail
                 ElseIf work.WF_SEL_DELIVERYFLG.Text = "0" _
                             AndAlso work.WF_SEL_CONTACTFLG.Text = "1" _
                             AndAlso work.WF_SEL_RESULTFLG.Text = "1" Then
-                    '280:手配中(託送指示未手配)入換積込手配連絡（手配・結果受理）
-                    O_VALUE = CONST_ORDERSTATUS_280
+                    '### 20200722 START 受注進行ステータスの制御を変更 #################################
+                    ''280:手配中(託送指示未手配)入換積込手配連絡（手配・結果受理）
+                    'O_VALUE = CONST_ORDERSTATUS_280
+                    '305:手配完了(託送未)
+                    O_VALUE = CONST_ORDERSTATUS_305
+                    '### 20200722 END   受注進行ステータスの制御を変更 #################################
 
                     '託送指示入力＝"1:手配"
                     'かつ、手配連絡＝"0:未連絡"
@@ -11824,6 +11927,16 @@ Public Class OIT0003OrderDetail
 
                 End If
                 '### END   ##################################################################
+
+                '### 20200722 START 受注進行ステータスの制御を追加 #################################
+                '受注進行ステータス＝"305:手配完了（託送未）"
+                '受注進行ステータス＝"205:手配中（千葉(根岸を除く)以外）"
+            Case BaseDllConst.CONST_ORDERSTATUS_305,
+                 BaseDllConst.CONST_ORDERSTATUS_205
+                '310:手配完了
+                O_VALUE = CONST_ORDERSTATUS_310
+                '### 20200722 END   受注進行ステータスの制御を追加 #################################
+
         End Select
     End Sub
 
@@ -11860,7 +11973,12 @@ Public Class OIT0003OrderDetail
         End If
 
         '〇 受注ステータスが"310:手配完了"へ変更された場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+        '### 20200722 受注進行ステータスの制御を追加 #################################
+        '205:手配中（千葉(根岸を除く)以外）
+        '305:手配完了（託送未）
+        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
             WF_DTAB_CHANGE_NO.Value = "2"
             WF_Detail_TABChange()
 
@@ -11929,7 +12047,12 @@ Public Class OIT0003OrderDetail
             pnlSummaryArea.Visible = False
 
             '310:手配完了の場合は、タブ「タンク車明細」を許可
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
             WF_Dtab01.Enabled = True
             WF_Dtab02.Enabled = True
             WF_Dtab03.Enabled = True
@@ -12070,9 +12193,14 @@ Public Class OIT0003OrderDetail
             '(実績)空車着日
             Me.TxtActualEmparrDate.Enabled = False
 
-            '受注情報が「310:手配完了」の場合は、(実績)すべての日付の入力を制限
+            '受注情報が「310:手配完了」の場合は、(実績)すべての日付の入力を解放
             '310:手配完了
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
             '(実績)積込日
             Me.TxtActualLoadingDate.Enabled = True
             '(実績)発日
@@ -12324,7 +12452,10 @@ Public Class OIT0003OrderDetail
 
             '受注進行ステータスが以下の場合
             '200:手配
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 Then
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 Then
 
             '★割当確定ボタン押下時に更新
             If Me.WW_UPBUTTONFLG = "1" AndAlso isNormal(WW_ERRCODE) Then
@@ -12359,7 +12490,10 @@ Public Class OIT0003OrderDetail
 
             '受注進行ステータスが「310:手配完了」の場合
             '310:手配完了
-        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '305:手配完了（託送未）
+        ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
 
             '### 特になし ###############################################################
 
@@ -13729,8 +13863,13 @@ Public Class OIT0003OrderDetail
         '     1 : dt1はdt2より後の日
         '(実績)積込日 と　現在日付を比較
         '受注進行ステータスが"310:手配完了"の場合
+        '### 20200722 受注進行ステータスの制御を追加 #################################
+        '205:手配中（千葉(根岸を除く)以外）
+        '305:手配完了（託送未）
         If Me.TxtActualLoadingDate.Text <> "" _
-            AndAlso work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 Then
+            AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
+                    OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305) Then
             iresult = Date.Parse(Me.TxtActualLoadingDate.Text).CompareTo(DateTime.Today)
             'If iresult = -1 Then
             '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)積込日", needsPopUp:=True)
@@ -16073,6 +16212,9 @@ Public Class OIT0003OrderDetail
                     '270:手配中(入換積込指示手配済), 280:手配中(託送指示未手配)入換積込手配連絡（手配・結果受理）
                     '290:手配中(入換積込未連絡), 300:手配中(入換積込未確認)
                     '310:手配完了
+                    '### 20200722 受注進行ステータスの制御を追加 #################################
+                    '205:手配中（千葉(根岸を除く)以外）
+                    '305:手配完了（託送未）
                     Case BaseDllConst.CONST_ORDERSTATUS_200,
                          BaseDllConst.CONST_ORDERSTATUS_210,
                          BaseDllConst.CONST_ORDERSTATUS_220,
@@ -16084,7 +16226,9 @@ Public Class OIT0003OrderDetail
                          BaseDllConst.CONST_ORDERSTATUS_280,
                          BaseDllConst.CONST_ORDERSTATUS_290,
                          BaseDllConst.CONST_ORDERSTATUS_300,
-                         BaseDllConst.CONST_ORDERSTATUS_310
+                         BaseDllConst.CONST_ORDERSTATUS_310,
+                         BaseDllConst.CONST_ORDERSTATUS_205,
+                         BaseDllConst.CONST_ORDERSTATUS_305
 
                         '★タンク車所在の更新
                         '引数１：所在地コード　⇒　変更なし(空白)
@@ -16412,6 +16556,8 @@ Public Class OIT0003OrderDetail
             '受注進行ステータス＝"300:手配中(入換積込未確認)"
             '### END   ##################################################################
             '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_210 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_220 _
@@ -16422,7 +16568,8 @@ Public Class OIT0003OrderDetail
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_270 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_280 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_290 _
-            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 Then
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_300 _
+            OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 Then
 
             Dim loopdr As DataRow = Nothing
             Dim rowIdx As Integer = 0
@@ -16652,11 +16799,16 @@ Public Class OIT0003OrderDetail
 
         '〇 受注進行ステータスの状態
         Select Case work.WF_SEL_ORDERSTATUS.Text
+            '### 20200722 受注進行ステータスの制御を追加 #################################
+            '205:手配中（千葉(根岸を除く)以外）
+            '305:手配完了（託送未）
             Case BaseDllConst.CONST_ORDERSTATUS_310,
                  BaseDllConst.CONST_ORDERSTATUS_320,
                  BaseDllConst.CONST_ORDERSTATUS_350,
                  BaseDllConst.CONST_ORDERSTATUS_400,
-                 BaseDllConst.CONST_ORDERSTATUS_450
+                 BaseDllConst.CONST_ORDERSTATUS_450,
+                 BaseDllConst.CONST_ORDERSTATUS_205,
+                 BaseDllConst.CONST_ORDERSTATUS_305
 
                 For Each rowitem As TableRow In tblObj.Rows
                     '画面表示行が存在している場合

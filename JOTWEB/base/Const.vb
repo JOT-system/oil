@@ -470,6 +470,10 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_200 As String = "200"
     ''' <summary>
+    ''' 205:手配中（千葉(根岸を除く)以外）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_205 As String = "205"
+    ''' <summary>
     ''' 210:手配中（入換指示入力済）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_210 As String = "210"
@@ -509,6 +513,10 @@ Public Module BaseDllConst
     ''' 300:手配中（入換積込未確認）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_300 As String = "300"
+    ''' <summary>
+    ''' 305:手配完了（託送未）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_305 As String = "305"
     ''' <summary>
     ''' 310:手配完了
     ''' </summary>

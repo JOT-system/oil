@@ -125,3 +125,8 @@
 #WF_ARRDATE_LABEL, #WF_ACCDATE_LABEL {
     text-align: right;
 }
+
+/*　個別対応*/
+#TxtHeadOfficeTrain {
+    width: 100%;
+}

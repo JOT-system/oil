@@ -178,7 +178,7 @@ Public Class EntryHistory
         Dim sqlDetailStat As New StringBuilder
         sqlDetailStat.AppendLine("INSERT INTO OIL.HIS0002_DETAIL")
         sqlDetailStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,")
-        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,FIRSTRETURNFLG,AFTERRETURNFLG,ORDERINFO,")
+        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,ORDERINFO,")
         sqlDetailStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,ORDERINGTYPE,ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    JOINTCODE,JOINT,REMARK,")
@@ -196,7 +196,7 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
         sqlDetailStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,")
-        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@ORDERINFO,")
+        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@ORDERINFO,")
         sqlDetailStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,@ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    @JOINTCODE,@JOINT,@REMARK,")
@@ -223,19 +223,11 @@ Public Class EntryHistory
                 .Add("LINEORDER", SqlDbType.NVarChar).Value = drOrder("LINEORDER")
                 .Add("TANKNO", SqlDbType.NVarChar).Value = drOrder("TANKNO")
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
-                Try
-                    .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
-                Catch ex As Exception
-                    If .Contains("STACKINGORDERNO") Then
-                        .Item("STACKINGORDERNO").Value = ""
-                    Else
-                        .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = ""
-                    End If
-
-                End Try
+                .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
+                .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = drOrder("OTTRANSPORTFLG")
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = drOrder("ORDERINFO")
                 .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = drOrder("SHIPPERSCODE")
                 .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = drOrder("SHIPPERSNAME")

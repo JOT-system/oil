@@ -860,6 +860,11 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     display: none;
 }
 
+select#RF_VIEW {
+    outline:none;
+}
+
+
 /* 左リストボックス */
 .WF_ListBoxArea {
     margin-top: 5px;

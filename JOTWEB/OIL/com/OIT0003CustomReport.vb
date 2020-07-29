@@ -93,7 +93,10 @@ Public Class OIT0003CustomReport : Implements IDisposable
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
         Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
-        If excelFileName = "OIT0003L_LOADPLAN.xlsx" Then
+        If excelFileName = "OIT0003L_DELIVERYPLAN.xlsx" Then
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("運送状"), Excel.Worksheet)
+            Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+        ElseIf excelFileName = "OIT0003L_LOADPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("積込指示書"), Excel.Worksheet)
             Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         ElseIf excelFileName = "OIT0003L_NEGISHI_SHIPPLAN.xlsx" _
@@ -103,12 +106,18 @@ Public Class OIT0003CustomReport : Implements IDisposable
         ElseIf excelFileName = "OIT0003L_NEGISHI_LOADPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("回線別積込"), Excel.Worksheet)
             'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+        ElseIf excelFileName = "OIT0003L_SODEGAURA_LINEPLAN.xlsx" Then
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("入線方"), Excel.Worksheet)
+            'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
+        ElseIf excelFileName = "OIT0003L_KINOENE_LOADPLAN.xlsx" Then
+            Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("出力"), Excel.Worksheet)
+            'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         End If
     End Sub
 
-#Region "ダウンロード(積込予定表(根岸以外))"
+#Region "ダウンロード(積込指示書(共通))"
     ''' <summary>
-    ''' テンプレートを元に帳票を作成しダウンロード(出荷・積込予定表(根岸))URLを生成する
+    ''' テンプレートを元に帳票を作成しダウンロード(積込指示書(共通))URLを生成する
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
@@ -152,7 +161,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Function
 
     ''' <summary>
-    ''' 帳票のヘッダー設定(積込予定表(根岸以外))
+    ''' 帳票のヘッダー設定(積込指示書(共通))
     ''' </summary>
     Private Sub EditLoadHeaderArea()
         Dim rngHeaderArea As Excel.Range = Nothing
@@ -185,7 +194,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Sub
 
     ''' <summary>
-    ''' 帳票の明細設定(積込予定表(根岸以外))
+    ''' 帳票の明細設定(積込指示書(共通))
     ''' </summary>
     Private Sub EditLoadDetailArea(ByVal officeCode As String)
         Dim rngDetailArea As Excel.Range = Nothing
@@ -295,7 +304,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintGoiData(ByVal repPtn As String) As String
+    Public Function CreateExcelPrintGoiData(ByVal repPtn As String, ByVal lodDate As String) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -366,61 +375,360 @@ Public Class OIT0003CustomReport : Implements IDisposable
     Private Sub EditGoiShipDetailArea()
         Dim rngDetailArea As Excel.Range = Nothing
         Dim svTrainNo As String = ""
+        Dim strYoko As String() = {"F", "G", "H", "I", "J", "K", "L", "N", "O", "P", "Q"}
+        Dim iYoko As Integer = 0
 
         Try
             Dim i As Integer = 8
             For Each PrintDatarow As DataRow In PrintData.Rows
 
-                '◯ HI-G(ハイオク)
-                rngDetailArea = Me.ExcelWorkSheet.Range("F" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                '★列車(着駅)が変更となった場合
+                If svTrainNo <> "" AndAlso svTrainNo <> PrintDatarow("OTTRAINNO").ToString() Then
+                    '行を１つ下に移動
+                    i += 1
+                End If
 
-                '◯ RE-G(レギュラー)
+                '油種が未設定の場合は次のデータへ
+                If PrintDatarow("OILCODE").ToString() = "" Then
+                    '★列車番号を退避
+                    svTrainNo = PrintDatarow("OTTRAINNO").ToString()
+                    Continue For
+                End If
+
+                Select Case PrintDatarow("REPORTOILNAME").ToString()
+                    '◯白油 
+                    '　HI-G(ハイオク)
+                    Case BaseDllConst.CONST_COSMO_HIG
+                        iYoko = 0
+                    '　RE-G(レギュラー)
+                    Case BaseDllConst.CONST_COSMO_REG
+                        iYoko = 1
+                    '　WKO(灯油)
+                    Case BaseDllConst.CONST_COSMO_WKO
+                        iYoko = 2
+                    '　DGO(軽油)
+                    Case BaseDllConst.CONST_COSMO_DGO
+                        iYoko = 3
+                    '　DGO.10(軽油１０)
+                    Case BaseDllConst.CONST_COSMO_DGO10
+                        iYoko = 4
+                    '　DGO.3(３号軽油)
+                    Case BaseDllConst.CONST_COSMO_DGO3
+                        iYoko = 5
+                    '　DGO.5(軽油５)
+                    Case BaseDllConst.CONST_COSMO_DGO5
+                        iYoko = 6
+
+                    '◯黒油
+                    '　LA-1(ＬＳＡ - 1)
+                    Case BaseDllConst.CONST_COSMO_LSA
+                        iYoko = 7
+                    '　LAブ(ＬＳＡ - 1（山岳）)
+                    Case BaseDllConst.CONST_COSMO_LSABU
+                        iYoko = 8
+                    '　AFO(AFO)
+                    Case BaseDllConst.CONST_COSMO_AFO
+                        iYoko = 9
+                    '　A-SP(AFO（山岳）)
+                    Case BaseDllConst.CONST_COSMO_AFOSP
+                        iYoko = 10
+
+                    Case Else
+                        Continue For
+                End Select
+
+                '★帳票に値を設定
+                rngDetailArea = Me.ExcelWorkSheet.Range(strYoko(iYoko) + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CNT")
+
+                '★列車番号を退避
+                svTrainNo = PrintDatarow("OTTRAINNO").ToString()
+
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ダウンロード(積込予定表(甲子))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(積込予定表(甲子))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintKinoeneData(ByVal repPtn As String, ByVal lodDate As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditKinoeneLineHeaderArea(lodDate)
+            '◯明細の設定
+            EditKinoeneLineDetailArea()
+            '***** TODO処理 ここまで *****
+            'ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(積込予定表(甲子))
+    ''' </summary>
+    Private Sub EditKinoeneLineHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                '◯ 積込日
+                Dim value As String = lodDate
+                '　月
+                rngHeaderArea = Me.ExcelWorkSheet.Range("J3")
+                rngHeaderArea.Value = Date.Parse(value).ToString("MM", New Globalization.CultureInfo("ja-JP"))
+                '　日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("K3")
+                rngHeaderArea.Value = Date.Parse(value).ToString("dd", New Globalization.CultureInfo("ja-JP"))
+
+                Exit For
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(積込予定表(甲子))
+    ''' </summary>
+    Private Sub EditKinoeneLineDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            'Dim i As Integer = 0
+            Dim iST As Integer = 0
+            Dim i1ST As Integer = 6
+            Dim i2ST As Integer = 17
+            Dim i3ST As Integer = 28
+            Dim i4ST As Integer = 39
+            Dim sPointy As String = ""
+            Dim sOdd() As String = {"B", "C", "D", "E", "F"}
+            Dim sEven() As String = {"H", "I", "J", "K", "L"}
+            Dim sPointx() As String = {"", "", "", "", ""}
+            For Each PrintDatarow As DataRow In PrintData.Rows
+
+                If sPointy = "" OrElse sPointy <> PrintDatarow("LOADINGPOINT").ToString() Then
+
+                    '積込回線により列の箇所を設定
+                    Select Case PrintDatarow("LOADINGPOINT").ToString()
+                        '★[Ｘ－１回目]
+                        Case "1", "3", "5", "7"
+                            sPointx = sOdd
+                        '★[Ｘ－２回目]
+                        Case "2", "4", "6", "8"
+                            sPointx = sEven
+                    End Select
+
+                    '積込回線により行の箇所を設定
+                    Select Case PrintDatarow("LOADINGPOINT").ToString()
+                        '★[１－１回目], [１－２回目]
+                        Case "1", "2"
+                            iST = i1ST
+                        '★[２－１回目], [２－２回目]
+                        Case "3", "4"
+                            iST = i2ST
+                        '★[３－１回目], [３－２回目]
+                        Case "5", "6"
+                            iST = i3ST
+                        '★[４－１回目], [４－２回目]
+                        Case "7", "8"
+                            iST = i4ST
+                    End Select
+                End If
+
+                ''◯ 注
+                'rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(0) + iST.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '◯ 車両番号
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(1) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("SYARYONUMBER")
+                '◯ 油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(2) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
+                '◯ 予約数量
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(3) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("RESERVEDQUANTITY")
+                '◯ 納入先
+                rngDetailArea = Me.ExcelWorkSheet.Range(sPointx(4) + iST.ToString())
+                rngDetailArea.Value = PrintDatarow("DELIVERYFIRST")
+
+                iST += 1
+                sPointy = PrintDatarow("LOADINGPOINT").ToString()
+
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+#End Region
+
+#Region "ダウンロード(入線方(袖ヶ浦))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(入線方(袖ヶ浦))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintSodegauraData(ByVal repPtn As String, ByVal lodDate As String, ByVal rTrainNo As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditSodegauraLineHeaderArea(lodDate)
+            '◯明細の設定
+            EditSodegauraLineDetailArea()
+            '***** TODO処理 ここまで *****
+            'ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(入線方(袖ヶ浦))
+    ''' </summary>
+    Private Sub EditSodegauraLineHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 現日付
+                rngHeaderArea = Me.ExcelWorkSheet.Range("L1")
+                rngHeaderArea.Value = Now.ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
+
+                '◯ 積込日
+                'Dim value As String = PrintDatarow("ACTUALLODDATE").ToString
+                Dim value As String = PrintDatarow("LODDATE").ToString
+                '　月
+                rngHeaderArea = Me.ExcelWorkSheet.Range("E6")
+                rngHeaderArea.Value = Date.Parse(value).ToString("MM", New Globalization.CultureInfo("ja-JP")) + "月"
+                '　日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("F6")
+                rngHeaderArea.Value = Date.Parse(value).ToString("dd", New Globalization.CultureInfo("ja-JP")) + "日"
+                '　曜日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("G6")
+                rngHeaderArea.Value = Date.Parse(value).ToString("(ddd)", New Globalization.CultureInfo("ja-JP"))
+
+                '◯ 入線列車名(臨海鉄道)
+                rngHeaderArea = Me.ExcelWorkSheet.Range("I6")
+                rngHeaderArea.Value = PrintDatarow("LOADINGIRILINETRAINNAME")
+
+                '◯ 入線列車No(臨海鉄道)
+                rngHeaderArea = Me.ExcelWorkSheet.Range("C10")
+                rngHeaderArea.Value = PrintDatarow("LOADINGIRILINETRAINNO")
+
+                '◯ 出線列車No(臨海鉄道)
+                rngHeaderArea = Me.ExcelWorkSheet.Range("F10")
+                rngHeaderArea.Value = PrintDatarow("LOADINGOUTLETTRAINNO")
+
+                Exit For
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(入線方(袖ヶ浦))
+    ''' </summary>
+    Private Sub EditSodegauraLineDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 12
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 発送列車
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("JRTRAINNO1")
+
+                '◯ 入線順
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("LOADINGIRILINEORDER")
+                rngDetailArea.Value = PrintDatarow("NYUSENNO")
+
+                '◯ 油種名
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
+
+                '◯ 車両番号
                 rngDetailArea = Me.ExcelWorkSheet.Range("G" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                rngDetailArea.Value = PrintDatarow("CARSNUMBER")
 
-                '◯ WKO(灯油)
-                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ DGO(軽油)
+                '◯ ☆入荷記
                 rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
+                rngDetailArea.Value = PrintDatarow("NYUUKA")
 
-                '◯ DGO.10(軽油１０)
-                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ DGO.3(３号軽油)
+                '◯ OT順位
                 rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ DGO.5(軽油５)
-                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ LA-1(ＬＳＡ－１, ＬＳＡ-1（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ LAブ(ＬＳＡーブレンド, ＬＳＡーブレンド（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ AFO(AFO, AFO（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("P" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ A-SP(AFOーSP, AFOーSP（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '◯ A(ブ(AFOーブレンド（山岳）)
-                rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("")
-
-                '★列車名(着駅)を退避
-                svTrainNo = PrintDatarow("TRAINNAME").ToString()
+                'rngDetailArea.Value = PrintDatarow("LOADINGOUTLETORDER")
+                rngDetailArea.Value = PrintDatarow("OTRANK")
 
                 i += 1
             Next
@@ -430,7 +738,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngDetailArea)
         End Try
     End Sub
-
 #End Region
 
 #Region "ダウンロード(出荷・積込予定表(根岸))"
@@ -485,7 +792,6 @@ Public Class OIT0003CustomReport : Implements IDisposable
 
     End Function
 
-#Region "出荷予定表(根岸)帳票設定"
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(根岸))
     ''' </summary>
@@ -550,9 +856,11 @@ Public Class OIT0003CustomReport : Implements IDisposable
                     Case "3093", "3091", "8777", "2777"
                         i = 25
                         If PrintDatarow("TRAINNO").ToString() = "3093" Then i = i
-                        If PrintDatarow("TRAINNO").ToString() = "3091" Then i = i + 1
-                        If PrintDatarow("TRAINNO").ToString() = "8777" Then i = i + 2
-                        If PrintDatarow("TRAINNO").ToString() = "2777" Then i = i + 3
+                        'If PrintDatarow("TRAINNO").ToString() = "5166" Then i = i + 1
+                        If PrintDatarow("TRAINNO").ToString() = "3091" Then i = i + 2
+                        If PrintDatarow("TRAINNO").ToString() = "8777" Then i = i + 3
+                        'If PrintDatarow("TRAINNO").ToString() = "8099" Then i = i + 4
+                        If PrintDatarow("TRAINNO").ToString() = "2777" Then i = i + 5
                     '着駅(八王子)
                     Case "85", "87", "8097", "5692"
                         i = 31
@@ -600,8 +908,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
             ExcelMemoryRelease(rngDetailArea)
         End Try
     End Sub
-#End Region
-#Region "積込予定表(根岸)帳票設定"
+
     ''' <summary>
     ''' 帳票のヘッダー設定(積込予定表(根岸))
     ''' </summary>
@@ -691,7 +998,179 @@ Public Class OIT0003CustomReport : Implements IDisposable
     End Sub
 #End Region
 
+#Region "ダウンロード(託送指示(四日市))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(託送指示(四日市))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintYokkaichiData(ByVal repPtn As String, ByVal lodDate As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditDeliveryHeaderArea(lodDate)
+            '◯明細の設定
+            EditDeliveryDetailArea()
+            '***** TODO処理 ここまで *****
+            ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+    End Function
 #End Region
+
+#Region "ダウンロード(託送指示(三重塩浜))"
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロード(託送指示(三重塩浜))URLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal lodDate As String) As String
+        Dim rngWrite As Excel.Range = Nothing
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditDeliveryHeaderArea(lodDate)
+            '◯明細の設定
+            EditDeliveryDetailArea()
+            '***** TODO処理 ここまで *****
+            ExcelTempSheet.Delete() '雛形シート削除
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                Me.ExcelBookObj.SaveAs(tmpFilePath, Excel.XlFileFormat.xlOpenXMLWorkbook)
+            End SyncLock
+            Me.ExcelBookObj.Close(False)
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+            ExcelMemoryRelease(rngWrite)
+        End Try
+    End Function
+#End Region
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定(託送指示)
+    ''' </summary>
+    Private Sub EditDeliveryHeaderArea(ByVal lodDate As String)
+        Dim rngHeaderArea As Excel.Range = Nothing
+        Dim value As String = Now.AddDays(0).ToString("yyyy年MM月dd日", New Globalization.CultureInfo("ja-JP"))
+
+        Try
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '発駅名
+                rngHeaderArea = Me.ExcelWorkSheet.Range("C3")
+                rngHeaderArea.Value = PrintDatarow("DEPSTATIONNAME")
+                '発行日
+                rngHeaderArea = Me.ExcelWorkSheet.Range("N2")
+                rngHeaderArea.Value = value
+
+                Exit For
+            Next
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngHeaderArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(託送指示)
+    ''' </summary>
+    Private Sub EditDeliveryDetailArea()
+        Dim rngDetailArea As Excel.Range = Nothing
+
+        Try
+            Dim i As Integer = 7
+            For Each PrintDatarow As DataRow In PrintData.Rows
+                '固定NO
+                rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '協定コード
+                rngDetailArea = Me.ExcelWorkSheet.Range("C" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '割増・割引C
+                rngDetailArea = Me.ExcelWorkSheet.Range("D" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '品目コード
+                rngDetailArea = Me.ExcelWorkSheet.Range("E" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '車種コード
+                rngDetailArea = Me.ExcelWorkSheet.Range("F" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '貨車番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("G" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("TANKNO")
+                '列車番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("TRAINNO")
+                '着駅名
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ARRSTATIONNAME")
+                '荷受人名
+                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("CONSIGNEENAME")
+                '運送状番号
+                rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '屯数
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '運賃
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+                '受領印
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("")
+
+                i += 1
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
 
     ''' <summary>
     ''' Excelオブジェクトの解放

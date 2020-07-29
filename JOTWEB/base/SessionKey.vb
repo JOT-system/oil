@@ -138,7 +138,10 @@ Public Module SessionKey
         ''' 選択終了年月日
         ''' </summary>
         Public Const SELECTED_END_DATE As String = "Selected_ENDYMD"
-
+        ''' <summary>
+        ''' メニューカスタム情報リスト
+        ''' </summary>
+        Public Const USERMENU_COSTOM_LIST As String = "UserMenuCostomList"
     End Class
 
 End Module 'End BaseDllConst

@@ -91,6 +91,7 @@
                     <a id="WF_ORDERTYPE_LABEL" class="requiredMark">受注パターン</a>
                     <a class="ef" id="WF_ORDERTYPE">
                         <asp:TextBox ID="TxtOrderType" runat="server" onblur="MsgClear();" Enabled="false"></asp:TextBox>
+                        <asp:TextBox ID="TxtOrderTrkKbn" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                     </a>
                 </span>
                 <!-- <span></span> -->
@@ -700,5 +701,7 @@
         <asp:HiddenField ID="hdnDispHeaderItems" runat="server" Value="1" />
         <!-- 油種数登録ボタン押下フラグ(True:有効, False：無効) -->
         <input id="WF_ButtonInsertFLG" runat="server" value="" type="text" />
+        <!-- 選択(チェックボックス)押下フラグ(True:有効, False：無効) -->
+        <input id="WF_CheckBoxFLG" runat="server" value="" type="text" />
     </div>
 </asp:Content>

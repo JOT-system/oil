@@ -257,13 +257,22 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents tileSalesOffice As Global.JOTWEB.GRC0001TILESELECTORWRKINC
     
     '''<summary>
-    '''rbShipBtn コントロール。
+    '''rbDeliveryBtn コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rbShipBtn As Global.System.Web.UI.WebControls.RadioButton
+    Protected WithEvents rbDeliveryBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbDeliveryCSVBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbDeliveryCSVBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
     '''rbLoadBtn コントロール。
@@ -275,6 +284,15 @@ Partial Public Class OIT0003OrderList
     Protected WithEvents rbLoadBtn As Global.System.Web.UI.WebControls.RadioButton
     
     '''<summary>
+    '''rbShipBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbShipBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
     '''rbLineBtn コントロール。
     '''</summary>
     '''<remarks>
@@ -282,6 +300,42 @@ Partial Public Class OIT0003OrderList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents rbLineBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbKinoeneLoadBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbKinoeneLoadBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''rbNegishiLoadBtn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rbNegishiLoadBtn As Global.System.Web.UI.WebControls.RadioButton
+    
+    '''<summary>
+    '''lblReportRTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblReportRTrainNo As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''txtReportRTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents txtReportRTrainNo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''Master プロパティ。

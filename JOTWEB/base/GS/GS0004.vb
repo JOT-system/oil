@@ -108,7 +108,7 @@ Public Class GS0004MEMOset
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
-
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 500).Value = MEMO
                     .Add("@P2", SqlDbType.NVarChar, 20).Value = USERID

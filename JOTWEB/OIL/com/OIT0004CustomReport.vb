@@ -586,9 +586,9 @@ Public Class OIT0004CustomReport : Implements IDisposable
                         ExcelMemoryRelease(rngPasteRow)
                         '車数
                         rngPasteRow = DirectCast(rngRowsObj("7:8"), Excel.Range)
-                        rngPasteRow.Value = lorryNum
+                        rngPasteRow.Value = syaSu
                         ExcelMemoryRelease(rngPasteRow)
-                        '車数
+                        'ローリー受入数
                         rngPasteRow = DirectCast(rngRowsObj("10:10"), Excel.Range)
                         rngPasteRow.Value = lorryNum
                         ExcelMemoryRelease(rngPasteRow)

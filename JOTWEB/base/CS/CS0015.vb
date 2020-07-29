@@ -80,6 +80,7 @@ Public Class CS0015TITLEcamp
 
         Using SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
+            SqlConnection.ClearPool(SQLcon)
             '●タイトル会社取得
             '○ User権限によりDB(OIS0009_ROLE)検索
             Try

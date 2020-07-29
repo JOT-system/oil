@@ -1,32 +1,38 @@
 ﻿Option Strict On
 Imports System.Data.SqlClient
 ''' <summary>
-''' メインメニュー画面クラス
+''' メニュー画面クラス
 ''' </summary>
 Public Class M00001MENU
     Inherits System.Web.UI.Page
-
     '*共通関数宣言(BASEDLL)
     Private CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
     Private CS0050Session As New CS0050SESSION              'セッション情報
+
     Public Property SelectedGuidanceNo As String = ""
     ''' <summary>
     '''  パスワードの変更依頼（期限切れまで何日前からか）
     ''' </summary>
     Private Const C_PASSWORD_CHANGE_LIMIT_COUNT As Integer = 31
+    Private Const C_VSNAME_LEFTNAVIDATA As String = "VS_MENU_LEFT_NAVI"
+
     ''' <summary>
-    ''' サーバー処理の遷移先
+    ''' ページロード時
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    ''' <remarks></remarks>
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-
         If IsPostBack Then
+
             If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                 If WF_ButtonClick.Value.StartsWith("WF_ButtonShowGuidance") Then
                     WF_ButtonShowGuidance_Click()
+                    Return
                 End If
+                Select Case WF_ButtonClick.Value
+                    Case "WF_ButtonLeftNavi"
+                        BtnLeftNavi_Click()
+                End Select
             End If
         Else
             '★★★ 初期画面表示 ★★★
@@ -35,92 +41,18 @@ Public Class M00001MENU
         End If
 
     End Sub
-
     ''' <summary>
     ''' 初期処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub Initialize()
         Master.MAPID = GRM00001WRKINC.MAPID
-        '★★★ メニュー貼り付け ★★★
-
-        '○メニュー貼り付け（左）
-        Dim WW_Select_CNT As String = String.Empty
-
-        '検索SQL文 最大２１行で取得できたものを当て込むように修正する
-        Dim SQLStr As String =
-                          "WITH ROWIDX(ROWLINE)  AS (          " _
-                        & " SELECT                             " _
-                        & "      1               AS ROWLINE    " _
-                        & " UNION ALL                          " _
-                        & " SELECT                             " _
-                        & "      ROWLINE + 1     AS ROWLINE    " _
-                        & " FROM  ROWIDX                       " _
-                        & " WHERE ROWLINE <= 6                " _
-                        & ")                                   " _
-                        & " SELECT                             " _
-                        & "      rtrim(R.ROWLINE)               as SEQ     , " _
-                        & "      rtrim(isnull(A.MAPID,''))      as MAPID   , " _
-                        & "      rtrim(isnull(A.VARIANT,''))    as VARIANT , " _
-                        & "      rtrim(isnull(A.TITLENAMES,'')) as TITLE   , " _
-                        & "      rtrim(isnull(A.MAPNAMES,''))   as NAMES   , " _
-                        & "      rtrim(isnull(A.MAPNAMEL,''))   as NAMEL   , " _
-                        & "      rtrim(isnull(B.URL,''))        as URL       " _
-                        & " FROM      ROWIDX                      R          " _
-                        & " LEFT JOIN COM.OIS0008_PROFMMAP              A       ON " _
-                        & "       A.CAMPCODE = @P1                           " _
-                        & "   and A.MAPIDP   = @P2                           " _
-                        & "   and A.VARIANTP = @P3                           " _
-                        & "   and A.TITLEKBN = 'I'                           " _
-                        & "   and A.POSICOL  = @P4                           " _
-                        & "   and A.STYMD   <= @P5                           " _
-                        & "   and A.ENDYMD  >= @P6                           " _
-                        & "   and A.DELFLG  <> @P7                           " _
-                        & "   and A.POSIROW  = R.ROWLINE                     " _
-                        & " LEFT JOIN COM.OIS0007_URL                   B       ON " _
-                        & "       B.MAPID    = A.MAPID                       " _
-                        & "   and B.STYMD   <= @P5                           " _
-                        & "   and B.ENDYMD  >= @P6                           " _
-                        & "   and B.DELFLG  <> @P7                           " _
-                        & " ORDER BY R.ROWLINE                               "
-        '　１回目（ユーザＩＤ）での貼り付け
-        Using SQLcon As SqlConnection = CS0050Session.getConnection,
-              SQLcmd As New SqlCommand(SQLStr, SQLcon)
+        Dim menuButtonList As List(Of MenuItem) = Nothing
+        Using sqlCon As SqlConnection = CS0050Session.getConnection
+            sqlCon.Open()
+            'メニューボタン情報の取得
             Try
-                'DataBase接続文字
-                SQLcon.Open() 'DataBase接続(Open)
-                '固定パラメータ
-                With SQLcmd.Parameters
-                    .Add("@P1", SqlDbType.NVarChar, 20).Value = work.WF_SEL_CAMPCODE.Text
-                    .Add("@P2", SqlDbType.NVarChar, 50).Value = Master.MAPID
-                    .Add("@P3", SqlDbType.NVarChar, 50).Value = Master.ROLE_MENU
-                    .Add("@P5", SqlDbType.Date).Value = Date.Now
-                    .Add("@P6", SqlDbType.Date).Value = Date.Now
-                    .Add("@P7", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
-                End With
-                '動的パラメータ
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 1)
-
-                Dim dicMenuBoxes As New Dictionary(Of String, Repeater) From
-                    {{"1", Repeater_Menu_L}, {"2", Repeater_Menu_L2},
-                     {"3", Repeater_Menu_R}, {"4", Repeater_Menu_R2},
-                     {"5", Repeater_Menu_L3}, {"6", Repeater_Menu_L4},
-                     {"7", Repeater_Menu_R3}, {"8", Repeater_Menu_R4}}
-
-                For Each menuBox In dicMenuBoxes
-                    WW_Select_CNT = ""
-                    PARA4.Value = menuBox.Key
-                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                        If SQLdr.HasRows = True Then
-                            menuBox.Value.DataSource = SQLdr
-                            menuBox.Value.DataBind()
-                            WW_Select_CNT = "OK"
-                        Else
-                            WW_Select_CNT = "NG"
-                        End If
-                    End Using
-                Next menuBox
-
+                menuButtonList = GetMenuItemList(sqlCon)
             Catch ex As Exception
                 Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "S0008_UPROFMAP SELECT")
 
@@ -130,11 +62,16 @@ Public Class M00001MENU
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWRITE.CS0011LOGWrite()
-                Exit Sub
+                Return
             End Try
+            '取得したデータを画面に展開
+            ViewState(C_VSNAME_LEFTNAVIDATA) = menuButtonList
+            Me.repLeftNav.DataSource = menuButtonList
+            Me.repLeftNav.DataBind()
+            'ガイダンスマスタの表示
             'ガイダンスデータ取得
             Try
-                Dim guidanceDt As DataTable = GetGuidanceData(SQLcon)
+                Dim guidanceDt As DataTable = GetGuidanceData(sqlCon)
                 Me.repGuidance.DataSource = guidanceDt
                 Me.repGuidance.DataBind()
                 If guidanceDt.Rows.Count = 0 Then
@@ -142,52 +79,229 @@ Public Class M00001MENU
                 End If
             Catch ex As Exception
             End Try
-
-            '■■■ パスワード有効期限の警告表示 ■■■
-            '○パスワード有効期限の警告表示
-            Dim WW_ENDYMD As Date = Date.Now
-
-            Try
-
-                'S0014_USER検索SQL文
-                Dim SQL_Str As String =
-                     "SELECT PASSENDYMD " _
-                   & " FROM  COM.OIS0005_USERPASS " _
-                   & " Where USERID = @P1 " _
-                   & "   and DELFLG <> @P2 "
-                Using USERcmd As New SqlCommand(SQL_Str, SQLcon)
-                    With USERcmd.Parameters
-                        .Add("@P1", SqlDbType.NVarChar, 20).Value = CS0050Session.USERID
-                        .Add("@P2", SqlDbType.NVarChar, 1).Value = "1"
-                    End With
-                    Dim SQLdr As SqlDataReader = USERcmd.ExecuteReader()
-
-                    While SQLdr.Read
-                        WW_ENDYMD = CDate(SQLdr("PASSENDYMD"))
-                        Exit While
-                    End While
-                End Using
-
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIS0005_USERPASS SELECT")
-
-                CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "OIS0005_USERPASS SELECT"                '
-                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWRITE.TEXT = ex.ToString()
-                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
-                CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-                Exit Sub
-            End Try
-
-
-            If DateDiff("d", Date.Now, WW_ENDYMD) < C_PASSWORD_CHANGE_LIMIT_COUNT Then
-                Master.Output(C_MESSAGE_NO.PASSWORD_INVALID_AT_SOON, C_MESSAGE_TYPE.INF)
-            End If
-
         End Using
-
     End Sub
+    ''' <summary>
+    ''' 左ナビゲーションボタン押下時処理
+    ''' </summary>
+    Protected Sub BtnLeftNavi_Click()
+        Dim CS0007CheckAuthority As New CS0007CheckAuthority          'AUTHORmap
+        Dim leftNaviList = DirectCast(ViewState(C_VSNAME_LEFTNAVIDATA), List(Of MenuItem))
+        'ありえないがメニュー表示リストが存在しない場合はそのまま終了
+        If leftNaviList Is Nothing OrElse
+           IsNumeric(Me.hdnPosiCol.Value) = False OrElse
+           IsNumeric(Me.hdnRowLine.Value) = False Then
+            Return
+        End If
+        Dim posiCol As Integer = CInt(Me.hdnPosiCol.Value)
+        Dim rowLine As Integer = CInt(Me.hdnRowLine.Value)
+        Me.hdnPosiCol.Value = ""
+        Me.hdnRowLine.Value = ""
+        Dim menuItm As MenuItem = Nothing
+        Dim qMenuItm = From itm In leftNaviList Where itm.PosiCol = posiCol
+        If rowLine = 1 Then
+            menuItm = qMenuItm.FirstOrDefault
+        Else
+            If qMenuItm.Any Then
+                menuItm = (From itm In qMenuItm(0).ChildMenuItem Where itm.RowLine = rowLine).FirstOrDefault
+            End If
+        End If
+        'ありえないが選択したメニューアイテムが存在しない場合はそのまま終了
+        If menuItm Is Nothing Then
+            Return
+        End If
+        '★★★ ボタン押下時、画面遷移（左） ★★★
+
+        '○画面遷移権限チェック（左）
+        CS0007CheckAuthority.MAPID = menuItm.MapId
+        CS0007CheckAuthority.ROLECODE_MAP = Master.ROLE_MAP
+        CS0007CheckAuthority.check()
+        If isNormal(CS0007CheckAuthority.ERR) Then
+            If CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.REFERLANCE OrElse
+               CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.UPDATE Then
+                CS0050Session.VIEW_PERMIT = CS0007CheckAuthority.MAPPERMITCODE
+                CS0050Session.VIEW_MAPID = menuItm.MapId
+                CS0050Session.VIEW_MAP_VARIANT = menuItm.Variant
+                CS0050Session.MAP_ETC = ""
+
+                Master.MAPvariant = menuItm.Variant
+                Master.MAPID = menuItm.MapId
+                Master.MAPpermitcode = CS0007CheckAuthority.MAPPERMITCODE
+                Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
+                Master.ShowMessage()
+
+            Else
+                Master.Output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & menuItm.MapId)
+                Master.ShowMessage()
+
+                Exit Sub
+            End If
+        Else
+            Master.Output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & menuItm.MapId)
+            Master.ShowMessage()
+
+            Exit Sub
+        End If
+        'セッション変数クリア
+        Dim eraseSessionNames As New List(Of String) From {"Selected_STYMD", "Selected_ENDYMD",
+            "Selected_USERIDFrom", "Selected_USERIDTo", "Selected_USERIDG1", "Selected_USERIDG2", "Selected_USERIDG3", "Selected_USERIDG4", "Selected_USERIDG5",
+            "Selected_MAPIDPFrom", "Selected_MAPIDPTo", "Selected_MAPIDPG1", "Selected_MAPIDPG2", "Selected_MAPIDPG3", "Selected_MAPIDPG4", "Selected_MAPIDPG5",
+            "Selected_MAPIDFrom", "Selected_MAPIDTo", "Selected_MAPIDG1", "Selected_MAPIDG2", "Selected_MAPIDG3", "Selected_MAPIDG4", "Selected_MAPIDG5"}
+
+        For Each eraseSessionName In eraseSessionNames
+            HttpContext.Current.Session(eraseSessionName) = ""
+        Next
+
+        'ボタン押下時、画面遷移
+        Server.Transfer(menuItm.Url)
+    End Sub
+    ''' <summary>
+    ''' ガイダンスリンク押下時
+    ''' </summary>
+    Private Sub WF_ButtonShowGuidance_Click()
+        Dim guidanceNo As String = WF_ButtonClick.Value.Replace("WF_ButtonShowGuidance", "")
+        Me.SelectedGuidanceNo = guidanceNo
+        'ボタン押下時、画面遷移
+        Server.Transfer(Me.WF_HdnGuidanceUrl.Value)
+    End Sub
+    ''' <summary>
+    ''' メニューボタン情報を取得する
+    ''' </summary>
+    ''' <returns></returns>
+
+    Private Function GetMenuItemList(sqlCon As SqlConnection) As List(Of MenuItem)
+        Dim retItm As New List(Of MenuItem)
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("SELECT A.POSICOL")
+        sqlStat.AppendLine("      ,A.POSIROW AS ROWLINE")
+        sqlStat.AppendLine("      ,rtrim(isnull(A.MAPID,''))      as MAPID")
+        sqlStat.AppendLine("      ,rtrim(isnull(A.VARIANT,''))    as VARIANT")
+        sqlStat.AppendLine("      ,rtrim(isnull(A.TITLENAMES,'')) as TITLE")
+        sqlStat.AppendLine("      ,rtrim(isnull(A.MAPNAMES,''))   as NAMES")
+        sqlStat.AppendLine("      ,rtrim(isnull(A.MAPNAMEL,''))   as NAMEL")
+        sqlStat.AppendLine("      ,rtrim(isnull(B.URL,''))        as URL")
+        sqlStat.AppendLine("  FROM      COM.OIS0008_PROFMMAP           A")
+        sqlStat.AppendLine("  LEFT JOIN COM.OIS0007_URL                B")
+        sqlStat.AppendLine("    ON B.MAPID    = A.MAPID")
+        sqlStat.AppendLine("   AND B.STYMD   <= @STYMD")
+        sqlStat.AppendLine("   AND B.ENDYMD  >= @ENDYMD")
+        sqlStat.AppendLine("   AND B.DELFLG  <> @DELFLG")
+        sqlStat.AppendLine(" WHERE A.CAMPCODE = @CAMPCODE")
+        sqlStat.AppendLine("   AND A.MAPIDP   = @MAPIDP")
+        sqlStat.AppendLine("   AND A.VARIANTP = @VARIANTP")
+        sqlStat.AppendLine("   AND A.TITLEKBN = 'I'")
+        sqlStat.AppendLine("   AND A.STYMD   <= @STYMD")
+        sqlStat.AppendLine("   AND A.ENDYMD  >= @ENDYMD")
+        sqlStat.AppendLine("   AND A.DELFLG  <> @DELFLG")
+        sqlStat.AppendLine(" ORDER BY A.POSICOL,A.POSIROW")
+        Using dt As New DataTable
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+
+                With sqlCmd.Parameters
+                    .Add("@CAMPCODE", SqlDbType.NVarChar, 20).Value = work.WF_SEL_CAMPCODE.Text
+                    .Add("@MAPIDP", SqlDbType.NVarChar, 50).Value = Master.MAPID
+                    .Add("@VARIANTP", SqlDbType.NVarChar, 50).Value = Master.ROLE_MENU
+                    .Add("@STYMD", SqlDbType.Date).Value = Date.Now
+                    .Add("@ENDYMD", SqlDbType.Date).Value = Date.Now
+                    .Add("@DELFLG", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                End With
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        dt.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    dt.Load(sqlDr)
+                    sqlDr.Close()
+                End Using 'sqlDr
+            End Using 'sqlCmd
+            '取得結果を元にメニューアイテムクラスに格納
+            '上位リストのみを取得()
+            Dim topLevelList = From dr As DataRow In dt Where dr("ROWLINE").Equals(1)
+            Dim childItems As List(Of DataRow) = Nothing
+            '上位回送のリストループROWLINEが"1"のみ
+            For Each topLevelItm In topLevelList
+                Dim posiCol As Integer = CInt(topLevelItm("POSICOL"))
+                childItems = (From dr As DataRow In dt Where dr("POSICOL").Equals(posiCol) AndAlso Not dr("ROWLINE").Equals(1)).ToList
+
+                Dim retTopLevelItm = New MenuItem
+                retTopLevelItm.PosiCol = CInt(topLevelItm("POSICOL"))
+                retTopLevelItm.RowLine = CInt(topLevelItm("ROWLINE"))
+                retTopLevelItm.MapId = Convert.ToString(topLevelItm("MAPID"))
+                retTopLevelItm.Variant = Convert.ToString(topLevelItm("VARIANT"))
+                retTopLevelItm.Title = Convert.ToString(topLevelItm("TITLE"))
+                retTopLevelItm.Names = Convert.ToString(topLevelItm("NAMES"))
+                retTopLevelItm.Names = Convert.ToString(topLevelItm("NAMEL"))
+                retTopLevelItm.Url = Convert.ToString(topLevelItm("URL"))
+
+                If childItems.Count = 0 Then
+                    '子供を完全に持たない
+                    '一応意味はないがコケると困るので
+                    If retTopLevelItm.Url = "" Then
+                        retTopLevelItm.Url = "~/OIL/ex/page_404.html"
+                    End If
+
+                ElseIf childItems.Count = 1 Then
+                    With childItems(0)
+                        If retTopLevelItm.MapId = "" Then
+                            retTopLevelItm.MapId = Convert.ToString(.Item("MAPID"))
+                        End If
+                        If retTopLevelItm.Variant = "" Then
+                            retTopLevelItm.Variant = Convert.ToString(.Item("VARIANT"))
+                        End If
+                        If retTopLevelItm.Title = "" Then
+                            retTopLevelItm.Title = Convert.ToString(.Item("TITLE"))
+                        End If
+                        If retTopLevelItm.Names = "" Then
+                            retTopLevelItm.Names = Convert.ToString(.Item("NAMES"))
+                        End If
+                        If retTopLevelItm.Namel = "" Then
+                            retTopLevelItm.Namel = Convert.ToString(.Item("NAMEL"))
+                        End If
+                        If retTopLevelItm.Url = "" Then
+                            retTopLevelItm.Url = Convert.ToString(.Item("URL"))
+                        End If
+                        If retTopLevelItm.Url = "" Then
+                            retTopLevelItm.Url = "~/OIL/ex/page_404.html"
+                        End If
+                    End With
+                Else
+                    '名前が無ければ子供の先頭の名称を付与
+                    With childItems(0)
+                        If retTopLevelItm.Names = "" Then
+                            retTopLevelItm.Names = Convert.ToString(.Item("NAMES"))
+                        End If
+                        If retTopLevelItm.Namel = "" Then
+                            retTopLevelItm.Namel = Convert.ToString(.Item("NAMEL"))
+                        End If
+                    End With
+                    For Each childItem In childItems
+                        Dim retChildItm = New MenuItem
+                        retChildItm.PosiCol = CInt(childItem("POSICOL"))
+                        retChildItm.RowLine = CInt(childItem("ROWLINE"))
+                        retChildItm.MapId = Convert.ToString(childItem("MAPID"))
+                        retChildItm.Variant = Convert.ToString(childItem("VARIANT"))
+                        retChildItm.Title = Convert.ToString(childItem("TITLE"))
+                        retChildItm.Names = Convert.ToString(childItem("NAMES"))
+                        retChildItm.Namel = Convert.ToString(childItem("NAMEL"))
+                        retChildItm.Url = Convert.ToString(childItem("URL"))
+                        If retChildItm.Url = "" Then
+                            retChildItm.Url = "~/OIL/ex/page_404.html"
+                        End If
+                        retTopLevelItm.ChildMenuItem.Add(retChildItm)
+                    Next childItem
+
+                End If
+                childItems = Nothing
+                If retTopLevelItm.Names = "" Then
+                    retTopLevelItm.Names = "　"
+                End If
+                retItm.Add(retTopLevelItm)
+            Next topLevelItm
+
+        End Using 'dt
+        Return retItm
+
+    End Function
     ''' <summary>
     ''' 表示用のガイダンスデータ取得
     ''' </summary>
@@ -199,18 +313,18 @@ Public Class M00001MENU
             .Add("GUIDANCENO", GetType(String))
             .Add("ENTRYDATE", GetType(String))
             .Add("TYPE", GetType(String))
-            .Add("TITTLE", GetType(String))
+            .Add("TITLE", GetType(String))
             .Add("NAIYOU", GetType(String))
-            .Add("FAILE1", GetType(String))
+            .Add("FILE1", GetType(String))
         End With
         Try
             Dim sqlStat As New StringBuilder
             sqlStat.AppendLine("SELECT GD.GUIDANCENO")
             sqlStat.AppendLine("      ,format(GD.INITYMD,'yyyy/M/d') AS ENTRYDATE")
             sqlStat.AppendLine("      ,GD.TYPE                       AS TYPE")
-            sqlStat.AppendLine("      ,GD.TITTLE                     AS TITTLE")
+            sqlStat.AppendLine("      ,GD.TITLE                      AS TITLE")
             sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
-            sqlStat.AppendLine("      ,GD.FAILE1                     AS FAILE1")
+            sqlStat.AppendLine("      ,GD.FILE1                      AS FILE1")
             sqlStat.AppendLine("  FROM oil.OIM0020_GUIDANCE GD")
             sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
             sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
@@ -241,9 +355,9 @@ Public Class M00001MENU
                         dr("GUIDANCENO") = sqlGuidDr("GUIDANCENO")
                         dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
                         dr("TYPE") = sqlGuidDr("TYPE")
-                        dr("TITTLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITTLE")))
+                        dr("TITLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITLE")))
                         dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU"))).Replace(ControlChars.CrLf, "<br />").Replace(ControlChars.Cr, "<br />").Replace(ControlChars.Lf, "<br />")
-                        dr("FAILE1") = Convert.ToString(sqlGuidDr("FAILE1"))
+                        dr("FILE1") = Convert.ToString(sqlGuidDr("FILE1"))
 
                         retDt.Rows.Add(dr)
                     End While
@@ -266,180 +380,165 @@ Public Class M00001MENU
                 Me.WF_HdnGuidanceUrl.Value = Convert.ToString(urlVal)
             End Using
         Catch ex As Exception
+            Return retDt
         End Try
 
         Return retDt
     End Function
     ''' <summary>
-    ''' Repeater_Menu_x バインドイベント(Handlesに含めたオブジェクトが対象)
+    ''' 画面表示用遷移ボタンアイテムクラス
     ''' </summary>
-    ''' <param name="sender">イベント発生オブジェクト</param>
-    ''' <param name="e"></param>
-    Protected Sub RptInfo_ItemDataBound_L(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.RepeaterItemEventArgs) _
-        Handles Repeater_Menu_L.ItemDataBound, Repeater_Menu_L2.ItemDataBound, Repeater_Menu_R.ItemDataBound,
-                Repeater_Menu_R2.ItemDataBound, Repeater_Menu_L3.ItemDataBound, Repeater_Menu_L4.ItemDataBound,
-                Repeater_Menu_R3.ItemDataBound, Repeater_Menu_R4.ItemDataBound
+    <Serializable>
+    Public Class MenuItem
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New()
+            Me.ChildMenuItem = New List(Of MenuItem)
+            Me.OpenChild = False
+        End Sub
+        ''' <summary>
+        ''' 列表示(PROFMAP:POSICOL)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PosiCol As Integer
+        ''' <summary>
+        ''' 行位置(PROFMAP:POSIROW) ⇒ 親クラスリストとして利用する場合は"1"のみ、子で再帰利用している箇所は"1"以外
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property RowLine As Integer
+        ''' <summary>
+        ''' 画面ＩＤ(PROFMAP:MAPID)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property MapId As String
+        ''' <summary>
+        ''' 変数(PROFMAP:VARIANT)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property [Variant] As String
+        ''' <summary>
+        ''' タイトル名称(PROFMAP:TITLENAMES)⇒左ナビのCSSクラス名として設定
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property Title As String
+        ''' <summary>
+        ''' 画面名称（短）(PROFMAP:MAPNAMES) ⇒ ボタン名称に設定
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Names As String
+        ''' <summary>
+        ''' 画面名称（長）(PROFMAP:MAPNAMEL) ⇒ 現状当プロパティに投入のみ未使用
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Namel As String
+        ''' <summary>
+        ''' URL（URLマスタ：URL）チルダ付き（アプリルート相対）の遷移URL
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property Url As String
+        ''' <summary>
+        ''' POSICOLが同一でROWLINが1以外の子データを格納
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ChildMenuItem As List(Of MenuItem)
+        ''' <summary>
+        ''' 子要素の表示状態
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>現状未使用：ポストバック発生時に閉じてしまったら利用検討</remarks>
+        Public Property OpenChild As Boolean = False
 
-        '★★★ Repeater_Menu_Lバインド時 編集（左） ★★★
-        '○ヘッダー編集 処理なし
-        If (e.Item.ItemType = ListItemType.Header) Then
-        End If
-
-        Dim dicSuffixList As New Dictionary(Of String, String) From {{"Repeater_Menu_L", "L"}, {"Repeater_Menu_L2", "L2"},
-                                                                     {"Repeater_Menu_R", "R"}, {"Repeater_Menu_R2", "R2"},
-                                                                     {"Repeater_Menu_L3", "L3"}, {"Repeater_Menu_L4", "L4"},
-                                                                     {"Repeater_Menu_R3", "R3"}, {"Repeater_Menu_R4", "R4"}}
-        Dim callRep As Repeater = DirectCast(sender, Repeater)
-        Dim repFieldSuffix As String = dicSuffixList(callRep.ID)
-
-        '○アイテム編集
-        If ((e.Item.ItemType = ListItemType.Item) Or (e.Item.ItemType = ListItemType.AlternatingItem)) Then
-            Dim repItem As Common.DbDataRecord = DirectCast(e.Item.DataItem, System.Data.Common.DbDataRecord)
-            Dim menuLabel As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuLabe_{0}", repFieldSuffix)), Label)
-            Dim menuVari As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuVARI_{0}", repFieldSuffix)), Label)
-            Dim menuUrl As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuURL_{0}", repFieldSuffix)), Label)
-            Dim menuMap As Label = DirectCast(e.Item.FindControl(String.Format("WF_MenuMAP_{0}", repFieldSuffix)), Label)
-            Dim menuButton As Button = DirectCast(e.Item.FindControl(String.Format("WF_MenuButton_{0}", repFieldSuffix)), Button)
-
-            menuLabel.Text = Convert.ToString(repItem("TITLE"))
-            menuVari.Text = Convert.ToString(repItem("VARIANT"))
-            If Convert.ToString(repItem("URL")) = "" Then
-                menuUrl.Text = String.Empty
-            Else
-                menuUrl.Text = Convert.ToString(repItem("URL"))
-            End If
-            menuMap.Text = Convert.ToString(repItem("MAPID"))
-            menuButton.Text = "  " & Convert.ToString(repItem("NAMES"))
-
-            If Convert.ToString(repItem("TITLE")) = "" Then
-                If Convert.ToString(repItem("NAMES")) = "" Then
-                    menuLabel.Text = "　　"
-                    menuLabel.Visible = False
-                    menuVari.Visible = False
-                    menuButton.Visible = False
-                    menuUrl.Visible = False
-                    menuMap.Visible = False
+        ''' <summary>
+        ''' 子要素を持っているか（デザイン判定用：▼表示判定）
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>ある程度「孫・ひ孫」対応できる構造だが現状「子」のみ</remarks>
+        Public ReadOnly Property HasChild As Boolean
+            Get
+                If ChildMenuItem Is Nothing OrElse ChildMenuItem.Count = 0 Then
+                    Return False
                 Else
-                    menuLabel.Visible = False
-                    menuVari.Visible = False
-                    menuButton.Visible = True
-                    menuUrl.Visible = False
-                    menuMap.Visible = False
+                    Return True
                 End If
-            Else
-                menuLabel.Visible = True
-                menuVari.Visible = False
-                menuButton.Visible = False
-                menuUrl.Visible = False
-                menuMap.Visible = False
-            End If
+            End Get
+        End Property
+        ''' <summary>
+        ''' メニュー２遷移可否（デザイン判定用：▶表示判定）
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property IsMenu2Link As Boolean
+            Get
+                '遷移先URLがM00002MENU.aspxで終わればメニュー２と判定
+                If Me.Url.EndsWith("M00002MENU.aspx") Then
+                    Return True
+                Else
+                    Return False
+                End If
+            End Get
+        End Property
+        ''' <summary>
+        ''' 次ページ遷移情報を持つか(True：次画面遷移あり、False：次画面遷移無し)
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property HasNextPageInfo As Boolean
+            Get
+                'MAPIDを持つか持たないかで判定
+                If Me.MapId.Trim.Equals("") Then
+                    Return False
+                Else
+                    Return True
+                End If
+            End Get
+        End Property
 
-        End If
+    End Class
 
-        '○フッター編集　 処理なし
-        If e.Item.ItemType = ListItemType.Footer Then
-        End If
-
+#Region "ViewStateを圧縮 個人用ペインでかなり大きくなると予想"
+    Protected Overrides Sub SavePageStateToPersistenceMedium(ByVal viewState As Object)
+        Dim lofF As New LosFormatter
+        Using sw As New IO.StringWriter
+            lofF.Serialize(sw, viewState)
+            Dim viewStateString = sw.ToString()
+            Dim bytes = Convert.FromBase64String(viewStateString)
+            bytes = CompressByte(bytes)
+            ClientScript.RegisterHiddenField("__VSTATE", Convert.ToBase64String(bytes))
+        End Using
     End Sub
+    Protected Overrides Function LoadPageStateFromPersistenceMedium() As Object
+        Dim viewState As String = Request.Form("__VSTATE")
+        Dim bytes = Convert.FromBase64String(viewState)
+        bytes = DeCompressByte(bytes)
+        Dim lofF = New LosFormatter()
+        Return lofF.Deserialize(Convert.ToBase64String(bytes))
+    End Function
     ''' <summary>
-    ''' Repeater_Menu_X ボタン押下時処理
+    ''' ByteDetaを圧縮
     ''' </summary>
-    ''' <param name="source"></param>
-    ''' <param name="e"></param>
-    Protected Sub Repeater_Menu_ItemCommand_L(source As Object, e As RepeaterCommandEventArgs) _
-        Handles Repeater_Menu_L.ItemCommand, Repeater_Menu_L2.ItemCommand, Repeater_Menu_R.ItemCommand,
-                Repeater_Menu_R2.ItemCommand, Repeater_Menu_L3.ItemCommand, Repeater_Menu_L4.ItemCommand,
-                Repeater_Menu_R3.ItemCommand, Repeater_Menu_R4.ItemCommand
-
-        Dim dicSuffixList As New Dictionary(Of String, String) From {{"Repeater_Menu_L", "L"}, {"Repeater_Menu_L2", "L2"},
-                                                                     {"Repeater_Menu_R", "R"}, {"Repeater_Menu_R2", "R2"},
-                                                                     {"Repeater_Menu_L3", "L3"}, {"Repeater_Menu_L4", "L4"},
-                                                                     {"Repeater_Menu_R3", "R3"}, {"Repeater_Menu_R4", "R4"}}
-        Dim callRep As Repeater = DirectCast(source, Repeater)
-        Dim repFieldSuffix As String = dicSuffixList(callRep.ID)
-
-        '共通宣言
-        '*共通関数宣言(BASEDLL)
-        Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
-        Dim CS0009MESSAGEout As New CS0009MESSAGEout        'Message out
-        Dim CS0007CheckAuthority As New CS0007CheckAuthority          'AUTHORmap
-
-        '★★★ ボタン押下時、画面遷移（左） ★★★
-        '○ボタン押下時、画面遷移情報取得
-        Dim WW_COUNT As Integer = e.Item.ItemIndex
-        Dim repItem As RepeaterItem = callRep.Items(WW_COUNT)
-        Dim WW_URL As Label = DirectCast(repItem.FindControl(String.Format("WF_MenuURL_{0}", repFieldSuffix)), Label)
-        Dim WW_VARI As Label = DirectCast(repItem.FindControl(String.Format("WF_MenuVARI_{0}", repFieldSuffix)), Label)
-        Dim WW_MAPID As Label = DirectCast(repItem.FindControl(String.Format("WF_MenuMAP_{0}", repFieldSuffix)), Label)
-
-        '○画面遷移権限チェック（左）
-        CS0007CheckAuthority.MAPID = WW_MAPID.Text
-        CS0007CheckAuthority.ROLECODE_MAP = Master.ROLE_MAP
-        CS0007CheckAuthority.check()
-        If isNormal(CS0007CheckAuthority.ERR) Then
-            If CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.REFERLANCE OrElse
-               CS0007CheckAuthority.MAPPERMITCODE = C_PERMISSION.UPDATE Then
-                CS0050Session.VIEW_PERMIT = CS0007CheckAuthority.MAPPERMITCODE
-                CS0050Session.VIEW_MAPID = WW_MAPID.Text
-                CS0050Session.VIEW_MAP_VARIANT = WW_VARI.Text
-                CS0050Session.MAP_ETC = ""
-
-                Master.MAPvariant = WW_VARI.Text
-                Master.MAPID = WW_MAPID.Text
-                Master.MAPpermitcode = CS0007CheckAuthority.MAPPERMITCODE
-                Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
-                Master.ShowMessage()
-
-            Else
-                Master.Output(C_MESSAGE_NO.AUTHORIZATION_ERROR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-                Master.ShowMessage()
-
-                Exit Sub
-            End If
-        Else
-            Master.Output(CS0007CheckAuthority.ERR, C_MESSAGE_TYPE.ABORT, "画面:" & WW_MAPID.Text)
-            Master.ShowMessage()
-
-            Exit Sub
-        End If
-        'セッション変数クリア
-        HttpContext.Current.Session("Selected_STYMD") = ""
-        HttpContext.Current.Session("Selected_ENDYMD") = ""
-
-        HttpContext.Current.Session("Selected_USERIDFrom") = ""
-        HttpContext.Current.Session("Selected_USERIDTo") = ""
-        HttpContext.Current.Session("Selected_USERIDG1") = ""
-        HttpContext.Current.Session("Selected_USERIDG2") = ""
-        HttpContext.Current.Session("Selected_USERIDG3") = ""
-        HttpContext.Current.Session("Selected_USERIDG4") = ""
-        HttpContext.Current.Session("Selected_USERIDG5") = ""
-
-        HttpContext.Current.Session("Selected_MAPIDPFrom") = ""
-        HttpContext.Current.Session("Selected_MAPIDPTo") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG1") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG2") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG3") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG4") = ""
-        HttpContext.Current.Session("Selected_MAPIDPG5") = ""
-
-        HttpContext.Current.Session("Selected_MAPIDFrom") = ""
-        HttpContext.Current.Session("Selected_MAPIDTo") = ""
-        HttpContext.Current.Session("Selected_MAPIDG1") = ""
-        HttpContext.Current.Session("Selected_MAPIDG2") = ""
-        HttpContext.Current.Session("Selected_MAPIDG3") = ""
-        HttpContext.Current.Session("Selected_MAPIDG4") = ""
-        HttpContext.Current.Session("Selected_MAPIDG5") = ""
-        'ボタン押下時、画面遷移
-        Server.Transfer(WW_URL.Text)
-
-    End Sub
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function CompressByte(data As Byte()) As Byte()
+        Using ms As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(ms, IO.Compression.CompressionMode.Compress)
+            ds.Write(data, 0, data.Length)
+            ds.Close()
+            Return ms.ToArray
+        End Using
+    End Function
     ''' <summary>
-    ''' ガイダンスリンク押下時
+    ''' Byteデータを解凍
     ''' </summary>
-    Private Sub WF_ButtonShowGuidance_Click()
-        Dim guidanceNo As String = WF_ButtonClick.Value.Replace("WF_ButtonShowGuidance", "")
-        Me.SelectedGuidanceNo = guidanceNo
-        'ボタン押下時、画面遷移
-        Server.Transfer(Me.WF_HdnGuidanceUrl.Value)
-    End Sub
+    ''' <param name="data"></param>
+    ''' <returns></returns>
+    Public Function DeCompressByte(data As Byte()) As Byte()
+        Using inpMs As New IO.MemoryStream(data),
+              outMs As New IO.MemoryStream,
+              ds As New IO.Compression.DeflateStream(inpMs, IO.Compression.CompressionMode.Decompress)
+            ds.CopyTo(outMs)
+            Return outMs.ToArray
+        End Using
+
+    End Function
+#End Region
 End Class

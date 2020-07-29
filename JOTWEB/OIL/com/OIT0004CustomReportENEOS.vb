@@ -130,10 +130,6 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
             ' 値の設定
             EditValuesArea()
 
-            '* 油種（行）、日付（列）を元に雛形の罫線を拡張し体裁を整える
-            'Dim posInfo As ExcelPositions = ExtentDisplayFormat()
-            ''* 数値埋め処理
-            'EditNumberArea(posInfo)
             '***** 生成処理群ここまで *****
             '休日シート非表示
             Me.ExcelHolidaysSheet.Visible = Excel.XlSheetVisibility.xlSheetHidden
@@ -193,22 +189,72 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
         Dim rngDateStart As Excel.Range = Nothing
         'Dim rowSettings As New Dictionary(Of String, Dictionary(Of String, String))
         Dim rowSettings As New Dictionary(Of String, String) From
-               {{"RNG_{0}_HG_ROWNAME", "1001"},
-                {"RNG_{0}_RG_ROWNAME", "1101"},
-                {"RNG_{0}_KE_ROWNAME", "1302"},
-                {"RNG_{0}_GO_ROWNAME", "1401"},
-                {"RNG_{0}_3GO_ROWNAME", "1404"},
-                {"RNG_{0}_A_ROWNAME", "2101"},
-                {"RNG_{0}_LSA_ROWNAME", "2201"}}
+               {{"1001", "RNG_{0}_HG_ROWNAME"},
+                {"1101", "RNG_{0}_RG_ROWNAME"},
+                {"1302", "RNG_{0}_KE_ROWNAME"},
+                {"1401", "RNG_{0}_GO_ROWNAME"},
+                {"1404", "RNG_{0}_3GO_ROWNAME"},
+                {"2101", "RNG_{0}_A_ROWNAME"},
+                {"2201", "RNG_{0}_LSA_ROWNAME"}}
+        Dim rngPrefix As String = "H"
 
         Try
             '起点年月日の設定、他の日付はExcel数式で+1日・・・と設定しているので不要
             rngDateStart = Me.ExcelWorkSheet.Range("RNG_FIRSTDATE")
             rngDateStart.Value = Me.HokushinData.StockDate.Values.First.ItemDate
             For Each printObj In {Me.HokushinData, Me.KouhuData}
-                If printObj.Consignee = "10" Then
-
+                If printObj.Consignee <> "10" Then
+                    rngPrefix = "K"
                 End If
+                Dim rngTargetRow As Excel.Range = Nothing
+                Dim rngOffset As Excel.Range = Nothing
+                Dim rngResize As Excel.Range = Nothing
+                Dim targetRowName As String
+                Dim pasteColHeader(0, 4) As Object
+                Dim pasteColUkeire(0, 2) As Object
+                For Each oilItm In printObj.StockList.Values
+                    If rowSettings.ContainsKey(oilItm.OilInfo.OilCode) = False Then
+                        Continue For
+                    End If
+                    targetRowName = rowSettings(oilItm.OilInfo.OilCode)
+                    targetRowName = String.Format(targetRowName, rngPrefix)
+                    rngTargetRow = Me.ExcelWorkSheet.Range(targetRowName)
+                    '列見出し部分の数値格納
+                    rngOffset = rngTargetRow.Offset(ColumnOffset:=1)
+                    rngResize = rngOffset.Resize(ColumnSize:=5)
+                    pasteColHeader(0, 0) = oilItm.TankCapacity '安全容量
+                    pasteColHeader(0, 1) = oilItm.DS 'D/S
+                    pasteColHeader(0, 2) = oilItm.Stock80  '80%在庫
+                    pasteColHeader(0, 3) = oilItm.LastShipmentAve
+                    '初日は朝在庫設定
+                    pasteColHeader(0, 4) = oilItm.StockItemList.Values.First.MorningStockWithoutDS
+                    rngResize.Value = pasteColHeader
+
+                    ExcelMemoryRelease(rngResize)
+                    ExcelMemoryRelease(rngOffset)
+                    '日付毎のループ
+                    Dim loopcnt = 0
+                    For Each daysItm In oilItm.StockItemList.Values
+                        '受入数量（３カラム分の設定）
+                        rngOffset = rngTargetRow.Offset(ColumnOffset:=7 + (7 * loopcnt))
+                        rngResize = rngOffset.Resize(ColumnSize:=3)
+                        pasteColUkeire(0, 0) = daysItm.Print1stPositionVal
+                        pasteColUkeire(0, 1) = daysItm.Print2ndPositionVal
+                        pasteColUkeire(0, 2) = daysItm.Print3rdPositionVal
+                        rngResize.Value = pasteColUkeire
+                        ExcelMemoryRelease(rngResize)
+                        ExcelMemoryRelease(rngOffset)
+                        '払出数量の設定
+                        rngOffset = rngTargetRow.Offset(ColumnOffset:=11 + (7 * loopcnt))
+                        rngOffset.Value = CDec(daysItm.Send)
+                        ExcelMemoryRelease(rngOffset)
+                        loopcnt = loopcnt + 1
+                    Next
+                    ExcelMemoryRelease(rngTargetRow)
+
+
+                Next
+                ExcelMemoryRelease(rngTargetRow)
             Next printObj
         Catch ex As Exception
             Throw
@@ -216,221 +262,7 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
             ExcelMemoryRelease(rngDateStart)
         End Try
     End Sub
-    ''' <summary>
-    ''' 一覧表の数字部分の設定
-    ''' </summary>
-    ''' <param name="posInfo"></param>
-    Private Sub EditNumberArea(posInfo As ExcelPositions)
-        'Dim rngAllCell As Excel.Range = Nothing
-        'Dim rngBasePasteArea As Excel.Range = Nothing
-        'Dim rngPasteArea As Excel.Range = Nothing
-        'Try
-        '    Dim targetDataList As New List(Of OIT0004OilStockCreate.DispDataClass)
-        '    targetDataList.Add(Me.PrintData)
-        '    If Me.PrintData.HasMoveInsideItem Then
-        '        targetDataList.Add(Me.PrintData.MiDispData)
-        '    End If
-        '    Dim loopCnt As Integer = 0
-        '    For Each prnItm In targetDataList
-        '        '一括貼り付け用の領域定義
-        '        '在庫部分
-        '        Dim morningStock(,) As Object '初日のみ設定他は数式の為1セル
-        '        Dim pastDaysCnt As Integer = 0 '朝在庫保持日数
-        '        Dim qPastDaysCnt = (From daysItm In prnItm.StockDate.Values Where daysItm.IsPastDay)
-        '        If qPastDaysCnt.Any Then
-        '            pastDaysCnt = qPastDaysCnt.Count - 1
-        '        End If
-        '        ReDim morningStock(0, pastDaysCnt)
-        '        Dim ukrireHaraiDasiNums As Object(,) '受入払出
-        '        Dim hoyuNums As Object(,) '保有日数
 
-        '        '車数部分
-        '        Dim syaSu As Object(,)
-        '        'ローリー部分
-        '        Dim lorryNum As Object(,)
-        '        Dim oilCnt As Integer = 0
-        '        Dim daysMax = prnItm.StockDate.Count - 1
-        '        rngAllCell = Me.ExcelWorkSheet.Cells
-        '        Dim firstRowNum As Integer = posInfo.FirstRowNum
-        '        If loopCnt = 1 Then
-        '            firstRowNum = posInfo.MiFirstRowNum
-        '        End If
-        '        Dim rngStartCell As Excel.Range = DirectCast(rngAllCell(firstRowNum, 7), Excel.Range)
-        '        Dim rngEndCell As Excel.Range = DirectCast(rngAllCell(firstRowNum + 10 - 1, 7 + daysMax), Excel.Range)
-        '        rngBasePasteArea = Me.ExcelWorkSheet.Range(rngStartCell, rngEndCell)
-        '        ExcelMemoryRelease(rngStartCell)
-        '        ExcelMemoryRelease(rngEndCell)
-        '        ExcelMemoryRelease(rngAllCell)
-        '        'ExcelMemoryRelease(rngAllCell)
-        '        '通常部油種別ループ
-        '        For Each oilItem In prnItm.StockList.Values
-        '            ReDim ukrireHaraiDasiNums(1, daysMax)
-        '            ReDim hoyuNums(0, daysMax)
-        '            ReDim syaSu(1, daysMax)
-        '            ReDim lorryNum(0, daysMax)
-        '            Dim trainNumList As OIT0004OilStockCreate.PrintTrainNumCollection = Nothing
-        '            If prnItm.PrintTrainNums.ContainsKey(oilItem.OilInfo.OilCode) Then
-        '                trainNumList = prnItm.PrintTrainNums(oilItem.OilInfo.OilCode)
-        '            Else
-        '                trainNumList = Nothing
-        '            End If
-        '            '日付別ループ
-        '            Dim daysCnt As Integer = 0
-        '            For Each dateItem In oilItem.StockItemList.Values
-
-        '                If daysCnt <= pastDaysCnt Then
-        '                    morningStock(0, daysCnt) = CDec(dateItem.MorningStock)
-        '                End If
-        '                '受入数
-        '                ukrireHaraiDasiNums(0, daysCnt) = CDec(dateItem.Receive)
-        '                '払出数
-        '                ukrireHaraiDasiNums(1, daysCnt) = CDec(dateItem.Send)
-        '                '保有日数
-        '                If daysCnt <= 6 Then
-        '                    '緑のエラーポップマークが付くので無意味ですが同じ数式
-        '                    hoyuNums(0, daysCnt) = "=IFERROR(R[-4]C/(SUMIFS(R[-2]C[-6]:R[-2]C,R4C[-6]:R4C,""<>(日)"") / 6),"""")" '''"="""""
-        '                Else
-        '                    '出荷可能数量 / ([日曜を含まない当日含む払出数] / 6) ※エラーの場合ブランク
-        '                    '上記コメント通りの数式を設定
-        '                    hoyuNums(0, daysCnt) = "=IFERROR(R[-4]C/(SUMIFS(R[-2]C[-6]:R[-2]C,R4C[-6]:R4C,""<>(日)"") / 6),"""")"
-        '                End If
-        '                'hoyuNums(0, daysCnt) = dateItem.Retentiondays
-        '                If trainNumList IsNot Nothing AndAlso trainNumList.PrintTrainNumList.Count > 0 Then
-        '                    syaSu(0, daysCnt) = trainNumList.PrintTrainNumList.Values(0).PrintTrainItems.Values(daysCnt).TrainNum
-        '                    If trainNumList.PrintTrainNumList.Count > 1 Then
-        '                        syaSu(1, daysCnt) = trainNumList.PrintTrainNumList.Values(1).PrintTrainItems.Values(daysCnt).TrainNum
-        '                    Else
-        '                        syaSu(1, daysCnt) = ""
-        '                    End If
-        '                Else
-        '                    syaSu(0, daysCnt) = ""
-        '                    syaSu(1, daysCnt) = ""
-        '                End If
-        '                'ローリー受入
-
-        '                lorryNum(0, daysCnt) = CDec(dateItem.ReceiveFromLorry)
-        '                daysCnt = daysCnt + 1
-        '            Next dateItem
-        '            'Excelに貼り付け
-        '            rngPasteArea = rngBasePasteArea.Offset(RowOffset:=10 * oilCnt)
-        '            Dim rngRowsObj As Excel.Range = Nothing
-        '            Dim rngPasteRow As Excel.Range = Nothing
-        '            Dim rngPasteResized As Excel.Range = Nothing
-        '            Try
-        '                '朝在庫
-        '                rngPasteRow = DirectCast(rngPasteArea(1, 1), Excel.Range)
-        '                rngPasteResized = rngPasteRow.Resize(ColumnSize:=pastDaysCnt + 1)
-        '                rngPasteResized.Value = morningStock
-        '                ExcelMemoryRelease(rngPasteResized)
-        '                ExcelMemoryRelease(rngPasteRow)
-        '                '受入払出
-        '                rngRowsObj = rngPasteArea.Rows
-        '                rngPasteRow = DirectCast(rngRowsObj("3:4"), Excel.Range)
-        '                rngPasteRow.Value = ukrireHaraiDasiNums
-        '                ExcelMemoryRelease(rngPasteRow)
-        '                '保有日数
-        '                'targetRowObj = DirectCast(rngPasteArea.Rows("6:6"), Excel.Range)
-        '                rngPasteRow = DirectCast(rngRowsObj("6:6"), Excel.Range)
-        '                rngPasteRow.FormulaR1C1 = hoyuNums
-        '                ExcelMemoryRelease(rngPasteRow)
-        '                '車数
-        '                rngPasteRow = DirectCast(rngRowsObj("7:8"), Excel.Range)
-        '                rngPasteRow.Value = lorryNum
-        '                ExcelMemoryRelease(rngPasteRow)
-        '                '車数
-        '                rngPasteRow = DirectCast(rngRowsObj("10:10"), Excel.Range)
-        '                rngPasteRow.Value = lorryNum
-        '                ExcelMemoryRelease(rngPasteRow)
-        '                'Rowsオブジェクトの解放
-        '                ExcelMemoryRelease(rngRowsObj)
-        '            Catch ex As Exception
-        '                Throw
-        '            Finally
-        '                ExcelMemoryRelease(rngPasteResized)
-        '                ExcelMemoryRelease(rngPasteRow)
-        '                ExcelMemoryRelease(rngPasteArea)
-        '            End Try
-        '            oilCnt = oilCnt + 1
-        '            ExcelMemoryRelease(rngPasteArea)
-        '        Next oilItem
-        '        ExcelMemoryRelease(rngBasePasteArea)
-        '        ExcelMemoryRelease(rngAllCell)
-        '        loopCnt = loopCnt + 1
-        '    Next prnItm
-        '    ExcelMemoryRelease(rngBasePasteArea)
-        '    ExcelMemoryRelease(rngAllCell)
-        'Catch ex As Exception
-        '    Throw
-        'Finally
-        '    ExcelMemoryRelease(rngBasePasteArea)
-        '    ExcelMemoryRelease(rngAllCell)
-        'End Try
-
-    End Sub
-    ''' <summary>
-    ''' 帳票色設定クラス
-    ''' </summary>
-    Private Class OilTypeColorSettings
-        Private ColorSettings As Dictionary(Of String, OilTypeColorSetting)
-        ''' <summary>
-        ''' コンストラクタ
-        ''' </summary>
-        Public Sub New()
-            Me.ColorSettings = New Dictionary(Of String, OilTypeColorSetting)
-            'ハイオク
-            Me.ColorSettings.Add("1001", New OilTypeColorSetting(RGB(255, 255, 0), RGB(20, 23, 26)))
-            'レギュラー
-            Me.ColorSettings.Add("1101", New OilTypeColorSetting(RGB(255, 192, 0), RGB(255, 255, 255)))
-            '灯油
-            Me.ColorSettings.Add("1301", New OilTypeColorSetting(RGB(255, 255, 255), RGB(20, 23, 26)))
-            '未添加灯油
-            Me.ColorSettings.Add("1302", New OilTypeColorSetting(RGB(221, 245, 253), RGB(20, 23, 26)))
-            '軽油
-            Me.ColorSettings.Add("1401", New OilTypeColorSetting(RGB(0, 176, 80), RGB(255, 255, 255)))
-            '3号軽油
-            Me.ColorSettings.Add("1404", New OilTypeColorSetting(RGB(146, 208, 80), RGB(255, 255, 255)))
-            'A重油
-            Me.ColorSettings.Add("2101", New OilTypeColorSetting(RGB(0, 112, 192), RGB(255, 255, 255)))
-            'LSA
-            Me.ColorSettings.Add("2201", New OilTypeColorSetting(RGB(0, 176, 240), RGB(255, 255, 255)))
-        End Sub
-        ''' <summary>
-        ''' 油種別の色情報取得
-        ''' </summary>
-        ''' <param name="oilTypeCode"></param>
-        ''' <returns></returns>
-        Public Function GetColor(oilTypeCode As String) As OilTypeColorSetting
-            If Me.ColorSettings.ContainsKey(oilTypeCode) Then
-                Return Me.ColorSettings(oilTypeCode)
-            Else
-                Return New OilTypeColorSetting(RGB(51, 152, 109), RGB(255, 255, 255))
-            End If
-        End Function
-
-    End Class
-    ''' <summary>
-    ''' 色設定クラス
-    ''' </summary>
-    Private Class OilTypeColorSetting
-        ''' <summary>
-        ''' コンストラクタ
-        ''' </summary>
-        Public Sub New(backGroundColor As Integer, fontColor As Integer)
-            Me.BackGroundColor = backGroundColor
-            Me.FontColor = fontColor
-        End Sub
-
-        ''' <summary>
-        ''' 背景色
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property BackGroundColor As Integer
-        ''' <summary>
-        ''' 文字色
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property FontColor As Integer
-    End Class
     ''' <summary>
     ''' Excelオブジェクトの解放
     ''' </summary>
@@ -452,32 +284,6 @@ Public Class OIT0004CustomReportENEOS : Implements IDisposable
         End If
 
     End Sub
-    ''' <summary>
-    ''' エクセルの座標保持クラス
-    ''' </summary>
-    Private Class ExcelPositions
-        ''' <summary>
-        ''' 通常の開始位置
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property FirstRowNum As Integer
-        ''' <summary>
-        ''' 通常の終了位置
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property LastRowNum As Integer
-        ''' <summary>
-        ''' 構内取り開始位置
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property MiFirstRowNum As Integer
-        ''' <summary>
-        ''' 構内取り終了位置
-        ''' </summary>
-        ''' <returns></returns>
-        Public Property MiLastRowNum As Integer
-
-    End Class
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' 重複する呼び出しを検出するには
 

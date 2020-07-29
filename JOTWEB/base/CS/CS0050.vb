@@ -552,6 +552,21 @@ Public Class CS0050SESSION : Implements IDisposable
         End Set
     End Property
     ''' <summary>
+    ''' メニューリスト表示リスト
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property UserMenuCostomList As List(Of UserMenuCostomItem)
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return DirectCast(SESSION(C_SESSION_KEY.USERMENU_COSTOM_LIST), List(Of UserMenuCostomItem))
+        End Get
+
+        Set(value As List(Of UserMenuCostomItem))
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.USERMENU_COSTOM_LIST) = value
+        End Set
+    End Property
+    ''' <summary>
     ''' DBの接続情報を作成する
     ''' </summary>
     ''' <param name="connect"></param>
@@ -583,6 +598,40 @@ Public Class CS0050SESSION : Implements IDisposable
 
         End If
     End Sub
+    ''' <summary>
+    ''' ユーザーメニューのカスタマイズ
+    ''' </summary>
+    Public Class UserMenuCostomItem
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New(outputId As String, onOff As String, sortNo As Integer)
+            Me.OutputId = outputId
+            If onOff = "1" Then
+                Me.OnOff = True
+            Else
+                Me.OnOff = False
+            End If
+
+            Me.SortNo = sortNo
+        End Sub
+
+        ''' <summary>
+        ''' 表示ID
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OutputId As String
+        ''' <summary>
+        ''' 表示非表示(True:表示,False:非表示)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OnOff As Boolean
+        ''' <summary>
+        ''' 並び順
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property SortNo As Integer
+    End Class
 End Class
 
 

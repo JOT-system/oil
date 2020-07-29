@@ -1,205 +1,230 @@
 ﻿/* ------------------------------
- 凡例
------------------------------- */
-
-/*
-h1 { color: red; }			--> h1要素に対して指定 
-h1, h2 { color: red; }		-->  h1 と h2要素に対して指定 
-ul li { color: red; }		-->  <ul>～</ul> の中にある li要素に対して指定 
-.sample { color: red; }		-->  class="sample" を持つ要素に対して指定 
-#sample { color: red; }		-->  id="sample" を持つ要素に対して指定 
-h1.sample { color: red; }	-->  class="sample" を持つ div要素に対して指定 
-a:link { color: red; }		-->  <a href="..."> のリンク(未訪問)に対して指定 
-*/
-
-/* ------------------------------
  擬似フレーム　スタイル定義
 ------------------------------ */
 
 #Menuheaderbox {
-    width: 100%;
-    min-width: 980px;
+    width: calc(100% - 2px);
     height: 100%;
-    overflow: hidden;
-    border-top: 1px solid rgb(255, 255, 255);
-    border-left: 1px solid rgb(255, 255, 255);
-    border-right: 1px solid rgb(255, 255, 255);
-    background-color: rgb(255, 255, 255);
-    display: flex; /* フレックス表示 */
-    flex-wrap: wrap;
-    box-sizing: border-box;
+    background-color: rgb(237,237,237);
 }
 
-
-/* メニュー枠の共通設定(色や画像は後述スタイルで個別設定)(aタグIDが"Menu_"で始まるもの) */
-a[id^="Menu_"] {
-    display: block; /* Block要素に変更 */
-    border: 1px solid rgb(255, 255, 255);
-    width: 25%; /* 4列にするため100% ÷ 4 これで4あふれた幅で折り返し2行になる */
-    height: 50%; /* 2行にするため50% */
-    overflow-y: auto;
-    overflow-x: hidden; /* 横スクロールはなし */
+.menuMain {
+    width: 100%;
+    min-width:710px;
+    height: 100%;
+    overflow: auto;
     box-sizing: border-box;
-    /* 以下イメージの共通設定 */
-    background-repeat: no-repeat;
-    background-position: left 2pt bottom 2pt;
-    background-size: 25%;
+    font-size: 0;
 }
-/* メニュー枠内のテーブル設定 */
-a[id^="Menu_"] table {
-    width:100%;
+.sideMenu, .guidance, .parsonalParts {
+    font-size: 16px;
 }
-a[id^="Menu_"] table td {
-    max-width:100%;
-}
-/* メニュー枠内タイトルの共通設定(色や画像は後述スタイルで個別設定)(spanタグIDが"WF_MenuLabe_"で始まるもの) */
-span[id*=WF_MenuLabe_] {
+
+.sideMenu {
+    width: 250px;
+    //height: calc(100% - 4px);
+    height: auto;
     display: inline-block;
-    overflow: hidden;
-    width: 100%;
-    max-width:100%;
-    color: rgba(56, 56, 56, 0.6);
-    text-align: left;
-    font-weight: 600;
-    font-size: 5ex;
+    vertical-align: top;
+    box-sizing: border-box;
+    //background-color: blue;
 }
-/* メニュー枠内ボタンの共通設定 */
-a[id^="Menu_"] input[type=submit] {
-    width: calc(100% - 2em); /* 全体幅から当マージン分を引く */
-    max-width: calc(100% - 2em); /* 全体幅から当マージン分を引く */
-    color: white;
-    /* background-color: rgba(255, 255, 255,0.1); */  /* transparent → 白の透明度90% 0.1を増加させれば白が増します */
-    border-left-width: 4px;
-    border-right-width: 2px;
-    border-top-style: none;
-    border-right-style: solid;
-    border-bottom-style: none;
-    border-left-style: solid;
-    border-color: rgba(56,56,56,0.4);
-    font-size: 20px;
-    height: 30px;
-    font-weight: 600;
-    text-align: left;
-    margin-left: 2em;
-    overflow: hidden;
-    white-space: nowrap;
-    padding-left: 3px;
-    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.33);
+.guidance_parsonalArea {
+    width: calc(100% - 255px);
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
 }
-/*在庫管理メニュー表示*/
-#Menu_L {
-    background-image: url(../img/oiltank.png);
-}
-#Menu_L, #Menu_L input[type=submit] {
-    background-color: #8DCF3F;
-}
-#Menu_L input[type=submit]:hover {
-    background-color: #58BE89;
-}
-/*受注管理メニュー表示*/
-#Menu_L2 {
-    background-image: url(../img/order.png);
-}
-#Menu_L2, #Menu_L2 input[type=submit] {
-    background-color: #44DEDE;
-}
-#Menu_L2 input[type=submit]:hover {
-    background-color: #40AAEF;
-}
-/*請求支払管理メニュー表示*/
-#Menu_L3 {
-    background-image: url(../img/pay.png);
-}
-#Menu_L3, #Menu_L3 input[type=submit] {
-    background-color: #FDC44F;
-}
-#Menu_L3 input[type=submit]:hover {
-    background-color: #FBA848;
-}
-/*タンク車所在管理メニュー表示*/
-#Menu_L4 {
-    background-image: url(../img/tank.png);
-}
-#Menu_L4, #Menu_L4 input[type=submit] {
-    background-color: #CC6699;
-}
-#Menu_L4 input[type=submit]:hover {
-    background-color: #990066;
-}
-/*回送管理メニュー表示*/
-#Menu_R {
-    background-image: url(../img/foward.png);
-}
-#Menu_R, #Menu_R input[type=submit] {
-    background-color: #F58E7E;
-}
-#Menu_R input[type=submit]:hover {
-    background-color: #F27398;
-}
-/*マスタ管理メニュー表示*/
-#Menu_R2 {
-    background-image: url(../img/master.png);
-}
-#Menu_R2, #Menu_R2 input[type=submit] {
-    background-color: #93B8CA;
-}
-#Menu_R2 input[type=submit]:hover {
-    background-color: #0E7AC4;
-}
-/*実績・統計メニュー表示*/
-#Menu_R3 {
-    background-image: url(../img/statistics.png);
-}
-#Menu_R3, #Menu_R3 input[type=submit] {
-    background-color: #CCCCCC;
-}
-#Menu_R3 input[type=submit]:hover {
-    background-color: #737373;
-}
-/*データ連携メニュー表示*/
-#Menu_R4 {
-    background-image: url(../img/datalink.png);
-}
-#Menu_R4, #Menu_R4 input[type=submit] {
-    background-color: #55efc4;
-}
-#Menu_R4 input[type=submit]:hover {
-    background-color: #00b894;
-}
-a[id^="Menu_"] input[type=submit] {
-    background-image: linear-gradient(0deg, RGBA(0,0,0,0.1),RGBA(0,0,0,0.1));
-    outline: none;
-}
-/* **************************
-    ガイダンス関連
-************************** */
 .guidance {
-    border: 1px solid rgb(255, 255, 255);
-    height: 100px;
+    padding-top:5px;
+    height: 150px;
     width: 100%;
-    //overflow-y: auto;
-    overflow: hidden; /* 横スクロールはなし */
+    box-sizing: border-box;
+    overflow: hidden;
     position: relative;
 }
+.parsonalParts {
+    //height: calc(100% - 100px);
+    min-height:100px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius:2px;
+}
+/* ********************** */
+/* 左ナビゲーションの設定 */
+/* ********************** */
+div.parentMenu > input[type=checkbox] {
+    display: none;
+}
+div.parentMenu {
+    display: block;
+    vertical-align: middle;
+    width: 100%;
+    //height: 50px;
+}
+div.parentMenu > input[type=checkbox] + label,
+.childMenu label {
+    margin: 5px;
+    display: block;
+    text-align: left;
+    padding-left: 10px;
+    padding-top: 12px;
+    width: calc(100% - 12px);
+    height: 50px;
+    background-color: rgb(15,39,61);
+    color: rgb(255,255,255);
+    //font-weight: bold;
+    font-size: 22px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    position:relative;
+    -ms-user-select: none;
+    user-select:none; /* ボタン認識の為ユーザー選択させない */
+}
+.childMenu label {
+    background-color: rgb(22,58,90);
+}
+
+div.parentMenu > input[type=checkbox] + label:hover {
+    outline: 1px solid rgb(15,39,61);
+    background-color: rgba(15,39,61,0.5);
+    color: rgb(15,39,61);
+}
+.childMenu label:hover {
+    outline: 1px solid rgb(22,58,90);
+    background-color: rgba(22,58,90,0.15);
+    color: rgb(22,58,90);
+}
+/* 左ナビゲーション画像の共通設定 */
+div.parentMenu > input[type=checkbox] + label:before,
+.childMenu label:before{
+    margin-top: -2px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    content: " ";
+    background-image: none;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: contain;
+    float: left;
+    margin-right: 10px;
+}
+/* 左ナビゲーション画像：在庫管理 */
+div.parentMenu.Inventory > input[type=checkbox] + label:before {
+    background-image: url(../img/oiltank.png);
+}
+/* 左ナビゲーション画像：受注管理 */
+div.parentMenu.Order > input[type=checkbox] + label:before {
+    background-image: url(../img/order.png);
+}
+/* 左ナビゲーション画像：回送管理 */
+div.parentMenu.Forwarding > input[type=checkbox] + label:before {
+    background-image: url(../img/foward.png);
+}
+/* 左ナビゲーション画像：回送管理 */
+div.parentMenu.Master > input[type=checkbox] + label:before {
+    background-image: url(../img/master.png);
+}
+/* 左ナビゲーション画像：請求支払管理 */
+div.parentMenu.Billing > input[type=checkbox] + label:before {
+    background-image: url(../img/pay.png);
+}
+/* 左ナビゲーション画像：タンク車所在管理 */
+div.parentMenu.Location > input[type=checkbox] + label:before {
+    background-image: url(../img/tank.png);
+}
+/* 左ナビゲーション画像：実績・統計 */
+div.parentMenu.Report > input[type=checkbox] + label:before {
+    background-image: url(../img/statistics.png);
+}
+/* 左ナビゲーション画像：実績・統計 */
+div.parentMenu.DataLinkage > input[type=checkbox] + label:before {
+    background-image: url(../img/datalink.png);
+}
+/* 左ナビゲーション：アコーディオン展開マーク */
+div.parentMenu.hasChild > input[type=checkbox] + label {
+    padding-right: 11px;
+}
+div.parentMenu.hasChild > input[type=checkbox] + label:after {
+    position:absolute;
+    top:calc(50% - 12px);
+    right:-5px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    content: "▼";
+    background-image: none;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+div.parentMenu.hasChild > input[type=checkbox]:checked + label:after {
+    content: "▲";
+}
+/* 左ナビゲーション：メニュー２への誘導マーク */
+div.parentMenu.menu2Link > input[type=checkbox] + label {
+    padding-right: 11px;
+}
+div.parentMenu.menu2Link > input[type=checkbox] + label:after {
+    position:absolute;
+    top:calc(50% - 12px);
+    right:-5px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    content: "▶";
+    background-image: none;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* 左ナビゲーション アコーディオン */
+div.parentMenu > input[type=checkbox] + label + div {
+    display:none;
+}
+div.parentMenu > input[type=checkbox]:checked + label + div {
+    display:block;
+}
+/* ********************** */
+/* ガイダンスの設定       */
+/* ********************** */
 #guidanceList {
-    height: calc(100px - 2px);
+    height: calc(110px - 2px);
     width: calc(100% - 2px);
     //border: solid 1px gray;
     border-radius: 2px;
     background-color: rgb(241,208,227);
     padding-bottom: 5px;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 #guidanceOpenCloseWrapper {
     width: 100%;
     text-align: center;
-    position: absolute;
-    bottom:8px;
+    //position: absolute;
+    //bottom:8px;
+    height:10px;
 }
 #guidanceOpenClose {
-    position: fixed;
-    left: calc(50% - 100px);
-    z-index: 31;
+    //position: fixed;
+    //left: calc(50% - 100px);
+    //z-index: 31;
+    background-color: rgba(241, 208, 227, 1);
+}
+/* ガイダンス表示非表示が左ナビボタンに貫通しないよう調整 */
+@media all and (max-width: 710px) {
+    #guidanceOpenClose {
+        left: 260px;
+    }
 }
 #guidanceOpenCloseButton {
     color: white;
@@ -222,6 +247,12 @@ a[id^="Menu_"] input[type=submit] {
     padding-bottom: 2px;
     vertical-align :top;
 }
+.guidanceTable tr:last-child td {
+    padding-bottom: 10px;
+}
+.guidanceTable a:hover {
+    color:rgb(252, 136, 48)
+}
 div.showGuidance a[id^="Menu_"] {
     height: calc(50% - 50px);
 }
@@ -243,4 +274,150 @@ div.showGuidance a[id^="Menu_"] {
 .guidanceType div.I {
     content: " ";
     background-image: url('../img/guidanceIconI.png');
+}
+/* ************************** */
+/* ペインリストの共通デザイン */
+/* ************************** */
+/* 大枠はフレックスとする*/
+#paneList {
+    width :100%;
+    min-width:1095px;
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    margin-bottom:5px;
+}
+#paneList * {
+    box-sizing :border-box;
+}
+.menuPaneItem {
+    margin-top: 5px;
+    margin-right: 5px;
+    padding: 5px;
+    overflow: hidden;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+/* ３列幅を使うペイン設定 */
+.menuPaneItem.paneWidth3 {
+    width: 1068px;
+    min-width:1068px;
+    max-width: 1068px;
+}
+/* ２列幅を使うペイン設定 */
+.menuPaneItem.paneWidth2 {
+    width: calc(1063px / 2);
+    min-width: calc(1063px / 2);
+    max-width: calc(1063px / 2);
+}
+/* １列幅を使うペイン設定 */
+.menuPaneItem.paneWidth1 {
+    width: calc(1058px / 3);
+    min-width: calc(1058px / 3);
+    max-width: calc(1058px / 3);
+}
+/* ペインタイトルエリア */
+.paneTitle {
+    width:100%;
+}
+.paneTitle > div {
+    display:inline-block;
+    vertical-align:top;
+}
+.paneTitleLeft {
+    width:calc(100% - 40px);
+    font-size:16pt;
+    font-weight:bold;
+    height:32px;
+}
+
+/* 再描画ボタンアイコン */
+.paneRefreshImg {
+    width: 100%;
+    height: 100%;
+    background-size: 32px 32px;
+    background-repeat: no-repeat;
+    background-image: url('../img/menuPaneRefresh.png');
+    position:absolute;
+}
+.paneTitleRefresh {
+    width: 32px;
+    height: 32px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    user-select :none;
+    overflow:hidden;
+    position:relative;
+}
+.paneTitleRefresh:hover {
+    border: 1px solid darkgray;
+    cursor:pointer;
+}
+.paneTitleRefresh:hover .paneRefreshImg {
+    animation:3s linear infinite rotationIcon;
+}
+@keyframes rotationIcon {
+    0% {
+        transform: rotate(0);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/* ペイン内ドロップダウンレイアウト(IDにddlMonthTransOfficeとつけたもののみ) */
+.paneContent select.officeDdl {
+    height: 28px;
+    font-size: 12pt;
+    padding: 2px;
+}
+/* ******************** */
+/* 月間輸送量ペイン個別 */
+/* ******************** */
+/* 表とグラフを横並び */
+.monthTransLeft, .monthTransRight {
+    display:inline-block;
+    vertical-align:top;
+}
+.monthTransTable table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+/* セルの余白折り返し */
+.monthTransTable table td,
+.monthTransTable table th {
+    white-space:nowrap; /* セルオーバーで折り返さない */
+    padding:2px;
+    border:1px solid darkgray;
+}
+.monthTransTable table tr {
+    height:30px;
+}
+/* 左グラフの縦位置調整 */
+.monthTransRight {
+    margin-top:-15px;
+}
+.monthTransTable table tr:nth-child(1) th:nth-child(1) {
+    border-top: none;
+    border-left: none;
+}
+/* その他数値セル幅 */
+.monthTransTable table th.oilType {
+    width:120px;
+}
+/* その他数値セル幅 */
+.monthTransTable table th.yesterday,
+.monthTransTable table th.today,
+.monthTransTable table th.todayTrans{
+    width:100px;
+}
+/* 列見出し（油種名）*/
+.monthTransTable .oilNameData {
+    text-align: left;
+}
+.monthTransTable td {
+    text-align:right;
 }

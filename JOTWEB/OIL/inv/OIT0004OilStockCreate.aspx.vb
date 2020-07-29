@@ -38,7 +38,8 @@ Public Class OIT0004OilStockCreate
     Private WW_RTN_SW As String = ""
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
-
+    '車数から数量を求める定数(車数 × 当定数 ÷ 油種別ウェイト
+    Public UKEIRE_BASE_NUM As Decimal = 45
     ''' <summary>
     ''' サーバー処理の遷移先
     ''' </summary>
@@ -493,6 +494,7 @@ Public Class OIT0004OilStockCreate
         dispValues.SuggestValueInputValueToZero()
         Using sqlCon = CS0050SESSION.getConnection
             sqlCon.Open()
+            SqlConnection.ClearPool(sqlCon)
             If dispValues.ShowSuggestList = False Then
                 dispValues = EditEmptyTurnCarsNum(sqlCon, dispValues)
                 dispValues = EditOtEmptyTurnCarsNum(sqlCon, dispValues)
@@ -671,7 +673,7 @@ Public Class OIT0004OilStockCreate
             Else
                 'ENEOS帳票のデータ取得
                 baseDate = CDate(txtReportFromDate.Text).ToString("yyyy/MM/dd")
-                toDate = CDate(txtReportFromDate.Text).AddDays(7).ToString("yyyy/MM/dd")
+                toDate = CDate(txtReportFromDate.Text).AddDays(4).ToString("yyyy/MM/dd")
                 daySpan = CInt((CDate(toDate) - CDate(baseDate)).TotalDays) + 1
                 '北信と甲府の在庫データ取得
                 Dim dispHokushin As New DispDataClass(dispClass.SalesOffice, dispClass.Shipper, CONST_CONSIGNEECODE_10)
@@ -772,7 +774,11 @@ Public Class OIT0004OilStockCreate
             '列車運行情報の取得
             printData = GetTrainOperation(sqlCon, printData)
             printData.AsyncDeleteShipper = IsAsyncDeleteShipper(sqlCon, printData)
-            printData = GetPrintUkeireTrainNum(sqlCon, printData)
+            If dispClass.ShowSuggestList Then
+                printData = GetPrintUkeireTrainNum(sqlCon, printData)
+            Else
+                printData = GetPrintOtUkeireTrainNum(sqlCon, printData)
+            End If
             '構内取り設定がある場合、構内取りデータ取得
             If printData.HasMoveInsideItem Then
                 '表構えの為親と構内取り元と同じ列車
@@ -800,7 +806,7 @@ Public Class OIT0004OilStockCreate
                 End If
                 '過去日以外の日付について受入数取得
                 printData.MiDispData = GetReciveFromOrder(sqlCon, printData.MiDispData)
-                printData.MiDispData = GetPrintUkeireTrainNum(sqlCon, printData.MiDispData)
+                printData.MiDispData = GetPrintUkeireTrainNum(sqlCon, printData.MiDispData, True, printData.Consignee)
                 printData = GetUkeireOilstock(sqlCon, printData)
                 printData.MiDispData.RecalcStockList(False)
                 'メインクラスに構内取り情報を紐づけ（参照設定）
@@ -1381,6 +1387,7 @@ Public Class OIT0004OilStockCreate
         sqlStr.AppendLine("       )")
         '荷主取得条件(JOINTコード考慮)↑
         sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
         sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.LODDATE")
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
@@ -1390,6 +1397,7 @@ Public Class OIT0004OilStockCreate
                 .Add("@DATE_TO", SqlDbType.Date).Value = dateTo
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
                 .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
 
@@ -1637,35 +1645,51 @@ Public Class OIT0004OilStockCreate
     ''' <returns></returns>
     Private Function GetPrintTrainAmount(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
         Dim retVal As DispDataClass = dispData
-        If {"10", "20"}.Contains(dispData.Consignee) Then
+        If {"10", "20"}.Contains(dispData.Consignee) = False Then
             Return retVal
         End If
         Dim fromDateObj = dispData.StockDate.Values.FirstOrDefault
         Dim toDateObj = dispData.StockDate.Values.LastOrDefault
-
+        Dim hasKeyList As New Dictionary(Of String, String)
         Dim sqlStat As New StringBuilder
+        '油種コードをフィールド名に割り当てる変数
+        Dim oilCodeToFieldNameList As New Dictionary(Of String, String) From {
+            {"1101", "RTANK1"}, {"1001", "HTANK1"}, {"1301", "TTANK1"}, {"1302", "MTTANK1"},
+            {"1401", "KTANK1"}, {"1404", "K3TANK1"}, {"2201", "LTANK1"}, {"2101", "ATANK1"}}
         Dim isHokushin As Boolean = False
         If dispData.Consignee = "10" Then
             isHokushin = True
         End If
         sqlStat.AppendLine("SELECT DTL.OILCODE")
-        sqlStat.AppendLine("     , format(ODR.ACTUALLODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        'sqlStat.AppendLine("     , format(ODR.ACTUALLODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
         sqlStat.AppendLine("     , SUM(isnull(DTL.CARSAMOUNT,0))                    AS CARSAMOUNT")
         If isHokushin Then
             sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '5463' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT1 ")
             sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '2085' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT2 ")
             sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '8471' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT3 ")
+
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '5463' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT1 ")
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '2085' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT2 ")
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '8471' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT3 ")
+
         Else
             sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '81' AND DTL.FIRSTRETURNFLG = '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT1 ")
             sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.FIRSTRETURNFLG <> '1' AND DTL.AFTERRETURNFLG <> '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT2 ")
-            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '83' AND DTL.AFTERRETURNFLG = '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT3 ")
+            sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.AFTERRETURNFLG = '1' THEN DTL.CARSAMOUNT ELSE 0 END),0) AS AMOUNT3 ")
+
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO = '81' AND DTL.FIRSTRETURNFLG = '1' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT1 ")
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.FIRSTRETURNFLG <> '1' AND DTL.AFTERRETURNFLG <> '1' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT2 ")
+            'sqlStat.AppendLine("     , ISNULL(SUM(CASE WHEN ODR.TRAINNO IN ('81','83') AND DTL.AFTERRETURNFLG = '1' THEN DTL.CARSNUMBER ELSE 0 END),0) AS AMOUNT3 ")
         End If
         sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
         sqlStat.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
         sqlStat.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
         sqlStat.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStat.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @FROMDATE AND @TODATE")
+        'sqlStat.AppendLine(" WHERE ODR.ACTUALLODDATE  BETWEEN @FROMDATE AND @TODATE")
+        sqlStat.AppendLine(" WHERE ODR.LODDATE  BETWEEN @FROMDATE AND @TODATE")
+        sqlStat.AppendLine("   AND ODR.ACTUALLODDATE is not null")
         sqlStat.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
         'sqlStat.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
         '荷主取得条件(JOINTコード考慮)↓
@@ -1681,7 +1705,40 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("   AND ODR.DELFLG          = @DELFLG")
         sqlStat.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
         sqlStat.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
-        sqlStat.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACTUALLODDATE")
+        'sqlStat.AppendLine(" GROUP BY DTL.OILCODE,ODR.ACTUALLODDATE")
+        sqlStat.AppendLine(" GROUP BY DTL.OILCODE,ODR.LODDATE")
+
+        Dim sqlZaikoTrainAmount As New StringBuilder
+        sqlZaikoTrainAmount.AppendLine("SELECT format(STOCKYMD,'yyyy/MM/dd') AS TARGETDATE")
+        If isHokushin Then
+            sqlZaikoTrainAmount.AppendLine("      ,TRAINNO")
+        End If
+        For Each fieldName In oilCodeToFieldNameList.Values
+            sqlZaikoTrainAmount.AppendFormat("      ,ISNULL(SUM({0}),0)  AS {0}", fieldName).AppendLine()
+        Next
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(RTANK1)  AS RTANK1")
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(HTANK1)  AS HTANK1")
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(TTANK1)  AS TTANK1")
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(MTTANK1) AS MTTANK1")
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(KTANK1)  AS KTANK1")
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(K3TANK1) AS K3TANK1")
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(LTANK1)  AS LTANK1")
+        'sqlZaikoTrainAmount.AppendLine("      ,SUM(ATANK1)  AS ATANK1")
+        sqlZaikoTrainAmount.AppendLine("  FROM OIL.OIT0009_UKEIREOILSTOCK")
+        sqlZaikoTrainAmount.AppendLine(" WHERE STOCKYMD   BETWEEN @FROMDATE AND @TODATE")
+        sqlZaikoTrainAmount.AppendLine("   AND OFFICECODE    = @OFFICECODE")
+        sqlZaikoTrainAmount.AppendLine("   AND SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlZaikoTrainAmount.AppendLine("   AND CONSIGNEECODE = @CONSIGNEECODE")
+        sqlZaikoTrainAmount.AppendLine("   AND DELFLG        =  @DELFLG")
+        sqlZaikoTrainAmount.AppendLine("   AND RTANK1 + HTANK1 + TTANK1 + MTTANK1 + KTANK1 + K3TANK1 + LTANK1 + ATANK1 > 0")
+        If isHokushin Then
+            sqlZaikoTrainAmount.AppendLine(" GROUP BY STOCKYMD,TRAINNO")
+            sqlZaikoTrainAmount.AppendLine(" ORDER BY STOCKYMD,TRAINNO")
+        Else
+            sqlZaikoTrainAmount.AppendLine(" GROUP BY STOCKYMD")
+            sqlZaikoTrainAmount.AppendLine(" ORDER BY STOCKYMD")
+        End If
+
 
         '保存済みの在庫情報を取得
         Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
@@ -1725,9 +1782,65 @@ Public Class OIT0004OilStockCreate
                     dateValue.Print1stPositionVal = Decimal.Parse(Convert.ToString(sqlDr("AMOUNT1")))
                     dateValue.Print2ndPositionVal = Decimal.Parse(Convert.ToString(sqlDr("AMOUNT2")))
                     dateValue.Print3rdPositionVal = Decimal.Parse(Convert.ToString(sqlDr("AMOUNT3")))
-                End While 'sqlDr.Read
-            End Using 'sqlDr
+                    If hasKeyList.ContainsKey(oilCode & "@" & curDate) = False Then
+                        hasKeyList.Add(oilCode & "@" & curDate, "")
+                    End If
 
+                End While 'sqlDr.Read
+
+            End Using 'sqlDr 在庫テーブル側
+            '**************************
+            '在庫管理側のテーブルよりデータ取得
+            '**************************
+            sqlCmd.CommandText = sqlZaikoTrainAmount.ToString
+            Using sqlDr = sqlCmd.ExecuteReader
+                Dim curDate As String = ""
+                Dim oilCode As String = ""
+                Dim stockListCol As DispDataClass.StockListCollection = Nothing
+                Dim dateValue As DispDataClass.StockListItem = Nothing
+                While sqlDr.Read
+                    curDate = Convert.ToString(sqlDr("TARGETDATE"))
+                    '過去日の場合は次のレコード
+                    If curDate < Now.ToString("yyyy/MM/dd") Then
+                        Continue While
+                    End If
+                    For Each fieldItems In oilCodeToFieldNameList
+                        oilCode = fieldItems.Key
+                        If hasKeyList.ContainsKey(oilCode & "@" & curDate) Then
+                            Continue For
+                        End If
+                        '対象油種を保持していない場合
+                        If dispData.StockList.ContainsKey(oilCode) = False Then
+                            Continue For '次のループへ
+                        End If
+                        stockListCol = dispData.StockList(oilCode)
+                        dateValue = stockListCol.StockItemList(curDate)
+                        Dim amount As Decimal = 0
+                        Dim carsNum As Decimal = CDec(sqlDr(fieldItems.Value))
+                        If stockListCol.OilInfo.Weight > 0 Then
+                            amount = Math.Floor(carsNum * 45 / stockListCol.OilInfo.Weight)
+                        End If
+
+                        If isHokushin Then
+                            Dim trainNum As String = Convert.ToString(sqlDr("TRAINNO"))
+                            Select Case trainNum
+                                Case "5463"
+                                    dateValue.Print1stPositionVal = amount
+                                Case "2085"
+                                    dateValue.Print2ndPositionVal = amount
+                                Case "8471"
+                                    dateValue.Print3rdPositionVal = amount
+                            End Select
+                        Else
+                            dateValue.Print1stPositionVal = 0
+                            dateValue.Print2ndPositionVal = amount
+                            dateValue.Print3rdPositionVal = 0
+                        End If
+
+                    Next fieldItems
+
+                End While
+            End Using ' sqlDr 在庫管理側
         End Using 'sqlCmd
 
         Return retVal
@@ -1819,6 +1932,12 @@ Public Class OIT0004OilStockCreate
                        Where opeItm.TrainNo = targetTrainNo AndAlso
                              opeItm.WorkingDate = targetDate
                        Select Convert.ToString(opeItm.Run)).DefaultIfEmpty("1").First
+                '川崎且つ曜日が土日はロック
+                If odrItm.TrainInfo.TrainNo.Equals("川崎") AndAlso
+                  {"0", "6"}.Contains(sgItm.DayInfo.WeekNum) Then
+                    run = "0"
+                End If
+
                 If run = "0" Then
                     odrItm.TrainLock = True
                 Else
@@ -2122,7 +2241,7 @@ Public Class OIT0004OilStockCreate
                             Dim weight = retVal.StockList(oilCode).OilInfo.Weight
                             stockReceiveVal = 0D
                             If weight <> 0 Then
-                                stockReceiveVal = Math.Floor(Convert.ToDecimal(sqlDr("CARSNUMBER")) * 45 / weight)
+                                stockReceiveVal = Math.Floor(Convert.ToDecimal(sqlDr("CARSNUMBER")) * UKEIRE_BASE_NUM / weight)
                             End If
                             .Receive = stockReceiveVal.ToString
                         End With
@@ -2243,7 +2362,7 @@ Public Class OIT0004OilStockCreate
     ''' <param name="sqlCon"></param>
     ''' <param name="dispData"></param>
     ''' <returns></returns>
-    Private Function GetPrintUkeireTrainNum(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+    Private Function GetPrintUkeireTrainNum(sqlCon As SqlConnection, dispData As DispDataClass, Optional isMiData As Boolean = False, Optional parentConsignee As String = "") As DispDataClass
         Dim retVal = dispData
         retVal.PrintTrainNums = New Dictionary(Of String, PrintTrainNumCollection)
         Dim sqlStr As New StringBuilder
@@ -2254,40 +2373,59 @@ Public Class OIT0004OilStockCreate
         '検索値の設定
         Dim dateFrom As String = dispData.StockDate.First.Value.KeyString
         Dim dateTo As String = dispData.StockDate.Last.Value.KeyString
-        sqlStr.AppendLine("SELECT DTL.OILCODE")
-        sqlStr.AppendLine("     , ODR.OFFICECODE")
-        sqlStr.AppendLine("     , MAX(ODR.OFFICENAME) AS OFFICENAME")
-        sqlStr.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
-        sqlStr.AppendLine("     , SUM(isnull(DTL.CARSNUMBER,0))    AS CARSNUMBER")
-        sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
-        sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
-        sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
-        sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
-        sqlStr.AppendLine("   AND DTL.OILCODE is not null")
-        sqlStr.AppendLine(" WHERE ODR.LODDATE   BETWEEN @DATE_FROM AND @DATE_TO")
-        'sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
-        'sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
-        sqlStr.AppendLine("   AND ((     DTL.SHIPPERSCODE   = @SHIPPERSCODE")
-        sqlStr.AppendLine("          AND (    ISNULL(DTL.JOINTCODE,'') = ''   ")
-        sqlStr.AppendLine("                OR DTL.JOINTCODE = DTL.SHIPPERSCODE ")
-        sqlStr.AppendLine("              ) ")
-        sqlStr.AppendLine("        ) OR  (     DTL.SHIPPERSCODE   <> @SHIPPERSCODE")
-        sqlStr.AppendLine("                AND DTL.JOINTCODE = @SHIPPERSCODE")
-        sqlStr.AppendLine("              )")
-        sqlStr.AppendLine("       )")
+        'sqlStr.AppendLine("SELECT DTL.OILCODE")
+        'sqlStr.AppendLine("     , ODR.OFFICECODE")
+        'sqlStr.AppendLine("     , MAX(ODR.OFFICENAME) AS OFFICENAME")
+        'sqlStr.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS TARGETDATE")
+        'sqlStr.AppendLine("     , SUM(isnull(DTL.CARSNUMBER,0))    AS CARSNUMBER")
+        'sqlStr.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+        'sqlStr.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DTL")
+        'sqlStr.AppendLine("    ON ODR.ORDERNO =  DTL.ORDERNO")
+        'sqlStr.AppendLine("   AND DTL.DELFLG  =  @DELFLG")
+        'sqlStr.AppendLine("   AND DTL.OILCODE is not null")
+        'sqlStr.AppendLine(" WHERE ODR.LODDATE   BETWEEN @DATE_FROM AND @DATE_TO")
+        ''sqlStr.AppendLine("   AND ODR.OFFICECODE      = @OFFICECODE")
+        ''sqlStr.AppendLine("   AND ODR.SHIPPERSCODE    = @SHIPPERSCODE")
+        'sqlStr.AppendLine("   AND ((     DTL.SHIPPERSCODE   = @SHIPPERSCODE")
+        'sqlStr.AppendLine("          AND (    ISNULL(DTL.JOINTCODE,'') = ''   ")
+        'sqlStr.AppendLine("                OR DTL.JOINTCODE = DTL.SHIPPERSCODE ")
+        'sqlStr.AppendLine("              ) ")
+        'sqlStr.AppendLine("        ) OR  (     DTL.SHIPPERSCODE   <> @SHIPPERSCODE")
+        'sqlStr.AppendLine("                AND DTL.JOINTCODE = @SHIPPERSCODE")
+        'sqlStr.AppendLine("              )")
+        'sqlStr.AppendLine("       )")
 
-        sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
-        sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
-        sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
-        sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.OFFICECODE,ODR.LODDATE")
-        sqlStr.AppendLine(" ORDER BY OILCODE,OFFICECODE,LODDATE")
+        'sqlStr.AppendLine("   AND ODR.CONSIGNEECODE   = @CONSIGNEECODE")
+        'sqlStr.AppendLine("   AND ODR.DELFLG          = @DELFLG")
+        'sqlStr.AppendLine("   AND ODR.ORDERSTATUS    <> @ORDERSTATUS_CANCEL") 'キャンセルは含めない
+        'sqlStr.AppendLine(" GROUP BY DTL.OILCODE,ODR.OFFICECODE,ODR.LODDATE")
+        'sqlStr.AppendLine(" ORDER BY OILCODE,OFFICECODE,LODDATE")
 
+        sqlStr.AppendLine("SELECT format(UOS.STOCKYMD,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStr.AppendLine("      ,UOS.OFFICECODE")
+        Dim fieldSuffix As String = "1"
+        If isMiData Then
+            fieldSuffix = "2"
+        End If
+        For Each fieldName In oilCodeToFieldNameList.Values
+            sqlStr.AppendFormat("      ,ISNULL(SUM(UOS.{0}{1}),0)            AS {0}", fieldName, fieldSuffix)
+        Next
+        sqlStr.AppendLine("  FROM      OIL.OIT0009_UKEIREOILSTOCK  UOS")
+        sqlStr.AppendLine(" WHERE UOS.STOCKYMD BETWEEN @DATE_FROM AND @DATE_TO")
+        'sqlStr.AppendLine("   AND UOS.OFFICECODE    = @OFFICECODE")
+        sqlStr.AppendLine("   AND UOS.SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStr.AppendLine("   AND UOS.CONSIGNEECODE = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND UOS.DELFLG        = @DELFLG")
+        sqlStr.AppendLine(" GROUP BY UOS.OFFICECODE,UOS.STOCKYMD")
+        sqlStr.AppendLine(" ORDER BY UOS.OFFICECODE,UOS.STOCKYMD")
         Dim retDt As DataTable = New DataTable("TMPTABLE")
         With retDt.Columns
-            .Add("OILCODE", GetType(String))
             .Add("OFFICECODE", GetType(String))
             .Add("TARGETDATE", GetType(String))
             .Add("CARSNUMBER", GetType(Decimal))
+            For Each fieldName In oilCodeToFieldNameList.Values
+                .Add(fieldName, GetType(Decimal))
+            Next
         End With
         Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
             With sqlCmd.Parameters
@@ -2296,8 +2434,13 @@ Public Class OIT0004OilStockCreate
                 .Add("@DATE_TO", SqlDbType.Date).Value = dateTo
                 '.Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
                 .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
-                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
-                .Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
+                If isMiData = False Then
+                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                Else
+                    .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = parentConsignee
+                End If
+
+                '.Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
             End With
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 If sqlDr.HasRows = True Then
@@ -2361,21 +2504,137 @@ Public Class OIT0004OilStockCreate
         Next oilItm
         '抽出結果を振り分け
         For Each dr As DataRow In retDt.Rows
+            For Each oilCodeItm In oilCodeToFieldNameList
+                Dim oilCode As String = oilCodeItm.Key
+                Dim officeCode As String = Convert.ToString(dr("OFFICECODE"))
+                Dim dateString As String = Convert.ToString(dr("TARGETDATE"))
+                Dim carNum As Decimal = CDec(dr(oilCodeItm.Value))
+                If retVal.PrintTrainNums.ContainsKey(oilCode) Then
+                    With retVal.PrintTrainNums(oilCode)
+                        If .PrintTrainNumList.ContainsKey(officeCode) Then
+                            With .PrintTrainNumList(officeCode)
+                                If .PrintTrainItems.ContainsKey(dateString) Then
+                                    .PrintTrainItems(dateString).TrainNum = carNum
+                                End If
+                            End With
+                        End If
+                    End With
+                End If
+            Next
+
+        Next dr
+
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 印刷用の受入車数(OT)の取得
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="dispData"></param>
+    ''' <returns></returns>
+    Private Function GetPrintOtUkeireTrainNum(sqlCon As SqlConnection, dispData As DispDataClass) As DispDataClass
+        Dim retVal = dispData
+        retVal.PrintTrainNums = New Dictionary(Of String, PrintTrainNumCollection)
+        '検索値の設定
+        Dim dateFrom As String = dispData.StockDate.First.Value.KeyString
+        Dim dateTo As String = dispData.StockDate.Last.Value.KeyString
+        Dim sqlStr As New StringBuilder
+        sqlStr.AppendLine("SELECT format(STC.STOCKYMD,'yyyy/MM/dd') AS TARGETDATE ")
+        sqlStr.AppendLine("      ,STC.OFFICECODE")
+        sqlStr.AppendLine("      ,STC.OILCODE")
+        sqlStr.AppendLine("      ,ISNULL(SUM(STC.ARRVOL),0) AS ARRVOL")
+        sqlStr.AppendLine("  FROM OIL.OIT0001_OILSTOCK STC")
+        sqlStr.AppendLine(" WHERE STC.STOCKYMD BETWEEN @DATE_FROM AND @DATE_TO")
+        sqlStr.AppendLine("   AND STC.SHIPPERSCODE  = @SHIPPERSCODE")
+        sqlStr.AppendLine("   AND STC.CONSIGNEECODE = @CONSIGNEECODE")
+        sqlStr.AppendLine("   AND STC.DELFLG        = @DELFLG")
+        sqlStr.AppendLine(" GROUP BY STC.OILCODE,STC.OFFICECODE,STC.STOCKYMD")
+        sqlStr.AppendLine(" ORDER BY STC.OILCODE,STC.OFFICECODE,STC.STOCKYMD")
+
+        Dim retDt As DataTable = New DataTable("TMPTABLE")
+        With retDt.Columns
+            .Add("OFFICECODE", GetType(String))
+            .Add("TARGETDATE", GetType(String))
+            .Add("OILCODE", GetType(String))
+            .Add("ARRVOL", GetType(Decimal))
+        End With
+        Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon)
+            With sqlCmd.Parameters
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                .Add("@DATE_FROM", SqlDbType.Date).Value = dateFrom
+                .Add("@DATE_TO", SqlDbType.Date).Value = dateTo
+                '.Add("@OFFICECODE", SqlDbType.NVarChar).Value = dispData.SalesOffice
+                .Add("@SHIPPERSCODE", SqlDbType.NVarChar).Value = dispData.Shipper
+                .Add("@CONSIGNEECODE", SqlDbType.NVarChar).Value = dispData.Consignee
+                '.Add("@ORDERSTATUS_CANCEL", SqlDbType.NVarChar).Value = CONST_ORDERSTATUS_900
+            End With
+
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows = True Then
+                    retDt.Load(sqlDr)
+                End If
+            End Using
+        End Using
+        Dim officeCodes As New Dictionary(Of String, String)
+        '増幅するパターンの場合
+        '出光シェル+JONET松本、ENEOS+OT宇都宮、コスモ+OT郡山、コスモ+OT松本
+        If dispData.Consignee = "40" AndAlso dispData.Shipper = "0122700010" Then
+            officeCodes.Add("011203", "袖ヶ浦")
+            officeCodes.Add("012402", "三重塩浜")
+        ElseIf dispData.Consignee = "53" AndAlso dispData.Shipper = "0005700010" Then
+            officeCodes.Add("011402", "根岸")
+            officeCodes.Add("011202", "甲子")
+        ElseIf dispData.Consignee = "52" AndAlso dispData.Shipper = "0094000010" Then
+            officeCodes.Add("011201", "五井")
+            officeCodes.Add("010402", "仙台新港")
+        ElseIf dispData.Consignee = "56" AndAlso dispData.Shipper = "0094000010" Then
+            officeCodes.Add("011201", "五井")
+            officeCodes.Add("012401", "四日市")
+        Else
+            '上記以外は検索条件通り
+            officeCodes.Add(dispData.SalesOffice, dispData.SalesOfficeName.Replace("営業所", ""))
+        End If
+        '車数0のガワを作成
+        For Each oilItm In dispData.OilTypeList.Values
+            Dim trainNumTopObj = New PrintTrainNumCollection
+            trainNumTopObj.OilInfo = oilItm
+            trainNumTopObj.PrintTrainNumList = New Dictionary(Of String, PrintTrainNum)
+            For Each officeCode In officeCodes
+                Dim printTrainNum = New PrintTrainNum
+                printTrainNum.OfficeCode = officeCode.Key
+                printTrainNum.OfficeName = officeCode.Value
+                printTrainNum.PrintTrainItems = New Dictionary(Of String, PrintTrainItem)
+                For Each daysItm In dispData.StockDate.Values
+                    Dim printTrainItem = New PrintTrainItem
+                    printTrainItem.TrainNum = 0
+                    printTrainItem.DateString = daysItm.KeyString
+                    printTrainNum.PrintTrainItems.Add(daysItm.KeyString, printTrainItem)
+                Next
+                trainNumTopObj.PrintTrainNumList.Add(officeCode.Key, printTrainNum)
+            Next officeCode
+            retVal.PrintTrainNums.Add(oilItm.OilCode, trainNumTopObj)
+        Next oilItm
+        '抽出結果を振り分け
+        For Each dr As DataRow In retDt.Rows
+
             Dim oilCode As String = Convert.ToString(dr("OILCODE"))
             Dim officeCode As String = Convert.ToString(dr("OFFICECODE"))
             Dim dateString As String = Convert.ToString(dr("TARGETDATE"))
-            Dim carNum As Decimal = CDec(dr("CARSNUMBER"))
+            Dim carVol As Decimal = CDec(dr("ARRVOL"))
+            Dim carNum As Decimal = 0
             If retVal.PrintTrainNums.ContainsKey(oilCode) Then
                 With retVal.PrintTrainNums(oilCode)
                     If .PrintTrainNumList.ContainsKey(officeCode) Then
                         With .PrintTrainNumList(officeCode)
                             If .PrintTrainItems.ContainsKey(dateString) Then
+                                carNum = Math.Floor(carVol * retVal.OilTypeList(oilCode).Weight / 45)
                                 .PrintTrainItems(dateString).TrainNum = carNum
                             End If
                         End With
                     End If
                 End With
             End If
+
         Next dr
 
         Return retVal
@@ -2568,9 +2827,11 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.LINEORDER),'')               AS LINEORDER")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.TANKNO),'')                  AS TANKNO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.KAMOKU),'')                  AS KAMOKU")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.STACKINGORDERNO),'')         AS STACKINGORDERNO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.STACKINGFLG),'')             AS STACKINGFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.FIRSTRETURNFLG),'')          AS FIRSTRETURNFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.AFTERRETURNFLG),'')          AS AFTERRETURNFLG")
+        sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.OTTRANSPORTFLG),'')          AS OTTRANSPORTFLG")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.ORDERINFO),'')               AS ORDERINFO")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.SHIPPERSCODE),'')            AS SHIPPERSCODE")
         sqlStat.AppendLine("      ,ISNULL(RTRIM(DTL.SHIPPERSNAME),'')            AS SHIPPERSNAME")
@@ -3459,7 +3720,7 @@ Public Class OIT0004OilStockCreate
             '**************************
             '既登録データのキー照合
             Dim qOder = (From itm In entredOrderList.Values
-                         Where itm.AccDate = chkItm.dayInfo.KeyString AndAlso
+                         Where itm.LodDate = chkItm.dayInfo.KeyString AndAlso
                               ((itm.ShippersCode = dispDataClass.Shipper AndAlso
                                 itm.JointOrder = "0") OrElse
                                (itm.JointOrder = "1" AndAlso
@@ -3471,7 +3732,7 @@ Public Class OIT0004OilStockCreate
 
             '重複オーダーチェック用クエリーJOINT設定を除き同一受入日、荷主、荷受人、列車番号のキーで抽出
             Dim qDupeOder = (From itm In entredOrderList.Values
-                             Where itm.AccDate = chkItm.dayInfo.KeyString AndAlso
+                             Where itm.LodDate = chkItm.dayInfo.KeyString AndAlso
                               itm.ShippersCode = dispDataClass.Shipper AndAlso
                               itm.ConsigneeCode = dispDataClass.Consignee AndAlso
                               itm.TrainNo = chkItm.trainInfo.TrainNo AndAlso
@@ -4129,7 +4390,7 @@ Public Class OIT0004OilStockCreate
     Public Sub InsertOrderDetail(sqlCon As SqlConnection, sqlTran As SqlTransaction, detailItem As OrderDetailItem)
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("INSERT INTO OIL.OIT0003_DETAIL")
-        sqlStat.AppendLine("   (ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,STACKINGFLG,FIRSTRETURNFLG,AFTERRETURNFLG,ORDERINFO,")
+        sqlStat.AppendLine("   (ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,STACKINGORDERNO,STACKINGFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,ORDERINFO,")
         sqlStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,")
         sqlStat.AppendLine("    ORDERINGTYPE,ORDERINGOILNAME,")
         sqlStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
@@ -4147,7 +4408,7 @@ Public Class OIT0004OilStockCreate
         sqlStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlStat.AppendLine("    VALUES")
-        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,@STACKINGFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@ORDERINFO,")
+        sqlStat.AppendLine("   (@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,@STACKINGORDERNO,@STACKINGFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@ORDERINFO,")
         sqlStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,")
         sqlStat.AppendLine("    @ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
@@ -4173,9 +4434,11 @@ Public Class OIT0004OilStockCreate
                 .Add("LINEORDER", SqlDbType.NVarChar).Value = detailItem.LineOrder
                 .Add("TANKNO", SqlDbType.NVarChar).Value = detailItem.TankNo
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = detailItem.Kamoku
+                .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = detailItem.StackingOrderNo
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = detailItem.StackingFlg
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = detailItem.FirstReturnFlg
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = detailItem.AfterReturnFlg
+                .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = detailItem.OtTransportFlg
                 .Add("ORDERINFO", SqlDbType.NVarChar).Value = detailItem.OrderInfo
                 .Add("SHIPPERSCODE", SqlDbType.NVarChar).Value = detailItem.ShippersCode
                 .Add("SHIPPERSNAME", SqlDbType.NVarChar).Value = detailItem.ShippersName
@@ -7491,9 +7754,11 @@ Public Class OIT0004OilStockCreate
             Me.LineOrder = ""
             Me.TankNo = ""
             Me.Kamoku = ""
+            Me.StackingOrderNo = ""
             Me.StackingFlg = "2"
             Me.FirstReturnFlg = "2"
             Me.AfterReturnFlg = "2"
+            Me.OtTransportFlg = "2"
             Me.OrderInfo = ""
             Me.ShippersCode = dispDataClass.Shipper
             Me.ShippersName = dispDataClass.ShipperName
@@ -7567,9 +7832,11 @@ Public Class OIT0004OilStockCreate
             Me.LineOrder = Convert.ToString(sqlDr("LINEORDER"))
             Me.TankNo = Convert.ToString(sqlDr("TANKNO"))
             Me.Kamoku = Convert.ToString(sqlDr("KAMOKU"))
+            Me.StackingOrderNo = Convert.ToString(sqlDr("STACKINGORDERNO"))
             Me.StackingFlg = Convert.ToString(sqlDr("STACKINGFLG"))
             Me.FirstReturnFlg = Convert.ToString(sqlDr("FIRSTRETURNFLG"))
             Me.AfterReturnFlg = Convert.ToString(sqlDr("AFTERRETURNFLG"))
+            Me.OtTransportFlg = Convert.ToString(sqlDr("OTTRANSPORTFLG"))
             Me.OrderInfo = Convert.ToString(sqlDr("ORDERINFO"))
             Me.ShippersCode = Convert.ToString(sqlDr("SHIPPERSCODE"))
             Me.ShippersName = Convert.ToString(sqlDr("SHIPPERSNAME"))
@@ -7658,6 +7925,11 @@ Public Class OIT0004OilStockCreate
         ''' <returns></returns>
         Public Property Kamoku As String
         ''' <summary>
+        ''' 積置受注№
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property StackingOrderNo As String
+        ''' <summary>
         ''' 積置可否フラグ
         ''' </summary>
         ''' <returns></returns>
@@ -7672,6 +7944,11 @@ Public Class OIT0004OilStockCreate
         ''' </summary>
         ''' <returns></returns>
         Public Property AfterReturnFlg As String
+        ''' <summary>
+        ''' OT輸送可否フラグ
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OtTransportFlg As String
         ''' <summary>
         ''' 受注情報
         ''' </summary>
@@ -7925,7 +8202,7 @@ Public Class OIT0004OilStockCreate
             Dim retDt As New DataTable
             With retDt.Columns
                 Dim fieldList As New List(Of String) From {
-                   "ORDERNO", "DETAILNO", "SHIPORDER", "LINEORDER", "TANKNO", "KAMOKU", "STACKINGFLG", "FIRSTRETURNFLG", "AFTERRETURNFLG", "ORDERINFO",
+                   "ORDERNO", "DETAILNO", "SHIPORDER", "LINEORDER", "TANKNO", "KAMOKU", "STACKINGORDERNO", "STACKINGFLG", "FIRSTRETURNFLG", "AFTERRETURNFLG", "OTTRANSPORTFLG", "ORDERINFO",
                    "SHIPPERSCODE", "SHIPPERSNAME", "OILCODE", "OILNAME", "ORDERINGTYPE",
                    "ORDERINGOILNAME", "CARSNUMBER", "CARSAMOUNT", "RETURNDATETRAIN",
                    "JOINTCODE", "JOINT", "REMARK", "CHANGETRAINNO", "CHANGETRAINNAME",
@@ -7956,9 +8233,11 @@ Public Class OIT0004OilStockCreate
             dr("LINEORDER") = Me.LineOrder
             dr("TANKNO") = Me.TankNo
             dr("KAMOKU") = Me.Kamoku
+            dr("STACKINGORDERNO") = Me.StackingOrderNo
             dr("STACKINGFLG") = Me.StackingFlg
             dr("FIRSTRETURNFLG") = Me.FirstReturnFlg
             dr("AFTERRETURNFLG") = Me.AfterReturnFlg
+            dr("OTTRANSPORTFLG") = Me.OtTransportFlg
             dr("ORDERINFO") = Me.OrderInfo
             dr("SHIPPERSCODE") = Me.ShippersCode
             dr("SHIPPERSNAME") = Me.ShippersName

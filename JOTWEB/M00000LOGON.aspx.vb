@@ -44,6 +44,7 @@ Public Class M00000LOGON
 
         '   MAPmapid      : 画面間IF(MAPID)
 
+
         If IsPostBack Then
             PassWord.Attributes.Add("value", PassWord.Text)
 
@@ -205,21 +206,23 @@ Public Class M00000LOGON
         '○共通宣言
         '*共通関数宣言(APPLDLL)
         Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
-        Dim CS0009MESSAGEout As New CS0009MESSAGEout        'メッセージ出力 out
+        '   Dim CS0009MESSAGEout As New CS0009MESSAGEout        'メッセージ出力 out
         Dim CS0006TERMchk As New CS0006TERMchk              'ローカルコンピュータ名存在チェック
         Dim CS0008ONLINEstat As New CS0008ONLINEstat        'ONLINE状態
+        Dim CS001INIFILE As New CS0001INIFILEget            'INIファイル読み込み
+
 
         '○オンラインサービス判定
         '画面UserIDの会社からDB(T0001_ONLINESTAT)検索
-        CS0008ONLINEstat.CS0008ONLINEstat()
-        If isNormal(CS0008ONLINEstat.ERR) Then
-            'オンラインサービス停止時、ログオン画面へ遷移
-            If CS0008ONLINEstat.ONLINESW = 0 Then Exit Sub
+        '   CS0008ONLINEstat.CS0008ONLINEstat()
+        '  If isNormal(CS0008ONLINEstat.ERR) Then
+        'オンラインサービス停止時、ログオン画面へ遷移
+        ' If CS0008ONLINEstat.ONLINESW = 0 Then Exit Sub
 
-        Else
-            Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
-            Exit Sub
-        End If
+        'Else
+        'Master.Output(CS0008ONLINEstat.ERR, C_MESSAGE_TYPE.ABORT, "CS0008ONLINEstat")
+        'Exit Sub
+        'End If
 
         '■■■　メイン処理　■■■
         '〇ID、パスワードのいずれかが未入力なら抜ける
@@ -256,9 +259,20 @@ Public Class M00000LOGON
         Dim WW_URL As String = String.Empty
         Dim WW_MENUURL As String = String.Empty
         Dim WW_chk As String = String.Empty
+        'Userメニューリスト設定
+        Dim WW_UserMenuList As New List(Of CS0050SESSION.UserMenuCostomItem)
+
+
+        'セッションアウト後の再INIファイル読取り
+        CS001INIFILE.CS0001INIFILEget()
+        If Not isNormal(CS001INIFILE.ERR) Then
+            Master.Output(CS001INIFILE.ERR, C_MESSAGE_TYPE.ABORT)
+            Exit Sub
+        End If
 
         'DataBase接続文字
         Using SQLcon As SqlConnection = CS0050Session.getConnection
+
             SQLcon.Open() 'DataBase接続(Open)
 
             ' パスワード　証明書オープン
@@ -281,78 +295,89 @@ Public Class M00000LOGON
 
             Try
                 'OIS0004_USER検索SQL文
-                Dim SQL_Str As String =
-                     "SELECT " _
-                   & " rtrim(A.USERID)   as USERID    , " _
-                   & " rtrim(A.CAMPCODE) as CAMPCODE  , " _
-                   & " rtrim(A.ORG)      as ORG       , " _
-                   & " A.STYMD                        , " _
-                   & " A.ENDYMD                       , " _
-                   & " rtrim(CONVERT(nvarchar, DecryptByKey(B.PASSWORD))) as PASSWORD  , " _
-                   & " B.MISSCNT                      , " _
-                   & " A.INITYMD                      , " _
-                   & " A.UPDYMD                       , " _
-                   & " A.UPDTIMSTP                    , " _
-                   & " rtrim(A.MENUROLE) as MENUROLE  , " _
-                   & " rtrim(A.MAPROLE) as MAPROLE    , " _
-                   & " rtrim(A.VIEWPROFID) as VIEWPROFID    , " _
-                   & " rtrim(A.RPRTPROFID) as RPRTPROFID    , " _
-                   & " rtrim(A.MAPID)    as MAPID     , " _
-                   & " rtrim(A.VARIANT)  as VARIANT   , " _
-                   & " rtrim(A.APPROVALID) as APPROVALID    , " _
-                   & " B.PASSENDYMD      as PASSENDYMD  " _
-                   & " FROM       COM.OIS0004_USER       A    " _
-                   & " INNER JOIN COM.OIS0005_USERPASS   B ON " _
-                   & "       B.USERID      = A.USERID   " _
-                   & "   and B.DELFLG     <> @P4        " _
-                   & " Where A.USERID      = @P1        " _
-                   & "   and A.STYMD      <= @P2        " _
-                   & "   and A.ENDYMD     >= @P3        " _
-                   & "   and B.PASSENDYMD >= @P3        " _
-                   & "   and A.DELFLG     <> @P4        "
-                Using SQLcmd As New SqlCommand(SQL_Str, SQLcon)
-                    Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", System.Data.SqlDbType.NVarChar, 20)
-                    Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", System.Data.SqlDbType.Date)
-                    Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", System.Data.SqlDbType.Date)
-                    Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", System.Data.SqlDbType.NVarChar, 1)
-                    PARA1.Value = UserID.Text
-                    PARA2.Value = Date.Now
-                    PARA3.Value = Date.Now
-                    PARA4.Value = C_DELETE_FLG.DELETE
-                    Dim SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                Dim sqlStat As New StringBuilder
+                sqlStat.AppendLine("SELECT rtrim(A.USERID)   as USERID")
+                sqlStat.AppendLine("      ,rtrim(A.CAMPCODE) as CAMPCODE")
+                sqlStat.AppendLine("      ,rtrim(A.ORG)      as ORG")
+                sqlStat.AppendLine("      ,A.STYMD")
+                sqlStat.AppendLine("      ,A.ENDYMD")
+                sqlStat.AppendLine("      ,rtrim(CONVERT(nvarchar, DecryptByKey(B.PASSWORD))) as PASSWORD")
+                sqlStat.AppendLine("      ,B.MISSCNT")
+                sqlStat.AppendLine("      ,A.INITYMD")
+                sqlStat.AppendLine("      ,A.UPDYMD")
+                sqlStat.AppendLine("      ,A.UPDTIMSTP")
+                sqlStat.AppendLine("      ,rtrim(A.MENUROLE)   as MENUROLE")
+                sqlStat.AppendLine("      ,rtrim(A.MAPROLE)    as MAPROLE")
+                sqlStat.AppendLine("      ,rtrim(A.VIEWPROFID) as VIEWPROFID")
+                sqlStat.AppendLine("      ,rtrim(A.RPRTPROFID) as RPRTPROFID")
+                sqlStat.AppendLine("      ,rtrim(A.MAPID)      as MAPID")
+                sqlStat.AppendLine("      ,rtrim(A.VARIANT)    as VARIANT")
+                sqlStat.AppendLine("      ,rtrim(A.APPROVALID) as APPROVALID")
+                For i = 1 To 25 Step 1
+                    sqlStat.AppendFormat("      ,isnull(rtrim(A.OUTPUTID{0}),'') as OUTPUTID{0}", i).AppendLine()
+                    sqlStat.AppendFormat("      ,isnull(rtrim(A.ONOFF{0}),'')    as ONOFF{0}", i).AppendLine()
+                    sqlStat.AppendFormat("      ,isnull(A.SORTNO{0},99999)       as SORTNO{0}", i).AppendLine()
+                Next i
+                sqlStat.AppendLine("      ,B.PASSENDYMD        as PASSENDYMD")
+                sqlStat.AppendLine("  FROM        COM.OIS0004_USER       A")
+                sqlStat.AppendLine("  INNER JOIN  COM.OIS0005_USERPASS   B")
+                sqlStat.AppendLine("    ON B.USERID      = A.USERID")
+                sqlStat.AppendLine("   and B.DELFLG     <> @P4 ")
+                sqlStat.AppendLine(" Where A.USERID      = @P1 ")
+                sqlStat.AppendLine("   and A.STYMD      <= @P2")
+                sqlStat.AppendLine("   and A.ENDYMD     >= @P3")
+                sqlStat.AppendLine("   and B.PASSENDYMD >= @P3")
+                sqlStat.AppendLine("   and A.DELFLG     <> @P4")
 
-                    WW_err = C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR
-                    If SQLdr.Read Then
-                        WW_USERID = Convert.ToString(SQLdr("USERID"))
-                        WW_PASSWORD = Convert.ToString(SQLdr("PASSWORD"))
-                        WW_USERCAMP = Convert.ToString(SQLdr("CAMPCODE"))
-                        WW_ORG = Convert.ToString(SQLdr("ORG"))
-                        WW_STYMD = CDate(SQLdr("STYMD"))
-                        WW_ENDYMD = CDate(SQLdr("ENDYMD"))
-                        WW_MISSCNT = CInt(SQLdr("MISSCNT"))
-                        If SQLdr("UPDYMD") Is DBNull.Value Then
-                            WW_UPDYMD = System.DateTime.UtcNow
-                        Else
-                            WW_UPDYMD = CDate(SQLdr("UPDYMD"))
+                Using SQLcmd As New SqlCommand(sqlStat.ToString, SQLcon)
+                    With SQLcmd.Parameters
+                        .Add("@P1", SqlDbType.NVarChar, 20).Value = UserID.Text
+                        .Add("@P2", SqlDbType.Date).Value = Date.Now
+                        .Add("@P3", SqlDbType.Date).Value = Date.Now
+                        .Add("@P4", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
+
+                    Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                        WW_err = C_MESSAGE_NO.UNMATCH_ID_PASSWD_ERROR
+                        If SQLdr.Read Then
+                            WW_USERID = Convert.ToString(SQLdr("USERID"))
+                            WW_PASSWORD = Convert.ToString(SQLdr("PASSWORD"))
+                            WW_USERCAMP = Convert.ToString(SQLdr("CAMPCODE"))
+                            WW_ORG = Convert.ToString(SQLdr("ORG"))
+                            WW_STYMD = CDate(SQLdr("STYMD"))
+                            WW_ENDYMD = CDate(SQLdr("ENDYMD"))
+                            WW_MISSCNT = CInt(SQLdr("MISSCNT"))
+                            If SQLdr("UPDYMD") Is DBNull.Value Then
+                                WW_UPDYMD = System.DateTime.UtcNow
+                            Else
+                                WW_UPDYMD = CDate(SQLdr("UPDYMD"))
+                            End If
+                            WW_UPDTIMSTP = CType(SQLdr("UPDTIMSTP"), Byte())
+                            '20191101-追加-START
+                            WW_MENUROLE = Convert.ToString(SQLdr("MENUROLE"))
+                            WW_MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
+                            WW_VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
+                            WW_RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
+                            WW_APPROVALID = Convert.ToString(SQLdr("APPROVALID"))
+                            '20191101-追加-END
+                            WW_MAPID = Convert.ToString(SQLdr("MAPID"))
+                            WW_VARIANT = Convert.ToString(SQLdr("VARIANT"))
+                            WW_PASSENDYMD = Convert.ToString(SQLdr("PASSENDYMD"))
+                            Dim outputId As String = ""
+                            Dim onOff As String = ""
+                            Dim sortNo As Integer = 0
+                            For i As Integer = 1 To 25
+                                outputId = Convert.ToString(SQLdr(String.Format("OUTPUTID{0}", i)))
+                                onOff = Convert.ToString(SQLdr(String.Format("ONOFF{0}", i)))
+                                sortNo = CInt(SQLdr(String.Format("SORTNO{0}", i)))
+                                Dim userMenuItm = New CS0050SESSION.UserMenuCostomItem(outputId, onOff, sortNo)
+                                WW_UserMenuList.Add(userMenuItm)
+                            Next
+
+                            WW_err = C_MESSAGE_NO.NORMAL
                         End If
-                        WW_UPDTIMSTP = CType(SQLdr("UPDTIMSTP"), Byte())
-                        '20191101-追加-START
-                        WW_MENUROLE = Convert.ToString(SQLdr("MENUROLE"))
-                        WW_MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
-                        WW_VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
-                        WW_RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
-                        WW_APPROVALID = Convert.ToString(SQLdr("APPROVALID"))
-                        '20191101-追加-END
-                        WW_MAPID = Convert.ToString(SQLdr("MAPID"))
-                        WW_VARIANT = Convert.ToString(SQLdr("VARIANT"))
-                        WW_PASSENDYMD = Convert.ToString(SQLdr("PASSENDYMD"))
-                        WW_err = C_MESSAGE_NO.NORMAL
-                    End If
 
-                    'Close
-                    SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
-
+                    End Using
                 End Using
 
             Catch ex As Exception
@@ -548,7 +573,7 @@ Public Class M00000LOGON
         CS0050Session.VIEW_MAP_VARIANT = WW_VARIANT
         CS0050Session.MAP_ETC = ""
         CS0050Session.VIEW_PERMIT = ""
-
+        CS0050Session.UserMenuCostomList = WW_UserMenuList
         Master.MAPID = WW_MAPID
         Master.USERCAMP = WW_USERCAMP
         '20191101-追加-START
@@ -646,18 +671,18 @@ Public Class M00000LOGON
             .Add("GUIDANCENO", GetType(String))
             .Add("ENTRYDATE", GetType(String))
             .Add("TYPE", GetType(String))
-            .Add("TITTLE", GetType(String))
+            .Add("TITLE", GetType(String))
             .Add("NAIYOU", GetType(String))
-            .Add("FAILE1", GetType(String))
+            .Add("FILE1", GetType(String))
         End With
         Try
             Dim sqlStat As New StringBuilder
             sqlStat.AppendLine("SELECT GD.GUIDANCENO")
             sqlStat.AppendLine("      ,format(GD.INITYMD,'yyyy/M/d') AS ENTRYDATE")
             sqlStat.AppendLine("      ,GD.TYPE                       AS TYPE")
-            sqlStat.AppendLine("      ,GD.TITTLE                     AS TITTLE")
+            sqlStat.AppendLine("      ,GD.TITLE                      AS TITLE")
             sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
-            sqlStat.AppendLine("      ,GD.FAILE1                     AS FAILE1")
+            sqlStat.AppendLine("      ,GD.FILE1                      AS FILE1")
             sqlStat.AppendLine("  FROM oil.OIM0020_GUIDANCE GD")
             sqlStat.AppendLine(" WHERE GETDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
             sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
@@ -678,10 +703,10 @@ Public Class M00000LOGON
                         dr("GUIDANCENO") = sqlGuidDr("GUIDANCENO")
                         dr("ENTRYDATE") = sqlGuidDr("ENTRYDATE")
                         dr("TYPE") = sqlGuidDr("TYPE")
-                        dr("TITTLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITTLE")))
+                        dr("TITLE") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("TITLE")))
                         dr("NAIYOU") = HttpUtility.HtmlEncode(Convert.ToString(sqlGuidDr("NAIYOU"))).Replace(ControlChars.CrLf, ControlChars.VerticalTab & "<br />").Replace(ControlChars.Cr, ControlChars.VerticalTab & "<br />").Replace(ControlChars.Lf, ControlChars.VerticalTab & "<br />")
                         dr("NAIYOU") = Convert.ToString(dr("NAIYOU")).Replace(ControlChars.VerticalTab, ControlChars.CrLf)
-                        dr("FAILE1") = Convert.ToString(sqlGuidDr("FAILE1"))
+                        dr("FILE1") = Convert.ToString(sqlGuidDr("FILE1"))
 
                         retDt.Rows.Add(dr)
                     End While

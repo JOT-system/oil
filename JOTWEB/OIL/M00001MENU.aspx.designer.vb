@@ -86,6 +86,15 @@ Partial Public Class M00001MENU
     Protected WithEvents P005 As Global.JOTWEB.MP0005ConsignmentStatus
     
     '''<summary>
+    '''P006 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P006 As Global.JOTWEB.MP0006LinkListImportStatus
+    
+    '''<summary>
     '''P009 コントロール。
     '''</summary>
     '''<remarks>

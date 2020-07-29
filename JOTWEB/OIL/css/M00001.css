@@ -421,3 +421,57 @@ div.showGuidance a[id^="Menu_"] {
 .monthTransTable td {
     text-align:right;
 }
+/* ******************************** */
+/* 貨車連結順序表取込状況ペイン個別 */
+/* ******************************** */
+.paneLinkListImportItems {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+
+}
+.paneLinkListImportItems > div {
+    align-content:center;
+    justify-content:center;
+}
+.paneLinkListImportItems .linkListTrainNo {
+    border:2px solid rgb(50,106,168);
+    height:32px;
+    margin:5px;
+    border-radius:10px;
+    width:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:"Meiryo UI";
+    font-weight:bold;
+    font-size:14pt;
+    cursor:default;
+    -webkit-user-select:none;
+    user-select:none;
+}
+.paneLinkListImportItems .linkListImported {
+    height:30px;
+    margin:5px;
+    width:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:default;
+    position:relative;
+}
+
+.paneLinkListImportItems .linkListImported .Imported {
+    /* まる */
+    display:block;
+    content:"";
+    border:solid 2px rgb(0,112,192);
+    border-radius:50%;
+    width:25px;
+    height:25px;
+}
+.paneLinkListImportItems .linkListImported .notProceed:after {
+    /* 棒 */
+    content:'―';
+    font-weight:bolder;
+}

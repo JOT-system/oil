@@ -23,6 +23,42 @@ Partial Public Class MP0003OTLoadingSendStatus
     Protected WithEvents contentPane As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
+    '''lblPaneTitle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblPaneTitle As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''hdnRefreshCall コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnRefreshCall As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''ddlLoadingSendStatusOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlLoadingSendStatusOffice As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''repLoadingSendStatusItems コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repLoadingSendStatusItems As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>
     '''<remarks>

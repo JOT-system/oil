@@ -331,6 +331,8 @@ div.showGuidance a[id^="Menu_"] {
     font-size:16pt;
     font-weight:bold;
     height:32px;
+    margin-top:5px;
+    box-sizing:border-box;
 }
 
 /* 再描画ボタンアイコン */
@@ -373,13 +375,124 @@ div.showGuidance a[id^="Menu_"] {
     font-size: 12pt;
     padding: 2px;
 }
+/* 列車○×票の共通 */
+.trainStatList {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+.trainStatList > div {
+    align-content: center;
+    justify-content: center;
+}
+.trainStatList .trainItem .trainNo {
+    border:2px solid rgb(50,106,168);
+    height:32px;
+    margin:5px;
+    border-radius:10px;
+    width:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:"Meiryo UI";
+    font-weight:bold;
+    font-size:14pt;
+    cursor:default;
+    -webkit-user-select:none;
+    user-select:none;
+}
+.trainStatList .trainNo,
+.trainStatList .trainStatus{
+    height:30px;
+    margin:5px;
+    width:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:default;
+    position:relative;
+}
+
+.trainStatList .trainStatus .stC:after {
+    /* まる */
+    display:block;
+    content:"";
+    border:solid 2px rgb(0,112,192);
+    border-radius:50%;
+    width:25px;
+    height:25px;
+}
+.trainStatList .trainStatus .st-:after {
+    /* 棒 */
+    content:'―';
+    font-weight:bolder;
+}
+/* ******************** */
+/* 締状況ペイン個別 */
+/* ******************** */
+.cycleBillingStatusWrapper {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+.cycleBillingStatusDeptBranch {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+.cycleBillingStatusDeptBranch .deptList {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+.cycleBillingStatusWrapper .underArrow {
+    display: block;
+    text-align: center;
+}
+.cycleBillingStatusWrapper .underArrow:after {
+    content: "";
+    display:inline-block;
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url('../img/underArrow.png');
+}
+.cycleBillingStatusWrapper .branchItemItem > span,
+.cycleBillingStatusWrapper .deptItem > span,
+.cycleBillingStatusWrapper .bottomItem > span {
+    display: flex;
+    height: 35px;
+    border: 1px solid rgb(65,113,156);
+    border-radius: 10px;
+    background-color: rgb(91,155,213);
+    color: rgb(255,255,255);
+    //padding-top: 0.5em;
+    margin-right: 5px;
+    margin-bottom: 2px;
+    align-items: center;
+    justify-content:center;
+}
+.cycleBillingStatusWrapper .deptItem {
+    text-align: center;
+    box-sizing :border-box;
+}
+.cycleBillingStatusWrapper .branchItemItem,
+.cycleBillingStatusWrapper .bottomItem {
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.deptItem > span {
+    width:145px;
+}
 /* ******************** */
 /* 月間輸送量ペイン個別 */
 /* ******************** */
 /* 表とグラフを横並び */
 .monthTransLeft, .monthTransRight {
-    display:inline-block;
-    vertical-align:top;
+    display: inline-block;
+    vertical-align: top;
 }
 .monthTransTable table {
     table-layout: fixed;

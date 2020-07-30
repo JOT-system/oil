@@ -184,6 +184,7 @@
     <Content Include="OIL\img\suitekiEmptyIcon.png" />
     <Content Include="OIL\img\suitekiIcon.png" />
     <Content Include="OIL\img\tank.png" />
+    <Content Include="OIL\img\underArrow.png" />
     <Content Include="OIL\img\unlockKey.png" />
     <Content Include="OIL\img\warning.png" />
     <Content Include="OIL\img\w_cat.png" />

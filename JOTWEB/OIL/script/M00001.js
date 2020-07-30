@@ -20,6 +20,19 @@ function InitDisplay() {
             
         }
     }
+    //〆状況ペインの幅調整
+    let closeBranchAll = document.querySelectorAll('.cycleBillingStatusDeptBranch > div');
+    let closeBottom = document.querySelector('.cycleBillingStatusBottom');
+    if (closeBranchAll !== null) {
+        if (closeBottom !== null) {
+            let branchSize = 0;
+            for (let i = 0; i < closeBranchAll.length; i++) {
+                let closeBranch = closeBranchAll[i];
+                branchSize = branchSize + closeBranch.clientWidth;
+            }
+            closeBottom.style.width = branchSize + "px";
+        }
+    }
 }
 /**
  * 左ナビゲーションクリックイベントバインド

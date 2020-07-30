@@ -23,6 +23,42 @@ Partial Public Class MP0005ConsignmentStatus
     Protected WithEvents contentPane As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
+    '''lblPaneTitle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents lblPaneTitle As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''hdnRefreshCall コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnRefreshCall As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''ddlConsignmentOffice コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlConsignmentOffice As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''repConsignmentItems コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repConsignmentItems As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>
     '''<remarks>

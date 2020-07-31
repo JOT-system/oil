@@ -57,47 +57,64 @@ Public Class MP0009ActualTraction
     ''' </summary>
     ''' <returns></returns>
     Private Function GetListData(sqlCon As SqlConnection) As DataTable
+        Dim sqlTrainData As New StringBuilder
+        sqlTrainData.AppendLine("SELECT TR.TRAINNO")
+        sqlTrainData.AppendLine("  FROM OIL.OIM0007_TRAIN TR")
+        sqlTrainData.AppendLine(" WHERE TR.DELFLG = @DELFLG")
+        If Not Me.ddlActualTractionOffice.SelectedValue.Equals("ALL") Then
+            sqlTrainData.AppendLine("   AND TR.OFFICECODE = @OFFICECODE")
+        End If
+        sqlTrainData.AppendLine(" GROUP BY TR.TRAINNO")
+        sqlTrainData.AppendLine(" ORDER BY CONVERT(int,TR.TRAINNO)")
+
         Dim sqlStat As New StringBuilder
         Dim retTbl As DataTable = Nothing
-        'FIXVALUEのPRODUCTPATTERNを油種の主体とする
-        '受注データが無くとも全対象油種表示をさせる
-        sqlStat.AppendLine("SELECT  FV.KEYCODE AS OILCODE ")
-        sqlStat.AppendLine("      , FV.VALUE1  AS OILNAME ")
-        sqlStat.AppendLine("      , CAST(Rand(CHECKSUM(NEWID())) * 1000 as INT) + 1 + ISNULL(SUMVAL.YESTERDAYVAL,0) AS YESTERDAYVAL")
-        sqlStat.AppendLine("      , CAST(Rand(CHECKSUM(NEWID())) * 1000 as INT) + 1 + ISNULL(SUMVAL.TODAYVAL,0)     AS TODAYVAL")
-        sqlStat.AppendLine("      , ISNULL(SUMVAL.TODAYVAL,0) - ISNULL(SUMVAL.YESTERDAYVAL,0)  AS TODAYTRANS")
-        sqlStat.AppendLine("  FROM OIL.VIW0001_FIXVALUE FV")
-        sqlStat.AppendLine("  LEFT JOIN  (SELECT ODD.OILCODE")
-        sqlStat.AppendLine("                    ,ISNULL(SUM(CASE WHEN ORD.ACTUALDEPDATE = @TO_DATE THEN 0 ELSE ODD.CARSAMOUNT END),0) AS YESTERDAYVAL")
-        sqlStat.AppendLine("                    ,ISNULL(SUM(ODD.CARSAMOUNT),0)                                                        AS TODAYVAL")
-        sqlStat.AppendLine("                FROM      OIL.OIT0002_ORDER  ORD")
-        sqlStat.AppendLine("               INNER JOIN OIL.OIT0003_DETAIL ODD")
-        sqlStat.AppendLine("                       ON ORD.ORDERNO    = ODD.ORDERNO")
-        sqlStat.AppendLine("                      AND ORD.OFFICECODE = @OFFICECODE")
-        sqlStat.AppendLine("                      AND ORD.ACTUALDEPDATE BETWEEN  @FROM_DATE AND @TO_DATE")
-        sqlStat.AppendLine("                      AND ORD.DELFLG     = @DELFLG")
-        sqlStat.AppendLine("                      AND ODD.DELFLG     = @DELFLG")
-        sqlStat.AppendLine("               GROUP BY ODD.OILCODE")
-        sqlStat.AppendLine("             ) SUMVAL")
-        sqlStat.AppendLine("         ON FV.KEYCODE = SUMVAL.OILCODE")
-        sqlStat.AppendLine(" WHERE FV.CAMPCODE = @OFFICECODE")
-        sqlStat.AppendLine("   AND FV.CLASS    = @CLASS")
-        sqlStat.AppendLine("   AND FV.DELFLG   = @DELFLG")
-        sqlStat.AppendLine(" ORDER BY FV.KEYCODE")
-        Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
-            With sqlCmd.Parameters
-                '月初から現在の日付の範囲
-                Dim fromDtm As Date = New Date(Now.Year, Now.Month, 1)
-                Dim toDtm As Date = Now
 
+        '受注テーブルより列車番号を横軸としたクロス集計を行いグラフ用データを取得
+        'またデータが無くても日付の範囲で出せるようカレンダーテーブルを結合する
+        sqlStat.AppendLine("SELECT pvr.TARGETDATE  ")
+        sqlStat.AppendLine("      ,{0}  ")
+        sqlStat.AppendLine("  FROM (SELECT format(CAL.WORKINGYMD,'yyyy/MM/dd') AS TARGETDATE")
+        sqlStat.AppendLine("              ,ODR.TRAINNO AS TRAINNO")
+        sqlStat.AppendLine("              ,DTL.CARSNUMBER")
+        sqlStat.AppendLine("          FROM COM.OIS0021_CALENDAR CAL")
+        sqlStat.AppendLine("     LEFT JOIN OIL.OIT0002_ORDER ODR")
+        sqlStat.AppendLine("            ON CAL.WORKINGYMD =  ODR.LODDATE")
+        sqlStat.AppendLine("           AND CAL.DELFLG     =  @DELFLG")
+        sqlStat.AppendLine("           AND ODR.DELFLG     =  @DELFLG")
+        sqlStat.AppendLine("           AND ODR.LODDATE IS NOT NULL")
+        sqlStat.AppendLine("     LEFT JOIN OIL.OIT0003_DETAIL DTL")
+        sqlStat.AppendLine("            ON ODR.ORDERNO = DTL.ORDERNO")
+        sqlStat.AppendLine("           AND DTL.DELFLG     =  @DELFLG")
+        sqlStat.AppendLine("         WHERE CAL.WORKINGYMD BETWEEN Getdate() -3 AND Getdate()")
+        sqlStat.AppendLine("       ) pvbase")
+        sqlStat.AppendLine(" PIVOT(SUM(CARSNUMBER) FOR [TRAINNO] IN ({1})) pvr")
+
+        Using sqlCmd As New SqlCommand(sqlTrainData.ToString, sqlCon)
+            With sqlCmd.Parameters
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.ddlActualTractionOffice.SelectedValue
-                .Add("@CLASS", SqlDbType.NVarChar).Value = "PRODUCTPATTERN"
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
-                .Add("@FROM_DATE", SqlDbType.Date).Value = fromDtm
-                .Add("@TO_DATE", SqlDbType.Date).Value = toDtm
 
             End With
+            Dim fieldList As String = ""
+            Dim firldListWithIsNull As String = ""
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                '列車リストが取得出来ない場合はグラフデータなしのまま終了
+                If sqlDr.HasRows = False Then
+                    Return retTbl
+                End If
 
+                While sqlDr.Read
+                    If fieldList <> "" Then
+                        fieldList = fieldList & ","
+                        firldListWithIsNull = firldListWithIsNull & ","
+                    End If
+                    fieldList = fieldList & "[" & Convert.ToString(sqlDr("TRAINNO")) & "]"
+                    firldListWithIsNull = firldListWithIsNull & String.Format("IsNull([{0}],0) AS [{0}]", Convert.ToString(sqlDr("TRAINNO")))
+                End While
+
+            End Using 'sqlDr
+            sqlCmd.CommandText = String.Format(sqlStat.ToString, firldListWithIsNull, fieldList)
             Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
                 If IsNothing(retTbl) Then
                     retTbl = New DataTable
@@ -109,7 +126,8 @@ Public Class MP0009ActualTraction
 
                 retTbl.Clear()
                 retTbl.Load(sqlDr)
-            End Using 'sqlDr
+            End Using
+
         End Using 'sqlCmd
         Return retTbl
     End Function
@@ -125,12 +143,34 @@ Public Class MP0009ActualTraction
         End Using
 
         With Me.chtActualTraction
-            Dim revData = dt
-            If dt IsNot Nothing OrElse dt.Rows.Count > 0 Then
-                revData = (From dr As DataRow In dt Order By Convert.ToString(dr("OILCODE")) Descending).CopyToDataTable
-            End If
+            'Dim revData = dt
+            'If dt IsNot Nothing OrElse dt.Rows.Count > 0 Then
+            '    revData = (From dr As DataRow In dt Order By Convert.ToString(dr("TARGETDATE")) Descending).CopyToDataTable
+            'End If
+            .Series.Clear()
+            'データ列が動的な為VB上で生成
+            For Each revCol As DataColumn In dt.Columns
+                If revCol.ColumnName = "TARGETDATE" Then
+                    Continue For
+                End If
+                With .Series.Add("T" & revCol.ColumnName)
+                    .ChartArea = "carActualTraction"
+                    .ChartType = SeriesChartType.Column
+                    '.Color = "#2F5197" '色は一旦自動でおまかせ。列車番号毎に必要なら別途定義
+                    .XValueMember = "TARGETDATE"
+                    .YValueMembers = revCol.ColumnName
+                    '凡例名
+                    .LegendText = revCol.ColumnName
+                    .Legend = "legHan"
+                    '棒グラフに値を表示
+                    .IsValueShownAsLabel = True
+                End With
 
-            .DataSource = revData
+            Next
+            For Each dr As DataRow In dt.Rows
+                dr("TARGETDATE") = CDate(dr("TARGETDATE")).ToString("M月d日")
+            Next
+            .DataSource = dt
             .DataBind()
 
         End With

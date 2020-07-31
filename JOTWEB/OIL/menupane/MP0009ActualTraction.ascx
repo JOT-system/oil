@@ -22,42 +22,19 @@
             </div>
             <!-- グラフコントロール -->
             <asp:Chart ID="chtActualTraction" runat="server" EnableViewState="true"
-                Width="620"
+                Width="1070"
                 BackColor="Transparent">
                 <Series>
-                    <%-- 当日分のデータ設定 --%>
-                    <asp:Series Name="serToday" 
-                        ChartArea="carMonthTrans" 
-                        ChartType="Column" 
-                        Color="#2F5197" 
-                        XValueMember="OILNAME" 
-                        YValueMembers="TODAYVAL"
-                        LegendText="当日"
-                        Legend="legHan"
-                        >
-                    </asp:Series>
-                    <%--前日分のデータ設定 --%>
-                    <asp:Series Name="serYesterday" 
-                        ChartArea="carMonthTrans" 
-                        ChartType="Column" 
-                        Color="#A6A6A6"
-                        XValueMember="OILNAME" 
-                        YValueMembers="YESTERDAYVAL"
-                        LegendText="前日"
-                        Legend="legHan"
-                        IsValueShownAsLabel="true"
-                        >
-                    </asp:Series>
 
                 </Series>
                 <ChartAreas>
-                    <asp:ChartArea Name="carMonthTrans" 
+                    <asp:ChartArea Name="carActualTraction" 
                             >
                             
                         <AxisX LabelAutoFitMaxFontSize="12"
                                 LineColor="Gray">
                             <%-- 油種名フォント --%>
-                            <LabelStyle Font="ms pgothic, 6pt, style=Bold"  />
+                            <LabelStyle Font="ms pgothic, 6pt, style=Bold" />
                             <%-- 横軸文言とつなぐメモリ線（表示しない） --%>
                             <MajorTickMark Enabled="false" />
                             <%-- 横軸のグリッド線 --%>
@@ -66,6 +43,7 @@
                         <AxisY LineColor="Gray">
                             <%-- 縦軸メモリ線を消す --%>
                             <MajorTickMark Enabled="false" />
+                            
                             <%-- 数値フォント --%>
                             <LabelStyle Font="ms pgothic, 6pt, style=Regular" Format="#,##0"  />
                             <%-- 縦軸のグリッド線 --%>
@@ -76,6 +54,7 @@
                 <Legends>
                     <asp:Legend Name="legHan" 
                         LegendStyle="row" 
+                        Font="ms pgothic, 8pt, style=Regular"
                         Docking="Top"  
                         Alignment="Far" 
                         BackColor="Transparent" ></asp:Legend>

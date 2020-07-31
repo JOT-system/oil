@@ -7,6 +7,7 @@
 <%@ Register Src="~/OIL/menupane/MP0003OTLoadingSendStatus.ascx" TagPrefix="LSINC" TagName="MP0003OTLoadingSendStatus" %>
 <%@ Register Src="~/OIL/menupane/MP0004ImportShipmentAmountStatus.ascx" TagPrefix="LSINC" TagName="MP0004ImportShipmentAmountStatus" %>
 <%@ Register Src="~/OIL/menupane/MP0005ConsignmentStatus.ascx" TagPrefix="LSINC" TagName="MP0005ConsignmentStatus" %>
+<%@ Register Src="~/OIL/menupane/MP0006LinkListImportStatus.ascx" TagPrefix="LSINC" TagName="MP0006LinkListImportStatus" %>
 <%@ Register Src="~/OIL/menupane/MP0009ActualTraction.ascx" TagPrefix="LSINC" TagName="MP0009ActualTraction" %>
 
 
@@ -103,6 +104,7 @@
                         <LSINC:MP0003OTLoadingSendStatus runat="server" ID="P003" />
                         <LSINC:MP0004ImportShipmentAmountStatus runat="server" ID="P004" />
                         <LSINC:MP0005ConsignmentStatus runat="server" id="P005" />
+                        <LSINC:MP0006LinkListImportStatus runat="server" id="P006" />
                         <LSINC:MP0009ActualTraction runat="server" ID="P009" />
                     </div>
                 </div>            

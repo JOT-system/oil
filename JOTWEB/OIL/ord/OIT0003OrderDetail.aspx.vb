@@ -4866,10 +4866,10 @@ Public Class OIT0003OrderDetail
                 Dim PARA7 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 40) '荷受人名
 
                 Dim intDetailNo As Integer = 0
-                For Each OIT0001WKrow As DataRow In OIT0003WKtbl.Rows
-                    intDetailNo = OIT0001WKrow("DETAILNO")
-                    PARA1.Value = OIT0001WKrow("ORDERNO")
-                    PARA8.Value = OIT0001WKrow("DETAILNO")
+                For Each OIT0003WKrow As DataRow In OIT0003WKtbl.Rows
+                    intDetailNo = OIT0003WKrow("DETAILNO")
+                    PARA1.Value = OIT0003WKrow("ORDERNO")
+                    PARA8.Value = OIT0003WKrow("DETAILNO")
                     PARA2.Value = work.WF_SEL_SHIPPERSCODE.Text
                     PARA3.Value = work.WF_SEL_SHIPPERSNAME.Text
                     PARA4.Value = work.WF_SEL_BASECODE.Text

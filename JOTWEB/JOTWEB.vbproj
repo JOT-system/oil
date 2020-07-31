@@ -115,6 +115,7 @@
     <Content Include="OIL\css\OIM0020C.css" />
     <Content Include="OIL\css\OIM0020L.css" />
     <Content Include="OIL\css\OIM0020S.css" />
+    <Content Include="OIL\css\OIM0001S.css" />
     <Content Include="OIL\css\OIT0006D.css" />
     <Content Include="OIL\css\OIT0006L.css" />
     <Content Include="OIL\css\OIT0005C.css" />

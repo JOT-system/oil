@@ -2,7 +2,7 @@
 Imports System.Data.SqlClient
 
 ''' <summary>
-''' 基地情報取得
+''' 運用基地⇒管轄営業所情報取得
 ''' </summary>
 ''' <remarks></remarks>
 Public Class GL0014PLANTList
@@ -47,27 +47,36 @@ Public Class GL0014PLANTList
         'DataBase接続文字
         Using SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
-
+            SqlConnection.ClearPool(SQLcon)
             getPlantList(SQLcon)
 
         End Using
     End Sub
     ''' <summary>
-    ''' 基地一覧取得
+    ''' 運用基地（管轄営業所）一覧取得
     ''' </summary>
     Protected Sub getPlantList(ByVal SQLcon As SqlConnection)
         '●Leftボックス用会社取得
         '○ User権限によりDB(OIM0009_PLANT)検索
         Try
 
+            'Dim SQLStr As String =
+            '        " SELECT DISTINCT                 " &
+            '        "         PLANTCODE     as PLANTCODE   , " &
+            '        "         PLANTNAME     as ROLENAME    , " &
+            '        "         SHIPPERCODE   as SHIPPERCODE " &
+            '        " FROM OIL.OIM0009_PLANT            " &
+            '        " WHERE   DELFLG       <> @P1       " &
+            '        "   ORDER BY PLANTCODE  "
+
             Dim SQLStr As String =
                     " SELECT DISTINCT                 " &
-                    "         PLANTCODE     as PLANTCODE   , " &
-                    "         PLANTNAME     as ROLENAME    , " &
-                    "         SHIPPERCODE   as SHIPPERCODE " &
-                    " FROM OIL.OIM0009_PLANT            " &
-                    " WHERE   DELFLG       <> @P1       " &
+                    "         ORGCODE     as PLANTCODE   , " &
+                    "         ORGNAME     as ROLENAME     " &
+                    " FROM OIL.VIW0009_BRANCHCHANGE            " &
                     "   ORDER BY PLANTCODE  "
+
+
 
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
 

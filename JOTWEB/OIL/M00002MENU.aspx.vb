@@ -21,12 +21,28 @@ Public Class M00002MENU
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         If IsPostBack Then
-
+            '○ 各ボタン押下処理
+            If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
+                Select Case WF_ButtonClick.Value
+                    Case "WF_ButtonBackToMenu"
+                        WF_ButtonBackToMenu_Click()
+                End Select
+            End If
         Else
             '★★★ 初期画面表示 ★★★
             Initialize()
         End If
 
+    End Sub
+
+    ''' <summary>
+    ''' メニューへ戻るボタン押下時処理
+    ''' </summary>
+    Public Sub WF_ButtonBackToMenu_Click()
+        '本当はURLマスタですが一旦固定
+        Server.Transfer("~/OIL/M00001MENU.aspx")
+        CS0050Session.VIEW_MAPID = "M00001"
+        'Me.MAPID = "M00001"
     End Sub
 
     ''' <summary>
@@ -55,7 +71,7 @@ Public Class M00002MENU
                         & " SELECT                             " _
                         & "      ROWLINE + 1     AS ROWLINE    " _
                         & " FROM  ROWIDX                       " _
-                        & " WHERE ROWLINE <= 6                " _
+                        & " WHERE ROWLINE <= 30                " _
                         & ")                                   " _
                         & " SELECT                             " _
                         & "      rtrim(R.ROWLINE)               as SEQ     , " _

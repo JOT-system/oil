@@ -13,6 +13,8 @@
     <script type="text/javascript">
         
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
+        //共通ポップアップボタン名
+        var customPopUpOkButtonName = 'ﾀﾞｳﾝﾛｰﾄﾞ';
     </script>
 </asp:Content>
  
@@ -38,11 +40,8 @@
                 <div class="rightSide">
                     <input type="button" id="WF_ButtonRECULC"        class="btn-sticky" value="在庫表再計算"     onclick="ButtonClick('WF_ButtonRECULC');" />
                     <input type="button" id="WF_ButtonUPDATE"        class="btn-sticky" value="在庫表保存"     onclick="ButtonClick('WF_ButtonUPDATE');" />
-                    <span id="spnDownloadMonth">
-                        <asp:Label ID="lblDownloadMonth" runat="server" Text="帳票年月"></asp:Label>
-                        <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
-                    </span>
-                    <input type="button" id="WF_ButtonCSV"           class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonCSV');" />
+
+                    <input type="button" id="WF_ButtonReport"           class="btn-sticky" value="帳票" onclick="commonShowCustomPopup();" />
                     <input type="button" id="WF_ButtonEND"           class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                     <div                 id="WF_ButtonFIRST"         class="firstPage"  runat="server"   visible="false" onclick="ButtonClick('WF_ButtonFIRST');"></div>
                     <div                 id="WF_ButtonLAST"          class="lastPage"   runat="server"   visible="false" onclick="ButtonClick('WF_ButtonLAST');"></div>
@@ -171,9 +170,10 @@
                                                 <asp:TextBox ID="txtSuggestValue" runat="server" 
                                                     Text='<%# DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).ItemValue %>' 
                                                     Enabled='<%# If(DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).OilInfo.OilCode = DispDataClass.SUMMARY_CODE _
-                                                                                        OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True,
-                                                                                        "False",
-                                                                                        "True") %>'></asp:TextBox>
+                                                                                                                                                    OrElse DirectCast(Eval("Value"), DispDataClass.SuggestItem.SuggestValue).DayInfo.IsBeforeToday = True _
+                                                                                                                                                    OrElse Me.pnlSuggestList.Attributes.Keys.Cast(Of String).Contains("data-otmode"),
+                                                                                                                                        "False",
+                                                                                                                                        "True") %>'></asp:TextBox>
                                             </div>
                                         </ItemTemplate>
                                     </asp:Repeater>
@@ -451,7 +451,54 @@
             <asp:ListBox ID="lstDispStockOilType" runat="server" SelectionMode="Multiple"></asp:ListBox>
             <!-- ローリー表示・非表示状態保持用 full or hideLorry -->
             <asp:HiddenField ID="hdnDispLorry" runat="server" Value="full" />
+            <!-- 油槽所変更値保持用 -->
+            <asp:HiddenField ID="hdnChgConsignee" runat="server" />
+            <asp:HiddenField ID="hdnChgConsigneeName" runat="server" />
+            <!-- 油槽所変更時初回ロード 0:通常、1:初回 -->
+            <asp:HiddenField ID="hdnChgConsigneeFirstLoad" runat="server" Value="0" />
+            <!-- 帳票設定表示状態保持用 -->
+            <asp:HiddenField ID="hdnDispReportSettings" runat="server" value="0"/>
             <!-- 権限 -->
         </div>
  
+</asp:Content>
+<%--ポップアップタイトルバーの文字--%>
+<asp:Content ID="ctCostumPopUpTitle" ContentPlaceHolderID ="contentsPopUpTitle" runat="server">
+    帳票設定
+</asp:Content>
+<%--ポップアップタイトルバーの内容--%>
+<asp:Content ID="ctCostumPopUp" ContentPlaceHolderID ="contentsPopUpInside" runat="server">
+    <div id="divChkEneos" runat="server">
+        <div class="grc0001Wrapper">
+            <ul>
+                <li>
+                    <asp:CheckBox ID="chkPrintENEOS" runat="server" Text="ENEOS用帳票" />
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div>
+        <span id="spnDownloadMonth" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %> >
+            <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
+            <asp:Label ID="Label1" runat="server" Text="帳票年月"></asp:Label>
+            <asp:TextBox ID="txtDownloadMonth" runat="server" data-monthpicker="1"></asp:TextBox>
+        </span>
+    </div>
+    <div>
+        <span id="spnFromDate" <%= If(hdnShowPnlToDate.Value = "1", "style='display:none;'", "") %>>
+            <asp:Label ID="lblReportFromDate" runat="server" Text="開始日"></asp:Label>
+            <a class="ef" id="aReportFromDate" ondblclick="Field_DBclick('txtReportFromDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:TextBox ID="txtReportFromDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>
+<%--    <div id="pnlToDate" <%= If(hdnShowPnlToDate.Value = "1", "", "style='display:none;'") %>>
+        <asp:HiddenField ID="hdnShowPnlToDate" runat="server" Value="1" />
+        <span id="spnToDate">
+            <asp:Label ID="lblReportToDate" runat="server" Text="終了日"></asp:Label>
+            <a class="ef" id="aReportToDate" ondblclick="Field_DBclick('txtReportToDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                <asp:TextBox ID="txtReportToDate" runat="server" CssClass="calendarIcon"  onblur="MsgClear();"></asp:TextBox>
+            </a>
+        </span>
+    </div>--%>
 </asp:Content>

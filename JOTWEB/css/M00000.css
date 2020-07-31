@@ -1,6 +1,8 @@
 ﻿.logonbox {
     width: 100%;
-    height:100%;
+    min-width: 400px;
+    height: 100%;
+    min-height:430px;
     background: -moz-linear-gradient(65deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
     background: -webkit-linear-gradient(65deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
     background: linear-gradient(25deg, rgba(40, 222, 132, 0.5), rgba(40, 103, 247, 0.8)),url(../img/tank2.png);
@@ -17,39 +19,82 @@
 
 .logonkeybox {
     width: 350px;
-    padding-top: 8%;
+    padding-top: 10px;
     margin-right: auto;
     margin-bottom: 0px;
     margin-left: auto;
 }
 
-    .logonkeybox p {
-        margin-bottom: 1em;
-    }
-
-    .logonkeybox span {
-        min-width: 8em;
-        position: relative;
-        width: 80%;
-        margin: 40px 3%;
-    }
-
-.guidancebox {
-    width: 100px;
-    margin: 0 auto 0 auto;
-    top: 15em;
-    height: 15em;
-    background-color: white;
-    border: inset;
-    overflow-y: scroll;
-    border-color: black
+.logonkeybox p {
+    margin-bottom: 1em;
 }
 
-    .guidancebox span {
-        color: red;
-        background-color: white;
-    }
+.logonkeybox span {
+    min-width: 8em;
+    position: relative;
+    width: 80%;
+    margin: 40px 3%;
+}
 
+.guidanceboxWrapper {
+    width: calc(100% - 30px);
+    min-width: 350px;
+    height : calc(100% - 315px);
+    min-height: 120px;
+    background-color: white;
+    margin-top: 10px;
+    margin-left: 10px;
+    padding: 5px;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+    overflow-y: auto;
+}
+#guidanceTitle {
+    word-spacing :2px;
+    font-weight:bold;
+    font-size:18px;
+}
+.ulGuidance {
+    display:flex;
+    flex-wrap:wrap;
+    list-style-type :none;
+    margin:5px;
+}
+.ulGuidance li{
+    display:flex;
+    width:100%;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+.ulGuidance li div.titleLine {
+    width:100%;
+    display:flex;
+    flex-wrap:nowrap;
+    line-height :18px;
+}
+.ulGuidance li div.entryDate {
+    width: 80px;
+}
+.ulGuidance li div.title {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    word-break:normal;
+    white-space :nowrap;
+    width:calc(100% - 80px);
+    font-weight:bold;
+}
+.ulGuidance li div.otherLine {
+    margin-left:80px;
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+}
+.ulGuidance li div.naiyo {
+    word-break:break-all;
+    margin-right:10px;
+}
+.ulGuidance li div.attachFile1 {
+}
 #OK {
     /* input要素全部に対して装飾 */
     background-image: linear-gradient(0deg, #F0F8FF, F8F8FF); /* グラデーション */
@@ -65,19 +110,21 @@
     background-color: #49a9d4;
     border-radius: 5px;
     box-shadow: 2px 2px #1a6ea0;
+    outline:none;
+    border:none;
 }
 
-    #OK:hover {
-        /* マウスが上に載ったとき */
-        background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
-        border: 1px solid #2c628b;
-    }
+#OK:hover {
+    /* マウスが上に載ったとき */
+    background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
+    border: 1px solid #2c628b;
+}
 
-    #OK:active {
-        /* 押されたとき */
-        background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
-        border: 1px solid skyblue;
-    }
+#OK:active {
+    /* 押されたとき */
+    background-image: linear-gradient(180deg, #F8F8FF, #F8F8FF);
+    border: 1px solid skyblue;
+}
 
 #LogInImage {
     opacity: 0.4;

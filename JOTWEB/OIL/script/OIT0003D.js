@@ -179,6 +179,8 @@ function InitDisplay() {
         commonBindEnterToVerticalTabStep();
         // チェックボックス変更
         ChangeCheckBox(arrListId[i]);
+        // チェックボックス変更(Light)
+        ChangeCheckBoxLight(arrListId[i]);
     }
 }
 
@@ -194,7 +196,8 @@ function ChangeCheckBox(listId) {
 
     var chkObjs = objTable.querySelectorAll("input[id^='chk" + listId + "OPERATION']");
     var spnObjs = objTable.querySelectorAll("span[id^='hchk" + listId + "OPERATION']");
-
+    let objSelectIndex = document.getElementById("WF_SelectedIndex").value
+    let objChkboxFlg = document.getElementById("WF_CheckBoxFLG").value
     for (let i = 0; i < chkObjs.length; i++) {
 
         if (chkObjs[i] !== null) {
@@ -203,17 +206,102 @@ function ChangeCheckBox(listId) {
             } else {
                 chkObjs[i].checked = false;
             }
+            // チェックボックスをクリック、かつ選択した行の場合
+            if (objChkboxFlg === "TRUE" && Number(objSelectIndex) === i + 1) {
+                // フォーカスを当てる
+                chkObjs[i].focus()
+                // フォーカスを外す
+                chkObjs[i].blur()
+            }
+        }
+    }
+}
+
+
+// ○チェックボックス変更(Light)
+function ChangeCheckBoxLight(listId) {
+    var objDataLightSide = document.getElementById(listId + "_DR");
+    if (objDataLightSide === null) {
+        return;
+    }
+    var objLightTable = objDataLightSide.children[0];
+
+    var chkObjsLight1 = objLightTable.querySelectorAll("input[id^='chk" + listId + "STACKINGFLG']");
+    var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "STACKINGFLG']");
+    var chkObjsLight2 = objLightTable.querySelectorAll("input[id^='chk" + listId + "FIRSTRETURNFLG']");
+    var spnObjsLight2 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "FIRSTRETURNFLG']");
+    var chkObjsLight3 = objLightTable.querySelectorAll("input[id^='chk" + listId + "AFTERRETURNFLG']");
+    var spnObjsLight3 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "AFTERRETURNFLG']");
+    var chkObjsLight4 = objLightTable.querySelectorAll("input[id^='chk" + listId + "OTTRANSPORTFLG']");
+    var spnObjsLight4 = objLightTable.querySelectorAll("span[id^='hchk" + listId + "OTTRANSPORTFLG']");
+
+    for (let i = 0; i < chkObjsLight1.length; i++) {
+
+        if (chkObjsLight1[i] !== null) {
+            if (spnObjsLight1[i].innerText === "on") {
+                chkObjsLight1[i].checked = true;
+            } else {
+                chkObjsLight1[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight2.length; i++) {
+
+        if (chkObjsLight2[i] !== null) {
+            if (spnObjsLight2[i].innerText === "on") {
+                chkObjsLight2[i].checked = true;
+            } else {
+                chkObjsLight2[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight3.length; i++) {
+
+        if (chkObjsLight3[i] !== null) {
+            if (spnObjsLight3[i].innerText === "on") {
+                chkObjsLight3[i].checked = true;
+            } else {
+                chkObjsLight3[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight4.length; i++) {
+
+        if (chkObjsLight4[i] !== null) {
+            if (spnObjsLight4[i].innerText === "on") {
+                chkObjsLight4[i].checked = true;
+            } else {
+                chkObjsLight4[i].checked = false;
+            }
         }
     }
 }
 
 
 // ○チェックボックス選択
-function SelectCheckBox(obj, lineCnt) {
+function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+
+        surfix = '';
+        if (fieldName === 'STACKINGFLG') {
+            surfix = 'STACKING'
+        }
+        if (fieldName === 'FIRSTRETURNFLG') {
+            surfix = 'FIRSTRETURN'
+        }
+        if (fieldName === 'AFTERRETURNFLG') {
+            surfix = 'AFTERRETURN'
+        }
+        if (fieldName === 'OTTRANSPORTFLG') {
+            surfix = 'OTTRANSPORT'
+        }
+
         document.getElementById("WF_SelectedIndex").value = lineCnt;
-        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }
@@ -263,11 +351,20 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "JOINT") {
             document.getElementById('WF_LeftMViewChange').value = 53;
         }
+        else if (fieldNM === "ACCSEGCODE") {
+            document.getElementById('WF_LeftMViewChange').value = 67;
+        }
+        else if (fieldNM === "INVOICECODE"
+            || fieldNM === "PAYEECODE") {
+            document.getElementById('WF_LeftMViewChange').value = 68;
+        }
         else if (fieldNM === "ACTUALLODDATE"
             || fieldNM === "ACTUALDEPDATE" 
             || fieldNM === "ACTUALARRDATE" 
             || fieldNM === "ACTUALACCDATE" 
-            || fieldNM === "ACTUALEMPARRDATE") {
+            || fieldNM === "ACTUALEMPARRDATE"
+            || fieldNM === "KEIJYOYM"
+            || fieldNM === "JRINSPECTIONDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

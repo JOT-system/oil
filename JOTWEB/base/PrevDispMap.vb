@@ -142,6 +142,43 @@ Public Module PrevDispMap
         ''' タンク車マスタメンテナンス（登録）
         ''' </summary>
         Public Const OIM0005C As String = "ASP.OIL_MAS_OIM0005TANKCREATE_ASPX"
+        ''' <summary>
+        ''' ガイダンスマスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0020S As String = "ASP.OIL_MAS_OIM0020GUIDANCESEARCH_ASPX"
+        ''' <summary>
+        ''' ガイダンスマスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0020L As String = "ASP.OIL_MAS_OIM0020GUIDANCELIST_ASPX"
+        ''' <summary>
+        ''' ガイダンスマスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0020C As String = "ASP.OIL_MAS_OIM0020GUIDANCECREATE_ASPX"
+        ''' <summary>
+        ''' 組織マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0002S As String = "ASP.OIL_MAS_OIM0002ORGSEARCH_ASPX"
+        ''' <summary>
+        ''' 組織マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0002L As String = "ASP.OIL_MAS_OIM0002ORGLIST_ASPX"
+        ''' <summary>
+        ''' 組織マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0002C As String = "ASP.OIL_MAS_OIM0002ORGCREATE_ASPX"
+        ''' <summary>
+        ''' 品種マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0003S As String = "ASP.OIL_MAS_OIM0003PRODUCTSEARCH_ASPX"
+        ''' <summary>
+        ''' 品種マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0003L As String = "ASP.OIL_MAS_OIM0003PRODUCTLIST_ASPX"
+        ''' <summary>
+        ''' 品種マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0003C As String = "ASP.OIL_MAS_OIM0003PRODUCTCREATE_ASPX"
+
     End Class
 
 End Module 'End BaseDllConst

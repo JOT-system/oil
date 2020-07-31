@@ -54,6 +54,13 @@
 #divSuggestList div.leftColumn div:nth-child(1) {
     height:calc(24px * 3);
 }
+#pnlSuggestList[data-otmode] #divSuggestList div.leftColumn div:nth-child(1) {
+    height: calc(24px * 2);
+}
+#pnlSuggestList[data-otmode] #divSuggestList > div.oilTypeColumn > div:nth-child(3),
+#pnlSuggestList[data-otmode] #divSuggestList > div.dataColumn > div.values > div:nth-child(2) {
+    display: none;
+}
 /* 提案表直下のDivタグ */
 #divSuggestList > div {
     width: 80px;
@@ -221,7 +228,6 @@
     border:none !important;
     background-repeat: no-repeat;
     background-size: contain;
-    //float: right;
     pointer-events: auto; 
     cursor:pointer !important;
     position:relative;
@@ -247,6 +253,10 @@
 }
 #divSuggestList .lockImgArea.Unlocked:hover {
     background-image:  url('../img/lockKey.png');
+}
+#pnlSuggestList[data-otmode] #divSuggestList .lockImgArea {
+    background-image:none;
+    display:none;
 }
 /* *********************** */
 /* 比重表 設定             */
@@ -304,13 +314,11 @@ div.weightListOilType {
 #divStockList,
 #divStockList div{
     box-sizing:border-box;
-    //padding:2px;
 }
 #divStockList > div.header,
 #divStockList > div.oilTypeData {
     display:flex;
     flex-wrap: nowrap;
-    //border:1px solid darkgray; /* 暫定 */
 }
 #divStockList div.lastMargin {
     margin-left:auto;
@@ -323,7 +331,6 @@ span.minus {
 /* データ行の１～６列目の幅を足す
    ※余白要素があるので手動でバランスとる */
 #divStockList div.emptyBox {
-    //width:411px;
     width: calc(90px + 110px + 70px + 95px);
     min-width: calc(90px + 110px + 70px + 95px);
 }
@@ -351,7 +358,6 @@ span.minus {
 #divStockList div.col5{
     width:110px;
     min-width:110px;
-    //text-align:center;
     display:flex;
     flex-wrap: nowrap;
     flex-direction:column;
@@ -393,7 +399,6 @@ span.minus {
 #divStockList div.col4 > div > span,
 #divStockList div.col5 > div > span{
     display:inline-block;
-    //margin-top:calc(100% / 3 - 5px);
 }
 #divStockList div.col3 > div > span,
 #divStockList div.col5 > div > span {
@@ -485,8 +490,6 @@ span.morningStockIdx0 {
 }
 #divStockList input[type=text][data-textfield="MorningStock"],
 #divStockList input[type=number][data-textfield="MorningStock"] {
-    // height: 18px;
-    //line-height:0.8em;
     width: calc(100% + 5.5px);
 }
 #divStockList input[type=text][name$="txtSend"],
@@ -732,10 +735,8 @@ div.oilTypeData div.col1 span[data-tiptext] {
     display: block;
     padding: 0.2em 0.5em;
     content: attr(data-tiptext);
-    //white-space: nowrap;
     color: #ffffff;
     border-radius: 6px;
-    //background: #1b2538;
     background-color: RGBA(27, 37, 56, 0.8);
     font-size:0.8em;
     z-index:5;
@@ -813,3 +814,32 @@ _:-ms-lang(x)::backdrop,
 /* ************************ */
 /* ↑ボタン固定ここまで↑   */
 /* ************************ */
+/* ************************ */
+/* ↓油槽所選択ここから↓   */
+/* ************************ */
+#selHeadConsignee {
+    height: 17.5px;
+    line-height: 17.5px;
+    outline: none;
+    font-size:11.5px;
+}
+#selHeadConsignee option {
+    outline: none;
+}
+/* ************************ */
+/* ↑油槽所選択ここまで↑   */
+/* ************************ */
+
+/* ************************ */
+/* ポップアップ内コンテンツ */
+/* ************************ */
+div.popUpContents > div {
+    margin-bottom:5px;
+}
+#txtReportFromDate,
+#txtReportToDate {
+    width: 150px !important;
+}
+.calendarIconArea div {
+    margin-top:calc(100% - 14px) !important;
+}

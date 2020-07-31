@@ -50,15 +50,6 @@ Partial Public Class OIT0002LinkDetail
     Protected WithEvents WF_ORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''lblOrderOffice_dummy コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents lblOrderOffice_dummy As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''TxtOrderOffice コントロール。
     '''</summary>
     '''<remarks>
@@ -68,85 +59,31 @@ Partial Public Class OIT0002LinkDetail
     Protected WithEvents TxtOrderOffice As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtHeadOfficeTrain コントロール。
+    '''TxtBTrainNo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtHeadOfficeTrain As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtBTrainNo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtHeadOfficeTrainName コントロール。
+    '''TxtBTrainName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtHeadOfficeTrainName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtBTrainName As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''AvailableYMD コントロール。
+    '''txtEmparrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents AvailableYMD As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''TxtDepstation コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtDepstation As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''LblDepstationName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents LblDepstationName As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtRetstation コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtRetstation As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''LblRetstationName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents LblRetstationName As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtEmpDate コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtEmpDate As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''TxtActEmpDate コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtActEmpDate As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents txtEmparrDate As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtTotalTank コントロール。
@@ -435,6 +372,15 @@ Partial Public Class OIT0002LinkDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_UPDERRFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_ButtonInsertFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonInsertFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

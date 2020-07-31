@@ -583,6 +583,63 @@ Public Module Messages
         ''' タンク車(発送中)使用メッセージ
         ''' </summary>
         Public Const OIL_TANKNO_SHIPPING_USE As String = "20047"
+        ''' <summary>
+        ''' 添付ファイル最大数超えメッセージ
+        ''' </summary>
+        Public Const OIL_ATTACHMENT_COUNTOVER As String = "20048"
+        ''' <summary>
+        ''' タンク車状態未到着エラー
+        ''' </summary>
+        Public Const OIL_TANKSTATUS_ERROR As String = "20049"
+
+        ''' <summary>
+        ''' 油種数登録ボタン未使用(新規登録時(受注割当時)において)
+        ''' </summary>
+        Public Const OIL_OILREGISTER_ORDER_NOTUSE As String = "20050"
+
+        ''' <summary>
+        ''' タンク車(交検日(過去日))エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_KOUKENBI_PAST_ERROR As String = "20051"
+
+        ''' <summary>
+        ''' タンク車(インフォメーション)メッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_INFO_MESSAGE As String = "20052"
+
+        ''' <summary>
+        ''' 受注No(警告)メッセージ
+        ''' </summary>
+        Public Const OIL_ORDERNO_WAR_MESSAGE As String = "20053"
+
+        ''' <summary>
+        ''' 受注オーダー時の発日チェック(列車が同一かつ発日が同一の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_DEPDATE_SAMETRAIN As String = "20054"
+        ''' <summary>
+        ''' 受注オーダー時の発日チェック(列車が同一かつ発日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_DEPDATE_SAMETRAINTANKNO As String = "20055"
+        ''' <summary>
+        ''' 受注オーダー時の発日チェック(列車が別かつ発日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_DEPDATE_DIFFTRAINTANKNO As String = "20056"
+
+        ''' <summary>
+        ''' 発送順の最大値が油種合計オーバー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_OILTOTAL_OVER As String = "20057"
+
+        ''' <summary>
+        ''' 受注オーダー時の積込日チェック(列車が別かつ積込日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_LODDATE_DIFFTRAINTANKNO As String = "20058"
+
+        ''' <summary>
+        ''' 指定タンク車№が所属営業所以外のためエラー
+        ''' </summary>
+        Public Const OIL_ORDER_NOT_BELONGOFFICE_TANKNO_ERROR As String = "20059"
+
 #End Region
 
 

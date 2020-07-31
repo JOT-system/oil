@@ -111,6 +111,9 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
             //document.getElementById('WF_LeftMViewChange').value = 20;
             document.getElementById('WF_LeftMViewChange').value = 55;
         }
+        else if (fieldNM === "ORDERINGOILNAME") {
+            document.getElementById('WF_LeftMViewChange').value = 46;
+        }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";

@@ -85,7 +85,7 @@ Public Class GL0012RoleList
         'DataBase接続文字
         Using SQLcon = sm.getConnection
             SQLcon.Open() 'DataBase接続(Open)
-
+            SqlConnection.ClearPool(SQLcon)
             getRoleList(SQLcon)
 
         End Using

@@ -59,6 +59,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.DataVisualization" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -103,6 +104,17 @@
     <Content Include="img\oillogo.png" />
     <Content Include="img\right.png" />
     <Content Include="img\tank2.png" />
+    <Content Include="OIL\css\M00001.css" />
+    <Content Include="OIL\css\M00002.css" />
+    <Content Include="OIL\css\OIM0003C.css" />
+    <Content Include="OIL\css\OIM0002C.css" />
+    <Content Include="OIL\css\OIM0003L.css" />
+    <Content Include="OIL\css\OIM0002L.css" />
+    <Content Include="OIL\css\OIM0003S.css" />
+    <Content Include="OIL\css\OIM0002S.css" />
+    <Content Include="OIL\css\OIM0020C.css" />
+    <Content Include="OIL\css\OIM0020L.css" />
+    <Content Include="OIL\css\OIM0020S.css" />
     <Content Include="OIL\css\OIM0001S.css" />
     <Content Include="OIL\css\OIT0006D.css" />
     <Content Include="OIL\css\OIT0006L.css" />
@@ -130,6 +142,7 @@
     <Content Include="OIL\css\OIM0004S.css" />
     <Content Include="OIL\css\OIT0002S.css" />
     <Content Include="OIL\css\OIT0006S.css" />
+    <Content Include="OIL\ex\page_err_default.html" />
     <Content Include="OIL\for\OIT0006OutOfServiceDetail.aspx" />
     <Content Include="OIL\for\OIT0006OutOfServiceList.aspx" />
     <Content Include="OIL\for\OIT0006OutOfServiceSearch.aspx" />
@@ -137,10 +150,8 @@
     <Content Include="OIL\img\404cat.png" />
     <Content Include="OIL\css\ex\bootstrap.min.css" />
     <Content Include="css\common.css" />
-    <Content Include="OIL\css\M00001.css" />
     <Content Include="css\M00000.css" />
     <Content Include="OIL\css\ex\custom.min.css" />
-    <Content Include="OIL\css\ex\font-awesome.min.css" />
     <Content Include="img\logo.png" />
     <Content Include="img\ヘルプ.jpg" />
     <Content Include="img\先頭頁.png" />
@@ -152,10 +163,15 @@
     <Content Include="OIL\img\caution.png" />
     <Content Include="OIL\img\datalink.png" />
     <Content Include="OIL\img\e_cat.png" />
+    <Content Include="OIL\img\guidanceIconE.png" />
+    <Content Include="OIL\img\guidanceIconI.png" />
+    <Content Include="OIL\img\guidanceIconW.png" />
     <Content Include="OIL\img\iconError.png" />
+    <Content Include="OIL\img\IconHasAttach.png" />
     <Content Include="OIL\img\iconInfo.png" />
     <Content Include="OIL\img\iconWarn.png" />
     <Content Include="OIL\img\lockKey.png" />
+    <Content Include="OIL\img\menuPaneRefresh.png" />
     <Content Include="OIL\img\noicon.png" />
     <Content Include="OIL\img\foward.png" />
     <Content Include="OIL\img\leftbox.png" />
@@ -169,6 +185,7 @@
     <Content Include="OIL\img\suitekiEmptyIcon.png" />
     <Content Include="OIL\img\suitekiIcon.png" />
     <Content Include="OIL\img\tank.png" />
+    <Content Include="OIL\img\underArrow.png" />
     <Content Include="OIL\img\unlockKey.png" />
     <Content Include="OIL\img\warning.png" />
     <Content Include="OIL\img\w_cat.png" />
@@ -181,6 +198,13 @@
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
     <Content Include="M00000LOGON.aspx" />
+    <Content Include="OIL\inc\OIM0002C.css" />
+    <Content Include="OIL\inc\OIM0002L.css" />
+    <Content Include="OIL\inc\OIM0002S.css" />
+    <Content Include="OIL\inc\OIM0003WRKINC.ascx" />
+    <Content Include="OIL\inc\OIM0002WRKINC.ascx" />
+    <Content Include="OIL\inc\OIM0020WRKINC.ascx" />
+    <Content Include="OIL\inc\OIT0002WRKINCOLD.ascx" />
     <Content Include="OIL\loc\OIT0005TankLocDetail.aspx" />
     <Content Include="OIL\inc\OIT0005WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0004WRKINC.ascx" />
@@ -196,21 +220,41 @@
     <Content Include="OIL\loc\OIT0005TankLocCondition.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocList.aspx" />
     <Content Include="OIL\loc\OIT0005TankLocSearch.aspx" />
-    <Content Include="OIL\M00001MENU.aspx" />
-    <Content Include="OIL\css\ex\nprogress.css" />
     <Content Include="OIL\ex\page_404.html" />
+    <Content Include="OIL\M00001MENU.aspx" />
     <Content Include="OIL\M00002MENU.aspx" />
+    <Content Include="OIL\mas\OIM0002OrgCreate.aspx" />
+    <Content Include="OIL\mas\OIM0002OrgList.aspx" />
+    <Content Include="OIL\mas\OIM0003ProductSearch.aspx" />
     <Content Include="OIL\mas\OIM0004StationCreate.aspx" />
+    <Content Include="OIL\mas\OIM0002OrgSearch.aspx" />
     <Content Include="OIL\mas\OIM0005TankCreate.aspx" />
     <Content Include="OIL\mas\OIM0005TankList.aspx" />
     <Content Include="OIL\mas\OIM0004StationList.aspx" />
     <Content Include="OIL\mas\OIM0005TankSearch.aspx" />
     <Content Include="OIL\mas\OIM0004StationSearch.aspx" />
+    <Content Include="OIL\mas\OIM0020GuidanceCreate.aspx" />
+    <Content Include="OIL\mas\OIM0020GuidanceDownload.aspx" />
+    <Content Include="OIL\mas\OIM0020GuidanceList.aspx" />
+    <Content Include="OIL\mas\OIM0020GuidanceSearch.aspx" />
     <Content Include="OIL\mas\OIS0001UserCreate.aspx" />
     <Content Include="OIL\mas\OIS0001UserList.aspx" />
     <Content Include="OIL\mas\OIS0001UserSearch.aspx" />
+    <Content Include="OIL\menupane\MP0001CycleBillingStatus.ascx" />
+    <Content Include="OIL\menupane\MP0002MonthlyTransfer.ascx" />
+    <Content Include="OIL\menupane\MP0003OTLoadingSendStatus.ascx" />
+    <Content Include="OIL\menupane\MP0004ImportShipmentAmountStatus.ascx" />
+    <Content Include="OIL\menupane\MP0005ConsignmentStatus.ascx" />
+    <Content Include="OIL\menupane\MP0006LinkListImportStatus.ascx" />
+    <Content Include="OIL\menupane\MP0007BudgetYoYNums.ascx" />
+    <Content Include="OIL\menupane\MP0008BudgetYoYAmount.ascx" />
+    <Content Include="OIL\menupane\MP0009ActualTraction.ascx" />
+    <Content Include="OIL\menupane\MP0010ActualShippingExpenses.ascx" />
+    <Content Include="OIL\ord\OIT0002LinkDetailOLD.aspx" />
     <Content Include="OIL\ord\OIT0002LinkDetail.aspx" />
+    <Content Include="OIL\ord\OIT0002LinkListOLD.aspx" />
     <Content Include="OIL\ord\OIT0002LinkList.aspx" />
+    <Content Include="OIL\ord\OIT0002LinkSearchOLD.aspx" />
     <Content Include="OIL\ord\OIT0002LinkSearch.aspx" />
     <Content Include="OIL\ord\OIT0001EmptyTurnDairyDetail.aspx" />
     <Content Include="OIL\ord\OIT0001EmptyTurnDairyList.aspx" />
@@ -220,6 +264,16 @@
     <Content Include="OIL\ord\OIT0003OrderLinkQuota.aspx" />
     <Content Include="OIL\ord\OIT0003OrderList.aspx" />
     <Content Include="OIL\ord\OIT0003OrderSearch.aspx" />
+    <Content Include="OIL\script\M00001.js" />
+    <Content Include="OIL\script\OIM0003C.js" />
+    <Content Include="OIL\script\OIM0002C.js" />
+    <Content Include="OIL\script\OIM0003L.js" />
+    <Content Include="OIL\script\OIM0002L.js" />
+    <Content Include="OIL\script\OIM0003S .js" />
+    <Content Include="OIL\script\OIM0002S.js" />
+    <Content Include="OIL\script\OIM0020C.js" />
+    <Content Include="OIL\script\OIM0020L.js" />
+    <Content Include="OIL\script\OIM0020S.js" />
     <Content Include="OIL\script\OIT0003B.js" />
     <Content Include="OIL\script\OIT0005D.js" />
     <Content Include="OIL\script\OIT0006D.js" />
@@ -251,8 +305,8 @@
     <Content Include="OIL\script\OIM0004S.js" />
     <Content Include="script\calendar.js" />
     <Content Include="script\common.js" />
+    <Content Include="script\easyselectbox.min.js" />
     <Content Include="script\event.js" />
-    <Content Include="OIL\script\M00001.js" />
     <Content Include="script\M00000.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -308,9 +362,13 @@
     <Compile Include="inc\GRCO0100XLSUP.ashx.vb">
       <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
     </Compile>
+    <Compile Include="OIL\com\CsvCreate.vb" />
     <Compile Include="OIL\com\EntryHistory.vb" />
     <Compile Include="OIL\com\OIT0001CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0003CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0004CustomReportENEOS.vb" />
     <Compile Include="OIL\com\OIT0004CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0004CustomReportOLD.vb" />
     <Compile Include="OIL\for\OIT0006OutOfServiceDetail.aspx.designer.vb">
       <DependentUpon>OIT0006OutOfServiceDetail.aspx</DependentUpon>
     </Compile>
@@ -344,6 +402,37 @@
     </Compile>
     <Compile Include="OIL\inc\GRM00002WRKINC.ascx.vb">
       <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0003WRKINC.ascx.designer.vb">
+      <DependentUpon>OIM0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0003WRKINC.ascx.vb">
+      <DependentUpon>OIM0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0002WRKINC.ascx.designer.vb">
+      <DependentUpon>OIM0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0002WRKINC.ascx.vb">
+      <DependentUpon>OIM0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0020FILEUPLOAD.ashx.vb">
+      <DependentUpon>OIM0020FILEUPLOAD.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0020WRKINC.ascx.designer.vb">
+      <DependentUpon>OIM0020WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0020WRKINC.ascx.vb">
+      <DependentUpon>OIM0020WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0002WRKINCOLD.ascx.designer.vb">
+      <DependentUpon>OIT0002WRKINCOLD.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIT0002WRKINCOLD.ascx.vb">
+      <DependentUpon>OIT0002WRKINCOLD.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\loc\OIT0005TankLocDetail.aspx.designer.vb">
@@ -444,6 +533,13 @@
       <DependentUpon>OIT0005TankLocSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
+    <Compile Include="OIL\M00001MENU.aspx.designer.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\M00001MENU.aspx.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="OIL\M00002MENU.aspx.designer.vb">
       <DependentUpon>M00002MENU.aspx</DependentUpon>
     </Compile>
@@ -456,6 +552,62 @@
     </Compile>
     <Compile Include="OIL\inv\OIT0004OilStockSearch.aspx.vb">
       <DependentUpon>OIT0004OilStockSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0002OrgCreate.aspx.designer.vb">
+      <DependentUpon>OIM0002OrgCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0002OrgCreate.aspx.vb">
+      <DependentUpon>OIM0002OrgCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0002OrgList.aspx.designer.vb">
+      <DependentUpon>OIM0002OrgList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0002OrgList.aspx.vb">
+      <DependentUpon>OIM0002OrgList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0003ProductSearch.aspx.designer.vb">
+      <DependentUpon>OIM0003ProductSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0003ProductSearch.aspx.vb">
+      <DependentUpon>OIM0003ProductSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0002OrgSearch.aspx.designer.vb">
+      <DependentUpon>OIM0002OrgSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0002OrgSearch.aspx.vb">
+      <DependentUpon>OIM0002OrgSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceCreate.aspx.designer.vb">
+      <DependentUpon>OIM0020GuidanceCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceCreate.aspx.vb">
+      <DependentUpon>OIM0020GuidanceCreate.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceDownload.aspx.designer.vb">
+      <DependentUpon>OIM0020GuidanceDownload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceDownload.aspx.vb">
+      <DependentUpon>OIM0020GuidanceDownload.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceList.aspx.designer.vb">
+      <DependentUpon>OIM0020GuidanceList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceList.aspx.vb">
+      <DependentUpon>OIM0020GuidanceList.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceSearch.aspx.designer.vb">
+      <DependentUpon>OIM0020GuidanceSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0020GuidanceSearch.aspx.vb">
+      <DependentUpon>OIM0020GuidanceSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\mas\OIS0001UserCreate.aspx.designer.vb">
@@ -477,6 +629,79 @@
     </Compile>
     <Compile Include="OIL\mas\OIS0001UserSearch.aspx.vb">
       <DependentUpon>OIS0001UserSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0000Base.vb">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0001CycleBillingStatus.ascx.designer.vb">
+      <DependentUpon>MP0001CycleBillingStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0001CycleBillingStatus.ascx.vb">
+      <DependentUpon>MP0001CycleBillingStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0002MonthlyTransfer.ascx.designer.vb">
+      <DependentUpon>MP0002MonthlyTransfer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0002MonthlyTransfer.ascx.vb">
+      <DependentUpon>MP0002MonthlyTransfer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0003OTLoadingSendStatus.ascx.designer.vb">
+      <DependentUpon>MP0003OTLoadingSendStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0003OTLoadingSendStatus.ascx.vb">
+      <DependentUpon>MP0003OTLoadingSendStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0004ImportShipmentAmountStatus.ascx.designer.vb">
+      <DependentUpon>MP0004ImportShipmentAmountStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0004ImportShipmentAmountStatus.ascx.vb">
+      <DependentUpon>MP0004ImportShipmentAmountStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0005ConsignmentStatus.ascx.designer.vb">
+      <DependentUpon>MP0005ConsignmentStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0005ConsignmentStatus.ascx.vb">
+      <DependentUpon>MP0005ConsignmentStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0006LinkListImportStatus.ascx.designer.vb">
+      <DependentUpon>MP0006LinkListImportStatus.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0006LinkListImportStatus.ascx.vb">
+      <DependentUpon>MP0006LinkListImportStatus.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0007BudgetYoYNums.ascx.designer.vb">
+      <DependentUpon>MP0007BudgetYoYNums.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0007BudgetYoYNums.ascx.vb">
+      <DependentUpon>MP0007BudgetYoYNums.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0008BudgetYoYAmount.ascx.designer.vb">
+      <DependentUpon>MP0008BudgetYoYAmount.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0008BudgetYoYAmount.ascx.vb">
+      <DependentUpon>MP0008BudgetYoYAmount.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0009ActualTraction.ascx.designer.vb">
+      <DependentUpon>MP0009ActualTraction.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0009ActualTraction.ascx.vb">
+      <DependentUpon>MP0009ActualTraction.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0010ActualShippingExpenses.ascx.designer.vb">
+      <DependentUpon>MP0010ActualShippingExpenses.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\menupane\MP0010ActualShippingExpenses.ascx.vb">
+      <DependentUpon>MP0010ActualShippingExpenses.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\OILMasterPage.Master.designer.vb">
@@ -533,13 +758,6 @@
     </Compile>
     <Compile Include="M00000LOGON.aspx.vb">
       <DependentUpon>M00000LOGON.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="OIL\M00001MENU.aspx.designer.vb">
-      <DependentUpon>M00001MENU.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="OIL\M00001MENU.aspx.vb">
-      <DependentUpon>M00001MENU.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -603,6 +821,13 @@
       <DependentUpon>OIM0004StationSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
+    <Compile Include="OIL\ord\OIT0002LinkDetailOLD.aspx.designer.vb">
+      <DependentUpon>OIT0002LinkDetailOLD.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\ord\OIT0002LinkDetailOLD.aspx.vb">
+      <DependentUpon>OIT0002LinkDetailOLD.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="OIL\ord\OIT0002LinkDetail.aspx.designer.vb">
       <DependentUpon>OIT0002LinkDetail.aspx</DependentUpon>
     </Compile>
@@ -610,11 +835,25 @@
       <DependentUpon>OIT0002LinkDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="OIL\ord\OIT0002LinkListOLD.aspx.designer.vb">
+      <DependentUpon>OIT0002LinkListOLD.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\ord\OIT0002LinkListOLD.aspx.vb">
+      <DependentUpon>OIT0002LinkListOLD.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="OIL\ord\OIT0002LinkList.aspx.designer.vb">
       <DependentUpon>OIT0002LinkList.aspx</DependentUpon>
     </Compile>
     <Compile Include="OIL\ord\OIT0002LinkList.aspx.vb">
       <DependentUpon>OIT0002LinkList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\ord\OIT0002LinkSearchOLD.aspx.designer.vb">
+      <DependentUpon>OIT0002LinkSearchOLD.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\ord\OIT0002LinkSearchOLD.aspx.vb">
+      <DependentUpon>OIT0002LinkSearchOLD.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\ord\OIT0002LinkSearch.aspx.designer.vb">
@@ -702,6 +941,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <Content Include="OIL\inc\OIM0020FILEUPLOAD.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <SubType>Designer</SubType>

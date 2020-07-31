@@ -292,7 +292,7 @@ Public Class OIT0003OrderLinkQuota
             & "  INNER JOIN OIL.VIW0003_OFFICECHANGE VIW0003 ON " _
             & "        VIW0003.ORGCODE    = @P1" _
             & "    AND VIW0003.OFFICECODE = OIT0004.OFFICECODE " _
-            & "  WHERE OIT0004.AVAILABLEYMD <= @P2" _
+            & "  WHERE OIT0004.AVAILABLEYMD >= @P2" _
             & "    AND OIT0004.STATUS       = '1'"
 
         '& "  WHERE OIT0004.OFFICECODE = @P1" _
@@ -341,7 +341,11 @@ Public Class OIT0003OrderLinkQuota
                 If work.WF_SEL_LODDATE.Text.Equals("") Then
                     PARA2.Value = work.WF_SEL_REGISTRATIONDATE.Text
                 Else
-                    PARA2.Value = work.WF_SEL_LODDATE.Text
+                    '### 20200709 START 利用可能日の条件を変更 #####################################
+                    'PARA2.Value = work.WF_SEL_LODDATE.Text
+                    '★(予定)積込日－1日(オーダーは積置の前日に作成するため)を条件とする。
+                    PARA2.Value = Date.Parse(work.WF_SEL_LODDATE.Text).AddDays(-1).ToString("yyyy/MM/dd")
+                    '### 20200709 END   利用可能日の条件を変更 #####################################
                 End If
                 '### END  ###################################
                 'PARA3.Value = work.WF_SEL_TRAIN.Text

@@ -82,7 +82,7 @@ Public Class CS0008ONLINEstat : Implements IDisposable
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQL_Str, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
-
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.NVarChar, 30).Value = TERMID
                     .Add("@P2", SqlDbType.NVarChar, 1).Value = C_DELETE_FLG.DELETE
@@ -102,7 +102,14 @@ Public Class CS0008ONLINEstat : Implements IDisposable
                     'Close
                     SQLdr.Close() 'Reader(Close)
                 End Using 'SQLdr
+
+                SQLcon.Close()
+                SQLcon.Dispose()
+
             End Using 'SQLcon, SQLcmd
+
+
+
 
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get

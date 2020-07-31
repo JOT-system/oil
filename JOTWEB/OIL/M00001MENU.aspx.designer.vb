@@ -14,76 +14,94 @@ Option Explicit On
 Partial Public Class M00001MENU
     
     '''<summary>
-    '''Repeater_Menu_L コントロール。
+    '''repLeftNav コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_L As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents repLeftNav As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
-    '''Repeater_Menu_L2 コントロール。
+    '''guidanceArea コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_L2 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents guidanceArea As Global.System.Web.UI.HtmlControls.HtmlGenericControl
     
     '''<summary>
-    '''Repeater_Menu_R コントロール。
+    '''repGuidance コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_R As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents repGuidance As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
-    '''Repeater_Menu_R2 コントロール。
+    '''P001 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_R2 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents P001 As Global.JOTWEB.MP0001CycleBillingStatus
     
     '''<summary>
-    '''Repeater_Menu_L3 コントロール。
+    '''P002 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_L3 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents P002 As Global.JOTWEB.MP0002MonthlyTransfer
     
     '''<summary>
-    '''Repeater_Menu_L4 コントロール。
+    '''P003 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_L4 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents P003 As Global.JOTWEB.MP0003OTLoadingSendStatus
     
     '''<summary>
-    '''Repeater_Menu_R3 コントロール。
+    '''P004 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_R3 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents P004 As Global.JOTWEB.MP0004ImportShipmentAmountStatus
     
     '''<summary>
-    '''Repeater_Menu_R4 コントロール。
+    '''P005 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents Repeater_Menu_R4 As Global.System.Web.UI.WebControls.Repeater
+    Protected WithEvents P005 As Global.JOTWEB.MP0005ConsignmentStatus
+    
+    '''<summary>
+    '''P006 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P006 As Global.JOTWEB.MP0006LinkListImportStatus
+    
+    '''<summary>
+    '''P009 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents P009 As Global.JOTWEB.MP0009ActualTraction
     
     '''<summary>
     '''WF_ButtonClick コントロール。
@@ -93,6 +111,42 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''hdnPosiCol コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnPosiCol As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnRowLine コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnRowLine As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''WF_HdnGuidanceUrl コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_HdnGuidanceUrl As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''hdnPaneAreaVScroll コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnPaneAreaVScroll As Global.System.Web.UI.WebControls.HiddenField
     
     '''<summary>
     '''work コントロール。

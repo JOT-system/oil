@@ -74,4 +74,21 @@ Public Class OIM0005WRKINC
         CreateFIXParam = prmData
     End Function
 
+    '' <summary>
+    '' 原籍所有者コードの取得
+    '' </summary>
+    '' <param name="COMPCODE"></param>
+    '' <param name="FIXCODE"></param>
+    '' <returns></returns>
+    '' <remarks></remarks>
+    Function CreateOriginOwnercodeParam(ByVal I_COMPCODE As String, Optional ByVal I_FIXCODE As String = "") As Hashtable
+        Dim prmData As New Hashtable
+        prmData.Item(C_PARAMETERS.LP_COMPANY) = I_COMPCODE
+        prmData.Item(C_PARAMETERS.LP_ORIGINOWNERCODE) = I_FIXCODE
+        CreateOriginOwnercodeParam = prmData
+    End Function
+
+
+
+
 End Class

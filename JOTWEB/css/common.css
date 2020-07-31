@@ -144,6 +144,7 @@ input[type=number]:focus,
 textarea:focus {
     border-color: rgba(1,60,65, .5);
     background-image:none;
+    outline:none;
     //box-shadow: 0 0 5px 1px rgba(218,60,65, .5);
 }
 input[type=text][disabled]:hover,
@@ -615,12 +616,13 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     margin-left: auto; /* 右に寄せる為マージンで埋める */
     box-sizing: border-box;
 }
-.actionButtonBox .btn-sticky{
-    min-width:5em;
-    width:auto;
-    padding-left:5px;
-    padding-right:5px;
-}
+    .actionButtonBox .btn-sticky {
+        min-width: 5em;
+        width: auto;
+        padding-left: 5px;
+        padding-right: 5px;
+        outline: none;
+    }
 /* ******************************** */
 /* 条件画面設定                     */
 /* ******************************** */
@@ -858,6 +860,11 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     display: none;
 }
 
+select#RF_VIEW {
+    outline:none;
+}
+
+
 /* 左リストボックス */
 .WF_ListBoxArea {
     margin-top: 5px;
@@ -869,6 +876,7 @@ div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
     overflow-y: auto;
     color: black;
     border: 1px solid;
+    outline: none;
     border-color: rgba(176, 176, 276, 0.6);
     background-color: rgba(255, 255, 255, 1);
     font-size: 1em;
@@ -1541,6 +1549,14 @@ div[data-generated="1"] tr.hasOrderInfoValue.hover td,
 div[data-generated="1"] tr.hasOrderInfoValue.hover th {
     background-color: #32a3a3 !important;
 }
+div[data-generated="1"] tr.hasOrderInfoValue.warnInfo td,
+div[data-generated="1"] tr.hasOrderInfoValue.warnInfo th {
+    background-color:#ffffa3
+}
+div[data-generated="1"] tr.hasOrderInfoValue.warnInfo.hover td,
+div[data-generated="1"] tr.hasOrderInfoValue.warnInfo.hover th {
+    background-color: #a3a4ff !important;
+}
 /* ************************ */
 /* タブ下部の入力エリア     */
 /* ************************ */
@@ -1683,8 +1699,8 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     content:"✔";
     color:red;
 }
-.grc0001Wrapper input[type=checkbox] + label:hover,
-.grc0001Wrapper input[type=radio] + label:hover{
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover{
     cursor:pointer;
     background-color:rgba(157,195,230,0.5);
     color:#737373;
@@ -1993,6 +2009,57 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
     max-height: calc(100vh - 100px);
     max-width: calc(100vw - 60px);
 }
+/* ********************************** */
+/* ↓カスタムポップアップここから↓   */
+/* ********************************** */
+#divContentsPopUpWrapper {
+    position: fixed;
+    z-index: 19; 
+    background-color: rgba(55, 55, 55, 0.6);
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    max-height: 100vh;
+    display: none;
+    margin-bottom: -10px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow: auto;
+}
+    #divContentsPopUpWrapper .popUpButtons input[type=button] {
+        font-family: "meiryo", "ms pgothic";
+        outline: none;
+    }
+#divContentsPopUp {
+    background-color: rgb(240,240,240);
+    box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
+    height: auto;
+    min-height: 300px;
+    width: 500px;
+    min-width: 500px;
+    margin-left: calc(50vw - 250px);
+    margin-top: calc(10vh);
+    border-radius: 5px;
+}
+
+#divContentsPopUp > div:nth-child(1) {
+    font-weight: bold;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to bottom, #8BACCD, rgb(240,240,240));
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+#divContentsPopUp > div {
+    padding: 10px;
+    box-sizing: border-box;
+}
+/* ********************************** */
+/* ↑カスタムポップアップここまで↑   */
+/* ********************************** */
+
 /* ------------------------------
     月選択ポップアップスタイル
 ------------------------------ */
@@ -2010,7 +2077,7 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
 .commonMonthListWrapper > div {
     position: fixed;
     //z-index:10;
-    width:200px;
+    width:205px;
     margin:5px;
     border-radius:5px;
     border:1px solid gray;

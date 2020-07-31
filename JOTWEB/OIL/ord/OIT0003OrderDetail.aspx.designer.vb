@@ -86,6 +86,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents chkOrderInfo As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
+    '''chkOrderDetailInfo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkOrderDetailInfo As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''TxtOrderType コントロール。
     '''</summary>
     '''<remarks>
@@ -93,6 +102,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtOrderType As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtOrderTrkKbn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOrderTrkKbn As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtOrderOffice コントロール。
@@ -129,6 +147,24 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtTrainName As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtOTTrainNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOTTrainNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtOTTrainName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtOTTrainName As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''TxtShippersCode コントロール。
@@ -689,6 +725,15 @@ Partial Public Class OIT0003OrderDetail
     Protected WithEvents TxtATank As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''TxtTotalCnt コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotalCnt As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''TxtHTank_w コントロール。
     '''</summary>
     '''<remarks>
@@ -777,6 +822,15 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtATank_w As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''TxtTotalCnt_w コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTotalCnt_w As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''pnlListArea1 コントロール。
@@ -1065,6 +1119,24 @@ Partial Public Class OIT0003OrderDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents hdnDispHeaderItems As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
+    '''WF_ButtonInsertFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonInsertFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_CheckBoxFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_CheckBoxFLG As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

@@ -62,7 +62,7 @@ Public Class OILMasterPage
     ''' <param name="e"></param>
     ''' <remarks></remarks >
     Protected Sub Page_Init(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Init
-
+        System.Data.SqlClient.SqlConnection.ClearAllPools()
         'ログオン及びスケジュールから呼ばれた場合はすべて無視
         If TypeOf Me.Page Is M00000LOGON Then
             Return
@@ -129,7 +129,7 @@ Public Class OILMasterPage
                     footer.Output(C_MESSAGE_NO.FILE_IO_ERROR, C_MESSAGE_TYPE.ABORT, "表題設定エラー")
                     Exit Sub
                 End If
-
+                Me.MF_SHOWCUSTOMOPOUP.Value = "0" '初回ロード時はポップアップ無し状態
             End If
 
         Catch ex As Threading.ThreadAbortException
@@ -415,6 +415,12 @@ Public Class OILMasterPage
     Public Sub ShowHelp()
         Dim HELPCAMP As String = GetTargetComp()
         footer.ShowHelp(MF_MAPID.Value, HELPCAMP, USERID)
+    End Sub
+    ''' <summary>
+    ''' 共通ポップアップを非表示にする
+    ''' </summary>
+    Public Sub HideCustomPopUp()
+        Me.MF_SHOWCUSTOMOPOUP.Value = "0"
     End Sub
     ''' <summary>
     ''' メニューへ戻るボタン押下時処理

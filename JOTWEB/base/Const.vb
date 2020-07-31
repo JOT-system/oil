@@ -231,6 +231,15 @@ Public Module BaseDllConst
 
 #Region "営業所"
     ''' <summary>
+    ''' 情報システム部
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010006 As String = "010006"
+    ''' <summary>
+    ''' 石油部
+    ''' </summary>
+    Public Const CONST_OFFICECODE_010007 As String = "010007"
+
+    ''' <summary>
     ''' 東北支店
     ''' </summary>
     Public Const CONST_OFFICECODE_010401 As String = "010401"
@@ -273,6 +282,53 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_OFFICECODE_012402 As String = "012402"
 
+#End Region
+
+#Region "荷受人"
+    ''' <summary>
+    ''' JXTG北信油槽所
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_10 As String = "10"
+    ''' <summary>
+    ''' JXTG甲府油槽所
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_20 As String = "20"
+    ''' <summary>
+    ''' コウショウ高崎
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_30 As String = "30"
+    ''' <summary>
+    ''' JONET松本
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_40 As String = "40"
+    ''' <summary>
+    ''' OT盛岡
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_51 As String = "51"
+    ''' <summary>
+    ''' OT郡山
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_52 As String = "52"
+    ''' <summary>
+    ''' OT宇都宮
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_53 As String = "53"
+    ''' <summary>
+    ''' OT高崎
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_54 As String = "54"
+    ''' <summary>
+    ''' OT八王子
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_55 As String = "55"
+    ''' <summary>
+    ''' OT松本
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_56 As String = "56"
+    ''' <summary>
+    ''' 愛知機関区
+    ''' </summary>
+    Public Const CONST_CONSIGNEECODE_70 As String = "70"
 #End Region
 
 #Region "受注情報"
@@ -377,6 +433,14 @@ Public Module BaseDllConst
     ''' 発送順重複
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_100 As String = "100"
+    ''' <summary>
+    ''' タンク車状態未到着
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_101 As String = "101"
+    ''' <summary>
+    ''' タンク車所属外
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_102 As String = "102"
 
     ''' <summary>
     ''' 失注（荷主都合）
@@ -405,6 +469,10 @@ Public Module BaseDllConst
     ''' 200:手配
     ''' </summary>
     Public Const CONST_ORDERSTATUS_200 As String = "200"
+    ''' <summary>
+    ''' 205:手配中（千葉(根岸を除く)以外）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_205 As String = "205"
     ''' <summary>
     ''' 210:手配中（入換指示入力済）
     ''' </summary>
@@ -445,6 +513,10 @@ Public Module BaseDllConst
     ''' 300:手配中（入換積込未確認）
     ''' </summary>
     Public Const CONST_ORDERSTATUS_300 As String = "300"
+    ''' <summary>
+    ''' 305:手配完了（託送未）
+    ''' </summary>
+    Public Const CONST_ORDERSTATUS_305 As String = "305"
     ''' <summary>
     ''' 310:手配完了
     ''' </summary>
@@ -578,6 +650,25 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "輸送形態"
+    ''' <summary>
+    ''' C:請負
+    ''' </summary>
+    Public Const CONST_TRKBN_C As String = "C"
+    ''' <summary>
+    ''' O:OT輸送
+    ''' </summary>
+    Public Const CONST_TRKBN_O As String = "O"
+    ''' <summary>
+    ''' M:請負OT混載
+    ''' </summary>
+    Public Const CONST_TRKBN_M As String = "M"
+    ''' <summary>
+    ''' F:回送
+    ''' </summary>
+    Public Const CONST_TRKBN_F As String = "F"
+#End Region
+
 #Region "回送パターン"
     ''' <summary>
     ''' 01:修理-JOT負担発払
@@ -683,6 +774,58 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ATank As String = "2101"
 #End Region
+
+#Region "油種(コスモ石油)"
+    ''' <summary>
+    ''' ハイオク
+    ''' </summary>
+    Public Const CONST_COSMO_HIG As String = "HI-G"
+    ''' <summary>
+    ''' レギュラー
+    ''' </summary>
+    Public Const CONST_COSMO_REG As String = "RE-G"
+    ''' <summary>
+    ''' 灯油
+    ''' </summary>
+    Public Const CONST_COSMO_WKO As String = "WKO"
+    ''' <summary>
+    ''' 軽油
+    ''' </summary>
+    Public Const CONST_COSMO_DGO As String = "DGO"
+    ''' <summary>
+    ''' 軽油５
+    ''' </summary>
+    Public Const CONST_COSMO_DGO5 As String = "DGO.5"
+    ''' <summary>
+    ''' 軽油１０
+    ''' </summary>
+    Public Const CONST_COSMO_DGO10 As String = "DGO.10"
+    ''' <summary>
+    ''' ３号軽油
+    ''' </summary>
+    Public Const CONST_COSMO_DGO3 As String = "DGO.3"
+    ''' <summary>
+    ''' Ａ重油
+    ''' </summary>
+    Public Const CONST_COSMO_AFO As String = "AFO"
+    ''' <summary>
+    ''' Ａ重油SP
+    ''' </summary>
+    Public Const CONST_COSMO_AFOSP As String = "A-SP"
+    ''' <summary>
+    ''' Ａ重油ブレンド
+    ''' </summary>
+    Public Const CONST_COSMO_AFOBU As String = "A(ブ"
+    ''' <summary>
+    ''' ＬＳＡ
+    ''' </summary>
+    Public Const CONST_COSMO_LSA As String = "LA-1"
+    ''' <summary>
+    ''' ＬＳＡブレンド
+    ''' </summary>
+    Public Const CONST_COSMO_LSABU As String = "LAブ"
+#End Region
+
 
 #Region "海外向け"
     ''' <summary>

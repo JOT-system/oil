@@ -124,6 +124,7 @@ Public Structure CS0011LOGWrite
             Using SQLcon = sm.getConnection,
                   SQLcmd As New SqlCommand(SQLstr_LOGCNTL, SQLcon)
                 SQLcon.Open() 'DataBase接続(Open)
+                SqlConnection.ClearPool(SQLcon)
                 With SQLcmd.Parameters
                     .Add("@P1", SqlDbType.Date).Value = Date.Now
                     .Add("@P2", SqlDbType.Date).Value = Date.Now
@@ -153,7 +154,8 @@ Public Structure CS0011LOGWrite
         Catch ex As Exception
             'エラーログのエラーは処理できない
             W_OUTPUTSW = "1"
-            ERR = C_MESSAGE_NO.DB_ERROR  'DB ERR
+            '  ERR = C_MESSAGE_NO.DB_ERROR  'DB ERR
+            ERR = "99999"  'DB ERR
         End Try
 
         '●エラーログ出力
@@ -161,7 +163,9 @@ Public Structure CS0011LOGWrite
             Try
                 'ＥＲＲＬｏｇディレクトリ＆ファイル名作成
                 Dim W_LOGDIR As String
-                W_LOGDIR = sm.LOG_PATH & "\ONLINE\"
+                '                W_LOGDIR = sm.LOG_PATH & "\ONLINE\"
+
+                W_LOGDIR = "\OIL\" & "\ONLINE\"
                 W_LOGDIR = W_LOGDIR & sm.TERM_COMPANY & "-"
                 W_LOGDIR = W_LOGDIR & sm.TERM_ORG & "-"
                 W_LOGDIR = W_LOGDIR & DateTime.Now.ToString("yyyyMMddHHmmss")

@@ -3268,6 +3268,9 @@ Public Class OIT0002LinkDetail
                 Dim WW_DATENOW As DateTime = Date.Now
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
+                    '★石油輸送での営業所ではない（コンテナなどの登録データ）ものは除外
+                    If OIT0002row("OFFICECODE") = "" Then Continue For
+
                     '◯ DB更新
                     '貨車連結順序表№
                     PARA01.Value = OIT0002row("LINKNO")
@@ -3297,11 +3300,11 @@ Public Class OIT0002LinkDetail
                     PARA06.Value = ""
                     PARA07.Value = Me.TxtBTrainNo.Text                 '返送列車
                     PARA08.Value = Me.TxtBTrainName.Text               '返送列車名
-                    PARA09.Value = work.WF_SEL_OFFICECODE.Text         '登録営業所コード
-                    PARA10.Value = work.WF_SEL_DEPSTATION.Text         '空車発駅（着駅）コード
-                    PARA11.Value = work.WF_SEL_DEPSTATIONNAME.Text     '空車発駅（着駅）名
-                    PARA12.Value = work.WF_SEL_RETSTATION.Text         '空車着駅（発駅）コード
-                    PARA13.Value = work.WF_SEL_RETSTATIONNAME.Text     '空車着駅（発駅）名
+                    PARA09.Value = OIT0002row("OFFICECODE")            '登録営業所コード
+                    PARA10.Value = OIT0002row("DEPSTATION")            '空車発駅（着駅）コード
+                    PARA11.Value = OIT0002row("DEPSTATIONNAME")        '空車発駅（着駅）名
+                    PARA12.Value = OIT0002row("RETSTATION")            '空車着駅（発駅）コード
+                    PARA13.Value = OIT0002row("RETSTATIONNAME")        '空車着駅（発駅）名
                     '空車着日(予定)
                     If work.WF_SEL_EMPARRDATE.Text = "" Then
                         PARA14.Value = DBNull.Value

@@ -1305,6 +1305,13 @@ Public Class OIT0002LinkList
         '○ UPLOAD XLSデータ取得
         CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl)
 
+        '◯貨車連結(臨海)TBL削除処理(再アップロード対応)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_DELETE_RLINK(SQLcon)
+        End Using
+
         '◯貨車連結(臨海)TBL追加処理
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
@@ -1325,22 +1332,104 @@ Public Class OIT0002LinkList
     End Sub
 
     ''' <summary>
+    ''' 貨車連結(臨海)TBL削除処理(再アップロード対応)
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="sqlCon">接続オブジェクト</param>
+    Protected Sub WW_DELETE_RLINK(ByVal SQLcon As SqlConnection)
+
+        '再アップロード時の削除データ取得用
+        If IsNothing(OIT0002EXLDELtbl) Then
+            OIT0002EXLDELtbl = New DataTable
+        End If
+
+        If OIT0002EXLDELtbl.Columns.Count <> 0 Then
+            OIT0002EXLDELtbl.Columns.Clear()
+        End If
+
+        OIT0002EXLDELtbl.Clear()
+
+        '○ ＤＢ削除
+        Dim SQLDelRLinkTblStr As String =
+          " DELETE FROM OIL.OIT0011_RLINK WHERE RLINKNO = @P01 AND DELFLG = '0'; "
+
+        Dim SQLDelLinkTblStr As String =
+          " DELETE FROM OIL.OIT0004_LINK WHERE LINKNO = @P01 AND DELFLG = '0'; " _
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを貨車連結順序表テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT " _
+            & "      ISNULL(RTRIM(OIT0011.RLINKNO), '')  AS RLINKNO " _
+            & "    , ISNULL(RTRIM(OIT0011.LINKNO), '')   AS LINKNO " _
+            & " FROM oil.OIT0011_RLINK OIT0011 " _
+            & " WHERE " _
+            & "     OIT0011.LINKNO          <> '' " _
+            & " AND OIT0011.REGISTRATIONDATE = @P01 " _
+            & " AND OIT0011.TRAINNO          = @P02 " _
+            & " AND OIT0011.DELFLG          <> @P03 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon),
+                  SQLDel1cmd As New SqlCommand(SQLDelRLinkTblStr, SQLcon),
+                  SQLDel2cmd As New SqlCommand(SQLDelLinkTblStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Date)                '登録年月日
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 4)         '列車
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 1)         '削除フラグ
+
+                PARA01.Value = OIT0002EXLUPtbl.Rows(0)("REGISTRATIONDATE")
+                PARA02.Value = OIT0002EXLUPtbl.Rows(0)("TRAINNO")
+                PARA03.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002EXLDELtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002EXLDELtbl.Load(SQLdr)
+                End Using
+
+                '★削除実行(貨車連結表(臨海)テーブル)
+                Dim PARADELRL01 As SqlParameter = SQLDel1cmd.Parameters.Add("@P01", SqlDbType.NVarChar) '貨車連結(臨海)順序表№
+                PARADELRL01.Value = OIT0002EXLDELtbl.Rows(0)("RLINKNO")
+                SQLDel1cmd.ExecuteNonQuery()
+                SQLDel1cmd.Dispose()
+
+                '★削除実行(貨車連結表テーブル)
+                Dim PARADELL01 As SqlParameter = SQLDel2cmd.Parameters.Add("@P01", SqlDbType.NVarChar)  '貨車連結順序表№
+                For Each OIT0002Exlrow As DataRow In OIT0002EXLDELtbl.Rows
+                    PARADELL01.Value = OIT0002Exlrow("LINKNO")
+                    SQLDel2cmd.ExecuteNonQuery()
+                Next
+                SQLDel2cmd.Dispose()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L_RLINK_DELETE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L_RLINK_DELETE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
     ''' 貨車連結(臨海)TBL追加処理
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="sqlCon">接続オブジェクト</param>
     Protected Sub WW_INSERT_RLINK(ByVal SQLcon As SqlConnection)
-
-        ''再アップロード時の削除データ取得用
-        'If IsNothing(OIT0002EXLDELtbl) Then
-        '    OIT0002EXLDELtbl = New DataTable
-        'End If
-
-        'If OIT0002EXLDELtbl.Columns.Count <> 0 Then
-        '    OIT0002EXLDELtbl.Columns.Clear()
-        'End If
-
-        'OIT0002EXLDELtbl.Clear()
 
         Try
             '貨車連結順序表No取得用SQL
@@ -1432,6 +1521,14 @@ Public Class OIT0002LinkList
                 '発駅・着駅名(保存用)
                 Dim strDepstationName As String = ""
                 Dim strArrstationName As String = ""
+                '### 内部テーブルに出線順の値を設定するための準備 ########################
+                Dim dcOutOrder As DataColumn = New DataColumn
+                Dim iTblTotal As Integer = OIT0002EXLUPtbl.Select("TRUCKSYMBOL<>''").Count
+                dcOutOrder.ColumnName = "OUTORDER"
+                dcOutOrder.DefaultValue = String.Empty
+                dcOutOrder.DataType = Type.GetType("System.String")
+                OIT0002EXLUPtbl.Columns.Add(dcOutOrder)
+                '#########################################################################
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
                     'Select Case (Nothing, "ARRSTATIONNAME, DEPSTATIONNAME, SERIALNUMBER")
 
@@ -1547,6 +1644,13 @@ Public Class OIT0002LinkList
                     UPDTERMID.Value = Master.USERTERMID
                     '集信日時
                     RECEIVEYMD.Value = C_DEFAULT_YMD
+
+                    '### ★内部テーブルにて『出線順』を設定 ###################################
+                    If OIT0002EXLUProw("TRUCKSYMBOL") <> "" Then
+                        OIT0002EXLUProw("OUTORDER") = iTblTotal
+                        iTblTotal -= 1
+                    End If
+                    '##########################################################################
 
                     SQLRLinkcmd.CommandTimeout = 300
                     SQLRLinkcmd.ExecuteNonQuery()

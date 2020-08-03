@@ -114,6 +114,22 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "ORDERINGOILNAME") {
             document.getElementById('WF_LeftMViewChange').value = 46;
         }
+        else if (fieldNM === "FILLINGPOINT") {
+            document.getElementById('WF_LeftMViewChange').value = 52;
+        }
+        else if (fieldNM === "LOADINGIRILINETRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 47;
+        }
+        else if (fieldNM === "LOADINGOUTLETTRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 48;
+        }
+        else if (fieldNM === "LOADINGTRAINNO") {
+            document.getElementById('WF_LeftMViewChange').value = 23;
+        }
+        else if (fieldNM === "LOADINGLODDATE"
+            || fieldNM === "LOADINGDEPDATE") {
+            document.getElementById('WF_LeftMViewChange').value = 17;
+        }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";

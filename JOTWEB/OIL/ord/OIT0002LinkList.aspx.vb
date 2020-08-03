@@ -1521,6 +1521,14 @@ Public Class OIT0002LinkList
                 '発駅・着駅名(保存用)
                 Dim strDepstationName As String = ""
                 Dim strArrstationName As String = ""
+                '### 内部テーブルに出線順の値を設定するための準備 ########################
+                Dim dcOutOrder As DataColumn = New DataColumn
+                Dim iTblTotal As Integer = OIT0002EXLUPtbl.Select("TRUCKSYMBOL<>''").Count
+                dcOutOrder.ColumnName = "OUTORDER"
+                dcOutOrder.DefaultValue = String.Empty
+                dcOutOrder.DataType = Type.GetType("System.String")
+                OIT0002EXLUPtbl.Columns.Add(dcOutOrder)
+                '#########################################################################
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
                     'Select Case (Nothing, "ARRSTATIONNAME, DEPSTATIONNAME, SERIALNUMBER")
 
@@ -1636,6 +1644,13 @@ Public Class OIT0002LinkList
                     UPDTERMID.Value = Master.USERTERMID
                     '集信日時
                     RECEIVEYMD.Value = C_DEFAULT_YMD
+
+                    '### ★内部テーブルにて『出線順』を設定 ###################################
+                    If OIT0002EXLUProw("TRUCKSYMBOL") <> "" Then
+                        OIT0002EXLUProw("OUTORDER") = iTblTotal
+                        iTblTotal -= 1
+                    End If
+                    '##########################################################################
 
                     SQLRLinkcmd.CommandTimeout = 300
                     SQLRLinkcmd.ExecuteNonQuery()

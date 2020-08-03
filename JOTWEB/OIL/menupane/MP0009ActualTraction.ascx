@@ -17,8 +17,14 @@
         <div class="paneContent">
             <!-- 営業所選択 -->
             <div class="actualTractionDdl" onchange="refreshPane('<%= Me.hdnRefreshCall.ClientId %>');">
-                表示する営業所 
-                <asp:DropDownList ID="ddlActualTractionOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
+                <span>
+                    表示する営業所 
+                    <asp:DropDownList ID="ddlActualTractionOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
+                </span>
+                <span>
+                    着駅
+                    <asp:DropDownList ID="ddlActualTractionArrStation" runat="server" ClientIDMode="Predictable" CssClass="stationDdl"></asp:DropDownList>
+                </span>
             </div>
             <!-- グラフコントロール -->
             <asp:Chart ID="chtActualTraction" runat="server" EnableViewState="true"
@@ -65,4 +71,5 @@
 
     </div>
     <asp:HiddenField ID="hdnPaneOrder" runat="server" Visible="false" ClientIDMode="Predictable" />
+    <asp:HiddenField ID="hdnCurrentOfficeCode" runat="server" Visible="false" ClientIDMode="Predictable" /> 
 </asp:Panel>

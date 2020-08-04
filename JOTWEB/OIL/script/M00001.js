@@ -67,6 +67,7 @@ function bindLeftNaviClick() {
                 hdnPosiColObj.value = posicol;
                 let hdnRowLineObj = document.getElementById('hdnRowLine');
                 hdnRowLineObj.value = rowline;
+                commonDispWait();
                 ButtonClick('WF_ButtonLeftNavi'); /* 共通サブミット処理、VB側ロード時のSelectケースで割り振らせる */ 
             };
         })(posicol, rowline), false);

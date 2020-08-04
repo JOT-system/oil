@@ -282,6 +282,7 @@ div.showGuidance a[id^="Menu_"] {
 #paneList {
     width :100%;
     min-width:1095px;
+    max-width:1095px;
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
@@ -370,7 +371,8 @@ div.showGuidance a[id^="Menu_"] {
     }
 }
 /* ペイン内ドロップダウンレイアウト(IDにddlMonthTransOfficeとつけたもののみ) */
-.paneContent select.officeDdl {
+.paneContent select.officeDdl,
+.paneContent select.stationDdl {
     height: 28px;
     font-size: 12pt;
     padding: 2px;

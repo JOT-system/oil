@@ -1,4 +1,5 @@
 ﻿Option Strict On
+Imports System.Data.SqlClient
 ''' <summary>
 ''' メニューペイン基底クラス
 ''' </summary>
@@ -8,6 +9,7 @@
 Public Class MP0000Base
     Inherits System.Web.UI.UserControl
     Public Property TargetCustomPaneInfo As CS0050SESSION.UserMenuCostomItem
+    Private Const CONST_COOKIE_MENUPANE_PREFIX = "MP0000"
     ''' <summary>
     ''' ロード時処理(根底クラス)
     ''' </summary>
@@ -75,4 +77,100 @@ Public Class MP0000Base
         End Using
         Return letList
     End Function
+    ''' <summary>
+    ''' 営業所を元に列車に紐づく着駅コードを取得
+    ''' </summary>
+    ''' <param name="officeCode">営業所コード</param>
+    ''' <returns></returns>
+    Public Function GetArrTrainNoList(officeCode As String) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim sqlStat As New StringBuilder
+        sqlStat.AppendLine("SELECT TR.ARRSTATION AS STATIONCODE")
+        sqlStat.AppendLine("      ,ISNULL(ST.STATONNAME,'') AS STATONNAME")
+        sqlStat.AppendLine("  FROM      OIL.OIM0007_TRAIN TR")
+        sqlStat.AppendLine("  LEFT JOIN OIL.OIM0004_STATION ST")
+        sqlStat.AppendLine("    ON TR.ARRSTATION = ST.STATIONCODE + ST.BRANCH")
+        sqlStat.AppendLine("   AND ST.DELFLG     = @DELFLG")
+        sqlStat.AppendLine(" WHERE TR.OFFICECODE = @OFFICECODE")
+        sqlStat.AppendLine("   AND TR.DELFLG     = @DELFLG")
+        sqlStat.AppendLine(" GROUP BY TR.ARRSTATION,ST.STATONNAME")
+        sqlStat.AppendLine(" ORDER BY STATIONCODE")
+        Using sqlCon As New SqlConnection(CS0050Session.DBCon),
+              sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
+            sqlCon.Open()
+            SqlConnection.ClearPool(sqlCon)
+            With sqlCmd.Parameters
+                .Add("@OFFICECODE", SqlDbType.NVarChar).Value = officeCode
+                .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+            End With
+            Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                If sqlDr.HasRows = False Then
+                    Return retList
+                End If
+                While sqlDr.Read
+                    Dim listItm As New ListItem(Convert.ToString(sqlDr("STATONNAME")), Convert.ToString(sqlDr("STATIONCODE")))
+                    retList.Items.Add(listItm)
+                End While
+            End Using
+        End Using
+        Return retList
+    End Function
+    ''' <summary>
+    ''' cookieにDDLの選択値を保持する
+    ''' </summary>
+    ''' <param name="key">クライアント描画のコントロールID</param>
+    ''' <param name="value">設定値</param>
+    Public Sub SaveCookie(ByVal key As String, ByVal value As String)
+        Dim prefixedKey As String = Me.Page.Title & key
+        Dim cookie As HttpCookie = Nothing
+        If Me.Page.Response.Cookies.AllKeys.Contains(prefixedKey) Then
+            Me.Page.Response.Cookies.Remove(prefixedKey)
+        End If
+
+        cookie = New HttpCookie(prefixedKey)
+        cookie.Expires = DateTime.Now.AddYears(1) '一旦10年保持
+        cookie.Value = value
+
+        Me.Page.Response.Cookies.Add(cookie)
+    End Sub
+    ''' <summary>
+    ''' cookieよりDDLの選択値を取得
+    ''' </summary>
+    ''' <param name="key"></param>
+    ''' <returns></returns>
+    Public Function LoadCookie(ByVal key As String) As String
+        Dim prefixedKey As String = Me.Page.Title & key
+        Dim retVal As String = ""
+        If Me.Page.Request.Cookies.AllKeys.Contains(prefixedKey) = False Then
+            Return retVal
+        End If
+        Dim cookie As HttpCookie
+        cookie = Me.Page.Request.Cookies(prefixedKey)
+        retVal = cookie.Value
+        If Me.Page.Response.Cookies.AllKeys.Contains(prefixedKey) Then
+            Me.Page.Response.Cookies.Remove(prefixedKey)
+        End If
+        cookie.Expires = DateTime.Now.AddYears(1)
+        Me.Page.Response.Cookies.Add(cookie)
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' ドロップダウンの初期値を設定する
+    ''' </summary>
+    ''' <param name="ddlObj"></param>
+    ''' <param name="value"></param>
+    Public Sub SetDdlDefaultValue(ByRef ddlObj As DropDownList, ByVal value As String)
+        If ddlObj Is Nothing OrElse
+           ddlObj.Items.Count = 0 Then
+            Return
+        End If
+
+        If ddlObj.Items.FindByValue(value) IsNot Nothing Then
+            ddlObj.SelectedValue = value
+        Else
+            ddlObj.SelectedIndex = 0
+        End If
+
+    End Sub
 End Class

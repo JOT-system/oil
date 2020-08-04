@@ -4977,29 +4977,63 @@ Public Class OIT0002LinkDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        Dim loopdr As DataRow = Nothing
+        Dim rowIdx As Integer = 0
+        Dim cvTruckSymbol As String = ""
 
         For Each rowitem As TableRow In tblObj.Rows
             For Each cellObj As TableCell In rowitem.Controls
-                '(一覧)入線列車番号, (一覧)入線順序が対象
-                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGIRILINETRAINNO") _
-                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGIRILINEORDER") Then
-                    '営業所が"011201(五井営業所)", "011202(甲子営業所)", "011203(袖ヶ浦営業所)"が対象
-                    If work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                        OrElse work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                        OrElse work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
 
-                        '### 入力対象のため何もしない ####################
+                loopdr = OIT0002tbl.Rows(rowIdx)
+                cvTruckSymbol = StrConv(loopdr("MODEL"), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
 
-                    Else
+                '★コンテナの場合は入力制限する。
+                If (cvTruckSymbol.Substring(0, 1) = "コ" OrElse cvTruckSymbol.Substring(0, 1) = "チ") Then
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "FILLINGPOINT") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGIRILINEORDER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGIRILINETRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGOUTLETORDER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGOUTLETTRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGTRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGLODDATE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGDEPDATE") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-
                     End If
-                    '
-                ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "PREORDERINGOILNAME") Then
-                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
+                    '★(一覧)の営業所が受注営業所コード(テキストボックス)と不一致の場合は入力制限する。
+                ElseIf loopdr("OFFICECODE") <> work.WF_SEL_OFFICECODE.Text Then
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "FILLINGPOINT") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGIRILINEORDER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGIRILINETRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGOUTLETORDER") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGOUTLETTRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGTRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGLODDATE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGDEPDATE") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+
+                Else
+                    '(一覧)積込油種, (一覧)入線列車, (一覧)出線列車, 
+                    '(一覧)積込後本線列車, (一覧)積込後本線列車積込予定日, (一覧)積込後本線列車発予定日
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGIRILINETRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGOUTLETTRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGTRAINNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGLODDATE") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGDEPDATE") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    End If
                 End If
+
             Next
+            rowIdx += 1
         Next
 
     End Sub

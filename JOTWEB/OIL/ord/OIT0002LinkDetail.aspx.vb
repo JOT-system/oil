@@ -452,7 +452,7 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0011.TRUCKSYMBOL), '')        AS MODEL " _
             & " , ISNULL(RTRIM(OIT0011.TRUCKNO), '')            AS TANKNUMBER " _
             & " , ISNULL(RTRIM(OIT0002.OFFICECODE)," _
-            & "          RTRIM(OIT0004.OFFICECODE))             AS OFFICECODE " _
+            & "          ISNULL(RTRIM(OIT0004.OFFICECODE), '')) AS OFFICECODE " _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')         AS OFFICENAME " _
             & " , ISNULL(RTRIM(OIT0002.ORDERTYPE), '')          AS PATTERNCODE " _
             & " , ''                                            AS PATTERNNAME " _
@@ -590,8 +590,9 @@ Public Class OIT0002LinkDetail
                     OIT0002row("LINECNT") = i        'LINECNT
 
                     '登録営業所
-                    CODENAME_get("SALESOFFICE", OIT0002row("OFFICECODE"), OIT0002row("OFFICENAME"), WW_DUMMY)
-
+                    If OIT0002row("OFFICECODE") <> "" Then
+                        CODENAME_get("SALESOFFICE", OIT0002row("OFFICECODE"), OIT0002row("OFFICENAME"), WW_DUMMY)
+                    End If
                 Next
             End Using
         Catch ex As Exception

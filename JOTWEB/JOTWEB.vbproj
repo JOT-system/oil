@@ -365,6 +365,7 @@
     <Compile Include="OIL\com\CsvCreate.vb" />
     <Compile Include="OIL\com\EntryHistory.vb" />
     <Compile Include="OIL\com\OIT0001CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0002CustomReport.vb" />
     <Compile Include="OIL\com\OIT0003CustomReport.vb" />
     <Compile Include="OIL\com\OIT0004CustomReportENEOS.vb" />
     <Compile Include="OIL\com\OIT0004CustomReport.vb" />

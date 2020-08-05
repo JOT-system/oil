@@ -24,6 +24,7 @@ Public Class OIT0002LinkDetail
     Private OIT0002UPDtbl As DataTable                              '更新用テーブル
     Private OIT0002WKtbl As DataTable                               '作業用テーブル
     Private OIT0002GETtbl As DataTable                              '取得用テーブル
+    Private OIT0002Reporttbl As DataTable                           '帳票用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_INIT_ROWS As Integer = 5                    '新規登録時初期行数
@@ -1805,34 +1806,170 @@ Public Class OIT0002LinkDetail
 
     End Sub
 
+#Region "帳票処理"
     ''' <summary>
     ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonDownload_Click()
 
-        '○ 帳票出力
-        CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-        CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
-        CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
-        CS0030REPORT.TBLDATA = OIT0002tbl                       'データ参照  Table
-        CS0030REPORT.CS0030REPORT()
-        If Not isNormal(CS0030REPORT.ERR) Then
-            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Else
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
-            End If
-            Exit Sub
-        End If
+        '******************************
+        '帳票表示データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
 
-        '○ 別画面でExcelを表示
-        WF_PrintURL.Value = CS0030REPORT.URL
-        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+            ExcelDataGet(SQLcon)
+        End Using
+
+        '******************************
+        '帳票作成処理の実行
+        '******************************
+        Using repCbj = New OIT0002CustomReport(Master.MAPID, Master.MAPID & ".xlsx", OIT0002Reporttbl)
+            Dim url As String
+            Try
+                url = repCbj.CreateExcelPrintData
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+        ''### 共通帳票処理をコメント ##################################################################
+        ''○ 帳票出力
+        'CS0030REPORT.CAMPCODE = work.WF_SEL_CAMPCODE.Text       '会社コード
+        'CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
+        'CS0030REPORT.MAPID = Master.MAPID                       '画面ID
+        'CS0030REPORT.REPORTID = rightview.GetReportId()         '帳票ID
+        'CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
+        'CS0030REPORT.TBLDATA = OIT0002tbl                       'データ参照  Table
+        'CS0030REPORT.CS0030REPORT()
+        'If Not isNormal(CS0030REPORT.ERR) Then
+        '    If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
+        '        Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '    Else
+        '        Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
+        '    End If
+        '    Exit Sub
+        'End If
+
+        ''○ 別画面でExcelを表示
+        'WF_PrintURL.Value = CS0030REPORT.URL
+        'ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        ''#############################################################################################
 
     End Sub
+
+    ''' <summary>
+    ''' 帳票表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0002Reporttbl) Then
+            OIT0002Reporttbl = New DataTable
+        End If
+
+        If OIT0002Reporttbl.Columns.Count <> 0 Then
+            OIT0002Reporttbl.Columns.Clear()
+        End If
+
+        OIT0002Reporttbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+        " SELECT " _
+            & "   0                                              AS LINECNT" _
+            & " , ''                                             AS OPERATION" _
+            & " , '0'                                            AS TIMSTP" _
+            & " , 1                                              AS 'SELECT'" _
+            & " , 0                                              AS HIDDEN" _
+            & " , OIT0011.TRAINNO                                AS TRAINNO" _
+            & " , OIT0011.AGOBEHINDFLG                           AS AGOBEHINDFLG" _
+            & " , OIT0011.REGISTRATIONDATE                       AS REGISTRATIONDATE" _
+            & " , OIT0011.SERIALNUMBER                           AS SERIALNUMBER" _
+            & " , OIT0011.TRUCKSYMBOL                            AS TRUCKSYMBOL" _
+            & " , OIT0011.TRUCKNO                                AS TRUCKNO" _
+            & " , OIT0011.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
+            & " , OIT0011.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
+            & " , OIT0011.ARTICLENAME                            AS ARTICLENAME" _
+            & " , OIT0011.CONVERSIONAMOUNT                       AS CONVERSIONAMOUNT" _
+            & " , OIT0011.ARTICLE                                AS ARTICLE" _
+            & " , OIT0011.CURRENTCARTOTAL                        AS CURRENTCARTOTAL" _
+            & " , OIT0011.EXTEND                                 AS EXTEND" _
+            & " , OIT0011.CONVERSIONTOTAL                        AS CONVERSIONTOTAL" _
+            & " , OIT0003.OILCODE                                AS OILCODE" _
+            & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+            & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
+            & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
+            & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
+            & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
+            & " FROM oil.OIT0011_RLINK OIT0011 " _
+            & " LEFT JOIN oil.OIT0002_ORDER OIT0002 ON " _
+            & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
+            & " AND OIT0002.DELFLG <> @DELFLG " _
+            & " LEFT JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
+            & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
+            & " AND OIT0003.DELFLG <> @DELFLG " _
+            & " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+            & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND TMP0005.OILNo = '1' " _
+            & " AND TMP0005.OILCODE = OIT0003.OILCODE " _
+            & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " WHERE OIT0011.RLINKNO = @RLINKNO "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim P_RLINKNO As SqlParameter = SQLcmd.Parameters.Add("@RLINKNO", SqlDbType.NVarChar, 11)  '貨車連結(臨海)順序表№
+                Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)     '削除フラグ
+                P_RLINKNO.Value = work.WF_SEL_RLINKNO.Text
+                P_DELFLG.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002Reporttbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002Reporttbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0002Reprow As DataRow In OIT0002Reporttbl.Rows
+                    i += 1
+                    OIT0002Reprow("LINECNT") = i        'LINECNT
+                Next
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D EXCEL_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002D EXCEL_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+        '○ 画面表示データ保存
+        'Master.SaveTable(OIT0002Reporttbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+#End Region
 
     ''' <summary>
     ''' 明細更新ボタン押下時処理
@@ -3979,7 +4116,8 @@ Public Class OIT0002LinkDetail
 
                     P_FILLINGPOINT.Value = OIT0002row("FILLINGPOINT")       '充填ポイント
                     P_LINE.Value = OIT0002row("LINE")                       '回線
-                    P_LOADINGIRILINETRAINNO.Value = OIT0002row("LOADINGIRILINETRAINNO")     '積込入線列車番号
+                    P_LOADINGIRILINETRAINNO.Value = ""                      '積込入線列車番号
+                    'P_LOADINGIRILINETRAINNO.Value = OIT0002row("LOADINGIRILINETRAINNO")     '積込入線列車番号
                     P_LOADINGIRILINETRAINNAME.Value = OIT0002row("LOADINGIRILINETRAINNAME") '積込入線列車番号名
                     P_LOADINGIRILINEORDER.Value = OIT0002row("LOADINGIRILINEORDER")         '積込入線順
                     P_LOADINGOUTLETTRAINNO.Value = OIT0002row("LOADINGOUTLETTRAINNO")       '積込出線列車番号
@@ -5029,6 +5167,12 @@ Public Class OIT0002LinkDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGLODDATE") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LOADINGDEPDATE") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+
+                        '★袖ヶ浦営業所の場合は、位置(充填ポイント)を入力制限する。
+                    ElseIf work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 _
+                    AndAlso cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "FILLINGPOINT") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+
                     End If
                 End If
 

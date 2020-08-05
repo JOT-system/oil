@@ -333,7 +333,8 @@ Public Class OIT0002LinkList
         SQLStr &=
               " AND OIT0004.EMPARRDATE  >= @P01 " _
             & " AND OIT0004.DELFLG      <> @P02 " _
-            & " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' "
+            & " WHERE ISNULL(OIT0011.TRUCKSYMBOL,'') <> '' " _
+            & " AND ISNULL(OIT0011.LINKNO,'') <> '' "
 
         SQLStr &=
               " GROUP BY " _

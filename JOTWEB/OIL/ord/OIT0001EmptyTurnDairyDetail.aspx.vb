@@ -2144,24 +2144,24 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , '0'                                            AS TIMSTP" _
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
-            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
-            & " , OIT0002.OFFICENAME                             AS OFFICENAME" _
-            & " , OIT0002.TRAINNO                                AS TRAINNO" _
-            & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIT0002_OTHER.OFFICECODE                       AS OFFICECODE" _
+            & " , OIT0002_OTHER.OFFICENAME                       AS OFFICENAME" _
+            & " , OIT0002_OTHER.TRAINNO                          AS TRAINNO" _
+            & " , OIT0002_OTHER.TRAINNAME                        AS TRAINNAME" _
             & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
             & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _
-            & " , OIT0002.BASECODE                               AS BASECODE" _
-            & " , OIT0002.BASENAME                               AS BASENAME" _
-            & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
-            & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
-            & " , OIT0002.DEPSTATION                             AS DEPSTATION" _
-            & " , OIT0002.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
-            & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
-            & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
-            & " , OIT0002.LODDATE                                AS LODDATE" _
-            & " , OIT0002.DEPDATE                                AS DEPDATE" _
-            & " , OIT0002.ARRDATE                                AS ARRDATE" _
-            & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " , OIT0002_OTHER.BASECODE                         AS BASECODE" _
+            & " , OIT0002_OTHER.BASENAME                         AS BASENAME" _
+            & " , OIT0002_OTHER.CONSIGNEECODE                    AS CONSIGNEECODE" _
+            & " , OIT0002_OTHER.CONSIGNEENAME                    AS CONSIGNEENAME" _
+            & " , OIT0002_OTHER.DEPSTATION                       AS DEPSTATION" _
+            & " , OIT0002_OTHER.DEPSTATIONNAME                   AS DEPSTATIONNAME" _
+            & " , OIT0002_OTHER.ARRSTATION                       AS ARRSTATION" _
+            & " , OIT0002_OTHER.ARRSTATIONNAME                   AS ARRSTATIONNAME" _
+            & " , OIT0002_OTHER.LODDATE                          AS LODDATE" _
+            & " , OIT0002_OTHER.DEPDATE                          AS DEPDATE" _
+            & " , OIT0002_OTHER.ARRDATE                          AS ARRDATE" _
+            & " , OIT0002_OTHER.ACCDATE                          AS ACCDATE" _
             & " , OIT0002.EMPARRDATE                             AS EMPARRDATE" _
             & " , OIT0003.ACTUALLODDATE                          AS ACTUALLODDATE" _
             & " , OIT0003.ACTUALDEPDATE                          AS ACTUALDEPDATE" _
@@ -2205,8 +2205,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , OTOILCT.CNT                                    AS OTOILCTCNT" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
-            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & " AND OIT0003.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIT0002_ORDER OIT0002_OTHER ON " _
+            & "     OIT0002_OTHER.ORDERNO = OIT0003.ORDERNO " _
             & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
             & "     OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
             & " AND OIM0003.OILCODE = OIT0003.OILCODE " _
@@ -2230,7 +2232,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "       , COUNT(1) AS CNT " _
             & "   FROM oil.OIT0002_ORDER OIT0002 " _
             & "   INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
-            & "       OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "       (OIT0003.ORDERNO = OIT0002.ORDERNO OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & "   AND OIT0003.DELFLG <> @P02 " _
             & "   INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
             & "       OIM0003.OFFICECODE = OIT0002.OFFICECODE " _

@@ -561,7 +561,7 @@ Public Class OIT0002LinkList
             Dim SQLcon = CS0050SESSION.getConnection
             SQLcon.Open() 'DataBase接続(Open)
 
-            '更新SQL文･･･受注・受注明細を一括論理削除
+            '更新SQL文･･･貨車連結順序表を一括論理削除
             Dim SQLStr As String =
                       " UPDATE OIL.OIT0004_LINK        " _
                     & "    SET UPDYMD      = @P11,      " _

@@ -613,6 +613,7 @@ Public Class OIT0001EmptyTurnDairyList
 
                     '200:手配　～　310：手配完了
                     Case BaseDllConst.CONST_ORDERSTATUS_200,
+                         BaseDllConst.CONST_ORDERSTATUS_205,
                          BaseDllConst.CONST_ORDERSTATUS_210,
                          BaseDllConst.CONST_ORDERSTATUS_220,
                          BaseDllConst.CONST_ORDERSTATUS_230,
@@ -623,6 +624,7 @@ Public Class OIT0001EmptyTurnDairyList
                          BaseDllConst.CONST_ORDERSTATUS_280,
                          BaseDllConst.CONST_ORDERSTATUS_290,
                          BaseDllConst.CONST_ORDERSTATUS_300,
+                         BaseDllConst.CONST_ORDERSTATUS_305,
                          BaseDllConst.CONST_ORDERSTATUS_310,
                          BaseDllConst.CONST_ORDERSTATUS_320
                         '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
@@ -630,7 +632,9 @@ Public Class OIT0001EmptyTurnDairyList
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                        WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0001His2tblrow("TANKNO"), I_SITUATION:="1")
+                        WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
+                                            I_TANKNO:=OIT0001His2tblrow("TANKNO"), I_SITUATION:="1",
+                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
 
                     '350：受注確定
                     Case BaseDllConst.CONST_ORDERSTATUS_350
@@ -640,7 +644,9 @@ Public Class OIT0001EmptyTurnDairyList
                         '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
-                        WW_UpdateTankShozai(strDepstation, "3", "", I_TANKNO:=OIT0001His2tblrow("TANKNO"))
+                        WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
+                                            I_TANKNO:=OIT0001His2tblrow("TANKNO"),
+                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
 
                     '400：受入確認中, 450:受入確認中(受入日入力)
                     Case BaseDllConst.CONST_ORDERSTATUS_400,
@@ -1119,6 +1125,7 @@ Public Class OIT0001EmptyTurnDairyList
                                       ByVal I_KBN As String,
                                       Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal I_ORDERNO As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal I_EmparrDate As String = Nothing,
                                       Optional ByVal upActualEmparrDate As Boolean = False,
@@ -1159,6 +1166,9 @@ Public Class OIT0001EmptyTurnDairyList
             '空車着日（実績）
             If upActualEmparrDate = True Then
                 SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+                '### 20200618 START 受注での使用をリセットする対応 #########################################
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
+                '### 20200618 END   受注での使用をリセットする対応 #########################################
             End If
 
             SQLStr &=
@@ -1167,7 +1177,15 @@ Public Class OIT0001EmptyTurnDairyList
                     & "        UPDTERMID    = @P13, " _
                     & "        RECEIVEYMD   = @P14  " _
                     & "  WHERE TANKNUMBER   = @P01  " _
-                    & "    AND DELFLG      <> @P02; "
+                    & "    AND DELFLG      <> @P02 "
+
+            '### 20200618 START 受注での使用をリセットする対応 #########################################
+            If I_ORDERNO <> "" Then
+                SQLStr &=
+                      "    AND (ISNULL(USEORDERNO, '')     = '' "
+                SQLStr &= String.Format(" OR USEORDERNO = '{0}') ", I_ORDERNO)
+            End If
+            '### 20200618 END   受注での使用をリセットする対応 #########################################
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300

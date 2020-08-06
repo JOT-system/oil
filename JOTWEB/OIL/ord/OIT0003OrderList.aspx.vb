@@ -1339,22 +1339,29 @@ Public Class OIT0003OrderList
         '画面表示データ保存(遷移先(登録画面)向け)
         Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTBL.Text)
 
-        '受注進行ステータス(コード)
-        '〇受注進行ステータスが"100:受注受付"の場合
-        If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
-            If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
-                '受注貨車連結割当画面ページへ遷移
-                Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
-            Else
-                '受注明細画面ページへ遷移
-                Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
-            End If
-        Else
-            '受注明細画面ページへ遷移
-            Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
-        End If
+        '### 20200806 START 受注一覧画面からの受注貨車連結割当画面への遷移を廃止 ###########################
+        '### ★貨車連結順序表画面にて受注明細のデータを作成できるように変更したため(指摘票(全体)No115) #####
+        ''受注進行ステータス(コード)
+        ''〇受注進行ステータスが"100:受注受付"の場合
+        'If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+        '    If work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+        '        OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+        '        OrElse work.WF_SEL_ORDERSALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+        '        '受注貨車連結割当画面ページへ遷移
+        '        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
+        '    Else
+        '        '受注明細画面ページへ遷移
+        '        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
+        '    End If
+        'Else
+        '    '受注明細画面ページへ遷移
+        '    Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
+        'End If
+
+        '受注明細画面ページへ遷移
+        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text)
+
+        '### 20200806 END   受注一覧画面からの受注貨車連結割当画面への遷移を廃止 ###########################
 
     End Sub
 
@@ -1688,6 +1695,7 @@ Public Class OIT0003OrderList
 
                     '200:手配　～　310：手配完了
                     Case BaseDllConst.CONST_ORDERSTATUS_200,
+                         BaseDllConst.CONST_ORDERSTATUS_205,
                          BaseDllConst.CONST_ORDERSTATUS_210,
                          BaseDllConst.CONST_ORDERSTATUS_220,
                          BaseDllConst.CONST_ORDERSTATUS_230,
@@ -1698,6 +1706,7 @@ Public Class OIT0003OrderList
                          BaseDllConst.CONST_ORDERSTATUS_280,
                          BaseDllConst.CONST_ORDERSTATUS_290,
                          BaseDllConst.CONST_ORDERSTATUS_300,
+                         BaseDllConst.CONST_ORDERSTATUS_305,
                          BaseDllConst.CONST_ORDERSTATUS_310,
                          BaseDllConst.CONST_ORDERSTATUS_320
                         '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
@@ -1705,7 +1714,8 @@ Public Class OIT0003OrderList
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                        WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
+                        WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                            I_TANKNO:=OIT0003His2tblrow("TANKNO"), I_SITUATION:="1",
                                             I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
 
                     '350：受注確定
@@ -1716,7 +1726,9 @@ Public Class OIT0003OrderList
                         '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
-                        WW_UpdateTankShozai(strDepstation, "3", "", I_TANKNO:=OIT0003His2tblrow("TANKNO"))
+                        WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0003His2tblrow("ORDERNO"),
+                                            I_TANKNO:=OIT0003His2tblrow("TANKNO"),
+                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
 
                     '400：受入確認中, 450:受入確認中(受入日入力)
                     Case BaseDllConst.CONST_ORDERSTATUS_400,
@@ -2572,14 +2584,18 @@ Public Class OIT0003OrderList
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
             & " , OIT0002.TOTALTANKCH                            AS TOTALTANK" _
-            & " , OIT0002.LODDATE                                AS LODDATE" _
-            & " , OIT0002.DEPDATE                                AS DEPDATE" _
-            & " , OIT0002.ARRDATE                                AS ARRDATE" _
-            & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " , OIT0002_OTHER.LODDATE                          AS LODDATE" _
+            & " , OIT0002_OTHER.DEPDATE                          AS DEPDATE" _
+            & " , OIT0002_OTHER.ARRDATE                          AS ARRDATE" _
+            & " , OIT0002_OTHER.ACCDATE                          AS ACCDATE" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
-            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & " AND OIT0003.DELFLG <> @P02 " _
+            & " AND OIT0003.ACTUALLODDATE = @P03 " _
+            & " LEFT JOIN OIL.OIT0002_ORDER OIT0002_OTHER ON " _
+            & "     OIT0002_OTHER.ORDERNO = OIT0003.ORDERNO " _
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
             & " AND OIM0005.DELFLG <> @P02 " _
@@ -3815,6 +3831,7 @@ Public Class OIT0003OrderList
                                       ByVal I_KBN As String,
                                       Optional ByVal I_SITUATION As String = Nothing,
                                       Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal I_ORDERNO As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal I_EmparrDate As String = Nothing,
                                       Optional ByVal upActualEmparrDate As Boolean = False,
@@ -3866,7 +3883,15 @@ Public Class OIT0003OrderList
                     & "        UPDTERMID    = @P13, " _
                     & "        RECEIVEYMD   = @P14  " _
                     & "  WHERE TANKNUMBER   = @P01  " _
-                    & "    AND DELFLG      <> @P02; "
+                    & "    AND DELFLG      <> @P02  "
+
+            '### 20200618 START 受注での使用をリセットする対応 #########################################
+            If I_ORDERNO <> "" Then
+                SQLStr &=
+                      "    AND (ISNULL(USEORDERNO, '')     = '' "
+                SQLStr &= String.Format(" OR USEORDERNO = '{0}') ", I_ORDERNO)
+            End If
+            '### 20200618 END   受注での使用をリセットする対応 #########################################
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300

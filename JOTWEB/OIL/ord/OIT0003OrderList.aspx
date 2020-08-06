@@ -41,7 +41,9 @@
                     <div class="rightSide">
                         <!-- 右ボタン -->
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
-                        <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonLinkINSERT');" />
+                        <a style="display:none;">
+                            <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonLinkINSERT');" />
+                        </a>
                         <a style="display:none;">
                             <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
                         </a>

@@ -431,6 +431,9 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS LOADINGRETSTATIONNAME " _
             & " , ''                                            AS LOADINGLODDATE " _
             & " , ''                                            AS LOADINGDEPDATE " _
+            & " , ''                                            AS LOADINGARRDATE " _
+            & " , ''                                            AS LOADINGACCDATE " _
+            & " , ''                                            AS LOADINGEMPARRDATE " _
             & " , '0'                                           AS DELFLG " _
             & " FROM sys.all_objects "
 
@@ -508,6 +511,9 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')     AS LOADINGRETSTATIONNAME " _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '') AS LOADINGLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '') AS LOADINGDEPDATE" _
+            & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '') AS LOADINGARRDATE" _
+            & " , ISNULL(FORMAT(OIT0002.ACCDATE, 'yyyy/MM/dd'), '') AS LOADINGACCDATE" _
+            & " , ISNULL(FORMAT(OIT0002.EMPARRDATE, 'yyyy/MM/dd'), '') AS LOADINGEMPARRDATE" _
             & " , ISNULL(RTRIM(OIT0004.DELFLG), '')             AS DELFLG " _
             & " FROM OIL.OIT0011_RLINK OIT0011 " _
             & " LEFT JOIN OIL.OIT0004_LINK OIT0004 ON " _
@@ -1257,11 +1263,11 @@ Public Class OIT0002LinkDetail
                 Me.txtEmparrDate.Focus()
 
             '(一覧)タンク車№, (一覧)油種名(受発注用), 
-            '(一覧)充填ポイント
-            '(一覧)積込後本線列車, (一覧)積込入線列車番号, (一覧)積込出線列車番号
+            '(一覧)充填ポイント, (一覧)積込入線列車番号, (一覧)積込出線列車番号
+            '(一覧)積込後本線列車, (一覧)積込後本線列車積込予定日, (一覧)積込後本線列車発予定日
             Case "TANKNUMBER", "ORDERINGOILNAME",
-                 "FILLINGPOINT",
-                 "LOADINGTRAINNO", "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO"
+                 "FILLINGPOINT", "LOADINGIRILINETRAINNO", "LOADINGOUTLETTRAINNO",
+                 "LOADINGTRAINNO", "LOADINGLODDATE", "LOADINGDEPDATE"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -1314,97 +1320,9 @@ Public Class OIT0002LinkDetail
                         updHeader.Item("ORDERINGTYPE") = WW_GetValue(1)
                     End If
 
-                    '充填ポイントを一覧に設定
+                    '(一覧)充填ポイント
                 ElseIf WF_FIELD.Value = "FILLINGPOINT" Then
                     updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
-
-                    '(一覧)積込後本線列車
-                ElseIf WF_FIELD.Value = "LOADINGTRAINNO" Then
-                    If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
-                        Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
-                        Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
-                        WW_SelectValue = selectedItem.Value
-                        WW_SelectText = selectedItem.Text
-                    End If
-
-                    If WW_SelectValue = "" Then
-                        '◯ 積込後本線列車
-                        updHeader.Item(WF_FIELD.Value) = ""
-                        updHeader.Item("LOADINGTRAINNAME") = ""
-
-                        '◯ 積込後発駅
-                        updHeader.Item("LOADINGDEPSTATION") = ""
-                        updHeader.Item("LOADINGDEPSTATIONNAME") = ""
-
-                        '◯ 積込後着駅
-                        updHeader.Item("LOADINGRETSTATION") = ""
-                        updHeader.Item("LOADINGRETSTATIONNAME") = ""
-
-                        '◯ 積込後(予定)日付を設定
-                        updHeader.Item("LOADINGLODDATE") = ""
-                        updHeader.Item("LOADINGDEPDATE") = ""
-
-                        '荷主
-                        updHeader.Item("SHIPPERSCODE") = ""
-                        updHeader.Item("SHIPPERSNAME") = ""
-                        '基地
-                        updHeader.Item("BASECODE") = ""
-                        updHeader.Item("BASENAME") = ""
-                        '荷受人
-                        updHeader.Item("CONSIGNEECODE") = ""
-                        updHeader.Item("CONSIGNEENAME") = ""
-                        '受注パターン
-                        updHeader.Item("PATTERNCODE") = ""
-                        updHeader.Item("PATTERNNAME") = ""
-
-                        '○ 画面表示データ保存
-                        Master.SaveTable(OIT0002tbl)
-
-                        Exit Select
-                    End If
-
-                    updHeader.Item(WF_FIELD.Value) = WW_SelectValue
-                    updHeader.Item("LOADINGTRAINNAME") = WW_SelectText
-                    'updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
-                    'updHeader.Item("LOADINGTRAINNAME") = WW_SETTEXT
-
-                    '★列車名(本線)から情報を取得
-                    FixvalueMasterSearch(updHeader.Item("OFFICECODE"),
-                                         "TRAINNUMBER_FIND",
-                                         WW_SelectText,
-                                         WW_GetValue)
-
-                    '◯ 積込後発駅
-                    updHeader.Item("LOADINGDEPSTATION") = WW_GetValue(1)
-                    CODENAME_get("DEPSTATION", WW_GetValue(1), updHeader.Item("LOADINGDEPSTATIONNAME"), WW_RTN_SW, I_OFFICECODE:=updHeader.Item("OFFICECODE"))
-
-                    '◯ 積込後着駅
-                    updHeader.Item("LOADINGRETSTATION") = WW_GetValue(2)
-                    CODENAME_get("RETSTATION", WW_GetValue(2), updHeader.Item("LOADINGRETSTATIONNAME"), WW_RTN_SW, I_OFFICECODE:=updHeader.Item("OFFICECODE"))
-
-                    '〇 積込後(予定)日付を設定
-                    updHeader.Item("LOADINGLODDATE") = Now.AddDays(1).ToString("yyyy/MM/dd")
-                    updHeader.Item("LOADINGDEPDATE") = Now.AddDays(1 + Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
-
-                    '★営業所関連情報(荷主、基地、荷受人)取得
-                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                    FixvalueMasterSearch(updHeader.Item("OFFICECODE"),
-                                         "PATTERNMASTER",
-                                         updHeader.Item("LOADINGRETSTATION"),
-                                         WW_GetValue)
-
-                    '荷主
-                    updHeader.Item("SHIPPERSCODE") = WW_GetValue(0)
-                    updHeader.Item("SHIPPERSNAME") = WW_GetValue(1)
-                    '基地
-                    updHeader.Item("BASECODE") = WW_GetValue(2)
-                    updHeader.Item("BASENAME") = WW_GetValue(3)
-                    '荷受人
-                    updHeader.Item("CONSIGNEECODE") = WW_GetValue(4)
-                    updHeader.Item("CONSIGNEENAME") = WW_GetValue(5)
-                    '受注パターン
-                    updHeader.Item("PATTERNCODE") = WW_GetValue(6)
-                    updHeader.Item("PATTERNNAME") = WW_GetValue(7)
 
                     '(一覧)積込入線列車番号
                 ElseIf WF_FIELD.Value = "LOADINGIRILINETRAINNO" Then
@@ -1466,6 +1384,153 @@ Public Class OIT0002LinkDetail
                     updHeader.Item("LOADINGIRILINETRAINNO") = WW_GetValue(6)
                     '入線列車名
                     updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(7)
+
+                    '(一覧)積込後本線列車
+                ElseIf WF_FIELD.Value = "LOADINGTRAINNO" Then
+                    If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+                        Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
+                        Dim selectedItem = leftview.WF_LeftListBox.Items.FindByText(selectedText)
+                        WW_SelectValue = selectedItem.Value
+                        WW_SelectText = selectedItem.Text
+                    End If
+
+                    If WW_SelectValue = "" Then
+                        '◯ 積込後本線列車
+                        updHeader.Item(WF_FIELD.Value) = ""
+                        updHeader.Item("LOADINGTRAINNAME") = ""
+
+                        '◯ 積込後発駅
+                        updHeader.Item("LOADINGDEPSTATION") = ""
+                        updHeader.Item("LOADINGDEPSTATIONNAME") = ""
+
+                        '◯ 積込後着駅
+                        updHeader.Item("LOADINGRETSTATION") = ""
+                        updHeader.Item("LOADINGRETSTATIONNAME") = ""
+
+                        '◯ 積込後(予定)日付を設定
+                        updHeader.Item("LOADINGLODDATE") = ""
+                        updHeader.Item("LOADINGDEPDATE") = ""
+                        updHeader.Item("LOADINGARRDATE") = ""
+                        updHeader.Item("LOADINGACCDATE") = ""
+                        updHeader.Item("LOADINGEMPARRDATE") = ""
+
+                        '荷主
+                        updHeader.Item("SHIPPERSCODE") = ""
+                        updHeader.Item("SHIPPERSNAME") = ""
+                        '基地
+                        updHeader.Item("BASECODE") = ""
+                        updHeader.Item("BASENAME") = ""
+                        '荷受人
+                        updHeader.Item("CONSIGNEECODE") = ""
+                        updHeader.Item("CONSIGNEENAME") = ""
+                        '受注パターン
+                        updHeader.Item("PATTERNCODE") = ""
+                        updHeader.Item("PATTERNNAME") = ""
+
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0002tbl)
+
+                        Exit Select
+                    End If
+
+                    updHeader.Item(WF_FIELD.Value) = WW_SelectValue
+                    updHeader.Item("LOADINGTRAINNAME") = WW_SelectText
+                    'updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+                    'updHeader.Item("LOADINGTRAINNAME") = WW_SETTEXT
+
+                    '★列車名(本線)から情報を取得
+                    FixvalueMasterSearch(updHeader.Item("OFFICECODE"),
+                                         "TRAINNUMBER_FIND",
+                                         WW_SelectText,
+                                         WW_GetValue)
+
+                    '◯ 積込後発駅
+                    updHeader.Item("LOADINGDEPSTATION") = WW_GetValue(1)
+                    CODENAME_get("DEPSTATION", WW_GetValue(1), updHeader.Item("LOADINGDEPSTATIONNAME"), WW_RTN_SW, I_OFFICECODE:=updHeader.Item("OFFICECODE"))
+
+                    '◯ 積込後着駅
+                    updHeader.Item("LOADINGRETSTATION") = WW_GetValue(2)
+                    CODENAME_get("RETSTATION", WW_GetValue(2), updHeader.Item("LOADINGRETSTATIONNAME"), WW_RTN_SW, I_OFFICECODE:=updHeader.Item("OFFICECODE"))
+
+                    '〇 積込後(予定)日付を設定
+                    updHeader.Item("LOADINGLODDATE") = Now.AddDays(1).ToString("yyyy/MM/dd")
+                    updHeader.Item("LOADINGDEPDATE") = Now.AddDays(1 + Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
+                    updHeader.Item("LOADINGARRDATE") = Now.AddDays(1 + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                    updHeader.Item("LOADINGACCDATE") = Now.AddDays(1 + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    updHeader.Item("LOADINGEMPARRDATE") = Now.AddDays(1 + Integer.Parse(WW_GetValue(10)) + Integer.Parse(WW_GetValue(11))).ToString("yyyy/MM/dd")
+
+                    '★営業所関連情報(荷主、基地、荷受人)取得
+                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                    FixvalueMasterSearch(updHeader.Item("OFFICECODE"),
+                                         "PATTERNMASTER",
+                                         updHeader.Item("LOADINGRETSTATION"),
+                                         WW_GetValue)
+
+                    '荷主
+                    updHeader.Item("SHIPPERSCODE") = WW_GetValue(0)
+                    updHeader.Item("SHIPPERSNAME") = WW_GetValue(1)
+                    '基地
+                    updHeader.Item("BASECODE") = WW_GetValue(2)
+                    updHeader.Item("BASENAME") = WW_GetValue(3)
+                    '荷受人
+                    updHeader.Item("CONSIGNEECODE") = WW_GetValue(4)
+                    updHeader.Item("CONSIGNEENAME") = WW_GetValue(5)
+                    '受注パターン
+                    updHeader.Item("PATTERNCODE") = WW_GetValue(6)
+                    updHeader.Item("PATTERNNAME") = WW_GetValue(7)
+
+                    '(一覧)積込後本線列車積込予定日
+                ElseIf WF_FIELD.Value = "LOADINGLODDATE" Then
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            updHeader.Item("LOADINGLODDATE") = ""
+                        Else
+                            updHeader.Item("LOADINGLODDATE") = leftview.WF_Calendar.Text
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    'updHeader.Item("LOADINGLODDATE").Focus()
+
+                    '◯ 列車(名称)から日数を取得
+                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                    FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", updHeader.Item("LOADINGTRAINNAME"), WW_GetValue)
+
+                    '〇 (予定)の日付を設定
+                    updHeader.Item("LOADINGDEPDATE") = Date.Parse(updHeader.Item("LOADINGLODDATE")).AddDays(Integer.Parse(WW_GetValue(6))).ToString("yyyy/MM/dd")
+                    updHeader.Item("LOADINGARRDATE") = Date.Parse(updHeader.Item("LOADINGLODDATE")).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                    updHeader.Item("LOADINGACCDATE") = Date.Parse(updHeader.Item("LOADINGLODDATE")).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                    updHeader.Item("LOADINGEMPARRDATE") = Date.Parse(updHeader.Item("LOADINGLODDATE")).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+
+                    '(一覧)積込後本線列車発予定日
+                ElseIf WF_FIELD.Value = "LOADINGDEPDATE" Then
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            updHeader.Item("LOADINGDEPDATE") = ""
+                        Else
+                            updHeader.Item("LOADINGDEPDATE") = leftview.WF_Calendar.Text
+                        End If
+                    Catch ex As Exception
+                    End Try
+                    'updHeader.Item("LOADINGDEPDATE").Focus()
+
+                    '◯ 列車(名称)から日数を取得
+                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                    FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text, "TRAINNUMBER_FIND", updHeader.Item("LOADINGTRAINNAME"), WW_GetValue)
+
+                    '〇 (予定)の日付を設定
+                    If Integer.Parse(WW_GetValue(6)) = 0 Then
+                        updHeader.Item("LOADINGARRDATE") = Date.Parse(updHeader.Item("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                        updHeader.Item("LOADINGACCDATE") = Date.Parse(updHeader.Item("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                        updHeader.Item("LOADINGEMPARRDATE") = Date.Parse(updHeader.Item("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                    ElseIf Integer.Parse(WW_GetValue(6)) > 0 Then
+                        updHeader.Item("LOADINGARRDATE") = Date.Parse(updHeader.Item("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                        updHeader.Item("LOADINGACCDATE") = Date.Parse(updHeader.Item("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                        updHeader.Item("LOADINGEMPARRDATE") = Date.Parse(updHeader.Item("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                    End If
 
                 End If
 
@@ -1754,6 +1819,9 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS LOADINGRETSTATIONNAME " _
             & " , ''                                            AS LOADINGLODDATE " _
             & " , ''                                            AS LOADINGDEPDATE " _
+            & " , ''                                            AS LOADINGARRDATE " _
+            & " , ''                                            AS LOADINGACCDATE " _
+            & " , ''                                            AS LOADINGEMPARRDATE " _
             & " , '0'                                           AS DELFLG " _
             & " FROM sys.all_objects "
 
@@ -2880,12 +2948,12 @@ Public Class OIT0002LinkDetail
                     OIT0002row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_103
                     CODENAME_get("ORDERINFO", OIT0002row("ORDERINFO"), OIT0002row("ORDERINFONAME"), WW_DUMMY)
 
-                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()       'DataBase接続
+                    'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    '    SQLcon.Open()       'DataBase接続
 
-                        '貨車連結表TBLの情報を更新
-                        WW_UpdateLinkInfo(SQLcon, OIT0002row)
-                    End Using
+                    '    '貨車連結表TBLの情報を更新
+                    '    WW_UpdateLinkInfo(SQLcon, OIT0002row)
+                    'End Using
 
                     O_RTN = "ERR"
                 End If
@@ -4677,7 +4745,7 @@ Public Class OIT0002LinkDetail
 
                     P_ORDERSTATUS.Value = BaseDllConst.CONST_ORDERSTATUS_100      '受注進行ステータス
                     P_ORDERINFO.Value = ""                                        '受注情報
-                    P_EMPTYTURNFLG.Value = "0"                                    '空回日報可否フラグ(0:未作成)
+                    P_EMPTYTURNFLG.Value = "3"                                    '空回日報可否フラグ(3:作成(貨車連結表から作成))
 
                     '〇 積込日 < 発日 の場合 
                     iresult = Date.Parse(OIT0002row("LOADINGLODDATE")).CompareTo(Date.Parse(OIT0002row("LOADINGDEPDATE")))
@@ -4708,9 +4776,24 @@ Public Class OIT0002LinkDetail
                     Else
                         P_DEPDATE.Value = DBNull.Value
                     End If
-                    P_ARRDATE.Value = DBNull.Value                        '積車着日（予定）
-                    P_ACCDATE.Value = DBNull.Value                        '受入日（予定）
-                    P_EMPARRDATE.Value = DBNull.Value                     '空車着日（予定）
+                    '積車着日（予定）
+                    If OIT0002row("LOADINGARRDATE") <> "" Then
+                        P_ARRDATE.Value = OIT0002row("LOADINGARRDATE")
+                    Else
+                        P_ARRDATE.Value = DBNull.Value
+                    End If
+                    '受入日（予定）
+                    If OIT0002row("LOADINGACCDATE") <> "" Then
+                        P_ACCDATE.Value = OIT0002row("LOADINGACCDATE")
+                    Else
+                        P_ACCDATE.Value = DBNull.Value
+                    End If
+                    '空車着日（予定）
+                    If OIT0002row("LOADINGEMPARRDATE") <> "" Then
+                        P_EMPARRDATE.Value = OIT0002row("LOADINGEMPARRDATE")
+                    Else
+                        P_EMPARRDATE.Value = DBNull.Value
+                    End If
 
                     P_RTANK.Value = 0                      '車数（レギュラー）
                     P_HTANK.Value = 0                      '車数（ハイオク）

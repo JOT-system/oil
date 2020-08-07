@@ -439,6 +439,12 @@ div.showGuidance a[id^="Menu_"] {
     margin: 5px;
     font-size: 20px;
 }
+/* マイナス */
+.paneContent span.minus:before {
+    content: "\025B3";
+    color:red;
+    font-weight:bolder;
+}
 /* ******************** */
 /* 締状況ペイン個別 */
 /* ******************** */

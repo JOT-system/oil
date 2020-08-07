@@ -390,6 +390,8 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS BASENAME " _
             & " , ''                                            AS CONSIGNEECODE " _
             & " , ''                                            AS CONSIGNEENAME " _
+            & " , ''                                            AS ORDERINFO " _
+            & " , ''                                            AS ORDERINFONAME " _
             & " , @P05                                          AS DEPSTATION " _
             & " , @P06                                          AS DEPSTATIONNAME " _
             & " , @P07                                          AS RETSTATION " _
@@ -463,6 +465,8 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0002.BASENAME), '')           AS BASENAME " _
             & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')      AS CONSIGNEECODE " _
             & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')      AS CONSIGNEENAME " _
+            & " , ISNULL(RTRIM(OIT0004.INFO), '')               AS ORDERINFO " _
+            & " , ''                                            AS ORDERINFONAME " _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATION), '')         AS DEPSTATION " _
             & " , ISNULL(RTRIM(OIT0004.DEPSTATIONNAME), '')     AS DEPSTATIONNAME " _
             & " , ISNULL(RTRIM(OIT0004.RETSTATION), '')         AS RETSTATION " _
@@ -594,6 +598,9 @@ Public Class OIT0002LinkDetail
                     If OIT0002row("OFFICECODE") <> "" Then
                         CODENAME_get("SALESOFFICE", OIT0002row("OFFICECODE"), OIT0002row("OFFICENAME"), WW_DUMMY)
                     End If
+                    '受注情報
+                    CODENAME_get("ORDERINFO", OIT0002row("ORDERINFO"), OIT0002row("ORDERINFONAME"), WW_DUMMY)
+
                 Next
             End Using
         Catch ex As Exception
@@ -1320,6 +1327,42 @@ Public Class OIT0002LinkDetail
                         WW_SelectText = selectedItem.Text
                     End If
 
+                    If WW_SelectValue = "" Then
+                        '◯ 積込後本線列車
+                        updHeader.Item(WF_FIELD.Value) = ""
+                        updHeader.Item("LOADINGTRAINNAME") = ""
+
+                        '◯ 積込後発駅
+                        updHeader.Item("LOADINGDEPSTATION") = ""
+                        updHeader.Item("LOADINGDEPSTATIONNAME") = ""
+
+                        '◯ 積込後着駅
+                        updHeader.Item("LOADINGRETSTATION") = ""
+                        updHeader.Item("LOADINGRETSTATIONNAME") = ""
+
+                        '◯ 積込後(予定)日付を設定
+                        updHeader.Item("LOADINGLODDATE") = ""
+                        updHeader.Item("LOADINGDEPDATE") = ""
+
+                        '荷主
+                        updHeader.Item("SHIPPERSCODE") = ""
+                        updHeader.Item("SHIPPERSNAME") = ""
+                        '基地
+                        updHeader.Item("BASECODE") = ""
+                        updHeader.Item("BASENAME") = ""
+                        '荷受人
+                        updHeader.Item("CONSIGNEECODE") = ""
+                        updHeader.Item("CONSIGNEENAME") = ""
+                        '受注パターン
+                        updHeader.Item("PATTERNCODE") = ""
+                        updHeader.Item("PATTERNNAME") = ""
+
+                        '○ 画面表示データ保存
+                        Master.SaveTable(OIT0002tbl)
+
+                        Exit Select
+                    End If
+
                     updHeader.Item(WF_FIELD.Value) = WW_SelectValue
                     updHeader.Item("LOADINGTRAINNAME") = WW_SelectText
                     'updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
@@ -1670,6 +1713,8 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS BASENAME " _
             & " , ''                                            AS CONSIGNEECODE " _
             & " , ''                                            AS CONSIGNEENAME " _
+            & " , ''                                            AS ORDERINFO " _
+            & " , ''                                            AS ORDERINFONAME " _
             & " , @P04                                          AS DEPSTATION " _
             & " , @P05                                          AS DEPSTATIONNAME " _
             & " , @P06                                          AS RETSTATION " _
@@ -1993,7 +2038,30 @@ Public Class OIT0002LinkDetail
         '○関連チェック
         WW_Check(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
+            Master.SaveTable(OIT0002tbl)
             Exit Sub
+        End If
+
+        '〇 前回油種と油種の整合性チェック
+        Dim blnOilCheck As Boolean = False
+        WW_CheckLastOilConsistency(WW_ERRCODE)
+        '前回黒油によるエラー
+        If WW_ERRCODE = "ERR1" Then
+            Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+            Exit Sub
+
+            '前回揮発油,今回黒油、または灯軽油による警告
+        ElseIf WW_ERRCODE = "ERR2" Then
+            blnOilCheck = True
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ALERT,
+              C_MESSAGE_TYPE.QUES,
+              needsPopUp:=True,
+              messageBoxTitle:="")
+            'IsConfirm:=True,
+            'YesButtonId:="btnChkLastOilConfirmYes",
+            'needsConfirmNgToPostBack:=True,
+            'NoButtonId:="btnChkLastOilConfirmNo")
         End If
 
         '★受注No取得
@@ -2008,45 +2076,45 @@ Public Class OIT0002LinkDetail
         Master.SaveTable(OIT0002Tmptbl)
 
         '○ 同一レコードチェック
-        If isNormal(WW_ERRCODE) Then
-            '貨車連結表(臨海)DB追加・更新
+        'If isNormal(WW_ERRCODE) AndAlso blnOilCheck = False Then
+        '貨車連結表(臨海)DB追加・更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_UpdateRLINK(SQLcon)
+        End Using
+
+        '貨車連結表DB追加・更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WF_UPDERRFLG.Value = "0"
+
+            WW_UpdateLINK(SQLcon)
+        End Using
+
+        '受注明細DB追加・更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_UpdateORDERDETAIL(SQLcon)
+        End Using
+
+        '受注DB追加・更新
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            WW_UpdateORDER(SQLcon)
+        End Using
+
+        If WF_UPDERRFLG.Value <> "1" Then
+            '貨車連結表(一覧)画面表示データ取得
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
-
-                WW_UpdateRLINK(SQLcon)
+                WW_LinkListTBLSet(SQLcon)
             End Using
-
-            '貨車連結表DB追加・更新
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-
-                WF_UPDERRFLG.Value = "0"
-
-                WW_UpdateLINK(SQLcon)
-            End Using
-
-            '受注明細DB追加・更新
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-
-                WW_UpdateORDERDETAIL(SQLcon)
-            End Using
-
-            '受注DB追加・更新
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open()       'DataBase接続
-
-                WW_UpdateORDER(SQLcon)
-            End Using
-
-            If WF_UPDERRFLG.Value <> "1" Then
-                '貨車連結表(一覧)画面表示データ取得
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
-                    WW_LinkListTBLSet(SQLcon)
-                End Using
-            End If
         End If
+        'End If
 
         '○ GridView初期設定
         '○ 画面表示データ再取得(貨車連結表(明細)画面表示データ取得)
@@ -2078,7 +2146,7 @@ Public Class OIT0002LinkDetail
         End If
 
         '○ メッセージ表示
-        If Not isNormal(WW_ERRCODE) Then
+        If Not isNormal(WW_ERRCODE) AndAlso blnOilCheck = False Then
             Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
         End If
 
@@ -2795,6 +2863,44 @@ Public Class OIT0002LinkDetail
             End If
         Next
 
+        '(一覧)積込後本線列車チェック
+        '★受注登録するうえで、積込後本線列車番号が未設定の場合はエラーとする。
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+
+            '下記(一覧)項目が設定されているか確認
+            '(一覧)積込油種, (一覧)位置, (一覧)回線, (一覧)入線列車, (一覧)出線列車
+            If OIT0002row("ORDERINGOILNAME") <> "" _
+                OrElse OIT0002row("FILLINGPOINT") <> "" _
+                OrElse OIT0002row("LINE") <> "" _
+                OrElse OIT0002row("LOADINGIRILINETRAINNO") <> "" _
+                OrElse OIT0002row("LOADINGOUTLETTRAINNO") <> "" Then
+
+                '★積込後本線列車が未設定の場合
+                If OIT0002row("LOADINGTRAINNO") = "" Then
+                    OIT0002row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_103
+                    CODENAME_get("ORDERINFO", OIT0002row("ORDERINFO"), OIT0002row("ORDERINFONAME"), WW_DUMMY)
+
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        '貨車連結表TBLの情報を更新
+                        WW_UpdateLinkInfo(SQLcon, OIT0002row)
+                    End Using
+
+                    O_RTN = "ERR"
+                End If
+            Else
+                If OIT0002row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_103 Then
+                    OIT0002row("ORDERINFO") = ""
+                    OIT0002row("ORDERINFONAME") = ""
+                End If
+            End If
+        Next
+        If O_RTN = "ERR" Then
+            Master.Output(C_MESSAGE_NO.OIL_ORDER_NO_CHECKED_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
 
@@ -2897,6 +3003,71 @@ Public Class OIT0002LinkDetail
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ERR, I_DATENAME, needsPopUp:=True)
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 前回油種と油種の整合性チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckLastOilConsistency(ByRef O_RTN As String)
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_TEXT As String = ""
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_CS0024FCHECKERR As String = ""
+        Dim WW_CS0024FCHECKREPORT As String = ""
+        Dim WW_GetValue = {"", "", "", "", "", "", "", ""}
+
+        '前回油種と油種の整合性チェック
+        For Each OIT0002row As DataRow In OIT0002tbl.Rows
+
+            '★積込油種が未設定の場合はSKIP(次レコード)する。
+            If OIT0002row("OILCODE") = "" Then Continue For
+
+            WW_GetValue = {"", "", "", "", "", "", "", ""}
+            FixvalueMasterSearch(OIT0002row("PREOILCODE") + OIT0002row("PREORDERINGTYPE"), "LASTOILCONSISTENCY", OIT0002row("OILCODE") + OIT0002row("ORDERINGTYPE"), WW_GetValue)
+
+            '前回黒油
+            If WW_GetValue(2) = "1" AndAlso OIT0002row("DELFLG") = "0" Then
+                OIT0002row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
+                CODENAME_get("ORDERINFO", OIT0002row("ORDERINFO"), OIT0002row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "前回油種と油種の整合性エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0002row)
+                O_RTN = "ERR1"
+                'Exit Sub
+
+                '前回揮発油
+            ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso OIT0002row("DELFLG") = "0" Then
+                OIT0002row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                CODENAME_get("ORDERINFO", OIT0002row("ORDERINFO"), OIT0002row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "前回油種と油種の整合性エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0002row)
+
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    '貨車連結表TBLの情報を更新
+                    WW_UpdateLinkInfo(SQLcon, OIT0002row)
+                End Using
+
+                If O_RTN <> "ERR1" Then O_RTN = "ERR2"
+            Else
+                If OIT0002row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99 _
+                    OrElse OIT0002row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98 Then
+                    OIT0002row("ORDERINFO") = ""
+                    OIT0002row("ORDERINFONAME") = ""
+                End If
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0002tbl)
 
     End Sub
 
@@ -3239,7 +3410,7 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -3548,7 +3719,7 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -3756,7 +3927,7 @@ Public Class OIT0002LinkDetail
                     'ステータス
                     PARA04.Value = "1"
                     '情報
-                    PARA05.Value = ""
+                    PARA05.Value = OIT0002row("ORDERINFO")             '情報
                     '前回オーダー№
                     PARA06.Value = ""
                     PARA07.Value = Me.TxtBTrainNo.Text                 '返送列車
@@ -3916,7 +4087,7 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -4194,7 +4365,7 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
@@ -4675,10 +4846,75 @@ Public Class OIT0002LinkDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 
+    ''' <summary>
+    ''' (貨車連結表TBL)情報更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateLinkInfo(ByVal SQLcon As SqlConnection, ByVal OIT0002row As DataRow)
+
+        Try
+            '更新SQL文･･･貨車連結表TBLの情報を更新
+            Dim SQLStr As String = ""
+            SQLStr =
+                " UPDATE OIL.OIT0004_LINK " _
+                & "    SET INFO          = @INFO, " _
+                & "        UPDYMD        = @UPDYMD, " _
+                & "        UPDUSER       = @UPDUSER, " _
+                & "        UPDTERMID     = @UPDTERMID, " _
+                & "        RECEIVEYMD    = @RECEIVEYMD  " _
+                & "  WHERE LINKNO        = @LINKNO " _
+                & "    AND LINKDETAILNO  = @LINKDETAILNO " _
+                & "    AND DELFLG       <> @DELFLG "
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim P_LINKNO As SqlParameter = SQLcmd.Parameters.Add("@LINKNO", System.Data.SqlDbType.NVarChar)
+            Dim P_LINKDETAILNO As SqlParameter = SQLcmd.Parameters.Add("@LINKDETAILNO", System.Data.SqlDbType.NVarChar)
+            Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", System.Data.SqlDbType.NVarChar)
+            Dim P_INFO As SqlParameter = SQLcmd.Parameters.Add("@INFO", System.Data.SqlDbType.NVarChar)
+
+            Dim P_UPDYMD As SqlParameter = SQLcmd.Parameters.Add("@UPDYMD", System.Data.SqlDbType.DateTime)
+            Dim P_UPDUSER As SqlParameter = SQLcmd.Parameters.Add("@UPDUSER", System.Data.SqlDbType.NVarChar)
+            Dim P_UPDTERMID As SqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", System.Data.SqlDbType.NVarChar)
+            Dim P_RECEIVEYMD As SqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", System.Data.SqlDbType.DateTime)
+
+            P_LINKNO.Value = OIT0002row("LINKNO")
+            P_LINKDETAILNO.Value = OIT0002row("RLINKDETAILNO")
+            P_DELFLG.Value = C_DELETE_FLG.DELETE
+            P_INFO.Value = OIT0002row("ORDERINFO")
+
+            P_UPDYMD.Value = Date.Now
+            P_UPDUSER.Value = Master.USERID
+            P_UPDTERMID.Value = Master.USERTERMID
+            P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D_LINKINFO UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002D_LINKINFO UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        ''○メッセージ表示
+        'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
 
     ''' <summary>
     ''' 貨車連結順序表(一覧)表示用
@@ -5508,6 +5744,9 @@ Public Class OIT0002LinkDetail
 
                 Case "SALESOFFICE"      '登録営業所
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_SALESOFFICE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "SALESOFFICE"))
+
+                Case "ORDERINFO"        '受注情報
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
 
                 Case "USEPROPRIETY"     '利用可否フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "USEPROPRIETY"))

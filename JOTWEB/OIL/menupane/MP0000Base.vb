@@ -88,8 +88,8 @@ Public Class MP0000Base
         Dim sqlStat As New StringBuilder
         sqlStat.AppendLine("SELECT TR.ARRSTATION AS STATIONCODE")
         sqlStat.AppendLine("      ,ISNULL(ST.STATONNAME,'') AS STATONNAME")
-        sqlStat.AppendLine("  FROM      OIL.OIM0007_TRAIN TR")
-        sqlStat.AppendLine("  LEFT JOIN OIL.OIM0004_STATION ST")
+        sqlStat.AppendLine("  FROM      OIL.OIM0007_TRAIN TR  with(nolock)")
+        sqlStat.AppendLine("  LEFT JOIN OIL.OIM0004_STATION ST  with(nolock)")
         sqlStat.AppendLine("    ON TR.ARRSTATION = ST.STATIONCODE + ST.BRANCH")
         sqlStat.AppendLine("   AND ST.DELFLG     = @DELFLG")
         sqlStat.AppendLine(" WHERE TR.OFFICECODE = @OFFICECODE")
@@ -115,6 +115,34 @@ Public Class MP0000Base
             End Using
         End Using
         Return retList
+    End Function
+    ''' <summary>
+    ''' 月間輸送量ペイン用の一覧表の表示パターンを取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetMonthlyTransListPattern() As DropDownList
+        Dim letList As New DropDownList
+        Using obj As GRIS0005LeftBox = DirectCast(LoadControl("~/inc/GRIS0005LeftBox.ascx"), GRIS0005LeftBox)
+            Dim prmData As New Hashtable
+            Dim patent = DirectCast(Me.Page.Master, OILMasterPage)
+            'prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_COMPANY) = patent.USER_ORG
+            'prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_SALESOFFICE) = ""
+            'prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_TYPEMODE) = GL0003CustomerList.LC_CUSTOMER_TYPE.ALL
+
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_COMPANY) = "01"
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_FIX_CLASS) = "MENUMONTHTRPAT"
+            prmData.Item(GRIS0005LeftBox.C_PARAMETERS.LP_ADDITINALSORTORDER) = "VALUE5"
+
+            Dim WW_DUMMY As String = ""
+            obj.SetListBox(GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, WW_DUMMY, prmData)
+            For Each listitm As ListItem In obj.WF_LeftListBox.Items
+                Dim ddlItm As New ListItem(listitm.Text, listitm.Value)
+                ddlItm.Selected = False
+                letList.Items.Add(ddlItm)
+            Next
+
+        End Using
+        Return letList
     End Function
     ''' <summary>
     ''' cookieにDDLの選択値を保持する

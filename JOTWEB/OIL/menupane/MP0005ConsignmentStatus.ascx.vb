@@ -61,7 +61,7 @@ Public Class MP0005ConsignmentStatus
         'TODO 着駅で同一が複数、ソートまちまちなので要調整
         '     一旦列車番号
         sqlStat.AppendLine("SELECT TR.TRAINNO ")
-        sqlStat.AppendLine("  FROM OIL.OIM0007_TRAIN TR")
+        sqlStat.AppendLine("  FROM OIL.OIM0007_TRAIN TR with(nolock)")
         sqlStat.AppendLine(" WHERE TR.OFFICECODE  = @OFFICECODE")
         'sqlStat.AppendLine("   AND TR.OTFLG       = @OTFLG")
         'sqlStat.AppendLine("   AND TR.TRAINCLASS  IN(@TRAINCLASS_O,@TRAINCLASS_T)")

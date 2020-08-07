@@ -301,6 +301,9 @@ div.showGuidance a[id^="Menu_"] {
     box-sizing: border-box;
     background-color: rgba(225, 225, 225, 1)
 }
+.menuPaneItem:hover {
+    border-color:darkgray;
+}
 /* ３列幅を使うペイン設定 */
 .menuPaneItem.paneWidth3 {
     width: 1068px;
@@ -429,6 +432,13 @@ div.showGuidance a[id^="Menu_"] {
     content:'―';
     font-weight:bolder;
 }
+/* 表示データなしエリア */
+.paneContent .nodataArea {
+    color: red;
+    font-weight: bold;
+    margin: 5px;
+    font-size: 20px;
+}
 /* ******************** */
 /* 締状況ペイン個別 */
 /* ******************** */
@@ -513,28 +523,58 @@ div.showGuidance a[id^="Menu_"] {
 }
 /* 左グラフの縦位置調整 */
 .monthTransRight {
-    margin-top:-15px;
+    //margin-top:-15px;
 }
-.monthTransTable table tr:nth-child(1) th:nth-child(1) {
+.monthTransTable table th {
+    background-color:rgb(255,255,102);
+}
+.monthTransTable table td {
+    background-color: white;
+}
+.monthTransTable th.erase {
     border-top: none;
     border-left: none;
+    background-color: transparent;
 }
-/* その他数値セル幅 */
+/* 油種セル幅 */
 .monthTransTable table th.oilType {
     width:120px;
+}
+/* 白黒油種セル幅 */
+.monthTransTable table th.bigOilCode {
+    width:50px;
+    white-space:normal;
+    word-break:break-all;
 }
 /* その他数値セル幅 */
 .monthTransTable table th.yesterday,
 .monthTransTable table th.today,
-.monthTransTable table th.todayTrans{
-    width:100px;
+.monthTransTable table th.todayTrans,
+.monthTransTable table th.volumeChange,
+.monthTransTable table th.volumeRatio,
+.monthTransTable table th.lyVolumeChange,
+.monthTransTable table th.lyVolumeRatio {
+    width: 100px;
 }
 /* 列見出し（油種名）*/
 .monthTransTable .oilNameData {
     text-align: left;
 }
+/* 列データ */
 .monthTransTable td {
     text-align:right;
+}
+.monthTransTable td.center {
+    text-align: center;
+}
+/* 合計行のセル */
+.monthTransTable td.summary {
+   background-color:palegoldenrod;
+}
+/* 行Hover時 */
+.monthTransTable tr:hover td:not([rowspan]) {
+    background-color:darkorange;
+    color:white;
 }
 /* ******************************** */
 /* 貨車連結順序表取込状況ペイン個別 */
@@ -543,7 +583,6 @@ div.showGuidance a[id^="Menu_"] {
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
-
 }
 .paneLinkListImportItems > div {
     align-content:center;

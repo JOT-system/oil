@@ -54,7 +54,7 @@ Public Class MP0006LinkListImportStatus
         sqlStat.AppendLine("SELECT REPLACE(RTR.TRAINNAME,'レ','') AS TRAINNO ")
         sqlStat.AppendLine("     , MIN(RTR.OFFICECODE) AS OFFICECODE")
         sqlStat.AppendLine("     , MIN(RTR.LINECNT)    AS LINECNT")
-        sqlStat.AppendLine("  FROM OIL.OIM0016_RTRAIN RTR")
+        sqlStat.AppendLine("  FROM OIL.OIM0016_RTRAIN RTR with(nolock)")
         sqlStat.AppendLine(" WHERE RTR.IOKBN  = @IOKBN")
         sqlStat.AppendLine("   AND RTR.DELFLG = @DELFLG")
         sqlStat.AppendLine(" GROUP BY RTR.TRAINNAME")

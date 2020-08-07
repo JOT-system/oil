@@ -55,7 +55,7 @@ Public Class MP0001CycleBillingStatus
         Dim sqlStat As New StringBuilder
         Dim retDate As Date = New Date(Now.Year, Now.Month, 1)
         sqlStat.AppendLine("SELECT COUNT(*) AS WORKDAYCNT")
-        sqlStat.AppendLine("  FROM COM.OIS0021_CALENDAR")
+        sqlStat.AppendLine("  FROM COM.OIS0021_CALENDAR with(nolock)")
         sqlStat.AppendLine(" WHERE DELFLG = '0'")
         sqlStat.AppendLine("   AND DATEPART(YEAR,WORKINGYMD)  = DATEPART(YEAR,getdate())")
         sqlStat.AppendLine("   AND DATEPART(MONTH,WORKINGYMD) = DATEPART(MONTH,getdate())")
@@ -87,7 +87,7 @@ Public Class MP0001CycleBillingStatus
         sqlStat.AppendLine("      ,OFFICECODE")
         sqlStat.AppendLine("      ,OFFICENAME")
         sqlStat.AppendLine("      ,SORTORDER")
-        sqlStat.AppendLine("  FROM OIL.VIW0010_BELONG_TO_OFFICE")
+        sqlStat.AppendLine("  FROM OIL.VIW0010_BELONG_TO_OFFICE with(nolock)")
         sqlStat.AppendLine(" WHERE ORGCODE = @ORGCODE")
         sqlStat.AppendLine(" ORDER BY SORTORDER")
         Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)

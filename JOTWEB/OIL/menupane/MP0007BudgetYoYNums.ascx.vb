@@ -51,9 +51,14 @@ Public Class MP0007BudgetYoYNums
         SetDisplayValues()
 
     End Sub
-    'Private Function GetOilTypeList() As Table
+    ''' <summary>
+    ''' 対象油種データを取得
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    ''' <returns></returns>
+    Private Function GetOilTypeList(sqlCon As SqlConnection) As List(Of String)
 
-    'End Function
+    End Function
     ''' <summary>
     ''' 一覧表データ取得
     ''' </summary>

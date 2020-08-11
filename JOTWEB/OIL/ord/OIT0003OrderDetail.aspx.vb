@@ -12595,7 +12595,15 @@ Public Class OIT0003OrderDetail
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
 
-            '### 特になし ###############################################################
+            '★割当確定ボタン押下時に更新
+            If Me.WW_UPBUTTONFLG = "1" AndAlso isNormal(WW_ERRCODE) Then
+                '★タンク車所在の更新
+                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数２：タンク車状態　⇒　変更あり("1"(発送))
+                '引数３：積車区分　　　⇒　変更なし(空白)
+                '引数４：(予定)空車着日⇒　更新対象(画面項目)
+                WW_UpdateTankShozai("", "1", "", upEmparrDate:=True)
+            End If
 
             '受注進行ステータスが「320:受注確定」の場合
             '320:受注確定
@@ -16767,6 +16775,7 @@ Public Class OIT0003OrderDetail
             '受注進行ステータス＝"290:手配中(入換積込未連絡)"
             '受注進行ステータス＝"300:手配中(入換積込未確認)"
             '### END   ##################################################################
+            '受注進行ステータス＝"310:手配完了"
             '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
             '### 20200722 受注進行ステータスの制御を追加 #################################
             '205:手配中（千葉(根岸を除く)以外）
@@ -17288,6 +17297,7 @@ Public Class OIT0003OrderDetail
                         chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjAFId = chkObjIdWOAFcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
                         '下のループより先に見つけなければいけないかもしれないので
                         '冗長ですがこちらでループ
                         chkObjST = Nothing
@@ -17316,12 +17326,24 @@ Public Class OIT0003OrderDetail
                             End If
                         Next
                         '### 20200622 END  ((全体)No87対応) ######################################
+                        '### 20200717 START((全体)No112対応) ######################################
+                        chkObjOT = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjOT IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        '### 20200717 END  ((全体)No112対応) ######################################
                         '積込可否フラグ(チェックボックス)を非活性
                         chkObjST.Enabled = False
                         '先返し可否フラグ(チェックボックス)を非活性
                         chkObjFR.Enabled = False
                         '後返し可否フラグ(チェックボックス)を非活性
                         chkObjAF.Enabled = False
+                        'OT輸送可否フラグ(チェックボックス)を非活性
+                        chkObjOT.Enabled = False
                     End If
                     For Each cellObj As TableCell In rowitem.Controls
                         If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _

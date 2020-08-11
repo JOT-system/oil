@@ -1765,6 +1765,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS SECONDARRSTATIONNAME" _
             & " , ''                                             AS CHANGERETSTATION" _
             & " , ''                                             AS CHANGERETSTATIONNAME" _
+            & " , ''                                             AS USEORDERNO" _
             & " , '0'                                            AS DELFLG" _
             & " FROM sys.all_objects "
 
@@ -1860,6 +1861,7 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.SECONDARRSTATIONNAME), '')               AS SECONDARRSTATIONNAME" _
                 & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATION), '')                   AS CHANGERETSTATION" _
                 & " , ISNULL(RTRIM(OIT0003.CHANGERETSTATIONNAME), '')               AS CHANGERETSTATIONNAME" _
+                & " , ISNULL(RTRIM(OIT0005.USEORDERNO), '')                         AS USEORDERNO" _
                 & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                             AS DELFLG" _
                 & " FROM OIL.OIT0002_ORDER OIT0002 " _
                 & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
@@ -4824,9 +4826,10 @@ Public Class OIT0003OrderDetail
             & " , '未割当'                                       AS TANKQUOTA" _
             & " , ''                                             AS LINKNO" _
             & " , ''                                             AS LINKDETAILNO" _
-            & " , ''                                             AS LINEORDER" _
+            & " , ''                                             AS SHIPORDER" _
             & " , ''                                             AS TANKNO" _
             & " , ''                                             AS TANKSTATUS" _
+            & " , ''                                             AS LINEORDER" _
             & " , ''                                             AS MODEL" _
             & " , ''                                             AS JRINSPECTIONALERT" _
             & " , ''                                             AS JRINSPECTIONALERTSTR" _
@@ -4838,6 +4841,15 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS LASTOILNAME" _
             & " , ''                                             AS PREORDERINGTYPE" _
             & " , ''                                             AS PREORDERINGOILNAME" _
+            & " , ''                                             AS CHANGETRAINNO" _
+            & " , ''                                             AS CHANGETRAINNAME" _
+            & " , ''                                             AS SECONDCONSIGNEECODE" _
+            & " , ''                                             AS SECONDCONSIGNEENAME" _
+            & " , ''                                             AS SECONDARRSTATION" _
+            & " , ''                                             AS SECONDARRSTATIONNAME" _
+            & " , ''                                             AS CHANGERETSTATION" _
+            & " , ''                                             AS CHANGERETSTATIONNAME" _
+            & " , ''                                             AS USEORDERNO" _
             & " , '0'                                            AS DELFLG" _
             & " FROM sys.all_objects "
 
@@ -10138,8 +10150,9 @@ Public Class OIT0003OrderDetail
             '### 20200618 START 受注での使用をリセットする対応 #########################################
             '空車着日（実績）
             If upActualEmparrDate = True Then
-                SQLStr &=
-                      "    AND ISNULL(USEORDERNO, '')    <> ''; "
+                'SQLStr &=
+                '      "    AND ISNULL(USEORDERNO, '')    <> ''; "
+                SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
             Else
                 SQLStr &=
                       "    AND (ISNULL(USEORDERNO, '')     = '' "
@@ -16715,10 +16728,12 @@ Public Class OIT0003OrderDetail
                 Next
 
                 '★タンク車の状態が「発送」の場合は、入力を許可しない。
+                '★同受注Noとタンク車所在で管理している使用受注№が同じ場合(2020/08/11追加)
                 '画面表示行が存在している場合
                 If OIT0003tbl.Rows.Count <> 0 Then
                     loopdr = OIT0003tbl.Rows(rowIdx)
-                    If loopdr("TANKSTATUS") = "1" AndAlso loopdr("DELFLG") = "0" Then
+                    If loopdr("TANKSTATUS") = "1" AndAlso loopdr("DELFLG") = "0" _
+                        AndAlso loopdr("ORDERNO") = loopdr("USEORDERNO") Then
                         '◯ タンク車№
                         chkTankNo = chkTankNocnt & Convert.ToString(loopdr("LINECNT"))
                         For Each cellObj As TableCell In rowitem.Controls

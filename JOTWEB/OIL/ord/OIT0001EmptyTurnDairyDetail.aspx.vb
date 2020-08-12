@@ -5395,6 +5395,27 @@ Public Class OIT0001EmptyTurnDairyDetail
                     & "        OTHER9OTANK  = @P29,      " _
                     & "        OTHER10OTANK = @P30,      " _
                     & "        TOTALTANK    = @P31,      " _
+                    & "        HTANKCH        = @P37,      " _
+                    & "        RTANKCH        = @P38,      " _
+                    & "        TTANKCH        = @P39,      " _
+                    & "        MTTANKCH       = @P40,      " _
+                    & "        KTANKCH        = @P41,      " _
+                    & "        K3TANKCH       = @P42,      " _
+                    & "        K5TANKCH       = @P43,      " _
+                    & "        K10TANKCH      = @P44,      " _
+                    & "        LTANKCH        = @P45,      " _
+                    & "        ATANKCH        = @P46,      " _
+                    & "        OTHER1OTANKCH  = @P47,      " _
+                    & "        OTHER2OTANKCH  = @P48,      " _
+                    & "        OTHER3OTANKCH  = @P49,      " _
+                    & "        OTHER4OTANKCH  = @P50,      " _
+                    & "        OTHER5OTANKCH  = @P51,      " _
+                    & "        OTHER6OTANKCH  = @P52,      " _
+                    & "        OTHER7OTANKCH  = @P53,      " _
+                    & "        OTHER8OTANKCH  = @P54,      " _
+                    & "        OTHER9OTANKCH  = @P55,      " _
+                    & "        OTHER10OTANKCH = @P56,      " _
+                    & "        TOTALTANKCH    = @P57,      " _
                     & "        UPDYMD       = @P32,      " _
                     & "        UPDUSER      = @P33,      " _
                     & "        UPDTERMID    = @P34,      " _
@@ -5438,6 +5459,29 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARAUP29 As SqlParameter = SQLUpcmd.Parameters.Add("@P29", SqlDbType.Int)          '車数（その他９）
                 Dim PARAUP30 As SqlParameter = SQLUpcmd.Parameters.Add("@P30", SqlDbType.Int)          '車数（その他１０）
                 Dim PARAUP31 As SqlParameter = SQLUpcmd.Parameters.Add("@P31", SqlDbType.Int)          '合計車数
+                '### 20200812 START 変更後の車数にも同様に件数を設定 ####################################################
+                Dim PARAUP37 As SqlParameter = SQLUpcmd.Parameters.Add("@P37", SqlDbType.Int)          '変更後_車数（ハイオク）
+                Dim PARAUP38 As SqlParameter = SQLUpcmd.Parameters.Add("@P38", SqlDbType.Int)          '変更後_車数（レギュラー）
+                Dim PARAUP39 As SqlParameter = SQLUpcmd.Parameters.Add("@P39", SqlDbType.Int)          '変更後_車数（灯油）
+                Dim PARAUP40 As SqlParameter = SQLUpcmd.Parameters.Add("@P40", SqlDbType.Int)          '変更後_車数（未添加灯油）
+                Dim PARAUP41 As SqlParameter = SQLUpcmd.Parameters.Add("@P41", SqlDbType.Int)          '変更後_車数（軽油）
+                Dim PARAUP42 As SqlParameter = SQLUpcmd.Parameters.Add("@P42", SqlDbType.Int)          '変更後_車数（３号軽油）
+                Dim PARAUP43 As SqlParameter = SQLUpcmd.Parameters.Add("@P43", SqlDbType.Int)          '変更後_車数（５号軽油）
+                Dim PARAUP44 As SqlParameter = SQLUpcmd.Parameters.Add("@P44", SqlDbType.Int)          '変更後_車数（１０号軽油）
+                Dim PARAUP45 As SqlParameter = SQLUpcmd.Parameters.Add("@P45", SqlDbType.Int)          '変更後_車数（LSA）
+                Dim PARAUP46 As SqlParameter = SQLUpcmd.Parameters.Add("@P46", SqlDbType.Int)          '変更後_車数（A重油）
+                Dim PARAUP47 As SqlParameter = SQLUpcmd.Parameters.Add("@P47", SqlDbType.Int)          '変更後_車数（その他１）
+                Dim PARAUP48 As SqlParameter = SQLUpcmd.Parameters.Add("@P48", SqlDbType.Int)          '変更後_車数（その他２）
+                Dim PARAUP49 As SqlParameter = SQLUpcmd.Parameters.Add("@P49", SqlDbType.Int)          '変更後_車数（その他３）
+                Dim PARAUP50 As SqlParameter = SQLUpcmd.Parameters.Add("@P50", SqlDbType.Int)          '変更後_車数（その他４）
+                Dim PARAUP51 As SqlParameter = SQLUpcmd.Parameters.Add("@P51", SqlDbType.Int)          '変更後_車数（その他５）
+                Dim PARAUP52 As SqlParameter = SQLUpcmd.Parameters.Add("@P52", SqlDbType.Int)          '変更後_車数（その他６）
+                Dim PARAUP53 As SqlParameter = SQLUpcmd.Parameters.Add("@P53", SqlDbType.Int)          '変更後_車数（その他７）
+                Dim PARAUP54 As SqlParameter = SQLUpcmd.Parameters.Add("@P54", SqlDbType.Int)          '変更後_車数（その他８）
+                Dim PARAUP55 As SqlParameter = SQLUpcmd.Parameters.Add("@P55", SqlDbType.Int)          '変更後_車数（その他９）
+                Dim PARAUP56 As SqlParameter = SQLUpcmd.Parameters.Add("@P56", SqlDbType.Int)          '変更後_車数（その他１０）
+                Dim PARAUP57 As SqlParameter = SQLUpcmd.Parameters.Add("@P57", SqlDbType.Int)          '変更後_合計車数
+                '### 20200812 END   変更後の車数にも同様に件数を設定 ####################################################
                 Dim PARAUP32 As SqlParameter = SQLUpcmd.Parameters.Add("@P32", SqlDbType.DateTime)
                 Dim PARAUP33 As SqlParameter = SQLUpcmd.Parameters.Add("@P33", SqlDbType.NVarChar)
                 Dim PARAUP34 As SqlParameter = SQLUpcmd.Parameters.Add("@P34", SqlDbType.NVarChar)
@@ -5468,6 +5512,29 @@ Public Class OIT0001EmptyTurnDairyDetail
                 PARAUP29.Value = "0"
                 PARAUP30.Value = "0"
                 PARAUP31.Value = "0"
+                '### 20200812 START 変更後の車数にも同様に件数を設定 ####################################################
+                PARAUP37.Value = "0"
+                PARAUP38.Value = "0"
+                PARAUP39.Value = "0"
+                PARAUP40.Value = "0"
+                PARAUP41.Value = "0"
+                PARAUP42.Value = "0"
+                PARAUP43.Value = "0"
+                PARAUP44.Value = "0"
+                PARAUP45.Value = "0"
+                PARAUP46.Value = "0"
+                PARAUP47.Value = "0"
+                PARAUP48.Value = "0"
+                PARAUP49.Value = "0"
+                PARAUP50.Value = "0"
+                PARAUP51.Value = "0"
+                PARAUP52.Value = "0"
+                PARAUP53.Value = "0"
+                PARAUP54.Value = "0"
+                PARAUP55.Value = "0"
+                PARAUP56.Value = "0"
+                PARAUP57.Value = "0"
+                '### 20200812 END   変更後の車数にも同様に件数を設定 ####################################################
 
                 '各タンク車件数を初期化
                 TxtHTank.Text = "0"
@@ -5501,39 +5568,52 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Select Case Convert.ToString(OIT0001UPDrow("OILCODE"))
                         Case BaseDllConst.CONST_HTank
                             PARAUP11.Value = OIT0001UPDrow("CNT")
+                            PARAUP37.Value = OIT0001UPDrow("CNT")
                             TxtHTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_RTank
                             PARAUP12.Value = OIT0001UPDrow("CNT")
+                            PARAUP38.Value = OIT0001UPDrow("CNT")
                             TxtRTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_TTank
                             PARAUP13.Value = OIT0001UPDrow("CNT")
+                            PARAUP39.Value = OIT0001UPDrow("CNT")
                             TxtTTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_MTTank
                             PARAUP14.Value = OIT0001UPDrow("CNT")
+                            PARAUP40.Value = OIT0001UPDrow("CNT")
                             TxtMTTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_KTank1, BaseDllConst.CONST_KTank2
                             PARAUP15.Value = OIT0001UPDrow("CNT")
+                            PARAUP41.Value = OIT0001UPDrow("CNT")
                             TxtKTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_K3Tank1, BaseDllConst.CONST_K3Tank2
                             PARAUP16.Value = OIT0001UPDrow("CNT")
+                            PARAUP42.Value = OIT0001UPDrow("CNT")
                             TxtK3Tank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_K5Tank
                             PARAUP17.Value = OIT0001UPDrow("CNT")
+                            PARAUP43.Value = OIT0001UPDrow("CNT")
                             TxtK5Tank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_K10Tank
                             PARAUP18.Value = OIT0001UPDrow("CNT")
+                            PARAUP44.Value = OIT0001UPDrow("CNT")
                             TxtK10Tank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_LTank1, BaseDllConst.CONST_LTank2
                             PARAUP19.Value = OIT0001UPDrow("CNT")
+                            PARAUP45.Value = OIT0001UPDrow("CNT")
                             TxtLTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_ATank
                             PARAUP20.Value = OIT0001UPDrow("CNT")
+                            PARAUP46.Value = OIT0001UPDrow("CNT")
                             TxtATank.Text = cntVal.ToString
                     End Select
 
                     i += cntVal
                     TxtTotalTank.Text = i.ToString
                     PARAUP31.Value = i
+                    '### 20200812 START 変更後の車数にも同様に件数を設定 ####################################################
+                    PARAUP57.Value = i
+                    '### 20200812 END   変更後の車数にも同様に件数を設定 ####################################################
                     PARAUP32.Value = Date.Now
                     PARAUP33.Value = Master.USERID
                     PARAUP34.Value = Master.USERTERMID

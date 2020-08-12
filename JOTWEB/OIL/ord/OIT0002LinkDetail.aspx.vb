@@ -4355,13 +4355,14 @@ Public Class OIT0002LinkDetail
 
                     P_FILLINGPOINT.Value = OIT0002row("FILLINGPOINT")       '充填ポイント
                     P_LINE.Value = OIT0002row("LINE")                       '回線
-                    P_LOADINGIRILINETRAINNO.Value = ""                      '積込入線列車番号
-                    'P_LOADINGIRILINETRAINNO.Value = OIT0002row("LOADINGIRILINETRAINNO")     '積込入線列車番号
+                    P_LOADINGIRILINETRAINNO.Value = OIT0002row("LOADINGIRILINETRAINNO")     '積込入線列車番号
                     P_LOADINGIRILINETRAINNAME.Value = OIT0002row("LOADINGIRILINETRAINNAME") '積込入線列車番号名
-                    P_LOADINGIRILINEORDER.Value = OIT0002row("LOADINGIRILINEORDER")         '積込入線順
+                    P_LOADINGIRILINEORDER.Value = ""         '積込入線順
+                    'P_LOADINGIRILINEORDER.Value = OIT0002row("LOADINGIRILINEORDER")         '積込入線順
                     P_LOADINGOUTLETTRAINNO.Value = OIT0002row("LOADINGOUTLETTRAINNO")       '積込出線列車番号
                     P_LOADINGOUTLETTRAINNAME.Value = OIT0002row("LOADINGOUTLETTRAINNAME")   '積込出線列車番号名
-                    P_LOADINGOUTLETORDER.Value = OIT0002row("LOADINGOUTLETORDER")           '積込出線順
+                    P_LOADINGOUTLETORDER.Value = ""           '積込出線順
+                    'P_LOADINGOUTLETORDER.Value = OIT0002row("LOADINGOUTLETORDER")           '積込出線順
                     ''貨物駅入線順を積込入線順に設定
                     'P_LOADINGIRILINEORDER.Value = OIT0002row("LINEORDER")
                     ''積込出線順に(明細数 - 積込入線順 + 1)設定
@@ -4719,6 +4720,8 @@ Public Class OIT0002LinkDetail
 
                 Dim WW_DATENOW As DateTime = Date.Now
                 Dim iresult As Integer
+                Dim strOilCnt() As String
+
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
 
                     '★受注№が未設定の場合は次レコード
@@ -4795,59 +4798,44 @@ Public Class OIT0002LinkDetail
                         P_EMPARRDATE.Value = DBNull.Value
                     End If
 
-                    P_RTANK.Value = 0                      '車数（レギュラー）
-                    P_HTANK.Value = 0                      '車数（ハイオク）
-                    P_TTANK.Value = 0                      '車数（灯油）
-                    P_MTTANK.Value = 0                    '車数（未添加灯油）
-                    P_KTANK.Value = 0                      '車数（軽油）
-                    P_K3TANK.Value = 0                    '車数（３号軽油）
-                    P_K5TANK.Value = 0                    '車数（５号軽油）
-                    P_K10TANK.Value = 0                  '車数（１０号軽油）
-                    P_LTANK.Value = 0                      '車数（LSA）
-                    P_ATANK.Value = 0                      '車数（A重油）
-                    'P_RTANK.Value = OIT0002row("RTANK")                      '車数（レギュラー）
-                    'P_HTANK.Value = OIT0002row("HTANK")                      '車数（ハイオク）
-                    'P_TTANK.Value = OIT0002row("TTANK")                      '車数（灯油）
-                    'P_MTTANK.Value = OIT0002row("MTTANK")                    '車数（未添加灯油）
-                    'P_KTANK.Value = OIT0002row("KTANK")                      '車数（軽油）
-                    'P_K3TANK.Value = OIT0002row("K3TANK")                    '車数（３号軽油）
-                    'P_K5TANK.Value = OIT0002row("K5TANK")                    '車数（５号軽油）
-                    'P_K10TANK.Value = OIT0002row("K10TANK")                  '車数（１０号軽油）
-                    'P_LTANK.Value = OIT0002row("LTANK")                      '車数（LSA）
-                    'P_ATANK.Value = OIT0002row("ATANK")                      '車数（A重油）
-                    P_OTHER1OTANK.Value = 0                                  '車数（その他１）
-                    P_OTHER2OTANK.Value = 0                                  '車数（その他２）
-                    P_OTHER3OTANK.Value = 0                                  '車数（その他３）
-                    P_OTHER4OTANK.Value = 0                                  '車数（その他４）
-                    P_OTHER5OTANK.Value = 0                                  '車数（その他５）
-                    P_OTHER6OTANK.Value = 0                                  '車数（その他６）
-                    P_OTHER7OTANK.Value = 0                                  '車数（その他７）
-                    P_OTHER8OTANK.Value = 0                                  '車数（その他８）
-                    P_OTHER9OTANK.Value = 0                                  '車数（その他９）
-                    P_OTHER10OTANK.Value = 0                                  '車数（その他１０）
-                    '合計車数
-                    'P_TOTALTANK.Value = Integer.Parse(Me.TxtRTank.Text) _
-                    '                                + Integer.Parse(Me.TxtHTank.Text) _
-                    '                                + Integer.Parse(Me.TxtTTank.Text) _
-                    '                                + Integer.Parse(Me.TxtMTTank.Text) _
-                    '                                + Integer.Parse(Me.TxtKTank.Text) _
-                    '                                + Integer.Parse(Me.TxtK3Tank.Text) _
-                    '                                + Integer.Parse(Me.TxtK5Tank.Text) _
-                    '                                + Integer.Parse(Me.TxtK10Tank.Text) _
-                    '                                + Integer.Parse(Me.TxtLTank.Text) _
-                    '                                + Integer.Parse(Me.TxtATank.Text)
-                    P_TOTALTANK.Value = 0
+                    '★受注登録用油種数カウント用
+                    strOilCnt = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"}
+                    '油種別タンク車数、積込数量データ取得
+                    WW_OILTANKCntGet(SQLcon, P_ORDERNO.Value, strOilCnt)
 
-                    P_RTANKCH.Value = 0                                 '変更後_車数（レギュラー）
-                    P_HTANKCH.Value = 0                                 '変更後_車数（ハイオク）
-                    P_TTANKCH.Value = 0                                 '変更後_車数（灯油）
-                    P_MTTANKCH.Value = 0                                '変更後_車数（未添加灯油）
-                    P_KTANKCH.Value = 0                                 '変更後_車数（軽油）
-                    P_K3TANKCH.Value = 0                                '変更後_車数（３号軽油）
-                    P_K5TANKCH.Value = 0                                '変更後_車数（５号軽油）
-                    P_K10TANKCH.Value = 0                               '変更後_車数（１０号軽油）
-                    P_LTANKCH.Value = 0                                 '変更後_車数（LSA）
-                    P_ATANKCH.Value = 0                                 '変更後_車数（A重油）
+                    P_HTANK.Value = strOilCnt(1)                        '車数（ハイオク）
+                    P_RTANK.Value = strOilCnt(2)                        '車数（レギュラー）
+                    P_TTANK.Value = strOilCnt(3)                        '車数（灯油）
+                    P_MTTANK.Value = strOilCnt(4)                       '車数（未添加灯油）
+                    P_KTANK.Value = strOilCnt(5)                        '車数（軽油）
+                    P_K3TANK.Value = strOilCnt(6)                       '車数（３号軽油）
+                    P_K5TANK.Value = strOilCnt(7)                       '車数（５号軽油）
+                    P_K10TANK.Value = strOilCnt(8)                      '車数（１０号軽油）
+                    P_LTANK.Value = strOilCnt(9)                        '車数（LSA）
+                    P_ATANK.Value = strOilCnt(10)                       '車数（A重油）
+
+                    P_OTHER1OTANK.Value = 0                             '車数（その他１）
+                    P_OTHER2OTANK.Value = 0                             '車数（その他２）
+                    P_OTHER3OTANK.Value = 0                             '車数（その他３）
+                    P_OTHER4OTANK.Value = 0                             '車数（その他４）
+                    P_OTHER5OTANK.Value = 0                             '車数（その他５）
+                    P_OTHER6OTANK.Value = 0                             '車数（その他６）
+                    P_OTHER7OTANK.Value = 0                             '車数（その他７）
+                    P_OTHER8OTANK.Value = 0                             '車数（その他８）
+                    P_OTHER9OTANK.Value = 0                             '車数（その他９）
+                    P_OTHER10OTANK.Value = 0                            '車数（その他１０）
+                    P_TOTALTANK.Value = strOilCnt(0)                    '合計車数
+
+                    P_HTANKCH.Value = strOilCnt(1)                      '変更後_車数（ハイオク）
+                    P_RTANKCH.Value = strOilCnt(2)                      '変更後_車数（レギュラー）
+                    P_TTANKCH.Value = strOilCnt(3)                      '変更後_車数（灯油）
+                    P_MTTANKCH.Value = strOilCnt(4)                     '変更後_車数（未添加灯油）
+                    P_KTANKCH.Value = strOilCnt(5)                      '変更後_車数（軽油）
+                    P_K3TANKCH.Value = strOilCnt(6)                     '変更後_車数（３号軽油）
+                    P_K5TANKCH.Value = strOilCnt(7)                     '変更後_車数（５号軽油）
+                    P_K10TANKCH.Value = strOilCnt(8)                    '変更後_車数（１０号軽油）
+                    P_LTANKCH.Value = strOilCnt(9)                      '変更後_車数（LSA）
+                    P_ATANKCH.Value = strOilCnt(10)                     '変更後_車数（A重油）
                     P_OTHER1OTANKCH.Value = 0                           '変更後_車数（その他１）
                     P_OTHER2OTANKCH.Value = 0                           '変更後_車数（その他２）
                     P_OTHER3OTANKCH.Value = 0                           '変更後_車数（その他３）
@@ -4858,7 +4846,7 @@ Public Class OIT0002LinkDetail
                     P_OTHER8OTANKCH.Value = 0                           '変更後_車数（その他８）
                     P_OTHER9OTANKCH.Value = 0                           '変更後_車数（その他９）
                     P_OTHER10OTANKCH.Value = 0                          '変更後_車数（その他１０）
-                    P_TOTALTANKCH.Value = 0                             '変更後_合計車数
+                    P_TOTALTANKCH.Value = strOilCnt(0)                  '変更後_合計車数
 
                     P_KEIJYOYMD.Value = DBNull.Value                    '計上日
                     P_SALSE.Value = 0                                   '売上金額
@@ -4930,6 +4918,206 @@ Public Class OIT0002LinkDetail
         End Try
 
         'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 油種別タンク車数、積込数量データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_OILTANKCntGet(ByVal SQLcon As SqlConnection, ByVal OrderNo As String, ByRef OilCnt() As String)
+
+        If IsNothing(OIT0002WKtbl) Then
+            OIT0002WKtbl = New DataTable
+        End If
+
+        If OIT0002WKtbl.Columns.Count <> 0 Then
+            OIT0002WKtbl.Columns.Clear()
+        End If
+
+        OIT0002WKtbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを受注テーブルから取得する
+        Dim SQLStr As String =
+              " SELECT DISTINCT " _
+            & "   0                                                  AS LINECNT" _
+            & " , ''                                                 AS OPERATION" _
+            & " , ''                                                 AS TIMSTP" _
+            & " , 1                                                  AS 'SELECT'" _
+            & " , 0                                                  AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERNO), '')                 AS ORDERNO" _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P10 THEN 1 ELSE 0 END) " _
+            & "    OVER(Partition BY OIT0003.ORDERNO)                AS HTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P11 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS RTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P12 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P13 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS MTTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P14 OR OIT0003.OILCODE = @P15 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS KTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P16 OR OIT0003.OILCODE = @P17 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K3TANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P18 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K5TANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P19 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K10TANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P20 OR OIT0003.OILCODE = @P21 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS LTANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P22 THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS ATANK " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE <> '' THEN 1 ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TOTAL " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P10 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS HTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P11 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS RTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P12 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P13 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS MTTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P14 OR OIT0003.OILCODE = @P15 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS KTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P16 OR OIT0003.OILCODE = @P17 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K3TANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P18 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K5TANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P19 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS K10TANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P20 OR OIT0003.OILCODE = @P21 THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS LTANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE = @P22 THEN ISNULL(OIT0003.CARSAMOUNT,0)ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS ATANKCNT " _
+            & " , SUM(CASE WHEN OIT0003.OILCODE <> '' THEN ISNULL(OIT0003.CARSAMOUNT,0) ELSE 0 END) " _
+            & "    OVER (PARTITION BY OIT0003.ORDERNO)               AS TOTALCNT " _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & "  LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+            & "  OIT0003.TANKNO = OIM0005.TANKNUMBER " _
+            & " WHERE OIT0003.ORDERNO = @P01" _
+            & "   AND OIT0003.DELFLG <> @P02"
+
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0003.ORDERNO"
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA01.Value = OrderNo
+                PARA02.Value = C_DELETE_FLG.DELETE
+
+                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 4) '油種(ハイオク)
+                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 4) '油種(レギュラー)
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 4) '油種(灯油)
+                Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 4) '油種(未添加灯油)
+                Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 4) '油種(軽油)
+                Dim PARA15 As SqlParameter = SQLcmd.Parameters.Add("@P15", SqlDbType.NVarChar, 4) '油種(軽油)
+                Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", SqlDbType.NVarChar, 4) '油種(３号軽油)
+                Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", SqlDbType.NVarChar, 4) '油種(３号軽油)
+                Dim PARA18 As SqlParameter = SQLcmd.Parameters.Add("@P18", SqlDbType.NVarChar, 4) '油種(５号軽油)
+                Dim PARA19 As SqlParameter = SQLcmd.Parameters.Add("@P19", SqlDbType.NVarChar, 4) '油種(１０号軽油)
+                Dim PARA20 As SqlParameter = SQLcmd.Parameters.Add("@P20", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
+                Dim PARA21 As SqlParameter = SQLcmd.Parameters.Add("@P21", SqlDbType.NVarChar, 4) '油種(ＬＳＡ)
+                Dim PARA22 As SqlParameter = SQLcmd.Parameters.Add("@P22", SqlDbType.NVarChar, 4) '油種(Ａ重油)
+                PARA10.Value = BaseDllConst.CONST_HTank
+                PARA11.Value = BaseDllConst.CONST_RTank
+                PARA12.Value = BaseDllConst.CONST_TTank
+                PARA13.Value = BaseDllConst.CONST_MTTank
+                PARA14.Value = BaseDllConst.CONST_KTank1
+                PARA15.Value = BaseDllConst.CONST_KTank2
+                PARA16.Value = BaseDllConst.CONST_K3Tank1
+                PARA17.Value = BaseDllConst.CONST_K3Tank2
+                PARA18.Value = BaseDllConst.CONST_K5Tank
+                PARA19.Value = BaseDllConst.CONST_K10Tank
+                PARA20.Value = BaseDllConst.CONST_LTank1
+                PARA21.Value = BaseDllConst.CONST_LTank2
+                PARA22.Value = BaseDllConst.CONST_ATank
+
+                '■　初期化
+                '〇 油種別タンク車数(車)
+                OilCnt(0) = "0"             'タンク車数合計
+                OilCnt(1) = "0"             '油種(ハイオク)
+                OilCnt(2) = "0"             '油種(レギュラー)
+                OilCnt(3) = "0"             '油種(灯油)
+                OilCnt(4) = "0"             '油種(未添加灯油)
+                OilCnt(5) = "0"             '油種(軽油)
+                OilCnt(6) = "0"             '油種(３号軽油)
+                OilCnt(7) = "0"             '油種(５号軽油)
+                OilCnt(8) = "0"             '油種(１０号軽油)
+                OilCnt(9) = "0"             '油種(ＬＳＡ)
+                OilCnt(10) = "0"            '油種(Ａ重油)
+                ''〇 積込数量(kl)
+                'Me.TxtHTank_c2.Text = "0"
+                'Me.TxtRTank_c2.Text = "0"
+                'Me.TxtTTank_c2.Text = "0"
+                'Me.TxtMTTank_c2.Text = "0"
+                'Me.TxtKTank_c2.Text = "0"
+                'Me.TxtK3Tank_c2.Text = "0"
+                'Me.TxtK5Tank_c2.Text = "0"
+                'Me.TxtK10Tank_c2.Text = "0"
+                'Me.TxtLTank_c2.Text = "0"
+                'Me.TxtATank_c2.Text = "0"
+                'Me.TxtTotalCnt_c2.Text = "0"
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002WKtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002WKtbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0002WKrow As DataRow In OIT0002WKtbl.Rows
+                    i += 1
+                    OIT0002WKrow("LINECNT") = i        'LINECNT
+
+                    '[ヘッダー]
+                    '〇 油種別タンク車数(車)
+                    OilCnt(0) = OIT0002WKrow("TOTAL")             'タンク車数合計
+                    OilCnt(1) = OIT0002WKrow("HTANK")             '油種(ハイオク)
+                    OilCnt(2) = OIT0002WKrow("RTANK")             '油種(レギュラー)
+                    OilCnt(3) = OIT0002WKrow("TTANK")             '油種(灯油)
+                    OilCnt(4) = OIT0002WKrow("MTTANK")            '油種(未添加灯油)
+                    OilCnt(5) = OIT0002WKrow("KTANK")             '油種(軽油)
+                    OilCnt(6) = OIT0002WKrow("K3TANK")            '油種(３号軽油)
+                    OilCnt(7) = OIT0002WKrow("K5TANK")            '油種(５号軽油)
+                    OilCnt(8) = OIT0002WKrow("K10TANK")           '油種(１０号軽油)
+                    OilCnt(9) = OIT0002WKrow("LTANK")             '油種(ＬＳＡ)
+                    OilCnt(10) = OIT0002WKrow("ATANK")            '油種(Ａ重油)
+
+                    ''〇 積込数量(kl)
+                    'Me.TxtHTank_c2.Text = OIT0002WKrow("HTANKCNT")
+                    'Me.TxtRTank_c2.Text = OIT0002WKrow("RTANKCNT")
+                    'Me.TxtTTank_c2.Text = OIT0002WKrow("TTANKCNT")
+                    'Me.TxtMTTank_c2.Text = OIT0002WKrow("MTTANKCNT")
+                    'Me.TxtKTank_c2.Text = OIT0002WKrow("KTANKCNT")
+                    'Me.TxtK3Tank_c2.Text = OIT0002WKrow("K3TANKCNT")
+                    'Me.TxtK5Tank_c2.Text = OIT0002WKrow("K5TANKCNT")
+                    'Me.TxtK10Tank_c2.Text = OIT0002WKrow("K10TANKCNT")
+                    'Me.TxtLTank_c2.Text = OIT0002WKrow("LTANKCNT")
+                    'Me.TxtATank_c2.Text = OIT0002WKrow("ATANKCNT")
+                    'Me.TxtTotalCnt_c2.Text = OIT0002WKrow("TOTALCNT")
+
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002D SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002D Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 

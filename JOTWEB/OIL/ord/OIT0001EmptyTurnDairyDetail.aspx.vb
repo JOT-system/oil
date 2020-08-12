@@ -172,6 +172,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         WF_LeftboxOpen.Value = ""
         WF_RightboxOpen.Value = ""
         WF_ButtonInsertFLG.Value = "FALSE"
+        WF_OrderStatusFLG.Value = "FALSE"
         rightview.ResetIndex()
         leftview.ActiveListBox()
 
@@ -297,6 +298,40 @@ Public Class OIT0001EmptyTurnDairyDetail
         '着駅
         CODENAME_get("ARRSTATION", Me.TxtArrstation.Text, Me.LblArrstationName.Text, WW_DUMMY)
 
+        '### 20200812 START 指摘票対応(No120)全体 ############################################
+        '受注進行ステータスが「320：受注確定」以降の場合
+        If work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
+            '本線列車
+            Me.TxtHeadOfficeTrain.Enabled = False
+            '発駅
+            Me.TxtDepstation.Enabled = False
+            '着駅
+            Me.TxtArrstation.Enabled = False
+            '(予定)積込日
+            Me.TxtLoadingDate.Enabled = False
+            '(予定)発日
+            Me.TxtDepDate.Enabled = False
+            '(予定)積車着日
+            Me.TxtArrDate.Enabled = False
+            '(予定)受入日
+            Me.TxtAccDate.Enabled = False
+            '(予定)空車着日
+            Me.TxtEmparrDate.Enabled = False
+            '受注進行ステータス制御フラグ
+            WF_OrderStatusFLG.Value = "TRUE"
+        End If
+        '### 20200812 END   指摘票対応(No120)全体 ############################################
+
     End Sub
 
     ''' <summary>
@@ -340,16 +375,54 @@ Public Class OIT0001EmptyTurnDairyDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
-        For Each rowitem As TableRow In tblObj.Rows
-            For Each cellObj As TableCell In rowitem.Controls
-                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '### 20200812 START 指摘票対応(No120)全体 ############################################
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+        '受注進行ステータスが「320：受注確定」以降の場合
+        If work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "RETURNDATETRAIN") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "REMARK") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+            Next
+        Else
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
-                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                End If
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    End If
+                Next
             Next
-        Next
+        End If
+        '### 20200812 END   指摘票対応(No120)全体 ############################################
 
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
@@ -726,16 +799,54 @@ Public Class OIT0001EmptyTurnDairyDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
-        For Each rowitem As TableRow In tblObj.Rows
-            For Each cellObj As TableCell In rowitem.Controls
-                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '### 20200812 START 指摘票対応(No120)全体 ############################################
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+        '受注進行ステータスが「320：受注確定」以降の場合
+        If work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "RETURNDATETRAIN") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "REMARK") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+            Next
+        Else
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
-                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                End If
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    End If
+                Next
             Next
-        Next
+        End If
+        '### 20200812 END   指摘票対応(No120)全体 ############################################
 
         '○ クリア
         If TBLview.Count = 0 Then

@@ -308,6 +308,8 @@
             <input id="WF_CREATEFLG" runat="server" value="" type="text" />
             <!-- 油種数登録ボタン押下フラグ(True:有効, False：無効) -->
             <input id="WF_ButtonInsertFLG" runat="server" value="" type="text" />
+            <!-- 受注進行ステータス制御フラグ -->
+            <input id="WF_OrderStatusFLG" runat="server" value="" type="text" />
         </div>
 </asp:Content>
 

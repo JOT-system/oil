@@ -5164,6 +5164,16 @@ Public Class OIT0003OrderDetail
         If WF_DetailMView.ActiveViewIndex = "0" Then
             '割当確定ボタン押下時
             Me.WW_UPBUTTONFLG = "1"
+            '### 20200812 START(指摘票(全体)No121) #########################################
+            '★初期化
+            work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
+            '手配連絡フラグ("0"(未連絡))
+            work.WF_SEL_CONTACTFLG.Text = "0"
+            '結果受理フラグ("0"(未受理))
+            work.WF_SEL_RESULTFLG.Text = "0"
+            '託送指示フラグ("0"(未手配))
+            work.WF_SEL_DELIVERYFLG.Text = "0"
+            '### 20200812 END  (指摘票(全体)No121) #########################################
             WW_ButtonUPDATE_TAB1()
 
             'タブ「入換・積込指示」
@@ -7984,15 +7994,20 @@ Public Class OIT0003OrderDetail
 
                     '### 20200616 START((全体)No74対応) ######################################
                     '積込入線順
-                    '★五井・甲子・袖ヶ浦の場合
-                    If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                        OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-                        OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203) _
+                    '    ★袖ヶ浦の場合
+                    If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203) _
                         AndAlso OIT0003row("LINEORDER") <> "" Then
                         '貨物駅入線順を積込入線順に設定
                         PARA43.Value = OIT0003row("LINEORDER")
                         '積込出線順に(明細数 - 積込入線順 + 1)設定
                         PARA44.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
+                        '    '★五井・甲子の場合
+                        'ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                        '    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                        '    '積込入線順を設定
+                        '    PARA43.Value = OIT0003row("LOADINGIRILINEORDER")
+                        '    '積込出線順を設定
+                        '    PARA44.Value = OIT0003row("LOADINGOUTLETORDER")
                     Else
                         PARA43.Value = ""
                         PARA44.Value = ""
@@ -9849,7 +9864,8 @@ Public Class OIT0003OrderDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_UpdateOrderStatus(ByVal I_Value As String,
-                                       Optional ByVal InitializeFlg As Boolean = False)
+                                       Optional ByVal InitializeFlg As Boolean = False,
+                                       Optional ByVal ReuseFlg As Boolean = False)
 
         Try
             'DataBase接続文字
@@ -9916,6 +9932,20 @@ Public Class OIT0003OrderDetail
                 'SQLStr &= String.Format("        BILLINGNO = '{0}', ", "")
             End If
             '### 20200609 END  (内部No178) #################################################
+
+            '### 20200812 START(指摘票(全体)No121) #########################################
+            If ReuseFlg = True Then
+                '手配連絡フラグ
+                ' 0：未連絡, 1：連絡
+                SQLStr &= String.Format("        CONTACTFLG = '{0}', ", "0")
+                '結果受理フラグ
+                ' 0：未受理, 1：受理
+                SQLStr &= String.Format("        RESULTFLG = '{0}', ", "0")
+                '託送指示フラグ
+                ' 0：未手配, 1：手配
+                SQLStr &= String.Format("        DELIVERYFLG = '{0}', ", "0")
+            End If
+            '### 20200812 END  (指摘票(全体)No121) #########################################
 
             SQLStr &=
                       "        UPDYMD      = @P11, " _
@@ -11716,7 +11746,10 @@ Public Class OIT0003OrderDetail
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
 
-                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_200)
+                '### 20200812 START(指摘票(全体)No121) #########################################
+                'WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_200)
+                WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_200, ReuseFlg:=True)
+                '### 20200812 END  (指摘票(全体)No121) #########################################
                 CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_200, Me.TxtOrderStatus.Text, WW_DUMMY)
                 work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_200
                 work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text

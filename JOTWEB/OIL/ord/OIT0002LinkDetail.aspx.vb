@@ -4336,7 +4336,8 @@ Public Class OIT0002LinkDetail
                     P_ORDERNO.Value = OIT0002row("ORDERNO")                 '受注№
                     P_DETAILNO.Value = OIT0002row("DETAILNO")               '受注明細№
 
-                    P_LINEORDER.Value = OIT0002row("LINECNT")               '貨物駅入線順
+                    P_LINEORDER.Value = ""               '貨物駅入線順
+                    'P_LINEORDER.Value = OIT0002row("LINECNT")               '貨物駅入線順
                     P_TANKNO.Value = OIT0002row("TANKNUMBER")               'タンク車№
                     P_STACKINGFLG.Value = "2"                               '積置可否フラグ
                     P_FIRSTRETURNFLG.Value = "2"                            '先返し可否フラグ
@@ -4363,6 +4364,7 @@ Public Class OIT0002LinkDetail
                     P_LOADINGOUTLETTRAINNAME.Value = OIT0002row("LOADINGOUTLETTRAINNAME")   '積込出線列車番号名
                     P_LOADINGOUTLETORDER.Value = ""           '積込出線順
                     'P_LOADINGOUTLETORDER.Value = OIT0002row("LOADINGOUTLETORDER")           '積込出線順
+
                     ''貨物駅入線順を積込入線順に設定
                     'P_LOADINGIRILINEORDER.Value = OIT0002row("LINEORDER")
                     ''積込出線順に(明細数 - 積込入線順 + 1)設定

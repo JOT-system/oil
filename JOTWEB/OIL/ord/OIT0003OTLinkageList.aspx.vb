@@ -16,6 +16,7 @@ Public Class OIT0003OTLinkageList
     Private OIT0003INPtbl As DataTable                              'チェック用テーブル
     Private OIT0003UPDtbl As DataTable                              '更新用テーブル
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
+    Private OIT0003CsvOTLinkagetbl As DataTable                     'CSV用(OT発送日報)テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -52,7 +53,7 @@ Public Class OIT0003OTLinkageList
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"          'OT連携ボタン押下
-                            'WF_ButtonINSERT_Click()
+                            WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
@@ -68,7 +69,7 @@ Public Class OIT0003OTLinkageList
                     End Select
 
                     '○ 一覧再表示処理
-                    DisplayGrid()
+                    'DisplayGrid()
                 End If
             Else
                 '○ 初期化処理
@@ -138,7 +139,7 @@ Public Class OIT0003OTLinkageList
         WW_MAPValueSet()
 
         '○ GridView初期設定
-        GridViewInitialize()
+        'GridViewInitialize()
 
     End Sub
 
@@ -287,11 +288,189 @@ Public Class OIT0003OTLinkageList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
-        '○ 遷移先(OT連携一覧画面)退避データ保存先の作成
-        WW_CreateXMLSaveFile()
+        '******************************
+        'OT発送日報データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            OTLinkageDataGet(SQLcon)
+        End Using
+
+        '******************************
+        'CSV作成処理の実行
+        '******************************
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl)
+            Dim url As String
+            Try
+                url = repCbj.ConvertDataTableToCsv(False)
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
+
+        ''○ 遷移先(OT連携一覧画面)退避データ保存先の作成
+        'WW_CreateXMLSaveFile()
+
+        ''○ 画面表示データ保存
+        'Master.SaveTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
+
+    End Sub
+
+    ''' <summary>
+    ''' OT発送日報データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub OTLinkageDataGet(ByVal SQLcon As SqlConnection)
+
+        If IsNothing(OIT0003CsvOTLinkagetbl) Then
+            OIT0003CsvOTLinkagetbl = New DataTable
+        End If
+
+        If OIT0003CsvOTLinkagetbl.Columns.Count <> 0 Then
+            OIT0003CsvOTLinkagetbl.Columns.Clear()
+        End If
+
+        OIT0003CsvOTLinkagetbl.Clear()
+
+        '○ 取得SQL
+        '　 説明　：　帳票表示用SQL
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC)     AS OURDAILYBRANCHC" _
+            & " , CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC)   AS OTDAILYCONSIGNEEC" _
+            & " , FORMAT(ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE), 'yyyyMMdd')          AS LODDATE" _
+            & " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
+            & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
+            & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
+            & " , CONVERT(NCHAR(2), OIT0003.SHIPORDER)           AS SHIPORDER" _
+            & " , OIM0025.OTDAILYFROMPLANT                       AS OTDAILYFROMPLANT" _
+            & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
+            & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _
+            & " , CONVERT(NCHAR(8), OIM0025.OTDAILYDEPSTATIONN)  AS OTDAILYDEPSTATIONN" _
+            & " , CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC)     AS OTDAILYSHIPPERC" _
+            & " , CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN)     AS OTDAILYSHIPPERN" _
+            & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
+            & " , CONVERT(NCHAR(12), OIM0003.OTOILNAME)          AS OTOILNAME" _
+            & " , CONVERT(NCHAR(6), OIM0005.MODELTANKNO)         AS TANKNO" _
+            & " , CONVERT(NCHAR(1), '0')                         AS OUTSIDEINFO" _
+            & " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
+            & " , CONVERT(NCHAR(1), '0')                         AS RUNINFO" _
+            & " , REPLACE(CONVERT(NCHAR(5), CONVERT(INT, OIT0003.CARSAMOUNT)), SPACE(1), '0') AS CARSAMOUNT" _
+            & " , CONVERT(NCHAR(4), '')                          AS REMARK" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+            & " AND OIT0003.DELFLG <> @P02 " _
+            & " AND (OIT0002.LODDATE = @P03 " _
+            & "      OR OIT0003.ACTUALLODDATE = @P03) " _
+            & " INNER JOIN OIL.OIM0003_PRODUCT OIM0003 ON " _
+            & "     OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0003.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+            & " AND OIM0003.PLANTCODE = OIT0002.BASECODE " _
+            & " AND OIM0003.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0003.DELFLG <> @P02 " _
+            & " INNER JOIN OIL.OIM0010_PATTERN OIM0010 ON " _
+            & "     OIM0010.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0010.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+            & " AND OIM0010.PLANTCODE = OIT0002.BASECODE " _
+            & " AND OIM0010.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
+            & " AND OIM0010.BRANCH = '1' " _
+            & " AND OIM0010.KBN = 'O' " _
+            & " AND OIM0010.DEFAULTKBN = 'def' " _
+            & " AND OIM0010.DELFLG <> @P02 " _
+            & " LEFT JOIN (SELECT  " _
+            & "              OIM0005.TANKNUMBER " _
+            & "            , CASE  " _
+            & "              WHEN OIM0005.MODEL = 'タキ1000' THEN 100000 + CONVERT(INT, OIM0005.TANKNUMBER) " _
+            & "              ELSE OIM0005.TANKNUMBER " _
+            & "              END AS MODELTANKNO " _
+            & "            , CASE  " _
+            & "              WHEN CONVERT(VARCHAR, OIM0005.LOAD) <> '44.0' THEN '' " _
+            & "              ELSE CONVERT(VARCHAR, CONVERT(INT, OIM0005.LOAD)) " _
+            & "              END AS LOAD " _
+            & "            , OIM0005.DELFLG " _
+            & "            FROM oil.OIM0005_TANK OIM0005) OIM0005 ON " _
+            & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+            & " AND OIM0005.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIM0025_OTLINKAGE OIM0025 ON " _
+            & "     OIM0025.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0025.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+            & " AND OIM0025.PLANTCODE = OIT0002.BASECODE " _
+            & " AND OIM0025.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
+            & " AND OIM0025.OURDAILYMARKTUN = OIM0005.LOAD " _
+            & " AND OIM0025.TRKBN = OIM0010.TRKBN " _
+            & " AND OIM0025.OTTRANSPORTFLG = ISNULL(OIT0003.OTTRANSPORTFLG,'2') " _
+            & " AND OIM0025.DELFLG <> @P02 " _
+            & " WHERE OIT0002.OFFICECODE = @P01 " _
+            & "   AND OIT0002.DELFLG <> @P02 " _
+            & "   AND OIT0002.ORDERSTATUS <= @P04 "
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    OIM0025.OURDAILYBRANCHC" _
+            & "  , OIM0025.OURDAILYPLANTC" _
+            & "  , OIT0003.SHIPORDER" _
+            & "  , OIM0003.OTOILCODE"
+
+        Try
+
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                PARA01.Value = BaseDllConst.CONST_OFFICECODE_010402
+                PARA02.Value = C_DELETE_FLG.DELETE
+                'If Not String.IsNullOrEmpty(lodDate) Then
+                '    PARA03.Value = lodDate
+                'Else
+                PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                'End If
+                PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0003CsvOTLinkagetbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0003CsvOTLinkagetbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each OIT0003Csvrow As DataRow In OIT0003CsvOTLinkagetbl.Rows
+                    'i += 1
+                    'OIT0003Csvrow("LINECNT") = i        'LINECNT
+
+                Next
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL CSV_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL CSV_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
         '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
+        'Master.SaveTable(OIT0003CsvOTLinkagetbl)
+
+        '○メッセージ表示
+        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
 
     End Sub
 

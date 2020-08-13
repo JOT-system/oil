@@ -3,13 +3,17 @@
 
 <%@ Import Namespace="JOTWEB.GRIS0005LeftBox" %>
 
-<%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
+<%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/OIL/inc/OIT0003WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content id="OIT0003OTLH" contentplaceholderid="head" runat="server">
     <link href='<%=ResolveUrl("~/OIL/css/OIT0003OTL.css")%>' rel="stylesheet" type="text/css" /> 
     <script type="text/javascript" src='<%=ResolveUrl("~/OIL/script/OIT0003OTL.js")%>'></script>
+    <script type="text/javascript">
+        var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
+        var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
+    </script>
 </asp:Content>
 
 <asp:Content ID="OIT0003OTL" ContentPlaceHolderID="contents1" runat="server">
@@ -29,7 +33,6 @@
                         <!-- 左ボタン -->
                         <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
-                        <input type="button" id="WF_ButtonORDER_CANCEL" class="btn-sticky" value="キャンセル"  onclick="ButtonClick('WF_ButtonORDER_CANCEL');" />←選択した受注のキャンセル
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->

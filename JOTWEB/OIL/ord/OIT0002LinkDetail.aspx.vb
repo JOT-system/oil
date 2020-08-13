@@ -2986,8 +2986,8 @@ Public Class OIT0002LinkDetail
         Dim WW_CheckMES2 As String = ""
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
-        Dim iresult As Integer
-        Dim decChkDay As Decimal
+        'Dim iresult As Integer
+        'Dim decChkDay As Decimal
 
         ''○ 過去日付チェック
         ''例) iresult = dt1.Date.CompareTo(dt2.Date)

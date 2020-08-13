@@ -83,7 +83,7 @@ Partial Public Class OIT0003OTLinkageList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rightview As Global.JOTWEB.GRIS0003SRightBox
+    Protected WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
     
     '''<summary>
     '''leftview コントロール。

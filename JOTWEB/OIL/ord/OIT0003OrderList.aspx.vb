@@ -84,6 +84,8 @@ Public Class OIT0003OrderList
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonLinkINSERT"      '貨車連結選択ボタン押下
                             WF_ButtonLinkINSERT_Click()
+                        Case "WF_ButtonOTLinkageINSERT" 'OT連携選択ボタン押下
+                            WF_ButtonOTLinkageINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
@@ -1046,6 +1048,18 @@ Public Class OIT0003OrderList
         Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "1")
 
     End Sub
+
+    ''' <summary>
+    ''' OT連携選択ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonOTLinkageINSERT_Click()
+
+        '○ 次ページ遷移
+        Master.TransitionPage(work.WF_SEL_CAMPCODE.Text + "2")
+
+    End Sub
+
 
     ''' <summary>
     ''' 戻るボタン押下時処理

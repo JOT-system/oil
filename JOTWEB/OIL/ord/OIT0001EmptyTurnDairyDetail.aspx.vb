@@ -5826,6 +5826,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
@@ -5908,7 +5909,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '受注進行ステータス
                     retVal = Convert.ToString(OIT0001row("ORDERSTATUS"))
                     CODENAME_get("ORDERSTATUS", Convert.ToString(OIT0001row("ORDERSTATUS")), retVal, WW_DUMMY)
-                    OIT0001row("ORDERSTATUS") = retVal
+                    OIT0001row("ORDERSTATUSNAME") = retVal
                     '受注情報
                     retVal = Convert.ToString(OIT0001row("ORDERINFO"))
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), retVal, WW_DUMMY)

@@ -2607,7 +2607,8 @@ Public Class OIT0003OrderList
             & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & " AND OIT0003.DELFLG <> @P02 " _
-            & " AND OIT0003.ACTUALLODDATE = @P03 " _
+            & " AND (OIT0002.LODDATE = @P03 " _
+            & "      OR OIT0003.ACTUALLODDATE = @P03) " _
             & " LEFT JOIN OIL.OIT0002_ORDER OIT0002_OTHER ON " _
             & "     OIT0002_OTHER.ORDERNO = OIT0003.ORDERNO " _
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
@@ -2624,7 +2625,7 @@ Public Class OIT0003OrderList
             & " AND OIM0021.DELFLG <> @P02 " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
-            & "   AND OIT0002.LODDATE = @P03 "
+            & "   AND OIT0002.ORDERSTATUS <= @P04 "
 
         '& " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
         '& "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
@@ -2640,6 +2641,7 @@ Public Class OIT0003OrderList
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 PARA01.Value = OFFICECDE
                 PARA02.Value = C_DELETE_FLG.DELETE
                 'PARA03.Value = "2020/5/29"
@@ -2648,6 +2650,7 @@ Public Class OIT0003OrderList
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
+                PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

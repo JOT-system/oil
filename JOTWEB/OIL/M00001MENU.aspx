@@ -33,7 +33,8 @@
                             >
                             <asp:CheckBox ID="chkTopItem" 
                                           runat="server"
-                                          Text='<%# DirectCast(Container.DataItem, MenuItem).Names %>' />
+                                          Text='<%# DirectCast(Container.DataItem, MenuItem).Names %>'
+                                          Checked='<%# DirectCast(Container.DataItem, MenuItem).OpenChild %>' />
                             
                             <asp:Repeater ID="repLeftNavChild" 
                                             runat="server" 

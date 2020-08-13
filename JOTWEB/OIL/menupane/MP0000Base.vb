@@ -10,6 +10,7 @@ Public Class MP0000Base
     Inherits System.Web.UI.UserControl
     Public Property TargetCustomPaneInfo As CS0050SESSION.UserMenuCostomItem
     Private Const CONST_COOKIE_MENUPANE_PREFIX = "MP0000"
+
     ''' <summary>
     ''' ロード時処理(根底クラス)
     ''' </summary>
@@ -201,4 +202,5 @@ Public Class MP0000Base
         End If
 
     End Sub
+
 End Class

@@ -478,7 +478,8 @@ div.showGuidance a[id^="Menu_"] {
 }
 .cycleBillingStatusWrapper .branchItemItem > span,
 .cycleBillingStatusWrapper .deptItem > span,
-.cycleBillingStatusWrapper .bottomItem > span {
+.cycleBillingStatusWrapper .bottomItem > span
+ {
     display: flex;
     height: 35px;
     border: 1px solid rgb(65,113,156);
@@ -489,7 +490,22 @@ div.showGuidance a[id^="Menu_"] {
     margin-right: 5px;
     margin-bottom: 2px;
     align-items: center;
-    justify-content:center;
+    justify-content: center;
+    letter-spacing: 2px;
+    overflow:hidden;
+    text-overflow:initial;
+}
+.cycleBillingStatusWrapper .bottomItem > span {
+    border:none;
+}
+.cycleBillingStatusWrapper .bottomItem > span > span {
+    width:100%;
+    height:100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(65,113,156);
+    border-radius: 10px;
 }
 .cycleBillingStatusWrapper .deptItem {
     text-align: center;
@@ -503,6 +519,18 @@ div.showGuidance a[id^="Menu_"] {
 
 .deptItem > span {
     width:145px;
+}
+/* 〆完了時表示 */
+.cycleBillingStatusWrapper span[data-isclosed="True"] {
+    background-color: gray;
+    position:relative ;
+}
+.cycleBillingStatusWrapper span[data-isclosed="True"]:before {
+    content:"〆";
+    color:red;
+    position:absolute;
+    left:5px;
+    font-weight:bold;
 }
 /* ******************** */
 /* 月間輸送量ペイン個別 */
@@ -542,15 +570,36 @@ div.showGuidance a[id^="Menu_"] {
     border-left: none;
     background-color: transparent;
 }
+.monthTransTable table th.trainClass {
+    width:95px;
+    min-width:95px;
+}
 /* 油種セル幅 */
 .monthTransTable table th.oilType {
     width:120px;
+    min-width:120px;
 }
 /* 白黒油種セル幅 */
 .monthTransTable table th.bigOilCode {
     width:50px;
+    min-width:50px;
     white-space:normal;
     word-break:break-all;
+}
+/* 支店セル幅 */
+.monthTransTable table th.orgCode {
+    width: 80px;
+    min-width:80px;
+}
+/* 荷主セル幅 */
+.monthTransTable table th.shpCode {
+    width: 120px;
+    min-width:120px;
+}
+/* 着基地セル幅 */
+.monthTransTable table th.cnsCode {
+    width: 80px;
+    min-width:80px;
 }
 /* その他数値セル幅 */
 .monthTransTable table th.yesterday,
@@ -560,7 +609,9 @@ div.showGuidance a[id^="Menu_"] {
 .monthTransTable table th.volumeRatio,
 .monthTransTable table th.lyVolumeChange,
 .monthTransTable table th.lyVolumeRatio {
-    width: 100px;
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
 }
 /* 列見出し（油種名）*/
 .monthTransTable .oilNameData {
@@ -573,14 +624,38 @@ div.showGuidance a[id^="Menu_"] {
 .monthTransTable td.center {
     text-align: center;
 }
+/* 列データ(文字の均等割付（両端そろえ）荷主と着基地 */
+.monthTransTable td.shpCode:not(.summary) span,
+.monthTransTable td.cnsCode:not(.summary) span,
+.monthTransTable td.orgCode:not(.summary) span,
+.monthTransTable.view005 td.oilCode span{
+    text-align:justify;
+    text-align-last: justify;
+    text-justify:inter-ideograph ;  
+    display:block;
+    word-break: break-all
+}
+.monthTransTable.view005 td.oilCode.summary span,
+.monthTransTable.view005 td.oilCode.midSummary span {
+    font-weight: bold;
+}
 /* 合計行のセル */
 .monthTransTable td.summary {
    background-color:palegoldenrod;
 }
+/* 中計行のセル */
+.monthTransTable td.midSummary {
+   background-color:khaki;
+}
+/* 総計行のセル */
+.monthTransTable td[data-ttlsum="1"] {
+    background-color: palegoldenrod;
+}
 /* 行Hover時 */
-.monthTransTable tr:hover td:not([rowspan]) {
-    background-color:darkorange;
-    color:white;
+.monthTransTable tr:hover td:not([rowspan]),
+.monthTransTable tr:hover td[rowspan="1"] {
+    background-color: darkorange;
+    color: white;
 }
 /* ******************************** */
 /* 貨車連結順序表取込状況ペイン個別 */

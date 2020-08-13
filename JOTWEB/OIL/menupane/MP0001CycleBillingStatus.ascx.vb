@@ -106,7 +106,7 @@ Public Class MP0001CycleBillingStatus
                         bottomItem.Name = Convert.ToString(sqlDr("ORGNAME"))
                     End If
                     Dim code As String = Convert.ToString(sqlDr("OFFICECODE"))
-                    Dim name As String = Convert.ToString(sqlDr("OFFICENAME"))
+                    Dim name As String = Convert.ToString(sqlDr("OFFICENAME")).Replace("営業所", "")
                     Dim sortOrder As String = Convert.ToString(sqlDr("SORTORDER"))
                     Dim keyCode As String = Left(sortOrder, 3)
                     If sortOrder.EndsWith("000") Then
@@ -152,7 +152,7 @@ Public Class MP0001CycleBillingStatus
             .DataBind()
         End With
         If bottomItem IsNot Nothing Then
-            Me.lblBottomItem.Text = String.Format("<span class='bottomitem {0}'>{1}</span>", If(bottomItem.IsClosed, "closed", ""), bottomItem.Name)
+            Me.lblBottomItem.Text = String.Format("<span class='bottomitem' data-isclosed=""{0}"">{1}</span>", If(bottomItem.IsClosed, "True", ""), bottomItem.Name)
         End If
         Me.hdnTargetMonth.Value = targetDay.ToString("yyyy/MM/dd")
         Me.lblPaneTitle.Text = String.Format("{0:M月}締状況", targetDay)

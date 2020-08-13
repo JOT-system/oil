@@ -101,7 +101,7 @@ Public Class MP0002MonthlyTransfer
             Case "VIEW004" '荷受人別
                 variableFields.AddRange({"BIGOILCODE", "BIGOILNAME", "OILCODE", "OILNAME", "TRAINCLASS", "TRAINCLASSNAME", "CONSIGNEECODE", "CONSIGNEENAME"})
             Case "VIEW005" '油種別（中分類）
-                variableFields.AddRange({"MIDDLEOILCODE", "MIDDLEOILNAME", "TRAINCLASS", "TRAINCLASSNAME"})
+                variableFields.AddRange({"BIGOILCODE", "BIGOILNAME", "MIDDLEOILCODE", "MIDDLEOILNAME", "OILCODE", "OILNAME", "TRAINCLASS", "TRAINCLASSNAME"})
             Case "VIEW006" '荷主別
                 variableFields.AddRange({"BIGOILCODE", "BIGOILNAME", "OILCODE", "OILNAME", "TRAINCLASS", "TRAINCLASSNAME", "SHIPPERCODE", "SHIPPERNAME"})
         End Select
@@ -198,6 +198,12 @@ Public Class MP0002MonthlyTransfer
                 SetView002(dt)
             Case "VIEW003"
                 SetView003(dt)
+            Case "VIEW004"
+                SetView004(dt)
+            Case "VIEW005"
+                SetView005(dt)
+            Case "VIEW006"
+                SetView006(dt)
         End Select
     End Sub
     ''' <summary>
@@ -211,6 +217,19 @@ Public Class MP0002MonthlyTransfer
 
         Me.repMonthTrans002.DataSource = Nothing
         Me.repMonthTrans002.DataBind()
+
+        Me.repMonthTrans003.DataSource = Nothing
+        Me.repMonthTrans003.DataBind()
+
+        Me.repMonthTrans004.DataSource = Nothing
+        Me.repMonthTrans004.DataBind()
+
+        Me.repMonthTrans005.DataSource = Nothing
+        Me.repMonthTrans005.DataBind()
+
+        Me.repMonthTrans006.DataSource = Nothing
+        Me.repMonthTrans006.DataBind()
+
         Me.pnlNoData.Visible = False
     End Sub
     ''' <summary>
@@ -415,7 +434,7 @@ Public Class MP0002MonthlyTransfer
                 '付帯文言を読み取りテーブルから付与
                 Dim fstRow As DataRow = shpTbl.Rows(0)
                 appendDr("SHIPPERCODE") = fstRow("SHIPPERCODE")
-                appendDr("SHIPPERNAME") = fstRow("SHIPPERNAME")
+                appendDr("SHIPPERNAME") = StrConv(Convert.ToString(fstRow("SHIPPERNAME")), VbStrConv.Wide)
                 appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
                 appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
                 appendDr("TRAINCLASS") = ""
@@ -492,8 +511,388 @@ Public Class MP0002MonthlyTransfer
         Else
             dispData.AddRange({dtSum, dtShiro, dtKuro})
         End If
-        'Me.repMonthTrans002.DataSource = dispData
-        'Me.repMonthTrans002.DataBind()
+        Me.repMonthTrans003.DataSource = dispData
+        Me.repMonthTrans003.DataBind()
+    End Sub
+    ''' <summary>
+    ''' 荷受人別画面展開
+    ''' </summary>
+    ''' <param name="dt">全て込みのデータ</param>
+    Private Sub SetView004(dt As DataTable)
+        Dim dtSum As DataTable = dt.Clone
+        Dim dtShiro As DataTable = dt.Clone
+        Dim dtKuro As DataTable = dt.Clone
+        Dim appendDr As DataRow = Nothing
+        '*********************************
+        '粒データを白・黒別に集計する
+        '*********************************
+        For Each bigOilCode As String In {"B", "W"}
+            Dim appendDt As DataTable = Nothing
+            '油種分類に応じ挿入先テーブルを判定
+            If bigOilCode = "B" Then
+                appendDt = dtKuro
+            Else
+                appendDt = dtShiro
+            End If
+
+
+            '対象の黒油・白油、OT輸送を絞り込む 当切り口はOTのみ
+            Dim qTarget = (From dr As DataRow In dt
+                           Where dr("BIGOILCODE").Equals(bigOilCode) _
+                             AndAlso {"O"}.Contains(Convert.ToString(dr("TRAINCLASS")))
+                           Order By Convert.ToString(dr("CONSIGNEECODE"))
+                               )
+            If qTarget.Any = False Then
+                Continue For
+            End If
+            Dim targetDt As DataTable = qTarget.CopyToDataTable
+            '対象内の支店コードをグループ化
+            Dim shpCodeList = From dr As DataRow In targetDt Group By x = Convert.ToString(dr("CONSIGNEECODE")) Into Group Order By x Select x
+            For Each shpCode As String In shpCodeList
+                Dim shpTbl As DataTable = (From dr As DataRow In targetDt Where dr("CONSIGNEECODE").Equals(shpCode)).CopyToDataTable
+                appendDr = CreateDispRow(shpTbl, appendDt)
+                '付帯文言を読み取りテーブルから付与
+                Dim fstRow As DataRow = shpTbl.Rows(0)
+                appendDr("CONSIGNEECODE") = fstRow("CONSIGNEECODE")
+                appendDr("CONSIGNEENAME") = StrConv(Convert.ToString(fstRow("CONSIGNEENAME")), VbStrConv.Wide).Replace("ＯＴ", "")
+                appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
+                appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
+                appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
+                appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                appendDt.Rows.Add(appendDr)
+            Next shpCode
+
+            If appendDt Is Nothing OrElse appendDt.Rows.Count = 0 Then
+                Continue For
+            End If
+            '合計行の設定
+            appendDr = CreateDispRow(targetDt, appendDt)
+            appendDr("CONSIGNEENAME") = "計"
+            appendDr("BIGOILCODE") = bigOilCode
+            appendDt.Rows.Add(appendDr)
+
+            If appendDt Is Nothing OrElse appendDt.Rows.Count = 0 Then
+                Continue For
+            End If
+            appendDt.Rows(0)("ROWSPANFIELD1") = appendDt.Rows.Count
+        Next bigOilCode
+        '*********************************
+        '白黒の合算
+        '*********************************
+        Dim qmargeTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable)
+        Dim margeTable As DataTable = dt.Clone
+        If qmargeTable.Any Then
+            margeTable = qmargeTable.CopyToDataTable
+        End If
+        '対象の黒油・白油、JOT・OT輸送を絞り込む
+        Dim qAllTarget = (From dr As DataRow In margeTable
+                          Where Convert.ToString(dr("CONSIGNEECODE")) <> ""
+                          Order By Convert.ToString(dr("CONSIGNEECODE"))
+                           )
+        If qAllTarget.Any = True Then
+
+            Dim targetDt As DataTable = qAllTarget.CopyToDataTable
+            Dim allOrgCodeList = From dr As DataRow In targetDt Group By x = Convert.ToString(dr("CONSIGNEECODE")) Into Group Order By x Select x
+            Dim IsAllTransBreak As Boolean = True
+            For Each orgCode As String In allOrgCodeList
+                Dim orgTbl As DataTable = (From dr As DataRow In targetDt Where dr("CONSIGNEECODE").Equals(orgCode)).CopyToDataTable
+                appendDr = CreateDispRow(orgTbl, dtSum)
+                '付帯文言を読み取りテーブルから付与
+                Dim fstRow As DataRow = orgTbl.Rows(0)
+                appendDr("CONSIGNEECODE") = fstRow("CONSIGNEECODE")
+                appendDr("CONSIGNEENAME") = fstRow("CONSIGNEENAME")
+                appendDr("BIGOILNAME") = "計"
+                appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                dtSum.Rows.Add(appendDr)
+            Next orgCode
+            If Not (dtSum Is Nothing OrElse dtSum.Rows.Count = 0) Then
+                '合計行の設定
+                appendDr = CreateDispRow(targetDt, dtSum)
+                appendDr("CONSIGNEENAME") = "計"
+                appendDr("BIGOILNAME") = "計"
+                appendDr("TRAINCLASSNAME") = "OT"
+                dtSum.Rows.Add(appendDr)
+            End If
+        End If
+
+        If Not (dtSum Is Nothing OrElse dtSum.Rows.Count = 0) Then
+            dtSum.Rows(0)("ROWSPANFIELD1") = dtSum.Rows.Count
+        End If
+
+        '*********************************
+        '画面へのデータバインド
+        '*********************************
+        Dim dispData As New List(Of DataTable)
+        '一方（白or黒）しか無い場合白黒合算のテーブルを出す意味が無いので制御
+        If dtSum.Rows.Count = 0 Then
+            dispData = Nothing
+            Me.pnlNoData.Visible = True
+        ElseIf dtShiro.Rows.Count > 0 AndAlso dtKuro.Rows.Count = 0 Then
+            dispData.Add(dtShiro)
+        ElseIf dtShiro.Rows.Count = 0 AndAlso dtKuro.Rows.Count > 0 Then
+            dispData.Add(dtKuro)
+        Else
+            dispData.AddRange({dtSum, dtShiro, dtKuro})
+        End If
+        Me.repMonthTrans004.DataSource = dispData
+        Me.repMonthTrans004.DataBind()
+    End Sub
+    ''' <summary>
+    ''' 油種別（中分類）画面展開
+    ''' </summary>
+    ''' <param name="dt">全て込みのデータ</param>
+    Private Sub SetView005(dt As DataTable)
+        Dim dtDisp As DataTable = dt.Clone
+        Dim appendDr As DataRow = Nothing
+        '*********************************
+        '粒データを白・黒別に集計する
+        '*********************************
+        Dim rowCnt As Integer = 0
+        For Each trainClass As String In {"J", "O"}
+            rowCnt = dtDisp.Rows.Count
+            '油種分類に応じ挿入先テーブルを判定
+            For Each bigOilCode As String In {"W", "B"}
+                Dim hasBigOilData As Boolean
+                hasBigOilData = False
+                '対象の黒油・白油、JOT・OT輸送を絞り込む
+                Dim qTarget = (From dr As DataRow In dt
+                               Where dr("BIGOILCODE").Equals(bigOilCode) _
+                             AndAlso dr("TRAINCLASS").Equals(trainClass)
+                               Order By Convert.ToString(dr("OILCODE"))
+                               )
+                If qTarget.Any = False Then
+                    Continue For
+                End If
+                Dim targetDt As DataTable = qTarget.CopyToDataTable
+                '対象内の支店コードをグループ化
+                Dim oilCodeList = From dr As DataRow In targetDt Group By x = Convert.ToString(dr("OILCODE")) Into Group Order By x Select x
+                Dim IsTransBreak As Boolean = True
+                Dim bigOilName As String = ""
+                For Each oilCode As String In oilCodeList
+                    Dim oilTbl As DataTable = (From dr As DataRow In targetDt Where dr("OILCODE").Equals(oilCode)).CopyToDataTable
+                    appendDr = CreateDispRow(oilTbl, dtDisp)
+                    '付帯文言を読み取りテーブルから付与
+                    Dim fstRow As DataRow = oilTbl.Rows(0)
+                    appendDr("OILCODE") = fstRow("OILCODE")
+                    appendDr("OILNAME") = StrConv(Convert.ToString(fstRow("OILNAME")), VbStrConv.Wide)
+                    appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
+                    appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
+                    appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
+                    appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                    bigOilName = Convert.ToString(fstRow("BIGOILNAME"))
+                    If IsTransBreak = True Then
+                        IsTransBreak = False
+                        appendDr("ROWSPANFIELD2") = oilCodeList.Count + 1
+                    End If
+                    hasBigOilData = True
+                    dtDisp.Rows.Add(appendDr)
+                Next oilCode
+
+                If hasBigOilData = False Then
+                    Continue For
+                End If
+                '油種大分類合計行の設定
+                appendDr = CreateDispRow(targetDt, dtDisp)
+                appendDr("OILNAME") = bigOilName & "計"
+                appendDr("BIGOILCODE") = bigOilCode
+                appendDr("TRAINCLASS") = trainClass
+                dtDisp.Rows.Add(appendDr)
+            Next bigOilCode
+            If dtDisp Is Nothing OrElse dtDisp.Rows.Count = 0 Then
+                Continue For
+            End If
+            '輸送合計行の設定
+            Dim qsumTrainClass = (From dr In dt Where dr("TRAINCLASS").Equals(trainClass))
+            If qsumTrainClass.Any = False Then
+                Continue For
+            End If
+            Dim sumTrainClassDt As DataTable = qsumTrainClass.CopyToDataTable
+            appendDr = CreateDispRow(sumTrainClassDt, dtDisp)
+            appendDr("OILNAME") = "合計"
+            appendDr("BIGOILCODE") = ""
+            appendDr("TRAINCLASS") = trainClass
+            dtDisp.Rows.Add(appendDr)
+
+            dtDisp.Rows(rowCnt)("ROWSPANFIELD1") = dtDisp.Rows.Count - rowCnt
+        Next trainClass
+
+        '*********************************
+        '画面へのデータバインド
+        '*********************************
+        '一方（白or黒）しか無い場合白黒合算のテーブルを出す意味が無いので制御
+        If dtDisp Is Nothing OrElse dtDisp.Rows.Count = 0 Then
+            'dispData = Nothing
+            Me.pnlNoData.Visible = True
+        End If
+        Me.repMonthTrans005.DataSource = dtDisp
+        Me.repMonthTrans005.DataBind()
+    End Sub
+    ''' <summary>
+    ''' 荷主別画面展開
+    ''' </summary>
+    ''' <param name="dt">全て込みのデータ</param>
+    Private Sub SetView006(dt As DataTable)
+        Dim dtAllSum As DataTable = dt.Clone
+        Dim dtSum As DataTable = dt.Clone
+        Dim dtShiro As DataTable = dt.Clone
+        Dim dtKuro As DataTable = dt.Clone
+        Dim appendDr As DataRow = Nothing
+        '*********************************
+        '粒データを白・黒別に集計する
+        '*********************************
+        For Each bigOilCode As String In {"B", "W"}
+            Dim appendDt As DataTable = Nothing
+            '油種分類に応じ挿入先テーブルを判定
+            If bigOilCode = "B" Then
+                appendDt = dtKuro
+            Else
+                appendDt = dtShiro
+            End If
+
+            For Each trainClass As String In {"J", "O"}
+                '対象の黒油・白油、JOT・OT輸送を絞り込む
+                Dim qTarget = (From dr As DataRow In dt
+                               Where dr("BIGOILCODE").Equals(bigOilCode) _
+                                           AndAlso dr("TRAINCLASS").Equals(trainClass)
+                               Order By Convert.ToString(dr("SHIPPERCODE"))
+                               )
+                If qTarget.Any = False Then
+                    Continue For
+                End If
+                Dim targetDt As DataTable = qTarget.CopyToDataTable
+                '対象内の支店コードをグループ化
+                Dim orgCodeList = From dr As DataRow In targetDt Group By x = Convert.ToString(dr("SHIPPERCODE")) Into Group Order By x Select x
+                Dim IsTransBreak As Boolean = True
+                For Each orgCode As String In orgCodeList
+                    Dim orgTbl As DataTable = (From dr As DataRow In targetDt Where dr("SHIPPERCODE").Equals(orgCode)).CopyToDataTable
+                    appendDr = CreateDispRow(orgTbl, appendDt)
+                    '付帯文言を読み取りテーブルから付与
+                    Dim fstRow As DataRow = orgTbl.Rows(0)
+                    appendDr("SHIPPERCODE") = fstRow("SHIPPERCODE")
+                    appendDr("SHIPPERNAME") = fstRow("SHIPPERNAME")
+                    appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
+                    appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
+                    appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
+                    appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                    If IsTransBreak = True Then
+                        IsTransBreak = False
+                        appendDr("ROWSPANFIELD2") = orgCodeList.Count + 1
+                    End If
+                    appendDt.Rows.Add(appendDr)
+                Next orgCode
+
+                If appendDt Is Nothing OrElse appendDt.Rows.Count = 0 Then
+                    Continue For
+                End If
+                '合計行の設定
+                appendDr = CreateDispRow(targetDt, appendDt)
+                appendDr("SHIPPERNAME") = "計"
+                appendDr("BIGOILCODE") = bigOilCode
+                appendDr("TRAINCLASS") = trainClass
+                appendDt.Rows.Add(appendDr)
+            Next trainClass
+            If appendDt Is Nothing OrElse appendDt.Rows.Count = 0 Then
+                Continue For
+            End If
+            appendDt.Rows(0)("ROWSPANFIELD1") = appendDt.Rows.Count
+        Next bigOilCode
+        '*********************************
+        '白黒の合算
+        '*********************************
+        Dim margeTable As DataTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable).CopyToDataTable
+        For Each trainClass As String In {"J", "O"}
+            '対象の黒油・白油、JOT・OT輸送を絞り込む
+            Dim qTarget = (From dr As DataRow In margeTable
+                           Where dr("TRAINCLASS").Equals(trainClass) _
+                                       AndAlso Convert.ToString(dr("SHIPPERCODE")) <> ""
+                           Order By Convert.ToString(dr("SHIPPERCODE"))
+                           )
+            If qTarget.Any = False Then
+                Continue For
+            End If
+            Dim targetDt As DataTable = qTarget.CopyToDataTable
+            Dim allOrgCodeList = From dr As DataRow In targetDt Group By x = Convert.ToString(dr("SHIPPERCODE")) Into Group Order By x Select x
+            Dim IsAllTransBreak As Boolean = True
+            For Each orgCode As String In allOrgCodeList
+                Dim orgTbl As DataTable = (From dr As DataRow In targetDt Where dr("SHIPPERCODE").Equals(orgCode)).CopyToDataTable
+                appendDr = CreateDispRow(orgTbl, dtSum)
+                '付帯文言を読み取りテーブルから付与
+                Dim fstRow As DataRow = orgTbl.Rows(0)
+                appendDr("SHIPPERCODE") = fstRow("SHIPPERCODE")
+                appendDr("SHIPPERNAME") = StrConv(Convert.ToString(fstRow("SHIPPERNAME")), VbStrConv.Wide)
+                appendDr("BIGOILNAME") = "計"
+                appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
+                appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                If IsAllTransBreak = True Then
+                    IsAllTransBreak = False
+                    appendDr("ROWSPANFIELD2") = allOrgCodeList.Count + 1
+                End If
+                dtSum.Rows.Add(appendDr)
+            Next orgCode
+            If dtSum Is Nothing OrElse dtSum.Rows.Count = 0 Then
+                Continue For
+            End If
+            '合計行の設定
+            appendDr = CreateDispRow(targetDt, dtSum)
+            appendDr("SHIPPERNAME") = "計"
+            appendDr("BIGOILCODE") = "計"
+            appendDr("TRAINCLASS") = trainClass
+            dtSum.Rows.Add(appendDr)
+        Next trainClass
+        If Not (dtSum Is Nothing OrElse dtSum.Rows.Count = 0) Then
+            dtSum.Rows(0)("ROWSPANFIELD1") = dtSum.Rows.Count
+        End If
+        '*********************************
+        '総計テーブル生成
+        '*********************************
+        For Each trainClass As String In {"J", "O"}
+            '対象の黒油・白油、JOT・OT輸送を絞り込む
+            Dim qTarget = (From dr As DataRow In margeTable
+                           Where dr("TRAINCLASS").Equals(trainClass) _
+                                       AndAlso Convert.ToString(dr("SHIPPERCODE")) <> ""
+                           Order By Convert.ToString(dr("SHIPPERCODE"))
+                           )
+            If qTarget.Any = False Then
+                Continue For
+            End If
+            Dim targetDt As DataTable = qTarget.CopyToDataTable
+            '総計行の設定
+            appendDr = CreateDispRow(targetDt, dtAllSum)
+            appendDr("SHIPPERNAME") = "全社"
+            appendDr("BIGOILCODE") = targetDt.Rows(0)("BIGOILCODE")
+            appendDr("BIGOILNAME") = "計"
+            appendDr("TRAINCLASS") = targetDt.Rows(0)("TRAINCLASS")
+            appendDr("TRAINCLASSNAME") = targetDt.Rows(0)("TRAINCLASSNAME")
+            appendDr("ROWSPANFIELD2") = "1"
+            dtAllSum.Rows.Add(appendDr)
+        Next trainClass
+        If Not (dtAllSum Is Nothing OrElse dtAllSum.Rows.Count = 0) Then
+            '合計行の設定
+            appendDr = CreateDispRow(dtAllSum, dtAllSum)
+            appendDr("SHIPPERNAME") = "全社"
+            appendDr("BIGOILNAME") = "計"
+            appendDr("TRAINCLASSNAME") = "総計"
+            appendDr("ROWSPANFIELD2") = "1"
+            dtAllSum.Rows.Add(appendDr)
+            dtAllSum.Rows(0)("ROWSPANFIELD1") = dtAllSum.Rows.Count
+        End If
+        '*********************************
+        '画面へのデータバインド
+        '*********************************
+        Dim dispData As New List(Of DataTable)
+        '一方（白or黒）しか無い場合白黒合算のテーブルを出す意味が無いので制御
+        If dtSum.Rows.Count = 0 Then
+            dispData = Nothing
+            Me.pnlNoData.Visible = True
+        ElseIf dtShiro.Rows.Count > 0 AndAlso dtKuro.Rows.Count = 0 Then
+            dispData.AddRange({dtAllSum, dtShiro})
+        ElseIf dtShiro.Rows.Count = 0 AndAlso dtKuro.Rows.Count > 0 Then
+            dispData.AddRange({dtAllSum, dtKuro})
+        Else
+            dispData.AddRange({dtAllSum, dtSum, dtShiro, dtKuro})
+        End If
+        Me.repMonthTrans006.DataSource = dispData
+        Me.repMonthTrans006.DataBind()
     End Sub
     ''' <summary>
     ''' 率再計算

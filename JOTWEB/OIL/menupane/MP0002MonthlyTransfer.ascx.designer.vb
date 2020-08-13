@@ -131,6 +131,15 @@ Partial Public Class MP0002MonthlyTransfer
     Protected WithEvents VIEW003 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
+    '''repMonthTrans003 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans003 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''VIEW004 コントロール。
     '''</summary>
     '''<remarks>
@@ -138,6 +147,15 @@ Partial Public Class MP0002MonthlyTransfer
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents VIEW004 As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''repMonthTrans004 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans004 As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
     '''VIEW005 コントロール。
@@ -149,6 +167,15 @@ Partial Public Class MP0002MonthlyTransfer
     Protected WithEvents VIEW005 As Global.System.Web.UI.WebControls.View
     
     '''<summary>
+    '''repMonthTrans005 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans005 As Global.System.Web.UI.WebControls.Repeater
+    
+    '''<summary>
     '''VIEW006 コントロール。
     '''</summary>
     '''<remarks>
@@ -156,6 +183,15 @@ Partial Public Class MP0002MonthlyTransfer
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents VIEW006 As Global.System.Web.UI.WebControls.View
+    
+    '''<summary>
+    '''repMonthTrans006 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents repMonthTrans006 As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
     '''UNDEFINE コントロール。

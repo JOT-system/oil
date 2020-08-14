@@ -17170,15 +17170,34 @@ Public Class OIT0003OrderDetail
                         '★積置受注№が設定されている場合は、その行すべて入力不可とする。
                         '　(他の受注オーダーにて積込済みのため)
                         If chkObjType <> "" Then
+
+                            '### 20200814 START((全体)No123対応) ######################################
+                            '別オーダーの積置きまでロックされる為、数量が入力出来なくなるので
+                            '数量だけは入力出来るようにする
+
+                            'If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
+                            '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
+                            '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
+                            '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
+                            '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
+                            '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
+                            '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
+                            '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
+                            '    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGETRAINNO") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDARRSTATIONNAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SECONDCONSIGNEENAME") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+
+
+                                '### 20200814 END  ((全体)No123対応) ######################################
+
+
 
                                 '★(実績)発日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _

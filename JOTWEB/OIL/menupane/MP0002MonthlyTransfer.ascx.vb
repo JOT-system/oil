@@ -306,7 +306,7 @@ Public Class MP0002MonthlyTransfer
                     appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
                     appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
                     appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
-                    appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                    appendDr("TRAINCLASSNAME") = StrConv(Convert.ToString(fstRow("TRAINCLASSNAME")), VbStrConv.Wide).Replace("輸送", "")
                     If IsTransBreak = True Then
                         IsTransBreak = False
                         appendDr("ROWSPANFIELD2") = orgCodeList.Count + 1
@@ -355,7 +355,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr("ORGNAME") = fstRow("ORGNAME")
                 appendDr("BIGOILNAME") = "計"
                 appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
-                appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                appendDr("TRAINCLASSNAME") = StrConv(Convert.ToString(fstRow("TRAINCLASSNAME")), VbStrConv.Wide).Replace("輸送", "")
                 If IsAllTransBreak = True Then
                     IsAllTransBreak = False
                     appendDr("ROWSPANFIELD2") = allOrgCodeList.Count + 1
@@ -438,7 +438,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
                 appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
                 appendDr("TRAINCLASS") = ""
-                appendDr("TRAINCLASSNAME") = "請負+OT"
+                appendDr("TRAINCLASSNAME") = "請負+ＯＴ"
                 appendDt.Rows.Add(appendDr)
             Next shpCode
 
@@ -479,7 +479,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr("SHIPPERCODE") = fstRow("SHIPPERCODE")
                 appendDr("SHIPPERNAME") = fstRow("SHIPPERNAME")
                 appendDr("BIGOILNAME") = "計"
-                appendDr("TRAINCLASSNAME") = "請負+OT"
+                appendDr("TRAINCLASSNAME") = "請負+ＯＴ"
                 dtSum.Rows.Add(appendDr)
             Next orgCode
             If Not (dtSum Is Nothing OrElse dtSum.Rows.Count = 0) Then
@@ -487,7 +487,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr = CreateDispRow(targetDt, dtSum)
                 appendDr("SHIPPERNAME") = "計"
                 appendDr("BIGOILNAME") = "計"
-                appendDr("TRAINCLASSNAME") = "請負+OT"
+                appendDr("TRAINCLASSNAME") = "請負+ＯＴ"
                 dtSum.Rows.Add(appendDr)
             End If
         End If
@@ -558,7 +558,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
                 appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
                 appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
-                appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                appendDr("TRAINCLASSNAME") = StrConv(Convert.ToString(fstRow("TRAINCLASSNAME")), VbStrConv.Wide).Replace("輸送", "")
                 appendDt.Rows.Add(appendDr)
             Next shpCode
 
@@ -602,7 +602,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr("CONSIGNEECODE") = fstRow("CONSIGNEECODE")
                 appendDr("CONSIGNEENAME") = fstRow("CONSIGNEENAME")
                 appendDr("BIGOILNAME") = "計"
-                appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                appendDr("TRAINCLASSNAME") = StrConv(Convert.ToString(fstRow("TRAINCLASSNAME")), VbStrConv.Wide).Replace("輸送", "")
                 dtSum.Rows.Add(appendDr)
             Next orgCode
             If Not (dtSum Is Nothing OrElse dtSum.Rows.Count = 0) Then
@@ -610,7 +610,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr = CreateDispRow(targetDt, dtSum)
                 appendDr("CONSIGNEENAME") = "計"
                 appendDr("BIGOILNAME") = "計"
-                appendDr("TRAINCLASSNAME") = "OT"
+                appendDr("TRAINCLASSNAME") = "ＯＴ"
                 dtSum.Rows.Add(appendDr)
             End If
         End If
@@ -678,7 +678,7 @@ Public Class MP0002MonthlyTransfer
                     appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
                     appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
                     appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
-                    appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                    appendDr("TRAINCLASSNAME") = StrConv(Convert.ToString(fstRow("TRAINCLASSNAME")), VbStrConv.Wide).Replace("輸送", "")
                     bigOilName = Convert.ToString(fstRow("BIGOILNAME"))
                     If IsTransBreak = True Then
                         IsTransBreak = False
@@ -769,11 +769,11 @@ Public Class MP0002MonthlyTransfer
                     '付帯文言を読み取りテーブルから付与
                     Dim fstRow As DataRow = orgTbl.Rows(0)
                     appendDr("SHIPPERCODE") = fstRow("SHIPPERCODE")
-                    appendDr("SHIPPERNAME") = fstRow("SHIPPERNAME")
+                    appendDr("SHIPPERNAME") = StrConv(Convert.ToString(fstRow("SHIPPERNAME")), VbStrConv.Wide)
                     appendDr("BIGOILCODE") = fstRow("BIGOILCODE")
                     appendDr("BIGOILNAME") = fstRow("BIGOILNAME")
                     appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
-                    appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                    appendDr("TRAINCLASSNAME") = StrConv(Convert.ToString(fstRow("TRAINCLASSNAME")), VbStrConv.Wide).Replace("輸送", "")
                     If IsTransBreak = True Then
                         IsTransBreak = False
                         appendDr("ROWSPANFIELD2") = orgCodeList.Count + 1
@@ -822,7 +822,7 @@ Public Class MP0002MonthlyTransfer
                 appendDr("SHIPPERNAME") = StrConv(Convert.ToString(fstRow("SHIPPERNAME")), VbStrConv.Wide)
                 appendDr("BIGOILNAME") = "計"
                 appendDr("TRAINCLASS") = fstRow("TRAINCLASS")
-                appendDr("TRAINCLASSNAME") = fstRow("TRAINCLASSNAME")
+                appendDr("TRAINCLASSNAME") = StrConv(Convert.ToString(fstRow("TRAINCLASSNAME")), VbStrConv.Wide).Replace("輸送", "")
                 If IsAllTransBreak = True Then
                     IsAllTransBreak = False
                     appendDr("ROWSPANFIELD2") = allOrgCodeList.Count + 1

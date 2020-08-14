@@ -23,6 +23,9 @@
                     営業所
                     <asp:DropDownList ID="ddlMonthTransOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
                 </div>
+                <div class="measureText">
+                    単位(kl)
+                </div>
             </div>
             <!-- 表示種別で切り替えるビュー「asp:View」のIDはFIXVALUEのCLASS='MENUMONTHTRPAT'のKEYCODEと連動 -->
             <asp:MultiView ID="mvwMonthlyTransfer" runat="server" ClientIDMode="Predictable">
@@ -52,22 +55,22 @@
                                             <asp:Label ID="lblOilType" runat="server" Text='<%# Eval("OILNAME") %>' ClientIDMode="Predictable"></asp:Label>
                                         </th>
                                         <td>
-                                            <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                            <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                         </td>
                                         <td>
-                                            <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                            <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                         </td>
                                         <td>
-                                            <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                            <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                         </td>
                                         <td>
-                                            <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                            <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                         </td>
                                         <td>
                                             <asp:Label ID="lblVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("VOLUMERATIO")) < 0, "minus", If(CDec(Eval("VOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("VOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
                                         </td>
                                         <td>
-                                            <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                            <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                         </td>
                                         <td>
                                             <asp:Label ID="lblLyVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("LYVOLUMERATIO")) < 0, "minus", If(CDec(Eval("LYVOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("LYVOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
@@ -177,22 +180,22 @@
                                                 <asp:Label ID="lblOrgName" runat="server" Text='<%# Eval("ORGNAME") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("ORGNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("ORGNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("ORGNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("ORGNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("ORGNAME")) = "計", "summary", "") %>'>
                                                 <asp:Label ID="lblVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("VOLUMERATIO")) < 0, "minus", If(CDec(Eval("VOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("VOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("ORGNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("ORGNAME")) = "計", "summary", "") %>'>
                                                 <asp:Label ID="lblLyVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("LYVOLUMERATIO")) < 0, "minus", If(CDec(Eval("LYVOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("LYVOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
@@ -240,22 +243,22 @@
                                                 <asp:Label ID="lblOrgName" runat="server" Text='<%# Eval("SHIPPERNAME") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>'>
                                                 <asp:Label ID="lblVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("VOLUMERATIO")) < 0, "minus", If(CDec(Eval("VOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("VOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>'>
                                                 <asp:Label ID="lblLyVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("LYVOLUMERATIO")) < 0, "minus", If(CDec(Eval("LYVOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("LYVOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
@@ -303,22 +306,22 @@
                                                 <asp:Label ID="lblOrgName" runat="server" Text='<%# Eval("CONSIGNEENAME") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("CONSIGNEENAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("CONSIGNEENAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("CONSIGNEENAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("CONSIGNEENAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("CONSIGNEENAME")) = "計", "summary", "") %>'>
                                                 <asp:Label ID="lblVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("VOLUMERATIO")) < 0, "minus", If(CDec(Eval("VOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("VOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("CONSIGNEENAME")) = "計", "summary", "") %>'>
-                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("CONSIGNEENAME")) = "計", "summary", "") %>'>
                                                 <asp:Label ID="lblLyVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("LYVOLUMERATIO")) < 0, "minus", If(CDec(Eval("LYVOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("LYVOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
@@ -360,22 +363,22 @@
                                         <asp:Label ID="lblOrgName" runat="server" Text='<%# Eval("OILNAME") %>' ClientIDMode="Predictable"></asp:Label>
                                     </td>
                                     <td class='<%# If(Convert.ToString(Eval("OILNAME")) = "合計", "summary", If(Convert.ToString(Eval("OILNAME")).EndsWith("計"), "midSummary", "")) %>'>
-                                        <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                        <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                     </td>
                                     <td class='<%# If(Convert.ToString(Eval("OILNAME")) = "合計", "summary", If(Convert.ToString(Eval("OILNAME")).EndsWith("計"), "midSummary", "")) %>'>
-                                        <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                        <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                     </td>
                                     <td class='<%# If(Convert.ToString(Eval("OILNAME")) = "合計", "summary", If(Convert.ToString(Eval("OILNAME")).EndsWith("計"), "midSummary", "")) %>'>
-                                        <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                        <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                     </td>
                                     <td class='<%# If(Convert.ToString(Eval("OILNAME")) = "合計", "summary", If(Convert.ToString(Eval("OILNAME")).EndsWith("計"), "midSummary", "")) %>'>
-                                        <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                        <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                     </td>
                                     <td class='<%# If(Convert.ToString(Eval("OILNAME")) = "合計", "summary", If(Convert.ToString(Eval("OILNAME")).EndsWith("計"), "midSummary", "")) %>'>
                                         <asp:Label ID="lblVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("VOLUMERATIO")) < 0, "minus", If(CDec(Eval("VOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("VOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
                                     </td>
                                     <td class='<%# If(Convert.ToString(Eval("OILNAME")) = "合計", "summary", If(Convert.ToString(Eval("OILNAME")).EndsWith("計"), "midSummary", "")) %>'>
-                                        <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                        <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                     </td>
                                     <td class='<%# If(Convert.ToString(Eval("OILNAME")) = "合計", "summary", If(Convert.ToString(Eval("OILNAME")).EndsWith("計"), "midSummary", "")) %>'>
                                         <asp:Label ID="lblLyVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("LYVOLUMERATIO")) < 0, "minus", If(CDec(Eval("LYVOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("LYVOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
@@ -421,22 +424,22 @@
                                                 <asp:Label ID="lblOrgName" runat="server" Text='<%# Eval("SHIPPERNAME") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>' data-ttlsum='<%# If(Convert.ToString(Eval("TRAINCLASSNAME")) = "総計", "1", "") %>'>
-                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblYesterday" runat="server" Text='<%# CDec(Eval("MAERUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>' data-ttlsum='<%# If(Convert.ToString(Eval("TRAINCLASSNAME")) = "総計", "1", "") %>'>
-                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblToday" runat="server" Text='<%# CDec(Eval("RUIKEIVOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>' data-ttlsum='<%# If(Convert.ToString(Eval("TRAINCLASSNAME")) = "総計", "1", "") %>'>
-                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblTodayTrans" runat="server" Text='<%# CDec(Eval("VOLUME")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>' data-ttlsum='<%# If(Convert.ToString(Eval("TRAINCLASSNAME")) = "総計", "1", "") %>'>
-                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblVolumeChange" runat="server" Text='<%# CDec(Eval("VOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>' data-ttlsum='<%# If(Convert.ToString(Eval("TRAINCLASSNAME")) = "総計", "1", "") %>'>
                                                 <asp:Label ID="lblVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("VOLUMERATIO")) < 0, "minus", If(CDec(Eval("VOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("VOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>' data-ttlsum='<%# If(Convert.ToString(Eval("TRAINCLASSNAME")) = "総計", "1", "") %>'>
-                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000(kl)") %>' ClientIDMode="Predictable"></asp:Label>
+                                                <asp:Label ID="lblLyVolumeChange" runat="server" Text='<%# CDec(Eval("LYVOLUMECHANGE")).ToString("#,##0.000") %>' ClientIDMode="Predictable"></asp:Label>
                                             </td>
                                             <td class='<%# If(Convert.ToString(Eval("SHIPPERNAME")) = "計", "summary", "") %>' data-ttlsum='<%# If(Convert.ToString(Eval("TRAINCLASSNAME")) = "総計", "1", "") %>'>
                                                 <asp:Label ID="lblLyVolumeRatio" runat="server" CssClass='<%# If(CDec(Eval("LYVOLUMERATIO")) < 0, "minus", If(CDec(Eval("LYVOLUMERATIO")) = 0, "zero", "plus")) %>' Text='<%# CDec(Eval("LYVOLUMERATIO")).ToString("0.0%;0.0%") %>' ClientIDMode="Predictable"></asp:Label>

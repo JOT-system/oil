@@ -23,7 +23,8 @@ Public Class M00001MENU
     ''' <param name="e"></param>
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         If IsPostBack Then
-
+            '左ナビの開閉状態をcookieに記憶（Initializeで復元します）
+            Me.LeftNavCollectToSaveCookie()
             If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                 If WF_ButtonClick.Value.StartsWith("WF_ButtonShowGuidance") Then
                     WF_ButtonShowGuidance_Click()
@@ -295,6 +296,14 @@ Public Class M00001MENU
                 If retTopLevelItm.Names = "" Then
                     retTopLevelItm.Names = "　"
                 End If
+
+                Dim keyName As String = MP0000Base.GetBase64Str(retTopLevelItm.Names)
+                Dim val As String = MP0000Base.LoadCookie(keyName, Me)
+                Dim isOpen As Boolean = False
+                If val <> "" Then
+                    isOpen = Convert.ToBoolean(val)
+                End If
+                retTopLevelItm.OpenChild = isOpen
                 retItm.Add(retTopLevelItm)
             Next topLevelItm
 
@@ -385,6 +394,26 @@ Public Class M00001MENU
 
         Return retDt
     End Function
+    ''' <summary>
+    ''' 左ナビの開閉状態をcookieに保存
+    ''' </summary>
+    Private Sub LeftNavCollectToSaveCookie()
+        '左ナビの表示アイテムが無い場合は終了
+        If Me.repLeftNav Is Nothing OrElse Me.repLeftNav.Items.Count = 0 Then
+            Return
+        End If
+        For Each repItm As RepeaterItem In Me.repLeftNav.Items
+            Dim chkObj As CheckBox = DirectCast(repItm.FindControl("chkTopItem"), CheckBox)
+            If chkObj Is Nothing Then
+                Continue For
+            End If
+
+            Dim keyName As String = MP0000Base.GetBase64Str(chkObj.Text)
+            Dim val As String = Convert.ToString(chkObj.Checked)
+            MP0000Base.SaveCookie(keyName, val, Me)
+        Next repItm
+    End Sub
+
     ''' <summary>
     ''' 画面表示用遷移ボタンアイテムクラス
     ''' </summary>

@@ -151,39 +151,74 @@ Public Class MP0000Base
     ''' <param name="key">クライアント描画のコントロールID</param>
     ''' <param name="value">設定値</param>
     Public Sub SaveCookie(ByVal key As String, ByVal value As String)
-        Dim prefixedKey As String = Me.Page.Title & key
+
+        'Dim prefixedKey As String = Me.Page.Title & key
+        'Dim cookie As HttpCookie = Nothing
+        'If Me.Page.Response.Cookies.AllKeys.Contains(prefixedKey) Then
+        '    Me.Page.Response.Cookies.Remove(prefixedKey)
+        'End If
+
+        'cookie = New HttpCookie(prefixedKey)
+        'cookie.Expires = DateTime.Now.AddYears(1) '一旦10年保持
+        'cookie.Value = value
+
+        'Me.Page.Response.Cookies.Add(cookie)
+        SaveCookie(key, value, Me.Page)
+    End Sub
+    Public Shared Sub SaveCookie(ByVal key As String, ByVal value As String, pageObj As Page)
+        Dim prefixedKey As String = pageObj.Title & key
         Dim cookie As HttpCookie = Nothing
-        If Me.Page.Response.Cookies.AllKeys.Contains(prefixedKey) Then
-            Me.Page.Response.Cookies.Remove(prefixedKey)
+        If pageObj.Response.Cookies.AllKeys.Contains(prefixedKey) Then
+            pageObj.Response.Cookies.Remove(prefixedKey)
         End If
 
         cookie = New HttpCookie(prefixedKey)
         cookie.Expires = DateTime.Now.AddYears(1) '一旦10年保持
         cookie.Value = value
 
-        Me.Page.Response.Cookies.Add(cookie)
+        pageObj.Response.Cookies.Add(cookie)
     End Sub
+
     ''' <summary>
     ''' cookieよりDDLの選択値を取得
     ''' </summary>
     ''' <param name="key"></param>
     ''' <returns></returns>
     Public Function LoadCookie(ByVal key As String) As String
-        Dim prefixedKey As String = Me.Page.Title & key
+        'Dim prefixedKey As String = Me.Page.Title & key
+        'Dim retVal As String = ""
+        'If Me.Page.Request.Cookies.AllKeys.Contains(prefixedKey) = False Then
+        '    Return retVal
+        'End If
+        'Dim cookie As HttpCookie
+        'cookie = Me.Page.Request.Cookies(prefixedKey)
+        'retVal = cookie.Value
+        'If Me.Page.Response.Cookies.AllKeys.Contains(prefixedKey) Then
+        '    Me.Page.Response.Cookies.Remove(prefixedKey)
+        'End If
+        'cookie.Expires = DateTime.Now.AddYears(1)
+        'Me.Page.Response.Cookies.Add(cookie)
+        'Return retVal
+        Return LoadCookie(key, Me.Page)
+    End Function
+    Public Shared Function LoadCookie(ByVal key As String, pageObj As Page) As String
+        Dim prefixedKey As String = pageObj.Title & key
         Dim retVal As String = ""
-        If Me.Page.Request.Cookies.AllKeys.Contains(prefixedKey) = False Then
+        If pageObj.Request.Cookies.AllKeys.Contains(prefixedKey) = False Then
             Return retVal
         End If
         Dim cookie As HttpCookie
-        cookie = Me.Page.Request.Cookies(prefixedKey)
+        cookie = pageObj.Request.Cookies(prefixedKey)
         retVal = cookie.Value
-        If Me.Page.Response.Cookies.AllKeys.Contains(prefixedKey) Then
-            Me.Page.Response.Cookies.Remove(prefixedKey)
+        If pageObj.Response.Cookies.AllKeys.Contains(prefixedKey) Then
+            pageObj.Response.Cookies.Remove(prefixedKey)
         End If
         cookie.Expires = DateTime.Now.AddYears(1)
-        Me.Page.Response.Cookies.Add(cookie)
+        pageObj.Response.Cookies.Add(cookie)
         Return retVal
     End Function
+
+
     ''' <summary>
     ''' ドロップダウンの初期値を設定する
     ''' </summary>
@@ -202,5 +237,14 @@ Public Class MP0000Base
         End If
 
     End Sub
+    ''' <summary>
+    ''' 引数文字列をbase64エンコード文字に変換
+    ''' </summary>
+    ''' <param name="targetStr"></param>
+    ''' <returns></returns>
+    Public Shared Function GetBase64Str(targetStr As String) As String
+        Dim encoding = System.Text.Encoding.UTF8
+        Return Convert.ToBase64String(encoding.GetBytes(targetStr))
+    End Function
 
 End Class

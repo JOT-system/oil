@@ -2591,14 +2591,23 @@ Public Class OIT0003OrderList
             & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEAMOUNT" _
-            & " , CASE " _
-            & "   WHEN OIT0002.STACKINGFLG = '1' THEN '積置' " _
-            & "   ELSE '' " _
-            & "   END                                            AS STACKING" _
+            & "	, CASE " _
+            & "   WHEN OIT0003.STACKINGFLG ='1' AND OIT0003.ACTUALLODDATE IS NOT NULL " _
+            & "	      THEN '積置' " _
+            & "	      ELSE CASE " _
+            & "	           WHEN OIT0002.STACKINGFLG = '1' " _
+            & "	     	      THEN '積置' " _
+            & "	   		      ELSE '' " _
+            & "            END " _
+            & "   END  AS STACKING " _
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
             & " , OIT0002.TOTALTANKCH                            AS TOTALTANK" _
-            & " , OIT0002_OTHER.LODDATE                          AS LODDATE" _
+            & " , CASE " _
+            & "   WHEN OIT0003.STACKINGFLG ='1' AND OIT0003.ACTUALLODDATE IS NOT NULL" _
+            & "	      THEN OIT0003.ACTUALLODDATE " _
+            & "	      ELSE OIT0002_OTHER.LODDATE " _
+            & "	  END AS LODDATE" _
             & " , OIT0002_OTHER.DEPDATE                          AS DEPDATE" _
             & " , OIT0002_OTHER.ARRDATE                          AS ARRDATE" _
             & " , OIT0002_OTHER.ACCDATE                          AS ACCDATE" _

@@ -43,6 +43,16 @@ Public Class MP0002MonthlyTransfer
                 SetDisplayValues()
 
             End If
+            'ダウンロードボタン押下時処理
+            If Me.hdnDownloadCall.Value = "1" Then
+                With Me.ddlListPattern
+                    Me.SaveCookie(.ClientID, .SelectedValue)
+                End With
+                With Me.ddlMonthTransOffice
+                    Me.SaveCookie(.ClientID, .SelectedValue)
+                End With
+
+            End If
             '処理フラグを落とす
             Me.hdnRefreshCall.Value = ""
         End If 'End IsPostBack = False
@@ -165,7 +175,7 @@ Public Class MP0002MonthlyTransfer
     ''' <summary>
     ''' グラフ及び一覧表のデータを設定
     ''' </summary>
-    Private Sub SetDisplayValues()
+    Private Function SetDisplayValues() As List(Of DataTable)
         '部署ドロップダウンの表示非表示
         If Me.ddlListPattern.SelectedValue = "VIEW001" Then
             Me.divMonthlyTransOffice.Visible = True
@@ -177,7 +187,7 @@ Public Class MP0002MonthlyTransfer
         If selView Is Nothing Then
             selView = DirectCast(Me.mvwMonthlyTransfer.FindControl("UNDEFINE"), View)
             Me.mvwMonthlyTransfer.SetActiveView(selView)
-            Return
+            Return Nothing
         End If
         Me.mvwMonthlyTransfer.SetActiveView(selView)
 
@@ -191,21 +201,22 @@ Public Class MP0002MonthlyTransfer
 
         '画面にデータ展開(長くなるので各画面展開用関数に投げる)
         ClearAllDataBinds() '一旦全てのDataBindをクリア
+        Dim retVal As New List(Of DataTable)
         Select Case Me.ddlListPattern.SelectedValue
             Case "VIEW001"
-                SetView001(dt)
+                retVal = SetView001(dt)
             Case "VIEW002"
-                SetView002(dt)
+                retVal = SetView002(dt)
             Case "VIEW003"
-                SetView003(dt)
+                retVal = SetView003(dt)
             Case "VIEW004"
-                SetView004(dt)
+                retVal = SetView004(dt)
             Case "VIEW005"
-                SetView005(dt)
+                retVal = SetView005(dt)
             Case "VIEW006"
-                SetView006(dt)
+                retVal = SetView006(dt)
         End Select
-    End Sub
+    End Function
     ''' <summary>
     ''' ペイン内部のバインドデータを全てクリア(VIEWSTATEの容量軽減の為)
     ''' </summary>
@@ -231,12 +242,13 @@ Public Class MP0002MonthlyTransfer
         Me.repMonthTrans006.DataBind()
 
         Me.pnlNoData.Visible = False
+        Me.btnDownload.Visible = True
     End Sub
     ''' <summary>
     ''' 営業所別ビューコンテンツ展開
     ''' </summary>
     ''' <param name="dt"></param>
-    Private Sub SetView001(dt As DataTable)
+    Private Function SetView001(dt As DataTable) As List(Of DataTable)
         Dim targetTbl As DataTable = Nothing
         Dim qTarget = (From dr As DataRow In dt Order By Convert.ToString(dr("OILCODE")) Ascending)
         If qTarget.Any Then
@@ -257,15 +269,17 @@ Public Class MP0002MonthlyTransfer
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then
             Me.chtMonthTrans.Visible = False
             Me.pnlNoData.Visible = True
+            Me.btnDownload.Visible = False
         Else
             Me.chtMonthTrans.Visible = True
         End If
-    End Sub
+        Return New List(Of DataTable) From {targetTbl}
+    End Function
     ''' <summary>
     ''' 支店別画面展開
     ''' </summary>
     ''' <param name="dt">全て込みのデータ</param>
-    Private Sub SetView002(dt As DataTable)
+    Private Function SetView002(dt As DataTable) As List(Of DataTable)
         Dim dtSum As DataTable = dt.Clone
         Dim dtShiro As DataTable = dt.Clone
         Dim dtKuro As DataTable = dt.Clone
@@ -384,6 +398,7 @@ Public Class MP0002MonthlyTransfer
         If dtSum.Rows.Count = 0 Then
             dispData = Nothing
             Me.pnlNoData.Visible = True
+            Me.btnDownload.Visible = False
         ElseIf dtShiro.Rows.Count > 0 AndAlso dtKuro.Rows.Count = 0 Then
             dispData.Add(dtShiro)
         ElseIf dtShiro.Rows.Count = 0 AndAlso dtKuro.Rows.Count > 0 Then
@@ -393,12 +408,13 @@ Public Class MP0002MonthlyTransfer
         End If
         Me.repMonthTrans002.DataSource = dispData
         Me.repMonthTrans002.DataBind()
-    End Sub
+        Return dispData
+    End Function
     ''' <summary>
     ''' 荷主別　請負輸送OT輸送合算画面展開
     ''' </summary>
     ''' <param name="dt">全て込みのデータ</param>
-    Private Sub SetView003(dt As DataTable)
+    Private Function SetView003(dt As DataTable) As List(Of DataTable)
         Dim dtSum As DataTable = dt.Clone
         Dim dtShiro As DataTable = dt.Clone
         Dim dtKuro As DataTable = dt.Clone
@@ -504,6 +520,7 @@ Public Class MP0002MonthlyTransfer
         If dtSum.Rows.Count = 0 Then
             dispData = Nothing
             Me.pnlNoData.Visible = True
+            Me.btnDownload.Visible = False
         ElseIf dtShiro.Rows.Count > 0 AndAlso dtKuro.Rows.Count = 0 Then
             dispData.Add(dtShiro)
         ElseIf dtShiro.Rows.Count = 0 AndAlso dtKuro.Rows.Count > 0 Then
@@ -513,12 +530,13 @@ Public Class MP0002MonthlyTransfer
         End If
         Me.repMonthTrans003.DataSource = dispData
         Me.repMonthTrans003.DataBind()
-    End Sub
+        Return dispData
+    End Function
     ''' <summary>
     ''' 荷受人別画面展開
     ''' </summary>
     ''' <param name="dt">全て込みのデータ</param>
-    Private Sub SetView004(dt As DataTable)
+    Private Function SetView004(dt As DataTable) As List(Of DataTable)
         Dim dtSum As DataTable = dt.Clone
         Dim dtShiro As DataTable = dt.Clone
         Dim dtKuro As DataTable = dt.Clone
@@ -627,6 +645,7 @@ Public Class MP0002MonthlyTransfer
         If dtSum.Rows.Count = 0 Then
             dispData = Nothing
             Me.pnlNoData.Visible = True
+            Me.btnDownload.Visible = False
         ElseIf dtShiro.Rows.Count > 0 AndAlso dtKuro.Rows.Count = 0 Then
             dispData.Add(dtShiro)
         ElseIf dtShiro.Rows.Count = 0 AndAlso dtKuro.Rows.Count > 0 Then
@@ -636,12 +655,13 @@ Public Class MP0002MonthlyTransfer
         End If
         Me.repMonthTrans004.DataSource = dispData
         Me.repMonthTrans004.DataBind()
-    End Sub
+        Return dispData
+    End Function
     ''' <summary>
     ''' 油種別（中分類）画面展開
     ''' </summary>
     ''' <param name="dt">全て込みのデータ</param>
-    Private Sub SetView005(dt As DataTable)
+    Private Function SetView005(dt As DataTable) As List(Of DataTable)
         Dim dtDisp As DataTable = dt.Clone
         Dim appendDr As DataRow = Nothing
         '*********************************
@@ -723,15 +743,17 @@ Public Class MP0002MonthlyTransfer
         If dtDisp Is Nothing OrElse dtDisp.Rows.Count = 0 Then
             'dispData = Nothing
             Me.pnlNoData.Visible = True
+            Me.btnDownload.Visible = False
         End If
         Me.repMonthTrans005.DataSource = dtDisp
         Me.repMonthTrans005.DataBind()
-    End Sub
+        Return New List(Of DataTable) From {dtDisp}
+    End Function
     ''' <summary>
     ''' 荷主別画面展開
     ''' </summary>
     ''' <param name="dt">全て込みのデータ</param>
-    Private Sub SetView006(dt As DataTable)
+    Private Function SetView006(dt As DataTable) As List(Of DataTable)
         Dim dtAllSum As DataTable = dt.Clone
         Dim dtSum As DataTable = dt.Clone
         Dim dtShiro As DataTable = dt.Clone
@@ -884,6 +906,7 @@ Public Class MP0002MonthlyTransfer
         If dtSum.Rows.Count = 0 Then
             dispData = Nothing
             Me.pnlNoData.Visible = True
+            Me.btnDownload.Visible = False
         ElseIf dtShiro.Rows.Count > 0 AndAlso dtKuro.Rows.Count = 0 Then
             dispData.AddRange({dtAllSum, dtShiro})
         ElseIf dtShiro.Rows.Count = 0 AndAlso dtKuro.Rows.Count > 0 Then
@@ -893,7 +916,8 @@ Public Class MP0002MonthlyTransfer
         End If
         Me.repMonthTrans006.DataSource = dispData
         Me.repMonthTrans006.DataBind()
-    End Sub
+        Return dispData
+    End Function
     ''' <summary>
     ''' 率再計算
     ''' </summary>

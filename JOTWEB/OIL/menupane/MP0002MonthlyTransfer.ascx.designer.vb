@@ -68,6 +68,24 @@ Partial Public Class MP0002MonthlyTransfer
     Protected WithEvents ddlMonthTransOffice As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
+    '''btnDownload コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents btnDownload As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''hdnDownloadCall コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents hdnDownloadCall As Global.System.Web.UI.WebControls.HiddenField
+    
+    '''<summary>
     '''mvwMonthlyTransfer コントロール。
     '''</summary>
     '''<remarks>

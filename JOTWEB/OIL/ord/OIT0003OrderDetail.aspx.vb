@@ -2969,6 +2969,74 @@ Public Class OIT0003OrderDetail
     End Sub
 #End Region
 
+    ''' <summary>
+    ''' 各タブ(一覧)の再表示処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub ReDisplayTabList()
+
+        '○ 画面表示データ再取得(受注(明細)画面表示データ取得)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            work.WF_SEL_CREATEFLG.Text = 2
+            MAPDataGet(SQLcon, 0)
+        End Using
+
+        '貨車連結を使用する場合
+        If work.WF_SEL_CREATELINKFLG.Text = "2" Then
+            '○ 画面表示データ取得
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                'DataBase接続
+                SQLcon.Open()
+
+                MAPDataGetLinkTab1(SQLcon)
+            End Using
+        End If
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTAB1TBL.Text)
+
+        '○ 画面表示データ再取得(タブ「入換・積込」表示データ取得)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGetTab2(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
+
+        '○ 画面表示データ再取得(タブ「タンク車明細」表示データ取得)
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            MAPDataGetTab3(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
+        '◎ タブ「費用入力」画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+
+            '勘定科目明細作成
+            WW_InsertRequestAccountDetail(SQLcon)
+
+            '費用入力一覧(勘定科目サマリー作成)
+            MAPDataGetTab4(SQLcon)
+
+            '費用入力一覧(勘定科目追加項目作成)
+            MAPDataADDTab4(SQLcon)
+
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
+
+    End Sub
+
 #Region "一覧再表示処理"
     ''' <summary>
     ''' 一覧再表示処理
@@ -4476,68 +4544,8 @@ Public Class OIT0003OrderDetail
 
         End If
 
-        '### START ######################################################
-        '★ GridView初期設定
-        '○ 画面表示データ再取得(受注(明細)画面表示データ取得)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            MAPDataGet(SQLcon, 0)
-        End Using
-
-        '貨車連結を使用する場合
-        If work.WF_SEL_CREATELINKFLG.Text = "2" Then
-            '○ 画面表示データ取得
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                'DataBase接続
-                SQLcon.Open()
-
-                MAPDataGetLinkTab1(SQLcon)
-            End Using
-        End If
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTAB1TBL.Text)
-
-        '○ 画面表示データ再取得(タブ「入換・積込」表示データ取得)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            MAPDataGetTab2(SQLcon)
-        End Using
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
-
-        '○ 画面表示データ再取得(タブ「タンク車明細」表示データ取得)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            MAPDataGetTab3(SQLcon)
-        End Using
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
-
-        '◎ タブ「費用入力」画面表示データ取得
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            '勘定科目明細作成
-            WW_InsertRequestAccountDetail(SQLcon)
-
-            '費用入力一覧(勘定科目サマリー作成)
-            MAPDataGetTab4(SQLcon)
-
-            '費用入力一覧(勘定科目追加項目作成)
-            MAPDataADDTab4(SQLcon)
-
-        End Using
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
-
-        '### END   ######################################################
+        '各タブ(一覧)の再表示処理
+        ReDisplayTabList()
 
     End Sub
 
@@ -5293,6 +5301,29 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
+        '### 20200818 START (一覧)タンク車Noがすべて割当されてない場合は更新のみ実施 #####################
+        If OIT0003tbl.Select("TANKNO = ''").Count <> 0 Then
+            '受注DB追加・更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateOrder(SQLcon)
+            End Using
+
+            '受注明細DB追加・更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+
+                WW_UpdateOrderDetail(SQLcon)
+            End Using
+
+            '各タブ(一覧)の再表示処理
+            ReDisplayTabList()
+
+            Exit Sub
+        End If
+        '### 20200818 END   (一覧)タンク車Noがすべて割当されてない場合は更新のみ実施 #####################
+
         '○ 関連チェック
         WW_Check(WW_ERRCODE)
         If WW_ERRCODE = "ERR" Then
@@ -5457,52 +5488,9 @@ Public Class OIT0003OrderDetail
 
         '〇タンク車所在の更新
         WW_TankShozaiSet()
-        '### START ######################################################
-        '★ GridView初期設定
-        '○ 画面表示データ再取得(受注(明細)画面表示データ取得)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
 
-            work.WF_SEL_CREATEFLG.Text = 2
-            MAPDataGet(SQLcon, 0)
-        End Using
-
-        '貨車連結を使用する場合
-        If work.WF_SEL_CREATELINKFLG.Text = "2" Then
-            '○ 画面表示データ取得
-            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                'DataBase接続
-                SQLcon.Open()
-
-                MAPDataGetLinkTab1(SQLcon)
-            End Using
-        End If
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl)
-        Master.SaveTable(OIT0003tbl, work.WF_SEL_INPTAB1TBL.Text)
-
-        '○ 画面表示データ再取得(タブ「入換・積込」表示データ取得)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            MAPDataGetTab2(SQLcon)
-        End Using
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
-
-        '○ 画面表示データ再取得(タブ「タンク車明細」表示データ取得)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-
-            MAPDataGetTab3(SQLcon)
-        End Using
-
-        '○ 画面表示データ保存
-        Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
-
-        '### END   ######################################################
+        '★ 各タブ(一覧)の再表示処理
+        ReDisplayTabList()
 
         '〇 荷受人油種チェック
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -7854,19 +7842,19 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        SHIPORDER               = @P40, LINEORDER               = @P33, TANKNO              = @P03" _
-            & "        , ORDERINFO             = @P37, SHIPPERSCODE            = @P23, SHIPPERSNAME        = @P24" _
-            & "        , OILCODE               = @P05, OILNAME                 = @P34, ORDERINGTYPE        = @P35" _
-            & "        , ORDERINGOILNAME       = @P36, RETURNDATETRAIN         = @P07, JOINTCODE           = @P39, JOINT = @P08" _
-            & "        , CHANGETRAINNO         = @P26, CHANGETRAINNAME         = @P38" _
-            & "        , SECONDCONSIGNEECODE   = @P27, SECONDCONSIGNEENAME     = @P28" _
-            & "        , SECONDARRSTATION      = @P29, SECONDARRSTATIONNAME    = @P30" _
-            & "        , CHANGERETSTATION      = @P31, CHANGERETSTATIONNAME    = @P32" _
-            & "        , LOADINGIRILINEORDER   = @P43, LOADINGOUTLETORDER      = @P44, ACTUALLODDATE       = @P47" _
-            & "        , SALSE                 = @P09, SALSETAX                = @P10, TOTALSALSE          = @P11" _
-            & "        , PAYMENT               = @P12, PAYMENTTAX              = @P13, TOTALPAYMENT        = @P14" _
-            & "        , UPDYMD                = @P19, UPDUSER                 = @P20" _
-            & "        , UPDTERMID             = @P21, RECEIVEYMD              = @P22" _
+            & "        SHIPORDER             = @P40, LINEORDER            = @P33, TANKNO        = @P03" _
+            & "        , ORDERINFO           = @P37, STACKINGFLG          = @P41, SHIPPERSCODE  = @P23, SHIPPERSNAME = @P24" _
+            & "        , OILCODE             = @P05, OILNAME              = @P34, ORDERINGTYPE  = @P35" _
+            & "        , ORDERINGOILNAME     = @P36, RETURNDATETRAIN      = @P07, JOINTCODE     = @P39, JOINT        = @P08" _
+            & "        , CHANGETRAINNO       = @P26, CHANGETRAINNAME      = @P38" _
+            & "        , SECONDCONSIGNEECODE = @P27, SECONDCONSIGNEENAME  = @P28" _
+            & "        , SECONDARRSTATION    = @P29, SECONDARRSTATIONNAME = @P30" _
+            & "        , CHANGERETSTATION    = @P31, CHANGERETSTATIONNAME = @P32" _
+            & "        , LOADINGIRILINEORDER = @P43, LOADINGOUTLETORDER   = @P44, ACTUALLODDATE = @P47" _
+            & "        , SALSE               = @P09, SALSETAX             = @P10, TOTALSALSE    = @P11" _
+            & "        , PAYMENT             = @P12, PAYMENTTAX           = @P13, TOTALPAYMENT  = @P14" _
+            & "        , UPDYMD              = @P19, UPDUSER              = @P20" _
+            & "        , UPDTERMID           = @P21, RECEIVEYMD           = @P22" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & "        AND DETAILNO     = @P02" _

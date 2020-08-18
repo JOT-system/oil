@@ -23,6 +23,10 @@
                     営業所
                     <asp:DropDownList ID="ddlMonthTransOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
                 </div>
+                <div style="display:inline-block">
+                    <input id="btnDownload" type="button" runat="server" ClientIDMode="Predictable" class="btn-sticky btnDownload" value="ダウンロード" onclick='downloadPaneData(this.id);' style="display:none;" />
+                    <asp:HiddenField ID="hdnDownloadCall" runat="server" ClientIDMode="Predictable" EnableViewState="false"  />
+                </div>
                 <div class="measureText">
                     単位(kl)
                 </div>
@@ -454,7 +458,7 @@
                         </asp:Repeater>
                     </div>
                 </asp:View>
-                <!-- ありえないが未定義が来た場合VIEW -->
+                <!-- ありえないが未定義の切り口が来た場合VIEW -->
                 <asp:View ID="UNDEFINE" runat="server" ClientIDMode="Predictable">
                     <div style="color:red;margin:5px;font-size:20px;">選択した表示種別は実装されていません。</div>
                 </asp:View>

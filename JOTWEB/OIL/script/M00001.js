@@ -187,11 +187,13 @@ function downloadPaneData(dlButtonId) {
                 menuVscrollObj.value = menuPaneArea.scrollTop;
             }
         }
+        
         setTimeout(function () {
-            dlMarkObj.value = '1';
+            dlMarkObj.value = '';
             downLoadMarkObj.disabled = false;
             document.getElementById("MF_SUBMIT").value = "FALSE";
         }, 2000);
+        dlMarkObj.value = '1';
         downLoadMarkObj.disabled = true;
         document.forms[0].submit();
     }

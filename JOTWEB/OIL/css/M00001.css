@@ -583,16 +583,22 @@ div.showGuidance a[id^="Menu_"] {
     border-left: none;
     background-color: transparent;
 }
+/* */
+.monthTransTable.view003 table {
+    width: 100%;
+}
 .monthTransTable table th.trainClass {
     width: 50px;
     min-width: 50px;
+    max-width:50px;
     white-space: normal;
     word-break: break-all;
 }
+
 /* 油種セル幅 */
 .monthTransTable table th.oilType {
-    width:120px;
-    min-width:120px;
+    width: 120px;
+    min-width: 120px;
 }
 /* 白黒油種セル幅 */
 .monthTransTable table th.bigOilCode {
@@ -686,6 +692,7 @@ div.showGuidance a[id^="Menu_"] {
     height: 28px;
     padding-top: 0px;
     box-sizing:border-box;
+    width:140px;
 }
 /* ******************************** */
 /* 貨車連結順序表取込状況ペイン個別 */

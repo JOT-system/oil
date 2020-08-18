@@ -2616,7 +2616,7 @@ Public Class OIT0003OrderList
             & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & " AND OIT0003.DELFLG <> @P02 " _
-            & " AND (OIT0002.LODDATE = @P03 " _
+            & " AND ((OIT0002.LODDATE = @P03 AND ISNULL(OIT0003.ACTUALLODDATE,'') = '') " _
             & "      OR OIT0003.ACTUALLODDATE = @P03) " _
             & " LEFT JOIN OIL.OIT0002_ORDER OIT0002_OTHER ON " _
             & "     OIT0002_OTHER.ORDERNO = OIT0003.ORDERNO " _

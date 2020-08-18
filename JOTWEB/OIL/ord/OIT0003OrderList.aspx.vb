@@ -73,12 +73,9 @@ Public Class OIT0003OrderList
                             WF_ButtonALLSELECT_Click()
                         Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
                             WF_ButtonSELECT_LIFTED_Click()
-                        Case "WF_ButtonORDER_CANCEL"     'キャンセルボタン押下
+                        Case "WF_ButtonORDER_CANCEL"    'キャンセルボタン押下
                             WF_ButtonORDER_CANCEL_Click()
-                        Case "WF_ButtonCSV",
-                             "WF_ButtonSendaiLOADCSV",
-                             "WF_ButtonNegishiSHIPCSV",
-                             "WF_ButtonNegishiLOADCSV"  'ダウンロードボタン押下
+                        Case "WF_ButtonCSV"             'ダウンロードボタン押下
                             WF_ButtonDownload_Click()
                         Case "WF_ButtonINSERT"          '受注新規作成ボタン押下
                             WF_ButtonINSERT_Click()
@@ -663,80 +660,80 @@ Public Class OIT0003OrderList
         Select Case WF_ButtonClick.Value
             Case "WF_ButtonCSV"             'ダウンロードボタン押下
 
-            'ダウンロードボタン(積込予定)押下
-            Case "WF_ButtonSendaiLOADCSV"
+                ''ダウンロードボタン(積込予定)押下
+                'Case "WF_ButtonSendaiLOADCSV"
 
-                '******************************
-                '帳票表示データ取得処理
-                '******************************
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                '    '******************************
+                '    '帳票表示データ取得処理
+                '    '******************************
+                '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '        SQLcon.Open()       'DataBase接続
 
-                    ExcelLoadCommonDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_010402)
-                End Using
+                '        ExcelLoadCommonDataGet(SQLcon, BaseDllConst.CONST_OFFICECODE_010402)
+                '    End Using
 
-                '******************************
-                '帳票作成処理の実行
-                '******************************
-                Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
-                    Dim url As String
-                    Try
-                        url = repCbj.CreateExcelPrintData(BaseDllConst.CONST_OFFICECODE_010402)
-                    Catch ex As Exception
-                        Return
-                    End Try
-                    '○ 別画面でExcelを表示
-                    WF_PrintURL.Value = url
-                    ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-                End Using
+                '    '******************************
+                '    '帳票作成処理の実行
+                '    '******************************
+                '    Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
+                '        Dim url As String
+                '        Try
+                '            url = repCbj.CreateExcelPrintData(BaseDllConst.CONST_OFFICECODE_010402)
+                '        Catch ex As Exception
+                '            Return
+                '        End Try
+                '        '○ 別画面でExcelを表示
+                '        WF_PrintURL.Value = url
+                '        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                '    End Using
 
-            'ダウンロードボタン(根岸(出荷予定))押下
-            'ダウンロードボタン(根岸(積込予定))押下
-            Case "WF_ButtonNegishiSHIPCSV",
-                 "WF_ButtonNegishiLOADCSV"
+                ''ダウンロードボタン(根岸(出荷予定))押下
+                ''ダウンロードボタン(根岸(積込予定))押下
+                'Case "WF_ButtonNegishiSHIPCSV",
+                '     "WF_ButtonNegishiLOADCSV"
 
-                '******************************
-                '帳票表示データ取得処理
-                '******************************
-                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()       'DataBase接続
+                '    '******************************
+                '    '帳票表示データ取得処理
+                '    '******************************
+                '    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                '        SQLcon.Open()       'DataBase接続
 
-                    ExcelNegishiDataGet(SQLcon, WF_ButtonClick.Value)
-                End Using
+                '        ExcelNegishiDataGet(SQLcon, WF_ButtonClick.Value)
+                '    End Using
 
-                '******************************
-                '帳票作成処理の実行
-                '******************************
-                Select Case WF_ButtonClick.Value
-                    'ダウンロードボタン(根岸(出荷予定))押下
-                    Case "WF_ButtonNegishiSHIPCSV"
-                        Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
-                            Dim url As String
-                            Try
-                                url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Now.AddDays(1).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP")))
-                            Catch ex As Exception
-                                Return
-                            End Try
-                            '○ 別画面でExcelを表示
-                            WF_PrintURL.Value = url
-                            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-                        End Using
+                '    '******************************
+                '    '帳票作成処理の実行
+                '    '******************************
+                '    Select Case WF_ButtonClick.Value
+                '        'ダウンロードボタン(根岸(出荷予定))押下
+                '        Case "WF_ButtonNegishiSHIPCSV"
+                '            Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_SHIPPLAN.xlsx", OIT0003ReportNegishitbl)
+                '                Dim url As String
+                '                Try
+                '                    url = repCbj.CreateExcelPrintNegishiData("SHIPPLAN", Now.AddDays(1).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP")))
+                '                Catch ex As Exception
+                '                    Return
+                '                End Try
+                '                '○ 別画面でExcelを表示
+                '                WF_PrintURL.Value = url
+                '                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                '            End Using
 
-                    'ダウンロードボタン(根岸(積込予定))押下
-                    Case "WF_ButtonNegishiLOADCSV"
-                        Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_LOADPLAN.xlsx", OIT0003ReportNegishitbl)
-                            Dim url As String
-                            Try
-                                url = repCbj.CreateExcelPrintNegishiData("LOADPLAN", Now.AddDays(1).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP")))
-                            Catch ex As Exception
-                                Return
-                            End Try
-                            '○ 別画面でExcelを表示
-                            WF_PrintURL.Value = url
-                            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-                        End Using
+                '        'ダウンロードボタン(根岸(積込予定))押下
+                '        Case "WF_ButtonNegishiLOADCSV"
+                '            Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_NEGISHI_LOADPLAN.xlsx", OIT0003ReportNegishitbl)
+                '                Dim url As String
+                '                Try
+                '                    url = repCbj.CreateExcelPrintNegishiData("LOADPLAN", Now.AddDays(1).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP")))
+                '                Catch ex As Exception
+                '                    Return
+                '                End Try
+                '                '○ 別画面でExcelを表示
+                '                WF_PrintURL.Value = url
+                '                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+                '            End Using
 
-                End Select
+                '    End Select
         End Select
     End Sub
 #End Region
@@ -2259,7 +2256,7 @@ Public Class OIT0003OrderList
         Using repCbj = New OIT0003CustomReport(Master.MAPID, Master.MAPID & "_LOADPLAN.xlsx", OIT0003Reporttbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData(officeCode)
+                url = repCbj.CreateExcelPrintData(officeCode, lodDate:=Me.txtReportLodDate.Text)
             Catch ex As Exception
                 Return
             End Try

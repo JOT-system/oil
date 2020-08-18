@@ -121,7 +121,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData(ByVal officeCode As String) As String
+    Public Function CreateExcelPrintData(ByVal officeCode As String, Optional ByVal lodDate As String = Nothing) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -130,7 +130,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Try
             '***** TODO処理 ここから *****
             '◯ヘッダーの設定
-            EditLoadHeaderArea()
+            EditLoadHeaderArea(lodDate)
             '◯明細の設定
             EditLoadDetailArea(officeCode)
             '***** TODO処理 ここまで *****
@@ -163,7 +163,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(積込指示書(共通))
     ''' </summary>
-    Private Sub EditLoadHeaderArea()
+    Private Sub EditLoadHeaderArea(ByVal lodDate As String)
         Dim rngHeaderArea As Excel.Range = Nothing
         'Dim value As String = Now.AddDays(1).ToString("yyyy年MM月dd日（ddd）", New Globalization.CultureInfo("ja-JP"))
 
@@ -173,18 +173,22 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngHeaderArea = Me.ExcelWorkSheet.Range("B1")
                 rngHeaderArea.Value = PrintDatarow("BASENAME")
 
-                '◯ 積込日
-                Dim value As String = PrintDatarow("LODDATE").ToString
-                rngHeaderArea = Me.ExcelWorkSheet.Range("E1")
-                rngHeaderArea.Value = Date.Parse(value).ToString("MM月dd日分", New Globalization.CultureInfo("ja-JP"))
-
-                '◯ 作成日(当日)
-                rngHeaderArea = Me.ExcelWorkSheet.Range("O1")
-                'rngHeaderArea.Value = Date.Parse(value).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
-                rngHeaderArea.Value = Now.AddDays(0).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
+                ''◯ 積込日
+                'Dim value As String = PrintDatarow("LODDATE").ToString
+                'rngHeaderArea = Me.ExcelWorkSheet.Range("E1")
+                'rngHeaderArea.Value = Date.Parse(value).ToString("MM月dd日分", New Globalization.CultureInfo("ja-JP"))
 
                 Exit For
             Next
+
+            '◯ 積込日
+            Dim value As String = lodDate
+            rngHeaderArea = Me.ExcelWorkSheet.Range("E1")
+            rngHeaderArea.Value = Date.Parse(value).ToString("MM月dd日分", New Globalization.CultureInfo("ja-JP"))
+
+            '◯ 作成日(当日)
+            rngHeaderArea = Me.ExcelWorkSheet.Range("O1")
+            rngHeaderArea.Value = Now.AddDays(0).ToString("yyyy/MM/dd", New Globalization.CultureInfo("ja-JP"))
 
         Catch ex As Exception
             Throw

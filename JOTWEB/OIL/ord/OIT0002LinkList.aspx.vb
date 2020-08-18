@@ -1782,6 +1782,7 @@ Public Class OIT0002LinkList
 
             SQLLinkStr &= String.Format(" WHERE OIT0011.DELFLG <> '{0}'", C_DELETE_FLG.DELETE) _
                 & "  AND OIT0011.TRUCKSYMBOL <> ''" _
+                & "  AND OIT0011.LINKNO <> ''" _
                 & "  AND VIW0002.OFFICECODE IS NOT NULL"
 
             '○ 条件指定で指定されたものでSQLで可能なものを追加する

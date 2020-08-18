@@ -356,6 +356,51 @@ Partial Public Class OIT0005TankLocDetail
     Protected WithEvents TxtPreOrderingOilName As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''KEY_LINE_11 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents KEY_LINE_11 As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''LblUseOrderNoText コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblUseOrderNoText As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''LblUseOrderNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblUseOrderNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''spnUseOrderNoClear コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents spnUseOrderNoClear As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''chkUseOrderNoClear コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents chkUseOrderNoClear As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
     '''rightview コントロール。
     '''</summary>
     '''<remarks>

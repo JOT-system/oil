@@ -44,8 +44,8 @@
                         <a style="display:none;">
                             <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonLinkINSERT');" />
                         </a>
-                            <%--<input type="button" id="WF_ButtonOTLinkageINSERT" class="btn-sticky" value="OT連携選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonOTLinkageINSERT');" />--%>
                         <a style="display:none;">
+                            <input type="button" id="WF_ButtonOTLinkageINSERT" class="btn-sticky" value="OT連携選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonOTLinkageINSERT');" />
                             <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
                         </a>
                         <a style="display:none;">
@@ -115,6 +115,7 @@
             <!-- 2 : 関東支店/五井/甲子/袖ヶ浦/根岸  -->
             <!-- 3 : 中部支店/四日市/三重塩浜  -->
             <input id="WF_BUTTONpermitcode" runat="server" value="" type="text" />
+            <input id="WF_BUTTONofficecode" runat="server" value="" type="text" />
         </div>
  
 </asp:Content>

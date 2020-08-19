@@ -129,6 +129,7 @@ Public Class OIT0003OrderList
             End If
 
             '◯ ボタン(表示・非表示)設定(各営業所にて出し分けをするため)
+            WF_BUTTONofficecode.Value = Master.USER_ORG
             Select Case Master.USER_ORG
                 '★情報システム部/石油部
                 Case BaseDllConst.CONST_OFFICECODE_010006,
@@ -2729,7 +2730,9 @@ Public Class OIT0003OrderList
 
         SQLStrAri &=
               " ORDER BY" _
-            & "    OIT0002.BASECODE" _
+            & "    OIT0003.SHIPPERSCODE" _
+            & "  , OIT0002.TRAINNO" _
+            & "  , STACKING" _
             & "  , OIT0003.OILCODE"
 
         '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合

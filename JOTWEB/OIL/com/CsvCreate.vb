@@ -65,14 +65,14 @@
                 For i = 0 To colCount - 1
                     'ヘッダの取得
                     Dim field As String = Me.CsvData.Columns(i).Caption
-                    '"で囲む
-                    field = EncloseDoubleQuotesIfNeed(field)
+                    ''"で囲む
+                    'field = EncloseDoubleQuotesIfNeed(field)
                     'フィールドを書き込む
                     Me.CsvSW.Write(field)
-                    'カンマを書き込む
-                    If lastColIndex > i Then
-                        Me.CsvSW.Write(","c)
-                    End If
+                    ''カンマを書き込む
+                    'If lastColIndex > i Then
+                    '    Me.CsvSW.Write(","c)
+                    'End If
                 Next
                 '改行する
                 Me.CsvSW.Write(vbCrLf)
@@ -84,14 +84,14 @@
                 For i = 0 To colCount - 1
                     'フィールドの取得
                     Dim field As String = row(i).ToString()
-                    '"で囲む
-                    field = EncloseDoubleQuotesIfNeed(field)
+                    ''"で囲む
+                    'field = EncloseDoubleQuotesIfNeed(field)
                     'フィールドを書き込む
                     Me.CsvSW.Write(field)
-                    'カンマを書き込む
-                    If lastColIndex > i Then
-                        Me.CsvSW.Write(","c)
-                    End If
+                    ''カンマを書き込む
+                    'If lastColIndex > i Then
+                    '    Me.CsvSW.Write(","c)
+                    'End If
                 Next
                 '改行する
                 Me.CsvSW.Write(vbCrLf)

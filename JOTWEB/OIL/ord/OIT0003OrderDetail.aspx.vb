@@ -5710,12 +5710,14 @@ Public Class OIT0003OrderDetail
             Exit Sub
         End If
 
-        '貨車連結表DB追加・更新
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+        '### 20200819 START 受注明細画面からの貨車連結表自動作成を廃止 ##########
+        ''貨車連結表DB追加・更新
+        'Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+        '    SQLcon.Open()       'DataBase接続
 
-            WW_UpdateLink(SQLcon)
-        End Using
+        '    WW_UpdateLink(SQLcon)
+        'End Using
+        '### 20200819 END   受注明細画面からの貨車連結表自動作成を廃止 ##########
 
         '〇 受注DB更新
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection

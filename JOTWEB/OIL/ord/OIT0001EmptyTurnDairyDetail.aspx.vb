@@ -1615,6 +1615,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Dim WW_TANKNUMBER As String = WW_SETVALUE
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                     updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
+                    '### 20200819 START タンク車Noが変更されたらタンク車Noステータスを初期化 #####
+                    updHeader.Item("TANKSTATUS") = ""
+                    '### 20200819 END   タンク車Noが変更されたらタンク車Noステータスを初期化 #####
 
                     'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
@@ -2449,12 +2452,14 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
-        '### 2020/06/23 空回日報の登録では、タンク車所在の更新は行わないのでタンク車所在のチェックは実施しない ###
-        ''〇 タンク車状態チェック
-        'WW_CheckTankStatus(WW_ERRCODE)
-        'If WW_ERRCODE = "ERR" Then
-        '    Exit Sub
-        'End If
+        '### 20200819 START 一度チェックは外したが要望により復活 ###############################################
+        '### 20200623 空回日報の登録では、タンク車所在の更新は行わないのでタンク車所在のチェックは実施しない ###
+        '〇 タンク車状態チェック
+        WW_CheckTankStatus(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+        '### 20200819 END   一度チェックは外したが要望により復活 ###############################################
 
         '〇前回油種と油種の整合性チェック
         WW_CheckLastOilConsistency(WW_ERRCODE)
@@ -2946,6 +2951,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 If WW_ListValue = "" Then
                     'タンク車№
                     updHeader.Item("TANKNO") = ""
+                    '### 20200819 START タンク車Noが変更されたらタンク車Noステータスを初期化 #####
+                    updHeader.Item("TANKSTATUS") = ""
+                    '### 20200819 END   タンク車Noが変更されたらタンク車Noステータスを初期化 #####
                     '前回油種
                     updHeader.Item("LASTOILCODE") = ""
                     updHeader.Item("LASTOILNAME") = ""
@@ -2970,6 +2978,9 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 'タンク車№
                 updHeader.Item("TANKNO") = WW_ListValue
+                '### 20200819 START タンク車Noが変更されたらタンク車Noステータスを初期化 #####
+                updHeader.Item("TANKSTATUS") = ""
+                '### 20200819 END   タンク車Noが変更されたらタンク車Noステータスを初期化 #####
 
                 '前回油種
                 Dim WW_LASTOILNAME As String = ""
@@ -3559,13 +3570,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'タンク車情報を取得
                 WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0001row("TANKNO"), WW_GetValue)
 
-                '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                '### 20200819 START 指定したタンク車№が同じ受注Noの対応 #################
                 '使用受注№が設定されている場合
-                If WW_GetValue(12) <> "" Then
+                If WW_GetValue(12) = OIT0001row("ORDERNO") Then
                     '次のレコードに進む（SKIPする）
                     Continue For
                 End If
-                '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                '### 20200819 END   指定したタンク車№が同じ受注Noの対応 #################
 
                 'タンク車状態
                 Select Case WW_GetValue(11)

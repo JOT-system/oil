@@ -6296,9 +6296,14 @@ Public Class OIT0003OrderDetail
         '### 20200701 START((全体)No96対応) ######################################
         '★指定したタンク車№が所属営業所以外の場合
         If WW_GetValue(13) <> Me.TxtOrderOfficeCode.Text Then
-            OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
-            CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
-        Else
+            '### 20200819 START 管轄支店コード(11001(OT本社))対応 ####################
+            If WW_GetValue(14) <> BaseDllConst.CONST_BRANCHCODE_110001 Then
+                OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
+                CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+            End If
+            '### 20200819 END   管轄支店コード(11001(OT本社))対応 ####################
+        End If
+        If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102 Then
             OIT0003row("ORDERINFO") = ""
             OIT0003row("ORDERINFONAME") = ""
         End If

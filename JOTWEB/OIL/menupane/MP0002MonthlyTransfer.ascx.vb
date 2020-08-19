@@ -31,30 +31,47 @@ Public Class MP0002MonthlyTransfer
             Initialize()
             Me.hdnCurrentListPattern.Value = Me.ddlListPattern.SelectedValue
         Else
-            'ポストバック
-            If Me.hdnRefreshCall.Value = "1" Then
-                '最新化処理
-                With Me.ddlListPattern
-                    Me.SaveCookie(.ClientID, .SelectedValue)
-                End With
-                With Me.ddlMonthTransOffice
-                    Me.SaveCookie(.ClientID, .SelectedValue)
-                End With
-                SetDisplayValues()
+            Try
+                'ポストバック
+                If Me.hdnRefreshCall.Value = "1" Then
+                    '最新化処理
+                    With Me.ddlListPattern
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    With Me.ddlMonthTransOffice
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    SetDisplayValues()
 
-            End If
-            'ダウンロードボタン押下時処理
-            If Me.hdnDownloadCall.Value = "1" Then
-                With Me.ddlListPattern
-                    Me.SaveCookie(.ClientID, .SelectedValue)
-                End With
-                With Me.ddlMonthTransOffice
-                    Me.SaveCookie(.ClientID, .SelectedValue)
-                End With
+                End If
+                'ダウンロードボタン押下時処理
+                If Me.hdnDownloadCall.Value = "1" Then
+                    With Me.ddlListPattern
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    With Me.ddlMonthTransOffice
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    '画面展開するリストデータ(次処理にて同じデータを引き渡し帳票を生成する
+                    Dim retVal As List(Of DataTable) = SetDisplayValues()
+                    '帳票生成
+                    Dim tempFileName As String = String.Format("{0}{1}.xlsx", Me.ID, Me.ddlListPattern.SelectedValue)
+                    Using clsPrint As New M00001MP0002CustomReport(
+                        Me.Page.Title, tempFileName, retVal,
+                        Me.ddlListPattern.SelectedValue, Me.ddlListPattern.SelectedItem.Text,
+                        Me.ddlMonthTransOffice.SelectedItem.Text
+                        )
+                        clsPrint.CreateExcelFileStream(Me.Page)
+                    End Using
+                End If
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            Catch ex As Threading.ThreadAbortException
+                Dim doNothing = Nothing
+            Catch ex As Exception
+                Throw
+            End Try
 
-            End If
-            '処理フラグを落とす
-            Me.hdnRefreshCall.Value = ""
         End If 'End IsPostBack = False
     End Sub
     ''' <summary>
@@ -216,6 +233,7 @@ Public Class MP0002MonthlyTransfer
             Case "VIEW006"
                 retVal = SetView006(dt)
         End Select
+        Return retVal
     End Function
     ''' <summary>
     ''' ペイン内部のバインドデータを全てクリア(VIEWSTATEの容量軽減の為)

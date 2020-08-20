@@ -16,6 +16,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001WK3tbl As DataTable                              '作業用テーブル(同一列車(同一発日)タンク車チェック用)
     Private OIT0001WK4tbl As DataTable                              '作業用テーブル(異なる列車(同一発日)タンク車チェック用)
     Private OIT0001WK5tbl As DataTable                              '作業用テーブル(異なる列車(同一積込日)タンク車チェック用)
+    Private OIT0001WK6tbl As DataTable                              '作業用テーブル(他オーダー情報取得(同オーダーの同一積込日取得用))
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
@@ -3570,13 +3571,24 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'タンク車情報を取得
                 WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0001row("TANKNO"), WW_GetValue)
 
-                '### 20200819 START 指定したタンク車№が同じ受注Noの対応 #################
+                '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
                 '使用受注№が設定されている場合
                 If WW_GetValue(12) <> "" Then
+
+                    '### 20200820 START タンク車Noの積込日が同一で設定されていないかを確認する対応 ###############
+                    Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()       'DataBase接続
+
+                        '★タンク車Noの積込日重複チェック
+                        WW_CheckTankNoLodDateRepeat(O_RTN, SQLcon, OIT0001row)
+                    End Using
+                    If O_RTN = "ERR" Then Exit Sub
+                    '### 20200820 END   タンク車Noの積込日が同一で設定されていないかを確認する対応 ###############
+
                     '次のレコードに進む（SKIPする）
                     Continue For
                 End If
-                '### 20200819 END   指定したタンク車№が同じ受注Noの対応 #################
+                '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
                 'タンク車状態
                 Select Case WW_GetValue(11)
@@ -4100,6 +4112,133 @@ Public Class OIT0001EmptyTurnDairyDetail
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
             CS0011LOGWrite.INFPOSI = "DB:OIT0001D CHECK_TRAINTANKREPEAT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
+
+        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' タンク車Noの積込日重複チェック
+    ''' </summary>
+    ''' <param name="O_RTN"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckTankNoLodDateRepeat(ByRef O_RTN As String,
+                                              ByVal SQLcon As SqlConnection,
+                                              ByVal I_DR As DataRow)
+
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+
+        '他オーダー情報取得(同オーダーの同一積込日取得用)
+        If IsNothing(OIT0001WK6tbl) Then
+            OIT0001WK6tbl = New DataTable
+        End If
+
+        If OIT0001WK6tbl.Columns.Count <> 0 Then
+            OIT0001WK6tbl.Columns.Clear()
+        End If
+
+        OIT0001WK6tbl.Clear()
+
+        '○ チェックSQL
+        '　説明
+        '     登録された内容が受注TBLにすでに登録済みかチェックする
+
+        Dim SQLStr As String =
+              " SELECT " _
+            & "   ISNULL(RTRIM(OIT0002.ORDERNO), '')         AS ORDERNO" _
+            & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')        AS DETAILNO" _
+            & " , ISNULL(RTRIM(OIT0003.SHIPORDER), '')       AS SHIPORDER" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')         AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')       AS TRAINNAME" _
+            & " , ISNULL(RTRIM(OIT0003.LINEORDER), '')       AS LINEORDER" _
+            & " , ISNULL(RTRIM(OIT0003.TANKNO), '')          AS TANKNO" _
+            & " , ISNULL(RTRIM(OIT0003.OILCODE), '')         AS OILCODE" _
+            & " , ISNULL(RTRIM(OIT0003.OILNAME), '')         AS OILNAME" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')    AS ORDERINGTYPE" _
+            & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '') AS ORDERINGOILNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')     AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')      AS OFFICECODE" _
+            & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')      AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.SHIPPERSCODE), '')    AS SHIPPERSCODE" _
+            & " , ISNULL(RTRIM(OIT0002.SHIPPERSNAME), '')    AS SHIPPERSNAME" _
+            & " , ISNULL(RTRIM(OIT0002.BASECODE), '')        AS BASECODE" _
+            & " , ISNULL(RTRIM(OIT0002.BASENAME), '')        AS BASENAME" _
+            & " , ISNULL(RTRIM(OIT0002.CONSIGNEECODE), '')   AS CONSIGNEECODE" _
+            & " , ISNULL(RTRIM(OIT0002.CONSIGNEENAME), '')   AS CONSIGNEENAME" _
+            & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')      AS DEPSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')  AS DEPSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')      AS ARRSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')  AS ARRSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0003.ACTUALLODDATE), RTRIM(OIT0002.LODDATE)) AS LODDATE" _
+            & " , ISNULL(RTRIM(OIT0002.DEPDATE), '')         AS DEPDATE" _
+            & " , ISNULL(RTRIM(OIT0002.ARRDATE), '')         AS ARRDATE" _
+            & " , ISNULL(RTRIM(OIT0002.ACCDATE), '')         AS ACCDATE" _
+            & " , ISNULL(RTRIM(OIT0002.EMPARRDATE), '')      AS EMPARRDATE" _
+            & " FROM oil.OIT0002_ORDER OIT0002 " _
+            & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
+            & "       OIT0003.ORDERNO  = OIT0002.ORDERNO " _
+            & "   AND OIT0003.TANKNO   = @P03" _
+            & "   AND OIT0003.DELFLG  <> @P04" _
+            & " WHERE ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE) = @P01 " _
+            & "   AND OIT0002.ORDERSTATUS <> @P02 "
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Date)         '積込日
+                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)  'タンク車№
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
+                PARA1.Value = Me.TxtLoadingDate.Text
+                PARA2.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARA3.Value = I_DR("TANKNO")
+                PARA4.Value = C_DELETE_FLG.DELETE
+
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001WK6tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001WK6tbl.Load(SQLdr)
+                End Using
+
+                If OIT0001WK6tbl.Rows.Count <> 0 Then
+                    I_DR("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
+                    CODENAME_get("ORDERINFO", I_DR("ORDERINFO"), I_DR("ORDERINFONAME"), WW_DUMMY)
+
+                    WW_CheckMES1 = "タンク車№(同一の積込日)重複。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, I_DR)
+                    O_RTN = "ERR"
+
+                    Master.Output(C_MESSAGE_NO.OIL_TANKNO_LOADDATE_USE, C_MESSAGE_TYPE.ERR, OIT0001WK6tbl.Rows(0)("ORDERNO"), needsPopUp:=True)
+
+                Else
+                    If I_DR("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        I_DR("ORDERINFO") = ""
+                        I_DR("ORDERINFONAME") = ""
+                    End If
+                End If
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0001tbl)
+
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D CHECK_TANKNO_LODDATE_REPEAT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D CHECK_TANKNO_LODDATE_REPEAT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

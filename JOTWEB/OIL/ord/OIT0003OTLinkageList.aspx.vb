@@ -52,6 +52,12 @@ Public Class OIT0003OTLinkageList
                     Master.RecoverTable(OIT0003tbl)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click()
+                        Case "WF_ButtonALLSELECT"       '全選択ボタン押下
+                            WF_ButtonALLSELECT_Click()
+                        Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
+                            WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonINSERT"          'OT連携ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
@@ -69,7 +75,7 @@ Public Class OIT0003OTLinkageList
                     End Select
 
                     '○ 一覧再表示処理
-                    'DisplayGrid()
+                    DisplayGrid()
                 End If
             Else
                 '○ 初期化処理
@@ -376,7 +382,7 @@ Public Class OIT0003OTLinkageList
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
                 'PARA01.Value = OFFICECDE
-                PARA02.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                PARA02.Value = Format(Now.AddDays(0), "yyyy/MM/dd")
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE
                 PARA05.Value = Master.USER_ORG
@@ -421,10 +427,81 @@ Public Class OIT0003OTLinkageList
     End Sub
 
     ''' <summary>
+    ''' チェックボックス(選択)クリック処理
+    ''' </summary>
+    Protected Sub WF_CheckBoxSELECT_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        'チェックボックス判定
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                If OIT0003tbl.Rows(i)("OPERATION") = "" Then
+                    OIT0003tbl.Rows(i)("OPERATION") = "on"
+                Else
+                    OIT0003tbl.Rows(i)("OPERATION") = ""
+                End If
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 全選択ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonALLSELECT_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        '全チェックボックスON
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0003tbl.Rows(i)("OPERATION") = "on"
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 全解除ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonSELECT_LIFTED_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        '全チェックボックスOFF
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0003tbl.Rows(i)("OPERATION") = ""
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
     ''' OT連携ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
+
+        '一覧のチェックボックスが選択されているか確認
+        If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
 
         '******************************
         'OT発送日報データ取得処理

@@ -639,6 +639,14 @@ Public Module Messages
         ''' 指定タンク車№が所属営業所以外のためエラー
         ''' </summary>
         Public Const OIL_ORDER_NOT_BELONGOFFICE_TANKNO_ERROR As String = "20059"
+        ''' <summary>
+        ''' 受注オーダー時の積込日チェック(列車が同一かつ積込日が同一かつタンク車が複数の場合)
+        ''' </summary>
+        Public Const OIL_ORDER_LODDATE_SAMETRAINTANKNO As String = "20060"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性警告
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ALERT As String = "20061"
 
 #End Region
 

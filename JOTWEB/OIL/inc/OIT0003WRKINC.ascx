@@ -248,6 +248,8 @@
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>
     <!-- 貨車連結用更新データ(退避用) -->
     <asp:TextBox ID="WF_SEL_INPLINKTBL" runat="server"></asp:TextBox>
+    <!-- OT連携用更新データ(退避用) -->
+    <asp:TextBox ID="WF_SEL_INPOTLINKAGETBL" runat="server"></asp:TextBox>
 
     <!-- 明細画面(タブ１)(退避用) -->
     <asp:TextBox ID="WF_SEL_INPTAB1TBL" runat="server"></asp:TextBox>

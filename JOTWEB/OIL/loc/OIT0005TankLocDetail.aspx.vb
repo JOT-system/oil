@@ -157,6 +157,13 @@ Public Class OIT0005TankLocDetail
             '油種名をラベルに設定
             Me.LblOilCodeText.Text = Convert.ToString(selectedDr("OILNAME"))
             Me.LblLastOilCodeText.Text = Convert.ToString(selectedDr("LASTOILNAME"))
+            '使用受注No.削除チェック
+            Me.LblUseOrderNo.Text = Convert.ToString(selectedDr("USEORDERNO"))
+            If Me.LblUseOrderNo.Text <> "" Then
+                Me.KEY_LINE_11.Visible = True
+            Else
+                Me.KEY_LINE_11.Visible = False
+            End If
             'コードより名称を設定
             CODENAME_get("BRANCHCODE", TxtBranchCode.Text, LblBranchCodeText.Text, WW_DUMMY)
             CODENAME_get("OFFICECODE", TxtOfficeCode.Text, LblOfficeCodeText.Text, WW_DUMMY)
@@ -222,6 +229,11 @@ Public Class OIT0005TankLocDetail
         updateDr("LASTOILNAME") = Me.LblLastOilCodeText.Text
         updateDr("PREORDERINGTYPE") = Me.TxtPreOrderingType.Text
         updateDr("PREORDERINGOILNAME") = Me.TxtPreOrderingOilName.Text
+        updateDr("USEORDERNO") = Me.LblUseOrderNo.Text
+        If Me.chkUseOrderNoClear.Checked = True Then
+            updateDr("USEORDERNO") = ""
+            targetRow("USEORDERNO") = ""
+        End If
         updateDr("UPDYMD") = Now.ToString("yyyy/MM/dd HH:mm:ss.FFF")
         updateDr("UPDUSER") = Master.USERID
         updateDr("UPDTERMID") = Master.USERTERMID
@@ -231,6 +243,13 @@ Public Class OIT0005TankLocDetail
             sqlCon.Open()
             UpdateShozai(sqlCon, Nothing, updateDr)
         End Using
+
+        If Me.chkUseOrderNoClear.Checked = True Then
+            Master.SaveTable(OIT0005tbl, work.WF_LISTSEL_INPTBL.Text)
+            Me.KEY_LINE_11.Visible = False
+            Me.chkUseOrderNoClear.Checked = False
+            Me.LblUseOrderNo.Text = ""
+        End If
 
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
 
@@ -714,6 +733,7 @@ Public Class OIT0005TankLocDetail
         sqlStat.AppendLine("       ,LASTOILNAME        = @LASTOILNAME")
         sqlStat.AppendLine("       ,PREORDERINGTYPE    = @PREORDERINGTYPE")
         sqlStat.AppendLine("       ,PREORDERINGOILNAME = @PREORDERINGOILNAME")
+        sqlStat.AppendLine("       ,USEORDERNO         = @USEORDERNO")
         sqlStat.AppendLine("       ,UPDYMD             = @UPDYMD")
         sqlStat.AppendLine("       ,UPDUSER            = @UPDUSER")
         sqlStat.AppendLine("       ,UPDTERMID          = @UPDTERMID")
@@ -739,6 +759,7 @@ Public Class OIT0005TankLocDetail
                 .Add("LASTOILNAME", SqlDbType.NVarChar).Value = targetRow("LASTOILNAME")
                 .Add("PREORDERINGTYPE", SqlDbType.NVarChar).Value = targetRow("PREORDERINGTYPE")
                 .Add("PREORDERINGOILNAME", SqlDbType.NVarChar).Value = targetRow("PREORDERINGOILNAME")
+                .Add("USEORDERNO", SqlDbType.NVarChar).Value = targetRow("USEORDERNO")
                 .Add("UPDYMD", SqlDbType.DateTime).Value = targetRow("UPDYMD")
                 .Add("UPDUSER", SqlDbType.NVarChar).Value = targetRow("UPDUSER")
                 .Add("UPDTERMID", SqlDbType.NVarChar).Value = targetRow("UPDTERMID")

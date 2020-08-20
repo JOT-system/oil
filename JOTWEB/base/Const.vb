@@ -229,6 +229,34 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const C_MAX_YMD As String = "2099/12/31"
 
+#Region "管轄支店"
+    ''' <summary>
+    ''' 東北支店
+    ''' </summary>
+    Public Const CONST_BRANCHCODE_010401 As String = "010401"
+    ''' <summary>
+    ''' 関東支店
+    ''' </summary>
+    Public Const CONST_BRANCHCODE_011401 As String = "011401"
+    ''' <summary>
+    ''' 中部支店
+    ''' </summary>
+    Public Const CONST_BRANCHCODE_012301 As String = "012301"
+    ''' <summary>
+    ''' OT本社
+    ''' </summary>
+    Public Const CONST_BRANCHCODE_110001 As String = "110001"
+    ''' <summary>
+    ''' 株式会社日陸
+    ''' </summary>
+    Public Const CONST_BRANCHCODE_700001 As String = "700001"
+    ''' <summary>
+    ''' 在日米軍
+    ''' </summary>
+    Public Const CONST_BRANCHCODE_710001 As String = "710001"
+#End Region
+
+
 #Region "営業所"
     ''' <summary>
     ''' 情報システム部
@@ -441,6 +469,10 @@ Public Module BaseDllConst
     ''' タンク車所属外
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_102 As String = "102"
+    ''' <summary>
+    ''' 列車未設定
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_103 As String = "103"
 
     ''' <summary>
     ''' 失注（荷主都合）

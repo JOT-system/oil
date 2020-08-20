@@ -1,4 +1,19 @@
-﻿/* コンテンツの余白 */
+﻿.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+
+/* コンテンツの余白 */
 .actionButtonBox,
 .commonHeaderInput,
 .summaryArea,
@@ -129,4 +144,16 @@
 /*　個別対応*/
 #TxtHeadOfficeTrain {
     width: 100%;
+}
+
+/* 一覧表ヘッダー部の２行補正 */
+/* 左ヘッダー行スタイル,右ヘッダー行スタイル*/
+div[data-generated="1"] div[id$="_HR"] table tr,
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 37px;
+}
+/* 左(固定データテーブル用)DIV,右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"],
+div[data-generated="1"] div[id$="_DR"] {
+    top: 37px; /* ヘッダー行スタイルのheightに合わせる */
 }

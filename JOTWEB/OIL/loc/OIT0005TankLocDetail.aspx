@@ -11,6 +11,18 @@
     <script type="text/javascript">
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
     </script>
+    <style>
+        #chkUseOrderNoClear {
+            margin-left:5px;
+            margin-right:5px;
+        }
+        #chkUseOrderNoClear + label {
+
+        }
+        #chkUseOrderNoClear:checked + label {
+            color:red;
+        }
+    </style>
 </asp:Content>
 <asp:Content ID="OIT0005D" ContentPlaceHolderID="contents1" runat="server">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
@@ -174,6 +186,18 @@
                         <asp:Label ID="LblPreOrderingOilName" runat="server" Text="前回油種名(受発注用)" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <asp:TextBox ID="TxtPreOrderingOilName" runat="server" CssClass="WF_TEXTBOX_CSS" ></asp:TextBox>
                         <span></span>
+                    </span>
+                </p>
+                <p id="KEY_LINE_11" runat="server">
+                    <!-- 使用受注№ 削除判定 -->
+                    <span class="ef" id="WF_UseOrderNo">
+                        <asp:Label ID="LblUseOrderNoText" runat="server" Text="使用受注№" CssClass="WF_TEXT_LEFT"></asp:Label>
+                        <asp:TextBox ID="LblUseOrderNo" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                        <span>
+                            <span id="spnUseOrderNoClear" runat="server">
+                                <asp:CheckBox ID="chkUseOrderNoClear" runat="server" Text="受注紐づけ解除" />
+                            </span>
+                        </span>
                     </span>
                 </p>
             </div>

@@ -41,11 +41,10 @@
                     <div class="rightSide">
                         <!-- 右ボタン -->
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
-                        <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonLinkINSERT');" />
                         <a style="display:none;">
+                        <input type="button" id="WF_ButtonOTLinkageINSERT" class="btn-sticky" value="OT連携選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonOTLinkageINSERT');" />
+                            <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonLinkINSERT');" />
                             <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
-                        </a>
-                        <a style="display:none;">
                             <input type="button" id="WF_ButtonSendaiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonSendaiLOADCSV');" />
                             <input type="button" id="WF_ButtonNegishiSHIPCSV" class="btn-sticky" value="出荷予定" onclick="ButtonClick('WF_ButtonNegishiSHIPCSV');" />
                             <input type="button" id="WF_ButtonNegishiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonNegishiLOADCSV');" />
@@ -112,6 +111,7 @@
             <!-- 2 : 関東支店/五井/甲子/袖ヶ浦/根岸  -->
             <!-- 3 : 中部支店/四日市/三重塩浜  -->
             <input id="WF_BUTTONpermitcode" runat="server" value="" type="text" />
+            <input id="WF_BUTTONofficecode" runat="server" value="" type="text" />
         </div>
  
 </asp:Content>

@@ -49,10 +49,6 @@
             <a>
                 <asp:Label ID="WF_ORG_TEXT" runat="server" CssClass="WF_TEXT"></asp:Label>
             </a>
-            <!-- ↓いらん -->
-            <a id="WF_OFFICECODE_DUMMY">
-                <asp:Label ID="lblOrderOffice_dummy" runat="server"></asp:Label>
-            </a>
         </div>
         <!-- ○ 変動項目 ○ -->
         <div class="commonHeaderInput"> <!-- 共通ヘッダー入力部 1行4列設定 -->
@@ -60,75 +56,27 @@
             <span>
                 <a id="WF_OFFICECODE_LABEL" class="requiredMark">登録営業所</a>
                 <a class="ef" id="WF_OFFICECODE" ondblclick="Field_DBclick('TxtOrderOffice', <%=LIST_BOX_CLASSIFICATION.LC_SALESOFFICE%>);" onchange="TextBox_change('TxtOrderOffice');">
-                    <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="20"></asp:TextBox>
+                    <asp:TextBox ID="TxtOrderOffice" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="20"></asp:TextBox>
                 </a>
             </span>
             <span></span><span></span><span></span>
-            <!-- ■　本線列車　■ -->
+            <!-- ■　返送列車　■ -->
             <span>
-                <a id="WF_TRAIN_LABEL" class="requiredMark">本線列車</a>
-                <!-- 20200706 START 列車番号を手入力に変更(内部気づきより) -->
-<%--                <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtHeadOfficeTrain');">--%>
-<%--                    <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>--%>
-<%--                    <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" CssClass="boxIcon" Visible="false"></asp:TextBox>--%>
-                <a class="ef" id="WF_TRAINCODE" ondblclick="Field_DBclick('TxtHeadOfficeTrain', <%=LIST_BOX_CLASSIFICATION.LC_BTRAINNUMBER%>);">
-                    <asp:TextBox ID="TxtHeadOfficeTrain" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>
-                    <asp:TextBox ID="TxtHeadOfficeTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
-                <!-- 20200706 END   列車番号を手入力に変更(内部気づきより) -->
+                <a id="WF_BTRAIN_LABEL" class="requiredMark">返送列車</a>
+                <a class="ef" id="WF_BTRAINCODE" ondblclick="Field_DBclick('TxtBTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_BTRAINNUMBER%>);">
+                    <asp:TextBox ID="TxtBTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>
+                    <asp:TextBox ID="TxtBTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                 </a>
             </span>
             <span></span>
-            <!-- ■　利用可能日　■ -->
+            <!-- ■　空車着日　■ -->
             <span>
-                <a id="WF_AVAILABLEYMD_LABEL" class="requiredMark">利用可能日</a>
-                <a class="ef" id="WF_AVAILABLEYMD" ondblclick="Field_DBclick('AvailableYMD', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox ID="AvailableYMD" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
+                <a id="WF_EMPARRDATE_LABEL" class="requiredMark">空車着日</a>
+                <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('txtEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                    <asp:TextBox ID="txtEmparrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                 </a>
             </span>
             <span></span>
-            <!-- ■　空車発駅（着駅）　■ -->
-            <span>
-                <a id="WF_DEPSTATION_LABEL" class="requiredMark">空車発駅</a>
-                <a class="ef" id="WF_DEPSTATIONCODE" ondblclick="Field_DBclick('TxtDepstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtDepstation');">
-                    <asp:TextBox ID="TxtDepstation" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="7"></asp:TextBox>
-                </a>
-            </span>
-            <span>
-                <a id="WF_DEPSTATIONNAME">
-                    <asp:Label ID="LblDepstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
-            </span>
-            <!-- ■　空車着駅（発駅）　■ -->
-            <span>
-                <a id="WF_RETSTATION_LABEL" class="requiredMark">空車着駅</a>
-                <a class="ef" id="WF_RETSTATIONCODE" ondblclick="Field_DBclick('TxtRetstation', <%=LIST_BOX_CLASSIFICATION.LC_STATIONCODE%>);" onchange="TextBox_change('TxtRetstation');">
-                    <asp:TextBox ID="TxtRetstation" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="7"></asp:TextBox>
-                </a>
-            </span>
-            <span>
-                <a id="WF_RETSTATIONNAME">
-                    <asp:Label ID="LblRetstationName" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
-            </span>
-            <!-- 20200618 START 空車着日を画面から削除 -->
-            <div style="display:none;">
-                <!-- ■　(予定)空車着日　■ -->
-                <span>
-                    <a id="WF_EMPARRDATE_LABEL" class="requiredMark">(予定)空車着日</a>
-                    <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                        <asp:TextBox ID="TxtEmpDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
-                    </a>
-                </span>
-                <span></span>
-                <!-- ■　(実績)空車着日　■ -->
-                <span>
-                    <a id="WF_ACTUALEMPARRDATE_LABEL">(実績)空車着日</a>
-                    <a class="ef" id="WF_ACTUALEMPARRDATE" ondblclick="Field_DBclick('TxtActEmpDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                        <asp:TextBox ID="TxtActEmpDate" runat="server" CssClass="calendarIcon" onblur="MsgClear();"></asp:TextBox>
-                    </a>
-                </span>
-            </div>
-            <!-- 20200618 END   空車着日を画面から削除 -->
         </div>
         <div class="summaryAreaWrapper">
             <div class="summaryArea">

@@ -172,6 +172,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         WF_LeftboxOpen.Value = ""
         WF_RightboxOpen.Value = ""
         WF_ButtonInsertFLG.Value = "FALSE"
+        WF_OrderStatusFLG.Value = "FALSE"
         rightview.ResetIndex()
         leftview.ActiveListBox()
 
@@ -297,6 +298,40 @@ Public Class OIT0001EmptyTurnDairyDetail
         '着駅
         CODENAME_get("ARRSTATION", Me.TxtArrstation.Text, Me.LblArrstationName.Text, WW_DUMMY)
 
+        '### 20200812 START 指摘票対応(No120)全体 ############################################
+        '受注進行ステータスが「320：受注確定」以降の場合
+        If work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+
+            '本線列車
+            Me.TxtHeadOfficeTrain.Enabled = False
+            '発駅
+            Me.TxtDepstation.Enabled = False
+            '着駅
+            Me.TxtArrstation.Enabled = False
+            '(予定)積込日
+            Me.TxtLoadingDate.Enabled = False
+            '(予定)発日
+            Me.TxtDepDate.Enabled = False
+            '(予定)積車着日
+            Me.TxtArrDate.Enabled = False
+            '(予定)受入日
+            Me.TxtAccDate.Enabled = False
+            '(予定)空車着日
+            Me.TxtEmparrDate.Enabled = False
+            '受注進行ステータス制御フラグ
+            WF_OrderStatusFLG.Value = "TRUE"
+        End If
+        '### 20200812 END   指摘票対応(No120)全体 ############################################
+
     End Sub
 
     ''' <summary>
@@ -340,16 +375,54 @@ Public Class OIT0001EmptyTurnDairyDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
-        For Each rowitem As TableRow In tblObj.Rows
-            For Each cellObj As TableCell In rowitem.Controls
-                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '### 20200812 START 指摘票対応(No120)全体 ############################################
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+        '受注進行ステータスが「320：受注確定」以降の場合
+        If work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "RETURNDATETRAIN") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "REMARK") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+            Next
+        Else
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
-                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                End If
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    End If
+                Next
             Next
-        Next
+        End If
+        '### 20200812 END   指摘票対応(No120)全体 ############################################
 
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
@@ -726,16 +799,54 @@ Public Class OIT0001EmptyTurnDairyDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
-        For Each rowitem As TableRow In tblObj.Rows
-            For Each cellObj As TableCell In rowitem.Controls
-                If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '### 20200812 START 指摘票対応(No120)全体 ############################################
+        'For Each rowitem As TableRow In tblObj.Rows
+        '    For Each cellObj As TableCell In rowitem.Controls
+        '        If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+        '            OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
+        '            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+        '        End If
+        '    Next
+        'Next
+        '受注進行ステータスが「320：受注確定」以降の場合
+        If work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 _
+            OrElse work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_900 Then
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNO") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "RETURNDATETRAIN") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") _
+                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "REMARK") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+            Next
+        Else
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "SHIPPERSNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "OILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
-                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                End If
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    End If
+                Next
             Next
-        Next
+        End If
+        '### 20200812 END   指摘票対応(No120)全体 ############################################
 
         '○ クリア
         If TBLview.Count = 0 Then
@@ -1504,6 +1615,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Dim WW_TANKNUMBER As String = WW_SETVALUE
                     Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
                     updHeader.Item(WF_FIELD.Value) = WW_TANKNUMBER
+                    '### 20200819 START タンク車Noが変更されたらタンク車Noステータスを初期化 #####
+                    updHeader.Item("TANKSTATUS") = ""
+                    '### 20200819 END   タンク車Noが変更されたらタンク車Noステータスを初期化 #####
 
                     'WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
                     WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
@@ -2144,24 +2258,24 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , '0'                                            AS TIMSTP" _
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
-            & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
-            & " , OIT0002.OFFICENAME                             AS OFFICENAME" _
-            & " , OIT0002.TRAINNO                                AS TRAINNO" _
-            & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+            & " , OIT0002_OTHER.OFFICECODE                       AS OFFICECODE" _
+            & " , OIT0002_OTHER.OFFICENAME                       AS OFFICENAME" _
+            & " , OIT0002_OTHER.TRAINNO                          AS TRAINNO" _
+            & " , OIT0002_OTHER.TRAINNAME                        AS TRAINNAME" _
             & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
             & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _
-            & " , OIT0002.BASECODE                               AS BASECODE" _
-            & " , OIT0002.BASENAME                               AS BASENAME" _
-            & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
-            & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
-            & " , OIT0002.DEPSTATION                             AS DEPSTATION" _
-            & " , OIT0002.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
-            & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
-            & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
-            & " , OIT0002.LODDATE                                AS LODDATE" _
-            & " , OIT0002.DEPDATE                                AS DEPDATE" _
-            & " , OIT0002.ARRDATE                                AS ARRDATE" _
-            & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " , OIT0002_OTHER.BASECODE                         AS BASECODE" _
+            & " , OIT0002_OTHER.BASENAME                         AS BASENAME" _
+            & " , OIT0002_OTHER.CONSIGNEECODE                    AS CONSIGNEECODE" _
+            & " , OIT0002_OTHER.CONSIGNEENAME                    AS CONSIGNEENAME" _
+            & " , OIT0002_OTHER.DEPSTATION                       AS DEPSTATION" _
+            & " , OIT0002_OTHER.DEPSTATIONNAME                   AS DEPSTATIONNAME" _
+            & " , OIT0002_OTHER.ARRSTATION                       AS ARRSTATION" _
+            & " , OIT0002_OTHER.ARRSTATIONNAME                   AS ARRSTATIONNAME" _
+            & " , OIT0002_OTHER.LODDATE                          AS LODDATE" _
+            & " , OIT0002_OTHER.DEPDATE                          AS DEPDATE" _
+            & " , OIT0002_OTHER.ARRDATE                          AS ARRDATE" _
+            & " , OIT0002_OTHER.ACCDATE                          AS ACCDATE" _
             & " , OIT0002.EMPARRDATE                             AS EMPARRDATE" _
             & " , OIT0003.ACTUALLODDATE                          AS ACTUALLODDATE" _
             & " , OIT0003.ACTUALDEPDATE                          AS ACTUALDEPDATE" _
@@ -2205,8 +2319,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , OTOILCT.CNT                                    AS OTOILCTCNT" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
-            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & " AND OIT0003.DELFLG <> @P02 " _
+            & " LEFT JOIN OIL.OIT0002_ORDER OIT0002_OTHER ON " _
+            & "     OIT0002_OTHER.ORDERNO = OIT0003.ORDERNO " _
             & " LEFT JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
             & "     OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
             & " AND OIM0003.OILCODE = OIT0003.OILCODE " _
@@ -2230,7 +2346,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "       , COUNT(1) AS CNT " _
             & "   FROM oil.OIT0002_ORDER OIT0002 " _
             & "   INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
-            & "       OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "       (OIT0003.ORDERNO = OIT0002.ORDERNO OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & "   AND OIT0003.DELFLG <> @P02 " _
             & "   INNER JOIN oil.OIM0003_PRODUCT OIM0003 ON " _
             & "       OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
@@ -2336,12 +2452,14 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End If
 
-        '### 2020/06/23 空回日報の登録では、タンク車所在の更新は行わないのでタンク車所在のチェックは実施しない ###
-        ''〇 タンク車状態チェック
-        'WW_CheckTankStatus(WW_ERRCODE)
-        'If WW_ERRCODE = "ERR" Then
-        '    Exit Sub
-        'End If
+        '### 20200819 START 一度チェックは外したが要望により復活 ###############################################
+        '### 20200623 空回日報の登録では、タンク車所在の更新は行わないのでタンク車所在のチェックは実施しない ###
+        '〇 タンク車状態チェック
+        WW_CheckTankStatus(WW_ERRCODE)
+        If WW_ERRCODE = "ERR" Then
+            Exit Sub
+        End If
+        '### 20200819 END   一度チェックは外したが要望により復活 ###############################################
 
         '〇前回油種と油種の整合性チェック
         WW_CheckLastOilConsistency(WW_ERRCODE)
@@ -2833,6 +2951,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 If WW_ListValue = "" Then
                     'タンク車№
                     updHeader.Item("TANKNO") = ""
+                    '### 20200819 START タンク車Noが変更されたらタンク車Noステータスを初期化 #####
+                    updHeader.Item("TANKSTATUS") = ""
+                    '### 20200819 END   タンク車Noが変更されたらタンク車Noステータスを初期化 #####
                     '前回油種
                     updHeader.Item("LASTOILCODE") = ""
                     updHeader.Item("LASTOILNAME") = ""
@@ -2857,6 +2978,9 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 'タンク車№
                 updHeader.Item("TANKNO") = WW_ListValue
+                '### 20200819 START タンク車Noが変更されたらタンク車Noステータスを初期化 #####
+                updHeader.Item("TANKSTATUS") = ""
+                '### 20200819 END   タンク車Noが変更されたらタンク車Noステータスを初期化 #####
 
                 '前回油種
                 Dim WW_LASTOILNAME As String = ""
@@ -3446,13 +3570,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                 'タンク車情報を取得
                 WW_FixvalueMasterSearch("01", "TANKNUMBER", OIT0001row("TANKNO"), WW_GetValue)
 
-                '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                '### 20200819 START 指定したタンク車№が同じ受注Noの対応 #################
                 '使用受注№が設定されている場合
                 If WW_GetValue(12) <> "" Then
                     '次のレコードに進む（SKIPする）
                     Continue For
                 End If
-                '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                '### 20200819 END   指定したタンク車№が同じ受注Noの対応 #################
 
                 'タンク車状態
                 Select Case WW_GetValue(11)
@@ -5393,6 +5517,27 @@ Public Class OIT0001EmptyTurnDairyDetail
                     & "        OTHER9OTANK  = @P29,      " _
                     & "        OTHER10OTANK = @P30,      " _
                     & "        TOTALTANK    = @P31,      " _
+                    & "        HTANKCH        = @P37,      " _
+                    & "        RTANKCH        = @P38,      " _
+                    & "        TTANKCH        = @P39,      " _
+                    & "        MTTANKCH       = @P40,      " _
+                    & "        KTANKCH        = @P41,      " _
+                    & "        K3TANKCH       = @P42,      " _
+                    & "        K5TANKCH       = @P43,      " _
+                    & "        K10TANKCH      = @P44,      " _
+                    & "        LTANKCH        = @P45,      " _
+                    & "        ATANKCH        = @P46,      " _
+                    & "        OTHER1OTANKCH  = @P47,      " _
+                    & "        OTHER2OTANKCH  = @P48,      " _
+                    & "        OTHER3OTANKCH  = @P49,      " _
+                    & "        OTHER4OTANKCH  = @P50,      " _
+                    & "        OTHER5OTANKCH  = @P51,      " _
+                    & "        OTHER6OTANKCH  = @P52,      " _
+                    & "        OTHER7OTANKCH  = @P53,      " _
+                    & "        OTHER8OTANKCH  = @P54,      " _
+                    & "        OTHER9OTANKCH  = @P55,      " _
+                    & "        OTHER10OTANKCH = @P56,      " _
+                    & "        TOTALTANKCH    = @P57,      " _
                     & "        UPDYMD       = @P32,      " _
                     & "        UPDUSER      = @P33,      " _
                     & "        UPDTERMID    = @P34,      " _
@@ -5436,6 +5581,29 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARAUP29 As SqlParameter = SQLUpcmd.Parameters.Add("@P29", SqlDbType.Int)          '車数（その他９）
                 Dim PARAUP30 As SqlParameter = SQLUpcmd.Parameters.Add("@P30", SqlDbType.Int)          '車数（その他１０）
                 Dim PARAUP31 As SqlParameter = SQLUpcmd.Parameters.Add("@P31", SqlDbType.Int)          '合計車数
+                '### 20200812 START 変更後の車数にも同様に件数を設定 ####################################################
+                Dim PARAUP37 As SqlParameter = SQLUpcmd.Parameters.Add("@P37", SqlDbType.Int)          '変更後_車数（ハイオク）
+                Dim PARAUP38 As SqlParameter = SQLUpcmd.Parameters.Add("@P38", SqlDbType.Int)          '変更後_車数（レギュラー）
+                Dim PARAUP39 As SqlParameter = SQLUpcmd.Parameters.Add("@P39", SqlDbType.Int)          '変更後_車数（灯油）
+                Dim PARAUP40 As SqlParameter = SQLUpcmd.Parameters.Add("@P40", SqlDbType.Int)          '変更後_車数（未添加灯油）
+                Dim PARAUP41 As SqlParameter = SQLUpcmd.Parameters.Add("@P41", SqlDbType.Int)          '変更後_車数（軽油）
+                Dim PARAUP42 As SqlParameter = SQLUpcmd.Parameters.Add("@P42", SqlDbType.Int)          '変更後_車数（３号軽油）
+                Dim PARAUP43 As SqlParameter = SQLUpcmd.Parameters.Add("@P43", SqlDbType.Int)          '変更後_車数（５号軽油）
+                Dim PARAUP44 As SqlParameter = SQLUpcmd.Parameters.Add("@P44", SqlDbType.Int)          '変更後_車数（１０号軽油）
+                Dim PARAUP45 As SqlParameter = SQLUpcmd.Parameters.Add("@P45", SqlDbType.Int)          '変更後_車数（LSA）
+                Dim PARAUP46 As SqlParameter = SQLUpcmd.Parameters.Add("@P46", SqlDbType.Int)          '変更後_車数（A重油）
+                Dim PARAUP47 As SqlParameter = SQLUpcmd.Parameters.Add("@P47", SqlDbType.Int)          '変更後_車数（その他１）
+                Dim PARAUP48 As SqlParameter = SQLUpcmd.Parameters.Add("@P48", SqlDbType.Int)          '変更後_車数（その他２）
+                Dim PARAUP49 As SqlParameter = SQLUpcmd.Parameters.Add("@P49", SqlDbType.Int)          '変更後_車数（その他３）
+                Dim PARAUP50 As SqlParameter = SQLUpcmd.Parameters.Add("@P50", SqlDbType.Int)          '変更後_車数（その他４）
+                Dim PARAUP51 As SqlParameter = SQLUpcmd.Parameters.Add("@P51", SqlDbType.Int)          '変更後_車数（その他５）
+                Dim PARAUP52 As SqlParameter = SQLUpcmd.Parameters.Add("@P52", SqlDbType.Int)          '変更後_車数（その他６）
+                Dim PARAUP53 As SqlParameter = SQLUpcmd.Parameters.Add("@P53", SqlDbType.Int)          '変更後_車数（その他７）
+                Dim PARAUP54 As SqlParameter = SQLUpcmd.Parameters.Add("@P54", SqlDbType.Int)          '変更後_車数（その他８）
+                Dim PARAUP55 As SqlParameter = SQLUpcmd.Parameters.Add("@P55", SqlDbType.Int)          '変更後_車数（その他９）
+                Dim PARAUP56 As SqlParameter = SQLUpcmd.Parameters.Add("@P56", SqlDbType.Int)          '変更後_車数（その他１０）
+                Dim PARAUP57 As SqlParameter = SQLUpcmd.Parameters.Add("@P57", SqlDbType.Int)          '変更後_合計車数
+                '### 20200812 END   変更後の車数にも同様に件数を設定 ####################################################
                 Dim PARAUP32 As SqlParameter = SQLUpcmd.Parameters.Add("@P32", SqlDbType.DateTime)
                 Dim PARAUP33 As SqlParameter = SQLUpcmd.Parameters.Add("@P33", SqlDbType.NVarChar)
                 Dim PARAUP34 As SqlParameter = SQLUpcmd.Parameters.Add("@P34", SqlDbType.NVarChar)
@@ -5466,6 +5634,29 @@ Public Class OIT0001EmptyTurnDairyDetail
                 PARAUP29.Value = "0"
                 PARAUP30.Value = "0"
                 PARAUP31.Value = "0"
+                '### 20200812 START 変更後の車数にも同様に件数を設定 ####################################################
+                PARAUP37.Value = "0"
+                PARAUP38.Value = "0"
+                PARAUP39.Value = "0"
+                PARAUP40.Value = "0"
+                PARAUP41.Value = "0"
+                PARAUP42.Value = "0"
+                PARAUP43.Value = "0"
+                PARAUP44.Value = "0"
+                PARAUP45.Value = "0"
+                PARAUP46.Value = "0"
+                PARAUP47.Value = "0"
+                PARAUP48.Value = "0"
+                PARAUP49.Value = "0"
+                PARAUP50.Value = "0"
+                PARAUP51.Value = "0"
+                PARAUP52.Value = "0"
+                PARAUP53.Value = "0"
+                PARAUP54.Value = "0"
+                PARAUP55.Value = "0"
+                PARAUP56.Value = "0"
+                PARAUP57.Value = "0"
+                '### 20200812 END   変更後の車数にも同様に件数を設定 ####################################################
 
                 '各タンク車件数を初期化
                 TxtHTank.Text = "0"
@@ -5499,39 +5690,52 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Select Case Convert.ToString(OIT0001UPDrow("OILCODE"))
                         Case BaseDllConst.CONST_HTank
                             PARAUP11.Value = OIT0001UPDrow("CNT")
+                            PARAUP37.Value = OIT0001UPDrow("CNT")
                             TxtHTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_RTank
                             PARAUP12.Value = OIT0001UPDrow("CNT")
+                            PARAUP38.Value = OIT0001UPDrow("CNT")
                             TxtRTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_TTank
                             PARAUP13.Value = OIT0001UPDrow("CNT")
+                            PARAUP39.Value = OIT0001UPDrow("CNT")
                             TxtTTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_MTTank
                             PARAUP14.Value = OIT0001UPDrow("CNT")
+                            PARAUP40.Value = OIT0001UPDrow("CNT")
                             TxtMTTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_KTank1, BaseDllConst.CONST_KTank2
                             PARAUP15.Value = OIT0001UPDrow("CNT")
+                            PARAUP41.Value = OIT0001UPDrow("CNT")
                             TxtKTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_K3Tank1, BaseDllConst.CONST_K3Tank2
                             PARAUP16.Value = OIT0001UPDrow("CNT")
+                            PARAUP42.Value = OIT0001UPDrow("CNT")
                             TxtK3Tank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_K5Tank
                             PARAUP17.Value = OIT0001UPDrow("CNT")
+                            PARAUP43.Value = OIT0001UPDrow("CNT")
                             TxtK5Tank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_K10Tank
                             PARAUP18.Value = OIT0001UPDrow("CNT")
+                            PARAUP44.Value = OIT0001UPDrow("CNT")
                             TxtK10Tank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_LTank1, BaseDllConst.CONST_LTank2
                             PARAUP19.Value = OIT0001UPDrow("CNT")
+                            PARAUP45.Value = OIT0001UPDrow("CNT")
                             TxtLTank.Text = cntVal.ToString
                         Case BaseDllConst.CONST_ATank
                             PARAUP20.Value = OIT0001UPDrow("CNT")
+                            PARAUP46.Value = OIT0001UPDrow("CNT")
                             TxtATank.Text = cntVal.ToString
                     End Select
 
                     i += cntVal
                     TxtTotalTank.Text = i.ToString
                     PARAUP31.Value = i
+                    '### 20200812 START 変更後の車数にも同様に件数を設定 ####################################################
+                    PARAUP57.Value = i
+                    '### 20200812 END   変更後の車数にも同様に件数を設定 ####################################################
                     PARAUP32.Value = Date.Now
                     PARAUP33.Value = Master.USERID
                     PARAUP34.Value = Master.USERTERMID
@@ -5633,6 +5837,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')   　            AS ORDERNO" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
             & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUS" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSNAME" _
             & " , ISNULL(RTRIM(OIT0002.ORDERINFO), '')               AS ORDERINFO" _
             & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')              AS OFFICENAME" _
             & " , ISNULL(RTRIM(OIT0002.EMPTYTURNFLG), '')            AS EMPTYTURNFLG" _
@@ -5715,7 +5920,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '受注進行ステータス
                     retVal = Convert.ToString(OIT0001row("ORDERSTATUS"))
                     CODENAME_get("ORDERSTATUS", Convert.ToString(OIT0001row("ORDERSTATUS")), retVal, WW_DUMMY)
-                    OIT0001row("ORDERSTATUS") = retVal
+                    OIT0001row("ORDERSTATUSNAME") = retVal
                     '受注情報
                     retVal = Convert.ToString(OIT0001row("ORDERINFO"))
                     CODENAME_get("ORDERINFO", Convert.ToString(OIT0001row("ORDERINFO")), retVal, WW_DUMMY)

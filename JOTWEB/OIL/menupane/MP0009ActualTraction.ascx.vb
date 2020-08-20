@@ -28,11 +28,31 @@ Public Class MP0009ActualTraction
         If IsPostBack = False Then
             '初回ロード
             Initialize()
+            Me.hdnCurrentOfficeCode.Value = Me.ddlActualTractionOffice.SelectedValue
         Else
             'ポストバック
             If Me.hdnRefreshCall.Value = "1" Then
                 '最新化処理
+                With Me.ddlActualTractionOffice
+                    Me.SaveCookie(.ClientID, .SelectedValue)
+                End With
+                '着駅再取得
+                If Me.hdnCurrentOfficeCode.Value <> Me.ddlActualTractionOffice.SelectedValue Then
+                    If Me.ddlActualTractionOffice.Items.Count > 0 Then
+                        Me.ddlActualTractionArrStation.Items.Clear()
+                        Dim arrStDdl As DropDownList = Me.GetArrTrainNoList(Me.ddlActualTractionOffice.SelectedValue)
+                        Me.ddlActualTractionArrStation.Items.AddRange(arrStDdl.Items.Cast(Of ListItem).ToArray)
+                        Dim cuurentSt As String = ""
+                        Dim savedSelectedVal As String = ""
+                        SetDdlDefaultValue(Me.ddlActualTractionArrStation, savedSelectedVal)
+                    End If
+                    Me.hdnCurrentOfficeCode.Value = Me.ddlActualTractionOffice.SelectedValue
+                End If
+                With Me.ddlActualTractionArrStation
+                    Me.SaveCookie(.ClientID, .SelectedValue)
+                End With
                 SetDisplayValues()
+
             End If
             '処理フラグを落とす
             Me.hdnRefreshCall.Value = ""
@@ -47,8 +67,26 @@ Public Class MP0009ActualTraction
         Dim retDdl As DropDownList = Me.GetOfficeList()
         If retDdl.Items.Count > 0 Then
             Me.ddlActualTractionOffice.Items.AddRange(retDdl.Items.Cast(Of ListItem).ToArray)
-            Me.ddlActualTractionOffice.SelectedIndex = retDdl.SelectedIndex
+            Dim savedSelectedVal As String = ""
+            savedSelectedVal = Me.LoadCookie(ddlActualTractionOffice.ClientID)
+            If savedSelectedVal = "" Then
+                Me.ddlActualTractionOffice.SelectedIndex = retDdl.SelectedIndex
+            Else
+                SetDdlDefaultValue(Me.ddlActualTractionOffice, savedSelectedVal)
+            End If
+
         End If
+        '着駅ドロップダウンの生成
+        If Me.ddlActualTractionOffice.Items.Count > 0 Then
+            Dim arrStDdl As DropDownList = Me.GetArrTrainNoList(Me.ddlActualTractionOffice.SelectedValue)
+            Me.ddlActualTractionArrStation.Items.AddRange(arrStDdl.Items.Cast(Of ListItem).ToArray)
+            Dim cuurentSt As String = ""
+            Dim savedSelectedVal As String = ""
+            savedSelectedVal = Me.LoadCookie(Me.ddlActualTractionArrStation.ClientID)
+            SetDdlDefaultValue(Me.ddlActualTractionArrStation, savedSelectedVal)
+        End If
+
+        'グラフ情報の設定
         SetDisplayValues()
 
     End Sub
@@ -64,6 +102,7 @@ Public Class MP0009ActualTraction
         If Not Me.ddlActualTractionOffice.SelectedValue.Equals("ALL") Then
             sqlTrainData.AppendLine("   AND TR.OFFICECODE = @OFFICECODE")
         End If
+        sqlTrainData.AppendLine("   AND TR.ARRSTATION = @ARRSTATION")
         sqlTrainData.AppendLine(" GROUP BY TR.TRAINNO")
         sqlTrainData.AppendLine(" ORDER BY CONVERT(int,TR.TRAINNO)")
 
@@ -77,13 +116,13 @@ Public Class MP0009ActualTraction
         sqlStat.AppendLine("  FROM (SELECT format(CAL.WORKINGYMD,'yyyy/MM/dd') AS TARGETDATE")
         sqlStat.AppendLine("              ,ODR.TRAINNO AS TRAINNO")
         sqlStat.AppendLine("              ,DTL.CARSNUMBER")
-        sqlStat.AppendLine("          FROM COM.OIS0021_CALENDAR CAL")
-        sqlStat.AppendLine("     LEFT JOIN OIL.OIT0002_ORDER ODR")
+        sqlStat.AppendLine("          FROM COM.OIS0021_CALENDAR CAL with(nolock)")
+        sqlStat.AppendLine("     LEFT JOIN OIL.OIT0002_ORDER ODR  with(nolock)")
         sqlStat.AppendLine("            ON CAL.WORKINGYMD =  ODR.LODDATE")
         sqlStat.AppendLine("           AND CAL.DELFLG     =  @DELFLG")
         sqlStat.AppendLine("           AND ODR.DELFLG     =  @DELFLG")
         sqlStat.AppendLine("           AND ODR.LODDATE IS NOT NULL")
-        sqlStat.AppendLine("     LEFT JOIN OIL.OIT0003_DETAIL DTL")
+        sqlStat.AppendLine("     LEFT JOIN OIL.OIT0003_DETAIL DTL  with(nolock)")
         sqlStat.AppendLine("            ON ODR.ORDERNO = DTL.ORDERNO")
         sqlStat.AppendLine("           AND DTL.DELFLG     =  @DELFLG")
         sqlStat.AppendLine("         WHERE CAL.WORKINGYMD BETWEEN Getdate() -3 AND Getdate()")
@@ -93,6 +132,7 @@ Public Class MP0009ActualTraction
         Using sqlCmd As New SqlCommand(sqlTrainData.ToString, sqlCon)
             With sqlCmd.Parameters
                 .Add("@OFFICECODE", SqlDbType.NVarChar).Value = Me.ddlActualTractionOffice.SelectedValue
+                .Add("@ARRSTATION", SqlDbType.NVarChar).Value = Me.ddlActualTractionArrStation.SelectedValue
                 .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
 
             End With

@@ -50,67 +50,31 @@ Partial Public Class OIT0002LinkSearch
     Protected WithEvents WF_ORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_RETSTATION_CODE コントロール。
+    '''TxtBTrainNo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_RETSTATION_CODE As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtBTrainNo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_RETSTATION_NAME コントロール。
+    '''LblBTrainNo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_RETSTATION_NAME As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents LblBTrainNo As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_STYMD_CODE コントロール。
+    '''TxtEmparrDate コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_STYMD_CODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_TRAINNO_CODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TRAINNO_CODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_TRAINNO_NAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TRAINNO_NAME As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_SW1 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SW1 As Global.System.Web.UI.WebControls.RadioButton
-    
-    '''<summary>
-    '''WF_SW2 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_SW2 As Global.System.Web.UI.WebControls.RadioButton
+    Protected WithEvents TxtEmparrDate As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''rightview コントロール。
@@ -137,7 +101,7 @@ Partial Public Class OIT0002LinkSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB.OIT0002WRKINC
+    Protected WithEvents work As Global.JOTWEB.OIT0002WRKINCOLD
     
     '''<summary>
     '''WF_FIELD コントロール。

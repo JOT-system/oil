@@ -16,7 +16,8 @@ function InitDisplay() {
     }
 
     //更新ボタン活性／非活性
-    if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
+    if (document.getElementById('WF_MAPpermitcode').value === "TRUE"
+        && document.getElementById('WF_OrderStatusFLG').value === "FALSE") {
         //更新ボタン活性／非活性(新規登録、更新で切り分け)
         if (document.getElementById('WF_CREATEFLG').value === "1") {
             //活性
@@ -54,6 +55,7 @@ function InitDisplay() {
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_LIFTED").disabled = "disabled";
         document.getElementById("WF_ButtonLINE_ADD").disabled = "disabled";
+        //document.getElementById("WF_ButtonCSV").disabled = "disabled";
         document.getElementById("WF_ButtonUPDATE").disabled = "disabled";
     }
     /* フッターの高さ調整 */

@@ -3572,7 +3572,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 '### 20200819 START 指定したタンク車№が同じ受注Noの対応 #################
                 '使用受注№が設定されている場合
-                If WW_GetValue(12) = OIT0001row("ORDERNO") Then
+                If WW_GetValue(12) <> "" Then
                     '次のレコードに進む（SKIPする）
                     Continue For
                 End If

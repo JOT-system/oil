@@ -5302,7 +5302,7 @@ Public Class OIT0003OrderDetail
         End If
 
         '### 20200818 START (一覧)タンク車Noがすべて割当されてない場合は更新のみ実施 #####################
-        If OIT0003tbl.Select("TANKNO = ''").Count <> 0 Then
+        If OIT0003tbl.Select("TANKNO = '' AND DELFLG = '0'").Count <> 0 Then
             '受注DB追加・更新
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続

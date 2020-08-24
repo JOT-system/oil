@@ -17,6 +17,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private OIT0001WK4tbl As DataTable                              '作業用テーブル(異なる列車(同一発日)タンク車チェック用)
     Private OIT0001WK5tbl As DataTable                              '作業用テーブル(異なる列車(同一積込日)タンク車チェック用)
     Private OIT0001WK6tbl As DataTable                              '作業用テーブル(他オーダー情報取得(同オーダーの同一積込日取得用))
+    Private OIT0001WK7tbl As DataTable                              '作業用テーブル(他オーダー情報取得(同オーダーの同一発日取得用))
     Private OIT0001Fixvaltbl As DataTable                           '作業用テーブル(固定値マスタ取得用)
     Private OIT0001His1tbl As DataTable                             '履歴格納用テーブル
     Private OIT0001His2tbl As DataTable                             '履歴格納用テーブル
@@ -3880,11 +3881,19 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "       OIT0003.ORDERNO         = OIT0002.ORDERNO " _
-            & "   AND OIT0003.TANKNO          IN (''"
+            & "   AND OIT0003.TANKNO          IN ("
 
         '一覧に設定しているタンク車を条件に設定
+        Dim i As Integer = 0
         For Each OIT0001row As DataRow In OIT0001tbl.Rows
-            If OIT0001row("TANKNO") <> "" Then SQLStr &= ", '" & OIT0001row("TANKNO") & "' "
+            If OIT0001row("TANKNO") <> "" Then
+                If i = 0 Then
+                    SQLStr &= "'" & OIT0001row("TANKNO") & "' "
+                Else
+                    SQLStr &= ", '" & OIT0001row("TANKNO") & "' "
+                End If
+                i += 1
+            End If
         Next
 
         '### 20200620 START((全体)No79対応)異なる列車で同一積込日の場合###########
@@ -3956,6 +3965,7 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") _
                             AndAlso OIT0001row("TANKNO") <> "" Then
+
                             OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
 
@@ -4147,11 +4157,22 @@ Public Class OIT0001EmptyTurnDairyDetail
 
         OIT0001WK6tbl.Clear()
 
+        '他オーダー情報取得(同オーダーの同一発日取得用)
+        If IsNothing(OIT0001WK7tbl) Then
+            OIT0001WK7tbl = New DataTable
+        End If
+
+        If OIT0001WK7tbl.Columns.Count <> 0 Then
+            OIT0001WK7tbl.Columns.Clear()
+        End If
+
+        OIT0001WK7tbl.Clear()
+
         '○ チェックSQL
         '　説明
         '     登録された内容が受注TBLにすでに登録済みかチェックする
 
-        Dim SQLStr As String =
+        Dim SQLLODStr As String =
               " SELECT " _
             & "   ISNULL(RTRIM(OIT0002.ORDERNO), '')         AS ORDERNO" _
             & " , ISNULL(RTRIM(OIT0003.DETAILNO), '')        AS DETAILNO" _
@@ -4186,22 +4207,35 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "       OIT0003.ORDERNO  = OIT0002.ORDERNO " _
             & "   AND OIT0003.TANKNO   = @P03" _
-            & "   AND OIT0003.DELFLG  <> @P04" _
-            & " WHERE ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE) = @P01 " _
+            & "   AND OIT0003.DELFLG  <> @P04"
+
+        Dim SQLDEPStr As String =
+              SQLLODStr _
+            & " WHERE OIT0002.DEPDATE      = @P01 " _
+            & "   AND OIT0002.ORDERNO     <> @P05 " _
+            & "   AND OIT0002.ORDERSTATUS <> @P02 "
+
+
+        SQLLODStr &=
+              " WHERE ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE) = @P01 " _
+            & "   AND OIT0002.ORDERNO     <> @P05 " _
             & "   AND OIT0002.ORDERSTATUS <> @P02 "
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.Date)         '積込日
-                Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)  'タンク車№
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
-                PARA1.Value = Me.TxtLoadingDate.Text
-                PARA2.Value = BaseDllConst.CONST_ORDERSTATUS_900
-                PARA3.Value = I_DR("TANKNO")
-                PARA4.Value = C_DELETE_FLG.DELETE
+            Using SQLLODcmd As New SqlCommand(SQLLODStr, SQLcon),
+                  SQLDEPcmd As New SqlCommand(SQLDEPStr, SQLcon)
+                Dim PARALOD1 As SqlParameter = SQLLODcmd.Parameters.Add("@P01", SqlDbType.Date)         '積込日
+                Dim PARALOD2 As SqlParameter = SQLLODcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARALOD3 As SqlParameter = SQLLODcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)  'タンク車№
+                Dim PARALOD4 As SqlParameter = SQLLODcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARALOD5 As SqlParameter = SQLLODcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 11) '受注No
+                PARALOD1.Value = Me.TxtLoadingDate.Text
+                PARALOD2.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARALOD3.Value = I_DR("TANKNO")
+                PARALOD4.Value = C_DELETE_FLG.DELETE
+                PARALOD5.Value = I_DR("ORDERNO")
 
-                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                Using SQLdr As SqlDataReader = SQLLODcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
                         OIT0001WK6tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
@@ -4231,6 +4265,53 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 '○ 画面表示データ保存
                 Master.SaveTable(OIT0001tbl)
+
+                If O_RTN = "ERR" Then Exit Sub
+
+
+                Dim PARADEP1 As SqlParameter = SQLDEPcmd.Parameters.Add("@P01", SqlDbType.Date)         '発日
+                Dim PARADEP2 As SqlParameter = SQLDEPcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARADEP3 As SqlParameter = SQLDEPcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)  'タンク車№
+                Dim PARADEP4 As SqlParameter = SQLDEPcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARADEP5 As SqlParameter = SQLDEPcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 11) '受注No
+                PARADEP1.Value = Me.TxtDepDate.Text
+                PARADEP2.Value = BaseDllConst.CONST_ORDERSTATUS_900
+                PARADEP3.Value = I_DR("TANKNO")
+                PARADEP4.Value = C_DELETE_FLG.DELETE
+                PARADEP5.Value = I_DR("ORDERNO")
+
+                Using SQLdr As SqlDataReader = SQLDEPcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0001WK7tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0001WK7tbl.Load(SQLdr)
+                End Using
+
+                If OIT0001WK7tbl.Rows.Count <> 0 Then
+                    I_DR("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
+                    CODENAME_get("ORDERINFO", I_DR("ORDERINFO"), I_DR("ORDERINFONAME"), WW_DUMMY)
+
+                    WW_CheckMES1 = "タンク車№(同一の発日)重複。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, I_DR)
+                    O_RTN = "ERR"
+
+                    Master.Output(C_MESSAGE_NO.OIL_TANKNO_LOADDATE_USE, C_MESSAGE_TYPE.ERR, OIT0001WK7tbl.Rows(0)("ORDERNO"), needsPopUp:=True)
+
+                Else
+                    If I_DR("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        I_DR("ORDERINFO") = ""
+                        I_DR("ORDERINFONAME") = ""
+                    End If
+                End If
+
+                '○ 画面表示データ保存
+                Master.SaveTable(OIT0001tbl)
+
+                If O_RTN = "ERR" Then Exit Sub
 
             End Using
 

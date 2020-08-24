@@ -13768,6 +13768,7 @@ Public Class OIT0003OrderDetail
 
         '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
         '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
+        WW_SHIPORDER = "0"
         If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
             '発送順でソートし、重複がないかチェックする。
             OIT0003tbltab3_dv.Sort = "SHIPORDER"
@@ -13786,6 +13787,7 @@ Public Class OIT0003OrderDetail
                     chkShipOrder = drv("SHIPORDER")
                 End If
             Next
+            WW_SHIPORDER = StrConv(chkShipOrder, VbStrConv.Narrow)
         End If
 
         '(一覧)チェック

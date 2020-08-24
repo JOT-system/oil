@@ -5740,6 +5740,14 @@ Public Class OIT0003OrderDetail
             WW_OILTANKCntGet(SQLcon)
         End Using
 
+        '### 20200622 START((全体)No81対応) ######################################
+        '◯発送順(MAX値)と列車(油種)数のチェック
+        If Integer.Parse(Me.TxtTotal_c.Text) < Integer.Parse(WW_SHIPORDER) Then
+            Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+        '### 20200622 END  ((全体)No81対応) ######################################
+
         '### 20200622 START((全体)No82対応) ######################################
         '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
         '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
@@ -13345,11 +13353,40 @@ Public Class OIT0003OrderDetail
 
         'タンク車Noでソートし、重複がないかチェックする。
         Dim OIT0003tbl_DUMMY As DataTable = OIT0003tbl.Copy
+        'OIT0003tbl_DUMMY.Columns.Add("TANKNO_SORT", GetType(Integer), "Convert(TANKNO, 'System.Int32')")
+        'OIT0003tbl_DUMMY.Columns.Add("SHIPORDER_SORT", GetType(Integer), "Convert(SHIPORDER, 'System.Int32')")
+        'OIT0003tbl_DUMMY.Columns.Add("LINEORDER_SORT", GetType(Integer), "Convert(LINEORDER, 'System.Int32')")
+        OIT0003tbl_DUMMY.Columns.Add("TANKNO_SORT", GetType(Integer))
+        For Each OIT0003row As DataRow In OIT0003tbl_DUMMY.Rows
+            Try
+                OIT0003row("TANKNO_SORT") = OIT0003row("TANKNO")
+            Catch ex As Exception
+                OIT0003row("TANKNO_SORT") = 0
+            End Try
+        Next
+        OIT0003tbl_DUMMY.Columns.Add("SHIPORDER_SORT", GetType(Integer))
+        For Each OIT0003row As DataRow In OIT0003tbl_DUMMY.Rows
+            Try
+                OIT0003row("SHIPORDER_SORT") = OIT0003row("SHIPORDER")
+            Catch ex As Exception
+                OIT0003row("SHIPORDER_SORT") = 0
+            End Try
+        Next
+        OIT0003tbl_DUMMY.Columns.Add("LINEORDER_SORT", GetType(Integer))
+        For Each OIT0003row As DataRow In OIT0003tbl_DUMMY.Rows
+            Try
+                OIT0003row("LINEORDER_SORT") = OIT0003row("LINEORDER")
+            Catch ex As Exception
+                OIT0003row("LINEORDER_SORT") = 0
+            End Try
+        Next
+
         Dim OIT0003tbl_dv As DataView = New DataView(OIT0003tbl_DUMMY)
         Dim chkTankNo As String = ""
         Dim chkShipOrder As String = ""
         Dim chkLineOrder As String = ""
-        OIT0003tbl_dv.Sort = "TANKNO"
+        'OIT0003tbl_dv.Sort = "TANKNO"
+        OIT0003tbl_dv.Sort = "TANKNO_SORT"
         For Each drv As DataRowView In OIT0003tbl_dv
             If drv("HIDDEN") <> "1" AndAlso drv("TANKNO") <> "" AndAlso chkTankNo = drv("TANKNO") Then
                 Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -13381,7 +13418,8 @@ Public Class OIT0003OrderDetail
         If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
             '### START 2020/03/26 発送順を追加したため合わせてチェックを追加 ######################################
             '発送順でソートし、重複がないかチェックする。
-            OIT0003tbl_dv.Sort = "SHIPORDER"
+            'OIT0003tbl_dv.Sort = "SHIPORDER"
+            OIT0003tbl_dv.Sort = "SHIPORDER_SORT"
             For Each drv As DataRowView In OIT0003tbl_dv
                 If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
                     Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -13405,7 +13443,8 @@ Public Class OIT0003OrderDetail
         '　※上記以外の営業所については、入力しないためチェックは未実施。
         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
             '貨物駅入線順でソートし、重複がないかチェックする。
-            OIT0003tbl_dv.Sort = "LINEORDER"
+            'OIT0003tbl_dv.Sort = "LINEORDER"
+            OIT0003tbl_dv.Sort = "LINEORDER_SORT"
             For Each drv As DataRowView In OIT0003tbl_dv
                 If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") <> "" AndAlso chkLineOrder = drv("LINEORDER") Then
                     Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
@@ -13762,16 +13801,24 @@ Public Class OIT0003OrderDetail
         '### 20200622 START((全体)No82対応) ######################################
         '発送順でソートし、重複がないかチェックする。
         Dim OIT0003tbltab3_DUMMY As DataTable = OIT0003tbl_tab3.Copy
+        'OIT0003tbltab3_DUMMY.Columns.Add("SHIPORDER_SORT", GetType(Integer), "Convert(SHIPORDER, 'System.Int32')")
+        OIT0003tbltab3_DUMMY.Columns.Add("SHIPORDER_SORT", GetType(Integer))
+        For Each OIT0003row As DataRow In OIT0003tbltab3_DUMMY.Rows
+            Try
+                OIT0003row("SHIPORDER_SORT") = OIT0003row("SHIPORDER")
+            Catch ex As Exception
+                OIT0003row("SHIPORDER_SORT") = 0
+            End Try
+        Next
         Dim OIT0003tbltab3_dv As DataView = New DataView(OIT0003tbltab3_DUMMY)
         Dim chkShipOrder As String = ""
-        OIT0003tbltab3_dv.Sort = "SHIPORDER"
 
         '◯列車マスタ(発送順区分)が対象(1:発送対象)の場合チェックを実施
         '　※上記以外(2:発送対象外)については、入力しないためチェックは未実施。
         WW_SHIPORDER = "0"
         If work.WF_SEL_SHIPORDERCLASS.Text = "1" Then
             '発送順でソートし、重複がないかチェックする。
-            OIT0003tbltab3_dv.Sort = "SHIPORDER"
+            OIT0003tbltab3_dv.Sort = "SHIPORDER_SORT"
             For Each drv As DataRowView In OIT0003tbltab3_dv
                 If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
                     Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)

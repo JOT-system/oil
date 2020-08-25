@@ -2972,6 +2972,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Exit Select
                 End If
 
+                '★全角⇒半角変換
+                WW_ListValue = StrConv(WW_ListValue, VbStrConv.Narrow)
+
                 '### 2020/06/17 START #####################################################################################
                 '    タンク車Noを手入力した場合はすべてのタンク車Noの情報を取得したいため、会社コードにて取得するように変更
                 'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)

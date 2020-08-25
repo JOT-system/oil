@@ -553,21 +553,41 @@ Public Class OIT0003OTLinkageList
 
         OIT0003CsvOTLinkagetbl.Clear()
 
+        '桁数
+        Dim iOURDAILYBRANCHC As Integer = 2
+        Dim iOTDAILYCONSIGNEEC As Integer = 2
+        Dim iOTDAILYDEPSTATIONN As Integer = 8
+        Dim iOTDAILYSHIPPERN As Integer = 8
+        Dim iOTOILNAME As Integer = 12
+        Dim iTANKNO As Integer = 6
+
         '○ 取得SQL
         '　 説明　：　帳票表示用SQL
         '★積置フラグ無し用SQL
         Dim SQLStrNashi As String =
               " SELECT " _
-            & "   CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC)     AS OURDAILYBRANCHC" _
-            & " , CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC)   AS OTDAILYCONSIGNEEC" _
+            & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
+            & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
             & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+        '  " SELECT " _
+        '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
+        '& " , CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,'')))) AS OTDAILYCONSIGNEEC" _
+        '& " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
 
         '★積置フラグ有り用SQL
         Dim SQLStrAri As String =
               " SELECT " _
-            & "   CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC)     AS OURDAILYBRANCHC" _
-            & " , CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC)   AS OTDAILYCONSIGNEEC" _
+            & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
+            & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
             & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+        '  " SELECT " _
+        '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
+        '& " , CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,'')))) AS OTDAILYCONSIGNEEC" _
+        '& " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
 
         '★共通SQL
         Dim SQLStrCmn As String =
@@ -575,21 +595,33 @@ Public Class OIT0003OTLinkageList
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
             & " , CONVERT(NCHAR(2), OIT0003.SHIPORDER)           AS SHIPORDER" _
-            & " , OIM0025.OTDAILYFROMPLANT                       AS OTDAILYFROMPLANT" _
+            & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
             & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _
-            & " , CONVERT(NCHAR(8), OIM0025.OTDAILYDEPSTATIONN)  AS OTDAILYDEPSTATIONN" _
-            & " , CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC)     AS OTDAILYSHIPPERC" _
-            & " , CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN)     AS OTDAILYSHIPPERN" _
+            & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,''))" _
+            & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,'')))) AS OTDAILYDEPSTATIONN" _
+            & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
+            & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))" _
+            & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))))    AS OTDAILYSHIPPERN" _
             & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
-            & " , CONVERT(NCHAR(12), OIM0003.OTOILNAME)          AS OTOILNAME" _
-            & " , CONVERT(NCHAR(6), OIM0005.MODELTANKNO)         AS TANKNO" _
+            & " , CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))" _
+            & "   +  REPLICATE(SPACE (1), 12 - DATALENGTH(CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))))        AS OTOILNAME" _
+            & " , CASE" _
+            & "   WHEN OIM0005.MODELTANKNO IS NULL THEN SPACE(1)" _
+            & "   ELSE CONVERT(VARCHAR (6), OIM0005.MODELTANKNO)" _
+            & "   END" _
+            & "   +  REPLICATE(SPACE (1), 6 - DATALENGTH(CONVERT(VARCHAR (6), ISNULL(OIM0005.MODELTANKNO,''))))        AS TANKNO" _
             & " , CONVERT(NCHAR(1), '0')                         AS OUTSIDEINFO" _
             & " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
             & " , CONVERT(NCHAR(1), '0')                         AS RUNINFO" _
             & " , REPLACE(CONVERT(NCHAR(5), CONVERT(INT, OIT0003.CARSAMOUNT)), SPACE(1), '0') AS CARSAMOUNT" _
             & " , CONVERT(NCHAR(4), '')                          AS REMARK" _
             & " FROM OIL.OIT0002_ORDER OIT0002 "
+        '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYDEPSTATIONN), SPACE (8))  AS OTDAILYDEPSTATIONN" _
+        '& " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
+        '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN), SPACE (8))     AS OTDAILYSHIPPERN" _
+        '& " , CONVERT(NCHAR(12), OIM0003.OTOILNAME)          AS OTOILNAME" _
+        '& " , ISNULL(CONVERT(NCHAR(6), OIM0005.MODELTANKNO), SPACE (6))         AS TANKNO" _
 
         '★積置フラグ無し用SQL
         SQLStrNashi &=
@@ -706,6 +738,10 @@ Public Class OIT0003OTLinkageList
                 PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
+
+                '★桁数設定
+                Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
+                VALUE01.Value = iOURDAILYBRANCHC
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

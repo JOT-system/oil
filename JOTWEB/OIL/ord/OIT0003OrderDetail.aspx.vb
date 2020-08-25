@@ -6922,6 +6922,9 @@ Public Class OIT0003OrderDetail
                     Exit Select
                 End If
 
+                '★全角⇒半角変換
+                WW_ListValue = StrConv(WW_ListValue, VbStrConv.Narrow)
+
                 '設定されたタンク車Noを設定
                 updHeader.Item("TANKNO") = WW_ListValue
 
@@ -6976,6 +6979,8 @@ Public Class OIT0003OrderDetail
 
         Select Case WF_FIELD.Value
             Case "LOADINGIRILINEORDER"      '(一覧)積込入線順
+                '★全角⇒半角変換
+                WW_ListValue = StrConv(WW_ListValue, VbStrConv.Narrow)
 
                 '入力された値が""(空文字)の場合
                 If WW_ListValue = "" Then
@@ -6992,9 +6997,15 @@ Public Class OIT0003OrderDetail
                 End If
 
             Case "FILLINGPOINT"             '(一覧)充填ポイント
+                '★全角⇒半角変換
+                WW_ListValue = StrConv(WW_ListValue, VbStrConv.Narrow)
+
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
             Case "LOADINGOUTLETORDER"       '(一覧)積込出線順
+                '★全角⇒半角変換
+                WW_ListValue = StrConv(WW_ListValue, VbStrConv.Narrow)
+
                 '入力された値が""(空文字)の場合
                 If WW_ListValue = "" Then
                     updHeader.Item(WF_FIELD.Value) = ""
@@ -7018,6 +7029,9 @@ Public Class OIT0003OrderDetail
             '    updHeader.Item("LOADINGOUTLETTRAINNAME") = ""
 
             Case "LINE"                     '(一覧)回線を一覧に設定
+                '★全角⇒半角変換
+                WW_ListValue = StrConv(WW_ListValue, VbStrConv.Narrow)
+
                 updHeader.Item(WF_FIELD.Value) = WW_ListValue
 
                 '〇営業所配下情報を取得・設定
@@ -8054,8 +8068,12 @@ Public Class OIT0003OrderDetail
                     'DB更新
                     PARA01.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
                     PARA02.Value = OIT0003row("DETAILNO")             '受注明細№
-                    PARA40.Value = OIT0003row("SHIPORDER")            '発送順
-                    PARA33.Value = OIT0003row("LINEORDER")            '貨物駅入線順
+                    '発送順(★全角⇒半角変換)
+                    'PARA40.Value = OIT0003row("SHIPORDER")
+                    PARA40.Value = StrConv(OIT0003row("SHIPORDER"), VbStrConv.Narrow)
+                    '貨物駅入線順(★全角⇒半角変換)
+                    'PARA33.Value = OIT0003row("LINEORDER")
+                    PARA33.Value = StrConv(OIT0003row("LINEORDER"), VbStrConv.Narrow)
                     PARA03.Value = OIT0003row("TANKNO")               'タンク車№
                     PARA04.Value = ""                                 '費用科目
 

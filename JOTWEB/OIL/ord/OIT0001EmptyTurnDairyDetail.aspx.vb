@@ -3880,8 +3880,11 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.EMPARRDATE), '')      AS EMPARRDATE" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
-            & "       OIT0003.ORDERNO         = OIT0002.ORDERNO " _
-            & "   AND OIT0003.TANKNO          IN ("
+            & "       OIT0003.ORDERNO         = OIT0002.ORDERNO "
+
+        If OIT0001tbl.Select("TANKNO <> ''").Count <> 0 Then
+            SQLStr &= "   AND OIT0003.TANKNO          IN ("
+        End If
 
         '一覧に設定しているタンク車を条件に設定
         Dim i As Integer = 0
@@ -3897,9 +3900,11 @@ Public Class OIT0001EmptyTurnDairyDetail
         Next
 
         '### 20200620 START((全体)No79対応)異なる列車で同一積込日の場合###########
+        If OIT0001tbl.Select("TANKNO <> ''").Count <> 0 Then
+            SQLStr &= "                                  )"
+        End If
         Dim SQLDiffLODTrainStr As String =
               SQLStr _
-            & "                                  )" _
             & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.OFFICECODE      = @P06 " _
@@ -3910,8 +3915,7 @@ Public Class OIT0001EmptyTurnDairyDetail
         '### 20200620 END  ((全体)No79対応)異なる列車で同一積込日の場合###########
 
         SQLStr &=
-              "                                  )" _
-            & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
+              " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.OFFICECODE      = @P06 " _
             & "   AND OIT0002.DEPDATE         = @P03 " _

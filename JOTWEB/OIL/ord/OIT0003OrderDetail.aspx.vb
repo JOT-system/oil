@@ -3067,7 +3067,15 @@ Public Class OIT0003OrderDetail
             '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
             '### 20200626 タブ「タンク車明細」を表示したタイミング ###########################################
             If Me.WW_USEORDERFLG = True AndAlso Me.WW_InitializeTAB3 = True Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDERNO_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
+                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 Then
+                    '### 受注進行ステータスが検収中以降の場合は、メッセージを出力しない（何もしない) #########
+                Else
+                    Master.Output(C_MESSAGE_NO.OIL_ORDERNO_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+                End If
             End If
             '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
@@ -5744,7 +5752,24 @@ Public Class OIT0003OrderDetail
         '◯発送順(MAX値)と列車(油種)数のチェック
         If Integer.Parse(Me.TxtTotal_c.Text) < Integer.Parse(WW_SHIPORDER) Then
             Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_OILTOTAL_OVER, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+            For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                If OIT0003tab3row("SHIPORDER") = WW_SHIPORDER Then
+                    OIT0003tab3row.Item("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_80
+                    CODENAME_get("ORDERINFO", OIT0003tab3row.Item("ORDERINFO"), OIT0003tab3row.Item("ORDERINFONAME"), WW_DUMMY)
+                End If
+            Next
+            Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
+
             Exit Sub
+        Else
+            For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+                If OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_80 Then
+                    OIT0003tab3row.Item("ORDERINFO") = ""
+                    OIT0003tab3row.Item("ORDERINFONAME") = ""
+                End If
+            Next
+            Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
         End If
         '### 20200622 END  ((全体)No81対応) ######################################
 

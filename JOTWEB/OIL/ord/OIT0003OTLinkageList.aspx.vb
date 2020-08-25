@@ -382,7 +382,8 @@ Public Class OIT0003OTLinkageList
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
                 'PARA01.Value = OFFICECDE
-                PARA02.Value = Format(Now.AddDays(0), "yyyy/MM/dd")
+                PARA02.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                'PARA02.Value = "2020/08/20"
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE
                 PARA05.Value = Master.USER_ORG
@@ -650,9 +651,25 @@ Public Class OIT0003OTLinkageList
             & " AND OIM0025.TRKBN = OIM0010.TRKBN " _
             & " AND OIM0025.OTTRANSPORTFLG = ISNULL(OIT0003.OTTRANSPORTFLG,'2') " _
             & " AND OIM0025.DELFLG <> @P02 " _
-            & " WHERE OIT0002.ORDERNO = @P01 " _
-            & "   AND OIT0002.DELFLG <> @P02 " _
-            & "   AND OIT0002.ORDERSTATUS <= @P04 "
+            & " WHERE OIT0002.DELFLG <> @P02 " _
+            & "   AND OIT0002.ORDERSTATUS <= @P04 " _
+            & "   AND OIT0002.ORDERNO IN ( "
+
+        '一覧で指定された受注№を条件に設定
+        Dim j As Integer = 0
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+            '★指定されていない行はSKIP
+            If OIT0003row("OPERATION") = "" Then Continue For
+
+            If j = 0 Then
+                SQLStrCmn &= "'" & OIT0003row("ORDERNO") & "' "
+            Else
+                SQLStrCmn &= ", '" & OIT0003row("ORDERNO") & "' "
+            End If
+            j += 1
+        Next
+        SQLStrCmn &= ")"
 
         '★積置フラグ無し用SQL
         SQLStrNashi &=
@@ -680,13 +697,14 @@ Public Class OIT0003OTLinkageList
         Try
 
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注No
+                'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注No
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                PARA01.Value = "O2020081902"
+                'PARA01.Value = ""
                 PARA02.Value = C_DELETE_FLG.DELETE
                 PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()

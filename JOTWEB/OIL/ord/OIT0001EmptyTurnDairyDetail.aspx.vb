@@ -6101,6 +6101,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(RTRIM(OIT0002.OTHER9OTANK), '')             AS OTHER9OTANK" _
             & " , ISNULL(RTRIM(OIT0002.OTHER10OTANK), '')            AS OTHER10OTANK" _
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')               AS TOTALTANK" _
+            & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE   = @P1" _

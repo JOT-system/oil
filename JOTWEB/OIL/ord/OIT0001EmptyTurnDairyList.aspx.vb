@@ -298,7 +298,6 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')               AS TOTALTANK" _
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSCODE" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE   = @P1" _
@@ -580,7 +579,7 @@ Public Class OIT0001EmptyTurnDairyList
 
                     PARA01.Value = OIT0001UPDrow("ORDERNO")
                     work.WF_SEL_ORDERNUMBER.Text = OIT0001UPDrow("ORDERNO")
-                    strOrderSts = OIT0001UPDrow("ORDERSTATUSCODE")
+                    strOrderSts = OIT0001UPDrow("ORDERSTATUS")
                     strDepstation = OIT0001UPDrow("DEPSTATION")
                     strArrstation = OIT0001UPDrow("ARRSTATION")
                     strLinkNoMade = OIT0001UPDrow("TANKLINKNOMADE")

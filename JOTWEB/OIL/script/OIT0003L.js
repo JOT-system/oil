@@ -157,7 +157,7 @@ function ChangeOrgUse(obj, lineCnt) {
 
     for (let i = 0; i < trlst.length; i++) {
         // 一覧の項目(ステータス)の値を取得
-        var chkStatus = trlst[i].getElementsByTagName("td")[2].innerHTML;
+        var chkStatus = trlst[i].getElementsByTagName("td")[8].innerHTML;
         let leftTableObj = document.getElementById("pnlListArea_DL").getElementsByTagName("table")[0];
         let leftRowObj = leftTableObj.rows[i];
         var chkObj = leftRowObj.querySelector("input[type=checkbox]"); //document.getElementById("chkpnlListAreaOPERATION" + (i + 1));
@@ -172,10 +172,10 @@ function ChangeOrgUse(obj, lineCnt) {
             || chkStatus === "経理未計上"
             || chkStatus === "経理計上") {
             chkObj.disabled = true;
-            trlst[i].getElementsByTagName("td")[2].disabled = true;
+            trlst[i].getElementsByTagName("td")[8].disabled = true;
         } else {
             chkObj.disabled = false;
-            trlst[i].getElementsByTagName("td")[2].disabled = false;
+            trlst[i].getElementsByTagName("td")[8].disabled = false;
         }
     }
 }

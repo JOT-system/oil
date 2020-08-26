@@ -94,6 +94,13 @@ function ChangeCheckBox() {
     // 積置フラグ
     var objTableDR = document.getElementById("pnlListArea_DR").children[0];
     var objLightTable = objTableDR.children[0];
+    if (objLightTable === null) {
+        return;
+    }
+    if (objLightTable === undefined) {
+        return;
+    }
+
     var chkObjsLight1 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaSTACKINGFLG']");
     var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaSTACKINGFLG']");
 

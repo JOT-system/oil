@@ -24,7 +24,7 @@
                     <asp:DropDownList ID="ddlMonthTransOffice" runat="server" ClientIDMode="Predictable" CssClass="officeDdl"></asp:DropDownList>
                 </div>
                 <div style="display:inline-block">
-                    <input id="btnDownload" type="button" runat="server" ClientIDMode="Predictable" class="btn-sticky btnDownload" value="ダウンロード" onclick='downloadPaneData(this.id);' style="display:none;" />
+                    <input id="btnDownload" type="button" runat="server" ClientIDMode="Predictable" class="btn-sticky btnDownload" value="ダウンロード" onclick='downloadPaneData(this.id);'  />
                     <asp:HiddenField ID="hdnDownloadCall" runat="server" ClientIDMode="Predictable" EnableViewState="false"  />
                 </div>
                 <div class="measureText">

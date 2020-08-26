@@ -52,6 +52,12 @@ Public Class OIT0003OTLinkageList
                     Master.RecoverTable(OIT0003tbl)
 
                     Select Case WF_ButtonClick.Value
+                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click()
+                        Case "WF_ButtonALLSELECT"       '全選択ボタン押下
+                            WF_ButtonALLSELECT_Click()
+                        Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
+                            WF_ButtonSELECT_LIFTED_Click()
                         Case "WF_ButtonINSERT"          'OT連携ボタン押下
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
@@ -69,7 +75,7 @@ Public Class OIT0003OTLinkageList
                     End Select
 
                     '○ 一覧再表示処理
-                    'DisplayGrid()
+                    DisplayGrid()
                 End If
             Else
                 '○ 初期化処理
@@ -139,7 +145,7 @@ Public Class OIT0003OTLinkageList
         WW_MAPValueSet()
 
         '○ GridView初期設定
-        'GridViewInitialize()
+        GridViewInitialize()
 
     End Sub
 
@@ -233,15 +239,154 @@ Public Class OIT0003OTLinkageList
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データを受注テーブルから取得する
-        Dim SQLStr As String = ""
+        '★共通SQL
+        Dim SQLStrCmn As String =
+              " SELECT" _
+            & "   0                                                      AS LINECNT" _
+            & " , ''                                                     AS OPERATION" _
+            & " , 0                                                      AS TIMSTP" _
+            & " , 1                                                      AS 'SELECT'" _
+            & " , 0                                                      AS HIDDEN" _
+            & " , ISNULL(RTRIM(OIT0002.OFFICECODE), '')                  AS OFFICECODE" _
+            & " , ISNULL(RTRIM(OIT0002.OFFICENAME), '')                  AS OFFICENAME" _
+            & " , ISNULL(RTRIM(OIT0002.ORDERNO), '')                     AS ORDERNO" _
+
+        '★積置フラグ無し用SQL
+        Dim SQLStrNashi As String =
+              SQLStrCmn _
+            & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), NULL)    AS LODDATE "
+
+        '★積置フラグ有り用SQL
+        Dim SQLStrAri As String =
+              SQLStrCmn _
+            & " , ISNULL(FORMAT(OIT0003.ACTUALLODDATE, 'yyyy/MM/dd'), NULL)    AS LODDATE "
+
+        SQLStrCmn =
+              " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), NULL)    AS DEPDATE " _
+            & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), NULL)    AS ARRDATE " _
+            & " , ISNULL(FORMAT(OIT0002.ACCDATE, 'yyyy/MM/dd'), NULL)    AS ACCDATE " _
+            & " , ISNULL(FORMAT(OIT0002.EMPARRDATE, 'yyyy/MM/dd'), NULL) AS EMPARRDATE " _
+            & " , ISNULL(RTRIM(OIT0003.STACKINGFLG), '')                 AS STACKINGFLG" _
+            & " , ISNULL(RTRIM(OIS0015.VALUE1), '')                      AS STACKINGNAME" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNO), '')                     AS TRAINNO" _
+            & " , ISNULL(RTRIM(OIT0002.TRAINNAME), '')                   AS TRAINNAME" _
+            & " , ISNULL(RTRIM(OIT0002.DEPSTATION), '')                  AS DEPSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')              AS DEPSTATIONNAME" _
+            & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')                  AS ARRSTATION" _
+            & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')              AS ARRSTATIONNAME" _
+            & "	, COUNT(1)                                               AS TOTALTANK "
+
+        '油種(ハイオク)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS HTANK ", BaseDllConst.CONST_HTank)
+        '油種(レギュラー)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS RTANK ", BaseDllConst.CONST_RTank)
+        '油種(灯油)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS TTANK ", BaseDllConst.CONST_TTank)
+        '油種(未添加灯油)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS MTTANK ", BaseDllConst.CONST_MTTank)
+        '油種(軽油)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS KTANK ", BaseDllConst.CONST_KTank1)
+        '油種(３号軽油)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS K3TANK ", BaseDllConst.CONST_K3Tank1)
+        '油種(５号軽油)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS K5TANK ", BaseDllConst.CONST_K5Tank)
+        '油種(１０号軽油)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS K10TANK ", BaseDllConst.CONST_K10Tank)
+        '油種(ＬＳＡ)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS LTANK ", BaseDllConst.CONST_LTank1)
+        '油種(Ａ重油)
+        SQLStrCmn &= String.Format(" , SUM(CASE WHEN OIT0003.OILCODE ='{0}' Then 1 Else 0 End) AS ATANK ", BaseDllConst.CONST_ATank)
+
+        '★積置フラグ無し用SQL
+        SQLStrNashi &=
+              SQLStrCmn _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & "  INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "      (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "       OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+            & "  AND OIT0003.DELFLG <> @P04 " _
+            & "  AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
+
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & "  INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "      (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "       OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+            & "  AND OIT0003.DELFLG <> @P04 " _
+            & "  AND OIT0003.STACKINGFLG = '1' " _
+            & "  AND OIT0003.ACTUALLODDATE >= @P02 "
+
+        SQLStrCmn =
+              "  INNER JOIN com.OIS0015_FIXVALUE OIS0015 ON " _
+            & "      OIS0015.CLASS   = 'STACKING' " _
+            & "  AND OIS0015.KEYCODE = OIT0003.STACKINGFLG " _
+            & "  INNER JOIN oil.VIW0003_OFFICECHANGE VIW0003 ON " _
+            & "      VIW0003.ORGCODE    = @P05 " _
+            & "  AND VIW0003.OFFICECODE = OIT0002.OFFICECODE " _
+            & " WHERE OIT0002.DELFLG      <> @P04" _
+            & "   AND OIT0002.ORDERSTATUS <= @P03" _
+
+        '★積置フラグ無し用SQL
+        SQLStrNashi &=
+              SQLStrCmn _
+            & "   AND OIT0002.LODDATE     >= @P02"
+
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn
+
+        SQLStrCmn =
+              " GROUP BY" _
+            & "    OIT0002.OFFICECODE" _
+            & "  , OIT0002.OFFICENAME" _
+            & "  , OIT0002.ORDERNO" _
+            & "  , OIT0003.STACKINGFLG" _
+            & "  , OIS0015.VALUE1" _
+            & "  , OIT0002.TRAINNO" _
+            & "  , OIT0002.TRAINNAME" _
+            & "  , OIT0002.DEPSTATION" _
+            & "  , OIT0002.DEPSTATIONNAME" _
+            & "  , OIT0002.ARRSTATION" _
+            & "  , OIT0002.ARRSTATIONNAME" _
+            & "  , OIT0002.DEPDATE" _
+            & "  , OIT0002.ARRDATE" _
+            & "  , OIT0002.ACCDATE" _
+            & "  , OIT0002.EMPARRDATE"
+
+        '★積置フラグ無し用SQL
+        SQLStrNashi &=
+              SQLStrCmn _
+            & "  , OIT0002.LODDATE"
+
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn _
+            & "  , OIT0003.ACTUALLODDATE" _
+            & " ORDER BY" _
+            & "    OFFICECODE" _
+            & "  , TRAINNO" _
+            & "  , LODDATE"
+
+        '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
+        SQLStrNashi &=
+              " UNION ALL" _
+            & SQLStrAri
 
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                'Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 6) '登録営業所コード
-                'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.DateTime)    '利用可能日
-                'Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 4) '本線列車
-                'Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 1) '削除フラグ
-
+            Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
+                'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+                Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)         '積込日
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
+                'PARA01.Value = OFFICECDE
+                PARA02.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                'PARA02.Value = "2020/08/20"
+                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_310
+                PARA04.Value = C_DELETE_FLG.DELETE
+                PARA05.Value = Master.USER_ORG
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -283,10 +428,81 @@ Public Class OIT0003OTLinkageList
     End Sub
 
     ''' <summary>
+    ''' チェックボックス(選択)クリック処理
+    ''' </summary>
+    Protected Sub WF_CheckBoxSELECT_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        'チェックボックス判定
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                If OIT0003tbl.Rows(i)("OPERATION") = "" Then
+                    OIT0003tbl.Rows(i)("OPERATION") = "on"
+                Else
+                    OIT0003tbl.Rows(i)("OPERATION") = ""
+                End If
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 全選択ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonALLSELECT_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        '全チェックボックスON
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0003tbl.Rows(i)("OPERATION") = "on"
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 全解除ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonSELECT_LIFTED_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+
+        '全チェックボックスOFF
+        For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
+            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+                OIT0003tbl.Rows(i)("OPERATION") = ""
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+
+    End Sub
+
+    ''' <summary>
     ''' OT連携ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
+
+        '一覧のチェックボックスが選択されているか確認
+        If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
 
         '******************************
         'OT発送日報データ取得処理
@@ -337,39 +553,98 @@ Public Class OIT0003OTLinkageList
 
         OIT0003CsvOTLinkagetbl.Clear()
 
+        '桁数
+        Dim iOURDAILYBRANCHC As Integer = 2
+        Dim iOTDAILYCONSIGNEEC As Integer = 2
+        Dim iOTDAILYDEPSTATIONN As Integer = 8
+        Dim iOTDAILYSHIPPERN As Integer = 8
+        Dim iOTOILNAME As Integer = 12
+        Dim iTANKNO As Integer = 6
+
         '○ 取得SQL
         '　 説明　：　帳票表示用SQL
-        Dim SQLStr As String =
+        '★積置フラグ無し用SQL
+        Dim SQLStrNashi As String =
               " SELECT " _
-            & "   CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC)     AS OURDAILYBRANCHC" _
-            & " , CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC)   AS OTDAILYCONSIGNEEC" _
-            & " , FORMAT(ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE), 'yyyyMMdd')          AS LODDATE" _
-            & " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
+            & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
+            & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
+            & " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+        '  " SELECT " _
+        '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
+        '& " , CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,'')))) AS OTDAILYCONSIGNEEC" _
+        '& " , FORMAT(OIT0002.LODDATE, 'yyyyMMdd')            AS LODDATE"
+
+        '★積置フラグ有り用SQL
+        Dim SQLStrAri As String =
+              " SELECT " _
+            & "   ISNULL(CONVERT(NCHAR(2), OIM0025.OURDAILYBRANCHC), SPACE (2))     AS OURDAILYBRANCHC" _
+            & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYCONSIGNEEC), SPACE (2))   AS OTDAILYCONSIGNEEC" _
+            & " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+        '  " SELECT " _
+        '& "   CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OURDAILYBRANCHC,''))))   AS OURDAILYBRANCHC" _
+        '& " , CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,''))" _
+        '& "   +  REPLICATE(SPACE (1), 2 - DATALENGTH(CONVERT(VARCHAR (2), ISNULL(OIM0025.OTDAILYCONSIGNEEC,'')))) AS OTDAILYCONSIGNEEC" _
+        '& " , FORMAT(OIT0003.ACTUALLODDATE, 'yyyyMMdd')      AS LODDATE"
+
+        '★共通SQL
+        Dim SQLStrCmn As String =
+              " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
             & " , CONVERT(NCHAR(2), OIT0003.SHIPORDER)           AS SHIPORDER" _
-            & " , OIM0025.OTDAILYFROMPLANT                       AS OTDAILYFROMPLANT" _
+            & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
             & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _
-            & " , CONVERT(NCHAR(8), OIM0025.OTDAILYDEPSTATIONN)  AS OTDAILYDEPSTATIONN" _
-            & " , CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC)     AS OTDAILYSHIPPERC" _
-            & " , CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN)     AS OTDAILYSHIPPERN" _
+            & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,''))" _
+            & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYDEPSTATIONN,'')))) AS OTDAILYDEPSTATIONN" _
+            & " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
+            & " , CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))" _
+            & "   +  REPLICATE(SPACE (1), 8 - DATALENGTH(CONVERT(VARCHAR (8), ISNULL(OIM0025.OTDAILYSHIPPERN,''))))    AS OTDAILYSHIPPERN" _
             & " , OIM0003.OTOILCODE                              AS OTOILCODE" _
-            & " , CONVERT(NCHAR(12), OIM0003.OTOILNAME)          AS OTOILNAME" _
-            & " , CONVERT(NCHAR(6), OIM0005.MODELTANKNO)         AS TANKNO" _
+            & " , CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))" _
+            & "   +  REPLICATE(SPACE (1), 12 - DATALENGTH(CONVERT(VARCHAR (12), ISNULL(OIM0003.OTOILNAME,''))))        AS OTOILNAME" _
+            & " , CASE" _
+            & "   WHEN OIM0005.MODELTANKNO IS NULL THEN SPACE(1)" _
+            & "   ELSE CONVERT(VARCHAR (6), OIM0005.MODELTANKNO)" _
+            & "   END" _
+            & "   +  REPLICATE(SPACE (1), 6 - DATALENGTH(CONVERT(VARCHAR (6), ISNULL(OIM0005.MODELTANKNO,''))))        AS TANKNO" _
             & " , CONVERT(NCHAR(1), '0')                         AS OUTSIDEINFO" _
             & " , CONVERT(NCHAR(1), '')                          AS GENERALCARTYPE" _
             & " , CONVERT(NCHAR(1), '0')                         AS RUNINFO" _
             & " , REPLACE(CONVERT(NCHAR(5), CONVERT(INT, OIT0003.CARSAMOUNT)), SPACE(1), '0') AS CARSAMOUNT" _
             & " , CONVERT(NCHAR(4), '')                          AS REMARK" _
-            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & " FROM OIL.OIT0002_ORDER OIT0002 "
+        '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYDEPSTATIONN), SPACE (8))  AS OTDAILYDEPSTATIONN" _
+        '& " , ISNULL(CONVERT(NCHAR(2), OIM0025.OTDAILYSHIPPERC), SPACE (2))     AS OTDAILYSHIPPERC" _
+        '& " , ISNULL(CONVERT(NCHAR(8), OIM0025.OTDAILYSHIPPERN), SPACE (8))     AS OTDAILYSHIPPERN" _
+        '& " , CONVERT(NCHAR(12), OIM0003.OTOILNAME)          AS OTOILNAME" _
+        '& " , ISNULL(CONVERT(NCHAR(6), OIM0005.MODELTANKNO), SPACE (6))         AS TANKNO" _
+
+        '★積置フラグ無し用SQL
+        SQLStrNashi &=
+              SQLStrCmn _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
             & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
             & " AND OIT0003.DELFLG <> @P02 " _
-            & " AND (OIT0002.LODDATE = @P03 " _
-            & "      OR OIT0003.ACTUALLODDATE = @P03) " _
-            & " INNER JOIN OIL.OIM0003_PRODUCT OIM0003 ON " _
+            & " AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
+
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn _
+            & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+            & " AND OIT0003.DELFLG <> @P02 " _
+            & " AND OIT0003.STACKINGFLG = '1' " _
+            & " AND OIT0003.ACTUALLODDATE >= @P03 "
+
+        '★共通SQL
+        SQLStrCmn =
+              " INNER JOIN OIL.OIM0003_PRODUCT OIM0003 ON " _
             & "     OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
             & " AND OIM0003.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
             & " AND OIM0003.PLANTCODE = OIT0002.BASECODE " _
@@ -408,32 +683,65 @@ Public Class OIT0003OTLinkageList
             & " AND OIM0025.TRKBN = OIM0010.TRKBN " _
             & " AND OIM0025.OTTRANSPORTFLG = ISNULL(OIT0003.OTTRANSPORTFLG,'2') " _
             & " AND OIM0025.DELFLG <> @P02 " _
-            & " WHERE OIT0002.OFFICECODE = @P01 " _
-            & "   AND OIT0002.DELFLG <> @P02 " _
-            & "   AND OIT0002.ORDERSTATUS <= @P04 "
+            & " WHERE OIT0002.DELFLG <> @P02 " _
+            & "   AND OIT0002.ORDERSTATUS <= @P04 " _
+            & "   AND OIT0002.ORDERNO IN ( "
 
-        SQLStr &=
-              " ORDER BY" _
-            & "    OIM0025.OURDAILYBRANCHC" _
-            & "  , OIM0025.OURDAILYPLANTC" _
-            & "  , OIT0003.SHIPORDER" _
-            & "  , OIM0003.OTOILCODE"
+        '一覧で指定された受注№を条件に設定
+        Dim j As Integer = 0
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
+            '★指定されていない行はSKIP
+            If OIT0003row("OPERATION") = "" Then Continue For
+
+            If j = 0 Then
+                SQLStrCmn &= "'" & OIT0003row("ORDERNO") & "' "
+            Else
+                SQLStrCmn &= ", '" & OIT0003row("ORDERNO") & "' "
+            End If
+            j += 1
+        Next
+        SQLStrCmn &= ")"
+
+        '★積置フラグ無し用SQL
+        SQLStrNashi &=
+              SQLStrCmn _
+            & "   AND OIT0002.LODDATE >= @P03 "
+
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn _
+            & " ORDER BY" _
+            & "    OURDAILYBRANCHC" _
+            & "  , SHIPORDER" _
+            & "  , OTOILCODE"
+        '& " ORDER BY" _
+        '& "    OIM0025.OURDAILYBRANCHC" _
+        '& "  , OIM0025.OURDAILYPLANTC" _
+        '& "  , OIT0003.SHIPORDER" _
+        '& "  , OIM0003.OTOILCODE"
+
+        '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
+        SQLStrNashi &=
+              " UNION ALL" _
+            & SQLStrAri
 
         Try
 
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
-                Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
+            Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
+                'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注No
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
-                PARA01.Value = BaseDllConst.CONST_OFFICECODE_010402
+                'PARA01.Value = ""
                 PARA02.Value = C_DELETE_FLG.DELETE
-                'If Not String.IsNullOrEmpty(lodDate) Then
-                '    PARA03.Value = lodDate
-                'Else
                 PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
-                'End If
+                'PARA03.Value = "2020/08/20"
                 PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_310
+
+                '★桁数設定
+                Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
+                VALUE01.Value = iOURDAILYBRANCHC
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

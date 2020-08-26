@@ -298,12 +298,12 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')               AS TOTALTANK" _
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSCODE" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE   = @P1" _
             & "   AND OIT0002.LODDATE      >= @P2" _
             & "   AND OIT0002.DELFLG       <> @P3" _
+            & "   AND OIT0002.ORDERSTATUS  <> @P4" _
             & "   AND OIT0002.EMPTYTURNFLG <> '2'"
         '& "   AND OIT0002.TRAINNO    = @P4"
 
@@ -322,12 +322,12 @@ Public Class OIT0001EmptyTurnDairyList
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 10) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.DateTime)     '積込日(開始)
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)  '削除フラグ
-                'Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)  '列車番号
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 3)  '受注進行ステータス
 
                 PARA1.Value = work.WF_SEL_SALESOFFICECODE.Text
                 PARA2.Value = work.WF_SEL_LOADINGDATE.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
-                'PARA4.Value = work.WF_SEL_TRAINNUMBER.Text
+                PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -580,7 +580,7 @@ Public Class OIT0001EmptyTurnDairyList
 
                     PARA01.Value = OIT0001UPDrow("ORDERNO")
                     work.WF_SEL_ORDERNUMBER.Text = OIT0001UPDrow("ORDERNO")
-                    strOrderSts = OIT0001UPDrow("ORDERSTATUSCODE")
+                    strOrderSts = OIT0001UPDrow("ORDERSTATUS")
                     strDepstation = OIT0001UPDrow("DEPSTATION")
                     strArrstation = OIT0001UPDrow("ARRSTATION")
                     strLinkNoMade = OIT0001UPDrow("TANKLINKNOMADE")

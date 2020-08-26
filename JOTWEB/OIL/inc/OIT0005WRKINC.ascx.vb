@@ -91,13 +91,17 @@ Public Class OIT0005WRKINC
         Dim viewName As String = ""
         Select Case detailType
             Case "1" '残車状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
             Case "2" '輸送状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
             Case "3" '回送状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
             Case "4" 'その他状況
-                viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
         End Select
         Return viewName
     End Function

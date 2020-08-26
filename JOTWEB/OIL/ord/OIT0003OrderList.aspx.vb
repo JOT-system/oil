@@ -129,6 +129,7 @@ Public Class OIT0003OrderList
             End If
 
             '◯ ボタン(表示・非表示)設定(各営業所にて出し分けをするため)
+            WF_BUTTONofficecode.Value = Master.USER_ORG
             Select Case Master.USER_ORG
                 '★情報システム部/石油部
                 Case BaseDllConst.CONST_OFFICECODE_010006,
@@ -2087,7 +2088,7 @@ Public Class OIT0003OrderList
         Using repCbj = New CsvCreate(OIT0003CsvDeliverytbl)
             Dim url As String
             Try
-                url = repCbj.ConvertDataTableToCsv(False)
+                url = repCbj.ConvertDataTableToCsv(False, blnFrame:=True, blnSeparate:=True)
             Catch ex As Exception
                 Return
             End Try
@@ -2562,7 +2563,9 @@ Public Class OIT0003OrderList
 
         '○ 取得SQL
         '　 説明　：　帳票表示用SQL
-        Dim SQLStr As String =
+        '### 20200818 START SQLの入換を実施 ####################################################
+        '★共通SQL
+        Dim SQLStrCmn As String =
               " SELECT " _
             & "   0                                              AS LINECNT" _
             & " , ''                                             AS OPERATION" _
@@ -2589,35 +2592,47 @@ Public Class OIT0003OrderList
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEAMOUNT" _
             & "	, CASE " _
-            & "   WHEN OIT0003.STACKINGFLG ='1' AND OIT0003.ACTUALLODDATE IS NOT NULL " _
+            & "   WHEN OIT0003.STACKINGFLG ='1' " _
             & "	      THEN '積置' " _
-            & "	      ELSE CASE " _
-            & "	           WHEN OIT0002.STACKINGFLG = '1' " _
-            & "	     	      THEN '積置' " _
-            & "	   		      ELSE '' " _
-            & "            END " _
-            & "   END  AS STACKING " _
+            & "	      ELSE '' " _
+            & "   END                                            AS STACKING " _
             & " , OIT0002.TRAINNO                                AS TRAINNO" _
             & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
-            & " , OIT0002.TOTALTANKCH                            AS TOTALTANK" _
-            & " , CASE " _
-            & "   WHEN OIT0003.STACKINGFLG ='1' AND OIT0003.ACTUALLODDATE IS NOT NULL" _
-            & "	      THEN OIT0003.ACTUALLODDATE " _
-            & "	      ELSE OIT0002_OTHER.LODDATE " _
-            & "	  END AS LODDATE" _
-            & " , OIT0002_OTHER.DEPDATE                          AS DEPDATE" _
-            & " , OIT0002_OTHER.ARRDATE                          AS ARRDATE" _
-            & " , OIT0002_OTHER.ACCDATE                          AS ACCDATE" _
+            & " , OIT0002.TOTALTANKCH                            AS TOTALTANK"
+
+        '★積置フラグ無し用SQL
+        Dim SQLStrNashi As String =
+              SQLStrCmn _
+            & " , OIT0002.LODDATE                                AS LODDATE"
+
+        '★積置フラグ有り用SQL
+        Dim SQLStrAri As String =
+              SQLStrCmn _
+            & " , OIT0003.ACTUALLODDATE                          AS LODDATE"
+
+        SQLStrCmn =
+              " , OIT0002.DEPDATE                                AS DEPDATE" _
+            & " , OIT0002.ARRDATE                                AS ARRDATE" _
+            & " , OIT0002.ACCDATE                                AS ACCDATE" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
-            & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
-            & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
-            & " AND OIT0003.DELFLG <> @P02 " _
-            & " AND ((OIT0002.LODDATE = @P03 AND ISNULL(OIT0003.ACTUALLODDATE,'') = '') " _
-            & "      OR OIT0003.ACTUALLODDATE = @P03) " _
-            & " LEFT JOIN OIL.OIT0002_ORDER OIT0002_OTHER ON " _
-            & "     OIT0002_OTHER.ORDERNO = OIT0003.ORDERNO " _
-            & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+            & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
+            & " AND OIT0003.TANKNO <> '' " _
+            & " AND OIT0003.DELFLG <> @P02 "
+
+        '★積置フラグ無し用SQL
+        SQLStrNashi &=
+              SQLStrCmn _
+            & " AND (OIT0003.STACKINGFLG <> '1' OR OIT0003.STACKINGFLG IS NULL) "
+
+        '★積置フラグ有り用SQL
+        SQLStrAri &=
+              SQLStrCmn _
+            & " AND OIT0003.STACKINGFLG = '1' " _
+            & " AND OIT0003.ACTUALLODDATE = @P03 "
+
+        SQLStrCmn =
+              " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
             & " AND OIM0005.DELFLG <> @P02 " _
             & " LEFT JOIN OIL.OIM0021_LOADRESERVE OIM0021 ON " _
@@ -2631,19 +2646,102 @@ Public Class OIT0003OrderList
             & " AND OIM0021.DELFLG <> @P02 " _
             & " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
-            & "   AND OIT0002.ORDERSTATUS <= @P04 "
+            & "   AND OIT0002.ORDERSTATUS <= @P04 " _
 
-        '& " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
-        '& "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
-        '& " AND OIT0005.DELFLG <> @P02 " _
+        '★積置フラグ無し用SQL
+        SQLStrNashi &= SQLStrCmn _
+            & "   AND OIT0002.LODDATE = @P03 "
 
-        SQLStr &=
+        '★積置フラグ有り用SQL
+        SQLStrAri &= SQLStrCmn
+
+
+        'Dim SQLStr As String =
+        '      " SELECT " _
+        '    & "   0                                              AS LINECNT" _
+        '    & " , ''                                             AS OPERATION" _
+        '    & " , '0'                                            AS TIMSTP" _
+        '    & " , 1                                              AS 'SELECT'" _
+        '    & " , 0                                              AS HIDDEN" _
+        '    & " , OIT0002.OFFICECODE                             AS OFFICECODE" _
+        '    & " , OIT0002.OFFICENAME                             AS OFFICENAME" _
+        '    & " , OIT0002.BASECODE                               AS BASECODE" _
+        '    & " , OIT0002.BASENAME                               AS BASENAME" _
+        '    & " , OIT0003.SHIPPERSCODE                           AS SHIPPERSCODE" _
+        '    & " , OIT0003.SHIPPERSNAME                           AS SHIPPERSNAME" _
+        '    & " , OIT0002.ARRSTATION                             AS ARRSTATION" _
+        '    & " , OIT0002.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
+        '    & " , OIT0002.CONSIGNEECODE                          AS CONSIGNEECODE" _
+        '    & " , OIT0002.CONSIGNEENAME                          AS CONSIGNEENAME" _
+        '    & " , ''                                             AS LODPOINT" _
+        '    & " , OIT0003.OILCODE                                AS OILCODE" _
+        '    & " , OIT0003.OILNAME                                AS OILNAME" _
+        '    & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
+        '    & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
+        '    & " , OIM0005.MODEL                                  AS MODEL" _
+        '    & " , OIM0005.TANKNUMBER                             AS TANKNUMBER" _
+        '    & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
+        '    & " , OIM0021.RESERVEDQUANTITY                       AS RESERVEAMOUNT" _
+        '    & "	, CASE " _
+        '    & "   WHEN OIT0003.STACKINGFLG ='1' AND OIT0003.ACTUALLODDATE IS NOT NULL " _
+        '    & "	      THEN '積置' " _
+        '    & "	      ELSE CASE " _
+        '    & "	           WHEN OIT0002.STACKINGFLG = '1' " _
+        '    & "	     	      THEN '積置' " _
+        '    & "	   		      ELSE '' " _
+        '    & "            END " _
+        '    & "   END  AS STACKING " _
+        '    & " , OIT0002.TRAINNO                                AS TRAINNO" _
+        '    & " , OIT0002.TRAINNAME                              AS TRAINNAME" _
+        '    & " , OIT0002.TOTALTANKCH                            AS TOTALTANK" _
+        '    & " , CASE " _
+        '    & "   WHEN OIT0003.STACKINGFLG ='1' AND OIT0003.ACTUALLODDATE IS NOT NULL" _
+        '    & "	      THEN OIT0003.ACTUALLODDATE " _
+        '    & "	      ELSE OIT0002_OTHER.LODDATE " _
+        '    & "	  END AS LODDATE" _
+        '    & " , OIT0002_OTHER.DEPDATE                          AS DEPDATE" _
+        '    & " , OIT0002_OTHER.ARRDATE                          AS ARRDATE" _
+        '    & " , OIT0002_OTHER.ACCDATE                          AS ACCDATE" _
+        '    & " FROM OIL.OIT0002_ORDER OIT0002 " _
+        '    & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
+        '    & "     (OIT0003.ORDERNO = OIT0002.ORDERNO " _
+        '    & "      OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
+        '    & " AND OIT0003.DELFLG <> @P02 " _
+        '    & " AND ((OIT0002.LODDATE = @P03 AND ISNULL(OIT0003.ACTUALLODDATE,'') = '') " _
+        '    & "      OR OIT0003.ACTUALLODDATE = @P03) " _
+        '    & " LEFT JOIN OIL.OIT0002_ORDER OIT0002_OTHER ON " _
+        '    & "     OIT0002_OTHER.ORDERNO = OIT0003.ORDERNO " _
+        '    & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
+        '    & "     OIM0005.TANKNUMBER = OIT0003.TANKNO " _
+        '    & " AND OIM0005.DELFLG <> @P02 " _
+        '    & " LEFT JOIN OIL.OIM0021_LOADRESERVE OIM0021 ON " _
+        '    & "     OIM0021.OFFICECODE = OIT0002.OFFICECODE " _
+        '    & " AND OIM0021.MODEL = OIM0005.MODEL " _
+        '    & " AND OIM0021.LOAD = OIM0005.LOAD " _
+        '    & " AND OIM0021.OILCODE = OIT0003.OILCODE " _
+        '    & " AND OIM0021.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+        '    & " AND OIM0021.FROMYMD <= FORMAT(GETDATE(),'yyyy/MM/dd') " _
+        '    & " AND OIM0021.TOYMD >= FORMAT(GETDATE(),'yyyy/MM/dd') " _
+        '    & " AND OIM0021.DELFLG <> @P02 " _
+        '    & " WHERE OIT0002.OFFICECODE = @P01 " _
+        '    & "   AND OIT0002.DELFLG <> @P02 " _
+        '    & "   AND OIT0002.ORDERSTATUS <= @P04 "
+        '### 20200818 END   SQLの入換を実施 ####################################################
+
+        SQLStrAri &=
               " ORDER BY" _
-            & "    OIT0002.BASECODE" _
+            & "    OIT0003.SHIPPERSCODE" _
+            & "  , OIT0002.TRAINNO" _
+            & "  , STACKING" _
             & "  , OIT0003.OILCODE"
 
+        '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
+        SQLStrNashi &=
+              " UNION ALL" _
+            & SQLStrAri
+
         Try
-            Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日

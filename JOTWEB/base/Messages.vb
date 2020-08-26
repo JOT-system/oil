@@ -647,7 +647,14 @@ Public Module Messages
         ''' 前回揮発油で今回黒油、または灯軽油の整合性警告
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ALERT As String = "20061"
-
+        ''' <summary>
+        ''' OT連携行未存在
+        ''' </summary>
+        Public Const OIL_OTLINKAGELINE_NOTFOUND As String = "20062"
+        ''' <summary>
+        ''' タンク車(同一積込日)使用メッセージ
+        ''' </summary>
+        Public Const OIL_TANKNO_LOADDATE_USE As String = "20063"
 #End Region
 
 

@@ -10731,12 +10731,13 @@ Public Class OIT0003OrderDetail
                 & " FROM oil.OIT0002_ORDER OIT0002 " _
                 & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
                 & "       OIT0003.ORDERNO = OIT0002.ORDERNO " _
+                & "   AND OIT0003.STACKINGFLG = '1' " _
                 & "   AND OIT0003.ACTUALLODDATE = @P03 " _
                 & "   AND ISNULL(OIT0003.STACKINGORDERNO,'') = '' " _
                 & "   AND OIT0003.DELFLG <> @P05" _
                 & " WHERE OIT0002.ORDERNO <> @P01 " _
                 & " AND OIT0002.OFFICECODE = @P02 " _
-                & " AND OIT0002.ORDERSTATUS <> @P04 " _
+                & " AND (OIT0002.ORDERSTATUS <> @P04 AND OIT0002.ORDERSTATUS <= @P06)" _
                 & " AND OIT0002.DELFLG <> @P05 "
 
             '○ チェックSQL
@@ -10758,14 +10759,16 @@ Public Class OIT0003OrderDetail
                 'Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 20) '本線列車名
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 6)  '受注営業所コード
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '(実績)積込日
-                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス(900:受注キャンセル)
                 Dim PARA5 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA6 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 3)  '受注進行ステータス(310:受注確定)
                 PARA1.Value = work.WF_SEL_ORDERNUMBER.Text
                 'PARA2.Value = Me.TxtTrainName.Text
                 PARA2.Value = Me.TxtOrderOfficeCode.Text
                 PARA3.Value = Me.TxtActualLoadingDate.Text
                 PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARA5.Value = C_DELETE_FLG.DELETE
+                PARA6.Value = BaseDllConst.CONST_ORDERSTATUS_310
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -17739,28 +17742,60 @@ Public Class OIT0003OrderDetail
 
 
                                 '★(実績)発日
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
-                                AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450) Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    If Me.WW_USEORDERFLG = True Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False
 
-                                '★(実績)空車着日
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
-                                AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450) Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '★(実績)積車着日
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    If Me.WW_USEORDERFLG = True Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False
 
                                 '★(実績)受入日
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
-                                AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450) Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    If Me.WW_USEORDERFLG = True Then
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                    Else
+                                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                    End If
+                                End If
+
+                                '積込可否フラグ(チェックボックス)を非活性
+                                chkObjST.Enabled = False
+
+                                '★(実績)空車着日
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
+                                If Me.WW_USEORDERFLG = True Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False
@@ -17837,39 +17872,58 @@ Public Class OIT0003OrderDetail
                                 chkObjST.Enabled = False
 
                                 '★(実績)積込日
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
-                                AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450) Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False
 
                                 '★(実績)発日
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") _
-                                AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450) Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False
 
-                                '★(実績)空車着日
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") _
-                                AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
-                                         OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450) Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                '★(実績)積車着日
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False
 
                                 '★(実績)受入日
-                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") _
-                                AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450) Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                Else
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                                End If
+
+                                '積込可否フラグ(チェックボックス)を非活性
+                                chkObjST.Enabled = False
+
+                                '★(実績)空車着日
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
+                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
                                 '積込可否フラグ(チェックボックス)を非活性
                                 chkObjST.Enabled = False

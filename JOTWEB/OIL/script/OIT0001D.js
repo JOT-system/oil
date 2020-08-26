@@ -90,15 +90,39 @@ function ChangeCheckBox() {
             }
         }
     }
+
+    // 積置フラグ
+    var objTableDR = document.getElementById("pnlListArea_DR").children[0];
+    var objLightTable = objTableDR.children[0];
+    var chkObjsLight1 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaSTACKINGFLG']");
+    var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaSTACKINGFLG']");
+
+    for (let i = 0; i < chkObjsLight1.length; i++) {
+
+        if (chkObjsLight1[i] !== null) {
+            if (spnObjsLight1[i].innerText === "on") {
+                chkObjsLight1[i].checked = true;
+            } else {
+                chkObjsLight1[i].checked = false;
+            }
+        }
+    }
+
 }
 
 
 // ○チェックボックス選択
-function SelectCheckBox(obj, lineCnt) {
+function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+
+        surfix = '';
+        if (fieldName === 'STACKINGFLG') {
+            surfix = 'STACKING'
+        }
+
         document.getElementById("WF_SelectedIndex").value = lineCnt;
-        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }

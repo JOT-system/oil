@@ -1536,7 +1536,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtEmparrDate.Focus()
 
                 '(一覧)荷主, (一覧)油種, (一覧)タンク車№, (一覧)ジョイント, (一覧)返送日列車
-            Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO", "JOINT", "RETURNDATETRAIN"
+                '(一覧)積込日(実績)
+            Case "SHIPPERSNAME", "OILNAME", "ORDERINGOILNAME", "TANKNO", "JOINT", "RETURNDATETRAIN",
+                 "ACTUALLODDATE"
                 '○ LINECNT取得
                 Dim WW_LINECNT As Integer = 0
                 If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
@@ -1682,6 +1684,40 @@ Public Class OIT0001EmptyTurnDairyDetail
                     '    End If
                     'Catch ex As Exception
                     'End Try
+
+                    '(一覧)(実績)積込日を一覧に設定
+                ElseIf WF_FIELD.Value = "ACTUALLODDATE" Then
+                    Dim WW_DATE As Date
+                    Try
+                        Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                        If WW_DATE < C_DEFAULT_YMD Then
+                            updHeader.Item(WF_FIELD.Value) = ""
+                        Else
+                            updHeader.Item(WF_FIELD.Value) = leftview.WF_Calendar.Text
+                        End If
+
+                        '(一覧)(実績)積込日の場合
+                        If WF_FIELD.Value = "ACTUALLODDATE" Then
+                            '○ 過去日付チェック
+                            '例) iresult = dt1.Date.CompareTo(dt2.Date)
+                            '    iresultの意味
+                            '     0 : dt1とdt2は同じ日
+                            '    -1 : dt1はdt2より前の日
+                            '     1 : dt1はdt2より後の日
+                            '(予定)積込日 と　現在日付を比較
+                            Dim iresult As Integer = Date.Parse(leftview.WF_Calendar.Text).CompareTo(Date.Parse(Me.TxtDepDate.Text))
+                            '◯ (一覧)積込日＜(予定)発日
+                            If iresult = -1 Then
+                                '★積置(チェックボックスON)
+                                updHeader.Item("STACKINGFLG") = "on"
+                            Else
+                                '★積置(チェックボックスOFF)
+                                updHeader.Item("STACKINGFLG") = ""
+                            End If
+                        End If
+
+                    Catch ex As Exception
+                    End Try
 
                 End If
                 'updHeader("OPERATION") = C_LIST_OPERATION_CODE.UPDATING

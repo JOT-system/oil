@@ -1,15 +1,15 @@
-﻿.boxIconArea div, .calendarIconArea div {
+﻿#pnlListArea .boxIconArea div, #pnlListArea .calendarIconArea div {
     margin-top: calc(100% - 12.5px);
 }
 /* アイコン位置補正 */
 /* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-    .calendarIconArea div, .boxIconArea div {
+    #pnlListArea .calendarIconArea div, #pnlListArea .boxIconArea div {
         margin-top: calc(100% - 12px);
     }
 }
 /* Edgeも通ってしまうので打ち消す */
-_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+_:-ms-lang(x)::backdrop, #pnlListArea .calendarIconArea div, #pnlListArea .boxIconArea div {
     margin-top: calc(100% - 12.5px);
 }
 

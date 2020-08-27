@@ -15402,6 +15402,9 @@ Public Class OIT0003OrderDetail
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
 
+                    '★行削除したデータはSKIPする。
+                    If OIT0003row("DELFLG") = "1" Then Continue For
+
                     If OIT0003row("ACTUALLODDATE") <> "" Then
                         PARALDF8.Value = OIT0003row("ACTUALLODDATE")
                     Else
@@ -15422,8 +15425,6 @@ Public Class OIT0003OrderDetail
 
                     End Using
 
-                    '★行削除したデータはSKIPする。
-                    If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK8tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
@@ -15497,6 +15498,9 @@ Public Class OIT0003OrderDetail
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
 
+                    '★行削除したデータはSKIPする。
+                    If OIT0003row("DELFLG") = "1" Then Continue For
+
                     If OIT0003row("ACTUALLODDATE") <> "" Then
                         PARALSM8.Value = OIT0003row("ACTUALLODDATE")
                     Else
@@ -15517,8 +15521,6 @@ Public Class OIT0003OrderDetail
 
                     End Using
 
-                    '★行削除したデータはSKIPする。
-                    If OIT0003row("DELFLG") = "1" Then Continue For
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK10tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。

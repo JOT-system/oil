@@ -467,6 +467,9 @@
             <asp:Panel ID="pnlNoData" CssClass="nodataArea" runat="server" ClientIDMode="Predictable" Visible="false">
                 集計対象無し
             </asp:Panel>
+            <asp:Panel ID="pnlSysError" CssClass="nodataArea" runat="server" ClientIDMode="Predictable" Visible="false">
+                システムエラーが発生し月間輸送量を表示出来ませんでした。
+            </asp:Panel>
         </div>
     </div>
     <asp:HiddenField ID="hdnPaneOrder" runat="server" Visible="false" ClientIDMode="Predictable" />

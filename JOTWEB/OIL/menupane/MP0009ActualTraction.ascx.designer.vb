@@ -68,6 +68,15 @@ Partial Public Class MP0009ActualTraction
     Protected WithEvents chtActualTraction As Global.System.Web.UI.DataVisualization.Charting.Chart
     
     '''<summary>
+    '''pnlSysError コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlSysError As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>
     '''<remarks>

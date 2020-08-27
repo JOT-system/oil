@@ -75,9 +75,17 @@ Public Class OIT0005WRKINC
                 viewName = "OIL.VIW0008_TANKLOC01_ZANSHA"
             Case "2" '輸送状況
                 viewName = "OIL.VIW0008_TANKLOC02_TRANS"
-            Case "3" '回送状況
+            Case "3" '回送中（交検）
                 viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
-            Case "4" 'その他状況
+            Case "4" '回送中（全検）
+                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+            Case "5" '回送中（修理）
+                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+            Case "7" '回送中（疎開留置）
+                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+            Case "8" '回送（ＭＣ）状況
+                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+            Case "9" 'その他状況
                 viewName = "OIL.VIW0008_TANKLOC04_OTHERS"
         End Select
         Return viewName
@@ -99,7 +107,19 @@ Public Class OIT0005WRKINC
             Case "3" '回送状況
                 'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
                 viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
-            Case "4" 'その他状況
+            Case "4" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "5" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "7" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "8" '回送状況
+                'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+                viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
+            Case "9" 'その他状況
                 'viewName = "NONOPERATIONDAYS DESC, CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
                 viewName = "CONVERT(decimal(16,2),case when isnumeric(TANKNUMBER)=1 then TANKNUMBER else null end)"
         End Select
@@ -121,8 +141,12 @@ Public Class OIT0005WRKINC
             Me.ConditionList = New List(Of ConditionItem)
             Me.ConditionList.AddRange({New ConditionItem("1", "残車状況", "残車数", 0, "交検間近", 0),
                                        New ConditionItem("2", "輸送状況", "翌日発送分", 0, "輸送中", 0),
-                                       New ConditionItem("3", "回送状況", "回送指示中分", 0, "回送中", 0),
-                                       New ConditionItem("4", "その他状況", "留置", 0, "その他", 0)})
+                                       New ConditionItem("3", "回送（交検）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("4", "回送（全検）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("5", "回送（修理）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("7", "回送（<span style='letter-spacing:0;'>疎開留</span>置）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("8", "回送（ＭＣ）", "回送指示中分", 0, "回送中", 0),
+                                       New ConditionItem("9", "その他状況", "留置", 0, "その他", 0)})
 
         End Sub
         ''' <summary>

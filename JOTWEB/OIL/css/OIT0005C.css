@@ -40,16 +40,17 @@
     color:rgb(117,113,113);
     font-size:18px;
     margin-left:60px;
-    padding:5px;
+    /* padding:5px; */
     padding-bottom:0;
     width:calc(100% - 70px);
 }
 .conditionItem .value{
     color:rgb(0,32,96);
-    font-size:40px;
+    //font-size:40px;
+    font-size:32px;
     //margin-left:65px;
     margin-right:65px;
-    padding:5px;
+    /* padding:5px; */
     padding-top:0;
     width:calc(100% - 75px);
     text-align:right;

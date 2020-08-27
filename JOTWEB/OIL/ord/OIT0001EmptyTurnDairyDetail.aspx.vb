@@ -1888,6 +1888,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA14.Value = C_DEFAULT_YMD
 
                     SQLcmd.ExecuteNonQuery()
+
+                    If OIT0001UPDrow("TANKNO") <> "" Then
+                        '★タンク車所在の更新(タンク車№を再度選択できるようにするため)
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                        WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0001UPDrow("TANKNO"), I_SITUATION:="1",
+                                            I_ORDERNO:=OIT0001UPDrow("ORDERNO"), I_AEMPARRDATE:="", upActualEmparrDate:=True)
+                    End If
+
                 Else
                     i += 1
                     OIT0001UPDrow("LINECNT") = i        'LINECNT
@@ -6239,6 +6250,180 @@ Public Class OIT0001EmptyTurnDairyDetail
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' (タンク車所在TBL)の内容を更新
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_UpdateTankShozai(ByVal I_LOCATION As String,
+                                      ByVal I_STATUS As String,
+                                      ByVal I_KBN As String,
+                                      Optional ByVal I_SITUATION As String = Nothing,
+                                      Optional ByVal I_TANKNO As String = Nothing,
+                                      Optional ByVal I_ORDERNO As String = Nothing,
+                                      Optional ByVal I_EMPARRDATE As String = Nothing,
+                                      Optional ByVal I_AEMPARRDATE As String = Nothing,
+                                      Optional ByVal upEmparrDate As Boolean = False,
+                                      Optional ByVal upActualEmparrDate As Boolean = False,
+                                      Optional ByVal upLastOilCode As Boolean = False)
+
+        Try
+            'DataBase接続文字
+            Dim SQLcon = CS0050SESSION.getConnection
+            SQLcon.Open() 'DataBase接続(Open)
+
+            '更新SQL文･･･タンク車所在TBL更新
+            Dim SQLStr As String =
+                    " UPDATE OIL.OIT0005_SHOZAI " _
+                    & "    SET "
+
+            '○ 更新内容が指定されていれば追加する
+            '所在地コード
+            If Not String.IsNullOrEmpty(I_LOCATION) Then
+                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+            End If
+            'タンク車状態コード
+            If Not String.IsNullOrEmpty(I_STATUS) Then
+                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+            End If
+            '積車区分
+            If Not String.IsNullOrEmpty(I_KBN) Then
+                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+            End If
+            'タンク車状況コード
+            If Not String.IsNullOrEmpty(I_SITUATION) Then
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+            End If
+
+            '★空車着日（予定）が未設定の場合は、オーダー中の空車着日（予定）を設定
+            If String.IsNullOrEmpty(I_EMPARRDATE) Then I_EMPARRDATE = Me.TxtEmparrDate.Text
+            '空車着日（予定）
+            If upEmparrDate = True Then
+                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", I_EMPARRDATE)
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+            End If
+
+            ''★空車着日（実績）が未設定の場合は、オーダー中の空車着日（実績）を設定
+            'If String.IsNullOrEmpty(I_AEMPARRDATE) Then I_AEMPARRDATE = Me.TxtActualEmparrDate.Text
+            ''★受注Noが未設定の場合は、オーダー中の受注№を設定
+            'If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
+            '空車着日（実績）
+            If upActualEmparrDate = True Then
+                If I_AEMPARRDATE = "" Then
+                    SQLStr &= "        ACTUALEMPARRDATE   = NULL, "
+                Else
+                    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+                End If
+                '### 20200618 START 受注での使用をリセットする対応 #########################################
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
+                '### 20200618 END   受注での使用をリセットする対応 #########################################
+            Else
+                '### 20200618 START 受注での使用を設定する対応 #############################################
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", I_ORDERNO)
+                '### 20200618 END   受注での使用を設定する対応 #############################################
+            End If
+            '前回油種
+            If upLastOilCode = True Then
+                SQLStr &=
+                          "        LASTOILCODE        = @P03, " _
+                        & "        LASTOILNAME        = @P04, " _
+                        & "        PREORDERINGTYPE    = @P05, " _
+                        & "        PREORDERINGOILNAME = @P06, "
+            End If
+
+            SQLStr &=
+                      "        UPDYMD         = @P11, " _
+                    & "        UPDUSER        = @P12, " _
+                    & "        UPDTERMID      = @P13, " _
+                    & "        RECEIVEYMD     = @P14  " _
+                    & "  WHERE TANKNUMBER     = @P01  " _
+                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND DELFLG        <> @P02 "
+
+            '### 20200618 START 受注での使用をリセットする対応 #########################################
+            '空車着日（実績）
+            If upActualEmparrDate = True Then
+                'SQLStr &=
+                '      "    AND ISNULL(USEORDERNO, '')    <> ''; "
+                SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
+            Else
+                SQLStr &=
+                      "    AND (ISNULL(USEORDERNO, '')     = '' "
+                SQLStr &= String.Format(" OR USEORDERNO = '{0}');", I_ORDERNO)
+            End If
+            '### 20200618 END   受注での使用をリセットする対応 #########################################
+
+            Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+
+            Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", System.Data.SqlDbType.NVarChar)  'タンク車№
+            Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", System.Data.SqlDbType.NVarChar)  '削除フラグ
+
+            Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
+            Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
+            Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", System.Data.SqlDbType.NVarChar)
+            Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
+
+            PARA02.Value = C_DELETE_FLG.DELETE
+
+            PARA11.Value = Date.Now
+            PARA12.Value = Master.USERID
+            PARA13.Value = Master.USERTERMID
+            PARA14.Value = C_DEFAULT_YMD
+
+            If I_TANKNO = "" Then
+                '### ★前回油種の更新 ###############################
+                If upLastOilCode = True Then
+                    Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '前回油種コード
+                    Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '前回油種名
+                    Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
+                    Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
+
+                    '(一覧)で設定しているタンク車をKEYに前回油種を更新
+                    For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                        PARA01.Value = OIT0001row("TANKNO")
+                        PARA03.Value = OIT0001row("OILCODE")
+                        PARA04.Value = OIT0001row("OILNAME")
+                        PARA05.Value = OIT0001row("ORDERINGTYPE")
+                        PARA06.Value = OIT0001row("ORDERINGOILNAME")
+                        SQLcmd.ExecuteNonQuery()
+                    Next
+
+                Else
+                    '(一覧)で設定しているタンク車をKEYに更新
+                    For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                        PARA01.Value = OIT0001row("TANKNO")
+                        SQLcmd.ExecuteNonQuery()
+                    Next
+                End If
+            Else
+                '指定されたタンク車№をKEYに更新
+                PARA01.Value = I_TANKNO
+                SQLcmd.ExecuteNonQuery()
+            End If
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0001D_TANKSHOZAI UPDATE")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0001D_TANKSHOZAI UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+
+        End Try
+
+        'If WW_ERRCODE = C_MESSAGE_NO.NORMAL Then
+        '    '○メッセージ表示
+        '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        'End If
 
     End Sub
 

@@ -4647,8 +4647,10 @@ Public Class OIT0003OrderDetail
                     '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更なし(空白)
                     '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                    'WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1",
+                    '                    I_AEMPARRDATE:=Me.TxtEmparrDate.Text, upActualEmparrDate:=True)
                     WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1",
-                                        I_AEMPARRDATE:=Me.TxtEmparrDate.Text, upActualEmparrDate:=True)
+                                        I_AEMPARRDATE:="", upActualEmparrDate:=True)
 
                 Else
                     i += 1
@@ -10356,7 +10358,11 @@ Public Class OIT0003OrderDetail
             If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
             '空車着日（実績）
             If upActualEmparrDate = True Then
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+                If I_AEMPARRDATE = "" Then
+                    SQLStr &= "        ACTUALEMPARRDATE   = NULL, "
+                Else
+                    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+                End If
                 '### 20200618 START 受注での使用をリセットする対応 #########################################
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
                 '### 20200618 END   受注での使用をリセットする対応 #########################################

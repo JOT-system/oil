@@ -4647,8 +4647,10 @@ Public Class OIT0003OrderDetail
                     '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更なし(空白)
                     '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                    'WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1",
+                    '                    I_AEMPARRDATE:=Me.TxtEmparrDate.Text, upActualEmparrDate:=True)
                     WW_UpdateTankShozai("", "3", "", I_TANKNO:=OIT0003UPDrow("TANKNO"), I_SITUATION:="1",
-                                        I_AEMPARRDATE:=Me.TxtEmparrDate.Text, upActualEmparrDate:=True)
+                                        I_AEMPARRDATE:="", upActualEmparrDate:=True)
 
                 Else
                     i += 1
@@ -10356,7 +10358,11 @@ Public Class OIT0003OrderDetail
             If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
             '空車着日（実績）
             If upActualEmparrDate = True Then
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+                If I_AEMPARRDATE = "" Then
+                    SQLStr &= "        ACTUALEMPARRDATE   = NULL, "
+                Else
+                    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+                End If
                 '### 20200618 START 受注での使用をリセットする対応 #########################################
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
                 '### 20200618 END   受注での使用をリセットする対応 #########################################
@@ -15130,28 +15136,81 @@ Public Class OIT0003OrderDetail
         Next
 
         '### 20200620 START((全体)No79対応)異なる列車で同一積込日の場合###########
+        '### 20200827 START 積置を考慮した妥当性チェック対応 ######################
+        'Dim SQLDiffLODTrainStr As String =
+        '      SQLStr _
+        '    & "                                  )" _
+        '    & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
+        '    & "   AND OIT0002.ORDERNO        <> @P01 " _
+        '    & "   AND OIT0002.OFFICECODE      = @P06 " _
+        '    & "   AND OIT0002.LODDATE         = @P03 " _
+        '    & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
+        '    & "   AND OIT0002.DELFLG         <> @P05 " _
+        '    & "   AND OIT0002.TRAINNO        <> @P02 "
+
+        '★積置チェックパターン
+        '　１．　①積込日　＝　②積込日(明細)　ＯＲ　①積込日　＝　②積込日
+        '　２．（①積込日　＞　②積込日　　　　ＯＲ　①積込日　＞　②積込日(明細)）　ＡＮＤ　①発日　＜　②発日
+        '　３．　①積込日　＞　②積込日(明細)　ＡＮＤ　①発日　＜　②発日
+        '　４．（①積込日　＞　②積込日　　　　ＯＲ　①積込日　＞　②積込日(明細)）　ＡＮＤ　①発日　＞　②発日
+        '　５．　①積込日　＞　②積込日(明細)　ＡＮＤ　①発日　＞　②発日
+        '　６．（①積込日　＜　②積込日　　　　ＯＲ　①積込日　＜　②積込日(明細)）　ＡＮＤ　①発日　＞　②発日
+        '　７．　①積込日　＜　②積込日(明細)　ＡＮＤ　①発日　＜　②発日
         Dim SQLDiffLODTrainStr As String =
               SQLStr _
             & "                                  )" _
             & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.OFFICECODE      = @P06 " _
-            & "   AND OIT0002.LODDATE         = @P03 " _
+            & "   AND ( " _
+            & "          (OIT0002.LODDATE = @P03 OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08)) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE < @P07) " _
+            & "       ) " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 " _
             & "   AND OIT0002.TRAINNO        <> @P02 "
+        '### 20200827 END   積置を考慮した妥当性チェック対応 ######################
         '### 20200620 END  ((全体)No79対応)異なる列車で同一積込日の場合###########
+
         '### 20200805 START((全体)No117対応)異なる列車で同一積込日の場合###########
+        '### 20200827 START 積置を考慮した妥当性チェック対応 ######################
+        'Dim SQLSameLODTrainStr As String =
+        '      SQLStr _
+        '    & "                                  )" _
+        '    & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
+        '    & "   AND OIT0002.ORDERNO        <> @P01 " _
+        '    & "   AND OIT0002.OFFICECODE      = @P06 " _
+        '    & "   AND OIT0002.LODDATE         = @P03 " _
+        '    & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
+        '    & "   AND OIT0002.DELFLG         <> @P05 " _
+        '    & "   AND OIT0002.TRAINNO         = @P02 "
+
+        '★積置チェックパターン
+        '　上記と同様
         Dim SQLSameLODTrainStr As String =
               SQLStr _
             & "                                  )" _
             & " WHERE OIT0002.USEPROPRIETYFLG = '1' " _
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.OFFICECODE      = @P06 " _
-            & "   AND OIT0002.LODDATE         = @P03 " _
+            & "   AND ( " _
+            & "          (OIT0002.LODDATE = @P03 OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08)) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE < @P07) " _
+            & "       ) " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 " _
             & "   AND OIT0002.TRAINNO         = @P02 "
+        '### 20200827 END   積置を考慮した妥当性チェック対応 ######################
         '### 20200805 END  ((全体)No117対応)異なる列車で同一積込日の場合###########
 
         SQLStr &=
@@ -15326,28 +15385,52 @@ Public Class OIT0003OrderDetail
                 Dim PARALDF4 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARALDF5 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARALDF6 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P06", SqlDbType.NVarChar, 6)  '受注営業所
+                Dim PARALDF7 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P07", SqlDbType.Date)         '(予定)発日
+                Dim PARALDF8 As SqlParameter = SQLDiffLODTraincmd.Parameters.Add("@P08", SqlDbType.Date)         '(実績)積込日(明細)
                 PARALDF1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARALDF2.Value = Me.TxtTrainNo.Text
                 PARALDF3.Value = Me.TxtLoadingDate.Text
                 PARALDF4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARALDF5.Value = C_DELETE_FLG.DELETE
                 PARALDF6.Value = Me.TxtOrderOfficeCode.Text
-                'PARALDF6.Value = work.WF_SEL_SALESOFFICECODE.Text
+                PARALDF7.Value = Me.TxtDepDate.Text
 
-                Using SQLdr As SqlDataReader = SQLDiffLODTraincmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003WK8tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
+                'Using SQLdr As SqlDataReader = SQLDiffLODTraincmd.ExecuteReader()
+                '    '○ フィールド名とフィールドの型を取得
+                '    For index As Integer = 0 To SQLdr.FieldCount - 1
+                '        OIT0003WK8tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                '    Next
 
-                    '○ テーブル検索結果をテーブル格納
-                    OIT0003WK8tbl.Load(SQLdr)
-                End Using
+                '    '○ テーブル検索結果をテーブル格納
+                '    OIT0003WK8tbl.Load(SQLdr)
+                'End Using
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
                     '★行削除したデータはSKIPする。
                     If OIT0003row("DELFLG") = "1" Then Continue For
+
+                    If OIT0003row("ACTUALLODDATE") <> "" Then
+                        PARALDF8.Value = OIT0003row("ACTUALLODDATE")
+                    Else
+                        PARALDF8.Value = DBNull.Value
+                    End If
+
+                    Using SQLdr As SqlDataReader = SQLDiffLODTraincmd.ExecuteReader()
+
+                        If OIT0003WK8tbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0003WK8tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0003WK8tbl.Load(SQLdr)
+
+                    End Using
+
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK8tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
@@ -15398,27 +15481,52 @@ Public Class OIT0003OrderDetail
                 Dim PARALSM4 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P04", SqlDbType.NVarChar, 3)  '受注進行ステータス
                 Dim PARALSM5 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P05", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARALSM6 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P06", SqlDbType.NVarChar, 6)  '受注営業所
+                Dim PARALSM7 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P07", SqlDbType.Date)         '(予定)発日
+                Dim PARALSM8 As SqlParameter = SQLSameLODTraincmd.Parameters.Add("@P08", SqlDbType.Date)         '(実績)積込日(明細)
                 PARALSM1.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARALSM2.Value = Me.TxtTrainNo.Text
                 PARALSM3.Value = Me.TxtLoadingDate.Text
                 PARALSM4.Value = BaseDllConst.CONST_ORDERSTATUS_900
                 PARALSM5.Value = C_DELETE_FLG.DELETE
                 PARALSM6.Value = Me.TxtOrderOfficeCode.Text
+                PARALSM7.Value = Me.TxtDepDate.Text
 
-                Using SQLdr As SqlDataReader = SQLSameLODTraincmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003WK10tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
+                'Using SQLdr As SqlDataReader = SQLSameLODTraincmd.ExecuteReader()
+                '    '○ フィールド名とフィールドの型を取得
+                '    For index As Integer = 0 To SQLdr.FieldCount - 1
+                '        OIT0003WK10tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                '    Next
 
-                    '○ テーブル検索結果をテーブル格納
-                    OIT0003WK10tbl.Load(SQLdr)
-                End Using
+                '    '○ テーブル検索結果をテーブル格納
+                '    OIT0003WK10tbl.Load(SQLdr)
+                'End Using
 
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
+
                     '★行削除したデータはSKIPする。
                     If OIT0003row("DELFLG") = "1" Then Continue For
+
+                    If OIT0003row("ACTUALLODDATE") <> "" Then
+                        PARALSM8.Value = OIT0003row("ACTUALLODDATE")
+                    Else
+                        PARALSM8.Value = DBNull.Value
+                    End If
+
+                    Using SQLdr As SqlDataReader = SQLSameLODTraincmd.ExecuteReader()
+
+                        If OIT0003WK10tbl.Columns.Count = 0 Then
+                            '○ フィールド名とフィールドの型を取得
+                            For index As Integer = 0 To SQLdr.FieldCount - 1
+                                OIT0003WK10tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            Next
+                        End If
+
+                        '○ テーブル検索結果をテーブル格納
+                        OIT0003WK10tbl.Load(SQLdr)
+
+                    End Using
+
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK10tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。

@@ -28,6 +28,9 @@
                     </ItemTemplate>
                 </asp:Repeater>        
             </div>
+            <asp:Panel ID="pnlSysError" CssClass="nodataArea" runat="server" ClientIDMode="Predictable" Visible="false">
+                システムエラーが発生し貨車連結順序表取込状況を表示出来ませんでした。
+            </asp:Panel>
         </div>
 
     </div>

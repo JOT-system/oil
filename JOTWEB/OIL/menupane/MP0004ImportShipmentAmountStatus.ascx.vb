@@ -27,15 +27,42 @@ Public Class MP0004ImportShipmentAmountStatus
         '初回ロードかポストバックか判定
         If IsPostBack = False Then
             '初回ロード
-            Initialize()
+            Try
+                Initialize()
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                Me.ddlImportShipmentAmountOffice.Enabled = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0004ImportShipmentAmountStatus"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "INIT"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+            End Try
         Else
             'ポストバック
-            If Me.hdnRefreshCall.Value = "1" Then
-                '最新化処理
-                SetDisplayValues()
-            End If
-            '処理フラグを落とす
-            Me.hdnRefreshCall.Value = ""
+            Try
+                If Me.hdnRefreshCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    Me.ddlImportShipmentAmountOffice.Enabled = True
+                    '最新化処理
+                    SetDisplayValues()
+                End If
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                Me.ddlImportShipmentAmountOffice.Enabled = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0004ImportShipmentAmountStatus"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "POSTBACK"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            End Try
+
         End If 'End IsPostBack = False
     End Sub
     ''' <summary>

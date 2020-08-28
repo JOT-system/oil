@@ -57,7 +57,7 @@ Public Class MP0007BudgetYoYNums
     ''' <param name="sqlCon"></param>
     ''' <returns></returns>
     Private Function GetOilTypeList(sqlCon As SqlConnection) As List(Of String)
-
+        Return Nothing
     End Function
     ''' <summary>
     ''' 一覧表データ取得

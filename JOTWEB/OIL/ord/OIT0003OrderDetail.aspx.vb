@@ -5406,11 +5406,13 @@ Public Class OIT0003OrderDetail
             WW_CheckTrainRepeat(WW_ERRCODE, SQLcon)
             If WW_ERRCODE = "ERR" Then
 
-                '★新規登録の場合のみ
-                If work.WF_SEL_CREATEFLG.Text = "1" Then
-                    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                End If
+                '### 20200828 START エラー時のデータ削除を廃止 #########################
+                ''★新規登録の場合のみ
+                'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                'End If
+                '### 20200828 END   エラー時のデータ削除を廃止 #########################
                 Exit Sub
             End If
         End Using
@@ -5438,38 +5440,46 @@ Public Class OIT0003OrderDetail
             If WW_ERRCODE = "ERR1" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '★新規登録の場合のみ
-                If work.WF_SEL_CREATEFLG.Text = "1" Then
-                    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                End If
+                '### 20200828 START エラー時のデータ削除を廃止 #########################
+                ''★新規登録の場合のみ
+                'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                'End If
+                '### 20200828 END   エラー時のデータ削除を廃止 #########################
                 Exit Sub
             ElseIf WW_ERRCODE = "ERR2" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '★新規登録の場合のみ
-                If work.WF_SEL_CREATEFLG.Text = "1" Then
-                    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                End If
+                '### 20200828 START エラー時のデータ削除を廃止 #########################
+                ''★新規登録の場合のみ
+                'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                'End If
+                '### 20200828 END   エラー時のデータ削除を廃止 #########################
                 Exit Sub
             ElseIf WW_ERRCODE = "ERR3" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '★新規登録の場合のみ
-                If work.WF_SEL_CREATEFLG.Text = "1" Then
-                    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                End If
+                '### 20200828 START エラー時のデータ削除を廃止 #########################
+                ''★新規登録の場合のみ
+                'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                'End If
+                '### 20200828 END   エラー時のデータ削除を廃止 #########################
                 Exit Sub
             ElseIf WW_ERRCODE = "ERR4" Then
                 Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '★新規登録の場合のみ
-                If work.WF_SEL_CREATEFLG.Text = "1" Then
-                    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                End If
+                '### 20200828 START エラー時のデータ削除を廃止 #########################
+                ''★新規登録の場合のみ
+                'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                'End If
+                '### 20200828 END   エラー時のデータ削除を廃止 #########################
                 Exit Sub
             End If
         End Using

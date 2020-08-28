@@ -41,8 +41,8 @@
                     <div class="rightSide">
                         <!-- 右ボタン -->
                         <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="受注新規作成" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
-                        <a style="display:none;">
                         <input type="button" id="WF_ButtonOTLinkageINSERT" class="btn-sticky" value="OT連携選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonOTLinkageINSERT');" />
+                        <a style="display:none;">
                             <input type="button" id="WF_ButtonLinkINSERT" class="btn-sticky" value="貨車連結選択" style="width:7em;"  onclick="ButtonClick('WF_ButtonLinkINSERT');" />
                             <input type="button" id="WF_ButtonCSV" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ"   onclick="ButtonClick('WF_ButtonCSV');" />
                             <input type="button" id="WF_ButtonSendaiLOADCSV" class="btn-sticky" value="積込予定" onclick="ButtonClick('WF_ButtonSendaiLOADCSV');" />

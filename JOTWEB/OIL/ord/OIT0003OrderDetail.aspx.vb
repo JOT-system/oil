@@ -12871,7 +12871,6 @@ Public Class OIT0003OrderDetail
                 '引数３：積車区分　　　⇒　変更あり("F"(積車))
                 '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                 '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                'WW_UpdateTankShozai("", "", "F", I_SITUATION:="2", upLastOilCode:=True)
                 WW_UpdateTankShozai("", "1", "F", I_SITUATION:="2", upLastOilCode:=True)
 
                 '(実績)発日の入力が完了
@@ -12881,8 +12880,11 @@ Public Class OIT0003OrderDetail
                     '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
                     '引数３：積車区分　　　⇒　変更なし(空白)
                     '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-                    'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "", I_SITUATION:="2")
-                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
+                    '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                    '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                    'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2", upLastOilCode:=True)
+                    '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                 End If
             End If
 
@@ -12897,7 +12899,11 @@ Public Class OIT0003OrderDetail
                 '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
                 '引数３：積車区分　　　⇒　変更あり("F"(積車))
                 '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
+                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2")
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "2", "F", I_SITUATION:="2", upLastOilCode:=True)
+                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
             End If
             '########################################################
 
@@ -12910,19 +12916,26 @@ Public Class OIT0003OrderDetail
                 '★タンク車所在の更新
                 '引数１：所在地コード　⇒　変更あり(着駅)
                 '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                '引数３：積車区分　　　⇒　変更なし(空白)
+                '引数３：積車区分　　　⇒　変更あり("F"(積車))
                 '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
-                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "", I_SITUATION:="2")
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "F", I_SITUATION:="2")
+                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "F", I_SITUATION:="2")
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "F", I_SITUATION:="2", upLastOilCode:=True)
+                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
                 '(実績)受入日の入力が完了
                 If Me.TxtActualAccDate.Text <> "" Then
                     '★タンク車所在の更新
-                    '引数１：所在地コード　⇒　変更なし(空白)
-                    '引数２：タンク車状態　⇒　変更なし(空白)
+                    '引数１：所在地コード　⇒　変更あり(着駅)
+                    '引数２：タンク車状態　⇒　変更あり("3"(到着))
                     '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                    'WW_UpdateTankShozai("", "", "E")
-                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
+                    '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                    '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                    '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                    'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
+                    WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2", upLastOilCode:=True)
+                    '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                 End If
             End If
 
@@ -12934,11 +12947,15 @@ Public Class OIT0003OrderDetail
             '★明細更新ボタン押下時に更新
             If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
                 '★タンク車所在の更新
-                '引数１：所在地コード　⇒　変更なし(空白)
+                '引数１：所在地コード　⇒　変更あり(着駅)
                 '引数２：タンク車状態　⇒　変更あり("3"(到着))
                 '引数３：積車区分　　　⇒　変更あり("E"(空車))
-                'WW_UpdateTankShozai("", "3", "E")
-                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
+                '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                'WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2")
+                WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2", upLastOilCode:=True)
+                '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
             End If
             '########################################################
 
@@ -12973,7 +12990,11 @@ Public Class OIT0003OrderDetail
                         '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
                         '引数３：積車区分　　　⇒　変更あり("E"(空車))
                         '引数４：タンク車状況　⇒　変更あり("1"(残車))
-                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True)
+                        '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True)
+                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True, upLastOilCode:=True)
+                        '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
                         '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
                         '受注オーダーしているタンク車の存在確認
@@ -16875,7 +16896,7 @@ Public Class OIT0003OrderDetail
                     Case BaseDllConst.CONST_ORDERSTATUS_320
 
                         '引数１：所在地コード　⇒　変更なし(空白)
-                        '引数２：タンク車状態　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更あり("1"(発送))
                         '引数３：積車区分　　　⇒　変更あり("F"(積車))
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
@@ -16888,10 +16909,15 @@ Public Class OIT0003OrderDetail
                         '★タンク車所在の更新
                         '引数１：所在地コード　⇒　変更あり(着駅)
                         '引数２：タンク車状態　⇒　変更あり("2"(到着予定))
-                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数３：積車区分　　　⇒　変更あり("F"(積車))
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                        '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        'WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "2", "F", I_SITUATION:="2",
+                        '                    I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
                         WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "2", "F", I_SITUATION:="2",
-                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"), upLastOilCode:=True)
+                        '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
                     '400:受入確認中((実績)積車着日設定済み)
                     Case BaseDllConst.CONST_ORDERSTATUS_400
@@ -16899,20 +16925,31 @@ Public Class OIT0003OrderDetail
                         '★タンク車所在の更新
                         '引数１：所在地コード　⇒　変更あり(着駅)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数３：積車区分　　　⇒　変更あり("F"(積車))
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                        '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        'WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "F", I_SITUATION:="2",
+                        '                    I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
                         WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "F", I_SITUATION:="2",
-                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"), upLastOilCode:=True)
+                        '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
                     '450:受入確認中((実績)受入日設定済み)
                     Case BaseDllConst.CONST_ORDERSTATUS_450
 
                         '★タンク車所在の更新
-                        '引数１：所在地コード　⇒　変更なし(空白)
-                        '引数２：タンク車状態　⇒　変更なし(空白)
+                        '引数１：所在地コード　⇒　変更あり(着駅)
+                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                        '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                        '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
+                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        'WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "E", I_SITUATION:="2",
+                        '                    I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
                         WW_UpdateTankShozai(OIT0003FIDrow("ARRSTATION"), "3", "E", I_SITUATION:="2",
-                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
+                                            I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"), upLastOilCode:=True)
+                        '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
                 End Select
             Next

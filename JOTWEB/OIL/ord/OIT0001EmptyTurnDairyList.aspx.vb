@@ -633,9 +633,12 @@ Public Class OIT0001EmptyTurnDairyList
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                        'WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
+                        '                    I_TANKNO:=OIT0001His2tblrow("TANKNO"), I_SITUATION:="1",
+                        '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
                         WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
                                             I_TANKNO:=OIT0001His2tblrow("TANKNO"), I_SITUATION:="1",
-                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+                                            I_ActualEmparrDate:="", upActualEmparrDate:=True)
 
                     '350：受注確定
                     Case BaseDllConst.CONST_ORDERSTATUS_350
@@ -645,9 +648,12 @@ Public Class OIT0001EmptyTurnDairyList
                         '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
+                        'WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
+                        '                    I_TANKNO:=OIT0001His2tblrow("TANKNO"),
+                        '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
                         WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
                                             I_TANKNO:=OIT0001His2tblrow("TANKNO"),
-                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+                                            I_ActualEmparrDate:="", upActualEmparrDate:=True)
 
                     '400：受入確認中, 450:受入確認中(受入日入力)
                     Case BaseDllConst.CONST_ORDERSTATUS_400,
@@ -1166,7 +1172,13 @@ Public Class OIT0001EmptyTurnDairyList
             End If
             '空車着日（実績）
             If upActualEmparrDate = True Then
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+                'SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+                If I_ActualEmparrDate = "" Then
+                    SQLStr &= "        ACTUALEMPARRDATE   = NULL, "
+                Else
+                    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+                End If
+
                 '### 20200618 START 受注での使用をリセットする対応 #########################################
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
                 '### 20200618 END   受注での使用をリセットする対応 #########################################

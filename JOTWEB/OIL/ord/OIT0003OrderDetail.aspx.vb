@@ -1147,8 +1147,10 @@ Public Class OIT0003OrderDetail
         End Using
 
         '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
-        '◯受注№存在チェック
-        WW_OrderNoExistChk()
+        If work.WF_SEL_ORDERSTATUS.Text <= BaseDllConst.CONST_ORDERSTATUS_450 Then
+            '◯受注№存在チェック
+            WW_OrderNoExistChk()
+        End If
         '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
         '○ 画面表示データ保存
@@ -3064,8 +3066,10 @@ Public Class OIT0003OrderDetail
             Master.RecoverTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text)
 
             '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
-            '◯受注№存在チェック
-            WW_OrderNoExistChk()
+            If work.WF_SEL_ORDERSTATUS.Text <= BaseDllConst.CONST_ORDERSTATUS_450 Then
+                '◯受注№存在チェック
+                WW_OrderNoExistChk()
+            End If
             '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
             DisplayGrid_TAB3()

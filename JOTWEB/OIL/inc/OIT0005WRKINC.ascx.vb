@@ -76,17 +76,17 @@ Public Class OIT0005WRKINC
             Case "2" '輸送状況
                 viewName = "OIL.VIW0008_TANKLOC02_TRANS"
             Case "3" '回送中（交検）
-                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+                viewName = "OIL.VIW0008_TANKLOC03_FORWARD_KK"
             Case "4" '回送中（全検）
-                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+                viewName = "OIL.VIW0008_TANKLOC04_FORWARD_ZK"
             Case "5" '回送中（修理）
-                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+                viewName = "OIL.VIW0008_TANKLOC05_FORWARD_RP"
             Case "7" '回送中（疎開留置）
-                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+                viewName = "OIL.VIW0008_TANKLOC07_FORWARD_SR"
             Case "8" '回送（ＭＣ）状況
-                viewName = "OIL.VIW0008_TANKLOC03_FORWARD"
+                viewName = "OIL.VIW0008_TANKLOC08_FORWARD_MC"
             Case "9" 'その他状況
-                viewName = "OIL.VIW0008_TANKLOC04_OTHERS"
+                viewName = "OIL.VIW0008_TANKLOC09_OTHERS"
         End Select
         Return viewName
     End Function

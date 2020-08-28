@@ -142,29 +142,29 @@ Public Class M00001MP0002CustomReport : Implements IDisposable
             CreateHeader()
             Dim margeFieldLenFieldName As new Dictionary(Of String, String)
             'データ部生成
-            'Select Case Me.ViewId
-            '    Case "VIEW001"
-            '        CreateView001(margeFieldLenFieldName)
-            '    Case "VIEW002"
-            '        margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
-            '        margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD2")
-            '        CreateView002(margeFieldLenFieldName)
-            '    Case "VIEW003"
-            '        margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
-            '        margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD1")
-            '        CreateView003(margeFieldLenFieldName)
-            '    Case "VIEW004"
-            '        margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
-            '        margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD1")
-            '        CreateView004(margeFieldLenFieldName)
-            '    Case "VIEW005"
-            '        margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD1")
-            '        CreateView005(margeFieldLenFieldName)
-            '    Case "VIEW006"
-            '        margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
-            '        margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD2")
-            '        CreateView006(margeFieldLenFieldName)
-            'End Select
+            Select Case Me.ViewId
+                Case "VIEW001"
+                    CreateView001(margeFieldLenFieldName)
+                Case "VIEW002"
+                    margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
+                    margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD2")
+                    CreateView002(margeFieldLenFieldName)
+                Case "VIEW003"
+                    margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
+                    margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD1")
+                    CreateView003(margeFieldLenFieldName)
+                Case "VIEW004"
+                    margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
+                    margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD1")
+                    CreateView004(margeFieldLenFieldName)
+                Case "VIEW005"
+                    margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD1")
+                    CreateView005(margeFieldLenFieldName)
+                Case "VIEW006"
+                    margeFieldLenFieldName.Add("BIGOILNAME", "ROWSPANFIELD1")
+                    margeFieldLenFieldName.Add("TRAINCLASSNAME", "ROWSPANFIELD2")
+                    CreateView006(margeFieldLenFieldName)
+            End Select
             '保存処理実行
             ExcelAppObj.ScreenUpdating = True
             ExcelAppObj.Calculation = Excel.XlCalculation.xlCalculationAutomatic

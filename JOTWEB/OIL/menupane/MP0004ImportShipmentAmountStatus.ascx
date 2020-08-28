@@ -33,6 +33,9 @@
                     </ItemTemplate>
                 </asp:Repeater>        
             </div>
+            <asp:Panel ID="pnlSysError" CssClass="nodataArea" runat="server" ClientIDMode="Predictable" Visible="false">
+                システムエラーが発生し出荷実績取込状況を表示出来ませんでした。
+            </asp:Panel>
         </div>
     </div>
     <asp:HiddenField ID="hdnPaneOrder" runat="server" Visible="false" />

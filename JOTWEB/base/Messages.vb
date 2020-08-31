@@ -655,6 +655,10 @@ Public Module Messages
         ''' タンク車(同一積込日)使用メッセージ
         ''' </summary>
         Public Const OIL_TANKNO_LOADDATE_USE As String = "20063"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー(空回日報画面)
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20064"
 #End Region
 
 

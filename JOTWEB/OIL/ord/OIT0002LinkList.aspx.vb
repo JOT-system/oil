@@ -1326,7 +1326,7 @@ Public Class OIT0002LinkList
         '引数２：積車区分　　　⇒　変更あり("E"(空車))
         '引数３：タンク車状況　⇒　変更あり("1"(残車))
         '引数４：使用受注№　　⇒　初期化あり(TRUE)
-        'WW_UpdateTankShozai("3", "E", I_SITUATION:="1", I_USEORDERNO:=True)
+        WW_UpdateTankShozai("3", "E", I_SITUATION:="1", I_USEORDERNO:=True)
 
         '○ 画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -2178,6 +2178,8 @@ Public Class OIT0002LinkList
                     & "        LASTOILNAME    = @P05, " _
                     & "        PREORDERINGTYPE    = @P06, " _
                     & "        PREORDERINGOILNAME = @P07, " _
+                    & "        EMPARRDATE         = @P08, " _
+                    & "        ACTUALEMPARRDATE   = @P09, " _
                     & "        UPDYMD         = @P11, " _
                     & "        UPDUSER        = @P12, " _
                     & "        UPDTERMID      = @P13, " _
@@ -2195,6 +2197,8 @@ Public Class OIT0002LinkList
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種名
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
             Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
+            Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.Date)      '空車着日（予定）
+            Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.Date)      '空車着日（実績）
 
             Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", System.Data.SqlDbType.DateTime)
             Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", System.Data.SqlDbType.NVarChar)
@@ -2202,6 +2206,8 @@ Public Class OIT0002LinkList
             Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", System.Data.SqlDbType.DateTime)
 
             PARA02.Value = C_DELETE_FLG.DELETE
+            PARA08.Value = DBNull.Value
+            PARA09.Value = DBNull.Value
 
             PARA11.Value = Date.Now
             PARA12.Value = Master.USERID
@@ -2211,7 +2217,7 @@ Public Class OIT0002LinkList
             '(一覧)で設定しているタンク車をKEYに更新
             For Each OIT0002EXLINSrow As DataRow In OIT0002EXLINStbl.Rows
 
-                PARA01.Value = OIT0002EXLINSrow("TANKNO")               'タンク車No
+                PARA01.Value = OIT0002EXLINSrow("TANKNUMBER")           'タンク車No
                 PARA03.Value = OIT0002EXLINSrow("RETSTATION")           '空車着駅コード
                 PARA04.Value = OIT0002EXLINSrow("PREOILCODE")           '前回油種
                 PARA05.Value = OIT0002EXLINSrow("PREOILNAME")           '前回油種名

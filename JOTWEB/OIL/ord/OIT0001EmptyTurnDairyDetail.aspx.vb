@@ -52,6 +52,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     Private WW_RTN_SW As String = ""
     Private WW_DUMMY As String = ""
     Private WW_ERRCODE As String                                    'サブ用リターンコード
+    Private WW_CHK_OILCODE As Boolean = False
 
     Private WW_ORDERINFOFLG_10 As Boolean = False                   '受注情報セット可否(情報(10:積置))
     Private WW_ORDERINFOALERMFLG_80 As Boolean = False              '受注情報セット可否(警告(80:タンク車数オーバー))
@@ -2493,9 +2494,31 @@ Public Class OIT0001EmptyTurnDairyDetail
         '### 20200819 END   一度チェックは外したが要望により復活 ###############################################
 
         '〇前回油種と油種の整合性チェック
+        'Dim blnOilCheck As Boolean = False
+        WW_CHK_OILCODE = False
         WW_CheckLastOilConsistency(WW_ERRCODE)
-        If WW_ERRCODE = "ERR" Then
+        '前回黒油によるエラー
+        If WW_ERRCODE = "ERR1" Then
+            Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
             Exit Sub
+
+            '前回揮発油,今回黒油、または灯軽油による警告
+        ElseIf WW_ERRCODE = "ERR2" _
+            AndAlso work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+            'blnOilCheck = True
+            WW_CHK_OILCODE = True
+            Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            'Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR,
+            '  C_MESSAGE_TYPE.QUES,
+            '  needsPopUp:=True,
+            '  messageBoxTitle:="",
+            '  IsConfirm:=True,
+            '  YesButtonId:="btnChkLastOilConfirmYes",
+            '  needsConfirmNgToPostBack:=True,
+            '  NoButtonId:="btnChkLastOilConfirmNo")
+            '★警告のため、後続処理は実施
+            WW_ERRCODE = C_MESSAGE_NO.NORMAL
         End If
 
         '○ 同一レコードチェック
@@ -3594,22 +3617,54 @@ Public Class OIT0001EmptyTurnDairyDetail
 
             'タンク車№が未設定の場合はチェックはしない。
             If Convert.ToString(OIT0001row("TANKNO")) = "" Then
+                OIT0001row("ORDERINFO") = ""
+                OIT0001row("ORDERINFONAME") = ""
                 Continue For
             End If
 
             WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
             WW_FixvalueMasterSearch(Convert.ToString(OIT0001row("LASTOILCODE")) + Convert.ToString(OIT0001row("PREORDERINGTYPE")), "LASTOILCONSISTENCY", Convert.ToString(OIT0001row("OILCODE")) + Convert.ToString(OIT0001row("ORDERINGTYPE")), WW_GetValue)
 
-            If WW_GetValue(2) = "1" Then
-                Master.Output(C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            '前回黒油
+            If WW_GetValue(2) = "1" AndAlso OIT0001row("DELFLG") = "0" Then
+                OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99
+                CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
 
                 WW_CheckMES1 = "前回油種と油種の整合性エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTOIL_CONSISTENCY_ERROR
                 WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
-                O_RTN = "ERR"
-                Exit Sub
+                O_RTN = "ERR1"
+                'Exit Sub
+
+                '前回揮発油
+            ElseIf (WW_GetValue(2) = "2" OrElse WW_GetValue(2) = "3") AndAlso OIT0001row("DELFLG") = "0" Then
+                OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98
+                CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+
+                WW_CheckMES1 = "前回油種と油種の整合性エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2
+                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0001row)
+
+                Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()       'DataBase接続
+
+                    '受注明細TBLの受注情報を更新
+                    WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
+                End Using
+
+                If O_RTN <> "ERR1" Then O_RTN = "ERR2"
+
+            Else
+                If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_99 _
+                    OrElse OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_98 Then
+                    OIT0001row("ORDERINFO") = ""
+                    OIT0001row("ORDERINFONAME") = ""
+                End If
             End If
         Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0001tbl)
 
     End Sub
 
@@ -3862,7 +3917,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        If WW_CHK_OILCODE = False Then
+            Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 
@@ -4398,7 +4455,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End Try
 
-        'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        If WW_CHK_OILCODE = False Then
+            'Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 
@@ -5409,7 +5468,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If WW_CHK_OILCODE = False Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 
@@ -5441,7 +5502,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        TANKNO            = @P03, STACKINGFLG  = @P40" _
+            & "        TANKNO            = @P03, STACKINGFLG  = @P40, ORDERINFO    = @P34" _
             & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
             & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK       = @P38" _
@@ -5615,7 +5676,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         PARA40.Value = "2"
                     End If
 
-                    PARA34.Value = ""                                 '受注情報
+                    PARA34.Value = OIT0001row("ORDERINFO")            '受注情報
                     PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
                     PARA24.Value = OIT0001row("SHIPPERSNAME")         '荷主名
                     PARA05.Value = OIT0001row("OILCODE")              '油種コード
@@ -5719,7 +5780,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
         End Try
 
-        Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        If WW_CHK_OILCODE = False Then
+            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        End If
 
     End Sub
 

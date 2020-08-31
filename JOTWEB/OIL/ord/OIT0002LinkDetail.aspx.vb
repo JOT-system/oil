@@ -3455,14 +3455,20 @@ Public Class OIT0002LinkDetail
 
                         End If
 
-                        sOrderContent(0) = OIT0002row("ORDERNO")
-                        sOrderContent(1) = OIT0002row("DETAILNO")
-                        sOrderContent(2) = OIT0002row("OFFICECODE")
-                        sOrderContent(3) = OIT0002row("LOADINGTRAINNAME")
-                        sOrderContent(4) = OIT0002row("LOADINGLODDATE")
-                        sOrderContent(5) = OIT0002row("LOADINGDEPDATE")
+                        'sOrderContent(0) = OIT0002row("ORDERNO")
+                        'sOrderContent(1) = OIT0002row("DETAILNO")
+                        'sOrderContent(2) = OIT0002row("OFFICECODE")
+                        'sOrderContent(3) = OIT0002row("LOADINGTRAINNAME")
+                        'sOrderContent(4) = OIT0002row("LOADINGLODDATE")
+                        'sOrderContent(5) = OIT0002row("LOADINGDEPDATE")
 
                     End If
+                    sOrderContent(0) = OIT0002row("ORDERNO")
+                    sOrderContent(1) = OIT0002row("DETAILNO")
+                    sOrderContent(2) = OIT0002row("OFFICECODE")
+                    sOrderContent(3) = OIT0002row("LOADINGTRAINNAME")
+                    sOrderContent(4) = OIT0002row("LOADINGLODDATE")
+                    sOrderContent(5) = OIT0002row("LOADINGDEPDATE")
                 Next
             End Using
 
@@ -3598,7 +3604,8 @@ Public Class OIT0002LinkDetail
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '前後フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.Date)         '登録年月日
                 Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", SqlDbType.NVarChar, 4)  '列車
-                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.Int)          '通番
+                'Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.Int)          '通番
+                Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", SqlDbType.NVarChar, 2)  '通番
                 Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", SqlDbType.NVarChar, 20) '貨車(記号及び符号)
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 8)  '貨車(番号)
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 40) '発駅

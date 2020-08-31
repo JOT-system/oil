@@ -659,6 +659,10 @@ Public Module Messages
         ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー(空回日報画面)
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20064"
+        ''' <summary>
+        ''' 指定タンク車№が所属営業所以外のためエラー
+        ''' </summary>
+        Public Const OIL_ORDER_NOT_LOCATION_TANKNO_ERROR As String = "20065"
 #End Region
 
 

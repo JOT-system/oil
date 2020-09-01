@@ -473,6 +473,10 @@ Public Module BaseDllConst
     ''' 列車未設定
     ''' </summary>
     Public Const CONST_ORDERINFO_ALERT_103 As String = "103"
+    ''' <summary>
+    ''' 前回灯軽油
+    ''' </summary>
+    Public Const CONST_ORDERINFO_ALERT_104 As String = "104"
 
     ''' <summary>
     ''' 失注（荷主都合）

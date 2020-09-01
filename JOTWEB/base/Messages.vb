@@ -663,6 +663,10 @@ Public Module Messages
         ''' 指定タンク車№が所属営業所以外のためエラー
         ''' </summary>
         Public Const OIL_ORDER_NOT_LOCATION_TANKNO_ERROR As String = "20065"
+        ''' <summary>
+        ''' 前回灯軽油で今回黒油、または揮発油の整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTLIGHTOIL_BLACKVOLATILEOIL_ERROR As String = "20066"
 #End Region
 
 

@@ -2504,8 +2504,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             Exit Sub
 
             '前回揮発油,今回黒油、または灯軽油による警告
-        ElseIf WW_ERRCODE = "ERR2" _
-            AndAlso work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100 Then
+        ElseIf WW_ERRCODE = "ERR2" Then
             'blnOilCheck = True
             WW_CHK_OILCODE = True
             Master.Output(C_MESSAGE_NO.OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2, C_MESSAGE_TYPE.WAR, needsPopUp:=True)

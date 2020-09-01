@@ -429,6 +429,8 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS LOADINGDEPSTATIONNAME " _
             & " , ''                                            AS LOADINGRETSTATION " _
             & " , ''                                            AS LOADINGRETSTATIONNAME " _
+            & " , ''                                            AS ORDERTRKBN " _
+            & " , ''                                            AS OTTRANSPORTFLG " _
             & " , ''                                            AS LOADINGLODDATE " _
             & " , ''                                            AS LOADINGDEPDATE " _
             & " , ''                                            AS LOADINGARRDATE " _
@@ -509,6 +511,12 @@ Public Class OIT0002LinkDetail
             & " , ISNULL(RTRIM(OIT0002.DEPSTATIONNAME), '')     AS LOADINGDEPSTATIONNAME " _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATION), '')         AS LOADINGRETSTATION " _
             & " , ISNULL(RTRIM(OIT0002.ARRSTATIONNAME), '')     AS LOADINGRETSTATIONNAME " _
+            & " , ''                                            AS ORDERTRKBN " _
+            & " , CASE ISNULL(RTRIM(OIT0003.OTTRANSPORTFLG), '')" _
+            & "   WHEN '1' THEN 'on'" _
+            & "   WHEN '2' THEN ''" _
+            & "   ELSE ''" _
+            & "   END                                           AS OTTRANSPORTFLG" _
             & " , ISNULL(FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd'), '') AS LOADINGLODDATE" _
             & " , ISNULL(FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd'), '') AS LOADINGDEPDATE" _
             & " , ISNULL(FORMAT(OIT0002.ARRDATE, 'yyyy/MM/dd'), '') AS LOADINGARRDATE" _
@@ -568,10 +576,10 @@ Public Class OIT0002LinkDetail
                     PARA02.Value = work.WF_SEL_RLINKNO.Text
                 Else
                     '★新規の場合は、『貨車連結(臨海)順序表№』を取得して設定
-                    Dim WW_GetValue() As String = {"", "", "", "", "", ""}
-                    FixvalueMasterSearch("ZZ", "NEWRLINKNOGET", "", WW_GetValue)
+                    Dim WW_GetNumber() As String = {"", "", "", "", "", ""}
+                    FixvalueMasterSearch("ZZ", "NEWRLINKNOGET", "", WW_GetNumber)
 
-                    work.WF_SEL_RLINKNO.Text = WW_GetValue(0)
+                    work.WF_SEL_RLINKNO.Text = WW_GetNumber(0)
                     PARA02.Value = work.WF_SEL_RLINKNO.Text
 
                 End If
@@ -595,6 +603,7 @@ Public Class OIT0002LinkDetail
                 End Using
 
                 Dim i As Integer = 0
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 For Each OIT0002row As DataRow In OIT0002tbl.Rows
                     If i = 0 Then work.WF_SEL_LINKNO.Text = OIT0002row("LINKNO")
                     i += 1
@@ -603,6 +612,17 @@ Public Class OIT0002LinkDetail
                     '登録営業所
                     If OIT0002row("OFFICECODE") <> "" Then
                         CODENAME_get("SALESOFFICE", OIT0002row("OFFICECODE"), OIT0002row("OFFICENAME"), WW_DUMMY)
+
+                        '積込後着駅
+                        If OIT0002row("LOADINGRETSTATION") <> "" Then
+                            '★営業所関連情報(輸送形態区分)取得
+                            FixvalueMasterSearch(OIT0002row("OFFICECODE"),
+                                                 "PATTERNMASTER",
+                                                 OIT0002row("LOADINGRETSTATION"),
+                                                 WW_GetValue)
+                            OIT0002row("ORDERTRKBN") = WW_GetValue(8)
+                        End If
+
                     End If
                     '受注情報
                     CODENAME_get("ORDERINFO", OIT0002row("ORDERINFO"), OIT0002row("ORDERINFONAME"), WW_DUMMY)
@@ -1426,6 +1446,8 @@ Public Class OIT0002LinkDetail
                         '受注パターン
                         updHeader.Item("PATTERNCODE") = ""
                         updHeader.Item("PATTERNNAME") = ""
+                        '輸送形態区分
+                        updHeader.Item("ORDERTRKBN") = ""
 
                         '○ 画面表示データ保存
                         Master.SaveTable(OIT0002tbl)
@@ -1459,7 +1481,7 @@ Public Class OIT0002LinkDetail
                     updHeader.Item("LOADINGACCDATE") = Now.AddDays(1 + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
                     updHeader.Item("LOADINGEMPARRDATE") = Now.AddDays(1 + Integer.Parse(WW_GetValue(10)) + Integer.Parse(WW_GetValue(11))).ToString("yyyy/MM/dd")
 
-                    '★営業所関連情報(荷主、基地、荷受人)取得
+                    '★営業所関連情報(荷主、基地、荷受人、受注パターン、輸送形態区分)取得
                     WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                     FixvalueMasterSearch(updHeader.Item("OFFICECODE"),
                                          "PATTERNMASTER",
@@ -1478,6 +1500,8 @@ Public Class OIT0002LinkDetail
                     '受注パターン
                     updHeader.Item("PATTERNCODE") = WW_GetValue(6)
                     updHeader.Item("PATTERNNAME") = WW_GetValue(7)
+                    '輸送形態区分
+                    updHeader.Item("ORDERTRKBN") = WW_GetValue(8)
 
                     '(一覧)積込後本線列車積込予定日
                 ElseIf WF_FIELD.Value = "LOADINGLODDATE" Then
@@ -1817,6 +1841,8 @@ Public Class OIT0002LinkDetail
             & " , ''                                            AS LOADINGDEPSTATIONNAME " _
             & " , ''                                            AS LOADINGRETSTATION " _
             & " , ''                                            AS LOADINGRETSTATIONNAME " _
+            & " , ''                                            AS ORDERTRKBN " _
+            & " , ''                                            AS OTTRANSPORTFLG " _
             & " , ''                                            AS LOADINGLODDATE " _
             & " , ''                                            AS LOADINGDEPDATE " _
             & " , ''                                            AS LOADINGARRDATE " _
@@ -4232,7 +4258,7 @@ Public Class OIT0002LinkDetail
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
             & "        LINEORDER               = @LINEORDER            , TANKNO                  = @TANKNO" _
-            & "        , STACKINGFLG           = @STACKINGFLG" _
+            & "        , STACKINGFLG           = @STACKINGFLG          , OTTRANSPORTFLG          = @OTTRANSPORTFLG" _
             & "        , SHIPPERSCODE          = @SHIPPERSCODE         , SHIPPERSNAME            = @SHIPPERSNAME" _
             & "        , OILCODE               = @OILCODE              , OILNAME                 = @OILNAME" _
             & "        , ORDERINGTYPE          = @ORDERINGTYPE         , ORDERINGOILNAME         = @ORDERINGOILNAME" _
@@ -4380,7 +4406,14 @@ Public Class OIT0002LinkDetail
                     P_STACKINGFLG.Value = "2"                               '積置可否フラグ
                     P_FIRSTRETURNFLG.Value = "2"                            '先返し可否フラグ
                     P_AFTERRETURNFLG.Value = "2"                            '後返し可否フラグ
-                    P_OTTRANSPORTFLG.Value = "2"                            'OT輸送可否フラグ
+                    '# OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)
+                    'P_OTTRANSPORTFLG.Value = "2"                            'OT輸送可否フラグ
+                    If OIT0002row("OTTRANSPORTFLG") = "on" Then
+                        P_OTTRANSPORTFLG.Value = "1"
+                    Else
+                        P_OTTRANSPORTFLG.Value = "2"
+                    End If
+
                     P_ORDERINFO.Value = ""                                  '受注情報
                     P_SHIPPERSCODE.Value = OIT0002row("SHIPPERSCODE")       '荷主コード
                     P_SHIPPERSNAME.Value = OIT0002row("SHIPPERSNAME")       '荷主名

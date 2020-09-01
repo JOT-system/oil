@@ -3298,6 +3298,11 @@ Public Class OIT0002LinkDetail
                 & " , ISNULL(RTRIM(VIW0001.VALUE13), '')  AS VALUE13" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE14), '')  AS VALUE14" _
                 & " , ISNULL(RTRIM(VIW0001.VALUE15), '')  AS VALUE15" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE16), '')  AS VALUE16" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE17), '')  AS VALUE17" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE18), '')  AS VALUE18" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE19), '')  AS VALUE19" _
+                & " , ISNULL(RTRIM(VIW0001.VALUE20), '')  AS VALUE20" _
                 & " , ISNULL(RTRIM(VIW0001.DELFLG), '')   AS DELFLG" _
                 & " FROM  OIL.VIW0001_FIXVALUE VIW0001" _
                 & " WHERE VIW0001.CLASS = @P01" _

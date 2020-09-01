@@ -84,8 +84,9 @@ Public Class OIT0002LinkDetail
                             WF_ButtonEND_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
-                            WF_CheckBoxSELECT_Click()
+                        Case "WF_CheckBoxSELECT",
+                             "WF_CheckBoxSELECTOTTRANSPORT"   'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
                             WF_FIELD_Change()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
@@ -1051,21 +1052,41 @@ Public Class OIT0002LinkDetail
     ''' <summary>
     ''' チェックボックス(選択)クリック処理
     ''' </summary>
-    Protected Sub WF_CheckBoxSELECT_Click()
+    Protected Sub WF_CheckBoxSELECT_Click(ByVal chkFieldName As String)
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0002tbl)
 
-        'チェックボックス判定
-        For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
-            If OIT0002tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                If OIT0002tbl.Rows(i)("OPERATION") = "on" Then
-                    OIT0002tbl.Rows(i)("OPERATION") = ""
-                Else
-                    OIT0002tbl.Rows(i)("OPERATION") = "on"
-                End If
-            End If
-        Next
+        Select Case chkFieldName
+            Case "WF_CheckBoxSELECTOTTRANSPORT"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
+
+                    '◯ 輸送形態区分が"M"(請負OT混載)以外の場合
+                    If OIT0002tbl.Rows(i)("ORDERTRKBN") <> BaseDllConst.CONST_TRKBN_M Then
+                        Continue For
+                    End If
+
+                    If OIT0002tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0002tbl.Rows(i)("OTTRANSPORTFLG") = "on" Then
+                            OIT0002tbl.Rows(i)("OTTRANSPORTFLG") = ""
+                        Else
+                            OIT0002tbl.Rows(i)("OTTRANSPORTFLG") = "on"
+                        End If
+                    End If
+                Next
+            Case Else
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0002tbl.Rows.Count - 1
+                    If OIT0002tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0002tbl.Rows(i)("OPERATION") = "on" Then
+                            OIT0002tbl.Rows(i)("OPERATION") = ""
+                        Else
+                            OIT0002tbl.Rows(i)("OPERATION") = "on"
+                        End If
+                    End If
+                Next
+        End Select
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0002tbl)
@@ -5700,16 +5721,22 @@ Public Class OIT0002LinkDetail
         '〇 (一覧)テキストボックスの制御(読取専用)
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
+        '### OT輸送フラグ用 START ##########################################################
+        Dim chkObjOT As CheckBox = Nothing
+        Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea.ID & "OTTRANSPORTFLG"
+        Dim chkObjOTId As String
+        '### OT輸送フラグ用 END   ##########################################################
         Dim loopdr As DataRow = Nothing
         Dim rowIdx As Integer = 0
         Dim cvTruckSymbol As String = ""
+        Dim trkKbn As String = ""
 
         For Each rowitem As TableRow In tblObj.Rows
+
+            loopdr = OIT0002tbl.Rows(rowIdx)
+            cvTruckSymbol = StrConv(loopdr("MODEL"), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
+
             For Each cellObj As TableCell In rowitem.Controls
-
-                loopdr = OIT0002tbl.Rows(rowIdx)
-                cvTruckSymbol = StrConv(loopdr("MODEL"), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
-
                 '★コンテナの場合は入力制限する。
                 If (cvTruckSymbol.Substring(0, 1) = "コ" OrElse cvTruckSymbol.Substring(0, 1) = "チ") Then
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
@@ -5760,8 +5787,34 @@ Public Class OIT0002LinkDetail
 
                     End If
                 End If
-
             Next
+
+            '★輸送形態区分
+            trkKbn = loopdr("ORDERTRKBN")
+            chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
+            chkObjOT = Nothing
+            For Each cellObj As TableCell In rowitem.Controls
+                chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
+                'コントロールが見つかったら脱出
+                If chkObjOT IsNot Nothing Then
+                    Exit For
+                End If
+            Next
+
+            'コントロールが見つかっていたら活性・非活性を実施
+            If chkObjOT IsNot Nothing Then
+                'M:請負OT混載の場合
+                If trkKbn = BaseDllConst.CONST_TRKBN_M Then
+                    'OT輸送(チェックボックス)を活性
+                    chkObjOT.Enabled = True
+
+                    'M:請負OT混載以外
+                Else
+                    'OT輸送(チェックボックス)を非活性
+                    chkObjOT.Enabled = False
+                End If
+            End If
+
             rowIdx += 1
         Next
 

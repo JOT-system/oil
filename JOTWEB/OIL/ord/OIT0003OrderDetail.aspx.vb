@@ -1046,6 +1046,15 @@ Public Class OIT0003OrderDetail
             End Using
         End If
 
+        '★受注オーダーが存在する場合
+        If OIT0003tbl.Rows.Count <> 0 Then
+            For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                If OIT0003row("TANKNO") = "" Then Continue For
+                '★タンク車№に紐づく情報を取得
+                WW_TANKNUMBER_FIND(OIT0003row)
+            Next
+        End If
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
 

@@ -11410,6 +11410,10 @@ Public Class OIT0003OrderDetail
                             '設定されたタンク車Noを設定
                             updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
 
+                            '受注情報を初期化
+                            updHeader.Item("ORDERINFO") = ""
+                            updHeader.Item("ORDERINFONAME") = ""
+
                             'タンク車№に紐づく情報を取得・設定
                             WW_TANKNUMBER_FIND(updHeader)
 

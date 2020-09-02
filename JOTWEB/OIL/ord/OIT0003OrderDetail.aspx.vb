@@ -15271,7 +15271,8 @@ Public Class OIT0003OrderDetail
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.OFFICECODE      = @P06 " _
             & "   AND ( " _
-            & "          (OIT0002.LODDATE = @P03 OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08)) " _
+            & "          (OIT0002.LODDATE = @P03 OR OIT0002.LODDATE = @P08) " _
+            & "       OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08) " _
             & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
             & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
             & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
@@ -15282,6 +15283,7 @@ Public Class OIT0003OrderDetail
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 " _
             & "   AND OIT0002.TRAINNO        <> @P02 "
+        '& "          (OIT0002.LODDATE = @P03 OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08)) " _
         '### 20200827 END   積置を考慮した妥当性チェック対応 ######################
         '### 20200620 END  ((全体)No79対応)異なる列車で同一積込日の場合###########
 
@@ -15307,7 +15309,8 @@ Public Class OIT0003OrderDetail
             & "   AND OIT0002.ORDERNO        <> @P01 " _
             & "   AND OIT0002.OFFICECODE      = @P06 " _
             & "   AND ( " _
-            & "          (OIT0002.LODDATE = @P03 OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08)) " _
+            & "          (OIT0002.LODDATE = @P03 OR OIT0002.LODDATE = @P08) " _
+            & "       OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08) " _
             & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
             & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
             & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
@@ -15318,6 +15321,7 @@ Public Class OIT0003OrderDetail
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 " _
             & "   AND OIT0002.TRAINNO         = @P02 "
+        '& "          (OIT0002.LODDATE = @P03 OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08)) " _
         '### 20200827 END   積置を考慮した妥当性チェック対応 ######################
         '### 20200805 END  ((全体)No117対応)異なる列車で同一積込日の場合###########
 

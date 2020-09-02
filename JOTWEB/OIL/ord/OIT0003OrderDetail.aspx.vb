@@ -6951,15 +6951,16 @@ Public Class OIT0003OrderDetail
 
             Case "TANKNO"            '(一覧)タンク車№
 
+                '受注情報
+                updHeader.Item("ORDERINFO") = ""
+                updHeader.Item("ORDERINFONAME") = ""
+
                 '入力が空の場合は、対象項目を空文字で設定する。
                 If WW_ListValue = "" Then
                     'タンク車№
                     updHeader.Item("TANKNO") = ""
                     '型式
                     updHeader.Item("MODEL") = ""
-                    '受注情報
-                    updHeader.Item("ORDERINFO") = ""
-                    updHeader.Item("ORDERINFONAME") = ""
                     '前回油種
                     updHeader.Item("LASTOILCODE") = ""
                     updHeader.Item("LASTOILNAME") = ""

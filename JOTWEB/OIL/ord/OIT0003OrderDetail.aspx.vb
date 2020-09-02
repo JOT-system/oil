@@ -13590,6 +13590,18 @@ Public Class OIT0003OrderDetail
             'OIT0003tbl_dv.Sort = "SHIPORDER"
             OIT0003tbl_dv.Sort = "SHIPORDER_SORT"
             For Each drv As DataRowView In OIT0003tbl_dv
+
+                '### 20200902 START 発送順チェック追加("0"の場合はエラーとする) ###################################
+                If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") = "0" Then
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_ZERO_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WW_CheckMES1 = "発送順設定値0エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_ZERO_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+                '### 20200902 END   発送順チェック追加("0"の場合はエラーとする) ###################################
+
                 If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
                     Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                     WW_CheckMES1 = "発送順重複エラー。"
@@ -13615,6 +13627,17 @@ Public Class OIT0003OrderDetail
             'OIT0003tbl_dv.Sort = "LINEORDER"
             OIT0003tbl_dv.Sort = "LINEORDER_SORT"
             For Each drv As DataRowView In OIT0003tbl_dv
+                '### 20200902 START 入線順チェック追加("0"の場合はエラーとする) ###################################
+                If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") = "0" Then
+                    Master.Output(C_MESSAGE_NO.OIL_LINEORDER_ZERO_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WW_CheckMES1 = "入線順設定値0エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_ZERO_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+                '### 20200902 END   入線順チェック追加("0"の場合はエラーとする) ###################################
+
                 If drv("HIDDEN") <> "1" AndAlso drv("LINEORDER") <> "" AndAlso chkLineOrder = drv("LINEORDER") Then
                     Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                     WW_CheckMES1 = "貨物駅入線順重複エラー。"
@@ -14004,6 +14027,18 @@ Public Class OIT0003OrderDetail
             '発送順でソートし、重複がないかチェックする。
             OIT0003tbltab3_dv.Sort = "SHIPORDER_SORT"
             For Each drv As DataRowView In OIT0003tbltab3_dv
+
+                '### 20200902 START 発送順チェック追加("0"の場合はエラーとする) ###################################
+                If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") = "0" Then
+                    Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_ZERO_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    WW_CheckMES1 = "発送順設定値0エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_SHIPORDER_ZERO_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+                '### 20200902 END   発送順チェック追加("0"の場合はエラーとする) ###################################
+
                 If drv("HIDDEN") <> "1" AndAlso drv("SHIPORDER") <> "" AndAlso chkShipOrder = drv("SHIPORDER") Then
                     Master.Output(C_MESSAGE_NO.OIL_SHIPORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
                     WW_CheckMES1 = "発送順重複エラー。"

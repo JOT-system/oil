@@ -667,6 +667,14 @@ Public Module Messages
         ''' 前回灯軽油で今回黒油、または揮発油の整合性エラー
         ''' </summary>
         Public Const OIL_LASTLIGHTOIL_BLACKVOLATILEOIL_ERROR As String = "20066"
+        ''' <summary>
+        ''' 発送順設定値0エラー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_ZERO_ERROR As String = "20067"
+        ''' <summary>
+        ''' 入線順設定値0エラー
+        ''' </summary>
+        Public Const OIL_LINEORDER_ZERO_ERROR As String = "20068"
 #End Region
 
 

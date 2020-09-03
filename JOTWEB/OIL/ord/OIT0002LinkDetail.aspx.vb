@@ -2069,6 +2069,10 @@ Public Class OIT0002LinkDetail
             & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
+            & " , OIT0002.ORDERNO                                AS ORDERNO " _
+            & " , OIT0003.DETAILNO                               AS DETAILNO " _
+            & " , ''                                             AS ORDERTRKBN " _
+            & " , OIT0003.OTTRANSPORTFLG                         AS OTTRANSPORTFLG " _
             & " FROM oil.OIT0011_RLINK OIT0011 " _
             & " LEFT JOIN oil.OIT0002_ORDER OIT0002 ON " _
             & "     OIT0002.ORDERNO = OIT0011.ORDERNO " _
@@ -2105,6 +2109,22 @@ Public Class OIT0002LinkDetail
                 For Each OIT0002Reprow As DataRow In OIT0002Reporttbl.Rows
                     i += 1
                     OIT0002Reprow("LINECNT") = i        'LINECNT
+
+                    '◯受注Noが未設定の場合はSKIP
+                    If OIT0002Reprow("ORDERNO").ToString() = "" Then Continue For
+                    For Each OIT0002tblrow As DataRow In OIT0002tbl.Rows
+                        '◯受注Noが未設定の場合はSKIP
+                        If OIT0002tblrow("ORDERNO").ToString() = "" Then Continue For
+
+                        '★受注No＋受注明細Noと一致した場合
+                        If OIT0002tblrow("ORDERNO") + OIT0002tblrow("DETAILNO") _
+                            = OIT0002Reprow("ORDERNO") + OIT0002Reprow("DETAILNO") Then
+
+                            '★輸送形態を設定
+                            OIT0002Reprow("ORDERTRKBN") = OIT0002tblrow("ORDERTRKBN")
+                            Exit For
+                        End If
+                    Next
                 Next
 
             End Using
@@ -2730,63 +2750,101 @@ Public Class OIT0002LinkDetail
             End Try
         End If
 
-        '○ 一覧チェック
-        '(一覧)タンク車No(重複チェック)
-        Dim OIT0002tbl_DUMMY As DataTable = OIT0002tbl.Copy
-        Dim OIT0002tbl_dv As DataView = New DataView(OIT0002tbl_DUMMY)
-        Dim chkTankNo As String = ""
-        Dim chkLineOrder As String = ""
+        ''○ 一覧チェック
+        ''(一覧)タンク車No(重複チェック)
+        'Dim OIT0002tbl_DUMMY As DataTable = OIT0002tbl.Copy
+        'OIT0002tbl_DUMMY.Columns.Add("TANKNUMBER_SORT", GetType(Integer))
+        'For Each OIT0002row As DataRow In OIT0002tbl_DUMMY.Rows
+        '    Try
+        '        OIT0002row("TANKNUMBER_SORT") = OIT0002row("TANKNUMBER")
+        '    Catch ex As Exception
+        '        OIT0002row("TANKNUMBER_SORT") = 0
+        '    End Try
+        'Next
 
-        'タンク車Noでソートし、重複がないかチェックする。
-        OIT0002tbl_dv.Sort = "TANKNUMBER"
-        For Each drv As DataRowView In OIT0002tbl_dv
-            If drv("TANKNUMBER") <> "" AndAlso chkTankNo = drv("TANKNUMBER") Then
-                Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                WW_CheckMES1 = "タンク車№重複エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
-                WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-            chkTankNo = drv("TANKNUMBER")
-        Next
+        'OIT0002tbl_DUMMY.Columns.Add("LOADINGIRILINEORDER_SORT", GetType(Integer))
+        'For Each OIT0002row As DataRow In OIT0002tbl_DUMMY.Rows
+        '    Try
+        '        OIT0002row("LOADINGIRILINEORDER_SORT") = OIT0002row("LOADINGIRILINEORDER")
+        '    Catch ex As Exception
+        '        OIT0002row("LOADINGIRILINEORDER_SORT") = 0
+        '    End Try
+        'Next
 
-        '### 20200407 START 指摘票内部(No170)対象の営業所のみチェックをするように変更 #########################
-        '営業所が"011201(五井営業所)", "011202(甲子営業所)", "011203(袖ヶ浦営業所)"が対象
-        If work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-            OrElse work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
-            OrElse work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+        'OIT0002tbl_DUMMY.Columns.Add("LOADINGOUTLETORDER_SORT", GetType(Integer))
+        'For Each OIT0002row As DataRow In OIT0002tbl_DUMMY.Rows
+        '    Try
+        '        OIT0002row("LOADINGOUTLETORDER_SORT") = OIT0002row("LOADINGOUTLETORDER")
+        '    Catch ex As Exception
+        '        OIT0002row("LOADINGOUTLETORDER_SORT") = 0
+        '    End Try
+        'Next
 
-            '(一覧)入線順序でソートし、重複がないかチェックする。
-            OIT0002tbl_dv.Sort = "LOADINGIRILINEORDER"
-            For Each drv As DataRowView In OIT0002tbl_dv
-                If drv("LOADINGIRILINEORDER") <> "" AndAlso chkLineOrder = drv("LOADINGIRILINEORDER") Then
-                    Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                    WW_CheckMES1 = "入線順序重複エラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
-                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
-                    O_RTN = "ERR"
-                    Exit Sub
-                End If
-                chkLineOrder = drv("LOADINGIRILINEORDER")
-            Next
+        'Dim OIT0002tbl_dv As DataView = New DataView(OIT0002tbl_DUMMY)
+        'Dim chkTankNo As String = ""
+        'Dim chkLineOrder As String = ""
+        'Dim chkTrainName As String = ""
 
-            '(一覧)出線順序でソートし、重複がないかチェックする。
-            chkLineOrder = ""
-            OIT0002tbl_dv.Sort = "LOADINGOUTLETORDER"
-            For Each drv As DataRowView In OIT0002tbl_dv
-                If drv("LOADINGOUTLETORDER") <> "" AndAlso chkLineOrder = drv("LOADINGOUTLETORDER") Then
-                    Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                    WW_CheckMES1 = "出線順序重複エラー。"
-                    WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
-                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
-                    O_RTN = "ERR"
-                    Exit Sub
-                End If
-                chkLineOrder = drv("LOADINGOUTLETORDER")
-            Next
+        ''タンク車Noでソートし、重複がないかチェックする。
+        ''OIT0002tbl_dv.Sort = "TANKNUMBER"
+        'OIT0002tbl_dv.Sort = "TANKNUMBER_SORT"
+        'For Each drv As DataRowView In OIT0002tbl_dv
+        '    If drv("HIDDEN") <> "1" AndAlso drv("TANKNUMBER") <> "" AndAlso chkTankNo = drv("TANKNUMBER") Then
+        '        Master.Output(C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '        WW_CheckMES1 = "タンク車№重複エラー。"
+        '        WW_CheckMES2 = C_MESSAGE_NO.OIL_OILTANKNO_REPEAT_ERROR
+        '        WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+        '        O_RTN = "ERR"
+        '        Exit Sub
+        '    End If
+        '    chkTankNo = drv("TANKNUMBER")
+        'Next
 
-        End If
+        ''### 20200407 START 指摘票内部(No170)対象の営業所のみチェックをするように変更 #########################
+        ''営業所が"011201(五井営業所)", "011202(甲子営業所)", "011203(袖ヶ浦営業所)"が対象
+        'If work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+        '    OrElse work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 _
+        '    OrElse work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+
+        '    '(一覧)入線順序でソートし、重複がないかチェックする。
+        '    'OIT0002tbl_dv.Sort = "LOADINGIRILINEORDER"
+        '    OIT0002tbl_dv.Sort = "LOADINGIRILINEORDER_SORT,LOADINGTRAINNAME"
+        '    For Each drv As DataRowView In OIT0002tbl_dv
+        '        If drv("HIDDEN") <> "1" AndAlso drv("LOADINGIRILINEORDER") <> "" _
+        '            AndAlso chkLineOrder = drv("LOADINGIRILINEORDER") _
+        '            AndAlso chkTrainName = drv("LOADINGTRAINNAME") Then
+        '            Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '            WW_CheckMES1 = "入線順序重複エラー。"
+        '            WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+        '            WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+        '            O_RTN = "ERR"
+        '            Exit Sub
+        '        End If
+        '        chkLineOrder = drv("LOADINGIRILINEORDER")
+        '        chkTrainName = drv("LOADINGTRAINNAME")
+        '    Next
+
+        '    '(一覧)出線順序でソートし、重複がないかチェックする。
+        '    chkLineOrder = ""
+        '    chkTrainName = ""
+        '    'OIT0002tbl_dv.Sort = "LOADINGOUTLETORDER"
+        '    OIT0002tbl_dv.Sort = "LOADINGOUTLETORDER_SORT,LOADINGTRAINNAME"
+        '    For Each drv As DataRowView In OIT0002tbl_dv
+        '        If drv("HIDDEN") <> "1" AndAlso drv("LOADINGOUTLETORDER") <> "" _
+        '            AndAlso chkLineOrder = drv("LOADINGOUTLETORDER") _
+        '            AndAlso chkTrainName = drv("LOADINGTRAINNAME") Then
+        '            Master.Output(C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+        '            WW_CheckMES1 = "出線順序重複エラー。"
+        '            WW_CheckMES2 = C_MESSAGE_NO.OIL_LINEORDER_REPEAT_ERROR
+        '            WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, drv.Row)
+        '            O_RTN = "ERR"
+        '            Exit Sub
+        '        End If
+        '        chkLineOrder = drv("LOADINGOUTLETORDER")
+        '        chkTrainName = drv("LOADINGTRAINNAME")
+        '    Next
+
+        'End If
         '### 20200407 END   指摘票内部(No170)対象の営業所のみチェックをするように変更 #########################
 
         ''★(一覧)空白チェック

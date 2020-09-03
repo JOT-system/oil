@@ -208,6 +208,10 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 '◯ 記事
                 rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("ARTICLE")
+                'If PrintDatarow("ORDERTRKBN").ToString() = BaseDllConst.CONST_TRKBN_M _
+                '    AndAlso PrintDatarow("OTTRANSPORTFLG").ToString() = "2" Then
+                '    rngDetailArea.Value = PrintDatarow("ARTICLE").ToString() + "JOT"
+                'End If
 
                 '### 運　用　指　示 ###########################################
                 '◯ 充 填 線(油　種)

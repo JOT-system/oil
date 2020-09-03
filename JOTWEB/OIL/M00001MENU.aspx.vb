@@ -500,7 +500,7 @@ Public Class M00001MENU
         Public ReadOnly Property IsMenu2Link As Boolean
             Get
                 '遷移先URLがM00002MENU.aspxで終わればメニュー２と判定
-                If Me.Url.EndsWith("M00002MENU.aspx") Then
+                If Me.Title = "Master" Then
                     Return True
                 Else
                     Return False

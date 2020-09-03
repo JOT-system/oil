@@ -164,6 +164,7 @@ div.parentMenu.hasChild > input[type=checkbox] + label:after {
     display: block;
     background-repeat: no-repeat;
     background-size: contain;
+    z-index:1;
 }
 div.parentMenu.hasChild > input[type=checkbox]:checked + label:after {
     content: "▲";
@@ -186,10 +187,68 @@ div.parentMenu.menu2Link > input[type=checkbox] + label:after {
     background-repeat: no-repeat;
     background-size: contain;
 }
+div.parentMenu.menu2Link > input[type=checkbox]:checked + label {
+    z-index: 999;
+}
+div.parentMenu.menu2Link > input[type=checkbox]:checked + label:after {
+    content: "◀";
+}
+div.parentMenu.menu2Link {
+    position:relative;
+}
+div.parentMenu.menu2Link > .childMenu {
+    position:fixed;
+    top:38px;
+    //left:245px;
+    left:0;
+    padding-left:245px;
+    z-index:2;
+    background-color:rgba(255,255,255,0.85);
+    height:calc(100vh - 60px);
+    width:calc(100vw - 245px);
+    min-width:250px;
+}
+.menu2wrap {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-end;
+    align-content: flex-start;
+        //justify-content:flex-start;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y:hidden;
+    text-align: left;
+}
+.menu2wrap > div {
+    width: 250px;
+    min-width:250px;
+    max-width:250px;
+    //height:30px;
+    margin-left:10px;
+    background-color:white;
 
+}
+div.parentMenu.menu2Link > .childMenu > div {
+    //display:flex;
+}
+div.parentMenu.menu2Link .childMenu label::before {
+    width:0;
+    min-width:0;
+}
+div.parentMenu.menu2Link .childMenu label {
+//    width: 200px;
+//    min-width: 200px;
+    padding-top:8px;
+    padding-left:5px;
+    font-size: 18px;
+    height:40px;
+}
 /* 左ナビゲーション アコーディオン */
 div.parentMenu > input[type=checkbox] + label + div {
-    display:none;
+    display: none;
 }
 div.parentMenu > input[type=checkbox]:checked + label + div {
     display:block;

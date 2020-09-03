@@ -1125,7 +1125,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
-            Dim i As Integer = 7
+            Dim i As Integer = 8
             For Each PrintDatarow As DataRow In PrintData.Rows
                 '固定NO
                 rngDetailArea = Me.ExcelWorkSheet.Range("B" + i.ToString())

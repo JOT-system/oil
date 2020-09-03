@@ -755,7 +755,7 @@ Public Class OIT0001EmptyTurnDairyList
         '登録日
         work.WF_SEL_REGISTRATIONDATE.Text = ""
         '受注進行ステータス
-        work.WF_SEL_STATUS.Text = ""
+        work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
         '受注情報
         work.WF_SEL_INFORMATION.Text = ""
         '受注営業所名

@@ -27,6 +27,7 @@ Public Structure CS0001INIFILEget
         PDF_DIR
         UPF_DIR
         SYS_DIR
+        OTFILESEND_DIR
     End Enum
 
     Private Const IniFileC As String = "C:\APPL\APPLINI\OIL\JOTWEB.ini"
@@ -198,6 +199,28 @@ Public Structure CS0001INIFILEget
                             IniType = STRINGTYPE.NONE
                         End If
                     End If
+
+                    '### 20200828 START OT発送日報送信用追加 #########################################
+                    'OT発送日報File出力Dir(パス)
+                    If IniBuf.IndexOf("<OTFileSend directory>") >= 0 OrElse IniType = STRINGTYPE.OTFILESEND_DIR Then
+                        IniType = STRINGTYPE.OTFILESEND_DIR
+                        IniString &= IniBuf
+
+                        If IniBuf.IndexOf("</OTFileSend directory>") >= 0 Then
+                            IniString = IniString.Replace("<OTFileSend directory>", "")
+                            IniString = IniString.Replace("</OTFileSend directory>", "")
+                            IniString = IniString.Replace("<directory string>", "")
+                            IniString = IniString.Replace("</directory string>", "")
+                            IniString = IniString.Replace(ControlChars.Quote, "")
+                            IniString = IniString.Replace("path=", "")
+
+                            CS0050SESSION.OTFILESEND_PATH = Trim(IniString)
+                            IniString = ""
+                            IniType = STRINGTYPE.NONE
+                        End If
+                    End If
+                    '### 20200828 END   OT発送日報送信用追加 #########################################
+
                 End While
             Catch ex As Exception
                 ERR = C_MESSAGE_NO.SYSTEM_ADM_ERROR

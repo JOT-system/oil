@@ -516,7 +516,7 @@ Public Class OIT0003OTLinkageList
         '******************************
         'CSV作成処理の実行
         '******************************
-        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl)
+        Using repCbj = New CsvCreate(OIT0003CsvOTLinkagetbl, I_FolderPath:=CS0050SESSION.OTFILESEND_PATH)
             Dim url As String
             Try
                 url = repCbj.ConvertDataTableToCsv(False)
@@ -594,7 +594,7 @@ Public Class OIT0003OTLinkageList
               " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
-            & " , CONVERT(NCHAR(2), OIT0003.SHIPORDER)           AS SHIPORDER" _
+            & " , CONVERT(NCHAR(2), ISNULL(OIT0003.SHIPORDER,'')) AS SHIPORDER" _
             & " , ISNULL(OIM0025.OTDAILYFROMPLANT, SPACE (2))    AS OTDAILYFROMPLANT" _
             & " , CONVERT(NCHAR(1), '')                          AS LANDC" _
             & " , CONVERT(NCHAR(1), '')                          AS EMPTYFAREFLG" _

@@ -93,7 +93,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
         Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
-        If excelFileName = "OIT0003L_DELIVERYPLAN.xlsx" Then
+        If excelFileName = "OIT0003L_DELIVERYPLAN.xlsx" _
+            OrElse excelFileName = "OIT0003D_DELIVERYPLAN.xlsx" Then
             Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("運送状"), Excel.Worksheet)
             Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
         ElseIf excelFileName = "OIT0003L_LOADPLAN.xlsx" Then
@@ -1105,7 +1106,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 rngHeaderArea = Me.ExcelWorkSheet.Range("C3")
                 rngHeaderArea.Value = PrintDatarow("DEPSTATIONNAME")
                 '発行日
-                rngHeaderArea = Me.ExcelWorkSheet.Range("N2")
+                rngHeaderArea = Me.ExcelWorkSheet.Range("M2")
                 rngHeaderArea.Value = value
 
                 Exit For

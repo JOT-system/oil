@@ -204,6 +204,7 @@
     <Content Include="OIL\inc\OIM0002S.css" />
     <Content Include="OIL\inc\OIM0003WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0002WRKINC.ascx" />
+    <Content Include="OIL\inc\OIM0007WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0020WRKINC.ascx" />
     <Content Include="OIL\inc\OIT0002WRKINCOLD.ascx" />
     <Content Include="OIL\loc\OIT0005TankLocDetail.aspx" />
@@ -229,11 +230,14 @@
     <Content Include="OIL\mas\OIM0003ProductSearch.aspx" />
     <Content Include="OIL\mas\OIM0004StationCreate.aspx" />
     <Content Include="OIL\mas\OIM0002OrgSearch.aspx" />
+    <Content Include="OIL\mas\OIM0007TrainCreate.aspx" />
     <Content Include="OIL\mas\OIM0005TankCreate.aspx" />
     <Content Include="OIL\mas\OIM0005TankList.aspx" />
     <Content Include="OIL\mas\OIM0004StationList.aspx" />
     <Content Include="OIL\mas\OIM0005TankSearch.aspx" />
     <Content Include="OIL\mas\OIM0004StationSearch.aspx" />
+    <Content Include="OIL\mas\OIM0007TrainList.aspx" />
+    <Content Include="OIL\mas\OIM0007TrainSearch.aspx" />
     <Content Include="OIL\mas\OIM0020GuidanceCreate.aspx" />
     <Content Include="OIL\mas\OIM0020GuidanceDownload.aspx" />
     <Content Include="OIL\mas\OIM0020GuidanceList.aspx" />
@@ -273,6 +277,9 @@
     <Content Include="OIL\script\OIM0002L.js" />
     <Content Include="OIL\script\OIM0003S .js" />
     <Content Include="OIL\script\OIM0002S.js" />
+    <Content Include="OIL\script\OIM0007L.js" />
+    <Content Include="OIL\script\OIM0007C.js" />
+    <Content Include="OIL\script\OIM0007S.js" />
     <Content Include="OIL\script\OIM0020C.js" />
     <Content Include="OIL\script\OIM0020L.js" />
     <Content Include="OIL\script\OIM0020S.js" />
@@ -421,6 +428,13 @@
     </Compile>
     <Compile Include="OIL\inc\OIM0002WRKINC.ascx.vb">
       <DependentUpon>OIM0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0007WRKINC.ascx.designer.vb">
+      <DependentUpon>OIM0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0007WRKINC.ascx.vb">
+      <DependentUpon>OIM0007WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\OIM0020FILEUPLOAD.ashx.vb">
@@ -585,6 +599,27 @@
     </Compile>
     <Compile Include="OIL\mas\OIM0002OrgSearch.aspx.vb">
       <DependentUpon>OIM0002OrgSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0007TrainCreate.aspx.designer.vb">
+      <DependentUpon>OIM0007TrainCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0007TrainCreate.aspx.vb">
+      <DependentUpon>OIM0007TrainCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0007TrainList.aspx.designer.vb">
+      <DependentUpon>OIM0007TrainList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0007TrainList.aspx.vb">
+      <DependentUpon>OIM0007TrainList.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0007TrainSearch.aspx.designer.vb">
+      <DependentUpon>OIM0007TrainSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0007TrainSearch.aspx.vb">
+      <DependentUpon>OIM0007TrainSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\mas\OIM0020GuidanceCreate.aspx.designer.vb">

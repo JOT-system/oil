@@ -31,6 +31,7 @@
                              data-rowline='<%# Server.HtmlEncode(DirectCast(Container.DataItem, MenuItem).RowLine) %>'
                              data-hasnext='<%# if(Server.HtmlEncode(DirectCast(Container.DataItem, MenuItem).HasNextPageInfo), "1", "") %>'
                             >
+                            
                             <asp:CheckBox ID="chkTopItem" 
                                           runat="server"
                                           Text='<%# DirectCast(Container.DataItem, MenuItem).Names %>'
@@ -40,7 +41,8 @@
                                             runat="server" 
                                             DataSource='<%# DirectCast(Container.DataItem, MenuItem).ChildMenuItem %>'>
                                 <HeaderTemplate>
-                                    <div class="childMenu">
+                                    <div class="childMenu" <%# "onclick='document.getElementById(""" & DirectCast(DirectCast(Container.Parent.Parent, RepeaterItem).FindControl("chkTopItem"), CheckBox).ClientID & """).checked = !document.getElementById(""" & DirectCast(DirectCast(Container.Parent.Parent, RepeaterItem).FindControl("chkTopItem"), CheckBox).ClientID & """).checked;'" %>>
+                                        <%# If(DirectCast(DirectCast(Container.Parent.Parent, RepeaterItem).DataItem, MenuItem).IsMenu2Link, "<div class='menu2wrap' >", "")  %>
                                 </HeaderTemplate>  
                                 <ItemTemplate>
                                     <div data-posicol='<%# Server.HtmlEncode(DirectCast(Container.DataItem, MenuItem).PosiCol) %>'
@@ -51,10 +53,11 @@
                                     </div>
                                 </ItemTemplate>
                                 <FooterTemplate>
+                                    <%# If(DirectCast(DirectCast(Container.Parent.Parent, RepeaterItem).DataItem, MenuItem).IsMenu2Link, "</div>", "")  %>
                                     </div>
                                 </FooterTemplate>
                             </asp:Repeater>
-                            
+                        
                         </div>
                     </ItemTemplate>
                     <FooterTemplate>

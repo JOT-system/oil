@@ -5,12 +5,13 @@
     Private UploadRootPath As String = ""
     Private UploadTmpFileName As String = ""
     Private UploadTmpFilePath As String = ""
+    Private UploadFilePath As String = ""
     Private UrlRoot As String = ""
     Private CsvData As DataTable
     Private CsvSW As IO.StreamWriter
     Private xlProcId As Integer
 
-    Public Sub New(csvDataClass As DataTable)
+    Public Sub New(csvDataClass As DataTable, Optional ByVal I_FolderPath As String = Nothing)
         Dim CS0050SESSION As New CS0050SESSION
         'CSVファイルに書き込むときに使うEncoding
         Dim enc As System.Text.Encoding = System.Text.Encoding.GetEncoding("Shift_JIS")
@@ -21,6 +22,9 @@
         Me.CsvData = csvDataClass
         Me.UploadTmpFileName = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".csv"
         Me.UploadTmpFilePath = IO.Path.Combine(Me.UploadRootPath, Me.UploadTmpFileName)
+        If Not String.IsNullOrEmpty(I_FolderPath) Then
+            Me.UploadFilePath = IO.Path.Combine(I_FolderPath, Me.UploadTmpFileName)
+        End If
 
         'ディレクトリが存在しない場合は生成
         If IO.Directory.Exists(Me.UploadRootPath) = False Then
@@ -53,7 +57,11 @@
     ''' DataTableの内容をCSVファイルに保存する
     ''' </summary>
     ''' <param name="writeHeader">ヘッダを書き込む時はtrue。</param>
-    Public Function ConvertDataTableToCsv(writeHeader As Boolean) As String
+    ''' <param name="blnFrame">"(ダブルクオーテーション)で囲む時はtrue。</param>
+    ''' <param name="blnSeparate">,(カンマ)で区切る時はtrue。</param>
+    Public Function ConvertDataTableToCsv(writeHeader As Boolean,
+                                          Optional ByVal blnFrame As Boolean = False,
+                                          Optional ByVal blnSeparate As Boolean = False) As String
         Dim retByte() As Byte
         Dim colCount As Integer = Me.CsvData.Columns.Count
         Dim lastColIndex As Integer = colCount - 1
@@ -65,14 +73,18 @@
                 For i = 0 To colCount - 1
                     'ヘッダの取得
                     Dim field As String = Me.CsvData.Columns(i).Caption
-                    ''"で囲む
-                    'field = EncloseDoubleQuotesIfNeed(field)
+                    '"で囲む
+                    If blnFrame = True Then
+                        field = EncloseDoubleQuotesIfNeed(field)
+                    End If
                     'フィールドを書き込む
                     Me.CsvSW.Write(field)
-                    ''カンマを書き込む
-                    'If lastColIndex > i Then
-                    '    Me.CsvSW.Write(","c)
-                    'End If
+                    'カンマを書き込む
+                    If blnSeparate = True Then
+                        If lastColIndex > i Then
+                            Me.CsvSW.Write(","c)
+                        End If
+                    End If
                 Next
                 '改行する
                 Me.CsvSW.Write(vbCrLf)
@@ -84,20 +96,30 @@
                 For i = 0 To colCount - 1
                     'フィールドの取得
                     Dim field As String = row(i).ToString()
-                    ''"で囲む
-                    'field = EncloseDoubleQuotesIfNeed(field)
+                    '"で囲む
+                    If blnFrame = True Then
+                        field = EncloseDoubleQuotesIfNeed(field)
+                    End If
                     'フィールドを書き込む
                     Me.CsvSW.Write(field)
-                    ''カンマを書き込む
-                    'If lastColIndex > i Then
-                    '    Me.CsvSW.Write(","c)
-                    'End If
+                    'カンマを書き込む
+                    If blnSeparate = True Then
+                        If lastColIndex > i Then
+                            Me.CsvSW.Write(","c)
+                        End If
+                    End If
                 Next
                 '改行する
                 Me.CsvSW.Write(vbCrLf)
             Next
             '閉じる
             Me.CsvSW.Close()
+
+            '★指定フォルダが設定されている場合
+            If Me.UploadFilePath <> "" Then
+                '作成したファイルを指定フォルダに配置する。
+                System.IO.File.Copy(Me.UploadTmpFilePath, Me.UploadFilePath)
+            End If
 
             'ストリーム生成
             Using fs As New IO.FileStream(Me.UploadTmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)

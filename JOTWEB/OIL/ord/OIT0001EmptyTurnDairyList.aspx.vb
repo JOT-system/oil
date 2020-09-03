@@ -298,12 +298,12 @@ Public Class OIT0001EmptyTurnDairyList
             & " , ISNULL(RTRIM(OIT0002.TOTALTANK), '')               AS TOTALTANK" _
             & " , ISNULL(RTRIM(OIT0002.TANKLINKNOMADE), '')          AS TANKLINKNOMADE" _
             & " , ISNULL(FORMAT(OIT0002.ORDERYMD, 'yyyy/MM/dd'), '') AS ORDERYMD" _
-            & " , ISNULL(RTRIM(OIT0002.ORDERSTATUS), '')             AS ORDERSTATUSCODE" _
             & " , ISNULL(RTRIM(OIT0002.DELFLG), '')                  AS DELFLG" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " WHERE OIT0002.OFFICECODE   = @P1" _
             & "   AND OIT0002.LODDATE      >= @P2" _
             & "   AND OIT0002.DELFLG       <> @P3" _
+            & "   AND OIT0002.ORDERSTATUS  <> @P4" _
             & "   AND OIT0002.EMPTYTURNFLG <> '2'"
         '& "   AND OIT0002.TRAINNO    = @P4"
 
@@ -322,12 +322,12 @@ Public Class OIT0001EmptyTurnDairyList
                 Dim PARA1 As SqlParameter = SQLcmd.Parameters.Add("@P1", SqlDbType.NVarChar, 10) '受注№
                 Dim PARA2 As SqlParameter = SQLcmd.Parameters.Add("@P2", SqlDbType.DateTime)     '積込日(開始)
                 Dim PARA3 As SqlParameter = SQLcmd.Parameters.Add("@P3", SqlDbType.NVarChar, 1)  '削除フラグ
-                'Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 4)  '列車番号
+                Dim PARA4 As SqlParameter = SQLcmd.Parameters.Add("@P4", SqlDbType.NVarChar, 3)  '受注進行ステータス
 
                 PARA1.Value = work.WF_SEL_SALESOFFICECODE.Text
                 PARA2.Value = work.WF_SEL_LOADINGDATE.Text
                 PARA3.Value = C_DELETE_FLG.DELETE
-                'PARA4.Value = work.WF_SEL_TRAINNUMBER.Text
+                PARA4.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -580,7 +580,7 @@ Public Class OIT0001EmptyTurnDairyList
 
                     PARA01.Value = OIT0001UPDrow("ORDERNO")
                     work.WF_SEL_ORDERNUMBER.Text = OIT0001UPDrow("ORDERNO")
-                    strOrderSts = OIT0001UPDrow("ORDERSTATUSCODE")
+                    strOrderSts = OIT0001UPDrow("ORDERSTATUS")
                     strDepstation = OIT0001UPDrow("DEPSTATION")
                     strArrstation = OIT0001UPDrow("ARRSTATION")
                     strLinkNoMade = OIT0001UPDrow("TANKLINKNOMADE")
@@ -633,9 +633,12 @@ Public Class OIT0001EmptyTurnDairyList
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                        'WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
+                        '                    I_TANKNO:=OIT0001His2tblrow("TANKNO"), I_SITUATION:="1",
+                        '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
                         WW_UpdateTankShozai("", "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
                                             I_TANKNO:=OIT0001His2tblrow("TANKNO"), I_SITUATION:="1",
-                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+                                            I_ActualEmparrDate:="", upActualEmparrDate:=True)
 
                     '350：受注確定
                     Case BaseDllConst.CONST_ORDERSTATUS_350
@@ -645,9 +648,12 @@ Public Class OIT0001EmptyTurnDairyList
                         '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("3"(到着))
                         '引数３：積車区分　　　⇒　変更なし(空白)
+                        'WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
+                        '                    I_TANKNO:=OIT0001His2tblrow("TANKNO"),
+                        '                    I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
                         WW_UpdateTankShozai(strDepstation, "3", "", I_ORDERNO:=OIT0001His2tblrow("ORDERNO"),
                                             I_TANKNO:=OIT0001His2tblrow("TANKNO"),
-                                            I_ActualEmparrDate:=Now.ToString("yyyy/MM/dd"), upActualEmparrDate:=True)
+                                            I_ActualEmparrDate:="", upActualEmparrDate:=True)
 
                     '400：受入確認中, 450:受入確認中(受入日入力)
                     Case BaseDllConst.CONST_ORDERSTATUS_400,
@@ -749,7 +755,7 @@ Public Class OIT0001EmptyTurnDairyList
         '登録日
         work.WF_SEL_REGISTRATIONDATE.Text = ""
         '受注進行ステータス
-        work.WF_SEL_STATUS.Text = ""
+        work.WF_SEL_STATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
         '受注情報
         work.WF_SEL_INFORMATION.Text = ""
         '受注営業所名
@@ -1166,7 +1172,13 @@ Public Class OIT0001EmptyTurnDairyList
             End If
             '空車着日（実績）
             If upActualEmparrDate = True Then
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+                'SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+                If I_ActualEmparrDate = "" Then
+                    SQLStr &= "        ACTUALEMPARRDATE   = NULL, "
+                Else
+                    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_ActualEmparrDate)
+                End If
+
                 '### 20200618 START 受注での使用をリセットする対応 #########################################
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
                 '### 20200618 END   受注での使用をリセットする対応 #########################################

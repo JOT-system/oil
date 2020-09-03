@@ -20,7 +20,8 @@ Public Module PrevDispMap
         ''' <summary>
         ''' サブメニュー画面
         ''' </summary>
-        Public Const SUBMENU As String = "ASP.OIL_M00002MENU_ASPX"
+        Public Const SUBMENU As String = "ASP.OIL_M00001MENU_ASPX"
+        'Public Const SUBMENU As String = "ASP.OIL_M00002MENU_ASPX"
         ''' <summary>
         ''' 空回日報検索
         ''' </summary>

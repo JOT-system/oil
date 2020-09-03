@@ -655,6 +655,26 @@ Public Module Messages
         ''' タンク車(同一積込日)使用メッセージ
         ''' </summary>
         Public Const OIL_TANKNO_LOADDATE_USE As String = "20063"
+        ''' <summary>
+        ''' 前回揮発油で今回黒油、または灯軽油の整合性エラー(空回日報画面)
+        ''' </summary>
+        Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20064"
+        ''' <summary>
+        ''' 指定タンク車№が所属営業所以外のためエラー
+        ''' </summary>
+        Public Const OIL_ORDER_NOT_LOCATION_TANKNO_ERROR As String = "20065"
+        ''' <summary>
+        ''' 前回灯軽油で今回黒油、または揮発油の整合性エラー
+        ''' </summary>
+        Public Const OIL_LASTLIGHTOIL_BLACKVOLATILEOIL_ERROR As String = "20066"
+        ''' <summary>
+        ''' 発送順設定値0エラー
+        ''' </summary>
+        Public Const OIL_SHIPORDER_ZERO_ERROR As String = "20067"
+        ''' <summary>
+        ''' 入線順設定値0エラー
+        ''' </summary>
+        Public Const OIL_LINEORDER_ZERO_ERROR As String = "20068"
 #End Region
 
 

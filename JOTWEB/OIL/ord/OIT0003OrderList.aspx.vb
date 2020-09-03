@@ -2088,7 +2088,7 @@ Public Class OIT0003OrderList
         Using repCbj = New CsvCreate(OIT0003CsvDeliverytbl)
             Dim url As String
             Try
-                url = repCbj.ConvertDataTableToCsv(False)
+                url = repCbj.ConvertDataTableToCsv(False, blnFrame:=True, blnSeparate:=True)
             Catch ex As Exception
                 Return
             End Try
@@ -2614,6 +2614,7 @@ Public Class OIT0003OrderList
               " , OIT0002.DEPDATE                                AS DEPDATE" _
             & " , OIT0002.ARRDATE                                AS ARRDATE" _
             & " , OIT0002.ACCDATE                                AS ACCDATE" _
+            & " , OIM0024.PRIORITYNO                             AS PRIORITYNO" _
             & " FROM OIL.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
@@ -2643,8 +2644,19 @@ Public Class OIT0003OrderList
             & " AND OIM0021.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
             & " AND OIM0021.FROMYMD <= FORMAT(GETDATE(),'yyyy/MM/dd') " _
             & " AND OIM0021.TOYMD >= FORMAT(GETDATE(),'yyyy/MM/dd') " _
-            & " AND OIM0021.DELFLG <> @P02 " _
-            & " WHERE OIT0002.OFFICECODE = @P01 " _
+            & " AND OIM0021.DELFLG <> @P02 "
+
+        '### 20200902 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+        SQLStrCmn &=
+              " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
+            & "     OIM0024.OFFICECODE = @P01 " _
+            & " AND OIM0024.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0024.DELFLG <> @P02 "
+        '### 20200902 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+
+        SQLStrCmn &=
+              " WHERE OIT0002.OFFICECODE = @P01 " _
             & "   AND OIT0002.DELFLG <> @P02 " _
             & "   AND OIT0002.ORDERSTATUS <= @P04 " _
 
@@ -2733,7 +2745,8 @@ Public Class OIT0003OrderList
             & "    OIT0003.SHIPPERSCODE" _
             & "  , OIT0002.TRAINNO" _
             & "  , STACKING" _
-            & "  , OIT0003.OILCODE"
+            & "  , OIM0024.PRIORITYNO"
+        '& "  , OIT0003.OILCODE" _
 
         '◯積置フラグ無し用SQLと積置フラグ有り用SQLを結合
         SQLStrNashi &=
@@ -3462,7 +3475,8 @@ Public Class OIT0003OrderList
         '### 20200710 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
         SQLStr &=
               " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
-            & "     OIM0024.OILCODE = OIT0003.OILCODE " _
+            & "     OIM0024.OFFICECODE = @P01 " _
+            & " AND OIM0024.OILCODE = OIT0003.OILCODE " _
             & " AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
             & " AND OIM0024.DELFLG <> @P02 "
         '### 20200710 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############

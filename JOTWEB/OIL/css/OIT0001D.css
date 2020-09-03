@@ -1,4 +1,19 @@
-﻿/* 一旦レスポンス用 画像のプリロード */
+﻿#pnlListArea .boxIconArea div, #pnlListArea .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    #pnlListArea .calendarIconArea div, #pnlListArea .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, #pnlListArea .calendarIconArea div, #pnlListArea .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+
+/* 一旦レスポンス用 画像のプリロード */
 body:before {
     content: url(../img/leftbox.png) url(../img/calendar.png);
     display: none;

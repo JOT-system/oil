@@ -85,15 +85,46 @@ function ChangeCheckBox() {
             }
         }
     }
+
+    var objTableDR = document.getElementById("pnlListArea_DR").children[0];
+    var objLightTable = objTableDR.children[0];
+    if (objLightTable === null) {
+        return;
+    }
+    if (objLightTable === undefined) {
+        return;
+    }
+
+    // OT輸送
+    var chkObjsLight4 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaOTTRANSPORTFLG']");
+    var spnObjsLight4 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaOTTRANSPORTFLG']");
+
+    for (let i = 0; i < chkObjsLight4.length; i++) {
+
+        if (chkObjsLight4[i] !== null) {
+            if (spnObjsLight4[i].innerText === "on") {
+                chkObjsLight4[i].checked = true;
+            } else {
+                chkObjsLight4[i].checked = false;
+            }
+        }
+    }
+
 }
 
 
 // ○チェックボックス選択
-function SelectCheckBox(obj, lineCnt) {
+function SelectCheckBox(obj, lineCnt, fieldName) {
 
     if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+
+        surfix = '';
+        if (fieldName === 'OTTRANSPORTFLG') {
+            surfix = 'OTTRANSPORT'
+        }
+
         document.getElementById("WF_SelectedIndex").value = lineCnt
-        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;
         document.body.style.cursor = "wait";
         document.forms[0].submit();
     }

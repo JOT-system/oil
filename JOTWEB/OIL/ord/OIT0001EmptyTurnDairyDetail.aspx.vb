@@ -4151,10 +4151,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 PARA6.Value = work.WF_SEL_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0001WK3tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
+
+                    If OIT0001WK3tbl.Columns.Count = 0 Then
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIT0001WK3tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    Else
+                        OIT0001WK3tbl.Clear()
+                    End If
 
                     '○ テーブル検索結果をテーブル格納
                     OIT0001WK3tbl.Load(SQLdr)
@@ -4164,6 +4169,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
                     '★行削除したデータはSKIPする。
                     If OIT0001row("DELFLG") = "1" Then Continue For
+
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0001row("ORDERINFO") = ""
+                        OIT0001row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
+
+                    End If
+
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK3tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
@@ -4196,11 +4212,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
 
                             Exit For
-                        Else
-                            If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0001row("ORDERINFO") = ""
-                                OIT0001row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0001row("ORDERINFO") = ""
+                            '        OIT0001row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next
@@ -4225,10 +4241,15 @@ Public Class OIT0001EmptyTurnDairyDetail
                 PARADF6.Value = work.WF_SEL_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLDiffDEPTraincmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0001WK4tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
+
+                    If OIT0001WK4tbl.Columns.Count = 0 Then
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIT0001WK4tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    Else
+                        OIT0001WK4tbl.Clear()
+                    End If
 
                     '○ テーブル検索結果をテーブル格納
                     OIT0001WK4tbl.Load(SQLdr)
@@ -4238,6 +4259,17 @@ Public Class OIT0001EmptyTurnDairyDetail
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
                     '★行削除したデータはSKIPする。
                     If OIT0001row("DELFLG") = "1" Then Continue For
+
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0001row("ORDERINFO") = ""
+                        OIT0001row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
+
+                    End If
+
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK4tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
@@ -4269,11 +4301,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
 
                             Exit For
-                        Else
-                            If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0001row("ORDERINFO") = ""
-                                OIT0001row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0001row("ORDERINFO") = ""
+                            '        OIT0001row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next
@@ -4330,11 +4362,23 @@ Public Class OIT0001EmptyTurnDairyDetail
                             For index As Integer = 0 To SQLdr.FieldCount - 1
                                 OIT0001WK5tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                             Next
+                        Else
+                            OIT0001WK5tbl.Clear()
                         End If
 
                         '○ テーブル検索結果をテーブル格納
                         OIT0001WK5tbl.Load(SQLdr)
                     End Using
+
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0001row("ORDERINFO") = ""
+                        OIT0001row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
+
+                    End If
 
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK5tbl.Rows
 
@@ -4366,11 +4410,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                             WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
 
                             Exit For
-                        Else
-                            If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0001row("ORDERINFO") = ""
-                                OIT0001row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0001row("ORDERINFO") = ""
+                            '        OIT0001row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next
@@ -4411,6 +4455,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                 '〇1件でも存在したら、登録済みエラーとして終了。
                 For Each OIT0001row As DataRow In OIT0001tbl.Rows
 
+                    '★行削除したデータはSKIPする。
+                    If OIT0001row("DELFLG") = "1" Then Continue For
+
                     If OIT0001row("ACTUALLODDATE") <> "" Then
                         PARALSM8.Value = OIT0001row("ACTUALLODDATE")
                     Else
@@ -4424,6 +4471,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                             For index As Integer = 0 To SQLdr.FieldCount - 1
                                 OIT0001WK8tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                             Next
+                        Else
+                            OIT0001WK8tbl.Clear()
                         End If
 
                         '○ テーブル検索結果をテーブル格納
@@ -4431,8 +4480,16 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     End Using
 
-                    '★行削除したデータはSKIPする。
-                    If OIT0001row("DELFLG") = "1" Then Continue For
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0001row("ORDERINFO") = ""
+                        OIT0001row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
+
+                    End If
+
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK8tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
@@ -4472,11 +4529,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                             ''WW_UpdateTankShozai("", "2", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
 
                             Exit For
-                        Else
-                            If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0001row("ORDERINFO") = ""
-                                OIT0001row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0001row("ORDERINFO") = ""
+                            '        OIT0001row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next

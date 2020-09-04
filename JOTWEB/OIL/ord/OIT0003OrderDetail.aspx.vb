@@ -15581,10 +15581,15 @@ Public Class OIT0003OrderDetail
                 'PARA6.Value = work.WF_SEL_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003WK3tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
+
+                    If OIT0003WK3tbl.Columns.Count = 0 Then
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIT0003WK3tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    Else
+                        OIT0003WK3tbl.Clear()
+                    End If
 
                     '○ テーブル検索結果をテーブル格納
                     OIT0003WK3tbl.Load(SQLdr)
@@ -15594,6 +15599,17 @@ Public Class OIT0003OrderDetail
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     '★行削除したデータはSKIPする。
                     If OIT0003row("DELFLG") = "1" Then Continue For
+
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0003row("ORDERINFO") = ""
+                        OIT0003row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+
+                    End If
+
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK3tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
@@ -15634,11 +15650,11 @@ Public Class OIT0003OrderDetail
                             ''WW_UpdateTankShozai("", "2", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
 
                             Exit For
-                        Else
-                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0003row("ORDERINFO") = ""
-                                OIT0003row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0003row("ORDERINFO") = ""
+                            '        OIT0003row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next
@@ -15664,10 +15680,15 @@ Public Class OIT0003OrderDetail
                 'PARADF6.Value = work.WF_SEL_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLDiffDEPTraincmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003WK7tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
+
+                    If OIT0003WK7tbl.Columns.Count = 0 Then
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            OIT0003WK7tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+                    Else
+                        OIT0003WK7tbl.Clear()
+                    End If
 
                     '○ テーブル検索結果をテーブル格納
                     OIT0003WK7tbl.Load(SQLdr)
@@ -15677,6 +15698,17 @@ Public Class OIT0003OrderDetail
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     '★行削除したデータはSKIPする。
                     If OIT0003row("DELFLG") = "1" Then Continue For
+
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0003row("ORDERINFO") = ""
+                        OIT0003row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+
+                    End If
+
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK7tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
@@ -15717,11 +15749,11 @@ Public Class OIT0003OrderDetail
                             ''WW_UpdateTankShozai("", "2", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
 
                             Exit For
-                        Else
-                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0003row("ORDERINFO") = ""
-                                OIT0003row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0003row("ORDERINFO") = ""
+                            '        OIT0003row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next
@@ -15778,12 +15810,24 @@ Public Class OIT0003OrderDetail
                             For index As Integer = 0 To SQLdr.FieldCount - 1
                                 OIT0003WK8tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                             Next
+                        Else
+                            OIT0003WK8tbl.Clear()
                         End If
 
                         '○ テーブル検索結果をテーブル格納
                         OIT0003WK8tbl.Load(SQLdr)
 
                     End Using
+
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0003row("ORDERINFO") = ""
+                        OIT0003row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+
+                    End If
 
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK8tbl.Rows
 
@@ -15825,11 +15869,11 @@ Public Class OIT0003OrderDetail
                             ''WW_UpdateTankShozai("", "2", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
 
                             Exit For
-                        Else
-                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0003row("ORDERINFO") = ""
-                                OIT0003row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0003row("ORDERINFO") = ""
+                            '        OIT0003row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next
@@ -15886,12 +15930,24 @@ Public Class OIT0003OrderDetail
                             For index As Integer = 0 To SQLdr.FieldCount - 1
                                 OIT0003WK10tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                             Next
+                        Else
+                            OIT0003WK10tbl.Clear()
                         End If
 
                         '○ テーブル検索結果をテーブル格納
                         OIT0003WK10tbl.Load(SQLdr)
 
                     End Using
+
+                    '★受注情報を初期化(タンク車重複の場合のみ)
+                    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                        OIT0003row("ORDERINFO") = ""
+                        OIT0003row("ORDERINFONAME") = ""
+
+                        '受注明細TBLの受注情報を更新
+                        WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
+
+                    End If
 
                     For Each OIT0003CHKDrow As DataRow In OIT0003WK10tbl.Rows
 
@@ -15933,11 +15989,11 @@ Public Class OIT0003OrderDetail
                             ''WW_UpdateTankShozai("", "2", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="1", upActualEmparrDate:=True)
 
                             Exit For
-                        Else
-                            If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
-                                OIT0003row("ORDERINFO") = ""
-                                OIT0003row("ORDERINFONAME") = ""
-                            End If
+                            'Else
+                            '    If OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85 Then
+                            '        OIT0003row("ORDERINFO") = ""
+                            '        OIT0003row("ORDERINFONAME") = ""
+                            '    End If
                         End If
                     Next
                 Next

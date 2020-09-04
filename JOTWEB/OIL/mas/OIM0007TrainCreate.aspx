@@ -183,9 +183,7 @@
                         </span>
                         <asp:Label ID="WF_TRAINCLASS_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-
-                <p id="KEY_LINE_12">
+                    
                     <!-- 高速列車区分 -->
                     <span class="ef">
                         <asp:Label ID="WF_SPEEDCLASS_L" runat="server" Text="高速列車区分" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -196,7 +194,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_13">
+                <p id="KEY_LINE_12">
                     <!-- 発送順区分 -->
                     <span class="ef">
                         <asp:Label ID="WF_SHIPORDERCLASS_L" runat="server" Text="発送順区分" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -207,16 +205,14 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_14">
+                <p id="KEY_LINE_13">
                     <!-- 発日日数 -->
                     <span class="ef">
                         <asp:Label ID="WF_DEPDAYS_L" runat="server" Text="発日日数" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_DEPDAYS" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                         <asp:Label ID="WF_DEPDAYS_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-
-                <p id="KEY_LINE_15">
+                    
                     <!-- 特継日数 -->
                     <span class="ef">
                         <asp:Label ID="WF_MARGEDAYS_L" runat="server" Text="特継日数" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -225,16 +221,14 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_16">
+                <p id="KEY_LINE_14">
                     <!-- 積車着日数 -->
                     <span class="ef">
                         <asp:Label ID="WF_ARRDAYS_L" runat="server" Text="積車着日数" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_ARRDAYS" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                         <asp:Label ID="WF_ARRDAYS_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-
-                <p id="KEY_LINE_17">
+                    
                     <!-- 受入日数 -->
                     <span class="ef">
                         <asp:Label ID="WF_ACCDAYS_L" runat="server" Text="受入日数" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -243,16 +237,14 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_18">
+                <p id="KEY_LINE_15">
                     <!-- 空車着日数 -->
                     <span class="ef">
                         <asp:Label ID="WF_EMPARRDAYS_L" runat="server" Text="空車着日数" CssClass="WF_TEXT_LABEL"></asp:Label>
                         <asp:TextBox ID="WF_EMPARRDAYS" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                         <asp:Label ID="WF_EMPARRDAYS_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
-                </p>
-
-                <p id="KEY_LINE_19">
+                    
                     <!-- 当日利用日数 -->
                     <span class="ef">
                         <asp:Label ID="WF_USEDAYS_L" runat="server" Text="当日利用日数" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -263,7 +255,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_20">
+                <p id="KEY_LINE_16">
                     <!-- 料金マスタ区分 -->
                     <span class="ef">
                         <asp:Label ID="WF_FEEKBN_L" runat="server" Text="料金マスタ区分" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -272,7 +264,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_21">
+                <p id="KEY_LINE_17">
                     <!-- 稼働フラグ -->
                     <span class="ef">
                         <asp:Label ID="WF_RUN_L" runat="server" Text="稼働フラグ" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -283,7 +275,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_22">
+                <p id="KEY_LINE_18">
                     <!-- 在庫管理表表示ソート区分 -->
                     <span class="ef">
                         <asp:Label ID="WF_ZAIKOSORT_L" runat="server" Text="在庫管理表表示ソート区分" CssClass="WF_TEXT_LABEL"></asp:Label>
@@ -292,7 +284,7 @@
                     </span>
                 </p>
 
-                <p id="KEY_LINE_23">
+                <p id="KEY_LINE_19">
                     <!-- 備考 -->
                     <span class="ef">
                         <asp:Label ID="WF_BIKOU_L" runat="server" Text="備考" CssClass="WF_TEXT_LABEL"></asp:Label>

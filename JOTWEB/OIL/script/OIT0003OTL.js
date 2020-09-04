@@ -20,19 +20,19 @@ function InitDisplay() {
         //活性
         document.getElementById("WF_ButtonALLSELECT").disabled = "";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
-        document.getElementById("WF_ButtonINSERT").disabled = "";
+        document.getElementById("WF_ButtonOtSend").disabled = "";
 
     } else {
         //非活性 
         document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-        document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+        document.getElementById("WF_ButtonOtSend").disabled = "disabled";
     }
     /* 共通一覧のスクロールイベント紐づけ */
-    //bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
     // チェックボックス
-    //ChangeCheckBox();
+    ChangeCheckBox();
 
     //// 使用有無初期設定
     //ChangeOrgUse();

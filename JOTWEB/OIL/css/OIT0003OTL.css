@@ -1,4 +1,10 @@
-﻿/* 左ヘッダー行スタイル */
+﻿#WF_ButtonOtSend,
+#WF_ButtonReserved,
+#WF_ButtonTakusou {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+/* 左ヘッダー行スタイル */
 div[data-generated="1"] div[id$="_HL"] table tr {
     height: 37px;
 }

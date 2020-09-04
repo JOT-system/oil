@@ -1,5 +1,5 @@
-﻿'Option Strict On
-'Option Explicit On
+﻿Option Strict On
+Option Explicit On
 
 Imports System.Data.SqlClient
 Imports JOTWEB.GRIS0005LeftBox
@@ -58,8 +58,8 @@ Public Class OIT0003OTLinkageList
                             WF_ButtonALLSELECT_Click()
                         Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
                             WF_ButtonSELECT_LIFTED_Click()
-                        Case "WF_ButtonINSERT"          'OT連携ボタン押下
-                            WF_ButtonINSERT_Click()
+                        Case "WF_ButtonOtSend"          'OT連携ボタン押下
+                            WF_ButtonOtSend_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
@@ -200,9 +200,9 @@ Public Class OIT0003OTLinkageList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
-        CS0013ProfView.LEVENT = "ondblclick"
-        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.SCROLLTYPE = CInt(CS0013ProfView.SCROLLTYPE_ENUM.Both).ToString
+        'CS0013ProfView.LEVENT = "ondblclick"
+        'CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
@@ -437,8 +437,8 @@ Public Class OIT0003OTLinkageList
 
         'チェックボックス判定
         For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
-            If OIT0003tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                If OIT0003tbl.Rows(i)("OPERATION") = "" Then
+            If Convert.ToString(OIT0003tbl.Rows(i)("LINECNT")) = WF_SelectedIndex.Value Then
+                If Convert.ToString(OIT0003tbl.Rows(i)("OPERATION")) = "" Then
                     OIT0003tbl.Rows(i)("OPERATION") = "on"
                 Else
                     OIT0003tbl.Rows(i)("OPERATION") = ""
@@ -461,7 +461,7 @@ Public Class OIT0003OTLinkageList
 
         '全チェックボックスON
         For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
-            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+            If Convert.ToString(OIT0003tbl.Rows(i)("HIDDEN")) = "0" Then
                 OIT0003tbl.Rows(i)("OPERATION") = "on"
             End If
         Next
@@ -481,7 +481,7 @@ Public Class OIT0003OTLinkageList
 
         '全チェックボックスOFF
         For i As Integer = 0 To OIT0003tbl.Rows.Count - 1
-            If OIT0003tbl.Rows(i)("HIDDEN") = "0" Then
+            If Convert.ToString(OIT0003tbl.Rows(i)("HIDDEN")) = "0" Then
                 OIT0003tbl.Rows(i)("OPERATION") = ""
             End If
         Next
@@ -495,7 +495,7 @@ Public Class OIT0003OTLinkageList
     ''' OT連携ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WF_ButtonINSERT_Click()
+    Protected Sub WF_ButtonOtSend_Click()
 
         '一覧のチェックボックスが選択されているか確認
         If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
@@ -692,12 +692,12 @@ Public Class OIT0003OTLinkageList
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
 
             '★指定されていない行はSKIP
-            If OIT0003row("OPERATION") = "" Then Continue For
+            If Convert.ToString(OIT0003row("OPERATION")) = "" Then Continue For
 
             If j = 0 Then
-                SQLStrCmn &= "'" & OIT0003row("ORDERNO") & "' "
+                SQLStrCmn &= "'" & Convert.ToString(OIT0003row("ORDERNO")) & "' "
             Else
-                SQLStrCmn &= ", '" & OIT0003row("ORDERNO") & "' "
+                SQLStrCmn &= ", '" & Convert.ToString(OIT0003row("ORDERNO")) & "' "
             End If
             j += 1
         Next
@@ -808,12 +808,12 @@ Public Class OIT0003OTLinkageList
 
         If Not String.IsNullOrEmpty(WF_RightViewChange.Value) Then
             Try
-                Integer.TryParse(WF_RightViewChange.Value, WF_RightViewChange.Value)
+                WF_RightViewChange.Value = Integer.Parse(WF_RightViewChange.Value).ToString
             Catch ex As Exception
                 Exit Sub
             End Try
-
-            rightview.SelectIndex(WF_RightViewChange.Value)
+            Dim enumVal = DirectCast([Enum].ToObject(GetType(GRIS0004RightBox.RIGHT_TAB_INDEX), CInt(WF_RightViewChange.Value)), GRIS0004RightBox.RIGHT_TAB_INDEX)
+            rightview.SelectIndex(enumVal)
             WF_RightViewChange.Value = ""
         End If
 
@@ -840,7 +840,7 @@ Public Class OIT0003OTLinkageList
 
         '○ 表示対象行カウント(絞り込み対象)
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
-            If OIT0003row("HIDDEN") = 0 Then
+            If CInt(OIT0003row("HIDDEN")) = 0 Then
                 WW_DataCNT += 1
                 '行(LINECNT)を再設定する。既存項目(SELECT)を利用
                 OIT0003row("SELECT") = WW_DataCNT
@@ -890,9 +890,9 @@ Public Class OIT0003OTLinkageList
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
-        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
-        CS0013ProfView.LEVENT = "ondblclick"
-        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.SCROLLTYPE = CInt(CS0013ProfView.SCROLLTYPE_ENUM.Both).ToString
+        'CS0013ProfView.LEVENT = "ondblclick"
+        'CS0013ProfView.LFUNC = "ListDbClick"
         CS0013ProfView.TITLEOPT = True
         CS0013ProfView.HIDEOPERATIONOPT = True
         CS0013ProfView.CS0013ProfView()
@@ -901,7 +901,7 @@ Public Class OIT0003OTLinkageList
         If TBLview.Count = 0 Then
             WF_GridPosition.Text = "1"
         Else
-            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+            WF_GridPosition.Text = Convert.ToString(TBLview.Item(0)("SELECT"))
         End If
 
         TBLview.Dispose()
@@ -917,5 +917,112 @@ Public Class OIT0003OTLinkageList
         work.WF_SEL_INPOTLINKAGETBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPLINKTBL.txt"
     End Sub
+    Public Class fileLinkagePattern
+        Private _Item As Dictionary(Of String, FileLinkagePatternItem)
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New()
+            Me._Item = New Dictionary(Of String, FileLinkagePatternItem)
+            Dim fileLinkageItem As FileLinkagePatternItem
+            With Me._Item
+                '仙台新港営業所
+                fileLinkageItem = New FileLinkagePatternItem(
+                    "011202", True, True, True
+                    )
+                .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '五井営業所
+                fileLinkageItem = New FileLinkagePatternItem(
+                    "011201", True, True, True
+                    )
+                .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '甲子営業所
+                fileLinkageItem = New FileLinkagePatternItem(
+                    "011202", True, True, True
+                    )
+                .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '袖ヶ浦営業所
+                fileLinkageItem = New FileLinkagePatternItem(
+                    "011203", True, True, True
+                    )
+                .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '根岸営業所
+                fileLinkageItem = New FileLinkagePatternItem(
+                    "011402", True, True, True
+                    )
+                .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '四日市営業所
+                fileLinkageItem = New FileLinkagePatternItem(
+                    "012401", True, True, True
+                    )
+                .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '三重塩浜営業所
+                fileLinkageItem = New FileLinkagePatternItem(
+                    "012402", True, True, True
+                    )
+                .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+            End With
+        End Sub
+        ''' <summary>
+        ''' デフォルトプロパティ
+        ''' </summary>
+        ''' <param name="officeCode">営業所コード</param>
+        ''' <returns>表示パターンクラス</returns>
+        Default Public ReadOnly Property Item(officeCode As String) As FileLinkagePatternItem
+            Get
+                Return Me._Item(officeCode)
+            End Get
+
+        End Property
+
+    End Class
+
+
+    ''' <summary>
+    ''' 外部連携パターンアイテムクラス
+    ''' </summary>
+    Public Class FileLinkagePatternItem
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="officeCode"></param>
+        Public Sub New(officeCode As String)
+            Me.New(officeCode, False, False, False)
+        End Sub
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        ''' <param name="officeCode">営業所コード</param>
+        ''' <param name="canOtSend">OT発送日報出力可否(True:可,False:不可)</param>
+        ''' <param name="canReserved">製油所出荷予約出力可否(True:可,False:不可)</param>
+        ''' <param name="canTakusou">託送指示出力可否(True:可,False:不可)</param>
+        Public Sub New(officeCode As String, canOtSend As Boolean, canReserved As Boolean, canTakusou As Boolean)
+            Me.OfficeCode = officeCode
+            Me.CanOtSend = canOtSend
+            Me.CanReserved = canReserved
+            Me.CanTakusou = canTakusou
+        End Sub
+
+        ''' <summary>
+        ''' 営業所コード
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OfficeCode As String
+        ''' <summary>
+        ''' OT発送日報出力可否(True:可,False:不可)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CanOtSend As Boolean = False
+        ''' <summary>
+        ''' 製油所出荷予約出力可否(True:可,False:不可)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CanReserved As Boolean = False
+        ''' <summary>
+        ''' 託送指示出力可否(True:可,False:不可)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CanTakusou As Boolean = False
+    End Class
 
 End Class

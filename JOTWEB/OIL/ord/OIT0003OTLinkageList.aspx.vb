@@ -917,7 +917,10 @@ Public Class OIT0003OTLinkageList
         work.WF_SEL_INPOTLINKAGETBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPLINKTBL.txt"
     End Sub
-    Public Class fileLinkagePattern
+    ''' <summary>
+    ''' ファイル社外連携の各種出力ファイルの出力可否判定
+    ''' </summary>
+    Public Class FileLinkagePattern
         Private _Item As Dictionary(Of String, FileLinkagePatternItem)
         ''' <summary>
         ''' コンストラクタ

@@ -270,6 +270,7 @@
     <Content Include="OIL\ord\OIT0003OrderList.aspx" />
     <Content Include="OIL\ord\OIT0003OrderSearch.aspx" />
     <Content Include="OIL\ord\OIT0003OTLinkageList.aspx" />
+    <Content Include="OIL\ord\OIT0003OTLinkageSearch.aspx" />
     <Content Include="OIL\script\M00001.js" />
     <Content Include="OIL\script\OIM0003C.js" />
     <Content Include="OIL\script\OIM0002C.js" />
@@ -964,6 +965,13 @@
     </Compile>
     <Compile Include="OIL\ord\OIT0003OTLinkageList.aspx.vb">
       <DependentUpon>OIT0003OTLinkageList.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\ord\OIT0003OTLinkageSearch.aspx.designer.vb">
+      <DependentUpon>OIT0003OTLinkageSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\ord\OIT0003OTLinkageSearch.aspx.vb">
+      <DependentUpon>OIT0003OTLinkageSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
   </ItemGroup>

@@ -227,8 +227,8 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    LOADINGIRILINEORDER,LOADINGOUTLETTRAINNO,")
         sqlDetailStat.AppendLine("    LOADINGOUTLETTRAINNAME,LOADINGOUTLETORDER,")
         sqlDetailStat.AppendLine("    ACTUALLODDATE,ACTUALDEPDATE,ACTUALARRDATE,ACTUALACCDATE,ACTUALEMPARRDATE,")
-        sqlDetailStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
         sqlDetailStat.AppendLine("    RESERVEDNO,OTSENDCOUNT,DLRESERVEDCOUNT,DLTAKUSOUCOUNT,")
+        sqlDetailStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
         sqlDetailStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
@@ -246,8 +246,8 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    @LOADINGIRILINEORDER,@LOADINGOUTLETTRAINNO,")
         sqlDetailStat.AppendLine("    @LOADINGOUTLETTRAINNAME,@LOADINGOUTLETORDER,")
         sqlDetailStat.AppendLine("    @ACTUALLODDATE,@ACTUALDEPDATE,@ACTUALARRDATE,@ACTUALACCDATE,@ACTUALEMPARRDATE,")
-        sqlDetailStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
         sqlDetailStat.AppendLine("    @RESERVEDNO,@OTSENDCOUNT,@DLRESERVEDCOUNT,@DLTAKUSOUCOUNT,")
+        sqlDetailStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
         sqlDetailStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlDetailStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD )")
 
@@ -300,12 +300,6 @@ Public Class EntryHistory
                 .Add("ACTUALARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
                 .Add("ACTUALACCDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
                 .Add("ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
-                .Add("SALSE", SqlDbType.NVarChar).Value = drOrder("SALSE")
-                .Add("SALSETAX", SqlDbType.NVarChar).Value = drOrder("SALSETAX")
-                .Add("TOTALSALSE", SqlDbType.NVarChar).Value = drOrder("TOTALSALSE")
-                .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("PAYMENT")
-                .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("PAYMENTTAX")
-                .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
                 Try
                     .Add("RESERVEDNO", SqlDbType.NVarChar).Value = drOrder("RESERVEDNO")
                 Catch ex As Exception
@@ -342,6 +336,12 @@ Public Class EntryHistory
                         .Add("DLTAKUSOUCOUNT", SqlDbType.Int).Value = 0
                     End If
                 End Try
+                .Add("SALSE", SqlDbType.NVarChar).Value = drOrder("SALSE")
+                .Add("SALSETAX", SqlDbType.NVarChar).Value = drOrder("SALSETAX")
+                .Add("TOTALSALSE", SqlDbType.NVarChar).Value = drOrder("TOTALSALSE")
+                .Add("PAYMENT", SqlDbType.NVarChar).Value = drOrder("PAYMENT")
+                .Add("PAYMENTTAX", SqlDbType.NVarChar).Value = drOrder("PAYMENTTAX")
+                .Add("TOTALPAYMENT", SqlDbType.NVarChar).Value = drOrder("TOTALPAYMENT")
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.NVarChar).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")

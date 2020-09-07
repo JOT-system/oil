@@ -1321,12 +1321,27 @@ Public Class OIT0002LinkList
             WW_INSERT_RLINK(SQLcon)
         End Using
 
-        '(タンク車所在TBL)の内容を更新
-        '引数１：タンク車状態　⇒　変更あり("3"(到着))
-        '引数２：積車区分　　　⇒　変更あり("E"(空車))
-        '引数３：タンク車状況　⇒　変更あり("1"(残車))
-        '引数４：使用受注№　　⇒　初期化あり(TRUE)
-        WW_UpdateTankShozai("3", "E", I_SITUATION:="1", I_USEORDERNO:=True)
+        ''★(一覧)で設定しているタンク車がOT所有か判断
+        ''割り当てたタンク車のチェック
+        'Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+        'For Each OIT0002EXLINSrow As DataRow In OIT0002EXLINStbl.Rows
+
+        '    '配列を初期化
+        '    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+
+        '    '★(一覧)タンク車NoがOT本社、または在日米軍のリース車かチェック
+        '    WW_FixvalueMasterSearch("ZZ", "TANKNO_OTCHECK", OIT0002EXLINSrow("TANKNO"), WW_GetValue)
+
+        '    'タンク車がOT本社、または在日米軍のリース車の場合
+        '    If WW_GetValue(0) <> "" Then
+        '        '(タンク車所在TBL)の内容を更新
+        '        '引数１：タンク車状態　⇒　変更あり("3"(到着))
+        '        '引数２：積車区分　　　⇒　変更あり("E"(空車))
+        '        '引数３：タンク車状況　⇒　変更あり("1"(残車))
+        '        '引数４：使用受注№　　⇒　初期化あり(TRUE)
+        '        'WW_UpdateTankShozai("3", "E", I_SITUATION:="1", I_USEORDERNO:=True)
+        '    End If
+        'Next
 
         '○ 画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection

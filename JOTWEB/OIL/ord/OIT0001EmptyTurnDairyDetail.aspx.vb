@@ -5119,7 +5119,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME    , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION      , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , RETSTATION   , RETSTATIONNAME  , CHANGERETSTATION, CHANGERETSTATIONNAME, ORDERSTATUS, ORDERINFO    " _
-            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG" _
+            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG   , DELIVERYCOUNT" _
             & "        , LODDATE      , DEPDATE         , ARRDATE" _
             & "        , ACCDATE      , EMPARRDATE      , ACTUALLODDATE   , ACTUALDEPDATE       , ACTUALARRDATE" _
             & "        , ACTUALACCDATE, ACTUALEMPARRDATE, RTANK           , HTANK               , TTANK" _
@@ -5133,15 +5133,16 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , OTHER6OTANKCH, OTHER7OTANKCH   , OTHER8OTANKCH   , OTHER9OTANKCH       , OTHER10OTANKCH" _
             & "        , TOTALTANKCH" _
             & "        , TANKLINKNO   , KEIJYOYMD       , SALSE           , SALSETAX            , TOTALSALSE" _
-            & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT    , DELFLG" _
-            & "        , INITYMD      , INITUSER        , INITTERMID" _
+            & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT" _
+            & "        , RECEIVECOUNT , OTSENDSTATUS    , RESERVEDSTATUS  , TAKUSOUSTATUS" _
+            & "        , DELFLG       , INITYMD         , INITUSER        , INITTERMID" _
             & "        , UPDYMD       , UPDUSER         , UPDTERMID       , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P93, @P03, @P04, @P05" _
             & "        , @P06, @P07, @P08, @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14, @P15, @P16" _
             & "        , @P17, @P18, @P19, @P20, @P21, @P22" _
-            & "        , @P95, @P92, @P23, @P96, @P97, @P94" _
+            & "        , @P95, @P92, @P23, @P96, @P97, @P94, @P98" _
             & "        , @P24, @P25, @P26" _
             & "        , @P27, @P28, @P29, @P30, @P31" _
             & "        , @P32, @P33, @P34, @P35, @P36" _
@@ -5155,8 +5156,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P70, @P71, @P72, @P73, @P74" _
             & "        , @P75" _
             & "        , @P76, @P91, @P77, @P78, @P79" _
-            & "        , @P80, @P81, @P82, @P83" _
-            & "        , @P84, @P85, @P86" _
+            & "        , @P80, @P81, @P82" _
+            & "        , @P99, @P100, @P101, @P102" _
+            & "        , @P83, @P84, @P85, @P86" _
             & "        , @P87, @P88, @P89, @P90) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
@@ -5193,6 +5195,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , CONTACTFLG" _
             & "    , RESULTFLG" _
             & "    , DELIVERYFLG" _
+            & "    , DELIVERYCOUNT" _
             & "    , LODDATE" _
             & "    , DEPDATE" _
             & "    , ARRDATE" _
@@ -5253,6 +5256,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , PAYMENT" _
             & "    , PAYMENTTAX" _
             & "    , TOTALPAYMENT" _
+            & "    , RECEIVECOUNT" _
+            & "    , OTSENDSTATUS" _
+            & "    , RESERVEDSTATUS" _
+            & "    , TAKUSOUSTATUS" _
             & "    , DELFLG" _
             & "    , INITYMD" _
             & "    , INITUSER" _
@@ -5298,6 +5305,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA96 As SqlParameter = SQLcmd.Parameters.Add("@P96", SqlDbType.NVarChar, 1)  '手配連絡フラグ
                 Dim PARA97 As SqlParameter = SQLcmd.Parameters.Add("@P97", SqlDbType.NVarChar, 1)  '結果受理フラグ
                 Dim PARA94 As SqlParameter = SQLcmd.Parameters.Add("@P94", SqlDbType.NVarChar, 1)  '託送指示フラグ
+                Dim PARA98 As SqlParameter = SQLcmd.Parameters.Add("@P98", SqlDbType.Int)          '託送指示送信回数
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)         '積込日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)         '発日（予定）
                 Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Date)         '積車着日（予定）
@@ -5358,6 +5366,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA80 As SqlParameter = SQLcmd.Parameters.Add("@P80", SqlDbType.Int)          '支払金額
                 Dim PARA81 As SqlParameter = SQLcmd.Parameters.Add("@P81", SqlDbType.Int)          '支払消費税額
                 Dim PARA82 As SqlParameter = SQLcmd.Parameters.Add("@P82", SqlDbType.Int)          '支払合計金額
+                Dim PARA99 As SqlParameter = SQLcmd.Parameters.Add("@P99", SqlDbType.Int)          'OT空回日報受信回数
+                Dim PARA100 As SqlParameter = SQLcmd.Parameters.Add("@P100", SqlDbType.NVarChar, 1) 'OT発送日報送信状況
+                Dim PARA101 As SqlParameter = SQLcmd.Parameters.Add("@P101", SqlDbType.NVarChar, 1) '出荷予約ダウンロード状況
+                Dim PARA102 As SqlParameter = SQLcmd.Parameters.Add("@P102", SqlDbType.NVarChar, 1) '託送状ダウンロード状況
                 Dim PARA83 As SqlParameter = SQLcmd.Parameters.Add("@P83", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA84 As SqlParameter = SQLcmd.Parameters.Add("@P84", SqlDbType.DateTime)     '登録年月日
                 Dim PARA85 As SqlParameter = SQLcmd.Parameters.Add("@P85", SqlDbType.NVarChar, 20) '登録ユーザーID
@@ -5450,6 +5462,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA96.Value = "0"                                '手配連絡フラグ(0:未連絡)
                     PARA97.Value = "0"                                '結果受理フラグ(0:未受理)
                     PARA94.Value = "0"                                '託送指示フラグ(0:未手配)
+                    PARA98.Value = "0"                                '託送指示送信回数
                     PARA24.Value = TxtLoadingDate.Text                '積込日（予定）
                     PARA25.Value = TxtDepDate.Text                    '発日（予定）
                     PARA26.Value = TxtArrDate.Text                    '積車着日（予定）
@@ -5510,6 +5523,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                     PARA80.Value = "0"                                '支払金額
                     PARA81.Value = "0"                                '支払消費税額
                     PARA82.Value = "0"                                '支払合計金額
+                    PARA99.Value = "0"                                'OT空回日報受信回数
+                    PARA100.Value = "0"                               'OT発送日報送信状況
+                    PARA101.Value = "0"                               '出荷予約ダウンロード状況
+                    PARA102.Value = "0"                               '託送状ダウンロード状況
                     PARA83.Value = OIT0001row("DELFLG")               '削除フラグ
                     PARA84.Value = WW_DATENOW                         '登録年月日
                     PARA85.Value = Master.USERID                      '登録ユーザーID
@@ -5609,7 +5626,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        TANKNO            = @P03, STACKINGFLG  = @P40, ORDERINFO    = @P34" _
             & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
             & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
-            & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK       = @P38" _
+            & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK          = @P38" _
             & "        , ACTUALLODDATE   = @P41" _
             & "        , UPDYMD          = @P19, UPDUSER      = @P20" _
             & "        , UPDTERMID       = @P21, RECEIVEYMD   = @P22" _
@@ -5624,8 +5641,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
             & "        , RETURNDATETRAIN , JOINTCODE           , JOINT" _
             & "        , REMARK          , CHANGETRAINNO       , SECONDCONSIGNEECODE, SECONDCONSIGNEENAME" _
-            & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CHANGERETSTATION   , CHANGERETSTATIONNAME" _
-            & "        , ACTUALLODDATE   , SALSE               , SALSETAX" _
+            & "        , SECONDARRSTATION, SECONDARRSTATIONNAME, CHANGERETSTATION   , CHANGERETSTATIONNAME, ACTUALLODDATE" _
+            & "        , RESERVEDNO      , OTSENDCOUNT         , DLRESERVEDCOUNT    , DLTAKUSOUCOUNT" _
+            & "        , SALSE           , SALSETAX" _
             & "        , TOTALSALSE      , PAYMENT             , PAYMENTTAX         , TOTALPAYMENT" _
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
@@ -5636,8 +5654,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P36, @P37, @P06, @P25" _
             & "        , @P07, @P39, @P08" _
             & "        , @P38, @P26, @P27, @P28" _
-            & "        , @P29, @P30, @P31, @P32" _
-            & "        , @P41, @P09, @P10" _
+            & "        , @P29, @P30, @P31, @P32, @P41" _
+            & "        , @P42, @P43, @P44, @P45" _
+            & "        , @P09, @P10" _
             & "        , @P11, @P12, @P13, @P14" _
             & "        , @P15, @P16, @P17, @P18" _
             & "        , @P19, @P20, @P21, @P22) ;" _
@@ -5678,6 +5697,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , CHANGERETSTATION" _
             & "    , CHANGERETSTATIONNAME" _
             & "    , ACTUALLODDATE" _
+            & "    , RESERVEDNO" _
+            & "    , OTSENDCOUNT" _
+            & "    , DLRESERVEDCOUNT" _
+            & "    , DLTAKUSOUCOUNT" _
             & "    , SALSE" _
             & "    , SALSETAX" _
             & "    , TOTALSALSE" _
@@ -5739,6 +5762,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.NVarChar, 7)   '空車着駅コード（変更後）
                 Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar, 40)  '空車着駅名（変更後）
                 Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.Date)          '積込日（実績）
+                Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar, 3)   '予約番号
+                Dim PARA43 As SqlParameter = SQLcmd.Parameters.Add("@P43", SqlDbType.Int)           'OT発送日報送信回数
+                Dim PARA44 As SqlParameter = SQLcmd.Parameters.Add("@P44", SqlDbType.Int)           '出荷予約ダウンロード回数
+                Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.Int)           '託送状ダウンロード回数
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Int)           '売上金額
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Int)           '売上消費税額
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Int)           '売上合計金額
@@ -5811,6 +5838,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Else
                         PARA41.Value = OIT0001row("ACTUALLODDATE")
                     End If
+
+                    PARA42.Value = ""                                 '予約番号
+                    PARA43.Value = "0"                                'OT発送日報送信回数
+                    PARA44.Value = "0"                                '出荷予約ダウンロード回数
+                    PARA45.Value = "0"                                '託送状ダウンロード回数
 
                     PARA09.Value = "0"                                '売上金額
                     PARA10.Value = "0"                                '売上消費税額

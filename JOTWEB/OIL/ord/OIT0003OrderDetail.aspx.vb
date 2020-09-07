@@ -10597,7 +10597,8 @@ Public Class OIT0003OrderDetail
                                       Optional ByVal I_AEMPARRDATE As String = Nothing,
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal upActualEmparrDate As Boolean = False,
-                                      Optional ByVal upLastOilCode As Boolean = False)
+                                      Optional ByVal upLastOilCode As Boolean = False,
+                                      Optional ByVal upOTFlag As Boolean = False)
 
         Try
             'DataBase接続文字
@@ -10609,61 +10610,64 @@ Public Class OIT0003OrderDetail
                     " UPDATE OIL.OIT0005_SHOZAI " _
                     & "    SET "
 
-            '○ 更新内容が指定されていれば追加する
-            '所在地コード
-            If Not String.IsNullOrEmpty(I_LOCATION) Then
-                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
-            End If
-            'タンク車状態コード
-            If Not String.IsNullOrEmpty(I_STATUS) Then
-                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
-            End If
-            '積車区分
-            If Not String.IsNullOrEmpty(I_KBN) Then
-                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
-            End If
-            'タンク車状況コード
-            If Not String.IsNullOrEmpty(I_SITUATION) Then
-                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
-            End If
-
-            '★空車着日（予定）が未設定の場合は、オーダー中の空車着日（予定）を設定
-            If String.IsNullOrEmpty(I_EMPARRDATE) Then I_EMPARRDATE = Me.TxtEmparrDate.Text
-            '空車着日（予定）
-            If upEmparrDate = True Then
-                SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", I_EMPARRDATE)
-                SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
-            End If
-
-            '★空車着日（実績）が未設定の場合は、オーダー中の空車着日（実績）を設定
-            If String.IsNullOrEmpty(I_AEMPARRDATE) Then I_AEMPARRDATE = Me.TxtActualEmparrDate.Text
-            '★受注Noが未設定の場合は、オーダー中の受注№を設定
-            If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
-            '空車着日（実績）
-            If upActualEmparrDate = True Then
-                If I_AEMPARRDATE = "" Then
-                    SQLStr &= "        ACTUALEMPARRDATE   = NULL, "
-                Else
-                    SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+            '### 20200907 START タンク車がOT所有の場合のステータス更新対応 #########################
+            'OT所有ではない場合
+            If upOTFlag = False Then
+                '○ 更新内容が指定されていれば追加する
+                '所在地コード
+                If Not String.IsNullOrEmpty(I_LOCATION) Then
+                    SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
                 End If
-                '### 20200618 START 受注での使用をリセットする対応 #########################################
-                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
-                '### 20200618 END   受注での使用をリセットする対応 #########################################
-            Else
-                '### 20200618 START 受注での使用を設定する対応 #############################################
-                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", I_ORDERNO)
-                '### 20200618 END   受注での使用を設定する対応 #############################################
-            End If
-            '前回油種
-            If upLastOilCode = True Then
-                SQLStr &=
+                'タンク車状態コード
+                If Not String.IsNullOrEmpty(I_STATUS) Then
+                    SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+                End If
+                '積車区分
+                If Not String.IsNullOrEmpty(I_KBN) Then
+                    SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+                End If
+                'タンク車状況コード
+                If Not String.IsNullOrEmpty(I_SITUATION) Then
+                    SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+                End If
+
+                '★空車着日（予定）が未設定の場合は、オーダー中の空車着日（予定）を設定
+                If String.IsNullOrEmpty(I_EMPARRDATE) Then I_EMPARRDATE = Me.TxtEmparrDate.Text
+                '空車着日（予定）
+                If upEmparrDate = True Then
+                    SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", I_EMPARRDATE)
+                    SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+                End If
+
+                '★空車着日（実績）が未設定の場合は、オーダー中の空車着日（実績）を設定
+                If String.IsNullOrEmpty(I_AEMPARRDATE) Then I_AEMPARRDATE = Me.TxtActualEmparrDate.Text
+                '★受注Noが未設定の場合は、オーダー中の受注№を設定
+                If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
+                '空車着日（実績）
+                If upActualEmparrDate = True Then
+                    If I_AEMPARRDATE = "" Then
+                        SQLStr &= "        ACTUALEMPARRDATE   = NULL, "
+                    Else
+                        SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", I_AEMPARRDATE)
+                    End If
+                    '### 20200618 START 受注での使用をリセットする対応 #########################################
+                    SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
+                    '### 20200618 END   受注での使用をリセットする対応 #########################################
+                Else
+                    '### 20200618 START 受注での使用を設定する対応 #############################################
+                    SQLStr &= String.Format("        USEORDERNO         = '{0}', ", I_ORDERNO)
+                    '### 20200618 END   受注での使用を設定する対応 #############################################
+                End If
+                '前回油種
+                If upLastOilCode = True Then
+                    SQLStr &=
                           "        LASTOILCODE        = @P03, " _
                         & "        LASTOILNAME        = @P04, " _
                         & "        PREORDERINGTYPE    = @P05, " _
                         & "        PREORDERINGOILNAME = @P06, "
-            End If
+                End If
 
-            SQLStr &=
+                SQLStr &=
                       "        UPDYMD         = @P11, " _
                     & "        UPDUSER        = @P12, " _
                     & "        UPDTERMID      = @P13, " _
@@ -10672,18 +10676,39 @@ Public Class OIT0003OrderDetail
                     & "    AND TANKSITUATION <> '3' " _
                     & "    AND DELFLG        <> @P02 "
 
-            '### 20200618 START 受注での使用をリセットする対応 #########################################
-            '空車着日（実績）
-            If upActualEmparrDate = True Then
-                'SQLStr &=
-                '      "    AND ISNULL(USEORDERNO, '')    <> ''; "
-                SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
-            Else
-                SQLStr &=
+                '### 20200618 START 受注での使用をリセットする対応 #########################################
+                '空車着日（実績）
+                If upActualEmparrDate = True Then
+                    'SQLStr &=
+                    '      "    AND ISNULL(USEORDERNO, '')    <> ''; "
+                    SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
+                Else
+                    SQLStr &=
                       "    AND (ISNULL(USEORDERNO, '')     = '' "
-                SQLStr &= String.Format(" OR USEORDERNO = '{0}');", I_ORDERNO)
+                    SQLStr &= String.Format(" OR USEORDERNO = '{0}');", I_ORDERNO)
+                End If
+                '### 20200618 END   受注での使用をリセットする対応 #########################################
+
+                '★★★OT所有の場合
+            Else
+
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", I_ORDERNO)
+
+                SQLStr &=
+                      "        UPDYMD         = @P11, " _
+                    & "        UPDUSER        = @P12, " _
+                    & "        UPDTERMID      = @P13, " _
+                    & "        RECEIVEYMD     = @P14  " _
+                    & "  WHERE TANKNUMBER     = @P01  " _
+                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND DELFLG        <> @P02 "
+
+                '★受注Noが未設定の場合は、オーダー中の受注№を設定
+                If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
+                SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
+
             End If
-            '### 20200618 END   受注での使用をリセットする対応 #########################################
+            '### 20200907 END   タンク車がOT所有の場合のステータス更新対応 #########################
 
             Dim SQLcmd As New SqlCommand(SQLStr, SQLcon)
             SQLcmd.CommandTimeout = 300
@@ -13241,11 +13266,13 @@ Public Class OIT0003OrderDetail
 
                         '### 特に何もしない ####################################
 
-                        ''★タンク車所在の更新(### 所在地はそのまま更新しない###)
-                        ''引数１：所在地コード　⇒　変更なし(空白)
-                        ''引数２：タンク車状態　⇒　変更あり("3"(到着))
-                        ''引数３：積車区分　　　⇒　変更あり("E"(空車))
+                        '★タンク車所在の更新(### 所在地はそのまま更新しない###)
+                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数２：タンク車状態　⇒　変更なし(空白)
+                        '引数３：積車区分　　　⇒　変更なし(空白)
+                        '引数４：OT所有　　　　⇒　あり　　(TRUE)
                         'WW_UpdateTankShozai("", "3", "E")
+                        WW_UpdateTankShozai("", "", "", upOTFlag:=True)
 
                     Else
                         '★タンク車所在の更新
@@ -13259,13 +13286,19 @@ Public Class OIT0003OrderDetail
                         WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
                         '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
-                        '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
-                        '受注オーダーしているタンク車の存在確認
-                        WW_FindOrderTank()
-                        '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                        ''### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                        ''受注オーダーしているタンク車の存在確認
+                        'WW_FindOrderTank()
+                        ''### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
                     End If
                 Next
+
+                '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+                '受注オーダーしているタンク車の存在確認
+                WW_FindOrderTank()
+                '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
+
             End If
 
             '550:検収済
@@ -17306,22 +17339,22 @@ Public Class OIT0003OrderDetail
                          BaseDllConst.CONST_ORDERSTATUS_305
 
                         '★タンク車所在の更新
-                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("1"(発送))
                         '引数３：積車区分　　　⇒　変更なし(空白)
                         '引数４：(予定)空車着日⇒　更新対象(画面項目)
-                        WW_UpdateTankShozai("", "1", "", upEmparrDate:=True,
+                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), "1", "", upEmparrDate:=True,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_EMPARRDATE:=OIT0003FIDrow("EMPARRDATE"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
 
                     '320:受注確定((実績)積込日設定済み)
                     Case BaseDllConst.CONST_ORDERSTATUS_320
 
-                        '引数１：所在地コード　⇒　変更なし(空白)
+                        '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("1"(発送))
                         '引数３：積車区分　　　⇒　変更あり("F"(積車))
                         '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
-                        WW_UpdateTankShozai("", "1", "F", I_SITUATION:="2", upLastOilCode:=True,
+                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), "1", "F", I_SITUATION:="2", upLastOilCode:=True,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
 
                     '350:受注確定((実績)発日設定済み)

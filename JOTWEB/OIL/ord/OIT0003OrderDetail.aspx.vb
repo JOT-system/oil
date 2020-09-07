@@ -13229,7 +13229,8 @@ Public Class OIT0003OrderDetail
             If Me.WW_UPBUTTONFLG = "3" AndAlso isNormal(WW_ERRCODE) Then
                 '割り当てたタンク車のチェック
                 Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                'For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                For Each OIT0003row As DataRow In OIT0003tbl_tab3.Rows
                     WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
 
                     '★(一覧)タンク車NoがOT本社、または在日米軍のリース車かチェック
@@ -13255,7 +13256,7 @@ Public Class OIT0003OrderDetail
                         '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
                         'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True)
-                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True, upLastOilCode:=True)
+                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
                         '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 
                         '### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################

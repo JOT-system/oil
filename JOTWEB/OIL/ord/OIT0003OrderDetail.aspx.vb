@@ -10851,9 +10851,31 @@ Public Class OIT0003OrderDetail
                     Next
                 End If
             Else
-                '指定されたタンク車№をKEYに更新
-                PARA01.Value = I_TANKNO
-                SQLcmd.ExecuteNonQuery()
+                '### ★前回油種の更新 ###############################
+                If upLastOilCode = True Then
+                    Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", System.Data.SqlDbType.NVarChar)  '前回油種コード
+                    Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.NVarChar)  '前回油種名
+                    Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.NVarChar)  '前回油種区分(受発注用)
+                    Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.NVarChar)  '前回油種名(受発注用)
+
+                    '(一覧)で設定しているタンク車をKEYに前回油種を更新
+                    For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                        If OIT0003row("TANKNO") <> I_TANKNO Then Continue For
+                        PARA01.Value = OIT0003row("TANKNO")
+                        PARA03.Value = OIT0003row("OILCODE")
+                        PARA04.Value = OIT0003row("OILNAME")
+                        PARA05.Value = OIT0003row("ORDERINGTYPE")
+                        PARA06.Value = OIT0003row("ORDERINGOILNAME")
+                        SQLcmd.ExecuteNonQuery()
+                    Next
+
+                Else
+                    '指定されたタンク車№をKEYに更新
+                    PARA01.Value = I_TANKNO
+                    SQLcmd.ExecuteNonQuery()
+
+                End If
+
             End If
 
             'CLOSE
@@ -13383,8 +13405,10 @@ Public Class OIT0003OrderDetail
                         If Me.TxtActualEmparrDate.Text < OIT0003row("ACTUALEMPARRDATE") Then
                             '### 空車着日(実績)が未来日設定なので未更新 ###############
                             '※タンク車所在の更新はバッチにて実施する。
+                            WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="2", upLastOilCode:=True)
                         Else
-                            WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
+                            'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
+                            WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_TANKNO:=OIT0003row("TANKNO"), I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
                         End If
                         '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
 

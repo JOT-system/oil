@@ -117,6 +117,7 @@
     <Content Include="OIL\css\OIM0020S.css" />
     <Content Include="OIL\css\OIM0001S.css" />
     <Content Include="OIL\css\OIT0003OTL.css" />
+    <Content Include="OIL\css\OIT0003OTS.css" />
     <Content Include="OIL\css\OIT0006D.css" />
     <Content Include="OIL\css\OIT0006L.css" />
     <Content Include="OIL\css\OIT0005C.css" />
@@ -286,6 +287,7 @@
     <Content Include="OIL\script\OIM0020S.js" />
     <Content Include="OIL\script\OIT0003B.js" />
     <Content Include="OIL\script\OIT0003OTL.js" />
+    <Content Include="OIL\script\OIT0003OTS.js" />
     <Content Include="OIL\script\OIT0005D.js" />
     <Content Include="OIL\script\OIT0006D.js" />
     <Content Include="OIL\script\OIT0006L.js" />

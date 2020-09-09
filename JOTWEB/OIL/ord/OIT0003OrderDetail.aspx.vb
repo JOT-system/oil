@@ -178,6 +178,8 @@ Public Class OIT0003OrderDetail
                              "WF_ButtonUPDATE_TAB3",
                              "WF_ButtonUPDATE_TAB4"
                             WF_ButtonUPDATE_Click()
+                        Case "WF_ButtonCANCEL_TAB1"           '解除ボタン押下
+                            WF_ButtonCANCEL_Click()
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"              'マウスホイール(Down)
@@ -6300,6 +6302,67 @@ Public Class OIT0003OrderDetail
     End Sub
 
     ''' <summary>
+    ''' 解除ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCANCEL_Click()
+
+        '〇 選択されたタブ一覧の各更新ボタン押下時の制御
+        'タブ「タンク車割当」
+        If WF_DetailMView.ActiveViewIndex = "0" Then
+
+            '◯割当解除ボタン押下時処理(タブ「タンク車割当」)
+            WW_ButtonCANCEL_TAB1()
+
+            'タブ「入換・積込指示」
+        ElseIf WF_DetailMView.ActiveViewIndex = "1" Then
+            'WW_ButtonCANCEL_TAB2()
+
+            'タブ「タンク車明細」
+        ElseIf WF_DetailMView.ActiveViewIndex = "2" Then
+            'WW_ButtonCANCEL_TAB3()
+
+            'タブ「費用入力」
+        ElseIf WF_DetailMView.ActiveViewIndex = "3" Then
+            'WW_ButtonCANCEL_TAB4()
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 割当解除ボタン押下時処理(タブ「タンク車割当」)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ButtonCANCEL_TAB1()
+
+        '★初期化
+        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
+
+        '　手配連絡フラグ("0"(未連絡))
+        work.WF_SEL_CONTACTFLG.Text = "0"
+        '　結果受理フラグ("0"(未受理))
+        work.WF_SEL_RESULTFLG.Text = "0"
+        '　託送指示フラグ("0"(未手配))
+        work.WF_SEL_DELIVERYFLG.Text = "0"
+
+        '★受注TBL更新(100:受注受付に戻す)
+        WW_UpdateOrderStatus(BaseDllConst.CONST_ORDERSTATUS_100, ReuseFlg:=True)
+        CODENAME_get("ORDERSTATUS", BaseDllConst.CONST_ORDERSTATUS_100, Me.TxtOrderStatus.Text, WW_DUMMY)
+        work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_100
+        work.WF_SEL_ORDERSTATUSNM.Text = Me.TxtOrderStatus.Text
+
+        '★タンク車所在ステータス初期化
+        '引数１：所在地コード　⇒　変更あり(発駅)
+        '引数２：タンク車状態　⇒　変更あり("3"(到着))
+        '引数３：積車区分　　　⇒　変更あり("E"(空車))
+        '引数４：タンク車状況　⇒　変更あり("1"(残車))
+        '引数５：更新フラグ　　⇒　初期化　("2")
+        WW_UpdateTankShozai(I_LOCATION:=Me.TxtDepstationCode.Text, I_STATUS:="3", I_KBN:="E", I_SITUATION:="1", upFlag:="2")
+
+    End Sub
+
+    ''' <summary>
     ''' 一覧画面-マウスホイール時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -10598,7 +10661,7 @@ Public Class OIT0003OrderDetail
                                       Optional ByVal upEmparrDate As Boolean = False,
                                       Optional ByVal upActualEmparrDate As Boolean = False,
                                       Optional ByVal upLastOilCode As Boolean = False,
-                                      Optional ByVal upOTFlag As Boolean = False)
+                                      Optional ByVal upFlag As String = "0")
 
         Try
             'DataBase接続文字
@@ -10611,8 +10674,8 @@ Public Class OIT0003OrderDetail
                     & "    SET "
 
             '### 20200907 START タンク車がOT所有の場合のステータス更新対応 #########################
-            'OT所有ではない場合
-            If upOTFlag = False Then
+            '★upFlag条件なし
+            If upFlag = "0" Then
                 '○ 更新内容が指定されていれば追加する
                 '所在地コード
                 If Not String.IsNullOrEmpty(I_LOCATION) Then
@@ -10690,9 +10753,39 @@ Public Class OIT0003OrderDetail
                 '### 20200618 END   受注での使用をリセットする対応 #########################################
 
                 '★★★OT所有の場合
-            Else
+            ElseIf upFlag = "1" Then
 
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", I_ORDERNO)
+
+                SQLStr &=
+                      "        UPDYMD         = @P11, " _
+                    & "        UPDUSER        = @P12, " _
+                    & "        UPDTERMID      = @P13, " _
+                    & "        RECEIVEYMD     = @P14  " _
+                    & "  WHERE TANKNUMBER     = @P01  " _
+                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND DELFLG        <> @P02 "
+
+                '★受注Noが未設定の場合は、オーダー中の受注№を設定
+                If String.IsNullOrEmpty(I_ORDERNO) Then I_ORDERNO = Me.TxtOrderNo.Text
+                SQLStr &= String.Format("    AND USEORDERNO = '{0}';", I_ORDERNO)
+
+                '★★★タンク車所在(初期化)
+            ElseIf upFlag = "2" Then
+                '所在地コード
+                SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+                'タンク車状態コード
+                SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+                '積車区分
+                SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+                'タンク車状況コード
+                SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+                '空車着日（予定）
+                SQLStr &= String.Format("        EMPARRDATE   = {0}, ", "NULL")
+                '空車着日（実績）
+                SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
+                '使用受注№
+                SQLStr &= String.Format("        USEORDERNO         = '{0}', ", "")
 
                 SQLStr &=
                       "        UPDYMD         = @P11, " _
@@ -13266,13 +13359,13 @@ Public Class OIT0003OrderDetail
 
                         '### 特に何もしない ####################################
 
-                        '★タンク車所在の更新(### 所在地はそのまま更新しない###)
+                        '★タンク車所在の更新
                         '引数１：所在地コード　⇒　変更なし(空白)
                         '引数２：タンク車状態　⇒　変更なし(空白)
                         '引数３：積車区分　　　⇒　変更なし(空白)
-                        '引数４：OT所有　　　　⇒　あり　　(TRUE)
+                        '引数４：OT所有　　　　⇒　あり　　("1")
                         'WW_UpdateTankShozai("", "3", "E")
-                        WW_UpdateTankShozai("", "", "", upOTFlag:=True)
+                        WW_UpdateTankShozai("", "", "", upFlag:="1")
 
                     Else
                         '★タンク車所在の更新
@@ -13283,13 +13376,13 @@ Public Class OIT0003OrderDetail
                         '### 20200828 START 前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
                         '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
                         'WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", upActualEmparrDate:=True)
-                        WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
+                        If Me.TxtActualEmparrDate.Text < OIT0003row("ACTUALEMPARRDATE") Then
+                            '### 空車着日(実績)が未来日設定なので未更新 ###############
+                            '※タンク車所在の更新はバッチにて実施する。
+                        Else
+                            WW_UpdateTankShozai(Me.TxtDepstationCode.Text, "2", "E", I_SITUATION:="1", I_AEMPARRDATE:=OIT0003row("ACTUALEMPARRDATE"), upActualEmparrDate:=True, upLastOilCode:=True)
+                        End If
                         '### 20200828 END   前回油種の更新追加(積置日＋発日以降の同時設定対応) ######## 
-
-                        ''### 20200618 START すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
-                        ''受注オーダーしているタンク車の存在確認
-                        'WW_FindOrderTank()
-                        ''### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
                     End If
                 Next
@@ -13484,16 +13577,6 @@ Public Class OIT0003OrderDetail
             If OIT0003tab3row("USEORDERNO") = "" Then
                 Continue For
             ElseIf OIT0003tab3row("USEORDERNO") <> Me.TxtOrderNo.Text Then
-                '(実績)積込日
-                Me.TxtActualLoadingDate.Enabled = False
-                '(実績)発日
-                Me.TxtActualDepDate.Enabled = False
-                '(実績)積車着日
-                Me.TxtActualArrDate.Enabled = False
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = False
-                '(実績)空車着日
-                Me.TxtActualEmparrDate.Enabled = False
 
                 '★他の受注オーダー情報を取得
                 Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -13504,13 +13587,27 @@ Public Class OIT0003OrderDetail
                                    I_TANKNO:=OIT0003tab3row("TANKNO"))
                 End Using
 
-                Dim sOrderInfo As String = "利用中 "
-                sOrderInfo &= OIT0003FID2tbl_tab3.Rows(0)("TRAINNO_NM") + " "
-                sOrderInfo &= Date.Parse(OIT0003FID2tbl_tab3.Rows(0)("DEPDATE")).ToString("MM/dd") + "発分"
+                If OIT0003FID2tbl_tab3.Rows.Count <> 0 Then
+                    '(実績)積込日
+                    Me.TxtActualLoadingDate.Enabled = False
+                    '(実績)発日
+                    Me.TxtActualDepDate.Enabled = False
+                    '(実績)積車着日
+                    Me.TxtActualArrDate.Enabled = False
+                    '(実績)受入日
+                    Me.TxtActualAccDate.Enabled = False
+                    '(実績)空車着日
+                    Me.TxtActualEmparrDate.Enabled = False
 
-                OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
-                'CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
-                OIT0003tab3row("ORDERINFONAME") = sOrderInfo
+                    Dim sOrderInfo As String = "利用中 "
+                    sOrderInfo &= OIT0003FID2tbl_tab3.Rows(0)("TRAINNO_NM") + " "
+                    sOrderInfo &= Date.Parse(OIT0003FID2tbl_tab3.Rows(0)("DEPDATE")).ToString("MM/dd") + "発分"
+
+                    OIT0003tab3row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_101
+                    'CODENAME_get("ORDERINFO", OIT0003tab3row("ORDERINFO"), OIT0003tab3row("ORDERINFONAME"), WW_DUMMY)
+                    OIT0003tab3row("ORDERINFONAME") = sOrderInfo
+
+                End If
 
             End If
         Next
@@ -15546,13 +15643,11 @@ Public Class OIT0003OrderDetail
         '    & "   AND OIT0002.TRAINNO        <> @P02 "
 
         '★積置チェックパターン
-        '　１．　①積込日　＝　②積込日(明細)　ＯＲ　①積込日　＝　②積込日
-        '　２．（①積込日　＞　②積込日　　　　ＯＲ　①積込日　＞　②積込日(明細)）　ＡＮＤ　①発日　＜　②発日
-        '　３．　①積込日　＞　②積込日(明細)　ＡＮＤ　①発日　＜　②発日
-        '　４．（①積込日　＞　②積込日　　　　ＯＲ　①積込日　＞　②積込日(明細)）　ＡＮＤ　①発日　＞　②発日
-        '　５．　①積込日　＞　②積込日(明細)　ＡＮＤ　①発日　＞　②発日
-        '　６．（①積込日　＜　②積込日　　　　ＯＲ　①積込日　＜　②積込日(明細)）　ＡＮＤ　①発日　＞　②発日
-        '　７．　①積込日　＜　②積込日(明細)　ＡＮＤ　①発日　＞　②発日
+        '　１．　①積込日　＝　②積込日
+        '　２．　①積込日　＞　②積込日　ＡＮＤ　①発日　　＜＝　②発日
+        '　３．　①積込日　＞　②積込日　ＡＮＤ　①積込日　　＝　②発日
+        '　４．　①積込日　＜　②積込日　ＡＮＤ　①発日　　＞＝　②発日
+        '　５．　①積込日　＜　②積込日　ＡＮＤ　①発日　　　＝　②積込日
         Dim SQLDiffLODTrainStr As String =
               SQLStr _
             & "                                  )" _
@@ -15562,17 +15657,28 @@ Public Class OIT0003OrderDetail
             & "   AND ( " _
             & "          (OIT0002.LODDATE = @P03 OR OIT0002.LODDATE = @P08) " _
             & "       OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08) " _
-            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
-            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
-            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
-            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
-            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
-            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE <= @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE <= @P07) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.LODDATE = @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.LODDATE = @P07) " _
+            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE >= @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE >= @P07) " _
+            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE = @P03) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE = @P08) " _
             & "       ) " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 " _
             & "   AND OIT0002.TRAINNO        <> @P02 "
-        '& "          (OIT0002.LODDATE = @P03 OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08)) " _
+        '& "   AND ( " _
+        '& "          (OIT0002.LODDATE = @P03 OR OIT0002.LODDATE = @P08) " _
+        '& "       OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08) " _
+        '& "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
+        '& "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
+        '& "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
+        '& "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
+        '& "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
+        '& "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
+        '& "       ) " _
         '### 20200827 END   積置を考慮した妥当性チェック対応 ######################
         '### 20200620 END  ((全体)No79対応)異なる列車で同一積込日の場合###########
 
@@ -15600,12 +15706,14 @@ Public Class OIT0003OrderDetail
             & "   AND ( " _
             & "          (OIT0002.LODDATE = @P03 OR OIT0002.LODDATE = @P08) " _
             & "       OR (OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE = @P08) " _
-            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
-            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE < @P07) " _
-            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
-            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE > @P07) " _
-            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
-            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE > @P07) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.DEPDATE <= @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.DEPDATE <= @P07) " _
+            & "       OR ((OIT0002.LODDATE > @P03 OR OIT0002.LODDATE > @P08) AND OIT0002.LODDATE = @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE > @P08) AND OIT0002.LODDATE = @P07) " _
+            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE >= @P07) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE >= @P07) " _
+            & "       OR ((OIT0002.LODDATE < @P03 OR OIT0002.LODDATE < @P08) AND OIT0002.DEPDATE = @P03) " _
+            & "       OR ((OIT0003.STACKINGFLG = '1' AND OIT0003.ACTUALLODDATE < @P08) AND OIT0002.DEPDATE = @P08) " _
             & "       ) " _
             & "   AND OIT0002.ORDERSTATUS    <> @P04 " _
             & "   AND OIT0002.DELFLG         <> @P05 " _
@@ -17342,8 +17450,9 @@ Public Class OIT0003OrderDetail
                         '引数１：所在地コード　⇒　変更あり(発駅)
                         '引数２：タンク車状態　⇒　変更あり("1"(発送))
                         '引数３：積車区分　　　⇒　変更なし(空白)
-                        '引数４：(予定)空車着日⇒　更新対象(画面項目)
-                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), "1", "", upEmparrDate:=True,
+                        '引数４：タンク車状況　⇒　変更あり("1"(残車))
+                        '引数５：(予定)空車着日⇒　更新対象(画面項目)
+                        WW_UpdateTankShozai(OIT0003FIDrow("DEPSTATION"), "1", "", I_SITUATION:="1", upEmparrDate:=True,
                                             I_TANKNO:=OIT0003FIDrow("TANKNO"), I_EMPARRDATE:=OIT0003FIDrow("EMPARRDATE"), I_ORDERNO:=OIT0003FIDrow("ORDERNO"))
 
                     '320:受注確定((実績)積込日設定済み)

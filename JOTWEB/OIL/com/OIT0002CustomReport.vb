@@ -216,7 +216,8 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 '### 運　用　指　示 ###########################################
                 '◯ 充 填 線(油　種)
                 rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
+                'rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
+                rngDetailArea.Value = PrintDatarow("RINKAIOILKANA")
                 '◯ 充 填 線(位　置)
                 rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("FILLINGPOINT")

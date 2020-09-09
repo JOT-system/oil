@@ -2063,12 +2063,18 @@ Public Class OIT0002LinkDetail
             & " , OIT0011.EXTEND                                 AS EXTEND" _
             & " , OIT0011.CONVERSIONTOTAL                        AS CONVERSIONTOTAL" _
             & " , OIT0003.OILCODE                                AS OILCODE" _
+            & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
             & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
             & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
+            & " , TMP0005.RINKAIOILKANA                          AS RINKAIOILKANA" _
+            & " , TMP0005.RINKAISEGMENTOILNAME                   AS RINKAISEGMENTOILNAME" _
             & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
+            & " , OIT0002.TRAINNO                                AS ORDERTRAINNO " _
+            & " , FORMAT(OIT0002.LODDATE, 'yyyy/MM/dd')          AS ORDERLODDATE " _
+            & " , FORMAT(OIT0002.DEPDATE, 'yyyy/MM/dd')          AS ORDERDEPDATE " _
             & " , OIT0002.ORDERNO                                AS ORDERNO " _
             & " , OIT0003.DETAILNO                               AS DETAILNO " _
             & " , ''                                             AS ORDERTRKBN " _

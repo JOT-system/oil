@@ -1798,6 +1798,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS JRALLINSPECTIONALERT" _
             & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
+            & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
             & " , ''                                             AS ACTUALLODDATE" _
             & " , ''                                             AS JOINTCODE" _
@@ -1898,6 +1899,7 @@ Public Class OIT0003OrderDetail
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P11" _
                 & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
                 & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
+                & " , ISNULL(RTRIM(OIT0003.STACKINGORDERNO), '')                    AS STACKINGORDERNO" _
                 & " , CASE ISNULL(RTRIM(OIT0003.STACKINGFLG), '')" _
                 & "   WHEN '1' THEN 'on'" _
                 & "   WHEN '2' THEN ''" _
@@ -2159,6 +2161,7 @@ Public Class OIT0003OrderDetail
             & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P10" _
             & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
             & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
+            & " , ISNULL(RTRIM(TMP0001.STACKINGORDERNO), '')                    AS STACKINGORDERNO" _
             & " , CASE ISNULL(RTRIM(TMP0001.STACKINGFLG), '')" _
             & "   WHEN '1' THEN 'on'" _
             & "   WHEN '2' THEN ''" _
@@ -5184,6 +5187,7 @@ Public Class OIT0003OrderDetail
             & " , ''                                             AS JRALLINSPECTIONALERT" _
             & " , ''                                             AS JRALLINSPECTIONALERTSTR" _
             & " , ''                                             AS JRALLINSPECTIONDATE" _
+            & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
             & " , ''                                             AS ACTUALLODDATE" _
             & " , ''                                             AS JOINTCODE" _
@@ -17989,6 +17993,7 @@ Public Class OIT0003OrderDetail
         Dim chkObjIdWOSTcnt As String = "chk" & pnlListArea1.ID & "STACKINGFLG"
         Dim chkObjSTId As String
         '#######################################################################
+        Dim chkStackingOrderNo As String = ""
 
         '受注進行ステータスが"受注受付"の場合
         '※但し、受注営業所が"011203"(袖ヶ浦営業所)以外の場合は、貨物駅入線順を読取専用(入力不可)とする。
@@ -18000,6 +18005,7 @@ Public Class OIT0003OrderDetail
                 loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
                 chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjST = Nothing
+                chkStackingOrderNo = loopdr("STACKINGORDERNO")
                 For Each cellObj As TableCell In rowitem.Controls
                     chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                     'コントロールが見つかったら脱出
@@ -18010,6 +18016,11 @@ Public Class OIT0003OrderDetail
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
                 If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
                     chkObjST.Enabled = False
+                Else
+                    '★積置受注№が設定されている場合はチェックボックスは非活性
+                    If chkStackingOrderNo <> "" Then
+                        chkObjST.Enabled = False
+                    End If
                 End If
                 '###################################################################
 
@@ -18023,6 +18034,9 @@ Public Class OIT0003OrderDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
                         If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            '★積置受注№が設定されている場合は積込日は非活性
+                        ElseIf chkStackingOrderNo <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         Else
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
@@ -18081,6 +18095,7 @@ Public Class OIT0003OrderDetail
                 loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
                 chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                 chkObjST = Nothing
+                chkStackingOrderNo = loopdr("STACKINGORDERNO")
                 For Each cellObj As TableCell In rowitem.Controls
                     chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                     'コントロールが見つかったら脱出
@@ -18091,6 +18106,11 @@ Public Class OIT0003OrderDetail
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
                 If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
                     chkObjST.Enabled = False
+                Else
+                    '★積置受注№が設定されている場合はチェックボックスは非活性
+                    If chkStackingOrderNo <> "" Then
+                        chkObjST.Enabled = False
+                    End If
                 End If
                 '###################################################################
 
@@ -18104,6 +18124,9 @@ Public Class OIT0003OrderDetail
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALLODDATE") Then
                         If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                            '★積置受注№が設定されている場合は積込日は非活性
+                        ElseIf chkStackingOrderNo <> "" Then
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
                         Else
                             cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")

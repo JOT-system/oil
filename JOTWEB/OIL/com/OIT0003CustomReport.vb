@@ -1056,8 +1056,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintMieShiohamaData(ByVal repPtn As String, ByVal lodDate As String) As String
         Dim rngWrite As Excel.Range = Nothing
-        '        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".pdf"
+        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFileName2 As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".pdf"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -1084,7 +1084,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
                 fs.Read(retByte, 0, binaryLength)
                 fs.Flush()
             End Using
-            Return UrlRoot & tmpFileName
+            '            Return UrlRoot & tmpFileName
+            Return UrlRoot & tmpFileName2
 
         Catch ex As Exception
             Throw '呼出し元にThrow

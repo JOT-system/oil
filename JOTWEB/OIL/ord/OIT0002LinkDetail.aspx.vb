@@ -4372,6 +4372,7 @@ Public Class OIT0002LinkDetail
             & "        , CARSNUMBER           , CARSAMOUNT             , LINE               , FILLINGPOINT" _
             & "        , LOADINGIRILINETRAINNO, LOADINGIRILINETRAINNAME, LOADINGIRILINEORDER" _
             & "        , LOADINGOUTLETTRAINNO , LOADINGOUTLETTRAINNAME , LOADINGOUTLETORDER" _
+            & "        , RESERVEDNO           , OTSENDCOUNT            , DLRESERVEDCOUNT    , DLTAKUSOUCOUNT" _
             & "        , SALSE                , SALSETAX               , TOTALSALSE" _
             & "        , PAYMENT              , PAYMENTTAX             , TOTALPAYMENT" _
             & "        , DELFLG               , INITYMD                , INITUSER           , INITTERMID" _
@@ -4384,6 +4385,7 @@ Public Class OIT0002LinkDetail
             & "        , @CARSNUMBER           , @CARSAMOUNT             , @LINE               , @FILLINGPOINT" _
             & "        , @LOADINGIRILINETRAINNO, @LOADINGIRILINETRAINNAME, @LOADINGIRILINEORDER" _
             & "        , @LOADINGOUTLETTRAINNO , @LOADINGOUTLETTRAINNAME , @LOADINGOUTLETORDER" _
+            & "        , @RESERVEDNO           , @OTSENDCOUNT            , @DLRESERVEDCOUNT    , @DLTAKUSOUCOUNT" _
             & "        , @SALSE                , @SALSETAX               , @TOTALSALSE" _
             & "        , @PAYMENT              , @PAYMENTTAX             , @TOTALPAYMENT" _
             & "        , @DELFLG               , @INITYMD                , @INITUSER           , @INITTERMID" _
@@ -4419,6 +4421,10 @@ Public Class OIT0002LinkDetail
             & "    , LOADINGOUTLETTRAINNO" _
             & "    , LOADINGOUTLETTRAINNAME" _
             & "    , LOADINGOUTLETORDER" _
+            & "    , RESERVEDNO" _
+            & "    , OTSENDCOUNT" _
+            & "    , DLRESERVEDCOUNT" _
+            & "    , DLTAKUSOUCOUNT" _
             & "    , SALSE" _
             & "    , SALSETAX" _
             & "    , TOTALSALSE" _
@@ -4466,6 +4472,10 @@ Public Class OIT0002LinkDetail
                 Dim P_LOADINGOUTLETTRAINNO As SqlParameter = SQLcmd.Parameters.Add("@LOADINGOUTLETTRAINNO", SqlDbType.NVarChar, 4)        '積込出線列車番号
                 Dim P_LOADINGOUTLETTRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@LOADINGOUTLETTRAINNAME", SqlDbType.NVarChar, 40)   '積込出線列車番号名
                 Dim P_LOADINGOUTLETORDER As SqlParameter = SQLcmd.Parameters.Add("@LOADINGOUTLETORDER", SqlDbType.NVarChar, 2)            '積込出線順
+                Dim P_RESERVEDNO As SqlParameter = SQLcmd.Parameters.Add("@RESERVEDNO", SqlDbType.NVarChar, 11)     '予約番号
+                Dim P_OTSENDCOUNT As SqlParameter = SQLcmd.Parameters.Add("@OTSENDCOUNT", SqlDbType.Int)            'OT発送日報送信回数
+                Dim P_DLRESERVEDCOUNT As SqlParameter = SQLcmd.Parameters.Add("@DLRESERVEDCOUNT", SqlDbType.Int)    '出荷予約ダウンロード回数
+                Dim P_DLTAKUSOUCOUNT As SqlParameter = SQLcmd.Parameters.Add("@DLTAKUSOUCOUNT", SqlDbType.Int)      '託送状ダウンロード回数
                 Dim P_SALSE As SqlParameter = SQLcmd.Parameters.Add("@SALSE", SqlDbType.Int)                        '売上金額
                 Dim P_SALSETAX As SqlParameter = SQLcmd.Parameters.Add("@SALSETAX", SqlDbType.Int)                  '売上消費税額
                 Dim P_TOTALSALSE As SqlParameter = SQLcmd.Parameters.Add("@TOTALSALSE", SqlDbType.Int)              '売上合計金額
@@ -4530,6 +4540,11 @@ Public Class OIT0002LinkDetail
                     'P_LOADINGIRILINEORDER.Value = OIT0002row("LINEORDER")
                     ''積込出線順に(明細数 - 積込入線順 + 1)設定
                     'P_LOADINGOUTLETORDER.Value = (OIT0002tbl.Rows.Count - Integer.Parse(OIT0002row("LINEORDER"))) + 1
+
+                    P_RESERVEDNO.Value = ""                                 '予約番号
+                    P_OTSENDCOUNT.Value = "0"                               'OT発送日報送信回数
+                    P_DLRESERVEDCOUNT.Value = "0"                           '出荷予約ダウンロード回数
+                    P_DLTAKUSOUCOUNT.Value = "0"                            '託送状ダウンロード回数
 
                     P_SALSE.Value = "0"                                     '売上金額
                     P_SALSETAX.Value = "0"                                  '売上消費税額
@@ -4656,7 +4671,7 @@ Public Class OIT0002LinkDetail
             & "        , ORDERTYPE    , SHIPPERSCODE    , SHIPPERSNAME    , BASECODE            , BASENAME" _
             & "        , CONSIGNEECODE, CONSIGNEENAME   , DEPSTATION      , DEPSTATIONNAME      , ARRSTATION , ARRSTATIONNAME" _
             & "        , ORDERSTATUS  , ORDERINFO " _
-            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG" _
+            & "        , EMPTYTURNFLG , STACKINGFLG     , USEPROPRIETYFLG , CONTACTFLG          , RESULTFLG  , DELIVERYFLG   , DELIVERYCOUNT" _
             & "        , LODDATE      , DEPDATE         , ARRDATE         , ACCDATE             , EMPARRDATE " _
             & "        , RTANK        , HTANK           , TTANK           , MTTANK " _
             & "        , KTANK        , K3TANK          , K5TANK          , K10TANK" _
@@ -4668,15 +4683,16 @@ Public Class OIT0002LinkDetail
             & "        , OTHER1OTANKCH, OTHER2OTANKCH   , OTHER3OTANKCH   , OTHER4OTANKCH       , OTHER5OTANKCH" _
             & "        , OTHER6OTANKCH, OTHER7OTANKCH   , OTHER8OTANKCH   , OTHER9OTANKCH       , OTHER10OTANKCH" _
             & "        , TOTALTANKCH  , KEIJYOYMD       , SALSE           , SALSETAX            , TOTALSALSE" _
-            & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT    , DELFLG" _
-            & "        , INITYMD      , INITUSER        , INITTERMID" _
+            & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT" _
+            & "        , RECEIVECOUNT , OTSENDSTATUS    , RESERVEDSTATUS  , TAKUSOUSTATUS" _
+            & "        , DELFLG       , INITYMD         , INITUSER        , INITTERMID" _
             & "        , UPDYMD       , UPDUSER         , UPDTERMID       , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @ORDERNO      , @TRAINNO      , @TRAINNAME      , @ORDERYMD      , @OFFICECODE, @OFFICENAME" _
             & "        , @ORDERTYPE    , @SHIPPERSCODE , @SHIPPERSNAME   , @BASECODE      , @BASENAME" _
             & "        , @CONSIGNEECODE, @CONSIGNEENAME, @DEPSTATION     , @DEPSTATIONNAME, @ARRSTATION, @ARRSTATIONNAME" _
             & "        , @ORDERSTATUS  , @ORDERINFO" _
-            & "        , @EMPTYTURNFLG , @STACKINGFLG  , @USEPROPRIETYFLG, @CONTACTFLG    , @RESULTFLG , @DELIVERYFLG" _
+            & "        , @EMPTYTURNFLG , @STACKINGFLG  , @USEPROPRIETYFLG, @CONTACTFLG    , @RESULTFLG , @DELIVERYFLG   , @DELIVERYCOUNT" _
             & "        , @LODDATE      , @DEPDATE      , @ARRDATE        , @ACCDATE       , @EMPARRDATE" _
             & "        , @RTANK        , @HTANK        , @TTANK          , @MTTANK" _
             & "        , @KTANK        , @K3TANK       , @K5TANK         , @K10TANK" _
@@ -4688,8 +4704,9 @@ Public Class OIT0002LinkDetail
             & "        , @OTHER1OTANKCH, @OTHER2OTANKCH, @OTHER3OTANKCH  , @OTHER4OTANKCH , @OTHER5OTANKCH" _
             & "        , @OTHER6OTANKCH, @OTHER7OTANKCH, @OTHER8OTANKCH  , @OTHER9OTANKCH , @OTHER10OTANKCH" _
             & "        , @TOTALTANKCH  , @KEIJYOYMD    , @SALSE          , @SALSETAX      , @TOTALSALSE" _
-            & "        , @PAYMENT      , @PAYMENTTAX   , @TOTALPAYMENT   , @DELFLG" _
-            & "        , @INITYMD      , @INITUSER     , @INITTERMID" _
+            & "        , @PAYMENT      , @PAYMENTTAX   , @TOTALPAYMENT" _
+            & "        , @RECEIVECOUNT , @OTSENDSTATUS , @RESERVEDSTATUS , @TAKUSOUSTATUS" _
+            & "        , @DELFLG       , @INITYMD      , @INITUSER       , @INITTERMID" _
             & "        , @UPDYMD       , @UPDUSER      , @UPDTERMID      , @RECEIVEYMD) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
@@ -4722,6 +4739,7 @@ Public Class OIT0002LinkDetail
             & "    , CONTACTFLG" _
             & "    , RESULTFLG" _
             & "    , DELIVERYFLG" _
+            & "    , DELIVERYCOUNT" _
             & "    , LODDATE" _
             & "    , DEPDATE" _
             & "    , ARRDATE" _
@@ -4776,6 +4794,10 @@ Public Class OIT0002LinkDetail
             & "    , PAYMENT" _
             & "    , PAYMENTTAX" _
             & "    , TOTALPAYMENT" _
+            & "    , RECEIVECOUNT" _
+            & "    , OTSENDSTATUS" _
+            & "    , RESERVEDSTATUS" _
+            & "    , TAKUSOUSTATUS" _
             & "    , DELFLG" _
             & "    , INITYMD" _
             & "    , INITUSER" _
@@ -4816,6 +4838,7 @@ Public Class OIT0002LinkDetail
                 Dim P_CONTACTFLG As SqlParameter = SQLcmd.Parameters.Add("@CONTACTFLG", SqlDbType.NVarChar, 1)  '手配連絡フラグ
                 Dim P_RESULTFLG As SqlParameter = SQLcmd.Parameters.Add("@RESULTFLG", SqlDbType.NVarChar, 1)    '結果受理フラグ
                 Dim P_DELIVERYFLG As SqlParameter = SQLcmd.Parameters.Add("@DELIVERYFLG", SqlDbType.NVarChar, 1) '託送指示フラグ
+                Dim P_DELIVERYCOUNT As SqlParameter = SQLcmd.Parameters.Add("@DELIVERYCOUNT", SqlDbType.Int)     '託送指示送信回数
                 Dim P_LODDATE As SqlParameter = SQLcmd.Parameters.Add("@LODDATE", SqlDbType.Date)               '積込日（予定）
                 Dim P_DEPDATE As SqlParameter = SQLcmd.Parameters.Add("@DEPDATE", SqlDbType.Date)               '発日（予定）
                 Dim P_ARRDATE As SqlParameter = SQLcmd.Parameters.Add("@ARRDATE", SqlDbType.Date)               '積車着日（予定）
@@ -4870,6 +4893,10 @@ Public Class OIT0002LinkDetail
                 Dim P_PAYMENT As SqlParameter = SQLcmd.Parameters.Add("@PAYMENT", SqlDbType.Int)                '支払金額
                 Dim P_PAYMENTTAX As SqlParameter = SQLcmd.Parameters.Add("@PAYMENTTAX", SqlDbType.Int)          '支払消費税額
                 Dim P_TOTALPAYMENT As SqlParameter = SQLcmd.Parameters.Add("@TOTALPAYMENT", SqlDbType.Int)      '支払合計金額
+                Dim P_RECEIVECOUNT As SqlParameter = SQLcmd.Parameters.Add("@RECEIVECOUNT", SqlDbType.Int)             'OT空回日報受信回数
+                Dim P_OTSENDSTATUS As SqlParameter = SQLcmd.Parameters.Add("@OTSENDSTATUS", SqlDbType.NVarChar, 1)     'OT発送日報送信状況
+                Dim P_RESERVEDSTATUS As SqlParameter = SQLcmd.Parameters.Add("@RESERVEDSTATUS", SqlDbType.NVarChar, 1) '出荷予約ダウンロード状況
+                Dim P_TAKUSOUSTATUS As SqlParameter = SQLcmd.Parameters.Add("@TAKUSOUSTATUS", SqlDbType.NVarChar, 1)   '託送状ダウンロード状況
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
                 Dim P_INITYMD As SqlParameter = SQLcmd.Parameters.Add("@INITYMD", SqlDbType.DateTime)           '登録年月日
                 Dim P_INITUSER As SqlParameter = SQLcmd.Parameters.Add("@INITUSER", SqlDbType.NVarChar, 20)     '登録ユーザーID
@@ -4930,6 +4957,7 @@ Public Class OIT0002LinkDetail
                     P_CONTACTFLG.Value = "0"                              '手配連絡フラグ(0:未連絡)
                     P_RESULTFLG.Value = "0"                               '結果受理フラグ(0:未受理)
                     P_DELIVERYFLG.Value = "0"                             '託送指示フラグ(0:未手配, 1:手配)
+                    P_DELIVERYCOUNT.Value = "0"                           '託送指示送信回数
                     '積込日（予定）
                     If OIT0002row("LOADINGLODDATE") <> "" Then
                         P_LODDATE.Value = OIT0002row("LOADINGLODDATE")
@@ -5018,6 +5046,12 @@ Public Class OIT0002LinkDetail
                     P_PAYMENT.Value = 0                                 '支払金額
                     P_PAYMENTTAX.Value = 0                              '支払消費税額
                     P_TOTALPAYMENT.Value = 0                            '支払合計金額
+
+                    P_RECEIVECOUNT.Value = 0                            'OT空回日報受信回数
+                    P_OTSENDSTATUS.Value = "0"                          'OT発送日報送信状況
+                    P_RESERVEDSTATUS.Value = "0"                        '出荷予約ダウンロード状況
+                    P_TAKUSOUSTATUS.Value = "0"                         '託送状ダウンロード状況
+
                     P_DELFLG.Value = "0"                                '削除フラグ
                     P_INITYMD.Value = WW_DATENOW                        '登録年月日
                     P_INITUSER.Value = Master.USERID                    '登録ユーザーID

@@ -1951,9 +1951,16 @@ Public Class OIT0003OrderDetail
             '& "       AND OIT0005.LASTOILCODE = OIM0003_PAST.OILCODE" _
             '& "       AND OIM0003_PAST.DELFLG <> @P02" _
 
+            'SQLStr &=
+            '      " ORDER BY" _
+            '    & "    OIT0003.OILCODE"
+
             SQLStr &=
                   " ORDER BY" _
-                & "    OIT0003.OILCODE"
+                & "    OIT0003.OILCODE" _
+                & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+                & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+
 
         End If
         SQLTempTblStr &= SQLStr
@@ -2695,7 +2702,9 @@ Public Class OIT0003OrderDetail
 
         SQLStr &=
               " ORDER BY" _
-            & "    RIGHT('00' + OIT0003.LINEORDER, 2)"
+            & "    OIT0003.OILCODE" _
+            & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+            & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

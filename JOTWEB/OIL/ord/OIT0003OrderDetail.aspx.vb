@@ -433,20 +433,6 @@ Public Class OIT0003OrderDetail
                                  OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310) Then
                         '託送指示ボタンを活性
                         WF_DELIVERYFLG.Value = "0"
-
-                        '### 20200902 START 四日市営業所も託送指示を許可 ###################################
-                        '★四日市営業所の場合
-                        '　205:手配中（千葉(根岸を除く)以外）
-                        '　305:手配完了（託送未）
-                        '　310:手配完了
-                    ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 _
-                        AndAlso (work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
-                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 _
-                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310) Then
-                        '託送指示ボタンを活性
-                        WF_DELIVERYFLG.Value = "0"
-
-                        '### 20200902 END   四日市営業所も託送指示を許可 ###################################
                     Else
                         '託送指示ボタンを非活性
                         WF_DELIVERYFLG.Value = "1"
@@ -467,15 +453,6 @@ Public Class OIT0003OrderDetail
                         If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 Then
                             '託送指示ボタンを活性
                             WF_DELIVERYFLG.Value = "0"
-
-                            '### 20200902 START 四日市営業所も託送指示を許可 ###################################
-                            '四日市営業所の場合
-                        ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
-                            '託送指示ボタンを活性
-                            WF_DELIVERYFLG.Value = "0"
-
-                            '### 20200902 END   四日市営業所も託送指示を許可 ###################################
-
                         Else
                             '託送指示ボタンを非活性
                             WF_DELIVERYFLG.Value = "1"
@@ -499,13 +476,6 @@ Public Class OIT0003OrderDetail
                     OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012402 Then
                     '託送指示ボタンを活性
                     WF_DELIVERYFLG.Value = "0"
-
-                    '### 20200902 START 四日市営業所も託送指示を許可 ###################################
-                ElseIf WW_RINKAIFLG = True _
-                    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_012401 Then
-                    '託送指示ボタンを活性
-                    WF_DELIVERYFLG.Value = "0"
-                    '### 20200902 END   四日市営業所も託送指示を許可 ###################################
 
                 Else
                     '託送指示ボタンを非活性
@@ -1084,7 +1054,7 @@ Public Class OIT0003OrderDetail
             For Each OIT0003row As DataRow In OIT0003tbl.Rows
                 If OIT0003row("TANKNO") = "" Then Continue For
                 '★タンク車№に紐づく情報を取得
-                WW_TANKNUMBER_FIND(OIT0003row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+                WW_TANKNUMBER_FIND(OIT0003row)
             Next
         End If
 
@@ -3663,8 +3633,7 @@ Public Class OIT0003OrderDetail
             & " AND OIT0003.DELFLG <> @P02 " _
             & " WHERE OIT0002.LODDATE = @P03 " _
             & " AND OIT0002.OFFICECODE = @P01 " _
-            & " AND OIT0002.DELFLG <> @P02 " _
-            & " AND OIT0002.ORDERNO = @P04 "
+            & " AND OIT0002.DELFLG <> @P02 "
 
         'SQLStr &=
         '        " ORDER BY" _
@@ -3675,7 +3644,6 @@ Public Class OIT0003OrderDetail
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
-                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 11) '受注No
                 PARA01.Value = officeCode
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -3683,7 +3651,6 @@ Public Class OIT0003OrderDetail
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
-                PARA04.Value = Me.TxtOrderNo.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -15831,18 +15798,6 @@ Public Class OIT0003OrderDetail
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
                         If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
 
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0003CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
-
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
@@ -15929,18 +15884,6 @@ Public Class OIT0003OrderDetail
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
                         If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
-
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0003CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
 
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
@@ -16050,18 +15993,6 @@ Public Class OIT0003OrderDetail
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
                         If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
 
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0003CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
-
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
                             CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
@@ -16169,18 +16100,6 @@ Public Class OIT0003OrderDetail
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
                         If OIT0003CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
-
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0003CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0003row("ORDERINFO") = ""
-                            OIT0003row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0003row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
 
                         If OIT0003CHKDrow("TANKNO") = OIT0003row("TANKNO") Then
                             OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85

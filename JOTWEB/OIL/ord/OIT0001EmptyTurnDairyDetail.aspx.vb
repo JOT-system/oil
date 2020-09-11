@@ -4184,17 +4184,6 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
                         'If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0001CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0001row("ORDERINFO") = ""
-                            OIT0001row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
 
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") _
                             AndAlso OIT0001row("TANKNO") <> "" Then
@@ -4273,18 +4262,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     For Each OIT0001CHKDrow As DataRow In OIT0001WK4tbl.Rows
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
-                        'If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0001CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0001row("ORDERINFO") = ""
-                            OIT0001row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
+                        If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
 
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") _
                             AndAlso OIT0001row("TANKNO") <> "" Then
@@ -4384,17 +4362,6 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
                         'If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0001CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0001row("ORDERINFO") = ""
-                            OIT0001row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
 
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") Then
                             OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85
@@ -4494,17 +4461,6 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                         '★存在したデータがまだ「100:受注受付」の場合は、割当前なのでSKIPする。
                         'If OIT0001CHKDrow("ORDERSTATUS") = BaseDllConst.CONST_ORDERSTATUS_100 Then Continue For
-                        '### 20200903 START 受注進行ステータスが500：検収中以降はチェック不要とする ############
-                        If OIT0001CHKDrow("ORDERSTATUS") >= BaseDllConst.CONST_ORDERSTATUS_500 Then
-                            OIT0001row("ORDERINFO") = ""
-                            OIT0001row("ORDERINFONAME") = ""
-
-                            '受注明細TBLの受注情報を更新
-                            WW_UpdateOrderInfo(SQLcon, "2", OIT0001row)
-
-                            Continue For
-                        End If
-                        '### 20200903 END   受注進行ステータスが500：検収中以降はチェック不要とする ############
 
                         If OIT0001CHKDrow("TANKNO") = OIT0001row("TANKNO") Then
                             OIT0001row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_85

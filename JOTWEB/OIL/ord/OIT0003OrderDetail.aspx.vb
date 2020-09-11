@@ -10749,7 +10749,7 @@ Public Class OIT0003OrderDetail
                     & "        UPDTERMID      = @P13, " _
                     & "        RECEIVEYMD     = @P14  " _
                     & "  WHERE TANKNUMBER     = @P01  " _
-                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND TANKSITUATION IN ('1','2') " _
                     & "    AND DELFLG        <> @P02 "
 
                 '### 20200618 START 受注での使用をリセットする対応 #########################################
@@ -10776,7 +10776,7 @@ Public Class OIT0003OrderDetail
                     & "        UPDTERMID      = @P13, " _
                     & "        RECEIVEYMD     = @P14  " _
                     & "  WHERE TANKNUMBER     = @P01  " _
-                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND TANKSITUATION IN ('1','2') " _
                     & "    AND DELFLG        <> @P02 "
 
                 '★受注Noが未設定の場合は、オーダー中の受注№を設定
@@ -10806,7 +10806,7 @@ Public Class OIT0003OrderDetail
                     & "        UPDTERMID      = @P13, " _
                     & "        RECEIVEYMD     = @P14  " _
                     & "  WHERE TANKNUMBER     = @P01  " _
-                    & "    AND TANKSITUATION <> '3' " _
+                    & "    AND TANKSITUATION IN ('1','2') " _
                     & "    AND DELFLG        <> @P02 "
 
                 '★受注Noが未設定の場合は、オーダー中の受注№を設定

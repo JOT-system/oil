@@ -146,6 +146,25 @@ Public Class OIT0003OTLinkageList
 
         '○ GridView初期設定
         GridViewInitialize()
+        '○ ボタン制御
+        Dim flp As New FileLinkagePattern
+        '営業所設定取得
+        Dim settings = flp(work.WF_SEL_OTS_SALESOFFICECODE.Text)
+        '営業所に応じ表示非表示を行う
+        'OT発送日報
+        WF_ButtonOtSend.Visible = settings.CanOtSend
+        '製油所出荷予約
+        WF_ButtonReserved.Visible = settings.CanReserved
+        '託送指示
+        WF_ButtonTakusou.Visible = settings.CanTakusou
+
+        '表示するデータが無ければ各種ボタンは非活性
+        If OIT0003tbl Is Nothing OrElse OIT0003tbl.Rows.Count = 0 Then
+            WF_ButtonOtSend.Disabled = True
+            WF_ButtonReserved.Disabled = True
+            WF_ButtonTakusou.Disabled = True
+        End If
+
 
     End Sub
 
@@ -386,7 +405,7 @@ Public Class OIT0003OTLinkageList
                 'PARA02.Value = "2020/08/20"
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE
-                PARA05.Value = Master.USER_ORG
+                PARA05.Value = work.WF_SEL_OTS_SALESOFFICECODE.Text
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -754,7 +773,8 @@ Public Class OIT0003OTLinkageList
                 End Using
 
                 Dim i As Integer = 0
-                For Each OIT0003Csvrow As DataRow In OIT0003CsvOTLinkagetbl.Rows
+                Dim sortedDt = From dr As DataRow In OIT0003CsvOTLinkagetbl Order By dr("LODDATE")
+                For Each OIT0003Csvrow As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
                     'i += 1
                     'OIT0003Csvrow("LINECNT") = i        'LINECNT
 
@@ -788,7 +808,7 @@ Public Class OIT0003OTLinkageList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
 
-        Master.TransitionPrevPage(work.WF_SEL_CAMPCODE.Text + "2")
+        Master.TransitionPrevPage(work.WF_SEL_CAMPCODE.Text)
 
     End Sub
 
@@ -931,7 +951,7 @@ Public Class OIT0003OTLinkageList
             With Me._Item
                 '仙台新港営業所
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011202", True, True, True
+                    "010402", True, False, False
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '五井営業所
@@ -946,12 +966,12 @@ Public Class OIT0003OTLinkageList
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '袖ヶ浦営業所
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011203", True, True, True
+                    "011203", True, False, True
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '根岸営業所
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "011402", True, True, True
+                    "011402", True, True, False
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '四日市営業所
@@ -961,7 +981,7 @@ Public Class OIT0003OTLinkageList
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '三重塩浜営業所
                 fileLinkageItem = New FileLinkagePatternItem(
-                    "012402", True, True, True
+                    "012402", True, False, False
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
             End With
@@ -973,7 +993,13 @@ Public Class OIT0003OTLinkageList
         ''' <returns>表示パターンクラス</returns>
         Default Public ReadOnly Property Item(officeCode As String) As FileLinkagePatternItem
             Get
-                Return Me._Item(officeCode)
+                If Me._Item.ContainsKey(officeCode) Then
+                    Return Me._Item(officeCode)
+                Else
+                    '設定が存在しない場合は全てボタン非表示
+                    Return New FileLinkagePatternItem(officeCode, False, False, False)
+                End If
+
             End Get
 
         End Property
@@ -1027,5 +1053,7 @@ Public Class OIT0003OTLinkageList
         ''' <returns></returns>
         Public Property CanTakusou As Boolean = False
     End Class
+
+
 
 End Class

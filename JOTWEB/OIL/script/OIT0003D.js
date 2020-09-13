@@ -70,6 +70,7 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "disabled";
             }
             else {
                 //活性
@@ -79,6 +80,7 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
+                document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "";
             }
         }
         //〇タブ２
@@ -122,6 +124,7 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "disabled";
         }
         //〇タブ２
         else if (objDtabNo === "1") {

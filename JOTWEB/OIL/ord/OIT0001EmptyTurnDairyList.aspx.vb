@@ -1190,7 +1190,7 @@ Public Class OIT0001EmptyTurnDairyList
                     & "        UPDTERMID    = @P13, " _
                     & "        RECEIVEYMD   = @P14  " _
                     & "  WHERE TANKNUMBER   = @P01  " _
-                    & "    AND DELFLG      <> @P02 "
+                    & "    AND DELFLG      <> @P02  "
 
             '### 20200618 START 受注での使用をリセットする対応 #########################################
             If I_ORDERNO <> "" Then

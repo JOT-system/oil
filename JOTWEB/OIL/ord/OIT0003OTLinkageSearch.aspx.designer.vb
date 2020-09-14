@@ -11,97 +11,61 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class OIT0003OTLinkageList
+Partial Public Class OIT0003OTLinkageSearch
     
     '''<summary>
-    '''WF_SEL_CAMPCODE コントロール。
+    '''WF_CAMPCODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_CAMPNAME コントロール。
+    '''WF_CAMPCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_CAMPNAME As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CAMPCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_SELUORG_L コントロール。
+    '''WF_UORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SELUORG_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_UORG As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SELUORG_TEXT コントロール。
+    '''WF_UORG_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SELUORG_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_UORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_ButtonOtSend コントロール。
+    '''TxtSalesOffice コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonOtSend As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    Protected WithEvents TxtSalesOffice As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ButtonReserved コントロール。
+    '''LblSalesOfficeName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonReserved As Global.System.Web.UI.HtmlControls.HtmlInputButton
-    
-    '''<summary>
-    '''WF_ButtonTakusou コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonTakusou As Global.System.Web.UI.HtmlControls.HtmlInputButton
-    
-    '''<summary>
-    '''WF_ButtonFIRST コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
-    '''<summary>
-    '''WF_ButtonLAST コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
-    '''<summary>
-    '''pnlListArea コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
+    Protected WithEvents LblSalesOfficeName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''rightview コントロール。
@@ -110,7 +74,7 @@ Partial Public Class OIT0003OTLinkageList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rightview As Global.JOTWEB.GRIS0004RightBox
+    Protected WithEvents rightview As Global.JOTWEB.GRIS0003SRightBox
     
     '''<summary>
     '''leftview コントロール。
@@ -131,24 +95,6 @@ Partial Public Class OIT0003OTLinkageList
     Protected WithEvents work As Global.JOTWEB.OIT0003WRKINC
     
     '''<summary>
-    '''WF_GridDBclick コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_GridPosition コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
     '''<remarks>
@@ -156,15 +102,6 @@ Partial Public Class OIT0003OTLinkageList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_FIELD_REP コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_SelectedIndex コントロール。
@@ -176,15 +113,6 @@ Partial Public Class OIT0003OTLinkageList
     Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_LeftMViewChange コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
     '''<remarks>
@@ -192,15 +120,6 @@ Partial Public Class OIT0003OTLinkageList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_RightViewChange コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_RightboxOpen コントロール。
@@ -212,22 +131,13 @@ Partial Public Class OIT0003OTLinkageList
     Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_PrintURL コントロール。
+    '''WF_LeftMViewChange コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_BOXChange コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_ButtonClick コントロール。
@@ -239,13 +149,13 @@ Partial Public Class OIT0003OTLinkageList
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_MAPpermitcode コントロール。
+    '''WF_LoadAfterBackOrForward コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_LoadAfterBackOrForward As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

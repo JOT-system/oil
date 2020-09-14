@@ -100,9 +100,12 @@
                 <!-- ■　本線列車　■ -->
                 <span>
                     <a id="WF_TRAINNO_LABEL" class="requiredMark">本線列車</a>
-                    <a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">
-                        <asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>
-                        <%--<asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" ReadOnly="true" CssClass="boxIcon iconOnly" MaxLength="4"></asp:TextBox>--%>
+                    <%-- 20200911 START 本線列車の入力を自由入力に変更(指摘票No130) --%>
+                    <%--<a class="ef" id="WF_TRAINNO" ondblclick="Field_DBclick('TxtTrainNo', <%=LIST_BOX_CLASSIFICATION.LC_TRAINNUMBER%>);" onchange="TextBox_change('TxtTrainNo');">--%>
+                        <%--<asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" CssClass="boxIcon" MaxLength="4"></asp:TextBox>--%>
+                    <a class="ef" id="WF_TRAINNO">
+                        <asp:TextBox ID="TxtTrainNo" runat="server" onblur="MsgClear();" MaxLength="4"></asp:TextBox>
+                    <%-- 20200911 END   本線列車の入力を自由入力に変更(指摘票No130) --%>
                         <asp:TextBox ID="TxtTrainName" runat="server" onblur="MsgClear();" ReadOnly="true" Visible="false"></asp:TextBox>
                     </a>
                 </span>
@@ -129,8 +132,8 @@
                 <!-- ■　運賃フラグ　■ -->
                 <span>
                     <a id="WF_FAREFLG_LABEL" class="requiredMark">片道</a>
-                    <a id="WF_FAREFLG">
-                        <asp:CheckBox ID="ChkSelect" runat="server" />
+                    <a id="WF_FAREFLG" onchange="ButtonClick('WF_CheckBoxSELECTFAREFLG');">
+                        <asp:CheckBox ID="ChkFareFlg" runat="server" />
                     </a>
                 </span>
                 <span></span>
@@ -189,9 +192,9 @@
                     </a>
                 </span>
 
-                <!-- ■　(予定)空車着日　■ -->
+                <!-- ■　(予定)発駅戻り日　■ -->
                 <span>
-                    <a id="WF_EMPARRDATE_LABEL" class="requiredMark">空車着日</a>
+                    <a id="WF_EMPARRDATE_LABEL" class="requiredMark">発駅戻り日</a>
                     <a class="ef" id="WF_EMPARRDATE" ondblclick="Field_DBclick('TxtEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtEmparrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                     </a>
@@ -222,9 +225,9 @@
                     </a>
                 </span>
 
-                <!-- ■　(実績)空車着日　■ -->
+                <!-- ■　(実績)発駅戻り日　■ -->
                 <span>
-                    <a id="WF_ACTUALEMPARRDATE_LABEL" class="requiredMark">空車着日</a>
+                    <a id="WF_ACTUALEMPARRDATE_LABEL" class="requiredMark">発駅戻り日</a>
                     <a class="ef" id="WF_ACTUALEMPARRDATE" ondblclick="Field_DBclick('TxtActualEmparrDate', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
                         <asp:TextBox ID="TxtActualEmparrDate" runat="server" ReadOnly="true" CssClass="calendarIcon iconOnly" onblur="MsgClear();"></asp:TextBox>
                     </a>

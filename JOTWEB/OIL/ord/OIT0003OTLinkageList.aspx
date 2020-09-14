@@ -36,7 +36,9 @@
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->
-                        <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="OT連携" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonOtSend" class="btn-sticky" value="OT発送日報出力" runat="server" onclick="ButtonClick('WF_ButtonOtSend');" />
+                        <input type="button" id="WF_ButtonReserved" class="btn-sticky" value="製油所出荷予約" runat="server" onclick="ButtonClick('WF_ButtonReserved');" />
+                        <input type="button" id="WF_ButtonTakusou" class="btn-sticky" value="託送指示" runat="server" onclick="ButtonClick('WF_ButtonTakusou');" />
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"   onclick="ButtonClick('WF_ButtonEND');" />
                         <!-- 先頭行・末尾行ボタンを表示させる場合は divの括りを無くして WF_ButtonXXXを外だしにすれば出ます -->
                         <div style="display:none;">

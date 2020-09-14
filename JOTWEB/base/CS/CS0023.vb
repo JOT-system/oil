@@ -997,10 +997,196 @@ Public Structure CS0023XLSUPLOAD
             oSheet = CType(oSheets.Item(1), Excel.Worksheet)
 
             '★セルの内容を取得
-            Dim sCellAgoBehind() As String = {"", ""}
-            Dim sCellTitle() As String = {"", ""}
-            Dim sCellFooter() As String = {"", "", ""}
+            Dim sCellDistinguish As String = ""
 
+            '◯アップロードファイルの見分け用
+            rng = oSheet.Range("B4")
+            sCellDistinguish = rng.Text.ToString()
+
+            '　　★指定した位置に値が設定
+            If sCellDistinguish <> "" Then
+                '◯DataTable作成(運用指示書ありファイル(仕分分解報告))
+                dtSortingBreakdown(dt, excelFileName, oSheet, rng)
+
+                '★指定した位置に値が未設定
+            Else
+                '◯DataTable作成(運用指示書無しファイル(列車分解報告))
+                dtTrainBreakdown(dt, excelFileName, oSheet, rng)
+
+            End If
+
+        Catch ex As Exception
+            Throw　'呼び出し元の例外にスロー
+        Finally
+
+            'Excel終了＆リリース
+            ExcelMemoryRelease(rng)
+            CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' DataTable作成(運用指示書ありファイル(仕分分解報告))
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub dtSortingBreakdown(ByRef dt As DataTable,
+                                   ByVal excelFileName As String,
+                                   ByVal oSheet As Excel.Worksheet,
+                                   ByVal rng As Excel.Range)
+
+        '★セルの内容を取得
+        Dim sCellAgoBehind() As String = {"", ""}
+        Dim sCellTitle() As String = {"", ""}
+        Dim sCellFooter() As String = {"", "", ""}
+
+        Try
+            '◯ヘッダー情報取得
+            '　後から
+            rng = oSheet.Range("F2")
+            sCellAgoBehind(0) = rng.Text.ToString()
+            '　前から
+            rng = oSheet.Range("H2")
+            sCellAgoBehind(1) = rng.Text.ToString()
+            '　日付
+            rng = oSheet.Range("E5")
+            sCellTitle(0) = rng.Text.ToString()
+            '　列車
+            rng = oSheet.Range("B4")
+            sCellTitle(1) = rng.Text.ToString()
+
+            '◯フッター情報取得
+            '　現車
+            rng = oSheet.Range("C39")
+            sCellFooter(0) = rng.Text.ToString()
+            '　延長
+            rng = oSheet.Range("E39")
+            sCellFooter(1) = rng.Text.ToString()
+            '　換算
+            rng = oSheet.Range("H39")
+            sCellFooter(2) = rng.Text.ToString()
+
+            '◯明細情報取得
+            '　フィールド名とフィールドの型を設定
+            dt.Columns.Add("RLINKNO", Type.GetType("System.String"))
+            dt.Columns.Add("RLINKDETAILNO", Type.GetType("System.String"))
+            dt.Columns.Add("FILENAME", Type.GetType("System.String"))
+            dt.Columns.Add("AGOBEHINDFLG", Type.GetType("System.String"))
+            dt.Columns.Add("REGISTRATIONDATE", Type.GetType("System.String"))
+            dt.Columns.Add("TRAINNO", Type.GetType("System.String"))
+            dt.Columns.Add("SERIALNUMBER", Type.GetType("System.String"))
+            dt.Columns.Add("TRUCKSYMBOL", Type.GetType("System.String"))
+            dt.Columns.Add("TRUCKNO", Type.GetType("System.String"))
+            dt.Columns.Add("DEPSTATIONNAME", Type.GetType("System.String"))
+            dt.Columns.Add("ARRSTATIONNAME", Type.GetType("System.String"))
+            dt.Columns.Add("ARTICLENAME", Type.GetType("System.String"))
+            dt.Columns.Add("CONVERSIONAMOUNT", Type.GetType("System.String"))
+            dt.Columns.Add("ARTICLE", Type.GetType("System.String"))
+
+            ' ### 運送指示書(項目) START ####################################
+            dt.Columns.Add("OILNAME", Type.GetType("System.String"))
+            dt.Columns.Add("LINE", Type.GetType("System.String"))
+            dt.Columns.Add("POSITION", Type.GetType("System.String"))
+            dt.Columns.Add("INLINETRAIN", Type.GetType("System.String"))
+            dt.Columns.Add("LOADARRSTATION", Type.GetType("System.String"))
+            dt.Columns.Add("LOADINGTRAINNO", Type.GetType("System.String"))
+            dt.Columns.Add("LOADINGLODDATE", Type.GetType("System.String"))
+            dt.Columns.Add("LOADINGDEPDATE", Type.GetType("System.String"))
+            ' ### 運送指示書(項目) END   ####################################
+
+            dt.Columns.Add("CURRENTCARTOTAL", Type.GetType("System.String"))
+            dt.Columns.Add("EXTEND", Type.GetType("System.String"))
+            dt.Columns.Add("CONVERSIONTOTAL", Type.GetType("System.String"))
+
+            '明細行の開始
+            Dim jStart As Integer = 9
+            '明細行の終了
+            Dim jEnd As Integer = 29
+            For i As Integer = 0 To jEnd
+                dt.Rows.Add(dt.NewRow())
+                dt.Rows(i)("RLINKNO") = ""
+                dt.Rows(i)("RLINKDETAILNO") = (i + 1).ToString("000")
+                dt.Rows(i)("FILENAME") = excelFileName
+                If sCellAgoBehind(0) <> "" Then
+                    dt.Rows(i)("AGOBEHINDFLG") = "1"
+                ElseIf sCellAgoBehind(1) <> "" Then
+                    dt.Rows(i)("AGOBEHINDFLG") = "2"
+                End If
+                dt.Rows(i)("REGISTRATIONDATE") = sCellTitle(0)
+                dt.Rows(i)("TRAINNO") = sCellTitle(1)
+
+                rng = oSheet.Range("A" + jStart.ToString())
+                dt.Rows(i)("SERIALNUMBER") = rng.Text.ToString()
+
+                rng = oSheet.Range("B" + jStart.ToString())
+                dt.Rows(i)("TRUCKSYMBOL") = rng.Text.ToString()
+
+                rng = oSheet.Range("C" + jStart.ToString())
+                dt.Rows(i)("TRUCKNO") = rng.Text.ToString()
+
+                rng = oSheet.Range("D" + jStart.ToString())
+                dt.Rows(i)("DEPSTATIONNAME") = rng.Text.ToString()
+
+                rng = oSheet.Range("E" + jStart.ToString())
+                dt.Rows(i)("ARRSTATIONNAME") = rng.Text.ToString()
+                rng = oSheet.Range("F" + jStart.ToString())
+                dt.Rows(i)("ARTICLENAME") = rng.Text.ToString()
+                rng = oSheet.Range("G" + jStart.ToString())
+                dt.Rows(i)("CONVERSIONAMOUNT") = rng.Text.ToString()
+                rng = oSheet.Range("H" + jStart.ToString())
+                dt.Rows(i)("ARTICLE") = rng.Text.ToString()
+
+                ' ### 運送指示書(項目) START ####################################
+                rng = oSheet.Range("I" + jStart.ToString())
+                dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                rng = oSheet.Range("J" + jStart.ToString())
+                dt.Rows(i)("LINE") = rng.Text.ToString()
+                rng = oSheet.Range("K" + jStart.ToString())
+                dt.Rows(i)("POSITION") = rng.Text.ToString()
+                rng = oSheet.Range("L" + jStart.ToString())
+                dt.Rows(i)("INLINETRAIN") = rng.Text.ToString()
+                rng = oSheet.Range("M" + jStart.ToString())
+                dt.Rows(i)("LOADARRSTATION") = rng.Text.ToString()
+                rng = oSheet.Range("O" + jStart.ToString())
+                dt.Rows(i)("LOADINGTRAINNO") = rng.Text.ToString()
+                rng = oSheet.Range("P" + jStart.ToString())
+                dt.Rows(i)("LOADINGLODDATE") = rng.Text.ToString()
+                rng = oSheet.Range("Q" + jStart.ToString())
+                dt.Rows(i)("LOADINGDEPDATE") = rng.Text.ToString()
+                ' ### 運送指示書(項目) END   ####################################
+
+                dt.Rows(i)("CURRENTCARTOTAL") = sCellFooter(0)
+                dt.Rows(i)("EXTEND") = sCellFooter(1)
+                dt.Rows(i)("CONVERSIONTOTAL") = sCellFooter(2)
+
+                jStart += 1
+            Next
+
+
+        Catch ex As Exception
+            Throw　'呼び出し元の例外にスロー
+        Finally
+            'Excelリリース
+            ExcelMemoryRelease(rng)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' DataTable作成(運用指示書無しファイル(列車分解報告))
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub dtTrainBreakdown(ByRef dt As DataTable,
+                                 ByVal excelFileName As String,
+                                 ByVal oSheet As Excel.Worksheet,
+                                 ByVal rng As Excel.Range)
+
+        '★セルの内容を取得
+        Dim sCellAgoBehind() As String = {"", ""}
+        Dim sCellTitle() As String = {"", ""}
+        Dim sCellFooter() As String = {"", "", ""}
+
+        Try
             '◯ヘッダー情報取得
             '　後から
             rng = oSheet.Range("F4")
@@ -1095,10 +1281,8 @@ Public Structure CS0023XLSUPLOAD
         Catch ex As Exception
             Throw　'呼び出し元の例外にスロー
         Finally
-
-            'Excel終了＆リリース
+            'Excelリリース
             ExcelMemoryRelease(rng)
-            CloseExcel(oXls, oWBooks, oWBook, oSheets, oSheet)
         End Try
 
     End Sub

@@ -113,7 +113,8 @@ Public Class MP0001CycleBillingStatus
         sqlStat.AppendLine("      ,OFFICENAME")
         sqlStat.AppendLine("      ,SORTORDER")
         sqlStat.AppendLine("  FROM OIL.VIW0010_BELONG_TO_OFFICE with(nolock)")
-        sqlStat.AppendLine(" WHERE ORGCODE = @ORGCODE")
+        sqlStat.AppendLine(" WHERE ORGCODE     = @ORGCODE")
+        sqlStat.AppendLine("   AND SHOZAIONLY != '1'")
         sqlStat.AppendLine(" ORDER BY SORTORDER")
         Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
             With sqlCmd.Parameters

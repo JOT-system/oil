@@ -90,7 +90,8 @@ Public Class OIM0020GuidanceSearch
             Master.GetFirstValue(work.WF_SEL_ENDYMD.Text, "ENDYMD", txtEndYmd.Text)                   '型式
             Dim chklList = OIM0020WRKINC.GetNewDisplayFlags()
             If Not {"jot_sys_1", "jot_oil_1"}.Contains(Master.ROLE_MAP) Then
-                Dim prmData = work.CreateFIXParam(Master.USER_ORG)
+                Dim additionalCond As String = " and SHOZAIONLY != '1' "
+                Dim prmData = work.CreateFIXParam(Master.USER_ORG, I_ADDITIONALCONDITION:=additionalCond)
                 leftview.SetListBox(LIST_BOX_CLASSIFICATION.LC_BELONGTOOFFICE, WW_DUMMY, prmData)
                 Dim officeCodes = (From litm As ListItem In leftview.WF_LeftListBox.Items.Cast(Of ListItem) Select litm.Value)
                 chklList = (From itm In chklList Where officeCodes.Contains(itm.OfficeCode)).ToList

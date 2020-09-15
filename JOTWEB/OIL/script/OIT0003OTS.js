@@ -17,5 +17,12 @@ function InitDisplay() {
 
     // 左ボックス拡張機能追加
     addLeftBoxExtention(leftListExtentionTarget);
-
+    let bypassFlagObj = document.getElementById('WF_LoadAfterBackOrForward');
+    if (bypassFlagObj !== null) {
+        if (bypassFlagObj.value !== '') {
+            document.getElementById("MF_SUBMIT").value = "TRUE";
+            document.forms[0].style.visibility = 'hidden';
+            document.forms[0].submit();
+        }
+    }
 }

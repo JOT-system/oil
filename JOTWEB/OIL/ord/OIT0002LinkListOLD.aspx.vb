@@ -1437,7 +1437,8 @@ Public Class OIT0002LinkListOLD
         rightview.SetErrorReport("")
 
         '○ UPLOAD XLSデータ取得
-        CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl)
+        Dim useFlg As Boolean
+        CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl, useFlg)
 
         '◯貨車連結(臨海)TBL追加処理
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection

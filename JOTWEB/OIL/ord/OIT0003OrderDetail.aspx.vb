@@ -10736,6 +10736,32 @@ Public Class OIT0003OrderDetail
                 '★★★OT所有の場合
             ElseIf upFlag = "1" Then
 
+                '○ 更新内容が指定されていれば追加する
+                '所在地コード
+                If Not String.IsNullOrEmpty(I_LOCATION) Then
+                    SQLStr &= String.Format("        LOCATIONCODE = '{0}', ", I_LOCATION)
+                End If
+                'タンク車状態コード
+                If Not String.IsNullOrEmpty(I_STATUS) Then
+                    SQLStr &= String.Format("        TANKSTATUS   = '{0}', ", I_STATUS)
+                End If
+                '積車区分
+                If Not String.IsNullOrEmpty(I_KBN) Then
+                    SQLStr &= String.Format("        LOADINGKBN   = '{0}', ", I_KBN)
+                End If
+                'タンク車状況コード
+                If Not String.IsNullOrEmpty(I_SITUATION) Then
+                    SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
+                End If
+
+                '### 20200915 START OTタンク車前回油種更新対応 #############################################
+                SQLStr &=
+                          "        LASTOILCODE        = @P03, " _
+                        & "        LASTOILNAME        = @P04, " _
+                        & "        PREORDERINGTYPE    = @P05, " _
+                        & "        PREORDERINGOILNAME = @P06, "
+                '### 20200915 END   OTタンク車前回油種更新対応 #############################################
+
                 SQLStr &= String.Format("        USEORDERNO         = '{0}', ", I_ORDERNO)
 
                 SQLStr &=
@@ -13362,13 +13388,15 @@ Public Class OIT0003OrderDetail
 
                         '### 特に何もしない ####################################
 
-                        '★タンク車所在の更新
-                        '引数１：所在地コード　⇒　変更なし(空白)
-                        '引数２：タンク車状態　⇒　変更なし(空白)
-                        '引数３：積車区分　　　⇒　変更なし(空白)
-                        '引数４：OT所有　　　　⇒　あり　　("1")
-                        'WW_UpdateTankShozai("", "3", "E")
-                        WW_UpdateTankShozai("", "", "", upFlag:="1")
+                        '★タンク車所在の更新(受入日設定時の内容を設定)
+                        '引数１：所在地コード　⇒　変更あり(着駅)
+                        '引数２：タンク車状態　⇒　変更あり("3"(到着))
+                        '引数３：積車区分　　　⇒　変更あり("E"(空車))
+                        '引数４：タンク車状況　⇒　変更あり("2"(輸送中))
+                        '引数５：前回油種　　　⇒　変更あり(油種⇒前回油種に更新)
+                        '引数６：OT所有　　　　⇒　あり　　("1")
+                        'WW_UpdateTankShozai("", "", "", upFlag:="1")
+                        WW_UpdateTankShozai(Me.TxtArrstationCode.Text, "3", "E", I_SITUATION:="2", I_TANKNO:=OIT0003row("TANKNO"), upLastOilCode:=True, upFlag:="1")
 
                     Else
                         '★タンク車所在の更新

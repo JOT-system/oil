@@ -17024,6 +17024,7 @@ Public Class OIT0003OrderDetail
             & "       OIT0002.ORDERNO <> PRESENTORDER.ORDERNO " _
             & "   AND OIT0002.OFFICECODE = PRESENTORDER.OFFICECODE" _
             & "   AND OIT0002.LODDATE = PRESENTORDER.ACTUALLODDATE" _
+            & "   AND OIT0002.ORDERSTATUS <> @P03" _
             & "   AND OIT0002.DELFLG <> @P02" _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "       OIT0003.ORDERNO = OIT0002.ORDERNO " _
@@ -17034,8 +17035,10 @@ Public Class OIT0003OrderDetail
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 11) '受注№
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
+                Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 3)  '受注進行ステータス(900：受注キャンセル)
                 PARA01.Value = work.WF_SEL_ORDERNUMBER.Text
                 PARA02.Value = C_DELETE_FLG.DELETE
+                PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

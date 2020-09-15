@@ -3114,7 +3114,7 @@ Public Class OIT0003OrderList
             & "      AND OIT0002.LODDATE = @P03 " _
             & "  ) ORDERINFOTBL ON " _
             & "      VIW0013.RINKAITRAINNAME = ORDERINFOTBL.LOADINGIRILINETRAINNAME " _
-            & "  AND VIW0013.SPOTNO = ORDERINFOTBL.LOADINGIRILINEORDER "
+            & "  AND VIW0013.SPOTNO = ORDERINFOTBL.FILLINGPOINT "
 
         SQLStr &=
               " ORDER BY" _

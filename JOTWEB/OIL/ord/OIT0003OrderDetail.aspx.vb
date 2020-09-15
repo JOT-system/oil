@@ -6596,6 +6596,7 @@ Public Class OIT0003OrderDetail
             If WW_GetValue(14) <> BaseDllConst.CONST_BRANCHCODE_110001 Then
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_102
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
+                Exit Sub
             Else
                 OIT0003row("ORDERINFO") = ""
                 OIT0003row("ORDERINFONAME") = ""
@@ -13862,7 +13863,8 @@ Public Class OIT0003OrderDetail
 
         '(一覧)チェック(準備)
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
-            If OIT0003row("ORDERINFO") <> BaseDllConst.CONST_ORDERINFO_ALERT_102 Then
+            If OIT0003row("ORDERINFO") <> BaseDllConst.CONST_ORDERINFO_ALERT_102 _
+                AndAlso OIT0003row("ORDERINFO") <> BaseDllConst.CONST_ORDERINFO_ALERT_101 Then
                 OIT0003row("ORDERINFO") = ""
                 OIT0003row("ORDERINFONAME") = ""
             End If

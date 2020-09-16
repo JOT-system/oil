@@ -1908,33 +1908,33 @@ Public Class OIT0003OrderDetail
                 & "       AND OIM0005.DELFLG <> @P02" _
                 & " LEFT JOIN com.OIS0015_FIXVALUE OIS0015_2 ON " _
                 & "        OIS0015_2.CLASS   = 'ORDERINFO' " _
-                & "    AND OIS0015_2.KEYCODE = OIT0003.ORDERINFO " _
-                & " WHERE OIT0002.ORDERNO = @P01" _
+                & "    AND OIS0015_2.KEYCODE = OIT0003.ORDERINFO "
+
+            '### 20200902 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+            SQLStr &=
+                  " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
+                & "     OIM0024.OFFICECODE = OIT0002.OFFICECODE " _
+                & " AND OIM0024.OILCODE = OIT0003.OILCODE " _
+                & " AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+                & " AND OIM0024.DELFLG <> @P02 "
+            '### 20200902 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+
+            SQLStr &=
+                  " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
-
-            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_NOW ON " _
-            '& "       OIT0002.OFFICECODE = OIM0003_NOW.OFFICECODE" _
-            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_NOW.SHIPPERCODE" _
-            '& "       AND OIT0002.BASECODE = OIM0003_NOW.PLANTCODE" _
-            '& "       AND OIT0003.OILCODE = OIM0003_NOW.OILCODE" _
-            '& "       AND OIM0003_NOW.DELFLG <> @P02" _
-            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
-            '& "       OIT0002.OFFICECODE = OIM0003_PAST.OFFICECODE" _
-            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_PAST.SHIPPERCODE" _
-            '& "       AND OIT0002.BASECODE = OIM0003_PAST.PLANTCODE" _
-            '& "       AND OIT0005.LASTOILCODE = OIM0003_PAST.OILCODE" _
-            '& "       AND OIM0003_PAST.DELFLG <> @P02" _
-
-            'SQLStr &=
-            '      " ORDER BY" _
-            '    & "    OIT0003.OILCODE"
 
             SQLStr &=
                   " ORDER BY" _
-                & "    OIT0003.OILCODE" _
+                & "    OIM0024.PRIORITYNO" _
+                & " ,  OIT0003.TANKNO" _
                 & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
                 & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
-
+            'SQLStr &=
+            '      " ORDER BY" _
+            '    & "    OIT0003.OILCODE" _
+            '    & " ,  OIT0003.TANKNO" _
+            '    & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+            '    & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
 
         End If
         SQLTempTblStr &= SQLStr
@@ -2670,15 +2670,33 @@ Public Class OIT0003OrderDetail
                 & "    AND OIS0015_2.KEYCODE = OIT0003.ORDERINFO " _
                 & " LEFT JOIN OIL.OIT0005_SHOZAI OIT0005 ON " _
                 & "       OIT0003.TANKNO = OIT0005.TANKNUMBER" _
-                & "       AND OIT0005.DELFLG <> @P02" _
-                & " WHERE OIT0002.ORDERNO = @P01" _
+                & "       AND OIT0005.DELFLG <> @P02"
+
+        '### 20200902 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+        SQLStr &=
+                  " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
+                & "     OIM0024.OFFICECODE = OIT0002.OFFICECODE " _
+                & " AND OIM0024.OILCODE = OIT0003.OILCODE " _
+                & " AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+                & " AND OIM0024.DELFLG <> @P02 "
+        '### 20200902 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+
+        SQLStr &=
+                  " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
 
         SQLStr &=
               " ORDER BY" _
-            & "    OIT0003.OILCODE" _
+            & "    OIM0024.PRIORITYNO" _
+            & " ,  OIT0003.TANKNO" _
             & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
             & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIT0003.OILCODE" _
+        '    & " ,  OIT0003.TANKNO" _
+        '    & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+        '    & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
 
         Try
             Using SQLcmd As New SqlCommand(SQLStr, SQLcon)

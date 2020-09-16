@@ -620,30 +620,30 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "       AND OIT0005.DELFLG <> @P2" _
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "       OIT0003.TANKNO = OIM0005.TANKNUMBER" _
-            & "       AND OIM0005.DELFLG <> @P2" _
-            & " WHERE OIT0002.ORDERNO = @P1" _
-            & " AND OIT0002.DELFLG <> @P2"
-            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_NOW ON " _
-            '& "       OIT0002.OFFICECODE = OIM0003_NOW.OFFICECODE" _
-            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_NOW.SHIPPERCODE" _
-            '& "       AND OIT0002.BASECODE = OIM0003_NOW.PLANTCODE" _
-            '& "       AND OIT0003.OILCODE = OIM0003_NOW.OILCODE" _
-            '& "       AND OIM0003_NOW.DELFLG <> @P2" _
-            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
-            '& "       OIT0002.OFFICECODE = OIM0003_PAST.OFFICECODE" _
-            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_PAST.SHIPPERCODE" _
-            '& "       AND OIT0002.BASECODE = OIM0003_PAST.PLANTCODE" _
-            '& "       AND OIT0005.LASTOILCODE = OIM0003_PAST.OILCODE" _
-            '& "       AND OIM0003_PAST.DELFLG <> @P2" _
+            & "       AND OIM0005.DELFLG <> @P2"
+
+            '### 20200902 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+            SQLStr &=
+              " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
+            & "     OIM0024.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0024.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0024.DELFLG <> @P2 "
+            '### 20200902 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
 
             SQLStr &=
-                  " ORDER BY" _
-                & "    OIT0002.ORDERYMD" _
-                & "    , OIT0002.SHIPPERSCODE" _
-                & "    , OIT0003.DETAILNO" _
-                & "    , OIT0003.OILCODE" _
-                & "    , OIT0003.ORDERINGTYPE" _
-                & "    , OIT0003.TANKNO"
+              " WHERE OIT0002.ORDERNO = @P1" _
+            & " AND OIT0002.DELFLG <> @P2"
+
+            SQLStr &=
+              " ORDER BY" _
+            & "    OIM0024.PRIORITYNO" _
+            & " ,  OIT0003.TANKNO"
+            'SQLStr &=
+            '  " ORDER BY" _
+            '& "    OIT0003.OILCODE" _
+            '& " ,  OIT0003.TANKNO"
+
         End If
 
         Try
@@ -2571,57 +2571,60 @@ Public Class OIT0001EmptyTurnDairyDetail
             End If
         End Using
 
-        '列車タンク車重複チェック(同じ列車(発日も一緒)でタンク車がすでに登録済みかチェック)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+        '### 20200818 START (一覧)タンク車Noが割当されている場合はチェックを実施 #####################
+        If OIT0001tbl.Select("TANKNO <> '' AND DELFLG = '0'").Count <> 0 Then
+            '列車タンク車重複チェック(同じ列車(発日も一緒)でタンク車がすでに登録済みかチェック)
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            WW_CheckTrainTankRepeat(WW_ERRCODE, SQLcon)
-            If WW_ERRCODE = "ERR1" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckTrainTankRepeat(WW_ERRCODE, SQLcon)
+                If WW_ERRCODE = "ERR1" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            ElseIf WW_ERRCODE = "ERR2" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                ElseIf WW_ERRCODE = "ERR2" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            ElseIf WW_ERRCODE = "ERR3" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                ElseIf WW_ERRCODE = "ERR3" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            ElseIf WW_ERRCODE = "ERR4" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                ElseIf WW_ERRCODE = "ERR4" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            End If
-        End Using
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                End If
+            End Using
+        End If
 
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then

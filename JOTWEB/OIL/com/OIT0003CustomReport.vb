@@ -318,7 +318,7 @@ Public Class OIT0003CustomReport : Implements IDisposable
         Try
             '***** TODO処理 ここから *****
             '◯ヘッダーの設定
-            EditGoiShipHeaderArea()
+            EditGoiShipHeaderArea(lodDate)
             '◯明細の設定
             EditGoiShipDetailArea()
             '***** TODO処理 ここまで *****
@@ -350,13 +350,14 @@ Public Class OIT0003CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定(出荷予定表(五井))
     ''' </summary>
-    Private Sub EditGoiShipHeaderArea()
+    Private Sub EditGoiShipHeaderArea(ByVal lodDate As String)
         Dim rngHeaderArea As Excel.Range = Nothing
 
         Try
             For Each PrintDatarow As DataRow In PrintData.Rows
                 '◯ 積込日
-                Dim value As String = PrintDatarow("LODDATE").ToString
+                'Dim value As String = PrintDatarow("LODDATE").ToString
+                Dim value As String = lodDate
                 rngHeaderArea = Me.ExcelWorkSheet.Range("D3")
                 rngHeaderArea.Value = Date.Parse(value).ToString("yyyy", New Globalization.CultureInfo("ja-JP"))
                 rngHeaderArea = Me.ExcelWorkSheet.Range("F3")

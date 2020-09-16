@@ -1049,18 +1049,19 @@ Public Class OIT0003OrderDetail
             End Using
         End If
 
-        '### 20200916 START 「500：検収中」以降のステータスはチェックを実施しない ################
-        If Me.TxtOrderStatus.Text < BaseDllConst.CONST_ORDERSTATUS_500 Then
-            '★受注オーダーが存在する場合
-            If OIT0003tbl.Rows.Count <> 0 Then
-                For Each OIT0003row As DataRow In OIT0003tbl.Rows
-                    If OIT0003row("TANKNO") = "" Then Continue For
-                    '★タンク車№に紐づく情報を取得
-                    WW_TANKNUMBER_FIND(OIT0003row)
-                Next
-            End If
+        '★受注オーダーが存在する場合
+        If OIT0003tbl.Rows.Count <> 0 Then
+            For Each OIT0003row As DataRow In OIT0003tbl.Rows
+                If OIT0003row("TANKNO") = "" Then Continue For
+                '★タンク車№に紐づく情報を取得
+                WW_TANKNUMBER_FIND(OIT0003row)
+            Next
         End If
-        '### 20200916 END   「500：検収中」以降のステータスはチェックを実施しない ################
+        ''### 20200916 START 「500：検収中」以降のステータスはチェックを実施しない ################
+        'If Me.TxtOrderStatus.Text < BaseDllConst.CONST_ORDERSTATUS_500 Then
+
+        'End If
+        ''### 20200916 END   「500：検収中」以降のステータスはチェックを実施しない ################
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)

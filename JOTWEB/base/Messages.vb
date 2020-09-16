@@ -675,6 +675,10 @@ Public Module Messages
         ''' 入線順設定値0エラー
         ''' </summary>
         Public Const OIL_LINEORDER_ZERO_ERROR As String = "20068"
+        ''' <summary>
+        ''' (実績)日付の一括設定確認メッセージ
+        ''' </summary>
+        Public Const OIL_ACTUALDATE_BULKSET_MSG As String = "20069"
 #End Region
 
 

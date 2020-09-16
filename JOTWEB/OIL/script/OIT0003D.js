@@ -102,9 +102,22 @@ function InitDisplay() {
         else if (objDtabNo === "2") {
             if (document.getElementById('WF_MAPButtonControl').value === "3") {
                 //非活性
+                document.getElementById("WF_ButtonBULKDATE_TAB3").disabled = "disabled";
                 document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
             }
             else {
+
+                //使用受注オーダー有り
+                if (document.getElementById('WF_USEORDERFLG').value === "0") {
+                    //非活性
+                    document.getElementById("WF_ButtonBULKDATE_TAB3").disabled = "disabled";
+                }
+                //使用受注オーダーなし
+                else {
+                    //活性
+                    document.getElementById("WF_ButtonBULKDATE_TAB3").disabled = "";
+                }
+
                 //活性
                 document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "";
             }
@@ -133,6 +146,7 @@ function InitDisplay() {
         }
         //〇タブ３
         else if (objDtabNo === "2") {
+            document.getElementById("WF_ButtonBULKDATE_TAB3").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB3").disabled = "disabled";
         }
         ////〇タブ４

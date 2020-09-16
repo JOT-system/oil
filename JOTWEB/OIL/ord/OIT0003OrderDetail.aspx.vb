@@ -180,6 +180,8 @@ Public Class OIT0003OrderDetail
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonCANCEL_TAB1"           '解除ボタン押下
                             WF_ButtonCANCEL_Click()
+                        Case "WF_ButtonBULKDATE_TAB3"         '一括ボタン押下
+                            WF_ButtonBULK_Click()
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"              'マウスホイール(Down)
@@ -198,6 +200,9 @@ Public Class OIT0003OrderDetail
                             '画面表示設定処理(受注進行ステータス)
                             WW_ScreenOrderStatusSet()
                         Case "btnChkLastOilConfirmNo"         '確認メッセージいいえボタン押下(前回油種チェック)
+                        Case "btnChkBulkDateConfirmYes"       '確認メッセージはいボタン押下((実績)日付一括入力チェック)
+                            WW_BulkDateSet()
+                        Case "btnChkBulkDateConfirmNo"        '確認メッセージいいえボタン押下((実績)日付一括入力チェック)
 
                     End Select
 
@@ -482,6 +487,15 @@ Public Class OIT0003OrderDetail
                     WF_DELIVERYFLG.Value = "1"
 
                 End If
+            End If
+
+            '◯使用受注オーダー可否フラグ
+            If Me.WW_USEORDERFLG = True Then
+                '使用受注オーダー有り
+                WF_USEORDERFLG.Value = "0"
+            Else
+                '使用受注オーダーなし
+                WF_USEORDERFLG.Value = "1"
             End If
 
             '◯受注進行ステータスが310:手配完了のステータスに変更された場合
@@ -6363,6 +6377,73 @@ Public Class OIT0003OrderDetail
         WW_UpdateTankShozai(I_LOCATION:=Me.TxtDepstationCode.Text, I_STATUS:="3", I_KBN:="E", I_SITUATION:="1", upFlag:="2")
 
     End Sub
+
+    ''' <summary>
+    ''' 一括ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonBULK_Click()
+
+        '実績日付すべてを一括設定する旨をメッセージにて確認
+        Master.Output(C_MESSAGE_NO.OIL_ACTUALDATE_BULKSET_MSG,
+                      C_MESSAGE_TYPE.QUES,
+                      needsPopUp:=True,
+                      messageBoxTitle:="",
+                      IsConfirm:=True,
+                      YesButtonId:="btnChkBulkDateConfirmYes",
+                      needsConfirmNgToPostBack:=True,
+                      NoButtonId:="btnChkBulkDateConfirmNo")
+
+    End Sub
+    ''' <summary>
+    ''' (実績)日付の一括設定処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_BulkDateSet()
+
+        '★タブ「タンク車明細」の件数チェック
+        If OIT0003tbl_tab3.Rows.Count = 0 Then Exit Sub
+
+        '◯ヘッダー
+        '★(予定)に入力された日付を、(実績)の日付に反映させる。
+        Me.TxtActualLoadingDate.Text = Me.TxtLoadingDate.Text
+        Me.TxtActualDepDate.Text = Me.TxtDepDate.Text
+        Me.TxtActualArrDate.Text = Me.TxtArrDate.Text
+        Me.TxtActualAccDate.Text = Me.TxtAccDate.Text
+        Me.TxtActualEmparrDate.Text = Me.TxtEmparrDate.Text
+
+        '◯一覧
+        '★(予定)積込日に入力された日付を、(一覧)積込日に反映させる。
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            If OIT0003tab3row("ACTUALLODDATE") <> "" Then Continue For
+            OIT0003tab3row("ACTUALLODDATE") = Me.TxtLoadingDate.Text
+        Next
+
+        '★(予定)発日に入力された日付を、(一覧)発日に反映させる。
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            OIT0003tab3row("ACTUALDEPDATE") = Me.TxtDepDate.Text
+        Next
+
+        '★(予定)積込着日に入力された日付を、(一覧)積込着日に反映させる。
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            OIT0003tab3row("ACTUALARRDATE") = Me.TxtArrDate.Text
+        Next
+
+        '★(予定)受入日に入力された日付を、(一覧)受入日に反映させる。
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            OIT0003tab3row("ACTUALACCDATE") = Me.TxtAccDate.Text
+        Next
+
+        '★(予定)空車着日に入力された日付を、(一覧)空車着日に反映させる。
+        For Each OIT0003tab3row As DataRow In OIT0003tbl_tab3.Rows
+            OIT0003tab3row("ACTUALEMPARRDATE") = Me.TxtEmparrDate.Text
+        Next
+
+        '○ 画面表示データ保存
+        If Not Master.SaveTable(OIT0003tbl_tab3, work.WF_SEL_INPTAB3TBL.Text) Then Exit Sub
+
+    End Sub
+
 
     ''' <summary>
     ''' 一覧画面-マウスホイール時処理
@@ -12987,16 +13068,31 @@ Public Class OIT0003OrderDetail
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_310 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_205 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_305 Then
-            '(実績)積込日
-            Me.TxtActualLoadingDate.Enabled = True
-            '(実績)発日
-            Me.TxtActualDepDate.Enabled = True
-            '(実績)積車着日
-            Me.TxtActualArrDate.Enabled = True
-            '(実績)受入日
-            Me.TxtActualAccDate.Enabled = True
-            '(実績)空車着日
-            Me.TxtActualEmparrDate.Enabled = True
+
+            '★使用受注フラグの有無で決定
+            If Me.WW_USEORDERFLG = False Then
+                '(実績)積込日
+                Me.TxtActualLoadingDate.Enabled = True
+                '(実績)発日
+                Me.TxtActualDepDate.Enabled = True
+                '(実績)積車着日
+                Me.TxtActualArrDate.Enabled = True
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = True
+                '(実績)空車着日
+                Me.TxtActualEmparrDate.Enabled = True
+            Else
+                '(実績)積込日
+                Me.TxtActualLoadingDate.Enabled = False
+                '(実績)発日
+                Me.TxtActualDepDate.Enabled = False
+                '(実績)積車着日
+                Me.TxtActualArrDate.Enabled = False
+                '(実績)受入日
+                Me.TxtActualAccDate.Enabled = False
+                '(実績)空車着日
+                Me.TxtActualEmparrDate.Enabled = False
+            End If
 
             '受注情報が「320:受注確定」の場合は、(実績)積込日の入力を制限
             '320:受注確定
@@ -18215,10 +18311,7 @@ Public Class OIT0003OrderDetail
                         Exit For
                     End If
                 Next
-                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
-                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
-                    chkObjST.Enabled = False
-                End If
+                chkObjST.Enabled = False
                 '###################################################################
 
                 For Each cellObj As TableCell In rowitem.Controls

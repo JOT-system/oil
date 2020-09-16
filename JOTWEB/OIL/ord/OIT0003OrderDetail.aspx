@@ -606,6 +606,9 @@
                 <!-- ボタン -->
                 <div class="actionButtonBox">
                     <div class="leftSide">
+                        <%-- 20200916 START 指摘票対応(No148) --%>
+                        <input type="button" id="WF_ButtonBULKDATE_TAB3" class="btn-sticky" value="実績一括" onclick="ButtonClick('WF_ButtonBULKDATE_TAB3');" />
+                        <%-- 20200916 END   指摘票対応(No148) --%>
 <%-- 20200219_タンク車明細での明細の追加・削除などは想定しないため削除
                         <input type="button" id="WF_ButtonALLSELECT_TAB3" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT_TAB3');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED_TAB3" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB3');" />
@@ -694,6 +697,8 @@
         <input id="WF_RESULTFLG" runat="server" value="" type="text" />
         <!-- 託送指示フラグ -->
         <input id="WF_DELIVERYFLG" runat="server" value="" type="text" />
+        <!-- 使用受注オーダー可否フラグ -->
+        <input id="WF_USEORDERFLG" runat="server" value="" type="text" />
         <!-- 画面ボタン制御 -->
         <input id="WF_MAPButtonControl" runat="server" value="0" type="text" />
         <!-- DetailBox Mview切替 -->

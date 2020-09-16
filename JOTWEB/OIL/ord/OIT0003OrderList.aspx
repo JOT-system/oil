@@ -168,10 +168,10 @@
                 <asp:RadioButton ID="rbLineBtn" runat="server" GroupName="WF_SW" Text="入線方" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbKinoeneLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定(甲子)" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbKinoeneLoadBtn" runat="server" GroupName="WF_SW" Text="回線別指示書<br>(甲子)" onclick="reportRadioButton();" />
             </li>
             <li>
-                <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="積込予定(根岸)" onclick="reportRadioButton();" />
+                <asp:RadioButton ID="rbNegishiLoadBtn" runat="server" GroupName="WF_SW" Text="回線別(根岸)" onclick="reportRadioButton();" />
             </li>
         </ul>
     </div>

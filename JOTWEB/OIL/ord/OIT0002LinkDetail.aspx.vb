@@ -2070,6 +2070,7 @@ Public Class OIT0002LinkDetail
             & " , TMP0005.RINKAIOILKANA                          AS RINKAIOILKANA" _
             & " , TMP0005.RINKAISEGMENTOILNAME                   AS RINKAISEGMENTOILNAME" _
             & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
+            & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
             & " , OIT0002.TRAINNO                                AS ORDERTRAINNO " _
@@ -2133,6 +2134,18 @@ Public Class OIT0002LinkDetail
                     Next
                 Next
 
+                '### 20200916 START 指摘票対応(No142)全体 ########################################################
+                '★甲子営業所対応(位置(充填ポイント)に、回転(回線)+位置(充填ポイント)を再設定)
+                For Each OIT0002Reprow As DataRow In OIT0002Reporttbl.Rows
+                    If work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                        Try
+                            OIT0002Reprow("FILLINGPOINT") = OIT0002Reprow("LINE") + OIT0002Reprow("FILLINGPOINT")
+                        Catch ex As Exception
+                            OIT0002Reprow("FILLINGPOINT") = ""
+                        End Try
+                    End If
+                Next
+                '### 20200916 END   指摘票対応(No142)全体 ########################################################
             End Using
 
         Catch ex As Exception

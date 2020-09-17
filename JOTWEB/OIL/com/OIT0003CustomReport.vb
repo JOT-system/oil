@@ -627,6 +627,8 @@ Public Class OIT0003CustomReport : Implements IDisposable
             EditSodegauraLineHeaderArea(lodDate)
             '◯明細の設定
             EditSodegauraLineDetailArea()
+            '◯フッターの設定
+            EditSodegauraLineFooterArea()
             '***** TODO処理 ここまで *****
             'ExcelTempSheet.Delete() '雛形シート削除
 
@@ -742,6 +744,154 @@ Public Class OIT0003CustomReport : Implements IDisposable
             Throw
         Finally
             ExcelMemoryRelease(rngDetailArea)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票のフッター設定(入線方(袖ヶ浦))
+    ''' </summary>
+    Private Sub EditSodegauraLineFooterArea()
+        Dim rngFooterArea As Excel.Range = Nothing
+
+        Try
+            '荷受人(比較用)
+            Dim svConsigneeCode As String = ""
+            '開始行
+            Dim j As Integer = 48
+            Dim i As Integer = j
+
+            '★油種合計(列)
+            Dim clnTrain() As String = {"C", "E", "G", "I", "K", "M"}
+            Dim svTrain As String = ""
+            '★油種数(HR, RG, 灯油, 軽油, 3号軽油, LSA, A重油)
+            Dim oilCnt() As Integer = {0, 0, 0, 0, 0, 0, 0}
+            For Each PrintDatarow As DataRow In PrintData.Select(Nothing, "JRTRAINNO1, OILCODE")
+
+                '### ２列車存在する場合の対応
+                If svConsigneeCode <> "" AndAlso svConsigneeCode <> PrintDatarow("CONSIGNEECODE").ToString() Then
+                    '◯荷受人
+                    Select Case svConsigneeCode
+                    '# JONET松本
+                        Case BaseDllConst.CONST_CONSIGNEECODE_40
+                            svTrain = clnTrain(5)
+                    '# OT宇都宮
+                        Case BaseDllConst.CONST_CONSIGNEECODE_53
+                            svTrain = clnTrain(4)
+                        Case Else
+                            svTrain = ""
+                    End Select
+
+                    '# 油種合計用の荷受人の場合
+                    If svTrain <> "" Then
+                        '◯HR
+                        rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                        rngFooterArea.Value = oilCnt(0)
+                        i += 1
+                        '◯RG
+                        rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                        rngFooterArea.Value = oilCnt(1)
+                        i += 1
+                        '◯灯油
+                        rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                        rngFooterArea.Value = oilCnt(2)
+                        i += 1
+                        '◯軽油
+                        rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                        rngFooterArea.Value = oilCnt(3)
+                        i += 1
+                        '◯3号軽油
+                        rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                        rngFooterArea.Value = oilCnt(4)
+                        i += 1
+                        '◯LSA
+                        rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                        rngFooterArea.Value = oilCnt(5)
+                        i += 1
+                        '◯A重油
+                        rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                        rngFooterArea.Value = oilCnt(6)
+                    End If
+
+                    '★★★初期化
+                    i = j
+                    oilCnt = {0, 0, 0, 0, 0, 0, 0}
+                End If
+
+                Select Case PrintDatarow("OILCODE").ToString()
+                    '# ハイオク
+                    Case BaseDllConst.CONST_HTank
+                        oilCnt(0) += 1
+                    '# レギュラー
+                    Case BaseDllConst.CONST_RTank
+                        oilCnt(1) += 1
+                    '# 灯油
+                    Case BaseDllConst.CONST_TTank
+                        oilCnt(2) += 1
+                    '# 軽油
+                    Case BaseDllConst.CONST_KTank1
+                        oilCnt(3) += 1
+                    '# ３号軽油
+                    Case BaseDllConst.CONST_K3Tank1
+                        oilCnt(4) += 1
+                    '# LSA
+                    Case BaseDllConst.CONST_LTank1
+                        oilCnt(5) += 1
+                    '# A重油
+                    Case BaseDllConst.CONST_ATank
+                        oilCnt(6) += 1
+                End Select
+
+                '荷受人(保存)
+                svConsigneeCode = PrintDatarow("CONSIGNEECODE").ToString()
+            Next
+
+            '◯荷受人
+            Select Case svConsigneeCode
+                    '# JONET松本
+                Case BaseDllConst.CONST_CONSIGNEECODE_40
+                    svTrain = clnTrain(5)
+                    '# OT宇都宮
+                Case BaseDllConst.CONST_CONSIGNEECODE_53
+                    svTrain = clnTrain(4)
+                Case Else
+                    svTrain = ""
+            End Select
+
+            '# 油種合計用の荷受人の場合
+            If svTrain <> "" Then
+                '◯HR
+                rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                rngFooterArea.Value = oilCnt(0)
+                i += 1
+                '◯RG
+                rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                rngFooterArea.Value = oilCnt(1)
+                i += 1
+                '◯灯油
+                rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                rngFooterArea.Value = oilCnt(2)
+                i += 1
+                '◯軽油
+                rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                rngFooterArea.Value = oilCnt(3)
+                i += 1
+                '◯3号軽油
+                rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                rngFooterArea.Value = oilCnt(4)
+                i += 1
+                '◯LSA
+                rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                rngFooterArea.Value = oilCnt(5)
+                i += 1
+                '◯A重油
+                rngFooterArea = Me.ExcelWorkSheet.Range(svTrain + i.ToString())
+                rngFooterArea.Value = oilCnt(6)
+            End If
+
+        Catch ex As Exception
+            Throw
+        Finally
+            ExcelMemoryRelease(rngFooterArea)
         End Try
     End Sub
 #End Region

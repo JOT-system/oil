@@ -29,6 +29,9 @@
             </div>
             <div class="rightSide">
                 <!-- ボタン -->
+                <%-- 20200916 START 指摘票対応(No148) --%>
+                <input type="button" id="WF_ButtonBULKDATE" class="btn-sticky" value="実績日一括反映" onclick="ButtonClick('WF_ButtonBULKDATE');" />
+                <%-- 20200916 END   指摘票対応(No148) --%>
                 <input type="button" id="WF_ButtonCONTACT" class="btn-sticky" value="手配連絡" onclick="ButtonClick('WF_ButtonCONTACT');" />
                 <input type="button" id="WF_ButtonRESULT" class="btn-sticky" value="結果受理" onclick="ButtonClick('WF_ButtonRESULT');" />
                 <input type="button" id="WF_ButtonDELIVERY" class="btn-sticky" value="託送指示" onclick="ButtonClick('WF_ButtonDELIVERY');" />
@@ -606,9 +609,6 @@
                 <!-- ボタン -->
                 <div class="actionButtonBox">
                     <div class="leftSide">
-                        <%-- 20200916 START 指摘票対応(No148) --%>
-                        <input type="button" id="WF_ButtonBULKDATE_TAB3" class="btn-sticky" value="実績一括" onclick="ButtonClick('WF_ButtonBULKDATE_TAB3');" />
-                        <%-- 20200916 END   指摘票対応(No148) --%>
 <%-- 20200219_タンク車明細での明細の追加・削除などは想定しないため削除
                         <input type="button" id="WF_ButtonALLSELECT_TAB3" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT_TAB3');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED_TAB3" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED_TAB3');" />
@@ -691,6 +691,8 @@
         <input id="WF_CREATEFLG" runat="server" value="" type="text" />
         <!-- 貨車連結切替用フラグ -->
         <input id="WF_CREATELINKFLG" runat="server" value="" type="text" />
+        <!-- 一括フラグ -->
+        <input id="WF_BULKFLG" runat="server" value="" type="text" />
         <!-- 手配連絡フラグ -->
         <input id="WF_CONTACTFLG" runat="server" value="" type="text" />
         <!-- 結果受理フラグ -->

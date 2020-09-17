@@ -127,6 +127,8 @@ Public Class OIT0003OrderDetail
                     Me.WW_InitializeTAB3 = False
                     Me.WF_CheckBoxFLG.Value = "FALSE"
                     Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonBULKDATE"              '一括ボタン押下
+                            WF_ButtonBULK_Click()
                         Case "WF_ButtonCONTACT"               '手配連絡ボタン押下
                             WF_ButtonCONTACT_Click()
                         Case "WF_ButtonRESULT"                '結果受理ボタン押下
@@ -180,8 +182,6 @@ Public Class OIT0003OrderDetail
                             WF_ButtonUPDATE_Click()
                         Case "WF_ButtonCANCEL_TAB1"           '解除ボタン押下
                             WF_ButtonCANCEL_Click()
-                        Case "WF_ButtonBULKDATE_TAB3"         '一括ボタン押下
-                            WF_ButtonBULK_Click()
                         Case "WF_MouseWheelUp"                'マウスホイール(Up)
                             WF_Grid_Scroll()
                         Case "WF_MouseWheelDown"              'マウスホイール(Down)
@@ -518,6 +518,11 @@ Public Class OIT0003OrderDetail
                 End If
                 '### 20200722 END   受注進行ステータスの制御を追加 #################################
 
+                '### 20200916 START 指摘票対応(No148) #######################################
+                '◯一括フラグ(活性)
+                WF_BULKFLG.Value = "0"
+                '### 20200916 END   指摘票対応(No148) #######################################
+
                 '◯受注進行ステータスが320:受注確定以降のステータスに変更された場合
             ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
@@ -526,6 +531,11 @@ Public Class OIT0003OrderDetail
 
                 'タブ「タンク車割当」, タブ「入換・積込指示」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "1"
+
+                '### 20200916 START 指摘票対応(No148) #######################################
+                '◯一括フラグ(非活性)
+                WF_BULKFLG.Value = "1"
+                '### 20200916 END   指摘票対応(No148) #######################################
 
                 '◯受注進行ステータスが500:検収中以降のステータスに変更された場合
             ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
@@ -538,6 +548,11 @@ Public Class OIT0003OrderDetail
                 'タブ「タンク車割当」, タブ「入換・積込指示」, タブ「タンク車明細」のボタンをすべて非活性
                 WF_MAPButtonControl.Value = "3"
 
+                '### 20200916 START 指摘票対応(No148) #######################################
+                '◯一括フラグ(非活性)
+                WF_BULKFLG.Value = "1"
+                '### 20200916 END   指摘票対応(No148) #######################################
+
             Else
                 '★臨海鉄道対応(臨海鉄道でない営業所)
                 '(入換・積込の運用がないため、更新ボタンを活性にする。)
@@ -547,6 +562,11 @@ Public Class OIT0003OrderDetail
                 Else
                     WF_MAPButtonControl.Value = "0"
                 End If
+
+                '### 20200916 START 指摘票対応(No148) #######################################
+                '◯一括フラグ(非活性)
+                WF_BULKFLG.Value = "1"
+                '### 20200916 END   指摘票対応(No148) #######################################
 
             End If
 

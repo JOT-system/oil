@@ -131,6 +131,17 @@ Public Class GRC0001TILESELECTORWRKINC
         Next
     End Sub
     ''' <summary>
+    ''' 選択したキーを未選択にする
+    ''' </summary>
+    ''' <param name="key"></param>
+    Public Sub UnSelectItem(key As String)
+        For Each chkItm As ListItem In chklGrc0001SelectionBox.Items
+            If chkItm.Value = key Then
+                chkItm.Selected = False
+            End If
+        Next
+    End Sub
+    ''' <summary>
     ''' 選択したデータ有無(True:選択あり,False:選択なし)
     ''' </summary>
     ''' <returns></returns>

@@ -1306,7 +1306,8 @@ Public Class OIT0002LinkList
         rightview.SetErrorReport("")
 
         '○ UPLOAD XLSデータ取得
-        CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl)
+        Dim useFlg As Boolean
+        CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl, useFlg)
 
         '◯貨車連結(臨海)TBL削除処理(再アップロード対応)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1319,29 +1320,32 @@ Public Class OIT0002LinkList
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            WW_INSERT_RLINK(SQLcon)
+            WW_INSERT_RLINK(SQLcon, useFlg)
         End Using
 
-        '★受注No取得
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+        '◯運用指示書あり(受注情報が設定)
+        If useFlg = True Then
+            '★受注No取得
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            WW_GetOrderNo(SQLcon)
-        End Using
+                WW_GetOrderNo(SQLcon)
+            End Using
 
-        '受注明細DB追加・更新
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+            '受注明細DB追加・更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            WW_UpdateORDERDETAIL(SQLcon)
-        End Using
+                WW_UpdateORDERDETAIL(SQLcon)
+            End Using
 
-        '受注DB追加・更新
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+            '受注DB追加・更新
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            WW_UpdateORDER(SQLcon)
-        End Using
+                WW_UpdateORDER(SQLcon)
+            End Using
+        End If
 
         ''★(一覧)で設定しているタンク車がOT所有か判断
         ''割り当てたタンク車のチェック
@@ -1499,7 +1503,7 @@ Public Class OIT0002LinkList
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="sqlCon">接続オブジェクト</param>
-    Protected Sub WW_INSERT_RLINK(ByVal SQLcon As SqlConnection)
+    Protected Sub WW_INSERT_RLINK(ByVal SQLcon As SqlConnection, ByVal useFlg As Boolean)
 
         Try
             '貨車連結順序表No取得用SQL
@@ -1673,29 +1677,49 @@ Public Class OIT0002LinkList
                     End Try
 
                     ' ### 運送指示書(項目) START ####################################
-                    '油種(運用指示)
-                    OILNAME.Value = OIT0002EXLUProw("OILNAME")
-                    '回転(運用指示)
-                    LINE.Value = OIT0002EXLUProw("LINE")
-                    '位置(運用指示)
-                    POSITION.Value = OIT0002EXLUProw("POSITION")
-                    '入線列車(運用指示)
-                    INLINETRAIN.Value = OIT0002EXLUProw("INLINETRAIN")
-                    '着駅(運用指示)
-                    LOADARRSTATION.Value = OIT0002EXLUProw("LOADARRSTATION")
-                    '本線列車(運用指示)
-                    LOADINGTRAINNO.Value = OIT0002EXLUProw("LOADINGTRAINNO")
-                    '積込日(運用指示)
-                    If OIT0002EXLUProw("LOADINGLODDATE").ToString() = "" Then
+                    '◯運用指示書あり(受注情報が設定)
+                    If useFlg = True Then
+                        '油種(運用指示)
+                        OILNAME.Value = OIT0002EXLUProw("OILNAME")
+                        '回転(運用指示)
+                        LINE.Value = OIT0002EXLUProw("LINE")
+                        '位置(運用指示)
+                        POSITION.Value = OIT0002EXLUProw("POSITION")
+                        '入線列車(運用指示)
+                        INLINETRAIN.Value = OIT0002EXLUProw("INLINETRAIN")
+                        '着駅(運用指示)
+                        LOADARRSTATION.Value = OIT0002EXLUProw("LOADARRSTATION")
+                        '本線列車(運用指示)
+                        LOADINGTRAINNO.Value = OIT0002EXLUProw("LOADINGTRAINNO")
+                        '積込日(運用指示)
+                        If OIT0002EXLUProw("LOADINGLODDATE").ToString() = "" Then
+                            LOADINGLODDATE.Value = DBNull.Value
+                        Else
+                            LOADINGLODDATE.Value = OIT0002EXLUProw("LOADINGLODDATE")
+                        End If
+                        '発日(運用指示)
+                        If OIT0002EXLUProw("LOADINGDEPDATE").ToString() = "" Then
+                            LOADINGDEPDATE.Value = DBNull.Value
+                        Else
+                            LOADINGDEPDATE.Value = OIT0002EXLUProw("LOADINGDEPDATE")
+                        End If
+                    Else
+                        '油種(運用指示)
+                        OILNAME.Value = ""
+                        '回転(運用指示)
+                        LINE.Value = ""
+                        '位置(運用指示)
+                        POSITION.Value = ""
+                        '入線列車(運用指示)
+                        INLINETRAIN.Value = ""
+                        '着駅(運用指示)
+                        LOADARRSTATION.Value = ""
+                        '本線列車(運用指示)
+                        LOADINGTRAINNO.Value = ""
+                        '積込日(運用指示)
                         LOADINGLODDATE.Value = DBNull.Value
-                    Else
-                        LOADINGLODDATE.Value = OIT0002EXLUProw("LOADINGLODDATE")
-                    End If
-                    '発日(運用指示)
-                    If OIT0002EXLUProw("LOADINGDEPDATE").ToString() = "" Then
+                        '発日(運用指示)
                         LOADINGDEPDATE.Value = DBNull.Value
-                    Else
-                        LOADINGDEPDATE.Value = OIT0002EXLUProw("LOADINGDEPDATE")
                     End If
                     ' ### 運送指示書(項目) END   ####################################
 
@@ -1781,7 +1805,7 @@ Public Class OIT0002LinkList
                 SQLRLinkcmd.Dispose()
 
                 '貨車連結TBL追加処理
-                WW_INSERT_LINK(SQLcon, WW_ERRCODE, I_RLinkNo:=sRLinkNo)
+                WW_INSERT_LINK(SQLcon, WW_ERRCODE, useFlg, I_RLinkNo:=sRLinkNo)
                 If WW_ERRCODE = "ERR" Then
                     Exit Sub
                 End If
@@ -1811,6 +1835,7 @@ Public Class OIT0002LinkList
     ''' <param name="sqlCon">接続オブジェクト</param>
     Protected Sub WW_INSERT_LINK(ByVal SQLcon As SqlConnection,
                                  ByRef O_RTN As String,
+                                 ByVal I_UseFlg As Boolean,
                                  Optional ByVal I_RLinkNo As String = Nothing)
 
         If IsNothing(OIT0002EXLINStbl) Then
@@ -1994,85 +2019,91 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("LOADINGARRDATE", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("LOADINGACCDATE", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("LOADINGEMPARRDATE", Type.GetType("System.String"))
-                For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
-                    For Each OIT0002ExlINSrow As DataRow In OIT0002EXLINStbl.Rows
-                        If OIT0002ExlUProw("TRUCKNO") = OIT0002ExlINSrow("TANKNUMBER") _
-                            AndAlso OIT0002ExlUProw("LOADINGTRAINNO") <> "" Then
-                            OIT0002ExlUProw("OFFICECODE") = OIT0002ExlINSrow("OFFICECODE")
+                '◯運用指示書あり(受注情報が設定)
+                If I_UseFlg = True Then
+                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
+                        For Each OIT0002ExlINSrow As DataRow In OIT0002EXLINStbl.Rows
+                            If OIT0002ExlUProw("TRUCKNO") = OIT0002ExlINSrow("TANKNUMBER") _
+                                AndAlso OIT0002ExlUProw("LOADINGTRAINNO") <> "" Then
+                                OIT0002ExlUProw("OFFICECODE") = OIT0002ExlINSrow("OFFICECODE")
 
-                            '◯名称取得
-                            '受注営業所
-                            CODENAME_get("SALESOFFICE", OIT0002ExlUProw("OFFICECODE"), strOfficeName, WW_DUMMY)
-                            OIT0002ExlUProw("OFFICENAME") = strOfficeName
+                                '◯名称取得
+                                '受注営業所
+                                CODENAME_get("SALESOFFICE", OIT0002ExlUProw("OFFICECODE"), strOfficeName, WW_DUMMY)
+                                OIT0002ExlUProw("OFFICENAME") = strOfficeName
 
-                            OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlINSrow("DEPSTATIONNAME")
-                            OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
-                            OIT0002ExlUProw("RETSTATION") = OIT0002ExlINSrow("RETSTATION")
-                            OIT0002ExlUProw("ORDEROILCODE") = OIT0002ExlINSrow("OILCODE")
-                            OIT0002ExlUProw("ORDEROILNAME") = OIT0002ExlINSrow("OILNAME")
-                            OIT0002ExlUProw("ORDERINGTYPE") = OIT0002ExlINSrow("ORDERINGTYPE")
-                            OIT0002ExlUProw("ORDERINGOILNAME") = OIT0002ExlINSrow("ORDERINGOILNAME")
+                                OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlINSrow("DEPSTATIONNAME")
+                                OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
+                                OIT0002ExlUProw("RETSTATION") = OIT0002ExlINSrow("RETSTATION")
+                                OIT0002ExlUProw("ORDEROILCODE") = OIT0002ExlINSrow("OILCODE")
+                                OIT0002ExlUProw("ORDEROILNAME") = OIT0002ExlINSrow("OILNAME")
+                                OIT0002ExlUProw("ORDERINGTYPE") = OIT0002ExlINSrow("ORDERINGTYPE")
+                                OIT0002ExlUProw("ORDERINGOILNAME") = OIT0002ExlINSrow("ORDERINGOILNAME")
 
-                            '積車着日(予定), 受入日(予定), 空車着日(予定)
-                            If OIT0002ExlUProw("LOADINGDEPDATE").ToString() = "" Then Continue For
-                            WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                            'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNAME"), WW_GetValue)
-                            WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + OIT0002ExlINSrow("DEPSTATION"), WW_GetValue)
+                                '積車着日(予定), 受入日(予定), 空車着日(予定)
+                                If OIT0002ExlUProw("LOADINGDEPDATE").ToString() = "" Then Continue For
+                                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                                'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNAME"), WW_GetValue)
+                                WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + OIT0002ExlINSrow("DEPSTATION"), WW_GetValue)
 
-                            Try
-                                '〇 (予定)の日付を設定
-                                If Integer.Parse(WW_GetValue(6)) = 0 Then
-                                    OIT0002ExlUProw("LOADINGARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
-                                    OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
-                                    OIT0002ExlUProw("LOADINGEMPARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
-                                ElseIf Integer.Parse(WW_GetValue(6)) > 0 Then
-                                    OIT0002ExlUProw("LOADINGARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
-                                    OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
-                                    OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
-                                End If
-                            Catch ex As Exception
-                                OIT0002ExlUProw("LOADINGARRDATE") = DBNull.Value
-                                OIT0002ExlUProw("LOADINGACCDATE") = DBNull.Value
-                                OIT0002ExlUProw("LOADINGEMPARRDATE") = DBNull.Value
-                            End Try
-                        End If
+                                Try
+                                    '〇 (予定)の日付を設定
+                                    If Integer.Parse(WW_GetValue(6)) = 0 Then
+                                        OIT0002ExlUProw("LOADINGARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                                        OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                                        OIT0002ExlUProw("LOADINGEMPARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays(Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                                    ElseIf Integer.Parse(WW_GetValue(6)) > 0 Then
+                                        OIT0002ExlUProw("LOADINGARRDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(8))).ToString("yyyy/MM/dd")
+                                        OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(9))).ToString("yyyy/MM/dd")
+                                        OIT0002ExlUProw("LOADINGACCDATE") = Date.Parse(OIT0002ExlUProw("LOADINGDEPDATE")).AddDays((-1 * Integer.Parse(WW_GetValue(6))) + Integer.Parse(WW_GetValue(10))).ToString("yyyy/MM/dd")
+                                    End If
+                                Catch ex As Exception
+                                    OIT0002ExlUProw("LOADINGARRDATE") = DBNull.Value
+                                    OIT0002ExlUProw("LOADINGACCDATE") = DBNull.Value
+                                    OIT0002ExlUProw("LOADINGEMPARRDATE") = DBNull.Value
+                                End Try
+                            End If
+                        Next
                     Next
-                Next
+                End If
 
                 '★列車番号(臨海)の設定
                 OIT0002EXLUPtbl.Columns.Add("INLINETRAINNAME", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("OUTLINETRAIN", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("OUTLINETRAINNAME", Type.GetType("System.String"))
-                For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
+                '◯運用指示書あり(受注情報が設定)
+                If I_UseFlg = True Then
+                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
 
-                    '★入線列車番号が未設定の場合はSKIP
-                    If OIT0002ExlUProw("INLINETRAIN") = "" Then
-                        Continue For
-                    Else
-                        '★入線列車名の設定
-                        OIT0002ExlUProw("INLINETRAINNAME") = OIT0002ExlUProw("INLINETRAIN") + "レ"
+                        '★入線列車番号が未設定の場合はSKIP
+                        If OIT0002ExlUProw("INLINETRAIN") = "" Then
+                            Continue For
+                        Else
+                            '★入線列車名の設定
+                            OIT0002ExlUProw("INLINETRAINNAME") = OIT0002ExlUProw("INLINETRAIN") + "レ"
 
-                        '★甲子営業所の場合は入線列車名を追加設定
-                        If OIT0002ExlUProw("OFFICECODE") = BaseDllConst.CONST_OFFICECODE_011202 _
-                            AndAlso OIT0002ExlUProw("LINE") <> "" Then
-                            If OIT0002ExlUProw("LINE") = "11" Then
-                                OIT0002ExlUProw("INLINETRAINNAME") &= "1"
-                            ElseIf OIT0002ExlUProw("LINE") = "12" Then
-                                OIT0002ExlUProw("INLINETRAINNAME") &= "2"
+                            '★甲子営業所の場合は入線列車名を追加設定
+                            If OIT0002ExlUProw("OFFICECODE") = BaseDllConst.CONST_OFFICECODE_011202 _
+                                AndAlso OIT0002ExlUProw("LINE") <> "" Then
+                                If OIT0002ExlUProw("LINE") = "11" Then
+                                    OIT0002ExlUProw("INLINETRAINNAME") &= "1"
+                                ElseIf OIT0002ExlUProw("LINE") = "12" Then
+                                    OIT0002ExlUProw("INLINETRAINNAME") &= "2"
+                                End If
                             End If
                         End If
-                    End If
 
-                    '〇営業所配下情報を取得・設定
-                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                    WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "RINKAITRAIN_FIND_I", OIT0002ExlUProw("INLINETRAINNAME"), WW_GetValue)
+                        '〇営業所配下情報を取得・設定
+                        WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                        WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "RINKAITRAIN_FIND_I", OIT0002ExlUProw("INLINETRAINNAME"), WW_GetValue)
 
-                    '出線列車番号
-                    OIT0002ExlUProw("OUTLINETRAIN") = WW_GetValue(6)
-                    '出線列車名
-                    OIT0002ExlUProw("OUTLINETRAINNAME") = WW_GetValue(7)
+                        '出線列車番号
+                        OIT0002ExlUProw("OUTLINETRAIN") = WW_GetValue(6)
+                        '出線列車名
+                        OIT0002ExlUProw("OUTLINETRAINNAME") = WW_GetValue(7)
 
-                Next
+                    Next
+                End If
 
                 '★荷主、基地、荷受人、受注パターンの設定
                 OIT0002EXLUPtbl.Columns.Add("SHIPPERSCODE", Type.GetType("System.String"))
@@ -2083,25 +2114,27 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("CONSIGNEENAME", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("PATTERNCODE", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("PATTERNNAME", Type.GetType("System.String"))
-                For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
-                    If OIT0002ExlUProw("LOADINGTRAINNO") <> "" Then
+                '◯運用指示書あり(受注情報が設定)
+                If I_UseFlg = True Then
+                    For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
+                        If OIT0002ExlUProw("LOADINGTRAINNO") <> "" Then
 
-                        '〇営業所配下情報を取得・設定
-                        WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                        WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "PATTERNMASTER", OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
+                            '〇営業所配下情報を取得・設定
+                            WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                            WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "PATTERNMASTER", OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
 
-                        OIT0002ExlUProw("SHIPPERSCODE") = WW_GetValue(0)
-                        OIT0002ExlUProw("SHIPPERSNAME") = WW_GetValue(1)
-                        OIT0002ExlUProw("BASECODE") = WW_GetValue(2)
-                        OIT0002ExlUProw("BASENAME") = WW_GetValue(3)
-                        OIT0002ExlUProw("CONSIGNEECODE") = WW_GetValue(4)
-                        OIT0002ExlUProw("CONSIGNEENAME") = WW_GetValue(5)
-                        OIT0002ExlUProw("PATTERNCODE") = WW_GetValue(6)
-                        OIT0002ExlUProw("PATTERNNAME") = WW_GetValue(7)
+                            OIT0002ExlUProw("SHIPPERSCODE") = WW_GetValue(0)
+                            OIT0002ExlUProw("SHIPPERSNAME") = WW_GetValue(1)
+                            OIT0002ExlUProw("BASECODE") = WW_GetValue(2)
+                            OIT0002ExlUProw("BASENAME") = WW_GetValue(3)
+                            OIT0002ExlUProw("CONSIGNEECODE") = WW_GetValue(4)
+                            OIT0002ExlUProw("CONSIGNEENAME") = WW_GetValue(5)
+                            OIT0002ExlUProw("PATTERNCODE") = WW_GetValue(6)
+                            OIT0002ExlUProw("PATTERNNAME") = WW_GetValue(7)
 
-                    End If
-                Next
-
+                        End If
+                    Next
+                End If
             End Using
 
         Catch ex As Exception

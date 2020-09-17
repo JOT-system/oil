@@ -125,6 +125,9 @@ Public Class OIT0005TankLocSearch
 
             If {"jot_sys_1", "jot_oil_1"}.Contains(Master.ROLE_MAP) Then
                 Me.tileSalesOffice.SelectAll()
+                'OTと在日米軍につきデフォルトは未選択状態
+                Me.tileSalesOffice.UnSelectItem("110001")
+                Me.tileSalesOffice.UnSelectItem("710001")
             Else
                 Me.tileSalesOffice.SelectSingleItem(Master.USER_ORG)
             End If

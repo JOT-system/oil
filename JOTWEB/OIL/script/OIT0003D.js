@@ -15,6 +15,26 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 実績日一括反映ボタン活性／非活性
+    if (document.getElementById('WF_BULKFLG').value === "0") {
+
+        //使用受注オーダー有り
+        if (document.getElementById('WF_USEORDERFLG').value === "0") {
+            //非活性
+            document.getElementById("WF_ButtonBULKDATE").disabled = "disabled";
+        }
+        //使用受注オーダーなし
+        else {
+            //活性
+            document.getElementById("WF_ButtonBULKDATE").disabled = "";
+        }
+
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonBULKDATE").disabled = "disabled";
+    }
+
     //〇 手配完了ボタン活性／非活性
     if (document.getElementById('WF_CONTACTFLG').value === "0") {
         //活性 

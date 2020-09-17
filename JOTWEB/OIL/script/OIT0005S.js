@@ -18,4 +18,18 @@ function InitDisplay() {
     // 左ボックス拡張機能追加
     addLeftBoxExtention(leftListExtentionTarget);
 
-};
+}
+/* 全選択ボタン押下時 */
+function checkAll() {
+    let chkObjList = document.querySelectorAll("input[id^='tileSalesOffice_chklGrc0001SelectionBox']");
+    for (let i = 0; i < chkObjList.length; i++) {
+        chkObjList[i].checked = true;
+    }
+}
+/* 選択解除ボタン押下j */
+function unCheck() {
+    let chkObjList = document.querySelectorAll("input[id^='tileSalesOffice_chklGrc0001SelectionBox']");
+    for (let i = 0; i < chkObjList.length; i++) {
+        chkObjList[i].checked = false;
+    }
+}

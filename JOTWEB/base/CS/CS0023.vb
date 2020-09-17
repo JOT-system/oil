@@ -926,7 +926,7 @@ Public Structure CS0023XLSUPLOAD
     ''' XLSアップロード(貨車連結順序表(臨海鉄道))
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub CS0023XLSUPLOAD_RLINK(ByRef dt As DataTable)
+    Public Sub CS0023XLSUPLOAD_RLINK(ByRef dt As DataTable, ByRef useFlg As Boolean)
 
         If IsNothing(dt) Then
             dt = New DataTable
@@ -1005,11 +1005,13 @@ Public Structure CS0023XLSUPLOAD
 
             '　　★指定した位置に値が設定
             If sCellDistinguish <> "" Then
+                useFlg = True
                 '◯DataTable作成(運用指示書ありファイル(仕分分解報告))
                 dtSortingBreakdown(dt, excelFileName, oSheet, rng)
 
                 '★指定した位置に値が未設定
             Else
+                useFlg = False
                 '◯DataTable作成(運用指示書無しファイル(列車分解報告))
                 dtTrainBreakdown(dt, excelFileName, oSheet, rng)
 

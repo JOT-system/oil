@@ -2234,19 +2234,26 @@ Public Class OIT0001EmptyTurnDairyDetail
         '******************************
         '帳票表示データ取得処理
         '******************************
+        Dim officeCode As String = ""
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            ExcelDataGet(SQLcon)
+            ExcelDataGet(SQLcon, officeCode)
         End Using
 
         '******************************
         '帳票作成処理の実行
         '******************************
-        Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & ".xlsx", OIT0001Reporttbl)
+        '使用する帳票の確認
+        Dim tyohyoName As String = ""
+        If officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '◯ファイル名(袖ヶ浦営業所用)
+            tyohyoName = "_SODEGAURA"
+        End If
+        Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0001Reporttbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData
+                url = repCbj.CreateExcelPrintData(officeCode)
             Catch ex As Exception
                 Return
             End Try
@@ -2285,7 +2292,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection)
+    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection, ByRef O_officeCode As String)
 
         If IsNothing(OIT0001Reporttbl) Then
             OIT0001Reporttbl = New DataTable
@@ -2365,6 +2372,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
             & " , OTOILCT.OTOILCODE                              AS OTOILCTCODE" _
             & " , OTOILCT.CNT                                    AS OTOILCTCNT" _
+            & " , OIM0026.DELIVERYCODE                           AS DELIVERYCODE" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     (OIT0003.ORDERNO = OIT0002.ORDERNO OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
@@ -2383,6 +2391,15 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
             & " AND OIT0005.DELFLG <> @P02 "
 
+        '### 20200917 START 指摘票対応(No138)全体 ###################################################
+        SQLStr &=
+              " LEFT JOIN oil.OIM0026_DELIVERY OIM0026 ON " _
+            & "     OIM0026.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0026.TRAINNAME = OIT0003.LOADINGIRILINETRAINNAME " _
+            & " AND OIM0026.LINEORDER = OIT0003.LINEORDER " _
+            & " AND OIM0026.DELFLG <> @P02 "
+        '### 20200917 END   指摘票対応(No138)全体 ###################################################
+
         SQLStr &=
               " LEFT JOIN ( " _
             & "   SELECT " _
@@ -2400,8 +2417,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "       OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
             & "   AND OIM0003.OILCODE = OIT0003.OILCODE " _
             & "   AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
-            & "   AND OIM0003.DELFLG <> @P02 " _
-            & "   WHERE OIT0002.ORDERNO = @P01 " _
+            & "   AND OIM0003.DELFLG <> @P02 "
+
+        SQLStr &=
+              "   WHERE OIT0002.ORDERNO = @P01 " _
             & "   GROUP BY " _
             & "         OIT0002.ORDERNO " _
             & "       , OIT0003.SHIPPERSCODE " _
@@ -2444,6 +2463,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 For Each OIT0001Reprow As DataRow In OIT0001Reporttbl.Rows
                     i += 1
                     OIT0001Reprow("LINECNT") = i        'LINECNT
+                    O_officeCode = OIT0001Reprow("OFFICECODE")
                 Next
             End Using
 

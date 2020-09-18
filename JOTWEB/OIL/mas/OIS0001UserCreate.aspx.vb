@@ -2782,7 +2782,7 @@ Public Class OIS0001UserCreate
                 If OIS0001INProw(fieldName_ONOFFn) = "1" Then
 
                     '情報出力IDn
-                    If DuplicateCheckList_OUTPUTID.IndexOf(OIS0001INProw(fieldName_OUTPUTIDn)) Then
+                    If DuplicateCheckList_OUTPUTID.IndexOf(OIS0001INProw(fieldName_OUTPUTIDn)) >= 0 Then
                         WW_CheckMES1 = "・更新できないレコード(" & "情報出力ID" & n.ToString() & "重複エラー)です。"
                         WW_CheckMES2 = WW_CS0024FCHECKREPORT
                         WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
@@ -2794,7 +2794,7 @@ Public Class OIS0001UserCreate
                     End If
 
                     '表示順n
-                    If DuplicateCheckList_OUTPUTID.IndexOf(OIS0001INProw(fieldName_SORTNOn)) Then
+                    If DuplicateCheckList_OUTPUTID.IndexOf(OIS0001INProw(fieldName_SORTNOn)) >= 0 Then
                         WW_CheckMES1 = "・更新できないレコード(" & "表示順" & n.ToString() & "重複エラー)です。"
                         WW_CheckMES2 = WW_CS0024FCHECKREPORT
                         WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)

@@ -48,8 +48,8 @@
         'URLのルートを表示
         Me.UrlRoot = String.Format("{0}://{1}/PRINT/{2}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Host, CS0050SESSION.USERID)
         '書き込むファイルを開く
-        Dim sr As New System.IO.StreamWriter(Me.UploadTmpFilePath, False, enc)
-        Me.CsvSW = sr
+        'Dim sr As New System.IO.StreamWriter(Me.UploadTmpFilePath, False, enc)
+        Me.CsvSW = New System.IO.StreamWriter(Me.UploadTmpFilePath, False, enc)
 
     End Sub
 
@@ -185,6 +185,15 @@
 
             ' TODO: アンマネージド リソース (アンマネージド オブジェクト) を解放し、下の Finalize() をオーバーライドします。
             ' TODO: 大きなフィールドを null に設定します。
+        End If
+        If Me.CsvSW IsNot Nothing Then
+            Try
+                Me.CsvSW.Close()
+                Me.CsvSW.Dispose()
+                Me.CsvSW = Nothing
+            Catch ex As Exception
+                '強制クローズの為何もしない
+            End Try
         End If
         disposedValue = True
     End Sub

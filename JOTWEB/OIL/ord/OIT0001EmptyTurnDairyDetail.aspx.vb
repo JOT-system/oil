@@ -635,10 +635,17 @@ Public Class OIT0001EmptyTurnDairyDetail
               " WHERE OIT0002.ORDERNO = @P1" _
             & " AND OIT0002.DELFLG <> @P2"
 
+            '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
             SQLStr &=
-              " ORDER BY" _
-            & "    OIM0024.PRIORITYNO" _
-            & " ,  OIT0003.TANKNO"
+                  " ORDER BY" _
+                & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                & " ,  OIM0024.PRIORITYNO" _
+                & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)"
+            'SQLStr &=
+            '  " ORDER BY" _
+            '& "    OIM0024.PRIORITYNO" _
+            '& " ,  OIT0003.TANKNO"
+            '### 20200918 END   ソート順(積込日－油種－車番)対応 ###########################################
             'SQLStr &=
             '  " ORDER BY" _
             '& "    OIT0003.OILCODE" _

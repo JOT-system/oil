@@ -102,7 +102,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData() As String
+    Public Function CreateExcelPrintData(ByVal I_officeCode As String) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -113,7 +113,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
             '◯ヘッダーの設定
             EditHeaderArea()
             '◯明細の設定
-            EditDetailArea()
+            EditDetailArea(I_officeCode)
             '***** TODO処理 ここまで *****
             'ExcelTempSheet.Delete() '雛形シート削除
 
@@ -196,7 +196,7 @@ Public Class OIT0001CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票の明細設定
     ''' </summary>
-    Private Sub EditDetailArea()
+    Private Sub EditDetailArea(ByVal I_officeCode As String)
         Dim rngDetailArea As Excel.Range = Nothing
 
         Try
@@ -236,11 +236,24 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '◯ 返送日列車
                 rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("RETURNDATETRAIN")
-                '◯ ジョイント先
-                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("JOINT")
-                '◯ 割当元
-                '### 未使用項目 ###########################################
+
+                '### 20200917 START 指摘票対応(No138)全体 ###################################################
+                '★袖ヶ浦営業所の場合(フォーマットが異なるため別設定)
+                If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '◯ FOC入線順
+                    '### 未使用項目 ###########################################
+                    '◯ 託送用コード
+                    rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("DELIVERYCODE")
+                Else
+                    '◯ ジョイント先
+                    rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("JOINT")
+                    '◯ 割当元
+                    '### 未使用項目 ###########################################
+                End If
+                '### 20200917 END   指摘票対応(No138)全体 ###################################################
+
                 '◯ 記事
                 rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("REMARK")

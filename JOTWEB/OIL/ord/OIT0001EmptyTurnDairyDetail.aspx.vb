@@ -352,14 +352,18 @@ Public Class OIT0001EmptyTurnDairyDetail
             MAPDataGet(SQLcon, 0)
         End Using
 
-        '★受注オーダーが存在する場合
-        If OIT0001tbl.Rows.Count <> 0 Then
-            For Each OIT0001row As DataRow In OIT0001tbl.Rows
-                If OIT0001row("TANKNO") = "" Then Continue For
-                '★タンク車№に紐づく情報を取得
-                WW_TANKNUMBER_FIND(OIT0001row)
-            Next
+        '### 20200916 START 「500：検収中」以降のステータスはチェックを実施しない ################
+        If work.WF_SEL_STATUS.Text < BaseDllConst.CONST_ORDERSTATUS_500 Then
+            '★受注オーダーが存在する場合
+            If OIT0001tbl.Rows.Count <> 0 Then
+                For Each OIT0001row As DataRow In OIT0001tbl.Rows
+                    If OIT0001row("TANKNO") = "" Then Continue For
+                    '★タンク車№に紐づく情報を取得
+                    WW_TANKNUMBER_FIND(OIT0001row, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
+                Next
+            End If
         End If
+        '### 20200916 END   「500：検収中」以降のステータスはチェックを実施しない ################
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0001tbl)
@@ -616,30 +620,37 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "       AND OIT0005.DELFLG <> @P2" _
             & " LEFT JOIN OIL.OIM0005_TANK OIM0005 ON " _
             & "       OIT0003.TANKNO = OIM0005.TANKNUMBER" _
-            & "       AND OIM0005.DELFLG <> @P2" _
-            & " WHERE OIT0002.ORDERNO = @P1" _
-            & " AND OIT0002.DELFLG <> @P2"
-            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_NOW ON " _
-            '& "       OIT0002.OFFICECODE = OIM0003_NOW.OFFICECODE" _
-            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_NOW.SHIPPERCODE" _
-            '& "       AND OIT0002.BASECODE = OIM0003_NOW.PLANTCODE" _
-            '& "       AND OIT0003.OILCODE = OIM0003_NOW.OILCODE" _
-            '& "       AND OIM0003_NOW.DELFLG <> @P2" _
-            '& " LEFT JOIN OIL.OIM0003_PRODUCT OIM0003_PAST ON " _
-            '& "       OIT0002.OFFICECODE = OIM0003_PAST.OFFICECODE" _
-            '& "       AND OIT0002.SHIPPERSCODE = OIM0003_PAST.SHIPPERCODE" _
-            '& "       AND OIT0002.BASECODE = OIM0003_PAST.PLANTCODE" _
-            '& "       AND OIT0005.LASTOILCODE = OIM0003_PAST.OILCODE" _
-            '& "       AND OIM0003_PAST.DELFLG <> @P2" _
+            & "       AND OIM0005.DELFLG <> @P2"
+
+            '### 20200902 START 積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
+            SQLStr &=
+              " LEFT JOIN oil.OIM0024_PRIORITY OIM0024 ON " _
+            & "     OIM0024.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0024.OILCODE = OIT0003.OILCODE " _
+            & " AND OIM0024.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " AND OIM0024.DELFLG <> @P2 "
+            '### 20200902 END   積込優先油種マスタを条件に追加(油種の優先をこのマスタで制御) ###############
 
             SQLStr &=
+              " WHERE OIT0002.ORDERNO = @P1" _
+            & " AND OIT0002.DELFLG <> @P2"
+
+            '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
+            SQLStr &=
                   " ORDER BY" _
-                & "    OIT0002.ORDERYMD" _
-                & "    , OIT0002.SHIPPERSCODE" _
-                & "    , OIT0003.DETAILNO" _
-                & "    , OIT0003.OILCODE" _
-                & "    , OIT0003.ORDERINGTYPE" _
-                & "    , OIT0003.TANKNO"
+                & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                & " ,  OIM0024.PRIORITYNO" _
+                & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)"
+            'SQLStr &=
+            '  " ORDER BY" _
+            '& "    OIM0024.PRIORITYNO" _
+            '& " ,  OIT0003.TANKNO"
+            '### 20200918 END   ソート順(積込日－油種－車番)対応 ###########################################
+            'SQLStr &=
+            '  " ORDER BY" _
+            '& "    OIT0003.OILCODE" _
+            '& " ,  OIT0003.TANKNO"
+
         End If
 
         Try
@@ -2230,19 +2241,26 @@ Public Class OIT0001EmptyTurnDairyDetail
         '******************************
         '帳票表示データ取得処理
         '******************************
+        Dim officeCode As String = ""
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            ExcelDataGet(SQLcon)
+            ExcelDataGet(SQLcon, officeCode)
         End Using
 
         '******************************
         '帳票作成処理の実行
         '******************************
-        Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & ".xlsx", OIT0001Reporttbl)
+        '使用する帳票の確認
+        Dim tyohyoName As String = ""
+        If officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+            '◯ファイル名(袖ヶ浦営業所用)
+            tyohyoName = "_SODEGAURA"
+        End If
+        Using repCbj = New OIT0001CustomReport(Master.MAPID, Master.MAPID & tyohyoName & ".xlsx", OIT0001Reporttbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData
+                url = repCbj.CreateExcelPrintData(officeCode)
             Catch ex As Exception
                 Return
             End Try
@@ -2281,7 +2299,7 @@ Public Class OIT0001EmptyTurnDairyDetail
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection)
+    Protected Sub ExcelDataGet(ByVal SQLcon As SqlConnection, ByRef O_officeCode As String)
 
         If IsNothing(OIT0001Reporttbl) Then
             OIT0001Reporttbl = New DataTable
@@ -2361,6 +2379,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , OIT0005.PREORDERINGOILNAME                     AS PREORDERINGOILNAME" _
             & " , OTOILCT.OTOILCODE                              AS OTOILCTCODE" _
             & " , OTOILCT.CNT                                    AS OTOILCTCNT" _
+            & " , OIM0026.DELIVERYCODE                           AS DELIVERYCODE" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     (OIT0003.ORDERNO = OIT0002.ORDERNO OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
@@ -2379,6 +2398,15 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "     OIT0005.TANKNUMBER = OIT0003.TANKNO " _
             & " AND OIT0005.DELFLG <> @P02 "
 
+        '### 20200917 START 指摘票対応(No138)全体 ###################################################
+        SQLStr &=
+              " LEFT JOIN oil.OIM0026_DELIVERY OIM0026 ON " _
+            & "     OIM0026.OFFICECODE = OIT0002.OFFICECODE " _
+            & " AND OIM0026.TRAINNAME = OIT0003.LOADINGIRILINETRAINNAME " _
+            & " AND OIM0026.LINEORDER = OIT0003.LINEORDER " _
+            & " AND OIM0026.DELFLG <> @P02 "
+        '### 20200917 END   指摘票対応(No138)全体 ###################################################
+
         SQLStr &=
               " LEFT JOIN ( " _
             & "   SELECT " _
@@ -2396,8 +2424,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "       OIM0003.OFFICECODE = OIT0002.OFFICECODE " _
             & "   AND OIM0003.OILCODE = OIT0003.OILCODE " _
             & "   AND OIM0003.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
-            & "   AND OIM0003.DELFLG <> @P02 " _
-            & "   WHERE OIT0002.ORDERNO = @P01 " _
+            & "   AND OIM0003.DELFLG <> @P02 "
+
+        SQLStr &=
+              "   WHERE OIT0002.ORDERNO = @P01 " _
             & "   GROUP BY " _
             & "         OIT0002.ORDERNO " _
             & "       , OIT0003.SHIPPERSCODE " _
@@ -2440,6 +2470,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 For Each OIT0001Reprow As DataRow In OIT0001Reporttbl.Rows
                     i += 1
                     OIT0001Reprow("LINECNT") = i        'LINECNT
+                    O_officeCode = OIT0001Reprow("OFFICECODE")
                 Next
             End Using
 
@@ -2567,57 +2598,60 @@ Public Class OIT0001EmptyTurnDairyDetail
             End If
         End Using
 
-        '列車タンク車重複チェック(同じ列車(発日も一緒)でタンク車がすでに登録済みかチェック)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
+        '### 20200818 START (一覧)タンク車Noが割当されている場合はチェックを実施 #####################
+        If OIT0001tbl.Select("TANKNO <> '' AND DELFLG = '0'").Count <> 0 Then
+            '列車タンク車重複チェック(同じ列車(発日も一緒)でタンク車がすでに登録済みかチェック)
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
 
-            WW_CheckTrainTankRepeat(WW_ERRCODE, SQLcon)
-            If WW_ERRCODE = "ERR1" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                WW_CheckTrainTankRepeat(WW_ERRCODE, SQLcon)
+                If WW_ERRCODE = "ERR1" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            ElseIf WW_ERRCODE = "ERR2" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                ElseIf WW_ERRCODE = "ERR2" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_DEPDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            ElseIf WW_ERRCODE = "ERR3" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                ElseIf WW_ERRCODE = "ERR3" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_DIFFTRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            ElseIf WW_ERRCODE = "ERR4" Then
-                Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                ElseIf WW_ERRCODE = "ERR4" Then
+                    Master.Output(C_MESSAGE_NO.OIL_ORDER_LODDATE_SAMETRAINTANKNO, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
-                '### 20200828 START エラー時のデータ削除を廃止 #########################
-                ''★新規登録の場合のみ
-                'If work.WF_SEL_CREATEFLG.Text = "1" Then
-                '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
-                '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
-                'End If
-                '### 20200828 END   エラー時のデータ削除を廃止 #########################
-                Exit Sub
-            End If
-        End Using
+                    '### 20200828 START エラー時のデータ削除を廃止 #########################
+                    ''★新規登録の場合のみ
+                    'If work.WF_SEL_CREATEFLG.Text = "1" Then
+                    '    '★チェックNGの場合は、登録されている受注TBL・受注明細TBLを削除する。
+                    '    WW_DeleteOrder(SQLcon, work.WF_SEL_ORDERNUMBER.Text)
+                    'End If
+                    '### 20200828 END   エラー時のデータ削除を廃止 #########################
+                    Exit Sub
+                End If
+            End Using
+        End If
 
         '○ 同一レコードチェック
         If isNormal(WW_ERRCODE) Then

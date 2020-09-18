@@ -202,11 +202,11 @@ Public Class OIM0005TankCreate
 
         '名義所有者C, 名義所有者
         WF_OWNERCODE.Text = work.WF_SEL_OWNERCODE.Text
-        CODENAME_get("OWNERCODE", WF_OWNERCODE.Text, WF_OWNERCODE_TEXT.Text, WW_RTN_SW)
+        CODENAME_get("ORIGINOWNERCODE", WF_OWNERCODE.Text, WF_OWNERCODE_TEXT.Text, WW_RTN_SW)
 
         'リース先C, リース先
         WF_LEASECODE.Text = work.WF_SEL_LEASECODE.Text
-        CODENAME_get("LEASE", WF_LEASECODE.Text, WF_LEASECODE_TEXT.Text, WW_RTN_SW)
+        CODENAME_get("CAMPCODE", WF_LEASECODE.Text, WF_LEASECODE_TEXT.Text, WW_RTN_SW)
 
         'リース区分C, リース区分
         WF_LEASECLASS.Text = work.WF_SEL_LEASECLASS.Text
@@ -345,6 +345,7 @@ Public Class OIM0005TankCreate
 
         'JR車種コード
         WF_JRTANKTYPE.Text = work.WF_SEL_JRTANKTYPE.Text
+        CODENAME_get("JRTANKTYPE", WF_JRTANKTYPE.Text, WF_JRTANKTYPE_TEXT.Text, WW_RTN_SW)
 
         '旧JOT車番
         WF_OLDTANKNUMBER.Text = work.WF_SEL_OLDTANKNUMBER.Text
@@ -894,6 +895,10 @@ Public Class OIM0005TankCreate
                             Case "WF_JXTGTAGCODE2", "WF_IDSSTAGCODE"
                                 prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "TAGCODE")
 
+                            'JR車種コード
+                            Case "WF_JRTANKTYPE"
+                                prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "JRTANKTYPE")
+
                         End Select
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_DUMMY, prmData)
@@ -1079,7 +1084,7 @@ Public Class OIM0005TankCreate
                 CODENAME_get("ORIGINOWNERCODE", WF_OWNERCODE.Text, WF_OWNERCODE_TEXT.Text, WW_RTN_SW)
             'リース先C
             Case "WF_LEASECODE"
-                CODENAME_get("LEASE", WF_LEASECODE.Text, WF_LEASECODE_TEXT.Text, WW_RTN_SW)
+                CODENAME_get("CAMPCODE", WF_LEASECODE.Text, WF_LEASECODE_TEXT.Text, WW_RTN_SW)
             'リース区分C
             Case "WF_LEASECLASS"
                 CODENAME_get("LEASECLASS", WF_LEASECLASS.Text, WF_LEASECLASS_TEXT.Text, WW_RTN_SW)
@@ -1122,6 +1127,9 @@ Public Class OIM0005TankCreate
             '取得先C
             Case "WF_OBTAINEDCODE"
                 CODENAME_get("OBTAINEDCODE", WF_OBTAINEDCODE.Text, WF_OBTAINEDCODE_TEXT.Text, WW_RTN_SW)
+            'JR車種コード
+            Case "WF_JRTANKTYPE"
+                CODENAME_get("JRTANKTYPE", WF_JRTANKTYPE.Text, WF_JRTANKTYPE_TEXT.Text, WW_RTN_SW)
             '利用フラグ
             Case "WF_USEDFLG"
                 CODENAME_get("USEDFLG", WF_USEDFLG.Text, WF_USEDFLG_TEXT.Text, WW_RTN_SW)
@@ -1469,6 +1477,11 @@ Public Class OIM0005TankCreate
                     WF_OBTAINEDCODE_TEXT.Text = WW_SelectText
                     WF_OBTAINEDCODE.Focus()
 
+                Case "WF_JRTANKTYPE"    'JR車種コード
+                    WF_JRTANKTYPE.Text = WW_SelectValue
+                    WF_JRTANKTYPE_TEXT.Text = WW_SelectText
+                    WF_JRTANKTYPE.Focus()
+
                 Case "WF_USEDFLG"    '利用フラグ
                     WF_USEDFLG.Text = WW_SelectValue
                     WF_USEDFLG_TEXT.Text = WW_SelectText
@@ -1602,6 +1615,9 @@ Public Class OIM0005TankCreate
 
                 Case "WF_OBTAINEDCODE"                  '取得先C
                     WF_OBTAINEDCODE.Focus()
+
+                Case "WF_JRTANKTYPE"                    'JR車種コード
+                    WF_JRTANKTYPE.Focus()
 
                 Case "WF_USEDFLG"                       '利用フラグ
                     WF_USEDFLG.Focus()
@@ -2332,11 +2348,6 @@ Public Class OIM0005TankCreate
                 Case "ORIGINOWNERCODE"              '原籍所有者C
                     prmData = work.CreateOriginOwnercodeParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORIGINOWNERCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "OWNERCODE"                    '名義所有者C
-                    prmData = work.CreateOwnercodeParam(work.WF_SEL_CAMPCODE.Text, I_VALUE)
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_OWNERCODE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "LEASE"                        'リース先C
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_LEASE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "LEASECLASS"                   'リース区分C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_LEASECLASS, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "AUTOEXTENTION"                '自動延長
@@ -2358,13 +2369,16 @@ Public Class OIM0005TankCreate
                 Case "COLORCODE"                    '塗色C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COLOR, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "MARKCODE"                     'マークコード
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "MARKCODE")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "JXTGTAGCODE2"                 'JXTG千葉タグコード
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
-                Case "IDSSTAGCODE"                  '出光昭シタグコード
+                Case "TAGCODE"                      'タグコード
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "TAGCODE")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "OBTAINEDCODE"                 '取得先C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_OBTAINED, I_VALUE, O_TEXT, O_RTN, prmData)
+                Case "JRTANKTYPE"                   'JR車種コード
+                    prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "JRTANKTYPE")
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "USEDFLG"                      '利用フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_USEPROPRIETY, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DELFLG"                       '削除フラグ

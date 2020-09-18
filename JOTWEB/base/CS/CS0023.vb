@@ -926,7 +926,7 @@ Public Structure CS0023XLSUPLOAD
     ''' XLSアップロード(貨車連結順序表(臨海鉄道))
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub CS0023XLSUPLOAD_RLINK(ByRef dt As DataTable, ByRef useFlg As Boolean)
+    Public Sub CS0023XLSUPLOAD_RLINK(ByRef dt As DataTable, ByRef useFlg As String)
 
         If IsNothing(dt) Then
             dt = New DataTable
@@ -997,23 +997,54 @@ Public Structure CS0023XLSUPLOAD
             oSheet = CType(oSheets.Item(1), Excel.Worksheet)
 
             '★セルの内容を取得
-            Dim sCellDistinguish As String = ""
+            Dim sCellPolarisType As String = ""     'ポラリス投入用区別
+            Dim sCellSortingType As String = ""     '戻り列車投入用区別
+            Dim sCellTrainType As String = ""       '在来線投入用区別
 
             '◯アップロードファイルの見分け用
+            rng = oSheet.Range("A1")
+            sCellPolarisType = rng.Text.ToString()
             rng = oSheet.Range("B4")
-            sCellDistinguish = rng.Text.ToString()
+            sCellSortingType = rng.Text.ToString()
+            rng = oSheet.Range("A4")
+            sCellTrainType = rng.Text.ToString()
 
-            '　　★指定した位置に値が設定
-            If sCellDistinguish <> "" Then
-                useFlg = True
-                '◯DataTable作成(運用指示書ありファイル(仕分分解報告))
-                dtSortingBreakdown(dt, excelFileName, oSheet, rng)
+            '############################################################################
+            'ファイルの見分けは下記の通りとする
+            '　useFlg："0"(仕分分解報告(運用指示書あり))
+            '　useFlg："1"(仕分分解報告(運用指示書なし))
+            '　useFlg："2"(列車分解報告(運用指示書あり))
+            '　useFlg："3"(未使用)
+            '　useFlg："4"(ポラリス投入用)
+            '############################################################################
 
-                '★指定した位置に値が未設定
+            '    ###  ★A1セルに「ポラリス投入用」と設定されている場合(ポラリス投入用と判別)
+            If sCellPolarisType <> "" Then
+                useFlg = "4"
+                '◯DataTable作成(ポラリス投入用)
+                'dtPolaris(dt, excelFileName, oSheet, rng)
+
+                '### ★B4セルに列車番号が存在した場合(仕分分解報告(運用指示書あり)と判別)
+            ElseIf sCellSortingType <> "" Then
+                useFlg = "0"
+                '◯DataTable作成(仕分分解報告(運用指示書あり))
+                dtSortingBreakdownYes(dt, excelFileName, oSheet, rng)
+
+                '### ★B4セルに列車番号が未存在
+                '      かつ、A4セルに在来線番号が未存在の場合(仕分分解報告(運用指示書あり)と判別)
+            ElseIf sCellSortingType = "" AndAlso sCellTrainType = "" Then
+                useFlg = "1"
+                '◯DataTable作成(仕分分解報告(運用指示書なし))
+                dtSortingBreakdownNo(dt, excelFileName, oSheet, rng)
+
+                '###  ★A4セルに在来線番号が存在した場合(列車分解報告(運用指示書あり)と判別)
+            ElseIf sCellTrainType <> "" Then
+                useFlg = "2"
+                '◯DataTable作成(列車分解報告(運用指示書あり))
+                'dtTrainBreakdownYes(dt, excelFileName, oSheet, rng)
             Else
-                useFlg = False
-                '◯DataTable作成(運用指示書無しファイル(列車分解報告))
-                dtTrainBreakdown(dt, excelFileName, oSheet, rng)
+                'ファイル判別不可
+                useFlg = "9"
 
             End If
 
@@ -1032,7 +1063,7 @@ Public Structure CS0023XLSUPLOAD
     ''' DataTable作成(運用指示書ありファイル(仕分分解報告))
     ''' </summary>
     ''' <remarks></remarks>
-    Private Sub dtSortingBreakdown(ByRef dt As DataTable,
+    Private Sub dtSortingBreakdownYes(ByRef dt As DataTable,
                                    ByVal excelFileName As String,
                                    ByVal oSheet As Excel.Worksheet,
                                    ByVal rng As Excel.Range)
@@ -1175,10 +1206,10 @@ Public Structure CS0023XLSUPLOAD
     End Sub
 
     ''' <summary>
-    ''' DataTable作成(運用指示書無しファイル(列車分解報告))
+    ''' DataTable作成(運用指示書無しファイル(仕分分解報告))
     ''' </summary>
     ''' <remarks></remarks>
-    Private Sub dtTrainBreakdown(ByRef dt As DataTable,
+    Private Sub dtSortingBreakdownNo(ByRef dt As DataTable,
                                  ByVal excelFileName As String,
                                  ByVal oSheet As Excel.Worksheet,
                                  ByVal rng As Excel.Range)

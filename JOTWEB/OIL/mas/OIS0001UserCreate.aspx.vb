@@ -244,6 +244,281 @@ Public Class OIS0001UserCreate
         WF_APPROVALID.Text = work.WF_SEL_APPROVALID.Text
         CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
 
+        '情報出力ID1
+        WF_OUTPUTID1.Text = work.WF_SEL_OUTPUTID1.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID1.Text, WF_OUTPUTID1_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ1
+        WF_ONOFF1.Text = work.WF_SEL_ONOFF1.Text
+        CODENAME_get("ONOFF", WF_ONOFF1.Text, WF_ONOFF1_TEXT.Text, WW_DUMMY)
+
+        '表示順1
+        WF_SORTNO1.Text = work.WF_SEL_SORTNO1.Text
+
+        '情報出力ID2
+        WF_OUTPUTID2.Text = work.WF_SEL_OUTPUTID2.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID2.Text, WF_OUTPUTID2_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ2
+        WF_ONOFF2.Text = work.WF_SEL_ONOFF2.Text
+        CODENAME_get("ONOFF", WF_ONOFF2.Text, WF_ONOFF2_TEXT.Text, WW_DUMMY)
+
+        '表示順2
+        WF_SORTNO2.Text = work.WF_SEL_SORTNO2.Text
+
+        '情報出力ID3
+        WF_OUTPUTID3.Text = work.WF_SEL_OUTPUTID3.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID3.Text, WF_OUTPUTID3_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ3
+        WF_ONOFF3.Text = work.WF_SEL_ONOFF3.Text
+        CODENAME_get("ONOFF", WF_ONOFF3.Text, WF_ONOFF3_TEXT.Text, WW_DUMMY)
+
+        '表示順3
+        WF_SORTNO3.Text = work.WF_SEL_SORTNO3.Text
+
+        '情報出力ID4
+        WF_OUTPUTID4.Text = work.WF_SEL_OUTPUTID4.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID4.Text, WF_OUTPUTID4_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ4
+        WF_ONOFF4.Text = work.WF_SEL_ONOFF4.Text
+        CODENAME_get("ONOFF", WF_ONOFF4.Text, WF_ONOFF4_TEXT.Text, WW_DUMMY)
+
+        '表示順4
+        WF_SORTNO4.Text = work.WF_SEL_SORTNO4.Text
+
+        '情報出力ID5
+        WF_OUTPUTID5.Text = work.WF_SEL_OUTPUTID5.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID5.Text, WF_OUTPUTID5_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ5
+        WF_ONOFF5.Text = work.WF_SEL_ONOFF5.Text
+        CODENAME_get("ONOFF", WF_ONOFF5.Text, WF_ONOFF5_TEXT.Text, WW_DUMMY)
+
+        '表示順5
+        WF_SORTNO5.Text = work.WF_SEL_SORTNO5.Text
+
+        '情報出力ID6
+        WF_OUTPUTID6.Text = work.WF_SEL_OUTPUTID6.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID6.Text, WF_OUTPUTID6_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ6
+        WF_ONOFF6.Text = work.WF_SEL_ONOFF6.Text
+        CODENAME_get("ONOFF", WF_ONOFF6.Text, WF_ONOFF6_TEXT.Text, WW_DUMMY)
+
+        '表示順6
+        WF_SORTNO6.Text = work.WF_SEL_SORTNO6.Text
+
+        '情報出力ID7
+        WF_OUTPUTID7.Text = work.WF_SEL_OUTPUTID7.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID7.Text, WF_OUTPUTID7_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ7
+        WF_ONOFF7.Text = work.WF_SEL_ONOFF7.Text
+        CODENAME_get("ONOFF", WF_ONOFF7.Text, WF_ONOFF7_TEXT.Text, WW_DUMMY)
+
+        '表示順7
+        WF_SORTNO7.Text = work.WF_SEL_SORTNO7.Text
+
+        '情報出力ID8
+        WF_OUTPUTID8.Text = work.WF_SEL_OUTPUTID8.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID8.Text, WF_OUTPUTID8_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ8
+        WF_ONOFF8.Text = work.WF_SEL_ONOFF8.Text
+        CODENAME_get("ONOFF", WF_ONOFF8.Text, WF_ONOFF8_TEXT.Text, WW_DUMMY)
+
+        '表示順8
+        WF_SORTNO8.Text = work.WF_SEL_SORTNO8.Text
+
+        '情報出力ID9
+        WF_OUTPUTID9.Text = work.WF_SEL_OUTPUTID9.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID9.Text, WF_OUTPUTID9_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ9
+        WF_ONOFF9.Text = work.WF_SEL_ONOFF9.Text
+        CODENAME_get("ONOFF", WF_ONOFF9.Text, WF_ONOFF9_TEXT.Text, WW_DUMMY)
+
+        '表示順9
+        WF_SORTNO9.Text = work.WF_SEL_SORTNO9.Text
+
+        '情報出力ID10
+        WF_OUTPUTID10.Text = work.WF_SEL_OUTPUTID10.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID10.Text, WF_OUTPUTID10_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ10
+        WF_ONOFF10.Text = work.WF_SEL_ONOFF10.Text
+        CODENAME_get("ONOFF", WF_ONOFF10.Text, WF_ONOFF10_TEXT.Text, WW_DUMMY)
+
+        '表示順10
+        WF_SORTNO10.Text = work.WF_SEL_SORTNO10.Text
+
+        '情報出力ID11
+        WF_OUTPUTID11.Text = work.WF_SEL_OUTPUTID11.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID11.Text, WF_OUTPUTID11_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ11
+        WF_ONOFF11.Text = work.WF_SEL_ONOFF11.Text
+        CODENAME_get("ONOFF", WF_ONOFF11.Text, WF_ONOFF11_TEXT.Text, WW_DUMMY)
+
+        '表示順11
+        WF_SORTNO11.Text = work.WF_SEL_SORTNO11.Text
+
+        '情報出力ID12
+        WF_OUTPUTID12.Text = work.WF_SEL_OUTPUTID12.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID12.Text, WF_OUTPUTID12_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ12
+        WF_ONOFF12.Text = work.WF_SEL_ONOFF12.Text
+        CODENAME_get("ONOFF", WF_ONOFF12.Text, WF_ONOFF12_TEXT.Text, WW_DUMMY)
+
+        '表示順12
+        WF_SORTNO12.Text = work.WF_SEL_SORTNO12.Text
+
+        '情報出力ID13
+        WF_OUTPUTID13.Text = work.WF_SEL_OUTPUTID13.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID13.Text, WF_OUTPUTID13_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ13
+        WF_ONOFF13.Text = work.WF_SEL_ONOFF13.Text
+        CODENAME_get("ONOFF", WF_ONOFF13.Text, WF_ONOFF13_TEXT.Text, WW_DUMMY)
+
+        '表示順13
+        WF_SORTNO13.Text = work.WF_SEL_SORTNO13.Text
+
+        '情報出力ID14
+        WF_OUTPUTID14.Text = work.WF_SEL_OUTPUTID14.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID14.Text, WF_OUTPUTID14_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ14
+        WF_ONOFF14.Text = work.WF_SEL_ONOFF14.Text
+        CODENAME_get("ONOFF", WF_ONOFF14.Text, WF_ONOFF14_TEXT.Text, WW_DUMMY)
+
+        '表示順14
+        WF_SORTNO14.Text = work.WF_SEL_SORTNO14.Text
+
+        '情報出力ID15
+        WF_OUTPUTID15.Text = work.WF_SEL_OUTPUTID15.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID15.Text, WF_OUTPUTID15_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ15
+        WF_ONOFF15.Text = work.WF_SEL_ONOFF15.Text
+        CODENAME_get("ONOFF", WF_ONOFF15.Text, WF_ONOFF15_TEXT.Text, WW_DUMMY)
+
+        '表示順15
+        WF_SORTNO15.Text = work.WF_SEL_SORTNO15.Text
+
+        '情報出力ID16
+        WF_OUTPUTID16.Text = work.WF_SEL_OUTPUTID16.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID16.Text, WF_OUTPUTID16_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ16
+        WF_ONOFF16.Text = work.WF_SEL_ONOFF16.Text
+        CODENAME_get("ONOFF", WF_ONOFF16.Text, WF_ONOFF16_TEXT.Text, WW_DUMMY)
+
+        '表示順16
+        WF_SORTNO16.Text = work.WF_SEL_SORTNO16.Text
+
+        '情報出力ID17
+        WF_OUTPUTID17.Text = work.WF_SEL_OUTPUTID17.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID17.Text, WF_OUTPUTID17_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ17
+        WF_ONOFF17.Text = work.WF_SEL_ONOFF17.Text
+        CODENAME_get("ONOFF", WF_ONOFF17.Text, WF_ONOFF17_TEXT.Text, WW_DUMMY)
+
+        '表示順17
+        WF_SORTNO17.Text = work.WF_SEL_SORTNO17.Text
+
+        '情報出力ID18
+        WF_OUTPUTID18.Text = work.WF_SEL_OUTPUTID18.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID18.Text, WF_OUTPUTID18_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ18
+        WF_ONOFF18.Text = work.WF_SEL_ONOFF18.Text
+        CODENAME_get("ONOFF", WF_ONOFF18.Text, WF_ONOFF18_TEXT.Text, WW_DUMMY)
+
+        '表示順18
+        WF_SORTNO18.Text = work.WF_SEL_SORTNO18.Text
+
+        '情報出力ID19
+        WF_OUTPUTID19.Text = work.WF_SEL_OUTPUTID19.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID19.Text, WF_OUTPUTID19_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ19
+        WF_ONOFF19.Text = work.WF_SEL_ONOFF19.Text
+        CODENAME_get("ONOFF", WF_ONOFF19.Text, WF_ONOFF19_TEXT.Text, WW_DUMMY)
+
+        '表示順19
+        WF_SORTNO19.Text = work.WF_SEL_SORTNO19.Text
+
+        '情報出力ID20
+        WF_OUTPUTID20.Text = work.WF_SEL_OUTPUTID20.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID20.Text, WF_OUTPUTID20_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ20
+        WF_ONOFF20.Text = work.WF_SEL_ONOFF20.Text
+        CODENAME_get("ONOFF", WF_ONOFF20.Text, WF_ONOFF20_TEXT.Text, WW_DUMMY)
+
+        '表示順20
+        WF_SORTNO20.Text = work.WF_SEL_SORTNO20.Text
+
+        '情報出力ID21
+        WF_OUTPUTID21.Text = work.WF_SEL_OUTPUTID21.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID21.Text, WF_OUTPUTID21_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ21
+        WF_ONOFF21.Text = work.WF_SEL_ONOFF21.Text
+        CODENAME_get("ONOFF", WF_ONOFF21.Text, WF_ONOFF21_TEXT.Text, WW_DUMMY)
+
+        '表示順21
+        WF_SORTNO21.Text = work.WF_SEL_SORTNO21.Text
+
+        '情報出力ID22
+        WF_OUTPUTID22.Text = work.WF_SEL_OUTPUTID22.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID22.Text, WF_OUTPUTID22_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ22
+        WF_ONOFF22.Text = work.WF_SEL_ONOFF22.Text
+        CODENAME_get("ONOFF", WF_ONOFF22.Text, WF_ONOFF22_TEXT.Text, WW_DUMMY)
+
+        '表示順22
+        WF_SORTNO22.Text = work.WF_SEL_SORTNO22.Text
+
+        '情報出力ID23
+        WF_OUTPUTID23.Text = work.WF_SEL_OUTPUTID23.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID23.Text, WF_OUTPUTID23_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ23
+        WF_ONOFF23.Text = work.WF_SEL_ONOFF23.Text
+        CODENAME_get("ONOFF", WF_ONOFF23.Text, WF_ONOFF23_TEXT.Text, WW_DUMMY)
+
+        '表示順23
+        WF_SORTNO23.Text = work.WF_SEL_SORTNO23.Text
+
+        '情報出力ID24
+        WF_OUTPUTID24.Text = work.WF_SEL_OUTPUTID24.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID24.Text, WF_OUTPUTID24_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ24
+        WF_ONOFF24.Text = work.WF_SEL_ONOFF24.Text
+        CODENAME_get("ONOFF", WF_ONOFF24.Text, WF_ONOFF24_TEXT.Text, WW_DUMMY)
+
+        '表示順24
+        WF_SORTNO24.Text = work.WF_SEL_SORTNO24.Text
+
+        '情報出力ID25
+        WF_OUTPUTID25.Text = work.WF_SEL_OUTPUTID25.Text
+        CODENAME_get("OUTPUTID", WF_OUTPUTID25.Text, WF_OUTPUTID25_TEXT.Text, WW_DUMMY)
+
+        '表示フラグ25
+        WF_ONOFF25.Text = work.WF_SEL_ONOFF25.Text
+        CODENAME_get("ONOFF", WF_ONOFF25.Text, WF_ONOFF25_TEXT.Text, WW_DUMMY)
+
+        '表示順25
+        WF_SORTNO25.Text = work.WF_SEL_SORTNO25.Text
+
         '削除
         WF_DELFLG.Text = work.WF_SEL_DELFLG.Text
         CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
@@ -310,6 +585,81 @@ Public Class OIS0001UserCreate
             & "    , ISNULL(RTRIM(OIS0004.RPRTPROFID), '')                AS RPRTPROFID " _
             & "    , ISNULL(RTRIM(OIS0004.VARIANT), '')             AS VARIANT " _
             & "    , ISNULL(RTRIM(OIS0004.APPROVALID), '')                AS APPROVALID " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID1), '')                AS OUTPUTID1 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF1), '')                   AS ONOFF1 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO1), '')                  AS SORTNO1 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID2), '')                AS OUTPUTID2 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF2), '')                   AS ONOFF2 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO2), '')                  AS SORTNO2 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID3), '')                AS OUTPUTID3 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF3), '')                   AS ONOFF3 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO3), '')                  AS SORTNO3 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID4), '')                AS OUTPUTID4 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF4), '')                   AS ONOFF4 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO4), '')                  AS SORTNO4 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID5), '')                AS OUTPUTID5 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF5), '')                   AS ONOFF5 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO5), '')                  AS SORTNO5 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID6), '')                AS OUTPUTID6 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF6), '')                   AS ONOFF6 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO6), '')                  AS SORTNO6 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID7), '')                AS OUTPUTID7 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF7), '')                   AS ONOFF7 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO7), '')                  AS SORTNO7 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID8), '')                AS OUTPUTID8 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF8), '')                   AS ONOFF8 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO8), '')                  AS SORTNO8 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID9), '')                AS OUTPUTID9 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF9), '')                   AS ONOFF9 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO9), '')                  AS SORTNO9 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID10), '')                AS OUTPUTID10 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF10), '')                   AS ONOFF10 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO10), '')                  AS SORTNO10 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID11), '')                AS OUTPUTID11 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF11), '')                   AS ONOFF11 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO11), '')                  AS SORTNO11 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID12), '')                AS OUTPUTID12 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF12), '')                   AS ONOFF12 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO12), '')                  AS SORTNO12 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID13), '')                AS OUTPUTID13 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF13), '')                   AS ONOFF13 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO13), '')                  AS SORTNO13 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID14), '')                AS OUTPUTID14 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF14), '')                   AS ONOFF14 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO14), '')                  AS SORTNO14 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID15), '')                AS OUTPUTID15 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF15), '')                   AS ONOFF15 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO15), '')                  AS SORTNO15 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID16), '')                AS OUTPUTID16 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF16), '')                   AS ONOFF16 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO16), '')                  AS SORTNO16 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID17), '')                AS OUTPUTID17 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF17), '')                   AS ONOFF17 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO17), '')                  AS SORTNO17 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID18), '')                AS OUTPUTID18 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF18), '')                   AS ONOFF18 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO18), '')                  AS SORTNO18 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID19), '')                AS OUTPUTID19 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF19), '')                   AS ONOFF19 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO19), '')                  AS SORTNO19 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID20), '')                AS OUTPUTID20 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF20), '')                   AS ONOFF20 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO20), '')                  AS SORTNO20 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID21), '')                AS OUTPUTID21 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF21), '')                   AS ONOFF21 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO21), '')                  AS SORTNO21 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID22), '')                AS OUTPUTID22 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF22), '')                   AS ONOFF22 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO22), '')                  AS SORTNO22 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID23), '')                AS OUTPUTID23 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF23), '')                   AS ONOFF23 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO23), '')                  AS SORTNO23 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID24), '')                AS OUTPUTID24 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF24), '')                   AS ONOFF24 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO24), '')                  AS SORTNO24 " _
+            & "    , ISNULL(RTRIM(OIS0004.OUTPUTID25), '')                AS OUTPUTID25 " _
+            & "    , ISNULL(RTRIM(OIS0004.ONOFF25), '')                   AS ONOFF25 " _
+            & "    , ISNULL(RTRIM(OIS0004.SORTNO25), '')                  AS SORTNO25 " _
             & " FROM " _
             & "    COM.OIS0004_USER OIS0004 " _
             & "    INNER JOIN COM.OIS0005_USERPASS OIS0005 " _
@@ -575,43 +925,193 @@ Public Class OIS0001UserCreate
         OIS0001INProw("SELECT") = 1
         OIS0001INProw("HIDDEN") = 0
 
-        OIS0001INProw("DELFLG") = WF_DELFLG.Text                     '削除フラグ
+        OIS0001INProw("DELFLG") = WF_DELFLG.Text                '削除フラグ
 
-        OIS0001INProw("USERID") = WF_USERID.Text              'ユーザID
+        OIS0001INProw("USERID") = WF_USERID.Text                'ユーザID
 
-        OIS0001INProw("STAFFNAMES") = WF_STAFFNAMES.Text              '社員名（短）
+        OIS0001INProw("STAFFNAMES") = WF_STAFFNAMES.Text        '社員名（短）
 
-        OIS0001INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text              '社員名（長）
+        OIS0001INProw("STAFFNAMEL") = WF_STAFFNAMEL.Text        '社員名（長）
 
-        OIS0001INProw("MAPID") = WF_MAPID.Text              '画面ＩＤ
+        OIS0001INProw("MAPID") = WF_MAPID.Text                  '画面ＩＤ
 
-        OIS0001INProw("PASSWORD") = WF_PASSWORD.Text              'パスワード
+        OIS0001INProw("PASSWORD") = WF_PASSWORD.Text            'パスワード
 
         OIS0001INProw("MISSCNT") = WF_MISSCNT.Text              '誤り回数
 
-        OIS0001INProw("PASSENDYMD") = WF_PASSENDYMD.Text              'パスワード有効期限
+        OIS0001INProw("PASSENDYMD") = WF_PASSENDYMD.Text        'パスワード有効期限
 
-        OIS0001INProw("STYMD") = WF_STYMD.Text              '開始年月日
+        OIS0001INProw("STYMD") = WF_STYMD.Text                  '開始年月日
 
-        OIS0001INProw("ENDYMD") = WF_ENDYMD.Text              '終了年月日
+        OIS0001INProw("ENDYMD") = WF_ENDYMD.Text                '終了年月日
 
-        OIS0001INProw("CAMPCODE") = WF_CAMPCODE.Text              '会社コード
+        OIS0001INProw("CAMPCODE") = WF_CAMPCODE.Text            '会社コード
 
-        OIS0001INProw("ORG") = WF_ORG.Text              '組織コード
+        OIS0001INProw("ORG") = WF_ORG.Text                      '組織コード
 
-        OIS0001INProw("EMAIL") = WF_EMAIL.Text              'メールアドレス
+        OIS0001INProw("EMAIL") = WF_EMAIL.Text                  'メールアドレス
 
-        OIS0001INProw("MENUROLE") = WF_MENUROLE.Text              'メニュー表示制御ロール
+        OIS0001INProw("MENUROLE") = WF_MENUROLE.Text            'メニュー表示制御ロール
 
         OIS0001INProw("MAPROLE") = WF_MAPROLE.Text              '画面参照更新制御ロール
 
-        OIS0001INProw("VIEWPROFID") = WF_VIEWPROFID.Text              '画面表示項目制御ロール
+        OIS0001INProw("VIEWPROFID") = WF_VIEWPROFID.Text        '画面表示項目制御ロール
 
-        OIS0001INProw("RPRTPROFID") = WF_RPRTPROFID.Text              'エクセル出力制御ロール
+        OIS0001INProw("RPRTPROFID") = WF_RPRTPROFID.Text        'エクセル出力制御ロール
 
         OIS0001INProw("VARIANT") = WF_VARIANT.Text              '画面初期値ロール
 
-        OIS0001INProw("APPROVALID") = WF_APPROVALID.Text              '承認権限ロール
+        OIS0001INProw("APPROVALID") = WF_APPROVALID.Text        '承認権限ロール
+
+        OIS0001INProw("OUTPUTID1") = WF_OUTPUTID1.Text          '情報出力ID1
+
+        OIS0001INProw("ONOFF1") = WF_ONOFF1.Text                '表示フラグ1
+
+        OIS0001INProw("SORTNO1") = WF_SORTNO1.Text              '表示順1
+
+        OIS0001INProw("OUTPUTID2") = WF_OUTPUTID2.Text          '情報出力ID2
+
+        OIS0001INProw("ONOFF2") = WF_ONOFF2.Text                '表示フラグ2
+
+        OIS0001INProw("SORTNO2") = WF_SORTNO2.Text              '表示順2
+
+        OIS0001INProw("OUTPUTID3") = WF_OUTPUTID3.Text          '情報出力ID3
+
+        OIS0001INProw("ONOFF3") = WF_ONOFF3.Text                '表示フラグ3
+
+        OIS0001INProw("SORTNO3") = WF_SORTNO3.Text              '表示順3
+
+        OIS0001INProw("OUTPUTID4") = WF_OUTPUTID4.Text          '情報出力ID4
+
+        OIS0001INProw("ONOFF4") = WF_ONOFF4.Text                '表示フラグ4
+
+        OIS0001INProw("SORTNO4") = WF_SORTNO4.Text              '表示順4
+
+        OIS0001INProw("OUTPUTID5") = WF_OUTPUTID5.Text          '情報出力ID5
+
+        OIS0001INProw("ONOFF5") = WF_ONOFF5.Text                '表示フラグ5
+
+        OIS0001INProw("SORTNO5") = WF_SORTNO5.Text              '表示順5
+
+        OIS0001INProw("OUTPUTID6") = WF_OUTPUTID6.Text          '情報出力ID6
+
+        OIS0001INProw("ONOFF6") = WF_ONOFF6.Text                '表示フラグ6
+
+        OIS0001INProw("SORTNO6") = WF_SORTNO6.Text              '表示順6
+
+        OIS0001INProw("OUTPUTID7") = WF_OUTPUTID7.Text          '情報出力ID7
+
+        OIS0001INProw("ONOFF7") = WF_ONOFF7.Text                '表示フラグ7
+
+        OIS0001INProw("SORTNO7") = WF_SORTNO7.Text              '表示順7
+
+        OIS0001INProw("OUTPUTID8") = WF_OUTPUTID8.Text          '情報出力ID8
+
+        OIS0001INProw("ONOFF8") = WF_ONOFF8.Text                '表示フラグ8
+
+        OIS0001INProw("SORTNO8") = WF_SORTNO8.Text              '表示順8
+
+        OIS0001INProw("OUTPUTID9") = WF_OUTPUTID9.Text          '情報出力ID9
+
+        OIS0001INProw("ONOFF9") = WF_ONOFF9.Text                '表示フラグ9
+
+        OIS0001INProw("SORTNO9") = WF_SORTNO9.Text              '表示順9
+
+        OIS0001INProw("OUTPUTID10") = WF_OUTPUTID10.Text        '情報出力ID10
+
+        OIS0001INProw("ONOFF10") = WF_ONOFF10.Text              '表示フラグ10
+
+        OIS0001INProw("SORTNO10") = WF_SORTNO10.Text            '表示順10
+
+        OIS0001INProw("OUTPUTID11") = WF_OUTPUTID11.Text        '情報出力ID11
+
+        OIS0001INProw("ONOFF11") = WF_ONOFF11.Text              '表示フラグ11
+
+        OIS0001INProw("SORTNO11") = WF_SORTNO11.Text            '表示順11
+
+        OIS0001INProw("OUTPUTID12") = WF_OUTPUTID12.Text        '情報出力ID12
+
+        OIS0001INProw("ONOFF12") = WF_ONOFF12.Text              '表示フラグ12
+
+        OIS0001INProw("SORTNO12") = WF_SORTNO12.Text            '表示順12
+
+        OIS0001INProw("OUTPUTID13") = WF_OUTPUTID13.Text        '情報出力ID13
+
+        OIS0001INProw("ONOFF13") = WF_ONOFF13.Text              '表示フラグ13
+
+        OIS0001INProw("SORTNO13") = WF_SORTNO13.Text            '表示順13
+
+        OIS0001INProw("OUTPUTID14") = WF_OUTPUTID14.Text        '情報出力ID14
+
+        OIS0001INProw("ONOFF14") = WF_ONOFF14.Text              '表示フラグ14
+
+        OIS0001INProw("SORTNO14") = WF_SORTNO14.Text            '表示順14
+
+        OIS0001INProw("OUTPUTID15") = WF_OUTPUTID15.Text        '情報出力ID15
+
+        OIS0001INProw("ONOFF15") = WF_ONOFF15.Text              '表示フラグ15
+
+        OIS0001INProw("SORTNO15") = WF_SORTNO15.Text            '表示順15
+
+        OIS0001INProw("OUTPUTID16") = WF_OUTPUTID16.Text        '情報出力ID16
+
+        OIS0001INProw("ONOFF16") = WF_ONOFF16.Text              '表示フラグ16
+
+        OIS0001INProw("SORTNO16") = WF_SORTNO16.Text            '表示順16
+
+        OIS0001INProw("OUTPUTID17") = WF_OUTPUTID17.Text        '情報出力ID17
+
+        OIS0001INProw("ONOFF17") = WF_ONOFF17.Text              '表示フラグ17
+
+        OIS0001INProw("SORTNO17") = WF_SORTNO17.Text            '表示順17
+
+        OIS0001INProw("OUTPUTID18") = WF_OUTPUTID18.Text        '情報出力ID18
+
+        OIS0001INProw("ONOFF18") = WF_ONOFF18.Text              '表示フラグ18
+
+        OIS0001INProw("SORTNO18") = WF_SORTNO18.Text            '表示順18
+
+        OIS0001INProw("OUTPUTID19") = WF_OUTPUTID19.Text        '情報出力ID19
+
+        OIS0001INProw("ONOFF19") = WF_ONOFF19.Text              '表示フラグ19
+
+        OIS0001INProw("SORTNO19") = WF_SORTNO19.Text            '表示順19
+
+        OIS0001INProw("OUTPUTID20") = WF_OUTPUTID20.Text        '情報出力ID20
+
+        OIS0001INProw("ONOFF20") = WF_ONOFF20.Text              '表示フラグ20
+
+        OIS0001INProw("SORTNO20") = WF_SORTNO20.Text            '表示順20
+
+        OIS0001INProw("OUTPUTID21") = WF_OUTPUTID21.Text        '情報出力ID21
+
+        OIS0001INProw("ONOFF21") = WF_ONOFF21.Text              '表示フラグ21
+
+        OIS0001INProw("SORTNO21") = WF_SORTNO21.Text            '表示順21
+
+        OIS0001INProw("OUTPUTID22") = WF_OUTPUTID22.Text        '情報出力ID22
+
+        OIS0001INProw("ONOFF22") = WF_ONOFF22.Text              '表示フラグ22
+
+        OIS0001INProw("SORTNO22") = WF_SORTNO22.Text            '表示順22
+
+        OIS0001INProw("OUTPUTID23") = WF_OUTPUTID23.Text        '情報出力ID23
+
+        OIS0001INProw("ONOFF23") = WF_ONOFF23.Text              '表示フラグ23
+
+        OIS0001INProw("SORTNO23") = WF_SORTNO23.Text            '表示順23
+
+        OIS0001INProw("OUTPUTID24") = WF_OUTPUTID24.Text        '情報出力ID24
+
+        OIS0001INProw("ONOFF24") = WF_ONOFF24.Text              '表示フラグ24
+
+        OIS0001INProw("SORTNO24") = WF_SORTNO24.Text            '表示順24
+
+        OIS0001INProw("OUTPUTID25") = WF_OUTPUTID25.Text        '情報出力ID25
+
+        OIS0001INProw("ONOFF25") = WF_ONOFF25.Text              '表示フラグ25
+
+        OIS0001INProw("SORTNO25") = WF_SORTNO25.Text            '表示順25
 
         '○ チェック用テーブルに登録する
         OIS0001INPtbl.Rows.Add(OIS0001INProw)
@@ -697,6 +1197,131 @@ Public Class OIS0001UserCreate
         WF_APPROVALID.Text = ""            '承認権限ロール
         WF_DELFLG.Text = ""                 '削除フラグ
         WF_DELFLG_TEXT.Text = ""            '削除フラグ名称
+        WF_OUTPUTID1.Text = ""            '情報出力ID1
+        WF_OUTPUTID1_TEXT.Text = ""            '情報出力ID1名称
+        WF_ONOFF1.Text = ""            '表示フラグ1
+        WF_ONOFF1_TEXT.Text = ""            '表示フラグ1名称
+        WF_SORTNO1.Text = ""            '表示順1
+        WF_OUTPUTID2.Text = ""            '情報出力ID2
+        WF_OUTPUTID2_TEXT.Text = ""            '情報出力ID2名称
+        WF_ONOFF2.Text = ""            '表示フラグ2
+        WF_ONOFF2_TEXT.Text = ""            '表示フラグ2名称
+        WF_SORTNO2.Text = ""            '表示順2
+        WF_OUTPUTID3.Text = ""            '情報出力ID3
+        WF_OUTPUTID3_TEXT.Text = ""            '情報出力ID3名称
+        WF_ONOFF3.Text = ""            '表示フラグ3
+        WF_ONOFF3_TEXT.Text = ""            '表示フラグ3名称
+        WF_SORTNO3.Text = ""            '表示順3
+        WF_OUTPUTID4.Text = ""            '情報出力ID4
+        WF_OUTPUTID4_TEXT.Text = ""            '情報出力ID4名称
+        WF_ONOFF4.Text = ""            '表示フラグ4
+        WF_ONOFF4_TEXT.Text = ""            '表示フラグ4名称
+        WF_SORTNO4.Text = ""            '表示順4
+        WF_OUTPUTID5.Text = ""            '情報出力ID5
+        WF_OUTPUTID5_TEXT.Text = ""            '情報出力ID5名称
+        WF_ONOFF5.Text = ""            '表示フラグ5
+        WF_ONOFF5_TEXT.Text = ""            '表示フラグ5名称
+        WF_SORTNO5.Text = ""            '表示順5
+        WF_OUTPUTID6.Text = ""            '情報出力ID6
+        WF_OUTPUTID6_TEXT.Text = ""            '情報出力ID6名称
+        WF_ONOFF6.Text = ""            '表示フラグ6
+        WF_ONOFF6_TEXT.Text = ""            '表示フラグ6名称
+        WF_SORTNO6.Text = ""            '表示順6
+        WF_OUTPUTID7.Text = ""            '情報出力ID7
+        WF_OUTPUTID7_TEXT.Text = ""            '情報出力ID7名称
+        WF_ONOFF7.Text = ""            '表示フラグ7
+        WF_ONOFF7_TEXT.Text = ""            '表示フラグ7名称
+        WF_SORTNO7.Text = ""            '表示順7
+        WF_OUTPUTID8.Text = ""            '情報出力ID8
+        WF_OUTPUTID8_TEXT.Text = ""            '情報出力ID8名称
+        WF_ONOFF8.Text = ""            '表示フラグ8
+        WF_ONOFF8_TEXT.Text = ""            '表示フラグ8名称
+        WF_SORTNO8.Text = ""            '表示順8
+        WF_OUTPUTID9.Text = ""            '情報出力ID9
+        WF_OUTPUTID9_TEXT.Text = ""            '情報出力ID9名称
+        WF_ONOFF9.Text = ""            '表示フラグ9
+        WF_ONOFF9_TEXT.Text = ""            '表示フラグ9名称
+        WF_SORTNO9.Text = ""            '表示順9
+        WF_OUTPUTID10.Text = ""            '情報出力ID10
+        WF_OUTPUTID10_TEXT.Text = ""            '情報出力ID10名称
+        WF_ONOFF10.Text = ""            '表示フラグ10
+        WF_ONOFF10_TEXT.Text = ""            '表示フラグ10名称
+        WF_SORTNO10.Text = ""            '表示順10
+        WF_OUTPUTID11.Text = ""            '情報出力ID11
+        WF_OUTPUTID11_TEXT.Text = ""            '情報出力ID11名称
+        WF_ONOFF11.Text = ""            '表示フラグ11
+        WF_ONOFF11_TEXT.Text = ""            '表示フラグ11名称
+        WF_SORTNO11.Text = ""            '表示順11
+        WF_OUTPUTID12.Text = ""            '情報出力ID12
+        WF_OUTPUTID12_TEXT.Text = ""            '情報出力ID12名称
+        WF_ONOFF12.Text = ""            '表示フラグ12
+        WF_ONOFF12_TEXT.Text = ""            '表示フラグ12名称
+        WF_SORTNO12.Text = ""            '表示順12
+        WF_OUTPUTID13.Text = ""            '情報出力ID13
+        WF_OUTPUTID13_TEXT.Text = ""            '情報出力ID13名称
+        WF_ONOFF13.Text = ""            '表示フラグ13
+        WF_ONOFF13_TEXT.Text = ""            '表示フラグ13名称
+        WF_SORTNO13.Text = ""            '表示順13
+        WF_OUTPUTID14.Text = ""            '情報出力ID14
+        WF_OUTPUTID14_TEXT.Text = ""            '情報出力ID14名称
+        WF_ONOFF14.Text = ""            '表示フラグ14
+        WF_ONOFF14_TEXT.Text = ""            '表示フラグ14名称
+        WF_SORTNO14.Text = ""            '表示順14
+        WF_OUTPUTID15.Text = ""            '情報出力ID15
+        WF_OUTPUTID15_TEXT.Text = ""            '情報出力ID15名称
+        WF_ONOFF15.Text = ""            '表示フラグ15
+        WF_ONOFF15_TEXT.Text = ""            '表示フラグ15名称
+        WF_SORTNO15.Text = ""            '表示順15
+        WF_OUTPUTID16.Text = ""            '情報出力ID16
+        WF_OUTPUTID16_TEXT.Text = ""            '情報出力ID16名称
+        WF_ONOFF16.Text = ""            '表示フラグ16
+        WF_ONOFF16_TEXT.Text = ""            '表示フラグ16名称
+        WF_SORTNO16.Text = ""            '表示順16
+        WF_OUTPUTID17.Text = ""            '情報出力ID17
+        WF_OUTPUTID17_TEXT.Text = ""            '情報出力ID17名称
+        WF_ONOFF17.Text = ""            '表示フラグ17
+        WF_ONOFF17_TEXT.Text = ""            '表示フラグ17名称
+        WF_SORTNO17.Text = ""            '表示順17
+        WF_OUTPUTID18.Text = ""            '情報出力ID18
+        WF_OUTPUTID18_TEXT.Text = ""            '情報出力ID18名称
+        WF_ONOFF18.Text = ""            '表示フラグ18
+        WF_ONOFF18_TEXT.Text = ""            '表示フラグ18名称
+        WF_SORTNO18.Text = ""            '表示順18
+        WF_OUTPUTID19.Text = ""            '情報出力ID19
+        WF_OUTPUTID19_TEXT.Text = ""            '情報出力ID19名称
+        WF_ONOFF19.Text = ""            '表示フラグ19
+        WF_ONOFF19_TEXT.Text = ""            '表示フラグ19名称
+        WF_SORTNO19.Text = ""            '表示順19
+        WF_OUTPUTID20.Text = ""            '情報出力ID20
+        WF_OUTPUTID20_TEXT.Text = ""            '情報出力ID20名称
+        WF_ONOFF20.Text = ""            '表示フラグ20
+        WF_ONOFF20_TEXT.Text = ""            '表示フラグ20名称
+        WF_SORTNO20.Text = ""            '表示順20
+        WF_OUTPUTID21.Text = ""            '情報出力ID21
+        WF_OUTPUTID21_TEXT.Text = ""            '情報出力ID21名称
+        WF_ONOFF21.Text = ""            '表示フラグ21
+        WF_ONOFF21_TEXT.Text = ""            '表示フラグ21名称
+        WF_SORTNO21.Text = ""            '表示順21
+        WF_OUTPUTID22.Text = ""            '情報出力ID22
+        WF_OUTPUTID22_TEXT.Text = ""            '情報出力ID22名称
+        WF_ONOFF22.Text = ""            '表示フラグ22
+        WF_ONOFF22_TEXT.Text = ""            '表示フラグ22名称
+        WF_SORTNO22.Text = ""            '表示順22
+        WF_OUTPUTID23.Text = ""            '情報出力ID23
+        WF_OUTPUTID23_TEXT.Text = ""            '情報出力ID23名称
+        WF_ONOFF23.Text = ""            '表示フラグ23
+        WF_ONOFF23_TEXT.Text = ""            '表示フラグ23名称
+        WF_SORTNO23.Text = ""            '表示順23
+        WF_OUTPUTID24.Text = ""            '情報出力ID24
+        WF_OUTPUTID24_TEXT.Text = ""            '情報出力ID24名称
+        WF_ONOFF24.Text = ""            '表示フラグ24
+        WF_ONOFF24_TEXT.Text = ""            '表示フラグ24名称
+        WF_SORTNO24.Text = ""            '表示順24
+        WF_OUTPUTID25.Text = ""            '情報出力ID25
+        WF_OUTPUTID25_TEXT.Text = ""            '情報出力ID25名称
+        WF_ONOFF25.Text = ""            '表示フラグ25
+        WF_ONOFF25_TEXT.Text = ""            '表示フラグ25名称
+        WF_SORTNO25.Text = ""            '表示順25
 
     End Sub
 
@@ -768,6 +1393,106 @@ Public Class OIS0001UserCreate
                                 prmData = work.CreateRoleList(WF_CAMPCODE.Text, "XML")
                             Case "WF_APPROVALID"       '承認権限ロール
                                 prmData = work.CreateRoleList(WF_CAMPCODE.Text, "APPROVAL")
+                            Case "WF_OUTPUTID1"  '情報出力ID1
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF1"     '表示フラグ1
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID2"  '情報出力ID2
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF2"     '表示フラグ2
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID3"  '情報出力ID3
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF3"     '表示フラグ3
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID4"  '情報出力ID4
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF4"     '表示フラグ4
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID5"  '情報出力ID5
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF5"     '表示フラグ5
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID6"  '情報出力ID6
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF6"     '表示フラグ6
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID7"  '情報出力ID7
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF7"     '表示フラグ7
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID8"  '情報出力ID8
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF8"     '表示フラグ8
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID9"  '情報出力ID9
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF9"     '表示フラグ9
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID10"  '情報出力ID10
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF10"     '表示フラグ10
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID11"  '情報出力ID11
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF11"     '表示フラグ11
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID12"  '情報出力ID12
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF12"     '表示フラグ12
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID13"  '情報出力ID13
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF13"     '表示フラグ13
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID14"  '情報出力ID14
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF14"     '表示フラグ14
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID15"  '情報出力ID15
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF15"     '表示フラグ15
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID16"  '情報出力ID16
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF16"     '表示フラグ16
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID17"  '情報出力ID17
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF17"     '表示フラグ17
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID18"  '情報出力ID18
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF18"     '表示フラグ18
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID19"  '情報出力ID19
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF19"     '表示フラグ19
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID20"  '情報出力ID20
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF20"     '表示フラグ20
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID21"  '情報出力ID21
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF21"     '表示フラグ21
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID22"  '情報出力ID22
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF22"     '表示フラグ22
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID23"  '情報出力ID23
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF23"     '表示フラグ23
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID24"  '情報出力ID24
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF24"     '表示フラグ24
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
+                            Case "WF_OUTPUTID25"  '情報出力ID25
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "PANEID")
+                            Case "WF_ONOFF25"     '表示フラグ25
+                                prmData = work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG")
                             Case "WF_DELFLG"
                                 prmData.Item(C_PARAMETERS.LP_COMPANY) = Master.USERCAMP
                                 prmData.Item(C_PARAMETERS.LP_TYPEMODE) = "2"
@@ -810,6 +1535,156 @@ Public Class OIS0001UserCreate
 
             Case "WF_APPROVALID"               '承認権限ロール
                 CODENAME_get("APPROVAL", WF_APPROVALID.Text, WF_APPROVALID_TEXT.Text, WW_DUMMY)
+
+            Case "WF_OUTPUTID1"          '情報出力ID1
+                CODENAME_get("OUTPUTID", WF_OUTPUTID1.Text, WF_OUTPUTID1_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF1"               '表示フラグ1
+                CODENAME_get("ONOFF", WF_ONOFF1.Text, WF_ONOFF1_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID2"          '情報出力ID2
+                CODENAME_get("OUTPUTID", WF_OUTPUTID2.Text, WF_OUTPUTID2_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF2"               '表示フラグ2
+                CODENAME_get("ONOFF", WF_ONOFF2.Text, WF_ONOFF2_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID3"          '情報出力ID3
+                CODENAME_get("OUTPUTID", WF_OUTPUTID3.Text, WF_OUTPUTID3_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF3"               '表示フラグ3
+                CODENAME_get("ONOFF", WF_ONOFF3.Text, WF_ONOFF3_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID4"          '情報出力ID4
+                CODENAME_get("OUTPUTID", WF_OUTPUTID4.Text, WF_OUTPUTID4_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF4"               '表示フラグ4
+                CODENAME_get("ONOFF", WF_ONOFF4.Text, WF_ONOFF4_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID5"          '情報出力ID5
+                CODENAME_get("OUTPUTID", WF_OUTPUTID5.Text, WF_OUTPUTID5_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF5"               '表示フラグ5
+                CODENAME_get("ONOFF", WF_ONOFF5.Text, WF_ONOFF5_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID6"          '情報出力ID6
+                CODENAME_get("OUTPUTID", WF_OUTPUTID6.Text, WF_OUTPUTID6_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF6"               '表示フラグ6
+                CODENAME_get("ONOFF", WF_ONOFF6.Text, WF_ONOFF6_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID7"          '情報出力ID7
+                CODENAME_get("OUTPUTID", WF_OUTPUTID7.Text, WF_OUTPUTID7_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF7"               '表示フラグ7
+                CODENAME_get("ONOFF", WF_ONOFF7.Text, WF_ONOFF7_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID8"          '情報出力ID8
+                CODENAME_get("OUTPUTID", WF_OUTPUTID8.Text, WF_OUTPUTID8_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF8"               '表示フラグ8
+                CODENAME_get("ONOFF", WF_ONOFF8.Text, WF_ONOFF8_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID9"          '情報出力ID9
+                CODENAME_get("OUTPUTID", WF_OUTPUTID9.Text, WF_OUTPUTID9_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF9"               '表示フラグ9
+                CODENAME_get("ONOFF", WF_ONOFF9.Text, WF_ONOFF9_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID10"          '情報出力ID10
+                CODENAME_get("OUTPUTID", WF_OUTPUTID10.Text, WF_OUTPUTID10_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF10"               '表示フラグ10
+                CODENAME_get("ONOFF", WF_ONOFF10.Text, WF_ONOFF10_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID11"          '情報出力ID11
+                CODENAME_get("OUTPUTID", WF_OUTPUTID11.Text, WF_OUTPUTID11_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF11"               '表示フラグ11
+                CODENAME_get("ONOFF", WF_ONOFF11.Text, WF_ONOFF11_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID12"          '情報出力ID12
+                CODENAME_get("OUTPUTID", WF_OUTPUTID12.Text, WF_OUTPUTID12_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF12"               '表示フラグ12
+                CODENAME_get("ONOFF", WF_ONOFF12.Text, WF_ONOFF12_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID13"          '情報出力ID13
+                CODENAME_get("OUTPUTID", WF_OUTPUTID13.Text, WF_OUTPUTID13_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF13"               '表示フラグ13
+                CODENAME_get("ONOFF", WF_ONOFF13.Text, WF_ONOFF13_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID14"          '情報出力ID14
+                CODENAME_get("OUTPUTID", WF_OUTPUTID14.Text, WF_OUTPUTID14_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF14"               '表示フラグ14
+                CODENAME_get("ONOFF", WF_ONOFF14.Text, WF_ONOFF14_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID15"          '情報出力ID15
+                CODENAME_get("OUTPUTID", WF_OUTPUTID15.Text, WF_OUTPUTID15_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF15"               '表示フラグ15
+                CODENAME_get("ONOFF", WF_ONOFF15.Text, WF_ONOFF15_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID16"          '情報出力ID16
+                CODENAME_get("OUTPUTID", WF_OUTPUTID16.Text, WF_OUTPUTID16_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF16"               '表示フラグ16
+                CODENAME_get("ONOFF", WF_ONOFF16.Text, WF_ONOFF16_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID17"          '情報出力ID17
+                CODENAME_get("OUTPUTID", WF_OUTPUTID17.Text, WF_OUTPUTID17_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF17"               '表示フラグ17
+                CODENAME_get("ONOFF", WF_ONOFF17.Text, WF_ONOFF17_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID18"          '情報出力ID18
+                CODENAME_get("OUTPUTID", WF_OUTPUTID18.Text, WF_OUTPUTID18_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF18"               '表示フラグ18
+                CODENAME_get("ONOFF", WF_ONOFF18.Text, WF_ONOFF18_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID19"          '情報出力ID19
+                CODENAME_get("OUTPUTID", WF_OUTPUTID19.Text, WF_OUTPUTID19_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF19"               '表示フラグ19
+                CODENAME_get("ONOFF", WF_ONOFF19.Text, WF_ONOFF19_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID20"          '情報出力ID20
+                CODENAME_get("OUTPUTID", WF_OUTPUTID20.Text, WF_OUTPUTID20_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF20"               '表示フラグ20
+                CODENAME_get("ONOFF", WF_ONOFF20.Text, WF_ONOFF20_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID21"          '情報出力ID21
+                CODENAME_get("OUTPUTID", WF_OUTPUTID21.Text, WF_OUTPUTID21_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF21"               '表示フラグ21
+                CODENAME_get("ONOFF", WF_ONOFF21.Text, WF_ONOFF21_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID22"          '情報出力ID22
+                CODENAME_get("OUTPUTID", WF_OUTPUTID22.Text, WF_OUTPUTID22_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF22"               '表示フラグ22
+                CODENAME_get("ONOFF", WF_ONOFF22.Text, WF_ONOFF22_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID23"          '情報出力ID23
+                CODENAME_get("OUTPUTID", WF_OUTPUTID23.Text, WF_OUTPUTID23_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF23"               '表示フラグ23
+                CODENAME_get("ONOFF", WF_ONOFF23.Text, WF_ONOFF23_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID24"          '情報出力ID24
+                CODENAME_get("OUTPUTID", WF_OUTPUTID24.Text, WF_OUTPUTID24_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF24"               '表示フラグ24
+                CODENAME_get("ONOFF", WF_ONOFF24.Text, WF_ONOFF24_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_OUTPUTID25"          '情報出力ID25
+                CODENAME_get("OUTPUTID", WF_OUTPUTID25.Text, WF_OUTPUTID25_TEXT.Text, WW_RTN_SW)
+
+            Case "WF_ONOFF25"               '表示フラグ25
+                CODENAME_get("ONOFF", WF_ONOFF25.Text, WF_ONOFF25_TEXT.Text, WW_RTN_SW)
 
             Case "WF_DELFLG"               '削除フラグ
                 CODENAME_get("DELFLG", WF_DELFLG.Text, WF_DELFLG_TEXT.Text, WW_DUMMY)
@@ -930,6 +1805,257 @@ Public Class OIS0001UserCreate
                     WF_APPROVALID.Text = WW_SelectValue
                     WF_APPROVALID_TEXT.Text = WW_SelectText
                     WF_APPROVALID.Focus()
+
+                Case "WF_OUTPUTID1"               '情報出力ID1
+                    WF_OUTPUTID1.Text = WW_SelectValue
+                    WF_OUTPUTID1_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID1.Focus()
+
+                Case "WF_ONOFF1"                  '表示フラグ1
+                    WF_ONOFF1.Text = WW_SelectValue
+                    WF_ONOFF1_TEXT.Text = WW_SelectText
+                    WF_ONOFF1.Focus()
+
+                Case "WF_OUTPUTID2"               '情報出力ID2
+                    WF_OUTPUTID2.Text = WW_SelectValue
+                    WF_OUTPUTID2_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID2.Focus()
+
+                Case "WF_ONOFF2"                  '表示フラグ2
+                    WF_ONOFF2.Text = WW_SelectValue
+                    WF_ONOFF2_TEXT.Text = WW_SelectText
+                    WF_ONOFF2.Focus()
+
+                Case "WF_OUTPUTID3"               '情報出力ID3
+                    WF_OUTPUTID3.Text = WW_SelectValue
+                    WF_OUTPUTID3_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID3.Focus()
+
+                Case "WF_ONOFF3"                  '表示フラグ3
+                    WF_ONOFF3.Text = WW_SelectValue
+                    WF_ONOFF3_TEXT.Text = WW_SelectText
+                    WF_ONOFF3.Focus()
+
+                Case "WF_OUTPUTID4"               '情報出力ID4
+                    WF_OUTPUTID4.Text = WW_SelectValue
+                    WF_OUTPUTID4_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID4.Focus()
+
+                Case "WF_ONOFF4"                  '表示フラグ4
+                    WF_ONOFF4.Text = WW_SelectValue
+                    WF_ONOFF4_TEXT.Text = WW_SelectText
+                    WF_ONOFF4.Focus()
+
+                Case "WF_OUTPUTID5"               '情報出力ID5
+                    WF_OUTPUTID5.Text = WW_SelectValue
+                    WF_OUTPUTID5_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID5.Focus()
+
+                Case "WF_ONOFF5"                  '表示フラグ5
+                    WF_ONOFF5.Text = WW_SelectValue
+                    WF_ONOFF5_TEXT.Text = WW_SelectText
+                    WF_ONOFF5.Focus()
+
+                Case "WF_OUTPUTID6"               '情報出力ID6
+                    WF_OUTPUTID6.Text = WW_SelectValue
+                    WF_OUTPUTID6_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID6.Focus()
+
+                Case "WF_ONOFF6"                  '表示フラグ6
+                    WF_ONOFF6.Text = WW_SelectValue
+                    WF_ONOFF6_TEXT.Text = WW_SelectText
+                    WF_ONOFF6.Focus()
+
+                Case "WF_OUTPUTID7"               '情報出力ID7
+                    WF_OUTPUTID7.Text = WW_SelectValue
+                    WF_OUTPUTID7_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID7.Focus()
+
+                Case "WF_ONOFF7"                  '表示フラグ7
+                    WF_ONOFF7.Text = WW_SelectValue
+                    WF_ONOFF7_TEXT.Text = WW_SelectText
+                    WF_ONOFF7.Focus()
+
+                Case "WF_OUTPUTID8"               '情報出力ID8
+                    WF_OUTPUTID8.Text = WW_SelectValue
+                    WF_OUTPUTID8_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID8.Focus()
+
+                Case "WF_ONOFF8"                  '表示フラグ8
+                    WF_ONOFF8.Text = WW_SelectValue
+                    WF_ONOFF8_TEXT.Text = WW_SelectText
+                    WF_ONOFF8.Focus()
+
+                Case "WF_OUTPUTID9"               '情報出力ID9
+                    WF_OUTPUTID9.Text = WW_SelectValue
+                    WF_OUTPUTID9_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID9.Focus()
+
+                Case "WF_ONOFF9"                  '表示フラグ9
+                    WF_ONOFF9.Text = WW_SelectValue
+                    WF_ONOFF9_TEXT.Text = WW_SelectText
+                    WF_ONOFF9.Focus()
+
+                Case "WF_OUTPUTID10"               '情報出力ID10
+                    WF_OUTPUTID10.Text = WW_SelectValue
+                    WF_OUTPUTID10_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID10.Focus()
+
+                Case "WF_ONOFF10"                  '表示フラグ10
+                    WF_ONOFF10.Text = WW_SelectValue
+                    WF_ONOFF10_TEXT.Text = WW_SelectText
+                    WF_ONOFF10.Focus()
+
+                Case "WF_OUTPUTID11"               '情報出力ID11
+                    WF_OUTPUTID11.Text = WW_SelectValue
+                    WF_OUTPUTID11_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID11.Focus()
+
+                Case "WF_ONOFF11"                  '表示フラグ11
+                    WF_ONOFF11.Text = WW_SelectValue
+                    WF_ONOFF11_TEXT.Text = WW_SelectText
+                    WF_ONOFF11.Focus()
+
+                Case "WF_OUTPUTID12"               '情報出力ID12
+                    WF_OUTPUTID12.Text = WW_SelectValue
+                    WF_OUTPUTID12_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID12.Focus()
+
+                Case "WF_ONOFF12"                  '表示フラグ12
+                    WF_ONOFF12.Text = WW_SelectValue
+                    WF_ONOFF12_TEXT.Text = WW_SelectText
+                    WF_ONOFF12.Focus()
+
+                Case "WF_OUTPUTID13"               '情報出力ID13
+                    WF_OUTPUTID13.Text = WW_SelectValue
+                    WF_OUTPUTID13_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID13.Focus()
+
+                Case "WF_ONOFF13"                  '表示フラグ13
+                    WF_ONOFF13.Text = WW_SelectValue
+                    WF_ONOFF13_TEXT.Text = WW_SelectText
+                    WF_ONOFF13.Focus()
+
+                Case "WF_OUTPUTID14"               '情報出力ID14
+                    WF_OUTPUTID14.Text = WW_SelectValue
+                    WF_OUTPUTID14_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID14.Focus()
+
+                Case "WF_ONOFF14"                  '表示フラグ14
+                    WF_ONOFF14.Text = WW_SelectValue
+                    WF_ONOFF14_TEXT.Text = WW_SelectText
+                    WF_ONOFF14.Focus()
+
+                Case "WF_OUTPUTID15"               '情報出力ID15
+                    WF_OUTPUTID15.Text = WW_SelectValue
+                    WF_OUTPUTID15_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID15.Focus()
+
+                Case "WF_ONOFF15"                  '表示フラグ15
+                    WF_ONOFF15.Text = WW_SelectValue
+                    WF_ONOFF15_TEXT.Text = WW_SelectText
+                    WF_ONOFF15.Focus()
+
+                Case "WF_OUTPUTID16"               '情報出力ID16
+                    WF_OUTPUTID16.Text = WW_SelectValue
+                    WF_OUTPUTID16_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID16.Focus()
+
+                Case "WF_ONOFF16"                  '表示フラグ16
+                    WF_ONOFF16.Text = WW_SelectValue
+                    WF_ONOFF16_TEXT.Text = WW_SelectText
+                    WF_ONOFF16.Focus()
+
+                Case "WF_OUTPUTID17"               '情報出力ID17
+                    WF_OUTPUTID17.Text = WW_SelectValue
+                    WF_OUTPUTID17_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID17.Focus()
+
+                Case "WF_ONOFF17"                  '表示フラグ17
+                    WF_ONOFF17.Text = WW_SelectValue
+                    WF_ONOFF17_TEXT.Text = WW_SelectText
+                    WF_ONOFF17.Focus()
+
+                Case "WF_OUTPUTID18"               '情報出力ID18
+                    WF_OUTPUTID18.Text = WW_SelectValue
+                    WF_OUTPUTID18_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID18.Focus()
+
+                Case "WF_ONOFF18"                  '表示フラグ18
+                    WF_ONOFF18.Text = WW_SelectValue
+                    WF_ONOFF18_TEXT.Text = WW_SelectText
+                    WF_ONOFF18.Focus()
+
+                Case "WF_OUTPUTID19"               '情報出力ID19
+                    WF_OUTPUTID19.Text = WW_SelectValue
+                    WF_OUTPUTID19_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID19.Focus()
+
+                Case "WF_ONOFF19"                  '表示フラグ19
+                    WF_ONOFF19.Text = WW_SelectValue
+                    WF_ONOFF19_TEXT.Text = WW_SelectText
+                    WF_ONOFF19.Focus()
+
+                Case "WF_OUTPUTID20"               '情報出力ID20
+                    WF_OUTPUTID20.Text = WW_SelectValue
+                    WF_OUTPUTID20_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID20.Focus()
+
+                Case "WF_ONOFF20"                  '表示フラグ20
+                    WF_ONOFF20.Text = WW_SelectValue
+                    WF_ONOFF20_TEXT.Text = WW_SelectText
+                    WF_ONOFF20.Focus()
+
+                Case "WF_OUTPUTID21"               '情報出力ID21
+                    WF_OUTPUTID21.Text = WW_SelectValue
+                    WF_OUTPUTID21_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID21.Focus()
+
+                Case "WF_ONOFF21"                  '表示フラグ21
+                    WF_ONOFF21.Text = WW_SelectValue
+                    WF_ONOFF21_TEXT.Text = WW_SelectText
+                    WF_ONOFF21.Focus()
+
+                Case "WF_OUTPUTID22"               '情報出力ID22
+                    WF_OUTPUTID22.Text = WW_SelectValue
+                    WF_OUTPUTID22_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID22.Focus()
+
+                Case "WF_ONOFF22"                  '表示フラグ22
+                    WF_ONOFF22.Text = WW_SelectValue
+                    WF_ONOFF22_TEXT.Text = WW_SelectText
+                    WF_ONOFF22.Focus()
+
+                Case "WF_OUTPUTID23"               '情報出力ID23
+                    WF_OUTPUTID23.Text = WW_SelectValue
+                    WF_OUTPUTID23_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID23.Focus()
+
+                Case "WF_ONOFF23"                  '表示フラグ23
+                    WF_ONOFF23.Text = WW_SelectValue
+                    WF_ONOFF23_TEXT.Text = WW_SelectText
+                    WF_ONOFF23.Focus()
+
+                Case "WF_OUTPUTID24"               '情報出力ID24
+                    WF_OUTPUTID24.Text = WW_SelectValue
+                    WF_OUTPUTID24_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID24.Focus()
+
+                Case "WF_ONOFF24"                  '表示フラグ24
+                    WF_ONOFF24.Text = WW_SelectValue
+                    WF_ONOFF24_TEXT.Text = WW_SelectText
+                    WF_ONOFF24.Focus()
+
+                Case "WF_OUTPUTID25"               '情報出力ID25
+                    WF_OUTPUTID25.Text = WW_SelectValue
+                    WF_OUTPUTID25_TEXT.Text = WW_SelectText
+                    WF_OUTPUTID25.Focus()
+
+                Case "WF_ONOFF25"                  '表示フラグ25
+                    WF_ONOFF25.Text = WW_SelectValue
+                    WF_ONOFF25_TEXT.Text = WW_SelectText
+                    WF_ONOFF25.Focus()
+
             End Select
         Else
         End If
@@ -951,9 +2077,188 @@ Public Class OIS0001UserCreate
         '○ フォーカスセット
         If WF_FIELD_REP.Value = "" Then
             Select Case WF_FIELD.Value
-                '削除フラグ
-                Case "WF_DELFLG"
+                Case "WF_DELFLG"            '削除フラグ
                     WF_DELFLG.Focus()
+
+                Case "WF_PASSENDYMD"        'パスワード有効期限
+                    WF_PASSENDYMD.Focus()
+
+                Case "WF_STYMD"             '有効年月日(From)
+                    WF_STYMD.Focus()
+
+                Case "WF_ENDYMD"            '有効年月日(To)
+                    WF_ENDYMD.Focus()
+
+                Case "WF_CAMPCODE"          '会社コード
+                    WF_CAMPCODE.Focus()
+
+                Case "WF_ORG"               '組織コード
+                    WF_ORG.Focus()
+
+                Case "WF_MENUROLE"          'メニュー表示制御ロール
+                    WF_MENUROLE.Focus()
+
+                Case "WF_MAPROLE"           '画面参照更新制御ロール
+                    WF_MAPROLE.Focus()
+
+                Case "WF_VIEWPROFID"        '画面表示項目制御ロール
+                    WF_VIEWPROFID.Focus()
+
+                Case "WF_RPRTPROFID"        'エクセル出力制御ロール
+                    WF_RPRTPROFID.Focus()
+
+                Case "WF_APPROVALID"        '承認権限ロール
+                    WF_APPROVALID.Focus()
+
+                Case "WF_OUTPUTID1"         '情報出力ID1
+                    WF_OUTPUTID1.Focus()
+
+                Case "WF_ONOFF1"            '表示フラグ1
+                    WF_ONOFF1.Focus()
+
+                Case "WF_OUTPUTID2"         '情報出力ID2
+                    WF_OUTPUTID2.Focus()
+
+                Case "WF_ONOFF2"            '表示フラグ2
+                    WF_ONOFF2.Focus()
+
+                Case "WF_OUTPUTID3"         '情報出力ID3
+                    WF_OUTPUTID3.Focus()
+
+                Case "WF_ONOFF3"            '表示フラグ3
+                    WF_ONOFF3.Focus()
+
+                Case "WF_OUTPUTID4"         '情報出力ID4
+                    WF_OUTPUTID4.Focus()
+
+                Case "WF_ONOFF4"            '表示フラグ4
+                    WF_ONOFF4.Focus()
+
+                Case "WF_OUTPUTID5"         '情報出力ID5
+                    WF_OUTPUTID5.Focus()
+
+                Case "WF_ONOFF5"            '表示フラグ5
+                    WF_ONOFF5.Focus()
+
+                Case "WF_OUTPUTID6"         '情報出力ID6
+                    WF_OUTPUTID6.Focus()
+
+                Case "WF_ONOFF6"            '表示フラグ6
+                    WF_ONOFF6.Focus()
+
+                Case "WF_OUTPUTID7"         '情報出力ID7
+                    WF_OUTPUTID7.Focus()
+
+                Case "WF_ONOFF7"            '表示フラグ7
+                    WF_ONOFF7.Focus()
+
+                Case "WF_OUTPUTID8"         '情報出力ID8
+                    WF_OUTPUTID8.Focus()
+
+                Case "WF_ONOFF8"            '表示フラグ8
+                    WF_ONOFF8.Focus()
+
+                Case "WF_OUTPUTID9"         '情報出力ID9
+                    WF_OUTPUTID9.Focus()
+
+                Case "WF_ONOFF9"            '表示フラグ9
+                    WF_ONOFF9.Focus()
+
+                Case "WF_OUTPUTID10"        '情報出力ID10
+                    WF_OUTPUTID10.Focus()
+
+                Case "WF_ONOFF10"           '表示フラグ10
+                    WF_ONOFF10.Focus()
+
+                Case "WF_OUTPUTID11"        '情報出力ID11
+                    WF_OUTPUTID11.Focus()
+
+                Case "WF_ONOFF11"           '表示フラグ11
+                    WF_ONOFF11.Focus()
+
+                Case "WF_OUTPUTID12"        '情報出力ID12
+                    WF_OUTPUTID12.Focus()
+
+                Case "WF_ONOFF12"           '表示フラグ12
+                    WF_ONOFF12.Focus()
+
+                Case "WF_OUTPUTID13"        '情報出力ID13
+                    WF_OUTPUTID13.Focus()
+
+                Case "WF_ONOFF13"           '表示フラグ13
+                    WF_ONOFF13.Focus()
+
+                Case "WF_OUTPUTID14"        '情報出力ID14
+                    WF_OUTPUTID14.Focus()
+
+                Case "WF_ONOFF14"           '表示フラグ14
+                    WF_ONOFF14.Focus()
+
+                Case "WF_OUTPUTID15"        '情報出力ID15
+                    WF_OUTPUTID15.Focus()
+
+                Case "WF_ONOFF15"           '表示フラグ15
+                    WF_ONOFF15.Focus()
+
+                Case "WF_OUTPUTID16"        '情報出力ID16
+                    WF_OUTPUTID16.Focus()
+
+                Case "WF_ONOFF16"           '表示フラグ16
+                    WF_ONOFF16.Focus()
+
+                Case "WF_OUTPUTID17"        '情報出力ID17
+                    WF_OUTPUTID17.Focus()
+
+                Case "WF_ONOFF17"           '表示フラグ17
+                    WF_ONOFF17.Focus()
+
+                Case "WF_OUTPUTID18"        '情報出力ID18
+                    WF_OUTPUTID18.Focus()
+
+                Case "WF_ONOFF18"           '表示フラグ18
+                    WF_ONOFF18.Focus()
+
+                Case "WF_OUTPUTID19"        '情報出力ID19
+                    WF_OUTPUTID19.Focus()
+
+                Case "WF_ONOFF19"           '表示フラグ19
+                    WF_ONOFF19.Focus()
+
+                Case "WF_OUTPUTID20"        '情報出力ID20
+                    WF_OUTPUTID20.Focus()
+
+                Case "WF_ONOFF20"           '表示フラグ20
+                    WF_ONOFF20.Focus()
+
+                Case "WF_OUTPUTID21"        '情報出力ID21
+                    WF_OUTPUTID21.Focus()
+
+                Case "WF_ONOFF21"           '表示フラグ21
+                    WF_ONOFF21.Focus()
+
+                Case "WF_OUTPUTID22"        '情報出力ID22
+                    WF_OUTPUTID22.Focus()
+
+                Case "WF_ONOFF22"           '表示フラグ22
+                    WF_ONOFF22.Focus()
+
+                Case "WF_OUTPUTID23"        '情報出力ID23
+                    WF_OUTPUTID23.Focus()
+
+                Case "WF_ONOFF23"           '表示フラグ23
+                    WF_ONOFF23.Focus()
+
+                Case "WF_OUTPUTID24"        '情報出力ID24
+                    WF_OUTPUTID24.Focus()
+
+                Case "WF_ONOFF24"           '表示フラグ24
+                    WF_ONOFF24.Focus()
+
+                Case "WF_OUTPUTID25"        '情報出力ID25
+                    WF_OUTPUTID25.Focus()
+
+                Case "WF_ONOFF25"           '表示フラグ25
+                    WF_ONOFF25.Focus()
             End Select
         Else
         End If
@@ -1409,6 +2714,101 @@ Public Class OIS0001UserCreate
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
+            Dim DuplicateCheckList_OUTPUTID As New ArrayList()
+            Dim DuplicateCheckList_SORTNO As New ArrayList()
+
+            For n As Integer = 1 To 25
+
+                Dim fieldName_OUTPUTIDn As String = "OUTPUTID" & n.ToString()
+                Dim fieldName_ONOFFn As String = "ONOFF" & n.ToString()
+                Dim fieldName_SORTNOn As String = "SORTNO" & n.ToString()
+
+                '情報出力IDn(バリデーションチェック）
+                Master.CheckField(Master.USERCAMP, fieldName_OUTPUTIDn, OIS0001INProw(fieldName_OUTPUTIDn), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                If isNormal(WW_CS0024FCHECKERR) Then
+                    '値存在チェック
+                    CODENAME_get("OUTPUTID", OIS0001INProw(fieldName_OUTPUTIDn), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(" & "情報出力ID" & n.ToString() & "入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                        Exit For
+                    End If
+                Else
+                    WW_CheckMES1 = "・更新できないレコード(" & "情報出力ID" & n.ToString() & "入力エラー)です。"
+                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Exit For
+                End If
+
+                '表示フラグn(バリデーションチェック）
+                Master.CheckField(Master.USERCAMP, fieldName_ONOFFn, OIS0001INProw(fieldName_ONOFFn), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                If isNormal(WW_CS0024FCHECKERR) Then
+                    '値存在チェック
+                    CODENAME_get("ONOFF", OIS0001INProw(fieldName_ONOFFn), WW_DUMMY, WW_RTN_SW)
+                    If Not isNormal(WW_RTN_SW) Then
+                        WW_CheckMES1 = "・更新できないレコード(" & "表示フラグ" & n.ToString() & "入力エラー)です。"
+                        WW_CheckMES2 = "マスタに存在しません。"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                        Exit For
+                    End If
+                Else
+                    WW_CheckMES1 = "・更新できないレコード(" & "表示フラグ" & n.ToString() & "入力エラー)です。"
+                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Exit For
+                End If
+
+                '表示順n(バリデーションチェック）
+                Master.CheckField(Master.USERCAMP, fieldName_SORTNOn, OIS0001INProw(fieldName_SORTNOn), WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+                If Not isNormal(WW_CS0024FCHECKERR) Then
+                    WW_CheckMES1 = "・更新できないレコード(" & "表示順" & n.ToString() & "入力エラー)です。"
+                    WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                    WW_LINE_ERR = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Exit For
+                End If
+
+                '重複チェック
+                If OIS0001INProw(fieldName_ONOFFn) = "1" Then
+
+                    '情報出力IDn
+                    If DuplicateCheckList_OUTPUTID.IndexOf(OIS0001INProw(fieldName_OUTPUTIDn)) >= 0 Then
+                        WW_CheckMES1 = "・更新できないレコード(" & "情報出力ID" & n.ToString() & "重複エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                        Exit For
+                    Else
+                        DuplicateCheckList_OUTPUTID.Add(OIS0001INProw(fieldName_OUTPUTIDn))
+                    End If
+
+                    '表示順n
+                    If DuplicateCheckList_OUTPUTID.IndexOf(OIS0001INProw(fieldName_SORTNOn)) >= 0 Then
+                        WW_CheckMES1 = "・更新できないレコード(" & "表示順" & n.ToString() & "重複エラー)です。"
+                        WW_CheckMES2 = WW_CS0024FCHECKREPORT
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2, OIS0001INProw)
+                        WW_LINE_ERR = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                        Exit For
+                    Else
+                        DuplicateCheckList_OUTPUTID.Add(OIS0001INProw(fieldName_SORTNOn))
+                    End If
+
+                End If
+
+            Next
+
             '一意制約チェック
             '同一レコードの更新の場合、チェック対象外
             If OIS0001INProw("USERID") = work.WF_SEL_USERID.Text Then
@@ -1522,6 +2922,81 @@ Public Class OIS0001UserCreate
             WW_ERR_MES &= ControlChars.NewLine & "  --> エクセル出力制御ロール =" & OIS0001row("RPRTPROFID") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 画面初期値ロール =" & OIS0001row("VARIANT") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 承認権限ロール =" & OIS0001row("APPROVALID") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID1 =" & OIS0001row("OUTPUTID1") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ1 =" & OIS0001row("ONOFF1") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順1 =" & OIS0001row("SORTNO1") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID2 =" & OIS0001row("OUTPUTID2") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ2 =" & OIS0001row("ONOFF2") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順2 =" & OIS0001row("SORTNO2") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID3 =" & OIS0001row("OUTPUTID3") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ3 =" & OIS0001row("ONOFF3") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順3 =" & OIS0001row("SORTNO3") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID4 =" & OIS0001row("OUTPUTID4") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ4 =" & OIS0001row("ONOFF4") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順4 =" & OIS0001row("SORTNO4") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID5 =" & OIS0001row("OUTPUTID5") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ5 =" & OIS0001row("ONOFF5") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順5 =" & OIS0001row("SORTNO5") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID6 =" & OIS0001row("OUTPUTID6") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ6 =" & OIS0001row("ONOFF6") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順6 =" & OIS0001row("SORTNO6") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID7 =" & OIS0001row("OUTPUTID7") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ7 =" & OIS0001row("ONOFF7") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順7 =" & OIS0001row("SORTNO7") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID8 =" & OIS0001row("OUTPUTID8") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ8 =" & OIS0001row("ONOFF8") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順8 =" & OIS0001row("SORTNO8") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID9 =" & OIS0001row("OUTPUTID9") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ9 =" & OIS0001row("ONOFF9") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順9 =" & OIS0001row("SORTNO9") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID10 =" & OIS0001row("OUTPUTID10") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ10 =" & OIS0001row("ONOFF10") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順10 =" & OIS0001row("SORTNO10") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID11 =" & OIS0001row("OUTPUTID11") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ11 =" & OIS0001row("ONOFF11") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順11 =" & OIS0001row("SORTNO11") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID12 =" & OIS0001row("OUTPUTID12") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ12 =" & OIS0001row("ONOFF12") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順12 =" & OIS0001row("SORTNO12") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID13 =" & OIS0001row("OUTPUTID13") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ13 =" & OIS0001row("ONOFF13") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順13 =" & OIS0001row("SORTNO13") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID14 =" & OIS0001row("OUTPUTID14") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ14 =" & OIS0001row("ONOFF14") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順14 =" & OIS0001row("SORTNO14") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID15 =" & OIS0001row("OUTPUTID15") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ15 =" & OIS0001row("ONOFF15") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順15 =" & OIS0001row("SORTNO15") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID16 =" & OIS0001row("OUTPUTID16") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ16 =" & OIS0001row("ONOFF16") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順16 =" & OIS0001row("SORTNO16") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID17 =" & OIS0001row("OUTPUTID17") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ17 =" & OIS0001row("ONOFF17") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順17 =" & OIS0001row("SORTNO17") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID18 =" & OIS0001row("OUTPUTID18") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ18 =" & OIS0001row("ONOFF18") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順18 =" & OIS0001row("SORTNO18") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID19 =" & OIS0001row("OUTPUTID19") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ19 =" & OIS0001row("ONOFF19") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順19 =" & OIS0001row("SORTNO19") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID20 =" & OIS0001row("OUTPUTID20") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ20 =" & OIS0001row("ONOFF20") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順20 =" & OIS0001row("SORTNO20") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID21 =" & OIS0001row("OUTPUTID21") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ21 =" & OIS0001row("ONOFF21") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順21 =" & OIS0001row("SORTNO21") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID22 =" & OIS0001row("OUTPUTID22") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ22 =" & OIS0001row("ONOFF22") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順22 =" & OIS0001row("SORTNO22") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID23 =" & OIS0001row("OUTPUTID23") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ23 =" & OIS0001row("ONOFF23") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順23 =" & OIS0001row("SORTNO23") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID24 =" & OIS0001row("OUTPUTID24") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ24 =" & OIS0001row("ONOFF24") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順24 =" & OIS0001row("SORTNO24") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 情報出力ID25 =" & OIS0001row("OUTPUTID25") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示フラグ25 =" & OIS0001row("ONOFF25") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 表示順25 =" & OIS0001row("SORTNO25") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIS0001row("DELFLG")
         End If
 
@@ -1584,6 +3059,81 @@ Public Class OIS0001UserCreate
                         OIS0001row("RPRTPROFID") = OIS0001INProw("RPRTPROFID") AndAlso
                         OIS0001row("VARIANT") = OIS0001INProw("VARIANT") AndAlso
                         OIS0001row("APPROVALID") = OIS0001INProw("APPROVALID") AndAlso
+                        OIS0001row("OUTPUTID1") = OIS0001INProw("OUTPUTID1") AndAlso
+                        OIS0001row("ONOFF1") = OIS0001INProw("ONOFF1") AndAlso
+                        OIS0001row("SORTNO1") = OIS0001INProw("SORTNO1") AndAlso
+                        OIS0001row("OUTPUTID2") = OIS0001INProw("OUTPUTID2") AndAlso
+                        OIS0001row("ONOFF2") = OIS0001INProw("ONOFF2") AndAlso
+                        OIS0001row("SORTNO2") = OIS0001INProw("SORTNO2") AndAlso
+                        OIS0001row("OUTPUTID3") = OIS0001INProw("OUTPUTID3") AndAlso
+                        OIS0001row("ONOFF3") = OIS0001INProw("ONOFF3") AndAlso
+                        OIS0001row("SORTNO3") = OIS0001INProw("SORTNO3") AndAlso
+                        OIS0001row("OUTPUTID4") = OIS0001INProw("OUTPUTID4") AndAlso
+                        OIS0001row("ONOFF4") = OIS0001INProw("ONOFF4") AndAlso
+                        OIS0001row("SORTNO4") = OIS0001INProw("SORTNO4") AndAlso
+                        OIS0001row("OUTPUTID5") = OIS0001INProw("OUTPUTID5") AndAlso
+                        OIS0001row("ONOFF5") = OIS0001INProw("ONOFF5") AndAlso
+                        OIS0001row("SORTNO5") = OIS0001INProw("SORTNO5") AndAlso
+                        OIS0001row("OUTPUTID6") = OIS0001INProw("OUTPUTID6") AndAlso
+                        OIS0001row("ONOFF6") = OIS0001INProw("ONOFF6") AndAlso
+                        OIS0001row("SORTNO6") = OIS0001INProw("SORTNO6") AndAlso
+                        OIS0001row("OUTPUTID7") = OIS0001INProw("OUTPUTID7") AndAlso
+                        OIS0001row("ONOFF7") = OIS0001INProw("ONOFF7") AndAlso
+                        OIS0001row("SORTNO7") = OIS0001INProw("SORTNO7") AndAlso
+                        OIS0001row("OUTPUTID8") = OIS0001INProw("OUTPUTID8") AndAlso
+                        OIS0001row("ONOFF8") = OIS0001INProw("ONOFF8") AndAlso
+                        OIS0001row("SORTNO8") = OIS0001INProw("SORTNO8") AndAlso
+                        OIS0001row("OUTPUTID9") = OIS0001INProw("OUTPUTID9") AndAlso
+                        OIS0001row("ONOFF9") = OIS0001INProw("ONOFF9") AndAlso
+                        OIS0001row("SORTNO9") = OIS0001INProw("SORTNO9") AndAlso
+                        OIS0001row("OUTPUTID10") = OIS0001INProw("OUTPUTID10") AndAlso
+                        OIS0001row("ONOFF10") = OIS0001INProw("ONOFF10") AndAlso
+                        OIS0001row("SORTNO10") = OIS0001INProw("SORTNO10") AndAlso
+                        OIS0001row("OUTPUTID11") = OIS0001INProw("OUTPUTID11") AndAlso
+                        OIS0001row("ONOFF11") = OIS0001INProw("ONOFF11") AndAlso
+                        OIS0001row("SORTNO11") = OIS0001INProw("SORTNO11") AndAlso
+                        OIS0001row("OUTPUTID12") = OIS0001INProw("OUTPUTID12") AndAlso
+                        OIS0001row("ONOFF12") = OIS0001INProw("ONOFF12") AndAlso
+                        OIS0001row("SORTNO12") = OIS0001INProw("SORTNO12") AndAlso
+                        OIS0001row("OUTPUTID13") = OIS0001INProw("OUTPUTID13") AndAlso
+                        OIS0001row("ONOFF13") = OIS0001INProw("ONOFF13") AndAlso
+                        OIS0001row("SORTNO13") = OIS0001INProw("SORTNO13") AndAlso
+                        OIS0001row("OUTPUTID14") = OIS0001INProw("OUTPUTID14") AndAlso
+                        OIS0001row("ONOFF14") = OIS0001INProw("ONOFF14") AndAlso
+                        OIS0001row("SORTNO14") = OIS0001INProw("SORTNO14") AndAlso
+                        OIS0001row("OUTPUTID15") = OIS0001INProw("OUTPUTID15") AndAlso
+                        OIS0001row("ONOFF15") = OIS0001INProw("ONOFF15") AndAlso
+                        OIS0001row("SORTNO15") = OIS0001INProw("SORTNO15") AndAlso
+                        OIS0001row("OUTPUTID16") = OIS0001INProw("OUTPUTID16") AndAlso
+                        OIS0001row("ONOFF16") = OIS0001INProw("ONOFF16") AndAlso
+                        OIS0001row("SORTNO16") = OIS0001INProw("SORTNO16") AndAlso
+                        OIS0001row("OUTPUTID17") = OIS0001INProw("OUTPUTID17") AndAlso
+                        OIS0001row("ONOFF17") = OIS0001INProw("ONOFF17") AndAlso
+                        OIS0001row("SORTNO17") = OIS0001INProw("SORTNO17") AndAlso
+                        OIS0001row("OUTPUTID18") = OIS0001INProw("OUTPUTID18") AndAlso
+                        OIS0001row("ONOFF18") = OIS0001INProw("ONOFF18") AndAlso
+                        OIS0001row("SORTNO18") = OIS0001INProw("SORTNO18") AndAlso
+                        OIS0001row("OUTPUTID19") = OIS0001INProw("OUTPUTID19") AndAlso
+                        OIS0001row("ONOFF19") = OIS0001INProw("ONOFF19") AndAlso
+                        OIS0001row("SORTNO19") = OIS0001INProw("SORTNO19") AndAlso
+                        OIS0001row("OUTPUTID20") = OIS0001INProw("OUTPUTID20") AndAlso
+                        OIS0001row("ONOFF20") = OIS0001INProw("ONOFF20") AndAlso
+                        OIS0001row("SORTNO20") = OIS0001INProw("SORTNO20") AndAlso
+                        OIS0001row("OUTPUTID21") = OIS0001INProw("OUTPUTID21") AndAlso
+                        OIS0001row("ONOFF21") = OIS0001INProw("ONOFF21") AndAlso
+                        OIS0001row("SORTNO21") = OIS0001INProw("SORTNO21") AndAlso
+                        OIS0001row("OUTPUTID22") = OIS0001INProw("OUTPUTID22") AndAlso
+                        OIS0001row("ONOFF22") = OIS0001INProw("ONOFF22") AndAlso
+                        OIS0001row("SORTNO22") = OIS0001INProw("SORTNO22") AndAlso
+                        OIS0001row("OUTPUTID23") = OIS0001INProw("OUTPUTID23") AndAlso
+                        OIS0001row("ONOFF23") = OIS0001INProw("ONOFF23") AndAlso
+                        OIS0001row("SORTNO23") = OIS0001INProw("SORTNO23") AndAlso
+                        OIS0001row("OUTPUTID24") = OIS0001INProw("OUTPUTID24") AndAlso
+                        OIS0001row("ONOFF24") = OIS0001INProw("ONOFF24") AndAlso
+                        OIS0001row("SORTNO24") = OIS0001INProw("SORTNO24") AndAlso
+                        OIS0001row("OUTPUTID25") = OIS0001INProw("OUTPUTID25") AndAlso
+                        OIS0001row("ONOFF25") = OIS0001INProw("ONOFF25") AndAlso
+                        OIS0001row("SORTNO25") = OIS0001INProw("SORTNO25") AndAlso
                         OIS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA Then
                     Else
                         'KEY項目以外の項目に変更がある時は「操作」の項目を「更新」に設定する
@@ -1755,6 +3305,12 @@ Public Class OIS0001UserCreate
                 Case "APPROVAL"         '承認権限ロール
                     prmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, prmData)
+
+                Case "OUTPUTID"         '情報出力ID
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, "PANEID"))
+
+                Case "ONOFF"            '表示フラグ
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, "VISIBLEFLG"))
 
                 Case "DELFLG"           '削除フラグ
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DELFLG, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, "DELFLG"))

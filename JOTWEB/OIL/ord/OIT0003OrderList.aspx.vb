@@ -3114,7 +3114,7 @@ Public Class OIT0003OrderList
             & "      AND OIT0002.LODDATE = @P03 " _
             & "  ) ORDERINFOTBL ON " _
             & "      VIW0013.RINKAITRAINNAME = ORDERINFOTBL.LOADINGIRILINETRAINNAME " _
-            & "  AND VIW0013.SPOTNO = ORDERINFOTBL.LOADINGIRILINEORDER "
+            & "  AND VIW0013.SPOTNO = ORDERINFOTBL.FILLINGPOINT "
 
         SQLStr &=
               " ORDER BY" _
@@ -3220,6 +3220,10 @@ Public Class OIT0003OrderList
             & " , OIT0003.LOADINGIRILINEORDER                    AS LOADINGIRILINEORDER" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0003.LOADINGIRILINETRAINNAME                AS LOADINGIRILINETRAINNAME" _
+            & " , OIT0003.OILCODE                                AS OILCODE" _
+            & " , OIT0003.OILNAME                                AS OILNAME" _
+            & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
+            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
             & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
             & " , CASE" _
             & "   WHEN OIM0005.MODEL = 'タキ1000' THEN '1-' + OIT0003.TANKNO" _

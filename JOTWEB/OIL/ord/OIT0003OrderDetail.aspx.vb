@@ -1957,12 +1957,21 @@ Public Class OIT0003OrderDetail
                   " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
 
+            '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
             SQLStr &=
                   " ORDER BY" _
-                & "    OIM0024.PRIORITYNO" _
-                & " ,  OIT0003.TANKNO" _
+                & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                & " ,  OIM0024.PRIORITYNO" _
+                & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
                 & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
                 & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+            'SQLStr &=
+            '      " ORDER BY" _
+            '    & "    OIM0024.PRIORITYNO" _
+            '    & " ,  OIT0003.TANKNO" _
+            '    & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+            '    & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+            '### 20200918 END   ソート順(積込日－油種－車番)対応 ###########################################
             'SQLStr &=
             '      " ORDER BY" _
             '    & "    OIT0003.OILCODE" _
@@ -2719,12 +2728,21 @@ Public Class OIT0003OrderDetail
                   " WHERE OIT0002.ORDERNO = @P01" _
                 & " AND OIT0002.DELFLG <> @P02"
 
+        '### 20200918 START ソート順(積込日－油種－車番)対応 ###########################################
         SQLStr &=
-              " ORDER BY" _
-            & "    OIM0024.PRIORITYNO" _
-            & " ,  OIT0003.TANKNO" _
-            & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
-            & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+                  " ORDER BY" _
+                & "    ISNULL(OIT0003.ACTUALLODDATE, OIT0002.LODDATE)" _
+                & " ,  OIM0024.PRIORITYNO" _
+                & " ,  RIGHT('00000000' + OIT0003.TANKNO, 8)" _
+                & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+                & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+        'SQLStr &=
+        '      " ORDER BY" _
+        '    & "    OIM0024.PRIORITYNO" _
+        '    & " ,  OIT0003.TANKNO" _
+        '    & " ,  RIGHT('00' + OIT0003.LINEORDER, 2)" _
+        '    & " ,  RIGHT('00' + OIT0003.SHIPORDER, 2)"
+        '### 20200918 END   ソート順(積込日－油種－車番)対応 ###########################################
         'SQLStr &=
         '      " ORDER BY" _
         '    & "    OIT0003.OILCODE" _

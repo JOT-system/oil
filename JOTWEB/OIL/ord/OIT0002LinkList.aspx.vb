@@ -1305,9 +1305,15 @@ Public Class OIT0002LinkList
         '○ エラーレポート準備
         rightview.SetErrorReport("")
 
-        '○ UPLOAD XLSデータ取得
-        Dim useFlg As Boolean
-        CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl, useFlg)
+        '★ファイル判別フラグ
+        Dim useFlg As String = ""
+
+        Try
+            '○ UPLOAD XLSデータ取得
+            CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl, useFlg)
+        Catch ex As Exception
+            Exit Sub
+        End Try
 
         '◯貨車連結(臨海)TBL削除処理(再アップロード対応)
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
@@ -1324,7 +1330,7 @@ Public Class OIT0002LinkList
         End Using
 
         '◯運用指示書あり(受注情報が設定)
-        If useFlg = True Then
+        If useFlg = "0" Then
             '★受注No取得
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
@@ -1503,7 +1509,7 @@ Public Class OIT0002LinkList
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="sqlCon">接続オブジェクト</param>
-    Protected Sub WW_INSERT_RLINK(ByVal SQLcon As SqlConnection, ByVal useFlg As Boolean)
+    Protected Sub WW_INSERT_RLINK(ByVal SQLcon As SqlConnection, ByVal useFlg As String)
 
         Try
             '貨車連結順序表No取得用SQL
@@ -1678,7 +1684,7 @@ Public Class OIT0002LinkList
 
                     ' ### 運送指示書(項目) START ####################################
                     '◯運用指示書あり(受注情報が設定)
-                    If useFlg = True Then
+                    If useFlg = "0" Then
                         '油種(運用指示)
                         OILNAME.Value = OIT0002EXLUProw("OILNAME")
                         '回転(運用指示)
@@ -1703,7 +1709,7 @@ Public Class OIT0002LinkList
                         Else
                             LOADINGDEPDATE.Value = OIT0002EXLUProw("LOADINGDEPDATE")
                         End If
-                    Else
+                    ElseIf useFlg = "1" Then
                         '油種(運用指示)
                         OILNAME.Value = ""
                         '回転(運用指示)
@@ -1835,7 +1841,7 @@ Public Class OIT0002LinkList
     ''' <param name="sqlCon">接続オブジェクト</param>
     Protected Sub WW_INSERT_LINK(ByVal SQLcon As SqlConnection,
                                  ByRef O_RTN As String,
-                                 ByVal I_UseFlg As Boolean,
+                                 ByVal I_UseFlg As String,
                                  Optional ByVal I_RLinkNo As String = Nothing)
 
         If IsNothing(OIT0002EXLINStbl) Then
@@ -2020,7 +2026,7 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("LOADINGACCDATE", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("LOADINGEMPARRDATE", Type.GetType("System.String"))
                 '◯運用指示書あり(受注情報が設定)
-                If I_UseFlg = True Then
+                If I_UseFlg = "0" Then
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         For Each OIT0002ExlINSrow As DataRow In OIT0002EXLINStbl.Rows
                             If OIT0002ExlUProw("TRUCKNO") = OIT0002ExlINSrow("TANKNUMBER") _
@@ -2072,7 +2078,7 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("OUTLINETRAIN", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("OUTLINETRAINNAME", Type.GetType("System.String"))
                 '◯運用指示書あり(受注情報が設定)
-                If I_UseFlg = True Then
+                If I_UseFlg = "0" Then
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
 
                         '★入線列車番号が未設定の場合はSKIP
@@ -2115,7 +2121,7 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("PATTERNCODE", Type.GetType("System.String"))
                 OIT0002EXLUPtbl.Columns.Add("PATTERNNAME", Type.GetType("System.String"))
                 '◯運用指示書あり(受注情報が設定)
-                If I_UseFlg = True Then
+                If I_UseFlg = "0" Then
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         If OIT0002ExlUProw("LOADINGTRAINNO") <> "" Then
 

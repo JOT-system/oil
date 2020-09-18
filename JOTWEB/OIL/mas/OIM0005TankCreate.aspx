@@ -196,7 +196,7 @@
                         <span ondblclick="Field_DBclick('WF_USERCODE', <%=LIST_BOX_CLASSIFICATION.LC_THIRDUSER%>);" onchange="TextBox_change('WF_USERCODE');">
                             <asp:TextBox ID="WF_USERCODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
-                        <asp:Label ID="WF_USERCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL">定義なし</asp:Label>
+                        <asp:Label ID="WF_USERCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                     
                     <!-- 第三者使用期限 -->
@@ -225,7 +225,7 @@
                         <span ondblclick="Field_DBclick('WF_DEDICATETYPECODE', <%=LIST_BOX_CLASSIFICATION.LC_DEDICATETYPE%>);" onchange="TextBox_change('WF_DEDICATETYPECODE');">
                             <asp:TextBox ID="WF_DEDICATETYPECODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
-                        <asp:Label ID="WF_DEDICATETYPECODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL">定義なし</asp:Label>
+                        <asp:Label ID="WF_DEDICATETYPECODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 
@@ -256,7 +256,7 @@
                         <span ondblclick="Field_DBclick('WF_EXTRADINARYTYPECODE', <%=LIST_BOX_CLASSIFICATION.LC_EXTRADINARYTYPE%>);" onchange="TextBox_change('WF_DEDICATETYPECODE');">
                             <asp:TextBox ID="WF_EXTRADINARYTYPECODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
-                        <asp:Label ID="WF_EXTRADINARYTYPECODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL">定義なし</asp:Label>
+                        <asp:Label ID="WF_EXTRADINARYTYPECODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- 臨時専用期限 -->
@@ -296,7 +296,7 @@
                         <span ondblclick="Field_DBclick('WF_COLORCODE', <%=LIST_BOX_CLASSIFICATION.LC_COLOR%>);" onchange="TextBox_change('WF_COLORCODE');">
                             <asp:TextBox ID="WF_COLORCODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
-                        <asp:Label ID="WF_COLORCODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL">定義なし</asp:Label>
+                        <asp:Label ID="WF_COLORCODE_TEXT" runat="server"  CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
                     <!-- マークコード-->
@@ -473,7 +473,7 @@
                         <span ondblclick="Field_DBclick('WF_OBTAINEDCODE', <%=LIST_BOX_CLASSIFICATION.LC_OBTAINED%>);" onchange="TextBox_change('WF_OBTAINEDCODE');">
                             <asp:TextBox ID="WF_OBTAINEDCODE" runat="server"  CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="2"></asp:TextBox>
                         </span>
-                        <asp:Label ID="WF_OBTAINEDCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL">定義なし</asp:Label>
+                        <asp:Label ID="WF_OBTAINEDCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
                 </p>
 

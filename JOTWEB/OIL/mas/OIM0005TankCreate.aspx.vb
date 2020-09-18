@@ -2355,15 +2355,12 @@ Public Class OIM0005TankCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "USERCODE"                     '第三者使用者C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_THIRDUSER, I_VALUE, O_TEXT, O_RTN, prmData)
-                    O_TEXT = "定義なし"
                 Case "STATIONPATTERN"　              '原常備駅C、臨時常備駅C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "DEDICATETYPECODE"             '原専用種別C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_DEDICATETYPE, I_VALUE, O_TEXT, O_RTN, prmData)
-                    O_TEXT = "定義なし"
                 Case "EXTRADINARYTYPECODE"          '臨時専用種別C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_EXTRADINARYTYPE, I_VALUE, O_TEXT, O_RTN, prmData)
-                    O_TEXT = "定義なし"
                 Case "BIGOILCODE"                   '油種大分類コード
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BIGOILCODE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "BASE"                         '運用基地
@@ -2371,7 +2368,6 @@ Public Class OIM0005TankCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_BASE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "COLORCODE"                    '塗色C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COLOR, I_VALUE, O_TEXT, O_RTN, prmData)
-                    O_TEXT = "定義なし"
                 Case "MARKCODE"                     'マークコード
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "MARKCODE")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
@@ -2380,7 +2376,6 @@ Public Class OIM0005TankCreate
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)
                 Case "OBTAINEDCODE"                 '取得先C
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_OBTAINED, I_VALUE, O_TEXT, O_RTN, prmData)
-                    O_TEXT = "定義なし"
                 Case "JRTANKTYPE"                   'JR車種コード
                     prmData = work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "JRTANKTYPE")
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, prmData)

@@ -228,6 +228,7 @@ Public Class OIT0002LinkDetail
         '返送列車
         Me.TxtBTrainNo.Text = work.WF_SEL_BTRAINNO.Text
         Me.TxtBTrainName.Text = work.WF_SEL_BTRAINNAME.Text
+        Me.LblBTrainName.Text = work.WF_SEL_BTRAINNAME.Text
         '空車着日（予定）
         Me.txtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
 
@@ -1249,6 +1250,7 @@ Public Class OIT0002LinkDetail
                     '◯ 返送列車
                     Me.TxtBTrainNo.Text = ""
                     Me.TxtBTrainName.Text = ""
+                    Me.LblBTrainName.Text = ""
 
                     '◯ 空車発駅
                     work.WF_SEL_DEPSTATION.Text = ""
@@ -1263,6 +1265,7 @@ Public Class OIT0002LinkDetail
 
                 Me.TxtBTrainNo.Text = WW_SelectValue
                 Me.TxtBTrainName.Text = WW_SelectText
+                Me.LblBTrainName.Text = WW_SelectText
                 Me.TxtBTrainNo.Focus()
 
                 '★列車名(返送)から情報を取得
@@ -5840,16 +5843,22 @@ Public Class OIT0002LinkDetail
         Dim loopdr As DataRow = Nothing
         Dim rowIdx As Integer = 0
         Dim cvTruckSymbol As String = ""
+        Dim cvTruckSymbolSub As String = ""
         Dim trkKbn As String = ""
 
         For Each rowitem As TableRow In tblObj.Rows
 
             loopdr = OIT0002tbl.Rows(rowIdx)
             cvTruckSymbol = StrConv(loopdr("MODEL"), Microsoft.VisualBasic.VbStrConv.Wide, &H411)
+            Try
+                cvTruckSymbolSub = cvTruckSymbol.Substring(0, 1)
+            Catch ex As Exception
+                cvTruckSymbolSub = ""
+            End Try
 
             For Each cellObj As TableCell In rowitem.Controls
                 '★コンテナの場合は入力制限する。
-                If (cvTruckSymbol.Substring(0, 1) = "コ" OrElse cvTruckSymbol.Substring(0, 1) = "チ") Then
+                If (cvTruckSymbolSub = "コ" OrElse cvTruckSymbolSub = "チ") Then
                     If cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "TANKNUMBER") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ORDERINGOILNAME") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "LINE") _
@@ -6267,17 +6276,17 @@ Public Class OIT0002LinkDetail
                 Case "DEPSTATION"       '積込後発駅
                     'leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "2", "DEPSTATION"))
                     If IsNothing(I_OFFICECODE) Then
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "1", "DEPSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "2", "DEPSTATION"))
                     Else
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE + "1", "DEPSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE + "2", "DEPSTATION"))
                     End If
 
                 Case "RETSTATION"       '積込後着駅
                     'leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "1", "RETSTATION"))
                     If IsNothing(I_OFFICECODE) Then
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "2", "RETSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_OFFICECODE.Text + "1", "RETSTATION"))
                     Else
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE + "2", "RETSTATION"))
+                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_STATIONCODE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(I_OFFICECODE + "1", "RETSTATION"))
                     End If
 
                 Case "PRODUCTPATTERN"   '油種

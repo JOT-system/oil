@@ -1592,7 +1592,11 @@ Public Class OIM0005TankList
                         PARA62.Value = Master.USERID
                         PARA63.Value = Master.USERTERMID
                         PARA64.Value = C_DEFAULT_YMD
-                        PARA66.Value = OIM0005row("MYWEIGHT")
+                        If OIM0005row("MYWEIGHT") <> "" Then
+                            PARA66.Value = OIM0005row("MYWEIGHT")
+                        Else
+                            PARA66.Value = "0.0"
+                        End If
                         PARA67.Value = OIM0005row("AUTOEXTENTIONNAME")
                         PARA68.Value = OIM0005row("BIGOILCODE")
                         PARA69.Value = OIM0005row("BIGOILNAME")

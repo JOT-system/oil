@@ -977,7 +977,7 @@ Public Class OIM0005TankCreate
                     'その他: ﾀｷ-XXXXX
                     '※ﾀｷは半角カナ
                     If modelL = "タキ" AndAlso modelR = 1000 Then
-                        WF_JRTANKNUMBER.Text = String.Format("{0}-{1}", StrConv(modelL, VbStrConv.Narrow), tankNumber)
+                        WF_JRTANKNUMBER.Text = String.Format("{0}{1}-{2}", StrConv(modelL, VbStrConv.Narrow), modelR, tankNumber)
                     Else
                         WF_JRTANKNUMBER.Text = String.Format("{0}-{1}", StrConv(modelL, VbStrConv.Narrow), modelR)
                     End If

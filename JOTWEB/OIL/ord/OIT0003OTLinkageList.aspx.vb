@@ -58,10 +58,22 @@ Public Class OIT0003OTLinkageList
                             WF_ButtonALLSELECT_Click()
                         Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
                             WF_ButtonSELECT_LIFTED_Click()
+                        Case "WF_ButtonFilter"
+                            WF_ButtonFilter_Click(False)
+                        Case "WF_ButtonFilterClear"
+                            WF_ButtonFilter_Click(True)
                         Case "WF_ButtonOtSend"          'OT連携ボタン押下
                             WF_ButtonOtSend_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
+                        Case "WF_Field_DBClick"             'フィールドダブルクリック
+                            WF_FIELD_DBClick()
+                        Case "WF_ButtonSel"                 '(左ボックス)選択ボタン押下
+                            WF_ButtonSel_Click()
+                        Case "WF_ButtonCan"                 '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"            '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             'WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
@@ -173,7 +185,18 @@ Public Class OIT0003OTLinkageList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
+        'フィルタ初期選択値取得（PROFVARIより)
+        Dim dummyTxt As New TextBox
+        Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "FILTERDATEFLD", dummyTxt.Text)       '会社コード
+        If dummyTxt.Text <> "" AndAlso Me.rblFilterDateFiled.Items.FindByValue(dummyTxt.Text) IsNot Nothing Then
+            Me.rblFilterDateFiled.SelectedValue = dummyTxt.Text
+        Else
+            If Me.rblFilterDateFiled IsNot Nothing AndAlso Me.rblFilterDateFiled.Items.Count > 0 Then
+                Me.rblFilterDateFiled.SelectedIndex = 0
+            End If
+        End If
 
+        Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "FILTERDATE", WF_FILTERDATE_TEXT.Text)       '会社コード
         '○ 受注一覧画面からの遷移
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0003L Then
             'Grid情報保存先のファイル名
@@ -182,6 +205,8 @@ Public Class OIT0003OTLinkageList
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0003D Then
             Master.RecoverTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
         End If
+
+        '
 
         ''○ 名称設定処理
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
@@ -204,6 +229,20 @@ Public Class OIT0003OTLinkageList
                 MAPDataGet(SQLcon)
             End Using
         End If
+        Dim chkField As String = ""
+        If Me.rblFilterDateFiled IsNot Nothing AndAlso Me.rblFilterDateFiled.SelectedIndex <> -1 Then
+            chkField = rblFilterDateFiled.SelectedValue
+        End If
+        SetFilterValue(OIT0003tbl, chkField, Me.WF_FILTERDATE_TEXT.Text)
+        '○ 表示対象行カウント(絞り込み対象)
+        Dim WW_DataCNT As Integer = 0
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            If CInt(OIT0003row("HIDDEN")) = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIT0003row("SELECT") = WW_DataCNT
+            End If
+        Next
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
@@ -211,7 +250,10 @@ Public Class OIT0003OTLinkageList
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(OIT0003tbl)
 
-        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+        'TBLview.RowFilter = "HIDDEN = 0 and LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= 1 and SELECT <= " & CONST_DISPROWCOUNT
+
 
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
@@ -347,10 +389,11 @@ Public Class OIT0003OTLinkageList
             & " WHERE OIT0002.DELFLG      <> @P04" _
             & "   AND OIT0002.ORDERSTATUS <= @P03" _
 
-        '★積置フラグ無し用SQL
+        '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND OIT0002.LODDATE     >= @P02"
+            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "         OR OIT0002.DEPDATE     >= @P02) "
 
         '★積置フラグ有り用SQL
         SQLStrAri &=
@@ -394,6 +437,7 @@ Public Class OIT0003OTLinkageList
             & SQLStrAri
 
         Try
+            Dim targetDate As String = Format(Now.AddDays(1), "yyyy/MM/dd")
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
                 'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)         '積込日
@@ -401,27 +445,52 @@ Public Class OIT0003OTLinkageList
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
                 'PARA01.Value = OFFICECDE
-                PARA02.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                PARA02.Value = targetDate
                 'PARA02.Value = "2020/08/20"
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE
                 PARA05.Value = work.WF_SEL_OTS_SALESOFFICECODE.Text
-
+                Dim dtWrk As DataTable = New DataTable
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        dtWrk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0003tbl.Load(SQLdr)
+                    dtWrk.Load(SQLdr)
                 End Using
+                '各ボタンで処理が可能か判定するフラグフィールド（３ボタン分追加）
+                'OT発送日報出力可否
+                dtWrk.Columns.Add("CAN_OTSEND", GetType(String)).DefaultValue = "0"
+                '製油所出荷予約出力可否
+                dtWrk.Columns.Add("CAN_RESERVED", GetType(String)).DefaultValue = "0"
+                '託送指示出力可否
+                dtWrk.Columns.Add("CAN_TAKUSOU", GetType(String)).DefaultValue = "0"
+                If dtWrk.Rows.Count <> 0 Then
+                    OIT0003tbl = (From dr As DataRow In dtWrk Order By dr("LODDATE")).CopyToDataTable
+                Else
+                    OIT0003tbl = dtWrk
+                End If
 
                 Dim i As Integer = 0
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
-
+                    '積込日比較
+                    If Convert.ToString(OIT0003row("LODDATE")) >= targetDate Then
+                        OIT0003row("CAN_OTSEND") = "1"
+                    Else
+                        OIT0003row("CAN_OTSEND") = "0"
+                    End If
+                    '発日比較
+                    If Convert.ToString(OIT0003row("DEPDATE")) >= targetDate Then
+                        OIT0003row("CAN_RESERVED") = "1"
+                        OIT0003row("CAN_TAKUSOU") = "1"
+                    Else
+                        OIT0003row("CAN_RESERVED") = "0"
+                        OIT0003row("CAN_TAKUSOU") = "0"
+                    End If
                     ''受注進行ステータス
                     'CODENAME_get("ORDERSTATUS", OIT0003row("STATUS"), OIT0003row("STATUS"), WW_DUMMY)
                     ''受注情報
@@ -509,27 +578,57 @@ Public Class OIT0003OTLinkageList
         Master.SaveTable(OIT0003tbl)
 
     End Sub
-
+    ''' <summary>
+    ''' フィルタ処理実行
+    ''' </summary>
+    ''' <param name="isClear"></param>
+    Protected Sub WF_ButtonFilter_Click(isClear As Boolean)
+        Dim chkField As String = ""
+        If Me.rblFilterDateFiled IsNot Nothing AndAlso Me.rblFilterDateFiled.SelectedIndex <> -1 Then
+            chkField = rblFilterDateFiled.SelectedValue
+        End If
+        Dim dataVal As String = ""
+        If isClear = False Then
+            dataVal = Me.WF_FILTERDATE_TEXT.Text
+        End If
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+        '表示行制御実行
+        OIT0003tbl = SetFilterValue(OIT0003tbl, chkField, dataVal)
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+    End Sub
     ''' <summary>
     ''' OT連携ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonOtSend_Click()
-
+        Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
         '一覧のチェックボックスが選択されているか確認
         If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
             '選択されていない場合は、エラーメッセージを表示し終了
             Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
+        '処理対象外のチェックがなされている場合
+        Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+                                                         AndAlso dr("CAN_OTSEND").Equals("0")
 
+        If qCannotProc.Any Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
         '******************************
         'OT発送日報データ取得処理
         '******************************
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
-
-            OTLinkageDataGet(SQLcon)
+            SqlConnection.ClearPool(SQLcon)
+            selectedOrderInfo = OTLinkageDataGet(SQLcon)
+            If selectedOrderInfo Is Nothing Then
+                Return
+            End If
         End Using
 
         '******************************
@@ -546,7 +645,61 @@ Public Class OIT0003OTLinkageList
             WF_PrintURL.Value = url
             ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
         End Using
+        '******************************
+        'OT発送日報データの（本体）ダウンロードフラグ更新
+        '                  （明細）ダウンロード数インクリメント
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            Dim procDate As Date = Now
+            Dim resProc As Boolean = False
+            Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                'オーダー明細のダウンロードカウントのインクリメント
+                resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                'オーダー明細よりダウンロードフラグを取得
+                orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
+                If orderDlFlags Is Nothing Then
+                    Return
+                End If
+                'オーダーを更新
+                resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                '履歴登録用直近データ取得
+                '直近履歴番号取得
+                Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                If historyNo = "" Then
+                    Return
+                End If
+                Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                    Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                    Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
 
+                    '履歴テーブル登録
+                    For Each dr As DataRow In hisOrderTbl.Rows
+                        EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                    Next
+                    For Each dr As DataRow In hisDetailTbl.Rows
+                        EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                    Next
+                    'ジャーナル登録
+                    OutputJournal(orderTbl, "OIT0002_ORDER")
+                    OutputJournal(detailTbl, "OIT0003_DETAIL")
+                End If
+
+                'ここまで来たらコミット
+                sqlTran.Commit()
+            End Using
+
+        End Using
         ''○ 遷移先(OT連携一覧画面)退避データ保存先の作成
         'WW_CreateXMLSaveFile()
 
@@ -554,14 +707,60 @@ Public Class OIT0003OTLinkageList
         'Master.SaveTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
 
     End Sub
+    ''' <summary>
+    ''' 受注履歴テーブル用の履歴番号取得
+    ''' </summary>
+    ''' <returns>履歴番号</returns>
+    Private Function GetNewOrderHistoryNo(ByVal sqlCon As SqlConnection, sqlTran As SqlTransaction) As String
+        Dim retVal As String = ""
+        Try
+            Dim sqlStr As New StringBuilder
+            sqlStr.AppendLine("SELECT FX.KEYCODE  AS HISTORYNO")
+            sqlStr.AppendLine("  FROM OIL.VIW0001_FIXVALUE FX")
+            sqlStr.AppendLine(" WHERE FX.CLASS    = @CLASS")
+            sqlStr.AppendLine("   AND FX.DELFLG   = @DELFLG")
+            Using sqlCmd As New SqlCommand(sqlStr.ToString, sqlCon, sqlTran)
+                With sqlCmd.Parameters
+                    .Add("@CLASS", SqlDbType.NVarChar).Value = "NEWHISTORYNOGET"
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                End With
 
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows Then
+                        sqlDr.Read()
+                        retVal = Convert.ToString(sqlDr("HISTORYNO"))
+                    Else
+                        Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL ORDER_HISTORYNOGET")
+
+                        CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+                        CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL ORDER_HISTORYNOGET"
+                        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                        CS0011LOGWrite.TEXT = "履歴番号の取得に失敗"
+                        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                        CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+                        retVal = ""
+                    End If
+                End Using 'sqlDr
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL ORDER_HISTORYNOGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL ORDER_HISTORYNOGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+        End Try
+        Return retVal
+    End Function
     ''' <summary>
     ''' OT発送日報データ取得
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub OTLinkageDataGet(ByVal SQLcon As SqlConnection)
-
+    Protected Function OTLinkageDataGet(ByVal SQLcon As SqlConnection) As List(Of OutputOrdedrInfo)
+        Dim retVal As New List(Of OutputOrdedrInfo)
         If IsNothing(OIT0003CsvOTLinkagetbl) Then
             OIT0003CsvOTLinkagetbl = New DataTable
         End If
@@ -610,7 +809,9 @@ Public Class OIT0003OTLinkageList
 
         '★共通SQL
         Dim SQLStrCmn As String =
-              " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
+              " , OIT0002.ORDERNO                                AS ORDERNO" _
+            & " , OIT0003.DETAILNO                               AS DETAILNO" _
+            & " , REPLACE(CONVERT(NCHAR(4), ''), SPACE(1), '0')  AS TRAINNO" _
             & " , CONVERT(NCHAR(1), '')                          AS TRAINTYPE" _
             & " , CONVERT(NCHAR(2), OIT0002.TOTALTANKCH)         AS TOTALTANK" _
             & " , CONVERT(NCHAR(2), ISNULL(OIT0003.SHIPORDER,'')) AS SHIPORDER" _
@@ -708,10 +909,8 @@ Public Class OIT0003OTLinkageList
 
         '一覧で指定された受注№を条件に設定
         Dim j As Integer = 0
-        For Each OIT0003row As DataRow In OIT0003tbl.Rows
-
-            '★指定されていない行はSKIP
-            If Convert.ToString(OIT0003row("OPERATION")) = "" Then Continue For
+        Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+        For Each OIT0003row As DataRow In checkedRow.Rows
 
             If j = 0 Then
                 SQLStrCmn &= "'" & Convert.ToString(OIT0003row("ORDERNO")) & "' "
@@ -745,6 +944,7 @@ Public Class OIT0003OTLinkageList
               " UNION ALL" _
             & SQLStrAri
 
+
         Try
 
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
@@ -761,20 +961,36 @@ Public Class OIT0003OTLinkageList
                 '★桁数設定
                 Dim VALUE01 As SqlParameter = SQLcmd.Parameters.Add("@V01", SqlDbType.Int) '支店Ｃ(当社日報)
                 VALUE01.Value = iOURDAILYBRANCHC
-
+                Dim wrkDt As DataTable = New DataTable
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        OIT0003CsvOTLinkagetbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        wrkDt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        If SQLdr.GetName(index) <> "ORDERNO" Then
+                            OIT0003CsvOTLinkagetbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        End If
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    OIT0003CsvOTLinkagetbl.Load(SQLdr)
+                    wrkDt.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
-                Dim sortedDt = From dr As DataRow In OIT0003CsvOTLinkagetbl Order By dr("LODDATE")
-                For Each OIT0003Csvrow As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
+                Dim sortedDt = From dr As DataRow In wrkDt Order By dr("LODDATE")
+                For Each sortedDr As DataRow In sortedDt 'OIT0003CsvOTLinkagetbl.Rows
+                    Dim qHasSelectedRow = From chkDr In checkedRow Where sortedDr("ORDERNO").Equals(chkDr("ORDERNO")) AndAlso
+                                                                       Convert.ToString(sortedDr("LODDATE")) = Convert.ToString(chkDr("LODDATE")).Replace("/", "")
+                    If qHasSelectedRow.Any Then
+                        Dim newDr As DataRow = OIT0003CsvOTLinkagetbl.NewRow
+                        For Each col As DataColumn In wrkDt.Columns
+                            If Not {"ORDERNO", "DETAILNO"}.Contains(col.ColumnName) Then
+                                newDr(col.ColumnName) = sortedDr(col.ColumnName)
+                            End If
+                        Next
+
+                        OIT0003CsvOTLinkagetbl.Rows.Add(newDr)
+                        retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
+                    End If
                     'i += 1
                     'OIT0003Csvrow("LINECNT") = i        'LINECNT
 
@@ -791,7 +1007,7 @@ Public Class OIT0003OTLinkageList
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
+            Return Nothing
         End Try
 
         '○ 画面表示データ保存
@@ -799,9 +1015,395 @@ Public Class OIT0003OTLinkageList
 
         '○メッセージ表示
         Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+        Return retVal
+    End Function
+    ''' <summary>
+    ''' 受注・受注明細テーブルの各出力フラグ及び、カウントをインクリメント
+    ''' </summary>
+    ''' <param name="uploadOrderInfo">出力した受注キー情報</param>
+    ''' <param name="callerButton">呼出し元ボタン</param>
+    ''' <param name="sqlCon">SQL接続</param>
+    ''' <param name="sqlTran">トランザクション</param>
+    Private Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#) As Boolean
+        Try
 
-    End Sub
+            Dim sqlStat As StringBuilder
+            If procDate = #1900/1/1# Then
+                procDate = Now
+            End If
 
+            '選択済の画面の行データ取得
+            Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+
+            '選択した受注No、積込日と合致する明細行のインクリメント
+            'アップロード方式によりインクリメントフィールドを変更
+            Dim incFieldName As String = ""
+            Select Case callerButton
+                Case "WF_ButtonOtSend" 'OT発送日報出力
+                    incFieldName = "OTSENDCOUNT"
+                Case "WF_ButtonReserved" '製油所出荷予約
+                    incFieldName = "DLRESERVEDCOUNT"
+                Case "WF_ButtonTakusou" '託送指示
+                    incFieldName = "DLTAKUSOUCOUNT"
+                Case Else
+                    Throw New Exception("想定外のボタンが押されました")
+            End Select
+            sqlStat = New StringBuilder
+            sqlStat.AppendLine("UPDATE OIL.OIT0003_DETAIL")
+            sqlStat.AppendFormat("   SET {0} = ISNULL({0},0) + 1", incFieldName).AppendLine()
+            sqlStat.AppendLine("       ,UPDYMD             = @UPDYMD")
+            sqlStat.AppendLine("       ,UPDUSER            = @UPDUSER")
+            sqlStat.AppendLine("       ,UPDTERMID          = @UPDTERMID")
+            sqlStat.AppendLine("       ,RECEIVEYMD         = @RECEIVEYMD")
+            sqlStat.AppendLine(" WHERE ORDERNO  = @ORDERNO")
+            sqlStat.AppendLine("   AND DETAILNO = @DETAILNO")
+            sqlStat.AppendLine("   AND DELFLG   = @DELFLG") 'ここまで来て削除フラグ1はありえないが念の為
+
+            For Each orderKey In uploadOrderInfo
+                Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+                    With sqlCmd.Parameters
+                        '値
+                        .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
+                        .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
+                        .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                        .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = C_DEFAULT_YMD
+                        '条件
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = orderKey.OrderNo
+                        .Add("@DETAILNO", SqlDbType.NVarChar).Value = orderKey.DetailNo
+                        .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    End With
+                    sqlCmd.ExecuteNonQuery()
+                End Using
+            Next orderKey
+            Return True
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL INCREMENT_OUTPUT_CNT", needsPopUp:=True)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL INCREMENT_OUTPUT_CNT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return False
+        End Try
+
+    End Function
+    ''' <summary>
+    ''' 受注明細を検索、ダウンロード回数を判定し更新すべき出力フラグ値を取得
+    ''' </summary>
+    ''' <param name="uploadOrderInfo">更新した受注情報（オーダーNo,明細No）</param>
+    ''' <param name="callerButton">呼出し元ボタン</param>
+    ''' <param name="sqlCon">SQLコネクション</param>
+    ''' <param name="sqlTran">トランザクションオブジェクト</param>
+    ''' <returns>ORDER番号とフラグ値のディクショナリ※nothing:エラー発生時</returns>
+    Private Function GetOutputFlag(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction) As Dictionary(Of String, String)
+        Try
+            '更新したオーダー番号をユニークにする
+            Dim orderNoList = (From itm In uploadOrderInfo Group By g = itm.OrderNo Into Group Select g).ToList
+            '呼出し元ボタンに応じカウントアップしたフィールドを取得
+            Dim incFieldName As String
+            Select Case callerButton
+                Case "WF_ButtonOtSend" 'OT発送日報出力
+                    incFieldName = "OTSENDCOUNT"
+                Case "WF_ButtonReserved" '製油所出荷予約
+                    incFieldName = "DLRESERVEDCOUNT"
+                Case "WF_ButtonTakusou" '託送指示
+                    incFieldName = "DLTAKUSOUCOUNT"
+                Case Else
+                    Throw New Exception("想定外のボタンが押されました")
+            End Select
+            Dim sqlStat = New StringBuilder
+            sqlStat.AppendLine("SELECT ORDERNO ")
+            sqlStat.AppendFormat("      ,SUM(CASE WHEN ISNULL({0},0)  = 0 THEN 1 ELSE 0 END) AS CNT_ZERO", incFieldName).AppendLine()
+            sqlStat.AppendFormat("      ,SUM(CASE WHEN ISNULL({0},0)  = 1 THEN 1 ELSE 0 END) AS CNT_ONE", incFieldName).AppendLine()
+            sqlStat.AppendFormat("      ,SUM(CASE WHEN ISNULL({0},0) >= 2 THEN 1 ELSE 0 END) AS CNT_OVER2", incFieldName).AppendLine()
+            sqlStat.AppendLine("      ,COUNT(DETAILNO) AS CNT_TTL")
+            sqlStat.AppendLine("  FROM OIL.OIT0003_DETAIL WITH(nolock)")
+            sqlStat.AppendLine(" WHERE DELFLG   = @DELFLG")
+            Dim inStat As String = String.Join(",", (From itm In orderNoList Select "'" & itm & "'"))
+            sqlStat.AppendFormat("   AND ORDERNO IN ({0})", inStat).AppendLine()
+            sqlStat.AppendLine(" GROUP BY ORDERNO")
+            Dim retDec As New Dictionary(Of String, String)
+
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+                sqlCmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    While sqlDr.Read
+                        Dim orderNo As String = Convert.ToString(sqlDr("ORDERNO"))
+                        Dim cntZero As Decimal = CDec(sqlDr("CNT_ZERO"))
+                        Dim cntOne As Decimal = CDec(sqlDr("CNT_ONE"))
+                        Dim cntOverTwo As Decimal = CDec(sqlDr("CNT_OVER2"))
+                        Dim cntTotal As Decimal = CDec(sqlDr("CNT_TTL"))
+
+
+                        If cntZero = cntTotal Then
+                            '全件0の場合は未送信(そもそも
+                            '　　　　　　　　　　当画面でこのケースはありえない）
+                            retDec.Add(orderNo, "0")
+                            Continue While
+                        ElseIf callerButton <> "WF_ButtonOtSend" Then
+                            '発送日報以外で未送信以外は基本的に送信済
+                            '再送信の情報も押えない
+                            retDec.Add(orderNo, "1")
+                            Continue While
+                        End If
+                        '***************************
+                        '以下は発送日報のみの制御
+                        '***************************
+                        If cntOne = cntTotal Then
+                            '全て一度送信
+                            retDec.Add(orderNo, "1")
+                            Continue While
+                        End If
+                        '以下は発送日報のみの制御
+                        If cntZero >= 1 AndAlso cntOverTwo = 0 Then
+                            '未送信があり、再送信が無い場合
+                            retDec.Add(orderNo, "2") '一部送信
+                            Continue While
+                        End If
+
+                        If cntZero >= 1 AndAlso cntOverTwo >= 1 Then
+                            '未送信があり、再送信がある場合
+                            retDec.Add(orderNo, "3") '一部再送信済
+                            Continue While
+                        End If
+
+                        'ここまで来たら全て送信、または再送信している状態
+                        retDec.Add(orderNo, "4") '再送信済
+                        Continue While
+                    End While
+                End Using 'sqlDr
+            End Using 'sqlCmd
+            Return retDec
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL GETOUTPUTFLG", needsPopUp:=True)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL GETOUTPUTFLG"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return Nothing
+        End Try
+    End Function
+    ''' <summary>
+    ''' 引数の情報を元に受注テーブルの出力フラグを更新
+    ''' </summary>
+    ''' <param name="orderOutputFlags">キー：オーダー番号、値：出力フラグ値</param>
+    ''' <param name="callerButton">呼出し元ボタン</param>
+    ''' <param name="sqlCon">SQL接続オブジェクト</param>
+    ''' <param name="sqlTran">トランザクションオブジェクト</param>
+    ''' <param name="procDate">処理日、※未指定日処理実行時点の日時</param>
+    ''' <returns>処理結果：True:正常、False：異常</returns>
+    Private Function UpdateOrderOutputFlag(orderOutputFlags As Dictionary(Of String, String), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#) As Boolean
+        Try
+            Dim sqlStat As StringBuilder
+            If procDate = #1900/1/1# Then
+                procDate = Now
+            End If
+
+            '選択済の画面の行データ取得
+            Dim checkedRow As DataTable = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "").CopyToDataTable
+
+            '選択した受注No、積込日と合致する明細行のインクリメント
+            'アップロード方式によりインクリメントフィールドを変更
+            Dim updFieldName As String = ""
+            Select Case callerButton
+                Case "WF_ButtonOtSend" 'OT発送日報出力
+                    updFieldName = "OTSENDSTATUS"
+                Case "WF_ButtonReserved" '製油所出荷予約
+                    updFieldName = "RESERVEDSTATUS"
+                Case "WF_ButtonTakusou" '託送指示
+                    updFieldName = "TAKUSOUSTATUS"
+                Case Else
+                    Throw New Exception("想定外のボタンが押されました")
+            End Select
+            sqlStat = New StringBuilder
+            sqlStat.AppendLine("UPDATE OIL.OIT0002_ORDER")
+            sqlStat.AppendFormat("   SET {0} = @FLAGVALUE", updFieldName).AppendLine()
+            sqlStat.AppendLine("       ,UPDYMD             = @UPDYMD")
+            sqlStat.AppendLine("       ,UPDUSER            = @UPDUSER")
+            sqlStat.AppendLine("       ,UPDTERMID          = @UPDTERMID")
+            sqlStat.AppendLine("       ,RECEIVEYMD         = @RECEIVEYMD")
+            sqlStat.AppendLine(" WHERE ORDERNO  = @ORDERNO")
+            sqlStat.AppendLine("   AND DELFLG   = @DELFLG") 'ここまで来て削除フラグ1はありえないが念の為
+
+            For Each orderKey In orderOutputFlags
+                Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+                    With sqlCmd.Parameters
+                        '値
+                        .Add("@FLAGVALUE", SqlDbType.NVarChar).Value = orderKey.Value
+                        .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
+                        .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
+                        .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
+                        .Add("@RECEIVEYMD", SqlDbType.DateTime).Value = C_DEFAULT_YMD
+                        '条件
+                        .Add("@ORDERNO", SqlDbType.NVarChar).Value = orderKey.Key
+                        .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    End With
+                    sqlCmd.ExecuteNonQuery()
+                End Using
+            Next orderKey
+            Return True
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL UPDATE_ORDER_UPLOADFLAG", needsPopUp:=True)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL UPDATE_ORDER_UPLOADFLAG"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return False
+        End Try
+
+    End Function
+    ''' <summary>
+    ''' 更新した受注明細の取得
+    ''' </summary>
+    ''' <param name="uploadOrderInfo"></param>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <returns></returns>
+    Private Function GetUpdatedOrderDetail(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+        Dim retDt As New DataTable
+        Try
+            Dim sqlStat = New StringBuilder
+            sqlStat.AppendLine("SELECT *")
+            sqlStat.AppendLine("  FROM OIL.OIT0003_DETAIL WITH(nolock)")
+            sqlStat.AppendLine(" WHERE DELFLG   = @DELFLG")
+            sqlStat.AppendLine("   AND (")
+            Dim isFirst As Boolean = True
+            For Each orderInfo In uploadOrderInfo
+                If isFirst Then
+                    isFirst = False
+                    sqlStat.AppendFormat("     (ORDERNO = '{0}' AND DETAILNO = '{1}')", orderInfo.OrderNo, orderInfo.DetailNo).AppendLine()
+                Else
+                    sqlStat.AppendFormat(" OR  (ORDERNO = '{0}' AND DETAILNO = '{1}')", orderInfo.OrderNo, orderInfo.DetailNo).AppendLine()
+                End If
+            Next orderInfo
+
+            sqlStat.AppendLine("       )")
+            'SQL実行
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+                sqlCmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        retDt.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    If retDt.Columns.Contains("UPDTIMSTP") Then
+                        retDt.Columns.Remove("UPDTIMSTP")
+                    End If
+                    retDt.Load(sqlDr)
+                End Using 'sqlDr
+            End Using 'sqlCmd
+
+            Return retDt
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL GET_UPDATED_ORDERDETAIL")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL GET_UPDATED_ORDERDETAIL"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return Nothing
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 更新した受注の取得
+    ''' </summary>
+    ''' <param name="uploadOrderInfo"></param>
+    ''' <param name="sqlCon"></param>
+    ''' <param name="sqlTran"></param>
+    ''' <returns></returns>
+    Private Function GetUpdatedOrder(uploadOrderInfo As List(Of OutputOrdedrInfo), sqlCon As SqlConnection, sqlTran As SqlTransaction) As DataTable
+        Dim retDt As New DataTable
+        Try
+            Dim sqlStat = New StringBuilder
+            sqlStat.AppendLine("SELECT *")
+            sqlStat.AppendLine("  FROM OIL.OIT0002_ORDER WITH(nolock)")
+            sqlStat.AppendLine(" WHERE DELFLG   = @DELFLG")
+            Dim orderNoList = (From itm In uploadOrderInfo Group By g = itm.OrderNo Into Group Select g).ToList
+            Dim inStat As String = String.Join(",", (From itm In orderNoList Select "'" & itm & "'"))
+            sqlStat.AppendFormat("   AND ORDERNO IN ({0})", inStat).AppendLine()
+            'SQL実行
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
+                sqlCmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        retDt.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    If retDt.Columns.Contains("UPDTIMSTP") Then
+                        retDt.Columns.Remove("UPDTIMSTP")
+                    End If
+                    retDt.Load(sqlDr)
+                End Using 'sqlDr
+            End Using 'sqlCmd
+
+            Return retDt
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL GET_UPDATED_ORDER")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL GET_UPDATED_ORDER"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return Nothing
+        End Try
+    End Function
+    ''' <summary>
+    ''' 履歴テーブル用の情報を付与したデータテーブルに変換
+    ''' </summary>
+    ''' <returns></returns>
+    Private Function ModifiedHistoryDatatable(dt As DataTable, historyNo As String) As DataTable
+        Dim retDt As DataTable = dt.Clone
+        '履歴とMAPIDの付与
+        retDt.Columns.Add("HISTORYNO", GetType(String)).DefaultValue = historyNo
+        retDt.Columns.Add("MAPID", GetType(String)).DefaultValue = Master.MAPID
+        Dim retDr As DataRow = Nothing
+        For Each dr As DataRow In dt.Rows
+            retDr = retDt.NewRow
+            For Each colName As DataColumn In dt.Columns
+                retDr(colName.ColumnName) = dr(colName.ColumnName)
+            Next
+            retDt.Rows.Add(retDr)
+        Next
+        Return retDt
+    End Function
+    ''' <summary>
+    ''' ジャーナル書き込み
+    ''' </summary>
+    ''' <param name="journalDt"></param>
+    ''' <returns></returns>
+    Private Function OutputJournal(journalDt As DataTable, tabName As String) As Boolean
+        For Each dr As DataRow In journalDt.Rows
+            CS0020JOURNAL.TABLENM = tabName
+            CS0020JOURNAL.ACTION = "UPDATE"
+            CS0020JOURNAL.ROW = dr
+            CS0020JOURNAL.CS0020JOURNAL()
+            If Not isNormal(CS0020JOURNAL.ERR) Then
+                Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
+
+                CS0011LOGWrite.INFSUBCLASS = "MAIN"                     'SUBクラス名
+                CS0011LOGWrite.INFPOSI = "CS0020JOURNAL JOURNAL"
+                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWrite.TEXT = "CS0020JOURNAL Call Err!"
+                CS0011LOGWrite.MESSAGENO = CS0020JOURNAL.ERR
+                CS0011LOGWrite.CS0011LOGWrite()                         'ログ出力
+                Return False
+            End If
+        Next
+        Return True
+    End Function
     ''' <summary>
     ''' 戻るボタン押下時処理
     ''' </summary>
@@ -811,7 +1413,33 @@ Public Class OIT0003OTLinkageList
         Master.TransitionPrevPage(work.WF_SEL_CAMPCODE.Text)
 
     End Sub
+    ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
 
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                WF_LeftMViewChange.Value = Integer.Parse(WF_LeftMViewChange.Value).ToString
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                Select Case CInt(WF_LeftMViewChange.Value)
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
+                            Case "WF_FILTERDATE"
+                                .WF_Calendar.Text = WF_FILTERDATE_TEXT.Text
+                        End Select
+                        .ActiveCalendar()
+                End Select
+            End With
+        End If
+
+    End Sub
     ''' <summary>
     ''' 一覧画面-マウスホイール時処理
     ''' </summary>
@@ -938,6 +1566,44 @@ Public Class OIT0003OTLinkageList
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPLINKTBL.txt"
     End Sub
     ''' <summary>
+    ''' 一覧表フィルタ処理実行
+    ''' </summary>
+    ''' <param name="dt"></param>
+    ''' <param name="filterField">フィルタ対象フィールド</param>
+    ''' <param name="filterDate">フィルタ対象日付</param>
+    ''' <returns></returns>
+    Private Function SetFilterValue(dt As DataTable, filterField As String, filterDate As String) As DataTable
+        '対象のデータが無い場合はそのまま終了
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then
+            Return dt
+        End If
+        'フィルタフィールドが未指定または対象テーブルに未存在の場合はそのまま終了
+        If filterField = "" OrElse dt.Columns.Contains(filterField) = False Then
+            Return dt
+        End If
+        Dim dtFieldVal As String = filterDate
+        If filterDate <> "" AndAlso IsDate(dtFieldVal) = False Then
+            Return dt
+        End If
+        If filterDate <> "" Then
+            dtFieldVal = CDate(dtFieldVal).ToString("yyyy/MM/dd")
+        End If
+
+        For Each dr As DataRow In dt.Rows
+            If dtFieldVal <> "" AndAlso Not dr(filterField).Equals(dtFieldVal) Then
+                dr("HIDDEN") = "1"
+            Else
+                dr("HIDDEN") = "0"
+            End If
+            'フィルタ再指定の場合はチェック状態をＯＦＦに変更
+            If dtFieldVal <> "" Then
+                dr("OPERATION") = ""
+            End If
+        Next
+
+        Return dt
+    End Function
+    ''' <summary>
     ''' ファイル社外連携の各種出力ファイルの出力可否判定
     ''' </summary>
     Public Class FileLinkagePattern
@@ -1053,7 +1719,88 @@ Public Class OIT0003OTLinkageList
         ''' <returns></returns>
         Public Property CanTakusou As Boolean = False
     End Class
+    ''' <summary>
+    ''' 出力したオーダーのキー情報を保持する為のクラス
+    ''' </summary>
+    Public Class OutputOrdedrInfo
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New(orderNo As String, detailNo As String)
+            Me.OrderNo = orderNo
+            Me.DetailNo = detailNo
+        End Sub
+        ''' <summary>
+        ''' オーダー番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OrderNo As String
+        ''' <summary>
+        ''' 明細番号
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property DetailNo As String
+    End Class
+    ' ******************************************************************************
+    ' ***  LeftBox関連操作                                                       ***
+    ' ******************************************************************************
+
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+
+        '○ 選択内容を取得
+        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex.ToString
+            WW_SelectValue = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "WF_FILTERDATE"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE <CDate(C_DEFAULT_YMD) Then
+                        WF_FILTERDATE_TEXT.Text = ""
+                    Else
+                        WF_FILTERDATE_TEXT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                    End If
+                Catch ex As Exception
+                End Try
+                WF_FILTERDATE_TEXT.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+        'WF_LeftMViewChange.Value = ""  '★
+
+    End Sub
 
 
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
 
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "WF_FILTERDATE"
+                Me.WF_FILTERDATE_TEXT.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+        'WF_LeftMViewChange.Value = ""
+
+    End Sub
 End Class

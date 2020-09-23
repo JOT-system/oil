@@ -2,6 +2,7 @@
 Option Explicit On
 
 Imports System.Data.SqlClient
+Imports JOTWEB.GRIS0005LeftBox
 
 ''' <summary>
 ''' OT連携一覧画面
@@ -57,10 +58,22 @@ Public Class OIT0003OTLinkageList
                             WF_ButtonALLSELECT_Click()
                         Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
                             WF_ButtonSELECT_LIFTED_Click()
+                        Case "WF_ButtonFilter"
+                            WF_ButtonFilter_Click(False)
+                        Case "WF_ButtonFilterClear"
+                            WF_ButtonFilter_Click(True)
                         Case "WF_ButtonOtSend"          'OT連携ボタン押下
                             WF_ButtonOtSend_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
+                        Case "WF_Field_DBClick"             'フィールドダブルクリック
+                            WF_FIELD_DBClick()
+                        Case "WF_ButtonSel"                 '(左ボックス)選択ボタン押下
+                            WF_ButtonSel_Click()
+                        Case "WF_ButtonCan"                 '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
+                        Case "WF_ListboxDBclick"            '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             'WF_Grid_DBClick()
                         Case "WF_MouseWheelUp"          'マウスホイール(Up)
@@ -172,7 +185,18 @@ Public Class OIT0003OTLinkageList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
+        'フィルタ初期選択値取得（PROFVARIより)
+        Dim dummyTxt As New TextBox
+        Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "FILTERDATEFLD", dummyTxt.Text)       '会社コード
+        If dummyTxt.Text <> "" AndAlso Me.rblFilterDateFiled.Items.FindByValue(dummyTxt.Text) IsNot Nothing Then
+            Me.rblFilterDateFiled.SelectedValue = dummyTxt.Text
+        Else
+            If Me.rblFilterDateFiled IsNot Nothing AndAlso Me.rblFilterDateFiled.Items.Count > 0 Then
+                Me.rblFilterDateFiled.SelectedIndex = 0
+            End If
+        End If
 
+        Master.GetFirstValue(work.WF_SEL_CAMPCODE.Text, "FILTERDATE", WF_FILTERDATE_TEXT.Text)       '会社コード
         '○ 受注一覧画面からの遷移
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0003L Then
             'Grid情報保存先のファイル名
@@ -181,6 +205,8 @@ Public Class OIT0003OTLinkageList
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.OIT0003D Then
             Master.RecoverTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
         End If
+
+        '
 
         ''○ 名称設定処理
         'CODENAME_get("CAMPCODE", work.WF_SEL_CAMPCODE.Text, WF_SEL_CAMPNAME.Text, WW_DUMMY)             '会社コード
@@ -203,6 +229,20 @@ Public Class OIT0003OTLinkageList
                 MAPDataGet(SQLcon)
             End Using
         End If
+        Dim chkField As String = ""
+        If Me.rblFilterDateFiled IsNot Nothing AndAlso Me.rblFilterDateFiled.SelectedIndex <> -1 Then
+            chkField = rblFilterDateFiled.SelectedValue
+        End If
+        SetFilterValue(OIT0003tbl, chkField, Me.WF_FILTERDATE_TEXT.Text)
+        '○ 表示対象行カウント(絞り込み対象)
+        Dim WW_DataCNT As Integer = 0
+        For Each OIT0003row As DataRow In OIT0003tbl.Rows
+            If CInt(OIT0003row("HIDDEN")) = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                OIT0003row("SELECT") = WW_DataCNT
+            End If
+        Next
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl, work.WF_SEL_INPOTLINKAGETBL.Text)
@@ -210,7 +250,10 @@ Public Class OIT0003OTLinkageList
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(OIT0003tbl)
 
-        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+        'TBLview.RowFilter = "HIDDEN = 0 and LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= 1 and SELECT <= " & CONST_DISPROWCOUNT
+
 
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
         CS0013ProfView.PROFID = Master.PROF_VIEW
@@ -346,10 +389,11 @@ Public Class OIT0003OTLinkageList
             & " WHERE OIT0002.DELFLG      <> @P04" _
             & "   AND OIT0002.ORDERSTATUS <= @P03" _
 
-        '★積置フラグ無し用SQL
+        '★積置フラグ無し用SQL(積み置きがが無いパターンでしか発日を使用するパターンは存在しない）
         SQLStrNashi &=
               SQLStrCmn _
-            & "   AND OIT0002.LODDATE     >= @P02"
+            & "   AND (    OIT0002.LODDATE     >= @P02" _
+            & "         OR OIT0002.DEPDATE     >= @P02) "
 
         '★積置フラグ有り用SQL
         SQLStrAri &=
@@ -393,6 +437,7 @@ Public Class OIT0003OTLinkageList
             & SQLStrAri
 
         Try
+            Dim targetDate As String = Format(Now.AddDays(1), "yyyy/MM/dd")
             Using SQLcmd As New SqlCommand(SQLStrNashi, SQLcon)
                 'Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.Date)         '積込日
@@ -400,7 +445,7 @@ Public Class OIT0003OTLinkageList
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  '組織コード
                 'PARA01.Value = OFFICECDE
-                PARA02.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
+                PARA02.Value = targetDate
                 'PARA02.Value = "2020/08/20"
                 PARA03.Value = BaseDllConst.CONST_ORDERSTATUS_310
                 PARA04.Value = C_DELETE_FLG.DELETE
@@ -415,6 +460,13 @@ Public Class OIT0003OTLinkageList
                     '○ テーブル検索結果をテーブル格納
                     dtWrk.Load(SQLdr)
                 End Using
+                '各ボタンで処理が可能か判定するフラグフィールド（３ボタン分追加）
+                'OT発送日報出力可否
+                dtWrk.Columns.Add("CAN_OTSEND", GetType(String)).DefaultValue = "0"
+                '製油所出荷予約出力可否
+                dtWrk.Columns.Add("CAN_RESERVED", GetType(String)).DefaultValue = "0"
+                '託送指示出力可否
+                dtWrk.Columns.Add("CAN_TAKUSOU", GetType(String)).DefaultValue = "0"
                 If dtWrk.Rows.Count <> 0 Then
                     OIT0003tbl = (From dr As DataRow In dtWrk Order By dr("LODDATE")).CopyToDataTable
                 Else
@@ -425,7 +477,20 @@ Public Class OIT0003OTLinkageList
                 For Each OIT0003row As DataRow In OIT0003tbl.Rows
                     i += 1
                     OIT0003row("LINECNT") = i        'LINECNT
-
+                    '積込日比較
+                    If Convert.ToString(OIT0003row("LODDATE")) >= targetDate Then
+                        OIT0003row("CAN_OTSEND") = "1"
+                    Else
+                        OIT0003row("CAN_OTSEND") = "0"
+                    End If
+                    '発日比較
+                    If Convert.ToString(OIT0003row("DEPDATE")) >= targetDate Then
+                        OIT0003row("CAN_RESERVED") = "1"
+                        OIT0003row("CAN_TAKUSOU") = "1"
+                    Else
+                        OIT0003row("CAN_RESERVED") = "0"
+                        OIT0003row("CAN_TAKUSOU") = "0"
+                    End If
                     ''受注進行ステータス
                     'CODENAME_get("ORDERSTATUS", OIT0003row("STATUS"), OIT0003row("STATUS"), WW_DUMMY)
                     ''受注情報
@@ -513,7 +578,26 @@ Public Class OIT0003OTLinkageList
         Master.SaveTable(OIT0003tbl)
 
     End Sub
-
+    ''' <summary>
+    ''' フィルタ処理実行
+    ''' </summary>
+    ''' <param name="isClear"></param>
+    Protected Sub WF_ButtonFilter_Click(isClear As Boolean)
+        Dim chkField As String = ""
+        If Me.rblFilterDateFiled IsNot Nothing AndAlso Me.rblFilterDateFiled.SelectedIndex <> -1 Then
+            chkField = rblFilterDateFiled.SelectedValue
+        End If
+        Dim dataVal As String = ""
+        If isClear = False Then
+            dataVal = Me.WF_FILTERDATE_TEXT.Text
+        End If
+        '○ 画面表示データ復元
+        Master.RecoverTable(OIT0003tbl)
+        '表示行制御実行
+        OIT0003tbl = SetFilterValue(OIT0003tbl, chkField, dataVal)
+        '○ 画面表示データ保存
+        Master.SaveTable(OIT0003tbl)
+    End Sub
     ''' <summary>
     ''' OT連携ボタン押下時処理
     ''' </summary>
@@ -526,7 +610,15 @@ Public Class OIT0003OTLinkageList
             Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
+        '処理対象外のチェックがなされている場合
+        Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+                                                         AndAlso dr("CAN_OTSEND").Equals("0")
 
+        If qCannotProc.Any Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
         '******************************
         'OT発送日報データ取得処理
         '******************************
@@ -1321,7 +1413,33 @@ Public Class OIT0003OTLinkageList
         Master.TransitionPrevPage(work.WF_SEL_CAMPCODE.Text)
 
     End Sub
+    ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
 
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                WF_LeftMViewChange.Value = Integer.Parse(WF_LeftMViewChange.Value).ToString
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                Select Case CInt(WF_LeftMViewChange.Value)
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+                        '日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
+                        Select Case WF_FIELD.Value
+                            Case "WF_FILTERDATE"
+                                .WF_Calendar.Text = WF_FILTERDATE_TEXT.Text
+                        End Select
+                        .ActiveCalendar()
+                End Select
+            End With
+        End If
+
+    End Sub
     ''' <summary>
     ''' 一覧画面-マウスホイール時処理
     ''' </summary>
@@ -1447,6 +1565,44 @@ Public Class OIT0003OTLinkageList
         work.WF_SEL_INPOTLINKAGETBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPLINKTBL.txt"
     End Sub
+    ''' <summary>
+    ''' 一覧表フィルタ処理実行
+    ''' </summary>
+    ''' <param name="dt"></param>
+    ''' <param name="filterField">フィルタ対象フィールド</param>
+    ''' <param name="filterDate">フィルタ対象日付</param>
+    ''' <returns></returns>
+    Private Function SetFilterValue(dt As DataTable, filterField As String, filterDate As String) As DataTable
+        '対象のデータが無い場合はそのまま終了
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then
+            Return dt
+        End If
+        'フィルタフィールドが未指定または対象テーブルに未存在の場合はそのまま終了
+        If filterField = "" OrElse dt.Columns.Contains(filterField) = False Then
+            Return dt
+        End If
+        Dim dtFieldVal As String = filterDate
+        If filterDate <> "" AndAlso IsDate(dtFieldVal) = False Then
+            Return dt
+        End If
+        If filterDate <> "" Then
+            dtFieldVal = CDate(dtFieldVal).ToString("yyyy/MM/dd")
+        End If
+
+        For Each dr As DataRow In dt.Rows
+            If dtFieldVal <> "" AndAlso Not dr(filterField).Equals(dtFieldVal) Then
+                dr("HIDDEN") = "1"
+            Else
+                dr("HIDDEN") = "0"
+            End If
+            'フィルタ再指定の場合はチェック状態をＯＦＦに変更
+            If dtFieldVal <> "" Then
+                dr("OPERATION") = ""
+            End If
+        Next
+
+        Return dt
+    End Function
     ''' <summary>
     ''' ファイル社外連携の各種出力ファイルの出力可否判定
     ''' </summary>
@@ -1585,5 +1741,66 @@ Public Class OIT0003OTLinkageList
         ''' <returns></returns>
         Public Property DetailNo As String
     End Class
+    ' ******************************************************************************
+    ' ***  LeftBox関連操作                                                       ***
+    ' ******************************************************************************
 
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+
+        '○ 選択内容を取得
+        If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex.ToString
+            WW_SelectValue = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(CInt(WF_SelectedIndex.Value)).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "WF_FILTERDATE"
+                Dim WW_DATE As Date
+                Try
+                    Date.TryParse(leftview.WF_Calendar.Text, WW_DATE)
+                    If WW_DATE <CDate(C_DEFAULT_YMD) Then
+                        WF_FILTERDATE_TEXT.Text = ""
+                    Else
+                        WF_FILTERDATE_TEXT.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                    End If
+                Catch ex As Exception
+                End Try
+                WF_FILTERDATE_TEXT.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+        'WF_LeftMViewChange.Value = ""  '★
+
+    End Sub
+
+
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
+
+        '○ フォーカスセット
+        Select Case WF_FIELD.Value
+            Case "WF_FILTERDATE"
+                Me.WF_FILTERDATE_TEXT.Focus()
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+        'WF_LeftMViewChange.Value = ""
+
+    End Sub
 End Class

@@ -59,6 +59,15 @@ Partial Public Class MP0005ConsignmentStatus
     Protected WithEvents repConsignmentItems As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
+    '''pnlSysError コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlSysError As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''hdnPaneOrder コントロール。
     '''</summary>
     '''<remarks>

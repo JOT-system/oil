@@ -34,6 +34,9 @@
                     </ItemTemplate>
                 </asp:Repeater>        
             </div>
+            <asp:Panel ID="pnlSysError" CssClass="nodataArea" runat="server" ClientIDMode="Predictable" Visible="false">
+                システムエラーが発生しOT発送日報送信状況を表示出来ませんでした。
+            </asp:Panel>
         </div>
 
     </div>

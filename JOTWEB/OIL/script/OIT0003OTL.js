@@ -16,23 +16,29 @@ function InitDisplay() {
     }
 
     //更新ボタン活性／非活性
+    let buttonObjList = document.querySelectorAll('#WF_ButtonOtSend:not(:disabled),#WF_ButtonReserved:not(:disabled),#WF_ButtonTakusou:not(:disabled)');
+
     if (document.getElementById('WF_MAPpermitcode').value === "TRUE") {
         //活性
         document.getElementById("WF_ButtonALLSELECT").disabled = "";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "";
-        document.getElementById("WF_ButtonINSERT").disabled = "";
+        for (let i = 0; i < buttonObjList.length; i++) {
+            buttonObjList[i].disabled = "";
+        }
 
     } else {
         //非活性 
         document.getElementById("WF_ButtonALLSELECT").disabled = "disabled";
         document.getElementById("WF_ButtonSELECT_LIFTED").disabled = "disabled";
-        document.getElementById("WF_ButtonINSERT").disabled = "disabled";
+        for (let i = 0; i < buttonObjList.length; i++) {
+            buttonObjList[i].disabled = "disabled";
+        }
     }
     /* 共通一覧のスクロールイベント紐づけ */
-    //bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
     // チェックボックス
-    //ChangeCheckBox();
+    ChangeCheckBox();
 
     //// 使用有無初期設定
     //ChangeOrgUse();
@@ -112,13 +118,13 @@ function reportRadioButton() {
     let txtObj = document.getElementById('divRTrainNo'); //←表示非表示切替用
 
     if (chkObj === null) {
-        txtObj.style.display = 'none'
+        txtObj.style.display = 'none';
         return;
     }
 
     if (chkObj.checked) {
-        txtObj.style.display = 'block'
+        txtObj.style.display = 'block';
     } else {
-        txtObj.style.display = 'none'
+        txtObj.style.display = 'none';
     }
 }

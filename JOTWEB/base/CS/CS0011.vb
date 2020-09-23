@@ -163,9 +163,9 @@ Public Structure CS0011LOGWrite
             Try
                 'ＥＲＲＬｏｇディレクトリ＆ファイル名作成
                 Dim W_LOGDIR As String
-                '                W_LOGDIR = sm.LOG_PATH & "\ONLINE\"
+                W_LOGDIR = sm.LOG_PATH & "\ONLINE\"
 
-                W_LOGDIR = "\OIL\" & "\ONLINE\"
+                'W_LOGDIR = "\OIL\" & "\ONLINE\"
                 W_LOGDIR = W_LOGDIR & sm.TERM_COMPANY & "-"
                 W_LOGDIR = W_LOGDIR & sm.TERM_ORG & "-"
                 W_LOGDIR = W_LOGDIR & DateTime.Now.ToString("yyyyMMddHHmmss")

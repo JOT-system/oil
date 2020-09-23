@@ -93,8 +93,9 @@ Public Class OIT0006OutOfServiceDetail
                             WF_ButtonEND_Click()
                         Case "WF_Field_DBClick"               'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        Case "WF_CheckBoxSELECT"              'チェックボックス(選択)クリック
-                            WF_CheckBoxSELECT_Click()
+                        Case "WF_CheckBoxSELECT",
+                             "WF_CheckBoxSELECTFAREFLG"       'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"          'フィールドチェンジ
                             WF_FIELD_Change()
                         Case "WF_ButtonSel"                   '(左ボックス)選択ボタン押下
@@ -379,9 +380,9 @@ Public Class OIT0006OutOfServiceDetail
 
         '■運賃フラグ(1:片道 2:往復)
         If work.WF_SEL_FAREFLG.Text = "1" Then
-            Me.ChkSelect.Checked = True
+            Me.ChkFareFlg.Checked = True
         Else
-            Me.ChkSelect.Checked = False
+            Me.ChkFareFlg.Checked = False
         End If
 
         '■発駅
@@ -395,7 +396,7 @@ Public Class OIT0006OutOfServiceDetail
         Me.TxtArrDate.Text = work.WF_SEL_ARRDATE.Text
         '■(予定)受入日
         Me.TxtAccDate.Text = work.WF_SEL_ACCDATE.Text
-        '■(予定)空車着日
+        '■(予定)発駅戻り日
         Me.TxtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
 
         '■(実績)発日
@@ -404,7 +405,7 @@ Public Class OIT0006OutOfServiceDetail
         Me.TxtActualArrDate.Text = work.WF_SEL_ACTUALARRDATE.Text
         '■(実績)受入日
         Me.TxtActualAccDate.Text = work.WF_SEL_ACTUALACCDATE.Text
-        '■(実績)空車着日
+        '■(実績)発駅戻り日
         Me.TxtActualEmparrDate.Text = work.WF_SEL_ACTUALEMPARRDATE.Text
 
         '本線列車・目的・タンク車数・発駅・着駅を入力するテキストボックスは数値(0～9)のみ可能とする。
@@ -1155,7 +1156,7 @@ Public Class OIT0006OutOfServiceDetail
                         '(予定)受入日
                         Case "TxtAccDate"
                             .WF_Calendar.Text = Me.TxtAccDate.Text
-                        '(予定)空車着日
+                        '(予定)発駅戻り日
                         Case "TxtEmparrDate"
                             .WF_Calendar.Text = Me.TxtEmparrDate.Text
                         '(実績)発日
@@ -1167,7 +1168,7 @@ Public Class OIT0006OutOfServiceDetail
                         '(実績)受入日
                         Case "TxtActualAccDate"
                             .WF_Calendar.Text = Me.TxtActualAccDate.Text
-                        '(実績)空車着日
+                        '(実績)発駅戻り日
                         Case "TxtActualEmparrDate"
                             .WF_Calendar.Text = Me.TxtActualEmparrDate.Text
                     End Select
@@ -1182,21 +1183,43 @@ Public Class OIT0006OutOfServiceDetail
     ''' <summary>
     ''' チェックボックス(選択)クリック処理
     ''' </summary>
-    Protected Sub WF_CheckBoxSELECT_Click()
+    Protected Sub WF_CheckBoxSELECT_Click(ByVal chkFieldName As String)
 
         '○ 画面表示データ復元
         Master.RecoverTable(OIT0006tbl)
 
-        'チェックボックス判定
-        For i As Integer = 0 To OIT0006tbl.Rows.Count - 1
-            If OIT0006tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
-                If OIT0006tbl.Rows(i)("OPERATION") = "on" Then
-                    OIT0006tbl.Rows(i)("OPERATION") = ""
+        Select Case chkFieldName
+            Case "WF_CheckBoxSELECTFAREFLG"
+                '　　### ★片道(チェックボックス)をON  ###
+                If Me.ChkFareFlg.Checked = True Then
+                    '(予定)発駅戻り日
+                    Me.TxtEmparrDate.Enabled = False
+                    Me.TxtEmparrDate.Text = ""
+                    '(実績)発駅戻り日
+                    Me.TxtActualEmparrDate.Enabled = False
+
+                    '### ★片道(チェックボックス)をOFF ###
                 Else
-                    OIT0006tbl.Rows(i)("OPERATION") = "on"
+                    '(予定)発駅戻り日
+                    Me.TxtEmparrDate.Enabled = True
+                    Me.TxtEmparrDate.Text = ""
+                    '(実績)発駅戻り日
+                    Me.TxtActualEmparrDate.Enabled = True
                 End If
-            End If
-        Next
+
+            Case Else
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0006tbl.Rows.Count - 1
+                    If OIT0006tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0006tbl.Rows(i)("OPERATION") = "on" Then
+                            OIT0006tbl.Rows(i)("OPERATION") = ""
+                        Else
+                            OIT0006tbl.Rows(i)("OPERATION") = "on"
+                        End If
+                    End If
+                Next
+
+        End Select
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0006tbl)
@@ -1475,10 +1498,10 @@ Public Class OIT0006OutOfServiceDetail
                     OrElse Me.TxtKaisouType.Text = BaseDllConst.CONST_KAISOUPATTERN_14 Then
 
                     '片道(チェックボックス)をON
-                    Me.ChkSelect.Checked = True
+                    Me.ChkFareFlg.Checked = True
                 Else
                     '片道(チェックボックス)をOFF
-                    Me.ChkSelect.Checked = False
+                    Me.ChkFareFlg.Checked = False
                 End If
 
             '目的
@@ -1541,7 +1564,7 @@ Public Class OIT0006OutOfServiceDetail
                 End Try
                 Me.TxtAccDate.Focus()
 
-            '(予定)空車着日
+            '(予定)発駅戻り日
             Case "TxtEmparrDate"
                 Dim WW_DATE As Date
                 Try
@@ -1618,7 +1641,7 @@ Public Class OIT0006OutOfServiceDetail
                 '○ 画面表示データ保存
                 If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
 
-            '(実績)空車着日
+            '(実績)発駅戻り日
             Case "TxtActualEmparrDate"
                 Dim WW_DATE As Date
                 Try
@@ -1632,7 +1655,7 @@ Public Class OIT0006OutOfServiceDetail
                 End Try
                 Me.TxtActualEmparrDate.Focus()
 
-                '(実績)空車着日に入力された日付を、(一覧)空車着日に反映させる。
+                '(実績)発駅戻り日に入力された日付を、(一覧)発駅戻り日に反映させる。
                 For Each OIT0006tab1row As DataRow In OIT0006tbl.Rows
                     OIT0006tab1row("ACTUALEMPARRDATE") = Me.TxtActualEmparrDate.Text
                 Next
@@ -1640,7 +1663,7 @@ Public Class OIT0006OutOfServiceDetail
                 If Not Master.SaveTable(OIT0006tbl) Then Exit Sub
 
             'タブ「タンク車割当」 ⇒　(一覧)タンク車№
-            '                   　    (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)空車着日
+            '                   　    (一覧)(実績)発日, (一覧)(実績)積車着日, (一覧)(実績)受入日, (一覧)(実績)発駅戻り日
             Case "TANKNO",
                  "ACTUALDEPDATE", "ACTUALARRDATE", "ACTUALACCDATE", "ACTUALEMPARRDATE"
                 '○ LINECNT取得
@@ -1764,7 +1787,7 @@ Public Class OIT0006OutOfServiceDetail
                             End If
 
                             '(一覧)(実績)発日, 　(一覧)(実績)着日, 
-                            '(一覧)(実績)受入日, (一覧)(実績)空車着日を一覧に設定
+                            '(一覧)(実績)受入日, (一覧)(実績)発駅戻り日を一覧に設定
                         ElseIf WF_FIELD.Value = "ACTUALDEPDATE" _
                             OrElse WF_FIELD.Value = "ACTUALARRDATE" _
                             OrElse WF_FIELD.Value = "ACTUALACCDATE" _
@@ -1825,7 +1848,7 @@ Public Class OIT0006OutOfServiceDetail
                 Me.TxtArrDate.Focus()
             Case "TxtAccDate"                '(予定)受入日
                 Me.TxtAccDate.Focus()
-            Case "TxtEmparrDate"             '(予定)空車着日
+            Case "TxtEmparrDate"             '(予定)発駅戻り日
                 Me.TxtEmparrDate.Focus()
             Case "TxtActualDepDate"          '(実績)発日
                 Me.TxtActualDepDate.Focus()
@@ -1833,7 +1856,7 @@ Public Class OIT0006OutOfServiceDetail
                 Me.TxtActualArrDate.Focus()
             Case "TxtActualAccDate"          '(実績)受入日
                 Me.TxtActualAccDate.Focus()
-            Case "TxtActualEmparrDate"       '(実績)空車着日
+            Case "TxtActualEmparrDate"       '(実績)発駅戻り日
                 Me.TxtActualEmparrDate.Focus()
         End Select
 
@@ -2464,7 +2487,7 @@ Public Class OIT0006OutOfServiceDetail
                 '(実績)発日の入力が完了(★)
                 'かつ、(実績)着日の入力が完了
                 'かつ、(実績)受入日の入力が完了(★)
-                'かつ、(実績)空車着日の入力が完了
+                'かつ、(実績)発駅戻り日の入力が完了
                 If Me.TxtActualDepDate.Text <> "" _
                     AndAlso Me.TxtActualArrDate.Text <> "" _
                     AndAlso Me.TxtActualAccDate.Text <> "" _
@@ -2492,7 +2515,7 @@ Public Class OIT0006OutOfServiceDetail
                 End If
 
                 '(実績)受入日の入力が完了(★)
-                'かつ、(実績)空車着日の入力が完了
+                'かつ、(実績)発駅戻り日の入力が完了
                 If Me.TxtActualAccDate.Text <> "" _
                     AndAlso Me.TxtActualEmparrDate.Text <> "" Then
                     strKaisouStatus = BaseDllConst.CONST_KAISOUSTATUS_500
@@ -2947,11 +2970,11 @@ Public Class OIT0006OutOfServiceDetail
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.Date)     '発日（予定）
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.Date)     '着日（予定）
                 Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", SqlDbType.Date)     '受入日（予定）
-                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Date)     '空車着日（予定）
+                Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", SqlDbType.Date)     '発駅戻り日（予定）
                 Dim PARA27 As SqlParameter = SQLcmd.Parameters.Add("@P27", SqlDbType.Date)     '発日（実績）
                 Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", SqlDbType.Date)     '着日（実績）
                 Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", SqlDbType.Date)     '受入日（実績）
-                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.Date)     '空車着日（実績）
+                Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", SqlDbType.Date)     '発駅戻り日（実績）
                 Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", SqlDbType.Int)      '合計車数
                 Dim PARA32 As SqlParameter = SQLcmd.Parameters.Add("@P32", SqlDbType.NVarChar) '受注№
                 Dim PARA33 As SqlParameter = SQLcmd.Parameters.Add("@P33", SqlDbType.Date)     '計上日
@@ -2999,7 +3022,7 @@ Public Class OIT0006OutOfServiceDetail
                 PARA20.Value = work.WF_SEL_INFORMATION.Text       '回送情報
 
                 '運賃フラグ(1:片道 2:往復)
-                If Me.ChkSelect.Checked = True Then
+                If Me.ChkFareFlg.Checked = True Then
                     PARA21.Value = "1"
                 Else
                     PARA21.Value = "2"
@@ -3011,22 +3034,31 @@ Public Class OIT0006OutOfServiceDetail
 
                 PARA23.Value = Me.TxtDepDate.Text                 '発日（予定）
                 PARA24.Value = Me.TxtArrDate.Text                 '着日（予定）
+                PARA25.Value = Me.TxtAccDate.Text                 '受入日（予定）
 
-                '### 目的が"24:疎開留置", "25:移動"の場合は、受入日はNULLを設定 ###########
-                '受入日（予定）
-                If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-                    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-                    PARA25.Value = DBNull.Value
-                    '########################################################################
+                ''### 目的が"24:疎開留置", "25:移動"の場合は、受入日はNULLを設定 ###########
+                ''受入日（予定）
+                'If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                '    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
+                '    PARA25.Value = DBNull.Value
+                '    '########################################################################
+                'Else
+                '    PARA25.Value = Me.TxtAccDate.Text
+                'End If
+
+                '### 運賃フラグが選択されている場合は、発駅戻り日はNULLを設定 #############
+                'PARA26.Value = Me.TxtEmparrDate.Text              '発駅戻り日（予定）
+                '発駅戻り日（予定）
+                If Me.ChkFareFlg.Checked = True Then
+                    PARA26.Value = DBNull.Value
                 Else
-                    PARA25.Value = Me.TxtAccDate.Text
+                    PARA26.Value = Me.TxtEmparrDate.Text
                 End If
-                PARA26.Value = Me.TxtEmparrDate.Text              '空車着日（予定）
 
                 PARA27.Value = DBNull.Value                       '発日（実績）
                 PARA28.Value = DBNull.Value                       '着日（実績）
                 PARA29.Value = DBNull.Value                       '受入日（実績）
-                PARA30.Value = DBNull.Value                       '空車着日（実績）
+                PARA30.Value = DBNull.Value                       '発駅戻り日（実績）
 
                 'PARA31.Value = Me.TxtTankCnt.Text                 'タンク車数
                 PARA32.Value = work.WF_SEL_ORDERNUMBER.Text       '受注№
@@ -3213,7 +3245,7 @@ Public Class OIT0006OutOfServiceDetail
                 Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.Date)          '発日（実績）
                 Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.Date)          '着日（実績）
                 Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.Date)          '受入日（実績）
-                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.Date)          '空車着日（実績）
+                Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.Date)          '発駅戻り日（実績）
 
                 Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.Int)           '売上金額
                 Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.Int)           '売上消費税額
@@ -3242,7 +3274,7 @@ Public Class OIT0006OutOfServiceDetail
                 PARA09.Value = DBNull.Value                       '発日（実績）
                 PARA10.Value = DBNull.Value                       '積車着日（実績）
                 PARA11.Value = DBNull.Value                       '受入日（実績）
-                PARA12.Value = DBNull.Value                       '空車着日（実績）
+                PARA12.Value = DBNull.Value                       '発駅戻り日（実績）
 
                 PARA13.Value = 0                                  '売上金額
                 PARA14.Value = 0                                  '売上消費税額
@@ -3358,7 +3390,7 @@ Public Class OIT0006OutOfServiceDetail
             Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Date)      '発日（実績）
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.Date)      '着日（実績）
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.Date)      '受入日（実績）
-            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '空車着日（実績）
+            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '発駅戻り日（実績）
             Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.DateTime)  '更新年月日
             Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
             Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", System.Data.SqlDbType.NVarChar)  '更新端末
@@ -3388,7 +3420,7 @@ Public Class OIT0006OutOfServiceDetail
                 PARA06.Value = Date.Parse(Me.TxtActualAccDate.Text)
             End If
 
-            '空車着日（実績）
+            '発駅戻り日（実績）
             If Me.TxtActualEmparrDate.Text = "" Then
                 PARA07.Value = DBNull.Value
             Else
@@ -3457,7 +3489,7 @@ Public Class OIT0006OutOfServiceDetail
             Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", System.Data.SqlDbType.Date)      '発日（実績）
             Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", System.Data.SqlDbType.Date)      '着日（実績）
             Dim PARA06 As SqlParameter = SQLcmd.Parameters.Add("@P06", System.Data.SqlDbType.Date)      '受入日（実績）
-            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '空車着日（実績）
+            Dim PARA07 As SqlParameter = SQLcmd.Parameters.Add("@P07", System.Data.SqlDbType.Date)      '発駅戻り日（実績）
 
             Dim PARA08 As SqlParameter = SQLcmd.Parameters.Add("@P08", System.Data.SqlDbType.DateTime)  '更新年月日
             Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", System.Data.SqlDbType.NVarChar)  '更新ユーザーＩＤ
@@ -3493,7 +3525,7 @@ Public Class OIT0006OutOfServiceDetail
                     PARA06.Value = OIT0006row("ACTUALACCDATE")
                 End If
 
-                '空車着日（実績）
+                '発駅戻り日（実績）
                 If OIT0006row("ACTUALEMPARRDATE") = "" Then
                     PARA07.Value = DBNull.Value
                 Else
@@ -3840,53 +3872,60 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
-        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
+        ''### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
+        'If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+        '    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
 
-            '### 特に何もしない ##########################################
+        '    '### 特に何もしない ##########################################
 
-        Else
-            '(予定)受入日
-            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCDATE", Me.TxtAccDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
-            If isNormal(WW_CS0024FCHECKERR) Then
-                Try
-                    Date.TryParse(Me.TxtAccDate.Text, WW_STYMD)
-                Catch ex As Exception
-                    WW_STYMD = C_DEFAULT_YMD
-                End Try
-            Else
-                '年月日チェック
-                WW_CheckDate(Me.TxtAccDate.Text, "(予定)受入日", WW_CS0024FCHECKERR)
-                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
-                Me.TxtAccDate.Focus()
-                WW_CheckMES1 = "受入日入力エラー。"
-                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-                Exit Sub
-            End If
-        End If
-        '##################################################################################
-
-        '(予定)空車着日
-        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EMPARRDATE", Me.TxtEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+        'Else
+        '(予定)受入日
+        Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACCDATE", Me.TxtAccDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
         If isNormal(WW_CS0024FCHECKERR) Then
             Try
-                Date.TryParse(Me.TxtEmparrDate.Text, WW_STYMD)
+                Date.TryParse(Me.TxtAccDate.Text, WW_STYMD)
             Catch ex As Exception
                 WW_STYMD = C_DEFAULT_YMD
             End Try
         Else
             '年月日チェック
-            WW_CheckDate(Me.TxtEmparrDate.Text, "(予定)空車着日", WW_CS0024FCHECKERR)
-            'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
-            Me.TxtEmparrDate.Focus()
-            WW_CheckMES1 = "空車着日入力エラー。"
+            WW_CheckDate(Me.TxtAccDate.Text, "(予定)受入日", WW_CS0024FCHECKERR)
+            'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
+            Me.TxtAccDate.Focus()
+            WW_CheckMES1 = "受入日入力エラー。"
             WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
             WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             O_RTN = "ERR"
             Exit Sub
+        End If
+        'End If
+        ''##################################################################################
+
+        '### 運賃フラグが選択されている場合は、(予定)発駅戻り日のチェックはしない ##########
+        If Me.ChkFareFlg.Checked = True Then
+
+            '### 特に何もしない ##########################################
+
+        Else
+            '(予定)発駅戻り日
+            Master.CheckField(work.WF_SEL_CAMPCODE.Text, "EMPARRDATE", Me.TxtEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
+            If isNormal(WW_CS0024FCHECKERR) Then
+                Try
+                    Date.TryParse(Me.TxtEmparrDate.Text, WW_STYMD)
+                Catch ex As Exception
+                    WW_STYMD = C_DEFAULT_YMD
+                End Try
+            Else
+                '年月日チェック
+                WW_CheckDate(Me.TxtEmparrDate.Text, "(予定)発駅戻り日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(予定)発駅戻り日", needsPopUp:=True)
+                Me.TxtEmparrDate.Focus()
+                WW_CheckMES1 = "発駅戻り日入力エラー。"
+                WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+                Exit Sub
+            End If
         End If
 
         ''(一覧)チェック(準備)
@@ -4073,7 +4112,7 @@ Public Class OIT0006OutOfServiceDetail
             End If
         End If
 
-        '(実績)空車着日
+        '(実績)発駅戻り日
         If Me.TxtActualEmparrDate.Text <> "" Then
             Master.CheckField(work.WF_SEL_CAMPCODE.Text, "ACTUALEMPARRDATE", Me.TxtActualEmparrDate.Text, WW_CS0024FCHECKERR, WW_CS0024FCHECKREPORT)
             If isNormal(WW_CS0024FCHECKERR) Then
@@ -4085,10 +4124,10 @@ Public Class OIT0006OutOfServiceDetail
             Else
 
                 '年月日チェック
-                WW_CheckDate(Me.TxtActualEmparrDate.Text, "(実績)空車着日", WW_CS0024FCHECKERR)
-                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+                WW_CheckDate(Me.TxtActualEmparrDate.Text, "(実績)発駅戻り日", WW_CS0024FCHECKERR)
+                'Master.Output(WW_CS0024FCHECKERR, C_MESSAGE_TYPE.ERR, "(実績)発駅戻り日", needsPopUp:=True)
                 Me.TxtActualEmparrDate.Focus()
-                WW_CheckMES1 = "空車着日入力エラー。"
+                WW_CheckMES1 = "発駅戻り日入力エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.PREREQUISITE_ERROR
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
@@ -4143,37 +4182,44 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-        '### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
-        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
+        ''### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
+        'If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+        '    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
+
+        '    '### 特に何もしない ##########################################
+
+        'Else
+        '(予定)受入日 と　現在日付を比較
+        iresult = Date.Parse(Me.TxtAccDate.Text).CompareTo(DateTime.Today)
+        If iresult = -1 Then
+            Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
+            Me.TxtAccDate.Focus()
+            WW_CheckMES1 = "(予定日)過去日付エラー。"
+            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
+            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            O_RTN = "ERR"
+            Exit Sub
+        End If
+        'End If
+        ''##################################################################################
+
+        '### 運賃フラグが選択されている場合は、(予定)発駅戻り日のチェックはしない ##########
+        If Me.ChkFareFlg.Checked = True Then
 
             '### 特に何もしない ##########################################
 
         Else
-            '(予定)受入日 と　現在日付を比較
-            iresult = Date.Parse(Me.TxtAccDate.Text).CompareTo(DateTime.Today)
+            '(予定)発駅戻り日 と　現在日付を比較
+            iresult = Date.Parse(Me.TxtEmparrDate.Text).CompareTo(DateTime.Today)
             If iresult = -1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日", needsPopUp:=True)
-                Me.TxtAccDate.Focus()
+                Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)発駅戻り日", needsPopUp:=True)
+                Me.TxtEmparrDate.Focus()
                 WW_CheckMES1 = "(予定日)過去日付エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
                 Exit Sub
             End If
-        End If
-        '##################################################################################
-
-        '(予定)空車着日 と　現在日付を比較
-        iresult = Date.Parse(Me.TxtEmparrDate.Text).CompareTo(DateTime.Today)
-        If iresult = -1 Then
-            Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(予定)空車着日", needsPopUp:=True)
-            Me.TxtEmparrDate.Focus()
-            WW_CheckMES1 = "(予定日)過去日付エラー。"
-            WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
-            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            O_RTN = "ERR"
-            Exit Sub
         End If
 
         '○ 日付妥当性チェック
@@ -4194,24 +4240,19 @@ Public Class OIT0006OutOfServiceDetail
             Exit Sub
         End If
 
-
-        '### 目的が"24:疎開留置", "25:移動"の場合は、受入日のチェックを実施しない ###########
-        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-            OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-
-            '(予定)着日 と　(予定)空車着日を比較
-            iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(Date.Parse(Me.TxtEmparrDate.Text))
+        '### 運賃フラグが選択されている場合は、(予定)発駅戻り日のチェックはしない ##########
+        If Me.ChkFareFlg.Checked = True Then
+            '(予定)着日 と　(予定)受入日を比較
+            iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(Date.Parse(Me.TxtAccDate.Text))
             If iresult = 1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)着日 > (予定)空車着日", needsPopUp:=True)
-                Me.TxtEmparrDate.Focus()
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)着日 > (予定)受入日", needsPopUp:=True)
+                Me.TxtAccDate.Focus()
                 WW_CheckMES1 = "(予定日)入力エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
                 Exit Sub
             End If
-            '##################################################################################
-
         Else
             '(予定)着日 と　(予定)受入日を比較
             iresult = Date.Parse(Me.TxtArrDate.Text).CompareTo(Date.Parse(Me.TxtAccDate.Text))
@@ -4225,10 +4266,10 @@ Public Class OIT0006OutOfServiceDetail
                 Exit Sub
             End If
 
-            '(予定)受入日 と　(予定)空車着日を比較
+            '(予定)受入日 と　(予定)発駅戻り日を比較
             iresult = Date.Parse(Me.TxtAccDate.Text).CompareTo(Date.Parse(Me.TxtEmparrDate.Text))
             If iresult = 1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日 > (予定)空車着日", needsPopUp:=True)
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(予定)受入日 > (予定)発駅戻り日", needsPopUp:=True)
                 Me.TxtEmparrDate.Focus()
                 WW_CheckMES1 = "(予定日)入力エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
@@ -4236,7 +4277,6 @@ Public Class OIT0006OutOfServiceDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
-
         End If
 
     End Sub
@@ -4311,14 +4351,14 @@ Public Class OIT0006OutOfServiceDetail
             'End If
         End If
 
-        '(実績)空車着日 と　現在日付を比較
+        '(実績)発駅戻り日 と　現在日付を比較
         '### ステータス追加(仮) #################################
         '受注進行ステータスが"450:受入確認中((実績)受入日設定済み)"の場合
         If Me.TxtActualEmparrDate.Text <> "" _
             AndAlso work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_450 Then
             iresult = Date.Parse(Me.TxtActualEmparrDate.Text).CompareTo(DateTime.Today)
             'If iresult = -1 Then
-            '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)空車着日", needsPopUp:=True)
+            '    Master.Output(C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR, C_MESSAGE_TYPE.ERR, "(実績)発駅戻り日", needsPopUp:=True)
             '    Me.TxtActualEmparrDate.Focus()
             '    WW_CheckMES1 = "(実績日)過去日付エラー。"
             '    WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_PASTDATE_ERROR
@@ -4362,11 +4402,11 @@ Public Class OIT0006OutOfServiceDetail
             End If
         End If
 
-        '(実績)受入日 と　(実績)空車着日を比較
+        '(実績)受入日 と　(実績)発駅戻り日を比較
         If Me.TxtActualAccDate.Text <> "" AndAlso Me.TxtActualEmparrDate.Text <> "" Then
             iresult = Date.Parse(Me.TxtActualAccDate.Text).CompareTo(Date.Parse(Me.TxtActualEmparrDate.Text))
             If iresult = 1 Then
-                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)受入日 > (実績)空車着日", needsPopUp:=True)
+                Master.Output(C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR, C_MESSAGE_TYPE.ERR, "(実績)受入日 > (実績)発駅戻り日", needsPopUp:=True)
                 Me.TxtActualEmparrDate.Focus()
                 WW_CheckMES1 = "(実績日)入力エラー。"
                 WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
@@ -4438,14 +4478,14 @@ Public Class OIT0006OutOfServiceDetail
                 End If
             End If
 
-            '〇 (実績)空車着日 と　(一覧)空車着日を比較
+            '〇 (実績)発駅戻り日 と　(一覧)発駅戻り日を比較
             If Me.TxtActualEmparrDate.Text <> "" AndAlso OIT0006row("ACTUALEMPARRDATE") <> "" Then
                 iresult = Date.Parse(Me.TxtActualEmparrDate.Text).CompareTo(Date.Parse(OIT0006row("ACTUALEMPARRDATE")))
                 If iresult = 1 Then
                     OIT0006row("KAISOUINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_95
                     CODENAME_get("KAISOUINFO", OIT0006row("KAISOUINFO"), OIT0006row("KAISOUINFONAME"), WW_DUMMY)
 
-                    WW_CheckMES1 = "(実績)空車着日で入力した日付より過去日のためエラー。"
+                    WW_CheckMES1 = "(実績)発駅戻り日で入力した日付より過去日のためエラー。"
                     WW_CheckMES2 = C_MESSAGE_NO.OIL_DATE_VALIDITY_ERROR
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
@@ -4491,7 +4531,7 @@ Public Class OIT0006OutOfServiceDetail
         WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)発日         =" & Me.TxtDepDate.Text & " , "
         WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)積車着日     =" & Me.TxtArrDate.Text & " , "
         WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)受入日       =" & Me.TxtAccDate.Text
-        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)空車着日     =" & Me.TxtEmparrDate.Text
+        WW_ERR_MES &= ControlChars.NewLine & "  --> (予定)発駅戻り日   =" & Me.TxtEmparrDate.Text
 
         rightview.SetErrorReport(WW_ERR_MES)
 
@@ -4519,7 +4559,7 @@ Public Class OIT0006OutOfServiceDetail
             WW_ERR_MES &= ControlChars.NewLine & "  --> (実績)発日         =" & OIM0006row("ACTUALDEPDATE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> (実績)着日         =" & OIM0006row("ACTUALARRDATE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> (実績)受入日       =" & OIM0006row("ACTUALACCDATE") & " , "
-            WW_ERR_MES &= ControlChars.NewLine & "  --> (実績)空車着日     =" & OIM0006row("ACTUALEMPARRDATE")
+            WW_ERR_MES &= ControlChars.NewLine & "  --> (実績)発駅戻り日   =" & OIM0006row("ACTUALEMPARRDATE")
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)
@@ -4807,7 +4847,7 @@ Public Class OIT0006OutOfServiceDetail
             '回送パターン
             Me.TxtKaisouType.Enabled = False
             '運賃フラグ
-            Me.ChkSelect.Enabled = False
+            Me.ChkFareFlg.Enabled = False
             '発駅
             Me.TxtDepstationCode.Enabled = False
             '着駅
@@ -4819,7 +4859,7 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtArrDate.Enabled = False
             '(予定)受入日
             Me.TxtAccDate.Enabled = False
-            '(予定)空車着日
+            '(予定)発駅戻り日
             Me.TxtEmparrDate.Enabled = False
         Else
             '回送登録営業所
@@ -4833,7 +4873,7 @@ Public Class OIT0006OutOfServiceDetail
             '回送パターン
             Me.TxtKaisouType.Enabled = True
             '運賃フラグ
-            Me.ChkSelect.Enabled = True
+            Me.ChkFareFlg.Enabled = True
             '発駅
             Me.TxtDepstationCode.Enabled = True
             '着駅
@@ -4843,21 +4883,20 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtDepDate.Enabled = True
             '(予定)積車着日
             Me.TxtArrDate.Enabled = True
-
-            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-                '(予定)受入日
-                Me.TxtAccDate.Enabled = False
-                Me.TxtAccDate.Text = ""
+            '(予定)受入日
+            Me.TxtAccDate.Enabled = True
+            ''(予定)発駅戻り日
+            'Me.TxtEmparrDate.Enabled = True
+            '### 運賃フラグが選択により、発駅戻り日の入力制限を実施 ###############
+            If Me.ChkFareFlg.Checked = True Then
+                '(予定)発駅戻り日
+                Me.TxtEmparrDate.Enabled = False
+                Me.TxtEmparrDate.Text = ""
             Else
-                '(予定)受入日
-                Me.TxtAccDate.Enabled = True
+                '(予定)発駅戻り日
+                Me.TxtEmparrDate.Enabled = True
             End If
             '############################################################################
-
-            '(予定)空車着日
-            Me.TxtEmparrDate.Enabled = True
         End If
 
         '〇 (実績)の日付の入力可否制御
@@ -4873,7 +4912,7 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualArrDate.Enabled = False
             '(実績)受入日
             Me.TxtActualAccDate.Enabled = False
-            '(実績)空車着日
+            '(実績)発駅戻り日
             Me.TxtActualEmparrDate.Enabled = False
 
             '受注情報が「250:手配完了」の場合は、(実績)すべての日付の入力を解放
@@ -4883,19 +4922,20 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualDepDate.Enabled = True
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
-
-            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = False
+            '(実績)受入日
+            Me.TxtActualAccDate.Enabled = True
+            ''(実績)発駅戻り日
+            'Me.TxtActualEmparrDate.Enabled = True
+            '### 運賃フラグが選択により、発駅戻り日の入力制限を実施 ###############
+            If Me.ChkFareFlg.Checked = True Then
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = False
+                Me.TxtActualEmparrDate.Text = ""
             Else
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = True
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = True
             End If
             '############################################################################
-            '(実績)空車着日
-            Me.TxtActualEmparrDate.Enabled = True
 
             '### 積込日の概念がないため削除 ################################################
             '    '回送情報が「300:回送確定」の場合は、(実績)積込日の入力を制限
@@ -4907,7 +4947,7 @@ Public Class OIT0006OutOfServiceDetail
             '    Me.TxtActualArrDate.Enabled = True
             '    '(実績)受入日
             '    Me.TxtActualAccDate.Enabled = True
-            '    '(実績)空車着日
+            '    '(実績)発駅戻り日
             '    Me.TxtActualEmparrDate.Enabled = True
             '###############################################################################
 
@@ -4918,20 +4958,20 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualDepDate.Enabled = False
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = True
-
-            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = False
+            '(実績)受入日
+            Me.TxtActualAccDate.Enabled = True
+            ''(実績)発駅戻り日
+            'Me.TxtActualEmparrDate.Enabled = True
+            '### 運賃フラグが選択により、発駅戻り日の入力制限を実施 ###############
+            If Me.ChkFareFlg.Checked = True Then
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = False
+                Me.TxtActualEmparrDate.Text = ""
             Else
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = True
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = True
             End If
             '############################################################################
-
-            '(実績)空車着日
-            Me.TxtActualEmparrDate.Enabled = True
 
             '回送情報が「400:受入確認中」の場合は、(実績)着日の入力を制限
             '400:受入確認中
@@ -4940,20 +4980,20 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualDepDate.Enabled = False
             '(実績)積車着日
             Me.TxtActualArrDate.Enabled = False
-
-            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
-            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = False
+            '(実績)受入日
+            Me.TxtActualAccDate.Enabled = True
+            ''(実績)発駅戻り日
+            'Me.TxtActualEmparrDate.Enabled = True
+            '### 運賃フラグが選択により、発駅戻り日の入力制限を実施 ###############
+            If Me.ChkFareFlg.Checked = True Then
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = False
+                Me.TxtActualEmparrDate.Text = ""
             Else
-                '(実績)受入日
-                Me.TxtActualAccDate.Enabled = True
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = True
             End If
             '############################################################################
-
-            '(実績)空車着日
-            Me.TxtActualEmparrDate.Enabled = True
 
             '回送情報が「450:受入確認中」の場合は、(実績)受入日の入力を制限
             '450:受入確認中((実績)受入日入力済み)
@@ -4964,10 +5004,20 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualArrDate.Enabled = False
             '(実績)受入日
             Me.TxtActualAccDate.Enabled = False
-            '(実績)空車着日
-            Me.TxtActualEmparrDate.Enabled = True
+            ''(実績)発駅戻り日
+            'Me.TxtActualEmparrDate.Enabled = True
+            '### 運賃フラグが選択により、発駅戻り日の入力制限を実施 ###############
+            If Me.ChkFareFlg.Checked = True Then
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = False
+                Me.TxtActualEmparrDate.Text = ""
+            Else
+                '(実績)発駅戻り日
+                Me.TxtActualEmparrDate.Enabled = True
+            End If
+            '############################################################################
 
-            '回送情報が「500:検収中」の場合は、(実績)空車着日の入力を制限
+            '回送情報が「500:検収中」の場合は、(実績)発駅戻り日の入力を制限
             '500:検収中
         ElseIf work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_500 Then
             '(実績)発日
@@ -4976,7 +5026,7 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualArrDate.Enabled = False
             '(実績)受入日
             Me.TxtActualAccDate.Enabled = False
-            '(実績)空車着日
+            '(実績)発駅戻り日
             Me.TxtActualEmparrDate.Enabled = False
 
             '550:検収済
@@ -4997,7 +5047,7 @@ Public Class OIT0006OutOfServiceDetail
             Me.TxtActualArrDate.Enabled = True
             '(実績)受入日
             Me.TxtActualAccDate.Enabled = True
-            '(実績)空車着日
+            '(実績)発駅戻り日
             Me.TxtActualEmparrDate.Enabled = True
 
         End If
@@ -5049,105 +5099,135 @@ Public Class OIT0006OutOfServiceDetail
            'タンク車割当
             Case 0
                 '〇 (一覧)テキストボックスの制御(読取専用)
-                Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
-                Dim tblObj = DirectCast(divObj.Controls(0), Table)
-
-                '回送進行ステータスが"100:回送受付"
-                '回送進行ステータスが"200:手配"
-                '回送進行ステータスが"210:手配中"
-                If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_100 _
-                    OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_200 _
-                    OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_210 Then
-                    For Each rowitem As TableRow In tblObj.Rows
-                        For Each cellObj As TableCell In rowitem.Controls
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            End If
-                        Next
-                    Next
-
-                    '受注進行ステータスが"250：手配完了"以降のステータスの場合
-                Else
-                    '### ★選択（チェックボックス）を非活性にするための準備 ################
-                    Dim chkObj As CheckBox = Nothing
-                    '　LINECNTを除いたチェックボックスID
-                    Dim chkObjIdWOLincnt As String = "chk" & pnlListArea1.ID & "OPERATION"
-                    '　LINECNTを含むチェックボックスID
-                    Dim chkObjId As String
-                    'Dim chkObjType As String
-                    '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
-                    Dim loopdr As DataRow = Nothing
-                    '　データテーブルの行Index
-                    Dim rowIdx As Integer = 0
-                    '#######################################################################
-
-                    For Each rowitem As TableRow In tblObj.Rows
-                        '### ★選択（チェックボックス）を非活性にする ######################
-                        loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
-                        chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
-                        'chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
-                        chkObj = Nothing
-                        For Each cellObj As TableCell In rowitem.Controls
-                            chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
-                            'コントロールが見つかったら脱出
-                            If chkObj IsNot Nothing Then
-                                Exit For
-                            End If
-                        Next
-                        chkObj.Enabled = False
-                        '###################################################################
-
-                        For Each cellObj As TableCell In rowitem.Controls
-
-                            If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") Then
-                                cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-                            End If
-
-                            '### 目的が"24:疎開留置", "25:移動"の場合は、受入日の入力を省略する ###########
-                            If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
-                                OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
-
-                                '(実績)発日, (実績)着日, (実績)空車着日を入力可能とする。
-                                If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
-                                    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-
-                                    '(実績)受入日は入力不可とする。
-                                ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
-
-                                End If
-                                '############################################################################
-
-                            Else
-                                '(実績)のすべてを入力可能とする。
-                                If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
-                                OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
-                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
-                                End If
-
-                            End If
-
-                        Next
-                        rowIdx += 1
-                    Next
-                End If
+                WW_ListTextBoxReadControlTab1()
 
             '費用入力
             Case 1
                 '〇 (一覧)テキストボックスの制御(読取専用)
-                Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
-                Dim tblObj = DirectCast(divObj.Controls(0), Table)
+                WW_ListTextBoxReadControlTab2()
 
-                '〇 回送進行ステータスの状態
-                Select Case work.WF_SEL_KAISOUSTATUS.Text
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' タブ(タンク車割当)
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControlTab1()
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea1.FindControl(pnlListArea1.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+        '回送進行ステータスが"100:回送受付"
+        '回送進行ステータスが"200:手配"
+        '回送進行ステータスが"210:手配中"
+        If work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_100 _
+            OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_200 _
+            OrElse work.WF_SEL_KAISOUSTATUS.Text = BaseDllConst.CONST_KAISOUSTATUS_210 Then
+            For Each rowitem As TableRow In tblObj.Rows
+                For Each cellObj As TableCell In rowitem.Controls
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+                Next
+            Next
+
+            '受注進行ステータスが"250：手配完了"以降のステータスの場合
+        Else
+            '### ★選択（チェックボックス）を非活性にするための準備 ################
+            Dim chkObj As CheckBox = Nothing
+            '　LINECNTを除いたチェックボックスID
+            Dim chkObjIdWOLincnt As String = "chk" & pnlListArea1.ID & "OPERATION"
+            '　LINECNTを含むチェックボックスID
+            Dim chkObjId As String
+            'Dim chkObjType As String
+            '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
+            Dim loopdr As DataRow = Nothing
+            '　データテーブルの行Index
+            Dim rowIdx As Integer = 0
+            '#######################################################################
+
+            For Each rowitem As TableRow In tblObj.Rows
+                '### ★選択（チェックボックス）を非活性にする ######################
+                loopdr = CS0013ProfView.SRCDATA.Rows(rowIdx)
+                chkObjId = chkObjIdWOLincnt & Convert.ToString(loopdr("LINECNT"))
+                'chkObjType = Convert.ToString(loopdr("CALCACCOUNT"))
+                chkObj = Nothing
+                For Each cellObj As TableCell In rowitem.Controls
+                    chkObj = DirectCast(cellObj.FindControl(chkObjId), CheckBox)
+                    'コントロールが見つかったら脱出
+                    If chkObj IsNot Nothing Then
+                        Exit For
+                    End If
+                Next
+                chkObj.Enabled = False
+                '###################################################################
+
+                For Each cellObj As TableCell In rowitem.Controls
+
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "SHIPORDER") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "TANKNO") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    End If
+
+                    '(実績)発日, (実績)着日, (実績)受入日を入力可能(読取専用)とする。
+                    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALDEPDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALARRDATE") _
+                        OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALACCDATE") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    End If
+
+                    '★運賃フラグ(チェックボックス)をON  ###
+                    If Me.ChkFareFlg.Checked = True Then
+                        '(実績)発駅戻り日は入力不可とする。
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                        End If
+                    Else
+                        '(実績)発駅戻り日を入力可能とする。
+                        If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                            cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                        End If
+                    End If
+
+                    ''    ### 目的が"24:疎開留置", "25:移動"の場合は、発駅戻り日の入力を省略する ###########
+                    'If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_24 _
+                    '    OrElse Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
+                    '    '(実績)発駅戻り日は入力不可とする。
+                    '    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                    '        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                    '    End If
+                    '    '##################################################################################
+                    'Else
+                    '    '(実績)発駅戻り日を入力可能とする。
+                    '    If cellObj.Text.Contains("input id=""txt" & pnlListArea1.ID & "ACTUALEMPARRDATE") Then
+                    '        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+                    '    End If
+                    'End If
+
+                Next
+                rowIdx += 1
+            Next
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' タブ(費用入力)
+    ''' (一覧)テキストボックスの制御(読取専用)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ListTextBoxReadControlTab2()
+        '〇 (一覧)テキストボックスの制御(読取専用)
+        Dim divObj = DirectCast(pnlListArea2.FindControl(pnlListArea2.ID & "_DR"), Panel)
+        Dim tblObj = DirectCast(divObj.Controls(0), Table)
+
+        '〇 回送進行ステータスの状態
+        Select Case work.WF_SEL_KAISOUSTATUS.Text
                 '回送進行ステータス＝"200:手配中"
                 '回送進行ステータス＝"210:手配中(入換指示入力済)"
                 '回送進行ステータス＝"220:手配中(積込指示入力済)"
@@ -5161,18 +5241,16 @@ Public Class OIT0006OutOfServiceDetail
                 '回送進行ステータス＝"290:手配中(入換積込未連絡)"
                 '回送進行ステータス＝"300:手配中(入換積込未確認)"
                 '### END   ##################################################################
-                    Case BaseDllConst.CONST_KAISOUSTATUS_200,
-                         BaseDllConst.CONST_KAISOUSTATUS_210,
-                         BaseDllConst.CONST_KAISOUSTATUS_250,
-                         BaseDllConst.CONST_KAISOUSTATUS_300
+            Case BaseDllConst.CONST_KAISOUSTATUS_200,
+                 BaseDllConst.CONST_KAISOUSTATUS_210,
+                 BaseDllConst.CONST_KAISOUSTATUS_250,
+                 BaseDllConst.CONST_KAISOUSTATUS_300
 
-                    Case Else
-
-                End Select
+            Case Else
 
         End Select
-
     End Sub
+
 
     ''' <summary>
     ''' タンク車所在設定処理
@@ -5194,7 +5272,7 @@ Public Class OIT0006OutOfServiceDetail
             '引数１：所在地コード　⇒　変更なし(空白)
             '引数２：タンク車状態　⇒　変更あり("1"(発送))
             '引数３：積車区分　　　⇒　変更なし(空白)
-            '引数４：(予定)空車着日⇒　更新対象(画面項目)
+            '引数４：(予定)発駅戻り日⇒　更新対象(画面項目)
             '引数５：タンク車状況　⇒　変更あり("3"(回送中))
             WW_UpdateTankShozai("", "1", "", upEmparrDate:=True, I_SITUATION:="3")
 
@@ -5541,12 +5619,12 @@ Public Class OIT0006OutOfServiceDetail
             If Not String.IsNullOrEmpty(I_SITUATION) Then
                 SQLStr &= String.Format("        TANKSITUATION = '{0}', ", I_SITUATION)
             End If
-            '空車着日（予定）
+            '発駅戻り日（予定）
             If upEmparrDate = True Then
                 SQLStr &= String.Format("        EMPARRDATE   = '{0}', ", Me.TxtEmparrDate.Text)
                 SQLStr &= String.Format("        ACTUALEMPARRDATE   = {0}, ", "NULL")
             End If
-            '空車着日（実績）
+            '発駅戻り日（実績）
             If upActualEmparrDate = True Then
                 SQLStr &= String.Format("        ACTUALEMPARRDATE   = '{0}', ", Me.TxtActualEmparrDate.Text)
             End If

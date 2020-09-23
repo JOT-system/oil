@@ -1987,6 +1987,7 @@ Public Class OIT0004OilStockCreate
                     Dim trName As String = Convert.ToString(sqlDr("TRAINNAME"))
                     Dim trMaxVol As Decimal = CDec(Convert.ToString(sqlDr("MAXVOLUME")))
                     Dim trItem As New TrainListItem(trNo, trName, trMaxVol)
+                    trItem.AccDays = 1 '一日後着
                     trItem.UnmanagedTrain = True '管理外フラグをOnに変更
                     retVal.Add(trItem.TrainNo, trItem)
                 End If
@@ -5991,7 +5992,7 @@ Public Class OIT0004OilStockCreate
         ''' <summary>
         ''' (内部メソッド)日付、油種での提案受入数の合計（列車の部分を合計）を取得
         ''' </summary>
-        ''' <param name="dateKey">日付(yyyy/MM/dd形式)</param>
+        ''' <param name="dateKey">日付(yyyy/MM/dd形式)※受入日</param>
         ''' <param name="oilCode">油種コード</param>
         ''' <returns></returns>
 
@@ -6001,21 +6002,32 @@ Public Class OIT0004OilStockCreate
             If Me.SuggestList.ContainsKey(dateKey) = False Then
                 Throw New Exception(String.Format("提案表データ(Key={0})が未存在", dateKey))
             End If
+            For Each daysItems In Me.SuggestList.Values
 
-            For Each tgtItm In Me.SuggestList(dateKey).SuggestOrderItem.Values
-                'チェックをしている値のみ合計する
-                If tgtItm.CheckValue = True OrElse tgtItm.CheckValue = False Then　'20200529 チェック未チェックでもOK戻しやすいよう両条件入れておく本来このIF不要
-                    If tgtItm.SuggestValuesItem.ContainsKey(oilCode) Then
-                        '入力値 * 45 / Weight
-                        Dim suggestItm = tgtItm.SuggestValuesItem(oilCode)
-                        Dim calcVal As Decimal = 0
-                        If suggestItm.OilInfo.Weight <> 0 Then
-                            calcVal = Math.Floor(Decimal.Parse(suggestItm.ItemValue) * 45 / suggestItm.OilInfo.Weight)
-                        End If
-                        retVal = retVal + calcVal
+                For Each tgtItm In daysItems.SuggestOrderItem.Values
+                    If IsNumeric(tgtItm.TrainInfo.AccDays) = False Then
+                        Continue For
                     End If
-                End If
+                    Dim accDays As Decimal = tgtItm.TrainInfo.AccDays * -1
+                    Dim targetDay As String = CDate(dateKey).AddDays(accDays).ToString("yyyy/MM/dd")
+                    If Not daysItems.DayInfo.KeyString = targetDay Then
+                        Continue For
+                    End If
+                    'チェックをしている値のみ合計する
+                    If tgtItm.CheckValue = True OrElse tgtItm.CheckValue = False Then '20200529 チェック未チェックでもOK戻しやすいよう両条件入れておく本来このIF不要
+                        If tgtItm.SuggestValuesItem.ContainsKey(oilCode) Then
+                            '入力値 * 45 / Weight
+                            Dim suggestItm = tgtItm.SuggestValuesItem(oilCode)
+                            Dim calcVal As Decimal = 0
+                            If suggestItm.OilInfo.Weight <> 0 Then
+                                calcVal = Math.Floor(Decimal.Parse(suggestItm.ItemValue) * 45 / suggestItm.OilInfo.Weight)
+                            End If
+                            retVal = retVal + calcVal
+                        End If
+                    End If
+                Next
             Next
+
             Return retVal
         End Function
         ''' <summary>

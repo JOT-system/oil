@@ -15,6 +15,26 @@ function InitDisplay() {
         document.getElementById("RF_RIGHTBOX").style.width = "26em";
     }
 
+    //〇 実績日一括反映ボタン活性／非活性
+    if (document.getElementById('WF_BULKFLG').value === "0") {
+
+        //使用受注オーダー有り
+        if (document.getElementById('WF_USEORDERFLG').value === "0") {
+            //非活性
+            document.getElementById("WF_ButtonBULKDATE").disabled = "disabled";
+        }
+        //使用受注オーダーなし
+        else {
+            //活性
+            document.getElementById("WF_ButtonBULKDATE").disabled = "";
+        }
+
+    }
+    else {
+        //非活性
+        document.getElementById("WF_ButtonBULKDATE").disabled = "disabled";
+    }
+
     //〇 手配完了ボタン活性／非活性
     if (document.getElementById('WF_CONTACTFLG').value === "0") {
         //活性 
@@ -70,6 +90,7 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+                document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "disabled";
             }
             else {
                 //活性
@@ -79,6 +100,7 @@ function InitDisplay() {
                 document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "";
                 //document.getElementById("WF_ButtonCSV").disabled = "";
                 document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "";
+                document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "";
             }
         }
         //〇タブ２
@@ -122,6 +144,7 @@ function InitDisplay() {
             document.getElementById("WF_ButtonLINE_LIFTED_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonLINE_ADD_TAB1").disabled = "disabled";
             document.getElementById("WF_ButtonUPDATE_TAB1").disabled = "disabled";
+            document.getElementById("WF_ButtonCANCEL_TAB1").disabled = "disabled";
         }
         //〇タブ２
         else if (objDtabNo === "1") {

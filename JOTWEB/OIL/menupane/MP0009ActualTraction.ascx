@@ -66,7 +66,9 @@
                         BackColor="Transparent" ></asp:Legend>
 	            </Legends>
             </asp:Chart>
-
+            <asp:Panel ID="pnlSysError" CssClass="nodataArea" runat="server" ClientIDMode="Predictable" Visible="false">
+                システムエラーが発生し営業所別　列車牽引実績を表示出来ませんでした。
+            </asp:Panel>
         </div>
 
     </div>

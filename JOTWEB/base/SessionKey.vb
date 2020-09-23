@@ -66,6 +66,12 @@ Public Module SessionKey
         ''' システム格納ディレクトリ
         ''' </summary>
         Public Const SYSTEM_PATH As String = "SYSdir"
+        '### 20200828 START OT発送日報送信用追加 #########################################
+        ''' <summary>
+        ''' OT発送日報送信FILE格納ディレクトリ
+        ''' </summary>
+        Public Const OTFILESEND_PATH As String = "OTFILESenddir"
+        '### 20200828 END   OT発送日報送信用追加 #########################################
         ''' <summary>
         ''' APサーバ端末ID
         ''' </summary>

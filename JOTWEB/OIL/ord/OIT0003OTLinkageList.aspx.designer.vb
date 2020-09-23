@@ -50,6 +50,51 @@ Partial Public Class OIT0003OTLinkageList
     Protected WithEvents WF_SELUORG_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''rblFilterDateFiled コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents rblFilterDateFiled As Global.System.Web.UI.WebControls.RadioButtonList
+    
+    '''<summary>
+    '''WF_FILTERDATE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_FILTERDATE_TEXT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ButtonOtSend コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonOtSend As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''WF_ButtonReserved コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonReserved As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
+    '''WF_ButtonTakusou コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonTakusou As Global.System.Web.UI.HtmlControls.HtmlInputButton
+    
+    '''<summary>
     '''WF_ButtonFIRST コントロール。
     '''</summary>
     '''<remarks>

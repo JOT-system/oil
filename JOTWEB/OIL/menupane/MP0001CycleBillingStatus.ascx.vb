@@ -29,15 +29,40 @@ Public Class MP0001CycleBillingStatus
         '初回ロードかポストバックか判定
         If IsPostBack = False Then
             '初回ロード
-            Initialize()
+            Try
+                Initialize()
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                CS0011LOGWRITE.INFSUBCLASS = "MP0001CycleBillingStatus"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "INIT"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+            End Try
+
         Else
             'ポストバック
-            If Me.hdnRefreshCall.Value = "1" Then
-                '最新化処理
-                SetDisplayValues()
-            End If
-            '処理フラグを落とす
-            Me.hdnRefreshCall.Value = ""
+            Try
+                If Me.hdnRefreshCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    '最新化処理
+                    SetDisplayValues()
+                End If
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                CS0011LOGWRITE.INFSUBCLASS = "MP0001CycleBillingStatus"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "POSTBACK"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            End Try
+
         End If 'End IsPostBack = False
     End Sub
     ''' <summary>
@@ -88,7 +113,8 @@ Public Class MP0001CycleBillingStatus
         sqlStat.AppendLine("      ,OFFICENAME")
         sqlStat.AppendLine("      ,SORTORDER")
         sqlStat.AppendLine("  FROM OIL.VIW0010_BELONG_TO_OFFICE with(nolock)")
-        sqlStat.AppendLine(" WHERE ORGCODE = @ORGCODE")
+        sqlStat.AppendLine(" WHERE ORGCODE     = @ORGCODE")
+        sqlStat.AppendLine("   AND SHOZAIONLY != '1'")
         sqlStat.AppendLine(" ORDER BY SORTORDER")
         Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon)
             With sqlCmd.Parameters

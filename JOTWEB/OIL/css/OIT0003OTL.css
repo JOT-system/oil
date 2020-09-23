@@ -1,4 +1,10 @@
-﻿/* 左ヘッダー行スタイル */
+﻿#WF_ButtonOtSend,
+#WF_ButtonReserved,
+#WF_ButtonTakusou {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+/* 左ヘッダー行スタイル */
 div[data-generated="1"] div[id$="_HL"] table tr {
     height: 37px;
 }
@@ -29,7 +35,7 @@ div[data-generated="1"] td:nth-child(4) {
 }
 /* 横スクロールを出す最小幅を個別指定 */
 .headerboxOnly {
-    min-width: 750px; /* (共通指定 650pxだと小さすぎる為) */
+    min-width: 1110px; /* (共通指定 650pxだと小さすぎる為) */
 }
 /* 帳票ポップアップ個別指定*/
 #txtReportLodDate{
@@ -40,8 +46,51 @@ div[data-generated="1"] td:nth-child(4) {
 }
 
 .calendarIconArea div {
-    margin-top: calc(100% - 14px) !important;
+    margin-top: calc(100% - 10px) !important;
 }
 .boxIconArea div {
-    margin-top: calc(100% - 14px) !important;
+    margin-top: calc(100% - 10px) !important;
+}
+a.ef {
+    height: 30px;
+    width: 150px;
+    display: inline-block;
+    vertical-align: middle;
+}
+a.ef input {
+    height:28px;
+}
+.rightSide {
+    height:31.3px;
+}
+.filterDateFiledWrapper {
+    display:inline-block;
+    height:25px;
+    vertical-align:middle;
+}
+.filterDateFiledWrapper td {
+    vertical-align: middle;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    margin-top: -4px;
+}
+.filterDateFiledWrapper input[type=radio] {
+    /* margin-top: 2px; */
+    margin-left: 5px;
+    margin-right: 5px;
+    /* height: 15px; */
+    cursor: pointer;
+}
+.filterDateFiledWrapper input[type=radio] + label {
+    cursor:pointer;
+    //display:inline-block;
+    //height:20px;
+}
+.filterDateFiledWrapper input[type=radio]:checked + label {
+    color:darkcyan;
+}
+#rblFilterDateFiled {
+    height:100%;
 }

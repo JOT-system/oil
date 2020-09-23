@@ -28,12 +28,29 @@ Public Class MP0002MonthlyTransfer
         '初回ロードかポストバックか判定
         If IsPostBack = False Then
             '初回ロード
-            Initialize()
-            Me.hdnCurrentListPattern.Value = Me.ddlListPattern.SelectedValue
+            Try
+
+                Initialize()
+                Me.hdnCurrentListPattern.Value = Me.ddlListPattern.SelectedValue
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                Me.ddlListPattern.Enabled = False
+                Me.ddlMonthTransOffice.Enabled = False
+                Me.btnDownload.Visible = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0002MonthlyTransfer"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "INIT"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+            End Try
         Else
             Try
                 'ポストバック
                 If Me.hdnRefreshCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    Me.ddlListPattern.Enabled = True
+                    Me.ddlMonthTransOffice.Enabled = True
                     '最新化処理
                     With Me.ddlListPattern
                         Me.SaveCookie(.ClientID, .SelectedValue)
@@ -46,6 +63,10 @@ Public Class MP0002MonthlyTransfer
                 End If
                 'ダウンロードボタン押下時処理
                 If Me.hdnDownloadCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    Me.ddlListPattern.Enabled = True
+                    Me.ddlMonthTransOffice.Enabled = True
+
                     With Me.ddlListPattern
                         Me.SaveCookie(.ClientID, .SelectedValue)
                     End With
@@ -68,8 +89,21 @@ Public Class MP0002MonthlyTransfer
                 Me.hdnRefreshCall.Value = ""
             Catch ex As Threading.ThreadAbortException
                 Dim doNothing = Nothing
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
             Catch ex As Exception
-                Throw
+                pnlSysError.Visible = True
+                Me.ddlListPattern.Enabled = False
+                Me.ddlMonthTransOffice.Enabled = False
+                Me.btnDownload.Visible = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0002MonthlyTransfer"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "POSTBACK"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
             End Try
 
         End If 'End IsPostBack = False
@@ -364,7 +398,12 @@ Public Class MP0002MonthlyTransfer
         '*********************************
         '白黒の合算
         '*********************************
-        Dim margeTable As DataTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable).CopyToDataTable
+        Dim qmargeTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable)
+        Dim margeTable As DataTable = dt.Clone
+        If qmargeTable.Any Then
+            margeTable = qmargeTable.CopyToDataTable
+        End If
+        'Dim margeTable As DataTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable).CopyToDataTable
         For Each trainClass As String In {"J", "O"}
             '対象の黒油・白油、JOT・OT輸送を絞り込む
             Dim qTarget = (From dr As DataRow In margeTable
@@ -493,8 +532,11 @@ Public Class MP0002MonthlyTransfer
         '*********************************
         '白黒の合算
         '*********************************
-        Dim margeTable As DataTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable).CopyToDataTable
-
+        Dim qmargeTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable)
+        Dim margeTable As DataTable = dt.Clone
+        If qmargeTable.Any Then
+            margeTable = qmargeTable.CopyToDataTable
+        End If
         '対象の黒油・白油、JOT・OT輸送を絞り込む
         Dim qAllTarget = (From dr As DataRow In margeTable
                           Where Convert.ToString(dr("SHIPPERCODE")) <> ""
@@ -839,7 +881,11 @@ Public Class MP0002MonthlyTransfer
         '*********************************
         '白黒の合算
         '*********************************
-        Dim margeTable As DataTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable).CopyToDataTable
+        Dim qmargeTable = dtShiro.AsEnumerable().Union(dtKuro.AsEnumerable)
+        Dim margeTable As DataTable = dt.Clone
+        If qmargeTable.Any Then
+            margeTable = qmargeTable.CopyToDataTable
+        End If
         For Each trainClass As String In {"J", "O"}
             '対象の黒油・白油、JOT・OT輸送を絞り込む
             Dim qTarget = (From dr As DataRow In margeTable

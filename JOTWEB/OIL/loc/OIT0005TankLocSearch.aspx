@@ -45,7 +45,13 @@
             </div>
             <!-- 所属先 -->
             <div class="inputItem" >
-                <a id="WF_Test"  class="requiredMark">タンク車を管轄する支店・営業所を選ぶ</a>
+                <a id="WF_Test" >
+                    <div>
+                    <span class="requiredMark" style="display:inline-block;margin-bottom:5px;">タンク車を管轄する支店・営業所を選ぶ</span>
+                    <input type="button" class="btn-sticky" id="btnChkAll" value="全選択" onclick="checkAll();" />
+                    <input type="button" class="btn-sticky" id="btnUnChk" value="選択解除" onclick="unCheck();" />
+                    </div>
+                </a>
                 <a>
                     <MSINC:tilelist ID="tileSalesOffice" runat="server" />
                 </a>

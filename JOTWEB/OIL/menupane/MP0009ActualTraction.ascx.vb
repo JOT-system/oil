@@ -26,36 +26,65 @@ Public Class MP0009ActualTraction
         End If
         '初回ロードかポストバックか判定
         If IsPostBack = False Then
-            '初回ロード
-            Initialize()
-            Me.hdnCurrentOfficeCode.Value = Me.ddlActualTractionOffice.SelectedValue
-        Else
-            'ポストバック
-            If Me.hdnRefreshCall.Value = "1" Then
-                '最新化処理
-                With Me.ddlActualTractionOffice
-                    Me.SaveCookie(.ClientID, .SelectedValue)
-                End With
-                '着駅再取得
-                If Me.hdnCurrentOfficeCode.Value <> Me.ddlActualTractionOffice.SelectedValue Then
-                    If Me.ddlActualTractionOffice.Items.Count > 0 Then
-                        Me.ddlActualTractionArrStation.Items.Clear()
-                        Dim arrStDdl As DropDownList = Me.GetArrTrainNoList(Me.ddlActualTractionOffice.SelectedValue)
-                        Me.ddlActualTractionArrStation.Items.AddRange(arrStDdl.Items.Cast(Of ListItem).ToArray)
-                        Dim cuurentSt As String = ""
-                        Dim savedSelectedVal As String = ""
-                        SetDdlDefaultValue(Me.ddlActualTractionArrStation, savedSelectedVal)
-                    End If
-                    Me.hdnCurrentOfficeCode.Value = Me.ddlActualTractionOffice.SelectedValue
-                End If
-                With Me.ddlActualTractionArrStation
-                    Me.SaveCookie(.ClientID, .SelectedValue)
-                End With
-                SetDisplayValues()
+            Try
+                '初回ロード
+                Initialize()
+                Me.hdnCurrentOfficeCode.Value = Me.ddlActualTractionOffice.SelectedValue
 
-            End If
-            '処理フラグを落とす
-            Me.hdnRefreshCall.Value = ""
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                Me.ddlActualTractionOffice.Enabled = False
+                Me.ddlActualTractionArrStation.Enabled = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0009ActualTraction"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "INIT"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+            End Try
+        Else
+            Try
+                'ポストバック
+                If Me.hdnRefreshCall.Value = "1" Then
+                    pnlSysError.Visible = False
+                    '最新化処理
+                    With Me.ddlActualTractionOffice
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    '着駅再取得
+                    If Me.hdnCurrentOfficeCode.Value <> Me.ddlActualTractionOffice.SelectedValue Then
+                        If Me.ddlActualTractionOffice.Items.Count > 0 Then
+                            Me.ddlActualTractionArrStation.Items.Clear()
+                            Dim arrStDdl As DropDownList = Me.GetArrTrainNoList(Me.ddlActualTractionOffice.SelectedValue)
+                            Me.ddlActualTractionArrStation.Items.AddRange(arrStDdl.Items.Cast(Of ListItem).ToArray)
+                            Dim cuurentSt As String = ""
+                            Dim savedSelectedVal As String = ""
+                            SetDdlDefaultValue(Me.ddlActualTractionArrStation, savedSelectedVal)
+                        End If
+                        Me.hdnCurrentOfficeCode.Value = Me.ddlActualTractionOffice.SelectedValue
+                    End If
+                    With Me.ddlActualTractionArrStation
+                        Me.SaveCookie(.ClientID, .SelectedValue)
+                    End With
+                    SetDisplayValues()
+
+                End If
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            Catch ex As Exception
+                pnlSysError.Visible = True
+                Me.ddlActualTractionOffice.Enabled = False
+                Me.ddlActualTractionArrStation.Enabled = False
+                CS0011LOGWRITE.INFSUBCLASS = "MP0009ActualTraction"                         'SUBクラス名
+                CS0011LOGWRITE.INFPOSI = "POSTBACK"
+                CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+                CS0011LOGWRITE.TEXT = ex.ToString()
+                CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                CS0011LOGWRITE.CS0011LOGWrite()
+                '処理フラグを落とす
+                Me.hdnRefreshCall.Value = ""
+            End Try
+
         End If 'End IsPostBack = False
     End Sub
     ''' <summary>

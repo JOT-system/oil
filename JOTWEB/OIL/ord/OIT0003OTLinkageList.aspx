@@ -33,10 +33,24 @@
                         <!-- 左ボタン -->
                         <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                        <div class="filterDateFiledWrapper">
+                        <asp:RadioButtonList ID="rblFilterDateFiled" runat="server"  RepeatDirection="Horizontal">
+                            <asp:ListItem Text="積込日" Value="LODDATE" Selected="True"></asp:ListItem>
+                            <asp:ListItem Text="発日" Value="DEPDATE"></asp:ListItem>
+                        </asp:RadioButtonList>
+                        </div>
+                        <a class="ef" id="WF_FILTERDATE" ondblclick="Field_DBclick('WF_FILTERDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                            <asp:TextBox ID="WF_FILTERDATE_TEXT" CssClass="calendarIcon" runat="server"></asp:TextBox>
+                        </a>
+                       
+                        <input type="button" id="WF_ButtonFilter" class="btn-sticky" value="絞込" title="選択は解除されます"  onclick="ButtonClick('WF_ButtonFilter');" />
+                        <input type="button" id="WF_ButtonFilterClear" class="btn-sticky" value="絞込解除"   onclick="ButtonClick('WF_ButtonFilterClear');" />
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->
-                        <input type="button" id="WF_ButtonINSERT" class="btn-sticky" value="OT連携" style="width:7em;"  onclick="ButtonClick('WF_ButtonINSERT');" />
+                        <input type="button" id="WF_ButtonOtSend" class="btn-sticky" value="OT発送日報出力" runat="server" onclick="ButtonClick('WF_ButtonOtSend');" />
+                        <input type="button" id="WF_ButtonReserved" class="btn-sticky" value="製油所出荷予約" runat="server" onclick="ButtonClick('WF_ButtonReserved');" />
+                        <input type="button" id="WF_ButtonTakusou" class="btn-sticky" value="託送指示" runat="server" onclick="ButtonClick('WF_ButtonTakusou');" />
                         <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"   onclick="ButtonClick('WF_ButtonEND');" />
                         <!-- 先頭行・末尾行ボタンを表示させる場合は divの括りを無くして WF_ButtonXXXを外だしにすれば出ます -->
                         <div style="display:none;">

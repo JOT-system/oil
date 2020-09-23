@@ -216,6 +216,10 @@ Public Class OIT0005TankLocList
         sqlStat.AppendLine("      ,VTS.* ") 'ビューのフィールド追加しても動作可能なようにしている(削った場合は要稼働確認)
         sqlStat.AppendFormat("  FROM {0} VTS", viewName).AppendLine()
         sqlStat.AppendFormat(" WHERE VTS.OFFICECODE in ({0})", salesOfficeInstat).AppendLine()
+        If salesOfficeInstat.Contains("'110001'") Then
+            sqlStat.AppendFormat("    OR VTS.BRANCHCODE = '110001'", salesOfficeInstat).AppendLine()
+            'sqlStat.AppendFormat("    OR VTS.OFFICECODE = ''", salesOfficeInstat).AppendLine()
+        End If
         sqlStat.AppendFormat(" ORDER BY {0}", sotrOrderValue).AppendLine()
 
         Try

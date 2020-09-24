@@ -679,6 +679,10 @@ Public Module Messages
         ''' (実績)日付の一括設定確認メッセージ
         ''' </summary>
         Public Const OIL_ACTUALDATE_BULKSET_MSG As String = "20069"
+        ''' <summary>
+        ''' アップロード(警告)メッセージ
+        ''' </summary>
+        Public Const OIL_UPLOAD_WAR_MESSAGE As String = "20070"
 #End Region
 
 

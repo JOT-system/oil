@@ -1406,6 +1406,12 @@ Public Class OIT0002LinkList
             End If
         Next
 
+        '◯アップロードデータチェック
+        WW_CheckUpload(WW_ERRCODE)
+        If WW_ERRCODE = "WAR" Then
+            Master.Output(C_MESSAGE_NO.OIL_UPLOAD_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+        End If
+
         '○ 画面表示データ取得
         Using SQLcon As SqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
@@ -2102,9 +2108,13 @@ Public Class OIT0002LinkList
                                 '受注営業所
                                 CODENAME_get("SALESOFFICE", OIT0002ExlUProw("OFFICECODE"), strOfficeName, WW_DUMMY)
                                 OIT0002ExlUProw("OFFICENAME") = strOfficeName
+                                OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION")
 
-                                OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlINSrow("DEPSTATIONNAME")
-                                OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
+                                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                                WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
+                                OIT0002ExlUProw("DEPSTATION") = WW_GetValue(0)
+                                'OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
+
                                 OIT0002ExlUProw("RETSTATION") = OIT0002ExlINSrow("RETSTATION")
                                 OIT0002ExlUProw("ORDEROILCODE") = OIT0002ExlINSrow("OILCODE")
                                 OIT0002ExlUProw("ORDEROILNAME") = OIT0002ExlINSrow("OILNAME")
@@ -2115,7 +2125,8 @@ Public Class OIT0002LinkList
                                 If OIT0002ExlUProw("LOADINGDEPDATE").ToString() = "" Then Continue For
                                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                                 'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNAME"), WW_GetValue)
-                                WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + OIT0002ExlINSrow("DEPSTATION"), WW_GetValue)
+                                'WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
+                                WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "TRAINNUMBER_FIND", OIT0002ExlUProw("LOADINGTRAINNO") + OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
 
                                 Try
                                     '〇 (予定)の日付を設定
@@ -3679,6 +3690,54 @@ Public Class OIT0002LinkList
 
     End Sub
 
+    ''' <summary>
+    ''' アップロードデータチェック
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckUpload(ByRef O_RTN As String)
+
+        O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_CheckMES1 As String = ""
+        Dim WW_CheckMES2 As String = ""
+        Dim WW_ErrMES() As String = {"本線列車未登録のため登録できません",
+                                     "油種は対象外のため登録できません"}
+
+        For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
+
+            '◯本線列車未設定チェック(運用指示書に登録ありで、本線列車が未登録の場合)
+            '★本線列車が未登録の場合、かつ
+            '　　　　　(運用指示)油種が設定されている
+            '　または、(運用指示)回転が設定されている
+            '　または、(運用指示)位置が設定されている
+            '　または、(運用指示)入線列車が設定されている
+            '　または、(運用指示)積込後の着駅が設定されている
+            '　または、(ポラリス必須)積込日が設定されている
+            '　または、(ポラリス必須)発日が設定されている
+            If OIT0002ExlUProw("LOADINGTRAINNO") = "" AndAlso
+                (OIT0002ExlUProw("OILNAME") <> "" _
+                 OrElse OIT0002ExlUProw("LINE") <> "" _
+                 OrElse OIT0002ExlUProw("POSITION") <> "" _
+                 OrElse OIT0002ExlUProw("INLINETRAIN") <> "" _
+                 OrElse OIT0002ExlUProw("LOADARRSTATION") <> "" _
+                 OrElse OIT0002ExlUProw("LOADINGLODDATE") <> "" _
+                 OrElse OIT0002ExlUProw("LOADINGDEPDATE") <> "") Then
+
+                WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(0))
+                O_RTN = "WAR"
+
+            End If
+
+            '◯油種が営業所未対象チェック
+            '★(運用指示)油種と(受注登録用)油種が不一致
+            If OIT0002ExlUProw("OILNAME").ToString() <> OIT0002ExlUProw("ORDERINGOILNAME").ToString() Then
+
+                WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(1))
+                O_RTN = "WAR"
+
+            End If
+        Next
+
+    End Sub
 
     ''' <summary>
     ''' (貨車連結表(臨海)TBL)受注No更新
@@ -4010,6 +4069,40 @@ Public Class OIT0002LinkList
             WW_ERR_MES &= ControlChars.NewLine & "  --> タンク車№ =" & OIT0002row("TANKNUMBER") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 前回油種 =" & OIT0002row("PREOILCODE") & " , "
             WW_ERR_MES &= ControlChars.NewLine & "  --> 削除フラグ =" & OIT0002row("DELFLG")
+        End If
+
+        rightview.AddErrorReport(WW_ERR_MES)
+
+    End Sub
+
+    ''' <summary>
+    ''' エラーレポート編集(アップロード用)
+    ''' </summary>
+    ''' <param name="MESSAGE1"></param>
+    ''' <param name="MESSAGE2"></param>
+    ''' <param name="OIT0002row"></param>
+    ''' <remarks></remarks>
+    Protected Sub WW_CheckUploadERR(ByVal MESSAGE1 As String, ByVal MESSAGE2 As String,
+                                    Optional ByVal OIT0002row As DataRow = Nothing,
+                                    Optional ByVal ERRReason As String = Nothing)
+
+        Dim WW_ERR_MES As String = ""
+        WW_ERR_MES = MESSAGE1
+        If MESSAGE2 <> "" Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> " & MESSAGE2 & " , "
+        End If
+
+        If Not IsNothing(OIT0002row) Then
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 該当行　　　:" & OIT0002row("SERIALNUMBER") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 本線列車　　:" & OIT0002row("LOADINGTRAINNO") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 積込日　　　:" & OIT0002row("LOADINGLODDATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 発日　　　　:" & OIT0002row("LOADINGDEPDATE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 油種　　　　:" & OIT0002row("OILNAME") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 回転　　　　:" & OIT0002row("LINE") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 位置　　　　:" & OIT0002row("POSITION") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 入線列車　　:" & OIT0002row("INLINETRAIN") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> 積込後の着駅:" & OIT0002row("LOADARRSTATION") & " , "
+            WW_ERR_MES &= ControlChars.NewLine & "  --> エラー理由　:" & ERRReason
         End If
 
         rightview.AddErrorReport(WW_ERR_MES)

@@ -1312,15 +1312,16 @@ Public Class OIT0002LinkList
             '○ UPLOAD XLSデータ取得
             CS0023XLSUPLOAD.CS0023XLSUPLOAD_RLINK(OIT0002EXLUPtbl, useFlg)
 
-            '◯ポラリス投入用の場合
+            '◯列車分解報告(運用指示書あり)、またはポラリス投入用の場合
             Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-            If useFlg = "4" Then
+            If useFlg = "2" OrElse useFlg = "4" Then
                 '配列を初期化
                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 '★(UPLOAD XLS)列車番号が在線の場合
-                WW_FixvalueMasterSearch(BaseDllConst.CONST_OFFICECODE_011201, "CTRAINNUMBER_FIND", OIT0002EXLUPtbl.Rows(0)("TRAINNO") + "番", WW_GetValue)
+                WW_FixvalueMasterSearch(BaseDllConst.CONST_OFFICECODE_011201, "CTRAINNUMBER_FIND", OIT0002EXLUPtbl.Rows(0)("TRAINNO").ToString().Replace("番", "") + "番", WW_GetValue)
                 For Each OIT0002EXLUProw As DataRow In OIT0002EXLUPtbl.Rows
-                    OIT0002EXLUProw("CONVENTIONAL") = OIT0002EXLUProw("TRAINNO")
+                    If WW_GetValue(0) = "" Then Exit For
+                    OIT0002EXLUProw("CONVENTIONAL") = OIT0002EXLUProw("TRAINNO").ToString().Replace("番", "")
                     OIT0002EXLUProw("TRAINNO") = WW_GetValue(0)
                 Next
             End If
@@ -2100,26 +2101,32 @@ Public Class OIT0002LinkList
                 If I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4" Then
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         For Each OIT0002ExlINSrow As DataRow In OIT0002EXLINStbl.Rows
-                            If OIT0002ExlUProw("TRUCKNO") = OIT0002ExlINSrow("TANKNUMBER") _
-                                AndAlso OIT0002ExlUProw("LOADINGTRAINNO") <> "" Then
-                                OIT0002ExlUProw("OFFICECODE") = OIT0002ExlINSrow("OFFICECODE")
+                            If OIT0002ExlUProw("TRUCKNO") = OIT0002ExlINSrow("TANKNUMBER") Then
 
-                                '◯名称取得
                                 '受注営業所
+                                OIT0002ExlUProw("OFFICECODE") = OIT0002ExlINSrow("OFFICECODE")
+                                '◯名称取得
                                 CODENAME_get("SALESOFFICE", OIT0002ExlUProw("OFFICECODE"), strOfficeName, WW_DUMMY)
                                 OIT0002ExlUProw("OFFICENAME") = strOfficeName
+
+                                '空車着駅
+                                OIT0002ExlUProw("RETSTATION") = OIT0002ExlINSrow("RETSTATION")
+                                '油種
+                                OIT0002ExlUProw("ORDEROILCODE") = OIT0002ExlINSrow("OILCODE")
+                                OIT0002ExlUProw("ORDEROILNAME") = OIT0002ExlINSrow("OILNAME")
+                                OIT0002ExlUProw("ORDERINGTYPE") = OIT0002ExlINSrow("ORDERINGTYPE")
+                                OIT0002ExlUProw("ORDERINGOILNAME") = OIT0002ExlINSrow("ORDERINGOILNAME")
+
+                                '本線列車が未登録の場合はSKIP
+                                If OIT0002ExlUProw("LOADINGTRAINNO") = "" Then Continue For
+
+                                '本線列車名
                                 OIT0002ExlUProw("LOADINGTRAINNAME") = OIT0002ExlUProw("LOADINGTRAINNO") + "-" + OIT0002ExlUProw("LOADARRSTATION")
 
                                 WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                                 WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "STATIONPATTERN_N", OIT0002ExlUProw("LOADARRSTATION"), WW_GetValue)
                                 OIT0002ExlUProw("DEPSTATION") = WW_GetValue(0)
                                 'OIT0002ExlUProw("DEPSTATION") = OIT0002ExlINSrow("DEPSTATION")
-
-                                OIT0002ExlUProw("RETSTATION") = OIT0002ExlINSrow("RETSTATION")
-                                OIT0002ExlUProw("ORDEROILCODE") = OIT0002ExlINSrow("OILCODE")
-                                OIT0002ExlUProw("ORDEROILNAME") = OIT0002ExlINSrow("OILNAME")
-                                OIT0002ExlUProw("ORDERINGTYPE") = OIT0002ExlINSrow("ORDERINGTYPE")
-                                OIT0002ExlUProw("ORDERINGOILNAME") = OIT0002ExlINSrow("ORDERINGOILNAME")
 
                                 '積車着日(予定), 受入日(予定), 空車着日(予定)
                                 If OIT0002ExlUProw("LOADINGDEPDATE").ToString() = "" Then Continue For
@@ -2165,7 +2172,7 @@ Public Class OIT0002LinkList
                             OIT0002ExlUProw("INLINETRAINNAME") = OIT0002ExlUProw("INLINETRAIN") + "レ"
 
                             '★甲子営業所の場合は入線列車名を追加設定
-                            If OIT0002ExlUProw("OFFICECODE") = BaseDllConst.CONST_OFFICECODE_011202 _
+                            If OIT0002ExlUProw("OFFICECODE").ToString() = BaseDllConst.CONST_OFFICECODE_011202 _
                                 AndAlso OIT0002ExlUProw("LINE") <> "" Then
                                 If OIT0002ExlUProw("LINE") = "11" Then
                                     OIT0002ExlUProw("INLINETRAINNAME") &= "1"
@@ -2177,7 +2184,7 @@ Public Class OIT0002LinkList
 
                         '〇営業所配下情報を取得・設定
                         WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                        WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "RINKAITRAIN_FIND_I", OIT0002ExlUProw("INLINETRAINNAME"), WW_GetValue)
+                        WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE").ToString(), "RINKAITRAIN_FIND_I", OIT0002ExlUProw("INLINETRAINNAME"), WW_GetValue)
 
                         '出線列車番号
                         OIT0002ExlUProw("OUTLINETRAIN") = WW_GetValue(6)
@@ -2203,7 +2210,7 @@ Public Class OIT0002LinkList
 
                             '〇営業所配下情報を取得・設定
                             WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                            WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE"), "PATTERNMASTER", OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
+                            WW_FixvalueMasterSearch(OIT0002ExlUProw("OFFICECODE").ToString(), "PATTERNMASTER", OIT0002ExlUProw("DEPSTATION"), WW_GetValue)
 
                             OIT0002ExlUProw("SHIPPERSCODE") = WW_GetValue(0)
                             OIT0002ExlUProw("SHIPPERSNAME") = WW_GetValue(1)
@@ -3697,10 +3704,12 @@ Public Class OIT0002LinkList
     Protected Sub WW_CheckUpload(ByRef O_RTN As String)
 
         O_RTN = C_MESSAGE_NO.NORMAL
+        Dim WW_Kensa As String = "検"
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
-        Dim WW_ErrMES() As String = {"本線列車未登録のため登録できません",
-                                     "油種は対象外のため登録できません"}
+        Dim WW_ErrMES() As String = {"本線列車未登録のため受注登録できません",
+                                     "油種は対象外のため受注登録できません",
+                                     "検査中のため受注登録できません"}
 
         For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
 
@@ -3722,7 +3731,12 @@ Public Class OIT0002LinkList
                  OrElse OIT0002ExlUProw("LOADINGLODDATE") <> "" _
                  OrElse OIT0002ExlUProw("LOADINGDEPDATE") <> "") Then
 
-                WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(0))
+                If OIT0002ExlUProw("ARTICLENAME") = WW_Kensa Then
+                    WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(2))
+                    Continue For
+                Else
+                    WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(0))
+                End If
                 O_RTN = "WAR"
 
             End If
@@ -3731,7 +3745,12 @@ Public Class OIT0002LinkList
             '★(運用指示)油種と(受注登録用)油種が不一致
             If OIT0002ExlUProw("OILNAME").ToString() <> OIT0002ExlUProw("ORDERINGOILNAME").ToString() Then
 
-                WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(1))
+                If OIT0002ExlUProw("ARTICLENAME") = WW_Kensa Then
+                    WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(2))
+                    Continue For
+                Else
+                    WW_CheckUploadERR(WW_CheckMES1, WW_CheckMES2, OIT0002ExlUProw, WW_ErrMES(1))
+                End If
                 O_RTN = "WAR"
 
             End If

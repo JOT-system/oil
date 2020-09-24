@@ -1255,10 +1255,10 @@ Public Structure CS0023XLSUPLOAD
                 dt.Rows(i)("ARTICLE") = rng.Text.ToString()
 
                 ' ### 運送指示書(項目) START ####################################
-                rng = oSheet.Range("I" + jStart.ToString())
-                dt.Rows(i)("OILNAME") = rng.Text.ToString()
                 rng = oSheet.Range("J" + jStart.ToString())
-                dt.Rows(i)("LINE") = rng.Text.ToString()
+                dt.Rows(i)("OILNAME") = rng.Text.ToString()
+                '回転(回線)は未存在のため(空文字)
+                dt.Rows(i)("LINE") = ""
                 rng = oSheet.Range("K" + jStart.ToString())
                 dt.Rows(i)("POSITION") = rng.Text.ToString()
                 rng = oSheet.Range("L" + jStart.ToString())
@@ -1465,8 +1465,8 @@ Public Structure CS0023XLSUPLOAD
                 '    dt.Rows(i)("AGOBEHINDFLG") = "2"
                 'End If
                 dt.Rows(i)("REGISTRATIONDATE") = sCellTitle(0)
-                dt.Rows(i)("TRAINNO") = ""
-                dt.Rows(i)("CONVENTIONAL") = sCellTitle(1)
+                dt.Rows(i)("TRAINNO") = sCellTitle(1)
+                dt.Rows(i)("CONVENTIONAL") = ""
                 dt.Rows(i)("CONVENTIONALTIME") = sCellTitle(2)
 
                 rng = oSheet.Range("A" + jStart.ToString())

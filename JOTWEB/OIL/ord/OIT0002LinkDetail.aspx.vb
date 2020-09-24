@@ -228,10 +228,14 @@ Public Class OIT0002LinkDetail
         '返送列車
         Me.TxtBTrainNo.Text = work.WF_SEL_BTRAINNO.Text
         Me.TxtBTrainName.Text = work.WF_SEL_BTRAINNAME.Text
-        Me.LblBTrainName.Text = work.WF_SEL_BTRAINNAME.Text
+        If work.WF_SEL_BTRAINNO.Text = work.WF_SEL_BTRAINNAME.Text Then
+            Me.LblBTrainName.Text = work.WF_SEL_BTRAINNAME.Text + "レ"
+        Else
+            Me.LblBTrainName.Text = work.WF_SEL_BTRAINNAME.Text
+        End If
+
         '空車着日（予定）
         Me.txtEmparrDate.Text = work.WF_SEL_EMPARRDATE.Text
-
         '合計車数
         Me.TxtTotalTank.Text = work.WF_SEL_TANKCARTOTAL.Text
         '車数（レギュラー）

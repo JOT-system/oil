@@ -258,10 +258,12 @@ Public Class OIT0002LinkDetail
         '返送列車を入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtBTrainNo.Attributes("onkeyPress") = "CheckNum()"
 
-        '新規作成の場合
+        '新規作成ではない場合
         If work.WF_SEL_CREATEFLG.Text <> "1" Then
             '既存データの修正については、登録営業所は入力不可とする。
-            TxtOrderOffice.Enabled = False
+            Me.TxtOrderOffice.Enabled = False
+            Me.TxtBTrainNo.Enabled = False
+            Me.txtEmparrDate.Enabled = False
         End If
 
         '○ 名称設定処理
@@ -1273,6 +1275,15 @@ Public Class OIT0002LinkDetail
                                      "BTRAINNUMBER_FIND",
                                      Me.TxtBTrainName.Text,
                                      WW_GetValue)
+
+                '◯情報が取得できない場合
+                If WW_GetValue(1) = "" Then
+                    '★列車名(在線)から情報を取得
+                    FixvalueMasterSearch(work.WF_SEL_OFFICECODE.Text,
+                                     "CTRAINNUMBER_FIND",
+                                     Me.TxtBTrainName.Text,
+                                     WW_GetValue)
+                End If
 
                 '◯ 空車発駅
                 work.WF_SEL_DEPSTATION.Text = WW_GetValue(1)

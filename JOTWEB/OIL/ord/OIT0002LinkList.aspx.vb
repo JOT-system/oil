@@ -1926,7 +1926,10 @@ Public Class OIT0002LinkList
                 & " , ''                                               AS INFO" _
                 & " , ''                                               AS PREORDERNO" _
                 & " , OIT0011.TRAINNO                                  AS TRAINNO" _
-                & " , ISNULL(OIM0007.TRAINNAME, OIT0011.CONVENTIONAL)  AS TRAINNAME" _
+                & " , CASE" _
+                & "   WHEN OIT0011.CONVENTIONAL = '' THEN OIT0011.TRAINNO" _
+                & "   ELSE OIT0011.CONVENTIONAL" _
+                & "   END                                              AS TRAINNAME" _
                 & " , VIW0002.OFFICECODE                               AS OFFICECODE" _
                 & " , VIW0002.DEPSTATION                               AS DEPSTATION" _
                 & " , VIW0002.DEPSTATIONNAME                           AS DEPSTATIONNAME" _

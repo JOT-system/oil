@@ -1567,7 +1567,7 @@ Public Class OIT0002LinkList
                   " INSERT INTO OIL.OIT0011_RLINK " _
                 & " ( RLINKNO       , RLINKDETAILNO  , FILENAME        , AGOBEHINDFLG    , REGISTRATIONDATE" _
                 & " , TRAINNO       , CONVENTIONAL   , CONVENTIONALTIME, SERIALNUMBER    , TRUCKSYMBOL   , TRUCKNO" _
-                & " , DEPSTATIONNAME, ARRSTATIONNAME , ARTICLENAME     , CONVERSIONAMOUNT" _
+                & " , DEPSTATIONNAME, ARRSTATIONNAME , ARTICLENAME     , INSPECTIONDATE  , CONVERSIONAMOUNT" _
                 & " , ARTICLE       , ARTICLETRAINNO , ARTICLEOILNAME" _
                 & " , OILNAME       , LINE           , POSITION        , INLINETRAIN     , LOADARRSTATION" _
                 & " , LOADINGTRAINNO, LOADINGLODDATE , LOADINGDEPDATE  , CURRENTCARTOTAL" _
@@ -1579,7 +1579,7 @@ Public Class OIT0002LinkList
                   " VALUES" _
                 & " ( @RLINKNO       , @RLINKDETAILNO  , @FILENAME        , @AGOBEHINDFLG    , @REGISTRATIONDATE" _
                 & " , @TRAINNO       , @CONVENTIONAL   , @CONVENTIONALTIME, @SERIALNUMBER    , @TRUCKSYMBOL   , @TRUCKNO" _
-                & " , @DEPSTATIONNAME, @ARRSTATIONNAME , @ARTICLENAME     , @CONVERSIONAMOUNT" _
+                & " , @DEPSTATIONNAME, @ARRSTATIONNAME , @ARTICLENAME     , @INSPECTIONDATE  , @CONVERSIONAMOUNT" _
                 & " , @ARTICLE       , @ARTICLETRAINNO , @ARTICLEOILNAME" _
                 & " , @OILNAME       , @LINE           , @POSITION        , @INLINETRAIN     , @LOADARRSTATION" _
                 & " , @LOADINGTRAINNO, @LOADINGLODDATE , @LOADINGDEPDATE  , @CURRENTCARTOTAL" _
@@ -1629,6 +1629,7 @@ Public Class OIT0002LinkList
                 Dim DEPSTATIONNAME As SqlParameter = SQLRLinkcmd.Parameters.Add("@DEPSTATIONNAME", SqlDbType.NVarChar)       '発駅
                 Dim ARRSTATIONNAME As SqlParameter = SQLRLinkcmd.Parameters.Add("@ARRSTATIONNAME", SqlDbType.NVarChar)       '着駅
                 Dim ARTICLENAME As SqlParameter = SQLRLinkcmd.Parameters.Add("@ARTICLENAME", SqlDbType.NVarChar)             '品名
+                Dim INSPECTIONDATE As SqlParameter = SQLRLinkcmd.Parameters.Add("@INSPECTIONDATE", SqlDbType.NVarChar)       '交検年月日
                 Dim CONVERSIONAMOUNT As SqlParameter = SQLRLinkcmd.Parameters.Add("@CONVERSIONAMOUNT", SqlDbType.Decimal)    '換算数量
                 Dim ARTICLE As SqlParameter = SQLRLinkcmd.Parameters.Add("@ARTICLE", SqlDbType.NVarChar)                     '記事
                 Dim ARTICLETRAINNO As SqlParameter = SQLRLinkcmd.Parameters.Add("@ARTICLETRAINNO", SqlDbType.NVarChar)       '記事(列車)
@@ -1707,6 +1708,12 @@ Public Class OIT0002LinkList
                     ARRSTATIONNAME.Value = OIT0002EXLUProw("ARRSTATIONNAME")
                     '品名
                     ARTICLENAME.Value = OIT0002EXLUProw("ARTICLENAME")
+                    '交検年月日
+                    If OIT0002EXLUProw("INSPECTIONDATE") = "" Then
+                        INSPECTIONDATE.Value = DBNull.Value
+                    Else
+                        INSPECTIONDATE.Value = OIT0002EXLUProw("INSPECTIONDATE")
+                    End If
                     '換算数量
                     If OIT0002EXLUProw("CONVERSIONAMOUNT") = "" Then
                         CONVERSIONAMOUNT.Value = DBNull.Value

@@ -2006,7 +2006,7 @@ Public Class OIT0002LinkDetail
         Using repCbj = New OIT0002CustomReport(Master.MAPID, Master.MAPID & ".xlsx", OIT0002Reporttbl)
             Dim url As String
             Try
-                url = repCbj.CreateExcelPrintData
+                url = repCbj.CreateExcelPrintData(work.WF_SEL_OFFICENAME.Text)
             Catch ex As Exception
                 Return
             End Try
@@ -2067,6 +2067,8 @@ Public Class OIT0002LinkDetail
             & " , 1                                              AS 'SELECT'" _
             & " , 0                                              AS HIDDEN" _
             & " , OIT0011.TRAINNO                                AS TRAINNO" _
+            & " , OIT0011.CONVENTIONAL                           AS CONVENTIONAL" _
+            & " , OIT0011.CONVENTIONALTIME                       AS CONVENTIONALTIME" _
             & " , OIT0011.AGOBEHINDFLG                           AS AGOBEHINDFLG" _
             & " , OIT0011.REGISTRATIONDATE                       AS REGISTRATIONDATE" _
             & " , OIT0011.SERIALNUMBER                           AS SERIALNUMBER" _
@@ -2075,6 +2077,7 @@ Public Class OIT0002LinkDetail
             & " , OIT0011.DEPSTATIONNAME                         AS DEPSTATIONNAME" _
             & " , OIT0011.ARRSTATIONNAME                         AS ARRSTATIONNAME" _
             & " , OIT0011.ARTICLENAME                            AS ARTICLENAME" _
+            & " , ISNULL(OIT0011.INSPECTIONDATE, OIM0005.JRINSPECTIONDATE) AS INSPECTIONDATE" _
             & " , OIT0011.CONVERSIONAMOUNT                       AS CONVERSIONAMOUNT" _
             & " , OIT0011.ARTICLE                                AS ARTICLE" _
             & " , OIT0011.CURRENTCARTOTAL                        AS CURRENTCARTOTAL" _
@@ -2111,6 +2114,9 @@ Public Class OIT0002LinkDetail
             & " AND TMP0005.OILNo = '1' " _
             & " AND TMP0005.OILCODE = OIT0003.OILCODE " _
             & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
+            & " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & "     OIM0005.TANKNUMBER = OIT0011.TRUCKNO " _
+            & " AND OIM0005.DELFLG <> @DELFLG " _
             & " WHERE OIT0011.RLINKNO = @RLINKNO "
 
         Try
@@ -2152,18 +2158,20 @@ Public Class OIT0002LinkDetail
                     Next
                 Next
 
-                '### 20200916 START 指摘票対応(No142)全体 ########################################################
-                '★甲子営業所対応(位置(充填ポイント)に、回転(回線)+位置(充填ポイント)を再設定)
-                For Each OIT0002Reprow As DataRow In OIT0002Reporttbl.Rows
-                    If work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                        Try
-                            OIT0002Reprow("FILLINGPOINT") = OIT0002Reprow("LINE") + OIT0002Reprow("FILLINGPOINT")
-                        Catch ex As Exception
-                            OIT0002Reprow("FILLINGPOINT") = ""
-                        End Try
-                    End If
-                Next
-                '### 20200916 END   指摘票対応(No142)全体 ########################################################
+                '### 20200925 START 帳票(Excel)の計算式にて対応のため廃止 ########################################
+                ''### 20200916 START 指摘票対応(No142)全体 ########################################################
+                ''★甲子営業所対応(位置(充填ポイント)に、回転(回線)+位置(充填ポイント)を再設定)
+                'For Each OIT0002Reprow As DataRow In OIT0002Reporttbl.Rows
+                '    If work.WF_SEL_OFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
+                '        Try
+                '            OIT0002Reprow("FILLINGPOINT") = OIT0002Reprow("LINE") + OIT0002Reprow("FILLINGPOINT")
+                '        Catch ex As Exception
+                '            OIT0002Reprow("FILLINGPOINT") = ""
+                '        End Try
+                '    End If
+                'Next
+                ''### 20200916 END   指摘票対応(No142)全体 ########################################################
+                '### 20200925 END   帳票(Excel)の計算式にて対応のため廃止 ########################################
             End Using
 
         Catch ex As Exception

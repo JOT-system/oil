@@ -93,7 +93,7 @@ Public Class OIT0002CustomReport : Implements IDisposable
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
                                                 [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
         Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
-        Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("列車"), Excel.Worksheet)
+        Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("ポラリス投入用"), Excel.Worksheet)
         'Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
     End Sub
 
@@ -102,7 +102,7 @@ Public Class OIT0002CustomReport : Implements IDisposable
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData() As String
+    Public Function CreateExcelPrintData(ByVal I_OFFICENAME As String) As String
         Dim rngWrite As Excel.Range = Nothing
         Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
@@ -111,7 +111,7 @@ Public Class OIT0002CustomReport : Implements IDisposable
         Try
             '***** TODO処理 ここから *****
             '◯ヘッダーの設定
-            EditHeaderArea()
+            EditHeaderArea(I_OFFICENAME)
             '◯明細の設定
             EditDetailArea()
             '***** TODO処理 ここまで *****
@@ -144,15 +144,22 @@ Public Class OIT0002CustomReport : Implements IDisposable
     ''' <summary>
     ''' 帳票のヘッダー設定
     ''' </summary>
-    Private Sub EditHeaderArea()
+    Private Sub EditHeaderArea(ByVal I_OFFICENAME As String)
         Dim rngTitleArea As Excel.Range = Nothing
         Try
             For Each PrintDatarow As DataRow In PrintData.Rows
+                '◯ 営業所名
+                rngTitleArea = Me.ExcelWorkSheet.Range("A2")
+                rngTitleArea.Value = I_OFFICENAME
                 '◯ 列車No
-                rngTitleArea = Me.ExcelWorkSheet.Range("B4")
-                rngTitleArea.Value = PrintDatarow("TRAINNO")
+                rngTitleArea = Me.ExcelWorkSheet.Range("E2")
+                If PrintDatarow("CONVENTIONAL").ToString() = "" Then
+                    rngTitleArea.Value = PrintDatarow("TRAINNO")
+                Else
+                    rngTitleArea.Value = PrintDatarow("CONVENTIONAL")
+                End If
                 '◯ 登録日
-                rngTitleArea = Me.ExcelWorkSheet.Range("E5")
+                rngTitleArea = Me.ExcelWorkSheet.Range("D4")
                 rngTitleArea.Value = PrintDatarow("REGISTRATIONDATE")
 
                 '◯ 現車
@@ -212,21 +219,37 @@ Public Class OIT0002CustomReport : Implements IDisposable
                 '    AndAlso PrintDatarow("OTTRANSPORTFLG").ToString() = "2" Then
                 '    rngDetailArea.Value = PrintDatarow("ARTICLE").ToString() + "JOT"
                 'End If
+                '◯ 交検日
+                rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("INSPECTIONDATE")
 
                 '### 運　用　指　示 ###########################################
                 '◯ 充 填 線(油　種)
-                rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
-                'rngDetailArea.Value = PrintDatarow("REPORTOILNAME")
-                rngDetailArea.Value = PrintDatarow("RINKAIOILKANA")
-                '◯ 充 填 線(位　置)
                 rngDetailArea = Me.ExcelWorkSheet.Range("K" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("RINKAIOILKANA")
+                rngDetailArea.Value = PrintDatarow("ORDERINGOILNAME")
+                '◯ 充 填 線(回　転)
+                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("LINE")
+                '◯ 充 填 線(位　置)
+                rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("FILLINGPOINT")
                 '◯ 入　線 　列　車
-                rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("LOADINGIRILINETRAINNO")
-                '◯ 着駅(本線列車)
-                rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("LOADINGARRSTATIONNAME")
+                '◯ 着駅(本線列車)※自動設定のため未設定
+                'rngDetailArea = Me.ExcelWorkSheet.Range("O" + i.ToString())
+                'rngDetailArea.Value = PrintDatarow("LOADINGARRSTATIONNAME")
+
+                '◯ ポラリス受注登録必須項目(本線列車)
+                rngDetailArea = Me.ExcelWorkSheet.Range("Q" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ORDERTRAINNO")
+                '◯ ポラリス受注登録必須項目(積込日)
+                rngDetailArea = Me.ExcelWorkSheet.Range("R" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ORDERLODDATE")
+                '◯ ポラリス受注登録必須項目(発日)
+                rngDetailArea = Me.ExcelWorkSheet.Range("S" + i.ToString())
+                rngDetailArea.Value = PrintDatarow("ORDERDEPDATE")
 
                 i += 1
             Next

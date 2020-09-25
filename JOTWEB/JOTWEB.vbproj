@@ -376,6 +376,7 @@
     <Compile Include="OIL\com\M00001MP0002CustomReport.vb" />
     <Compile Include="OIL\com\OIT0001CustomReport.vb" />
     <Compile Include="OIL\com\OIT0002CustomReport.vb" />
+    <Compile Include="OIL\com\OIT0002CustomReportOLD.vb" />
     <Compile Include="OIL\com\OIT0003CustomReport.vb" />
     <Compile Include="OIL\com\OIT0003CustomReportTakusouCsv.vb" />
     <Compile Include="OIL\com\OIT0003CustomReportTakusouExcel.vb" />

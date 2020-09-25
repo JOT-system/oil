@@ -28,6 +28,8 @@ Public Class OIT0002LinkList
     Private OIT0002EXLDELtbl As DataTable                            'EXCELアップロード(削除)用
     Private OIT0002EXLINStbl As DataTable                            'EXCELアップロード(追加(貨車連結表TBL))用
     Private OIT0002Fixvaltbl As DataTable                            '作業用テーブル(固定値マスタ取得用)
+    Private OIT0002His1tbl As DataTable                             '履歴格納用テーブル
+    Private OIT0002His2tbl As DataTable                             '履歴格納用テーブル
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -3015,8 +3017,10 @@ Public Class OIT0002LinkList
                 Dim WW_DATENOW As DateTime = Date.Now
                 Dim iresult As Integer
                 Dim strOilCnt() As String
+                Dim strOrderNo As String = ""
 
-                For Each OIT0002row As DataRow In OIT0002EXLUPtbl.Rows
+                'For Each OIT0002row As DataRow In OIT0002EXLUPtbl.Rows
+                For Each OIT0002row As DataRow In OIT0002EXLUPtbl.Select(Nothing, "ORDERNO")
 
                     '★受注№が未設定の場合は次レコード
                     If OIT0002row("ORDERNO").ToString() = "" Then Continue For
@@ -3208,6 +3212,12 @@ Public Class OIT0002LinkList
                             Exit Sub
                         End If
                     Next
+
+                    If strOrderNo <> OIT0002row("ORDERNO") Then
+                        '受注履歴テーブル追加処理
+                        WW_InsertOrderHistory(SQLcon, OIT0002row("ORDERNO"))
+                    End If
+                    strOrderNo = OIT0002row("ORDERNO")
                 Next
 
             End Using
@@ -3224,6 +3234,105 @@ Public Class OIT0002LinkList
         End Try
 
         'Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF)
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注履歴TBL追加処理
+    ''' </summary>
+    ''' <param name="sqlCon"></param>
+    Private Sub WW_InsertOrderHistory(ByVal SQLcon As SqlConnection,
+                                      ByVal I_ORDERNO As String)
+        Dim WW_GetHistoryNo() As String = {""}
+        WW_FixvalueMasterSearch("", "NEWHISTORYNOGET", "", WW_GetHistoryNo)
+
+        '◯受注履歴テーブル格納用
+        If IsNothing(OIT0002His1tbl) Then
+            OIT0002His1tbl = New DataTable
+        End If
+
+        If OIT0002His1tbl.Columns.Count <> 0 Then
+            OIT0002His1tbl.Columns.Clear()
+        End If
+        OIT0002His1tbl.Clear()
+
+        '◯受注明細履歴テーブル格納用
+        If IsNothing(OIT0002His2tbl) Then
+            OIT0002His2tbl = New DataTable
+        End If
+
+        If OIT0002His2tbl.Columns.Count <> 0 Then
+            OIT0002His2tbl.Columns.Clear()
+        End If
+        OIT0002His2tbl.Clear()
+
+        '○ 受注TBL検索SQL
+        Dim SQLOrderStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0002.*" _
+            & " FROM OIL.OIT0002_ORDER OIT0002 " _
+            & String.Format(" WHERE OIT0002.ORDERNO = '{0}'", I_ORDERNO)
+
+        '○ 受注明細TBL検索SQL
+        Dim SQLOrderDetailStr As String =
+            "SELECT " _
+            & String.Format("   '{0}' AS HISTORYNO", WW_GetHistoryNo(0)) _
+            & String.Format(" , '{0}' AS MAPID", Me.Title) _
+            & " , OIT0003.*" _
+            & " FROM OIL.OIT0003_DETAIL OIT0003 " _
+            & String.Format(" WHERE OIT0003.ORDERNO = '{0}'", I_ORDERNO)
+
+        Try
+            Using SQLcmd As New SqlCommand(SQLOrderStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002His1tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002His1tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using SQLcmd As New SqlCommand(SQLOrderDetailStr, SQLcon)
+                Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        OIT0002His2tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    OIT0002His2tbl.Load(SQLdr)
+                End Using
+            End Using
+
+            Using tran = SQLcon.BeginTransaction
+                '■受注履歴テーブル
+                EntryHistory.InsertOrderHistory(SQLcon, tran, OIT0002His1tbl.Rows(0))
+
+                '■受注明細履歴テーブル
+                For Each OIT0001His2rowtbl In OIT0002His2tbl.Rows
+                    EntryHistory.InsertOrderDetailHistory(SQLcon, tran, OIT0001His2rowtbl)
+                Next
+
+                'トランザクションコミット
+                tran.Commit()
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0002L ORDERHISTORY")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0002L ORDERHISTORY"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 

@@ -683,6 +683,14 @@ Public Module Messages
         ''' アップロード(警告)メッセージ
         ''' </summary>
         Public Const OIL_UPLOAD_WAR_MESSAGE As String = "20070"
+        ''' <summary>
+        ''' タンク車(交検日(間近))エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_KOUKENBI_UPCLOSE_ERROR As String = "20071"
+        ''' <summary>
+        ''' タンク車(全検日(間近))エラー
+        ''' </summary>
+        Public Const OIL_TANKNO_ZENKENBI_UPCLOSE_ERROR As String = "20072"
 #End Region
 
 

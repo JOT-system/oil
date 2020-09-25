@@ -574,7 +574,7 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_450 As String = "450"
     ''' <summary>
-    ''' 500:検収中
+    ''' 500:輸送完了
     ''' </summary>
     Public Const CONST_ORDERSTATUS_500 As String = "500"
     ''' <summary>

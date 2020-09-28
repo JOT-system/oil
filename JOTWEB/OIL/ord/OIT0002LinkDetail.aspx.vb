@@ -4405,10 +4405,12 @@ Public Class OIT0002LinkDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO              , DETAILNO               , LINEORDER          , TANKNO" _
-            & "        , STACKINGFLG          , FIRSTRETURNFLG         , AFTERRETURNFLG     , OTTRANSPORTFLG" _
+            & "        , STACKINGFLG          , INSPECTIONFLG          , DETENTIONFLG" _
+            & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
-            & "        , CARSNUMBER           , CARSAMOUNT             , LINE               , FILLINGPOINT" _
+            & "        , CARSNUMBER           , CARSAMOUNT             , RETURNDATETRAIN" _
+            & "        , LINE                 , FILLINGPOINT" _
             & "        , LOADINGIRILINETRAINNO, LOADINGIRILINETRAINNAME, LOADINGIRILINEORDER" _
             & "        , LOADINGOUTLETTRAINNO , LOADINGOUTLETTRAINNAME , LOADINGOUTLETORDER" _
             & "        , RESERVEDNO           , OTSENDCOUNT            , DLRESERVEDCOUNT    , DLTAKUSOUCOUNT" _
@@ -4418,10 +4420,12 @@ Public Class OIT0002LinkDetail
             & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @ORDERNO              , @DETAILNO               , @LINEORDER          , @TANKNO" _
-            & "        , @STACKINGFLG          , @FIRSTRETURNFLG         , @AFTERRETURNFLG     , @OTTRANSPORTFLG" _
+            & "        , @STACKINGFLG          , @INSPECTIONFLG          , @DETENTIONFLG" _
+            & "        , @FIRSTRETURNFLG       , @AFTERRETURNFLG         , @OTTRANSPORTFLG" _
             & "        , @ORDERINFO            , @SHIPPERSCODE           , @SHIPPERSNAME" _
             & "        , @OILCODE              , @OILNAME                , @ORDERINGTYPE       , @ORDERINGOILNAME" _
-            & "        , @CARSNUMBER           , @CARSAMOUNT             , @LINE               , @FILLINGPOINT" _
+            & "        , @CARSNUMBER           , @CARSAMOUNT             , @RETURNDATETRAIN" _
+            & "        , @LINE                 , @FILLINGPOINT" _
             & "        , @LOADINGIRILINETRAINNO, @LOADINGIRILINETRAINNAME, @LOADINGIRILINEORDER" _
             & "        , @LOADINGOUTLETTRAINNO , @LOADINGOUTLETTRAINNAME , @LOADINGOUTLETORDER" _
             & "        , @RESERVEDNO           , @OTSENDCOUNT            , @DLRESERVEDCOUNT    , @DLTAKUSOUCOUNT" _
@@ -4440,6 +4444,8 @@ Public Class OIT0002LinkDetail
             & "    , LINEORDER" _
             & "    , TANKNO" _
             & "    , STACKINGFLG" _
+            & "    , INSPECTIONFLG" _
+            & "    , DETENTIONFLG" _
             & "    , FIRSTRETURNFLG" _
             & "    , AFTERRETURNFLG" _
             & "    , OTTRANSPORTFLG" _
@@ -4452,6 +4458,7 @@ Public Class OIT0002LinkDetail
             & "    , ORDERINGOILNAME" _
             & "    , CARSNUMBER" _
             & "    , CARSAMOUNT" _
+            & "    , RETURNDATETRAIN" _
             & "    , LINE" _
             & "    , FILLINGPOINT" _
             & "    , LOADINGIRILINETRAINNO" _
@@ -4491,6 +4498,8 @@ Public Class OIT0002LinkDetail
                 Dim P_LINEORDER As SqlParameter = SQLcmd.Parameters.Add("@LINEORDER", SqlDbType.NVarChar, 2)        '貨物駅入線順
                 Dim P_TANKNO As SqlParameter = SQLcmd.Parameters.Add("@TANKNO", SqlDbType.NVarChar, 8)              'タンク車№
                 Dim P_STACKINGFLG As SqlParameter = SQLcmd.Parameters.Add("@STACKINGFLG", SqlDbType.NVarChar)       '積置可否フラグ
+                Dim P_INSPECTIONFLG As SqlParameter = SQLcmd.Parameters.Add("@INSPECTIONFLG", SqlDbType.NVarChar)   '交検可否フラグ
+                Dim P_DETENTIONFLG As SqlParameter = SQLcmd.Parameters.Add("@DETENTIONFLG", SqlDbType.NVarChar)     '留置可否フラグ
                 Dim P_FIRSTRETURNFLG As SqlParameter = SQLcmd.Parameters.Add("@FIRSTRETURNFLG", SqlDbType.NVarChar) '先返し可否フラグ
                 Dim P_AFTERRETURNFLG As SqlParameter = SQLcmd.Parameters.Add("@AFTERRETURNFLG", SqlDbType.NVarChar) '後返し可否フラグ
                 Dim P_OTTRANSPORTFLG As SqlParameter = SQLcmd.Parameters.Add("@OTTRANSPORTFLG", SqlDbType.NVarChar) 'OT輸送可否フラグ
@@ -4503,6 +4512,9 @@ Public Class OIT0002LinkDetail
                 Dim P_ORDERINGOILNAME As SqlParameter = SQLcmd.Parameters.Add("@ORDERINGOILNAME", SqlDbType.NVarChar, 40)  '油種名(受発注用)
                 Dim P_CARSNUMBER As SqlParameter = SQLcmd.Parameters.Add("@CARSNUMBER", SqlDbType.Int)              '車数
                 Dim P_CARSAMOUNT As SqlParameter = SQLcmd.Parameters.Add("@CARSAMOUNT", SqlDbType.Int)              '数量
+                '### 20200928 START 指摘票対応(全体(No149)) ###############################################################
+                Dim P_RETURNDATETRAIN As SqlParameter = SQLcmd.Parameters.Add("@RETURNDATETRAIN", SqlDbType.NVarChar, 4)                  '返送日列車
+                '### 20200928 END   指摘票対応(全体(No149)) ###############################################################
                 Dim P_LINE As SqlParameter = SQLcmd.Parameters.Add("@LINE", SqlDbType.NVarChar, 2)                  '回線
                 Dim P_FILLINGPOINT As SqlParameter = SQLcmd.Parameters.Add("@FILLINGPOINT", SqlDbType.NVarChar, 2)  '充填ポイント
                 Dim P_LOADINGIRILINETRAINNO As SqlParameter = SQLcmd.Parameters.Add("@LOADINGIRILINETRAINNO", SqlDbType.NVarChar, 4)      '積込入線列車番号
@@ -4543,6 +4555,8 @@ Public Class OIT0002LinkDetail
                     'P_LINEORDER.Value = OIT0002row("LINECNT")               '貨物駅入線順
                     P_TANKNO.Value = OIT0002row("TANKNUMBER")               'タンク車№
                     P_STACKINGFLG.Value = "2"                               '積置可否フラグ
+                    P_INSPECTIONFLG.Value = "2"                             '交検可否フラグ
+                    P_DETENTIONFLG.Value = "2"                              '留置可否フラグ
                     P_FIRSTRETURNFLG.Value = "2"                            '先返し可否フラグ
                     P_AFTERRETURNFLG.Value = "2"                            '後返し可否フラグ
                     '# OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)
@@ -4564,6 +4578,9 @@ Public Class OIT0002LinkDetail
                     P_CARSNUMBER.Value = 1                                  '車数
                     P_CARSAMOUNT.Value = 0                                  '数量
 
+                    '### 20200928 START 指摘票対応(全体(No149)) #######################################
+                    P_RETURNDATETRAIN.Value = Me.TxtBTrainNo.Text           '返送日列車
+                    '### 20200928 START 指摘票対応(全体(No149)) #######################################
                     P_FILLINGPOINT.Value = OIT0002row("FILLINGPOINT")       '充填ポイント
                     P_LINE.Value = OIT0002row("LINE")                       '回線
                     P_LOADINGIRILINETRAINNO.Value = OIT0002row("LOADINGIRILINETRAINNO")     '積込入線列車番号

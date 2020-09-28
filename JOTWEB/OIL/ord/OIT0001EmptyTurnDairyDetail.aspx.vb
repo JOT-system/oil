@@ -488,6 +488,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS ACTUALARRDATE" _
             & " , ''                                             AS ACTUALACCDATE" _
             & " , ''                                             AS ACTUALEMPARRDATE" _
+            & " , ''                                             AS RETURNDATETRAINNO" _
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
@@ -601,6 +602,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ISNULL(FORMAT(OIT0003.ACTUALARRDATE, 'yyyy/MM/dd'), '')           AS ACTUALARRDATE" _
             & " , ISNULL(FORMAT(OIT0003.ACTUALACCDATE, 'yyyy/MM/dd'), '')           AS ACTUALACCDATE" _
             & " , ISNULL(FORMAT(OIT0003.ACTUALEMPARRDATE, 'yyyy/MM/dd'), '')        AS ACTUALEMPARRDATE" _
+            & " , ISNULL(RTRIM(OIT0003.RETURNDATETRAIN), '')         AS RETURNDATETRAINNO" _
             & " , ISNULL(RTRIM(OIT0003.RETURNDATETRAIN), '')         AS RETURNDATETRAIN" _
             & " , ISNULL(RTRIM(OIT0003.JOINTCODE), '')               AS JOINTCODE" _
             & " , ISNULL(RTRIM(OIT0003.JOINT), '')                   AS JOINT" _
@@ -722,6 +724,9 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     '受注情報
                     CODENAME_get("ORDERINFO", OIT0001row("ORDERINFO"), OIT0001row("ORDERINFONAME"), WW_DUMMY)
+                    '返送列車
+                    CODENAME_get("CTRAINNUMBER", OIT0001row("RETURNDATETRAINNO"), OIT0001row("RETURNDATETRAIN"), WW_DUMMY)
+                    If OIT0001row("RETURNDATETRAIN") = "" Then OIT0001row("RETURNDATETRAIN") = OIT0001row("RETURNDATETRAINNO")
 
                 Next
             End Using
@@ -2147,6 +2152,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS ACTUALARRDATE" _
             & " , ''                                             AS ACTUALACCDATE" _
             & " , ''                                             AS ACTUALEMPARRDATE" _
+            & " , ''                                             AS RETURNDATETRAINNO" _
             & " , ''                                             AS RETURNDATETRAIN" _
             & " , ''                                             AS JOINTCODE" _
             & " , ''                                             AS JOINT" _
@@ -2395,6 +2401,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0005.JRALLINSPECTIONDATE                    AS JRALLINSPECTIONDATE" _
             & " , OIT0003.RETURNDATETRAIN                        AS RETURNDATETRAIN" _
+            & " , OIT0003.RETURNDATETRAIN                        AS RETURNDATETRAINNO" _
             & " , OIT0003.JOINTCODE                              AS JOINTCODE" _
             & " , OIT0003.JOINT                                  AS JOINT" _
             & " , OIT0003.REMARK                                 AS REMARK" _
@@ -2510,6 +2517,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     i += 1
                     OIT0001Reprow("LINECNT") = i        'LINECNT
                     O_officeCode = OIT0001Reprow("OFFICECODE")
+
+                    '返送列車
+                    CODENAME_get("CTRAINNUMBER", OIT0001Reprow("RETURNDATETRAINNO"), OIT0001Reprow("RETURNDATETRAIN"), WW_DUMMY)
+                    If OIT0001Reprow("RETURNDATETRAIN") = "" Then OIT0001Reprow("RETURNDATETRAIN") = OIT0001Reprow("RETURNDATETRAINNO")
+
                 Next
             End Using
 
@@ -5729,8 +5741,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        AND DETAILNO     = @P02" _
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
-            & "        ( ORDERNO         , DETAILNO" _
-            & "        , TANKNO          , KAMOKU              , STACKINGFLG        , ORDERINFO" _
+            & "        ( ORDERNO         , DETAILNO            , TANKNO             , KAMOKU" _
+            & "        , STACKINGFLG     , INSPECTIONFLG       , DETENTIONFLG       , FIRSTRETURNFLG" _
+            & "        , AFTERRETURNFLG  , OTTRANSPORTFLG      , ORDERINFO" _
             & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
             & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
             & "        , RETURNDATETRAIN , JOINTCODE           , JOINT" _
@@ -5742,8 +5755,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , DELFLG          , INITYMD             , INITUSER           , INITTERMID" _
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
-            & "        ( @P01, @P02" _
-            & "        , @P03, @P04, @P40, @P34" _
+            & "        ( @P01, @P02, @P03, @P04" _
+            & "        , @P40, @P46, @P47, @P48" _
+            & "        , @P49, @P50, @P34" _
             & "        , @P23, @P24, @P05, @P35" _
             & "        , @P36, @P37, @P06, @P25" _
             & "        , @P07, @P39, @P08" _
@@ -5770,6 +5784,11 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , STACKINGFLG" _
+            & "    , INSPECTIONFLG" _
+            & "    , DETENTIONFLG" _
+            & "    , FIRSTRETURNFLG" _
+            & "    , AFTERRETURNFLG" _
+            & "    , OTTRANSPORTFLG" _
             & "    , ORDERINFO" _
             & "    , SHIPPERSCODE" _
             & "    , SHIPPERSNAME" _
@@ -5835,6 +5854,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 1)   '積置可否フラグ
+                Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.NVarChar, 1)   '交検可否フラグ
+                Dim PARA47 As SqlParameter = SQLcmd.Parameters.Add("@P47", SqlDbType.NVarChar, 1)   '留置可否フラグ
+                Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.NVarChar, 1)   '先返し可否フラグ
+                Dim PARA49 As SqlParameter = SQLcmd.Parameters.Add("@P49", SqlDbType.NVarChar, 1)   '後返し可否フラグ
+                Dim PARA50 As SqlParameter = SQLcmd.Parameters.Add("@P50", SqlDbType.NVarChar, 1)   'OT輸送可否フラグ
                 Dim PARA34 As SqlParameter = SQLcmd.Parameters.Add("@P34", SqlDbType.NVarChar, 2)   '受注情報
                 Dim PARA23 As SqlParameter = SQLcmd.Parameters.Add("@P23", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", SqlDbType.NVarChar, 10)  '荷主名
@@ -5900,6 +5924,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Else
                         PARA40.Value = "2"
                     End If
+                    PARA46.Value = "2"                                '交検可否フラグ
+                    PARA47.Value = "2"                                '留置可否フラグ
+                    PARA48.Value = "2"                                '先返し可否フラグ
+                    PARA49.Value = "2"                                '後返し可否フラグ
+                    PARA50.Value = "2"                                'OT輸送可否フラグ
 
                     PARA34.Value = OIT0001row("ORDERINFO")            '受注情報
                     PARA23.Value = OIT0001row("SHIPPERSCODE")         '荷主コード
@@ -7334,6 +7363,8 @@ Public Class OIT0001EmptyTurnDairyDetail
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERSTATUS, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERSTATUS"))
                 Case "ORDERINFO"        '受注情報
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORDERINFO, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_CAMPCODE.Text, "ORDERINFO"))
+                Case "CTRAINNUMBER"     '列車番号(在線)
+                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_CTRAINNUMBER, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(work.WF_SEL_SALESOFFICECODE.Text, "CTRAINNUMBER_FIND"))
 
             End Select
         Catch ex As Exception
@@ -7647,6 +7678,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JRINSPECTIONDATE") _
                     OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "JOINT") Then
                         cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
+
+                    ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "RETURNDATETRAIN") Then
+                        cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                         '★受注営業所が仙台新港営業所以外の場合、(一覧)積込日(実績)の入力を許可しない
                     ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea.ID & "ACTUALLODDATE") _

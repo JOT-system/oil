@@ -31,7 +31,8 @@ Public Class EntryHistory
         sqlOrderStat.AppendLine("    OTHER1OTANKCH,OTHER2OTANKCH,OTHER3OTANKCH,OTHER4OTANKCH,OTHER5OTANKCH,")
         sqlOrderStat.AppendLine("    OTHER6OTANKCH,OTHER7OTANKCH,OTHER8OTANKCH,OTHER9OTANKCH,OTHER10OTANKCH,")
         sqlOrderStat.AppendLine("    TOTALTANKCH,TANKLINKNO,TANKLINKNOMADE,KEIJYOYMD,")
-        sqlOrderStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,OTFILENAME,RECEIVECOUNT,OTSENDSTATUS,RESERVEDSTATUS,TAKUSOUSTATUS,")
+        sqlOrderStat.AppendLine("    SALSE,SALSETAX,TOTALSALSE,PAYMENT,PAYMENTTAX,TOTALPAYMENT,")
+        sqlOrderStat.AppendLine("    OTFILENAME,RECEIVECOUNT,OTSENDSTATUS,RESERVEDSTATUS,TAKUSOUSTATUS,BTRAINNO,BTRAINNAME,")
         sqlOrderStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,")
         sqlOrderStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD)")
         sqlOrderStat.AppendLine("    VALUES")
@@ -48,7 +49,8 @@ Public Class EntryHistory
         sqlOrderStat.AppendLine("    @OTHER1OTANKCH,@OTHER2OTANKCH,@OTHER3OTANKCH,@OTHER4OTANKCH,@OTHER5OTANKCH,")
         sqlOrderStat.AppendLine("    @OTHER6OTANKCH,@OTHER7OTANKCH,@OTHER8OTANKCH,@OTHER9OTANKCH,@OTHER10OTANKCH,")
         sqlOrderStat.AppendLine("    @TOTALTANKCH,@TANKLINKNO,@TANKLINKNOMADE,@KEIJYOYMD,")
-        sqlOrderStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,@OTFILENAME,@RECEIVECOUNT,@OTSENDSTATUS,@RESERVEDSTATUS,@TAKUSOUSTATUS,")
+        sqlOrderStat.AppendLine("    @SALSE,@SALSETAX,@TOTALSALSE,@PAYMENT,@PAYMENTTAX,@TOTALPAYMENT,")
+        sqlOrderStat.AppendLine("    @OTFILENAME,@RECEIVECOUNT,@OTSENDSTATUS,@RESERVEDSTATUS,@TAKUSOUSTATUS,@BTRAINNO,@BTRAINNAME,")
         sqlOrderStat.AppendLine("    @DELFLG,@INITYMD,@INITUSER,@INITTERMID,")
         sqlOrderStat.AppendLine("    @UPDYMD,@UPDUSER,@UPDTERMID,@RECEIVEYMD)")
 
@@ -184,6 +186,24 @@ Public Class EntryHistory
                         .Add("TAKUSOUSTATUS", SqlDbType.NVarChar).Value = ""
                     End If
                 End Try
+                Try
+                    .Add("BTRAINNO", SqlDbType.NVarChar).Value = drOrder("BTRAINNO")
+                Catch ex As Exception
+                    If .Contains("BTRAINNO") Then
+                        .Item("BTRAINNO").Value = ""
+                    Else
+                        .Add("BTRAINNO", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
+                Try
+                    .Add("BTRAINNAME", SqlDbType.NVarChar).Value = drOrder("BTRAINNAME")
+                Catch ex As Exception
+                    If .Contains("BTRAINNAME") Then
+                        .Item("BTRAINNAME").Value = ""
+                    Else
+                        .Add("BTRAINNAME", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
@@ -214,8 +234,9 @@ Public Class EntryHistory
         Dim sqlDetailStat As New StringBuilder
         sqlDetailStat.AppendLine("INSERT INTO OIL.HIS0002_DETAIL")
         sqlDetailStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,")
-        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,ORDERINFO,")
-        sqlDetailStat.AppendLine("    SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,ORDERINGTYPE,ORDERINGOILNAME,")
+        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,INSPECTIONFLG,DETENTIONFLG,")
+        sqlDetailStat.AppendLine("    FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,")
+        sqlDetailStat.AppendLine("    ORDERINFO,SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,ORDERINGTYPE,ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    JOINTCODE,JOINT,REMARK,")
         sqlDetailStat.AppendLine("    CHANGETRAINNO,CHANGETRAINNAME,")
@@ -233,8 +254,9 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
         sqlDetailStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,")
-        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,@ORDERINFO,")
-        sqlDetailStat.AppendLine("    @SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,@ORDERINGTYPE,@ORDERINGOILNAME,")
+        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@INSPECTIONFLG,@DETENTIONFLG,")
+        sqlDetailStat.AppendLine("    @FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,")
+        sqlDetailStat.AppendLine("    @ORDERINFO,@SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,@ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
         sqlDetailStat.AppendLine("    @JOINTCODE,@JOINT,@REMARK,")
         sqlDetailStat.AppendLine("    @CHANGETRAINNO,@CHANGETRAINNAME,")
@@ -263,6 +285,24 @@ Public Class EntryHistory
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
                 .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
+                Try
+                    .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = drOrder("INSPECTIONFLG")
+                Catch ex As Exception
+                    If .Contains("INSPECTIONFLG") Then
+                        .Item("INSPECTIONFLG").Value = ""
+                    Else
+                        .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
+                Try
+                    .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = drOrder("DETENTIONFLG")
+                Catch ex As Exception
+                    If .Contains("DETENTIONFLG") Then
+                        .Item("DETENTIONFLG").Value = ""
+                    Else
+                        .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
                 .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = drOrder("OTTRANSPORTFLG")

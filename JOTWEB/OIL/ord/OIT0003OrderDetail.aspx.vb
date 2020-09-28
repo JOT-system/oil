@@ -8382,7 +8382,8 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO              , DETAILNO               , SHIPORDER          , LINEORDER           , TANKNO" _
-            & "        , KAMOKU               , STACKINGFLG            , FIRSTRETURNFLG     , AFTERRETURNFLG      , OTTRANSPORTFLG" _
+            & "        , KAMOKU               , STACKINGFLG            , INSPECTIONFLG      , DETENTIONFLG" _
+            & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CARSNUMBER           , CARSAMOUNT             , RETURNDATETRAIN    , JOINTCODE           , JOINT" _
@@ -8396,7 +8397,8 @@ Public Class OIT0003OrderDetail
             & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P40, @P33, @P03" _
-            & "        , @P04, @P41, @P42, @P45, @P46" _
+            & "        , @P04, @P41, @P52, @P53" _
+            & "        , @P42, @P45, @P46" _
             & "        , @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
             & "        , @P06, @P25, @P07, @P39, @P08" _
@@ -8421,6 +8423,8 @@ Public Class OIT0003OrderDetail
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , STACKINGFLG" _
+            & "    , INSPECTIONFLG" _
+            & "    , DETENTIONFLG" _
             & "    , FIRSTRETURNFLG" _
             & "    , AFTERRETURNFLG" _
             & "    , OTTRANSPORTFLG" _
@@ -8490,6 +8494,8 @@ Public Class OIT0003OrderDetail
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.NVarChar)      '積置可否フラグ
+                Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar)      '交検可否フラグ
+                Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar)      '留置可否フラグ
                 Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar)      '先返し可否フラグ
                 Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.NVarChar)      '後返し可否フラグ
                 Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.NVarChar)      'OT輸送可否フラグ
@@ -8563,6 +8569,8 @@ Public Class OIT0003OrderDetail
                     Else
                         PARA41.Value = "2"
                     End If
+                    PARA52.Value = "2"                                '交検可否フラグ(1:交検あり 2:交検なし)
+                    PARA53.Value = "2"                                '留置可否フラグ(1:留置あり 2:留置なし)
                     PARA42.Value = "2"                                '先返し可否フラグ(1:先返しあり 2:先返しなし)
                     PARA45.Value = "2"                                '後返し可否フラグ(1:後返しあり 2:後返しなし)
                     PARA46.Value = "2"                                'OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)

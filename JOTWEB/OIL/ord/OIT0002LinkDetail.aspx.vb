@@ -112,7 +112,7 @@ Public Class OIT0002LinkDetail
                         Case "WF_MouseWheelDown"        'マウスホイール(Down)
                             WF_Grid_Scroll()
                         Case "WF_EXCEL_UPLOAD"          'ファイルアップロード
-                            WF_FILEUPLOAD()
+                            'WF_FILEUPLOAD()
                         Case "WF_RadioButonClick"       '(右ボックス)ラジオボタン選択
                             WF_RadioButton_Click()
                         Case "WF_MEMOChange"            '(右ボックス)メモ欄更新
@@ -4724,6 +4724,7 @@ Public Class OIT0002LinkDetail
             & "        , TOTALTANKCH  , KEIJYOYMD       , SALSE           , SALSETAX            , TOTALSALSE" _
             & "        , PAYMENT      , PAYMENTTAX      , TOTALPAYMENT" _
             & "        , RECEIVECOUNT , OTSENDSTATUS    , RESERVEDSTATUS  , TAKUSOUSTATUS" _
+            & "        , BTRAINNO     , BTRAINNAME" _
             & "        , DELFLG       , INITYMD         , INITUSER        , INITTERMID" _
             & "        , UPDYMD       , UPDUSER         , UPDTERMID       , RECEIVEYMD)" _
             & "    VALUES" _
@@ -4745,6 +4746,7 @@ Public Class OIT0002LinkDetail
             & "        , @TOTALTANKCH  , @KEIJYOYMD    , @SALSE          , @SALSETAX      , @TOTALSALSE" _
             & "        , @PAYMENT      , @PAYMENTTAX   , @TOTALPAYMENT" _
             & "        , @RECEIVECOUNT , @OTSENDSTATUS , @RESERVEDSTATUS , @TAKUSOUSTATUS" _
+            & "        , @BTRAINNO     , @BTRAINNAME" _
             & "        , @DELFLG       , @INITYMD      , @INITUSER       , @INITTERMID" _
             & "        , @UPDYMD       , @UPDUSER      , @UPDTERMID      , @RECEIVEYMD) ;" _
             & " CLOSE hensuu ;" _
@@ -4837,6 +4839,8 @@ Public Class OIT0002LinkDetail
             & "    , OTSENDSTATUS" _
             & "    , RESERVEDSTATUS" _
             & "    , TAKUSOUSTATUS" _
+            & "    , BTRAINNO" _
+            & "    , BTRAINNAME" _
             & "    , DELFLG" _
             & "    , INITYMD" _
             & "    , INITUSER" _
@@ -4936,6 +4940,10 @@ Public Class OIT0002LinkDetail
                 Dim P_OTSENDSTATUS As SqlParameter = SQLcmd.Parameters.Add("@OTSENDSTATUS", SqlDbType.NVarChar, 1)     'OT発送日報送信状況
                 Dim P_RESERVEDSTATUS As SqlParameter = SQLcmd.Parameters.Add("@RESERVEDSTATUS", SqlDbType.NVarChar, 1) '出荷予約ダウンロード状況
                 Dim P_TAKUSOUSTATUS As SqlParameter = SQLcmd.Parameters.Add("@TAKUSOUSTATUS", SqlDbType.NVarChar, 1)   '託送状ダウンロード状況
+                '### 20200928 START 指摘票対応(全体(No149)) ###############################################################
+                Dim P_BTRAINNO As SqlParameter = SQLcmd.Parameters.Add("@BTRAINNO", SqlDbType.NVarChar, 4)      '返送列車
+                Dim P_BTRAINNAME As SqlParameter = SQLcmd.Parameters.Add("@BTRAINNAME", SqlDbType.NVarChar, 20) '返送列車名
+                '### 20200928 END   指摘票対応(全体(No149)) ###############################################################
                 Dim P_DELFLG As SqlParameter = SQLcmd.Parameters.Add("@DELFLG", SqlDbType.NVarChar, 1)          '削除フラグ
                 Dim P_INITYMD As SqlParameter = SQLcmd.Parameters.Add("@INITYMD", SqlDbType.DateTime)           '登録年月日
                 Dim P_INITUSER As SqlParameter = SQLcmd.Parameters.Add("@INITUSER", SqlDbType.NVarChar, 20)     '登録ユーザーID
@@ -5090,6 +5098,10 @@ Public Class OIT0002LinkDetail
                     P_OTSENDSTATUS.Value = "0"                          'OT発送日報送信状況
                     P_RESERVEDSTATUS.Value = "0"                        '出荷予約ダウンロード状況
                     P_TAKUSOUSTATUS.Value = "0"                         '託送状ダウンロード状況
+                    '### 20200928 START 指摘票対応(全体(No149)) #################################
+                    P_BTRAINNO.Value = Me.TxtBTrainNo.Text
+                    P_BTRAINNAME.Value = Me.LblBTrainName.Text
+                    '### 20200928 START 指摘票対応(全体(No149)) #################################
 
                     P_DELFLG.Value = "0"                                '削除フラグ
                     P_INITYMD.Value = WW_DATENOW                        '登録年月日

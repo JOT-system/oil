@@ -7508,13 +7508,32 @@ Public Class OIT0001EmptyTurnDairyDetail
             WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
 
             Dim WW_JRINSPECTIONFLG As String
-            If WW_JRINSPECTIONCNT <= 3 Then
-                WW_JRINSPECTIONFLG = "1"
-            ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
-                WW_JRINSPECTIONFLG = "2"
+            '### 20200929 START 仙台新港営業所対応 ###############################################
+            If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                If WW_JRINSPECTIONCNT < 0 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 3 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
             Else
-                WW_JRINSPECTIONFLG = "3"
+                If WW_JRINSPECTIONCNT <= 3 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
             End If
+            'If WW_JRINSPECTIONCNT <= 3 Then
+            '    WW_JRINSPECTIONFLG = "1"
+            'ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+            '    WW_JRINSPECTIONFLG = "2"
+            'Else
+            '    WW_JRINSPECTIONFLG = "3"
+            'End If
+            '### 20200929 END   仙台新港営業所対応 ###############################################
             Select Case WW_JRINSPECTIONFLG
                 Case "1"
                     OIT0001row("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
@@ -7538,13 +7557,32 @@ Public Class OIT0001EmptyTurnDairyDetail
             WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
 
             Dim WW_JRALLINSPECTIONFLG As String
-            If WW_JRALLINSPECTIONCNT <= 3 Then
-                WW_JRALLINSPECTIONFLG = "1"
-            ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
-                WW_JRALLINSPECTIONFLG = "2"
+            '### 20200929 START 仙台新港営業所対応 ###############################################
+            If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                If WW_JRALLINSPECTIONCNT < 0 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 3 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
             Else
-                WW_JRALLINSPECTIONFLG = "3"
+                If WW_JRALLINSPECTIONCNT <= 3 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
             End If
+            'If WW_JRALLINSPECTIONCNT <= 3 Then
+            '    WW_JRALLINSPECTIONFLG = "1"
+            'ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+            '    WW_JRALLINSPECTIONFLG = "2"
+            'Else
+            '    WW_JRALLINSPECTIONFLG = "3"
+            'End If
+            '### 20200929 END   仙台新港営業所対応 ###############################################
             Select Case WW_JRALLINSPECTIONFLG
                 Case "1"
                     OIT0001row("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")

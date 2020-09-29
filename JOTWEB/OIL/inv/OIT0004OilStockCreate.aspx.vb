@@ -3775,15 +3775,15 @@ Public Class OIT0004OilStockCreate
                 (From sitm In chkItm.SuggestOrderItem.Values
                  Where CInt(sitm.ItemValue) > 0).Any = False Then
 
-                '戻り値エラー情報に格納
-                retMessage.Add(New EntryOrderResultItm With {
-                               .AccDate = chkItm.dayInfo.KeyString,
-                               .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
-                               .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
-                               .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
-                               .TrainNo = chkItm.trainInfo.TrainNo,
-                               .MessageId = C_MESSAGE_NO.OIL_CANNOT_ENTRY_ORDER
-                               })
+                '戻り値エラー情報に格納（2020/9/29 スルーするよう修正）
+                'retMessage.Add(New EntryOrderResultItm With {
+                '               .AccDate = chkItm.dayInfo.KeyString,
+                '               .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                '               .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                '               .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
+                '               .TrainNo = chkItm.trainInfo.TrainNo,
+                '               .MessageId = C_MESSAGE_NO.OIL_CANNOT_ENTRY_ORDER
+                '               })
                 Continue For
             End If
 
@@ -3969,14 +3969,14 @@ Public Class OIT0004OilStockCreate
             '***********************************************
             '受注詳細でEntryType=None以外が存在のしない場合、DB登録の意味がないのでスキップ
             If Not (From tmpOdrItm In orderEntList Where (From dtlitm In tmpOdrItm.DetailList Where dtlitm.EntryType <> OrderDetailItem.DetailEntryType.None).Any).Any Then
-                retMessage.Add(New EntryOrderResultItm With {
-                                   .AccDate = chkItm.dayInfo.KeyString,
-                                   .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
-                                   .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
-                                   .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
-                                   .TrainNo = chkItm.trainInfo.TrainNo,
-                                   .MessageId = C_MESSAGE_NO.OIL_CANNOT_ENTRY_ORDER
-                                   })
+                'retMessage.Add(New EntryOrderResultItm With {
+                '                   .AccDate = chkItm.dayInfo.KeyString,
+                '                   .OfficeCode = String.Format("{1}({0})", dispDataClass.SalesOffice, dispDataClass.SalesOfficeName),
+                '                   .ShipperCode = String.Format("{1}({0})", dispDataClass.Shipper, dispDataClass.ShipperName),
+                '                   .ConsigneeCode = String.Format("{1}({0})", dispDataClass.Consignee, dispDataClass.ConsigneeName),
+                '                   .TrainNo = chkItm.trainInfo.TrainNo,
+                '                   .MessageId = C_MESSAGE_NO.OIL_CANNOT_ENTRY_ORDER
+                '                   })
                 Continue For
             End If
             '***********************************************

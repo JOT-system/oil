@@ -138,5 +138,7 @@
 
     <!-- 託送指示フラグ -->
     <asp:TextBox ID="WF_SEL_DELIVERYFLG" runat="server"></asp:TextBox>
+    <!-- タンク車状況コード -->
+    <asp:TextBox ID="WF_SEL_TANKSITUATION" runat="server"></asp:TextBox>
 
 </div>

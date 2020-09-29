@@ -765,6 +765,49 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "タンク車状況コード"
+    ''' <summary>
+    ''' 01:残車
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_01 As String = "1"
+    ''' <summary>
+    ''' 02:輸送中
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_02 As String = "2"
+    ''' <summary>
+    ''' 03:回送中（交検）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_03 As String = "3"
+    ''' <summary>
+    ''' 04:回送中（全検）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_04 As String = "4"
+    ''' <summary>
+    ''' 05:回送中（修理）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_05 As String = "5"
+    ''' <summary>
+    ''' 06:回送中（疎開留置）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_06 As String = "6"
+    ''' <summary>
+    ''' 07:回送中（ＭＣ）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_07 As String = "7"
+    ''' <summary>
+    ''' 08:回送中(移動)
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_08 As String = "8"
+    ''' <summary>
+    ''' 09:交検中
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_09 As String = "9"
+    ''' <summary>
+    ''' 10:留置中
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_10 As String = "10"
+#End Region
+
 #Region "油種"
     ''' <summary>
     ''' 油種(ハイオク)

@@ -707,6 +707,10 @@ Public Module Messages
         ''' 出荷予約複数日付選択エラー
         ''' </summary>
         Public Const OIL_RESERVED_NOT_ACCEPT_SEL_DAYS As String = "20076"
+        ''' <summary>
+        ''' OT発送日報複数日付選択エラー
+        ''' </summary>
+        Public Const OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS As String = "20077"
 #End Region
 
 

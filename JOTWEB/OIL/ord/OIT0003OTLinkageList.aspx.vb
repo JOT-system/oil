@@ -630,6 +630,14 @@ Public Class OIT0003OTLinkageList
             Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
+        '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
+        '対象の積日が統一されていない場合（同一積日以外は不許可）
+        Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
+        If qSameProcDateCnt > 1 Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
         '******************************
         'OT発送日報データ取得処理
         '******************************
@@ -742,7 +750,7 @@ Public Class OIT0003OTLinkageList
         '一覧のチェックボックスが選択されているか確認
         If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
             '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
         '処理対象外のチェックがなされている場合(ここは本来全て可能な想定だが念のため)
@@ -751,7 +759,7 @@ Public Class OIT0003OTLinkageList
 
         If qCannotProc.Any Then
             '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
         '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
@@ -759,7 +767,7 @@ Public Class OIT0003OTLinkageList
         Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
         If qSameProcDateCnt > 1 Then
             '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_OTLINKAGELINE_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
             Exit Sub
         End If
 
@@ -773,10 +781,14 @@ Public Class OIT0003OTLinkageList
                 Return
             End If
         End Using
+        If selectedOrderInfo.Count = 0 Then
+            Return '出力対象無し
+        End If
         '******************************
         ' 出力データ生成
         '******************************
         Using repCbj = New OIT0003CustomReportTakusouExcel(work.WF_SEL_OTS_SALESOFFICECODE.Text, OIT0003Takusoutbl)
+            'repCbj.FileType = OIT0003CustomReportTakusouExcel.OutputFileType.Excel 'デバッグ用Excel出力に変更
             Dim url As String
             Try
                 url = repCbj.CreatePrintData()
@@ -791,7 +803,57 @@ Public Class OIT0003OTLinkageList
         '託送指示データの（本体）ダウンロードフラグ更新
         '                  （明細）ダウンロード数インクリメント
         '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            Dim procDate As Date = Now
+            Dim resProc As Boolean = False
+            Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                'オーダー明細のダウンロードカウントのインクリメント
+                resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                'オーダー明細よりダウンロードフラグを取得
+                orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
+                If orderDlFlags Is Nothing Then
+                    Return
+                End If
+                'オーダーを更新
+                resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                If resProc = False Then
+                    Return
+                End If
+                '履歴登録用直近データ取得
+                '直近履歴番号取得
+                Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                If historyNo = "" Then
+                    Return
+                End If
+                Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                    Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                    Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
 
+                    '履歴テーブル登録
+                    For Each dr As DataRow In hisOrderTbl.Rows
+                        EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                    Next
+                    For Each dr As DataRow In hisDetailTbl.Rows
+                        EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                    Next
+                    'ジャーナル登録
+                    OutputJournal(orderTbl, "OIT0002_ORDER")
+                    OutputJournal(detailTbl, "OIT0003_DETAIL")
+                End If
+
+                'ここまで来たらコミット
+                sqlTran.Commit()
+            End Using
+
+        End Using
     End Sub
     ''' <summary>
     ''' 受注履歴テーブル用の履歴番号取得
@@ -1188,7 +1250,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   AND NIU.DELFLG          = @DELFLG")
         '荷受人マスタここまで↑
         '変換マスタ（油種コード⇒託送指示用油種コード）ここから↓
-        sqlStat.AppendLine(" INNER JOIN OIL.OIM0029_CONVERT OCNV")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT OCNV")
         sqlStat.AppendLine("    ON OCNV.CLASS          = 'TAKUSOUOIL'")
         sqlStat.AppendLine("   AND OCNV.KEYCODE01      = DET.OILCODE")
         sqlStat.AppendLine("   AND OCNV.DELFLG         = @DELFLG")

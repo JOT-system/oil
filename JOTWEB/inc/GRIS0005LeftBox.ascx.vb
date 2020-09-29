@@ -160,6 +160,7 @@ Public Class GRIS0005LeftBox
         LC_OWNERCODE
         LC_BTRAINNUMBER
         LC_UNIT
+        LC_CTRAINNUMBER
     End Enum
 
     ''' <summary>
@@ -252,6 +253,7 @@ Public Class GRIS0005LeftBox
         LP_ORIGINOWNERCODE
         LP_OWNERCODE
         LP_BTRAINNUMBER
+        LP_CTRAINNUMBER
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -787,6 +789,11 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_BTRAINNUMBER
                 '列車番号(返送)
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "BTRAINNUMBER"
+                lbox = CreateFixValueList(Params, O_RTN)
+
+            Case LIST_BOX_CLASSIFICATION.LC_CTRAINNUMBER
+                '列車番号(在線)
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "CTRAINNUMBER_FIND"
                 lbox = CreateFixValueList(Params, O_RTN)
 
             Case LIST_BOX_CLASSIFICATION.LC_UNIT

@@ -33,6 +33,18 @@
                         <!-- 左ボタン -->
                         <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"  onclick="ButtonClick('WF_ButtonALLSELECT');" />
                         <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除"  onclick="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                        <div class="filterDateFiledWrapper">
+                        <asp:RadioButtonList ID="rblFilterDateFiled" runat="server"  RepeatDirection="Horizontal">
+                            <asp:ListItem Text="積込日" Value="LODDATE" Selected="True"></asp:ListItem>
+                            <asp:ListItem Text="発日" Value="DEPDATE"></asp:ListItem>
+                        </asp:RadioButtonList>
+                        </div>
+                        <a class="ef" id="WF_FILTERDATE" ondblclick="Field_DBclick('WF_FILTERDATE', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                            <asp:TextBox ID="WF_FILTERDATE_TEXT" CssClass="calendarIcon" runat="server"></asp:TextBox>
+                        </a>
+                       
+                        <input type="button" id="WF_ButtonFilter" class="btn-sticky" value="絞込" title="選択は解除されます"  onclick="ButtonClick('WF_ButtonFilter');" />
+                        <input type="button" id="WF_ButtonFilterClear" class="btn-sticky" value="絞込解除"   onclick="ButtonClick('WF_ButtonFilterClear');" />
                     </div>
                     <div class="rightSide">
                         <!-- 右ボタン -->

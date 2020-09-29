@@ -161,7 +161,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "JOINT") {
             document.getElementById('WF_LeftMViewChange').value = 53;
         }
-        else if (fieldNM === "ACTUALLODDATE") {
+        else if (fieldNM === "ACTUALLODDATE" 
+            || fieldNM === "JRINSPECTIONDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

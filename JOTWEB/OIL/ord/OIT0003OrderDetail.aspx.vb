@@ -537,7 +537,7 @@ Public Class OIT0003OrderDetail
                 WF_BULKFLG.Value = "1"
                 '### 20200916 END   指摘票対応(No148) #######################################
 
-                '◯受注進行ステータスが500:検収中以降のステータスに変更された場合
+                '◯受注進行ステータスが500:輸送完了以降のステータスに変更された場合
             ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
@@ -705,7 +705,7 @@ Public Class OIT0003OrderDetail
             End If
             '### 20200618 END   すでに指定したタンク車№が他の受注で使用されている場合の対応 #################
 
-            '〇 受注進行ステータスが"500:検収中"へ変更された場合
+            '〇 受注進行ステータスが"500:輸送完了"へ変更された場合
             '### ステータス追加(仮) #################################
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 _
             OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_550 _
@@ -1083,7 +1083,7 @@ Public Class OIT0003OrderDetail
             End Using
         End If
 
-        '### 20200916 START 「500：検収中」以降のステータスはチェックを実施しない ################
+        '### 20200916 START 「500：輸送完了」以降のステータスはチェックを実施しない ################
         If work.WF_SEL_ORDERSTATUS.Text < BaseDllConst.CONST_ORDERSTATUS_500 Then
             '★受注オーダーが存在する場合
             If OIT0003tbl.Rows.Count <> 0 Then
@@ -1094,7 +1094,7 @@ Public Class OIT0003OrderDetail
                 Next
             End If
         End If
-        '### 20200916 END   「500：検収中」以降のステータスはチェックを実施しない ################
+        '### 20200916 END   「500：輸送完了」以降のステータスはチェックを実施しない ################
 
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl)
@@ -1861,16 +1861,29 @@ Public Class OIT0003OrderDetail
                 & " , ISNULL(RTRIM(OIT0003.OILCODE), '')                 AS OILCODE" _
                 & " , ISNULL(RTRIM(OIT0003.OILNAME), '')                 AS OILNAME" _
                 & " , ISNULL(RTRIM(OIT0003.ORDERINGTYPE), '')            AS ORDERINGTYPE" _
-                & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS ORDERINGOILNAME" _
-                & " , CASE" _
+                & " , ISNULL(RTRIM(OIT0003.ORDERINGOILNAME), '')         AS ORDERINGOILNAME"
+
+            '### 20200925 START 全検日のチェックを廃止 ###########################################################
+            SQLStr &=
+                  " , CASE" _
                 & "   WHEN OIT0003.TANKNO <> '' " _
                 & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P04" _
-                & "   WHEN OIT0003.TANKNO <> '' " _
-                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P04" _
                 & "   WHEN ISNULL(RTRIM(OIT0003.TANKNO), '') <> '' THEN @P03" _
                 & "   ELSE @P05" _
-                & "   END                                                AS TANKQUOTA" _
-                & " , ''                                                 AS LINKNO" _
+                & "   END                                                AS TANKQUOTA"
+            'SQLStr &=
+            '      " , CASE" _
+            '    & "   WHEN OIT0003.TANKNO <> '' " _
+            '    & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P04" _
+            '    & "   WHEN OIT0003.TANKNO <> '' " _
+            '    & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P04" _
+            '    & "   WHEN ISNULL(RTRIM(OIT0003.TANKNO), '') <> '' THEN @P03" _
+            '    & "   ELSE @P05" _
+            '    & "   END                                                AS TANKQUOTA"
+            '### 20200925 END   全検日のチェックを廃止 ###########################################################
+
+            SQLStr &=
+                  " , ''                                                 AS LINKNO" _
                 & " , ''                                                 AS LINKDETAILNO" _
                 & " , ISNULL(RTRIM(OIT0003.SHIPORDER), '')               AS SHIPORDER" _
                 & " , ISNULL(RTRIM(OIT0003.TANKNO), '')                  AS TANKNO" _
@@ -1886,10 +1899,10 @@ Public Class OIT0003OrderDetail
                 & "   END                                                           AS JRINSPECTIONALERT" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '') = '' THEN ''" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN @P09" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 3 THEN '" + C_INSPECTIONALERT.ALERT_RED + "'" _
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 4" _
-                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN @P10" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN @P11" _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) <= 6 THEN '" + C_INSPECTIONALERT.ALERT_YELLOW + "'" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRINSPECTIONDATE), '')) >= 7 THEN '" + C_INSPECTIONALERT.ALERT_GREEN + "'" _
                 & "   END                                                           AS JRINSPECTIONALERTSTR" _
                 & " , ISNULL(FORMAT(OIM0005.JRINSPECTIONDATE, 'yyyy/MM/dd'), NULL)    AS JRINSPECTIONDATE" _
                 & " , CASE" _
@@ -1901,10 +1914,10 @@ Public Class OIT0003OrderDetail
                 & "   END                                                           AS JRALLINSPECTIONALERT" _
                 & " , CASE" _
                 & "   WHEN ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '') = '' THEN ''" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN @P09" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 3 THEN '" + C_INSPECTIONALERT.ALERT_RED + "'" _
                 & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 4" _
-                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN @P10" _
-                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN @P11" _
+                & "    AND DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) <= 6 THEN '" + C_INSPECTIONALERT.ALERT_YELLOW + "'" _
+                & "   WHEN DATEDIFF(day, GETDATE(), ISNULL(RTRIM(OIM0005.JRALLINSPECTIONDATE), '')) >= 7 THEN '" + C_INSPECTIONALERT.ALERT_GREEN + "'" _
                 & "   END                                                           AS JRALLINSPECTIONALERTSTR" _
                 & " , ISNULL(FORMAT(OIM0005.JRALLINSPECTIONDATE, 'yyyy/MM/dd'), NULL) AS JRALLINSPECTIONDATE" _
                 & " , ISNULL(RTRIM(OIT0003.STACKINGORDERNO), '')                    AS STACKINGORDERNO" _
@@ -1991,9 +2004,9 @@ Public Class OIT0003OrderDetail
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 6)  'タンク車割当状況(不可)
                 Dim PARA05 As SqlParameter = SQLcmd.Parameters.Add("@P05", SqlDbType.NVarChar, 6)  'タンク車割当状況(未割当)
 
-                Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)  '赤丸
-                Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '黄丸
-                Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)  '緑丸
+                'Dim PARA09 As SqlParameter = SQLcmd.Parameters.Add("@P09", SqlDbType.NVarChar, 20)  '赤丸
+                'Dim PARA10 As SqlParameter = SQLcmd.Parameters.Add("@P10", SqlDbType.NVarChar, 20)  '黄丸
+                'Dim PARA11 As SqlParameter = SQLcmd.Parameters.Add("@P11", SqlDbType.NVarChar, 20)  '緑丸
                 Dim PARA12 As SqlParameter = SQLcmd.Parameters.Add("@P12", SqlDbType.NVarChar, 10)  '荷主コード
                 Dim PARA13 As SqlParameter = SQLcmd.Parameters.Add("@P13", SqlDbType.NVarChar, 40)  '荷主名
                 Dim PARA14 As SqlParameter = SQLcmd.Parameters.Add("@P14", SqlDbType.NVarChar, 9)   '基地コード
@@ -2008,9 +2021,9 @@ Public Class OIT0003OrderDetail
                 PARA04.Value = CONST_TANKNO_STATUS_FUKA
                 PARA05.Value = CONST_TANKNO_STATUS_MIWARI
 
-                PARA09.Value = C_INSPECTIONALERT.ALERT_RED
-                PARA10.Value = C_INSPECTIONALERT.ALERT_YELLOW
-                PARA11.Value = C_INSPECTIONALERT.ALERT_GREEN
+                'PARA09.Value = C_INSPECTIONALERT.ALERT_RED
+                'PARA10.Value = C_INSPECTIONALERT.ALERT_YELLOW
+                'PARA11.Value = C_INSPECTIONALERT.ALERT_GREEN
                 PARA12.Value = work.WF_SEL_SHIPPERSCODE.Text
                 PARA13.Value = work.WF_SEL_SHIPPERSNAME.Text
                 PARA14.Value = work.WF_SEL_BASECODE.Text
@@ -3180,7 +3193,7 @@ Public Class OIT0003OrderDetail
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_600 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_700 _
                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_800 Then
-                    '### 受注進行ステータスが検収中以降の場合は、メッセージを出力しない（何もしない) #########
+                    '### 受注進行ステータスが500:輸送完了以降の場合は、メッセージを出力しない（何もしない) #########
                 Else
                     Master.Output(C_MESSAGE_NO.OIL_ORDERNO_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
                 End If
@@ -6246,7 +6259,7 @@ Public Class OIT0003OrderDetail
                     strOrderStatus = BaseDllConst.CONST_ORDERSTATUS_500
                 End If
 
-            '"500:検収中"
+            '"500:輸送完了"
             Case BaseDllConst.CONST_ORDERSTATUS_500
 
         End Select
@@ -6313,7 +6326,7 @@ Public Class OIT0003OrderDetail
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab4, work.WF_SEL_INPTAB4TBL.Text)
 
-        '〇 受注ステータスが"500:検収中"へ変更された場合
+        '〇 受注ステータスが"500:輸送完了"へ変更された場合
         If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
             WF_DTAB_CHANGE_NO.Value = "3"
             WF_Detail_TABChange()
@@ -6676,13 +6689,32 @@ Public Class OIT0003OrderDetail
             WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2)))
 
             Dim WW_JRINSPECTIONFLG As String
-            If WW_JRINSPECTIONCNT <= 3 Then
-                WW_JRINSPECTIONFLG = "1"
-            ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
-                WW_JRINSPECTIONFLG = "2"
+            '### 20200929 START 仙台新港営業所対応 ###############################################
+            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                If WW_JRINSPECTIONCNT < 0 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 3 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
             Else
-                WW_JRINSPECTIONFLG = "3"
+                If WW_JRINSPECTIONCNT <= 3 Then
+                    WW_JRINSPECTIONFLG = "1"
+                ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+                    WW_JRINSPECTIONFLG = "2"
+                Else
+                    WW_JRINSPECTIONFLG = "3"
+                End If
             End If
+            'If WW_JRINSPECTIONCNT <= 3 Then
+            '    WW_JRINSPECTIONFLG = "1"
+            'ElseIf WW_JRINSPECTIONCNT >= 4 And WW_JRINSPECTIONCNT <= 6 Then
+            '    WW_JRINSPECTIONFLG = "2"
+            'Else
+            '    WW_JRINSPECTIONFLG = "3"
+            'End If
+            '### 20200929 END   仙台新港営業所対応 ###############################################
             Select Case WW_JRINSPECTIONFLG
                 Case "1"
                     OIT0003row("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
@@ -6705,13 +6737,32 @@ Public Class OIT0003OrderDetail
             WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3)))
 
             Dim WW_JRALLINSPECTIONFLG As String
-            If WW_JRALLINSPECTIONCNT <= 3 Then
-                WW_JRALLINSPECTIONFLG = "1"
-            ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
-                WW_JRALLINSPECTIONFLG = "2"
+            '### 20200929 START 仙台新港営業所対応 ###############################################
+            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
+                If WW_JRALLINSPECTIONCNT < 0 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 3 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
             Else
-                WW_JRALLINSPECTIONFLG = "3"
+                If WW_JRALLINSPECTIONCNT <= 3 Then
+                    WW_JRALLINSPECTIONFLG = "1"
+                ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+                    WW_JRALLINSPECTIONFLG = "2"
+                Else
+                    WW_JRALLINSPECTIONFLG = "3"
+                End If
             End If
+            'If WW_JRALLINSPECTIONCNT <= 3 Then
+            '    WW_JRALLINSPECTIONFLG = "1"
+            'ElseIf WW_JRALLINSPECTIONCNT >= 4 And WW_JRALLINSPECTIONCNT <= 6 Then
+            '    WW_JRALLINSPECTIONFLG = "2"
+            'Else
+            '    WW_JRALLINSPECTIONFLG = "3"
+            'End If
+            '### 20200929 END   仙台新港営業所対応 ###############################################
             Select Case WW_JRALLINSPECTIONFLG
                 Case "1"
                     OIT0003row("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
@@ -8369,7 +8420,8 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO              , DETAILNO               , SHIPORDER          , LINEORDER           , TANKNO" _
-            & "        , KAMOKU               , STACKINGFLG            , FIRSTRETURNFLG     , AFTERRETURNFLG      , OTTRANSPORTFLG" _
+            & "        , KAMOKU               , STACKINGFLG            , INSPECTIONFLG      , DETENTIONFLG" _
+            & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
             & "        , CARSNUMBER           , CARSAMOUNT             , RETURNDATETRAIN    , JOINTCODE           , JOINT" _
@@ -8383,7 +8435,8 @@ Public Class OIT0003OrderDetail
             & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P40, @P33, @P03" _
-            & "        , @P04, @P41, @P42, @P45, @P46" _
+            & "        , @P04, @P41, @P52, @P53" _
+            & "        , @P42, @P45, @P46" _
             & "        , @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
             & "        , @P06, @P25, @P07, @P39, @P08" _
@@ -8408,6 +8461,8 @@ Public Class OIT0003OrderDetail
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , STACKINGFLG" _
+            & "    , INSPECTIONFLG" _
+            & "    , DETENTIONFLG" _
             & "    , FIRSTRETURNFLG" _
             & "    , AFTERRETURNFLG" _
             & "    , OTTRANSPORTFLG" _
@@ -8477,6 +8532,8 @@ Public Class OIT0003OrderDetail
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.NVarChar)      '積置可否フラグ
+                Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar)      '交検可否フラグ
+                Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar)      '留置可否フラグ
                 Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar)      '先返し可否フラグ
                 Dim PARA45 As SqlParameter = SQLcmd.Parameters.Add("@P45", SqlDbType.NVarChar)      '後返し可否フラグ
                 Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.NVarChar)      'OT輸送可否フラグ
@@ -8550,6 +8607,8 @@ Public Class OIT0003OrderDetail
                     Else
                         PARA41.Value = "2"
                     End If
+                    PARA52.Value = "2"                                '交検可否フラグ(1:交検あり 2:交検なし)
+                    PARA53.Value = "2"                                '留置可否フラグ(1:留置あり 2:留置なし)
                     PARA42.Value = "2"                                '先返し可否フラグ(1:先返しあり 2:先返しなし)
                     PARA45.Value = "2"                                '後返し可否フラグ(1:後返しあり 2:後返しなし)
                     PARA46.Value = "2"                                'OT輸送可否フラグ(1:OT輸送あり 2:OT輸送なし)
@@ -13192,8 +13251,8 @@ Public Class OIT0003OrderDetail
             Me.TxtActualEmparrDate.Enabled = True
             '########################################################
 
-            '受注情報が「500:検収中」の場合は、(実績)空車着日の入力を制限
-            '500:検収中
+            '受注情報が「500:輸送完了」の場合は、(実績)空車着日の入力を制限
+            '500:輸送完了
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
             '(実績)積込日
             Me.TxtActualLoadingDate.Enabled = False
@@ -13524,8 +13583,8 @@ Public Class OIT0003OrderDetail
             End If
             '########################################################
 
-            '受注進行ステータスが「500:検収中」の場合
-            '500:検収中
+            '受注進行ステータスが「500:輸送完了」の場合
+            '500:輸送完了
         ElseIf work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_500 Then
 
             '★明細更新ボタン押下時に更新
@@ -13653,8 +13712,11 @@ Public Class OIT0003OrderDetail
                         'タンク車番号が設定された場合
                         If I_updHeader.Item("TANKNO") <> "" Then
                             '〇 指定されたタンク車の交検日、または全検日が近い場合
-                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
-                                OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            '    ### 20200925 START 全検日のチェックを廃止 ###############################################
+                            'If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
+                            '    OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                                '### 20200925 END   全検日のチェックを廃止 ###############################################
                                 'タンク車割当状況＝"不可"に設定
                                 I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_FUKA
                             Else
@@ -13679,8 +13741,11 @@ Public Class OIT0003OrderDetail
                         'タンク車番号が設定された場合
                         If I_updHeader.Item("TANKNO") <> "" Then
                             '〇 指定されたタンク車の交検日、または全検日が近い場合
-                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
-                                OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            '    ### 20200925 START 全検日のチェックを廃止 ###############################################
+                            'If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
+                            '    OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                                '### 20200925 END   全検日のチェックを廃止 ###############################################
                                 'タンク車割当状況＝"不可"に設定
                                 I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_FUKA
                             Else
@@ -13698,8 +13763,11 @@ Public Class OIT0003OrderDetail
                         'タンク車番号が設定された場合
                         If I_updHeader.Item("TANKNO") <> "" Then
                             '〇 指定されたタンク車の交検日、または全検日が近い場合
-                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
-                                OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            '    ### 20200925 START 全検日のチェックを廃止 ###############################################
+                            'If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
+                            '    OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                                '### 20200925 END   全検日のチェックを廃止 ###############################################
                                 'タンク車割当状況＝"不可"に設定
                                 I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_FUKA
                             Else
@@ -13724,8 +13792,11 @@ Public Class OIT0003OrderDetail
                         'タンク車番号が設定された場合
                         If I_updHeader.Item("TANKNO") <> "" Then
                             '〇 指定されたタンク車の交検日、または全検日が近い場合
-                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
-                                OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            '    ### 20200925 START 全検日のチェックを廃止 ###############################################
+                            'If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED _
+                            '    OrElse I_updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                            If I_updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                                '### 20200925 END   全検日のチェックを廃止 ###############################################
                                 'タンク車割当状況＝"不可"に設定
                                 I_updHeader.Item("TANKQUOTA") = CONST_TANKNO_STATUS_FUKA
                             Else
@@ -14253,6 +14324,31 @@ Public Class OIT0003OrderDetail
                 O_RTN = "ERR"
                 Exit Sub
             End If
+
+            '### 20200925 START((全体)No150対応) #####################################
+            '(一覧)タンク車割当状況(不可チェック)
+            If OIT0003row("TANKQUOTA") = CONST_TANKNO_STATUS_FUKA And OIT0003row("DELFLG") = "0" Then
+                '(一覧)タンク車交検日チェック
+                If OIT0003row("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                    Master.Output(C_MESSAGE_NO.OIL_TANKNO_KOUKENBI_UPCLOSE_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+                    WW_CheckMES1 = "タンク車No交検日(間近)エラー。"
+                    WW_CheckMES2 = C_MESSAGE_NO.OIL_TANKNO_KOUKENBI_UPCLOSE_ERROR
+                    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    O_RTN = "ERR"
+                    Exit Sub
+                    '    '(一覧)タンク車全検日チェック
+                    'ElseIf OIT0003row("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED Then
+                    '    Master.Output(C_MESSAGE_NO.OIL_TANKNO_ZENKENBI_UPCLOSE_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+
+                    '    WW_CheckMES1 = "タンク車No全検日(間近)エラー。"
+                    '    WW_CheckMES2 = C_MESSAGE_NO.OIL_TANKNO_ZENKENBI_UPCLOSE_ERROR
+                    '    WW_CheckListERR(WW_CheckMES1, WW_CheckMES2, OIT0003row)
+                    '    O_RTN = "ERR"
+                    '    Exit Sub
+                End If
+            End If
+            '### 20200925 END  ((全体)No150対応) #####################################
 
             '### 20200701 START((全体)No96対応) ######################################
             '★指定したタンク車№が所属営業所以外の場合

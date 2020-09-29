@@ -68,7 +68,11 @@
                     <asp:TextBox ID="TxtBTrainName" runat="server" onblur="MsgClear();" Visible="false"></asp:TextBox>
                 </a>
             </span>
-            <span></span>
+            <span>
+                <a id="WF_BTRAINNAME">
+                    <asp:Label ID="LblBTrainName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                </a>
+            </span>
             <!-- ■　空車着日　■ -->
             <span>
                 <a id="WF_EMPARRDATE_LABEL" class="requiredMark">空車着日</a>

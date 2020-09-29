@@ -112,6 +112,9 @@
     <Content Include="OIL\css\OIM0002L.css" />
     <Content Include="OIL\css\OIM0003S.css" />
     <Content Include="OIL\css\OIM0002S.css" />
+    <Content Include="OIL\css\OIM0009S.css" />
+    <Content Include="OIL\css\OIM0009L.css" />
+    <Content Include="OIL\css\OIM0009C.css" />
     <Content Include="OIL\css\OIM0020C.css" />
     <Content Include="OIL\css\OIM0020L.css" />
     <Content Include="OIL\css\OIM0020S.css" />
@@ -205,6 +208,7 @@
     <Content Include="OIL\inc\OIM0002S.css" />
     <Content Include="OIL\inc\OIM0003WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0002WRKINC.ascx" />
+    <Content Include="OIL\inc\OIM0009WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0007WRKINC.ascx" />
     <Content Include="OIL\inc\OIM0020WRKINC.ascx" />
     <Content Include="OIL\loc\OIT0005TankLocDetail.aspx" />
@@ -238,6 +242,9 @@
     <Content Include="OIL\mas\OIM0004StationSearch.aspx" />
     <Content Include="OIL\mas\OIM0007TrainList.aspx" />
     <Content Include="OIL\mas\OIM0007TrainSearch.aspx" />
+    <Content Include="OIL\mas\OIM0009PlantCreate.aspx" />
+    <Content Include="OIL\mas\OIM0009PlantList.aspx" />
+    <Content Include="OIL\mas\OIM0009PlantSearch.aspx" />
     <Content Include="OIL\mas\OIM0020GuidanceCreate.aspx" />
     <Content Include="OIL\mas\OIM0020GuidanceDownload.aspx" />
     <Content Include="OIL\mas\OIM0020GuidanceList.aspx" />
@@ -275,6 +282,9 @@
     <Content Include="OIL\script\OIM0002L.js" />
     <Content Include="OIL\script\OIM0003S .js" />
     <Content Include="OIL\script\OIM0002S.js" />
+    <Content Include="OIL\script\OIM0009S.js" />
+    <Content Include="OIL\script\OIM0009L.js" />
+    <Content Include="OIL\script\OIM0009C.js" />
     <Content Include="OIL\script\OIM0007L.js" />
     <Content Include="OIL\script\OIM0007C.js" />
     <Content Include="OIL\script\OIM0007S.js" />
@@ -429,6 +439,13 @@
     </Compile>
     <Compile Include="OIL\inc\OIM0002WRKINC.ascx.vb">
       <DependentUpon>OIM0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0009WRKINC.ascx.designer.vb">
+      <DependentUpon>OIM0009WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\inc\OIM0009WRKINC.ascx.vb">
+      <DependentUpon>OIM0009WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="OIL\inc\OIM0007WRKINC.ascx.designer.vb">
@@ -614,6 +631,27 @@
     </Compile>
     <Compile Include="OIL\mas\OIM0007TrainSearch.aspx.vb">
       <DependentUpon>OIM0007TrainSearch.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0009PlantCreate.aspx.designer.vb">
+      <DependentUpon>OIM0009PlantCreate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0009PlantCreate.aspx.vb">
+      <DependentUpon>OIM0009PlantCreate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0009PlantList.aspx.designer.vb">
+      <DependentUpon>OIM0009PlantList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0009PlantList.aspx.vb">
+      <DependentUpon>OIM0009PlantList.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0009PlantSearch.aspx.designer.vb">
+      <DependentUpon>OIM0009PlantSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OIL\mas\OIM0009PlantSearch.aspx.vb">
+      <DependentUpon>OIM0009PlantSearch.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="OIL\mas\OIM0020GuidanceCreate.aspx.designer.vb">

@@ -87,15 +87,7 @@ Public Class EntryHistory
                 .Add("CONTACTFLG", SqlDbType.NVarChar).Value = drOrder("CONTACTFLG")
                 .Add("RESULTFLG", SqlDbType.NVarChar).Value = drOrder("RESULTFLG")
                 .Add("DELIVERYFLG", SqlDbType.NVarChar).Value = drOrder("DELIVERYFLG")
-                Try
-                    .Add("DELIVERYCOUNT", SqlDbType.Int).Value = drOrder("DELIVERYCOUNT")
-                Catch ex As Exception
-                    If .Contains("DELIVERYCOUNT") Then
-                        .Item("DELIVERYCOUNT").Value = 0
-                    Else
-                        .Add("DELIVERYCOUNT", SqlDbType.Int).Value = 0
-                    End If
-                End Try
+                .Add("DELIVERYCOUNT", SqlDbType.Int).Value = drOrder("DELIVERYCOUNT")
                 .Add("LODDATE", SqlDbType.Date).Value = drOrder("LODDATE")
                 .Add("DEPDATE", SqlDbType.Date).Value = drOrder("DEPDATE")
                 .Add("ARRDATE", SqlDbType.Date).Value = drOrder("ARRDATE")
@@ -159,51 +151,11 @@ Public Class EntryHistory
                 .Add("TOTALPAYMENT", SqlDbType.Int).Value = drOrder("TOTALPAYMENT")
                 .Add("OTFILENAME", SqlDbType.NVarChar).Value = drOrder("OTFILENAME")
                 .Add("RECEIVECOUNT", SqlDbType.Int).Value = If(Convert.ToString(drOrder("RECEIVECOUNT")) = "", CType(DBNull.Value, Object), drOrder("RECEIVECOUNT"))
-                Try
-                    .Add("OTSENDSTATUS", SqlDbType.NVarChar).Value = drOrder("OTSENDSTATUS")
-                Catch ex As Exception
-                    If .Contains("OTSENDSTATUS") Then
-                        .Item("OTSENDSTATUS").Value = ""
-                    Else
-                        .Add("OTSENDSTATUS", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
-                Try
-                    .Add("RESERVEDSTATUS", SqlDbType.NVarChar).Value = drOrder("RESERVEDSTATUS")
-                Catch ex As Exception
-                    If .Contains("RESERVEDSTATUS") Then
-                        .Item("RESERVEDSTATUS").Value = ""
-                    Else
-                        .Add("RESERVEDSTATUS", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
-                Try
-                    .Add("TAKUSOUSTATUS", SqlDbType.NVarChar).Value = drOrder("TAKUSOUSTATUS")
-                Catch ex As Exception
-                    If .Contains("TAKUSOUSTATUS") Then
-                        .Item("TAKUSOUSTATUS").Value = ""
-                    Else
-                        .Add("TAKUSOUSTATUS", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
-                Try
-                    .Add("BTRAINNO", SqlDbType.NVarChar).Value = drOrder("BTRAINNO")
-                Catch ex As Exception
-                    If .Contains("BTRAINNO") Then
-                        .Item("BTRAINNO").Value = ""
-                    Else
-                        .Add("BTRAINNO", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
-                Try
-                    .Add("BTRAINNAME", SqlDbType.NVarChar).Value = drOrder("BTRAINNAME")
-                Catch ex As Exception
-                    If .Contains("BTRAINNAME") Then
-                        .Item("BTRAINNAME").Value = ""
-                    Else
-                        .Add("BTRAINNAME", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
+                .Add("OTSENDSTATUS", SqlDbType.NVarChar).Value = drOrder("OTSENDSTATUS")
+                .Add("RESERVEDSTATUS", SqlDbType.NVarChar).Value = drOrder("RESERVEDSTATUS")
+                .Add("TAKUSOUSTATUS", SqlDbType.NVarChar).Value = drOrder("TAKUSOUSTATUS")
+                .Add("BTRAINNO", SqlDbType.NVarChar).Value = drOrder("BTRAINNO")
+                .Add("BTRAINNAME", SqlDbType.NVarChar).Value = drOrder("BTRAINNAME")
                 .Add("DELFLG", SqlDbType.NVarChar).Value = drOrder("DELFLG")
                 .Add("INITYMD", SqlDbType.DateTime).Value = drOrder("INITYMD")
                 .Add("INITUSER", SqlDbType.NVarChar).Value = drOrder("INITUSER")
@@ -285,24 +237,8 @@ Public Class EntryHistory
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
                 .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
-                Try
-                    .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = drOrder("INSPECTIONFLG")
-                Catch ex As Exception
-                    If .Contains("INSPECTIONFLG") Then
-                        .Item("INSPECTIONFLG").Value = ""
-                    Else
-                        .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
-                Try
-                    .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = drOrder("DETENTIONFLG")
-                Catch ex As Exception
-                    If .Contains("DETENTIONFLG") Then
-                        .Item("DETENTIONFLG").Value = ""
-                    Else
-                        .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
+                .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = drOrder("INSPECTIONFLG")
+                .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = drOrder("DETENTIONFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")
                 .Add("AFTERRETURNFLG", SqlDbType.NVarChar).Value = drOrder("AFTERRETURNFLG")
                 .Add("OTTRANSPORTFLG", SqlDbType.NVarChar).Value = drOrder("OTTRANSPORTFLG")
@@ -340,42 +276,10 @@ Public Class EntryHistory
                 .Add("ACTUALARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALARRDATE"))
                 .Add("ACTUALACCDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALACCDATE"), CType(DBNull.Value, Object), drOrder("ACTUALACCDATE"))
                 .Add("ACTUALEMPARRDATE", SqlDbType.NVarChar).Value = If(drOrder.IsNull("ACTUALEMPARRDATE"), CType(DBNull.Value, Object), drOrder("ACTUALEMPARRDATE"))
-                Try
-                    .Add("RESERVEDNO", SqlDbType.NVarChar).Value = drOrder("RESERVEDNO")
-                Catch ex As Exception
-                    If .Contains("RESERVEDNO") Then
-                        .Item("RESERVEDNO").Value = ""
-                    Else
-                        .Add("RESERVEDNO", SqlDbType.NVarChar).Value = ""
-                    End If
-                End Try
-                Try
-                    .Add("OTSENDCOUNT", SqlDbType.Int).Value = drOrder("OTSENDCOUNT")
-                Catch ex As Exception
-                    If .Contains("OTSENDCOUNT") Then
-                        .Item("OTSENDCOUNT").Value = 0
-                    Else
-                        .Add("OTSENDCOUNT", SqlDbType.Int).Value = 0
-                    End If
-                End Try
-                Try
-                    .Add("DLRESERVEDCOUNT", SqlDbType.Int).Value = drOrder("DLRESERVEDCOUNT")
-                Catch ex As Exception
-                    If .Contains("DLRESERVEDCOUNT") Then
-                        .Item("DLRESERVEDCOUNT").Value = 0
-                    Else
-                        .Add("DLRESERVEDCOUNT", SqlDbType.Int).Value = 0
-                    End If
-                End Try
-                Try
-                    .Add("DLTAKUSOUCOUNT", SqlDbType.Int).Value = drOrder("DLTAKUSOUCOUNT")
-                Catch ex As Exception
-                    If .Contains("DLTAKUSOUCOUNT") Then
-                        .Item("DLTAKUSOUCOUNT").Value = 0
-                    Else
-                        .Add("DLTAKUSOUCOUNT", SqlDbType.Int).Value = 0
-                    End If
-                End Try
+                .Add("RESERVEDNO", SqlDbType.NVarChar).Value = drOrder("RESERVEDNO")
+                .Add("OTSENDCOUNT", SqlDbType.Int).Value = drOrder("OTSENDCOUNT")
+                .Add("DLRESERVEDCOUNT", SqlDbType.Int).Value = drOrder("DLRESERVEDCOUNT")
+                .Add("DLTAKUSOUCOUNT", SqlDbType.Int).Value = drOrder("DLTAKUSOUCOUNT")
                 .Add("SALSE", SqlDbType.NVarChar).Value = drOrder("SALSE")
                 .Add("SALSETAX", SqlDbType.NVarChar).Value = drOrder("SALSETAX")
                 .Add("TOTALSALSE", SqlDbType.NVarChar).Value = drOrder("TOTALSALSE")

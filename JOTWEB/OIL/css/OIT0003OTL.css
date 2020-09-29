@@ -34,8 +34,14 @@ div[data-generated="1"] td:nth-child(4) {
     margin-left: 0.7em;
 }
 /* 横スクロールを出す最小幅を個別指定 */
-.headerboxOnly {
-    min-width: 1110px; /* (共通指定 650pxだと小さすぎる為) */
+form.btnCnt1 .headerboxOnly {
+    min-width: 1100px; /* (共通指定 650pxだと小さすぎる為) */
+}
+form.btnCnt2 .headerboxOnly {
+    min-width: 1230px; /* (共通指定 650pxだと小さすぎる為) */
+}
+form.btnCnt3 .headerboxOnly {
+    min-width: 1365px; /* (共通指定 650pxだと小さすぎる為) */
 }
 /* 帳票ポップアップ個別指定*/
 #txtReportLodDate{

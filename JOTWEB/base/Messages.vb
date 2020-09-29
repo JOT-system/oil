@@ -691,6 +691,26 @@ Public Module Messages
         ''' タンク車(全検日(間近))エラー
         ''' </summary>
         Public Const OIL_TANKNO_ZENKENBI_UPCLOSE_ERROR As String = "20072"
+        ''' <summary>
+        ''' 託送指示未選択エラー
+        ''' </summary>
+        Public Const OIL_TAKUSOU_PRINT_NOTFOUND As String = "20073"
+        ''' <summary>
+        ''' 託送指示複数日付選択エラー
+        ''' </summary>
+        Public Const OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS As String = "20074"
+        ''' <summary>
+        ''' 出荷予約未選択エラー
+        ''' </summary>
+        Public Const OIL_RESERVED_PRINT_NOTFOUND As String = "20075"
+        ''' <summary>
+        ''' 出荷予約複数日付選択エラー
+        ''' </summary>
+        Public Const OIL_RESERVED_NOT_ACCEPT_SEL_DAYS As String = "20076"
+        ''' <summary>
+        ''' OT発送日報複数日付選択エラー
+        ''' </summary>
+        Public Const OIL_OTLINKAGELINE_NOT_ACCEPT_SEL_DAYS As String = "20077"
 #End Region
 
 

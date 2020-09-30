@@ -156,6 +156,18 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const OIM0007C As String = "ASP.OIL_MAS_OIM0007TRAINCREATE_ASPX"
         ''' <summary>
+        ''' 基地マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const OIM0009S As String = "ASP.OIL_MAS_OIM0009PLANTSEARCH_ASPX"
+        ''' <summary>
+        ''' 基地マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const OIM0009L As String = "ASP.OIL_MAS_OIM0009PLANTLIST_ASPX"
+        ''' <summary>
+        ''' 基地マスタメンテナンス（登録）
+        ''' </summary>
+        Public Const OIM0009C As String = "ASP.OIL_MAS_OIM0009PLANTCREATE_ASPX"
+        ''' <summary>
         ''' ガイダンスマスタメンテナンス（検索）
         ''' </summary>
         Public Const OIM0020S As String = "ASP.OIL_MAS_OIM0020GUIDANCESEARCH_ASPX"

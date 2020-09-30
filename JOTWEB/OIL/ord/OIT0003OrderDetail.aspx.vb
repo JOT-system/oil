@@ -8661,17 +8661,27 @@ Public Class OIT0003OrderDetail
                     '    ★袖ヶ浦の場合
                     If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203) _
                         AndAlso OIT0003row("LINEORDER") <> "" Then
-                        '貨物駅入線順を積込入線順に設定
-                        PARA43.Value = OIT0003row("LINEORDER")
-                        '積込出線順に(明細数 - 積込入線順 + 1)設定
-                        PARA44.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
-                        '    '★五井・甲子の場合
-                        'ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
-                        '    OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202 Then
-                        '    '積込入線順を設定
-                        '    PARA43.Value = OIT0003row("LOADINGIRILINEORDER")
-                        '    '積込出線順を設定
-                        '    PARA44.Value = OIT0003row("LOADINGOUTLETORDER")
+                        '### 20200930 START 臨海鉄道(袖ヶ浦)対応 ##########################################
+                        '貨物駅入線順を積込出線順に設定
+                        PARA44.Value = OIT0003row("LINEORDER")
+                        '積込入線順に(明細数 - 貨物駅入線順 + 1)設定
+                        PARA43.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
+                        ''貨物駅入線順を積込入線順に設定
+                        'PARA43.Value = OIT0003row("LINEORDER")
+                        ''積込出線順に(明細数 - 貨物駅入線順 + 1)設定
+                        'PARA44.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
+                        '### 20200930 END   臨海鉄道(袖ヶ浦)対応 ##########################################
+
+                        '### 20200930 START 臨海鉄道(五井、甲子)対応 ######################################
+                        '★五井、甲子の場合(発送対象のみ)
+                    ElseIf (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011201 _
+                            OrElse Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011202) _
+                            AndAlso OIT0003row("SHIPORDER") <> "" Then
+                        '発送順を積込入線順に設定
+                        PARA43.Value = OIT0003row("SHIPORDER")
+                        '積込出線順に(明細数 - 発送順 + 1)設定
+                        PARA44.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("SHIPORDER"))) + 1
+                        '### 20200930 END   臨海鉄道(五井、甲子)対応 ######################################
                     Else
                         PARA43.Value = ""
                         PARA44.Value = ""
@@ -14311,7 +14321,7 @@ Public Class OIT0003OrderDetail
                 End If
 
                 '★数値(大文字)で設定されている場合は、数値(小文字)に変換する。
-                OIT0003row("SHIPORDER") = StrConv(OIT0003row("LINEORDER"), VbStrConv.Narrow)
+                OIT0003row("LINEORDER") = StrConv(OIT0003row("LINEORDER"), VbStrConv.Narrow)
             End If
 
             '(一覧)タンク車割当状況(未割当チェック)

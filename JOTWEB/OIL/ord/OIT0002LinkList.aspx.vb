@@ -2219,7 +2219,7 @@ Public Class OIT0002LinkList
                 If OIT0002EXLINStbl.Rows.Count <> 0 _
                     AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
-                        If OIT0002ExlUProw("LOADINGTRAINNO") <> "" Then
+                        If OIT0002ExlUProw("LOADINGTRAINNO").ToString() <> "" AndAlso OIT0002ExlUProw("OFFICECODE").ToString() <> "" Then
 
                             '〇営業所配下情報を取得・設定
                             WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}

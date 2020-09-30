@@ -1365,7 +1365,9 @@ Public Class OIT0002LinkList
 
         '◯運用指示書あり(受注情報が設定)
         If OIT0002EXLINStbl.Rows.Count <> 0 _
-            AndAlso (useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "4") Then
+            AndAlso (useFlg = "4") Then
+            'AndAlso (useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "4") Then    '# 20200930(ポラリス投入用のみに変更)
+
             '★受注No取得
             Using SQLcon As SqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()       'DataBase接続
@@ -1410,10 +1412,13 @@ Public Class OIT0002LinkList
             End If
         Next
 
-        '◯アップロードデータチェック
-        WW_CheckUpload(WW_ERRCODE)
-        If WW_ERRCODE = "WAR" Then
-            Master.Output(C_MESSAGE_NO.OIL_UPLOAD_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+        '◯ポラリス投入用のみチェック
+        If useFlg = "4" Then
+            '◯アップロードデータチェック
+            WW_CheckUpload(WW_ERRCODE)
+            If WW_ERRCODE = "WAR" Then
+                Master.Output(C_MESSAGE_NO.OIL_UPLOAD_WAR_MESSAGE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            End If
         End If
 
         '○ 画面表示データ取得
@@ -1743,7 +1748,8 @@ Public Class OIT0002LinkList
 
                     ' ### 運送指示書(項目) START ####################################
                     '◯運用指示書あり(受注情報が設定)
-                    If useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "4" Then
+                    'If useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "4" Then   '# 20200930(ポラリス投入用のみに変更) 
+                    If useFlg = "4" Then
                         '油種(運用指示)
                         OILNAME.Value = OIT0002EXLUProw("OILNAME")
                         '回転(運用指示)
@@ -1768,7 +1774,9 @@ Public Class OIT0002LinkList
                         Else
                             LOADINGDEPDATE.Value = OIT0002EXLUProw("LOADINGDEPDATE")
                         End If
-                    ElseIf useFlg = "1" Then
+
+                        'ElseIf useFlg = "1" Then
+                    ElseIf useFlg = "0" OrElse useFlg = "2" OrElse useFlg = "1" Then
                         '油種(運用指示)
                         OILNAME.Value = ""
                         '回転(運用指示)
@@ -2109,7 +2117,8 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("LOADINGEMPARRDATE", Type.GetType("System.String"))
                 '◯運用指示書あり(受注情報が設定)
                 If OIT0002EXLINStbl.Rows.Count <> 0 _
-                    AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then
+                    AndAlso (I_UseFlg = "4") Then
+                    'AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then  '# 20200930(ポラリス投入用のみに変更)
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         For Each OIT0002ExlINSrow As DataRow In OIT0002EXLINStbl.Rows
                             If OIT0002ExlUProw("TRUCKNO") = OIT0002ExlINSrow("TANKNUMBER") Then
@@ -2173,7 +2182,8 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("OUTLINETRAINNAME", Type.GetType("System.String"))
                 '◯運用指示書あり(受注情報が設定)
                 If OIT0002EXLINStbl.Rows.Count <> 0 _
-                    AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then
+                    AndAlso (I_UseFlg = "4") Then
+                    'AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then  '# 20200930(ポラリス投入用のみに変更)
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
 
                         '★入線列車番号が未設定の場合はSKIP
@@ -2217,7 +2227,8 @@ Public Class OIT0002LinkList
                 OIT0002EXLUPtbl.Columns.Add("PATTERNNAME", Type.GetType("System.String"))
                 '◯運用指示書あり(受注情報が設定)
                 If OIT0002EXLINStbl.Rows.Count <> 0 _
-                    AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then
+                    AndAlso (I_UseFlg = "4") Then
+                    'AndAlso (I_UseFlg = "0" OrElse I_UseFlg = "2" OrElse I_UseFlg = "4") Then  '# 20200930(ポラリス投入用のみに変更)
                     For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
                         If OIT0002ExlUProw("LOADINGTRAINNO").ToString() <> "" AndAlso OIT0002ExlUProw("OFFICECODE").ToString() <> "" Then
 

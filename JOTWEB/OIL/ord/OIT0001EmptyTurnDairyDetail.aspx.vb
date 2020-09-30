@@ -7512,7 +7512,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
                 If WW_JRINSPECTIONCNT < 0 Then
                     WW_JRINSPECTIONFLG = "1"
-                ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 3 Then
+                ElseIf WW_JRINSPECTIONCNT >= 0 And WW_JRINSPECTIONCNT <= 10 Then
                     WW_JRINSPECTIONFLG = "2"
                 Else
                     WW_JRINSPECTIONFLG = "3"
@@ -7561,7 +7561,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             If work.WF_SEL_SALESOFFICECODE.Text = BaseDllConst.CONST_OFFICECODE_010402 Then
                 If WW_JRALLINSPECTIONCNT < 0 Then
                     WW_JRALLINSPECTIONFLG = "1"
-                ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 3 Then
+                ElseIf WW_JRALLINSPECTIONCNT >= 0 And WW_JRALLINSPECTIONCNT <= 10 Then
                     WW_JRALLINSPECTIONFLG = "2"
                 Else
                     WW_JRALLINSPECTIONFLG = "3"

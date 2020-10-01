@@ -799,13 +799,33 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_TANKSITUATION_08 As String = "8"
     ''' <summary>
-    ''' 09:交検中
+    ''' 09:交検中(仙台(受注用))
     ''' </summary>
     Public Const CONST_TANKSITUATION_09 As String = "9"
     ''' <summary>
-    ''' 10:留置中
+    ''' 10:留置中(仙台(受注用))
     ''' </summary>
     Public Const CONST_TANKSITUATION_10 As String = "10"
+    ''' <summary>
+    ''' 11:修理中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_11 As String = "11"
+    ''' <summary>
+    ''' 12:MC中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_12 As String = "12"
+    ''' <summary>
+    ''' 13:交検中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_13 As String = "13"
+    ''' <summary>
+    ''' 14:全検中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_14 As String = "14"
+    ''' <summary>
+    ''' 15:留置中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_15 As String = "15"
 #End Region
 
 #Region "油種"

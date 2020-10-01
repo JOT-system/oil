@@ -2518,9 +2518,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                     OIT0001Reprow("LINECNT") = i        'LINECNT
                     O_officeCode = OIT0001Reprow("OFFICECODE")
 
-                    '返送列車
-                    CODENAME_get("CTRAINNUMBER", OIT0001Reprow("RETURNDATETRAINNO"), OIT0001Reprow("RETURNDATETRAIN"), WW_DUMMY)
-                    If OIT0001Reprow("RETURNDATETRAIN") = "" Then OIT0001Reprow("RETURNDATETRAIN") = OIT0001Reprow("RETURNDATETRAINNO")
+                    If OIT0001Reprow("RETURNDATETRAINNO").ToString() <> "" Then
+                        '返送列車
+                        CODENAME_get("CTRAINNUMBER", OIT0001Reprow("RETURNDATETRAINNO").ToString(), OIT0001Reprow("RETURNDATETRAIN").ToString(), WW_DUMMY)
+                        If OIT0001Reprow("RETURNDATETRAIN").ToString() = "" Then OIT0001Reprow("RETURNDATETRAIN") = OIT0001Reprow("RETURNDATETRAINNO")
+                    End If
 
                 Next
             End Using

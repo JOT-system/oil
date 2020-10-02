@@ -2086,11 +2086,21 @@ Public Class OIT0002LinkDetail
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
-            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
-            & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
-            & " , TMP0005.RINKAIOILKANA                          AS RINKAIOILKANA" _
-            & " , TMP0005.RINKAISEGMENTOILNAME                   AS RINKAISEGMENTOILNAME" _
-            & " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
+            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME"
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        SQLStr &=
+              " , OIM0029.VALUE02                                AS REPORTOILNAME" _
+            & " , OIM0029.VALUE05                                AS RINKAIOILKANA" _
+            & " , OIM0029.VALUE06                                AS RINKAISEGMENTOILNAME"
+        'SQLStr &=
+        '      " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
+        '    & " , TMP0005.RINKAIOILKANA                          AS RINKAIOILKANA" _
+        '    & " , TMP0005.RINKAISEGMENTOILNAME                   AS RINKAISEGMENTOILNAME"
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              " , OIT0003.FILLINGPOINT                           AS FILLINGPOINT" _
             & " , OIT0003.LINE                                   AS LINE" _
             & " , OIT0003.LOADINGIRILINETRAINNO                  AS LOADINGIRILINETRAINNO" _
             & " , OIT0002.ARRSTATIONNAME                         AS LOADINGARRSTATIONNAME" _
@@ -2108,13 +2118,25 @@ Public Class OIT0002LinkDetail
             & " LEFT JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0003.ORDERNO = OIT0011.ORDERNO " _
             & " AND OIT0003.DETAILNO = OIT0011.DETAILNO " _
-            & " AND OIT0003.DELFLG <> @DELFLG " _
-            & " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
-            & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE " _
-            & " AND TMP0005.OILNo = '1' " _
-            & " AND TMP0005.OILCODE = OIT0003.OILCODE " _
-            & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
-            & " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
+            & " AND OIT0003.DELFLG <> @DELFLG "
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        SQLStr &=
+              " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
+            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & " AND OIM0029.KEYCODE04 = '1' " _
+            & " AND OIM0029.KEYCODE05 = OIT0003.OILCODE " _
+            & " AND OIM0029.KEYCODE08 = OIT0003.ORDERINGTYPE "
+        'SQLStr &=
+        '      " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+        '    & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE " _
+        '    & " AND TMP0005.OILNo = '1' " _
+        '    & " AND TMP0005.OILCODE = OIT0003.OILCODE " _
+        '    & " AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE "
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              " LEFT JOIN oil.OIM0005_TANK OIM0005 ON " _
             & "     OIM0005.TANKNUMBER = OIT0011.TRUCKNO " _
             & " AND OIM0005.DELFLG <> @DELFLG " _
             & " WHERE OIT0011.RLINKNO = @RLINKNO "

@@ -1965,12 +1965,23 @@ Public Class OIT0002LinkList
                 & " , NULL                                             AS ACTUALEMPARRDATE" _
                 & " , ''                                               AS LINETRAINNO" _
                 & " , OIT0011.SERIALNUMBER                             AS LINEORDER" _
-                & " , OIT0011.TRUCKNO                                  AS TANKNUMBER" _
-                & " , ISNULL(TMP0005.OILCODE, OIT0005.LASTOILCODE)     AS PREOILCODE" _
-                & " , ISNULL(TMP0005.OILNAME, OIT0005.LASTOILNAME)     AS PREOILNAME" _
-                & " , ISNULL(TMP0005.SEGMENTOILCODE, OIT0005.PREORDERINGTYPE)    AS PREORDERINGTYPE" _
-                & " , ISNULL(TMP0005.SEGMENTOILNAME, OIT0005.PREORDERINGOILNAME) AS PREORDERINGOILNAME" _
-                & String.Format(" , '{0}'                              AS DELFLG", C_DELETE_FLG.ALIVE) _
+                & " , OIT0011.TRUCKNO                                  AS TANKNUMBER"
+
+            '### 20201002 START 変換マスタに移行したため修正 ########################
+            SQLStr &=
+                  " , ISNULL(OIM0029.KEYCODE05, OIT0005.LASTOILCODE)        AS PREOILCODE" _
+                & " , ISNULL(OIM0029.KEYCODE06, OIT0005.LASTOILNAME)        AS PREOILNAME" _
+                & " , ISNULL(OIM0029.KEYCODE08, OIT0005.PREORDERINGTYPE)    AS PREORDERINGTYPE" _
+                & " , ISNULL(OIM0029.KEYCODE09, OIT0005.PREORDERINGOILNAME) AS PREORDERINGOILNAME"
+            'SQLStr &=
+            '      " , ISNULL(TMP0005.OILCODE, OIT0005.LASTOILCODE)     AS PREOILCODE" _
+            '    & " , ISNULL(TMP0005.OILNAME, OIT0005.LASTOILNAME)     AS PREOILNAME" _
+            '    & " , ISNULL(TMP0005.SEGMENTOILCODE, OIT0005.PREORDERINGTYPE)    AS PREORDERINGTYPE" _
+            '    & " , ISNULL(TMP0005.SEGMENTOILNAME, OIT0005.PREORDERINGOILNAME) AS PREORDERINGOILNAME"
+            '### 20201002 END   変換マスタに移行したため修正 ########################
+
+            SQLStr &=
+                  String.Format(" , '{0}'                              AS DELFLG", C_DELETE_FLG.ALIVE) _
                 & String.Format(" , '{0}'                              AS INITYMD", WW_DATENOW) _
                 & String.Format(" , '{0}'                              AS INITUSER", Master.USERID) _
                 & String.Format(" , '{0}'                              AS INITTERMID", Master.USERTERMID) _
@@ -2006,19 +2017,33 @@ Public Class OIT0002LinkList
                 & "  AND OIM0007.ARRSTATION = VIW0002.ARRSTATION"
             SQLCmn &= String.Format("  AND OIM0007.DELFLG <> '{0}'", C_DELETE_FLG.DELETE)
 
-            '### 20200706 START((内部)No184対応) ######################################
+            '### 20201002 START 変換マスタに移行したため修正 ########################
             SQLCmn &=
-                  " LEFT JOIN OIL.TMP0005OILMASTER TMP0005 ON" _
-                & "  TMP0005.OFFICECODE = VIW0002.OFFICECODE" _
-                & "  AND TMP0005.OILNo = '1'" _
-                & "  AND TMP0005.RINKAIOILCODE <> ''" _
-                & "  AND TMP0005.RINKAIOILKANA = OIT0011.ARTICLEOILNAME"
-            SQLCmn &= String.Format("  AND TMP0005.OILCODE IN ('{0}', '{1}', '{2}', '{3}', '{4}')",
+                  " LEFT JOIN OIL.OIM0029_CONVERT OIM0029 ON" _
+                & "      OIM0029.KEYCODE01 = VIW0002.OFFICECODE" _
+                & "  AND OIM0029.KEYCODE04 = '1'" _
+                & "  AND OIM0029.VALUE03 <> ''" _
+                & "  AND OIM0029.VALUE05 = OIT0011.ARTICLEOILNAME"
+            SQLCmn &= String.Format("  AND OIM0029.KEYCODE05 IN ('{0}', '{1}', '{2}', '{3}', '{4}')",
                                         BaseDllConst.CONST_HTank,
                                         BaseDllConst.CONST_RTank,
                                         BaseDllConst.CONST_TTank,
                                         BaseDllConst.CONST_KTank1,
                                         BaseDllConst.CONST_ATank)
+            ''### 20200706 START((内部)No184対応) ######################################
+            'SQLCmn &=
+            '      " LEFT JOIN OIL.TMP0005OILMASTER TMP0005 ON" _
+            '    & "  TMP0005.OFFICECODE = VIW0002.OFFICECODE" _
+            '    & "  AND TMP0005.OILNo = '1'" _
+            '    & "  AND TMP0005.RINKAIOILCODE <> ''" _
+            '    & "  AND TMP0005.RINKAIOILKANA = OIT0011.ARTICLEOILNAME"
+            'SQLCmn &= String.Format("  AND TMP0005.OILCODE IN ('{0}', '{1}', '{2}', '{3}', '{4}')",
+            '                            BaseDllConst.CONST_HTank,
+            '                            BaseDllConst.CONST_RTank,
+            '                            BaseDllConst.CONST_TTank,
+            '                            BaseDllConst.CONST_KTank1,
+            '                            BaseDllConst.CONST_ATank)
+            '### 20201002 END   変換マスタに移行したため修正 ########################
 
             '### 20200923 START(受注用の油種コード(JOT)を取得) ########################
             SQLCmn &=

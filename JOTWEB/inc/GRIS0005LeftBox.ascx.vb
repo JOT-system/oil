@@ -863,6 +863,7 @@ Public Class GRIS0005LeftBox
                 '上記データテーブルの表示対象項目を定義(フィールド、表示名）
                 dispFieldsDef = New List(Of LeftTableDefItem) From
                     {New LeftTableDefItem("VALUE9", "状態"),
+                     New LeftTableDefItem("VALUE15", "状況", 13),
                      New LeftTableDefItem("VALUE5", "管轄支店", 9),
                      New LeftTableDefItem("VALUE7", "所属営業所", 9),
                      New LeftTableDefItem("VALUE3", "所在地", 9),

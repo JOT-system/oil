@@ -1143,7 +1143,11 @@ Public Class OIT0006OutOfServiceDetail
                         '    prmData = work.CreateSALESOFFICEParam(work.WF_SEL_SALESOFFICECODE.Text, "")
                         'End If
 
-                        prmData = work.CreateSALESOFFICEParam(Me.TxtDepstationCode.Text, "")
+                        If Me.TxtObjective.Text = BaseDllConst.CONST_OBJECTCODE_25 Then
+                            prmData = work.CreateSALESOFFICEParam(Me.TxtDepstationCode.Text + "_IDO", "")
+                        Else
+                            prmData = work.CreateSALESOFFICEParam(Me.TxtDepstationCode.Text, "")
+                        End If
 
                         '### LeftBoxマルチ対応(20200217) START #####################################################
                         If WF_FIELD.Value = "TANKNO" Then
@@ -2622,6 +2626,12 @@ Public Class OIT0006OutOfServiceDetail
             SQLcon.Open()       'DataBase接続
 
             MAPDataGet(SQLcon, 0)
+        End Using
+
+        '回送(一覧)画面表示データ取得
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            WW_KaisouListTBLSet(SQLcon)
         End Using
 
         '○ 画面表示データ保存

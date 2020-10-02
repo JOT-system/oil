@@ -3871,9 +3871,12 @@ Public Class OIT0002LinkList
         Dim WW_Kensa As String = "検"
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
-        Dim WW_ErrMES() As String = {"本線列車未登録のため受注登録できません",
-                                     "油種は対象外のため受注登録できません",
-                                     "検査中のため受注登録できません"}
+        Dim WW_ErrMES() As String = {"入力している本線列車番号が列車マスタに登録されていない為、受注登録できませんでした。",
+                                     "入力している油種の値が判別できず受注登録が出来ませんでした。",
+                                     "交検のタンク車を割当てようとしいる為、受注登録できませんでした。"}
+        'Dim WW_ErrMES() As String = {"本線列車未登録のため受注登録できません",
+        '                             "油種は対象外のため受注登録できません",
+        '                             "検査中のため受注登録できません"}
 
         For Each OIT0002ExlUProw As DataRow In OIT0002EXLUPtbl.Rows
 

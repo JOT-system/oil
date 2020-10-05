@@ -77,7 +77,9 @@ Public Class OIT0001EmptyTurnDairyDetail
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
                         Case "WF_CheckBoxSELECT",
-                             "WF_CheckBoxSELECTSTACKING"    'チェックボックス(選択)クリック
+                             "WF_CheckBoxSELECTSTACKING",
+                             "WF_CheckBoxSELECTINSPECTION",
+                             "WF_CheckBoxSELECTDETENTION"    'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
                         Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
                             WF_FIELD_Change()
@@ -474,6 +476,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS PREORDERINGOILNAME" _
             & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
+            & " , ''                                             AS WHOLESALEFLG" _
+            & " , ''                                             AS INSPECTIONFLG" _
+            & " , ''                                             AS DETENTIONFLG" _
             & " , ''                                             AS FIRSTRETURNFLG" _
             & " , ''                                             AS AFTERRETURNFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _
@@ -552,6 +557,21 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "   WHEN '2' THEN ''" _
             & "   ELSE ''" _
             & "   END                                                AS STACKINGFLG" _
+            & " , CASE ISNULL(RTRIM(OIT0003.WHOLESALEFLG), '')" _
+            & "   WHEN '1' THEN 'on'" _
+            & "   WHEN '2' THEN ''" _
+            & "   ELSE ''" _
+            & "   END                                                AS WHOLESALEFLG" _
+            & " , CASE ISNULL(RTRIM(OIT0003.INSPECTIONFLG), '')" _
+            & "   WHEN '1' THEN 'on'" _
+            & "   WHEN '2' THEN ''" _
+            & "   ELSE ''" _
+            & "   END                                                AS INSPECTIONFLG" _
+            & " , CASE ISNULL(RTRIM(OIT0003.DETENTIONFLG), '')" _
+            & "   WHEN '1' THEN 'on'" _
+            & "   WHEN '2' THEN ''" _
+            & "   ELSE ''" _
+            & "   END                                                AS DETENTIONFLG" _
             & " , CASE ISNULL(RTRIM(OIT0003.FIRSTRETURNFLG), '')" _
             & "   WHEN '1' THEN 'on'" _
             & "   WHEN '2' THEN ''" _
@@ -1154,6 +1174,40 @@ Public Class OIT0001EmptyTurnDairyDetail
                             OIT0001tbl.Rows(i)("ACTUALLODDATE") = Me.TxtLoadingDate.Text
                         End If
 
+                    End If
+                Next
+
+            Case "WF_CheckBoxSELECTINSPECTION"
+                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                If work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                    Exit Select
+                End If
+
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
+                    If OIT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0001tbl.Rows(i)("INSPECTIONFLG") = "on" Then
+                            OIT0001tbl.Rows(i)("INSPECTIONFLG") = ""
+                        Else
+                            OIT0001tbl.Rows(i)("INSPECTIONFLG") = "on"
+                        End If
+                    End If
+                Next
+
+            Case "WF_CheckBoxSELECTDETENTION"
+                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                If work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                    Exit Select
+                End If
+
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
+                    If OIT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0001tbl.Rows(i)("DETENTIONFLG") = "on" Then
+                            OIT0001tbl.Rows(i)("DETENTIONFLG") = ""
+                        Else
+                            OIT0001tbl.Rows(i)("DETENTIONFLG") = "on"
+                        End If
                     End If
                 Next
 
@@ -2138,6 +2192,9 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , ''                                             AS PREORDERINGOILNAME" _
             & " , ''                                             AS STACKINGORDERNO" _
             & " , ''                                             AS STACKINGFLG" _
+            & " , ''                                             AS WHOLESALEFLG" _
+            & " , ''                                             AS INSPECTIONFLG" _
+            & " , ''                                             AS DETENTIONFLG" _
             & " , ''                                             AS FIRSTRETURNFLG" _
             & " , ''                                             AS AFTERRETURNFLG" _
             & " , ''                                             AS OTTRANSPORTFLG" _
@@ -5731,10 +5788,10 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        TANKNO            = @P03, STACKINGFLG  = @P40, ORDERINFO    = @P34" _
-            & "        , SHIPPERSCODE    = @P23, SHIPPERSNAME = @P24" _
-            & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
-            & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT        = @P08, REMARK          = @P38" _
+            & "        TANKNO            = @P03, STACKINGFLG  = @P40, INSPECTIONFLG  = @P46, DETENTIONFLG    = @P47" _
+            & "        , ORDERINFO       = @P34, SHIPPERSCODE = @P23, SHIPPERSNAME   = @P24" _
+            & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE   = @P36, ORDERINGOILNAME = @P37" _
+            & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT          = @P08, REMARK          = @P38" _
             & "        , ACTUALLODDATE   = @P41" _
             & "        , UPDYMD          = @P19, UPDUSER      = @P20" _
             & "        , UPDTERMID       = @P21, RECEIVEYMD   = @P22" _
@@ -5744,8 +5801,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO         , DETAILNO            , TANKNO             , KAMOKU" _
-            & "        , STACKINGFLG     , INSPECTIONFLG       , DETENTIONFLG       , FIRSTRETURNFLG" _
-            & "        , AFTERRETURNFLG  , OTTRANSPORTFLG      , ORDERINFO" _
+            & "        , STACKINGFLG     , WHOLESALEFLG        , INSPECTIONFLG      , DETENTIONFLG" _
+            & "        , FIRSTRETURNFLG  , AFTERRETURNFLG      , OTTRANSPORTFLG     , ORDERINFO" _
             & "        , SHIPPERSCODE    , SHIPPERSNAME        , OILCODE            , OILNAME" _
             & "        , ORDERINGTYPE    , ORDERINGOILNAME     , CARSNUMBER         , CARSAMOUNT          " _
             & "        , RETURNDATETRAIN , JOINTCODE           , JOINT" _
@@ -5758,8 +5815,8 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , UPDYMD          , UPDUSER             , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P03, @P04" _
-            & "        , @P40, @P46, @P47, @P48" _
-            & "        , @P49, @P50, @P34" _
+            & "        , @P40, @P51, @P46, @P47" _
+            & "        , @P48, @P49, @P50, @P34" _
             & "        , @P23, @P24, @P05, @P35" _
             & "        , @P36, @P37, @P06, @P25" _
             & "        , @P07, @P39, @P08" _
@@ -5786,6 +5843,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , STACKINGFLG" _
+            & "    , WHOLESALEFLG" _
             & "    , INSPECTIONFLG" _
             & "    , DETENTIONFLG" _
             & "    , FIRSTRETURNFLG" _
@@ -5856,6 +5914,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 1)   '積置可否フラグ
+                Dim PARA51 As SqlParameter = SQLcmd.Parameters.Add("@P51", SqlDbType.NVarChar, 1)   '未卸可否フラグ
                 Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.NVarChar, 1)   '交検可否フラグ
                 Dim PARA47 As SqlParameter = SQLcmd.Parameters.Add("@P47", SqlDbType.NVarChar, 1)   '留置可否フラグ
                 Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.NVarChar, 1)   '先返し可否フラグ
@@ -5926,8 +5985,21 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Else
                         PARA40.Value = "2"
                     End If
-                    PARA46.Value = "2"                                '交検可否フラグ
-                    PARA47.Value = "2"                                '留置可否フラグ
+                    PARA51.Value = "2"                                '未卸可否フラグ
+
+                    '# 交検可否フラグ(1:交検あり 2:交検なし)
+                    If OIT0001row("INSPECTIONFLG") = "on" Then
+                        PARA46.Value = "1"
+                    Else
+                        PARA46.Value = "2"
+                    End If
+                    '# 留置可否フラグ(1:留置あり 2:留置なし)
+                    If OIT0001row("DETENTIONFLG") = "on" Then
+                        PARA47.Value = "1"
+                    Else
+                        PARA47.Value = "2"
+                    End If
+
                     PARA48.Value = "2"                                '先返し可否フラグ
                     PARA49.Value = "2"                                '後返し可否フラグ
                     PARA50.Value = "2"                                'OT輸送可否フラグ
@@ -7645,10 +7717,16 @@ Public Class OIT0001EmptyTurnDairyDetail
         Dim divObj = DirectCast(pnlListArea.FindControl(pnlListArea.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
         Dim chkObjST As CheckBox = Nothing
+        Dim chkObjIN As CheckBox = Nothing
+        Dim chkObjDE As CheckBox = Nothing
         'LINECNTを除いたチェックボックスID
         Dim chkObjIdWOSTcnt As String = "chk" & pnlListArea.ID & "STACKINGFLG"
+        Dim chkObjIdWOINcnt As String = "chk" & pnlListArea.ID & "INSPECTIONFLG"
+        Dim chkObjIdWODEcnt As String = "chk" & pnlListArea.ID & "DETENTIONFLG"
         'LINECNTを含むチェックボックスID
         Dim chkObjSTId As String
+        Dim chkObjINId As String
+        Dim chkObjDEId As String
         Dim chkObjType As String = ""
         '　ループ内の対象データROW(これでXXX項目の値をとれるかと）
         Dim loopdr As DataRow = Nothing
@@ -7697,12 +7775,34 @@ Public Class OIT0001EmptyTurnDairyDetail
                     loopdr = OIT0001tbl.Rows(rowIdx)
                     chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                     chkObjST = Nothing
+                    chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjIN = Nothing
+                    chkObjDEId = chkObjIdWODEcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjDE = Nothing
                     For Each cellObj As TableCell In rowitem.Controls
                         chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                         'コントロールが見つかったら脱出
                         If chkObjST IsNot Nothing Then
                             '積込可否フラグ(チェックボックス)を非活性
                             chkObjST.Enabled = False
+                            Exit For
+                        End If
+                    Next
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjIN IsNot Nothing Then
+                            '交検可否フラグ(チェックボックス)を非活性
+                            chkObjIN.Enabled = False
+                            Exit For
+                        End If
+                    Next
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjDE = DirectCast(cellObj.FindControl(chkObjDEId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjDE IsNot Nothing Then
+                            '留置可否フラグ(チェックボックス)を非活性
+                            chkObjDE.Enabled = False
                             Exit For
                         End If
                     Next
@@ -7755,6 +7855,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                     chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
                     chkObjType = Convert.ToString(loopdr("STACKINGORDERNO"))
                     chkObjST = Nothing
+                    chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjIN = Nothing
+                    chkObjDEId = chkObjIdWODEcnt & Convert.ToString(loopdr("LINECNT"))
+                    chkObjDE = Nothing
                     For Each cellObj As TableCell In rowitem.Controls
                         chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                         'コントロールが見つかったら脱出
@@ -7767,6 +7871,30 @@ Public Class OIT0001EmptyTurnDairyDetail
                                 chkObjST.Enabled = False
                             End If
                             Exit For
+                        End If
+                    Next
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjIN IsNot Nothing Then
+                            '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                            If work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                                '交検可否フラグ(チェックボックス)を非活性
+                                chkObjIN.Enabled = False
+                                Exit For
+                            End If
+                        End If
+                    Next
+                    For Each cellObj As TableCell In rowitem.Controls
+                        chkObjDE = DirectCast(cellObj.FindControl(chkObjDEId), CheckBox)
+                        'コントロールが見つかったら脱出
+                        If chkObjDE IsNot Nothing Then
+                            '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                            If work.WF_SEL_SALESOFFICECODE.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                                '留置可否フラグ(チェックボックス)を非活性
+                                chkObjDE.Enabled = False
+                                Exit For
+                            End If
                         End If
                     Next
 

@@ -143,6 +143,9 @@ Public Class OIT0003OrderDetail
                             WF_FIELD_DBClick()
                         Case "WF_CheckBoxSELECT",
                              "WF_CheckBoxSELECTSTACKING",
+                             "WF_CheckBoxSELECTWHOLESALE",
+                             "WF_CheckBoxSELECTINSPECTION",
+                             "WF_CheckBoxSELECTDETENTION",
                              "WF_CheckBoxSELECTFIRSTRETURN",
                              "WF_CheckBoxSELECTAFTERRETURN",
                              "WF_CheckBoxSELECTOTTRANSPORT"   'チェックボックス(選択)クリック
@@ -2650,6 +2653,21 @@ Public Class OIT0003OrderDetail
                 & "   WHEN '2' THEN ''" _
                 & "   ELSE ''" _
                 & "   END                                                AS STACKINGFLG" _
+                & " , CASE ISNULL(RTRIM(OIT0003.WHOLESALEFLG), '')" _
+                & "   WHEN '1' THEN 'on'" _
+                & "   WHEN '2' THEN ''" _
+                & "   ELSE ''" _
+                & "   END                                                AS WHOLESALEFLG" _
+                & " , CASE ISNULL(RTRIM(OIT0003.INSPECTIONFLG), '')" _
+                & "   WHEN '1' THEN 'on'" _
+                & "   WHEN '2' THEN ''" _
+                & "   ELSE ''" _
+                & "   END                                                AS INSPECTIONFLG" _
+                & " , CASE ISNULL(RTRIM(OIT0003.DETENTIONFLG), '')" _
+                & "   WHEN '1' THEN 'on'" _
+                & "   WHEN '2' THEN ''" _
+                & "   ELSE ''" _
+                & "   END                                                AS DETENTIONFLG" _
                 & " , CASE ISNULL(RTRIM(OIT0003.FIRSTRETURNFLG), '')" _
                 & "   WHEN '1' THEN 'on'" _
                 & "   WHEN '2' THEN ''" _
@@ -4373,6 +4391,43 @@ Public Class OIT0003OrderDetail
                     End If
                 Next
                 '### 20200626 END   (一覧)積置をチェックした場合の表示方法を変更 ###################
+
+            Case "WF_CheckBoxSELECTWHOLESALE"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
+                    If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0003tbl_tab3.Rows(i)("WHOLESALEFLG") = "on" Then
+                            OIT0003tbl_tab3.Rows(i)("WHOLESALEFLG") = ""
+                        Else
+                            OIT0003tbl_tab3.Rows(i)("WHOLESALEFLG") = "on"
+                        End If
+                    End If
+                Next
+
+            Case "WF_CheckBoxSELECTINSPECTION"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
+                    If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on" Then
+                            OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = ""
+                        Else
+                            OIT0003tbl_tab3.Rows(i)("INSPECTIONFLG") = "on"
+                        End If
+                    End If
+                Next
+
+            Case "WF_CheckBoxSELECTDETENTION"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
+                    If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0003tbl_tab3.Rows(i)("DETENTIONFLG") = "on" Then
+                            OIT0003tbl_tab3.Rows(i)("DETENTIONFLG") = ""
+                        Else
+                            OIT0003tbl_tab3.Rows(i)("DETENTIONFLG") = "on"
+                        End If
+                    End If
+                Next
+
             Case "WF_CheckBoxSELECTFIRSTRETURN"
                 '◯ 受注営業所が"011402"(根岸営業所)以外の場合
                 If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_011402 _
@@ -8420,7 +8475,7 @@ Public Class OIT0003OrderDetail
             & " IF (@@FETCH_STATUS <> 0)" _
             & "    INSERT INTO OIL.OIT0003_DETAIL" _
             & "        ( ORDERNO              , DETAILNO               , SHIPORDER          , LINEORDER           , TANKNO" _
-            & "        , KAMOKU               , STACKINGFLG            , INSPECTIONFLG      , DETENTIONFLG" _
+            & "        , KAMOKU               , STACKINGFLG            , WHOLESALEFLG       , INSPECTIONFLG       , DETENTIONFLG" _
             & "        , FIRSTRETURNFLG       , AFTERRETURNFLG         , OTTRANSPORTFLG" _
             & "        , ORDERINFO            , SHIPPERSCODE           , SHIPPERSNAME" _
             & "        , OILCODE              , OILNAME                , ORDERINGTYPE       , ORDERINGOILNAME" _
@@ -8435,7 +8490,7 @@ Public Class OIT0003OrderDetail
             & "        , UPDYMD               , UPDUSER                , UPDTERMID          , RECEIVEYMD)" _
             & "    VALUES" _
             & "        ( @P01, @P02, @P40, @P33, @P03" _
-            & "        , @P04, @P41, @P52, @P53" _
+            & "        , @P04, @P41, @P54, @P52, @P53" _
             & "        , @P42, @P45, @P46" _
             & "        , @P37, @P23, @P24" _
             & "        , @P05, @P34, @P35, @P36" _
@@ -8461,6 +8516,7 @@ Public Class OIT0003OrderDetail
             & "    , TANKNO" _
             & "    , KAMOKU" _
             & "    , STACKINGFLG" _
+            & "    , WHOLESALEFLG" _
             & "    , INSPECTIONFLG" _
             & "    , DETENTIONFLG" _
             & "    , FIRSTRETURNFLG" _
@@ -8532,6 +8588,7 @@ Public Class OIT0003OrderDetail
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA41 As SqlParameter = SQLcmd.Parameters.Add("@P41", SqlDbType.NVarChar)      '積置可否フラグ
+                Dim PARA54 As SqlParameter = SQLcmd.Parameters.Add("@P54", SqlDbType.NVarChar)      '未卸可否フラグ
                 Dim PARA52 As SqlParameter = SQLcmd.Parameters.Add("@P52", SqlDbType.NVarChar)      '交検可否フラグ
                 Dim PARA53 As SqlParameter = SQLcmd.Parameters.Add("@P53", SqlDbType.NVarChar)      '留置可否フラグ
                 Dim PARA42 As SqlParameter = SQLcmd.Parameters.Add("@P42", SqlDbType.NVarChar)      '先返し可否フラグ
@@ -8607,6 +8664,7 @@ Public Class OIT0003OrderDetail
                     Else
                         PARA41.Value = "2"
                     End If
+                    PARA54.Value = "2"                                '未卸可否フラグ(1:未卸あり 2:未卸なし)
                     PARA52.Value = "2"                                '交検可否フラグ(1:交検あり 2:交検なし)
                     PARA53.Value = "2"                                '留置可否フラグ(1:留置あり 2:留置なし)
                     PARA42.Value = "2"                                '先返し可否フラグ(1:先返しあり 2:先返しなし)
@@ -9598,6 +9656,9 @@ Public Class OIT0003OrderDetail
                     & "        CHANGERETSTATION     = @P16, " _
                     & "        CHANGERETSTATIONNAME = @P17, " _
                     & "        STACKINGFLG          = @P24, " _
+                    & "        WHOLESALEFLG         = @P29, " _
+                    & "        INSPECTIONFLG        = @P30, " _
+                    & "        DETENTIONFLG         = @P31, " _
                     & "        FIRSTRETURNFLG       = @P25, " _
                     & "        AFTERRETURNFLG       = @P26, " _
                     & "        OTTRANSPORTFLG       = @P28, " _
@@ -9633,6 +9694,9 @@ Public Class OIT0003OrderDetail
             Dim PARA16 As SqlParameter = SQLcmd.Parameters.Add("@P16", System.Data.SqlDbType.NVarChar)  '空車着駅コード（変更後）
             Dim PARA17 As SqlParameter = SQLcmd.Parameters.Add("@P17", System.Data.SqlDbType.NVarChar)  '空車着駅名（変更後）
             Dim PARA24 As SqlParameter = SQLcmd.Parameters.Add("@P24", System.Data.SqlDbType.NVarChar)  '積置可否フラグ
+            Dim PARA29 As SqlParameter = SQLcmd.Parameters.Add("@P29", System.Data.SqlDbType.NVarChar)  '未卸可否フラグ
+            Dim PARA30 As SqlParameter = SQLcmd.Parameters.Add("@P30", System.Data.SqlDbType.NVarChar)  '交検可否フラグ
+            Dim PARA31 As SqlParameter = SQLcmd.Parameters.Add("@P31", System.Data.SqlDbType.NVarChar)  '留置可否フラグ
             Dim PARA25 As SqlParameter = SQLcmd.Parameters.Add("@P25", System.Data.SqlDbType.NVarChar)  '先返し可否フラグ
             Dim PARA26 As SqlParameter = SQLcmd.Parameters.Add("@P26", System.Data.SqlDbType.NVarChar)  '後返し可否フラグ
             Dim PARA28 As SqlParameter = SQLcmd.Parameters.Add("@P28", System.Data.SqlDbType.NVarChar)  'OT輸送可否フラグ
@@ -9699,6 +9763,26 @@ Public Class OIT0003OrderDetail
                 Else
                     PARA24.Value = "2"
                 End If
+
+                '# 未卸可否フラグ(1:未卸あり 2:未卸なし)
+                If OIT0003tab3row("WHOLESALEFLG") = "on" Then
+                    PARA29.Value = "1"
+                Else
+                    PARA29.Value = "2"
+                End If
+                '# 交検可否フラグ(1:交検あり 2:交検なし)
+                If OIT0003tab3row("INSPECTIONFLG") = "on" Then
+                    PARA30.Value = "1"
+                Else
+                    PARA30.Value = "2"
+                End If
+                '# 留置可否フラグ(1:交検あり 2:交検なし)
+                If OIT0003tab3row("DETENTIONFLG") = "on" Then
+                    PARA31.Value = "1"
+                Else
+                    PARA31.Value = "2"
+                End If
+
                 '# 先返し可否フラグ(1:先返しあり 2:先返しなし)
                 If OIT0003tab3row("FIRSTRETURNFLG") = "on" Then
                     PARA25.Value = "1"
@@ -18584,16 +18668,25 @@ Public Class OIT0003OrderDetail
         Dim divObj = DirectCast(pnlListArea3.FindControl(pnlListArea3.ID & "_DR"), Panel)
         Dim tblObj = DirectCast(divObj.Controls(0), Table)
         Dim chkObjST As CheckBox = Nothing
+        Dim chkObjWH As CheckBox = Nothing
+        Dim chkObjIN As CheckBox = Nothing
+        Dim chkObjDE As CheckBox = Nothing
         Dim chkObjFR As CheckBox = Nothing
         Dim chkObjAF As CheckBox = Nothing
         Dim chkObjOT As CheckBox = Nothing
         'LINECNTを除いたチェックボックスID
         Dim chkObjIdWOSTcnt As String = "chk" & pnlListArea3.ID & "STACKINGFLG"
+        Dim chkObjIdWOWHcnt As String = "chk" & pnlListArea3.ID & "WHOLESALEFLG"
+        Dim chkObjIdWOINcnt As String = "chk" & pnlListArea3.ID & "INSPECTIONFLG"
+        Dim chkObjIdWODEcnt As String = "chk" & pnlListArea3.ID & "DETENTIONFLG"
         Dim chkObjIdWOFRcnt As String = "chk" & pnlListArea3.ID & "FIRSTRETURNFLG"
         Dim chkObjIdWOAFcnt As String = "chk" & pnlListArea3.ID & "AFTERRETURNFLG"
         Dim chkObjIdWOOTcnt As String = "chk" & pnlListArea3.ID & "OTTRANSPORTFLG"
         'LINECNTを含むチェックボックスID
         Dim chkObjSTId As String
+        Dim chkObjWHId As String
+        Dim chkObjINId As String
+        Dim chkObjDEId As String
         Dim chkObjFRId As String
         Dim chkObjAFId As String
         Dim chkObjOTId As String
@@ -18621,6 +18714,8 @@ Public Class OIT0003OrderDetail
                     If OIT0003tbl_tab3.Rows.Count <> 0 Then
                         loopdr = OIT0003tbl_tab3.Rows(rowIdx)
                         chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjDEId = chkObjIdWODEcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjAFId = chkObjIdWOAFcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
@@ -18632,6 +18727,22 @@ Public Class OIT0003OrderDetail
                             chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjST IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObjIN = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjIN IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObjDE = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjDE = DirectCast(cellObj.FindControl(chkObjDEId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjDE IsNot Nothing Then
                                 Exit For
                             End If
                         Next
@@ -18671,6 +18782,15 @@ Public Class OIT0003OrderDetail
                             '積込可否フラグ(チェックボックス)を非活性
                             chkObjST.Enabled = False
                         End If
+
+                        '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                        If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                            '交検可否フラグ(チェックボックス)を非活性
+                            chkObjIN.Enabled = False
+                            '留置可否フラグ(チェックボックス)を非活性
+                            chkObjDE.Enabled = False
+                        End If
+
                         '◯ 受注営業所が"011402"(根岸営業所)以外の場合
                         '### 20200618 すでに指定したタンク車№が他の受注で使用されている場合の対応 ### 
                         'Me.WW_USEORDERFLG(TRUE:使用中, FALSE:未使用)
@@ -18945,6 +19065,9 @@ Public Class OIT0003OrderDetail
                     If OIT0003tbl_tab3.Rows.Count <> 0 Then
                         loopdr = OIT0003tbl_tab3.Rows(rowIdx)
                         chkObjSTId = chkObjIdWOSTcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjWHId = chkObjIdWOWHcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjINId = chkObjIdWOINcnt & Convert.ToString(loopdr("LINECNT"))
+                        chkObjDEId = chkObjIdWODEcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjFRId = chkObjIdWOFRcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjAFId = chkObjIdWOAFcnt & Convert.ToString(loopdr("LINECNT"))
                         chkObjOTId = chkObjIdWOOTcnt & Convert.ToString(loopdr("LINECNT"))
@@ -18955,6 +19078,30 @@ Public Class OIT0003OrderDetail
                             chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjST IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObjWH = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjWH = DirectCast(cellObj.FindControl(chkObjWHId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjWH IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObjIN = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjIN IsNot Nothing Then
+                                Exit For
+                            End If
+                        Next
+                        chkObjDE = Nothing
+                        For Each cellObj As TableCell In rowitem.Controls
+                            chkObjDE = DirectCast(cellObj.FindControl(chkObjDEId), CheckBox)
+                            'コントロールが見つかったら脱出
+                            If chkObjDE IsNot Nothing Then
                                 Exit For
                             End If
                         Next
@@ -18988,6 +19135,12 @@ Public Class OIT0003OrderDetail
                         '### 20200717 END  ((全体)No112対応) ######################################
                         '積込可否フラグ(チェックボックス)を非活性
                         chkObjST.Enabled = False
+                        '未卸可否フラグ(チェックボックス)を非活性
+                        chkObjWH.Enabled = False
+                        '交検可否フラグ(チェックボックス)を非活性
+                        chkObjIN.Enabled = False
+                        '留置可否フラグ(チェックボックス)を非活性
+                        chkObjDE.Enabled = False
                         '先返し可否フラグ(チェックボックス)を非活性
                         chkObjFR.Enabled = False
                         '後返し可否フラグ(チェックボックス)を非活性

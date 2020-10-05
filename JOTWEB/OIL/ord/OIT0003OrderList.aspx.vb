@@ -3074,7 +3074,7 @@ Public Class OIT0003OrderList
             & " , ORDERINFOTBL.TANKNO                            AS TANKNO" _
             & " , ORDERINFOTBL.MODEL                             AS MODEL" _
             & " , CASE" _
-            & "   WHEN ORDERINFOTBL.MODEL = 'タキ1000' THEN '1000' + ORDERINFOTBL.TANKNO" _
+            & "   WHEN ORDERINFOTBL.MODEL = 'タキ1000' THEN FORMAT(CONVERT(int,ORDERINFOTBL.TANKNO),'1000000')" _
             & "   ELSE ORDERINFOTBL.TANKNO" _
             & "   END                                            AS SYARYONUMBER" _
             & " , ORDERINFOTBL.REPORTOILNAME                     AS REPORTOILNAME" _

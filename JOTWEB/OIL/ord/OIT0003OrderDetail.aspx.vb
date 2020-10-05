@@ -18785,10 +18785,10 @@ Public Class OIT0003OrderDetail
 
                         '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
                         If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
-                            ''交検可否フラグ(チェックボックス)を非活性
-                            'chkObjIN.Enabled = False
-                            ''留置可否フラグ(チェックボックス)を非活性
-                            'chkObjDE.Enabled = False
+                            '交検可否フラグ(チェックボックス)を非活性
+                            chkObjIN.Enabled = False
+                            '留置可否フラグ(チェックボックス)を非活性
+                            chkObjDE.Enabled = False
                         End If
 
                         '◯ 受注営業所が"011402"(根岸営業所)以外の場合
@@ -19135,12 +19135,12 @@ Public Class OIT0003OrderDetail
                         '### 20200717 END  ((全体)No112対応) ######################################
                         '積込可否フラグ(チェックボックス)を非活性
                         chkObjST.Enabled = False
-                        '未卸可否フラグ(チェックボックス)を非活性
-                        chkObjWH.Enabled = False
-                        '交検可否フラグ(チェックボックス)を非活性
-                        chkObjIN.Enabled = False
-                        '留置可否フラグ(チェックボックス)を非活性
-                        chkObjDE.Enabled = False
+                        ''未卸可否フラグ(チェックボックス)を非活性
+                        'chkObjWH.Enabled = False
+                        ''交検可否フラグ(チェックボックス)を非活性
+                        'chkObjIN.Enabled = False
+                        ''留置可否フラグ(チェックボックス)を非活性
+                        'chkObjDE.Enabled = False
                         '先返し可否フラグ(チェックボックス)を非活性
                         chkObjFR.Enabled = False
                         '後返し可否フラグ(チェックボックス)を非活性

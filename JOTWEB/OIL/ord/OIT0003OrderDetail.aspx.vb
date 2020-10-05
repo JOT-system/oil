@@ -18780,15 +18780,17 @@ Public Class OIT0003OrderDetail
                         If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 _
                             OrElse chkObjType <> "" Then
                             '積込可否フラグ(チェックボックス)を非活性
-                            chkObjST.Enabled = False
+                            If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+
                         End If
 
                         '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
                         If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
                             '交検可否フラグ(チェックボックス)を非活性
-                            chkObjIN.Enabled = False
+                            If chkObjIN IsNot Nothing Then chkObjIN.Enabled = False
                             '留置可否フラグ(チェックボックス)を非活性
-                            chkObjDE.Enabled = False
+                            If chkObjDE IsNot Nothing Then chkObjDE.Enabled = False
+
                         End If
 
                         '◯ 受注営業所が"011402"(根岸営業所)以外の場合
@@ -18799,35 +18801,40 @@ Public Class OIT0003OrderDetail
                             OrElse Me.WW_USEORDERFLG = True _
                             OrElse chkObjType <> "" Then
                             '先返し可否フラグ(チェックボックス)を非活性
-                            chkObjFR.Enabled = False
+                            If chkObjFR IsNot Nothing Then chkObjFR.Enabled = False
                             '後返し可否フラグ(チェックボックス)を非活性
-                            chkObjAF.Enabled = False
+                            If chkObjAF IsNot Nothing Then chkObjAF.Enabled = False
 
                             '### 20200622 START((全体)No87対応) ######################################
                         ElseIf Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011402 Then
                             If Me.TxtTrainNo.Text = "81" Then
                                 '先返し可否フラグ(チェックボックス)を活性
-                                chkObjFR.Enabled = True
-                                '後返し可否フラグ(チェックボックス)を非活性
-                                chkObjAF.Enabled = True
+                                If chkObjFR IsNot Nothing Then chkObjFR.Enabled = True
+                                '後返し可否フラグ(チェックボックス)を活性
+                                If chkObjAF IsNot Nothing Then chkObjAF.Enabled = True
+
                             ElseIf Me.TxtTrainNo.Text = "83" Then
                                 '先返し可否フラグ(チェックボックス)を非活性
-                                chkObjFR.Enabled = False
+                                If chkObjFR IsNot Nothing Then chkObjFR.Enabled = False
                                 '後返し可否フラグ(チェックボックス)を活性
-                                chkObjAF.Enabled = True
+                                If chkObjAF IsNot Nothing Then chkObjAF.Enabled = True
+
                             Else
                                 '先返し可否フラグ(チェックボックス)を非活性
-                                chkObjFR.Enabled = False
+                                If chkObjFR IsNot Nothing Then chkObjFR.Enabled = False
                                 '後返し可否フラグ(チェックボックス)を非活性
-                                chkObjAF.Enabled = False
+                                If chkObjAF IsNot Nothing Then chkObjAF.Enabled = False
+
                             End If
                             '### 20200622 END  ((全体)No87対応) ######################################
                         End If
 
                         '### 20200717 START((全体)No112対応) ######################################
                         If Me.TxtOrderTrkKbn.Text <> BaseDllConst.CONST_TRKBN_M Then
+
                             'OT輸送可否フラグ(チェックボックス)を非活性
-                            chkObjOT.Enabled = False
+                            If chkObjOT IsNot Nothing Then chkObjOT.Enabled = False
+
                         End If
                         '### 20200717 END  ((全体)No112対応) ######################################
                     End If
@@ -18881,7 +18888,7 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)積車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") Then
@@ -18897,7 +18904,7 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)受入日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
@@ -18912,7 +18919,7 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)空車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
@@ -18923,7 +18930,7 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                             End If
 
@@ -18994,7 +19001,7 @@ Public Class OIT0003OrderDetail
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)積込日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") Then
@@ -19008,7 +19015,7 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)発日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") Then
@@ -19021,7 +19028,7 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)積車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") Then
@@ -19033,7 +19040,7 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)受入日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
@@ -19044,14 +19051,14 @@ Public Class OIT0003OrderDetail
                                 End If
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)空車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
                                 '積込可否フラグ(チェックボックス)を非活性
-                                chkObjST.Enabled = False
+                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                             End If
                         End If
@@ -19078,6 +19085,8 @@ Public Class OIT0003OrderDetail
                             chkObjST = DirectCast(cellObj.FindControl(chkObjSTId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjST IsNot Nothing Then
+                                '積込可否フラグ(チェックボックス)を非活性
+                                chkObjST.Enabled = False
                                 Exit For
                             End If
                         Next
@@ -19086,6 +19095,8 @@ Public Class OIT0003OrderDetail
                             chkObjWH = DirectCast(cellObj.FindControl(chkObjWHId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjWH IsNot Nothing Then
+                                '未卸可否フラグ(チェックボックス)を非活性
+                                chkObjWH.Enabled = False
                                 Exit For
                             End If
                         Next
@@ -19094,6 +19105,8 @@ Public Class OIT0003OrderDetail
                             chkObjIN = DirectCast(cellObj.FindControl(chkObjINId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjIN IsNot Nothing Then
+                                '交検可否フラグ(チェックボックス)を非活性
+                                chkObjIN.Enabled = False
                                 Exit For
                             End If
                         Next
@@ -19102,6 +19115,8 @@ Public Class OIT0003OrderDetail
                             chkObjDE = DirectCast(cellObj.FindControl(chkObjDEId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjDE IsNot Nothing Then
+                                '留置可否フラグ(チェックボックス)を非活性
+                                chkObjDE.Enabled = False
                                 Exit For
                             End If
                         Next
@@ -19110,6 +19125,8 @@ Public Class OIT0003OrderDetail
                             chkObjFR = DirectCast(cellObj.FindControl(chkObjFRId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjFR IsNot Nothing Then
+                                '先返し可否フラグ(チェックボックス)を非活性
+                                chkObjFR.Enabled = False
                                 Exit For
                             End If
                         Next
@@ -19119,6 +19136,8 @@ Public Class OIT0003OrderDetail
                             chkObjAF = DirectCast(cellObj.FindControl(chkObjAFId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjAF IsNot Nothing Then
+                                '後返し可否フラグ(チェックボックス)を非活性
+                                chkObjAF.Enabled = False
                                 Exit For
                             End If
                         Next
@@ -19129,24 +19148,12 @@ Public Class OIT0003OrderDetail
                             chkObjOT = DirectCast(cellObj.FindControl(chkObjOTId), CheckBox)
                             'コントロールが見つかったら脱出
                             If chkObjOT IsNot Nothing Then
+                                'OT輸送可否フラグ(チェックボックス)を非活性
+                                chkObjOT.Enabled = False
                                 Exit For
                             End If
                         Next
                         '### 20200717 END  ((全体)No112対応) ######################################
-                        '積込可否フラグ(チェックボックス)を非活性
-                        chkObjST.Enabled = False
-                        ''未卸可否フラグ(チェックボックス)を非活性
-                        'chkObjWH.Enabled = False
-                        ''交検可否フラグ(チェックボックス)を非活性
-                        'chkObjIN.Enabled = False
-                        ''留置可否フラグ(チェックボックス)を非活性
-                        'chkObjDE.Enabled = False
-                        '先返し可否フラグ(チェックボックス)を非活性
-                        chkObjFR.Enabled = False
-                        '後返し可否フラグ(チェックボックス)を非活性
-                        chkObjAF.Enabled = False
-                        'OT輸送可否フラグ(チェックボックス)を非活性
-                        chkObjOT.Enabled = False
                     End If
                     For Each cellObj As TableCell In rowitem.Controls
                         If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _

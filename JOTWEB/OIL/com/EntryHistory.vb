@@ -186,7 +186,7 @@ Public Class EntryHistory
         Dim sqlDetailStat As New StringBuilder
         sqlDetailStat.AppendLine("INSERT INTO OIL.HIS0002_DETAIL")
         sqlDetailStat.AppendLine("   (HISTORYNO,MAPID,ORDERNO,DETAILNO,SHIPORDER,LINEORDER,TANKNO,KAMOKU,")
-        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,INSPECTIONFLG,DETENTIONFLG,")
+        sqlDetailStat.AppendLine("    STACKINGORDERNO,STACKINGFLG,WHOLESALEFLG,INSPECTIONFLG,DETENTIONFLG,")
         sqlDetailStat.AppendLine("    FIRSTRETURNFLG,AFTERRETURNFLG,OTTRANSPORTFLG,")
         sqlDetailStat.AppendLine("    ORDERINFO,SHIPPERSCODE,SHIPPERSNAME,OILCODE,OILNAME,ORDERINGTYPE,ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    CARSNUMBER,CARSAMOUNT,RETURNDATETRAIN,")
@@ -206,7 +206,7 @@ Public Class EntryHistory
         sqlDetailStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,RECEIVEYMD )")
         sqlDetailStat.AppendLine("    VALUES")
         sqlDetailStat.AppendLine("   (@HISTORYNO,@MAPID,@ORDERNO,@DETAILNO,@SHIPORDER,@LINEORDER,@TANKNO,@KAMOKU,")
-        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@INSPECTIONFLG,@DETENTIONFLG,")
+        sqlDetailStat.AppendLine("    @STACKINGORDERNO,@STACKINGFLG,@WHOLESALEFLG,@INSPECTIONFLG,@DETENTIONFLG,")
         sqlDetailStat.AppendLine("    @FIRSTRETURNFLG,@AFTERRETURNFLG,@OTTRANSPORTFLG,")
         sqlDetailStat.AppendLine("    @ORDERINFO,@SHIPPERSCODE,@SHIPPERSNAME,@OILCODE,@OILNAME,@ORDERINGTYPE,@ORDERINGOILNAME,")
         sqlDetailStat.AppendLine("    @CARSNUMBER,@CARSAMOUNT,@RETURNDATETRAIN,")
@@ -237,6 +237,15 @@ Public Class EntryHistory
                 .Add("KAMOKU", SqlDbType.NVarChar).Value = drOrder("KAMOKU")
                 .Add("STACKINGORDERNO", SqlDbType.NVarChar).Value = drOrder("STACKINGORDERNO")
                 .Add("STACKINGFLG", SqlDbType.NVarChar).Value = drOrder("STACKINGFLG")
+                Try
+                    .Add("WHOLESALEFLG", SqlDbType.NVarChar).Value = drOrder("WHOLESALEFLG")
+                Catch ex As Exception
+                    If .Contains("WHOLESALEFLG") Then
+                        .Item("WHOLESALEFLG").Value = ""
+                    Else
+                        .Add("WHOLESALEFLG", SqlDbType.NVarChar).Value = ""
+                    End If
+                End Try
                 .Add("INSPECTIONFLG", SqlDbType.NVarChar).Value = drOrder("INSPECTIONFLG")
                 .Add("DETENTIONFLG", SqlDbType.NVarChar).Value = drOrder("DETENTIONFLG")
                 .Add("FIRSTRETURNFLG", SqlDbType.NVarChar).Value = drOrder("FIRSTRETURNFLG")

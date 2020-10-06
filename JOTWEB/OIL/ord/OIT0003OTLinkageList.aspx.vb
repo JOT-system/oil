@@ -491,15 +491,15 @@ Public Class OIT0003OTLinkageList
                     '積込日比較
                     If Convert.ToString(OIT0003row("LODDATE")) >= targetDate Then
                         OIT0003row("CAN_OTSEND") = "1"
+                        OIT0003row("CAN_RESERVED") = "1"
                     Else
                         OIT0003row("CAN_OTSEND") = "0"
+                        OIT0003row("CAN_RESERVED") = "0"
                     End If
                     '発日比較
                     If Convert.ToString(OIT0003row("DEPDATE")) >= targetDate Then
-                        OIT0003row("CAN_RESERVED") = "1"
                         OIT0003row("CAN_TAKUSOU") = "1"
                     Else
-                        OIT0003row("CAN_RESERVED") = "0"
                         OIT0003row("CAN_TAKUSOU") = "0"
                     End If
                     ''受注進行ステータス
@@ -1306,6 +1306,140 @@ Public Class OIT0003OTLinkageList
 
     End Function
     ''' <summary>
+    ''' 出荷予約データを取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <returns>処理対象の受注Noと明細No</returns>
+    ''' <remarks>このロジックにたどりつけるのは積置無しのみ、積置を許容するなら要修正</remarks>
+    Private Function ReservedDataGet(ByVal SQLcon As SqlConnection) As List(Of OutputOrdedrInfo)
+        '当処理の抽出結果の全フィールドを帳票に出すわけではない
+
+        Dim retVal As New List(Of OutputOrdedrInfo)
+        If IsNothing(Me.OIT0003Takusoutbl) Then
+            Me.OIT0003Takusoutbl = New DataTable
+        End If
+
+        If Me.OIT0003Takusoutbl.Columns.Count <> 0 Then
+            Me.OIT0003Takusoutbl.Columns.Clear()
+        End If
+
+        Me.OIT0003Takusoutbl.Clear()
+        '画面上選択されたORDERNO一覧を生成
+        Dim qcheckedRow = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "" Select Convert.ToString(dr("ORDERNO")))
+        'ここまで来て未選択はありえないが念のため
+        If qcheckedRow.Any = False Then
+            Return Nothing
+        End If
+        Dim selectedOrderNo As List(Of String) = qcheckedRow.ToList
+        Dim selectedOrderNoInStat As String = String.Join(",", (From odrNo In selectedOrderNo Select "'" & odrNo & "'"))
+        Dim sqlStat As New StringBuilder
+
+        sqlStat.AppendLine("SELECT ODR.ORDERNO")            'キー情報
+        sqlStat.AppendLine("     , DET.DETAILNO")           'キー情報
+        sqlStat.AppendLine("     , format(ODR.DEPDATE,'yyyy/MM/dd') AS LODDATE")     '積込日
+        sqlStat.AppendLine("     , ISNULL(DET.RESERVEDNO,'')        AS RESERVEDNO")  '予約番号
+        sqlStat.AppendLine("     , PRD.REPORTOILNAME")            '油種コード(甲子用？）
+        sqlStat.AppendLine("     , LRV.RESERVEDQUANTITY")         '予約数量
+        sqlStat.AppendLine("     , ODR.TRAINNO")
+        sqlStat.AppendLine("     , DET.TANKNO")
+        sqlStat.AppendLine("     , TNK.MODEL")  'モデル⇒ﾀｷ1000の場合・・・など後続の設定処理の分岐で利用
+        sqlStat.AppendLine("     , PRD.SHIPPEROILCODE")
+        sqlStat.AppendLine("     , ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("     , ODR.CONSIGNEECODE")
+        sqlStat.AppendLine("     , CCNV.VALUE01 AS CONSIGNEECONVCODE")
+        sqlStat.AppendLine("     , CCNV.VALUE02 AS CONSIGNEECONVVALUE")
+        sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
+        sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
+        sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+        '明細結合ここから↓
+        sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
+        sqlStat.AppendLine("    ON ODR.ORDERNO =  DET.ORDERNO")
+        sqlStat.AppendLine("   AND DET.DELFLG  = @DELFLG")
+        '明細結合ここまで↑
+        '油種マスタ結合ここから↓
+        sqlStat.AppendLine(" INNER JOIN OIL.OIM0003_PRODUCT PRD")
+        sqlStat.AppendLine("    ON PRD.OFFICECODE     = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND PRD.SHIPPERCODE    = ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("   AND PRD.PLANTCODE      = ODR.BASECODE")
+        sqlStat.AppendLine("   AND PRD.OILCODE        = DET.OILCODE")
+        sqlStat.AppendLine("   AND PRD.SEGMENTOILCODE = DET.ORDERINGTYPE")
+        sqlStat.AppendLine("   AND PRD.DELFLG         = @DELFLG")
+        '油種マスタ結合ここまで↑
+        'タンク車マスタ結合ここから↓
+        sqlStat.AppendLine(" INNER JOIN OIL.OIM0005_TANK TNK")
+        sqlStat.AppendLine("    ON TNK.TANKNUMBER  = DET.TANKNO")
+        sqlStat.AppendLine("   AND TNK.DELFLG      = @DELFLG")
+        'タンク車マスタ結合ここまで↑
+        '積込予約マスタ結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0021_LOADRESERVE LRV")
+        sqlStat.AppendLine("    ON LRV.OFFICECODE     = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND ODR.LODDATE        BETWEEN LRV.FROMYMD AND LRV.TOYMD")
+        sqlStat.AppendLine("   AND LRV.LOAD           = TNK.LOAD")
+        sqlStat.AppendLine("   AND LRV.OILCODE        = DET.OILCODE")
+        sqlStat.AppendLine("   AND LRV.SEGMENTOILCODE = DET.ORDERINGTYPE")
+        sqlStat.AppendLine("   AND LRV.DELFLG         = @DELFLG")
+        '積込予約マスタ結合ここまで↑
+        '変換マスタ（荷受人）結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT CCNV")
+        sqlStat.AppendLine("    ON OCNV.CLASS          = 'RESERVED_NIUKE'")
+        sqlStat.AppendLine("   AND OCNV.KEYCODE01      = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND OCNV.KEYCODE02      = ODR.CONSIGNEECODE")
+        sqlStat.AppendLine("   AND OCNV.DELFLG         = @DELFLG")
+        '変換マスタ（荷受人）結合ここまで↑
+        '変換マスタ（荷主）結合ここから↓
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT SCNV")
+        sqlStat.AppendLine("    ON OCNV.CLASS          = 'RESERVED_SHIPPER'")
+        sqlStat.AppendLine("   AND OCNV.KEYCODE01      = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND OCNV.KEYCODE02      = ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("   AND OCNV.DELFLG         = @DELFLG")
+        '変換マスタ（荷主）結合ここまで↑
+        Try
+            '並び順は抽出後
+            Using sqlCmd As New SqlCommand(sqlStat.ToString, SQLcon)
+                'SQLパラメータ設定
+                With sqlCmd.Parameters
+                    .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
+                    .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = BaseDllConst.CONST_ORDERSTATUS_310
+                End With
+                'SQL実行
+                Dim wrkDt As New DataTable
+                Using sqlDr As SqlDataReader = sqlCmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        wrkDt.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                        OIT0003Takusoutbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    wrkDt.Load(sqlDr)
+                End Using
+
+                Dim sortedDt = From dr As DataRow In wrkDt Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
+                For Each sortedDr As DataRow In sortedDt
+                    Dim newDr As DataRow = OIT0003Takusoutbl.NewRow
+
+                    For Each col As DataColumn In wrkDt.Columns
+                        newDr(col.ColumnName) = sortedDr(col.ColumnName)
+                    Next
+
+                    OIT0003Takusoutbl.Rows.Add(newDr)
+                    retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
+                Next
+            End Using
+            Return retVal
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL TAKUSOU_DATAGET")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL TAKUSOU_DATAGET"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Return Nothing
+        End Try
+    End Function
+    ''' <summary>
     ''' 受注・受注明細テーブルの各出力フラグ及び、カウントをインクリメント
     ''' </summary>
     ''' <param name="uploadOrderInfo">出力した受注キー情報</param>
@@ -1966,6 +2100,15 @@ Public Class OIT0003OTLinkageList
     ''' </summary>
     Public Class FileLinkagePatternItem
         ''' <summary>
+        ''' 出荷予約出力フォーマット列挙
+        ''' </summary>
+        Public Enum ReserveOutputFileType
+            Csv = 1
+            Excel2007 = 2 '4文字拡張子
+            Excel2003 = 4 '3文字拡張子（これはマクロが入るからやらない想定？）
+            Pdf = 8       'Pdf（これは絶対に無い想定？）PDF作ってメール送信あるかも？
+        End Enum
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
         ''' <param name="officeCode"></param>
@@ -2006,6 +2149,13 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property CanTakusou As Boolean = False
+
+        ''' <summary>
+        ''' 出荷予約出力フォーマット
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ReservedOutputType As ReserveOutputFileType
+
     End Class
     ''' <summary>
     ''' 出力したオーダーのキー情報を保持する為のクラス
@@ -2028,6 +2178,11 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property DetailNo As String
+        ''' <summary>
+        ''' 予約番号（連番部分のみ）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property ReservedNo As String
     End Class
     ' ******************************************************************************
     ' ***  LeftBox関連操作                                                       ***

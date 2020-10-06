@@ -7597,6 +7597,17 @@ Public Class OIT0003OrderDetail
 
         End Select
 
+        '◯袖ヶ浦営業所の場合
+        If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+            WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+            WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text,
+                                            "DELIVERYMASTER",
+                                            updHeader.Item("LOADINGIRILINETRAINNAME") + updHeader.Item("LOADINGIRILINEORDER"),
+                                            WW_GetValue)
+            '託送コード設定(充填ポイント)
+            updHeader.Item("FILLINGPOINT") = WW_GetValue(0)
+        End If
+
         '○ 画面表示データ保存
         Master.SaveTable(OIT0003tbl_tab2, work.WF_SEL_INPTAB2TBL.Text)
 
@@ -12221,6 +12232,19 @@ Public Class OIT0003OrderDetail
                                 Next
                             End If
 
+                            '◯袖ヶ浦営業所の場合
+                            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                For Each OIT0003row As DataRow In OIT0003tbl_tab2.Rows
+                                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                                    WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text,
+                                                                "DELIVERYMASTER",
+                                                                OIT0003row("LOADINGIRILINETRAINNAME") + OIT0003row("LOADINGIRILINEORDER"),
+                                                                WW_GetValue)
+                                    '託送コード設定(充填ポイント)
+                                    OIT0003row("FILLINGPOINT") = WW_GetValue(0)
+                                Next
+                            End If
+
                             '積込出線列車番号を一覧に設定
                         ElseIf WF_FIELD.Value = "LOADINGOUTLETTRAINNO" Then
                             '〇 KeyCodeが重複し、名称(Value1)が異なる場合の取得術
@@ -12255,6 +12279,30 @@ Public Class OIT0003OrderDetail
                             '入線列車名
                             updHeader.Item("LOADINGIRILINETRAINNAME") = WW_GetValue(7)
 
+                            '★表の1行目を入力した場合、2行目以降の値も同様に設定する。
+                            If WW_LINECNT = 1 Then
+                                For Each OIT0003row As DataRow In OIT0003tbl_tab2.Rows
+                                    OIT0003row("LOADINGOUTLETTRAINNO") = WW_SelectValue
+                                    OIT0003row("LOADINGOUTLETTRAINNAME") = WW_SelectText
+                                    OIT0003row("LINE") = WW_GetValue(5)
+                                    OIT0003row("LOADINGIRILINETRAINNO") = WW_GetValue(6)
+                                    OIT0003row("LOADINGIRILINETRAINNAME") = WW_GetValue(7)
+                                Next
+                            End If
+
+                            '◯袖ヶ浦営業所の場合
+                            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                For Each OIT0003row As DataRow In OIT0003tbl_tab2.Rows
+                                    WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                                    WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text,
+                                                                "DELIVERYMASTER",
+                                                                OIT0003row("LOADINGIRILINETRAINNAME") + OIT0003row("LOADINGIRILINEORDER"),
+                                                                WW_GetValue)
+                                    '託送コード設定(充填ポイント)
+                                    OIT0003row("FILLINGPOINT") = WW_GetValue(0)
+                                Next
+                            End If
+
                             '回線を一覧に設定
                         ElseIf WF_FIELD.Value = "LINE" Then
                             updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
@@ -12280,9 +12328,20 @@ Public Class OIT0003OrderDetail
                             '出線列車名
                             updHeader.Item("LOADINGOUTLETTRAINNAME") = WW_GetValue(7)
 
+                            '◯袖ヶ浦営業所の場合
+                            If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                                WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                                WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text,
+                                                        "DELIVERYMASTER",
+                                                        updHeader.Item("LOADINGIRILINETRAINNAME") + updHeader.Item("LOADINGIRILINEORDER"),
+                                                        WW_GetValue)
+                                '託送コード設定(充填ポイント)
+                                updHeader.Item("FILLINGPOINT") = WW_GetValue(0)
+                            End If
+
                             '充填ポイントを一覧に設定
                         ElseIf WF_FIELD.Value = "FILLINGPOINT" Then
-                            updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
+                                updHeader.Item(WF_FIELD.Value) = WW_SETVALUE
 
                         End If
 

@@ -18,6 +18,7 @@ Public Class OIT0003OTLinkageList
     Private OIT0003WKtbl As DataTable                               '作業用テーブル
     Private OIT0003CsvOTLinkagetbl As DataTable                     'CSV用(OT発送日報)テーブル
     Private OIT0003Takusoutbl As DataTable                     '帳票用(託送指示)テーブル
+    Private OIT0003Reserved As DataTable
 
     Private Const CONST_DISPROWCOUNT As Integer = 45                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
@@ -732,9 +733,66 @@ Public Class OIT0003OTLinkageList
     ''' 製油所出荷予約ボタン押下時処理
     ''' </summary>
     Protected Sub WF_ButtonReserved_Click()
+        Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
+        '一覧のチェックボックスが選択されているか確認
+        If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_RESERVED_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+        '処理対象外のチェックがなされている場合
+        Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+                                                         AndAlso dr("CAN_RESERVED").Equals("0")
 
+        If qCannotProc.Any Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_RESERVED_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+        '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
+        '対象の積日が統一されていない場合（同一積日以外は不許可）
+        Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
+        If qSameProcDateCnt > 1 Then
+            '選択されていない場合は、エラーメッセージを表示し終了
+            Master.Output(C_MESSAGE_NO.OIL_RESERVED_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Exit Sub
+        End If
+        '******************************
+        '出荷予約データ取得処理
+        '******************************
+        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            SqlConnection.ClearPool(SQLcon)
+            selectedOrderInfo = ReservedDataGet(SQLcon)
+            If selectedOrderInfo Is Nothing Then
+                Return
+            End If
+        End Using
 
-
+        '******************************
+        '出力ファイル作成処理の実行
+        '******************************
+        '出力設定取得
+        Dim flp As New FileLinkagePattern
+        '営業所設定取得
+        Dim settings = flp(work.WF_SEL_OTS_SALESOFFICECODE.Text)
+        If settings.OutputFiledList Is Nothing OrElse settings.OutputFiledList.Count = 0 Then
+            Return
+        End If
+        Using repCbj = New OIT0003CustomReportReservedCsv(OIT0003Reserved, settings)
+            Dim url As String
+            Try
+                url = repCbj.ConvertDataTableToCsv(False)
+                If url = "" Then
+                    Return
+                End If
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+        End Using
 
     End Sub
     ''' <summary>
@@ -799,6 +857,7 @@ Public Class OIT0003OTLinkageList
             WF_PrintURL.Value = url
             ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
         End Using
+        Return
         '******************************
         '託送指示データの（本体）ダウンロードフラグ更新
         '                  （明細）ダウンロード数インクリメント
@@ -1315,28 +1374,32 @@ Public Class OIT0003OTLinkageList
         '当処理の抽出結果の全フィールドを帳票に出すわけではない
 
         Dim retVal As New List(Of OutputOrdedrInfo)
-        If IsNothing(Me.OIT0003Takusoutbl) Then
-            Me.OIT0003Takusoutbl = New DataTable
+        If IsNothing(Me.OIT0003Reserved) Then
+            Me.OIT0003Reserved = New DataTable
         End If
 
-        If Me.OIT0003Takusoutbl.Columns.Count <> 0 Then
-            Me.OIT0003Takusoutbl.Columns.Clear()
+        If Me.OIT0003Reserved.Columns.Count <> 0 Then
+            Me.OIT0003Reserved.Columns.Clear()
         End If
 
-        Me.OIT0003Takusoutbl.Clear()
+        Me.OIT0003Reserved.Clear()
         '画面上選択されたORDERNO一覧を生成
         Dim qcheckedRow = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "" Select Convert.ToString(dr("ORDERNO")))
         'ここまで来て未選択はありえないが念のため
         If qcheckedRow.Any = False Then
             Return Nothing
         End If
+        '先頭の選択された積込日取得（全て同一日想定）
+        Dim lodDate = (From dr As DataRow In OIT0003tbl Where Convert.ToString(dr("OPERATION")) <> "" Select Convert.ToString(dr("LODDATE"))).FirstOrDefault
+
         Dim selectedOrderNo As List(Of String) = qcheckedRow.ToList
         Dim selectedOrderNoInStat As String = String.Join(",", (From odrNo In selectedOrderNo Select "'" & odrNo & "'"))
         Dim sqlStat As New StringBuilder
 
         sqlStat.AppendLine("SELECT ODR.ORDERNO")            'キー情報
         sqlStat.AppendLine("     , DET.DETAILNO")           'キー情報
-        sqlStat.AppendLine("     , format(ODR.DEPDATE,'yyyy/MM/dd') AS LODDATE")     '積込日
+        sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyy/MM/dd') AS LODDATE")     '積込日
+        sqlStat.AppendLine("     , format(ODR.LODDATE,'yyyyMMdd') AS LODDATE_WITHOUT_SLASH")     '積込日(スラなし）
         sqlStat.AppendLine("     , ISNULL(DET.RESERVEDNO,'')        AS RESERVEDNO")  '予約番号
         sqlStat.AppendLine("     , PRD.REPORTOILNAME")            '油種コード(甲子用？）
         sqlStat.AppendLine("     , LRV.RESERVEDQUANTITY")         '予約数量
@@ -1350,6 +1413,14 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , CCNV.VALUE02 AS CONSIGNEECONVVALUE")
         sqlStat.AppendLine("     , SCNV.VALUE01 AS SHIPPERCONVCODE")
         sqlStat.AppendLine("     , SCNV.VALUE02 AS SHIPPERCONVVALUE")
+        sqlStat.AppendLine("     , '1'          AS KINO_DATAKBN")
+        sqlStat.AppendLine("     , ''           AS OUTPUTRESERVENO") '出力用予約番号(後続処理で番号を組み立てる）
+        sqlStat.AppendLine("     , '2'          AS KINO_TOKUISAKICODE") '得意先コード（甲子）
+        sqlStat.AppendLine("     , 'ＥＮＥＯＳ株式会社□□□□□'   AS KINO_TOKUISAKINAME") '得意先名（甲子）
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN '1000' + DET.TANKNO ELSE DET.TANKNO END AS KINO_TRAINNO") 'デバッグ用
+        sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
+        sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
+        sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
         sqlStat.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
         '明細結合ここから↓
         sqlStat.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
@@ -1357,7 +1428,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   AND DET.DELFLG  = @DELFLG")
         '明細結合ここまで↑
         '油種マスタ結合ここから↓
-        sqlStat.AppendLine(" INNER JOIN OIL.OIM0003_PRODUCT PRD")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0003_PRODUCT PRD")
         sqlStat.AppendLine("    ON PRD.OFFICECODE     = ODR.OFFICECODE")
         sqlStat.AppendLine("   AND PRD.SHIPPERCODE    = ODR.SHIPPERSCODE")
         sqlStat.AppendLine("   AND PRD.PLANTCODE      = ODR.BASECODE")
@@ -1366,7 +1437,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("   AND PRD.DELFLG         = @DELFLG")
         '油種マスタ結合ここまで↑
         'タンク車マスタ結合ここから↓
-        sqlStat.AppendLine(" INNER JOIN OIL.OIM0005_TANK TNK")
+        sqlStat.AppendLine(" LEFT JOIN OIL.OIM0005_TANK TNK")
         sqlStat.AppendLine("    ON TNK.TANKNUMBER  = DET.TANKNO")
         sqlStat.AppendLine("   AND TNK.DELFLG      = @DELFLG")
         'タンク車マスタ結合ここまで↑
@@ -1381,18 +1452,30 @@ Public Class OIT0003OTLinkageList
         '積込予約マスタ結合ここまで↑
         '変換マスタ（荷受人）結合ここから↓
         sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT CCNV")
-        sqlStat.AppendLine("    ON OCNV.CLASS          = 'RESERVED_NIUKE'")
-        sqlStat.AppendLine("   AND OCNV.KEYCODE01      = ODR.OFFICECODE")
-        sqlStat.AppendLine("   AND OCNV.KEYCODE02      = ODR.CONSIGNEECODE")
-        sqlStat.AppendLine("   AND OCNV.DELFLG         = @DELFLG")
+        sqlStat.AppendLine("    ON CCNV.CLASS          = 'RESERVED_NIUKE'")
+        sqlStat.AppendLine("   AND CCNV.KEYCODE01      = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND CCNV.KEYCODE02      = ODR.CONSIGNEECODE")
+        sqlStat.AppendLine("   AND CCNV.DELFLG         = @DELFLG")
         '変換マスタ（荷受人）結合ここまで↑
         '変換マスタ（荷主）結合ここから↓
         sqlStat.AppendLine(" LEFT JOIN OIL.OIM0029_CONVERT SCNV")
-        sqlStat.AppendLine("    ON OCNV.CLASS          = 'RESERVED_SHIPPER'")
-        sqlStat.AppendLine("   AND OCNV.KEYCODE01      = ODR.OFFICECODE")
-        sqlStat.AppendLine("   AND OCNV.KEYCODE02      = ODR.SHIPPERSCODE")
-        sqlStat.AppendLine("   AND OCNV.DELFLG         = @DELFLG")
+        sqlStat.AppendLine("    ON SCNV.CLASS          = 'RESERVED_SHIPPER'")
+        sqlStat.AppendLine("   AND SCNV.KEYCODE01      = ODR.OFFICECODE")
+        sqlStat.AppendLine("   AND SCNV.KEYCODE02      = ODR.SHIPPERSCODE")
+        sqlStat.AppendLine("   AND SCNV.DELFLG         = @DELFLG")
         '変換マスタ（荷主）結合ここまで↑
+        sqlStat.AppendLine(" WHERE ODR.ORDERSTATUS <= @ORDERSTATUS")
+        sqlStat.AppendLine("   AND ODR.DELFLG       = @DELFLG")
+        sqlStat.AppendFormat("   AND ODR.ORDERNO     IN({0})", selectedOrderNoInStat).AppendLine()
+
+        Dim sqlMaxReservedNo As New StringBuilder
+        sqlMaxReservedNo.AppendLine("SELECT ISNULL(MAX(DET.RESERVEDNO),'000') AS RESERVEDNO")
+        sqlMaxReservedNo.AppendLine("  FROM      OIL.OIT0002_ORDER  ODR")
+        '明細結合ここから↓
+        sqlMaxReservedNo.AppendLine(" INNER JOIN OIL.OIT0003_DETAIL DET")
+        sqlMaxReservedNo.AppendLine("    ON ODR.ORDERNO =  DET.ORDERNO")
+        '明細結合ここまで↑
+        sqlMaxReservedNo.AppendLine(" WHERE ODR.LODDATE = @LODDATE")
         Try
             '並び順は抽出後
             Using sqlCmd As New SqlCommand(sqlStat.ToString, SQLcon)
@@ -1400,6 +1483,7 @@ Public Class OIT0003OTLinkageList
                 With sqlCmd.Parameters
                     .Add("@DELFLG", SqlDbType.NVarChar).Value = C_DELETE_FLG.ALIVE
                     .Add("@ORDERSTATUS", SqlDbType.NVarChar).Value = BaseDllConst.CONST_ORDERSTATUS_310
+                    .Add("@LODDATE", SqlDbType.Date).Value = lodDate
                 End With
                 'SQL実行
                 Dim wrkDt As New DataTable
@@ -1407,22 +1491,24 @@ Public Class OIT0003OTLinkageList
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To sqlDr.FieldCount - 1
                         wrkDt.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
-                        OIT0003Takusoutbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                        OIT0003Reserved.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
                     wrkDt.Load(sqlDr)
                 End Using
 
-                Dim sortedDt = From dr As DataRow In wrkDt Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
+                sqlCmd.CommandText = sqlMaxReservedNo.ToString
+
+                Dim sortedDt = From dr As DataRow In wrkDt 'Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
                 For Each sortedDr As DataRow In sortedDt
-                    Dim newDr As DataRow = OIT0003Takusoutbl.NewRow
+                    Dim newDr As DataRow = OIT0003Reserved.NewRow
 
                     For Each col As DataColumn In wrkDt.Columns
                         newDr(col.ColumnName) = sortedDr(col.ColumnName)
                     Next
 
-                    OIT0003Takusoutbl.Rows.Add(newDr)
+                    OIT0003Reserved.Rows.Add(newDr)
                     retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
                 Next
             End Using
@@ -2037,37 +2123,64 @@ Public Class OIT0003OTLinkageList
             Me._Item = New Dictionary(Of String, FileLinkagePatternItem)
             Dim fileLinkageItem As FileLinkagePatternItem
             With Me._Item
+                '***************************
                 '仙台新港営業所
+                '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
                     "010402", True, False, False
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '***************************
                 '五井営業所
+                '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011201", True, True, True
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '***************************
                 '甲子営業所
+                '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011202", True, True, True
                     )
+                Dim outFieldList As New Dictionary(Of String, Integer)
+                outFieldList.Add("KINO_DATAKBN", 0)
+                outFieldList.Add("LODDATE_WITHOUT_SLASH", 0)
+                outFieldList.Add("OUTPUTRESERVENO", 0)
+                outFieldList.Add("KINO_TRAINNO", 0)
+                outFieldList.Add("REPORTOILNAME", 0)
+                outFieldList.Add("RESERVEDQUANTITY", 0)
+                outFieldList.Add("KINO_TOKUISAKICODE", 0)
+                outFieldList.Add("KINO_TOKUISAKINAME", 0)
+                outFieldList.Add("CONSIGNEECONVCODE", 0)
+                outFieldList.Add("CONSIGNEECONVVALUE", 0)
+                fileLinkageItem.OutputFiledList = outFieldList
+                fileLinkageItem.OutputReservedConstantField = False
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '***************************
                 '袖ヶ浦営業所
+                '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011203", True, False, True
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '***************************
                 '根岸営業所
+                '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
                     "011402", True, True, False
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '***************************
                 '四日市営業所
+                '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
                     "012401", True, True, True
                     )
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
+                '***************************
                 '三重塩浜営業所
+                '***************************
                 fileLinkageItem = New FileLinkagePatternItem(
                     "012402", True, False, True
                     )
@@ -2108,6 +2221,7 @@ Public Class OIT0003OTLinkageList
             Excel2003 = 4 '3文字拡張子（これはマクロが入るからやらない想定？）
             Pdf = 8       'Pdf（これは絶対に無い想定？）PDF作ってメール送信あるかも？
         End Enum
+
         ''' <summary>
         ''' コンストラクタ
         ''' </summary>
@@ -2155,7 +2269,16 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property ReservedOutputType As ReserveOutputFileType
-
+        ''' <summary>
+        ''' 出力フィールドリスト(フィールド名、固定長用フィールドサイズ）
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OutputFiledList As Dictionary(Of String, Integer)
+        ''' <summary>
+        ''' 出荷予約にてフィールドサイズ（OutputFiledList）で設定したサイズで出力する場合True、デフォルトはFalse
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property OutputReservedConstantField As Boolean = False
     End Class
     ''' <summary>
     ''' 出力したオーダーのキー情報を保持する為のクラス

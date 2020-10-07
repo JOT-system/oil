@@ -660,7 +660,7 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_LASTVOLATILEOIL_BLACKLIGHTOIL_ERROR2 As String = "20064"
         ''' <summary>
-        ''' 指定タンク車№が所属営業所以外のためエラー
+        ''' 指定タンク車№が所在地以外のためエラー
         ''' </summary>
         Public Const OIL_ORDER_NOT_LOCATION_TANKNO_ERROR As String = "20065"
         ''' <summary>

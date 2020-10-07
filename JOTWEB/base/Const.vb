@@ -256,7 +256,6 @@ Public Module BaseDllConst
     Public Const CONST_BRANCHCODE_710001 As String = "710001"
 #End Region
 
-
 #Region "営業所"
     ''' <summary>
     ''' 情報システム部
@@ -925,6 +924,20 @@ Public Module BaseDllConst
     Public Const CONST_COSMO_LSABU As String = "LAブ"
 #End Region
 
+#Region "型式(タンク車)"
+    ''' <summary>
+    ''' タキ1000
+    ''' </summary>
+    Public Const CONST_MODEL_1000 As String = "タキ1000"
+    ''' <summary>
+    ''' タキ43000
+    ''' </summary>
+    Public Const CONST_MODEL_43000 As String = "タキ43000"
+    ''' <summary>
+    ''' タキ243000
+    ''' </summary>
+    Public Const CONST_MODEL_243000 As String = "タキ243000"
+#End Region
 
 #Region "海外向け"
     ''' <summary>

@@ -2569,11 +2569,24 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 Dim i As Integer = 0
+                Dim WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
                 For Each OIT0003tab2row As DataRow In OIT0003tbl_tab2.Rows
                     i += 1
                     OIT0003tab2row("LINECNT") = i        'LINECNT
                     CODENAME_get("ORDERINFO", OIT0003tab2row("ORDERINFO"), OIT0003tab2row("ORDERINFONAME"), WW_DUMMY)
                     'CODENAME_get("PRODUCTPATTERN", OIT0003tab2row("OILCODE"), OIT0003tab2row("OILNAME"), WW_DUMMY)
+
+                    '◯袖ヶ浦営業所の場合
+                    If Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203 Then
+                        WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
+                        WW_FixvalueMasterSearch(Me.TxtOrderOfficeCode.Text,
+                                                        "DELIVERYMASTER",
+                                                        OIT0003tab2row("LOADINGIRILINETRAINNAME") + OIT0003tab2row("LOADINGIRILINEORDER"),
+                                                        WW_GetValue)
+                        '託送コード設定(充填ポイント)
+                        OIT0003tab2row("FILLINGPOINT") = WW_GetValue(0)
+                    End If
+
                 Next
 
             End Using
@@ -8730,16 +8743,22 @@ Public Class OIT0003OrderDetail
                     '    ★袖ヶ浦の場合
                     If (Me.TxtOrderOfficeCode.Text = BaseDllConst.CONST_OFFICECODE_011203) _
                         AndAlso OIT0003row("LINEORDER") <> "" Then
-                        '### 20200930 START 臨海鉄道(袖ヶ浦)対応 ##########################################
-                        '貨物駅入線順を積込出線順に設定
-                        PARA44.Value = OIT0003row("LINEORDER")
-                        '積込入線順に(明細数 - 貨物駅入線順 + 1)設定
-                        PARA43.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
+                        '### 20201007 START 仕様違いによる修正 ############################################
+                        '発送順を積込出線順に設定
+                        PARA44.Value = OIT0003row("SHIPORDER")
+                        '貨物駅入線順を積込入線順に設定
+                        PARA43.Value = OIT0003row("LINEORDER")
+                        '### 20201007 END   仕様違いによる修正 ############################################
+                        ''### 20200930 START 臨海鉄道(袖ヶ浦)対応 ##########################################
+                        ''貨物駅入線順を積込出線順に設定
+                        'PARA44.Value = OIT0003row("LINEORDER")
+                        ''積込入線順に(明細数 - 貨物駅入線順 + 1)設定
+                        ''PARA43.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
                         ''貨物駅入線順を積込入線順に設定
                         'PARA43.Value = OIT0003row("LINEORDER")
                         ''積込出線順に(明細数 - 貨物駅入線順 + 1)設定
                         'PARA44.Value = (OIT0003tbl.Rows.Count - Integer.Parse(OIT0003row("LINEORDER"))) + 1
-                        '### 20200930 END   臨海鉄道(袖ヶ浦)対応 ##########################################
+                        ''### 20200930 END   臨海鉄道(袖ヶ浦)対応 ##########################################
 
                         '### 20200930 START 臨海鉄道(五井、甲子)対応 ######################################
                         '★五井、甲子の場合(発送対象のみ)

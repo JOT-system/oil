@@ -2109,6 +2109,13 @@ function CheckNum() {
         event.preventDefault(); // IEはこれで効く
     }
 }
+// 〇数値と英字のみ入力可能
+function CheckNumAZ() {
+    if (event.keyCode < 48 || event.keyCode > 90) {
+        window.event.returnValue = false; // IEだと効かないので↓追加
+        event.preventDefault(); // IEはこれで効く
+    }
+}
 // 〇カレンダー値のみ入力可能
 function CheckCalendar() {
     if (event.keyCode < 47 || event.keyCode > 57) {

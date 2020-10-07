@@ -1751,7 +1751,7 @@ Public Class OIT0003OrderList
 
                         '### 何もしない####################
 
-                    '※"500：検収中"のステータス以降についてはキャンセルができない仕様だが
+                    '※"500：輸送完了"のステータス以降についてはキャンセルができない仕様だが
                     '　条件は追加しておく
                     Case BaseDllConst.CONST_ORDERSTATUS_500,
                          BaseDllConst.CONST_ORDERSTATUS_550,
@@ -2850,10 +2850,19 @@ Public Class OIT0003OrderList
             & " , OIT0002.OILCODE                                AS OILCODE" _
             & " , OIT0002.OILNAME                                AS OILNAME" _
             & " , OIT0002.ORDERINGTYPE                           AS ORDERINGTYPE" _
-            & " , OIT0002.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
-            & " , TMP0005.REPORTOILCODE                          AS REPORTOILCODE" _
-            & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
-            & " , OIT0002.CNT                                    AS CNT" _
+            & " , OIT0002.ORDERINGOILNAME                        AS ORDERINGOILNAME"
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        SQLStr &=
+              " , OIM0029.VALUE01                                AS REPORTOILCODE" _
+            & " , OIM0029.VALUE02                                AS REPORTOILNAME"
+        'SQLStr &=
+        '      " , TMP0005.REPORTOILCODE                          AS REPORTOILCODE" _
+        '    & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME"
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              " , OIT0002.CNT                                    AS CNT" _
             & " , OIT0002.LODDATE                                AS LODDATE" _
             & " , OIT0002.DEPDATE                                AS DEPDATE" _
             & " , OIT0002.ARRDATE                                AS ARRDATE" _
@@ -2921,15 +2930,25 @@ Public Class OIT0003OrderList
         '    & " AND OIT0003.DELFLG <> @P02 " _
         '    & " AND OIT0003.OTTRANSPORTFLG = @P04 "
 
+        '### 20201002 START 変換マスタに移行したため修正 ########################
         '★変換用油種コードと紐づけ
         SQLStr &=
-              " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
-            & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE  " _
-            & " AND TMP0005.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
-            & " AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
-            & " AND TMP0005.OILNo = '1' " _
-            & " AND TMP0005.OILCODE = OIT0002.OILCODE " _
-            & " AND TMP0005.SEGMENTOILCODE = OIT0002.ORDERINGTYPE "
+              " LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
+            & "     OIM0029.KEYCODE01 = OIT0002.OFFICECODE  " _
+            & " AND OIM0029.KEYCODE02 = OIT0002.SHIPPERSCODE " _
+            & " AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
+            & " AND OIM0029.KEYCODE04 = '1' " _
+            & " AND OIM0029.KEYCODE05 = OIT0002.OILCODE " _
+            & " AND OIM0029.KEYCODE08 = OIT0002.ORDERINGTYPE "
+        'SQLStr &=
+        '      " LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+        '    & "     TMP0005.OFFICECODE = OIT0002.OFFICECODE  " _
+        '    & " AND TMP0005.SHIPPERCODE = OIT0002.SHIPPERSCODE " _
+        '    & " AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
+        '    & " AND TMP0005.OILNo = '1' " _
+        '    & " AND TMP0005.OILCODE = OIT0002.OILCODE " _
+        '    & " AND TMP0005.SEGMENTOILCODE = OIT0002.ORDERINGTYPE "
+        '### 20201002 END   変換マスタに移行したため修正 ########################
 
         '請負用データ取得用
         Dim SQLStrADD As String =
@@ -3055,7 +3074,7 @@ Public Class OIT0003OrderList
             & " , ORDERINFOTBL.TANKNO                            AS TANKNO" _
             & " , ORDERINFOTBL.MODEL                             AS MODEL" _
             & " , CASE" _
-            & "   WHEN ORDERINFOTBL.MODEL = 'タキ1000' THEN '1000' + ORDERINFOTBL.TANKNO" _
+            & "   WHEN ORDERINFOTBL.MODEL = 'タキ1000' THEN FORMAT(CONVERT(int,ORDERINFOTBL.TANKNO),'1000000')" _
             & "   ELSE ORDERINFOTBL.TANKNO" _
             & "   END                                            AS SYARYONUMBER" _
             & " , ORDERINFOTBL.REPORTOILNAME                     AS REPORTOILNAME" _
@@ -3085,23 +3104,46 @@ Public Class OIT0003OrderList
             & "      , OIT0003.LOADINGIRILINETRAINNO " _
             & "      , OIT0003.LOADINGIRILINETRAINNAME " _
             & "      , OIT0003.LOADINGIRILINEORDER " _
-            & "      , OIM0021.RESERVEDQUANTITY " _
-            & "      , TMP0005.REPORTOILNAME " _
-            & "      FROM oil.OIT0002_ORDER OIT0002 " _
+            & "      , OIM0021.RESERVEDQUANTITY "
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        SQLStr &=
+              "      , OIM0029.VALUE02 AS REPORTOILNAME "
+        'SQLStr &=
+        '      "      , TMP0005.REPORTOILNAME "
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              "      FROM oil.OIT0002_ORDER OIT0002 " _
             & "       INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "           OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & "       AND OIT0003.DELFLG <> @P02 " _
             & "       INNER JOIN oil.OIM0005_TANK OIM0005 ON " _
             & "           OIM0005.TANKNUMBER = OIT0003.TANKNO " _
-            & "       AND OIM0005.DELFLG <> @P02 " _
-            & "       INNER JOIN oil.TMP0005OILMASTER TMP0005 ON " _
-            & "           TMP0005.OFFICECODE = OIT0002.OFFICECODE " _
-            & "       AND TMP0005.SHIPPERCODE = OIT0003.SHIPPERSCODE " _
-            & "       AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
-            & "       AND TMP0005.OILNo = '1' " _
-            & "       AND TMP0005.OILCODE = OIT0003.OILCODE " _
-            & "       AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
-            & "       INNER JOIN oil.OIM0021_LOADRESERVE OIM0021 ON " _
+            & "       AND OIM0005.DELFLG <> @P02 "
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        '★変換用油種コードと紐づけ
+        SQLStr &=
+              "       INNER JOIN oil.OIM0029_CONVERT OIM0029 ON " _
+            & "           OIM0029.KEYCODE01 = OIT0002.OFFICECODE " _
+            & "       AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
+            & "       AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
+            & "       AND OIM0029.KEYCODE04 = '1' " _
+            & "       AND OIM0029.KEYCODE05 = OIT0003.OILCODE " _
+            & "       AND OIM0029.KEYCODE08 = OIT0003.ORDERINGTYPE "
+        'SQLStr &=
+        '      "       INNER JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+        '    & "           TMP0005.OFFICECODE = OIT0002.OFFICECODE " _
+        '    & "       AND TMP0005.SHIPPERCODE = OIT0003.SHIPPERSCODE " _
+        '    & "       AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
+        '    & "       AND TMP0005.OILNo = '1' " _
+        '    & "       AND TMP0005.OILCODE = OIT0003.OILCODE " _
+        '    & "       AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE "
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              "       INNER JOIN oil.OIM0021_LOADRESERVE OIM0021 ON " _
             & "           OIM0021.OFFICECODE = OIT0002.OFFICECODE " _
             & "       AND OIM0021.MODEL = OIM0005.MODEL " _
             & "       AND OIM0021.LOAD = OIM0005.LOAD " _
@@ -3223,9 +3265,17 @@ Public Class OIT0003OrderList
             & " , OIT0003.OILCODE                                AS OILCODE" _
             & " , OIT0003.OILNAME                                AS OILNAME" _
             & " , OIT0003.ORDERINGTYPE                           AS ORDERINGTYPE" _
-            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME" _
-            & " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME" _
-            & " , CASE" _
+            & " , OIT0003.ORDERINGOILNAME                        AS ORDERINGOILNAME"
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        SQLStr &=
+              " , OIM0029.VALUE02                                AS REPORTOILNAME"
+        'SQLStr &=
+        '      " , TMP0005.REPORTOILNAME                          AS REPORTOILNAME"
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              " , CASE" _
             & "   WHEN OIM0005.MODEL = 'タキ1000' THEN '1-' + OIT0003.TANKNO" _
             & "   ELSE OIT0003.TANKNO" _
             & "   END                                            AS CARSNUMBER" _
@@ -3258,15 +3308,30 @@ Public Class OIT0003OrderList
             & "  LEFT JOIN oil.OIM0007_TRAIN OIM0007 ON " _
             & "      OIM0007.OFFICECODE = OIT0002.OFFICECODE " _
             & "  AND OIM0007.TRAINNAME = OIT0002.TRAINNAME " _
-            & "  AND OIM0007.DELFLG <> @P02 " _
-            & "  LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
-            & "      TMP0005.OFFICECODE =OIT0002.OFFICECODE " _
-            & "  AND TMP0005.SHIPPERCODE = OIT0003.SHIPPERSCODE " _
-            & "  AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
-            & "  AND TMP0005.OILNo = '1' " _
-            & "  AND TMP0005.OILCODE = OIT0003.OILCODE " _
-            & "  AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE " _
-            & " WHERE OIT0002.OFFICECODE = @P01 " _
+            & "  AND OIM0007.DELFLG <> @P02 "
+
+        '### 20201002 START 変換マスタに移行したため修正 ########################
+        '★変換用油種コードと紐づけ
+        SQLStr &=
+              "  LEFT JOIN oil.OIM0029_CONVERT OIM0029 ON " _
+            & "      OIM0029.KEYCODE01 =OIT0002.OFFICECODE " _
+            & "  AND OIM0029.KEYCODE02 = OIT0003.SHIPPERSCODE " _
+            & "  AND OIM0029.KEYCODE03 = OIT0002.BASECODE " _
+            & "  AND OIM0029.KEYCODE04 = '1' " _
+            & "  AND OIM0029.KEYCODE05 = OIT0003.OILCODE " _
+            & "  AND OIM0029.KEYCODE08 = OIT0003.ORDERINGTYPE "
+        'SQLStr &=
+        '      "  LEFT JOIN oil.TMP0005OILMASTER TMP0005 ON " _
+        '    & "      TMP0005.OFFICECODE =OIT0002.OFFICECODE " _
+        '    & "  AND TMP0005.SHIPPERCODE = OIT0003.SHIPPERSCODE " _
+        '    & "  AND TMP0005.PLANTCODE = OIT0002.BASECODE " _
+        '    & "  AND TMP0005.OILNo = '1' " _
+        '    & "  AND TMP0005.OILCODE = OIT0003.OILCODE " _
+        '    & "  AND TMP0005.SEGMENTOILCODE = OIT0003.ORDERINGTYPE "
+        '### 20201002 END   変換マスタに移行したため修正 ########################
+
+        SQLStr &=
+              " WHERE OIT0002.OFFICECODE = @P01 " _
             & " AND OIT0002.LODDATE = @P03 "
 
         SQLStr &=

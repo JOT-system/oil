@@ -552,7 +552,7 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MAPIDBACKUP As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DELIVERYFLG コントロール。
     '''</summary>
@@ -561,4 +561,13 @@ Partial Public Class OIT0006WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELIVERYFLG As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_TANKSITUATION コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TANKSITUATION As Global.System.Web.UI.WebControls.TextBox
 End Class

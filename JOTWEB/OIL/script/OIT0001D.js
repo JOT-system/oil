@@ -91,7 +91,6 @@ function ChangeCheckBox() {
         }
     }
 
-    // 積置フラグ
     var objTableDR = document.getElementById("pnlListArea_DR").children[0];
     var objLightTable = objTableDR.children[0];
     if (objLightTable === null) {
@@ -101,8 +100,15 @@ function ChangeCheckBox() {
         return;
     }
 
+    // 積置フラグ
     var chkObjsLight1 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaSTACKINGFLG']");
     var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaSTACKINGFLG']");
+    // 交検可否フラグ
+    var chkObjsLight2 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINSPECTIONFLG']");
+    var spnObjsLight2 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINSPECTIONFLG']");
+    // 留置可否フラグ
+    var chkObjsLight3 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaDETENTIONFLG']");
+    var spnObjsLight3 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaDETENTIONFLG']");
 
     for (let i = 0; i < chkObjsLight1.length; i++) {
 
@@ -111,6 +117,28 @@ function ChangeCheckBox() {
                 chkObjsLight1[i].checked = true;
             } else {
                 chkObjsLight1[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight2.length; i++) {
+
+        if (chkObjsLight2[i] !== null) {
+            if (spnObjsLight2[i].innerText === "on") {
+                chkObjsLight2[i].checked = true;
+            } else {
+                chkObjsLight2[i].checked = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < chkObjsLight3.length; i++) {
+
+        if (chkObjsLight3[i] !== null) {
+            if (spnObjsLight3[i].innerText === "on") {
+                chkObjsLight3[i].checked = true;
+            } else {
+                chkObjsLight3[i].checked = false;
             }
         }
     }
@@ -126,6 +154,12 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
         surfix = '';
         if (fieldName === 'STACKINGFLG') {
             surfix = 'STACKING'
+        }
+        if (fieldName === 'INSPECTIONFLG') {
+            surfix = 'INSPECTION'
+        }
+        if (fieldName === 'DETENTIONFLG') {
+            surfix = 'DETENTION'
         }
 
         document.getElementById("WF_SelectedIndex").value = lineCnt;
@@ -161,7 +195,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         else if (fieldNM === "JOINT") {
             document.getElementById('WF_LeftMViewChange').value = 53;
         }
-        else if (fieldNM === "ACTUALLODDATE") {
+        else if (fieldNM === "ACTUALLODDATE" 
+            || fieldNM === "JRINSPECTIONDATE") {
             document.getElementById('WF_LeftMViewChange').value = 17;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";

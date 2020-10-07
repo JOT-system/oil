@@ -661,7 +661,7 @@ Public Class OIT0001EmptyTurnDairyList
 
                         '### 何もしない####################
 
-                    '※"500：検収中"のステータス以降についてはキャンセルができない仕様だが
+                    '※"500：輸送完了"のステータス以降についてはキャンセルができない仕様だが
                     '　条件は追加しておく
                     Case BaseDllConst.CONST_ORDERSTATUS_500,
                          BaseDllConst.CONST_ORDERSTATUS_550,

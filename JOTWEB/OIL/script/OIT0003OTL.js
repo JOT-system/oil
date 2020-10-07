@@ -98,7 +98,7 @@ function ChangeOrgUse(obj, lineCnt) {
         }
 
         if (chkStatus === "受注キャンセル"
-            || chkStatus === "検収中"
+            || chkStatus === "輸送完了"
             || chkStatus === "検収済"
             || chkStatus === "費用確定"
             || chkStatus === "経理未計上"

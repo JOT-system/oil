@@ -574,7 +574,7 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_ORDERSTATUS_450 As String = "450"
     ''' <summary>
-    ''' 500:検収中
+    ''' 500:輸送完了
     ''' </summary>
     Public Const CONST_ORDERSTATUS_500 As String = "500"
     ''' <summary>
@@ -763,6 +763,69 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_KAISOUPATTERN_14 As String = "移動-他社負担"
 
+#End Region
+
+#Region "タンク車状況コード"
+    ''' <summary>
+    ''' 01:残車
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_01 As String = "1"
+    ''' <summary>
+    ''' 02:輸送中
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_02 As String = "2"
+    ''' <summary>
+    ''' 03:回送中（交検）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_03 As String = "3"
+    ''' <summary>
+    ''' 04:回送中（全検）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_04 As String = "4"
+    ''' <summary>
+    ''' 05:回送中（修理）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_05 As String = "5"
+    ''' <summary>
+    ''' 06:回送中（疎開留置）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_06 As String = "6"
+    ''' <summary>
+    ''' 07:回送中（ＭＣ）
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_07 As String = "7"
+    ''' <summary>
+    ''' 08:回送中(移動)
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_08 As String = "8"
+    ''' <summary>
+    ''' 09:交検中(仙台(受注用))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_09 As String = "9"
+    ''' <summary>
+    ''' 10:留置中(仙台(受注用))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_10 As String = "10"
+    ''' <summary>
+    ''' 11:修理中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_11 As String = "11"
+    ''' <summary>
+    ''' 12:MC中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_12 As String = "12"
+    ''' <summary>
+    ''' 13:交検中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_13 As String = "13"
+    ''' <summary>
+    ''' 14:全検中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_14 As String = "14"
+    ''' <summary>
+    ''' 15:留置中(回送(片道))
+    ''' </summary>
+    Public Const CONST_TANKSITUATION_15 As String = "15"
 #End Region
 
 #Region "油種"

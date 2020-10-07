@@ -3072,12 +3072,23 @@ Public Class OIT0003OrderList
             & " , VIW0013.RINKAITRAINNAME                        AS RINKAITRAINNAME" _
             & " , VIW0013.SPOTNO                                 AS SPOTNO" _
             & " , ORDERINFOTBL.TANKNO                            AS TANKNO" _
-            & " , ORDERINFOTBL.MODEL                             AS MODEL" _
-            & " , CASE" _
-            & "   WHEN ORDERINFOTBL.MODEL = 'タキ1000' THEN FORMAT(CONVERT(int,ORDERINFOTBL.TANKNO),'1000000')" _
+            & " , ORDERINFOTBL.MODEL                             AS MODEL"
+
+        '### 20201007 START JXTG千葉車番を設定 ##################################################################
+        SQLStr &=
+              " , CASE" _
+            & "   WHEN ORDERINFOTBL.MODEL = '" & BaseDllConst.CONST_MODEL_1000 & "' THEN ORDERINFOTBL.JXTGTANKNUMBER2" _
             & "   ELSE ORDERINFOTBL.TANKNO" _
-            & "   END                                            AS SYARYONUMBER" _
-            & " , ORDERINFOTBL.REPORTOILNAME                     AS REPORTOILNAME" _
+            & "   END                                            AS SYARYONUMBER"
+        'SQLStr &=
+        '      " , CASE" _
+        '    & "   WHEN ORDERINFOTBL.MODEL = '" & BaseDllConst.CONST_MODEL_1000 & "' THEN FORMAT(CONVERT(int,ORDERINFOTBL.TANKNO),'1000000')" _
+        '    & "   ELSE ORDERINFOTBL.TANKNO" _
+        '    & "   END                                            AS SYARYONUMBER"
+        '### 20201007 END   JXTG千葉車番を設定 ##################################################################
+
+        SQLStr &=
+              " , ORDERINFOTBL.REPORTOILNAME                     AS REPORTOILNAME" _
             & " , ORDERINFOTBL.RESERVEDQUANTITY                  AS RESERVEDQUANTITY" _
             & " , CASE " _
             & "   WHEN ORDERINFOTBL.TANKNO <> '' THEN VIW0013.DELIVERYFIRST " _
@@ -3095,6 +3106,7 @@ Public Class OIT0003OrderList
             & "      , OIT0003.TANKNO " _
             & "      , OIM0005.MODEL " _
             & "      , OIM0005.LOAD " _
+            & "      , OIM0005.JXTGTANKNUMBER2 " _
             & "      , OIT0003.OILCODE " _
             & "      , OIT0003.OILNAME " _
             & "      , OIT0003.ORDERINGTYPE " _
@@ -3276,7 +3288,7 @@ Public Class OIT0003OrderList
 
         SQLStr &=
               " , CASE" _
-            & "   WHEN OIM0005.MODEL = 'タキ1000' THEN '1-' + OIT0003.TANKNO" _
+            & "   WHEN OIM0005.MODEL = '" & BaseDllConst.CONST_MODEL_1000 & "' THEN '1-' + OIT0003.TANKNO" _
             & "   ELSE OIT0003.TANKNO" _
             & "   END                                            AS CARSNUMBER" _
             & " , OIT0003.TANKNO                                 AS TANKNO" _

@@ -15613,7 +15613,7 @@ Public Class OIT0003OrderDetail
         For Each OIT0003row As DataRow In OIT0003tbl.Rows
 
             '高速列車区分＝"1"(高速列車)、かつ型式<>"タキ1000"の場合はエラー
-            If WW_GetValue(5) = "1" AndAlso OIT0003row("MODEL") <> "タキ1000" AndAlso OIT0003row("DELFLG") = "0" Then
+            If WW_GetValue(5) = "1" AndAlso OIT0003row("MODEL") <> BaseDllConst.CONST_MODEL_1000 AndAlso OIT0003row("DELFLG") = "0" Then
                 OIT0003row("ORDERINFO") = BaseDllConst.CONST_ORDERINFO_ALERT_84
                 CODENAME_get("ORDERINFO", OIT0003row("ORDERINFO"), OIT0003row("ORDERINFONAME"), WW_DUMMY)
 

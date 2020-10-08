@@ -2455,10 +2455,12 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , OIM0005.OWNERNAME                              AS OWNERNAME" _
             & " , OIM0005.LEASECODE                              AS LEASECODE" _
             & " , OIM0005.LEASENAME                              AS LEASENAME" _
+            & " , OIT0003.SHIPORDER                              AS SHIPORDER" _
+            & " , OIT0003.LINEORDER                              AS LINEORDER" _
             & " , OIM0005.JRINSPECTIONDATE                       AS JRINSPECTIONDATE" _
             & " , OIM0005.JRALLINSPECTIONDATE                    AS JRALLINSPECTIONDATE" _
             & " , OIT0003.RETURNDATETRAIN                        AS RETURNDATETRAIN" _
-            & " , OIT0003.RETURNDATETRAIN                        AS RETURNDATETRAINNO" _
+            & " , ISNULL(OIT0003.RETURNDATETRAIN, OIT0002.BTRAINNO) AS RETURNDATETRAINNO" _
             & " , OIT0003.JOINTCODE                              AS JOINTCODE" _
             & " , OIT0003.JOINT                                  AS JOINT" _
             & " , OIT0003.REMARK                                 AS REMARK" _
@@ -2483,6 +2485,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " , OTOILCT.OTOILCODE                              AS OTOILCTCODE" _
             & " , OTOILCT.CNT                                    AS OTOILCTCNT" _
             & " , OIM0026.DELIVERYCODE                           AS DELIVERYCODE" _
+            & " , OIM0012.KUUKAICONSIGNEENAME                    AS KUUKAICONSIGNEENAME" _
             & " FROM oil.OIT0002_ORDER OIT0002 " _
             & " INNER JOIN oil.OIT0003_DETAIL OIT0003 ON " _
             & "     (OIT0003.ORDERNO = OIT0002.ORDERNO OR OIT0003.STACKINGORDERNO = OIT0002.ORDERNO) " _
@@ -2509,6 +2512,13 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " AND OIM0026.LINEORDER = OIT0003.LINEORDER " _
             & " AND OIM0026.DELFLG <> @P02 "
         '### 20200917 END   指摘票対応(No138)全体 ###################################################
+
+        '### 20201008 START 指摘票対応(NoXXX)全体 ###################################################
+        SQLStr &=
+              " LEFT JOIN oil.OIM0012_NIUKE OIM0012 ON " _
+            & "     OIM0012.CONSIGNEECODE = OIT0002.CONSIGNEECODE " _
+            & " AND OIM0012.DELFLG <> @P02 "
+        '### 20201008 END   指摘票対応(NoXXX)全体 ###################################################
 
         SQLStr &=
               " LEFT JOIN ( " _
@@ -2550,6 +2560,7 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "    OIT0003.SHIPPERSCODE" _
             & "  , OIT0002.DEPSTATION" _
             & "  , OIM0003.OTOILCODE" _
+            & "  , OIT0003.LINEORDER" _
             & "  , OIT0003.TANKNO"
 
         Try

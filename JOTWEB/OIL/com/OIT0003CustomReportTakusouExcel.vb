@@ -45,6 +45,7 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
     ''' 雛形ファイルパス
     ''' </summary>
     Private ExcelTemplatePath As String = ""
+    Private SealImageFilePath As String = ""
     Private UploadRootPath As String = ""
     Private UrlRoot As String = ""
     Private PrintData As DataTable
@@ -62,15 +63,24 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
         Dim templateParentFolderName As String = "OIT0003Takusou"
         Dim tempXlsFileName As String = "" '[営業所コード].xlsxとする
         tempXlsFileName = String.Format("{0}.xlsx", officeCode)
+
         Me.PrintData = printDataClass
         Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                       "PRINTFORMAT",
                                                       C_DEFAULT_DATAKEY,
                                                       templateParentFolderName, tempXlsFileName)
+        Dim tempSealImageFileName As String = String.Format("{0}.png", officeCode)
+        Me.SealImageFilePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
+                                                      "PRINTFORMAT",
+                                                      C_DEFAULT_DATAKEY,
+                                                      templateParentFolderName, tempSealImageFileName)
         If IO.File.Exists(Me.ExcelTemplatePath) = False Then
             Throw New Exception(String.Format("テンプレートファイルが存在しません。{0}", Me.ExcelTemplatePath))
         End If
 
+        If IO.File.Exists(Me.SealImageFilePath) = False Then
+            Me.SealImageFilePath = ""
+        End If
         Me.UploadRootPath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                    "PRINTWORK",
                                                    CS0050SESSION.USERID)
@@ -127,6 +137,8 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
             '***** TODO処理 ここから *****
             '◯ヘッダーの設定
             EditHeaderArea()
+            '○ヘッダーに印画像の挿入
+            EditHeaderSealArea()
             '◯明細の設定
             EditDetailArea()
             '***** TODO処理 ここまで *****
@@ -194,6 +206,43 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
             Throw
         Finally
             ExcelMemoryRelease(rngHeaderArea)
+        End Try
+
+    End Sub
+    ''' <summary>
+    ''' 印鑑画像貼り付け処理
+    ''' </summary>
+    Private Sub EditHeaderSealArea()
+        '画像ファイルが存在しない場合以下のプロパティは空白となる為スキップ
+        If Me.SealImageFilePath = "" Then
+            Return
+        End If
+        Dim excelShps As Excel.Shapes = Nothing
+        Dim addedShape As Excel.Shape = Nothing
+        Dim pasteTopLeftCell As Excel.Range = Nothing
+        Try
+            pasteTopLeftCell = Me.ExcelWorkSheet.Range("D1")
+            Dim top As Single = CSng(pasteTopLeftCell.Top)
+            Dim left As Single = CSng(pasteTopLeftCell.Left)
+            ExcelMemoryRelease(pasteTopLeftCell)
+
+            excelShps = Me.ExcelWorkSheet.Shapes
+            Dim width As Single = 91
+            Dim height As Single = width
+            addedShape = excelShps.AddPicture(Me.SealImageFilePath, Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoTrue, left, top, width, height)
+
+            'addedShape.ScaleHeight(1, Microsoft.Office.Core.MsoTriState.msoTrue)
+            'addedShape.ScaleWidth(1, Microsoft.Office.Core.MsoTriState.msoTrue)
+
+            ExcelMemoryRelease(addedShape)
+            ExcelMemoryRelease(excelShps)
+
+        Catch ex As Exception
+            Throw New Exception("画像設定に失敗" & ex.ToString)
+        Finally
+            ExcelMemoryRelease(pasteTopLeftCell)
+            ExcelMemoryRelease(addedShape)
+            ExcelMemoryRelease(excelShps)
         End Try
 
     End Sub

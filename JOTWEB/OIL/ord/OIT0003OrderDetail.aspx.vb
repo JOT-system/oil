@@ -18937,6 +18937,9 @@ Public Class OIT0003OrderDetail
                             '    OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CHANGERETSTATIONNAME") Then
                             '    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
 
+                            '積込可否フラグ(チェックボックス)を非活性
+                            If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+
                             If cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "JOINT") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "SHIPORDER") _
                                 OrElse cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALLODDATE") _
@@ -18949,6 +18952,13 @@ Public Class OIT0003OrderDetail
 
                                 '### 20200814 END  ((全体)No123対応) ######################################
 
+                            ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "CARSAMOUNT") Then
+                                If work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_320 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_350 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
+                                OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
+                                    cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+                                End If
 
 
                                 '★(実績)発日
@@ -18965,8 +18975,8 @@ Public Class OIT0003OrderDetail
                                     End If
                                 End If
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)積車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") Then
@@ -18981,8 +18991,8 @@ Public Class OIT0003OrderDetail
                                     End If
                                 End If
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)受入日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
@@ -18996,8 +19006,8 @@ Public Class OIT0003OrderDetail
                                     End If
                                 End If
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)空車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
@@ -19007,8 +19017,8 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                             End If
 
@@ -19088,12 +19098,13 @@ Public Class OIT0003OrderDetail
                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_400 _
                                 OrElse work.WF_SEL_ORDERSTATUS.Text = BaseDllConst.CONST_ORDERSTATUS_450 Then
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly'>")
+
+                                    '積込可否フラグ(チェックボックス)を非活性
+                                    If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+
                                 Else
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
-
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)発日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALDEPDATE") Then
@@ -19105,8 +19116,8 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)積車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALARRDATE") Then
@@ -19117,8 +19128,8 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)受入日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALACCDATE") Then
@@ -19128,15 +19139,15 @@ Public Class OIT0003OrderDetail
                                     cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
                                 End If
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                                 '★(実績)空車着日
                             ElseIf cellObj.Text.Contains("input id=""txt" & pnlListArea3.ID & "ACTUALEMPARRDATE") Then
                                 cellObj.Text = cellObj.Text.Replace(">", " readonly='readonly' class='iconOnly'>")
 
-                                '積込可否フラグ(チェックボックス)を非活性
-                                If chkObjST IsNot Nothing Then chkObjST.Enabled = False
+                                ''積込可否フラグ(チェックボックス)を非活性
+                                'If chkObjST IsNot Nothing Then chkObjST.Enabled = False
 
                             End If
                         End If

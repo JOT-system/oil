@@ -105,7 +105,7 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
         Me.ExcelBooksObj = Me.ExcelAppObj.Workbooks
         Me.ExcelBookObj = Me.ExcelBooksObj.Open(Me.ExcelTemplatePath,
                                                 UpdateLinks:=Excel.XlUpdateLinks.xlUpdateLinksNever,
-                                                [ReadOnly]:=True)
+                                                [ReadOnly]:=Excel.XlFileAccess.xlReadOnly)
         Me.ExcelWorkSheets = Me.ExcelBookObj.Sheets
         Me.ExcelWorkSheet = DirectCast(Me.ExcelWorkSheets("運送状"), Excel.Worksheet)
         Me.ExcelTempSheet = DirectCast(Me.ExcelWorkSheets("tempWork"), Excel.Worksheet)
@@ -141,17 +141,17 @@ Public Class OIT0003CustomReportTakusouExcel : Implements IDisposable
                 Else
                     'PDF出力時
                     '透過がワークしないためプランB
-                    Me.ExcelWorkSheet.ExportAsFixedFormat(Type:=0,
-                                                         Filename:=tmpFilePath,
-                                                         Quality:=0,
-                                                         IncludeDocProperties:=True,
-                                                         IgnorePrintAreas:=False,
-                                                         OpenAfterPublish:=False)
+                    'Me.ExcelWorkSheet.ExportAsFixedFormat(Type:=0,
+                    '                                     Filename:=tmpFilePath,
+                    '                                     Quality:=0,
+                    '                                     IncludeDocProperties:=True,
+                    '                                     IgnorePrintAreas:=False,
+                    '                                     OpenAfterPublish:=False)
 
 
                     'PDF印刷でのファイル出力
-                    'Me.ExcelWorkSheet.PrintOut(ActivePrinter:="Microsoft Print to PDF",
-                    '                           PrintToFile:=True, PrToFileName:=tmpFilePath)
+                    Me.ExcelWorkSheet.PrintOut(ActivePrinter:="Microsoft Print to PDF",
+                                               PrintToFile:=True, PrToFileName:=tmpFilePath)
 
                 End If
 

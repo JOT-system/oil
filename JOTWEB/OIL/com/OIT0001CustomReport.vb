@@ -228,8 +228,18 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '◯ 前回油種
                 rngDetailArea = Me.ExcelWorkSheet.Range("H" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("PREORDERINGOILNAME")
-                '◯ 順位
-                '### 未使用項目 ###########################################
+
+                '### 20201008 START 指摘票対応(NoXXX)全体 ###################################################
+                '★袖ヶ浦営業所の場合
+                If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '◯ 順位
+                    rngDetailArea = Me.ExcelWorkSheet.Range("I" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("SHIPORDER")
+                Else
+                    '◯ 順位
+                    '### 未使用項目 ###########################################
+                End If
+                '### 20201008 END   指摘票対応(NoXXX)全体 ###################################################
                 '◯ 次回交検日
                 rngDetailArea = Me.ExcelWorkSheet.Range("J" + i.ToString())
                 rngDetailArea.Value = PrintDatarow("JRINSPECTIONDATE")
@@ -241,7 +251,8 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 '★袖ヶ浦営業所の場合(フォーマットが異なるため別設定)
                 If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
                     '◯ FOC入線順
-                    '### 未使用項目 ###########################################
+                    rngDetailArea = Me.ExcelWorkSheet.Range("L" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("LINEORDER")
                     '◯ 託送用コード
                     rngDetailArea = Me.ExcelWorkSheet.Range("M" + i.ToString())
                     rngDetailArea.Value = PrintDatarow("DELIVERYCODE")
@@ -254,9 +265,18 @@ Public Class OIT0001CustomReport : Implements IDisposable
                 End If
                 '### 20200917 END   指摘票対応(No138)全体 ###################################################
 
-                '◯ 記事
-                rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
-                rngDetailArea.Value = PrintDatarow("REMARK")
+                '### 20201008 START 指摘票対応(NoXXX)全体 ###################################################
+                '★袖ヶ浦営業所の場合
+                If I_officeCode = BaseDllConst.CONST_OFFICECODE_011203 Then
+                    '◯ 記事
+                    rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("KUUKAICONSIGNEENAME")
+                Else
+                    '◯ 記事
+                    rngDetailArea = Me.ExcelWorkSheet.Range("N" + i.ToString())
+                    rngDetailArea.Value = PrintDatarow("REMARK")
+                End If
+                '### 20201008 END   指摘票対応(NoXXX)全体 ###################################################
 
                 i += 1
             Next

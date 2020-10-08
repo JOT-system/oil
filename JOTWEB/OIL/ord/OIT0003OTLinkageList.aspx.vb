@@ -846,7 +846,7 @@ Public Class OIT0003OTLinkageList
         ' 出力データ生成
         '******************************
         Using repCbj = New OIT0003CustomReportTakusouExcel(work.WF_SEL_OTS_SALESOFFICECODE.Text, OIT0003Takusoutbl)
-            'repCbj.FileType = OIT0003CustomReportTakusouExcel.OutputFileType.Excel 'デバッグ用Excel出力に変更
+            repCbj.FileType = OIT0003CustomReportTakusouExcel.OutputFileType.Excel 'デバッグ用Excel出力に変更
             Dim url As String
             Try
                 url = repCbj.CreatePrintData()

@@ -733,186 +733,218 @@ Public Class OIT0003OTLinkageList
     ''' 製油所出荷予約ボタン押下時処理
     ''' </summary>
     Protected Sub WF_ButtonReserved_Click()
-        Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
-        '一覧のチェックボックスが選択されているか確認
-        If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_RESERVED_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-        '処理対象外のチェックがなされている場合
-        Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+        Try
+            Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
+            '一覧のチェックボックスが選択されているか確認
+            If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_RESERVED_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '処理対象外のチェックがなされている場合
+            Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
                                                          AndAlso dr("CAN_RESERVED").Equals("0")
 
-        If qCannotProc.Any Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_RESERVED_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-        '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
-        '対象の積日が統一されていない場合（同一積日以外は不許可）
-        Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
-        If qSameProcDateCnt > 1 Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_RESERVED_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-        '******************************
-        '出荷予約データ取得処理
-        '******************************
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-            SqlConnection.ClearPool(SQLcon)
-            selectedOrderInfo = ReservedDataGet(SQLcon)
-            If selectedOrderInfo Is Nothing Then
-                Return
+            If qCannotProc.Any Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_RESERVED_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
             End If
-        End Using
-
-        '******************************
-        '出力ファイル作成処理の実行
-        '******************************
-        '出力設定取得
-        Dim flp As New FileLinkagePattern
-        '営業所設定取得
-        Dim settings = flp(work.WF_SEL_OTS_SALESOFFICECODE.Text)
-        If settings.OutputFiledList Is Nothing OrElse settings.OutputFiledList.Count = 0 Then
-            Return
-        End If
-        Using repCbj = New OIT0003CustomReportReservedCsv(OIT0003Reserved, settings)
-            Dim url As String
-            Try
-                url = repCbj.ConvertDataTableToCsv(False)
-                If url = "" Then
+            '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
+            '対象の積日が統一されていない場合（同一積日以外は不許可）
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("LODDATE")) Into Group Select g).Count
+            If qSameProcDateCnt > 1 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_RESERVED_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '******************************
+            '出荷予約データ取得処理
+            '******************************
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                selectedOrderInfo = ReservedDataGet(SQLcon)
+                If selectedOrderInfo Is Nothing Then
                     Return
                 End If
-            Catch ex As Exception
+            End Using
+
+            '******************************
+            '出力ファイル作成処理の実行
+            '******************************
+            '出力設定取得
+            Dim flp As New FileLinkagePattern
+            '営業所設定取得
+            Dim settings = flp(work.WF_SEL_OTS_SALESOFFICECODE.Text)
+            If settings.OutputFiledList Is Nothing OrElse settings.OutputFiledList.Count = 0 Then
                 Return
-            End Try
-            '○ 別画面でExcelを表示
-            WF_PrintURL.Value = url
-            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-        End Using
+            End If
+            Using repCbj = New OIT0003CustomReportReservedCsv(OIT0003Reserved, settings)
+                Dim url As String
+                Try
+                    url = repCbj.ConvertDataTableToCsv(False)
+                    If url = "" Then
+                        Return
+                    End If
+                Catch ex As Exception
+                    Return
+                End Try
+                '○ 別画面でExcelを表示
+                WF_PrintURL.Value = url
+                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLReserved")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLReserved"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+        End Try
 
     End Sub
     ''' <summary>
     ''' 託送指示ボタン押下時処理
     ''' </summary>
     Protected Sub WF_ButtonTakusou_Click()
-        '一旦三重塩浜、四日市ではない場合、素通り
-        Dim targetOffice As String = work.WF_SEL_OTS_SALESOFFICECODE.Text
-        If Not {"012401", "012402"}.Contains(targetOffice) Then
-            Return
-        End If
-        '
-        '一覧のチェックボックスが選択されているか確認
-        If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-        '処理対象外のチェックがなされている場合(ここは本来全て可能な想定だが念のため)
-        Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
-                                                         AndAlso dr("CAN_TAKUSOU").Equals("0")
-
-        If qCannotProc.Any Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-        '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
-        '対象の発日が統一されていない場合（同一発日以外は不許可）
-        Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
-        If qSameProcDateCnt > 1 Then
-            '選択されていない場合は、エラーメッセージを表示し終了
-            Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Exit Sub
-        End If
-
-        '処理対象のデータ明細を取得
-        Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-            SqlConnection.ClearPool(SQLcon)
-            selectedOrderInfo = TakusouDataGet(SQLcon)
-            If selectedOrderInfo Is Nothing OrElse selectedOrderInfo.Count = 0 Then
+        Try
+            '一旦三重塩浜、四日市ではない場合、素通り
+            Dim targetOffice As String = work.WF_SEL_OTS_SALESOFFICECODE.Text
+            If Not {"012401", "012402"}.Contains(targetOffice) Then
                 Return
             End If
-        End Using
-        If selectedOrderInfo.Count = 0 Then
-            Return '出力対象無し
-        End If
-        '******************************
-        ' 出力データ生成
-        '******************************
-        Using repCbj = New OIT0003CustomReportTakusouExcel(work.WF_SEL_OTS_SALESOFFICECODE.Text, OIT0003Takusoutbl)
-            repCbj.FileType = OIT0003CustomReportTakusouExcel.OutputFileType.Excel 'デバッグ用Excel出力に変更
-            Dim url As String
-            Try
-                url = repCbj.CreatePrintData()
-            Catch ex As Exception
-                Return
-            End Try
-            '○ 別画面でExcelを表示
-            WF_PrintURL.Value = url
-            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-        End Using
-        Return
-        '******************************
-        '託送指示データの（本体）ダウンロードフラグ更新
-        '                  （明細）ダウンロード数インクリメント
-        '******************************
-        Using SQLcon As SqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()       'DataBase接続
-            SqlConnection.ClearPool(SQLcon)
-            Dim procDate As Date = Now
-            Dim resProc As Boolean = False
-            Dim orderDlFlags As Dictionary(Of String, String) = Nothing
-            Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
-                'オーダー明細のダウンロードカウントのインクリメント
-                resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
-                If resProc = False Then
-                    Return
-                End If
-                'オーダー明細よりダウンロードフラグを取得
-                orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
-                If orderDlFlags Is Nothing Then
-                    Return
-                End If
-                'オーダーを更新
-                resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
-                If resProc = False Then
-                    Return
-                End If
-                '履歴登録用直近データ取得
-                '直近履歴番号取得
-                Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
-                If historyNo = "" Then
-                    Return
-                End If
-                Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
-                Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
-                If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
-                    Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
-                    Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+            '
+            '一覧のチェックボックスが選択されているか確認
+            If OIT0003tbl.Select("OPERATION = 'on'").Count = 0 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '処理対象外のチェックがなされている場合(ここは本来全て可能な想定だが念のため)
+            Dim qCannotProc = From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") _
+                                                             AndAlso dr("CAN_TAKUSOU").Equals("0")
 
-                    '履歴テーブル登録
-                    For Each dr As DataRow In hisOrderTbl.Rows
-                        EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
-                    Next
-                    For Each dr As DataRow In hisDetailTbl.Rows
-                        EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
-                    Next
-                    'ジャーナル登録
-                    OutputJournal(orderTbl, "OIT0002_ORDER")
-                    OutputJournal(detailTbl, "OIT0003_DETAIL")
-                End If
+            If qCannotProc.Any Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_PRINT_NOTFOUND, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
+            '日付またがりチェック(出力帳票のレイアウト上、同じ発日以外許可しない）
+            '対象の発日が統一されていない場合（同一発日以外は不許可）
+            Dim qSameProcDateCnt = (From dr As DataRow In OIT0003tbl Where dr("OPERATION").Equals("on") Group By g = Convert.ToString(dr("DEPDATE")) Into Group Select g).Count
+            If qSameProcDateCnt > 1 Then
+                '選択されていない場合は、エラーメッセージを表示し終了
+                Master.Output(C_MESSAGE_NO.OIL_TAKUSOU_NOT_ACCEPT_SEL_DAYS, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+                Exit Sub
+            End If
 
-                'ここまで来たらコミット
-                sqlTran.Commit()
+            '処理対象のデータ明細を取得
+            Dim selectedOrderInfo As New List(Of OutputOrdedrInfo)
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                selectedOrderInfo = TakusouDataGet(SQLcon)
+                If selectedOrderInfo Is Nothing OrElse selectedOrderInfo.Count = 0 Then
+                    Return
+                End If
             End Using
+            If selectedOrderInfo.Count = 0 Then
+                Return '出力対象無し
+            End If
+            '******************************
+            ' 出力データ生成
+            '******************************
+            Using repCbj = New OIT0003CustomReportTakusouExcel(work.WF_SEL_OTS_SALESOFFICECODE.Text, OIT0003Takusoutbl)
+                repCbj.FileType = OIT0003CustomReportTakusouExcel.OutputFileType.Excel 'デバッグ用Excel出力に変更
+                Dim url As String
+                Try
+                    url = repCbj.CreatePrintData()
+                Catch ex As Exception
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
 
-        End Using
+                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+                    CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLTakusou"
+                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                    CS0011LOGWrite.TEXT = ex.ToString()
+                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                    CS0011LOGWrite.CS0011LOGWrite()
+                    Return
+                End Try
+                '○ 別画面でExcelを表示
+                WF_PrintURL.Value = url
+                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+            End Using
+            Return
+            '******************************
+            '託送指示データの（本体）ダウンロードフラグ更新
+            '                  （明細）ダウンロード数インクリメント
+            '******************************
+            Using SQLcon As SqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()       'DataBase接続
+                SqlConnection.ClearPool(SQLcon)
+                Dim procDate As Date = Now
+                Dim resProc As Boolean = False
+                Dim orderDlFlags As Dictionary(Of String, String) = Nothing
+                Using sqlTran As SqlTransaction = SQLcon.BeginTransaction
+                    'オーダー明細のダウンロードカウントのインクリメント
+                    resProc = IncrementDetailOutputCount(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                    If resProc = False Then
+                        Return
+                    End If
+                    'オーダー明細よりダウンロードフラグを取得
+                    orderDlFlags = GetOutputFlag(selectedOrderInfo, WF_ButtonClick.Value, SQLcon, sqlTran)
+                    If orderDlFlags Is Nothing Then
+                        Return
+                    End If
+                    'オーダーを更新
+                    resProc = UpdateOrderOutputFlag(orderDlFlags, WF_ButtonClick.Value, SQLcon, sqlTran, procDate)
+                    If resProc = False Then
+                        Return
+                    End If
+                    '履歴登録用直近データ取得
+                    '直近履歴番号取得
+                    Dim historyNo As String = GetNewOrderHistoryNo(SQLcon, sqlTran)
+                    If historyNo = "" Then
+                        Return
+                    End If
+                    Dim orderTbl As DataTable = GetUpdatedOrder(selectedOrderInfo, SQLcon, sqlTran)
+                    Dim detailTbl As DataTable = GetUpdatedOrderDetail(selectedOrderInfo, SQLcon, sqlTran)
+                    If orderTbl IsNot Nothing AndAlso detailTbl IsNot Nothing Then
+                        Dim hisOrderTbl As DataTable = ModifiedHistoryDatatable(orderTbl, historyNo)
+                        Dim hisDetailTbl As DataTable = ModifiedHistoryDatatable(detailTbl, historyNo)
+
+                        '履歴テーブル登録
+                        For Each dr As DataRow In hisOrderTbl.Rows
+                            EntryHistory.InsertOrderHistory(SQLcon, sqlTran, dr)
+                        Next
+                        For Each dr As DataRow In hisDetailTbl.Rows
+                            EntryHistory.InsertOrderDetailHistory(SQLcon, sqlTran, dr)
+                        Next
+                        'ジャーナル登録
+                        OutputJournal(orderTbl, "OIT0002_ORDER")
+                        OutputJournal(detailTbl, "OIT0003_DETAIL")
+                    End If
+
+                    'ここまで来たらコミット
+                    sqlTran.Commit()
+                End Using
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "OIT0003OTL DLTakusou")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:OIT0003OTL DLTakusou"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()
+        End Try
+
     End Sub
     ''' <summary>
     ''' 受注履歴テーブル用の履歴番号取得
@@ -1417,7 +1449,7 @@ Public Class OIT0003OTLinkageList
         sqlStat.AppendLine("     , ''           AS OUTPUTRESERVENO") '出力用予約番号(後続処理で番号を組み立てる）
         sqlStat.AppendLine("     , '2'          AS KINO_TOKUISAKICODE") '得意先コード（甲子）
         sqlStat.AppendLine("     , 'ＥＮＥＯＳ株式会社□□□□□'   AS KINO_TOKUISAKINAME") '得意先名（甲子）
-        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN '1000' + DET.TANKNO ELSE DET.TANKNO END AS KINO_TRAINNO") 'デバッグ用
+        sqlStat.AppendLine("     , CASE WHEN TNK.MODEL = 'タキ1000' THEN TNK.JXTGTANKNUMBER2 ELSE convert(nvarchar,convert(int,TNK.JXTGTANKNUMBER2)) END AS KINO_TRAINNO") 'デバッグ用
         sqlStat.AppendLine("     , TNK.LOAD") 'デバッグ用
         sqlStat.AppendLine("     , DET.OILCODE")  'デバッグ用
         sqlStat.AppendLine("     , DET.ORDERINGTYPE") 'デバッグ用
@@ -1499,6 +1531,10 @@ Public Class OIT0003OTLinkageList
                 End Using
 
                 sqlCmd.CommandText = sqlMaxReservedNo.ToString
+                Dim maxReservedNo As String = Convert.ToString(sqlCmd.ExecuteScalar)
+                If maxReservedNo = "" Then
+                    maxReservedNo = "000"
+                End If
 
                 Dim sortedDt = From dr As DataRow In wrkDt 'Order By Convert.ToString(dr("AGREEMENTCODE")), Convert.ToString(dr("JROILTYPE"))
                 For Each sortedDr As DataRow In sortedDt
@@ -1507,9 +1543,19 @@ Public Class OIT0003OTLinkageList
                     For Each col As DataColumn In wrkDt.Columns
                         newDr(col.ColumnName) = sortedDr(col.ColumnName)
                     Next
+                    Dim reservedNo As String = Convert.ToString(sortedDr("RESERVEDNO"))
+                    If reservedNo = "" Then
+                        maxReservedNo = (CInt(maxReservedNo) + 1).ToString("000")
+                        reservedNo = maxReservedNo
+                    End If
+
+                    newDr("OUTPUTRESERVENO") = Convert.ToString(newDr("LODDATE_WITHOUT_SLASH")) & reservedNo
 
                     OIT0003Reserved.Rows.Add(newDr)
-                    retVal.Add(New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO"))))
+
+                    Dim orderInf = New OutputOrdedrInfo(Convert.ToString(sortedDr("ORDERNO")), Convert.ToString(sortedDr("DETAILNO")))
+                    orderInf.ReservedNo = reservedNo
+                    retVal.Add(orderInf)
                 Next
             End Using
             Return retVal
@@ -1532,7 +1578,7 @@ Public Class OIT0003OTLinkageList
     ''' <param name="callerButton">呼出し元ボタン</param>
     ''' <param name="sqlCon">SQL接続</param>
     ''' <param name="sqlTran">トランザクション</param>
-    Private Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#) As Boolean
+    Private Function IncrementDetailOutputCount(uploadOrderInfo As List(Of OutputOrdedrInfo), callerButton As String, sqlCon As SqlConnection, sqlTran As SqlTransaction, Optional procDate As Date = #1900/1/1#, Optional updateReservedNo As Boolean = False) As Boolean
         Try
 
             Dim sqlStat As StringBuilder
@@ -1559,6 +1605,9 @@ Public Class OIT0003OTLinkageList
             sqlStat = New StringBuilder
             sqlStat.AppendLine("UPDATE OIL.OIT0003_DETAIL")
             sqlStat.AppendFormat("   SET {0} = ISNULL({0},0) + 1", incFieldName).AppendLine()
+            If updateReservedNo Then
+                sqlStat.AppendLine("       ,RESERVEDNO         = @RESERVEDNO")
+            End If
             sqlStat.AppendLine("       ,UPDYMD             = @UPDYMD")
             sqlStat.AppendLine("       ,UPDUSER            = @UPDUSER")
             sqlStat.AppendLine("       ,UPDTERMID          = @UPDTERMID")
@@ -1571,6 +1620,7 @@ Public Class OIT0003OTLinkageList
                 Using sqlCmd As New SqlCommand(sqlStat.ToString, sqlCon, sqlTran)
                     With sqlCmd.Parameters
                         '値
+                        .Add("RESERVEDNO", SqlDbType.NVarChar).Value = orderKey.ReservedNo
                         .Add("@UPDYMD", SqlDbType.DateTime).Value = procDate
                         .Add("@UPDUSER", SqlDbType.NVarChar).Value = Master.USERID
                         .Add("@UPDTERMID", SqlDbType.NVarChar).Value = Master.USERTERMID
@@ -2156,6 +2206,8 @@ Public Class OIT0003OTLinkageList
                 outFieldList.Add("CONSIGNEECONVVALUE", 0)
                 fileLinkageItem.OutputFiledList = outFieldList
                 fileLinkageItem.OutputReservedConstantField = False
+                fileLinkageItem.OutputReservedFileNameWithoutExtention = ""
+                fileLinkageItem.OutputReservedFileExtention = ""
                 .Add(fileLinkageItem.OfficeCode, fileLinkageItem)
                 '***************************
                 '袖ヶ浦営業所
@@ -2279,6 +2331,8 @@ Public Class OIT0003OTLinkageList
         ''' </summary>
         ''' <returns></returns>
         Public Property OutputReservedConstantField As Boolean = False
+        Public Property OutputReservedFileNameWithoutExtention As String
+        Public Property OutputReservedFileExtention As String
     End Class
     ''' <summary>
     ''' 出力したオーダーのキー情報を保持する為のクラス

@@ -311,6 +311,37 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "基地"
+    ''' <summary>
+    ''' ENEOS仙台
+    ''' </summary>
+    Public Const CONST_PLANTCODE_0401 As String = "0401"
+    ''' <summary>
+    ''' コスモ千葉
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1201 As String = "1201"
+    ''' <summary>
+    ''' ENEOS千葉
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1202 As String = "1202"
+    ''' <summary>
+    ''' 富士袖ヶ浦
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1203 As String = "1203"
+    ''' <summary>
+    ''' ENEOS根岸
+    ''' </summary>
+    Public Const CONST_PLANTCODE_1401 As String = "1401"
+    ''' <summary>
+    ''' コスモ四日市
+    ''' </summary>
+    Public Const CONST_PLANTCODE_2401 As String = "2401"
+    ''' <summary>
+    ''' 出光昭和四日市
+    ''' </summary>
+    Public Const CONST_PLANTCODE_2402 As String = "2402"
+#End Region
+
 #Region "荷受人"
     ''' <summary>
     ''' JXTG北信油槽所

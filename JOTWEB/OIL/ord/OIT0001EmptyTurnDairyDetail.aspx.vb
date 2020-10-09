@@ -1058,12 +1058,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                         prmData = work.CreateUORGParam(work.WF_SEL_CAMPCODE.Text)
                     End If
 
-                    '########################################
                     '受注営業所
                     If WF_FIELD.Value = "TxtOrderOffice" Then
                         prmData = work.CreateSALESOFFICEParam(Master.USER_ORG, TxtOrderOffice.Text)
                     End If
-                    '########################################
 
                     '本線列車
                     If WF_FIELD.Value = "TxtHeadOfficeTrain" Then
@@ -1391,7 +1389,6 @@ Public Class OIT0001EmptyTurnDairyDetail
                 TxtOrderOffice.Focus()
 
             Case "TxtHeadOfficeTrain"   '本線列車
-                '                TxtHeadOfficeTrain.Text = WW_SelectValue.Substring(0, 4)
 
                 If leftview.WF_LeftListBox.SelectedIndex >= 0 Then
                     Dim selectedText = Me.Request.Form("commonLeftListSelectedText")
@@ -1429,7 +1426,6 @@ Public Class OIT0001EmptyTurnDairyDetail
                 End If
 
                 WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER_FIND", WW_SelectText, WW_GetValue)
-                'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TRAINNUMBER", WW_SelectValue, WW_GetValue)
 
                 '積置可否フラグ
                 '(積置列車:T, 非積置列車：N)
@@ -1677,81 +1673,6 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     'タンク車№に紐づく情報を取得・設定
                     WW_TANKNUMBER_FIND(updHeader)
-
-                    ''WW_FixvalueMasterSearch("", "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-                    'WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_TANKNUMBER, WW_GetValue)
-
-                    ''(一覧)前回油種
-                    'Dim WW_LASTOILNAME As String = ""
-                    'updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                    'updHeader.Item("LASTOILNAME") = WW_GetValue(4)
-                    'updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
-                    'updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
-
-                    ''CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                    ''updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
-
-                    ''WW_GetValue = {"", "", "", "", "", "", "", ""}
-                    ''WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", updHeader.Item("LASTOILCODE"), WW_GetValue)
-                    ''updHeader.Item("LASTOILNAME") = WW_GetValue(0)
-
-                    ''(一覧)交検日
-                    'Dim WW_JRINSPECTIONCNT As String
-                    'updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                    'If WW_GetValue(2) <> "" Then
-                    '    WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2))).ToString
-
-                    '    Dim WW_JRINSPECTIONFLG As String
-                    '    If CInt(WW_JRINSPECTIONCNT) <= 3 Then
-                    '        WW_JRINSPECTIONFLG = "1"
-                    '    ElseIf CInt(WW_JRINSPECTIONCNT) >= 4 AndAlso CInt(WW_JRINSPECTIONCNT) <= 6 Then
-                    '        WW_JRINSPECTIONFLG = "2"
-                    '    Else
-                    '        WW_JRINSPECTIONFLG = "3"
-                    '    End If
-                    '    Select Case WW_JRINSPECTIONFLG
-                    '        Case "1"
-                    '            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                    '            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                    '        Case "2"
-                    '            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                    '            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                    '        Case "3"
-                    '            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                    '            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                    '    End Select
-                    'Else
-                    '    updHeader.Item("JRINSPECTIONALERT") = ""
-                    'End If
-
-                    ''(一覧)全検日
-                    'Dim WW_JRALLINSPECTIONCNT As String
-                    'updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                    'If WW_GetValue(3) <> "" Then
-                    '    WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3))).ToString
-
-                    '    Dim WW_JRALLINSPECTIONFLG As String
-                    '    If CInt(WW_JRALLINSPECTIONCNT) <= 3 Then
-                    '        WW_JRALLINSPECTIONFLG = "1"
-                    '    ElseIf CInt(WW_JRALLINSPECTIONCNT) >= 4 AndAlso CInt(WW_JRALLINSPECTIONCNT) <= 6 Then
-                    '        WW_JRALLINSPECTIONFLG = "2"
-                    '    Else
-                    '        WW_JRALLINSPECTIONFLG = "3"
-                    '    End If
-                    '    Select Case WW_JRALLINSPECTIONFLG
-                    '        Case "1"
-                    '            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                    '            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                    '        Case "2"
-                    '            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                    '            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                    '        Case "3"
-                    '            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                    '            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                    '    End Select
-                    'Else
-                    '    updHeader.Item("JRALLINSPECTIONALERT") = ""
-                    'End If
 
                     '### 20200925 START((全体)No152対応) #####################################
                     '(一覧)交検日
@@ -3240,87 +3161,6 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                 'タンク車№に紐づく情報を取得・設定
                 WW_TANKNUMBER_FIND(updHeader, I_CMPCD:=work.WF_SEL_CAMPCODE.Text)
-
-                ''### 2020/06/17 START #####################################################################################
-                ''    タンク車Noを手入力した場合はすべてのタンク車Noの情報を取得したいため、会社コードにて取得するように変更
-                ''WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                'WW_FixvalueMasterSearch(work.WF_SEL_CAMPCODE.Text, "TANKNUMBER", WW_ListValue, WW_GetValue)
-                ''### 2020/06/17 END   #####################################################################################
-
-                ''前回油種
-                'Dim WW_LASTOILNAME As String = ""
-                'updHeader.Item("LASTOILCODE") = WW_GetValue(1)
-                'updHeader.Item("LASTOILNAME") = WW_GetValue(4)
-                'updHeader.Item("PREORDERINGTYPE") = WW_GetValue(5)
-                'updHeader.Item("PREORDERINGOILNAME") = WW_GetValue(6)
-                ''CODENAME_get("PRODUCTPATTERN", WW_GetValue(1), WW_LASTOILNAME, WW_DUMMY)
-                ''updHeader.Item("LASTOILNAME") = WW_LASTOILNAME
-
-                ''WW_GetValue = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
-                ''WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN", WW_GetValue(1), WW_GetValue)
-                ''WW_FixvalueMasterSearch(work.WF_SEL_SALESOFFICECODE.Text, "PRODUCTPATTERN_SEG", WW_GetValue(1) + WW_GetValue(4), WW_GetValue)
-                ''updHeader.Item("LASTOILNAME") = WW_GetValue(0)
-
-                ''交検日
-                'Dim WW_Now As String = Now.ToString("yyyy/MM/dd")
-                'Dim WW_JRINSPECTIONCNT As String
-                'updHeader.Item("JRINSPECTIONDATE") = WW_GetValue(2)
-                'If WW_GetValue(2) <> "" Then
-                '    WW_JRINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(2))).ToString
-
-                '    Dim WW_JRINSPECTIONFLG As String
-                '    If CInt(WW_JRINSPECTIONCNT) <= 3 Then
-                '        WW_JRINSPECTIONFLG = "1"
-                '    ElseIf CInt(WW_JRINSPECTIONCNT) >= 4 AndAlso CInt(WW_JRINSPECTIONCNT) <= 6 Then
-                '        WW_JRINSPECTIONFLG = "2"
-                '    Else
-                '        WW_JRINSPECTIONFLG = "3"
-                '    End If
-                '    Select Case WW_JRINSPECTIONFLG
-                '        Case "1"
-                '            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                '            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                '        Case "2"
-                '            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                '            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                '        Case "3"
-                '            updHeader.Item("JRINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                '            updHeader.Item("JRINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                '    End Select
-                'Else
-                '    updHeader.Item("JRINSPECTIONALERT") = ""
-                '    updHeader.Item("JRINSPECTIONALERTSTR") = ""
-                'End If
-
-                ''全検日
-                'Dim WW_JRALLINSPECTIONCNT As String
-                'updHeader.Item("JRALLINSPECTIONDATE") = WW_GetValue(3)
-                'If WW_GetValue(3) <> "" Then
-                '    WW_JRALLINSPECTIONCNT = DateDiff(DateInterval.Day, Date.Parse(WW_Now), Date.Parse(WW_GetValue(3))).ToString
-
-                '    Dim WW_JRALLINSPECTIONFLG As String
-                '    If CInt(WW_JRALLINSPECTIONCNT) <= 3 Then
-                '        WW_JRALLINSPECTIONFLG = "1"
-                '    ElseIf CInt(WW_JRALLINSPECTIONCNT) >= 4 AndAlso CInt(WW_JRALLINSPECTIONCNT) <= 6 Then
-                '        WW_JRALLINSPECTIONFLG = "2"
-                '    Else
-                '        WW_JRALLINSPECTIONFLG = "3"
-                '    End If
-                '    Select Case WW_JRALLINSPECTIONFLG
-                '        Case "1"
-                '            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_CAUTION.Replace("'", "")
-                '            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_RED
-                '        Case "2"
-                '            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_WARNING.Replace("'", "")
-                '            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_YELLOW
-                '        Case "3"
-                '            updHeader.Item("JRALLINSPECTIONALERT") = CONST_ALERT_STATUS_SAFE.Replace("'", "")
-                '            updHeader.Item("JRALLINSPECTIONALERTSTR") = C_INSPECTIONALERT.ALERT_GREEN
-                '    End Select
-                'Else
-                '    updHeader.Item("JRALLINSPECTIONALERT") = ""
-                '    updHeader.Item("JRALLINSPECTIONALERTSTR") = ""
-                'End If
 
                 '(★サーバー側で設定しているため必要ないが念のため残す(20200302))
             Case "RETURNDATETRAIN"   '(一覧)返送日列車
@@ -5842,11 +5682,6 @@ Public Class OIT0001EmptyTurnDairyDetail
             & "        , @P19, @P20, @P21, @P22) ;" _
             & " CLOSE hensuu ;" _
             & " DEALLOCATE hensuu ;"
-
-        '& "   AND  TANKNO   = @P03" _
-        '& "   AND  KAMOKU   = @P04" _
-        '& "        AND TANKNO       = @P03" _
-        '& "        AND KAMOKU       = @P04" _
 
         '○ 更新ジャーナル出力
         Dim SQLJnl As String =

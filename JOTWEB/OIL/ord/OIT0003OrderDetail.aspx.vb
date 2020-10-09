@@ -1474,8 +1474,8 @@ Public Class OIT0003OrderDetail
         & " INNER JOIN OIL.VIW0012_SALES_41010101_10101 VIW0012 ON " _
         & SQLFromStr2 _
         & "       And VIW0012.SENDAI_MORIOKA_FLAG =" _
-        & "           Case WHEN OIT0002.BASECODE = '0401' AND OIT0002.CONSIGNEECODE = '51' THEN" _
-        & "                Case WHEN OIT0003.OILCODE = '1001' OR OIT0003.OILCODE = '1101' THEN '1' ELSE '2' END" _
+        & "           Case WHEN OIT0002.BASECODE = '" & BaseDllConst.CONST_PLANTCODE_0401 & "' AND OIT0002.CONSIGNEECODE = '" & BaseDllConst.CONST_CONSIGNEECODE_51 & "' THEN" _
+        & "                Case WHEN OIT0003.OILCODE = '" & BaseDllConst.CONST_HTank & "' OR OIT0003.OILCODE = '" & BaseDllConst.CONST_RTank & "' THEN '1' ELSE '2' END" _
         & "           Else '0' END" _
         & " WHERE OIT0002.ORDERNO = @P01 " _
         & " AND OIT0002.DELFLG <> @P02 "
@@ -1509,7 +1509,7 @@ Public Class OIT0003OrderDetail
         & " INNER JOIN OIL.VIW0012_SALES_41010101_10102_1 VIW0012 ON " _
         & SQLFromStr2 _
         & "       And VIW0012.SENDAI_MORIOKA_FLAG =" _
-        & "           Case WHEN OIT0003.OILCODE = '1001' OR OIT0003.OILCODE = '1101' THEN '1' ELSE '2' END" _
+        & "           Case WHEN OIT0003.OILCODE = '" & BaseDllConst.CONST_HTank & "' OR OIT0003.OILCODE = '" & BaseDllConst.CONST_RTank & "' THEN '1' ELSE '2' END" _
         & " WHERE OIT0002.ORDERNO = @P01 " _
         & " AND OIT0002.DELFLG <> @P02 "
 
@@ -3087,6 +3087,8 @@ Public Class OIT0003OrderDetail
                 End Using
 
                 Dim i As Integer = 0
+                Dim dclApplyChargeSUM As Decimal = 0
+                Dim dclConsumptionTAX As Decimal = 0
                 For Each OIT0003tab4row As DataRow In OIT0003tbl_tab4.Rows
 
                     If OIT0003tab4row("LINECNT").ToString() <> "0" Then
@@ -3095,6 +3097,18 @@ Public Class OIT0003OrderDetail
                         i += 1
                         OIT0003tab4row("LINECNT") = i   'LINECNT
                     End If
+
+                    '金額
+                    dclApplyChargeSUM = Decimal.Parse(OIT0003tab4row("APPLYCHARGESUM").ToString().Replace("￥", ""))
+                    OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Truncate(dclApplyChargeSUM))  '切り捨て
+                    'OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Ceiling(dclApplyChargeSUM))   '切り上げ
+                    'OIT0003tab4row("APPLYCHARGESUM") = String.Format("￥{0:#,0}", Math.Round(dclApplyChargeSUM))     '四捨五入
+                    '消費税
+                    dclConsumptionTAX = Decimal.Parse(OIT0003tab4row("CONSUMPTIONTAX").ToString().Replace("￥", ""))
+                    OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Truncate(dclConsumptionTAX))  '切り捨て
+                    'OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Ceiling(dclConsumptionTAX))   '切り上げ
+                    'OIT0003tab4row("CONSUMPTIONTAX") = String.Format("￥{0:#,0}", Math.Round(dclConsumptionTAX))     '四捨五入
+
                 Next
 
             End Using

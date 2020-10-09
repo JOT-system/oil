@@ -103,12 +103,6 @@ function ChangeCheckBox() {
     // 積置フラグ
     var chkObjsLight1 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaSTACKINGFLG']");
     var spnObjsLight1 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaSTACKINGFLG']");
-    // 交検可否フラグ
-    var chkObjsLight2 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINSPECTIONFLG']");
-    var spnObjsLight2 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINSPECTIONFLG']");
-    // 留置可否フラグ
-    var chkObjsLight3 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaDETENTIONFLG']");
-    var spnObjsLight3 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaDETENTIONFLG']");
 
     for (let i = 0; i < chkObjsLight1.length; i++) {
 
@@ -120,6 +114,17 @@ function ChangeCheckBox() {
             }
         }
     }
+
+    //### 20201009 START 指摘票No165対応 ############################################################
+    // 未卸可否フラグ
+    var chkObjsLight2 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaWHOLESALEFLG']");
+    var spnObjsLight2 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaWHOLESALEFLG']");
+    // 交検可否フラグ
+    var chkObjsLight3 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaINSPECTIONFLG']");
+    var spnObjsLight3 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaINSPECTIONFLG']");
+    // 留置可否フラグ
+    var chkObjsLight4 = objLightTable.querySelectorAll("input[id^='chkpnlListAreaDETENTIONFLG']");
+    var spnObjsLight4 = objLightTable.querySelectorAll("span[id^='hchkpnlListAreaDETENTIONFLG']");
 
     for (let i = 0; i < chkObjsLight2.length; i++) {
 
@@ -143,6 +148,18 @@ function ChangeCheckBox() {
         }
     }
 
+    for (let i = 0; i < chkObjsLight4.length; i++) {
+
+        if (chkObjsLight4[i] !== null) {
+            if (spnObjsLight4[i].innerText === "on") {
+                chkObjsLight4[i].checked = true;
+            } else {
+                chkObjsLight4[i].checked = false;
+            }
+        }
+    }
+    //### 20201009 END   指摘票No165対応 ############################################################
+
 }
 
 
@@ -155,12 +172,17 @@ function SelectCheckBox(obj, lineCnt, fieldName) {
         if (fieldName === 'STACKINGFLG') {
             surfix = 'STACKING'
         }
+        //### 20201009 START 指摘票No165対応 ############################################################
+        if (fieldName === 'WHOLESALEFLG') {
+            surfix = 'WHOLESALE'
+        }
         if (fieldName === 'INSPECTIONFLG') {
             surfix = 'INSPECTION'
         }
         if (fieldName === 'DETENTIONFLG') {
             surfix = 'DETENTION'
         }
+        //### 20201009 END   指摘票No165対応 ############################################################
 
         document.getElementById("WF_SelectedIndex").value = lineCnt;
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT" + surfix;

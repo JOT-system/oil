@@ -3548,6 +3548,7 @@ Public Class OIT0003OrderList
             & " AND OIT0002.TRAINNO = VIW0013.TRAINNO " _
             & " AND OIT0002.OFFICECODE = @P01 " _
             & " AND OIT0002.DELFLG <> @P02 " _
+            & " AND OIT0002.ORDERSTATUS <> @P04 " _
             & " LEFT JOIN OIL.OIT0003_DETAIL OIT0003 ON " _
             & "     OIT0003.ORDERNO = OIT0002.ORDERNO " _
             & " AND OIT0003.DELFLG <> @P02 " _
@@ -3660,6 +3661,7 @@ Public Class OIT0003OrderList
                 Dim PARA01 As SqlParameter = SQLcmd.Parameters.Add("@P01", SqlDbType.NVarChar, 20) '受注営業所コード
                 Dim PARA02 As SqlParameter = SQLcmd.Parameters.Add("@P02", SqlDbType.NVarChar, 1)  '削除フラグ
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.Date)         '積込日
+                Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar)     '受注進行ステータス
                 PARA01.Value = BaseDllConst.CONST_OFFICECODE_011402
                 PARA02.Value = C_DELETE_FLG.DELETE
                 If Not String.IsNullOrEmpty(lodDate) Then
@@ -3667,6 +3669,7 @@ Public Class OIT0003OrderList
                 Else
                     PARA03.Value = Format(Now.AddDays(1), "yyyy/MM/dd")
                 End If
+                PARA04.Value = BaseDllConst.CONST_ORDERSTATUS_900
 
                 Using SQLdr As SqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得

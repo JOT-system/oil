@@ -78,6 +78,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                             WF_FIELD_DBClick()
                         Case "WF_CheckBoxSELECT",
                              "WF_CheckBoxSELECTSTACKING",
+                             "WF_CheckBoxSELECTWHOLESALE",
                              "WF_CheckBoxSELECTINSPECTION",
                              "WF_CheckBoxSELECTDETENTION"    'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click(WF_ButtonClick.Value)
@@ -1174,6 +1175,18 @@ Public Class OIT0001EmptyTurnDairyDetail
 
                     End If
                 Next
+            '### 20201009 START 指摘票No165対応 ############################################################
+            Case "WF_CheckBoxSELECTWHOLESALE"
+                'チェックボックス判定
+                For i As Integer = 0 To OIT0001tbl.Rows.Count - 1
+                    If OIT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                        If OIT0001tbl.Rows(i)("WHOLESALEFLG") = "on" Then
+                            OIT0001tbl.Rows(i)("WHOLESALEFLG") = ""
+                        Else
+                            OIT0001tbl.Rows(i)("WHOLESALEFLG") = "on"
+                        End If
+                    End If
+                Next
 
             Case "WF_CheckBoxSELECTINSPECTION"
                 '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
@@ -1208,6 +1221,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                         End If
                     End If
                 Next
+                '### 20201009 END   指摘票No165対応 ############################################################
 
             Case Else
                 'チェックボックス判定
@@ -5641,13 +5655,14 @@ Public Class OIT0001EmptyTurnDairyDetail
             & " IF (@@FETCH_STATUS = 0)" _
             & "    UPDATE OIL.OIT0003_DETAIL" _
             & "    SET" _
-            & "        TANKNO            = @P03, STACKINGFLG  = @P40, INSPECTIONFLG  = @P46, DETENTIONFLG    = @P47" _
-            & "        , ORDERINFO       = @P34, SHIPPERSCODE = @P23, SHIPPERSNAME   = @P24" _
-            & "        , OILCODE         = @P05, OILNAME      = @P35, ORDERINGTYPE   = @P36, ORDERINGOILNAME = @P37" _
-            & "        , RETURNDATETRAIN = @P07, JOINTCODE    = @P39, JOINT          = @P08, REMARK          = @P38" _
+            & "        TANKNO            = @P03, STACKINGFLG   = @P40" _
+            & "        , WHOLESALEFLG    = @P51, INSPECTIONFLG = @P46, DETENTIONFLG = @P47" _
+            & "        , ORDERINFO       = @P34, SHIPPERSCODE  = @P23, SHIPPERSNAME = @P24" _
+            & "        , OILCODE         = @P05, OILNAME       = @P35, ORDERINGTYPE = @P36, ORDERINGOILNAME = @P37" _
+            & "        , RETURNDATETRAIN = @P07, JOINTCODE     = @P39, JOINT        = @P08, REMARK          = @P38" _
             & "        , ACTUALLODDATE   = @P41" _
-            & "        , UPDYMD          = @P19, UPDUSER      = @P20" _
-            & "        , UPDTERMID       = @P21, RECEIVEYMD   = @P22" _
+            & "        , UPDYMD          = @P19, UPDUSER       = @P20" _
+            & "        , UPDTERMID       = @P21, RECEIVEYMD    = @P22" _
             & "    WHERE" _
             & "        ORDERNO          = @P01" _
             & "        AND DETAILNO     = @P02" _
@@ -5762,9 +5777,11 @@ Public Class OIT0001EmptyTurnDairyDetail
                 Dim PARA03 As SqlParameter = SQLcmd.Parameters.Add("@P03", SqlDbType.NVarChar, 8)   'タンク車№
                 Dim PARA04 As SqlParameter = SQLcmd.Parameters.Add("@P04", SqlDbType.NVarChar, 7)   '費用科目
                 Dim PARA40 As SqlParameter = SQLcmd.Parameters.Add("@P40", SqlDbType.NVarChar, 1)   '積置可否フラグ
+                '### 20201009 START 指摘票No165対応 ############################################################
                 Dim PARA51 As SqlParameter = SQLcmd.Parameters.Add("@P51", SqlDbType.NVarChar, 1)   '未卸可否フラグ
                 Dim PARA46 As SqlParameter = SQLcmd.Parameters.Add("@P46", SqlDbType.NVarChar, 1)   '交検可否フラグ
                 Dim PARA47 As SqlParameter = SQLcmd.Parameters.Add("@P47", SqlDbType.NVarChar, 1)   '留置可否フラグ
+                '### 20201009 END   指摘票No165対応 ############################################################
                 Dim PARA48 As SqlParameter = SQLcmd.Parameters.Add("@P48", SqlDbType.NVarChar, 1)   '先返し可否フラグ
                 Dim PARA49 As SqlParameter = SQLcmd.Parameters.Add("@P49", SqlDbType.NVarChar, 1)   '後返し可否フラグ
                 Dim PARA50 As SqlParameter = SQLcmd.Parameters.Add("@P50", SqlDbType.NVarChar, 1)   'OT輸送可否フラグ
@@ -5833,8 +5850,13 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Else
                         PARA40.Value = "2"
                     End If
-                    PARA51.Value = "2"                                '未卸可否フラグ
-
+                    '### 20201009 START 指摘票No165対応 ############################################################
+                    '# 未卸可否フラグ(1:未卸あり 2:未卸なし)
+                    If OIT0001row("WHOLESALEFLG") = "on" Then
+                        PARA51.Value = "1"
+                    Else
+                        PARA51.Value = "2"
+                    End If
                     '# 交検可否フラグ(1:交検あり 2:交検なし)
                     If OIT0001row("INSPECTIONFLG") = "on" Then
                         PARA46.Value = "1"
@@ -5847,6 +5869,7 @@ Public Class OIT0001EmptyTurnDairyDetail
                     Else
                         PARA47.Value = "2"
                     End If
+                    '### 20201009 END   指摘票No165対応 ############################################################
 
                     PARA48.Value = "2"                                '先返し可否フラグ
                     PARA49.Value = "2"                                '後返し可否フラグ

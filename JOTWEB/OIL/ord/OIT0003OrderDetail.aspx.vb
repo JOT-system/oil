@@ -4418,6 +4418,10 @@ Public Class OIT0003OrderDetail
                 Next
 
             Case "WF_CheckBoxSELECTINSPECTION"
+                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                    Exit Select
+                End If
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
@@ -4430,6 +4434,10 @@ Public Class OIT0003OrderDetail
                 Next
 
             Case "WF_CheckBoxSELECTDETENTION"
+                '◯ 受注営業所が"010402"(仙台新港営業所)以外の場合
+                If Me.TxtOrderOfficeCode.Text <> BaseDllConst.CONST_OFFICECODE_010402 Then
+                    Exit Select
+                End If
                 'チェックボックス判定
                 For i As Integer = 0 To OIT0003tbl_tab3.Rows.Count - 1
                     If OIT0003tbl_tab3.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
@@ -12141,8 +12149,10 @@ Public Class OIT0003OrderDetail
                                     '■ 選択した日付が未設定,
                                     '   選択した日付が現状の交検日より過去の場合
                                     If leftview.WF_Calendar.Text = "" _
-                                        OrElse updHeader.Item(WF_FIELD.Value) = "" _
-                                        OrElse Date.Compare(Date.Parse(leftview.WF_Calendar.Text), Date.Parse(updHeader.Item(WF_FIELD.Value))) = -1 Then
+                                        OrElse updHeader.Item(WF_FIELD.Value) = "" Then
+                                        '### 20201001 START 交検日が過去でも設定できるようにするため廃止 ################################################
+                                        'OrElse Date.Compare(Date.Parse(leftview.WF_Calendar.Text), Date.Parse(updHeader.Item(WF_FIELD.Value))) = -1 Then
+                                        '### 20201001 END   交検日が過去でも設定できるようにするため廃止 ################################################
                                         Master.Output(C_MESSAGE_NO.OIL_TANKNO_KOUKENBI_PAST_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
                                         '■ 選択した日付が現状の交検日と同日の場合

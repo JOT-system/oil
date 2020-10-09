@@ -1766,8 +1766,10 @@ Public Class OIT0001EmptyTurnDairyDetail
                             '■ 選択した日付が未設定,
                             '   選択した日付が現状の交検日より過去の場合
                             If leftview.WF_Calendar.Text = "" _
-                                OrElse updHeader.Item(WF_FIELD.Value) = "" _
-                                OrElse Date.Compare(Date.Parse(leftview.WF_Calendar.Text), Date.Parse(updHeader.Item(WF_FIELD.Value))) = -1 Then
+                                OrElse updHeader.Item(WF_FIELD.Value) = "" Then
+                                '### 20201001 START 交検日が過去でも設定できるようにするため廃止 ################################################
+                                'OrElse Date.Compare(Date.Parse(leftview.WF_Calendar.Text), Date.Parse(updHeader.Item(WF_FIELD.Value))) = -1 Then
+                                '### 20201001 END   交検日が過去でも設定できるようにするため廃止 ################################################
                                 Master.Output(C_MESSAGE_NO.OIL_TANKNO_KOUKENBI_PAST_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
 
                                 '■ 選択した日付が現状の交検日と同日の場合
